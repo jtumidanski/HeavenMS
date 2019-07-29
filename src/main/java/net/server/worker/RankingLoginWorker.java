@@ -40,7 +40,7 @@ public class RankingLoginWorker implements Runnable {
     private long lastUpdate = System.currentTimeMillis();
     
     private void resetMoveRank(boolean job) throws SQLException {
-        String query = "UPDATE characters SET " + (job == true ? "jobRankMove = 0" : "rankMove = 0");
+        String query = "UPDATE characters SET " + (job ? "jobRankMove = 0" : "rankMove = 0");
         PreparedStatement reset = con.prepareStatement(query);
         reset.executeUpdate();
     }
@@ -85,7 +85,7 @@ public class RankingLoginWorker implements Runnable {
             con = DatabaseConnection.getConnection();
             con.setAutoCommit(false);
             
-            if(ServerConstants.USE_REFRESH_RANK_MOVE == true) {
+            if(ServerConstants.USE_REFRESH_RANK_MOVE) {
                 resetMoveRank(true);
                 resetMoveRank(false);
             }

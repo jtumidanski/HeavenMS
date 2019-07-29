@@ -2152,7 +2152,7 @@ public class MaplePacketCreator {
                 boolean yes = false;
                 for (MapleRing ring : rings) {
                         if (ring.equipped()) {
-                                if (yes == false) {
+                                if (!yes) {
                                         yes = true;
                                         mplew.write(1);
                                 }
@@ -2163,7 +2163,7 @@ public class MaplePacketCreator {
                                 mplew.writeInt(ring.getItemId());
                         }
                 }
-                if (yes == false) {
+                if (!yes) {
                         mplew.write(0);
                 }
         }

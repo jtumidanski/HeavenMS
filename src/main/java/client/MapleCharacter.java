@@ -6385,7 +6385,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (level % 20 == 0) {
-         if (ServerConstants.USE_ADD_SLOTS_BY_LEVEL == true) {
+         if (ServerConstants.USE_ADD_SLOTS_BY_LEVEL) {
             if (!isGM()) {
                for (byte i = 1; i < 5; i++) {
                   gainSlots(i, 4, true);
@@ -6394,7 +6394,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                this.yellowMessage("You reached level " + level + ". Congratulations! As a token of your success, your inventory has been expanded a little bit.");
             }
          }
-         if (ServerConstants.USE_ADD_RATES_BY_LEVEL == true) { //For the rate upgrade
+         if (ServerConstants.USE_ADD_RATES_BY_LEVEL) { //For the rate upgrade
             revertLastPlayerRates();
             setPlayerRates();
             this.yellowMessage("You managed to get level " + level + "! Getting experience and items seems a little easier now, huh?");

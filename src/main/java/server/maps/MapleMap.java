@@ -3517,7 +3517,7 @@ public class MapleMap {
             reactor.lockReactor();
             try {
                 if(reactor.getReactorType() == 100) {
-                    if (reactor.getShouldCollect() == true && mapitem != null && mapitem == getMapObject(mapitem.getObjectId())) {
+                    if (reactor.getShouldCollect() && mapitem != null && mapitem == getMapObject(mapitem.getObjectId())) {
                         mapitem.lockItem();
                         try {
                             if (mapitem.isPickedUp()) {

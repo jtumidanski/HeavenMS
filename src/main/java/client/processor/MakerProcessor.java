@@ -371,7 +371,7 @@ public class MakerProcessor {
         Equip eqp = (Equip)item;
         if(ItemConstants.isAccessory(item.getItemId()) && eqp.getUpgradeSlots() <= 0) eqp.setUpgradeSlots(3);
 
-        if(ServerConstants.USE_ENHANCED_CRAFTING == true) {
+        if(ServerConstants.USE_ENHANCED_CRAFTING) {
             if(!(c.getPlayer().isGM() && ServerConstants.USE_PERFECT_GM_SCROLL)) {
                 eqp.setUpgradeSlots((byte)(eqp.getUpgradeSlots() + 1));
             }

@@ -84,7 +84,7 @@ public enum AutobanFactory {
 	}
 	
 	public void alert(MapleCharacter chr, String reason) {
-            if(ServerConstants.USE_AUTOBAN == true) {
+            if(ServerConstants.USE_AUTOBAN) {
 		if (chr != null && MapleLogger.ignored.contains(chr.getId())){
 			return;
 		}
@@ -96,7 +96,7 @@ public enum AutobanFactory {
 	}
 	
 	public void autoban(MapleCharacter chr, String value) {
-            if(ServerConstants.USE_AUTOBAN == true) {
+            if(ServerConstants.USE_AUTOBAN) {
 		chr.autoban("Autobanned for (" + this.name() + ": " + value + ")");
 		//chr.sendPolice("You will be disconnected for (" + this.name() + ": " + value + ")");
             }

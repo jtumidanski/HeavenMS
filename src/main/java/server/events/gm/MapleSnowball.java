@@ -53,7 +53,7 @@ public class MapleSnowball {
     }
 
     public void startEvent() {
-        if (hittable == true) return;
+        if (hittable) return;
 
         for (MapleCharacter chr : characters) {
             if (chr != null) {
@@ -153,7 +153,7 @@ public class MapleSnowball {
 
             @Override
             public void run() {
-                if (winner == true)
+                if (winner)
                     map.warpOutByTeam(team, 109050000);
                 else
                     map.warpOutByTeam(team, 109050001);
