@@ -56,9 +56,7 @@ public class WZTool {
       SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
       try {
          cipher = Cipher.getInstance("AES");
-      } catch (NoSuchAlgorithmException e) {
-         e.printStackTrace();
-      } catch (NoSuchPaddingException e) {
+      } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
          e.printStackTrace();
       }
       try {
@@ -70,18 +68,14 @@ public class WZTool {
       for (int i = 0; i < (0xFFFF / 16); i++) {
          try {
             iv = cipher.doFinal(iv);
-         } catch (IllegalBlockSizeException e) {
-            e.printStackTrace();
-         } catch (BadPaddingException e) {
+         } catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
          }
          System.arraycopy(iv, 0, encKey, (i * 16), 16);
       }
       try {
          iv = cipher.doFinal(iv);
-      } catch (IllegalBlockSizeException e) {
-         e.printStackTrace();
-      } catch (BadPaddingException e) {
+      } catch (IllegalBlockSizeException | BadPaddingException e) {
          e.printStackTrace();
       }
       System.arraycopy(iv, 0, encKey, 65520, 15);

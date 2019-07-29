@@ -91,10 +91,8 @@ public class MapScriptManager {
          final Invocable script = ((Invocable) se);
          scripts.put(scriptName, script);
          script.invokeFunction("start", new MapScriptMethods(c));
-      } catch (final UndeclaredThrowableException | ScriptException ute) {
+      } catch (final Exception ute) {
          FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", ute);
-      } catch (final Exception e) {
-         FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", e);
       } finally {
          if (fr != null) {
             try {

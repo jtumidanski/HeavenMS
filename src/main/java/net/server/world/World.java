@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.SortedMap;
@@ -1956,11 +1957,7 @@ public class World {
 
    public int unregisterFisherPlayer(MapleCharacter chr) {
       Integer baitLevel = fishingAttempters.remove(chr);
-      if (baitLevel != null) {
-         return baitLevel;
-      } else {
-         return 0;
-      }
+      return Objects.requireNonNullElse(baitLevel, 0);
    }
 
    public void runCheckFishingSchedule() {

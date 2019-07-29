@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import server.life.MapleLifeFactory.BanishInfo;
 import server.life.MapleLifeFactory.loseItem;
@@ -164,11 +165,7 @@ public class MapleMonsterStats {
 
    public ElementalEffectiveness getEffectiveness(Element e) {
       ElementalEffectiveness elementalEffectiveness = resistance.get(e);
-      if (elementalEffectiveness == null) {
-         return ElementalEffectiveness.NORMAL;
-      } else {
-         return elementalEffectiveness;
-      }
+      return Objects.requireNonNullElse(elementalEffectiveness, ElementalEffectiveness.NORMAL);
    }
 
    public String getName() {
@@ -376,9 +373,7 @@ public class MapleMonsterStats {
                Object value = fieldFrom.get(from);
                to.getClass().getDeclaredField(field.getName()).set(to, value);
 
-            } catch (IllegalAccessException e) {
-               e.printStackTrace();
-            } catch (NoSuchFieldException e) {
+            } catch (IllegalAccessException | NoSuchFieldException e) {
                e.printStackTrace();
             }
          }

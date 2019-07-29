@@ -106,11 +106,8 @@ public class NPCScriptManager extends AbstractScriptManager {
             }
          }
 
-      } catch (final UndeclaredThrowableException ute) {
+      } catch (final Exception ute) {
          FilePrinter.printError(FilePrinter.NPC + npc + ".txt", ute);
-         dispose(c);
-      } catch (final Exception e) {
-         FilePrinter.printError(FilePrinter.NPC + npc + ".txt", e);
          dispose(c);
       }
    }
@@ -157,13 +154,8 @@ public class NPCScriptManager extends AbstractScriptManager {
             c.announce(MaplePacketCreator.enableActions());
          }
          return true;
-      } catch (final UndeclaredThrowableException | ScriptException ute) {
+      } catch (final Exception ute) {
          FilePrinter.printError(FilePrinter.NPC + npc + ".txt", ute);
-         dispose(c);
-
-         return false;
-      } catch (final Exception e) {
-         FilePrinter.printError(FilePrinter.NPC + npc + ".txt", e);
          dispose(c);
 
          return false;

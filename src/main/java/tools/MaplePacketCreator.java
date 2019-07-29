@@ -33,6 +33,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -5899,11 +5900,7 @@ public class MaplePacketCreator {
       }
       mplew.write(0xFF);
       Integer cWeapon = equip.get((byte) -111);
-      if (cWeapon != null) {
-         mplew.writeInt(cWeapon);
-      } else {
-         mplew.writeInt(0);
-      }
+      mplew.writeInt(Objects.requireNonNullElse(cWeapon, 0));
       for (int i = 0; i < 3; i++) {
          mplew.writeInt(0);
       }
@@ -7396,11 +7393,7 @@ public class MaplePacketCreator {
    }
 
    private static String getRightPaddedStr(String in, char padchar, int length) {
-      StringBuilder builder = new StringBuilder(in);
-      for (int x = in.length(); x < length; x++) {
-         builder.append(padchar);
-      }
-      return builder.toString();
+      return in + String.valueOf(padchar).repeat(Math.max(0, length - in.length()));
    }
 
    public static byte[] MobDamageMobFriendly(MapleMonster mob, int damage, int remainingHp) {

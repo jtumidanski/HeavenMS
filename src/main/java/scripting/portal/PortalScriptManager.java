@@ -95,10 +95,8 @@ public class PortalScriptManager {
          if (script != null) {
             return script.enter(new PortalPlayerInteraction(c, portal));
          }
-      } catch (UndeclaredThrowableException ute) {
+      } catch (Exception ute) {
          FilePrinter.printError(FilePrinter.PORTAL + portal.getScriptName() + ".txt", ute);
-      } catch (final Exception e) {
-         FilePrinter.printError(FilePrinter.PORTAL + portal.getScriptName() + ".txt", e);
       }
       return false;
    }

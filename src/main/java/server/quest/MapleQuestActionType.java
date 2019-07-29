@@ -33,40 +33,41 @@ public enum MapleQuestActionType {
    }
 
    public static MapleQuestActionType getByWZName(String name) {
-      if (name.equals("exp")) {
-         return EXP;
-      } else if (name.equals("money")) {
-         return MESO;
-      } else if (name.equals("item")) {
-         return ITEM;
-      } else if (name.equals("skill")) {
-         return SKILL;
-      } else if (name.equals("nextQuest")) {
-         return NEXTQUEST;
-      } else if (name.equals("pop")) {
-         return FAME;
-      } else if (name.equals("buffItemID")) {
-         return BUFF;
-      } else if (name.equals("petskill")) {
-         return PETSKILL;
-      } else if (name.equals("no")) {
-         return NO;
-      } else if (name.equals("yes")) {
-         return YES;
-      } else if (name.equals("npc")) {
-         return NPC;
-      } else if (name.equals("lvmin")) {
-         return MIN_LEVEL;
-      } else if (name.equals("normalAutoStart")) {
-         return NORMAL_AUTO_START;
-      } else if (name.equals("pettameness")) {
-         return PETTAMENESS;
-      } else if (name.equals("petspeed")) {
-         return PETSPEED;
-      } else if (name.equals("0")) {
-         return ZERO;
-      } else {
-         return UNDEFINED;
+      switch (name) {
+         case "exp":
+            return EXP;
+         case "money":
+            return MESO;
+         case "item":
+            return ITEM;
+         case "skill":
+            return SKILL;
+         case "nextQuest":
+            return NEXTQUEST;
+         case "pop":
+            return FAME;
+         case "buffItemID":
+            return BUFF;
+         case "petskill":
+            return PETSKILL;
+         case "no":
+            return NO;
+         case "yes":
+            return YES;
+         case "npc":
+            return NPC;
+         case "lvmin":
+            return MIN_LEVEL;
+         case "normalAutoStart":
+            return NORMAL_AUTO_START;
+         case "pettameness":
+            return PETTAMENESS;
+         case "petspeed":
+            return PETSPEED;
+         case "0":
+            return ZERO;
+         default:
+            return UNDEFINED;
       }
    }
 }

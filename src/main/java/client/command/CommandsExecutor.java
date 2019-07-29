@@ -334,9 +334,7 @@ public class CommandsExecutor {
          commandInstance.setRank(rank);
 
          registeredCommands.put(commandName, commandInstance);
-      } catch (InstantiationException e) {
-         e.printStackTrace();
-      } catch (IllegalAccessException e) {
+      } catch (InstantiationException | IllegalAccessException e) {
          e.printStackTrace();
       }
    }

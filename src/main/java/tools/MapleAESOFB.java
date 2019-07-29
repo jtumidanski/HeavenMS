@@ -57,9 +57,7 @@ public class MapleAESOFB {
       try {
          cipher = Cipher.getInstance("AES");
          cipher.init(Cipher.ENCRYPT_MODE, skey);
-      } catch (NoSuchAlgorithmException e) {
-         System.out.println("ERROR " + e);
-      } catch (NoSuchPaddingException e) {
+      } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
          System.out.println("ERROR " + e);
       } catch (InvalidKeyException e) {
          System.out.println("Error initializing the encryption cipher.  Make sure you're using the Unlimited Strength cryptography jar files.");
@@ -142,9 +140,7 @@ public class MapleAESOFB {
                try {
                   byte[] newIv = cipher.doFinal(myIv);
                   System.arraycopy(newIv, 0, myIv, 0, myIv.length);
-               } catch (IllegalBlockSizeException e) {
-                  e.printStackTrace();
-               } catch (BadPaddingException e) {
+               } catch (IllegalBlockSizeException | BadPaddingException e) {
                   e.printStackTrace();
                }
             }
