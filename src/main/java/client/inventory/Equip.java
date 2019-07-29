@@ -638,12 +638,12 @@ public class Equip extends Item {
       this.itemLevel = level;
    }
 
-   public static enum ScrollResult {
+   public enum ScrollResult {
 
       FAIL(0), SUCCESS(1), CURSE(2);
       private int value = -1;
 
-      private ScrollResult(int value) {
+      ScrollResult(int value) {
          this.value = value;
       }
 
@@ -652,7 +652,7 @@ public class Equip extends Item {
       }
    }
 
-   public static enum StatUpgrade {
+   public enum StatUpgrade {
 
       incDEX(0), incSTR(1), incINT(2), incLUK(3),
       incMHP(4), incMMP(5), incPAD(6), incMAD(7),
@@ -660,7 +660,7 @@ public class Equip extends Item {
       incSpeed(12), incJump(13), incVicious(14), incSlot(15);
       private int value = -1;
 
-      private StatUpgrade(int value) {
+      StatUpgrade(int value) {
          this.value = value;
       }
    }

@@ -789,7 +789,7 @@ public final class PlayerInteractionHandler extends AbstractMaplePacketHandler {
       SELECT_CARD(0x44);
       final byte code;
 
-      private Action(int code) {
+      Action(int code) {
          this.code = (byte) code;
       }
 

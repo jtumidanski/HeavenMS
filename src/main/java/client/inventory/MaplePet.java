@@ -383,7 +383,7 @@ public class MaplePet extends Item {
 
       private int i;
 
-      private PetFlag(int i) {
+      PetFlag(int i) {
          this.i = i;
       }
 

@@ -61,6 +61,7 @@ public class MapleSessionCoordinator {
    private final ConcurrentHashMap<String, String> cachedHostHwids = new ConcurrentHashMap<>();
    private final ConcurrentHashMap<String, Long> cachedHostTimeout = new ConcurrentHashMap<>();
    private final List<ReentrantLock> poolLock = new ArrayList<>(100);
+
    private MapleSessionCoordinator() {
       for (int i = 0; i < 100; i++) {
          poolLock.add(MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_LOGIN_COORD));
@@ -513,7 +514,11 @@ public class MapleSessionCoordinator {
       }
 
       if (immediately != null) {
-         session.close(immediately);
+         if (immediately) {
+            session.closeNow();
+         } else {
+            session.closeOnFlush();
+         }
       }
 
       // session.removeAttribute(MapleClient.CLIENT_REMOTE_ADDRESS); No real need for removing String property on closed sessions

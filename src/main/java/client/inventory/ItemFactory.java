@@ -60,7 +60,7 @@ public enum ItemFactory {
    private final int value;
    private final boolean account;
 
-   private ItemFactory(int value, boolean account) {
+   ItemFactory(int value, boolean account) {
       this.value = value;
       this.account = account;
    }

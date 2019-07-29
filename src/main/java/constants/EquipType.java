@@ -72,7 +72,7 @@ public enum EquipType {
 
    private final int i;
 
-   private EquipType(int val) {
+   EquipType(int val) {
       this.i = val;
    }
 

@@ -107,7 +107,7 @@ public class MapleInviteCoordinator {
       final ConcurrentHashMap<Integer, MapleCharacter> inviteFrom;
       final ConcurrentHashMap<Integer, Integer> inviteTimeouts;
 
-      private InviteType() {
+      InviteType() {
          invites = new ConcurrentHashMap<>();
          inviteTimeouts = new ConcurrentHashMap<>();
          inviteFrom = new ConcurrentHashMap<>();

@@ -83,7 +83,7 @@ public class LanguageConstants {
 
       int lang;
 
-      private Language(int lang) {
+      Language(int lang) {
          this.lang = lang;
       }
 

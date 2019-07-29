@@ -41,15 +41,15 @@ public enum MapleDisease {
    private boolean first;
    private int mobskill;
 
-   private MapleDisease(long i) {
+   MapleDisease(long i) {
       this(i, false, 0);
    }
 
-   private MapleDisease(long i, int skill) {
+   MapleDisease(long i, int skill) {
       this(i, false, skill);
    }
 
-   private MapleDisease(long i, boolean first, int skill) {
+   MapleDisease(long i, boolean first, int skill) {
       this.i = i;
       this.first = first;
       this.mobskill = skill;

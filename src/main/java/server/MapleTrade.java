@@ -509,7 +509,7 @@ public class MapleTrade {
 
       private final int res;
 
-      private TradeResult(int res) {
+      TradeResult(int res) {
          this.res = res;
       }
 

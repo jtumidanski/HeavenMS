@@ -554,7 +554,7 @@ public class DueyProcessor {
       TOCLIENT_RECV_PACKAGE_MSG(0x1B);
       final byte code;
 
-      private Actions(int code) {
+      Actions(int code) {
          this.code = (byte) code;
       }
 

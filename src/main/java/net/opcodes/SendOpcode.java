@@ -355,7 +355,7 @@ public enum SendOpcode {
    VEGA_SCROLL(0x166);
    private int code = -2;
 
-   private SendOpcode(int code) {
+   SendOpcode(int code) {
       this.code = code;
    }
 

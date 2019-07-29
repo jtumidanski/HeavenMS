@@ -503,11 +503,11 @@ public class MapleMiniGame extends AbstractMapleMapObject {
       return MapleMapObjectType.MINI_GAME;
    }
 
-   public static enum MiniGameType {
+   public enum MiniGameType {
       UNDEFINED(0), OMOK(1), MATCH_CARD(2);
       private int value = 0;
 
-      private MiniGameType(int value) {
+      MiniGameType(int value) {
          this.value = value;
       }
 
@@ -516,7 +516,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
       }
    }
 
-   public static enum MiniGameResult {
+   public enum MiniGameResult {
       WIN, LOSS, TIE
    }
 }
