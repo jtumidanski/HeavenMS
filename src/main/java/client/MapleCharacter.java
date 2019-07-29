@@ -3931,7 +3931,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          effLock.unlock();
       }
 
-      cancelPlayerBuffs(Arrays.asList(stat));
+      cancelPlayerBuffs(Collections.singletonList(stat));
    }
 
    private Map<MapleBuffStat, MapleBuffStatValueHolder> extractCurrentBuffStats(MapleStatEffect effect) {
@@ -10141,7 +10141,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void showAllEquipFeatures() {
-      String showMsg = "";
+      StringBuilder showMsg = new StringBuilder();
 
       for (Item item : getInventory(MapleInventoryType.EQUIPPED).list()) {
          Equip nEquip = (Equip) item;
@@ -10150,10 +10150,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             continue;
          }
 
-         showMsg += nEquip.showEquipFeatures(client);
+         showMsg.append(nEquip.showEquipFeatures(client));
       }
 
-      if (!showMsg.isEmpty()) {
+      if (showMsg.length() > 0) {
          this.showHint("#ePLAYER EQUIPMENTS:#n\r\n\r\n" + showMsg, 400);
       }
    }

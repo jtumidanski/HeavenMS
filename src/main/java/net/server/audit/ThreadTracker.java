@@ -91,47 +91,47 @@ public class ThreadTracker {
         }
         
         
-        String s = "----------------------------\r\n" + dateFormat + "\r\n    ";
-        s += "Lock-thread usage count:";
+        StringBuilder s = new StringBuilder("----------------------------\r\n" + dateFormat + "\r\n    ");
+        s.append("Lock-thread usage count:");
         for(Map.Entry<MonitoredLockType, List<Integer>> lock : lockValues.entrySet()) {
-            s += ("\r\n  " + lock.getKey().name() + ": ");
+            s.append("\r\n  ").append(lock.getKey().name()).append(": ");
             
             for(Integer i : lock.getValue()) {
-                s += (i + " ");
+                s.append(i).append(" ");
             }
         }
-        s += "\r\n\r\nThread opened lock path:";
+        s.append("\r\n\r\nThread opened lock path:");
         
         for(Long tid : executingThreads) {
-            s += "\r\n";
+            s.append("\r\n");
             for(MonitoredLockType lockid : threadTracker.get(tid)) {
-                s += (lockid.name() + " ");
+                s.append(lockid.name()).append(" ");
             }
-            s += "|";
+            s.append("|");
         }
         
-        s += "\r\n\r\n";
+        s.append("\r\n\r\n");
         
-        return s;
+        return s.toString();
     }
     
     private static String printThreadLog(List<MonitoredLockType> stillLockedPath, String dateFormat) {
-        String s = "----------------------------\r\n" + dateFormat + "\r\n    ";
+        StringBuilder s = new StringBuilder("----------------------------\r\n" + dateFormat + "\r\n    ");
         for(MonitoredLockType lock : stillLockedPath) {
-            s += (lock.name() + " ");
+            s.append(lock.name()).append(" ");
         }
-        s += "\r\n\r\n";
+        s.append("\r\n\r\n");
         
-        return s;
+        return s.toString();
     }
     
     private static String printThreadStack(StackTraceElement[] list, String dateFormat) {
-        String s = "----------------------------\r\n" + dateFormat + "\r\n";
+        StringBuilder s = new StringBuilder("----------------------------\r\n" + dateFormat + "\r\n");
         for(int i = 0; i < list.length; i++) {
-            s += ("    " + list[i].toString() + "\r\n");
+            s.append("    ").append(list[i].toString()).append("\r\n");
         }
         
-        return s;
+        return s.toString();
     }
     
     public void accessThreadTracker(boolean update, boolean lock, MonitoredLockType lockId, long lockOid) {
@@ -263,17 +263,17 @@ public class ThreadTracker {
     }
     
     private String printLockStatus(MonitoredLockType lockId) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         
         for(Long threadid : locks.get(lockId).keySet()) {
             for(MonitoredLockType lockid : threadTracker.get(threadid)) {
-                s += ("  " + lockid.name());
+                s.append("  ").append(lockid.name());
             }
             
-            s += " |\r\n";
+            s.append(" |\r\n");
         }
         
-        return s;
+        return s.toString();
     }
     
     public void registerThreadTrackerTask() {

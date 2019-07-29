@@ -382,79 +382,79 @@ public class Equip extends Item {
     
     public Pair<String, Pair<Boolean, Boolean>> gainStats(List<Pair<StatUpgrade, Integer>> stats) {
         boolean gotSlot = false, gotVicious = false;
-        String lvupStr = "";
+        StringBuilder lvupStr = new StringBuilder();
         Integer statUp, maxStat = ServerConstants.MAX_EQUIPMNT_STAT;
         for (Pair<StatUpgrade, Integer> stat : stats) {
             switch (stat.getLeft()) {
                 case incDEX:
                     statUp = Math.min(stat.getRight(), maxStat - dex);
                     dex += statUp;
-                    lvupStr += "+" + statUp + "DEX ";
+                    lvupStr.append("+").append(statUp).append("DEX ");
                     break;
                 case incSTR:
                     statUp = Math.min(stat.getRight(), maxStat - str);
                     str += statUp;
-                    lvupStr += "+" + statUp + "STR ";
+                    lvupStr.append("+").append(statUp).append("STR ");
                     break;
                 case incINT:
                     statUp = Math.min(stat.getRight(), maxStat - _int);
                     _int += statUp;
-                    lvupStr += "+" + statUp + "INT ";
+                    lvupStr.append("+").append(statUp).append("INT ");
                     break;
                 case incLUK:
                     statUp = Math.min(stat.getRight(), maxStat - luk);
                     luk += statUp;
-                    lvupStr += "+" + statUp + "LUK ";
+                    lvupStr.append("+").append(statUp).append("LUK ");
                     break;
                 case incMHP:
                     statUp = Math.min(stat.getRight(), maxStat - hp);
                     hp += statUp;
-                    lvupStr += "+" + statUp + "HP ";
+                    lvupStr.append("+").append(statUp).append("HP ");
                     break;
                 case incMMP:
                     statUp = Math.min(stat.getRight(), maxStat - mp);
                     mp += statUp;
-                    lvupStr += "+" + statUp + "MP ";
+                    lvupStr.append("+").append(statUp).append("MP ");
                     break;
                 case incPAD:
                     statUp = Math.min(stat.getRight(), maxStat - watk);
                     watk += statUp;
-                    lvupStr += "+" + statUp + "WATK ";
+                    lvupStr.append("+").append(statUp).append("WATK ");
                     break;
                 case incMAD:
                     statUp = Math.min(stat.getRight(), maxStat - matk);
                     matk += statUp;
-                    lvupStr += "+" + statUp + "MATK ";
+                    lvupStr.append("+").append(statUp).append("MATK ");
                     break;
                 case incPDD:
                     statUp = Math.min(stat.getRight(), maxStat - wdef);
                     wdef += statUp;
-                    lvupStr += "+" + statUp + "WDEF ";
+                    lvupStr.append("+").append(statUp).append("WDEF ");
                     break;
                 case incMDD:
                     statUp = Math.min(stat.getRight(), maxStat - mdef);
                     mdef += statUp;
-                    lvupStr += "+" + statUp + "MDEF ";
+                    lvupStr.append("+").append(statUp).append("MDEF ");
                     break;
                 case incEVA:
                     statUp = Math.min(stat.getRight(), maxStat - avoid);
                     avoid += statUp;
-                    lvupStr += "+" + statUp + "AVOID ";
+                    lvupStr.append("+").append(statUp).append("AVOID ");
                     break;
                 case incACC:
                     statUp = Math.min(stat.getRight(), maxStat - acc);
                     acc += statUp;
-                    lvupStr += "+" + statUp + "ACC ";
+                    lvupStr.append("+").append(statUp).append("ACC ");
                     break;
                 case incSpeed:
                     statUp = Math.min(stat.getRight(), maxStat - speed);
                     speed += statUp;
-                    lvupStr += "+" + statUp + "SPEED ";
+                    lvupStr.append("+").append(statUp).append("SPEED ");
                     break;
                 case incJump:
                     statUp = Math.min(stat.getRight(), maxStat - jump);
                     jump += statUp;
-                    lvupStr += "+" + statUp + "JUMP ";
+                    lvupStr.append("+").append(statUp).append("JUMP ");
                     break;
                     
                 case incVicious:
@@ -468,7 +468,7 @@ public class Equip extends Item {
             }
         }
         
-        return new Pair<>(lvupStr, new Pair<>(gotSlot, gotVicious));
+        return new Pair<>(lvupStr.toString(), new Pair<>(gotSlot, gotVicious));
     }
     
     private void gainLevel(MapleClient c) {

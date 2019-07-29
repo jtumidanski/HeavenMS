@@ -153,10 +153,10 @@ public class MapleDataTool {
     }
 
     public static String getFullDataPath(MapleData data) {
-        String path = "";
+        StringBuilder path = new StringBuilder();
         MapleDataEntity myData = data;
         while (myData != null) {
-            path = myData.getName() + "/" + path;
+            path.insert(0, myData.getName() + "/");
             myData = myData.getParent();
         }
         return path.substring(0, path.length() - 1);

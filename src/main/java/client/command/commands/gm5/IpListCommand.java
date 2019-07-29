@@ -40,21 +40,21 @@ public class IpListCommand extends Command {
 
     @Override
     public void execute(MapleClient c, String[] params) {
-        String str = "Player-IP relation:";
+        StringBuilder str = new StringBuilder("Player-IP relation:");
         
         for (World w : Server.getInstance().getWorlds()) {
             Collection<MapleCharacter> chars = w.getPlayerStorage().getAllCharacters();
             
             if (!chars.isEmpty()) {
-                str += "\r\n" + GameConstants.WORLD_NAMES[w.getId()] + "\r\n";
+                str.append("\r\n").append(GameConstants.WORLD_NAMES[w.getId()]).append("\r\n");
                 
                 for (MapleCharacter chr : chars) {
-                    str += "  " + chr.getName() + " - " + chr.getClient().getSession().getRemoteAddress() + "\r\n";
+                    str.append("  ").append(chr.getName()).append(" - ").append(chr.getClient().getSession().getRemoteAddress()).append("\r\n");
                 }
             }
         }
         
-        c.getAbstractPlayerInteraction().npcTalk(22000, str);
+        c.getAbstractPlayerInteraction().npcTalk(22000, str.toString());
     }
     
 }

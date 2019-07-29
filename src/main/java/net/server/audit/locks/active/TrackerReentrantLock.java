@@ -143,12 +143,12 @@ public class TrackerReentrantLock extends ReentrantLock implements MonitoredReen
     }
     
     private static String printStackTrace(StackTraceElement[] list) {
-        String s = "";
+        StringBuilder s = new StringBuilder();
         for(int i = 0; i < list.length; i++) {
-            s += ("    " + list[i].toString() + "\r\n");
+            s.append("    ").append(list[i].toString()).append("\r\n");
         }
         
-        return s;
+        return s.toString();
     }
     
     @Override

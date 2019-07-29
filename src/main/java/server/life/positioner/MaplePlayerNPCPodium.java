@@ -23,7 +23,6 @@ import constants.ServerConstants;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import net.server.Server;
@@ -137,7 +136,7 @@ public class MaplePlayerNPCPodium {
         if(podiumCount >= 3 * podiumStep) {
             if(podiumStep >= ServerConstants.PLAYERNPC_AREA_STEPS) return null;
             
-            List<MapleMapObject> mmoList = map.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER_NPC));
+            List<MapleMapObject> mmoList = map.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC));
             map.getWorldServer().setPlayerNpcMapPodiumData(map.getId(), encodePodiumData(podiumStep + 1, podiumCount + 1));
             return reorganizePlayerNpcs(map, podiumStep + 1, mmoList);
         } else {

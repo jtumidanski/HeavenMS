@@ -48,12 +48,12 @@ public class IdCommand extends Command {
                     if (resultList.size() > 0) {
                         int count = 0;
                         for (Map.Entry<String, String> entry: resultList.entrySet()) {
-                            sb.append(String.format("Id for %s is: #b%s#k", entry.getKey(), entry.getValue()) + "\r\n");
+                            sb.append(String.format("Id for %s is: #b%s#k", entry.getKey(), entry.getValue())).append("\r\n");
                             if (++count > 100) {
                                 break;
                             }
                         }
-                        sb.append(String.format("Results found: #r%d#k | Returned: #b%d#k/100 | Refine search query to improve time.", resultList.size(), count) + "\r\n");
+                        sb.append(String.format("Results found: #r%d#k | Returned: #b%d#k/100 | Refine search query to improve time.", resultList.size(), count)).append("\r\n");
                         
                         player.getAbstractPlayerInteraction().npcTalk(9010000, sb.toString());
                     } else {

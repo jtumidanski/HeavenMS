@@ -916,7 +916,7 @@ public class AbstractPlayerInteraction {
 	public void resetMap(int mapid) {
 		getMap(mapid).resetReactors();
 		getMap(mapid).killAllMonsters();
-		for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.ITEM))) {
+		for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
 			getMap(mapid).removeMapObject(i);
 			getMap(mapid).broadcastMessage(MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, c.getPlayer().getId()));
 		}
@@ -1116,12 +1116,12 @@ public class AbstractPlayerInteraction {
 	}
         
         public String getExpeditionMemberNames(MapleExpeditionType type) {
-                String members = "";
+                StringBuilder members = new StringBuilder();
                 MapleExpedition exped = getExpedition(type);
                 for (String memberName : exped.getMembers().values()) {
-                       members += "" + memberName + ", ";
+                       members.append(memberName).append(", ");
                 }
-                return members;
+                return members.toString();
         }
 
         public boolean isLeaderExpedition(MapleExpeditionType type) {

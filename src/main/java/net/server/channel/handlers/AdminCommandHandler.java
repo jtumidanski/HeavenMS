@@ -22,6 +22,7 @@
 package net.server.channel.handlers;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.AbstractMaplePacketHandler;
@@ -127,7 +128,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             case 0x15: // Kill
                 int mobToKill = slea.readInt();
                 int amount = slea.readInt();
-                List<MapleMapObject> monsterx = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER));
+                List<MapleMapObject> monsterx = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
                 for (int x = 0; x < amount; x++) {
                     MapleMonster monster = (MapleMonster) monsterx.get(x);
                     if (monster.getId() == mobToKill) {
@@ -148,7 +149,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             case 0x18: // Maple & Mobhp
                 int mobHp = slea.readInt();
                 c.getPlayer().dropMessage("Monsters HP");
-                List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER));
+                List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
                 for (MapleMapObject mobs : monsters) {
                     MapleMonster monster = (MapleMonster) mobs;
                     if (monster.getId() == mobHp) {

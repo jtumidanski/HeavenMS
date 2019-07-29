@@ -104,35 +104,35 @@ public class MapleGachapon {
                         
                         String[] strList = new String[values.length + 1];
                         
-                        String menuStr = "";
+                        StringBuilder menuStr = new StringBuilder();
                         int j = 0;
                         for (Gachapon gacha : values) {
-                                menuStr += "#L" + j + "#" + gacha.name() + "#l\r\n";
+                                menuStr.append("#L").append(j).append("#").append(gacha.name()).append("#l\r\n");
                                 j++;
                                 
-                                String str = "";
+                                StringBuilder str = new StringBuilder();
 				for (int i = 0; i < 3; i++) {
                                         int[] gachaItems = gacha.getItems(i);
                                         
                                         if (gachaItems.length > 0) {
-                                                str += ("  #rTier " + i + "#k:\r\n");
+                                                str.append("  #rTier ").append(i).append("#k:\r\n");
                                                 for (int itemid : gachaItems) {
                                                         String itemName = ii.getName(itemid);
                                                         if (itemName == null) {
                                                                 itemName = "MISSING NAME #" + itemid;
                                                         }
 
-                                                        str += ("    " + itemName + "\r\n");
+                                                        str.append("    ").append(itemName).append("\r\n");
                                                 }
 
-                                                str += "\r\n";
+                                                str.append("\r\n");
                                         }
                                 }
-                                str += "\r\n";
+                                str.append("\r\n");
                                 
-                                strList[j] = str;
+                                strList[j] = str.toString();
 			}
-                        strList[0] = menuStr;
+                        strList[0] = menuStr.toString();
                         
 			return strList;
 		}

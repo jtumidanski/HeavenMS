@@ -34,6 +34,7 @@ import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ForceVacCommand extends Command {
@@ -44,7 +45,7 @@ public class ForceVacCommand extends Command {
     @Override
     public void execute(MapleClient c, String[] params) {
         MapleCharacter player = c.getPlayer();
-        List<MapleMapObject> items = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.ITEM));
+        List<MapleMapObject> items = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
         for (MapleMapObject item : items) {
             MapleMapItem mapItem = (MapleMapItem) item;
 

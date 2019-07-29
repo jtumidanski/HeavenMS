@@ -37,6 +37,7 @@ import server.maps.MapleReactor;
 
 import java.awt.*;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class DebugCommand extends Command {
@@ -58,16 +59,16 @@ public class DebugCommand extends Command {
         switch (params[0]) {
             case "type":
             case "help":
-                String msgTypes = "Available #bdebug types#k:\r\n\r\n";
+                StringBuilder msgTypes = new StringBuilder("Available #bdebug types#k:\r\n\r\n");
                 for(int i = 0; i < debugTypes.length; i++) {
-                    msgTypes += ("#L" + i + "#" + debugTypes[i] + "#l\r\n");
+                    msgTypes.append("#L").append(i).append("#").append(debugTypes[i]).append("#l\r\n");
                 }
                 
-                c.getAbstractPlayerInteraction().npcTalk(9201143, msgTypes);
+                c.getAbstractPlayerInteraction().npcTalk(9201143, msgTypes.toString());
                 break;
             
             case "monster":
-                List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER));
+                List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
                 for (MapleMapObject monstermo : monsters) {
                     MapleMonster monster = (MapleMonster) monstermo;
                     MapleCharacter controller = monster.getController();
@@ -131,21 +132,21 @@ public class DebugCommand extends Command {
 
             case "servercoupons":
             case "coupons":
-                String s = "Currently active SERVER coupons: ";
+                StringBuilder s = new StringBuilder("Currently active SERVER coupons: ");
                 for (Integer i : Server.getInstance().getActiveCoupons()) {
-                    s += (i + " ");
+                    s.append(i).append(" ");
                 }
 
-                player.dropMessage(6, s);
+                player.dropMessage(6, s.toString());
                 break;
 
             case "playercoupons":
-                String st = "Currently active PLAYER coupons: ";
+                StringBuilder st = new StringBuilder("Currently active PLAYER coupons: ");
                 for (Integer i : player.getActiveCoupons()) {
-                    st += (i + " ");
+                    st.append(i).append(" ");
                 }
 
-                player.dropMessage(6, st);
+                player.dropMessage(6, st.toString());
                 break;
 
             case "timer":

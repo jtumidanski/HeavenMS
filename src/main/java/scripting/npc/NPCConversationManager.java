@@ -344,7 +344,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         }
         
         public MaplePlayerNPC getPlayerNPCByScriptid(int scriptId) {
-                for(MapleMapObject pnpcObj : getPlayer().getMap().getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER_NPC))) {
+                for(MapleMapObject pnpcObj : getPlayer().getMap().getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
                         MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
 
                         if(pn.getScriptId() == scriptId) {
@@ -625,27 +625,25 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         }
 
         public boolean sendCPQMapLists() {
-            String msg = LanguageConstants.getMessage(getPlayer(), LanguageConstants.CPQPickRoom);
+            StringBuilder msg = new StringBuilder(LanguageConstants.getMessage(getPlayer(), LanguageConstants.CPQPickRoom));
             int msgLen = msg.length();
             for (int i = 0; i < 6; i++) {
                 if (fieldTaken(i)) {
                     if (fieldLobbied(i)) {
-                        msg += "#b#L" + i + "#Carnival Field " + (i + 1) + " (Level: "  // "Carnival field" GMS-like improvement thanks to Jayd
-                                + cpqCalcAvgLvl(980000100 + i * 100) + " / "
-                                + getPlayerCount(980000100 + i * 100) + "x"
-                                + getPlayerCount(980000100 + i * 100) + ")  #l\r\n";
+                        msg.append("#b#L").append(i).append("#Carnival Field ").append(i + 1).append(" (Level: "  // "Carnival field" GMS-like improvement thanks to Jayd
+								).append(cpqCalcAvgLvl(980000100 + i * 100)).append(" / ").append(getPlayerCount(980000100 + i * 100)).append("x").append(getPlayerCount(980000100 + i * 100)).append(")  #l\r\n");
                     }
                 } else {
                     if (i >= 0 && i <= 3) {
-                        msg += "#b#L" + i + "#Carnival Field " + (i + 1) + " (2x2) #l\r\n";
+                        msg.append("#b#L").append(i).append("#Carnival Field ").append(i + 1).append(" (2x2) #l\r\n");
                     } else {
-                        msg += "#b#L" + i + "#Carnival Field " + (i + 1) + " (3x3) #l\r\n";
+                        msg.append("#b#L").append(i).append("#Carnival Field ").append(i + 1).append(" (3x3) #l\r\n");
                     }
                 }
             }
             
             if (msg.length() > msgLen) {
-                sendSimple(msg);
+                sendSimple(msg.toString());
                 return true;
             } else {
                 return false;
@@ -846,27 +844,25 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
         }
 
         public boolean sendCPQMapLists2() {
-            String msg = LanguageConstants.getMessage(getPlayer(), LanguageConstants.CPQPickRoom);
+            StringBuilder msg = new StringBuilder(LanguageConstants.getMessage(getPlayer(), LanguageConstants.CPQPickRoom));
             int msgLen = msg.length();
             for (int i = 0; i < 3; i++) {
                 if (fieldTaken2(i)) {
                     if (fieldLobbied2(i)) {
-                        msg += "#b#L" + i + "#Carnival Field " + (i + 1) + " (Level: "  // "Carnival field" GMS-like improvement thanks to Jayd
-                                + cpqCalcAvgLvl(980031000 + i * 1000) + " / "
-                                + getPlayerCount(980031000 + i * 1000) + "x"
-                                + getPlayerCount(980031000 + i * 1000) + ")  #l\r\n";
+                        msg.append("#b#L").append(i).append("#Carnival Field ").append(i + 1).append(" (Level: "  // "Carnival field" GMS-like improvement thanks to Jayd
+								).append(cpqCalcAvgLvl(980031000 + i * 1000)).append(" / ").append(getPlayerCount(980031000 + i * 1000)).append("x").append(getPlayerCount(980031000 + i * 1000)).append(")  #l\r\n");
                     }
                 } else {
                     if (i == 0 || i == 1) {
-                        msg += "#b#L" + i + "#Carnival Field " + (i + 1) + " (2x2) #l\r\n";
+                        msg.append("#b#L").append(i).append("#Carnival Field ").append(i + 1).append(" (2x2) #l\r\n");
                     } else {
-                        msg += "#b#L" + i + "#Carnival Field " + (i + 1) + " (3x3) #l\r\n";
+                        msg.append("#b#L").append(i).append("#Carnival Field ").append(i + 1).append(" (3x3) #l\r\n");
                     }
                 }
             }
             
             if (msg.length() > msgLen) {
-                sendSimple(msg);
+                sendSimple(msg.toString());
                 return true;
             } else {
                 return false;

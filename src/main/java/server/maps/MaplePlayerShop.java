@@ -466,7 +466,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       visitorLock.lock();
       try {
          MapleCharacter[] copy = new MapleCharacter[3];
-         for (int i = 0; i < visitors.length; i++) copy[i] = visitors[i];
+         System.arraycopy(visitors, 0, copy, 0, visitors.length);
 
          return copy;
       } finally {

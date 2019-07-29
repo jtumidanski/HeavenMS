@@ -619,7 +619,7 @@ public class MapleSessionCoordinator {
     }
     
     public void printSessionTrace(MapleClient c) {
-        String str = "Opened server sessions:\r\n\r\n";
+        StringBuilder str = new StringBuilder("Opened server sessions:\r\n\r\n");
         
         if (!onlineClients.isEmpty()) {
             List<Entry<Integer, MapleClient>> elist = new ArrayList<>(onlineClients.entrySet());
@@ -630,9 +630,9 @@ public class MapleSessionCoordinator {
                 }
             });
             
-            str += ("Current online clients:\r\n");
+            str.append("Current online clients:\r\n");
             for (Entry<Integer, MapleClient> e : elist) {
-                str += ("  " + e.getKey() + "\r\n");
+                str.append("  ").append(e.getKey()).append("\r\n");
             }
         }
         
@@ -640,9 +640,9 @@ public class MapleSessionCoordinator {
             List<String> slist = new ArrayList<>(onlineRemoteHwids);
             Collections.sort(slist);
             
-            str += ("Current online HWIDs:\r\n");
+            str.append("Current online HWIDs:\r\n");
             for (String s : slist) {
-                str += ("  " + s + "\r\n");
+                str.append("  ").append(s).append("\r\n");
             }
         }
         
@@ -656,12 +656,12 @@ public class MapleSessionCoordinator {
                 }
             });
             
-            str += ("Current login sessions:\r\n");
+            str.append("Current login sessions:\r\n");
             for (Entry<String, Set<IoSession>> e : elist) {
-                str += ("  " + e.getKey() + ", IP: " + e.getValue() + "\r\n");
+                str.append("  ").append(e.getKey()).append(", IP: ").append(e.getValue()).append("\r\n");
             }
         }
         
-        c.getAbstractPlayerInteraction().npcTalk(2140000, str);
+        c.getAbstractPlayerInteraction().npcTalk(2140000, str.toString());
     }
 }

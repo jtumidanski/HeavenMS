@@ -35,11 +35,11 @@ public class InMapCommand extends Command {
     @Override
     public void execute(MapleClient c, String[] params) {
         MapleCharacter player = c.getPlayer();
-        String st = "";
+        StringBuilder st = new StringBuilder();
         for (MapleCharacter chr : player.getMap().getCharacters()) {
-            st += chr.getName() + " ";
+            st.append(chr.getName()).append(" ");
         }
-        player.message(st);
+        player.message(st.toString());
 
     }
 }

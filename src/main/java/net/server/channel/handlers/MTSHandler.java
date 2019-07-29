@@ -777,7 +777,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
     public byte[] getMTSSearch(int tab, int type, int cOi, String search, int page) {
         List<MTSItemInfo> items = new ArrayList<>();
         MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-        String listaitems = "";
+        StringBuilder listaitems = new StringBuilder();
         if (cOi != 0) {
             List<String> retItems = new ArrayList<>();
             for (Pair<Integer, String> itemPair : ii.getAllItems()) {
@@ -785,15 +785,15 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
                     retItems.add(" itemid=" + itemPair.getLeft() + " OR ");
                 }
             }
-            listaitems += " AND (";
+            listaitems.append(" AND (");
             if (retItems != null && retItems.size() > 0) {
                 for (String singleRetItem : retItems) {
-                    listaitems += singleRetItem;
+                    listaitems.append(singleRetItem);
                 }
-                listaitems += " itemid=0 )";
+                listaitems.append(" itemid=0 )");
             }
         } else {
-            listaitems = " AND sellername LIKE CONCAT('%','" + search + "', '%')";
+            listaitems = new StringBuilder(" AND sellername LIKE CONCAT('%','" + search + "', '%')");
         }
         Connection con = null;
         PreparedStatement ps;

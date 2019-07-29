@@ -209,15 +209,15 @@ public class MapleQuest {
         switch(mode) {
             case 2:
                 int hours   = (int) ((leftTime / (1000*60*60)));
-                str.append(hours + " hours, ");
+                str.append(hours).append(" hours, ");
                 
             case 1:
                 int minutes = (int) ((leftTime / (1000*60)) % 60);
-                str.append(minutes + " minutes, ");
+                str.append(minutes).append(" minutes, ");
                 
             default:
                 int seconds = (int) (leftTime / 1000) % 60 ;
-                str.append(seconds + " seconds");
+                str.append(seconds).append(" seconds");
         }
         
         return str.toString();

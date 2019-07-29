@@ -29,6 +29,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -577,7 +578,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
 
    private static MaplePlayerNPC getPlayerNPCFromWorldMap(String name, int world, int map) {
       World wserv = Server.getInstance().getWorld(world);
-      for (MapleMapObject pnpcObj : wserv.getChannel(1).getMapFactory().getMap(map).getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER_NPC))) {
+      for (MapleMapObject pnpcObj : wserv.getChannel(1).getMapFactory().getMap(map).getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
          MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
 
          if (name.contentEquals(pn.getName()) && pn.getScriptId() < 9977777) {
@@ -638,7 +639,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
             for (Channel channel : Server.getInstance().getChannelsFromWorld(world)) {
                MapleMap m = channel.getMapFactory().getMap(map);
 
-               for (MapleMapObject pnpcObj : m.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER_NPC))) {
+               for (MapleMapObject pnpcObj : m.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
                   MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
                   m.removeMapObject(pnpcObj);
                   m.broadcastMessage(MaplePacketCreator.removeNPCController(pn.getObjectId()));

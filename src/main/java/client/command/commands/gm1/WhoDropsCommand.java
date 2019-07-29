@@ -52,13 +52,13 @@ public class WhoDropsCommand extends Command {
         if (c.tryacquireClient()) {
             try {
                 String searchString = player.getLastCommandMessage();
-                String output = "";
+                StringBuilder output = new StringBuilder();
                 Iterator<Pair<Integer, String>> listIterator = MapleItemInformationProvider.getInstance().getItemDataByName(searchString).iterator();
                 if(listIterator.hasNext()) {
                     int count = 1;
                     while(listIterator.hasNext() && count <= 3) {
                         Pair<Integer, String> data = listIterator.next();
-                        output += "#b" + data.getRight() + "#k is dropped by:\r\n";
+                        output.append("#b").append(data.getRight()).append("#k is dropped by:\r\n");
                         try {
                             Connection con = DatabaseConnection.getConnection();
                             PreparedStatement ps = con.prepareStatement("SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50");
@@ -67,7 +67,7 @@ public class WhoDropsCommand extends Command {
                             while(rs.next()) {
                                 String resultName = MapleMonsterInformationProvider.getInstance().getMobNameFromId(rs.getInt("dropperid"));
                                 if (resultName != null) {
-                                    output += resultName + ", ";
+                                    output.append(resultName).append(", ");
                                 }
                             }
                             rs.close();
@@ -78,7 +78,7 @@ public class WhoDropsCommand extends Command {
                             e.printStackTrace();
                             return;
                         }
-                        output += "\r\n\r\n";
+                        output.append("\r\n\r\n");
                         count++;
                     }
                 } else {
@@ -86,7 +86,7 @@ public class WhoDropsCommand extends Command {
                     return;
                 }
                 
-                c.getAbstractPlayerInteraction().npcTalk(9010000, output);
+                c.getAbstractPlayerInteraction().npcTalk(9010000, output.toString());
             } finally {
                 c.releaseClient();
             }

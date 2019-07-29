@@ -41,10 +41,10 @@ public class OnlineTwoCommand extends Command {
         for (Channel ch : Server.getInstance().getChannelsFromWorld(player.getWorld())) {
             int size = ch.getPlayerStorage().getAllCharacters().size();
             total += size;
-            String s = "(Channel " + ch.getId() + " Online: " + size + ") : ";
+            StringBuilder s = new StringBuilder("(Channel " + ch.getId() + " Online: " + size + ") : ");
             if (ch.getPlayerStorage().getAllCharacters().size() < 50) {
                 for (MapleCharacter chr : ch.getPlayerStorage().getAllCharacters()) {
-                    s += MapleCharacter.makeMapleReadable(chr.getName()) + ", ";
+                    s.append(MapleCharacter.makeMapleReadable(chr.getName())).append(", ");
                 }
                 player.dropMessage(6, s.substring(0, s.length() - 2));
             }

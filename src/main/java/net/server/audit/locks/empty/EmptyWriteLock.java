@@ -43,13 +43,13 @@ public class EmptyWriteLock implements MonitoredWriteLock {
         dateFormat.setTimeZone(TimeZone.getDefault());
         String df = dateFormat.format(new Date());
         
-        String s = "\r\n" + df + "\r\n";
+        StringBuilder s = new StringBuilder("\r\n" + df + "\r\n");
         for(int i = 0; i < list.length; i++) {
-            s += ("    " + list[i].toString() + "\r\n");
+            s.append("    ").append(list[i].toString()).append("\r\n");
         }
-        s += "----------------------------\r\n\r\n";
+        s.append("----------------------------\r\n\r\n");
         
-        return s;
+        return s.toString();
     }
     
     @Override

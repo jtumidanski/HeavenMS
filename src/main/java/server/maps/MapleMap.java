@@ -1219,7 +1219,7 @@ public class MapleMap {
     
     public int countMonster(int minid, int maxid) {
         int count = 0;
-        for (MapleMapObject m : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER))) {
+        for (MapleMapObject m : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER))) {
             MapleMonster mob = (MapleMonster) m;
             if (mob.getId() >= minid && mob.getId() <= maxid) {
                 count++;
@@ -1229,19 +1229,19 @@ public class MapleMap {
     }
     
     public int countMonsters() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER)).size();
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER)).size();
     }
     
     public int countReactors() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.REACTOR)).size();
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.REACTOR)).size();
     }
     
     public final List<MapleMapObject> getReactors() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.REACTOR));
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.REACTOR));
     }
     
     public final List<MapleMapObject> getMonsters() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER));
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
     }
     
     public final List<MapleReactor> getAllReactors() {
@@ -1263,19 +1263,19 @@ public class MapleMap {
     }
     
     public int countItems() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.ITEM)).size();
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM)).size();
     }
     
     public final List<MapleMapObject> getItems() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.ITEM));
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
     }
 
     public int countPlayers() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER)).size();
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER)).size();
     }
     
     public List<MapleMapObject> getPlayers() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER));
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER));
     }
     
     public List<MapleCharacter> getAllPlayers() {
@@ -1525,7 +1525,7 @@ public class MapleMap {
     public void softKillAllMonsters() {
         closeMapSpawnPoints();
         
-        for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER))) {
+        for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER))) {
             MapleMonster monster = (MapleMonster) monstermo;
             if (monster.getStats().isFriendly()) {
                 continue;
@@ -1540,7 +1540,7 @@ public class MapleMap {
     public void killAllMonstersNotFriendly() {
         closeMapSpawnPoints();
         
-        for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER))) {
+        for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER))) {
             MapleMonster monster = (MapleMonster) monstermo;
             if (monster.getStats().isFriendly()) {
                 continue;
@@ -1553,7 +1553,7 @@ public class MapleMap {
     public void killAllMonsters() {
         closeMapSpawnPoints();
         
-        for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.MONSTER))) {
+        for (MapleMapObject monstermo : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER))) {
             MapleMonster monster = (MapleMonster) monstermo;
             
             killMonster(monster, null, false, 1);
@@ -1741,7 +1741,7 @@ public class MapleMap {
     }
     
     public void destroyNPC(int npcid) {     // assumption: there's at most one of the same NPC in a map.
-        List<MapleMapObject> npcs = getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.NPC));
+        List<MapleMapObject> npcs = getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.NPC));
         
         chrRLock.lock();
         objectWLock.lock();
@@ -3747,7 +3747,7 @@ public class MapleMap {
 
     public final int getNumPlayersItemsInRect(final Rectangle rect) {
         int retP = getNumPlayersInRect(rect);
-        int retI = getMapObjectsInBox(rect, Arrays.asList(MapleMapObjectType.ITEM)).size();
+        int retI = getMapObjectsInBox(rect, Collections.singletonList(MapleMapObjectType.ITEM)).size();
 
         return retP + retI;
     }
@@ -3879,7 +3879,7 @@ public class MapleMap {
     }
 
     public void clearDrops(MapleCharacter player) {
-        for (MapleMapObject i : getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.ITEM))) {
+        for (MapleMapObject i : getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
             droppedItemCount.decrementAndGet();
             removeMapObject(i);
             this.broadcastMessage(MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, player.getId()));
@@ -3887,7 +3887,7 @@ public class MapleMap {
     }
 
     public void clearDrops() {
-        for (MapleMapObject i : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.ITEM))) {
+        for (MapleMapObject i : getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
             droppedItemCount.decrementAndGet();
             removeMapObject(i);
             this.broadcastMessage(MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, 0));
@@ -4254,7 +4254,7 @@ public class MapleMap {
     }
 
     public List<MapleMapObject> getAllPlayer() {
-        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Arrays.asList(MapleMapObjectType.PLAYER));
+        return getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER));
     }
 
     public boolean isCPQMap() {
