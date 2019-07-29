@@ -337,9 +337,7 @@ public class MapleMatchCheckerCoordinator {
             if (mmcEntry.setAccept()) {
                this.confirmCount++;
 
-               if (this.confirmCount == this.confirmingMembers.size()) {
-                  return true;
-               }
+               return this.confirmCount == this.confirmingMembers.size();
             }
          }
 

@@ -408,13 +408,7 @@ public class MakerProcessor {
                            stat = "MMP";
                            break;
                      }
-
-                     Integer d = stats.get(stat);
-                     if (d == null) {
-                        stats.put(stat, reagentBuff.getRight() * r.getValue());
-                     } else {
-                        stats.put(stat, d + (reagentBuff.getRight() * r.getValue()));
-                     }
+                     stats.merge(stat, reagentBuff.getRight() * r.getValue(), Integer::sum);
                   }
                }
             }

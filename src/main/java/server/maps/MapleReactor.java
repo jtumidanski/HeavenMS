@@ -322,6 +322,7 @@ public class MapleReactor extends AbstractMapleMapObject {
       if (reactorLock.tryLock()) {
          try {
             boolean alive = this.isAlive();
+            // reactor neither alive nor in delayed respawn, remove map object allowed
             if (alive) {
                this.setAlive(false);
                this.cancelReactorTimeout();
@@ -329,11 +330,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                if (this.getDelay() > 0) {
                   this.delayedRespawn();
                }
-            } else if (this.inDelayedRespawn()) {
-               return false;
-            } else {
-               return true;    // reactor neither alive nor in delayed respawn, remove map object allowed
-            }
+            } else return !this.inDelayedRespawn();
          } finally {
             reactorLock.unlock();
          }

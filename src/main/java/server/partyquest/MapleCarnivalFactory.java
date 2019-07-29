@@ -32,7 +32,7 @@ public class MapleCarnivalFactory {
       initialize();
    }
 
-   public static final MapleCarnivalFactory getInstance() {
+   public static MapleCarnivalFactory getInstance() {
       return instance;
    }
 

@@ -63,12 +63,12 @@ public enum MapleDisease {
       }
    }
 
-   public static final MapleDisease getRandom() {
+   public static MapleDisease getRandom() {
       MapleDisease[] diseases = GameConstants.CPQ_DISEASES;
       return diseases[(int) (Math.random() * diseases.length)];
    }
 
-   public static final MapleDisease getBySkill(final int skill) {
+   public static MapleDisease getBySkill(final int skill) {
       for (MapleDisease d : MapleDisease.values()) {
          if (d.getDisease() == skill && d.getDisease() != 0) {
             return d;

@@ -178,11 +178,7 @@ public class MapleRing implements Comparable<MapleRing> {
    @Override
    public boolean equals(Object o) {
       if (o instanceof MapleRing) {
-         if (((MapleRing) o).getRingId() == getRingId()) {
-            return true;
-         } else {
-            return false;
-         }
+         return ((MapleRing) o).getRingId() == getRingId();
       }
       return false;
    }

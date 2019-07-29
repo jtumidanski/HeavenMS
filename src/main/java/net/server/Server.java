@@ -301,12 +301,7 @@ public class Server {
          Map<Integer, List<Item>> accPlayerEquips = new HashMap<>();
 
          for (Pair<Item, Integer> ae : accEquips) {
-            List<Item> playerEquips = accPlayerEquips.get(ae.getRight());
-            if (playerEquips == null) {
-               playerEquips = new LinkedList<>();
-               accPlayerEquips.put(ae.getRight(), playerEquips);
-            }
-
+            List<Item> playerEquips = accPlayerEquips.computeIfAbsent(ae.getRight(), k -> new LinkedList<>());
             playerEquips.add(ae.getLeft());
          }
 
@@ -1718,12 +1713,7 @@ public class Server {
    }
 
    private void disconnectIdlesOnLoginTask() {
-      TimerManager.getInstance().register(new Runnable() {
-         @Override
-         public void run() {
-            disconnectIdlesOnLoginState();
-         }
-      }, 300000);
+      TimerManager.getInstance().register(this::disconnectIdlesOnLoginState, 300000);
    }
 
    public final Runnable shutdown(final boolean restart) {//no player should be online when trying to shutdown!

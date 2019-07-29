@@ -90,24 +90,9 @@ public class MonsterCarnival {
 
          // thanks Atoot, Vcoc for noting double CPQ functional being sent to players in CPQ start
 
-         timer = TimerManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-               timeUp();
-            }
-         }, map.getTimeDefault() * 1000); // thanks Atoot for noticing an irregular "event extended" issue here
-         effectTimer = TimerManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-               complete();
-            }
-         }, map.getTimeDefault() * 1000 - 10 * 1000);
-         respawnTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               respawn();
-            }
-         }, ServerConstants.RESPAWN_INTERVAL);
+         timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeDefault() * 1000); // thanks Atoot for noticing an irregular "event extended" issue here
+         effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeDefault() * 1000 - 10 * 1000);
+         respawnTask = TimerManager.getInstance().register(this::respawn, ServerConstants.RESPAWN_INTERVAL);
 
          cs.initMonsterCarnival(cpq1, room);
       } catch (Exception e) {
@@ -357,19 +342,8 @@ public class MonsterCarnival {
 
       map.broadcastMessage(MaplePacketCreator.getClock(3 * 60));
 
-      timer = TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            timeUp();
-         }
-      }, map.getTimeExpand() * 1000);
-      effectTimer = TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            complete();
-         }
-
-      }, map.getTimeExpand() * 1000 - 10 * 1000); // thanks Vcoc for noticing a time set issue here
+      timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeExpand() * 1000);
+      effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeExpand() * 1000 - 10 * 1000); // thanks Vcoc for noticing a time set issue here
    }
 
    public void complete() {

@@ -869,11 +869,7 @@ public class MapleStatEffect {
          return false;
       }
 
-      if (cardStats.party && !partyHunting) {
-         return false;
-      }
-
-      return true;
+      return !cardStats.party || partyHunting;
    }
 
    public boolean isActive(MapleCharacter applyto) {
@@ -1586,10 +1582,8 @@ public class MapleStatEffect {
       if (lt == null || rb == null) {
          return false;
       }
-      if ((sourceid >= 1211003 && sourceid <= 1211008) || sourceid == Paladin.SWORD_HOLY_CHARGE || sourceid == Paladin.BW_HOLY_CHARGE || sourceid == DawnWarrior.SOUL_CHARGE) {// wk charges have lt and rb set but are neither player nor monster buffs
-         return false;
-      }
-      return true;
+      // wk charges have lt and rb set but are neither player nor monster buffs
+      return (sourceid < 1211003 || sourceid > 1211008) && sourceid != Paladin.SWORD_HOLY_CHARGE && sourceid != Paladin.BW_HOLY_CHARGE && sourceid != DawnWarrior.SOUL_CHARGE;
    }
 
    private boolean isHeal() {
@@ -1711,11 +1705,8 @@ public class MapleStatEffect {
    private boolean isCureAllAbnormalStatus() {
       if (skill) {
          return isHerosWill(sourceid);
-      } else if (sourceid == 2022544) {
-         return true;
-      }
+      } else return sourceid == 2022544;
 
-      return false;
    }
 
    private boolean isDash() {

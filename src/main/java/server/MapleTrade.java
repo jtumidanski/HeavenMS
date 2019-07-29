@@ -197,9 +197,7 @@ public class MapleTrade {
       if (other != null) {
          MapleTrade otherPartner = other.getPartner();
          if (otherPartner != null) {
-            if (otherPartner.getChr().getId() == c1.getId()) {
-               return true;
-            }
+            return otherPartner.getChr().getId() == c1.getId();
          }
       }
 

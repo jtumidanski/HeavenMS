@@ -98,9 +98,6 @@ public class PlayerBuffStorage {
          return false;
       }
       final PlayerBuffStorage other = (PlayerBuffStorage) obj;
-      if (id != other.id) {
-         return false;
-      }
-      return true;
+      return id == other.id;
    }
 }

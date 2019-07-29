@@ -1389,9 +1389,7 @@ public class MapleItemInformationProvider {
             break;
          }
       }
-      if (ret.get("skillid") == null) {
-         ret.put("skillid", 0);
-      }
+      ret.putIfAbsent("skillid", 0);
       return ret;
    }
 
@@ -1662,11 +1660,7 @@ public class MapleItemInformationProvider {
          return true;
       }
 
-      if (ServerConstants.USE_ENFORCE_UNMERCHABLE_PET && ItemConstants.isPet(itemId)) {
-         return true;
-      }
-
-      return false;
+      return ServerConstants.USE_ENFORCE_UNMERCHABLE_PET && ItemConstants.isPet(itemId);
    }
 
    public Collection<Item> canWearEquipment(MapleCharacter chr, Collection<Item> items) {

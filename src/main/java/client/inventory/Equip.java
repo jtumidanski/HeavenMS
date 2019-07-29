@@ -320,13 +320,9 @@ public class Equip extends Item {
 
       if (ItemConstants.isWeapon(this.getItemId())) {
          if (name.equals(StatUpgrade.incPAD)) {
-            if (!isPhysicalWeapon(this.getItemId())) {
-               return true;
-            }
+            return !isPhysicalWeapon(this.getItemId());
          } else if (name.equals(StatUpgrade.incMAD)) {
-            if (isPhysicalWeapon(this.getItemId())) {
-               return true;
-            }
+            return isPhysicalWeapon(this.getItemId());
          }
       }
 

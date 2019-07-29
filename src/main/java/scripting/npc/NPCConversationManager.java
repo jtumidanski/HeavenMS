@@ -481,11 +481,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          e.printStackTrace();
          return false;
       }
-      if (getPlayer().getMerchantMeso() == 0) {
-         return false;
-      } else {
-         return true;
-      }
+      return getPlayer().getMerchantMeso() != 0;
    }
 
    public void showFredrick() {
@@ -656,17 +652,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       if (!c.getChannelServer().getMapFactory().getMap(980000101 + field * 100).getAllPlayer().isEmpty()) {
          return true;
       }
-      if (!c.getChannelServer().getMapFactory().getMap(980000102 + field * 100).getAllPlayer().isEmpty()) {
-         return true;
-      }
-      return false;
+      return !c.getChannelServer().getMapFactory().getMap(980000102 + field * 100).getAllPlayer().isEmpty();
    }
 
    public boolean fieldLobbied(int field) {
-      if (!c.getChannelServer().getMapFactory().getMap(980000100 + field * 100).getAllPlayer().isEmpty()) {
-         return true;
-      }
-      return false;
+      return !c.getChannelServer().getMapFactory().getMap(980000100 + field * 100).getAllPlayer().isEmpty();
    }
 
    public void cpqLobby(int field) {
@@ -875,17 +865,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       if (!c.getChannelServer().getMapFactory().getMap(980031100 + field * 1000).getAllPlayer().isEmpty()) {
          return true;
       }
-      if (!c.getChannelServer().getMapFactory().getMap(980031200 + field * 1000).getAllPlayer().isEmpty()) {
-         return true;
-      }
-      return false;
+      return !c.getChannelServer().getMapFactory().getMap(980031200 + field * 1000).getAllPlayer().isEmpty();
    }
 
    public boolean fieldLobbied2(int field) {
-      if (!c.getChannelServer().getMapFactory().getMap(980031000 + field * 1000).getAllPlayer().isEmpty()) {
-         return true;
-      }
-      return false;
+      return !c.getChannelServer().getMapFactory().getMap(980031000 + field * 1000).getAllPlayer().isEmpty();
    }
 
    public void cpqLobby2(int field) {

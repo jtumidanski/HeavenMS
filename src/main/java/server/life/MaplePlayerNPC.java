@@ -271,13 +271,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    }
 
    private static int getNextScriptId(byte branch) {
-      List<Integer> availablesBranch = availablePlayerNpcScriptIds.get(branch);
-
-      if (availablesBranch == null) {
-         availablesBranch = new ArrayList<>(20);
-         availablePlayerNpcScriptIds.put(branch, availablesBranch);
-      }
-
+      List<Integer> availablesBranch = availablePlayerNpcScriptIds.computeIfAbsent(branch, k -> new ArrayList<>(20));
       if (availablesBranch.isEmpty()) {
          fetchAvailableScriptIdsFromDb(branch, availablesBranch);
 

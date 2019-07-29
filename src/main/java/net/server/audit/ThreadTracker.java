@@ -76,8 +76,8 @@ public class ThreadTracker {
 
    private static String printThreadStack(StackTraceElement[] list, String dateFormat) {
       StringBuilder s = new StringBuilder("----------------------------\r\n" + dateFormat + "\r\n");
-      for (int i = 0; i < list.length; i++) {
-         s.append("    ").append(list[i].toString()).append("\r\n");
+      for (StackTraceElement stackTraceElement : list) {
+         s.append("    ").append(stackTraceElement.toString()).append("\r\n");
       }
 
       return s.toString();
@@ -93,13 +93,7 @@ public class ThreadTracker {
             executingThreads.add(lockThreads.get(lc.getKey()));
 
             MonitoredLockType lockId = lockIds.get(lc.getKey());
-            List<Integer> list = lockValues.get(lockId);
-
-            if (list == null) {
-               list = new ArrayList<>();
-               lockValues.put(lockId, list);
-            }
-
+            List<Integer> list = lockValues.computeIfAbsent(lockId, k -> new ArrayList<>());
             list.add(lc.getValue().get());
          }
       }
@@ -219,18 +213,8 @@ public class ThreadTracker {
                }
                list.add(lockId);
 
-               Map<Long, Integer> threadLock = locks.get(lockId);
-               if (threadLock == null) {
-                  threadLock = new HashMap<>(5);
-                  locks.put(lockId, threadLock);
-               }
-
-               Integer lc = threadLock.get(tid);
-               if (lc != null) {
-                  threadLock.put(tid, lc + 1);
-               } else {
-                  threadLock.put(tid, 1);
-               }
+               Map<Long, Integer> threadLock = locks.computeIfAbsent(lockId, k -> new HashMap<>(5));
+               threadLock.merge(tid, 1, Integer::sum);
             } else {
                AtomicInteger c = lockCount.get(lockOid);
                if (c != null) {    // thanks BHB for detecting an NPE here

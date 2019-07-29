@@ -151,8 +151,8 @@ public class MaplePacketCreator {
    private static void addRemainingSkillInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
       int[] remainingSp = chr.getRemainingSps();
       int effectiveLength = 0;
-      for (int i = 0; i < remainingSp.length; i++) {
-         if (remainingSp[i] > 0) {
+      for (int value : remainingSp) {
+         if (value > 0) {
             effectiveLength++;
          }
       }
@@ -517,15 +517,13 @@ public class MaplePacketCreator {
       Map<Skill, MapleCharacter.SkillEntry> skills = chr.getSkills();
       int skillsSize = skills.size();
       // We don't want to include any hidden skill in this, so subtract them from the size list and ignore them.
-      for (Iterator<Entry<Skill, SkillEntry>> it = skills.entrySet().iterator(); it.hasNext(); ) {
-         Entry<Skill, MapleCharacter.SkillEntry> skill = it.next();
+      for (Entry<Skill, SkillEntry> skill : skills.entrySet()) {
          if (GameConstants.isHiddenSkills(skill.getKey().getId())) {
             skillsSize--;
          }
       }
       mplew.writeShort(skillsSize);
-      for (Iterator<Entry<Skill, SkillEntry>> it = skills.entrySet().iterator(); it.hasNext(); ) {
-         Entry<Skill, MapleCharacter.SkillEntry> skill = it.next();
+      for (Entry<Skill, SkillEntry> skill : skills.entrySet()) {
          if (GameConstants.isHiddenSkills(skill.getKey().getId())) {
             continue;
          }
@@ -708,7 +706,7 @@ public class MaplePacketCreator {
       mplew.write(c.getGender());
 
       boolean canFly = Server.getInstance().canFly(c.getAccID());
-      mplew.writeBool((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) ? c.getGMLevel() > 1 : false);    // thanks Steve(kaito1410) for pointing the GM account boolean here
+      mplew.writeBool((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && c.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
       mplew.write(((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && c.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
       mplew.write(0); // Country Code.
 
@@ -1875,7 +1873,7 @@ public class MaplePacketCreator {
       }
       if (chr.getBuffedValue(MapleBuffStat.COMBO) != null) {
          buffmask |= MapleBuffStat.COMBO.getValue();
-         buffvalue = chr.getBuffedValue(MapleBuffStat.COMBO).intValue();
+         buffvalue = chr.getBuffedValue(MapleBuffStat.COMBO);
       }
       if (chr.getBuffedValue(MapleBuffStat.SHADOWPARTNER) != null) {
          buffmask |= MapleBuffStat.SHADOWPARTNER.getValue();
@@ -1884,11 +1882,11 @@ public class MaplePacketCreator {
          buffmask |= MapleBuffStat.SOULARROW.getValue();
       }
       if (chr.getBuffedValue(MapleBuffStat.MORPH) != null) {
-         buffvalue = chr.getBuffedValue(MapleBuffStat.MORPH).intValue();
+         buffvalue = chr.getBuffedValue(MapleBuffStat.MORPH);
       }
       if (chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE) != null) {
          buffmask |= MapleBuffStat.ENERGY_CHARGE.getValue();
-         buffvalue = chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE).intValue();
+         buffvalue = chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE);
       }//AREN'T THESE
       mplew.writeInt((int) ((buffmask >> 32) & 0xffffffffL));
       if (buffvalue != null) {
@@ -2743,8 +2741,7 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.RECOMMENDED_WORLD_MESSAGE.getValue());
       mplew.write(worlds.size());//size
-      for (Iterator<Pair<Integer, String>> it = worlds.iterator(); it.hasNext(); ) {
-         Pair<Integer, String> world = it.next();
+      for (Pair<Integer, String> world : worlds) {
          mplew.writeInt(world.getLeft());
          mplew.writeMapleAsciiString(world.getRight());
       }
@@ -3406,8 +3403,8 @@ public class MaplePacketCreator {
       mplew.write(0); //speaker
       mplew.writeMapleAsciiString(talk);
       mplew.write(styles.length);
-      for (int i = 0; i < styles.length; i++) {
-         mplew.writeInt(styles[i]);
+      for (int style : styles) {
+         mplew.writeInt(style);
       }
       return mplew.getPacket();
    }
@@ -5007,7 +5004,7 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static final byte[] loadExceptionList(final int cid, final int petId, final byte petIdx, final List<Integer> data) {
+   public static byte[] loadExceptionList(final int cid, final int petId, final byte petIdx, final List<Integer> data) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.PET_EXCEPTION_LIST.getValue());
       mplew.writeInt(cid);
@@ -5520,8 +5517,8 @@ public class MaplePacketCreator {
          List<Pair<Item, MapleInventoryType>> items = ItemFactory.MERCHANT.loadItems(chr.getId(), false);
          mplew.write(items.size());
 
-         for (int i = 0; i < items.size(); i++) {
-            addItemInfo(mplew, items.get(i).getLeft(), true);
+         for (Pair<Item, MapleInventoryType> item : items) {
+            addItemInfo(mplew, item.getLeft(), true);
          }
       } catch (SQLException e) {
          e.printStackTrace();
@@ -5705,9 +5702,9 @@ public class MaplePacketCreator {
          List<Pair<String, Byte>> msgList = hm.getMessages();
 
          mplew.writeShort(msgList.size());
-         for (int i = 0; i < msgList.size(); i++) {
-            mplew.writeMapleAsciiString(msgList.get(i).getLeft());
-            mplew.write(msgList.get(i).getRight());
+         for (Pair<String, Byte> stringBytePair : msgList) {
+            mplew.writeMapleAsciiString(stringBytePair.getLeft());
+            mplew.write(stringBytePair.getRight());
          }
       } else {
          mplew.writeShort(0);
@@ -5976,8 +5973,7 @@ public class MaplePacketCreator {
       mplew.writeInt(page);
       mplew.write(1);
       mplew.write(1);
-      for (int i = 0; i < items.size(); i++) {
-         MTSItemInfo item = items.get(i);
+      for (MTSItemInfo item : items) {
          addItemInfo(mplew, item.getItem(), true);
          mplew.writeInt(item.getID()); //id
          mplew.writeInt(item.getTaxes()); //this + below = price

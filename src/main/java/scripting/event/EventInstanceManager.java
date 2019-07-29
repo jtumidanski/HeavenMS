@@ -672,12 +672,7 @@ public class EventInstanceManager {
    }
 
    private void disposeLocks() {
-      LockCollector.getInstance().registerDisposeAction(new Runnable() {
-         @Override
-         public void run() {
-            emptyLocks();
-         }
-      });
+      LockCollector.getInstance().registerDisposeAction(this::emptyLocks);
    }
 
    private void emptyLocks() {
@@ -1137,31 +1132,27 @@ public class EventInstanceManager {
       if (eventCleared && getPlayerCount() > 1) return false;
 
       if (!eventCleared && leavingEventMap && !isEventTeamLeaderOn()) return true;
-      if (getPlayerCount() < minPlayers) return true;
-
-      return false;
+      return getPlayerCount() < minPlayers;
    }
 
    public final boolean isExpeditionTeamLackingNow(boolean leavingEventMap, int minPlayers, MapleCharacter quitter) {
       if (eventCleared) {
-         if (leavingEventMap && getPlayerCount() <= 1) return true;
+         return leavingEventMap && getPlayerCount() <= 1;
       } else {
          // thanks Conrad for noticing expeditions don't need to have neither the leader nor meet the minimum requirement inside the event
-         if (getPlayerCount() <= 1) return true;
+         return getPlayerCount() <= 1;
       }
 
-      return false;
    }
 
    public final boolean isEventTeamLackingNow(boolean leavingEventMap, int minPlayers, MapleCharacter quitter) {
       if (eventCleared) {
-         if (leavingEventMap && getPlayerCount() <= 1) return true;
+         return leavingEventMap && getPlayerCount() <= 1;
       } else {
          if (leavingEventMap && getLeaderId() == quitter.getId()) return true;
-         if (getPlayerCount() <= minPlayers) return true;
+         return getPlayerCount() <= minPlayers;
       }
 
-      return false;
    }
 
    public final boolean isEventTeamTogether() {

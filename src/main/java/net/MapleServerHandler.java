@@ -262,12 +262,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
    }
 
    private void idleManagerTask() {
-      this.idleManager = TimerManager.getInstance().register(new Runnable() {
-         @Override
-         public void run() {
-            manageIdleSessions();
-         }
-      }, 10000);
+      this.idleManager = TimerManager.getInstance().register(this::manageIdleSessions, 10000);
    }
 
    private void cancelIdleManagerTask() {
@@ -276,12 +271,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
    }
 
    private void disposeLocks() {
-      LockCollector.getInstance().registerDisposeAction(new Runnable() {
-         @Override
-         public void run() {
-            emptyLocks();
-         }
-      });
+      LockCollector.getInstance().registerDisposeAction(this::emptyLocks);
    }
 
    private void emptyLocks() {

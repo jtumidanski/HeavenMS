@@ -1359,12 +1359,7 @@ public class World {
       try {
          Map<Integer, Integer> tabItemBought = cashItemBought.get(snid / 10000000);
 
-         Integer cur = tabItemBought.get(snid);
-         if (cur != null) {
-            tabItemBought.put(snid, cur + 1);
-         } else {
-            tabItemBought.put(snid, 1);
-         }
+         tabItemBought.merge(snid, 1, Integer::sum);
       } finally {
          suggestWLock.unlock();
       }
@@ -2008,12 +2003,7 @@ public class World {
    }
 
    private void disposeLocks() {
-      LockCollector.getInstance().registerDisposeAction(new Runnable() {
-         @Override
-         public void run() {
-            emptyLocks();
-         }
-      });
+      LockCollector.getInstance().registerDisposeAction(this::emptyLocks);
    }
 
    private void emptyLocks() {

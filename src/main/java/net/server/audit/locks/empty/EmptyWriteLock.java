@@ -44,8 +44,8 @@ public class EmptyWriteLock implements MonitoredWriteLock {
       String df = dateFormat.format(new Date());
 
       StringBuilder s = new StringBuilder("\r\n" + df + "\r\n");
-      for (int i = 0; i < list.length; i++) {
-         s.append("    ").append(list[i].toString()).append("\r\n");
+      for (StackTraceElement stackTraceElement : list) {
+         s.append("    ").append(stackTraceElement.toString()).append("\r\n");
       }
       s.append("----------------------------\r\n\r\n");
 

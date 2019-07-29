@@ -53,8 +53,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
       switch (mode) {
          case 0x00: // Level1~Level8 & Package1~Package2
             int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(slea.readInt());
-            for (int z = 0; z < toSpawn.length; z++) {
-               int[] toSpawnChild = toSpawn[z];
+            for (int[] toSpawnChild : toSpawn) {
                if (Randomizer.nextInt(100) < toSpawnChild[1]) {
                   c.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), c.getPlayer().getPosition());
                }

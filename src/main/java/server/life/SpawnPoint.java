@@ -67,11 +67,7 @@ public class SpawnPoint {
    }
 
    public boolean shouldForceSpawn() {
-      if (mobTime < 0 || spawnedMonsters.get() > 0) {
-         return false;
-      }
-
-      return true;
+      return mobTime >= 0 && spawnedMonsters.get() <= 0;
    }
 
    public MapleMonster getMonster() {

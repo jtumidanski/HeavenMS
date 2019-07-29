@@ -45,12 +45,7 @@ public class MapleMiniDungeon {
       baseMap = base;
       expireTime = timeLimit * 1000;
 
-      timeoutTask = TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            close();
-         }
-      }, expireTime);
+      timeoutTask = TimerManager.getInstance().schedule(this::close, expireTime);
 
       expireTime += System.currentTimeMillis();
    }

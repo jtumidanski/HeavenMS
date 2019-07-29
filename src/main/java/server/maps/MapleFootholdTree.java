@@ -143,9 +143,7 @@ public class MapleFootholdTree {
          }
          if ((p1.x > center.x || p2.x > center.x) && p1.y > center.y) {
             ret = se.findWallR(p1, p2);
-            if (ret != null) {
-               return ret;
-            }
+            return ret;
          }
       }
       return null;

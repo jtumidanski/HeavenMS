@@ -883,12 +883,7 @@ public class MapleMap {
             }
          }, ServerConstants.ITEM_MONITOR_TIME, ServerConstants.ITEM_MONITOR_TIME);
 
-         expireItemsTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               makeDisappearExpiredItemDrops();
-            }
-         }, ServerConstants.ITEM_EXPIRE_CHECK, ServerConstants.ITEM_EXPIRE_CHECK);
+         expireItemsTask = TimerManager.getInstance().register(this::makeDisappearExpiredItemDrops, ServerConstants.ITEM_EXPIRE_CHECK, ServerConstants.ITEM_EXPIRE_CHECK);
 
          if (ServerConstants.USE_SPAWN_LOOT_ON_ANIMATION) {
             lootLock.lock();
@@ -898,20 +893,10 @@ public class MapleMap {
                lootLock.unlock();
             }
 
-            mobSpawnLootTask = TimerManager.getInstance().register(new Runnable() {
-               @Override
-               public void run() {
-                  spawnMobItemDrops();
-               }
-            }, 200, 200);
+            mobSpawnLootTask = TimerManager.getInstance().register(this::spawnMobItemDrops, 200, 200);
          }
 
-         characterStatUpdateTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               runCharacterStatUpdate();
-            }
-         }, 200, 200);
+         characterStatUpdateTask = TimerManager.getInstance().register(this::runCharacterStatUpdate, 200, 200);
 
          itemMonitorTimeout = 1;
       } finally {
@@ -2306,12 +2291,12 @@ public class MapleMap {
       final Point dropPos = new Point(pos);
       dropPos.x -= (12 * list.size());
 
-      for (int i = 0; i < list.size(); i++) {
-         if (list.get(i) == 0) {
+      for (Integer integer : list) {
+         if (integer == 0) {
             spawnMesoDrop(owner != null ? 10 * owner.getMesoRate() : 10, calcDropPos(dropPos, pos), dropper, owner, playerDrop, (byte) (ffaDrop ? 2 : 0));
          } else {
             final Item drop;
-            int randomedId = list.get(i);
+            int randomedId = integer;
 
             if (ItemConstants.getInventoryType(randomedId) != MapleInventoryType.EQUIP) {
                drop = new Item(randomedId, (short) 0, (short) (rnd.nextInt(copies) + minCopies));
@@ -2607,10 +2592,10 @@ public class MapleMap {
       }
 
       MaplePet[] pets = chr.getPets();
-      for (int i = 0; i < pets.length; i++) {
-         if (pets[i] != null) {
-            pets[i].setPos(getGroundBelow(chr.getPosition()));
-            chr.announce(MaplePacketCreator.showPet(chr, pets[i], false, false));
+      for (MaplePet pet : pets) {
+         if (pet != null) {
+            pet.setPos(getGroundBelow(chr.getPosition()));
+            chr.announce(MaplePacketCreator.showPet(chr, pet, false, false));
          } else {
             break;
          }
@@ -3625,9 +3610,8 @@ public class MapleMap {
 
       chrRLock.lock();
       try {
-         final Iterator<MapleCharacter> ltr = characters.iterator();
-         while (ltr.hasNext()) {
-            if (rect.contains(ltr.next().getPosition())) {
+         for (MapleCharacter character : characters) {
+            if (rect.contains(character.getPosition())) {
                ret++;
             }
          }

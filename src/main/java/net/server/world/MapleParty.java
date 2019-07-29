@@ -432,12 +432,7 @@ public class MapleParty {
    }
 
    public void disposeLocks() {
-      LockCollector.getInstance().registerDisposeAction(new Runnable() {
-         @Override
-         public void run() {
-            emptyLocks();
-         }
-      });
+      LockCollector.getInstance().registerDisposeAction(this::emptyLocks);
    }
 
    private void emptyLocks() {
@@ -475,9 +470,6 @@ public class MapleParty {
          return false;
       }
       final MapleParty other = (MapleParty) obj;
-      if (id != other.id) {
-         return false;
-      }
-      return true;
+      return id == other.id;
    }
 }

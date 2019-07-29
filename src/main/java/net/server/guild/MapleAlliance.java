@@ -159,9 +159,7 @@ public class MapleAlliance {
             id = rs.getInt(1);
          }
 
-         for (int i = 0; i < guilds.size(); i++) {
-            int guild = guilds.get(i);
-
+         for (int guild : guilds) {
             ps = con.prepareStatement("INSERT INTO `allianceguilds` (`allianceid`, `guildid`) VALUES (?, ?)");
             ps.setInt(1, id);
             ps.setInt(2, guild);
@@ -379,9 +377,7 @@ public class MapleAlliance {
          ps.executeUpdate();
          ps.close();
 
-         for (int i = 0; i < guilds.size(); i++) {
-            int guild = guilds.get(i);
-
+         for (int guild : guilds) {
             ps = con.prepareStatement("INSERT INTO `allianceguilds` (`allianceid`, `guildid`) VALUES (?, ?)");
             ps.setInt(1, this.allianceId);
             ps.setInt(2, guild);

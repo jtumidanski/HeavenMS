@@ -991,7 +991,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public boolean isControllerHasAggro() {
-      return fake ? false : controllerHasAggro;
+      return !fake && controllerHasAggro;
    }
 
    private void setControllerHasAggro(boolean controllerHasAggro) {
@@ -1001,7 +1001,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public boolean isControllerKnowsAboutAggro() {
-      return fake ? false : controllerKnowsAboutAggro;
+      return !fake && controllerKnowsAboutAggro;
    }
 
    private void setControllerKnowsAboutAggro(boolean controllerKnowsAboutAggro) {
@@ -1787,9 +1787,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
          // check whether mob is currently under a puppet's field of action or not
          if (summon != null) {
-            if (isPuppetInVicinity(summon)) {
-               return true;
-            }
+            return isPuppetInVicinity(summon);
          } else {
             map.getAggroCoordinator().removePuppetAggro(chr.getId());
          }
@@ -1802,9 +1800,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       MapleCharacter chrController = this.getActiveController();
 
       if (chrController != null) {
-         if (this.isCharacterPuppetInVicinity(chrController)) {
-            return true;
-         }
+         return this.isCharacterPuppetInVicinity(chrController);
       }
 
       return false;
@@ -2172,12 +2168,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private void disposeLocks() {
-      LockCollector.getInstance().registerDisposeAction(new Runnable() {
-         @Override
-         public void run() {
-            emptyLocks();
-         }
-      });
+      LockCollector.getInstance().registerDisposeAction(this::emptyLocks);
    }
 
    private void emptyLocks() {

@@ -941,12 +941,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          MapleStatEffect mse = mseStack.peek();
-         Integer count = leafBuffCount.get(mse);
-         if (count == null) {
-            leafBuffCount.put(mse, 1);
-         } else {
-            leafBuffCount.put(mse, count + 1);
-         }
+         leafBuffCount.merge(mse, 1, Integer::sum);
       }
 
       return leafBuffCount;
@@ -999,12 +994,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             MapleStatEffect mse = emse.getLeft();
             mbsStack.push(mse);
 
-            Set<MapleBuffStat> mbsStats = stackedBuffStats.get(mse);
-            if (mbsStats == null) {
-               mbsStats = new LinkedHashSet<>();
-               stackedBuffStats.put(mse, mbsStats);
-            }
-
+            Set<MapleBuffStat> mbsStats = stackedBuffStats.computeIfAbsent(mse, k -> new LinkedHashSet<>());
             mbsStats.add(mbs);
          }
       }
@@ -1034,17 +1024,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          for (Pair<MapleBuffStat, Integer> statup : mse.getStatups()) {
             MapleBuffStat stat = statup.getLeft();
 
-            List<Pair<MapleStatEffect, Integer>> statBuffs = buffEffects.get(stat);
-            if (statBuffs == null) {
-               statBuffs = new ArrayList<>();
-               buffEffects.put(stat, statBuffs);
-            }
-
+            List<Pair<MapleStatEffect, Integer>> statBuffs = buffEffects.computeIfAbsent(stat, k -> new ArrayList<>());
             statBuffs.add(new Pair<>(mse, statup.getRight()));
          }
       }
 
-      Comparator<Pair<MapleStatEffect, Integer>> cmp = new Comparator<Pair<MapleStatEffect, Integer>>() {
+      Comparator<Pair<MapleStatEffect, Integer>> cmp = new Comparator<>() {
          @Override
          public int compare(Pair<MapleStatEffect, Integer> o1, Pair<MapleStatEffect, Integer> o2) {
             return o2.getRight().compareTo(o1.getRight());
@@ -1922,9 +1907,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          String prop = eim.getProperty("groomId");
 
          if (prop != null) {
-            if ((Integer.parseInt(prop) == id || eim.getIntProperty("brideId") == id) && (mapid == 680000110 || mapid == 680000210)) {
-               return true;
-            }
+            return (Integer.parseInt(prop) == id || eim.getIntProperty("brideId") == id) && (mapid == 680000110 || mapid == 680000210);
          }
       }
 
@@ -2711,11 +2694,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                if (value == 1 && ((returnMapid == 211000000 && thisMapid != 200082300) || returnMapid == 193000000)) {
                   return true;        //protection from cold
-               } else if (value == 2 && (returnMapid == 230000000 || thisMapid == 200082300)) {
-                  return true;        //breathing underwater
-               } else {
-                  return false;
-               }
+               } else return value == 2 && (returnMapid == 230000000 || thisMapid == 200082300);        //breathing underwater
             }
          }
       } finally {
@@ -3662,12 +3641,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void startHpDecreaseTask(long lastHpTask) {
-      hpDecreaseTask = TimerManager.getInstance().register(new Runnable() {
-         @Override
-         public void run() {
-            doHurtHp();
-         }
-      }, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL - lastHpTask);
+      hpDecreaseTask = TimerManager.getInstance().register(this::doHurtHp, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL - lastHpTask);
    }
 
    public void resetHpDecreaseTask() {
@@ -3828,8 +3802,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                long expiration, currenttime = System.currentTimeMillis();
                Set<Skill> keys = getSkills().keySet();
-               for (Iterator<Skill> i = keys.iterator(); i.hasNext(); ) {
-                  Skill key = i.next();
+               for (Skill key : keys) {
                   SkillEntry skill = getSkills().get(key);
                   if (skill.expiration != -1 && skill.expiration < currenttime) {
                      changeSkillLevel(key, (byte) -1, 0, -1);
@@ -6657,9 +6630,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean hasEntered(String script, int mapId) {
       if (entered.containsKey(mapId)) {
-         if (entered.get(mapId).equals(script)) {
-            return true;
-         }
+         return entered.get(mapId).equals(script);
       }
       return false;
    }
@@ -8294,8 +8265,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          ps.setInt(22, remainingAp);
 
          StringBuilder sps = new StringBuilder();
-         for (int i = 0; i < remainingSp.length; i++) {
-            sps.append(remainingSp[i]);
+         for (int value : remainingSp) {
+            sps.append(value);
             sps.append(",");
          }
          String sp = sps.toString();
@@ -8446,8 +8417,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             ps.setInt(11, maxhp);
             ps.setInt(12, maxmp);
             StringBuilder sps = new StringBuilder();
-            for (int i = 0; i < remainingSp.length; i++) {
-               sps.append(remainingSp[i]);
+            for (int value : remainingSp) {
+               sps.append(value);
                sps.append(",");
             }
             String sp = sps.toString();
@@ -9668,12 +9639,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       try {
          if (!questExpirations.isEmpty()) {
             if (questExpireTask == null) {
-               questExpireTask = TimerManager.getInstance().register(new Runnable() {
-                  @Override
-                  public void run() {
-                     runQuestExpireTask();
-                  }
-               }, 10 * 1000);
+               questExpireTask = TimerManager.getInstance().register(this::runQuestExpireTask, 10 * 1000);
             }
          }
       } finally {
@@ -9713,12 +9679,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       evtLock.lock();
       try {
          if (questExpireTask == null) {
-            questExpireTask = TimerManager.getInstance().register(new Runnable() {
-               @Override
-               public void run() {
-                  runQuestExpireTask();
-               }
-            }, 10 * 1000);
+            questExpireTask = TimerManager.getInstance().register(this::runQuestExpireTask, 10 * 1000);
          }
 
          questExpirations.put(quest, Server.getInstance().getCurrentTime() + time);
@@ -9960,11 +9921,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean isTrockMap(int id) {
       int index = trockmaps.indexOf(id);
-      if (index != -1) {
-         return true;
-      }
-
-      return false;
+      return index != -1;
    }
 
    public int getVipTrockSize() {
@@ -9993,11 +9950,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean isVipTrockMap(int id) {
       int index = viptrockmaps.indexOf(id);
-      if (index != -1) {
-         return true;
-      }
-
-      return false;
+      return index != -1;
    }
 
    public AutobanManager getAutobanManager() {

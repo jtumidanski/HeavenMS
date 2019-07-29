@@ -36,8 +36,8 @@ public class HexTool {
 
    public static String toString(byte[] bytes) {
       StringBuilder hexed = new StringBuilder();
-      for (int i = 0; i < bytes.length; i++) {
-         hexed.append(toString(bytes[i]));
+      for (byte aByte : bytes) {
+         hexed.append(toString(aByte));
          hexed.append(' ');
       }
       return hexed.substring(0, hexed.length() - 1);
@@ -45,8 +45,8 @@ public class HexTool {
 
    public static String toCompressedString(byte[] bytes) {
       StringBuilder hexed = new StringBuilder();
-      for (int i = 0; i < bytes.length; i++) {
-         hexed.append(toString(bytes[i]));
+      for (byte aByte : bytes) {
+         hexed.append(toString(aByte));
       }
       return hexed.substring(0, hexed.length());
    }
@@ -87,7 +87,7 @@ public class HexTool {
       return baos.toByteArray();
    }
 
-   public static final String toStringFromAscii(final byte[] bytes) {
+   public static String toStringFromAscii(final byte[] bytes) {
       byte[] ret = new byte[bytes.length];
       for (int x = 0; x < bytes.length; x++) {
          if (bytes[x] < 32 && bytes[x] >= 0) {

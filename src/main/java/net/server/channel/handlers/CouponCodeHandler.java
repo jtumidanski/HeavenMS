@@ -65,21 +65,10 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
       while (rs.next()) {
          int type = rs.getInt("type"), quantity = rs.getInt("quantity");
          if (type < 5) {
-            Integer i = couponPoints.get(type);
-            if (i != null) {
-               couponPoints.put(type, i + quantity);
-            } else {
-               couponPoints.put(type, quantity);
-            }
+            couponPoints.merge(type, quantity, Integer::sum);
          } else {
             int item = rs.getInt("item");
-
-            Integer i = couponItems.get(item);
-            if (i != null) {
-               couponItems.put(item, i + quantity);
-            } else {
-               couponItems.put(item, quantity);
-            }
+            couponItems.merge(item, quantity, Integer::sum);
          }
       }
 
