@@ -70,7 +70,7 @@ public abstract class AbstractScriptManager {
             }
             engine.eval(fr);
          } catch (final ScriptException | IOException t) {
-            FilePrinter.printError(FilePrinter.INVOCABLE + path.substring(12, path.length()), t, path);
+            FilePrinter.printError(FilePrinter.INVOCABLE + path.substring(12), t, path);
             return null;
          }
       }

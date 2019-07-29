@@ -322,7 +322,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
             short newHp = (short) (hpMpPool >> 48);
             short newMp = (short) (hpMpPool >> 32);
             short newMaxHp = (short) (hpMpPool >> 16);
-            short newMaxMp = (short) (hpMpPool.shortValue());
+            short newMaxMp = hpMpPool.shortValue();
 
             if (newMaxHp != Short.MIN_VALUE) {
                if (newMaxHp < 50) {
@@ -361,7 +361,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
             short newStr = (short) (strDexIntLuk >> 48);
             short newDex = (short) (strDexIntLuk >> 32);
             short newInt = (short) (strDexIntLuk >> 16);
-            short newLuk = (short) (strDexIntLuk.shortValue());
+            short newLuk = strDexIntLuk.shortValue();
 
             if (newStr >= 4) {
                setStr(newStr);
@@ -393,7 +393,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
 
          if (newSp != null) {
             short sp = (short) (newSp >> 16);
-            short skillbook = (short) (newSp.shortValue());
+            short skillbook = newSp.shortValue();
 
             setRemainingSp(sp, skillbook);
             statUpdates.put(MapleStat.AVAILABLESP, remainingSp[skillbook]);

@@ -127,7 +127,7 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
                               }
 
                               for (byte b = 0; b < qty; b++) {
-                                 pos.x = (int) (playerpos + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2))));
+                                 pos.x = playerpos + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
                                  map.spawnItemDrop(chr, chr, new Item(loseItem.getId(), (short) 0, (short) 1), map.calcDropPos(pos, chr.getPosition()), true, true);
                                  d++;
                               }

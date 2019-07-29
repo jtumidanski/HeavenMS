@@ -184,7 +184,7 @@ class PairedQuicksort {
          if (i <= j) {
             w = (Equip) A.get(i);
             A.set(i, A.get(j));
-            A.set(j, (Item) w);
+            A.set(j, w);
 
             i++;
             j--;
@@ -285,7 +285,7 @@ public final class InventorySortHandler extends AbstractMaplePacketHandler {
          for (short i = 1; i <= inventory.getSlotLimit(); i++) {
             Item item = inventory.getItem(i);
             if (item != null) {
-               itemarray.add((Item) item.copy());
+               itemarray.add(item.copy());
             }
          }
 

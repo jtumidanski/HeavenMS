@@ -153,7 +153,7 @@ public final class Channel {
          acceptor = new NioSocketAcceptor();
          acceptor.setHandler(new MapleServerHandler(world, channel));
          acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
-         acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
+         acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MapleCodecFactory()));
          acceptor.bind(new InetSocketAddress(port));
          ((SocketSessionConfig) acceptor.getSessionConfig()).setTcpNoDelay(true);
          expedType.addAll(Arrays.asList(MapleExpeditionType.values()));

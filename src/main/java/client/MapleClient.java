@@ -715,7 +715,7 @@ public class MapleClient {
 
          int len = convert.length();
          for (int i = len - 2; i >= 0; i -= 2) {
-            hwid.append(convert.substring(i, i + 2));
+            hwid.append(convert, i, i + 2);
          }
          hwid.insert(4, "-");
 

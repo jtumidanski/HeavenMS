@@ -144,12 +144,12 @@ public class ItemAction extends MapleQuestAction {
          }
 
          MapleInventoryManipulator.removeById(chr.getClient(), type, iPair.getLeft(), quantity, true, false);
-         chr.announce(MaplePacketCreator.getShowItemGain(iPair.getLeft(), (short) iPair.getRight().shortValue(), true));
+         chr.announce(MaplePacketCreator.getShowItemGain(iPair.getLeft(), iPair.getRight().shortValue(), true));
       }
 
       for (Pair<Integer, Integer> iPair : giveItem) {
-         MapleInventoryManipulator.addById(chr.getClient(), iPair.getLeft(), (short) iPair.getRight().shortValue(), "", -1);
-         chr.announce(MaplePacketCreator.getShowItemGain(iPair.getLeft(), (short) iPair.getRight().shortValue(), true));
+         MapleInventoryManipulator.addById(chr.getClient(), iPair.getLeft(), iPair.getRight().shortValue(), "", -1);
+         chr.announce(MaplePacketCreator.getShowItemGain(iPair.getLeft(), iPair.getRight().shortValue(), true));
       }
    }
 

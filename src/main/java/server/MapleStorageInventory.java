@@ -145,7 +145,7 @@ class PairedQuicksort {
          if (i <= j) {
             w = (Equip) A.get(i);
             A.set(i, A.get(j));
-            A.set(j, (Item) w);
+            A.set(j, w);
 
             i++;
             j--;
@@ -220,8 +220,8 @@ public class MapleStorageInventory {
    }
 
    private void move(short sSlot, short dSlot, short slotMax) {
-      Item source = (Item) inventory.get(sSlot);
-      Item target = (Item) inventory.get(dSlot);
+      Item source = inventory.get(sSlot);
+      Item target = inventory.get(dSlot);
       if (source == null) {
          return;
       }
@@ -349,7 +349,7 @@ public class MapleStorageInventory {
       for (short i = 1; i <= this.getSlotLimit(); i++) {
          Item item = this.getItem(i);
          if (item != null) {
-            itemarray.add((Item) item.copy());
+            itemarray.add(item.copy());
          }
       }
 

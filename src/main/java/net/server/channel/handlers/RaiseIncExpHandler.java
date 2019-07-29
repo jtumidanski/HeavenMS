@@ -43,7 +43,7 @@ public class RaiseIncExpHandler extends AbstractMaplePacketHandler {
                   return;
                }
 
-               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.getByType(inventorytype), (short) slot, (short) 1, false, true);
+               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.getByType(inventorytype), slot, (short) 1, false, true);
             } finally {
                inv.unlockInventory();
             }

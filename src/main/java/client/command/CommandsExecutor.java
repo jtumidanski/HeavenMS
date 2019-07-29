@@ -340,7 +340,7 @@ public class CommandsExecutor {
    }
 
    private void registerLv0Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand(new String[]{"help", "commands"}, HelpCommand.class);
       addCommand("droplimit", DropLimitCommand.class);
@@ -376,7 +376,7 @@ public class CommandsExecutor {
 
 
    private void registerLv1Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand("whatdropsfrom", 1, WhatDropsFromCommand.class);
       addCommand("whodrops", 1, WhoDropsCommand.class);
@@ -388,7 +388,7 @@ public class CommandsExecutor {
 
 
    private void registerLv2Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand("recharge", 2, RechargeCommand.class);
       addCommand("whereami", 2, WhereaMiCommand.class);
@@ -430,7 +430,7 @@ public class CommandsExecutor {
    }
 
    private void registerLv3Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand("debuff", 3, DebuffCommand.class);
       addCommand("fly", 3, FlyCommand.class);
@@ -496,7 +496,7 @@ public class CommandsExecutor {
    }
 
    private void registerLv4Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand("servermessage", 4, ServerMessageCommand.class);
       addCommand("proitem", 4, ProItemCommand.class);
@@ -527,7 +527,7 @@ public class CommandsExecutor {
    }
 
    private void registerLv5Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand("debug", 5, DebugCommand.class);
       addCommand("set", 5, SetCommand.class);
@@ -540,7 +540,7 @@ public class CommandsExecutor {
    }
 
    private void registerLv6Commands() {
-      levelCommandsCursor = new Pair<>((List<String>) new ArrayList<String>(), (List<String>) new ArrayList<String>());
+      levelCommandsCursor = new Pair<>(new ArrayList<String>(), new ArrayList<String>());
 
       addCommand("setgmlevel", 6, SetGmLevelCommand.class);
       addCommand("warpworld", 6, WarpWorldCommand.class);

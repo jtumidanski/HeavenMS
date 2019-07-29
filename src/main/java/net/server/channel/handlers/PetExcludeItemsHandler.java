@@ -40,7 +40,7 @@ public final class PetExcludeItemsHandler extends AbstractMaplePacketHandler {
       slea.skip(4);
 
       MapleCharacter chr = c.getPlayer();
-      byte petIndex = (byte) chr.getPetIndex(petId);
+      byte petIndex = chr.getPetIndex(petId);
       if (petIndex < 0) return;
 
       final MaplePet pet = chr.getPet(petIndex);

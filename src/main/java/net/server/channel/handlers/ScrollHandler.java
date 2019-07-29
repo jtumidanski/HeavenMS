@@ -102,7 +102,7 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
                   announceCannotScroll(c, legendarySpirit);
                   return;
                }
-            } else if (!ItemConstants.isModifierScroll(scroll.getItemId()) && ((Equip) toScroll).getUpgradeSlots() < 1) {
+            } else if (!ItemConstants.isModifierScroll(scroll.getItemId()) && toScroll.getUpgradeSlots() < 1) {
                announceCannotScroll(c, legendarySpirit);   // thanks onechord for noticing zero upgrade slots freezing Legendary Scroll UI
                return;
             }

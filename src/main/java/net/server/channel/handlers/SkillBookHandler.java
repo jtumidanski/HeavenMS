@@ -45,7 +45,7 @@ public final class SkillBookHandler extends AbstractMaplePacketHandler {
       }
 
       slea.readInt();
-      short slot = (short) slea.readShort();
+      short slot = slea.readShort();
       int itemId = slea.readInt();
 
       boolean canuse;

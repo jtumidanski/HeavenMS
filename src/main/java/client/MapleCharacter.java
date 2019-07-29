@@ -389,7 +389,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (type == MapleInventoryType.CASH) {
             b = 96;
          }
-         inventory[type.ordinal()] = new MapleInventory(this, type, (byte) b);
+         inventory[type.ordinal()] = new MapleInventory(this, type, b);
       }
       inventory[MapleInventoryType.CANHOLD.ordinal()] = new MapleInventoryProof(this);
 
@@ -4822,7 +4822,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             retrievedEffects.put(mbsvh.effect.getBuffSourceId(), new Pair<>(mbsvh.effect, mbsvh.startTime));
          }
 
-         maxBuffValue.put(mbs, new Pair<>(Integer.MIN_VALUE, (MapleStatEffect) null));
+         maxBuffValue.put(mbs, new Pair<>(Integer.MIN_VALUE, null));
       }
 
       Map<MapleStatEffect, Integer> updateEffects = new LinkedHashMap<>();
@@ -9139,7 +9139,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       MapleInventory inv = getInventory(type);
       inv.lockInventory();
       try {
-         Item item = inv.getItem((short) slot);
+         Item item = inv.getItem(slot);
          if (item == null) { //Basic check
             return (0);
          }
@@ -9547,7 +9547,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (qs.getQuest().getInfoNumber() > 0) {
          announce(MaplePacketCreator.updateQuest(qs, true));
       }
-      announce(MaplePacketCreator.updateQuestInfo((short) qs.getQuest().getId(), qs.getNpc()));
+      announce(MaplePacketCreator.updateQuestInfo(qs.getQuest().getId(), qs.getNpc()));
    }
 
    public void awardQuestPoint(int awardedPoints) {
@@ -9577,7 +9577,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (quest.getQuest().getInfoNumber() > 0) {
             announce(MaplePacketCreator.updateQuest(quest, true));
          }
-         announce(MaplePacketCreator.updateQuestInfo((short) quest.getQuest().getId(), quest.getNpc()));
+         announce(MaplePacketCreator.updateQuestInfo(quest.getQuest().getId(), quest.getNpc()));
       } else if (quest.getStatus().equals(MapleQuestStatus.Status.COMPLETED)) {
          MapleQuest mquest = quest.getQuest();
          short questid = mquest.getId();

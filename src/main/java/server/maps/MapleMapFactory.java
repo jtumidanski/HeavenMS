@@ -391,13 +391,12 @@ public class MapleMapFactory {
 
    private static String getMapName(int mapid) {
       String mapName = StringUtil.getLeftPaddedStr(Integer.toString(mapid), '0', 9);
-      StringBuilder builder = new StringBuilder("Map/Map");
       int area = mapid / 100000000;
-      builder.append(area);
-      builder.append("/");
-      builder.append(mapName);
-      builder.append(".img");
-      mapName = builder.toString();
+      String builder = "Map/Map" + area +
+            "/" +
+            mapName +
+            ".img";
+      mapName = builder;
       return mapName;
    }
 

@@ -932,7 +932,7 @@ public class Server {
       IoBuffer.setUseDirectBuffer(false);
       IoBuffer.setAllocator(new SimpleBufferAllocator());
       acceptor = new NioSocketAcceptor();
-      acceptor.getFilterChain().addLast("codec", (IoFilter) new ProtocolCodecFilter(new MapleCodecFactory()));
+      acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new MapleCodecFactory()));
 
       ThreadManager.getInstance().start();
       TimerManager tMan = TimerManager.getInstance();

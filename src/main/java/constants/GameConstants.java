@@ -512,8 +512,8 @@ public class GameConstants {
    private static boolean isInBranchJobTree(int skillJobId, int jobId, int branchType) {
       int branch = (int) (Math.pow(10, branchType));
 
-      int skillBranch = (int) (skillJobId / branch) * branch;
-      int jobBranch = (int) (jobId / branch) * branch;
+      int skillBranch = (skillJobId / branch) * branch;
+      int jobBranch = (jobId / branch) * branch;
 
       return skillBranch == jobBranch;
    }
@@ -521,8 +521,8 @@ public class GameConstants {
    private static boolean hasDivergedBranchJobTree(int skillJobId, int jobId, int branchType) {
       int branch = (int) (Math.pow(10, branchType));
 
-      int skillBranch = (int) (skillJobId / branch);
-      int jobBranch = (int) (jobId / branch);
+      int skillBranch = skillJobId / branch;
+      int jobBranch = jobId / branch;
 
       return skillBranch != jobBranch && skillBranch % 10 != 0;
    }

@@ -87,7 +87,7 @@ public enum ItemFactory {
       equip.setWatk((short) rs.getInt("watk"));
       equip.setWdef((short) rs.getInt("wdef"));
       equip.setUpgradeSlots((byte) rs.getInt("upgradeslots"));
-      equip.setLevel((byte) rs.getByte("level"));
+      equip.setLevel(rs.getByte("level"));
       equip.setItemExp(rs.getInt("itemexp"));
       equip.setItemLevel(rs.getByte("itemlevel"));
       equip.setExpiration(rs.getLong("expiration"));
@@ -207,10 +207,9 @@ public enum ItemFactory {
       Lock lock = locks[id % lockCount];
       lock.lock();
       try {
-         StringBuilder query = new StringBuilder();
-         query.append("DELETE `inventoryitems`, `inventoryequipment` FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `");
-         query.append(account ? "accountid" : "characterid").append("` = ?");
-         ps = con.prepareStatement(query.toString());
+         String query = "DELETE `inventoryitems`, `inventoryequipment` FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `" +
+               (account ? "accountid" : "characterid") + "` = ?";
+         ps = con.prepareStatement(query);
          ps.setInt(1, value);
          ps.setInt(2, id);
          ps.executeUpdate();
