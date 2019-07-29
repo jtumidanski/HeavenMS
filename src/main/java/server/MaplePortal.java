@@ -25,10 +25,10 @@ import java.awt.Point;
 import client.MapleClient;
 
 public interface MaplePortal {
-    public final int MAP_PORTAL = 2;
-    public final int DOOR_PORTAL = 6;
-    public static boolean OPEN = true;
-    public static boolean CLOSED = false;
+    int MAP_PORTAL = 2;
+    int DOOR_PORTAL = 6;
+    boolean OPEN = true;
+    boolean CLOSED = false;
     int getType();
     int getId();
     Point getPosition();

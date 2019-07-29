@@ -459,13 +459,13 @@ public class EventInstanceManager {
         public void changedMap(final MapleCharacter chr, final int mapId) {
                 try {
                         invokeScriptFunction("changedMap", EventInstanceManager.this, chr, mapId);
-                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
 	}
         
         public void afterChangedMap(final MapleCharacter chr, final int mapId) {
                 try {
                         invokeScriptFunction("afterChangedMap", EventInstanceManager.this, chr, mapId);
-                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
 	}
         
         public synchronized void changedLeader(final MapleCharacter ldr) {
@@ -516,19 +516,19 @@ public class EventInstanceManager {
         public void friendlyKilled(final MapleMonster mob, final boolean hasKiller) {
                 try {
                         invokeScriptFunction("friendlyKilled", mob, EventInstanceManager.this, hasKiller);
-                } catch (ScriptException | NoSuchMethodException ex) {} //optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} //optional
 	}
         
         public void friendlyDamaged(final MapleMonster mob) {
                 try {
                         invokeScriptFunction("friendlyDamaged", EventInstanceManager.this, mob);
-                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
 	}
         
         public void friendlyItemDrop(final MapleMonster mob) {
                 try {
                         invokeScriptFunction("friendlyItemDrop", EventInstanceManager.this, mob);
-                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
 	}
 
 	public void playerKilled(final MapleCharacter chr) {
@@ -537,7 +537,7 @@ public class EventInstanceManager {
                         public void run() {
                                 try {
                                         invokeScriptFunction("playerDead", EventInstanceManager.this, chr);
-                                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
                         }
                 });
 	}
@@ -545,7 +545,7 @@ public class EventInstanceManager {
         public void reviveMonster(final MapleMonster mob) {
                 try {
                         invokeScriptFunction("monsterRevive", EventInstanceManager.this, mob);
-                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
 	}
         
 	public boolean revivePlayer(final MapleCharacter chr) {
@@ -554,7 +554,7 @@ public class EventInstanceManager {
                         if (b instanceof Boolean) {
                                 return (Boolean) b;
                         }
-                } catch (ScriptException | NoSuchMethodException ex) {} // optional
+                } catch (ScriptException | NoSuchMethodException ignored) {} // optional
                 
 		return true;
 	}
@@ -916,7 +916,7 @@ public class EventInstanceManager {
             
             if (ServerConstants.JAVA_8) {
                 for (Object d: list) {
-                    intList.add(((Integer) d).intValue());
+                    intList.add((Integer) d);
                 }
             } else {
                 for (Object d: list) {

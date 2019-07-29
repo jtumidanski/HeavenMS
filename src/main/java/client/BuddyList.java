@@ -53,7 +53,7 @@ public class BuddyList {
 
     public boolean contains(int characterId) {
         synchronized(buddies) {
-            return buddies.containsKey(Integer.valueOf(characterId));
+            return buddies.containsKey(characterId);
         }
     }
 
@@ -80,7 +80,7 @@ public class BuddyList {
 
     public BuddylistEntry get(int characterId) {
         synchronized(buddies) {
-            return buddies.get(Integer.valueOf(characterId));
+            return buddies.get(characterId);
         }
     }
 
@@ -97,13 +97,13 @@ public class BuddyList {
 
     public void put(BuddylistEntry entry) {
         synchronized(buddies) {
-            buddies.put(Integer.valueOf(entry.getCharacterId()), entry);
+            buddies.put(entry.getCharacterId(), entry);
         }
     }
 
     public void remove(int characterId) {
         synchronized(buddies) {
-            buddies.remove(Integer.valueOf(characterId));
+            buddies.remove(characterId);
         }
     }
 
@@ -121,7 +121,7 @@ public class BuddyList {
 
     public int[] getBuddyIds() {
         synchronized(buddies) {
-            int buddyIds[] = new int[buddies.size()];
+           int[] buddyIds = new int[buddies.size()];
             int i = 0;
             for (BuddylistEntry ble : buddies.values()) {
                 buddyIds[i++] = ble.getCharacterId();

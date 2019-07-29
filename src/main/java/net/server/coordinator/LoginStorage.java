@@ -37,7 +37,7 @@ public class LoginStorage {
     private ConcurrentHashMap<Integer, List<Long>> loginHistory = new ConcurrentHashMap<>();
     
     public boolean registerLogin(int accountId) {
-        List<Long> accHist = loginHistory.putIfAbsent(accountId, new LinkedList<Long>());
+        List<Long> accHist = loginHistory.putIfAbsent(accountId, new LinkedList<>());
         if (accHist != null) {
             synchronized (accHist) {
                 if (accHist.size() > ServerConstants.MAX_ACCOUNT_LOGIN_ATTEMPT) {

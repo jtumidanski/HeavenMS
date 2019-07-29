@@ -69,7 +69,7 @@ public class FaceCommand extends Command {
                     player.yellowMessage("Player '" + params[0] + "' has not been found on this channel.");
                 }
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
     }

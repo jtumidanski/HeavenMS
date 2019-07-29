@@ -37,8 +37,8 @@ import tools.data.input.LittleEndianAccessor;
 
 public class ListWZFile {
     private LittleEndianAccessor lea;
-    private List<String> entries = new ArrayList<String>();
-    private static Collection<String> modernImgs = new HashSet<String>();
+    private List<String> entries = new ArrayList<>();
+    private static Collection<String> modernImgs = new HashSet<>();
 
     public static byte[] xorBytes(byte[] a, byte[] b) {
         byte[] wusched = new byte[a.length];
@@ -73,7 +73,7 @@ public class ListWZFile {
             ListWZFile listwz;
             try {
                 listwz = new ListWZFile(MapleDataProviderFactory.fileInWZPath("List.wz"));
-                modernImgs = new HashSet<String>(listwz.getEntries());
+                modernImgs = new HashSet<>(listwz.getEntries());
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }

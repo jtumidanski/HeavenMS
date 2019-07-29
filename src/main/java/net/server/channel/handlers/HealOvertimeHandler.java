@@ -25,7 +25,6 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
 import client.autoban.AutobanManager;
-import constants.GameConstants;
 import net.AbstractMaplePacketHandler;
 import net.server.Server;
 import server.maps.MapleMapFactory;

@@ -422,9 +422,7 @@ public class MapleQuest {
         }
 	
 	public static void clearCache(int quest) {
-		if(quests.containsKey(quest)){
-			quests.remove(quest);
-		}
+      quests.remove(quest);
 	}
 	
 	public static void clearCache() {

@@ -92,7 +92,7 @@ public class MaplePlayerNPCPodium {
                 playerNpcs.add((MaplePlayerNPC) mmo);
             }
             
-            Collections.sort(playerNpcs, new Comparator<MaplePlayerNPC>() {
+            playerNpcs.sort(new Comparator<>() {
                 @Override
                 public int compare(MaplePlayerNPC p1, MaplePlayerNPC p2) {
                     return p1.getScriptId() - p2.getScriptId(); // scriptid as playernpc history

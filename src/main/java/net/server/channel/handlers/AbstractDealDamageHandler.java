@@ -200,7 +200,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
             if (attack.skill == ChiefBandit.MESO_EXPLOSION) {
                 int delay = 0;
                 for (Integer oned : attack.allDamage.keySet()) {
-                    MapleMapObject mapobject = map.getMapObject(oned.intValue());
+                    MapleMapObject mapobject = map.getMapObject(oned);
                     if (mapobject != null && mapobject.getType() == MapleMapObjectType.ITEM) {
                         final MapleMapItem mapitem = (MapleMapItem) mapobject;
                             if (mapitem.getMeso() == 0) { //Maybe it is possible some how?
@@ -236,7 +236,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                 }
             }
             for (Integer oned : attack.allDamage.keySet()) {
-                final MapleMonster monster = map.getMonsterByOid(oned.intValue());
+                final MapleMonster monster = map.getMonsterByOid(oned);
                 if (monster != null) { 
                     double distance = player.getPosition().distanceSq(monster.getPosition());
                     double distanceToDetect = 200000.0;
@@ -294,7 +294,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                         int picklv = (player.isGM()) ? pickpocket.getMaxLevel() : player.getSkillLevel(pickpocket);
                         if(picklv > 0) {
                             int delay = 0;
-                            final int maxmeso = player.getBuffedValue(MapleBuffStat.PICKPOCKET).intValue();
+                            final int maxmeso = player.getBuffedValue(MapleBuffStat.PICKPOCKET);
                             for (Integer eachd : onedList) {				
                                 eachd += Integer.MAX_VALUE;
 
@@ -454,7 +454,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                     if (attack.skill != 0) {
                         if (attackEffect.getFixDamage() != -1) {
                             if (totDamageToOneMonster != attackEffect.getFixDamage() && totDamageToOneMonster != 0) {
-                                AutobanFactory.FIX_DAMAGE.autoban(player, String.valueOf(totDamageToOneMonster) + " damage");
+                                AutobanFactory.FIX_DAMAGE.autoban(player, totDamageToOneMonster + " damage");
                             }
                             
                             int threeSnailsId = player.getJobType() * 10000000 + 1000;
@@ -603,7 +603,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                 for (int j = 0; j < bullets; j++) {
                     int mesoid = lea.readInt();
                     lea.skip(1);
-                    ret.allDamage.put(Integer.valueOf(mesoid), null);
+                    ret.allDamage.put(mesoid, null);
                 }
                 return ret;
             } else {
@@ -617,16 +617,16 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                     List<Integer> allDamageNumbers = new ArrayList<>();
                     for (int j = 0; j < bullets; j++) {
                         int damage = lea.readInt();
-                        allDamageNumbers.add(Integer.valueOf(damage));
+                        allDamageNumbers.add(damage);
                     }
-                    ret.allDamage.put(Integer.valueOf(oid), allDamageNumbers);
+                    ret.allDamage.put(oid, allDamageNumbers);
                     lea.skip(4);
                 } else {
                     int bullets = lea.readByte();
                     for (int j = 0; j < bullets; j++) {
                         int mesoid = lea.readInt();
                         lea.skip(1);
-                        ret.allDamage.put(Integer.valueOf(mesoid), null);
+                        ret.allDamage.put(mesoid, null);
                     }
                 }
             }
@@ -893,7 +893,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
             if (ret.skill != Corsair.RAPID_FIRE || ret.skill != Aran.HIDDEN_FULL_DOUBLE || ret.skill != Aran.HIDDEN_FULL_TRIPLE || ret.skill != Aran.HIDDEN_OVER_DOUBLE || ret.skill != Aran.HIDDEN_OVER_TRIPLE) {
             	lea.skip(4);
             }
-            ret.allDamage.put(Integer.valueOf(oid), allDamageNumbers);
+            ret.allDamage.put(oid, allDamageNumbers);
         }
         if (ret.skill == NightWalker.POISON_BOMB) { // Poison Bomb
             lea.skip(4);

@@ -93,7 +93,7 @@ public final class WeddingHandler extends AbstractMaplePacketHandler {
                             } else {
                                 c.announce(Wedding.OnWeddingGiftResult((byte) 0xC, marriage.getWishlistItems(groomWishlist), null));
                             }
-                        } catch (NumberFormatException nfe) {}
+                        } catch (NumberFormatException ignored) {}
                     } else {
                         c.announce(MaplePacketCreator.enableActions());
                     }

@@ -243,7 +243,7 @@ public final class PlayerInteractionHandler extends AbstractMaplePacketHandler {
                             chr.getClient().announce(MaplePacketCreator.getMiniRoomError(10));
                             return;
                         }
-                    } catch (NullPointerException npe) {}
+                    } catch (NullPointerException ignored) {}
                     
                     String desc = slea.readMapleAsciiString();
                     slea.skip(3);
@@ -369,7 +369,7 @@ public final class PlayerInteractionHandler extends AbstractMaplePacketHandler {
                     if(ServerConstants.USE_ERASE_PERMIT_ON_OPENSHOP) {
                         try {
                             MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, shop.getItemId(), 1, true, false);
-                        } catch(RuntimeException re) {} // fella does not have a player shop permit...
+                        } catch(RuntimeException ignored) {} // fella does not have a player shop permit...
                     }
 
                     chr.getMap().broadcastMessage(MaplePacketCreator.updatePlayerShopBox(shop));

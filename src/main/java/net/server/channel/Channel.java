@@ -88,19 +88,19 @@ public final class Channel {
     private String ip, serverMessage;
     private MapleMapManager mapManager;
     private EventScriptManager eventSM;
-    private MobStatusScheduler mobStatusSchedulers[] = new MobStatusScheduler[ServerConstants.CHANNEL_LOCKS];
-    private MobAnimationScheduler mobAnimationSchedulers[] = new MobAnimationScheduler[ServerConstants.CHANNEL_LOCKS];
-    private MobClearSkillScheduler mobClearSkillSchedulers[] = new MobClearSkillScheduler[ServerConstants.CHANNEL_LOCKS];
-    private MobMistScheduler mobMistSchedulers[] = new MobMistScheduler[ServerConstants.CHANNEL_LOCKS];
-    private FaceExpressionScheduler faceExpressionSchedulers[] = new FaceExpressionScheduler[ServerConstants.CHANNEL_LOCKS];
-    private EventScheduler eventSchedulers[] = new EventScheduler[ServerConstants.CHANNEL_LOCKS];
-    private OverallScheduler channelSchedulers[] = new OverallScheduler[ServerConstants.CHANNEL_LOCKS];
+   private MobStatusScheduler[] mobStatusSchedulers = new MobStatusScheduler[ServerConstants.CHANNEL_LOCKS];
+   private MobAnimationScheduler[] mobAnimationSchedulers = new MobAnimationScheduler[ServerConstants.CHANNEL_LOCKS];
+   private MobClearSkillScheduler[] mobClearSkillSchedulers = new MobClearSkillScheduler[ServerConstants.CHANNEL_LOCKS];
+   private MobMistScheduler[] mobMistSchedulers = new MobMistScheduler[ServerConstants.CHANNEL_LOCKS];
+   private FaceExpressionScheduler[] faceExpressionSchedulers = new FaceExpressionScheduler[ServerConstants.CHANNEL_LOCKS];
+   private EventScheduler[] eventSchedulers = new EventScheduler[ServerConstants.CHANNEL_LOCKS];
+   private OverallScheduler[] channelSchedulers = new OverallScheduler[ServerConstants.CHANNEL_LOCKS];
     private Map<Integer, MapleHiredMerchant> hiredMerchants = new HashMap<>();
     private final Map<Integer, Integer> storedVars = new HashMap<>();
     private Set<Integer> playersAway = new HashSet<>();
     private Map<MapleExpeditionType, MapleExpedition> expeditions = new HashMap<>();
     private List<MapleExpeditionType> expedType = new ArrayList<>();
-    private Set<MapleMap> ownedMaps = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<MapleMap, Boolean>()));
+    private Set<MapleMap> ownedMaps = Collections.synchronizedSet(Collections.newSetFromMap(new WeakHashMap<>()));
     private MapleEvent event;
     private boolean finishedShutdown = false;
     private int usedDojo = 0;
@@ -128,8 +128,8 @@ public final class Channel {
     private ReentrantReadWriteLock merchantLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MERCHANT, true);
     private ReadLock merchRlock = merchantLock.readLock();
     private WriteLock merchWlock = merchantLock.writeLock();
-    
-    private MonitoredReentrantLock faceLock[] = new MonitoredReentrantLock[ServerConstants.CHANNEL_LOCKS];
+
+   private MonitoredReentrantLock[] faceLock = new MonitoredReentrantLock[ServerConstants.CHANNEL_LOCKS];
     
     private MonitoredReentrantLock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHANNEL, true);
     
@@ -448,7 +448,7 @@ public final class Channel {
         int[] retArr = new int[ret.size()];
         int pos = 0;
         for (Integer i : ret) {
-            retArr[pos++] = i.intValue();
+            retArr[pos++] = i;
         }
         return retArr;
     }
@@ -496,7 +496,7 @@ public final class Channel {
     }
     
     private static String [] getEvents(){
-    	List<String> events = new ArrayList<String>();
+    	List<String> events = new ArrayList<>();
     	for (File file : new File("scripts/event").listFiles()){
             events.add(file.getName().substring(0, file.getName().length() - 3));
     	}

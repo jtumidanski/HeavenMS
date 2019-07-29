@@ -22,7 +22,6 @@ package net.server.audit.locks.active;
 import constants.ServerConstants;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -36,8 +35,6 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.audit.locks.empty.EmptyReadLock;
-
-import tools.FilePrinter;
 
 /**
  *

@@ -92,7 +92,7 @@ public class SkillFactory {
 
     public static Skill getSkill(int id) {
         if (!skills.isEmpty()) {
-            return skills.get(Integer.valueOf(id));
+            return skills.get(id);
         }
         return null;
     }
@@ -389,10 +389,10 @@ public class SkillFactory {
     public static String getSkillName(int skillid) {
         MapleData data = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img");
         StringBuilder skill = new StringBuilder();
-        skill.append(String.valueOf(skillid));
+        skill.append(skillid);
         if (skill.length() == 4) {
             skill.delete(0, 4);
-            skill.append("000").append(String.valueOf(skillid));
+            skill.append("000").append(skillid);
         }
         if (data.getChildByPath(skill.toString()) != null) {
             for (MapleData skilldata : data.getChildByPath(skill.toString()).getChildren()) {

@@ -715,7 +715,7 @@ public class Server {
             try {
                 if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
                     for(int i = playerRanking.size(); i <= worldid; i++) {
-                        playerRanking.add(new ArrayList<Pair<String, Integer>>(0));
+                        playerRanking.add(new ArrayList<>(0));
                     }
                     
                     playerRanking.add(worldid, ranking.get(0).getRight());
@@ -759,7 +759,7 @@ public class Server {
             try {
                 if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
                     for(int i = playerRanking.size(); i <= rankUpdates.get(rankUpdates.size() - 1).getLeft(); i++) {
-                        playerRanking.add(new ArrayList<Pair<String, Integer>>(0));
+                        playerRanking.add(new ArrayList<>(0));
                     }
                     
                     for(Pair<Integer, List<Pair<String, Integer>>> wranks : rankUpdates) {
@@ -776,7 +776,7 @@ public class Server {
     
     private void initWorldPlayerRanking() {
         if (ServerConstants.USE_WHOLE_SERVER_RANKING) {
-            playerRanking.add(new ArrayList<Pair<String, Integer>>(0));
+            playerRanking.add(new ArrayList<>(0));
         }        
         updateWorldPlayerRanking();
     }
@@ -964,7 +964,7 @@ public class Server {
         CommandsExecutor.getInstance();
     }
 
-    public static void main(String args[]) {
+    public static void main(String[] args) {
         System.setProperty("wzpath", "wz");
         Security.setProperty("crypto.policy", "unlimited");
         AutoJCE.removeCryptographyRestrictions();
@@ -1455,7 +1455,7 @@ public class Server {
                 if(wchars == null) {
                     if(!accountChars.containsKey(accountId)) {
                         accountCharacterCount.put(accountId, (short) 0);
-                        accountChars.put(accountId, new HashSet<Integer>());    // not advisable at all to write on the map on a read-protected environment
+                        accountChars.put(accountId, new HashSet<>());    // not advisable at all to write on the map on a read-protected environment
                     }                                                           // yet it's known there's no problem since no other point in the source does
                 } else if(!wchars.isEmpty()) {                                  // this action.
                     lastwchars = wchars;
@@ -1474,7 +1474,7 @@ public class Server {
     private static Pair<Short, List<List<MapleCharacter>>> loadAccountCharactersViewFromDb(int accId, int wlen) {
         short characterCount = 0;
         List<List<MapleCharacter>> wchars = new ArrayList<>(wlen);
-        for(int i = 0; i < wlen; i++) wchars.add(i, new LinkedList<MapleCharacter>());
+        for(int i = 0; i < wlen; i++) wchars.add(i, new LinkedList<>());
         
         List<MapleCharacter> chars = new LinkedList<>();
         int curWorld = 0;

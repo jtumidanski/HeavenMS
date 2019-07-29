@@ -32,11 +32,9 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
 import server.quest.MapleQuest;
-import tools.MaplePacketCreator;
 import tools.Pair;
 
 import java.io.File;
-import java.util.List;
 
 public class SearchCommand extends Command {
     private static MapleData npcStringData;

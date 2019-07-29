@@ -33,7 +33,6 @@ import tools.HexTool;
 import tools.MapleAESOFB;
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericLittleEndianAccessor;
-import net.opcodes.RecvOpcode;
 import tools.FilePrinter;
 
 public class MaplePacketDecoder extends CumulativeProtocolDecoder {
@@ -69,7 +68,7 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
             return false;
         }
         if (in.remaining() >= decoderState.packetlength) {
-            byte decryptedPacket[] = new byte[decoderState.packetlength];
+           byte[] decryptedPacket = new byte[decoderState.packetlength];
             in.get(decryptedPacket, 0, decoderState.packetlength);
             decoderState.packetlength = -1;
             rcvdCrypto.crypt(decryptedPacket);

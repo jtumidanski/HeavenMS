@@ -304,7 +304,7 @@ public class MapleMatchCheckerCoordinator {
         while (!poolMatchPlayers(matchPlayers)) {
             try {
                 Thread.sleep(1000);
-            } catch (InterruptedException ie) {}
+            } catch (InterruptedException ignored) {}
         }
         
         try {

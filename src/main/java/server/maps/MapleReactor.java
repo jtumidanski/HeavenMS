@@ -22,7 +22,6 @@
 package server.maps;
 
 import client.MapleClient;
-import client.status.MonsterStatus;
 import constants.ServerConstants;
 
 import java.awt.Rectangle;

@@ -73,7 +73,6 @@ import scripting.npc.NPCScriptManager;
 import scripting.quest.QuestActionManager;
 import scripting.quest.QuestScriptManager;
 import server.life.MapleMonster;
-import server.MapleTrade;
 import server.ThreadManager;
 import server.maps.*;
 import server.quest.MapleQuest;
@@ -120,7 +119,7 @@ public class MapleClient {
         private final Semaphore actionsSemaphore = new Semaphore(7);
 	private final Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CLIENT, true);
         private final Lock encoderLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CLIENT_ENCODER, true);
-        private static final Lock loginLocks[] = new Lock[200];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
+   private static final Lock[] loginLocks = new Lock[200];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
 	private int votePoints;
 	private int voteTime = -1;
         private int visibleWorlds;
@@ -824,7 +823,7 @@ public class MapleClient {
 			birthday = Calendar.getInstance();
                         try {
                             birthday.setTime(rs.getDate("birthday"));
-                        } catch(SQLException e) {}
+                        } catch(SQLException ignored) {}
 			
 			int state = rs.getInt("loggedin");
 			if (state == LOGIN_SERVER_TRANSITION) {

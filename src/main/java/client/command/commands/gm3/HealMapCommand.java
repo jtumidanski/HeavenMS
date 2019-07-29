@@ -23,7 +23,6 @@
 */
 package client.command.commands.gm3;
 
-import client.MapleStat;
 import client.command.Command;
 import client.MapleClient;
 import client.MapleCharacter;

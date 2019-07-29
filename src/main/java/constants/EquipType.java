@@ -64,7 +64,7 @@ public enum EquipType {
     PISTOL(1492);
 
     private final int i;
-    private static final Map<Integer, EquipType> map = new HashMap(34);
+    private static final Map<Integer, EquipType> map = new HashMap<>(34);
 
     private EquipType(int val) {
         this.i = val;

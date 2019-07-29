@@ -499,7 +499,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
                             }
                         }
                     }
-                } catch (NumberFormatException nfe) {}
+                } catch (NumberFormatException ignored) {}
                 
                 break;
                 

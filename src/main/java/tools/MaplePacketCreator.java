@@ -150,7 +150,7 @@ public class MaplePacketCreator {
         }  
 
         private static void addRemainingSkillInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
-                int remainingSp[] = chr.getRemainingSps();
+                int[] remainingSp = chr.getRemainingSps();
                 int effectiveLength = 0;
                 for (int i = 0; i < remainingSp.length; i++) {
                         if (remainingSp[i] > 0) {
@@ -1016,7 +1016,7 @@ public class MaplePacketCreator {
                 }
                 List<Pair<MapleStat, Integer>> mystats = stats;
                 if (mystats.size() > 1) {
-                        Collections.sort(mystats, new Comparator<Pair<MapleStat, Integer>>() {
+                        mystats.sort(new Comparator<>() {
                                 @Override
                                 public int compare(Pair<MapleStat, Integer> o1, Pair<MapleStat, Integer> o2) {
                                         int val1 = o1.getLeft().getValue();
@@ -1043,7 +1043,7 @@ public class MaplePacketCreator {
                                 } else if (statupdate.getLeft().getValue() < 0xFFFF) {
                                         mplew.writeShort(statupdate.getRight().shortValue());
                                 } else {
-                                        mplew.writeInt(statupdate.getRight().intValue());
+                                        mplew.writeInt(statupdate.getRight());
                                 }
                         }
                 }
@@ -1149,7 +1149,6 @@ public class MaplePacketCreator {
          * Gets a packet to spawn a special map object.
          *
          * @param summon
-         * @param skillLevel The level of the skill used.
          * @param animated Animated spawn?
          * @return The spawn packet for the map object.
          */
@@ -1257,7 +1256,6 @@ public class MaplePacketCreator {
          * 5: Pink Text<br> 6: Lightblue Text
          *
          * @param type The type of the notice.
-         * @param channel The channel this notice was sent on.
          * @param message The message to convey.
          * @return The server notice packet.
          */
@@ -1506,7 +1504,7 @@ public class MaplePacketCreator {
                 mplew.writeShort(life.getFh());
                 
                 
-                /**
+                /*
                  * -4: Fake -3: Appear after linked mob is dead -2: Fade in 1: Smoke 3:
                  * King Slime spawn 4: Summoning rock thing, used for 3rd job? 6:
                  * Magical shit 7: Smoke shit 8: 'The Boss' 9/10: Grim phantom shit?
@@ -1643,7 +1641,6 @@ public class MaplePacketCreator {
          *
          * @param cidfrom The character ID who sent the chat.
          * @param text The text of the chat.
-         * @param whiteBG
          * @param show
          * @return The general chat packet.
          */
@@ -1879,7 +1876,7 @@ public class MaplePacketCreator {
                 }
                 if (chr.getBuffedValue(MapleBuffStat.COMBO) != null) {
                         buffmask |= MapleBuffStat.COMBO.getValue();
-                        buffvalue = Integer.valueOf(chr.getBuffedValue(MapleBuffStat.COMBO).intValue());
+                        buffvalue = chr.getBuffedValue(MapleBuffStat.COMBO).intValue();
                 }
                 if (chr.getBuffedValue(MapleBuffStat.SHADOWPARTNER) != null) {
                         buffmask |= MapleBuffStat.SHADOWPARTNER.getValue();
@@ -1888,11 +1885,11 @@ public class MaplePacketCreator {
                         buffmask |= MapleBuffStat.SOULARROW.getValue();
                 }
                 if (chr.getBuffedValue(MapleBuffStat.MORPH) != null) {
-                        buffvalue = Integer.valueOf(chr.getBuffedValue(MapleBuffStat.MORPH).intValue());
+                        buffvalue = chr.getBuffedValue(MapleBuffStat.MORPH).intValue();
                 }
                 if (chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE) != null) {
                         buffmask |= MapleBuffStat.ENERGY_CHARGE.getValue();
-                        buffvalue = Integer.valueOf(chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE).intValue());
+                        buffvalue = chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE).intValue();
                 }//AREN'T THESE 
                 mplew.writeInt((int) ((buffmask >> 32) & 0xffffffffL));
                 if (buffvalue != null) {
@@ -2406,13 +2403,13 @@ public class MaplePacketCreator {
                 for (Integer oned : damage.keySet()) {
                         List<Integer> onedList = damage.get(oned);
                         if (onedList != null) {
-                                lew.writeInt(oned.intValue());
+                                lew.writeInt(oned);
                                 lew.write(0x0);
                                 if (skill == 4211006) {
                                         lew.write(onedList.size());
                                 }
                                 for (Integer eachd : onedList) {
-                                        lew.writeInt(eachd.intValue());
+                                        lew.writeInt(eachd);
                                 }
                         }
                 }
@@ -2571,7 +2568,9 @@ public class MaplePacketCreator {
         }
         
         public static byte[] updateAriantPQRanking(final MapleCharacter chr, final int score) {
-                return updateAriantPQRanking(new LinkedHashMap<MapleCharacter, Integer>(){{put(chr, score);}});
+                return updateAriantPQRanking(new LinkedHashMap<>() {{
+                        put(chr, score);
+                }});
         }
         
         public static byte[] updateAriantPQRanking(Map<MapleCharacter, Integer> playerScore) {
@@ -2756,7 +2755,6 @@ public class MaplePacketCreator {
         /**
          *
          * @param chr
-         * @param isSelf
          * @return
          */
         public static byte[] charInfo(MapleCharacter chr) {
@@ -2879,7 +2877,6 @@ public class MaplePacketCreator {
         /**
          *
          * @param cid
-         * @param statups
          * @param mount
          * @return
          */
@@ -2911,7 +2908,6 @@ public class MaplePacketCreator {
 
         /**
          *
-         * @param c
          * @param quest
          * @return
          */
@@ -2926,7 +2922,6 @@ public class MaplePacketCreator {
 
         /**
          *
-         * @param c
          * @param quest
          * @return
          */
@@ -2942,10 +2937,8 @@ public class MaplePacketCreator {
 
         /**
          *
-         * @param c
          * @param quest
          * @param npc
-         * @param progress
          * @return
          */
         
@@ -3279,7 +3272,6 @@ public class MaplePacketCreator {
         
         /**
          *
-         * @param c
          * @param shop
          * @param owner
          * @return
@@ -3307,8 +3299,8 @@ public class MaplePacketCreator {
                 
                 addCharLook(mplew, shop.getOwner(), false);
                 mplew.writeMapleAsciiString(shop.getOwner().getName());
-                
-                MapleCharacter visitors[] = shop.getVisitors();
+
+                MapleCharacter[] visitors = shop.getVisitors();
                 for(int i = 0; i < 3; i++) {
                     if(visitors[i] != null) {
                         mplew.write(i + 1);
@@ -3412,7 +3404,7 @@ public class MaplePacketCreator {
                 return mplew.getPacket();
         }
 
-        public static byte[] getNPCTalkStyle(int npc, String talk, int styles[]) {
+        public static byte[] getNPCTalkStyle(int npc, String talk, int[] styles) {
                 final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
                 mplew.writeShort(SendOpcode.NPC_TALK.getValue());
                 mplew.write(4); // ?
@@ -3580,7 +3572,7 @@ public class MaplePacketCreator {
                 mplew.writeShort(SendOpcode.KEYMAP.getValue());
                 mplew.write(0);
                 for (int x = 0; x < 90; x++) {
-                        MapleKeyBinding binding = keybindings.get(Integer.valueOf(x));
+                        MapleKeyBinding binding = keybindings.get(x);
                         if (binding != null) {
                                 mplew.write(binding.getType());
                                 mplew.writeInt(binding.getAction());
@@ -5709,8 +5701,8 @@ public class MaplePacketCreator {
                 mplew.writeShort(hm.getVisitorSlotThreadsafe(chr) + 1);
                 mplew.writeInt(hm.getItemId());
                 mplew.writeMapleAsciiString("Hired Merchant");
-                
-                MapleCharacter visitors[] = hm.getVisitors();
+
+                MapleCharacter[] visitors = hm.getVisitors();
                 for (int i = 0; i < 3; i++) {
                         if (visitors[i] != null) {
                                 mplew.write(i + 1);
@@ -8054,7 +8046,6 @@ public class MaplePacketCreator {
         /**
          * Sends a request to remove Mir<br>
          *
-         * @param charid - Needs the specific Character ID
          * @return The packet
          *
          */

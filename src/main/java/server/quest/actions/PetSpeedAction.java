@@ -23,7 +23,6 @@ import client.MapleClient;
 import client.MapleCharacter;
 import client.inventory.MaplePet;
 import provider.MapleData;
-import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 

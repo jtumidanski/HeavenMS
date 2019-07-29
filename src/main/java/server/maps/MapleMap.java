@@ -102,8 +102,8 @@ public class MapleMap {
     
     private Map<Integer, MapleMapObject> mapobjects = new LinkedHashMap<>();
     private Set<Integer> selfDestructives = new LinkedHashSet<>();
-    private Collection<SpawnPoint> monsterSpawn = Collections.synchronizedList(new LinkedList<SpawnPoint>());
-    private Collection<SpawnPoint> allMonsterSpawn = Collections.synchronizedList(new LinkedList<SpawnPoint>());
+    private Collection<SpawnPoint> monsterSpawn = Collections.synchronizedList(new LinkedList<>());
+    private Collection<SpawnPoint> allMonsterSpawn = Collections.synchronizedList(new LinkedList<>());
     private AtomicInteger spawnedMonstersOnMap = new AtomicInteger(0);
     private AtomicInteger droppedItemCount = new AtomicInteger(0);
     private Collection<MapleCharacter> characters = new LinkedHashSet<>();
@@ -113,8 +113,8 @@ public class MapleMap {
     private Map<String, Integer> environment = new LinkedHashMap<>();
     private Map<MapleMapItem, Long> droppedItems = new LinkedHashMap<>();
     private LinkedList<WeakReference<MapleMapObject>> registeredDrops = new LinkedList<>();
-    private Map<MobLootEntry, Long> mobLootEntries = new HashMap(20);
-    private List<Runnable> statUpdateRunnables = new ArrayList(50);
+    private Map<MobLootEntry, Long> mobLootEntries = new HashMap<>(20);
+    private List<Runnable> statUpdateRunnables = new ArrayList<>(50);
     private List<Rectangle> areas = new ArrayList<>();
     private MapleFootholdTree footholds = null;
     private Pair<Integer, Integer> xLimits;  // caches the min and max x's with available footholds
@@ -484,7 +484,7 @@ public class MapleMap {
     public void removeMapObject(int num) {
         objectWLock.lock();
         try {
-            this.mapobjects.remove(Integer.valueOf(num));
+            this.mapobjects.remove(num);
         } finally {
             objectWLock.unlock();
         }
@@ -615,7 +615,7 @@ public class MapleMap {
      * @return correspondent coordinate.
      */
     public static String getRoundedCoordinate(double angle) {
-        String directions[] = {"E", "SE", "S", "SW", "W", "NW", "N", "NE", "E"};
+       String[] directions = {"E", "SE", "S", "SW", "W", "NW", "N", "NE", "E"};
         return directions[ (int)Math.round((  ((double)angle % 360) / 45)) ];
     }
     
@@ -630,7 +630,7 @@ public class MapleMap {
         }
         
         distn = Math.sqrt(distn);
-        return new Pair<>(getRoundedCoordinate(angle), Integer.valueOf((int)distn));
+        return new Pair<>(getRoundedCoordinate(angle), (int) distn);
     }
 
     private static void sortDropEntries(List<MonsterDropEntry> from, List<MonsterDropEntry> item, List<MonsterDropEntry> visibleQuest, List<MonsterDropEntry> otherQuest, MapleCharacter chr) {
@@ -1705,7 +1705,7 @@ public class MapleMap {
     public List<MapleMapObject> getMapObjects() {
         objectRLock.lock();
         try {
-            return new LinkedList(mapobjects.values());
+            return new LinkedList<>(mapobjects.values());
         } finally {
             objectRLock.unlock();
         }
@@ -1751,7 +1751,7 @@ public class MapleMap {
                     broadcastMessage(MaplePacketCreator.removeNPCController(obj.getObjectId()));
                     broadcastMessage(MaplePacketCreator.removeNPC(obj.getObjectId()));
                     
-                    this.mapobjects.remove(Integer.valueOf(obj.getObjectId()));
+                    this.mapobjects.remove(obj.getObjectId());
                 }
             }
         } finally {
@@ -2607,7 +2607,7 @@ public class MapleMap {
             broadcastGMSpawnPlayerMapObjectMessage(chr, chr, true);
             chr.announce(MaplePacketCreator.getGMEffect(0x10, (byte) 1));
 
-            List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<MapleBuffStat, Integer>(MapleBuffStat.DARKSIGHT, 0));
+            List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
             broadcastGMMessage(chr, MaplePacketCreator.giveForeignBuff(chr.getId(), dsstat), false);
         } else {
             broadcastSpawnPlayerMapObjectMessage(chr, chr, true);
@@ -2627,7 +2627,7 @@ public class MapleMap {
         }
         objectWLock.lock();
         try {
-            this.mapobjects.put(Integer.valueOf(chr.getObjectId()), chr);
+            this.mapobjects.put(chr.getObjectId(), chr);
         } finally {
             objectWLock.unlock();
         }
@@ -3752,12 +3752,12 @@ public class MapleMap {
         return retP + retI;
     }
 
-    private static interface DelayedPacketCreation {
+    private interface DelayedPacketCreation {
 
         void sendPackets(MapleClient c);
     }
 
-    private static interface SpawnCondition {
+    private interface SpawnCondition {
 
         boolean canSpawn(MapleCharacter chr);
     }
@@ -4235,10 +4235,10 @@ public class MapleMap {
     
     private final List<Point> takenSpawns = new LinkedList<>();
     private final List<GuardianSpawnPoint> guardianSpawns = new LinkedList<>();
-    private final List<MCSkill> blueTeamBuffs = new ArrayList();
-    private final List<MCSkill> redTeamBuffs = new ArrayList();
-    private List<Integer> skillIds = new ArrayList();
-    private List<Pair<Integer, Integer>> mobsToSpawn = new ArrayList();
+    private final List<MCSkill> blueTeamBuffs = new ArrayList<>();
+    private final List<MCSkill> redTeamBuffs = new ArrayList<>();
+    private List<Integer> skillIds = new ArrayList<>();
+    private List<Pair<Integer, Integer>> mobsToSpawn = new ArrayList<>();
 
     public List<MCSkill> getBlueTeamBuffs() {
         return blueTeamBuffs;
@@ -4428,7 +4428,7 @@ public class MapleMap {
     }
 
     public final void addMobSpawn(int mobId, int spendCP) {
-        this.mobsToSpawn.add(new Pair<Integer, Integer>(mobId, spendCP));
+        this.mobsToSpawn.add(new Pair<>(mobId, spendCP));
     }
 
     public final List<Pair<Integer, Integer>> getMobsToSpawn() {

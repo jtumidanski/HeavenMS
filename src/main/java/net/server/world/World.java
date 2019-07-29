@@ -170,7 +170,7 @@ public class World {
     private ScheduledFuture<?> timedMapObjectsSchedule;
     private MonitoredReentrantLock timedMapObjectLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_MAPOBJS, true);
     
-    private Map<MapleCharacter, Integer> fishingAttempters = Collections.synchronizedMap(new WeakHashMap<MapleCharacter, Integer>());
+    private Map<MapleCharacter, Integer> fishingAttempters = Collections.synchronizedMap(new WeakHashMap<>());
     
     private ScheduledFuture<?> charactersSchedule;
     private ScheduledFuture<?> marriagesSchedule;
@@ -196,7 +196,7 @@ public class World {
         mountUpdate = petUpdate;
         
         for (int i = 0; i < 9; i++) {
-            cashItemBought.add(new LinkedHashMap<Integer, Integer>());
+            cashItemBought.add(new LinkedHashMap<>());
         }
         
         TimerManager tman = TimerManager.getInstance();
@@ -440,7 +440,7 @@ public class World {
             list.add(e);
         }
         
-        Collections.sort(list, new Comparator<Entry<Integer, SortedMap<Integer, MapleCharacter>>>() {
+        list.sort(new Comparator<>() {
             @Override
             public int compare(Entry<Integer, SortedMap<Integer, MapleCharacter>> o1, Entry<Integer, SortedMap<Integer, MapleCharacter>> o2) {
                 return o1.getKey() - o2.getKey();
@@ -485,7 +485,7 @@ public class World {
             if(accChars != null) {
                 chrList = new LinkedList<>(accChars.values());
             } else {
-                accountChars.put(accountId, new TreeMap<Integer, MapleCharacter>());
+                accountChars.put(accountId, new TreeMap<>());
                 chrList = null;
             }
         } finally {
@@ -711,7 +711,7 @@ public class World {
     
     public void putMarriageQueued(int marriageId, boolean cathedral, boolean premium, int groomId, int brideId) {
         queuedMarriages.put(marriageId, new Pair<>(new Pair<>(cathedral, premium), new Pair<>(groomId, brideId)));
-        marriageGuests.put(marriageId, new HashSet());
+        marriageGuests.put(marriageId, new HashSet<>());
     }
     
     public Pair<Boolean, Set<Integer>> removeMarriageQueued(int marriageId) {
@@ -1217,7 +1217,7 @@ public class World {
         updateBuddies(characterId, channel, buddies, true);
     }
 
-    public void loggedOn(String name, int characterId, int channel, int buddies[]) {
+    public void loggedOn(String name, int characterId, int channel, int[] buddies) {
         updateBuddies(characterId, channel, buddies, false);
     }
 
@@ -1331,7 +1331,7 @@ public class World {
     private List<Integer> getMostSellerOnTab(List<Pair<Integer, Integer>> tabSellers) {
         List<Integer> tabLeaderboards;
         
-        Comparator<Pair<Integer, Integer>> comparator = new Comparator<Pair<Integer, Integer>>() {  // descending order
+        Comparator<Pair<Integer, Integer>> comparator = new Comparator<>() {  // descending order
             @Override
             public int compare(Pair<Integer, Integer> p1, Pair<Integer, Integer> p2) {
                 return p2.getRight().compareTo(p1.getRight());
@@ -1824,7 +1824,7 @@ public class World {
             }
         }
 
-        Collections.sort(hmsAvailable, new Comparator<Pair<MaplePlayerShopItem, AbstractMapleMapObject>>() {
+        hmsAvailable.sort(new Comparator<>() {
             @Override
             public int compare(Pair<MaplePlayerShopItem, AbstractMapleMapObject> p1, Pair<MaplePlayerShopItem, AbstractMapleMapObject> p2) {
                 return p1.getLeft().getPrice() - p2.getLeft().getPrice();

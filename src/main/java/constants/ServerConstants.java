@@ -301,7 +301,7 @@ public class ServerConstants {
    public static final long EVENT_END_TIMESTAMP = 1428897600000L;
 
    //Debug Variables
-   public static int DEBUG_VALUES[] = new int[10];             // Field designed for packet testing purposes
+   public static int[] DEBUG_VALUES = new int[10];             // Field designed for packet testing purposes
 
    //Properties
    static {

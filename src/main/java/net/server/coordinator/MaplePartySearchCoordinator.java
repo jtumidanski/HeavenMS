@@ -113,21 +113,21 @@ public class MaplePartySearchCoordinator {
     private static Map<Integer, MapleJob> instantiateJobTable() {
         Map<Integer, MapleJob> table = new HashMap<>();
         
-        List<Pair<Integer, Integer>> jobSearchTypes = new LinkedList<Pair<Integer, Integer>>() {{
-            add(new Pair<>(MapleJob.MAPLELEAF_BRIGADIER.getId(), 0));
-            add(new Pair<>(0, 0));
-            add(new Pair<>(MapleJob.ARAN1.getId(), 0));
-            add(new Pair<>(100, 3));
-            add(new Pair<>(MapleJob.DAWNWARRIOR1.getId(), 0));
-            add(new Pair<>(200, 3));
-            add(new Pair<>(MapleJob.BLAZEWIZARD1.getId(), 0));
-            add(new Pair<>(500, 2));
-            add(new Pair<>(MapleJob.THUNDERBREAKER1.getId(), 0));
-            add(new Pair<>(400, 2));
-            add(new Pair<>(MapleJob.NIGHTWALKER1.getId(), 0));
-            add(new Pair<>(300, 2));
-            add(new Pair<>(MapleJob.WINDARCHER1.getId(), 0));
-            add(new Pair<>(MapleJob.EVAN1.getId(), 0));
+        List<Pair<Integer, Integer>> jobSearchTypes = new LinkedList<>() {{
+           add(new Pair<>(MapleJob.MAPLELEAF_BRIGADIER.getId(), 0));
+           add(new Pair<>(0, 0));
+           add(new Pair<>(MapleJob.ARAN1.getId(), 0));
+           add(new Pair<>(100, 3));
+           add(new Pair<>(MapleJob.DAWNWARRIOR1.getId(), 0));
+           add(new Pair<>(200, 3));
+           add(new Pair<>(MapleJob.BLAZEWIZARD1.getId(), 0));
+           add(new Pair<>(500, 2));
+           add(new Pair<>(MapleJob.THUNDERBREAKER1.getId(), 0));
+           add(new Pair<>(400, 2));
+           add(new Pair<>(MapleJob.NIGHTWALKER1.getId(), 0));
+           add(new Pair<>(300, 2));
+           add(new Pair<>(MapleJob.WINDARCHER1.getId(), 0));
+           add(new Pair<>(MapleJob.EVAN1.getId(), 0));
         }};
         
         int i = 0;

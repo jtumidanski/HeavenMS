@@ -294,7 +294,7 @@ public class MapleItemInformationProvider {
 
     private MapleData getItemData(int itemId) {
         MapleData ret = null;
-        String idStr = "0" + String.valueOf(itemId);
+        String idStr = "0" + itemId;
         MapleDataDirectoryEntry root = itemData.getRoot();
         for (MapleDataDirectoryEntry topDir : root.getSubdirectories()) {
             for (MapleDataFileEntry iFile : topDir.getFiles()) {
@@ -996,46 +996,46 @@ public class MapleItemInformationProvider {
         for (Entry<String, Integer> stat : stats.entrySet()) {
             switch (stat.getKey()) {
                 case "STR":
-                    nEquip.setStr(getShortMaxIfOverflow(nEquip.getStr() + stat.getValue().intValue()));
+                    nEquip.setStr(getShortMaxIfOverflow(nEquip.getStr() + stat.getValue()));
                     break;
                 case "DEX":
-                    nEquip.setDex(getShortMaxIfOverflow(nEquip.getDex() + stat.getValue().intValue()));
+                    nEquip.setDex(getShortMaxIfOverflow(nEquip.getDex() + stat.getValue()));
                     break;
                 case "INT":
-                    nEquip.setInt(getShortMaxIfOverflow(nEquip.getInt() + stat.getValue().intValue()));
+                    nEquip.setInt(getShortMaxIfOverflow(nEquip.getInt() + stat.getValue()));
                     break;
                 case "LUK":
-                    nEquip.setLuk(getShortMaxIfOverflow(nEquip.getLuk() + stat.getValue().intValue()));
+                    nEquip.setLuk(getShortMaxIfOverflow(nEquip.getLuk() + stat.getValue()));
                     break;
                 case "PAD":
-                    nEquip.setWatk(getShortMaxIfOverflow(nEquip.getWatk() + stat.getValue().intValue()));
+                    nEquip.setWatk(getShortMaxIfOverflow(nEquip.getWatk() + stat.getValue()));
                     break;
                 case "PDD":
-                    nEquip.setWdef(getShortMaxIfOverflow(nEquip.getWdef() + stat.getValue().intValue()));
+                    nEquip.setWdef(getShortMaxIfOverflow(nEquip.getWdef() + stat.getValue()));
                     break;
                 case "MAD":
-                    nEquip.setMatk(getShortMaxIfOverflow(nEquip.getMatk() + stat.getValue().intValue()));
+                    nEquip.setMatk(getShortMaxIfOverflow(nEquip.getMatk() + stat.getValue()));
                     break;
                 case "MDD":
-                    nEquip.setMdef(getShortMaxIfOverflow(nEquip.getMdef() + stat.getValue().intValue()));
+                    nEquip.setMdef(getShortMaxIfOverflow(nEquip.getMdef() + stat.getValue()));
                     break;
                 case "ACC":
-                    nEquip.setAcc(getShortMaxIfOverflow(nEquip.getAcc() + stat.getValue().intValue()));
+                    nEquip.setAcc(getShortMaxIfOverflow(nEquip.getAcc() + stat.getValue()));
                     break;
                 case "EVA":
-                    nEquip.setAvoid(getShortMaxIfOverflow(nEquip.getAvoid() + stat.getValue().intValue()));
+                    nEquip.setAvoid(getShortMaxIfOverflow(nEquip.getAvoid() + stat.getValue()));
                     break;
                 case "Speed":
-                    nEquip.setSpeed(getShortMaxIfOverflow(nEquip.getSpeed() + stat.getValue().intValue()));
+                    nEquip.setSpeed(getShortMaxIfOverflow(nEquip.getSpeed() + stat.getValue()));
                     break;
                 case "Jump":
-                    nEquip.setJump(getShortMaxIfOverflow(nEquip.getJump() + stat.getValue().intValue()));
+                    nEquip.setJump(getShortMaxIfOverflow(nEquip.getJump() + stat.getValue()));
                     break;
                 case "MHP":
-                    nEquip.setHp(getShortMaxIfOverflow(nEquip.getHp() + stat.getValue().intValue()));
+                    nEquip.setHp(getShortMaxIfOverflow(nEquip.getHp() + stat.getValue()));
                     break;
                 case "MMP":
-                    nEquip.setMp(getShortMaxIfOverflow(nEquip.getMp() + stat.getValue().intValue()));
+                    nEquip.setMp(getShortMaxIfOverflow(nEquip.getMp() + stat.getValue()));
                     break;
                 case "afterImage":
                     break;
@@ -1151,7 +1151,7 @@ public class MapleItemInformationProvider {
     }
 
     public MapleStatEffect getItemEffect(int itemId) {
-        MapleStatEffect ret = itemEffects.get(Integer.valueOf(itemId));
+        MapleStatEffect ret = itemEffects.get(itemId);
         if (ret == null) {
             MapleData item = getItemData(itemId);
             if (item == null) {
@@ -1162,7 +1162,7 @@ public class MapleItemInformationProvider {
                 spec = item.getChildByPath("spec");
             }
             ret = MapleStatEffect.loadItemEffectFromData(spec, itemId);
-            itemEffects.put(Integer.valueOf(itemId), ret);
+            itemEffects.put(itemId, ret);
         }
         return ret;
     }
@@ -1181,12 +1181,12 @@ public class MapleItemInformationProvider {
     public int getWatkForProjectile(int itemId) {
         Integer atk = projectileWatkCache.get(itemId);
         if (atk != null) {
-            return atk.intValue();
+            return atk;
         }
         MapleData data = getItemData(itemId);
-        atk = Integer.valueOf(MapleDataTool.getInt("info/incPAD", data, 0));
+        atk = MapleDataTool.getInt("info/incPAD", data, 0);
         projectileWatkCache.put(itemId, atk);
-        return atk.intValue();
+        return atk;
     }
 
     public String getName(int itemId) {

@@ -61,8 +61,8 @@ public class MapleQuestStatus {
     private short questID;
     private Status status;
     //private boolean updated;   //maybe this can be of use for someone?
-    private final Map<Integer, String> progress = new LinkedHashMap<Integer, String>();
-    private final List<Integer> medalProgress = new LinkedList<Integer>();
+    private final Map<Integer, String> progress = new LinkedHashMap<>();
+    private final List<Integer> medalProgress = new LinkedList<>();
     private int npc;
     private long completionTime, expirationTime;
     private int forfeited = 0, completed = 0;

@@ -26,10 +26,8 @@ import client.MapleClient;
 import client.MapleKeyBinding;
 import client.Skill;
 import client.SkillFactory;
-import client.autoban.AutobanFactory;
 import client.inventory.MapleInventoryType;
 import net.AbstractMaplePacketHandler;
-import tools.FilePrinter;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class KeymapChangeHandler extends AbstractMaplePacketHandler {

@@ -1,7 +1,7 @@
 package constants;
  
-/**
- * @brief ScriptableNPCConstants
+/*
+  @brief ScriptableNPCConstants
  * @author GabrielSin <gabrielsin@playellin.net>
  * @date   16/09/2018
  * 
@@ -15,9 +15,9 @@ import tools.Pair;
 
 public class ScriptableNPCConstants {
     
-    public static final Set<Pair<Integer, String>> SCRIPTABLE_NPCS = new HashSet<Pair<Integer, String>>(){{
-        add(new Pair<>(9200000, "Cody"));
-        add(new Pair<>(9001105, "Grandpa Moon Bunny"));
+    public static final Set<Pair<Integer, String>> SCRIPTABLE_NPCS = new HashSet<>() {{
+       add(new Pair<>(9200000, "Cody"));
+       add(new Pair<>(9001105, "Grandpa Moon Bunny"));
     }};
     
 }

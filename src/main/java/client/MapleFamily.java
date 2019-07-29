@@ -35,7 +35,7 @@ import tools.DatabaseConnection;
  */
 public class MapleFamily {
 	private static int id;
-	private static Map<Integer, MapleFamilyEntry> members = new HashMap<Integer, MapleFamilyEntry>();
+	private static Map<Integer, MapleFamilyEntry> members = new HashMap<>();
 
 	public MapleFamily(int cid) {
 		try {

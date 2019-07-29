@@ -68,7 +68,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
     }
     
     public static enum MiniGameResult {
-        WIN, LOSS, TIE;
+        WIN, LOSS, TIE
     }
     
     public MapleMiniGame(MapleCharacter owner, String description, String password) {

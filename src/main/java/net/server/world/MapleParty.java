@@ -199,7 +199,7 @@ public class MapleParty {
             lock.unlock();
         }
 
-        Collections.sort(histList, new Comparator<Entry<Integer, Integer>>() {
+        histList.sort(new Comparator<>() {
             @Override
             public int compare(Entry<Integer, Integer> o1, Entry<Integer, Integer> o2) {
                 return (o1.getValue()).compareTo(o2.getValue());

@@ -244,7 +244,7 @@ public class MapleMonsterAggroCoordinator {
                         }
 
                         if (!toRemoveIdx.isEmpty()) {
-                            Collections.sort(toRemoveIdx, new Comparator<Integer>() {   // last to first indexes
+                            toRemoveIdx.sort(new Comparator<>() {   // last to first indexes
                                 @Override
                                 public int compare(Integer p1, Integer p2) {
                                     return p1 < p2 ? 1 : p1.equals(p2) ? 0 : -1;

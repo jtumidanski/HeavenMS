@@ -74,7 +74,7 @@ public class IdCommand extends Command {
         if (!handbookDirectory.containsKey(type)) {
             throw new IdTypeNotSupportedException();
         }
-        itemMap.put(type, new HashMap<String, String>());
+        itemMap.put(type, new HashMap<>());
         BufferedReader reader = new BufferedReader(new FileReader(handbookDirectory.get(type)));
         String line;
         while ((line = reader.readLine()) != null) {
@@ -96,7 +96,7 @@ public class IdCommand extends Command {
     private Map<String, String> fetchResults(Map<String, String> queryMap, String queryItem) {
         Map<String, String> results = new HashMap<>();
         for (String item: queryMap.keySet()) {
-            if (item.indexOf(queryItem) != -1) {
+            if (item.contains(queryItem)) {
                 results.put(item, queryMap.get(item));
             }
         }

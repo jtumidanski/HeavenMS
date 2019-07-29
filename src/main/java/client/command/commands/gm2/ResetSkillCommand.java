@@ -45,7 +45,7 @@ public class ResetSkillCommand extends Command {
             } catch (NumberFormatException nfe) {
                 nfe.printStackTrace();
                 break;
-            } catch (NullPointerException npe) {
+            } catch (NullPointerException ignored) {
             }
         }
 

@@ -475,7 +475,7 @@ public class CashShop {
                 if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
                     equip = (Equip) item;
                     equip.setRingId(rs.getInt("ringid"));
-                    gifts.add(new Pair<Item, String>(equip, rs.getString("message")));
+                    gifts.add(new Pair<>(equip, rs.getString("message")));
                 } else
                     gifts.add(new Pair<>(item, rs.getString("message")));
 

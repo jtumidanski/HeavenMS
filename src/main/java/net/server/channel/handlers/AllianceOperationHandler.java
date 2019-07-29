@@ -166,7 +166,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
                 break;
             }
             case 0x08:
-                String ranks[] = new String[5];
+               String[] ranks = new String[5];
                 for (int i = 0; i < 5; i++) {
                     ranks[i] = slea.readMapleAsciiString();
                 }

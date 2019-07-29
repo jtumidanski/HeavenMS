@@ -66,7 +66,7 @@ public class MapleLoginBypassCoordinator {
             try {
                 pic |= loginBypass.get(entry).getLeft();
                 expireTime = Math.max(loginBypass.get(entry).getRight(), expireTime);
-            } catch (NullPointerException npe) {}
+            } catch (NullPointerException ignored) {}
             
             loginBypass.put(entry, new Pair<>(pic, expireTime));
         }

@@ -52,7 +52,7 @@ public class MapleAlliance {
     private int capacity;
     private String name;
     private String notice = "";
-    private String rankTitles[] = new String[5];
+   private String[] rankTitles = new String[5];
 
     public MapleAlliance(String name, int id) {
         this.name = name;
@@ -202,8 +202,8 @@ public class MapleAlliance {
             alliance.capacity = rs.getInt("capacity");
             alliance.name = rs.getString("name");
             alliance.notice = rs.getString("notice");
-            
-            String ranks[] = new String[5];
+
+           String[] ranks = new String[5];
             ranks[0] = rs.getString("rank1");
             ranks[1] = rs.getString("rank2");
             ranks[2] = rs.getString("rank3");

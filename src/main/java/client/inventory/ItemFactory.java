@@ -52,7 +52,7 @@ public enum ItemFactory {
     private final boolean account;
     
     private static final int lockCount = 400;
-    private static final Lock locks[] = new Lock[lockCount];  // thanks Masterrulax for pointing out a bottleneck issue here
+   private static final Lock[] locks = new Lock[lockCount];  // thanks Masterrulax for pointing out a bottleneck issue here
     
     static {
         for (int i = 0; i < lockCount; i++) {
@@ -138,7 +138,7 @@ public enum ItemFactory {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         Integer cid = rs.getInt("characterid");
-                        items.add(new Pair<Item, Integer>(loadEquipFromResultSet(rs), cid));
+                        items.add(new Pair<>(loadEquipFromResultSet(rs), cid));
                     }
                 }
             }
@@ -171,7 +171,7 @@ public enum ItemFactory {
                 MapleInventoryType mit = MapleInventoryType.getByType(rs.getByte("inventorytype"));
 
                 if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-                    items.add(new Pair<Item, MapleInventoryType>(loadEquipFromResultSet(rs), mit));
+                    items.add(new Pair<>(loadEquipFromResultSet(rs), mit));
                 } else {
                     Item item = new Item(rs.getInt("itemid"), (byte) rs.getInt("position"), (short) rs.getInt("quantity"), rs.getInt("petid"));
                     item.setOwner(rs.getString("owner"));
@@ -326,7 +326,7 @@ public enum ItemFactory {
                 MapleInventoryType mit = MapleInventoryType.getByType(rs.getByte("inventorytype"));
 
                 if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-                    items.add(new Pair<Item, MapleInventoryType>(loadEquipFromResultSet(rs), mit));
+                    items.add(new Pair<>(loadEquipFromResultSet(rs), mit));
                 } else {
                     if(bundles > 0) {
                         Item item = new Item(rs.getInt("itemid"), (byte) rs.getInt("position"), (short)(bundles * rs.getInt("quantity")), rs.getInt("petid"));

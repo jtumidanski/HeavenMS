@@ -60,8 +60,8 @@ public class MapleGuild {
     
     private final List<MapleGuildCharacter> members;
     private final Lock membersLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.GUILD, true);
-    
-    private String rankTitles[] = new String[5]; // 1 = master, 2 = jr, 5 = lowest member
+
+   private String[] rankTitles = new String[5]; // 1 = master, 2 = jr, 5 = lowest member
     private String name, notice;
     private int id, gp, logo, logoColor, leader, capacity, logoBG, logoBGColor, signature, allianceId;
     private int world;
@@ -129,7 +129,7 @@ public class MapleGuild {
             if (notifications.keySet().size() != chs.size()) {
                 notifications.clear();
                 for (Integer ch : chs) {
-                    notifications.put(ch, new LinkedList<Integer>());
+                    notifications.put(ch, new LinkedList<>());
                 }
             } else {
                 for (List<Integer> l : notifications.values()) {

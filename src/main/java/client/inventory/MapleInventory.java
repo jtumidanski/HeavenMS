@@ -183,7 +183,7 @@ public class MapleInventory implements Iterable<Item> {
         }
         
         if (ret.size() > 1) {
-            Collections.sort(ret, new Comparator<Item>() {
+            ret.sort(new Comparator<>() {
                 @Override
                 public int compare(Item i1, Item i2) {
                     return i1.getPosition() - i2.getPosition();
@@ -203,7 +203,7 @@ public class MapleInventory implements Iterable<Item> {
         }
         
         if (ret.size() > 1) {
-            Collections.sort(ret, new Comparator<Item>() {
+            ret.sort(new Comparator<>() {
                 @Override
                 public int compare(Item i1, Item i2) {
                     return i1.getPosition() - i2.getPosition();

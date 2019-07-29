@@ -275,7 +275,7 @@ public class MapleShop {
                 }
             }
             for (Integer recharge : recharges) {
-                ret.addItem(new MapleShopItem((short) 1000, recharge.intValue(), 0, 0));
+                ret.addItem(new MapleShopItem((short) 1000, recharge, 0, 0));
             }
             rs.close();
             ps.close();

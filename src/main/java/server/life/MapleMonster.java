@@ -178,7 +178,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
     public void addSummonedMob(MapleMonster mob) {
         Set<Integer> calledOids = this.calledMobOids;
         if (calledOids == null) {
-            calledOids = Collections.synchronizedSet(new HashSet<Integer>());
+            calledOids = Collections.synchronizedSet(new HashSet<>());
             this.calledMobOids = calledOids;
         }
         
@@ -1214,7 +1214,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
         if (poison) {
             int poisonLevel = from.getSkillLevel(status.getSkill());
             int poisonDamage = Math.min(Short.MAX_VALUE, (int) (getMaxHp() / (70.0 - poisonLevel) + 0.999));
-            status.setValue(MonsterStatus.POISON, Integer.valueOf(poisonDamage));
+            status.setValue(MonsterStatus.POISON, poisonDamage);
             animationTime = broadcastStatusEffect(status);
             
             overtimeAction = new DamageTask(poisonDamage, from, status, 0);
@@ -1240,8 +1240,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                     poisonDamage += (Randomizer.nextInt(gap) + minDmg);
                 }
                 poisonDamage = Math.min(Short.MAX_VALUE, poisonDamage);
-                status.setValue(MonsterStatus.VENOMOUS_WEAPON, Integer.valueOf(poisonDamage));
-                status.setValue(MonsterStatus.POISON, Integer.valueOf(poisonDamage));
+                status.setValue(MonsterStatus.VENOMOUS_WEAPON, poisonDamage);
+                status.setValue(MonsterStatus.POISON, poisonDamage);
                 animationTime = broadcastStatusEffect(status);
                 
                 overtimeAction = new DamageTask(poisonDamage, from, status, 0);
@@ -1263,7 +1263,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
             final byte level = from.getSkillLevel(skill);
             final int damage = (int) ((from.getStr() + from.getLuk()) * ((3.7 * skill.getEffect(level).getDamage()) / 100));
             
-            status.setValue(MonsterStatus.NINJA_AMBUSH, Integer.valueOf(damage));
+            status.setValue(MonsterStatus.NINJA_AMBUSH, damage);
             animationTime = broadcastStatusEffect(status);
             
             overtimeAction = new DamageTask(damage, from, status, 2);
@@ -1287,7 +1287,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
     }
     
     public final void dispelSkill(final MobSkill skillId) {
-        List<MonsterStatus> toCancel = new ArrayList<MonsterStatus>();
+        List<MonsterStatus> toCancel = new ArrayList<>();
         for (Entry<MonsterStatus, MonsterStatusEffect> effects : stati.entrySet()) {
             MonsterStatusEffect mse = effects.getValue();
             if (mse.getMobSkill() != null && mse.getMobSkill().getSkillId() == skillId.getSkillId()) { //not checking for level.

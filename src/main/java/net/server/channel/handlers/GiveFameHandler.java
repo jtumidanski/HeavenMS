@@ -25,7 +25,6 @@ import client.MapleCharacter;
 import client.MapleCharacter.FameStatus;
 import client.autoban.AutobanFactory;
 import client.MapleClient;
-import client.MapleStat;
 import net.AbstractMaplePacketHandler;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;

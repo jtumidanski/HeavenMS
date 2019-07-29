@@ -33,8 +33,8 @@ import tools.MaplePacketCreator;
  * @author Ronan - made MapleTV mechanics synchronous
  */
 public class MapleTVEffect {
-	
-	private final static boolean ACTIVE[] = new boolean[Server.getInstance().getWorldsSize()];
+
+   private final static boolean[] ACTIVE = new boolean[Server.getInstance().getWorldsSize()];
 	
 	public static synchronized boolean broadcastMapleTVIfNotActive(MapleCharacter player, MapleCharacter victim, List<String> messages, int tvType){
                 int w = player.getWorld();

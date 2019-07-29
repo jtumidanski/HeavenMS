@@ -170,7 +170,7 @@ public class MapleSkillbookInformationProvider {
                     foundSkillbooks.put(currentItemid, SkillBookEntry.QUEST);
                 }
             }
-        } catch(Exception e) {}
+        } catch(Exception ignored) {}
     }
     
     private static void readItemToken(String token) {
@@ -326,7 +326,7 @@ public class MapleSkillbookInformationProvider {
             } finally {
                 scanner.close();
             }
-        } catch (NoSuchElementException e) {}
+        } catch (NoSuchElementException ignored) {}
         
         return text;
     }

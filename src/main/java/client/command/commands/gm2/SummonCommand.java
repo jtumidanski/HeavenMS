@@ -70,7 +70,7 @@ public class SummonCommand extends Command {
                     if (victim.isLoggedinWorld()) break;
                     Thread.sleep(1777);
                 }
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException ignored) {}
             
             MapleMap map = player.getMap();
             victim.saveLocationOnWarp();

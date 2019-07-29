@@ -118,7 +118,7 @@ public class MapleMarriage extends EventInstanceManager {
             } else if (chr.getId() == brideid) {
                 groom = false;
             }
-        } catch (NumberFormatException nfe) {}
+        } catch (NumberFormatException ignored) {}
 
         return groom;
     }
@@ -128,9 +128,9 @@ public class MapleMarriage extends EventInstanceManager {
         if (MapleInventory.checkSpot(chr, gifts)) {
             try {
                 Connection con = DatabaseConnection.getConnection();
-                ItemFactory.MARRIAGE_GIFTS.saveItems(new LinkedList<Pair<Item, MapleInventoryType>>(), chr.getId(), con);
+                ItemFactory.MARRIAGE_GIFTS.saveItems(new LinkedList<>(), chr.getId(), con);
                 con.close();
-            } catch (SQLException sqle) {}
+            } catch (SQLException ignored) {}
 
             for (Item item : gifts) {
                 MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);

@@ -79,13 +79,11 @@ public class ItemAction extends MapleQuestAction {
 			items.add(new ItemData(Integer.parseInt(iEntry.getName()), id, count, prop, job, gender));
 		}
                 
-                Collections.sort(items, new Comparator<ItemData>()
-                {
-                    @Override
-                    public int compare( ItemData o1, ItemData o2 )
-                    {
-                        return o1.map - o2.map;
-                    }
+                items.sort(new Comparator<>() {
+                   @Override
+                   public int compare(ItemData o1, ItemData o2) {
+                      return o1.map - o2.map;
+                   }
                 });
 	}
 	
@@ -162,7 +160,7 @@ public class ItemAction extends MapleQuestAction {
                 List<Pair<Item, MapleInventoryType>> selectList = new LinkedList<>();
                 List<Pair<Item, MapleInventoryType>> randomList = new LinkedList<>();
                 
-                List<Integer> allSlotUsed = new ArrayList(5);
+                List<Integer> allSlotUsed = new ArrayList<>(5);
                 for(byte i = 0; i < 5; i++) allSlotUsed.add(0);
                 
                 for(ItemData item : items) {
@@ -208,7 +206,7 @@ public class ItemAction extends MapleQuestAction {
                         int result;
                         MapleClient c = chr.getClient();
                         
-                        List<Integer> rndUsed = new ArrayList(5);
+                        List<Integer> rndUsed = new ArrayList<>(5);
                         for(byte i = 0; i < 5; i++) rndUsed.add(allSlotUsed.get(i));
                     
                         for(Pair<Item, MapleInventoryType> it: randomList) {

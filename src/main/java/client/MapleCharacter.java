@@ -246,7 +246,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     private MonsterBook monsterbook;
     private CashShop cashshop;
     private Set<NewYearCardRecord> newyears = new LinkedHashSet<>();
-    private SavedLocation savedLocations[];
+   private SavedLocation[] savedLocations;
     private SkillMacro[] skillMacros = new SkillMacro[5];
     private List<Integer> lastmonthfameids;
     private List<WeakReference<MapleMap>> lastVisitedMaps = new LinkedList<>();
@@ -592,7 +592,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
         effLock.lock();
         chrLock.lock();
         try {
-            this.coolDowns.put(Integer.valueOf(skillId), new MapleCoolDownValueHolder(skillId, startTime, length));
+            this.coolDowns.put(skillId, new MapleCoolDownValueHolder(skillId, startTime, length));
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -939,7 +939,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                 if (!login) {
                     getMap().broadcastNONGMMessage(this, MaplePacketCreator.removePlayerFromMap(getId()), false);
                 }
-                List<Pair<MapleBuffStat, Integer>> ldsstat = Collections.singletonList(new Pair<MapleBuffStat, Integer>(MapleBuffStat.DARKSIGHT, 0));
+                List<Pair<MapleBuffStat, Integer>> ldsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
                 getMap().broadcastGMMessage(this, MaplePacketCreator.giveForeignBuff(id, ldsstat), false);
                 this.releaseControlledMonsters();
             }
@@ -1024,7 +1024,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             return FameStatus.OK;
         } else if (lastfametime >= System.currentTimeMillis() - 3600000 * 24) {
             return FameStatus.NOT_TODAY;
-        } else if (lastmonthfameids.contains(Integer.valueOf(from.getId()))) {
+        } else if (lastmonthfameids.contains(from.getId())) {
             return FameStatus.NOT_THIS_MONTH;
         } else {
             return FameStatus.OK;
@@ -1290,9 +1290,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
     public void changeKeybinding(int key, MapleKeyBinding keybinding) {
         if (keybinding.getType() != 0) {
-            keymap.put(Integer.valueOf(key), keybinding);
+            keymap.put(key, keybinding);
         } else {
-            keymap.remove(Integer.valueOf(key));
+            keymap.remove(key);
         }
     }
     
@@ -2674,7 +2674,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
         for(Entry<MapleDisease, Pair<MapleDiseaseValueHolder, MobSkill>> di : chrDiseases) {
             MapleDisease disease = di.getKey();
             MobSkill skill = di.getValue().getRight();
-            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, Integer.valueOf(skill.getX())));
+            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
 
             if (disease != MapleDisease.SLOW) {
                 map.broadcastMessage(MaplePacketCreator.giveForeignDebuff(id, debuff, skill));
@@ -2705,7 +2705,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                 sitChair(-1);
             }
             
-            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, Integer.valueOf(skill.getX())));
+            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
             client.announce(MaplePacketCreator.giveDebuff(debuff, skill));
             
             if (disease != MapleDisease.SLOW) {
@@ -3336,7 +3336,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             if (mbsvh == null) {
                 return null;
             }
-            return Long.valueOf(mbsvh.startTime);
+            return mbsvh.startTime;
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -3351,7 +3351,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             if (mbsvh == null) {
                 return null;
             }
-            return Integer.valueOf(mbsvh.value);
+            return mbsvh.value;
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -3480,11 +3480,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
         }
         
-        Collections.sort(ret, new Comparator<Pair<MapleBuffStat, Integer>>() {
-            @Override
-            public int compare(Pair<MapleBuffStat, Integer> p1, Pair<MapleBuffStat, Integer> p2) {
-                return p1.getLeft().compareTo(p2.getLeft());
-            }
+        ret.sort(new Comparator<>() {
+           @Override
+           public int compare(Pair<MapleBuffStat, Integer> p1, Pair<MapleBuffStat, Integer> p2) {
+              return p1.getLeft().compareTo(p2.getLeft());
+           }
         });
         
         return ret;
@@ -3836,7 +3836,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                 }
             }
             
-            propagateBuffEffectUpdates(new LinkedHashMap<Integer, Pair<MapleStatEffect, Long>>(), retrievedStats, removedStats);
+            propagateBuffEffectUpdates(new LinkedHashMap<>(), retrievedStats, removedStats);
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -4136,7 +4136,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
         }
         
-        Comparator cmp = new Comparator<Pair<MapleStatEffect, Integer>>() {
+        Comparator<Pair<MapleStatEffect, Integer>> cmp = new Comparator<Pair<MapleStatEffect, Integer>>() {
             @Override
             public int compare(Pair<MapleStatEffect, Integer> o1, Pair<MapleStatEffect, Integer> o2)
             {
@@ -4145,7 +4145,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
         };
         
         for (Entry<MapleBuffStat, List<Pair<MapleStatEffect, Integer>>> statBuffs : buffEffects.entrySet()) {
-            Collections.sort(statBuffs.getValue(), cmp);
+            statBuffs.getValue().sort(cmp);
         }
         
         return topologicalSortEffects(buffEffects);
@@ -4452,14 +4452,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                         retrievedEffects.put(sourceid, new Pair<>(effect, starttime));
                     }
                     
-                    propagateBuffEffectUpdates(retrievedEffects, retrievedStats, new LinkedHashSet<MapleBuffStat>());
+                    propagateBuffEffectUpdates(retrievedEffects, retrievedStats, new LinkedHashSet<>());
                 }
             } else {
                 for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statup : appliedStatups.entrySet()) {
                     addItemEffectHolderCount(statup.getKey());
                 }
                 
-                toDeploy = (active ? appliedStatups : new LinkedHashMap<MapleBuffStat, MapleBuffStatValueHolder>());
+                toDeploy = (active ? appliedStatups : new LinkedHashMap<>());
             }
             
             addItemEffectHolder(sourceid, expirationtime, appliedStatups);
@@ -4585,7 +4585,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     public Collection<MapleDoor> getDoors() {
         prtLock.lock();
         try {
-            return (party != null ? Collections.unmodifiableCollection(party.getDoors().values()) : (pdoor != null ? Collections.singleton(pdoor) : new LinkedHashSet<MapleDoor>()));
+            return (party != null ? Collections.unmodifiableCollection(party.getDoors().values()) : (pdoor != null ? Collections.singleton(pdoor) : new LinkedHashSet<>()));
         } finally {
             prtLock.unlock();
         }
@@ -4687,7 +4687,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             if (petExclude != null) {
                 petExclude.clear();
             } else {
-                excluded.put(petId, new LinkedHashSet<Integer>());
+                excluded.put(petId, new LinkedHashSet<>());
             }
         } finally {
             chrLock.unlock();
@@ -5030,7 +5030,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     }
     
     public boolean haveWeddingRing() {
-        int rings[] = {1112806, 1112803, 1112807, 1112809};
+       int[] rings = {1112806, 1112803, 1112807, 1112809};
         
         for (int ringid : rings) {
             if (haveItemWithId(ringid, true)) {
@@ -5917,7 +5917,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
     public void hasGivenFame(MapleCharacter to) {
         lastfametime = System.currentTimeMillis();
-        lastmonthfameids.add(Integer.valueOf(to.getId()));
+        lastmonthfameids.add(to.getId());
         try {
             Connection con = DatabaseConnection.getConnection();
             try (PreparedStatement ps = con.prepareStatement("INSERT INTO famelog (characterid, characterid_to) VALUES (?, ?)")) {
@@ -6860,7 +6860,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     }
     
     private void loadCharSkillPoints(String[] skillPoints) {
-        int sps[] = new int[skillPoints.length];
+       int[] sps = new int[skillPoints.length];
         for (int i = 0; i < skillPoints.length; i++) {
             sps[i] = Integer.parseInt(skillPoints[i]);
         }
@@ -7257,7 +7257,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                     int key = rs.getInt("key");
                     int type = rs.getInt("type");
                     int action = rs.getInt("action");
-                    ret.keymap.put(Integer.valueOf(key), new MapleKeyBinding(type, action));
+                    ret.keymap.put(key, new MapleKeyBinding(type, action));
                 }
                 rs.close();
                 ps.close();
@@ -7276,7 +7276,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                 ret.lastmonthfameids = new ArrayList<>(31);
                 while (rs.next()) {
                     ret.lastfametime = Math.max(ret.lastfametime, rs.getTimestamp("when").getTime());
-                    ret.lastmonthfameids.add(Integer.valueOf(rs.getInt("characterid_to")));
+                    ret.lastmonthfameids.add(rs.getInt("characterid_to"));
                 }
                 rs.close();
                 ps.close();
@@ -7655,11 +7655,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
             Integer watkbuff = getBuffedValue(MapleBuffStat.WATK);
             if (watkbuff != null) {
-                localwatk += watkbuff.intValue();
+                localwatk += watkbuff;
             }
             Integer matkbuff = getBuffedValue(MapleBuffStat.MATK);
             if (matkbuff != null) {
-                localmagic += matkbuff.intValue();
+                localmagic += matkbuff;
             }
 
             /*
@@ -7820,9 +7820,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
         effLock.lock();
         chrLock.lock();
         try {
-            if (this.coolDowns.containsKey(skillId)) {
-                this.coolDowns.remove(skillId);
-            }
+           this.coolDowns.remove(skillId);
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -7921,15 +7919,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     }
     
     public void resetEnteredScript() {
-        if (entered.containsKey(map.getId())) {
-            entered.remove(map.getId());
-        }
+       entered.remove(map.getId());
     }
 
     public void resetEnteredScript(int mapId) {
-        if (entered.containsKey(mapId)) {
-            entered.remove(mapId);
-        }
+       entered.remove(mapId);
     }
 
     public void resetEnteredScript(String script) {
@@ -9246,7 +9240,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             Map<Equip, List<Pair<StatUpgrade, Integer>>> equipUpgrades = new LinkedHashMap<>();
             for (Equip eq : getUpgradeableEquipped()) {
                 upgradeableEquipped.add(new Pair<>(eq, eq.getStats()));
-                equipUpgrades.put(eq, new LinkedList<Pair<StatUpgrade, Integer>>());
+                equipUpgrades.put(eq, new LinkedList<>());
             }
 
             /*
@@ -9498,7 +9492,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
         effLock.lock();
         chrLock.lock();
         try {
-            return coolDowns.containsKey(Integer.valueOf(skillId));
+            return coolDowns.containsKey(skillId);
         } finally {
             chrLock.unlock();
             effLock.unlock();
@@ -9802,7 +9796,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     }
 
     private void updateSingleStat(MapleStat stat, int newval, boolean itemReaction) {
-        announce(MaplePacketCreator.updatePlayerStats(Collections.singletonList(new Pair<>(stat, Integer.valueOf(newval))), itemReaction, this));
+        announce(MaplePacketCreator.updatePlayerStats(Collections.singletonList(new Pair<>(stat, newval)), itemReaction, this));
     }
 
     public void announce(final byte[] packet) {
@@ -9920,7 +9914,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     }
 
     public boolean containsAreaInfo(int area, String info) {
-        Short area_ = Short.valueOf((short) area);
+        Short area_ = (short) area;
         if (area_info.containsKey(area_)) {
             return area_info.get(area_).contains(info);
         }
@@ -9928,12 +9922,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     }
 
     public void updateAreaInfo(int area, String info) {
-        area_info.put(Short.valueOf((short) area), info);
+        area_info.put((short) area, info);
         announce(MaplePacketCreator.updateAreaInfo(area, info));
     }
 
     public String getAreaInfo(int area) {
-        return area_info.get(Short.valueOf((short) area));
+        return area_info.get((short) area);
     }
 
     public Map<Short, String> getAreaInfos() {

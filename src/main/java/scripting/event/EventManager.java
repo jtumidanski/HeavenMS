@@ -77,8 +77,8 @@ public class EventManager {
     private World wserv;
     private Server server;
     private EventScriptScheduler ess = new EventScriptScheduler();
-    private Map<String, EventInstanceManager> instances = new HashMap<String, EventInstanceManager>();
-    private Map<String, Integer> instanceLocks = new HashMap<String, Integer>();
+    private Map<String, EventInstanceManager> instances = new HashMap<>();
+    private Map<String, Integer> instanceLocks = new HashMap<>();
     private final Queue<Integer> queuedGuilds = new LinkedList<>();
     private final Map<Integer, Integer> queuedGuildLeaders = new HashMap<>();
     private List<Boolean> openedLobbys;
@@ -172,7 +172,7 @@ public class EventManager {
         
         if (ServerConstants.JAVA_8) {
             for (Object d: list) {
-                intList.add(((Integer) d).intValue());
+                intList.add((Integer) d);
             }
         } else {
             for (Object d: list) {

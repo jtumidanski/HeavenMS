@@ -66,10 +66,9 @@ public class GotoCommand extends Command {
     public static String GOTO_AREAS_INFO = "";
     
     private static void sortGotoEntries(List<Entry<String, Integer>> listEntries) {
-        Collections.sort(listEntries, new Comparator<Entry<String, Integer>>() {
+        listEntries.sort(new Comparator<>() {
             @Override
-            public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2)
-            {
+            public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
                 return e1.getValue().compareTo(e2.getValue());
             }
         });

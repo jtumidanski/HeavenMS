@@ -100,7 +100,7 @@ public class HexTool {
         try {
             String str = new String(ret, encode);
             return str;
-        } catch (Exception e) {}
+        } catch (Exception ignored) {}
         return "";
     }
 
