@@ -19,38 +19,38 @@
 */
 package server.loot;
 
-import client.MapleCharacter;
 import java.util.HashMap;
 import java.util.Map;
+
+import client.MapleCharacter;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 
 
 /**
- *
  * @author Ronan
  */
 public class MapleLootInventory {
-    Map<Integer, Integer> items = new HashMap<>(50);
-    
-    public MapleLootInventory(MapleCharacter from) {
-        for (MapleInventoryType values : MapleInventoryType.values()) {
-            
-            for(Item it : from.getInventory(values).list()) {
-                Integer itemQty = items.get(it.getItemId());
-                
-                if(itemQty == null) {
-                    items.put(it.getItemId(), (int) it.getQuantity());
-                } else {
-                    items.put(it.getItemId(), itemQty + it.getQuantity());
-                }
+   Map<Integer, Integer> items = new HashMap<>(50);
+
+   public MapleLootInventory(MapleCharacter from) {
+      for (MapleInventoryType values : MapleInventoryType.values()) {
+
+         for (Item it : from.getInventory(values).list()) {
+            Integer itemQty = items.get(it.getItemId());
+
+            if (itemQty == null) {
+               items.put(it.getItemId(), (int) it.getQuantity());
+            } else {
+               items.put(it.getItemId(), itemQty + it.getQuantity());
             }
-        }
-    }
-    
-    public int hasItem(int itemid, int quantity) {
-        Integer itemQty = items.get(itemid);
-        return itemQty == null ? 0 : itemQty >= quantity ? 2 : itemQty > 0 ? 1 : 0;
-    }
-    
+         }
+      }
+   }
+
+   public int hasItem(int itemid, int quantity) {
+      Integer itemQty = items.get(itemid);
+      return itemQty == null ? 0 : itemQty >= quantity ? 2 : itemQty > 0 ? 1 : 0;
+   }
+
 }

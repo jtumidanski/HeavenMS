@@ -23,9 +23,9 @@
 */
 package client.command.commands.gm2;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
@@ -34,83 +34,83 @@ import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 
 public class ItemDropCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !drop <itemid> <quantity>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
 
-        int itemId = Integer.parseInt(params[0]);
-        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !drop <itemid> <quantity>");
+         return;
+      }
 
-        if(ii.getName(itemId) == null) {
-            player.yellowMessage("Item id '" + params[0] + "' does not exist.");
-            return;
-        }
+      int itemId = Integer.parseInt(params[0]);
+      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
-        short quantity = 1;
-        if(params.length >= 2) quantity = Short.parseShort(params[1]);
+      if (ii.getName(itemId) == null) {
+         player.yellowMessage("Item id '" + params[0] + "' does not exist.");
+         return;
+      }
 
-        if (ServerConstants.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
-            player.yellowMessage("You cannot create a cash item with this command.");
-            return;
-        }
+      short quantity = 1;
+      if (params.length >= 2) quantity = Short.parseShort(params[1]);
 
-        if (ItemConstants.isPet(itemId)) {
-            if (params.length >= 2){   // thanks to istreety & TacoBell
-                quantity = 1;
-                long days = Math.max(1, Integer.parseInt(params[1]));
-                long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
-                int petid = MaplePet.createPet(itemId);
+      if (ServerConstants.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
+         player.yellowMessage("You cannot create a cash item with this command.");
+         return;
+      }
 
-                Item toDrop = new Item(itemId, (short) 0, quantity, petid);
-                toDrop.setExpiration(expiration);
+      if (ItemConstants.isPet(itemId)) {
+         if (params.length >= 2) {   // thanks to istreety & TacoBell
+            quantity = 1;
+            long days = Math.max(1, Integer.parseInt(params[1]));
+            long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
+            int petid = MaplePet.createPet(itemId);
 
-                toDrop.setOwner("");
-                if(player.gmLevel() < 3) {
-                    short f = toDrop.getFlag();
-                    f |= ItemConstants.ACCOUNT_SHARING;
-                    f |= ItemConstants.UNTRADEABLE;
-                    f |= ItemConstants.SANDBOX;
-                    
-                    toDrop.setFlag(f);
-                    toDrop.setOwner("TRIAL-MODE");
-                }
+            Item toDrop = new Item(itemId, (short) 0, quantity, petid);
+            toDrop.setExpiration(expiration);
 
-                c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
+            toDrop.setOwner("");
+            if (player.gmLevel() < 3) {
+               short f = toDrop.getFlag();
+               f |= ItemConstants.ACCOUNT_SHARING;
+               f |= ItemConstants.UNTRADEABLE;
+               f |= ItemConstants.SANDBOX;
 
-                return;
-            } else {
-                player.yellowMessage("Pet Syntax: !drop <itemid> <expiration>");
-                return;        
+               toDrop.setFlag(f);
+               toDrop.setOwner("TRIAL-MODE");
             }
-        }
-        
-        Item toDrop;
-        if (ItemConstants.getInventoryType(itemId) == MapleInventoryType.EQUIP) {
-            toDrop = ii.getEquipById(itemId);
-        } else {
-            toDrop = new Item(itemId, (short) 0, quantity);
-        }
 
-        toDrop.setOwner(player.getName());
-        if(player.gmLevel() < 3) {
-            short f = toDrop.getFlag();
-            f |= ItemConstants.ACCOUNT_SHARING;
-            f |= ItemConstants.UNTRADEABLE;
-            f |= ItemConstants.SANDBOX;
+            c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
 
-            toDrop.setFlag(f);
-            toDrop.setOwner("TRIAL-MODE");
-        }
+            return;
+         } else {
+            player.yellowMessage("Pet Syntax: !drop <itemid> <expiration>");
+            return;
+         }
+      }
 
-        c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
-    }
+      Item toDrop;
+      if (ItemConstants.getInventoryType(itemId) == MapleInventoryType.EQUIP) {
+         toDrop = ii.getEquipById(itemId);
+      } else {
+         toDrop = new Item(itemId, (short) 0, quantity);
+      }
+
+      toDrop.setOwner(player.getName());
+      if (player.gmLevel() < 3) {
+         short f = toDrop.getFlag();
+         f |= ItemConstants.ACCOUNT_SHARING;
+         f |= ItemConstants.UNTRADEABLE;
+         f |= ItemConstants.SANDBOX;
+
+         toDrop.setFlag(f);
+         toDrop.setOwner("TRIAL-MODE");
+      }
+
+      c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
+   }
 }

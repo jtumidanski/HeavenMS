@@ -23,21 +23,21 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import tools.MapleLogger;
 
 public class MonitorsCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        for (Integer cid : MapleLogger.monitored) {
-            player.yellowMessage(MapleCharacter.getNameById(cid) + " is being monitored.");
-        }
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      for (Integer cid : MapleLogger.monitored) {
+         player.yellowMessage(MapleCharacter.getNameById(cid) + " is being monitored.");
+      }
+   }
 }

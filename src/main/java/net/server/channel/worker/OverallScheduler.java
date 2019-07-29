@@ -22,19 +22,18 @@ package net.server.channel.worker;
 import net.server.audit.locks.MonitoredLockType;
 
 /**
- *
  * @author Ronan
  */
 public class OverallScheduler extends BaseScheduler {
-    public OverallScheduler() {
-        super(MonitoredLockType.CHANNEL_OVERALL);
-    }
-    
-    public void registerDelayedAction(Runnable runAction, long delay) {
-        registerEntry(runAction, runAction, delay);
-    }
-    
-    public void forceRunDelayedAction(Runnable runAction) {
-        interruptEntry(runAction);
-    }
+   public OverallScheduler() {
+      super(MonitoredLockType.CHANNEL_OVERALL);
+   }
+
+   public void registerDelayedAction(Runnable runAction, long delay) {
+      registerEntry(runAction, runAction, delay);
+   }
+
+   public void forceRunDelayedAction(Runnable runAction) {
+      interruptEntry(runAction);
+   }
 }

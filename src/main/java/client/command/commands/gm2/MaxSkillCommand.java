@@ -23,39 +23,44 @@
 */
 package client.command.commands.gm2;
 
-import client.*;
+import java.io.File;
+
+import client.MapleCharacter;
+import client.MapleClient;
+import client.MapleJob;
+import client.Skill;
+import client.SkillFactory;
 import client.command.Command;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
 
-import java.io.File;
-
 public class MaxSkillCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
-            try {
-                Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
-                player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
-            } catch (NumberFormatException nfe) {
-                nfe.printStackTrace();
-                break;
-            } catch (NullPointerException ignored) { }
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
+         try {
+            Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
+            player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+         } catch (NumberFormatException nfe) {
+            nfe.printStackTrace();
+            break;
+         } catch (NullPointerException ignored) {
+         }
+      }
 
-        if (player.getJob().isA(MapleJob.ARAN1) || player.getJob().isA(MapleJob.LEGEND)) {
-            Skill skill = SkillFactory.getSkill(5001005);
-            player.changeSkillLevel(skill, (byte) -1, -1, -1);
-        } else {
-            Skill skill = SkillFactory.getSkill(21001001);
-            player.changeSkillLevel(skill, (byte) -1, -1, -1);
-        }
+      if (player.getJob().isA(MapleJob.ARAN1) || player.getJob().isA(MapleJob.LEGEND)) {
+         Skill skill = SkillFactory.getSkill(5001005);
+         player.changeSkillLevel(skill, (byte) -1, -1, -1);
+      } else {
+         Skill skill = SkillFactory.getSkill(21001001);
+         player.changeSkillLevel(skill, (byte) -1, -1, -1);
+      }
 
-        player.yellowMessage("Skills maxed out.");
-    }
+      player.yellowMessage("Skills maxed out.");
+   }
 }

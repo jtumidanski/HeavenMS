@@ -21,152 +21,153 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package server.maps;
 
-import client.MapleClient;
-import client.MapleCharacter;
-import constants.GameConstants;
 import java.awt.Point;
-import scripting.portal.PortalScriptManager;
-import server.MaplePortal;
-import tools.MaplePacketCreator;
+
+import client.MapleCharacter;
+import client.MapleClient;
+import constants.GameConstants;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import scripting.portal.PortalScriptManager;
+import server.MaplePortal;
+import tools.MaplePacketCreator;
 
 public class MapleGenericPortal implements MaplePortal {
 
-    private String name;
-    private String target;
-    private Point position;
-    private int targetmap;
-    private int type;
-    private boolean status = true;
-    private int id;
-    private String scriptName;
-    private boolean portalState;
-    private MonitoredReentrantLock scriptLock = null;
-    
-    public MapleGenericPortal(int type) {
-        this.type = type;
-    }
+   private String name;
+   private String target;
+   private Point position;
+   private int targetmap;
+   private int type;
+   private boolean status = true;
+   private int id;
+   private String scriptName;
+   private boolean portalState;
+   private MonitoredReentrantLock scriptLock = null;
 
-    @Override
-    public int getId() {
-        return id;
-    }
+   public MapleGenericPortal(int type) {
+      this.type = type;
+   }
 
-    public void setId(int id) {
-        this.id = id;
-    }
+   @Override
+   public int getId() {
+      return id;
+   }
 
-    @Override
-    public String getName() {
-        return name;
-    }
+   public void setId(int id) {
+      this.id = id;
+   }
 
-    @Override
-    public Point getPosition() {
-        return position;
-    }
+   @Override
+   public String getName() {
+      return name;
+   }
 
-    @Override
-    public String getTarget() {
-        return target;
-    }
+   public void setName(String name) {
+      this.name = name;
+   }
 
-    @Override
-    public void setPortalStatus(boolean newStatus) {
-        this.status = newStatus;
-    }
+   @Override
+   public Point getPosition() {
+      return position;
+   }
 
-    @Override
-    public boolean getPortalStatus() {
-        return status;
-    }
+   public void setPosition(Point position) {
+      this.position = position;
+   }
 
-    @Override
-    public int getTargetMapId() {
-        return targetmap;
-    }
+   @Override
+   public String getTarget() {
+      return target;
+   }
 
-    @Override
-    public int getType() {
-        return type;
-    }
+   public void setTarget(String target) {
+      this.target = target;
+   }
 
-    @Override
-    public String getScriptName() {
-        return scriptName;
-    }
+   @Override
+   public boolean getPortalStatus() {
+      return status;
+   }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+   @Override
+   public void setPortalStatus(boolean newStatus) {
+      this.status = newStatus;
+   }
 
-    public void setPosition(Point position) {
-        this.position = position;
-    }
+   @Override
+   public int getTargetMapId() {
+      return targetmap;
+   }
 
-    public void setTarget(String target) {
-        this.target = target;
-    }
+   public void setTargetMapId(int targetmapid) {
+      this.targetmap = targetmapid;
+   }
 
-    public void setTargetMapId(int targetmapid) {
-        this.targetmap = targetmapid;
-    }
+   @Override
+   public int getType() {
+      return type;
+   }
 
-    @Override
-    public void setScriptName(String scriptName) {
-        this.scriptName = scriptName;
-        
-        if(scriptName != null) {
-            if(scriptLock == null) {
-                scriptLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.PORTAL, true);
-            }
-        } else {
-            scriptLock = null;
-        }
-    }
+   @Override
+   public String getScriptName() {
+      return scriptName;
+   }
 
-    @Override
-    public void enterPortal(MapleClient c) {
-        boolean changed = false;
-        if (getScriptName() != null) {
+   @Override
+   public void setScriptName(String scriptName) {
+      this.scriptName = scriptName;
+
+      if (scriptName != null) {
+         if (scriptLock == null) {
+            scriptLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.PORTAL, true);
+         }
+      } else {
+         scriptLock = null;
+      }
+   }
+
+   @Override
+   public void enterPortal(MapleClient c) {
+      boolean changed = false;
+      if (getScriptName() != null) {
+         try {
+            scriptLock.lock();
             try {
-                scriptLock.lock();
-                try {
-                    changed = PortalScriptManager.getInstance().executePortalScript(this, c);
-                } finally {
-                    scriptLock.unlock();
-                }
-            } catch(NullPointerException npe) {
-                npe.printStackTrace();
+               changed = PortalScriptManager.getInstance().executePortalScript(this, c);
+            } finally {
+               scriptLock.unlock();
             }
-        } else if (getTargetMapId() != 999999999) {
-            MapleCharacter chr = c.getPlayer();
-            if (!(chr.getChalkboard() != null && GameConstants.isFreeMarketRoom(getTargetMapId()))) {
-                MapleMap to = chr.getEventInstance() == null ? c.getChannelServer().getMapFactory().getMap(getTargetMapId()) : chr.getEventInstance().getMapInstance(getTargetMapId());
-                MaplePortal pto = to.getPortal(getTarget());
-                if (pto == null) {// fallback for missing portals - no real life case anymore - interesting for not implemented areas
-                    pto = to.getPortal(0);
-                }
-                chr.changeMap(to, pto); //late resolving makes this harder but prevents us from loading the whole world at once
-                changed = true;
-            } else {
-                chr.dropMessage(5, "You cannot enter this map with the chalkboard opened.");
+         } catch (NullPointerException npe) {
+            npe.printStackTrace();
+         }
+      } else if (getTargetMapId() != 999999999) {
+         MapleCharacter chr = c.getPlayer();
+         if (!(chr.getChalkboard() != null && GameConstants.isFreeMarketRoom(getTargetMapId()))) {
+            MapleMap to = chr.getEventInstance() == null ? c.getChannelServer().getMapFactory().getMap(getTargetMapId()) : chr.getEventInstance().getMapInstance(getTargetMapId());
+            MaplePortal pto = to.getPortal(getTarget());
+            if (pto == null) {// fallback for missing portals - no real life case anymore - interesting for not implemented areas
+               pto = to.getPortal(0);
             }
-        }
-        if (!changed) {
-            c.announce(MaplePacketCreator.enableActions());
-        }
-    }
+            chr.changeMap(to, pto); //late resolving makes this harder but prevents us from loading the whole world at once
+            changed = true;
+         } else {
+            chr.dropMessage(5, "You cannot enter this map with the chalkboard opened.");
+         }
+      }
+      if (!changed) {
+         c.announce(MaplePacketCreator.enableActions());
+      }
+   }
 
-    @Override
-    public void setPortalState(boolean state) {
-        this.portalState = state;
-    }
+   @Override
+   public boolean getPortalState() {
+      return portalState;
+   }
 
-    @Override
-    public boolean getPortalState() {
-        return portalState;
-    }
+   @Override
+   public void setPortalState(boolean state) {
+      this.portalState = state;
+   }
 }

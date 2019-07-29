@@ -71,6 +71,19 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       this.itemid = itemid;
    }
 
+   private static boolean canBuy(MapleClient c, Item newItem) {
+      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+   }
+
+   public static byte[] shopErrorMessage(int error, int type) {
+      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.PLAYER_INTERACTION.getValue());
+      mplew.write(0x0A);
+      mplew.write(type);
+      mplew.write(error);
+      return mplew.getPacket();
+   }
+
    public int getChannel() {
       return owner.getClient().getChannel();
    }
@@ -216,10 +229,6 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    private void removeFromSlot(int slot) {
       items.remove(slot);
-   }
-
-   private static boolean canBuy(MapleClient c, Item newItem) {
-      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
    }
 
    public void takeItemBack(int slot, MapleCharacter chr) {
@@ -380,15 +389,6 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       if (owner != null) {
          forceRemoveVisitor(owner);
       }
-   }
-
-   public static byte[] shopErrorMessage(int error, int type) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PLAYER_INTERACTION.getValue());
-      mplew.write(0x0A);
-      mplew.write(type);
-      mplew.write(error);
-      return mplew.getPacket();
    }
 
    public void broadcast(final byte[] packet) {

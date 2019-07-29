@@ -23,38 +23,38 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import server.quest.MapleQuest;
 
 public class QuestCompleteCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        
-        if (params.length < 1){
-            player.yellowMessage("Syntax: !completequest <questid>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
 
-        int questId = Integer.parseInt(params[0]);
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !completequest <questid>");
+         return;
+      }
 
-        if (player.getQuestStatus(questId) == 1) {
-            MapleQuest quest = MapleQuest.getInstance(questId);
-            if (quest != null && quest.getNpcRequirement(true) != -1) {
-                c.getAbstractPlayerInteraction().forceCompleteQuest(questId, quest.getNpcRequirement(true));
-            } else {
-                c.getAbstractPlayerInteraction().forceCompleteQuest(questId);
-            }
-            
-            player.dropMessage(5, "QUEST " + questId + " completed.");
-        } else {
-            player.dropMessage(5, "QUESTID " + questId + " not started or already completed.");
-        }
-    }
+      int questId = Integer.parseInt(params[0]);
+
+      if (player.getQuestStatus(questId) == 1) {
+         MapleQuest quest = MapleQuest.getInstance(questId);
+         if (quest != null && quest.getNpcRequirement(true) != -1) {
+            c.getAbstractPlayerInteraction().forceCompleteQuest(questId, quest.getNpcRequirement(true));
+         } else {
+            c.getAbstractPlayerInteraction().forceCompleteQuest(questId);
+         }
+
+         player.dropMessage(5, "QUEST " + questId + " completed.");
+      } else {
+         player.dropMessage(5, "QUESTID " + questId + " not started or already completed.");
+      }
+   }
 }

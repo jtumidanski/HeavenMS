@@ -21,13 +21,12 @@
 */
 package net.server.channel.handlers;
 
-import client.inventory.ItemFactory;
-import client.MapleCharacter;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collections;
 
+import client.MapleCharacter;
 import client.MapleClient;
+import client.inventory.ItemFactory;
 import constants.GameConstants;
 import net.AbstractMaplePacketHandler;
 import server.maps.MapleMapObjectType;
@@ -35,29 +34,28 @@ import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author XoticStory
  */
 public final class HiredMerchantRequest extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        MapleCharacter chr = c.getPlayer();
-        if (chr.getMap().getMapObjectsInRange(chr.getPosition(), 23000, Collections.singletonList(MapleMapObjectType.HIRED_MERCHANT)).isEmpty() && (GameConstants.isFreeMarketRoom(chr.getMapId()))) {
-            if (!chr.hasMerchant()) {
-                try {
-                    if (ItemFactory.MERCHANT.loadItems(chr.getId(), false).isEmpty() && chr.getMerchantMeso() == 0) {
-                        c.announce(MaplePacketCreator.hiredMerchantBox());
-                    } else {
-                        chr.announce(MaplePacketCreator.retrieveFirstMessage());
-                    }
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                chr.dropMessage(1, "You already have a store open.");
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      MapleCharacter chr = c.getPlayer();
+      if (chr.getMap().getMapObjectsInRange(chr.getPosition(), 23000, Collections.singletonList(MapleMapObjectType.HIRED_MERCHANT)).isEmpty() && (GameConstants.isFreeMarketRoom(chr.getMapId()))) {
+         if (!chr.hasMerchant()) {
+            try {
+               if (ItemFactory.MERCHANT.loadItems(chr.getId(), false).isEmpty() && chr.getMerchantMeso() == 0) {
+                  c.announce(MaplePacketCreator.hiredMerchantBox());
+               } else {
+                  chr.announce(MaplePacketCreator.retrieveFirstMessage());
+               }
+            } catch (SQLException ex) {
+               ex.printStackTrace();
             }
-        } else {
-            chr.dropMessage(1, "You cannot open your hired merchant here.");
-        }
-    }
+         } else {
+            chr.dropMessage(1, "You already have a store open.");
+         }
+      } else {
+         chr.dropMessage(1, "You cannot open your hired merchant here.");
+      }
+   }
 }

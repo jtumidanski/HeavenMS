@@ -27,15 +27,15 @@ import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class CustomPacketHandler implements MaplePacketHandler {
-    @Override
-    public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        if (slea.available() > 0 && c.getGMLevel() == 4) {//w/e       
-            c.announce(MaplePacketCreator.customPacket(slea.read((int) slea.available())));
-        }
-    }
+   @Override
+   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      if (slea.available() > 0 && c.getGMLevel() == 4) {//w/e
+         c.announce(MaplePacketCreator.customPacket(slea.read((int) slea.available())));
+      }
+   }
 
-    @Override
-    public boolean validateState(MapleClient c) {
-        return true;
-    }
+   @Override
+   public boolean validateState(MapleClient c) {
+      return true;
+   }
 }

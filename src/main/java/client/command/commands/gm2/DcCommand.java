@@ -23,43 +23,43 @@
 */
 package client.command.commands.gm2;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 
 public class DcCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !dc <playername>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !dc <playername>");
+         return;
+      }
 
-        MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-        if (victim == null) {
-            victim = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]);
-            if (victim == null) {
-                victim = player.getMap().getCharacterByName(params[0]);
-                if (victim != null) {
-                    try {//sometimes bugged because the map = null
-                        victim.getClient().disconnect(true, false);
-                        player.getMap().removePlayer(victim);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else {
-                    return;
-                }
+      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+      if (victim == null) {
+         victim = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]);
+         if (victim == null) {
+            victim = player.getMap().getCharacterByName(params[0]);
+            if (victim != null) {
+               try {//sometimes bugged because the map = null
+                  victim.getClient().disconnect(true, false);
+                  player.getMap().removePlayer(victim);
+               } catch (Exception e) {
+                  e.printStackTrace();
+               }
+            } else {
+               return;
             }
-        }
-        if (player.gmLevel() < victim.gmLevel()) {
-            victim = player;
-        }
-        victim.getClient().disconnect(false, false);
-    }
+         }
+      }
+      if (player.gmLevel() < victim.gmLevel()) {
+         victim = player;
+      }
+      victim.getClient().disconnect(false, false);
+   }
 }

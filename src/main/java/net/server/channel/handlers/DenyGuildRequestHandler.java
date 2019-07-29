@@ -28,17 +28,16 @@ import net.server.guild.MapleGuild;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author Xterminator
  */
 public final class DenyGuildRequestHandler extends AbstractMaplePacketHandler {
-    
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        slea.readByte();
-        MapleCharacter cfrom = c.getWorldServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString());
-        if (cfrom != null) {
-            MapleGuild.answerInvitation(c.getPlayer().getId(), c.getPlayer().getName(), cfrom.getGuildId(), false);
-        }
-    }
+
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      slea.readByte();
+      MapleCharacter cfrom = c.getWorldServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString());
+      if (cfrom != null) {
+         MapleGuild.answerInvitation(c.getPlayer().getId(), c.getPlayer().getName(), cfrom.getGuildId(), false);
+      }
+   }
 }

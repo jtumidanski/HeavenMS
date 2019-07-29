@@ -23,9 +23,9 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.inventory.MaplePet;
 import client.inventory.PetCommand;
 import client.inventory.PetDataFactory;
-import client.inventory.MaplePet;
 import net.AbstractMaplePacketHandler;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
@@ -33,30 +33,30 @@ import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class PetCommandHandler extends AbstractMaplePacketHandler {
 
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        MapleCharacter chr = c.getPlayer();
-        int petId = slea.readInt();
-        byte petIndex = chr.getPetIndex(petId);
-        MaplePet pet;
-        if (petIndex == -1) {
-            return;
-        } else {
-            pet = chr.getPet(petIndex);
-        }
-        slea.readInt();
-        slea.readByte();
-        byte command = slea.readByte();
-        PetCommand petCommand = PetDataFactory.getPetCommand(pet.getItemId(), (int) command);
-        if (petCommand == null) {
-            return;
-        }
-        
-        if (Randomizer.nextInt(100) < petCommand.getProbability()) {
-            pet.gainClosenessFullness(chr, petCommand.getIncrease(), 0, command);
-            chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, false, command, false));
-        } else {
-            chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, true, command, false));
-        }
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      MapleCharacter chr = c.getPlayer();
+      int petId = slea.readInt();
+      byte petIndex = chr.getPetIndex(petId);
+      MaplePet pet;
+      if (petIndex == -1) {
+         return;
+      } else {
+         pet = chr.getPet(petIndex);
+      }
+      slea.readInt();
+      slea.readByte();
+      byte command = slea.readByte();
+      PetCommand petCommand = PetDataFactory.getPetCommand(pet.getItemId(), (int) command);
+      if (petCommand == null) {
+         return;
+      }
+
+      if (Randomizer.nextInt(100) < petCommand.getProbability()) {
+         pet.gainClosenessFullness(chr, petCommand.getIncrease(), 0, command);
+         chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, false, command, false));
+      } else {
+         chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, true, command, false));
+      }
+   }
 }

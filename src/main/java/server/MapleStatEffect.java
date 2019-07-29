@@ -147,69 +147,6 @@ public class MapleStatEffect {
    private byte mapProtection;
    private CardItemupStats cardStats;
 
-   private static class CardItemupStats {
-      protected int itemCode, prob;
-      protected boolean party;
-      private List<Pair<Integer, Integer>> areas;
-
-      private CardItemupStats(int code, int prob, List<Pair<Integer, Integer>> areas, boolean inParty) {
-         this.itemCode = code;
-         this.prob = prob;
-         this.areas = areas;
-         this.party = inParty;
-      }
-
-      private boolean isInArea(int mapid) {
-         if (this.areas == null) {
-            return true;
-         }
-
-         for (Pair<Integer, Integer> a : this.areas) {
-            if (mapid >= a.left && mapid <= a.right) {
-               return true;
-            }
-         }
-
-         return false;
-      }
-   }
-
-   private boolean isEffectActive(int mapid, boolean partyHunting) {
-      if (cardStats == null) return true;
-
-      if (!cardStats.isInArea(mapid)) {
-         return false;
-      }
-
-      if (cardStats.party && !partyHunting) {
-         return false;
-      }
-
-      return true;
-   }
-
-   public boolean isActive(MapleCharacter applyto) {
-      return isEffectActive(applyto.getMapId(), applyto.getPartyMembersOnSameMap().size() > 1);
-   }
-
-   public int getCardRate(int mapid, int itemid) {
-      if (cardStats != null) {
-         if (cardStats.itemCode == Integer.MAX_VALUE) {
-            return cardStats.prob;
-         } else if (cardStats.itemCode < 1000) {
-            if (itemid / 10000 == cardStats.itemCode) {
-               return cardStats.prob;
-            }
-         } else {
-            if (itemid == cardStats.itemCode) {
-               return cardStats.prob;
-            }
-         }
-      }
-
-      return 0;
-   }
-
    public static MapleStatEffect loadSkillEffectFromData(MapleData source, int skillid, boolean overtime) {
       return loadFromData(source, skillid, true, overtime);
    }
@@ -868,6 +805,97 @@ public class MapleStatEffect {
       statups.trimToSize();
       ret.statups = statups;
       return ret;
+   }
+
+   public static boolean isMapChair(int sourceid) {
+      return sourceid == Beginner.MAP_CHAIR || sourceid == Noblesse.MAP_CHAIR || sourceid == Legend.MAP_CHAIR;
+   }
+
+   public static boolean isDojoBuff(int sourceid) {
+      return sourceid >= 2022359 && sourceid <= 2022421;
+   }
+
+   public static boolean isHpMpRecovery(int sourceid) {
+      return sourceid == 2022198 || sourceid == 2022337;
+   }
+
+   public static boolean isPyramidBuff(int sourceid) {
+      return sourceid >= 2022585 && sourceid <= 2022617;
+   }
+
+   public static boolean isRateCoupon(int sourceid) {
+      int itemType = sourceid / 1000;
+      return itemType == 5211 || itemType == 5360;
+   }
+
+   public static boolean isExpIncrease(int sourceid) {
+      return sourceid >= 2022450 && sourceid <= 2022452;
+   }
+
+   public static boolean isAriantShield(int sourceid) {
+      return sourceid == 2022269;
+   }
+
+   public static boolean isMonsterCard(int sourceid) {
+      int itemType = sourceid / 10000;
+      return itemType == 238;
+   }
+
+   public static boolean isHerosWill(int skillid) {
+      switch (skillid) {
+         case Hero.HEROS_WILL:
+         case Paladin.HEROS_WILL:
+         case DarkKnight.HEROS_WILL:
+         case FPArchMage.HEROS_WILL:
+         case ILArchMage.HEROS_WILL:
+         case Bishop.HEROS_WILL:
+         case Bowmaster.HEROS_WILL:
+         case Marksman.HEROS_WILL:
+         case NightLord.HEROS_WILL:
+         case Shadower.HEROS_WILL:
+         case Buccaneer.PIRATES_RAGE:
+         case Aran.HEROS_WILL:
+            return true;
+
+         default:
+            return false;
+      }
+   }
+
+   private boolean isEffectActive(int mapid, boolean partyHunting) {
+      if (cardStats == null) return true;
+
+      if (!cardStats.isInArea(mapid)) {
+         return false;
+      }
+
+      if (cardStats.party && !partyHunting) {
+         return false;
+      }
+
+      return true;
+   }
+
+   public boolean isActive(MapleCharacter applyto) {
+      return isEffectActive(applyto.getMapId(), applyto.getPartyMembersOnSameMap().size() > 1);
+   }
+
+   public int getCardRate(int mapid, int itemid) {
+      if (cardStats != null) {
+         if (cardStats.itemCode == Integer.MAX_VALUE) {
+            return cardStats.prob;
+         } else if (cardStats.itemCode < 1000) {
+            if (itemid / 10000 == cardStats.itemCode) {
+               return cardStats.prob;
+            }
+         } else {
+            if (itemid == cardStats.itemCode) {
+               return cardStats.prob;
+            }
+         }
+      }
+
+      return 0;
    }
 
    /**
@@ -1592,42 +1620,8 @@ public class MapleStatEffect {
       return sourceid == Beginner.MAP_CHAIR || sourceid == Noblesse.MAP_CHAIR || sourceid == Legend.MAP_CHAIR;
    }
 
-   public static boolean isMapChair(int sourceid) {
-      return sourceid == Beginner.MAP_CHAIR || sourceid == Noblesse.MAP_CHAIR || sourceid == Legend.MAP_CHAIR;
-   }
-
    public boolean isDojoBuff() {
       return sourceid >= 2022359 && sourceid <= 2022421;
-   }
-
-   public static boolean isDojoBuff(int sourceid) {
-      return sourceid >= 2022359 && sourceid <= 2022421;
-   }
-
-   public static boolean isHpMpRecovery(int sourceid) {
-      return sourceid == 2022198 || sourceid == 2022337;
-   }
-
-   public static boolean isPyramidBuff(int sourceid) {
-      return sourceid >= 2022585 && sourceid <= 2022617;
-   }
-
-   public static boolean isRateCoupon(int sourceid) {
-      int itemType = sourceid / 1000;
-      return itemType == 5211 || itemType == 5360;
-   }
-
-   public static boolean isExpIncrease(int sourceid) {
-      return sourceid >= 2022450 && sourceid <= 2022452;
-   }
-
-   public static boolean isAriantShield(int sourceid) {
-      return sourceid == 2022269;
-   }
-
-   public static boolean isMonsterCard(int sourceid) {
-      int itemType = sourceid / 10000;
-      return itemType == 238;
    }
 
    private boolean isDs() {
@@ -1722,27 +1716,6 @@ public class MapleStatEffect {
       }
 
       return false;
-   }
-
-   public static boolean isHerosWill(int skillid) {
-      switch (skillid) {
-         case Hero.HEROS_WILL:
-         case Paladin.HEROS_WILL:
-         case DarkKnight.HEROS_WILL:
-         case FPArchMage.HEROS_WILL:
-         case ILArchMage.HEROS_WILL:
-         case Bishop.HEROS_WILL:
-         case Bowmaster.HEROS_WILL:
-         case Marksman.HEROS_WILL:
-         case NightLord.HEROS_WILL:
-         case Shadower.HEROS_WILL:
-         case Buccaneer.PIRATES_RAGE:
-         case Aran.HEROS_WILL:
-            return true;
-
-         default:
-            return false;
-      }
    }
 
    private boolean isDash() {
@@ -1957,5 +1930,32 @@ public class MapleStatEffect {
 
    public Map<MonsterStatus, Integer> getMonsterStati() {
       return monsterStatus;
+   }
+
+   private static class CardItemupStats {
+      protected int itemCode, prob;
+      protected boolean party;
+      private List<Pair<Integer, Integer>> areas;
+
+      private CardItemupStats(int code, int prob, List<Pair<Integer, Integer>> areas, boolean inParty) {
+         this.itemCode = code;
+         this.prob = prob;
+         this.areas = areas;
+         this.party = inParty;
+      }
+
+      private boolean isInArea(int mapid) {
+         if (this.areas == null) {
+            return true;
+         }
+
+         for (Pair<Integer, Integer> a : this.areas) {
+            if (mapid >= a.left && mapid <= a.right) {
+               return true;
+            }
+         }
+
+         return false;
+      }
    }
 }

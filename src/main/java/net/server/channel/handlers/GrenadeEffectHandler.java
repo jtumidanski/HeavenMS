@@ -19,39 +19,40 @@
 */
 package net.server.channel.handlers;
 
-import client.MapleClient;
+import java.awt.Point;
+
 import client.MapleCharacter;
+import client.MapleClient;
 import constants.skills.Gunslinger;
 import constants.skills.NightWalker;
 import net.AbstractMaplePacketHandler;
+import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
-import java.awt.Point;
-import tools.FilePrinter;
 
 /*
  * @author GabrielSin
  */
 public class GrenadeEffectHandler extends AbstractMaplePacketHandler {
- 
-    @Override
-    public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        MapleCharacter chr = c.getPlayer();
-        Point position = new Point(slea.readInt(), slea.readInt());
-        int keyDown = slea.readInt();
-        int skillId = slea.readInt();
-       
-        switch (skillId) {
-            case NightWalker.POISON_BOMB:
-            case Gunslinger.GRENADE:
-                int skillLevel = chr.getSkillLevel(skillId);
-                if (skillLevel > 0) {
-                    chr.getMap().broadcastMessage(chr, MaplePacketCreator.throwGrenade(chr.getId(), position, keyDown, skillId, skillLevel), position);
-                }
-                break;
-            default:
-                FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "The skill id: " + skillId + " is not coded in " + this.getClass().getName() + ".");
-        }
-    }
- 
+
+   @Override
+   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      MapleCharacter chr = c.getPlayer();
+      Point position = new Point(slea.readInt(), slea.readInt());
+      int keyDown = slea.readInt();
+      int skillId = slea.readInt();
+
+      switch (skillId) {
+         case NightWalker.POISON_BOMB:
+         case Gunslinger.GRENADE:
+            int skillLevel = chr.getSkillLevel(skillId);
+            if (skillLevel > 0) {
+               chr.getMap().broadcastMessage(chr, MaplePacketCreator.throwGrenade(chr.getId(), position, keyDown, skillId, skillLevel), position);
+            }
+            break;
+         default:
+            FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "The skill id: " + skillId + " is not coded in " + this.getClass().getName() + ".");
+      }
+   }
+
 }

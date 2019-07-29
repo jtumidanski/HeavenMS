@@ -23,39 +23,39 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import net.server.Server;
 import tools.MapleLogger;
 import tools.MaplePacketCreator;
 
 public class MonitorCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !monitor <ign>");
-            return;
-        }
-        MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-        if (victim == null) {
-            player.message("Player '" + params[0] + "' could not be found on this world.");
-            return;
-        }
-        boolean monitored = MapleLogger.monitored.contains(victim.getId());
-        if (monitored) {
-            MapleLogger.monitored.remove(victim.getId());
-        } else {
-            MapleLogger.monitored.add(victim.getId());
-        }
-        player.yellowMessage(victim.getId() + " is " + (!monitored ? "now being monitored." : "no longer being monitored."));
-        String message = player.getName() + (!monitored ? " has started monitoring " : " has stopped monitoring ") + victim.getId() + ".";
-        Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, message));
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !monitor <ign>");
+         return;
+      }
+      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+      if (victim == null) {
+         player.message("Player '" + params[0] + "' could not be found on this world.");
+         return;
+      }
+      boolean monitored = MapleLogger.monitored.contains(victim.getId());
+      if (monitored) {
+         MapleLogger.monitored.remove(victim.getId());
+      } else {
+         MapleLogger.monitored.add(victim.getId());
+      }
+      player.yellowMessage(victim.getId() + " is " + (!monitored ? "now being monitored." : "no longer being monitored."));
+      String message = player.getName() + (!monitored ? " has started monitoring " : " has stopped monitoring ") + victim.getId() + ".";
+      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, message));
 
-    }
+   }
 }

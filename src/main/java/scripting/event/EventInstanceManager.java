@@ -74,6 +74,7 @@ import tools.Pair;
  * @author Ronan
  */
 public class EventInstanceManager {
+   private final ReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(MonitoredLockType.EIM, true);
    private Map<Integer, MapleCharacter> chars = new HashMap<>();
    private int leaderId = -1;
    private List<MapleMonster> mobs = new LinkedList<>();
@@ -88,8 +89,6 @@ public class EventInstanceManager {
    private long eventTime = 0;
    private MapleExpedition expedition = null;
    private List<Integer> mapIds = new LinkedList<>();
-
-   private final ReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(MonitoredLockType.EIM, true);
    private ReadLock rL = lock.readLock();
    private WriteLock wL = lock.writeLock();
 
@@ -124,10 +123,6 @@ public class EventInstanceManager {
       this.name = name;
       this.ess = new EventScriptScheduler();
       this.mapManager = new MapleMapManager(this, em.getWorldServer().getId(), em.getChannelServer().getId());
-   }
-
-   public void setName(String name) {
-      this.name = name;
    }
 
    public EventManager getEm() {
@@ -718,6 +713,10 @@ public class EventInstanceManager {
 
    public String getName() {
       return name;
+   }
+
+   public void setName(String name) {
+      this.name = name;
    }
 
    public MapleMap getMapInstance(int mapId) {

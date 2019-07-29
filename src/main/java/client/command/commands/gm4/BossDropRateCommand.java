@@ -19,30 +19,29 @@
 */
 package client.command.commands.gm4;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import tools.MaplePacketCreator;
 
 /**
- *
  * @author Ronan
  */
 public class BossDropRateCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !bossdroprate <newrate>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !bossdroprate <newrate>");
+         return;
+      }
 
-        int bossdroprate = Math.max(Integer.parseInt(params[0]), 1);
-        c.getWorldServer().setBossDropRate(bossdroprate);
-        c.getWorldServer().broadcastPacket(MaplePacketCreator.serverNotice(6, "[Rate] Boss Drop Rate has been changed to " + bossdroprate + "x."));
-    }
+      int bossdroprate = Math.max(Integer.parseInt(params[0]), 1);
+      c.getWorldServer().setBossDropRate(bossdroprate);
+      c.getWorldServer().broadcastPacket(MaplePacketCreator.serverNotice(6, "[Rate] Boss Drop Rate has been changed to " + bossdroprate + "x."));
+   }
 }

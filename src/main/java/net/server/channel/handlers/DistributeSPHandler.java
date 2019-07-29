@@ -27,11 +27,11 @@ import net.AbstractMaplePacketHandler;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class DistributeSPHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        slea.readInt();
-        int skillid = slea.readInt();
-        
-        AssignSPProcessor.SPAssignAction(c, skillid);
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      slea.readInt();
+      int skillid = slea.readInt();
+
+      AssignSPProcessor.SPAssignAction(c, skillid);
+   }
 }

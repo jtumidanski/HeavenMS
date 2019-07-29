@@ -23,41 +23,41 @@
 */
 package client.command.commands.gm2;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import constants.ServerConstants;
 
 public class ApCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !ap [<playername>] <newap>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !ap [<playername>] <newap>");
+         return;
+      }
 
-        if (params.length < 2) {
-            int newAp = Integer.parseInt(params[0]);
+      if (params.length < 2) {
+         int newAp = Integer.parseInt(params[0]);
+         if (newAp < 0) newAp = 0;
+         else if (newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
+
+         player.changeRemainingAp(newAp, false);
+      } else {
+         MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+         if (victim != null) {
+            int newAp = Integer.parseInt(params[1]);
             if (newAp < 0) newAp = 0;
             else if (newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
 
-            player.changeRemainingAp(newAp, false);
-        } else {
-            MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-            if (victim != null) {
-                int newAp = Integer.parseInt(params[1]);
-                if (newAp < 0) newAp = 0;
-                else if (newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
-
-                victim.changeRemainingAp(newAp, false);
-            } else {
-                player.message("Player '" + params[0] + "' could not be found.");
-            }
-        }
-    }
+            victim.changeRemainingAp(newAp, false);
+         } else {
+            player.message("Player '" + params[0] + "' could not be found.");
+         }
+      }
+   }
 }

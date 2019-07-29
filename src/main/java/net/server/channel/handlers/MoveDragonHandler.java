@@ -31,23 +31,23 @@ import tools.data.input.SeekableLittleEndianAccessor;
 
 
 public class MoveDragonHandler extends AbstractMovementPacketHandler {
-    @Override
-    public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        final MapleCharacter chr = c.getPlayer();
-        final Point startPos = new Point(slea.readShort(), slea.readShort());
-        long movementDataStart = slea.getPosition();
-        final MapleDragon dragon = chr.getDragon();
-        if (dragon != null) {
-            updatePosition(slea, dragon, 0);
-            long movementDataLength = slea.getPosition() - movementDataStart; //how many bytes were read by updatePosition
-            if (movementDataLength > 0) {
-                slea.seek(movementDataStart);
-                if (chr.isHidden()) {
-                    chr.getMap().broadcastGMMessage(chr, MaplePacketCreator.moveDragon(dragon, startPos, slea, movementDataLength));
-                } else {
-                    chr.getMap().broadcastMessage(chr, MaplePacketCreator.moveDragon(dragon, startPos, slea, movementDataLength), dragon.getPosition());
-                }
+   @Override
+   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      final MapleCharacter chr = c.getPlayer();
+      final Point startPos = new Point(slea.readShort(), slea.readShort());
+      long movementDataStart = slea.getPosition();
+      final MapleDragon dragon = chr.getDragon();
+      if (dragon != null) {
+         updatePosition(slea, dragon, 0);
+         long movementDataLength = slea.getPosition() - movementDataStart; //how many bytes were read by updatePosition
+         if (movementDataLength > 0) {
+            slea.seek(movementDataStart);
+            if (chr.isHidden()) {
+               chr.getMap().broadcastGMMessage(chr, MaplePacketCreator.moveDragon(dragon, startPos, slea, movementDataLength));
+            } else {
+               chr.getMap().broadcastMessage(chr, MaplePacketCreator.moveDragon(dragon, startPos, slea, movementDataLength), dragon.getPosition());
             }
-        }
-    }
+         }
+      }
+   }
 }

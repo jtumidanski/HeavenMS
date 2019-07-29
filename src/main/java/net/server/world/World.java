@@ -104,6 +104,8 @@ import tools.packets.Fishing;
  */
 public class World {
 
+   private final ReentrantReadWriteLock chnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_CHANNELS, true);
+   private final ReentrantReadWriteLock suggestLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_SUGGEST, true);
    private int id, flag, exprate, droprate, bossdroprate, mesorate, questrate, travelrate, fishingrate;
    private String eventmsg;
    private List<Channel> channels = new ArrayList<>();
@@ -118,26 +120,19 @@ public class World {
    private PlayerStorage players = new PlayerStorage();
    private MapleMatchCheckerCoordinator matchChecker = new MapleMatchCheckerCoordinator();
    private MaplePartySearchCoordinator partySearch = new MaplePartySearchCoordinator();
-
-   private final ReentrantReadWriteLock chnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_CHANNELS, true);
    private ReadLock chnRLock = chnLock.readLock();
    private WriteLock chnWLock = chnLock.writeLock();
-
    private Map<Integer, SortedMap<Integer, MapleCharacter>> accountChars = new HashMap<>();
    private MonitoredReentrantLock accountCharsLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_CHARS, true);
-
    private Set<Integer> queuedGuilds = new HashSet<>();
    private Map<Integer, Pair<Pair<Boolean, Boolean>, Pair<Integer, Integer>>> queuedMarriages = new HashMap<>();
    private Map<Integer, Set<Integer>> marriageGuests = new ConcurrentHashMap<>();
-
    private Map<Integer, Integer> partyChars = new HashMap<>();
    private Map<Integer, MapleParty> parties = new HashMap<>();
    private AtomicInteger runningPartyId = new AtomicInteger();
    private MonitoredReentrantLock partyLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_PARTY, true);
-
    private Map<Integer, Integer> owlSearched = new LinkedHashMap<>();
    private List<Map<Integer, Integer>> cashItemBought = new ArrayList<>(9);
-   private final ReentrantReadWriteLock suggestLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_SUGGEST, true);
    private ReadLock suggestRLock = suggestLock.readLock();
    private WriteLock suggestWLock = suggestLock.writeLock();
 
@@ -208,6 +203,110 @@ public class World {
       fishingSchedule = tman.register(new FishingWorker(this), 10 * 1000, 10 * 1000);
       partySearchSchedule = tman.register(new PartySearchWorker(this), 10 * 1000, 10 * 1000);
 
+   }
+
+   private static List<Entry<Integer, SortedMap<Integer, MapleCharacter>>> getSortedAccountCharacterView(Map<Integer, SortedMap<Integer, MapleCharacter>> map) {
+      List<Entry<Integer, SortedMap<Integer, MapleCharacter>>> list = new ArrayList<>(map.size());
+      list.addAll(map.entrySet());
+
+      list.sort(new Comparator<>() {
+         @Override
+         public int compare(Entry<Integer, SortedMap<Integer, MapleCharacter>> o1, Entry<Integer, SortedMap<Integer, MapleCharacter>> o2) {
+            return o1.getKey() - o2.getKey();
+         }
+      });
+
+      return list;
+   }
+
+   private static Integer getPetKey(MapleCharacter chr, byte petSlot) {    // assuming max 3 pets
+      return (chr.getId() << 2) + petSlot;
+   }
+
+   private static void executePlayerNpcMapDataUpdate(Connection con, boolean isPodium, Map<Integer, ?> pnpcData, int value, int worldid, int mapid) throws SQLException {
+      PreparedStatement ps;
+      if (pnpcData.containsKey(mapid)) {
+         ps = con.prepareStatement("UPDATE playernpcs_field SET " + (isPodium ? "podium" : "step") + " = ? WHERE world = ? AND map = ?");
+      } else {
+         ps = con.prepareStatement("INSERT INTO playernpcs_field (" + (isPodium ? "podium" : "step") + ", world, map) VALUES (?, ?, ?)");
+      }
+
+      ps.setInt(1, value);
+      ps.setInt(2, worldid);
+      ps.setInt(3, mapid);
+      ps.executeUpdate();
+
+      ps.close();
+   }
+
+   private static Pair<Integer, Pair<Integer, Integer>> getRelationshipCoupleFromDb(int id, boolean usingMarriageId) {
+      try {
+         Connection con = DatabaseConnection.getConnection();
+         Integer mid = null, hid = null, wid = null;
+
+         PreparedStatement ps;
+         if (usingMarriageId) {
+            ps = con.prepareStatement("SELECT * FROM marriages WHERE marriageid = ?");
+            ps.setInt(1, id);
+         } else {
+            ps = con.prepareStatement("SELECT * FROM marriages WHERE husbandid = ? OR wifeid = ?");
+            ps.setInt(1, id);
+            ps.setInt(2, id);
+         }
+
+         ResultSet rs = ps.executeQuery();
+         if (rs.next()) {
+            mid = rs.getInt("marriageid");
+            hid = rs.getInt("husbandid");
+            wid = rs.getInt("wifeid");
+         }
+
+         rs.close();
+         ps.close();
+         con.close();
+
+         return (mid == null) ? null : new Pair<>(mid, new Pair<>(hid, wid));
+      } catch (SQLException se) {
+         se.printStackTrace();
+         return null;
+      }
+   }
+
+   private static int addRelationshipToDb(int groomId, int brideId) {
+      try {
+         Connection con = DatabaseConnection.getConnection();
+
+         PreparedStatement ps = con.prepareStatement("INSERT INTO marriages (husbandid, wifeid) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+         ps.setInt(1, groomId);
+         ps.setInt(2, brideId);
+         ps.executeUpdate();
+
+         ResultSet rs = ps.getGeneratedKeys();
+         rs.next();
+         int ret = rs.getInt(1);
+
+         rs.close();
+         ps.close();
+         con.close();
+         return ret;
+      } catch (SQLException se) {
+         se.printStackTrace();
+         return -1;
+      }
+   }
+
+   private static void deleteRelationshipFromDb(int playerId) {
+      try {
+         Connection con = DatabaseConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement("DELETE FROM marriages WHERE marriageid = ?");
+         ps.setInt(1, playerId);
+         ps.executeUpdate();
+
+         ps.close();
+         con.close();
+      } catch (SQLException se) {
+         se.printStackTrace();
+      }
    }
 
    public int getChannelsSize() {
@@ -297,12 +396,12 @@ public class World {
       return true;
    }
 
-   public void setFlag(byte b) {
-      this.flag = b;
-   }
-
    public int getFlag() {
       return flag;
+   }
+
+   public void setFlag(byte b) {
+      this.flag = b;
    }
 
    public String getEventMessage() {
@@ -429,20 +528,6 @@ public class World {
       } finally {
          accountCharsLock.unlock();
       }
-   }
-
-   private static List<Entry<Integer, SortedMap<Integer, MapleCharacter>>> getSortedAccountCharacterView(Map<Integer, SortedMap<Integer, MapleCharacter>> map) {
-      List<Entry<Integer, SortedMap<Integer, MapleCharacter>>> list = new ArrayList<>(map.size());
-      list.addAll(map.entrySet());
-
-      list.sort(new Comparator<>() {
-         @Override
-         public int compare(Entry<Integer, SortedMap<Integer, MapleCharacter>> o1, Entry<Integer, SortedMap<Integer, MapleCharacter>> o2) {
-            return o1.getKey() - o2.getKey();
-         }
-      });
-
-      return list;
    }
 
    public List<MapleCharacter> loadAndGetAllCharactersView() {
@@ -1236,10 +1321,6 @@ public class World {
       }
    }
 
-   private static Integer getPetKey(MapleCharacter chr, byte petSlot) {    // assuming max 3 pets
-      return (chr.getId() << 2) + petSlot;
-   }
-
    public void addOwlItemSearch(Integer itemid) {
       suggestWLock.lock();
       try {
@@ -1724,22 +1805,6 @@ public class World {
       setPlayerNpcMapData(mapid, step, podium, true);
    }
 
-   private static void executePlayerNpcMapDataUpdate(Connection con, boolean isPodium, Map<Integer, ?> pnpcData, int value, int worldid, int mapid) throws SQLException {
-      PreparedStatement ps;
-      if (pnpcData.containsKey(mapid)) {
-         ps = con.prepareStatement("UPDATE playernpcs_field SET " + (isPodium ? "podium" : "step") + " = ? WHERE world = ? AND map = ?");
-      } else {
-         ps = con.prepareStatement("INSERT INTO playernpcs_field (" + (isPodium ? "podium" : "step") + ", world, map) VALUES (?, ?, ?)");
-      }
-
-      ps.setInt(1, value);
-      ps.setInt(2, worldid);
-      ps.setInt(3, mapid);
-      ps.executeUpdate();
-
-      ps.close();
-   }
-
    private void setPlayerNpcMapData(int mapid, int step, int podium, boolean silent) {
       if (!silent) {
          try {
@@ -1861,67 +1926,11 @@ public class World {
       return ret;
    }
 
-   private static Pair<Integer, Pair<Integer, Integer>> getRelationshipCoupleFromDb(int id, boolean usingMarriageId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         Integer mid = null, hid = null, wid = null;
-
-         PreparedStatement ps;
-         if (usingMarriageId) {
-            ps = con.prepareStatement("SELECT * FROM marriages WHERE marriageid = ?");
-            ps.setInt(1, id);
-         } else {
-            ps = con.prepareStatement("SELECT * FROM marriages WHERE husbandid = ? OR wifeid = ?");
-            ps.setInt(1, id);
-            ps.setInt(2, id);
-         }
-
-         ResultSet rs = ps.executeQuery();
-         if (rs.next()) {
-            mid = rs.getInt("marriageid");
-            hid = rs.getInt("husbandid");
-            wid = rs.getInt("wifeid");
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-
-         return (mid == null) ? null : new Pair<>(mid, new Pair<>(hid, wid));
-      } catch (SQLException se) {
-         se.printStackTrace();
-         return null;
-      }
-   }
-
    public int createRelationship(int groomId, int brideId) {
       int ret = addRelationshipToDb(groomId, brideId);
 
       pushRelationshipCouple(new Pair<>(ret, new Pair<>(groomId, brideId)));
       return ret;
-   }
-
-   private static int addRelationshipToDb(int groomId, int brideId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
-         PreparedStatement ps = con.prepareStatement("INSERT INTO marriages (husbandid, wifeid) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
-         ps.setInt(1, groomId);
-         ps.setInt(2, brideId);
-         ps.executeUpdate();
-
-         ResultSet rs = ps.getGeneratedKeys();
-         rs.next();
-         int ret = rs.getInt(1);
-
-         rs.close();
-         ps.close();
-         con.close();
-         return ret;
-      } catch (SQLException se) {
-         se.printStackTrace();
-         return -1;
-      }
    }
 
    public void deleteRelationship(int playerId, int partnerId) {
@@ -1931,20 +1940,6 @@ public class World {
       relationshipCouples.remove(relationshipId);
       relationships.remove(playerId);
       relationships.remove(partnerId);
-   }
-
-   private static void deleteRelationshipFromDb(int playerId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("DELETE FROM marriages WHERE marriageid = ?");
-         ps.setInt(1, playerId);
-         ps.executeUpdate();
-
-         ps.close();
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
    }
 
    public void dropMessage(int type, String message) {

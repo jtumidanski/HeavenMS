@@ -21,8 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package scripting.map;
 
-import client.MapleClient;
-import constants.ServerConstants;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -35,75 +33,76 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+
+import client.MapleClient;
+import constants.ServerConstants;
 import tools.FilePrinter;
 
 public class MapScriptManager {
 
-    private static MapScriptManager instance = new MapScriptManager();
-    
-    public static MapScriptManager getInstance() {
-        return instance;
-    }
-    
-    private Map<String, Invocable> scripts = new HashMap<>();
-    private ScriptEngineFactory sef;
+   private static MapScriptManager instance = new MapScriptManager();
+   private Map<String, Invocable> scripts = new HashMap<>();
+   private ScriptEngineFactory sef;
+   private MapScriptManager() {
+      ScriptEngineManager sem = new ScriptEngineManager();
+      sef = sem.getEngineByName("javascript").getFactory();
+   }
 
-    private MapScriptManager() {
-        ScriptEngineManager sem = new ScriptEngineManager();
-        sef = sem.getEngineByName("javascript").getFactory();
-    }
+   public static MapScriptManager getInstance() {
+      return instance;
+   }
 
-    public void reloadScripts() {
-        scripts.clear();
-    }
+   public void reloadScripts() {
+      scripts.clear();
+   }
 
-    public boolean scriptExists(String scriptName, boolean firstUser) {
-        File scriptFile = new File("scripts/map/" + (firstUser ? "onFirstUserEnter/" : "onUserEnter/") + scriptName + ".js");
-        return scriptFile.exists();
-    }
+   public boolean scriptExists(String scriptName, boolean firstUser) {
+      File scriptFile = new File("scripts/map/" + (firstUser ? "onFirstUserEnter/" : "onUserEnter/") + scriptName + ".js");
+      return scriptFile.exists();
+   }
 
-    public void runMapScript(MapleClient c, String scriptName, boolean firstUser) {
-        if (scripts.containsKey(scriptName)) {
+   public void runMapScript(MapleClient c, String scriptName, boolean firstUser) {
+      if (scripts.containsKey(scriptName)) {
+         try {
+            scripts.get(scriptName).invokeFunction("start", new MapScriptMethods(c));
+         } catch (final ScriptException | NoSuchMethodException e) {
+            e.printStackTrace();
+         }
+         return;
+      }
+      String type = firstUser ? "onFirstUserEnter/" : "onUserEnter/";
+
+      File scriptFile = new File("scripts/map/" + type + scriptName + ".js");
+      if (!scriptExists(scriptName, firstUser)) {
+         return;
+      }
+      FileReader fr = null;
+      ScriptEngine se = sef.getScriptEngine();
+      try {
+         fr = new FileReader(scriptFile);
+
+         // java 8 support here thanks to Arufonsu
+         if (ServerConstants.JAVA_8) {
+            se.eval("load('nashorn:mozilla_compat.js');" + System.lineSeparator());
+         }
+
+         ((Compilable) se).compile(fr).eval();
+
+         final Invocable script = ((Invocable) se);
+         scripts.put(scriptName, script);
+         script.invokeFunction("start", new MapScriptMethods(c));
+      } catch (final UndeclaredThrowableException | ScriptException ute) {
+         FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", ute);
+      } catch (final Exception e) {
+         FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", e);
+      } finally {
+         if (fr != null) {
             try {
-                scripts.get(scriptName).invokeFunction("start", new MapScriptMethods(c));
-            } catch (final ScriptException | NoSuchMethodException e) {
-                e.printStackTrace();
+               fr.close();
+            } catch (IOException e) {
+               e.printStackTrace();
             }
-            return;
-        }
-        String type = firstUser ? "onFirstUserEnter/" : "onUserEnter/";
-
-        File scriptFile = new File("scripts/map/" + type + scriptName + ".js");
-        if (!scriptExists(scriptName, firstUser)) {
-            return;
-        }
-        FileReader fr = null;
-        ScriptEngine se = sef.getScriptEngine();
-        try {
-            fr = new FileReader(scriptFile);
-            
-            // java 8 support here thanks to Arufonsu
-            if (ServerConstants.JAVA_8){
-                    se.eval("load('nashorn:mozilla_compat.js');" + System.lineSeparator());
-            }
-            
-            ((Compilable) se).compile(fr).eval();
-            
-            final Invocable script = ((Invocable) se);
-            scripts.put(scriptName, script);
-            script.invokeFunction("start", new MapScriptMethods(c));
-        } catch (final UndeclaredThrowableException | ScriptException ute) {
-            FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", ute);
-        } catch (final Exception e) {
-            FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", e);
-        } finally {
-            if (fr != null) {
-                try {
-                    fr.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
+         }
+      }
+   }
 }

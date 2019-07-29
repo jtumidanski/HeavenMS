@@ -25,99 +25,100 @@ package client;
  * @author PurpleMadness Patrick :O
  */
 public class MapleMount {
-    private int itemid;
-    private int skillid;
-    private int tiredness;
-    private int exp;
-    private int level;
-    private MapleCharacter owner;
-    private boolean active;
+   private int itemid;
+   private int skillid;
+   private int tiredness;
+   private int exp;
+   private int level;
+   private MapleCharacter owner;
+   private boolean active;
 
-    public MapleMount(MapleCharacter owner, int id, int skillid) {
-        this.itemid = id;
-        this.skillid = skillid;
-        this.tiredness = 0;
-        this.level = 1;
-        this.exp = 0;
-        this.owner = owner;
-        active = true;
-    }
+   public MapleMount(MapleCharacter owner, int id, int skillid) {
+      this.itemid = id;
+      this.skillid = skillid;
+      this.tiredness = 0;
+      this.level = 1;
+      this.exp = 0;
+      this.owner = owner;
+      active = true;
+   }
 
-    public int getItemId() {
-        return itemid;
-    }
+   public int getItemId() {
+      return itemid;
+   }
 
-    public int getSkillId() {
-        return skillid;
-    }
+   public void setItemId(int newitemid) {
+      this.itemid = newitemid;
+   }
 
-    /**
-     * 1902000 - Hog
-     * 1902001 - Silver Mane
-     * 1902002 - Red Draco
-     * 1902005 - Mimiana
-     * 1902006 - Mimio
-     * 1902007 - Shinjou
-     * 1902008 - Frog
-     * 1902009 - Ostrich
-     * 1902010 - Frog
-     * 1902011 - Turtle
-     * 1902012 - Yeti
-     * @return the id
-     */
-    public int getId() {
-        if (this.itemid < 1903000) {
-            return itemid - 1901999;
-        }
-        return 5;
-    }
+   public int getSkillId() {
+      return skillid;
+   }
 
-    public int getTiredness() {
-        return tiredness;
-    }
+   /**
+    * 1902000 - Hog
+    * 1902001 - Silver Mane
+    * 1902002 - Red Draco
+    * 1902005 - Mimiana
+    * 1902006 - Mimio
+    * 1902007 - Shinjou
+    * 1902008 - Frog
+    * 1902009 - Ostrich
+    * 1902010 - Frog
+    * 1902011 - Turtle
+    * 1902012 - Yeti
+    *
+    * @return the id
+    */
+   public int getId() {
+      if (this.itemid < 1903000) {
+         return itemid - 1901999;
+      }
+      return 5;
+   }
 
-    public int getExp() {
-        return exp;
-    }
+   public int getTiredness() {
+      return tiredness;
+   }
 
-    public int getLevel() {
-        return level;
-    }
+   public void setTiredness(int newtiredness) {
+      this.tiredness = newtiredness;
+      if (tiredness < 0) {
+         tiredness = 0;
+      }
+   }
 
-    public void setTiredness(int newtiredness) {
-        this.tiredness = newtiredness;
-        if (tiredness < 0) {
-            tiredness = 0;
-        }
-    }
-    
-    public int incrementAndGetTiredness() {
-        this.tiredness++;
-        return this.tiredness;
-    }
+   public int getExp() {
+      return exp;
+   }
 
-    public void setExp(int newexp) {
-        this.exp = newexp;
-    }
+   public void setExp(int newexp) {
+      this.exp = newexp;
+   }
 
-    public void setLevel(int newlevel) {
-        this.level = newlevel;
-    }
+   public int getLevel() {
+      return level;
+   }
 
-    public void setItemId(int newitemid) {
-        this.itemid = newitemid;
-    }
+   public void setLevel(int newlevel) {
+      this.level = newlevel;
+   }
 
-    public void setActive(boolean set) {
-        this.active = set;
-    }
+   public int incrementAndGetTiredness() {
+      this.tiredness++;
+      return this.tiredness;
+   }
 
-    public boolean isActive() {
-        return active;
-    }
-    
-    public void empty() {
-        if(owner != null) owner.getClient().getWorldServer().unregisterMountHunger(owner);
-        this.owner = null;
-    }    
+   public boolean isActive() {
+      return active;
+   }
+
+   public void setActive(boolean set) {
+      this.active = set;
+   }
+
+   public void empty() {
+      if (owner != null) owner.getClient().getWorldServer().unregisterMountHunger(owner);
+      this.owner = null;
+   }
 }

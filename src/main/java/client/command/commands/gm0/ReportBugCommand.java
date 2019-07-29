@@ -24,30 +24,30 @@
 package client.command.commands.gm0;
 
 import client.MapleCharacter;
-import client.command.Command;
 import client.MapleClient;
+import client.command.Command;
 import net.server.Server;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
 public class ReportBugCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
 
-        if (params.length < 1) {
-            player.dropMessage(5, "Message too short and not sent. Please do @bug <bug>");
-            return;
-        }
-        String message = player.getLastCommandMessage();
-        Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[Bug]:" + MapleCharacter.makeMapleReadable(player.getName()) + ": " + message));
-        Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(1, message));
-        FilePrinter.printError(FilePrinter.COMMAND_BUG, MapleCharacter.makeMapleReadable(player.getName()) + ": " + message);
-        player.dropMessage(5, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
+      if (params.length < 1) {
+         player.dropMessage(5, "Message too short and not sent. Please do @bug <bug>");
+         return;
+      }
+      String message = player.getLastCommandMessage();
+      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[Bug]:" + MapleCharacter.makeMapleReadable(player.getName()) + ": " + message));
+      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(1, message));
+      FilePrinter.printError(FilePrinter.COMMAND_BUG, MapleCharacter.makeMapleReadable(player.getName()) + ": " + message);
+      player.dropMessage(5, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
 
-    }
+   }
 }

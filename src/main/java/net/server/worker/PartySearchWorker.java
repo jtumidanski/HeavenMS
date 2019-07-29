@@ -22,17 +22,16 @@ package net.server.worker;
 import net.server.world.World;
 
 /**
- *
  * @author Ronan
  */
 public class PartySearchWorker extends BaseWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        wserv.runPartySearchUpdateSchedule();
-    }
-    
-    public PartySearchWorker(World world) {
-        super(world);
-    }
+
+   public PartySearchWorker(World world) {
+      super(world);
+   }
+
+   @Override
+   public void run() {
+      wserv.runPartySearchUpdateSchedule();
+   }
 }

@@ -19,113 +19,113 @@
 */
 package net.server.channel.worker;
 
-import client.status.MonsterStatusEffect;
-import constants.ServerConstants;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import client.status.MonsterStatusEffect;
+import constants.ServerConstants;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 
 /**
- *
  * @author Ronan
  */
 public class MobStatusScheduler extends BaseScheduler {
-    private Map<MonsterStatusEffect, MobStatusOvertimeEntry> registeredMobStatusOvertime = new HashMap<>();
-    private MonitoredReentrantLock overtimeStatusLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHANNEL_OVTSTATUS, true);
-    
-    private class MobStatusOvertimeEntry {
-        private int procCount;
-        private int procLimit;
-        private Runnable r;
-        
-        protected MobStatusOvertimeEntry(int delay, Runnable run) {
-            procCount = 0;
-            procLimit = (int)Math.ceil((float) delay / ServerConstants.MOB_STATUS_MONITOR_PROC);
-            r = run;
-        }
-        
-        protected void update(List<Runnable> toRun) {
-            procCount++;
-            if(procCount >= procLimit) {
-                procCount = 0;
-                toRun.add(r);
-            }
-        }
-    }
-    
-    public MobStatusScheduler() {
-        super(MonitoredLockType.CHANNEL_MOBSTATUS);
-        
-        super.addListener(new SchedulerListener() {
-            @Override
-            public void removedScheduledEntries(List<Object> toRemove, boolean update) {
-                List<Runnable> toRun = new ArrayList<>();
-                
-                overtimeStatusLock.lock();
-                try {
-                    for(Object mseo : toRemove) {
-                        MonsterStatusEffect mse = (MonsterStatusEffect) mseo;
-                        registeredMobStatusOvertime.remove(mse);
-                    }
-                    
-                    if(update) {
-                        // it's probably ok to use one thread for both management & overtime actions
-                        List<MobStatusOvertimeEntry> mdoeList = new ArrayList<>(registeredMobStatusOvertime.values());
-                        for(MobStatusOvertimeEntry mdoe : mdoeList) {
-                            mdoe.update(toRun);
-                        }
-                    }
-                } finally {
-                    overtimeStatusLock.unlock();
-                }
-                
-                for(Runnable r : toRun) {
-                    r.run();
-                }
-            }
-        });
-    }
-    
-    public void registerMobStatus(MonsterStatusEffect mse, Runnable cancelStatus, long duration, Runnable overtimeStatus, int overtimeDelay) {
-        if(overtimeStatus != null) {
-            MobStatusOvertimeEntry mdoe = new MobStatusOvertimeEntry(overtimeDelay, overtimeStatus);
-            
+   private Map<MonsterStatusEffect, MobStatusOvertimeEntry> registeredMobStatusOvertime = new HashMap<>();
+   private MonitoredReentrantLock overtimeStatusLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHANNEL_OVTSTATUS, true);
+
+   public MobStatusScheduler() {
+      super(MonitoredLockType.CHANNEL_MOBSTATUS);
+
+      super.addListener(new SchedulerListener() {
+         @Override
+         public void removedScheduledEntries(List<Object> toRemove, boolean update) {
+            List<Runnable> toRun = new ArrayList<>();
+
             overtimeStatusLock.lock();
             try {
-                registeredMobStatusOvertime.put(mse, mdoe);
+               for (Object mseo : toRemove) {
+                  MonsterStatusEffect mse = (MonsterStatusEffect) mseo;
+                  registeredMobStatusOvertime.remove(mse);
+               }
+
+               if (update) {
+                  // it's probably ok to use one thread for both management & overtime actions
+                  List<MobStatusOvertimeEntry> mdoeList = new ArrayList<>(registeredMobStatusOvertime.values());
+                  for (MobStatusOvertimeEntry mdoe : mdoeList) {
+                     mdoe.update(toRun);
+                  }
+               }
             } finally {
-                overtimeStatusLock.unlock();
+               overtimeStatusLock.unlock();
             }
-        }
-        
-        registerEntry(mse, cancelStatus, duration);
-    }
-    
-    public void interruptMobStatus(MonsterStatusEffect mse) {
-        interruptEntry(mse);
-    }
-    
-    @Override
-    public void dispose() {
-        disposeLocks();
-        super.dispose();
-    }
-    
-    private void disposeLocks() {
-        LockCollector.getInstance().registerDisposeAction(new Runnable() {
-            @Override
-            public void run() {
-                emptyLocks();
+
+            for (Runnable r : toRun) {
+               r.run();
             }
-        });
-    }
-    
-    private void emptyLocks() {
-        overtimeStatusLock = overtimeStatusLock.dispose();
-    }
+         }
+      });
+   }
+
+   public void registerMobStatus(MonsterStatusEffect mse, Runnable cancelStatus, long duration, Runnable overtimeStatus, int overtimeDelay) {
+      if (overtimeStatus != null) {
+         MobStatusOvertimeEntry mdoe = new MobStatusOvertimeEntry(overtimeDelay, overtimeStatus);
+
+         overtimeStatusLock.lock();
+         try {
+            registeredMobStatusOvertime.put(mse, mdoe);
+         } finally {
+            overtimeStatusLock.unlock();
+         }
+      }
+
+      registerEntry(mse, cancelStatus, duration);
+   }
+
+   public void interruptMobStatus(MonsterStatusEffect mse) {
+      interruptEntry(mse);
+   }
+
+   @Override
+   public void dispose() {
+      disposeLocks();
+      super.dispose();
+   }
+
+   private void disposeLocks() {
+      LockCollector.getInstance().registerDisposeAction(new Runnable() {
+         @Override
+         public void run() {
+            emptyLocks();
+         }
+      });
+   }
+
+   private void emptyLocks() {
+      overtimeStatusLock = overtimeStatusLock.dispose();
+   }
+
+   private class MobStatusOvertimeEntry {
+      private int procCount;
+      private int procLimit;
+      private Runnable r;
+
+      protected MobStatusOvertimeEntry(int delay, Runnable run) {
+         procCount = 0;
+         procLimit = (int) Math.ceil((float) delay / ServerConstants.MOB_STATUS_MONITOR_PROC);
+         r = run;
+      }
+
+      protected void update(List<Runnable> toRun) {
+         procCount++;
+         if (procCount >= procLimit) {
+            procCount = 0;
+            toRun.add(r);
+         }
+      }
+   }
 }

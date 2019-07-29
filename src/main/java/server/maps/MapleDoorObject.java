@@ -21,6 +21,7 @@ package server.maps;
 
 import java.awt.Point;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import net.server.audit.locks.MonitoredLockType;
@@ -29,155 +30,152 @@ import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
 
 /**
- *
  * @author Ronan
  */
 public class MapleDoorObject extends AbstractMapleMapObject {
-    private final int ownerId;
-    private int pairOid;
-    
-    private final MapleMap from;
-    private final MapleMap to;
-    private int linkedPortalId;
-    private Point linkedPos;
-    
-    private final ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_DOOR, true);
-    private ReentrantReadWriteLock.ReadLock rlock = locks.readLock();
-    private ReentrantReadWriteLock.WriteLock wlock = locks.writeLock();
-    
-    public MapleDoorObject(int owner, MapleMap destination, MapleMap origin, int townPortalId, Point targetPosition, Point toPosition) {
-        super();
-        setPosition(targetPosition);
-        
-        ownerId = owner;
-        linkedPortalId = townPortalId;
-        from = origin;
-        to = destination;
-        linkedPos = toPosition;
-    }
-    
-    public void update(int townPortalId, Point toPosition) {
-        wlock.lock();
-        try {
-            linkedPortalId = townPortalId;
-            linkedPos = toPosition;
-        } finally {
-            wlock.unlock();
-        }
-    }
-    
-    private int getLinkedPortalId() {
-        rlock.lock();
-        try {
-            return linkedPortalId;
-        } finally {
-            rlock.unlock();
-        }
-    }
-    
-    private Point getLinkedPortalPosition() {
-        rlock.lock();
-        try {
-            return linkedPos;
-        } finally {
-            rlock.unlock();
-        }
-    }
-    
-    public void warp(final MapleCharacter chr) {
-        MapleParty party = chr.getParty();
-        if (chr.getId() == ownerId || (party != null && party.getMemberById(ownerId) != null)) {
-            if(!inTown() && party == null) {
-                chr.changeMap(to, getLinkedPortalId());
-            } else {
-                chr.changeMap(to, getLinkedPortalPosition());
-            }
-        } else {
-            chr.getClient().announce(MaplePacketCreator.blockedMessage(6));
-            chr.getClient().announce(MaplePacketCreator.enableActions());
-        }
-    }
+   private final int ownerId;
+   private final MapleMap from;
+   private final MapleMap to;
+   private final ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_DOOR, true);
+   private int pairOid;
+   private int linkedPortalId;
+   private Point linkedPos;
+   private ReentrantReadWriteLock.ReadLock rlock = locks.readLock();
+   private ReentrantReadWriteLock.WriteLock wlock = locks.writeLock();
 
-    @Override
-    public void sendSpawnData(MapleClient client) {
-        sendSpawnData(client, true);
-    }
-    
-    public void sendSpawnData(MapleClient client, boolean launched) {
-        MapleCharacter chr = client.getPlayer();
-        if (this.getFrom().getId() == chr.getMapId()) {
-            if (chr.getParty() != null && (this.getOwnerId() == chr.getId() || chr.getParty().getMemberById(this.getOwnerId()) != null)) {
-                chr.announce(MaplePacketCreator.partyPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
-            }
+   public MapleDoorObject(int owner, MapleMap destination, MapleMap origin, int townPortalId, Point targetPosition, Point toPosition) {
+      super();
+      setPosition(targetPosition);
 
-            chr.announce(MaplePacketCreator.spawnPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
-            if (!this.inTown()) {
-                chr.announce(MaplePacketCreator.spawnDoor(this.getOwnerId(), this.getPosition(), launched));
-            }
-        }
-    }
+      ownerId = owner;
+      linkedPortalId = townPortalId;
+      from = origin;
+      to = destination;
+      linkedPos = toPosition;
+   }
 
-    @Override
-    public void sendDestroyData(MapleClient client) {
-        MapleCharacter chr = client.getPlayer();
-        if (from.getId() == chr.getMapId()) {
-            MapleParty party = chr.getParty();
-            if (party != null && (ownerId == chr.getId() || party.getMemberById(ownerId) != null)) {
-                client.announce(MaplePacketCreator.partyPortal(999999999, 999999999, new Point(-1, -1)));
-            }
-            client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
-        }
-    }
-    
-    public void sendDestroyData(MapleClient client, boolean partyUpdate) {
-        if (client != null && from.getId() == client.getPlayer().getMapId()) {
+   public void update(int townPortalId, Point toPosition) {
+      wlock.lock();
+      try {
+         linkedPortalId = townPortalId;
+         linkedPos = toPosition;
+      } finally {
+         wlock.unlock();
+      }
+   }
+
+   private int getLinkedPortalId() {
+      rlock.lock();
+      try {
+         return linkedPortalId;
+      } finally {
+         rlock.unlock();
+      }
+   }
+
+   private Point getLinkedPortalPosition() {
+      rlock.lock();
+      try {
+         return linkedPos;
+      } finally {
+         rlock.unlock();
+      }
+   }
+
+   public void warp(final MapleCharacter chr) {
+      MapleParty party = chr.getParty();
+      if (chr.getId() == ownerId || (party != null && party.getMemberById(ownerId) != null)) {
+         if (!inTown() && party == null) {
+            chr.changeMap(to, getLinkedPortalId());
+         } else {
+            chr.changeMap(to, getLinkedPortalPosition());
+         }
+      } else {
+         chr.getClient().announce(MaplePacketCreator.blockedMessage(6));
+         chr.getClient().announce(MaplePacketCreator.enableActions());
+      }
+   }
+
+   @Override
+   public void sendSpawnData(MapleClient client) {
+      sendSpawnData(client, true);
+   }
+
+   public void sendSpawnData(MapleClient client, boolean launched) {
+      MapleCharacter chr = client.getPlayer();
+      if (this.getFrom().getId() == chr.getMapId()) {
+         if (chr.getParty() != null && (this.getOwnerId() == chr.getId() || chr.getParty().getMemberById(this.getOwnerId()) != null)) {
+            chr.announce(MaplePacketCreator.partyPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
+         }
+
+         chr.announce(MaplePacketCreator.spawnPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
+         if (!this.inTown()) {
+            chr.announce(MaplePacketCreator.spawnDoor(this.getOwnerId(), this.getPosition(), launched));
+         }
+      }
+   }
+
+   @Override
+   public void sendDestroyData(MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      if (from.getId() == chr.getMapId()) {
+         MapleParty party = chr.getParty();
+         if (party != null && (ownerId == chr.getId() || party.getMemberById(ownerId) != null)) {
             client.announce(MaplePacketCreator.partyPortal(999999999, 999999999, new Point(-1, -1)));
-            client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
-        }
-    }
-    
-    public int getOwnerId() {
-        return ownerId;
-    }
-    
-    public void setPairOid(int oid) {
-        this.pairOid = oid;
-    }
-    
-    public int getPairOid() {
-        return pairOid;
-    }
-    
-    public boolean inTown() {
-        return getLinkedPortalId() == -1;
-    }
-    
-    public MapleMap getFrom() {
-        return from;
-    }
-    
-    public MapleMap getTo() {
-        return to;
-    }
-    
-    public MapleMap getTown() {
-        return inTown() ? from : to;
-    }
-    
-    public MapleMap getArea() {
-        return !inTown() ? from : to;
-    }
-    
-    public Point getAreaPosition() {
-        return !inTown() ? getPosition() : getLinkedPortalPosition();
-    }
-    
-    public Point toPosition() {
-        return getLinkedPortalPosition();
-    }
-    
-    @Override
-    public MapleMapObjectType getType() {
-        return MapleMapObjectType.DOOR;
-    }
+         }
+         client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
+      }
+   }
+
+   public void sendDestroyData(MapleClient client, boolean partyUpdate) {
+      if (client != null && from.getId() == client.getPlayer().getMapId()) {
+         client.announce(MaplePacketCreator.partyPortal(999999999, 999999999, new Point(-1, -1)));
+         client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
+      }
+   }
+
+   public int getOwnerId() {
+      return ownerId;
+   }
+
+   public int getPairOid() {
+      return pairOid;
+   }
+
+   public void setPairOid(int oid) {
+      this.pairOid = oid;
+   }
+
+   public boolean inTown() {
+      return getLinkedPortalId() == -1;
+   }
+
+   public MapleMap getFrom() {
+      return from;
+   }
+
+   public MapleMap getTo() {
+      return to;
+   }
+
+   public MapleMap getTown() {
+      return inTown() ? from : to;
+   }
+
+   public MapleMap getArea() {
+      return !inTown() ? from : to;
+   }
+
+   public Point getAreaPosition() {
+      return !inTown() ? getPosition() : getLinkedPortalPosition();
+   }
+
+   public Point toPosition() {
+      return getLinkedPortalPosition();
+   }
+
+   @Override
+   public MapleMapObjectType getType() {
+      return MapleMapObjectType.DOOR;
+   }
 }

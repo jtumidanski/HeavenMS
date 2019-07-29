@@ -31,26 +31,25 @@ import server.MapleItemInformationProvider.ScriptedItem;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author Jay Estrella
  */
 public final class ScriptedItemHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        slea.readInt(); // trash stamp, thanks RMZero213
-        short itemSlot = slea.readShort(); // item slot, thanks RMZero213
-        int itemId = slea.readInt();
-        
-        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-        ScriptedItem info = ii.getScriptedItemInfo(itemId);
-        if (info == null) return;
-        
-        Item item = c.getPlayer().getInventory(ItemConstants.getInventoryType(itemId)).getItem(itemSlot);
-        if (item == null || item.getItemId() != itemId || item.getQuantity() < 1) {
-            return;
-        }
-        
-        ItemScriptManager ism = ItemScriptManager.getInstance();
-        ism.runItemScript(c, info);
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      slea.readInt(); // trash stamp, thanks RMZero213
+      short itemSlot = slea.readShort(); // item slot, thanks RMZero213
+      int itemId = slea.readInt();
+
+      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+      ScriptedItem info = ii.getScriptedItemInfo(itemId);
+      if (info == null) return;
+
+      Item item = c.getPlayer().getInventory(ItemConstants.getInventoryType(itemId)).getItem(itemSlot);
+      if (item == null || item.getItemId() != itemId || item.getQuantity() < 1) {
+         return;
+      }
+
+      ItemScriptManager ism = ItemScriptManager.getInstance();
+      ism.runItemScript(c, info);
+   }
 }

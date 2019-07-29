@@ -23,9 +23,12 @@
 */
 package client.command.commands.gm4;
 
-import client.command.Command;
-import client.MapleClient;
+import java.util.Collections;
+import java.util.List;
+
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import server.maps.MapleMapItem;
@@ -33,48 +36,44 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 public class ForceVacCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        List<MapleMapObject> items = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
-        for (MapleMapObject item : items) {
-            MapleMapItem mapItem = (MapleMapItem) item;
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      List<MapleMapObject> items = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
+      for (MapleMapObject item : items) {
+         MapleMapItem mapItem = (MapleMapItem) item;
 
-            mapItem.lockItem();
-            try {
-                if (mapItem.isPickedUp()) continue;
+         mapItem.lockItem();
+         try {
+            if (mapItem.isPickedUp()) continue;
 
-                if (mapItem.getMeso() > 0) {
-                    player.gainMeso(mapItem.getMeso(), true);
-                } else if (player.applyConsumeOnPickup(mapItem.getItemId())) {    // thanks Vcoc for pointing out consumables on pickup not being processed here
-                } else if (mapItem.getItemId() == 4031865 || mapItem.getItemId() == 4031866) {
-                    // Add NX to account, show effect and make item disappear
-                    player.getCashShop().gainCash(1, mapItem.getItemId() == 4031865 ? 100 : 250);
-                } else if (mapItem.getItem().getItemId() >= 5000000 && mapItem.getItem().getItemId() <= 5000100) {
-                    int petId = MaplePet.createPet(mapItem.getItem().getItemId());
-                    if (petId == -1) {
-                        continue;
-                    }
-                    MapleInventoryManipulator.addById(c, mapItem.getItem().getItemId(), mapItem.getItem().getQuantity(), null, petId);
-                } else if (MapleInventoryManipulator.addFromDrop(c, mapItem.getItem(), true)) {
-                    if (mapItem.getItemId() == 4031868) {
-                        player.updateAriantScore();
-                    }
-                }
-
-                player.getMap().pickItemDrop(MaplePacketCreator.removeItemFromMap(mapItem.getObjectId(), 2, player.getId()), mapItem);
-            } finally {
-                mapItem.unlockItem();
+            if (mapItem.getMeso() > 0) {
+               player.gainMeso(mapItem.getMeso(), true);
+            } else if (player.applyConsumeOnPickup(mapItem.getItemId())) {    // thanks Vcoc for pointing out consumables on pickup not being processed here
+            } else if (mapItem.getItemId() == 4031865 || mapItem.getItemId() == 4031866) {
+               // Add NX to account, show effect and make item disappear
+               player.getCashShop().gainCash(1, mapItem.getItemId() == 4031865 ? 100 : 250);
+            } else if (mapItem.getItem().getItemId() >= 5000000 && mapItem.getItem().getItemId() <= 5000100) {
+               int petId = MaplePet.createPet(mapItem.getItem().getItemId());
+               if (petId == -1) {
+                  continue;
+               }
+               MapleInventoryManipulator.addById(c, mapItem.getItem().getItemId(), mapItem.getItem().getQuantity(), null, petId);
+            } else if (MapleInventoryManipulator.addFromDrop(c, mapItem.getItem(), true)) {
+               if (mapItem.getItemId() == 4031868) {
+                  player.updateAriantScore();
+               }
             }
-        }
-    }
+
+            player.getMap().pickItemDrop(MaplePacketCreator.removeItemFromMap(mapItem.getObjectId(), 2, player.getId()), mapItem);
+         } finally {
+            mapItem.unlockItem();
+         }
+      }
+   }
 }

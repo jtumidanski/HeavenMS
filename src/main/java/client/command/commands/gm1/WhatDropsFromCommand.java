@@ -23,55 +23,55 @@
 */
 package client.command.commands.gm1;
 
+import java.util.Iterator;
+
 import client.MapleCharacter;
-import client.command.Command;
 import client.MapleClient;
+import client.command.Command;
 import server.MapleItemInformationProvider;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MonsterDropEntry;
 import tools.Pair;
 
-import java.util.Iterator;
-
 public class WhatDropsFromCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
-            return;
-        }
-        String monsterName = player.getLastCommandMessage();
-        StringBuilder output = new StringBuilder();
-        int limit = 3;
-        Iterator<Pair<Integer, String>> listIterator = MapleMonsterInformationProvider.getMobsIDsFromName(monsterName).iterator();
-        for (int i = 0; i < limit; i++) {
-            if(listIterator.hasNext()) {
-                Pair<Integer, String> data = listIterator.next();
-                int mobId = data.getLeft();
-                String mobName = data.getRight();
-                output.append(mobName).append(" drops the following items:\r\n\r\n");
-                for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)){
-                    try {
-                        String name = MapleItemInformationProvider.getInstance().getName(drop.itemId);
-                        if (name == null || name.equals("null") || drop.chance == 0){
-                            continue;
-                        }
-                        float chance = Math.max(1000000 / drop.chance / (!MapleMonsterInformationProvider.getInstance().isBoss(mobId) ? player.getDropRate() : player.getBossDropRate()), 1);
-                        output.append("- ").append(name).append(" (1/").append((int) chance).append(")\r\n");
-                    } catch (Exception ex){
-                        ex.printStackTrace();
-                        continue;
-                    }
-                }
-                output.append("\r\n");
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.dropMessage(5, "Please do @whatdropsfrom <monster name>");
+         return;
+      }
+      String monsterName = player.getLastCommandMessage();
+      StringBuilder output = new StringBuilder();
+      int limit = 3;
+      Iterator<Pair<Integer, String>> listIterator = MapleMonsterInformationProvider.getMobsIDsFromName(monsterName).iterator();
+      for (int i = 0; i < limit; i++) {
+         if (listIterator.hasNext()) {
+            Pair<Integer, String> data = listIterator.next();
+            int mobId = data.getLeft();
+            String mobName = data.getRight();
+            output.append(mobName).append(" drops the following items:\r\n\r\n");
+            for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)) {
+               try {
+                  String name = MapleItemInformationProvider.getInstance().getName(drop.itemId);
+                  if (name == null || name.equals("null") || drop.chance == 0) {
+                     continue;
+                  }
+                  float chance = Math.max(1000000 / drop.chance / (!MapleMonsterInformationProvider.getInstance().isBoss(mobId) ? player.getDropRate() : player.getBossDropRate()), 1);
+                  output.append("- ").append(name).append(" (1/").append((int) chance).append(")\r\n");
+               } catch (Exception ex) {
+                  ex.printStackTrace();
+                  continue;
+               }
             }
-        }
-        
-        c.getAbstractPlayerInteraction().npcTalk(9010000, output.toString());
-    }
+            output.append("\r\n");
+         }
+      }
+
+      c.getAbstractPlayerInteraction().npcTalk(9010000, output.toString());
+   }
 }

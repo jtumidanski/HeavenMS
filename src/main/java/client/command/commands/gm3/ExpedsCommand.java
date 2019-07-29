@@ -23,48 +23,48 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
+import java.util.List;
+import java.util.Map.Entry;
+
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import net.server.Server;
 import net.server.channel.Channel;
 import server.expeditions.MapleExpedition;
 
-import java.util.List;
-import java.util.Map.Entry;
-
 public class ExpedsCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        for (Channel ch : Server.getInstance().getChannelsFromWorld(c.getWorld())) {
-            List<MapleExpedition> expeds = ch.getExpeditions();
-            if (expeds.isEmpty()) {
-                player.yellowMessage("No Expeditions in Channel " + ch.getId());
-                continue;
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      for (Channel ch : Server.getInstance().getChannelsFromWorld(c.getWorld())) {
+         List<MapleExpedition> expeds = ch.getExpeditions();
+         if (expeds.isEmpty()) {
+            player.yellowMessage("No Expeditions in Channel " + ch.getId());
+            continue;
+         }
+         player.yellowMessage("Expeditions in Channel " + ch.getId());
+         int id = 0;
+         for (MapleExpedition exped : expeds) {
+            id++;
+            player.yellowMessage("> Expedition " + id);
+            player.yellowMessage(">> Type: " + exped.getType().toString());
+            player.yellowMessage(">> Status: " + (exped.isRegistering() ? "REGISTERING" : "UNDERWAY"));
+            player.yellowMessage(">> Size: " + exped.getMembers().size());
+            player.yellowMessage(">> Leader: " + exped.getLeader().getName());
+            int memId = 2;
+            for (Entry<Integer, String> e : exped.getMembers().entrySet()) {
+               if (exped.isLeader(e.getKey())) {
+                  continue;
+               }
+               player.yellowMessage(">>> Member " + memId + ": " + e.getValue());
+               memId++;
             }
-            player.yellowMessage("Expeditions in Channel " + ch.getId());
-            int id = 0;
-            for (MapleExpedition exped : expeds) {
-                id++;
-                player.yellowMessage("> Expedition " + id);
-                player.yellowMessage(">> Type: " + exped.getType().toString());
-                player.yellowMessage(">> Status: " + (exped.isRegistering() ? "REGISTERING" : "UNDERWAY"));
-                player.yellowMessage(">> Size: " + exped.getMembers().size());
-                player.yellowMessage(">> Leader: " + exped.getLeader().getName());
-                int memId = 2;
-                for (Entry<Integer, String> e : exped.getMembers().entrySet()) {
-                    if (exped.isLeader(e.getKey())) {
-                        continue;
-                    }
-                    player.yellowMessage(">>> Member " + memId + ": " + e.getValue());
-                    memId++;
-                }
-            }
-        }
-    }
+         }
+      }
+   }
 }

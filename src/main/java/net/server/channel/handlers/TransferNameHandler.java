@@ -26,21 +26,20 @@ import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author Ronan
  */
 public final class TransferNameHandler extends AbstractMaplePacketHandler {
-    
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        slea.readInt(); //cid
-        int birthday = slea.readInt();
-        if (!CashOperationHandler.checkBirthday(c, birthday)) {
-            c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
-            c.announce(MaplePacketCreator.enableActions());
-            return;
-        }
-        
-        c.announce(MaplePacketCreator.sendNameTransferRules(4));
-    }
+
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      slea.readInt(); //cid
+      int birthday = slea.readInt();
+      if (!CashOperationHandler.checkBirthday(c, birthday)) {
+         c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
+         c.announce(MaplePacketCreator.enableActions());
+         return;
+      }
+
+      c.announce(MaplePacketCreator.sendNameTransferRules(4));
+   }
 }

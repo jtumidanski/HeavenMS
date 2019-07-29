@@ -22,13 +22,12 @@ package net.server.worker;
 import net.server.coordinator.MapleEventRecallCoordinator;
 
 /**
- *
  * @author Ronan
  */
 public class EventRecallCoordinatorWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        MapleEventRecallCoordinator.getInstance().manageEventInstances();
-    }
+
+   @Override
+   public void run() {
+      MapleEventRecallCoordinator.getInstance().manageEventInstances();
+   }
 }

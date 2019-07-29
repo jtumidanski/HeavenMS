@@ -25,13 +25,13 @@ import net.server.world.World;
  * @author Ronan
  */
 public class MountTirednessWorker extends BaseWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        wserv.runMountSchedule();
-    }
-    
-    public MountTirednessWorker(World world) {
-        super(world);
-    }
+
+   public MountTirednessWorker(World world) {
+      super(world);
+   }
+
+   @Override
+   public void run() {
+      wserv.runMountSchedule();
+   }
 }

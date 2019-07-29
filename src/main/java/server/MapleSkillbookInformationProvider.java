@@ -38,326 +38,312 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import tools.DatabaseConnection;
 
 /**
- *
  * @author RonanLana
  */
 public class MapleSkillbookInformationProvider {
-    private final static MapleSkillbookInformationProvider instance = new MapleSkillbookInformationProvider();
-    
-    public static MapleSkillbookInformationProvider getInstance() {
-        return instance;
-    }
-    
-    protected static Map<Integer, SkillBookEntry> foundSkillbooks = new HashMap<>();
-    
-    public enum SkillBookEntry {
-        UNAVAILABLE,
-        QUEST,
-        REACTOR,
-        SCRIPT
-    }
-    
-    static String host = "jdbc:mysql://localhost:3306/heavenms";
-    static String driver = "com.mysql.jdbc.Driver";
-    static String username = "root";
-    static String password = "";
+   private final static MapleSkillbookInformationProvider instance = new MapleSkillbookInformationProvider();
+   protected static Map<Integer, SkillBookEntry> foundSkillbooks = new HashMap<>();
+   static String host = "jdbc:mysql://localhost:3306/heavenms";
+   static String driver = "com.mysql.jdbc.Driver";
+   static String username = "root";
+   static String password = "";
+   static String wzPath = "wz";
+   static String rootDirectory = ".";
+   static InputStreamReader fileReader = null;
+   static BufferedReader bufferedReader = null;
+   static int initialStringLength = 50;
+   static int skillbookMinItemid = 2280000;
+   static int skillbookMaxItemid = 2300000;  // exclusively
+   static byte status = 0;
+   static int questId = -1;
+   static int isCompleteState = 0;
+   static int currentItemid = 0;
+   static int currentCount = 0;
 
-    static String wzPath = "wz";
-    static String rootDirectory = ".";
-    
-    static InputStreamReader fileReader = null;
-    static BufferedReader bufferedReader = null;
-    
-    static int initialStringLength = 50;
-    
-    static int skillbookMinItemid = 2280000;
-    static int skillbookMaxItemid = 2300000;  // exclusively
-    
-    static byte status = 0;
-    static int questId = -1;
-    static int isCompleteState = 0;
-    
-    static int currentItemid = 0;
-    static int currentCount = 0;
-    
-    static {
-        loadSkillbooks();
-    }
+   static {
+      loadSkillbooks();
+   }
 
-    private static String getName(String token) {
-        int i, j;
-        char[] dest;
-        String d;
-        
-        i = token.lastIndexOf("name");
-        i = token.indexOf("\"", i) + 1; //lower bound of the string
-        j = token.indexOf("\"", i);     //upper bound
+   public static MapleSkillbookInformationProvider getInstance() {
+      return instance;
+   }
 
-        if(j < i) {           //node value containing 'name' in it's scope, cheap fix since we don't deal with strings anyway
-            System.out.println("[CRITICAL] Found this '" + token + "'");
-            return "0";
-        }
-        
-        dest = new char[initialStringLength];
-        token.getChars(i, j, dest, 0);
+   private static String getName(String token) {
+      int i, j;
+      char[] dest;
+      String d;
 
-        d = new String(dest);
-        return(d.trim());
-    }
-    
-    private static String getValue(String token) {
-        int i, j;
-        char[] dest;
-        String d;
+      i = token.lastIndexOf("name");
+      i = token.indexOf("\"", i) + 1; //lower bound of the string
+      j = token.indexOf("\"", i);     //upper bound
 
-        i = token.lastIndexOf("value");
-        i = token.indexOf("\"", i) + 1; //lower bound of the string
-        j = token.indexOf("\"", i);     //upper bound
+      if (j < i) {           //node value containing 'name' in it's scope, cheap fix since we don't deal with strings anyway
+         System.out.println("[CRITICAL] Found this '" + token + "'");
+         return "0";
+      }
 
-        dest = new char[initialStringLength];
-        token.getChars(i, j, dest, 0);
+      dest = new char[initialStringLength];
+      token.getChars(i, j, dest, 0);
 
-        d = new String(dest);
-        return(d.trim());
-    }
-    
-    private static void forwardCursor(int st) {
-        String line = null;
+      d = new String(dest);
+      return (d.trim());
+   }
 
-        try {
-            while(status >= st && (line = bufferedReader.readLine()) != null) {
-                simpleToken(line);
+   private static String getValue(String token) {
+      int i, j;
+      char[] dest;
+      String d;
+
+      i = token.lastIndexOf("value");
+      i = token.indexOf("\"", i) + 1; //lower bound of the string
+      j = token.indexOf("\"", i);     //upper bound
+
+      dest = new char[initialStringLength];
+      token.getChars(i, j, dest, 0);
+
+      d = new String(dest);
+      return (d.trim());
+   }
+
+   private static void forwardCursor(int st) {
+      String line = null;
+
+      try {
+         while (status >= st && (line = bufferedReader.readLine()) != null) {
+            simpleToken(line);
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+   }
+
+   private static void simpleToken(String token) {
+      if (token.contains("/imgdir")) {
+         status -= 1;
+      } else if (token.contains("imgdir") && !token.endsWith("/>")) {    // '\>' XML node description not being accounted, issue found thanks to Robin Schulz, CanIGetaPR
+         status += 1;
+      }
+   }
+
+   private static void inspectQuestItemList(int st) {
+      String line = null;
+
+      try {
+         while (status >= st && (line = bufferedReader.readLine()) != null) {
+            readItemToken(line);
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+   }
+
+   public static boolean isSkillBook(int itemid) {
+      return itemid >= skillbookMinItemid && itemid < skillbookMaxItemid;
+   }
+
+   private static void processCurrentItem() {
+      try {
+         if (isSkillBook(currentItemid)) {
+            if (currentCount > 0) {
+               foundSkillbooks.put(currentItemid, SkillBookEntry.QUEST);
             }
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
+         }
+      } catch (Exception ignored) {
+      }
+   }
 
-    private static void simpleToken(String token) {
-        if(token.contains("/imgdir")) {
-            status -= 1;
-        }
-        else if(token.contains("imgdir") && !token.endsWith("/>")) {    // '\>' XML node description not being accounted, issue found thanks to Robin Schulz, CanIGetaPR
-            status += 1;
-        }
-    }
-    
-    private static void inspectQuestItemList(int st) {
-        String line = null;
+   private static void readItemToken(String token) {
+      if (token.contains("/imgdir")) {
+         status -= 1;
 
-        try {
-            while(status >= st && (line = bufferedReader.readLine()) != null) {
-                readItemToken(line);
-            }
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
+         processCurrentItem();
 
-    public static boolean isSkillBook(int itemid) {
-        return itemid >= skillbookMinItemid && itemid < skillbookMaxItemid;
-    }
-    
-    private static void processCurrentItem() {
-        try {
-            if(isSkillBook(currentItemid)) {
-                if(currentCount > 0) {
-                    foundSkillbooks.put(currentItemid, SkillBookEntry.QUEST);
-                }
-            }
-        } catch(Exception ignored) {}
-    }
-    
-    private static void readItemToken(String token) {
-        if(token.contains("/imgdir")) {
-            status -= 1;
-            
-            processCurrentItem();
-            
-            currentItemid = 0;
-            currentCount = 0;
-        }
-        else if(token.contains("imgdir") && !token.endsWith("/>")) {
-            status += 1;
-        }
-        else {
-            String d = getName(token);
-            
-            if(d.equals("id")) {
-                currentItemid = Integer.parseInt(getValue(token));
-            } else if(d.equals("count")) {
-                currentCount = Integer.parseInt(getValue(token));
-            }
-        }
-    }
+         currentItemid = 0;
+         currentCount = 0;
+      } else if (token.contains("imgdir") && !token.endsWith("/>")) {
+         status += 1;
+      } else {
+         String d = getName(token);
 
-    private static void translateActToken(String token) {
-        String d;
-        int temp;
+         if (d.equals("id")) {
+            currentItemid = Integer.parseInt(getValue(token));
+         } else if (d.equals("count")) {
+            currentCount = Integer.parseInt(getValue(token));
+         }
+      }
+   }
 
-        if(token.contains("/imgdir")) {
-            status -= 1;
-        }
-        else if(token.contains("imgdir") && !token.endsWith("/>")) {
-            if(status == 1) {           //getting QuestId
-                d = getName(token);
-                questId = Integer.parseInt(d);
-            }
-            else if(status == 2) {      //start/complete
-                d = getName(token);
-                isCompleteState = Integer.parseInt(d);
-            }
-            else if(status == 3) {
-                d = getName(token);
+   private static void translateActToken(String token) {
+      String d;
+      int temp;
 
-                if(d.contains("item")) {
-                    temp = status;
-                    inspectQuestItemList(temp);
-                } else {
-                    forwardCursor(status);
-                }
-            }
+      if (token.contains("/imgdir")) {
+         status -= 1;
+      } else if (token.contains("imgdir") && !token.endsWith("/>")) {
+         if (status == 1) {           //getting QuestId
+            d = getName(token);
+            questId = Integer.parseInt(d);
+         } else if (status == 2) {      //start/complete
+            d = getName(token);
+            isCompleteState = Integer.parseInt(d);
+         } else if (status == 3) {
+            d = getName(token);
 
-            status += 1;
-        }
-    }
-    
-    private static void fetchSkillbooksFromQuests() {
-        String line = "";
-        int lineNumber = 0; // add line number, thanks to Alex (CanIGetaPR)
-        
-        try {
-            fileReader = new InputStreamReader(new FileInputStream(wzPath + "/Quest.wz/Act.img.xml"), "UTF-8");
-            bufferedReader = new BufferedReader(fileReader);
+            if (d.contains("item")) {
+               temp = status;
+               inspectQuestItemList(temp);
+            } else {
+               forwardCursor(status);
+            }
+         }
 
-            while((line = bufferedReader.readLine()) != null) {
-                lineNumber++;
-                translateActToken(line);
-            }
+         status += 1;
+      }
+   }
 
-            bufferedReader.close();
-            fileReader.close();
-        } catch(IOException ioe) {
-            System.out.println("Failed to read Quest.wz file. Line " + lineNumber + ": " + line);
-            ioe.printStackTrace();
-        } catch (Exception e) {
-            System.out.println("Failed to parse Quest.wz XML file.");   // catch this exception, thanks to YonhNi
-        }
-    }
-    
-    private static void fetchSkillbooksFromReactors() {
-        Connection con = null;
-        try {
-            con = DatabaseConnection.getConnection();
-            
-            PreparedStatement ps = con.prepareStatement("SELECT itemid FROM reactordrops WHERE itemid >= ? AND itemid < ?;");
-            ps.setInt(1, skillbookMinItemid);
-            ps.setInt(2, skillbookMaxItemid);
-            ResultSet rs = ps.executeQuery();
+   private static void fetchSkillbooksFromQuests() {
+      String line = "";
+      int lineNumber = 0; // add line number, thanks to Alex (CanIGetaPR)
 
-            if (rs.isBeforeFirst()) {
-                while(rs.next()) {
-                    foundSkillbooks.put(rs.getInt("itemid"), SkillBookEntry.REACTOR);
-                }
-            }
+      try {
+         fileReader = new InputStreamReader(new FileInputStream(wzPath + "/Quest.wz/Act.img.xml"), "UTF-8");
+         bufferedReader = new BufferedReader(fileReader);
 
-            rs.close();
-            ps.close();
-            
-            con.close();
-        } catch (SQLException sqle) {
-            sqle.printStackTrace();
-        }
-    }
-    
-    private static void listFiles(String directoryName, ArrayList<File> files) {
-        File directory = new File(directoryName);
+         while ((line = bufferedReader.readLine()) != null) {
+            lineNumber++;
+            translateActToken(line);
+         }
 
-        // get all the files from a directory
-        File[] fList = directory.listFiles();
-        for (File file : fList) {
-            if (file.isFile()) {
-                files.add(file);
-            } else if (file.isDirectory()) {
-                listFiles(file.getAbsolutePath(), files);
+         bufferedReader.close();
+         fileReader.close();
+      } catch (IOException ioe) {
+         System.out.println("Failed to read Quest.wz file. Line " + lineNumber + ": " + line);
+         ioe.printStackTrace();
+      } catch (Exception e) {
+         System.out.println("Failed to parse Quest.wz XML file.");   // catch this exception, thanks to YonhNi
+      }
+   }
+
+   private static void fetchSkillbooksFromReactors() {
+      Connection con = null;
+      try {
+         con = DatabaseConnection.getConnection();
+
+         PreparedStatement ps = con.prepareStatement("SELECT itemid FROM reactordrops WHERE itemid >= ? AND itemid < ?;");
+         ps.setInt(1, skillbookMinItemid);
+         ps.setInt(2, skillbookMaxItemid);
+         ResultSet rs = ps.executeQuery();
+
+         if (rs.isBeforeFirst()) {
+            while (rs.next()) {
+               foundSkillbooks.put(rs.getInt("itemid"), SkillBookEntry.REACTOR);
             }
-        }
-    }
-    
-    private static List<File> listFilesFromDirectoryRecursively(String directory) {
-        ArrayList<File> files = new ArrayList<>();
-        listFiles(directory, files);
-        
-        return files;
-    }
-    
-    private static void filterScriptDirectorySearchMatchingData(String path) {
-        for (File file : listFilesFromDirectoryRecursively(rootDirectory + "/" + path)) {
-            if (file.getName().endsWith(".js")) {
-                fileSearchMatchingData(file);
-            }
-        }
-    }
-    
-    private static Set<Integer> foundMatchingDataOnFile(String fileContent) {
-        Set<Integer> matches = new HashSet<>(4);
-        
-        Matcher searchM = Pattern.compile("22(8|9)[0-9]{4}").matcher(fileContent);
-        int idx = 0;
-        while (searchM.find(idx)) {
-            idx = searchM.end();
-            matches.add(Integer.valueOf(fileContent.substring(searchM.start(), idx)));
-        }
-        
-        return matches;
-    }
-    
-    static String readFileToString(File file, String encoding) throws IOException {
-        Scanner scanner = new Scanner(file, encoding);
-        String text = "";
-        try {
-            try {
-                text = scanner.useDelimiter("\\A").next();
-            } finally {
-                scanner.close();
-            }
-        } catch (NoSuchElementException ignored) {}
-        
-        return text;
-    }
-    
-    private static void fileSearchMatchingData(File file) {
-        try {
-            String fileContent = readFileToString(file, "UTF-8");
-            
-            Set<Integer> books = foundMatchingDataOnFile(fileContent);
-            for (Integer i : books) {
-                foundSkillbooks.put(i, SkillBookEntry.SCRIPT);
-            }
-        } catch (IOException ioe) {
-            System.out.println("Failed to read " + file.getName() + ".");
-            ioe.printStackTrace();
-        }
-    }
-    
-    private static void fetchSkillbooksFromScripts() {
-        filterScriptDirectorySearchMatchingData("scripts");
-    }
-    
-    private static void loadSkillbooks() {
-        fetchSkillbooksFromQuests();
-        fetchSkillbooksFromReactors();
-        fetchSkillbooksFromScripts();
-    }
-    
-    public SkillBookEntry getSkillbookAvailability(int itemid) {
-        SkillBookEntry sbe = foundSkillbooks.get(itemid);
-        return sbe != null ? sbe : SkillBookEntry.UNAVAILABLE;
-    }
-    
+         }
+
+         rs.close();
+         ps.close();
+
+         con.close();
+      } catch (SQLException sqle) {
+         sqle.printStackTrace();
+      }
+   }
+
+   private static void listFiles(String directoryName, ArrayList<File> files) {
+      File directory = new File(directoryName);
+
+      // get all the files from a directory
+      File[] fList = directory.listFiles();
+      for (File file : fList) {
+         if (file.isFile()) {
+            files.add(file);
+         } else if (file.isDirectory()) {
+            listFiles(file.getAbsolutePath(), files);
+         }
+      }
+   }
+
+   private static List<File> listFilesFromDirectoryRecursively(String directory) {
+      ArrayList<File> files = new ArrayList<>();
+      listFiles(directory, files);
+
+      return files;
+   }
+
+   private static void filterScriptDirectorySearchMatchingData(String path) {
+      for (File file : listFilesFromDirectoryRecursively(rootDirectory + "/" + path)) {
+         if (file.getName().endsWith(".js")) {
+            fileSearchMatchingData(file);
+         }
+      }
+   }
+
+   private static Set<Integer> foundMatchingDataOnFile(String fileContent) {
+      Set<Integer> matches = new HashSet<>(4);
+
+      Matcher searchM = Pattern.compile("22(8|9)[0-9]{4}").matcher(fileContent);
+      int idx = 0;
+      while (searchM.find(idx)) {
+         idx = searchM.end();
+         matches.add(Integer.valueOf(fileContent.substring(searchM.start(), idx)));
+      }
+
+      return matches;
+   }
+
+   static String readFileToString(File file, String encoding) throws IOException {
+      Scanner scanner = new Scanner(file, encoding);
+      String text = "";
+      try {
+         try {
+            text = scanner.useDelimiter("\\A").next();
+         } finally {
+            scanner.close();
+         }
+      } catch (NoSuchElementException ignored) {
+      }
+
+      return text;
+   }
+
+   private static void fileSearchMatchingData(File file) {
+      try {
+         String fileContent = readFileToString(file, "UTF-8");
+
+         Set<Integer> books = foundMatchingDataOnFile(fileContent);
+         for (Integer i : books) {
+            foundSkillbooks.put(i, SkillBookEntry.SCRIPT);
+         }
+      } catch (IOException ioe) {
+         System.out.println("Failed to read " + file.getName() + ".");
+         ioe.printStackTrace();
+      }
+   }
+
+   private static void fetchSkillbooksFromScripts() {
+      filterScriptDirectorySearchMatchingData("scripts");
+   }
+
+   private static void loadSkillbooks() {
+      fetchSkillbooksFromQuests();
+      fetchSkillbooksFromReactors();
+      fetchSkillbooksFromScripts();
+   }
+
+   public SkillBookEntry getSkillbookAvailability(int itemid) {
+      SkillBookEntry sbe = foundSkillbooks.get(itemid);
+      return sbe != null ? sbe : SkillBookEntry.UNAVAILABLE;
+   }
+
+   public enum SkillBookEntry {
+      UNAVAILABLE,
+      QUEST,
+      REACTOR,
+      SCRIPT
+   }
+
 }

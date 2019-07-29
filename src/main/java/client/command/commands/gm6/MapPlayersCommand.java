@@ -23,33 +23,33 @@
 */
 package client.command.commands.gm6;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import net.server.Server;
 import net.server.world.World;
 
 public class MapPlayersCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        String names = "";
-        int map = player.getMapId();
-        for (World world : Server.getInstance().getWorlds()) {
-            for (MapleCharacter chr : world.getPlayerStorage().getAllCharacters()) {
-                int curMap = chr.getMapId();
-                String hp = Integer.toString(chr.getHp());
-                String maxhp = Integer.toString(chr.getCurrentMaxHp());
-                String name = chr.getName() + ": " + hp + "/" + maxhp;
-                if (map == curMap) {
-                    names = names.equals("") ? name : (names + ", " + name);
-                }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      String names = "";
+      int map = player.getMapId();
+      for (World world : Server.getInstance().getWorlds()) {
+         for (MapleCharacter chr : world.getPlayerStorage().getAllCharacters()) {
+            int curMap = chr.getMapId();
+            String hp = Integer.toString(chr.getHp());
+            String maxhp = Integer.toString(chr.getCurrentMaxHp());
+            String name = chr.getName() + ": " + hp + "/" + maxhp;
+            if (map == curMap) {
+               names = names.equals("") ? name : (names + ", " + name);
             }
-        }
-        player.message("Players on mapid " + map + ": " + names);
-    }
+         }
+      }
+      player.message("Players on mapid " + map + ": " + names);
+   }
 }

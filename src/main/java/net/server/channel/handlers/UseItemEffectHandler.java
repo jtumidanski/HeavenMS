@@ -29,19 +29,19 @@ import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class UseItemEffectHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        Item toUse;
-        int itemId = slea.readInt();
-        if (itemId == 4290001 || itemId == 4290000) {
-            toUse = c.getPlayer().getInventory(MapleInventoryType.ETC).findById(itemId);
-        } else {
-            toUse = c.getPlayer().getInventory(MapleInventoryType.CASH).findById(itemId);
-        }
-        if (toUse == null || toUse.getQuantity() < 1) {
-            if (itemId != 0) return;
-        }
-        c.getPlayer().setItemEffect(itemId);
-        c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.itemEffect(c.getPlayer().getId(), itemId), false);
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      Item toUse;
+      int itemId = slea.readInt();
+      if (itemId == 4290001 || itemId == 4290000) {
+         toUse = c.getPlayer().getInventory(MapleInventoryType.ETC).findById(itemId);
+      } else {
+         toUse = c.getPlayer().getInventory(MapleInventoryType.CASH).findById(itemId);
+      }
+      if (toUse == null || toUse.getQuantity() < 1) {
+         if (itemId != 0) return;
+      }
+      c.getPlayer().setItemEffect(itemId);
+      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.itemEffect(c.getPlayer().getId(), itemId), false);
+   }
 }

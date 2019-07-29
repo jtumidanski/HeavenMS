@@ -23,16 +23,15 @@ import client.MapleClient;
 import client.command.Command;
 
 /**
- *
  * @author Ronan
  */
 public class GachaListCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        c.getAbstractPlayerInteraction().openNpc(10000, "gachaponInfo");
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      c.getAbstractPlayerInteraction().openNpc(10000, "gachaponInfo");
+   }
 }

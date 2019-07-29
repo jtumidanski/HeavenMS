@@ -23,38 +23,38 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import server.quest.MapleQuest;
 
 public class QuestStartCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        
-        if (params.length < 1){
-            player.yellowMessage("Syntax: !startquest <questid>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
 
-        int questid = Integer.parseInt(params[0]);
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !startquest <questid>");
+         return;
+      }
 
-        if (player.getQuestStatus(questid) == 0) {
-            MapleQuest quest = MapleQuest.getInstance(questid);
-            if (quest != null && quest.getNpcRequirement(false) != -1) {
-                c.getAbstractPlayerInteraction().forceStartQuest(questid, quest.getNpcRequirement(false));
-            } else {
-                c.getAbstractPlayerInteraction().forceStartQuest(questid);
-            }
-            
-            player.dropMessage(5, "QUEST " + questid + " started.");
-        } else {
-            player.dropMessage(5, "QUESTID " + questid + " already started/completed.");
-        }
-    }
+      int questid = Integer.parseInt(params[0]);
+
+      if (player.getQuestStatus(questid) == 0) {
+         MapleQuest quest = MapleQuest.getInstance(questid);
+         if (quest != null && quest.getNpcRequirement(false) != -1) {
+            c.getAbstractPlayerInteraction().forceStartQuest(questid, quest.getNpcRequirement(false));
+         } else {
+            c.getAbstractPlayerInteraction().forceStartQuest(questid);
+         }
+
+         player.dropMessage(5, "QUEST " + questid + " started.");
+      } else {
+         player.dropMessage(5, "QUESTID " + questid + " already started/completed.");
+      }
+   }
 }

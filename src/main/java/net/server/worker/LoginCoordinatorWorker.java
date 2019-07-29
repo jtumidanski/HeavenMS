@@ -22,13 +22,12 @@ package net.server.worker;
 import net.server.coordinator.MapleSessionCoordinator;
 
 /**
- *
  * @author Ronan
  */
 public class LoginCoordinatorWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        MapleSessionCoordinator.getInstance().runUpdateHwidHistory();
-    }
+
+   @Override
+   public void run() {
+      MapleSessionCoordinator.getInstance().runUpdateHwidHistory();
+   }
 }

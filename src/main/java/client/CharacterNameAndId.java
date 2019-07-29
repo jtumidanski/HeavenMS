@@ -22,20 +22,20 @@
 package client;
 
 public class CharacterNameAndId {
-    private int id;
-    private String name;
+   private int id;
+   private String name;
 
-    public CharacterNameAndId(int id, String name) {
-        super();
-        this.id = id;
-        this.name = name;
-    }
+   public CharacterNameAndId(int id, String name) {
+      super();
+      this.id = id;
+      this.name = name;
+   }
 
-    public int getId() {
-        return id;
-    }
+   public int getId() {
+      return id;
+   }
 
-    public String getName() {
-        return name;
-    }
+   public String getName() {
+      return name;
+   }
 }

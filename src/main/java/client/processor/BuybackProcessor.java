@@ -19,65 +19,64 @@
 */
 package client.processor;
 
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 
 /**
- *
  * @author RonanLana
  */
 public class BuybackProcessor {
-    
-    public static void processBuyback(MapleClient c) {
-        MapleCharacter chr = c.getPlayer();
-        boolean buyback;
-        
-        c.lockClient();
-        try {
-            buyback = !chr.isAlive() && chr.couldBuyback();
-        } finally {
-            c.unlockClient();
-        }
 
-        if (buyback) {
-            String jobString;
-            switch(chr.getJobStyle()) {
-                case WARRIOR:
-                    jobString = "warrior";
-                    break;
+   public static void processBuyback(MapleClient c) {
+      MapleCharacter chr = c.getPlayer();
+      boolean buyback;
 
-                case MAGICIAN:
-                    jobString = "magician";
-                    break;
+      c.lockClient();
+      try {
+         buyback = !chr.isAlive() && chr.couldBuyback();
+      } finally {
+         c.unlockClient();
+      }
 
-                case BOWMAN:
-                    jobString = "bowman";
-                    break;
+      if (buyback) {
+         String jobString;
+         switch (chr.getJobStyle()) {
+            case WARRIOR:
+               jobString = "warrior";
+               break;
 
-                case THIEF:
-                    jobString = "thief";
-                    break;
+            case MAGICIAN:
+               jobString = "magician";
+               break;
 
-                case BRAWLER:
-                case GUNSLINGER:
-                    jobString = "pirate";
-                    break;
+            case BOWMAN:
+               jobString = "bowman";
+               break;
 
-                default:
-                    jobString = "beginner";
-            }
+            case THIEF:
+               jobString = "thief";
+               break;
 
-            chr.healHpMp();
-            chr.broadcastStance(chr.isFacingLeft() ? 5 : 4);
-            
-            MapleMap map = chr.getMap();
-            map.broadcastMessage(MaplePacketCreator.playSound("Buyback/" + jobString));
-            map.broadcastMessage(MaplePacketCreator.earnTitleMessage(chr.getName() + " just bought back into the game!"));
+            case BRAWLER:
+            case GUNSLINGER:
+               jobString = "pirate";
+               break;
 
-            chr.announce(MaplePacketCreator.showBuybackEffect());
-            map.broadcastMessage(chr, MaplePacketCreator.showForeignBuybackEffect(chr.getId()), false);
-        }
-    }
+            default:
+               jobString = "beginner";
+         }
+
+         chr.healHpMp();
+         chr.broadcastStance(chr.isFacingLeft() ? 5 : 4);
+
+         MapleMap map = chr.getMap();
+         map.broadcastMessage(MaplePacketCreator.playSound("Buyback/" + jobString));
+         map.broadcastMessage(MaplePacketCreator.earnTitleMessage(chr.getName() + " just bought back into the game!"));
+
+         chr.announce(MaplePacketCreator.showBuybackEffect());
+         map.broadcastMessage(chr, MaplePacketCreator.showForeignBuybackEffect(chr.getId()), false);
+      }
+   }
 }

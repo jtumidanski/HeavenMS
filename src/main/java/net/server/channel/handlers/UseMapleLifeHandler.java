@@ -26,29 +26,28 @@ import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author RonanLana
  */
 public class UseMapleLifeHandler extends AbstractMaplePacketHandler {
-    @Override
-    public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        MapleCharacter player = c.getPlayer();
-        long timeNow = currentServerTime();
-        
-        if(timeNow - player.getLastUsedCashItem() < 3000) {
-            player.dropMessage(5, "Please wait a moment before trying again.");
-            c.announce(MaplePacketCreator.sendMapleLifeError(3));
-            c.announce(MaplePacketCreator.enableActions());
-            return;
-        }
-        player.setLastUsedCashItem(timeNow);
-        
-        String name = slea.readMapleAsciiString();
-        if(MapleCharacter.canCreateChar(name)) {
-            c.announce(MaplePacketCreator.sendMapleLifeCharacterInfo());
-        } else {
-            c.announce(MaplePacketCreator.sendMapleLifeNameError());
-        }
-        c.announce(MaplePacketCreator.enableActions());
-    }
+   @Override
+   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      MapleCharacter player = c.getPlayer();
+      long timeNow = currentServerTime();
+
+      if (timeNow - player.getLastUsedCashItem() < 3000) {
+         player.dropMessage(5, "Please wait a moment before trying again.");
+         c.announce(MaplePacketCreator.sendMapleLifeError(3));
+         c.announce(MaplePacketCreator.enableActions());
+         return;
+      }
+      player.setLastUsedCashItem(timeNow);
+
+      String name = slea.readMapleAsciiString();
+      if (MapleCharacter.canCreateChar(name)) {
+         c.announce(MaplePacketCreator.sendMapleLifeCharacterInfo());
+      } else {
+         c.announce(MaplePacketCreator.sendMapleLifeNameError());
+      }
+      c.announce(MaplePacketCreator.enableActions());
+   }
 }

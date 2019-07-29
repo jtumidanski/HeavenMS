@@ -23,30 +23,29 @@ import client.MapleClient;
 import client.inventory.Item;
 import net.AbstractMaplePacketHandler;
 import server.CashShop;
-import tools.data.input.SeekableLittleEndianAccessor;
 import tools.MaplePacketCreator;
 import tools.Pair;
+import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author RonanLana
  */
 public class CashShopSurpriseHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        CashShop cs = c.getPlayer().getCashShop();
-        
-        if(cs.isOpened()) {
-            Pair<Item, Item> cssResult = cs.openCashShopSurprise();
-            
-            if(cssResult != null) {
-                //Item cssItem = cssResult.getLeft(), cssBox = cssResult.getRight();
-                //c.announce(MaplePacketCreator.onCashGachaponOpenSuccess(c.getAccID(), cssBox.getSN(), cssBox.getQuantity(), cssItem, cssItem.getItemId(), cssItem.getQuantity(), true));
-                c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xA4));
-            } else {
-                //c.announce(MaplePacketCreator.onCashItemGachaponOpenFailed());
-                c.announce(MaplePacketCreator.showCashShopMessage((byte) 0x00));
-            }
-        }
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      CashShop cs = c.getPlayer().getCashShop();
+
+      if (cs.isOpened()) {
+         Pair<Item, Item> cssResult = cs.openCashShopSurprise();
+
+         if (cssResult != null) {
+            //Item cssItem = cssResult.getLeft(), cssBox = cssResult.getRight();
+            //c.announce(MaplePacketCreator.onCashGachaponOpenSuccess(c.getAccID(), cssBox.getSN(), cssBox.getQuantity(), cssItem, cssItem.getItemId(), cssItem.getQuantity(), true));
+            c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xA4));
+         } else {
+            //c.announce(MaplePacketCreator.onCashItemGachaponOpenFailed());
+            c.announce(MaplePacketCreator.showCashShopMessage((byte) 0x00));
+         }
+      }
+   }
 }

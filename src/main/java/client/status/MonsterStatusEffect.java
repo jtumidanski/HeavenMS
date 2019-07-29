@@ -21,47 +21,47 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package client.status;
 
-import client.Skill;
-import server.life.MobSkill;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import client.Skill;
+import server.life.MobSkill;
+
 public class MonsterStatusEffect {
 
-    private Map<MonsterStatus, Integer> stati;
-    private Skill skill;
-    private MobSkill mobskill;
-    private boolean monsterSkill;
-    
-    public MonsterStatusEffect(Map<MonsterStatus, Integer> stati, Skill skillId, MobSkill mobskill, boolean monsterSkill) {
-        this.stati = new ConcurrentHashMap<>(stati);
-        this.skill = skillId;
-        this.monsterSkill = monsterSkill;
-        this.mobskill = mobskill;
-    }
+   private Map<MonsterStatus, Integer> stati;
+   private Skill skill;
+   private MobSkill mobskill;
+   private boolean monsterSkill;
 
-    public Map<MonsterStatus, Integer> getStati() {
-        return stati;
-    }
+   public MonsterStatusEffect(Map<MonsterStatus, Integer> stati, Skill skillId, MobSkill mobskill, boolean monsterSkill) {
+      this.stati = new ConcurrentHashMap<>(stati);
+      this.skill = skillId;
+      this.monsterSkill = monsterSkill;
+      this.mobskill = mobskill;
+   }
 
-    public Integer setValue(MonsterStatus status, Integer newVal) {
-        return stati.put(status, newVal);
-    }
+   public Map<MonsterStatus, Integer> getStati() {
+      return stati;
+   }
 
-    public Skill getSkill() {
-        return skill;
-    }
+   public Integer setValue(MonsterStatus status, Integer newVal) {
+      return stati.put(status, newVal);
+   }
 
-    public boolean isMonsterSkill() {
-        return monsterSkill;
-    }
+   public Skill getSkill() {
+      return skill;
+   }
 
-    public void removeActiveStatus(MonsterStatus stat) {
-        stati.remove(stat);
-    }
+   public boolean isMonsterSkill() {
+      return monsterSkill;
+   }
 
-    public MobSkill getMobSkill() {
-        return mobskill;
-    }
+   public void removeActiveStatus(MonsterStatus stat) {
+      stati.remove(stat);
+   }
+
+   public MobSkill getMobSkill() {
+      return mobskill;
+   }
 }

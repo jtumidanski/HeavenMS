@@ -23,51 +23,52 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
+
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReadLock;
 import tools.FilePrinter;
 
 /**
- *
  * @author RonanLana
  */
 public class EmptyReadLock implements MonitoredReadLock {
-    private final MonitoredLockType id;
-    
-    public EmptyReadLock(MonitoredLockType type) {
-        this.id = type;
-    }
-    
-    private static String printThreadStack(StackTraceElement[] list) {
-        DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        dateFormat.setTimeZone(TimeZone.getDefault());
-        String df = dateFormat.format(new Date());
-        
-        StringBuilder s = new StringBuilder("\r\n" + df + "\r\n");
-        for(int i = 0; i < list.length; i++) {
-            s.append("    ").append(list[i].toString()).append("\r\n");
-        }
-        s.append("----------------------------\r\n\r\n");
-        
-        return s.toString();
-    }
-    
-    @Override
-    public void lock() {
-        FilePrinter.printError(FilePrinter.DISPOSED_LOCKS, "Captured locking tentative on disposed lock " + id + ":" + printThreadStack(Thread.currentThread().getStackTrace()));
-    }
-    
-    @Override
-    public void unlock() {}
-    
-    @Override
-    public boolean tryLock() {
-        FilePrinter.printError(FilePrinter.DISPOSED_LOCKS, "Captured try-locking tentative on disposed lock " + id + ":" + printThreadStack(Thread.currentThread().getStackTrace()));
-        return false;
-    }
-    
-    @Override
-    public MonitoredReadLock dispose() {
-        return this;
-    }
+   private final MonitoredLockType id;
+
+   public EmptyReadLock(MonitoredLockType type) {
+      this.id = type;
+   }
+
+   private static String printThreadStack(StackTraceElement[] list) {
+      DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+      dateFormat.setTimeZone(TimeZone.getDefault());
+      String df = dateFormat.format(new Date());
+
+      StringBuilder s = new StringBuilder("\r\n" + df + "\r\n");
+      for (int i = 0; i < list.length; i++) {
+         s.append("    ").append(list[i].toString()).append("\r\n");
+      }
+      s.append("----------------------------\r\n\r\n");
+
+      return s.toString();
+   }
+
+   @Override
+   public void lock() {
+      FilePrinter.printError(FilePrinter.DISPOSED_LOCKS, "Captured locking tentative on disposed lock " + id + ":" + printThreadStack(Thread.currentThread().getStackTrace()));
+   }
+
+   @Override
+   public void unlock() {
+   }
+
+   @Override
+   public boolean tryLock() {
+      FilePrinter.printError(FilePrinter.DISPOSED_LOCKS, "Captured try-locking tentative on disposed lock " + id + ":" + printThreadStack(Thread.currentThread().getStackTrace()));
+      return false;
+   }
+
+   @Override
+   public MonitoredReadLock dispose() {
+      return this;
+   }
 }

@@ -30,25 +30,25 @@ import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class SpouseChatHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        slea.readMapleAsciiString();//recipient
-        String msg = slea.readMapleAsciiString();
-        
-        int partnerId = c.getPlayer().getPartnerId();
-        if (partnerId > 0) { // yay marriage
-            MapleCharacter spouse = c.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
-            if (spouse != null) {
-                spouse.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
-                c.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
-                if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-                    LogHelper.logChat(c, "Spouse", msg);
-                }
-            } else {
-                c.getPlayer().dropMessage(5, "Your spouse is currently offline.");
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      slea.readMapleAsciiString();//recipient
+      String msg = slea.readMapleAsciiString();
+
+      int partnerId = c.getPlayer().getPartnerId();
+      if (partnerId > 0) { // yay marriage
+         MapleCharacter spouse = c.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
+         if (spouse != null) {
+            spouse.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
+            c.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
+            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+               LogHelper.logChat(c, "Spouse", msg);
             }
-        } else {
-            c.getPlayer().dropMessage(5, "You don't have a spouse.");
-        }
-    }
+         } else {
+            c.getPlayer().dropMessage(5, "Your spouse is currently offline.");
+         }
+      } else {
+         c.getPlayer().dropMessage(5, "You don't have a spouse.");
+      }
+   }
 }

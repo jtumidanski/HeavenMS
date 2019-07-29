@@ -29,19 +29,19 @@ import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class DeleteCharHandler extends AbstractMaplePacketHandler {
 
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        String pic = slea.readMapleAsciiString();
-        int cid = slea.readInt();
-        if (c.checkPic(pic)) {
-            if(c.deleteCharacter(cid, c.getAccID())) {
-                FilePrinter.print(FilePrinter.DELETED_CHAR + c.getAccountName() + ".txt", c.getAccountName() + " deleted CID: " + cid);
-                c.announce(MaplePacketCreator.deleteCharResponse(cid, 0));
-            } else {
-                c.announce(MaplePacketCreator.deleteCharResponse(cid, 0x14));
-            }
-        } else {
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      String pic = slea.readMapleAsciiString();
+      int cid = slea.readInt();
+      if (c.checkPic(pic)) {
+         if (c.deleteCharacter(cid, c.getAccID())) {
+            FilePrinter.print(FilePrinter.DELETED_CHAR + c.getAccountName() + ".txt", c.getAccountName() + " deleted CID: " + cid);
+            c.announce(MaplePacketCreator.deleteCharResponse(cid, 0));
+         } else {
             c.announce(MaplePacketCreator.deleteCharResponse(cid, 0x14));
-        }
-    }
+         }
+      } else {
+         c.announce(MaplePacketCreator.deleteCharResponse(cid, 0x14));
+      }
+   }
 }

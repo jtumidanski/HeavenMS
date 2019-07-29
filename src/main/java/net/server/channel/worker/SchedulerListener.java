@@ -22,9 +22,8 @@ package net.server.channel.worker;
 import java.util.List;
 
 /**
- *
  * @author Ronan
  */
 public interface SchedulerListener {
-    void removedScheduledEntries(List<Object> entries, boolean update);
+   void removedScheduledEntries(List<Object> entries, boolean update);
 }

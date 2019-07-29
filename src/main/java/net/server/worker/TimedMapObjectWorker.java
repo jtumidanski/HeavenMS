@@ -25,13 +25,13 @@ import net.server.world.World;
  * @author Ronan
  */
 public class TimedMapObjectWorker extends BaseWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        wserv.runTimedMapObjectSchedule();
-    }
-    
-    public TimedMapObjectWorker(World world) {
-        super(world);
-    }
+
+   public TimedMapObjectWorker(World world) {
+      super(world);
+   }
+
+   @Override
+   public void run() {
+      wserv.runTimedMapObjectSchedule();
+   }
 }

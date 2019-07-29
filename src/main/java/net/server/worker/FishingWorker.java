@@ -25,13 +25,13 @@ import net.server.world.World;
  * @author Ronan
  */
 public class FishingWorker extends BaseWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        wserv.runCheckFishingSchedule();
-    }
-    
-    public FishingWorker(World world) {
-        super(world);
-    }
+
+   public FishingWorker(World world) {
+      super(world);
+   }
+
+   @Override
+   public void run() {
+      wserv.runCheckFishingSchedule();
+   }
 }

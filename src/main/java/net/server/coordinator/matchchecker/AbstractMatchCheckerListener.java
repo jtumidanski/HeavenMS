@@ -19,16 +19,19 @@
 */
 package net.server.coordinator.matchchecker;
 
-import client.MapleCharacter;
 import java.util.Set;
 
+import client.MapleCharacter;
+
 /**
- *
  * @author Ronan
  */
 public interface AbstractMatchCheckerListener {
-    void onMatchCreated(MapleCharacter leader, Set<MapleCharacter> nonLeaderMatchPlayers, String message);
-    void onMatchAccepted(int leaderid, Set<MapleCharacter> matchPlayers, String message);
-    void onMatchDeclined(int leaderid, Set<MapleCharacter> matchPlayers, String message);
-    void onMatchDismissed(int leaderid, Set<MapleCharacter> matchPlayers, String message);
+   void onMatchCreated(MapleCharacter leader, Set<MapleCharacter> nonLeaderMatchPlayers, String message);
+
+   void onMatchAccepted(int leaderid, Set<MapleCharacter> matchPlayers, String message);
+
+   void onMatchDeclined(int leaderid, Set<MapleCharacter> matchPlayers, String message);
+
+   void onMatchDismissed(int leaderid, Set<MapleCharacter> matchPlayers, String message);
 }

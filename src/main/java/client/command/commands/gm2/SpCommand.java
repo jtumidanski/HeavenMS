@@ -23,43 +23,43 @@
 */
 package client.command.commands.gm2;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import constants.ServerConstants;
 
 public class SpCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !sp [<playername>] <newsp>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !sp [<playername>] <newsp>");
+         return;
+      }
 
-        if (params.length == 1) {
-            int newSp = Integer.parseInt(params[0]);
+      if (params.length == 1) {
+         int newSp = Integer.parseInt(params[0]);
+         if (newSp < 0) newSp = 0;
+         else if (newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
+
+         player.updateRemainingSp(newSp);
+      } else {
+         MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+         if (victim != null) {
+            int newSp = Integer.parseInt(params[1]);
             if (newSp < 0) newSp = 0;
             else if (newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
 
-            player.updateRemainingSp(newSp);
-        } else {
-            MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-            if (victim != null) {
-                int newSp = Integer.parseInt(params[1]);
-                if (newSp < 0) newSp = 0;
-                else if (newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
+            victim.updateRemainingSp(newSp);
 
-                victim.updateRemainingSp(newSp);
-
-                player.dropMessage(5, "SP given.");
-            } else {
-                player.message("Player '" + params[0] + "' could not be found.");
-            }
-        }
-    }
+            player.dropMessage(5, "SP given.");
+         } else {
+            player.message("Player '" + params[0] + "' could not be found.");
+         }
+      }
+   }
 }

@@ -23,27 +23,27 @@
 */
 package client.command.commands.gm2;
 
+import client.MapleCharacter;
+import client.MapleClient;
 import client.Skill;
 import client.SkillFactory;
 import client.command.Command;
-import client.MapleClient;
-import client.MapleCharacter;
 
 public class BuffCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !buff <buffid>");
-            return;
-        }
-        int skillid = Integer.parseInt(params[0]);
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !buff <buffid>");
+         return;
+      }
+      int skillid = Integer.parseInt(params[0]);
 
-        Skill skill = SkillFactory.getSkill(skillid);
-        if (skill != null) skill.getEffect(skill.getMaxLevel()).applyTo(player);
-    }
+      Skill skill = SkillFactory.getSkill(skillid);
+      if (skill != null) skill.getEffect(skill.getMaxLevel()).applyTo(player);
+   }
 }

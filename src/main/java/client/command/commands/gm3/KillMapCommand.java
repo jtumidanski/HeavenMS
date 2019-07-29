@@ -23,20 +23,20 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 
 public class KillMapCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        for (MapleCharacter mch : player.getMap().getCharacters()) {
-            mch.updateHp(0);
-        }
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      for (MapleCharacter mch : player.getMap().getCharacters()) {
+         mch.updateHp(0);
+      }
+   }
 }

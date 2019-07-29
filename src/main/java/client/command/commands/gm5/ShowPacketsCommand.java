@@ -23,17 +23,17 @@
 */
 package client.command.commands.gm5;
 
-import client.command.Command;
 import client.MapleClient;
+import client.command.Command;
 import constants.ServerConstants;
 
 public class ShowPacketsCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET = !ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET;
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET = !ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET;
+   }
 }

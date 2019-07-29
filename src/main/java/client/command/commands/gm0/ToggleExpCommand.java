@@ -23,22 +23,22 @@
 */
 package client.command.commands.gm0;
 
-import client.command.Command;
 import client.MapleClient;
+import client.command.Command;
 
 public class ToggleExpCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        if (c.tryacquireClient()) {
-            try {
-                c.getPlayer().toggleExpGain();  // Vcoc's idea
-            } finally {
-                c.releaseClient();
-            }
-        }
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      if (c.tryacquireClient()) {
+         try {
+            c.getPlayer().toggleExpGain();  // Vcoc's idea
+         } finally {
+            c.releaseClient();
+         }
+      }
+   }
 }

@@ -25,121 +25,121 @@ import client.MapleCharacter;
 import client.MapleJob;
 
 public class MaplePartyCharacter {
-    private String name;
-    private int id;
-    private int level;
-    private int channel, world;
-    private int jobid;
-    private int mapid;
-    private boolean online;
-    private MapleJob job;
-    private MapleCharacter character;
-    
-    public MaplePartyCharacter(MapleCharacter maplechar) {
-        this.character = maplechar;
-    	this.name = maplechar.getName();
-        this.level = maplechar.getLevel();
-        this.channel = maplechar.getClient().getChannel();
-        this.world = maplechar.getWorld();
-        this.id = maplechar.getId();
-        this.jobid = maplechar.getJob().getId();
-        this.mapid = maplechar.getMapId();
-        this.online = true;
-        this.job = maplechar.getJob();
-    }
+   private String name;
+   private int id;
+   private int level;
+   private int channel, world;
+   private int jobid;
+   private int mapid;
+   private boolean online;
+   private MapleJob job;
+   private MapleCharacter character;
 
-    public MaplePartyCharacter() {
-        this.name = "";
-    }
-    
-    public MapleCharacter getPlayer() {
-    	return character;
-    }
+   public MaplePartyCharacter(MapleCharacter maplechar) {
+      this.character = maplechar;
+      this.name = maplechar.getName();
+      this.level = maplechar.getLevel();
+      this.channel = maplechar.getClient().getChannel();
+      this.world = maplechar.getWorld();
+      this.id = maplechar.getId();
+      this.jobid = maplechar.getJob().getId();
+      this.mapid = maplechar.getMapId();
+      this.online = true;
+      this.job = maplechar.getJob();
+   }
 
-    public MapleJob getJob() {
-        return job;
-    }
+   public MaplePartyCharacter() {
+      this.name = "";
+   }
 
-    public int getLevel() {
-        return level;
-    }
+   public MapleCharacter getPlayer() {
+      return character;
+   }
 
-    public int getChannel() {
-        return channel;
-    }
+   public MapleJob getJob() {
+      return job;
+   }
 
-    public void setChannel(int channel) {
-        this.channel = channel;
-    }
-    
-    public boolean isLeader() {
-        return getPlayer().isPartyLeader();
-    }
+   public int getLevel() {
+      return level;
+   }
 
-    public boolean isOnline() {
-        return online;
-    }
+   public int getChannel() {
+      return channel;
+   }
 
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
+   public void setChannel(int channel) {
+      this.channel = channel;
+   }
 
-    public int getMapId() {
-        return mapid;
-    }
+   public boolean isLeader() {
+      return getPlayer().isPartyLeader();
+   }
 
-    public void setMapId(int mapid) {
-        this.mapid = mapid;
-    }
+   public boolean isOnline() {
+      return online;
+   }
 
-    public String getName() {
-        return name;
-    }
+   public void setOnline(boolean online) {
+      this.online = online;
+   }
 
-    public int getId() {
-        return id;
-    }
+   public int getMapId() {
+      return mapid;
+   }
 
-    public int getJobId() {
-        return jobid;
-    }
-    
-    public int getGuildId() {
-        return character.getGuildId();
-    }
-    
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
-        return result;
-    }
+   public void setMapId(int mapid) {
+      this.mapid = mapid;
+   }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
+   public String getName() {
+      return name;
+   }
+
+   public int getId() {
+      return id;
+   }
+
+   public int getJobId() {
+      return jobid;
+   }
+
+   public int getGuildId() {
+      return character.getGuildId();
+   }
+
+   @Override
+   public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((name == null) ? 0 : name.hashCode());
+      return result;
+   }
+
+   @Override
+   public boolean equals(Object obj) {
+      if (this == obj) {
+         return true;
+      }
+      if (obj == null) {
+         return false;
+      }
+      if (getClass() != obj.getClass()) {
+         return false;
+      }
+      final MaplePartyCharacter other = (MaplePartyCharacter) obj;
+      if (name == null) {
+         if (other.name != null) {
             return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final MaplePartyCharacter other = (MaplePartyCharacter) obj;
-        if (name == null) {
-            if (other.name != null) {
-                return false;
-            }
-        } else if (!name.equals(other.name)) {
-            return false;
-        }
-        return true;
-    }
+         }
+      } else if (!name.equals(other.name)) {
+         return false;
+      }
+      return true;
+   }
 
-    public int getWorld() {
-        return world;
-    }
-    
+   public int getWorld() {
+      return world;
+   }
+
 }

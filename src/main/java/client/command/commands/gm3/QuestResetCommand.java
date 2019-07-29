@@ -23,35 +23,35 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import server.quest.MapleQuest;
 
 public class QuestResetCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        
-        if (params.length < 1){
-            player.yellowMessage("Syntax: !resetquest <questid>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
 
-        int questid_ = Integer.parseInt(params[0]);
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !resetquest <questid>");
+         return;
+      }
 
-        if (player.getQuestStatus(questid_) != 0) {
-            MapleQuest quest = MapleQuest.getInstance(questid_);
-            if (quest != null) {
-                quest.reset(player);
-                player.dropMessage(5, "QUEST " + questid_ + " reseted.");
-            } else {    // should not occur
-                player.dropMessage(5, "QUESTID " + questid_ + " is invalid.");
-            }
-        }
-    }
+      int questid_ = Integer.parseInt(params[0]);
+
+      if (player.getQuestStatus(questid_) != 0) {
+         MapleQuest quest = MapleQuest.getInstance(questid_);
+         if (quest != null) {
+            quest.reset(player);
+            player.dropMessage(5, "QUEST " + questid_ + " reseted.");
+         } else {    // should not occur
+            player.dropMessage(5, "QUESTID " + questid_ + " is invalid.");
+         }
+      }
+   }
 }

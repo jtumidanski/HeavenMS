@@ -22,26 +22,25 @@
 package net.server.channel;
 
 /**
- *
  * @author Frz
  */
 public class CharacterIdChannelPair {
-    private int charid;
-    private int channel;
+   private int charid;
+   private int channel;
 
-    public CharacterIdChannelPair() {
-    }
+   public CharacterIdChannelPair() {
+   }
 
-    public CharacterIdChannelPair(int charid, int channel) {
-        this.charid = charid;
-        this.channel = channel;
-    }
+   public CharacterIdChannelPair(int charid, int channel) {
+      this.charid = charid;
+      this.channel = channel;
+   }
 
-    public int getCharacterId() {
-        return charid;
-    }
+   public int getCharacterId() {
+      return charid;
+   }
 
-    public int getChannel() {
-        return channel;
-    }
+   public int getChannel() {
+      return channel;
+   }
 }

@@ -58,36 +58,12 @@ public class MobSkill {
       this.skillLevel = level;
    }
 
-   public void setMpCon(int mpCon) {
-      this.mpCon = mpCon;
-   }
-
    public void addSummons(List<Integer> toSummon) {
       this.toSummon.addAll(toSummon);
    }
 
-   public void setSpawnEffect(int spawnEffect) {
-      this.spawnEffect = spawnEffect;
-   }
-
    public void setHp(int hp) {
       this.hp = hp;
-   }
-
-   public void setX(int x) {
-      this.x = x;
-   }
-
-   public void setY(int y) {
-      this.y = y;
-   }
-
-   public void setDuration(long duration) {
-      this.duration = duration;
-   }
-
-   public void setCoolTime(long cooltime) {
-      this.cooltime = cooltime;
    }
 
    public void setProp(float prop) {
@@ -97,10 +73,6 @@ public class MobSkill {
    public void setLtRb(Point lt, Point rb) {
       this.lt = lt;
       this.rb = rb;
-   }
-
-   public void setLimit(int limit) {
-      this.limit = limit;
    }
 
    public void applyDelayedEffect(final MapleCharacter player, final MapleMonster monster, final boolean skill, int animationTime) {
@@ -360,12 +332,20 @@ public class MobSkill {
       return mpCon;
    }
 
+   public void setMpCon(int mpCon) {
+      this.mpCon = mpCon;
+   }
+
    public List<Integer> getSummons() {
       return new ArrayList<>(toSummon);
    }
 
    public int getSpawnEffect() {
       return spawnEffect;
+   }
+
+   public void setSpawnEffect(int spawnEffect) {
+      this.spawnEffect = spawnEffect;
    }
 
    public int getHP() {
@@ -376,16 +356,32 @@ public class MobSkill {
       return x;
    }
 
+   public void setX(int x) {
+      this.x = x;
+   }
+
    public int getY() {
       return y;
+   }
+
+   public void setY(int y) {
+      this.y = y;
    }
 
    public long getDuration() {
       return duration;
    }
 
+   public void setDuration(long duration) {
+      this.duration = duration;
+   }
+
    public long getCoolTime() {
       return cooltime;
+   }
+
+   public void setCoolTime(long cooltime) {
+      this.cooltime = cooltime;
    }
 
    public Point getLt() {
@@ -398,6 +394,10 @@ public class MobSkill {
 
    public int getLimit() {
       return limit;
+   }
+
+   public void setLimit(int limit) {
+      this.limit = limit;
    }
 
    public boolean makeChanceResult() {

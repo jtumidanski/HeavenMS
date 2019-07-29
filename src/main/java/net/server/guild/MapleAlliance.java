@@ -228,44 +228,6 @@ public class MapleAlliance {
       return alliance;
    }
 
-   public void saveToDB() {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("UPDATE `alliance` SET capacity = ?, notice = ?, rank1 = ?, rank2 = ?, rank3 = ?, rank4 = ?, rank5 = ? WHERE id = ?");
-         ps.setInt(1, this.capacity);
-         ps.setString(2, this.notice);
-
-         ps.setString(3, this.rankTitles[0]);
-         ps.setString(4, this.rankTitles[1]);
-         ps.setString(5, this.rankTitles[2]);
-         ps.setString(6, this.rankTitles[3]);
-         ps.setString(7, this.rankTitles[4]);
-
-         ps.setInt(8, this.allianceId);
-         ps.executeUpdate();
-         ps.close();
-
-         ps = con.prepareStatement("DELETE FROM `allianceguilds` WHERE allianceid = ?");
-         ps.setInt(1, this.allianceId);
-         ps.executeUpdate();
-         ps.close();
-
-         for (int i = 0; i < guilds.size(); i++) {
-            int guild = guilds.get(i);
-
-            ps = con.prepareStatement("INSERT INTO `allianceguilds` (`allianceid`, `guildid`) VALUES (?, ?)");
-            ps.setInt(1, this.allianceId);
-            ps.setInt(2, guild);
-            ps.executeUpdate();
-            ps.close();
-         }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
-   }
-
    public static void disbandAlliance(int allianceId) {
       PreparedStatement ps = null;
       Connection con = null;
@@ -349,6 +311,90 @@ public class MapleAlliance {
       return true;
    }
 
+   public static void sendInvitation(MapleClient c, String targetGuildName, int allianceId) {
+      MapleGuild mg = Server.getInstance().getGuildByName(targetGuildName);
+      if (mg == null) {
+         c.getPlayer().dropMessage(5, "The entered guild does not exist.");
+      } else {
+         if (mg.getAllianceId() > 0) {
+            c.getPlayer().dropMessage(5, "The entered guild is already registered on a guild alliance.");
+         } else {
+            MapleCharacter victim = mg.getMGC(mg.getLeaderId()).getCharacter();
+            if (victim == null) {
+               c.getPlayer().dropMessage(5, "The master of the guild that you offered an invitation is currently not online.");
+            } else {
+               if (MapleInviteCoordinator.createInvite(InviteType.ALLIANCE, c.getPlayer(), allianceId, victim.getId())) {
+                  victim.getClient().announce(MaplePacketCreator.allianceInvite(allianceId, c.getPlayer()));
+               } else {
+                  c.getPlayer().dropMessage(5, "The master of the guild that you offered an invitation is currently managing another invite.");
+               }
+            }
+         }
+      }
+   }
+
+   public static boolean answerInvitation(int targetId, String targetGuildName, int allianceId, boolean answer) {
+      Pair<InviteResult, MapleCharacter> res = MapleInviteCoordinator.answerInvite(InviteType.ALLIANCE, targetId, allianceId, answer);
+
+      String msg;
+      MapleCharacter sender = res.getRight();
+      switch (res.getLeft()) {
+         case ACCEPTED:
+            return true;
+
+         case DENIED:
+            msg = "[" + targetGuildName + "] guild has denied your guild alliance invitation.";
+            break;
+
+         default:
+            msg = "The guild alliance request has not been accepted, since the invitation expired.";
+      }
+
+      if (sender != null) {
+         sender.dropMessage(5, msg);
+      }
+
+      return false;
+   }
+
+   public void saveToDB() {
+      try {
+         Connection con = DatabaseConnection.getConnection();
+         PreparedStatement ps = con.prepareStatement("UPDATE `alliance` SET capacity = ?, notice = ?, rank1 = ?, rank2 = ?, rank3 = ?, rank4 = ?, rank5 = ? WHERE id = ?");
+         ps.setInt(1, this.capacity);
+         ps.setString(2, this.notice);
+
+         ps.setString(3, this.rankTitles[0]);
+         ps.setString(4, this.rankTitles[1]);
+         ps.setString(5, this.rankTitles[2]);
+         ps.setString(6, this.rankTitles[3]);
+         ps.setString(7, this.rankTitles[4]);
+
+         ps.setInt(8, this.allianceId);
+         ps.executeUpdate();
+         ps.close();
+
+         ps = con.prepareStatement("DELETE FROM `allianceguilds` WHERE allianceid = ?");
+         ps.setInt(1, this.allianceId);
+         ps.executeUpdate();
+         ps.close();
+
+         for (int i = 0; i < guilds.size(); i++) {
+            int guild = guilds.get(i);
+
+            ps = con.prepareStatement("INSERT INTO `allianceguilds` (`allianceid`, `guildid`) VALUES (?, ?)");
+            ps.setInt(1, this.allianceId);
+            ps.setInt(2, guild);
+            ps.executeUpdate();
+            ps.close();
+         }
+
+         con.close();
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+   }
+
    public void updateAlliancePackets(MapleCharacter chr) {
       if (allianceId > 0) {
          this.broadcastMessage(MaplePacketCreator.updateAllianceInfo(this, chr.getWorld()));
@@ -422,12 +468,12 @@ public class MapleAlliance {
       this.capacity += inc;
    }
 
-   public void setCapacity(int newCapacity) {
-      this.capacity = newCapacity;
-   }
-
    public int getCapacity() {
       return this.capacity;
+   }
+
+   public void setCapacity(int newCapacity) {
+      this.capacity = newCapacity;
    }
 
    public int getId() {
@@ -466,51 +512,5 @@ public class MapleAlliance {
 
    public void broadcastMessage(byte[] packet) {
       Server.getInstance().allianceMessage(allianceId, packet, -1, -1);
-   }
-
-   public static void sendInvitation(MapleClient c, String targetGuildName, int allianceId) {
-      MapleGuild mg = Server.getInstance().getGuildByName(targetGuildName);
-      if (mg == null) {
-         c.getPlayer().dropMessage(5, "The entered guild does not exist.");
-      } else {
-         if (mg.getAllianceId() > 0) {
-            c.getPlayer().dropMessage(5, "The entered guild is already registered on a guild alliance.");
-         } else {
-            MapleCharacter victim = mg.getMGC(mg.getLeaderId()).getCharacter();
-            if (victim == null) {
-               c.getPlayer().dropMessage(5, "The master of the guild that you offered an invitation is currently not online.");
-            } else {
-               if (MapleInviteCoordinator.createInvite(InviteType.ALLIANCE, c.getPlayer(), allianceId, victim.getId())) {
-                  victim.getClient().announce(MaplePacketCreator.allianceInvite(allianceId, c.getPlayer()));
-               } else {
-                  c.getPlayer().dropMessage(5, "The master of the guild that you offered an invitation is currently managing another invite.");
-               }
-            }
-         }
-      }
-   }
-
-   public static boolean answerInvitation(int targetId, String targetGuildName, int allianceId, boolean answer) {
-      Pair<InviteResult, MapleCharacter> res = MapleInviteCoordinator.answerInvite(InviteType.ALLIANCE, targetId, allianceId, answer);
-
-      String msg;
-      MapleCharacter sender = res.getRight();
-      switch (res.getLeft()) {
-         case ACCEPTED:
-            return true;
-
-         case DENIED:
-            msg = "[" + targetGuildName + "] guild has denied your guild alliance invitation.";
-            break;
-
-         default:
-            msg = "The guild alliance request has not been accepted, since the invitation expired.";
-      }
-
-      if (sender != null) {
-         sender.dropMessage(5, msg);
-      }
-
-      return false;
    }
 }

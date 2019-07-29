@@ -24,16 +24,15 @@ import client.command.Command;
 import net.server.coordinator.MapleSessionCoordinator;
 
 /**
- *
  * @author Ronan
  */
 public class ShowSessionsCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleSessionCoordinator.getInstance().printSessionTrace(c);
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleSessionCoordinator.getInstance().printSessionTrace(c);
+   }
 }

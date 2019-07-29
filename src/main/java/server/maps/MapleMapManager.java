@@ -24,122 +24,123 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import scripting.event.EventInstanceManager;
 
 public class MapleMapManager {
 
-    private int channel, world;
-    private EventInstanceManager event;
-    
-    private Map<Integer, MapleMap> maps = new HashMap<>();
-    
-    private ReadLock mapsRLock;
-    private WriteLock mapsWLock;
+   private int channel, world;
+   private EventInstanceManager event;
 
-    public MapleMapManager(EventInstanceManager eim, int world, int channel) {
-        this.world = world;
-        this.channel = channel;
-        this.event = eim;
+   private Map<Integer, MapleMap> maps = new HashMap<>();
 
-        ReentrantReadWriteLock rrwl = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_MANAGER);
-        this.mapsRLock = rrwl.readLock();
-        this.mapsWLock = rrwl.writeLock();
-    }
+   private ReadLock mapsRLock;
+   private WriteLock mapsWLock;
 
-    public MapleMap resetMap(int mapid) {
-        mapsWLock.lock();
-        try {
-            maps.remove(mapid);
-        } finally {
-            mapsWLock.unlock();
-        }
+   public MapleMapManager(EventInstanceManager eim, int world, int channel) {
+      this.world = world;
+      this.channel = channel;
+      this.event = eim;
 
-        return getMap(mapid);
-    }
+      ReentrantReadWriteLock rrwl = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_MANAGER);
+      this.mapsRLock = rrwl.readLock();
+      this.mapsWLock = rrwl.writeLock();
+   }
 
-    private synchronized MapleMap loadMapFromWz(int mapid, boolean cache) {
-        MapleMap map;
+   public static float getMapRecoveryRate(int mapid) {
+      return MapleMapFactory.getMapRecoveryRate(mapid);
+   }
 
-        if (cache) {
-            mapsRLock.lock();
-            try {
-                map = maps.get(mapid);
-            } finally {
-                mapsRLock.unlock();
-            }
+   public MapleMap resetMap(int mapid) {
+      mapsWLock.lock();
+      try {
+         maps.remove(mapid);
+      } finally {
+         mapsWLock.unlock();
+      }
 
-            if (map != null) {
-                return map;
-            }
-        }
+      return getMap(mapid);
+   }
 
-        map = MapleMapFactory.loadMapFromWz(mapid, world, channel, event);
+   private synchronized MapleMap loadMapFromWz(int mapid, boolean cache) {
+      MapleMap map;
 
-        if (cache) {
-            mapsWLock.lock();
-            try {
-                maps.put(mapid, map);
-            } finally {
-                mapsWLock.unlock();
-            }
-        }
-
-        return map;
-    }
-
-    public MapleMap getMap(int mapid) {
-        MapleMap map;
-
-        mapsRLock.lock();
-        try {
+      if (cache) {
+         mapsRLock.lock();
+         try {
             map = maps.get(mapid);
-        } finally {
+         } finally {
             mapsRLock.unlock();
-        }
+         }
 
-        return (map != null) ? map : loadMapFromWz(mapid, true);
-    }
-    
-    public MapleMap getDisposableMap(int mapid) {
-        return loadMapFromWz(mapid, false);
-    }
+         if (map != null) {
+            return map;
+         }
+      }
 
-    public boolean isMapLoaded(int mapId) {
-        mapsRLock.lock();
-        try {
-            return maps.containsKey(mapId);
-        } finally {
-            mapsRLock.unlock();
-        }
-    }
+      map = MapleMapFactory.loadMapFromWz(mapid, world, channel, event);
 
-    public Map<Integer, MapleMap> getMaps() {
-        mapsRLock.lock();
-        try {
-            return new HashMap<>(maps);
-        } finally {
-            mapsRLock.unlock();
-        }
-    }
-    
-    public void updateMaps() {
-        for (MapleMap map : getMaps().values()) {
-            map.respawn();
-            map.mobMpRecovery();
-        }
-    }
-    
-    public void dispose() {
-        for (MapleMap map : getMaps().values()) {
-            map.dispose();
-        }
+      if (cache) {
+         mapsWLock.lock();
+         try {
+            maps.put(mapid, map);
+         } finally {
+            mapsWLock.unlock();
+         }
+      }
 
-        this.event = null;
-    }
+      return map;
+   }
 
-    public static float getMapRecoveryRate(int mapid) {
-        return MapleMapFactory.getMapRecoveryRate(mapid);
-    }
+   public MapleMap getMap(int mapid) {
+      MapleMap map;
+
+      mapsRLock.lock();
+      try {
+         map = maps.get(mapid);
+      } finally {
+         mapsRLock.unlock();
+      }
+
+      return (map != null) ? map : loadMapFromWz(mapid, true);
+   }
+
+   public MapleMap getDisposableMap(int mapid) {
+      return loadMapFromWz(mapid, false);
+   }
+
+   public boolean isMapLoaded(int mapId) {
+      mapsRLock.lock();
+      try {
+         return maps.containsKey(mapId);
+      } finally {
+         mapsRLock.unlock();
+      }
+   }
+
+   public Map<Integer, MapleMap> getMaps() {
+      mapsRLock.lock();
+      try {
+         return new HashMap<>(maps);
+      } finally {
+         mapsRLock.unlock();
+      }
+   }
+
+   public void updateMaps() {
+      for (MapleMap map : getMaps().values()) {
+         map.respawn();
+         map.mobMpRecovery();
+      }
+   }
+
+   public void dispose() {
+      for (MapleMap map : getMaps().values()) {
+         map.dispose();
+      }
+
+      this.event = null;
+   }
 }

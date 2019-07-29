@@ -21,105 +21,106 @@
 */
 package net.server;
 
-import client.MapleClient;
-import client.MapleCharacter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import client.MapleCharacter;
+import client.MapleClient;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 
 public class PlayerStorage {
-    private final ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_STORAGE, true);
-    private final Map<Integer, MapleCharacter> storage = new LinkedHashMap<>();
-    private final Map<String, MapleCharacter> nameStorage = new LinkedHashMap<>();
-    private ReadLock rlock = locks.readLock();
-    private WriteLock wlock = locks.writeLock();
+   private final ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_STORAGE, true);
+   private final Map<Integer, MapleCharacter> storage = new LinkedHashMap<>();
+   private final Map<String, MapleCharacter> nameStorage = new LinkedHashMap<>();
+   private ReadLock rlock = locks.readLock();
+   private WriteLock wlock = locks.writeLock();
 
-    public void addPlayer(MapleCharacter chr) {
-        wlock.lock();
-        try {
-            storage.put(chr.getId(), chr);
-            nameStorage.put(chr.getName().toLowerCase(), chr);
-        } finally {
-	    wlock.unlock();
-	}
-    }
+   public void addPlayer(MapleCharacter chr) {
+      wlock.lock();
+      try {
+         storage.put(chr.getId(), chr);
+         nameStorage.put(chr.getName().toLowerCase(), chr);
+      } finally {
+         wlock.unlock();
+      }
+   }
 
-    public MapleCharacter removePlayer(int chr) {
-        wlock.lock();
-        try {
-            MapleCharacter mc = storage.remove(chr);
-            if(mc != null) nameStorage.remove(mc.getName().toLowerCase());
-            
-            return mc;
-        } finally {
-            wlock.unlock();
-        }
-    }
+   public MapleCharacter removePlayer(int chr) {
+      wlock.lock();
+      try {
+         MapleCharacter mc = storage.remove(chr);
+         if (mc != null) nameStorage.remove(mc.getName().toLowerCase());
 
-    public MapleCharacter getCharacterByName(String name) {
-        rlock.lock();    
-        try {
-            return nameStorage.get(name.toLowerCase());
-        } finally {
-            rlock.unlock();
-        }
-    }
+         return mc;
+      } finally {
+         wlock.unlock();
+      }
+   }
 
-    public MapleCharacter getCharacterById(int id) { 
-        rlock.lock();    
-        try {
-            return storage.get(id);
-        } finally {
-            rlock.unlock();
-        }
-    }
+   public MapleCharacter getCharacterByName(String name) {
+      rlock.lock();
+      try {
+         return nameStorage.get(name.toLowerCase());
+      } finally {
+         rlock.unlock();
+      }
+   }
 
-    public Collection<MapleCharacter> getAllCharacters() {
-        rlock.lock();
-        try {
-            return new ArrayList<>(storage.values());
-        } finally {
-            rlock.unlock();
-        }
-    }
+   public MapleCharacter getCharacterById(int id) {
+      rlock.lock();
+      try {
+         return storage.get(id);
+      } finally {
+         rlock.unlock();
+      }
+   }
 
-    public final void disconnectAll() {
-        List<MapleCharacter> chrList;
-	rlock.lock();
-	try {
-            chrList = new ArrayList<>(storage.values());
-	} finally {
-	    rlock.unlock();
-	}
-        
-        for(MapleCharacter mc : chrList) {
-            MapleClient client = mc.getClient();
-            if(client != null) {
-                client.forceDisconnect();
-            }
-        }
-        
-        wlock.lock();
-	try {
-            storage.clear();
-	} finally {
-	    wlock.unlock();
-	}
-    }
-    
-    public int getSize() {
-        rlock.lock();
-        try {
-            return storage.size();
-        } finally {
-            rlock.unlock();
-        }
-    }
+   public Collection<MapleCharacter> getAllCharacters() {
+      rlock.lock();
+      try {
+         return new ArrayList<>(storage.values());
+      } finally {
+         rlock.unlock();
+      }
+   }
+
+   public final void disconnectAll() {
+      List<MapleCharacter> chrList;
+      rlock.lock();
+      try {
+         chrList = new ArrayList<>(storage.values());
+      } finally {
+         rlock.unlock();
+      }
+
+      for (MapleCharacter mc : chrList) {
+         MapleClient client = mc.getClient();
+         if (client != null) {
+            client.forceDisconnect();
+         }
+      }
+
+      wlock.lock();
+      try {
+         storage.clear();
+      } finally {
+         wlock.unlock();
+      }
+   }
+
+   public int getSize() {
+      rlock.lock();
+      try {
+         return storage.size();
+      } finally {
+         rlock.unlock();
+      }
+   }
 }

@@ -23,11 +23,11 @@ import net.server.audit.LockCollector;
 
 /**
  * @author Ronan
- * @info   Thread responsible for expiring locks signalized for dispose.
+ * @info Thread responsible for expiring locks signalized for dispose.
  */
 public class ReleaseLockWorker implements Runnable {
-    @Override
-    public void run() {
-        LockCollector.getInstance().runLockCollector();
-    }
+   @Override
+   public void run() {
+      LockCollector.getInstance().runLockCollector();
+   }
 }

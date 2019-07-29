@@ -85,6 +85,7 @@ import tools.Pair;
 
 public final class Channel {
 
+   private final Map<Integer, Integer> storedVars = new HashMap<>();
    private int port = 7575;
    private PlayerStorage players = new PlayerStorage();
    private int world, channel;
@@ -100,7 +101,6 @@ public final class Channel {
    private EventScheduler[] eventSchedulers = new EventScheduler[ServerConstants.CHANNEL_LOCKS];
    private OverallScheduler[] channelSchedulers = new OverallScheduler[ServerConstants.CHANNEL_LOCKS];
    private Map<Integer, MapleHiredMerchant> hiredMerchants = new HashMap<>();
-   private final Map<Integer, Integer> storedVars = new HashMap<>();
    private Set<Integer> playersAway = new HashSet<>();
    private Map<MapleExpeditionType, MapleExpedition> expeditions = new HashMap<>();
    private List<MapleExpeditionType> expedType = new ArrayList<>();
@@ -184,6 +184,64 @@ public final class Channel {
       } catch (Exception e) {
          e.printStackTrace();
       }
+   }
+
+   private static String[] getEvents() {
+      List<String> events = new ArrayList<>();
+      for (File file : new File("scripts/event").listFiles()) {
+         events.add(file.getName().substring(0, file.getName().length() - 3));
+      }
+      return events.toArray(new String[0]);
+   }
+
+   private static int getDojoSlot(int dojoMapId) {
+      return (dojoMapId % 100) + ((dojoMapId / 10000 == 92502) ? 5 : 0);
+   }
+
+   private static String getTimeLeft(long futureTime) {
+      StringBuilder str = new StringBuilder();
+      long leftTime = futureTime - System.currentTimeMillis();
+
+      if (leftTime < 0) {
+         return null;
+      }
+
+      byte mode = 0;
+      if (leftTime / (60 * 1000) > 0) {
+         mode++;     //counts minutes
+
+         if (leftTime / (60 * 60 * 1000) > 0)
+            mode++;     //counts hours
+      }
+
+      switch (mode) {
+         case 2:
+            int hours = (int) ((leftTime / (1000 * 60 * 60)));
+            str.append(hours).append(" hours, ");
+
+         case 1:
+            int minutes = (int) ((leftTime / (1000 * 60)) % 60);
+            str.append(minutes).append(" minutes, ");
+
+         default:
+            int seconds = (int) (leftTime / 1000) % 60;
+            str.append(seconds).append(" seconds");
+      }
+
+      return str.toString();
+   }
+
+   public static long getRelativeWeddingTicketExpireTime(int resSlot) {
+      return (resSlot * ServerConstants.WEDDING_RESERVATION_INTERVAL * 60 * 1000);
+   }
+
+   private static int getMonsterCarnivalRoom(boolean cpq1, int field) {
+      return (cpq1 ? 0 : 100) + field;
+   }
+
+   private static int getChannelSchedulerIndex(int mapid) {
+      int section = 1000000000 / ServerConstants.CHANNEL_LOCKS;
+      return mapid / section;
    }
 
    public void reloadEventScriptManager() {
@@ -326,6 +384,12 @@ public final class Channel {
 
    public String getServerMessage() {
       return serverMessage;
+   }
+
+   public void setServerMessage(String message) {
+      this.serverMessage = message;
+      broadcastPacket(MaplePacketCreator.serverMessage(message));
+      getWorldServer().resetDisabledServerMessages();
    }
 
    public PlayerStorage getPlayerStorage() {
@@ -491,20 +555,6 @@ public final class Channel {
       return finishedShutdown;
    }
 
-   public void setServerMessage(String message) {
-      this.serverMessage = message;
-      broadcastPacket(MaplePacketCreator.serverMessage(message));
-      getWorldServer().resetDisabledServerMessages();
-   }
-
-   private static String[] getEvents() {
-      List<String> events = new ArrayList<>();
-      for (File file : new File("scripts/event").listFiles()) {
-         events.add(file.getName().substring(0, file.getName().length() - 3));
-      }
-      return events.toArray(new String[0]);
-   }
-
    public int getStoredVar(int key) {
       if (storedVars.containsKey(key)) {
          return storedVars.get(key);
@@ -576,10 +626,6 @@ public final class Channel {
             }
          }
       }
-   }
-
-   private static int getDojoSlot(int dojoMapId) {
-      return (dojoMapId % 100) + ((dojoMapId / 10000 == 92502) ? 5 : 0);
    }
 
    public void resetDojoMap(int fromMapId) {
@@ -897,45 +943,8 @@ public final class Channel {
       return true;
    }
 
-   private static String getTimeLeft(long futureTime) {
-      StringBuilder str = new StringBuilder();
-      long leftTime = futureTime - System.currentTimeMillis();
-
-      if (leftTime < 0) {
-         return null;
-      }
-
-      byte mode = 0;
-      if (leftTime / (60 * 1000) > 0) {
-         mode++;     //counts minutes
-
-         if (leftTime / (60 * 60 * 1000) > 0)
-            mode++;     //counts hours
-      }
-
-      switch (mode) {
-         case 2:
-            int hours = (int) ((leftTime / (1000 * 60 * 60)));
-            str.append(hours).append(" hours, ");
-
-         case 1:
-            int minutes = (int) ((leftTime / (1000 * 60)) % 60);
-            str.append(minutes).append(" minutes, ");
-
-         default:
-            int seconds = (int) (leftTime / 1000) % 60;
-            str.append(seconds).append(" seconds");
-      }
-
-      return str.toString();
-   }
-
    public long getWeddingTicketExpireTime(int resSlot) {
       return ongoingStartTime + getRelativeWeddingTicketExpireTime(resSlot);
-   }
-
-   public static long getRelativeWeddingTicketExpireTime(int resSlot) {
-      return (resSlot * ServerConstants.WEDDING_RESERVATION_INTERVAL * 60 * 1000);
    }
 
    public String getWeddingReservationTimeLeft(Integer weddingId) {
@@ -1004,10 +1013,6 @@ public final class Channel {
       }
    }
 
-   private static int getMonsterCarnivalRoom(boolean cpq1, int field) {
-      return (cpq1 ? 0 : 100) + field;
-   }
-
    public void initMonsterCarnival(boolean cpq1, int field) {
       usedMC.add(getMonsterCarnivalRoom(cpq1, field));
    }
@@ -1018,11 +1023,6 @@ public final class Channel {
 
    public boolean canInitMonsterCarnival(boolean cpq1, int field) {
       return !usedMC.contains(getMonsterCarnivalRoom(cpq1, field));
-   }
-
-   private static int getChannelSchedulerIndex(int mapid) {
-      int section = 1000000000 / ServerConstants.CHANNEL_LOCKS;
-      return mapid / section;
    }
 
    public void registerMobStatus(int mapid, MonsterStatusEffect mse, Runnable cancelAction, long duration) {

@@ -19,29 +19,29 @@
 */
 package net.server.worker;
 
-import net.server.world.World;
 import client.MapleCharacter;
 import constants.ServerConstants;
 import net.server.PlayerStorage;
+import net.server.world.World;
 
 /**
  * @author Ronan
  */
 public class CharacterAutosaverWorker extends BaseWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        if(!ServerConstants.USE_AUTOSAVE) return;
-        
-        PlayerStorage ps = wserv.getPlayerStorage();
-        for(MapleCharacter chr: ps.getAllCharacters()) {
-            if(chr != null && chr.isLoggedin()) {
-                chr.saveCharToDB(false);
-            }
-        }
-    }
-    
-    public CharacterAutosaverWorker(World world) {
-        super(world);
-    }
+
+   public CharacterAutosaverWorker(World world) {
+      super(world);
+   }
+
+   @Override
+   public void run() {
+      if (!ServerConstants.USE_AUTOSAVE) return;
+
+      PlayerStorage ps = wserv.getPlayerStorage();
+      for (MapleCharacter chr : ps.getAllCharacters()) {
+         if (chr != null && chr.isLoggedin()) {
+            chr.saveCharToDB(false);
+         }
+      }
+   }
 }

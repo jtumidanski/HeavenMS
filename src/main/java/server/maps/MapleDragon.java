@@ -21,45 +21,44 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package server.maps;
 
-import tools.MaplePacketCreator;
 import client.MapleCharacter;
 import client.MapleClient;
-
+import tools.MaplePacketCreator;
 
 
 public class MapleDragon extends AbstractAnimatedMapleMapObject {
 
-    private MapleCharacter owner;
+   private MapleCharacter owner;
 
-    public MapleDragon(MapleCharacter chr) {
-        super();
-        this.owner = chr;
-        this.setPosition(chr.getPosition());
-        this.setStance(chr.getStance());
-        this.sendSpawnData(chr.getClient());
-    }
+   public MapleDragon(MapleCharacter chr) {
+      super();
+      this.owner = chr;
+      this.setPosition(chr.getPosition());
+      this.setStance(chr.getStance());
+      this.sendSpawnData(chr.getClient());
+   }
 
-    @Override
-    public MapleMapObjectType getType() {
-        return MapleMapObjectType.DRAGON;
-    }
+   @Override
+   public MapleMapObjectType getType() {
+      return MapleMapObjectType.DRAGON;
+   }
 
-    @Override
-    public void sendSpawnData(MapleClient client) {
-        client.announce(MaplePacketCreator.spawnDragon(this));     
-    }
+   @Override
+   public void sendSpawnData(MapleClient client) {
+      client.announce(MaplePacketCreator.spawnDragon(this));
+   }
 
-    @Override
-    public int getObjectId() {
-        return owner.getId();
-    }
+   @Override
+   public int getObjectId() {
+      return owner.getId();
+   }
 
-    @Override
-    public void sendDestroyData(MapleClient c) {
-        c.announce(MaplePacketCreator.removeDragon(owner.getId()));
-    }
-    
-    public MapleCharacter getOwner() {
-    	return owner;
-    }
+   @Override
+   public void sendDestroyData(MapleClient c) {
+      c.announce(MaplePacketCreator.removeDragon(owner.getId()));
+   }
+
+   public MapleCharacter getOwner() {
+      return owner;
+   }
 }

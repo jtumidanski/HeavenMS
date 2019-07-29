@@ -23,23 +23,23 @@
 */
 package client.command.commands.gm0;
 
-import client.command.Command;
 import client.MapleClient;
+import client.command.Command;
 import net.server.coordinator.MapleLoginBypassCoordinator;
 
 public class EnableAuthCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        if (c.tryacquireClient()) {
-            try {
-                MapleLoginBypassCoordinator.getInstance().unregisterLoginBypassEntry(c.getNibbleHWID(), c.getAccID());
-            } finally {
-                c.releaseClient();
-            }
-        }
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      if (c.tryacquireClient()) {
+         try {
+            MapleLoginBypassCoordinator.getInstance().unregisterLoginBypassEntry(c.getNibbleHWID(), c.getAccID());
+         } finally {
+            c.releaseClient();
+         }
+      }
+   }
 }

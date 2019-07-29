@@ -21,14 +21,15 @@
 */
 package net.server.channel.handlers;
 
+import java.util.List;
+
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
-import java.util.List;
 import net.AbstractMaplePacketHandler;
 import net.server.Server;
-import client.inventory.manipulator.MapleInventoryManipulator;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.RewardItem;
 import tools.MaplePacketCreator;
@@ -41,41 +42,42 @@ import tools.data.input.SeekableLittleEndianAccessor;
  * @author kevintjuh93
  */
 public final class ItemRewardHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        byte slot = (byte) slea.readShort();
-        int itemId = slea.readInt(); // will load from xml I don't care.
-        
-        Item it = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(slot);   // null check here thanks to Thora
-        if (it == null || it.getItemId() != itemId || c.getPlayer().getInventory(MapleInventoryType.USE).countById(itemId) < 1) return;
-        
-        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-        Pair<Integer, List<RewardItem>> rewards = ii.getItemReward(itemId);
-        for (RewardItem reward : rewards.getRight()) {
-            if (!MapleInventoryManipulator.checkSpace(c, reward.itemid, reward.quantity, "")) {
-                c.announce(MaplePacketCreator.getShowInventoryFull());
-                break;
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      byte slot = (byte) slea.readShort();
+      int itemId = slea.readInt(); // will load from xml I don't care.
+
+      Item it = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(slot);   // null check here thanks to Thora
+      if (it == null || it.getItemId() != itemId || c.getPlayer().getInventory(MapleInventoryType.USE).countById(itemId) < 1)
+         return;
+
+      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+      Pair<Integer, List<RewardItem>> rewards = ii.getItemReward(itemId);
+      for (RewardItem reward : rewards.getRight()) {
+         if (!MapleInventoryManipulator.checkSpace(c, reward.itemid, reward.quantity, "")) {
+            c.announce(MaplePacketCreator.getShowInventoryFull());
+            break;
+         }
+         if (Randomizer.nextInt(rewards.getLeft()) < reward.prob) {//Is it even possible to get an item with prob 1?
+            if (ItemConstants.getInventoryType(reward.itemid) == MapleInventoryType.EQUIP) {
+               final Item item = ii.getEquipById(reward.itemid);
+               if (reward.period != -1) {
+                  item.setExpiration(currentServerTime() + (reward.period * 60 * 60 * 10));
+               }
+               MapleInventoryManipulator.addFromDrop(c, item, false);
+            } else {
+               MapleInventoryManipulator.addById(c, reward.itemid, reward.quantity, "", -1);
             }
-            if (Randomizer.nextInt(rewards.getLeft()) < reward.prob) {//Is it even possible to get an item with prob 1?
-            	if (ItemConstants.getInventoryType(reward.itemid) == MapleInventoryType.EQUIP) {
-                    final Item item = ii.getEquipById(reward.itemid);
-                    if (reward.period != -1) {
-                    	item.setExpiration(currentServerTime() + (reward.period * 60 * 60 * 10));
-                    }
-                    MapleInventoryManipulator.addFromDrop(c, item, false);
-                } else {
-                    MapleInventoryManipulator.addById(c, reward.itemid, reward.quantity, "", -1);
-                }
-                MapleInventoryManipulator.removeById(c, MapleInventoryType.USE, itemId, 1, false, false);
-                if (reward.worldmsg != null) {
-                    String msg = reward.worldmsg;
-                    msg.replaceAll("/name", c.getPlayer().getName());
-                    msg.replaceAll("/item", ii.getName(reward.itemid));
-                    Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, msg));
-                }
-                break;
+            MapleInventoryManipulator.removeById(c, MapleInventoryType.USE, itemId, 1, false, false);
+            if (reward.worldmsg != null) {
+               String msg = reward.worldmsg;
+               msg.replaceAll("/name", c.getPlayer().getName());
+               msg.replaceAll("/item", ii.getName(reward.itemid));
+               Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, msg));
             }
-        }
-        c.announce(MaplePacketCreator.enableActions());
-    }
+            break;
+         }
+      }
+      c.announce(MaplePacketCreator.enableActions());
+   }
 }

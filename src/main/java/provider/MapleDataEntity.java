@@ -22,10 +22,10 @@
 package provider;
 
 /**
- *
  * @author Matze
  */
 public interface MapleDataEntity {
-    String getName();
-    MapleDataEntity getParent();
+   String getName();
+
+   MapleDataEntity getParent();
 }

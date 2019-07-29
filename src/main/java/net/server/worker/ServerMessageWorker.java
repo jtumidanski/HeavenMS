@@ -25,16 +25,16 @@ import net.server.world.World;
  * @author Ronan
  */
 public class ServerMessageWorker extends BaseWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        // It's purpose is for tracking whether the player client currently displays a boss HPBar and, if so,
-        // temporarily disable the server message for that player.
-        
-        wserv.runDisabledServerMessagesSchedule();
-    }
-    
-    public ServerMessageWorker(World world) {
-        super(world);
-    }
+
+   public ServerMessageWorker(World world) {
+      super(world);
+   }
+
+   @Override
+   public void run() {
+      // It's purpose is for tracking whether the player client currently displays a boss HPBar and, if so,
+      // temporarily disable the server message for that player.
+
+      wserv.runDisabledServerMessagesSchedule();
+   }
 }

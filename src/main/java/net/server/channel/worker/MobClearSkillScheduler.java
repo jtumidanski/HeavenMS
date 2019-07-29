@@ -22,15 +22,14 @@ package net.server.channel.worker;
 import net.server.audit.locks.MonitoredLockType;
 
 /**
- *
  * @author Ronan
  */
 public class MobClearSkillScheduler extends BaseScheduler {
-    public MobClearSkillScheduler() {
-        super(MonitoredLockType.CHANNEL_MOBSKILL);
-    }
-    
-    public void registerClearSkillAction(Runnable runAction, long delay) {
-        registerEntry(runAction, runAction, delay);
-    }
+   public MobClearSkillScheduler() {
+      super(MonitoredLockType.CHANNEL_MOBSKILL);
+   }
+
+   public void registerClearSkillAction(Runnable runAction, long delay) {
+      registerEntry(runAction, runAction, delay);
+   }
 }

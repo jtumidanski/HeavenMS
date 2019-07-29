@@ -23,9 +23,13 @@
 */
 package client.command.commands.gm5;
 
-import client.command.Command;
-import client.MapleClient;
+import java.awt.Rectangle;
+import java.util.Collections;
+import java.util.List;
+
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import net.server.Server;
 import server.MaplePortal;
 import server.TimerManager;
@@ -35,132 +39,127 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.maps.MapleReactor;
 
-import java.awt.*;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 public class DebugCommand extends Command {
    private final static String[] debugTypes = {"monster", "packet", "portal", "spawnpoint", "pos", "map", "mobsp", "event", "areas", "reactors", "servercoupons", "playercoupons", "timer", "marriage", "buff", ""};
-    
-    {
-        setDescription("");
-    }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
+   {
+      setDescription("");
+   }
 
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !debug <type>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
 
-        switch (params[0]) {
-            case "type":
-            case "help":
-                StringBuilder msgTypes = new StringBuilder("Available #bdebug types#k:\r\n\r\n");
-                for(int i = 0; i < debugTypes.length; i++) {
-                    msgTypes.append("#L").append(i).append("#").append(debugTypes[i]).append("#l\r\n");
-                }
-                
-                c.getAbstractPlayerInteraction().npcTalk(9201143, msgTypes.toString());
-                break;
-            
-            case "monster":
-                List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
-                for (MapleMapObject monstermo : monsters) {
-                    MapleMonster monster = (MapleMonster) monstermo;
-                    MapleCharacter controller = monster.getController();
-                    player.message("Monster ID: " + monster.getId() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
-                }
-                break;
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !debug <type>");
+         return;
+      }
 
-            case "packet":
-                //player.getMap().broadcastMessage(MaplePacketCreator.customPacket(joinStringFrom(params, 1)));
-                break;
+      switch (params[0]) {
+         case "type":
+         case "help":
+            StringBuilder msgTypes = new StringBuilder("Available #bdebug types#k:\r\n\r\n");
+            for (int i = 0; i < debugTypes.length; i++) {
+               msgTypes.append("#L").append(i).append("#").append(debugTypes[i]).append("#l\r\n");
+            }
 
-            case "portal":
-                MaplePortal portal = player.getMap().findClosestPortal(player.getPosition());
-                if (portal != null)
-                    player.dropMessage(6, "Closest portal: " + portal.getId() + " '" + portal.getName() + "' Type: " + portal.getType() + " --> toMap: " + portal.getTargetMapId() + " scriptname: '" + portal.getScriptName() + "' state: " + (portal.getPortalState() ? 1 : 0) + ".");
-                else player.dropMessage(6, "There is no portal on this map.");
-                break;
+            c.getAbstractPlayerInteraction().npcTalk(9201143, msgTypes.toString());
+            break;
 
-            case "spawnpoint":
-                SpawnPoint sp = player.getMap().findClosestSpawnpoint(player.getPosition());
-                if (sp != null)
-                    player.dropMessage(6, "Closest mob spawn point: " + " Position: x " + sp.getPosition().getX() + " y " + sp.getPosition().getY() + " Spawns mobid: '" + sp.getMonsterId() + "' --> canSpawn: " + !sp.getDenySpawn() + " canSpawnRightNow: " + sp.shouldSpawn() + ".");
-                else player.dropMessage(6, "There is no mob spawn point on this map.");
-                break;
+         case "monster":
+            List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+            for (MapleMapObject monstermo : monsters) {
+               MapleMonster monster = (MapleMonster) monstermo;
+               MapleCharacter controller = monster.getController();
+               player.message("Monster ID: " + monster.getId() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
+            }
+            break;
 
-            case "pos":
-                player.dropMessage(6, "Current map position: (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ").");
-                break;
+         case "packet":
+            //player.getMap().broadcastMessage(MaplePacketCreator.customPacket(joinStringFrom(params, 1)));
+            break;
 
-            case "map":
-                player.dropMessage(6, "Current map id " + player.getMap().getId() + ", event: '" + ((player.getMap().getEventInstance() != null) ? player.getMap().getEventInstance().getName() : "null") + "'; Players: " + player.getMap().getAllPlayers().size() + ", Mobs: " + player.getMap().countMonsters() + ", Reactors: " + player.getMap().countReactors() + ", Items: " + player.getMap().countItems() + ", Objects: " + player.getMap().getMapObjects().size() + ".");
-                break;
+         case "portal":
+            MaplePortal portal = player.getMap().findClosestPortal(player.getPosition());
+            if (portal != null)
+               player.dropMessage(6, "Closest portal: " + portal.getId() + " '" + portal.getName() + "' Type: " + portal.getType() + " --> toMap: " + portal.getTargetMapId() + " scriptname: '" + portal.getScriptName() + "' state: " + (portal.getPortalState() ? 1 : 0) + ".");
+            else player.dropMessage(6, "There is no portal on this map.");
+            break;
 
-            case "mobsp":
-                player.getMap().reportMonsterSpawnPoints(player);
-                break;
+         case "spawnpoint":
+            SpawnPoint sp = player.getMap().findClosestSpawnpoint(player.getPosition());
+            if (sp != null)
+               player.dropMessage(6, "Closest mob spawn point: " + " Position: x " + sp.getPosition().getX() + " y " + sp.getPosition().getY() + " Spawns mobid: '" + sp.getMonsterId() + "' --> canSpawn: " + !sp.getDenySpawn() + " canSpawnRightNow: " + sp.shouldSpawn() + ".");
+            else player.dropMessage(6, "There is no mob spawn point on this map.");
+            break;
 
-            case "event":
-                if (player.getEventInstance() == null) player.dropMessage(6, "Player currently not in an event.");
-                else player.dropMessage(6, "Current event name: " + player.getEventInstance().getName() + ".");
-                break;
+         case "pos":
+            player.dropMessage(6, "Current map position: (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ").");
+            break;
 
-            case "areas":
-                player.dropMessage(6, "Configured areas on map " + player.getMapId() + ":");
+         case "map":
+            player.dropMessage(6, "Current map id " + player.getMap().getId() + ", event: '" + ((player.getMap().getEventInstance() != null) ? player.getMap().getEventInstance().getName() : "null") + "'; Players: " + player.getMap().getAllPlayers().size() + ", Mobs: " + player.getMap().countMonsters() + ", Reactors: " + player.getMap().countReactors() + ", Items: " + player.getMap().countItems() + ", Objects: " + player.getMap().getMapObjects().size() + ".");
+            break;
 
-                byte index = 0;
-                for (Rectangle rect : player.getMap().getAreas()) {
-                    player.dropMessage(6, "Id: " + index + " -> posX: " + rect.getX() + " posY: '" + rect.getY() + "' dX: " + rect.getWidth() + " dY: " + rect.getHeight() + ".");
-                    index++;
-                }
-                break;
+         case "mobsp":
+            player.getMap().reportMonsterSpawnPoints(player);
+            break;
 
-            case "reactors":
-                player.dropMessage(6, "Current reactor states on map " + player.getMapId() + ":");
+         case "event":
+            if (player.getEventInstance() == null) player.dropMessage(6, "Player currently not in an event.");
+            else player.dropMessage(6, "Current event name: " + player.getEventInstance().getName() + ".");
+            break;
 
-                for (MapleMapObject mmo : player.getMap().getReactors()) {
-                    MapleReactor mr = (MapleReactor) mmo;
-                    player.dropMessage(6, "Id: " + mr.getId() + " Oid: " + mr.getObjectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.getPosition().getX() + " y " + mr.getPosition().getY() + ".");
-                }
-                break;
+         case "areas":
+            player.dropMessage(6, "Configured areas on map " + player.getMapId() + ":");
 
-            case "servercoupons":
-            case "coupons":
-                StringBuilder s = new StringBuilder("Currently active SERVER coupons: ");
-                for (Integer i : Server.getInstance().getActiveCoupons()) {
-                    s.append(i).append(" ");
-                }
+            byte index = 0;
+            for (Rectangle rect : player.getMap().getAreas()) {
+               player.dropMessage(6, "Id: " + index + " -> posX: " + rect.getX() + " posY: '" + rect.getY() + "' dX: " + rect.getWidth() + " dY: " + rect.getHeight() + ".");
+               index++;
+            }
+            break;
 
-                player.dropMessage(6, s.toString());
-                break;
+         case "reactors":
+            player.dropMessage(6, "Current reactor states on map " + player.getMapId() + ":");
 
-            case "playercoupons":
-                StringBuilder st = new StringBuilder("Currently active PLAYER coupons: ");
-                for (Integer i : player.getActiveCoupons()) {
-                    st.append(i).append(" ");
-                }
+            for (MapleMapObject mmo : player.getMap().getReactors()) {
+               MapleReactor mr = (MapleReactor) mmo;
+               player.dropMessage(6, "Id: " + mr.getId() + " Oid: " + mr.getObjectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.getPosition().getX() + " y " + mr.getPosition().getY() + ".");
+            }
+            break;
 
-                player.dropMessage(6, st.toString());
-                break;
+         case "servercoupons":
+         case "coupons":
+            StringBuilder s = new StringBuilder("Currently active SERVER coupons: ");
+            for (Integer i : Server.getInstance().getActiveCoupons()) {
+               s.append(i).append(" ");
+            }
 
-            case "timer":
-                TimerManager tMan = TimerManager.getInstance();
-                player.dropMessage(6, "Total Task: " + tMan.getTaskCount() + " Current Task: " + tMan.getQueuedTasks() + " Active Task: " + tMan.getActiveCount() + " Completed Task: " + tMan.getCompletedTaskCount());
-                break;
+            player.dropMessage(6, s.toString());
+            break;
 
-            case "marriage":
-                c.getChannelServer().debugMarriageStatus();
-                break;
-            
-            case "buff":
-                c.getPlayer().debugListAllBuffs();
-                break;
-        }
-    }
+         case "playercoupons":
+            StringBuilder st = new StringBuilder("Currently active PLAYER coupons: ");
+            for (Integer i : player.getActiveCoupons()) {
+               st.append(i).append(" ");
+            }
+
+            player.dropMessage(6, st.toString());
+            break;
+
+         case "timer":
+            TimerManager tMan = TimerManager.getInstance();
+            player.dropMessage(6, "Total Task: " + tMan.getTaskCount() + " Current Task: " + tMan.getQueuedTasks() + " Active Task: " + tMan.getActiveCount() + " Completed Task: " + tMan.getCompletedTaskCount());
+            break;
+
+         case "marriage":
+            c.getChannelServer().debugMarriageStatus();
+            break;
+
+         case "buff":
+            c.getPlayer().debugListAllBuffs();
+            break;
+      }
+   }
 }

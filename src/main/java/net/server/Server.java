@@ -106,7 +106,41 @@ import tools.Pair;
 
 public class Server {
 
+   private static final Set<Integer> activeFly = new HashSet<>();
+   private static final Map<Integer, Integer> couponRates = new HashMap<>(30);
+   private static final List<Integer> activeCoupons = new LinkedList<>();
+   public static long uptime = System.currentTimeMillis();
    private static Server instance = null;
+   private final Properties subnetInfo = new Properties();
+   private final Map<Integer, Set<Integer>> accountChars = new HashMap<>();
+   private final Map<Integer, Short> accountCharacterCount = new HashMap<>();
+   private final Map<Integer, Integer> worldChars = new HashMap<>();
+   private final Map<String, Integer> transitioningChars = new HashMap<>();
+   private final Map<Integer, MapleGuild> guilds = new HashMap<>(100);
+   private final Map<MapleClient, Long> inLoginState = new HashMap<>(100);
+   private final PlayerBuffStorage buffStorage = new PlayerBuffStorage();
+   private final Map<Integer, MapleAlliance> alliances = new HashMap<>(100);
+   private final Map<Integer, NewYearCardRecord> newyears = new HashMap<>();
+   private final List<MapleClient> processDiseaseAnnouncePlayers = new LinkedList<>();
+   private final List<MapleClient> registeredDiseaseAnnouncePlayers = new LinkedList<>();
+   private final List<List<Pair<String, Integer>>> playerRanking = new LinkedList<>();
+   private final Lock srvLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER);
+   private final Lock disLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_DISEASES);
+   private final ReentrantReadWriteLock wldLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_WORLDS, true);
+   private final ReadLock wldRLock = wldLock.readLock();
+   private final WriteLock wldWLock = wldLock.writeLock();
+   private final ReentrantReadWriteLock lgnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_LOGIN, true);
+   private final ReadLock lgnRLock = lgnLock.readLock();
+   private final WriteLock lgnWLock = lgnLock.writeLock();
+   private final AtomicLong currentTime = new AtomicLong(0);
+   private IoAcceptor acceptor;
+   private List<Map<Integer, String>> channels = new LinkedList<>();
+   private List<World> worlds = new ArrayList<>();
+   private List<Pair<Integer, String>> worldRecommendedList = new LinkedList<>();
+   private long serverCurrentTime = 0;
+
+   private boolean availableDeveloperRoom = false;
+   private boolean online = false;
 
    public static Server getInstance() {
       if (instance == null) {
@@ -115,47 +149,202 @@ public class Server {
       return instance;
    }
 
-   private static final Set<Integer> activeFly = new HashSet<>();
-   private static final Map<Integer, Integer> couponRates = new HashMap<>(30);
-   private static final List<Integer> activeCoupons = new LinkedList<>();
+   private static int getWorldProperty(Properties p, String property, int wid, int defaultValue) {
+      String content = p.getProperty(property + wid);
+      return content != null ? Integer.parseInt(content) : defaultValue;
+   }
 
-   private IoAcceptor acceptor;
-   private List<Map<Integer, String>> channels = new LinkedList<>();
-   private List<World> worlds = new ArrayList<>();
-   private final Properties subnetInfo = new Properties();
-   private final Map<Integer, Set<Integer>> accountChars = new HashMap<>();
-   private final Map<Integer, Short> accountCharacterCount = new HashMap<>();
-   private final Map<Integer, Integer> worldChars = new HashMap<>();
-   private final Map<String, Integer> transitioningChars = new HashMap<>();
-   private List<Pair<Integer, String>> worldRecommendedList = new LinkedList<>();
-   private final Map<Integer, MapleGuild> guilds = new HashMap<>(100);
-   private final Map<MapleClient, Long> inLoginState = new HashMap<>(100);
+   public static Properties loadWorldINI() {
+      Properties p = new Properties();
+      try {
+         p.load(new FileInputStream("world.ini"));
+         return p;
+      } catch (Exception e) {
+         e.printStackTrace();
+         System.out.println("[SEVERE] Could not find/open 'world.ini'.");
+         return null;
+      }
+   }
 
-   private final PlayerBuffStorage buffStorage = new PlayerBuffStorage();
-   private final Map<Integer, MapleAlliance> alliances = new HashMap<>(100);
-   private final Map<Integer, NewYearCardRecord> newyears = new HashMap<>();
-   private final List<MapleClient> processDiseaseAnnouncePlayers = new LinkedList<>();
-   private final List<MapleClient> registeredDiseaseAnnouncePlayers = new LinkedList<>();
+   private static long getTimeLeftForNextHour() {
+      Calendar nextHour = Calendar.getInstance();
+      nextHour.add(Calendar.HOUR, 1);
+      nextHour.set(Calendar.MINUTE, 0);
+      nextHour.set(Calendar.SECOND, 0);
 
-   private final List<List<Pair<String, Integer>>> playerRanking = new LinkedList<>();
+      return Math.max(0, nextHour.getTimeInMillis() - System.currentTimeMillis());
+   }
 
-   private final Lock srvLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER);
-   private final Lock disLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_DISEASES);
+   private static long getTimeLeftForNextDay() {
+      Calendar nextDay = Calendar.getInstance();
+      nextDay.add(Calendar.DAY_OF_MONTH, 1);
+      nextDay.set(Calendar.HOUR, 0);
+      nextDay.set(Calendar.MINUTE, 0);
+      nextDay.set(Calendar.SECOND, 0);
 
-   private final ReentrantReadWriteLock wldLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_WORLDS, true);
-   private final ReadLock wldRLock = wldLock.readLock();
-   private final WriteLock wldWLock = wldLock.writeLock();
+      return Math.max(0, nextDay.getTimeInMillis() - System.currentTimeMillis());
+   }
 
-   private final ReentrantReadWriteLock lgnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_LOGIN, true);
-   private final ReadLock lgnRLock = lgnLock.readLock();
-   private final WriteLock lgnWLock = lgnLock.writeLock();
+   public static void cleanNxcodeCoupons(Connection con) throws SQLException {
+      if (!ServerConstants.USE_CLEAR_OUTDATED_COUPONS) return;
 
-   private final AtomicLong currentTime = new AtomicLong(0);
-   private long serverCurrentTime = 0;
+      long timeClear = System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000;
 
-   private boolean availableDeveloperRoom = false;
-   private boolean online = false;
-   public static long uptime = System.currentTimeMillis();
+      PreparedStatement ps = con.prepareStatement("SELECT * FROM nxcode WHERE expiration <= ?");
+      ps.setLong(1, timeClear);
+      ResultSet rs = ps.executeQuery();
+
+      if (!rs.isLast()) {
+         PreparedStatement ps2 = con.prepareStatement("DELETE FROM nxcode_items WHERE codeid = ?");
+         while (rs.next()) {
+            ps2.setInt(1, rs.getInt("id"));
+            ps2.addBatch();
+         }
+         ps2.executeBatch();
+         ps2.close();
+
+         ps2 = con.prepareStatement("DELETE FROM nxcode WHERE expiration <= ?");
+         ps2.setLong(1, timeClear);
+         ps2.executeUpdate();
+         ps2.close();
+      }
+
+      rs.close();
+      ps.close();
+   }
+
+   private static List<Pair<Integer, List<Pair<String, Integer>>>> updatePlayerRankingFromDB(int worldid) {
+      List<Pair<Integer, List<Pair<String, Integer>>>> rankSystem = new ArrayList<>();
+      List<Pair<String, Integer>> rankUpdate = new ArrayList<>(0);
+
+      PreparedStatement ps = null;
+      ResultSet rs = null;
+      Connection con = null;
+      try {
+         con = DatabaseConnection.getConnection();
+
+         String worldQuery;
+         if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
+            if (worldid >= 0) {
+               worldQuery = (" AND `characters`.`world` = " + worldid);
+            } else {
+               worldQuery = (" AND `characters`.`world` >= 0 AND `characters`.`world` <= " + -worldid);
+            }
+         } else {
+            worldQuery = (" AND `characters`.`world` >= 0 AND `characters`.`world` <= " + Math.abs(worldid));
+         }
+
+         ps = con.prepareStatement("SELECT `characters`.`name`, `characters`.`level`, `characters`.`world` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` < 2 AND `accounts`.`banned` = '0'" + worldQuery + " ORDER BY " + (!ServerConstants.USE_WHOLE_SERVER_RANKING ? "world, " : "") + "level DESC, exp DESC, lastExpGainTime ASC LIMIT 50");
+         rs = ps.executeQuery();
+
+         if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
+            int currentWorld = -1;
+            while (rs.next()) {
+               int rsWorld = rs.getInt("world");
+               if (currentWorld < rsWorld) {
+                  currentWorld = rsWorld;
+                  rankUpdate = new ArrayList<>(50);
+                  rankSystem.add(new Pair<>(rsWorld, rankUpdate));
+               }
+
+               rankUpdate.add(new Pair<>(rs.getString("name"), rs.getInt("level")));
+            }
+         } else {
+            rankUpdate = new ArrayList<>(50);
+            rankSystem.add(new Pair<>(0, rankUpdate));
+
+            while (rs.next()) {
+               rankUpdate.add(new Pair<>(rs.getString("name"), rs.getInt("level")));
+            }
+         }
+
+         ps.close();
+         rs.close();
+         con.close();
+      } catch (SQLException ex) {
+         ex.printStackTrace();
+      } finally {
+         try {
+            if (ps != null && !ps.isClosed()) {
+               ps.close();
+            }
+            if (rs != null && !rs.isClosed()) {
+               rs.close();
+            }
+            if (con != null && !con.isClosed()) {
+               con.close();
+            }
+         } catch (SQLException e) {
+            e.printStackTrace();
+         }
+      }
+
+      return rankSystem;
+   }
+
+   public static void main(String[] args) {
+      System.setProperty("wzpath", "wz");
+      Security.setProperty("crypto.policy", "unlimited");
+      AutoJCE.removeCryptographyRestrictions();
+      Server.getInstance().init();
+   }
+
+   private static Pair<Short, List<List<MapleCharacter>>> loadAccountCharactersViewFromDb(int accId, int wlen) {
+      short characterCount = 0;
+      List<List<MapleCharacter>> wchars = new ArrayList<>(wlen);
+      for (int i = 0; i < wlen; i++) wchars.add(i, new LinkedList<>());
+
+      List<MapleCharacter> chars = new LinkedList<>();
+      int curWorld = 0;
+      try {
+         List<Pair<Item, Integer>> accEquips = ItemFactory.loadEquippedItems(accId, true, true);
+         Map<Integer, List<Item>> accPlayerEquips = new HashMap<>();
+
+         for (Pair<Item, Integer> ae : accEquips) {
+            List<Item> playerEquips = accPlayerEquips.get(ae.getRight());
+            if (playerEquips == null) {
+               playerEquips = new LinkedList<>();
+               accPlayerEquips.put(ae.getRight(), playerEquips);
+            }
+
+            playerEquips.add(ae.getLeft());
+         }
+
+         Connection con = DatabaseConnection.getConnection();
+         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM characters WHERE accountid = ? ORDER BY world, id")) {
+            ps.setInt(1, accId);
+            try (ResultSet rs = ps.executeQuery()) {
+               while (rs.next()) {
+                  characterCount++;
+
+                  int cworld = rs.getByte("world");
+                  if (cworld >= wlen) continue;
+
+                  if (cworld > curWorld) {
+                     wchars.add(curWorld, chars);
+
+                     curWorld = cworld;
+                     chars = new LinkedList<>();
+                  }
+
+                  Integer cid = rs.getInt("id");
+                  chars.add(MapleCharacter.loadCharacterEntryFromDB(rs, accPlayerEquips.get(cid)));
+               }
+            }
+         }
+         con.close();
+
+         wchars.add(curWorld, chars);
+      } catch (SQLException sqle) {
+         sqle.printStackTrace();
+      }
+
+      return new Pair<>(characterCount, wchars);
+   }
+
+   private static String getRemoteIp(IoSession session) {
+      return MapleSessionCoordinator.getSessionRemoteAddress(session);
+   }
 
    public int getCurrentTimestamp() {
       return (int) (Server.getInstance().getCurrentTime() - Server.uptime);
@@ -313,7 +502,6 @@ public class Server {
       }
    }
 
-
    private void dumpData() {
       wldWLock.lock();
       try {
@@ -380,11 +568,6 @@ public class Server {
       }
 
       return newWorld;
-   }
-
-   private static int getWorldProperty(Properties p, String property, int wid, int defaultValue) {
-      String content = p.getProperty(property + wid);
-      return content != null ? Integer.parseInt(content) : defaultValue;
    }
 
    private int initWorld(Properties p) {
@@ -504,67 +687,8 @@ public class Server {
       }
    }
 
-   public static Properties loadWorldINI() {
-      Properties p = new Properties();
-      try {
-         p.load(new FileInputStream("world.ini"));
-         return p;
-      } catch (Exception e) {
-         e.printStackTrace();
-         System.out.println("[SEVERE] Could not find/open 'world.ini'.");
-         return null;
-      }
-   }
-
-   private static long getTimeLeftForNextHour() {
-      Calendar nextHour = Calendar.getInstance();
-      nextHour.add(Calendar.HOUR, 1);
-      nextHour.set(Calendar.MINUTE, 0);
-      nextHour.set(Calendar.SECOND, 0);
-
-      return Math.max(0, nextHour.getTimeInMillis() - System.currentTimeMillis());
-   }
-
-   private static long getTimeLeftForNextDay() {
-      Calendar nextDay = Calendar.getInstance();
-      nextDay.add(Calendar.DAY_OF_MONTH, 1);
-      nextDay.set(Calendar.HOUR, 0);
-      nextDay.set(Calendar.MINUTE, 0);
-      nextDay.set(Calendar.SECOND, 0);
-
-      return Math.max(0, nextDay.getTimeInMillis() - System.currentTimeMillis());
-   }
-
    public Map<Integer, Integer> getCouponRates() {
       return couponRates;
-   }
-
-   public static void cleanNxcodeCoupons(Connection con) throws SQLException {
-      if (!ServerConstants.USE_CLEAR_OUTDATED_COUPONS) return;
-
-      long timeClear = System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000;
-
-      PreparedStatement ps = con.prepareStatement("SELECT * FROM nxcode WHERE expiration <= ?");
-      ps.setLong(1, timeClear);
-      ResultSet rs = ps.executeQuery();
-
-      if (!rs.isLast()) {
-         PreparedStatement ps2 = con.prepareStatement("DELETE FROM nxcode_items WHERE codeid = ?");
-         while (rs.next()) {
-            ps2.setInt(1, rs.getInt("id"));
-            ps2.addBatch();
-         }
-         ps2.executeBatch();
-         ps2.close();
-
-         ps2 = con.prepareStatement("DELETE FROM nxcode WHERE expiration <= ?");
-         ps2.setLong(1, timeClear);
-         ps2.executeUpdate();
-         ps2.close();
-      }
-
-      rs.close();
-      ps.close();
    }
 
    private void loadCouponRates(Connection c) throws SQLException {
@@ -775,75 +899,6 @@ public class Server {
       updateWorldPlayerRanking();
    }
 
-   private static List<Pair<Integer, List<Pair<String, Integer>>>> updatePlayerRankingFromDB(int worldid) {
-      List<Pair<Integer, List<Pair<String, Integer>>>> rankSystem = new ArrayList<>();
-      List<Pair<String, Integer>> rankUpdate = new ArrayList<>(0);
-
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-
-         String worldQuery;
-         if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
-            if (worldid >= 0) {
-               worldQuery = (" AND `characters`.`world` = " + worldid);
-            } else {
-               worldQuery = (" AND `characters`.`world` >= 0 AND `characters`.`world` <= " + -worldid);
-            }
-         } else {
-            worldQuery = (" AND `characters`.`world` >= 0 AND `characters`.`world` <= " + Math.abs(worldid));
-         }
-
-         ps = con.prepareStatement("SELECT `characters`.`name`, `characters`.`level`, `characters`.`world` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` < 2 AND `accounts`.`banned` = '0'" + worldQuery + " ORDER BY " + (!ServerConstants.USE_WHOLE_SERVER_RANKING ? "world, " : "") + "level DESC, exp DESC, lastExpGainTime ASC LIMIT 50");
-         rs = ps.executeQuery();
-
-         if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
-            int currentWorld = -1;
-            while (rs.next()) {
-               int rsWorld = rs.getInt("world");
-               if (currentWorld < rsWorld) {
-                  currentWorld = rsWorld;
-                  rankUpdate = new ArrayList<>(50);
-                  rankSystem.add(new Pair<>(rsWorld, rankUpdate));
-               }
-
-               rankUpdate.add(new Pair<>(rs.getString("name"), rs.getInt("level")));
-            }
-         } else {
-            rankUpdate = new ArrayList<>(50);
-            rankSystem.add(new Pair<>(0, rankUpdate));
-
-            while (rs.next()) {
-               rankUpdate.add(new Pair<>(rs.getString("name"), rs.getInt("level")));
-            }
-         }
-
-         ps.close();
-         rs.close();
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (rs != null && !rs.isClosed()) {
-               rs.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
-      }
-
-      return rankSystem;
-   }
-
    public void init() {
       Properties p = loadWorldINI();
       if (p == null) {
@@ -956,13 +1011,6 @@ public class Server {
       MapleSkillbookInformationProvider.getInstance();
       OpcodeConstants.generateOpcodeNames();
       CommandsExecutor.getInstance();
-   }
-
-   public static void main(String[] args) {
-      System.setProperty("wzpath", "wz");
-      Security.setProperty("crypto.policy", "unlimited");
-      AutoJCE.removeCryptographyRestrictions();
-      Server.getInstance().init();
    }
 
    public Properties getSubnetInfo() {
@@ -1384,6 +1432,18 @@ public class Server {
          lgnWLock.unlock();
       }
    }
+    
+    /*
+    public void deleteAccountEntry(Integer accountid) { is this even a thing?
+        lgnWLock.lock();
+        try {
+            accountCharacterCount.remove(accountid);
+            accountChars.remove(accountid);
+        } finally {
+            lgnWLock.unlock();
+        }
+    }
+    */
 
    public void deleteCharacterEntry(Integer accountid, Integer chrid) {
       lgnWLock.lock();
@@ -1422,18 +1482,6 @@ public class Server {
          lgnWLock.unlock();
       }
    }
-    
-    /*
-    public void deleteAccountEntry(Integer accountid) { is this even a thing?
-        lgnWLock.lock();
-        try {
-            accountCharacterCount.remove(accountid);
-            accountChars.remove(accountid);
-        } finally {
-            lgnWLock.unlock();
-        }
-    }
-    */
 
    public Pair<Pair<Integer, List<MapleCharacter>>, List<Pair<Integer, List<MapleCharacter>>>> loadAccountCharlist(Integer accountId, int visibleWorlds) {
       List<World> wlist = this.getWorlds();
@@ -1464,59 +1512,6 @@ public class Server {
       }
 
       return new Pair<>(new Pair<>(chrTotal, lastwchars), accChars);
-   }
-
-   private static Pair<Short, List<List<MapleCharacter>>> loadAccountCharactersViewFromDb(int accId, int wlen) {
-      short characterCount = 0;
-      List<List<MapleCharacter>> wchars = new ArrayList<>(wlen);
-      for (int i = 0; i < wlen; i++) wchars.add(i, new LinkedList<>());
-
-      List<MapleCharacter> chars = new LinkedList<>();
-      int curWorld = 0;
-      try {
-         List<Pair<Item, Integer>> accEquips = ItemFactory.loadEquippedItems(accId, true, true);
-         Map<Integer, List<Item>> accPlayerEquips = new HashMap<>();
-
-         for (Pair<Item, Integer> ae : accEquips) {
-            List<Item> playerEquips = accPlayerEquips.get(ae.getRight());
-            if (playerEquips == null) {
-               playerEquips = new LinkedList<>();
-               accPlayerEquips.put(ae.getRight(), playerEquips);
-            }
-
-            playerEquips.add(ae.getLeft());
-         }
-
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM characters WHERE accountid = ? ORDER BY world, id")) {
-            ps.setInt(1, accId);
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  characterCount++;
-
-                  int cworld = rs.getByte("world");
-                  if (cworld >= wlen) continue;
-
-                  if (cworld > curWorld) {
-                     wchars.add(curWorld, chars);
-
-                     curWorld = cworld;
-                     chars = new LinkedList<>();
-                  }
-
-                  Integer cid = rs.getInt("id");
-                  chars.add(MapleCharacter.loadCharacterEntryFromDB(rs, accPlayerEquips.get(cid)));
-               }
-            }
-         }
-         con.close();
-
-         wchars.add(curWorld, chars);
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
-
-      return new Pair<>(characterCount, wchars);
    }
 
    public void loadAllAccountsCharactersView() {
@@ -1616,10 +1611,6 @@ public class Server {
       }
 
       return gmLevel;
-   }
-
-   private static String getRemoteIp(IoSession session) {
-      return MapleSessionCoordinator.getSessionRemoteAddress(session);
    }
 
    public void setCharacteridInTransition(IoSession session, int charId) {

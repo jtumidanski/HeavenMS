@@ -40,9 +40,9 @@ import tools.Pair;
  * @author Ronan
  */
 public abstract class BaseScheduler {
+   private final List<MonitoredReentrantLock> externalLocks = new LinkedList<>();
    private int idleProcs = 0;
    private List<SchedulerListener> listeners = new LinkedList<>();
-   private final List<MonitoredReentrantLock> externalLocks = new LinkedList<>();
    private Map<Object, Pair<Runnable, Long>> registeredEntries = new HashMap<>();
 
    private ScheduledFuture<?> schedulerTask = null;

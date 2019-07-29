@@ -21,33 +21,32 @@
 */
 package net.server.channel.handlers;
 
-import constants.ServerConstants;
 import client.MapleCharacter;
 import client.MapleClient;
+import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author Jay Estrella
  */
 public final class FamilyAddHandler extends AbstractMaplePacketHandler {
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-    	if (!ServerConstants.USE_FAMILY_SYSTEM){
-    		return;
-    	}
-        System.out.println(slea.toString());
-        String toAdd = slea.readMapleAsciiString();
-        MapleCharacter addChr = c.getChannelServer().getPlayerStorage().getCharacterByName(toAdd);
-        if (addChr != null) {
-            addChr.getClient().announce(MaplePacketCreator.sendFamilyInvite(c.getPlayer().getId(), toAdd));
-            c.getPlayer().dropMessage("The invite has been sent.");
-        } else {
-            c.getPlayer().dropMessage("The player cannot be found!");
-        }
-        c.announce(MaplePacketCreator.enableActions());
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      if (!ServerConstants.USE_FAMILY_SYSTEM) {
+         return;
+      }
+      System.out.println(slea.toString());
+      String toAdd = slea.readMapleAsciiString();
+      MapleCharacter addChr = c.getChannelServer().getPlayerStorage().getCharacterByName(toAdd);
+      if (addChr != null) {
+         addChr.getClient().announce(MaplePacketCreator.sendFamilyInvite(c.getPlayer().getId(), toAdd));
+         c.getPlayer().dropMessage("The invite has been sent.");
+      } else {
+         c.getPlayer().dropMessage("The player cannot be found!");
+      }
+      c.announce(MaplePacketCreator.enableActions());
+   }
 }
 

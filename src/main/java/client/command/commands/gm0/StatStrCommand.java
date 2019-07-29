@@ -23,34 +23,34 @@
 */
 package client.command.commands.gm0;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import constants.ServerConstants;
 
 public class StatStrCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        int remainingAp = player.getRemainingAp();
-        int amount;
-        if (params.length > 0) {
-            try {
-                amount = Math.min(Integer.parseInt(params[0]), remainingAp);
-            } catch (NumberFormatException e) {
-                player.dropMessage("That is not a valid number!");
-                return;
-            }
-        } else {
-            amount = Math.min(remainingAp, ServerConstants.MAX_AP - player.getStr());
-        }
-        
-        if (!player.assignStr(Math.max(amount, 0))) {
-            player.dropMessage("Please make sure your AP is not over " + ServerConstants.MAX_AP + " and you have enough to distribute.");
-        }
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      int remainingAp = player.getRemainingAp();
+      int amount;
+      if (params.length > 0) {
+         try {
+            amount = Math.min(Integer.parseInt(params[0]), remainingAp);
+         } catch (NumberFormatException e) {
+            player.dropMessage("That is not a valid number!");
+            return;
+         }
+      } else {
+         amount = Math.min(remainingAp, ServerConstants.MAX_AP - player.getStr());
+      }
+
+      if (!player.assignStr(Math.max(amount, 0))) {
+         player.dropMessage("Please make sure your AP is not over " + ServerConstants.MAX_AP + " and you have enough to distribute.");
+      }
+   }
 }

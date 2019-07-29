@@ -23,30 +23,31 @@
 */
 package client.command.commands.gm2;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 
 public class SetStatCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            player.yellowMessage("Syntax: !setstat <newstat>");
-            return;
-        }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         player.yellowMessage("Syntax: !setstat <newstat>");
+         return;
+      }
 
-        try {
-            int x = Integer.parseInt(params[0]);
+      try {
+         int x = Integer.parseInt(params[0]);
 
-            if (x > Short.MAX_VALUE) x = Short.MAX_VALUE;
-            else if (x < 4) x = 4;  // thanks Vcoc for pointing the minimal allowed stat value here
+         if (x > Short.MAX_VALUE) x = Short.MAX_VALUE;
+         else if (x < 4) x = 4;  // thanks Vcoc for pointing the minimal allowed stat value here
 
-            player.updateStrDexIntLuk(x);
-        } catch (NumberFormatException ignored) {}
-    }
+         player.updateStrDexIntLuk(x);
+      } catch (NumberFormatException ignored) {
+      }
+   }
 }

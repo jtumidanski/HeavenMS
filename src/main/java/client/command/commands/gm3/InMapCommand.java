@@ -23,23 +23,23 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 
 public class InMapCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        StringBuilder st = new StringBuilder();
-        for (MapleCharacter chr : player.getMap().getCharacters()) {
-            st.append(chr.getName()).append(" ");
-        }
-        player.message(st.toString());
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      StringBuilder st = new StringBuilder();
+      for (MapleCharacter chr : player.getMap().getCharacters()) {
+         st.append(chr.getName()).append(" ");
+      }
+      player.message(st.toString());
 
-    }
+   }
 }

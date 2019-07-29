@@ -21,85 +21,86 @@
 */
 package net.mina;
 
-import constants.ServerConstants;
-import client.MapleClient;
-import constants.OpcodeConstants;
-import net.server.coordinator.MapleSessionCoordinator;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
+
+import client.MapleClient;
+import constants.OpcodeConstants;
+import constants.ServerConstants;
+import net.server.coordinator.MapleSessionCoordinator;
+import tools.FilePrinter;
 import tools.HexTool;
 import tools.MapleAESOFB;
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericLittleEndianAccessor;
-import tools.FilePrinter;
 
 public class MaplePacketDecoder extends CumulativeProtocolDecoder {
-    private static final String DECODER_STATE_KEY = MaplePacketDecoder.class.getName() + ".STATE";
+   private static final String DECODER_STATE_KEY = MaplePacketDecoder.class.getName() + ".STATE";
 
-    private static class DecoderState {
-        public int packetlength = -1;
-    }
+   @Override
+   protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
+      final MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
+      if (client == null) {
+         MapleSessionCoordinator.getInstance().closeSession(session, true);
+         return false;
+      }
 
-    @Override
-    protected boolean doDecode(IoSession session, IoBuffer in, ProtocolDecoderOutput out) throws Exception {
-        final MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
-        if(client == null) {
+      DecoderState decoderState = (DecoderState) session.getAttribute(DECODER_STATE_KEY);
+      if (decoderState == null) {
+         decoderState = new DecoderState();
+         session.setAttribute(DECODER_STATE_KEY, decoderState);
+      }
+
+      MapleAESOFB rcvdCrypto = client.getReceiveCrypto();
+      if (in.remaining() >= 4 && decoderState.packetlength == -1) {
+         int packetHeader = in.getInt();
+         if (!rcvdCrypto.checkPacket(packetHeader)) {
             MapleSessionCoordinator.getInstance().closeSession(session, true);
             return false;
-        }
-        
-        DecoderState decoderState = (DecoderState) session.getAttribute(DECODER_STATE_KEY);
-        if (decoderState == null) {
-            decoderState = new DecoderState();
-            session.setAttribute(DECODER_STATE_KEY, decoderState);
-        }
-        
-        MapleAESOFB rcvdCrypto = client.getReceiveCrypto();
-        if (in.remaining() >= 4 && decoderState.packetlength == -1) {
-            int packetHeader = in.getInt();
-            if (!rcvdCrypto.checkPacket(packetHeader)) {
-                MapleSessionCoordinator.getInstance().closeSession(session, true);
-                return false;
+         }
+         decoderState.packetlength = MapleAESOFB.getPacketLength(packetHeader);
+      } else if (in.remaining() < 4 && decoderState.packetlength == -1) {
+         return false;
+      }
+      if (in.remaining() >= decoderState.packetlength) {
+         byte[] decryptedPacket = new byte[decoderState.packetlength];
+         in.get(decryptedPacket, 0, decoderState.packetlength);
+         decoderState.packetlength = -1;
+         rcvdCrypto.crypt(decryptedPacket);
+         MapleCustomEncryption.decryptData(decryptedPacket);
+         out.write(decryptedPacket);
+         if (ServerConstants.USE_DEBUG_SHOW_PACKET) { // packet traffic log: Atoot's idea, applied using auto-identation thanks to lrenex
+            int packetLen = decryptedPacket.length;
+            int pHeader = readFirstShort(decryptedPacket);
+            String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();
+            String op = lookupSend(pHeader);
+            String Send = "ClientSend:" + op + " [" + pHeaderStr + "] (" + packetLen + ")\r\n";
+            if (packetLen <= 3000) {
+               String SendTo = Send + HexTool.toString(decryptedPacket) + "\r\n" + HexTool.toStringFromAscii(decryptedPacket);
+               System.out.println(SendTo);
+               if (op == null) {
+                  System.out.println("UnknownPacket:" + SendTo);
+               }
+            } else {
+               FilePrinter.print(FilePrinter.PACKET_STREAM + MapleSessionCoordinator.getSessionRemoteAddress(session) + ".txt", HexTool.toString(new byte[]{decryptedPacket[0], decryptedPacket[1]}) + "...");
             }
-            decoderState.packetlength = MapleAESOFB.getPacketLength(packetHeader);
-        } else if (in.remaining() < 4 && decoderState.packetlength == -1) {
-            return false;
-        }
-        if (in.remaining() >= decoderState.packetlength) {
-           byte[] decryptedPacket = new byte[decoderState.packetlength];
-            in.get(decryptedPacket, 0, decoderState.packetlength);
-            decoderState.packetlength = -1;
-            rcvdCrypto.crypt(decryptedPacket);
-            MapleCustomEncryption.decryptData(decryptedPacket);
-            out.write(decryptedPacket);
-            if (ServerConstants.USE_DEBUG_SHOW_PACKET){ // packet traffic log: Atoot's idea, applied using auto-identation thanks to lrenex
-                int packetLen = decryptedPacket.length;
-                int pHeader = readFirstShort(decryptedPacket);
-                String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();
-                String op = lookupSend(pHeader);
-                String Send = "ClientSend:" + op + " [" + pHeaderStr + "] (" + packetLen + ")\r\n";
-                if (packetLen <= 3000) {
-                    String SendTo = Send + HexTool.toString(decryptedPacket) + "\r\n" + HexTool.toStringFromAscii(decryptedPacket);
-                    System.out.println(SendTo);
-                    if (op == null) {
-                        System.out.println("UnknownPacket:" + SendTo);
-                    }
-                } else {
-                    FilePrinter.print(FilePrinter.PACKET_STREAM + MapleSessionCoordinator.getSessionRemoteAddress(session) + ".txt", HexTool.toString(new byte[]{decryptedPacket[0], decryptedPacket[1]}) + "...");
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    private String lookupSend(int val) {
-        return OpcodeConstants.recvOpcodeNames.get(val);
-    }
+         }
+         return true;
+      }
+      return false;
+   }
 
-    private int readFirstShort(byte[] arr) {
-        return new GenericLittleEndianAccessor(new ByteArrayByteStream(arr)).readShort();
-    }
+   private String lookupSend(int val) {
+      return OpcodeConstants.recvOpcodeNames.get(val);
+   }
+
+   private int readFirstShort(byte[] arr) {
+      return new GenericLittleEndianAccessor(new ByteArrayByteStream(arr)).readShort();
+   }
+
+   private static class DecoderState {
+      public int packetlength = -1;
+   }
 }

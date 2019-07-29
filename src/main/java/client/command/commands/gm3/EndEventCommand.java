@@ -23,19 +23,19 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 
 public class EndEventCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        c.getChannelServer().setEvent(null);
-        player.dropMessage(5, "You have ended the event. No more players may join.");
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      c.getChannelServer().setEvent(null);
+      player.dropMessage(5, "You have ended the event. No more players may join.");
+   }
 }

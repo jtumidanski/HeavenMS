@@ -19,18 +19,17 @@
 */
 package net.server.worker;
 
-import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleLoginBypassCoordinator;
+import net.server.coordinator.MapleSessionCoordinator;
 
 /**
- *
  * @author Ronan
  */
 public class LoginStorageWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        MapleSessionCoordinator.getInstance().runUpdateLoginHistory();
-        MapleLoginBypassCoordinator.getInstance().runUpdateLoginBypass();
-    }
+
+   @Override
+   public void run() {
+      MapleSessionCoordinator.getInstance().runUpdateLoginHistory();
+      MapleLoginBypassCoordinator.getInstance().runUpdateLoginBypass();
+   }
 }

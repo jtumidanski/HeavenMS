@@ -23,11 +23,10 @@ import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.audit.locks.active.TrackerWriteLock;
 
 /**
- *
  * @author RonanLana
  */
 public class MonitoredWriteLockFactory {
-    public static TrackerWriteLock createLock(MonitoredReentrantReadWriteLock lock) {
-        return new TrackerWriteLock(lock);
-    }
+   public static TrackerWriteLock createLock(MonitoredReentrantReadWriteLock lock) {
+      return new TrackerWriteLock(lock);
+   }
 }

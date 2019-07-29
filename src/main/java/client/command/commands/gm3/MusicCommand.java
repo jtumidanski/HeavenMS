@@ -23,53 +23,53 @@
 */
 package client.command.commands.gm3;
 
-import client.command.Command;
-import client.MapleClient;
 import client.MapleCharacter;
+import client.MapleClient;
+import client.command.Command;
 import constants.GameConstants;
 import tools.MaplePacketCreator;
 
 public class MusicCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    private static String getSongList() {
-        StringBuilder songList = new StringBuilder("Song:\r\n");
-        for (String s : GameConstants.GAME_SONGS) {
-            songList.append("  ").append(s).append("\r\n");
-        }
-        
-        return songList.toString();
-    }
-    
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        
-        MapleCharacter player = c.getPlayer();
-        if (params.length < 1) {
-            String sendMsg = "";
-            
-            sendMsg += "Syntax: #r!music <song>#k\r\n\r\n";
-            sendMsg += getSongList();
-            
-            c.announce(MaplePacketCreator.getNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
+   private static String getSongList() {
+      StringBuilder songList = new StringBuilder("Song:\r\n");
+      for (String s : GameConstants.GAME_SONGS) {
+         songList.append("  ").append(s).append("\r\n");
+      }
+
+      return songList.toString();
+   }
+
+   @Override
+   public void execute(MapleClient c, String[] params) {
+
+      MapleCharacter player = c.getPlayer();
+      if (params.length < 1) {
+         String sendMsg = "";
+
+         sendMsg += "Syntax: #r!music <song>#k\r\n\r\n";
+         sendMsg += getSongList();
+
+         c.announce(MaplePacketCreator.getNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
+         return;
+      }
+
+      String song = player.getLastCommandMessage();
+      for (String s : GameConstants.GAME_SONGS) {
+         if (s.equalsIgnoreCase(song)) {    // thanks Masterrulax for finding an issue here
+            player.getMap().broadcastMessage(MaplePacketCreator.musicChange(s));
+            player.yellowMessage("Now playing song " + s + ".");
             return;
-        }
-        
-        String song = player.getLastCommandMessage();
-        for (String s : GameConstants.GAME_SONGS) {
-            if (s.equalsIgnoreCase(song)) {    // thanks Masterrulax for finding an issue here
-                player.getMap().broadcastMessage(MaplePacketCreator.musicChange(s));
-                player.yellowMessage("Now playing song " + s + ".");
-                return;
-            }
-        }
-        
-        String sendMsg = "";
-        sendMsg += "Song not found, please enter a song below.\r\n\r\n";
-        sendMsg += getSongList();
-        
-        c.announce(MaplePacketCreator.getNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
-    }
+         }
+      }
+
+      String sendMsg = "";
+      sendMsg += "Song not found, please enter a song below.\r\n\r\n";
+      sendMsg += getSongList();
+
+      c.announce(MaplePacketCreator.getNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
+   }
 }

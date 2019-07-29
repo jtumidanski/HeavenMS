@@ -27,12 +27,12 @@ import client.MapleClient;
 import client.command.Command;
 
 public class StopMapEventCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        c.getPlayer().getMap().setEventStarted(false);
-    }
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      c.getPlayer().getMap().setEventStarted(false);
+   }
 }

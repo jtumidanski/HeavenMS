@@ -21,31 +21,30 @@
  */
 package net.server.channel.handlers;
 
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
+import net.AbstractMaplePacketHandler;
 import net.server.Server;
+import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author Matze
  */
 public final class ChangeChannelHandler extends AbstractMaplePacketHandler {
 
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        int channel = slea.readByte() + 1;
-        slea.readInt();
-        c.getPlayer().getAutobanManager().setTimestamp(6, Server.getInstance().getCurrentTimestamp(), 3);
-        if(c.getChannel() == channel) {
-                AutobanFactory.GENERAL.alert(c.getPlayer(), "CCing to same channel.");
-                c.disconnect(false, false);
-                return;
-        } else if (c.getPlayer().getCashShop().isOpened() || c.getPlayer().getMiniGame() != null || c.getPlayer().getPlayerShop() != null) {
-    		return;
-    	}
-        
-        c.changeChannel(channel);
-    }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      int channel = slea.readByte() + 1;
+      slea.readInt();
+      c.getPlayer().getAutobanManager().setTimestamp(6, Server.getInstance().getCurrentTimestamp(), 3);
+      if (c.getChannel() == channel) {
+         AutobanFactory.GENERAL.alert(c.getPlayer(), "CCing to same channel.");
+         c.disconnect(false, false);
+         return;
+      } else if (c.getPlayer().getCashShop().isOpened() || c.getPlayer().getMiniGame() != null || c.getPlayer().getPlayerShop() != null) {
+         return;
+      }
+
+      c.changeChannel(channel);
+   }
 }

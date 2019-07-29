@@ -19,46 +19,46 @@ package server.life;
 
 public class OverrideMonsterStats {
 
-    public int hp;
-    public int exp, mp;
+   public int hp;
+   public int exp, mp;
 
-    public OverrideMonsterStats() {
-        hp = 1;
-        exp = 0;
-        mp = 0;
-    }
+   public OverrideMonsterStats() {
+      hp = 1;
+      exp = 0;
+      mp = 0;
+   }
 
-    public OverrideMonsterStats(int hp, int mp, int exp, boolean change) {
-        this.hp = /*change ? (hp * 3L / 2L) : */ hp;
-        this.mp = mp;
-        this.exp = exp;
-    }
+   public OverrideMonsterStats(int hp, int mp, int exp, boolean change) {
+      this.hp = /*change ? (hp * 3L / 2L) : */ hp;
+      this.mp = mp;
+      this.exp = exp;
+   }
 
-    public OverrideMonsterStats(int hp, int mp, int exp) {
-        this(hp, mp, exp, true);
-    }
+   public OverrideMonsterStats(int hp, int mp, int exp) {
+      this(hp, mp, exp, true);
+   }
 
-    public int getExp() {
-        return exp;
-    }
+   public int getExp() {
+      return exp;
+   }
 
-    public void setOExp(int exp) {
-        this.exp = exp;
-    }
+   public void setOExp(int exp) {
+      this.exp = exp;
+   }
 
-    public int getHp() {
-        return hp;
-    }
+   public int getHp() {
+      return hp;
+   }
 
-    public void setOHp(int hp) {
-        this.hp = hp;
-    }
+   public void setOHp(int hp) {
+      this.hp = hp;
+   }
 
-    public int getMp() {
-        return mp;
-    }
+   public int getMp() {
+      return mp;
+   }
 
-    public void setOMp(int mp) {
-        this.mp = mp;
-    }
+   public void setOMp(int mp) {
+      this.mp = mp;
+   }
 }

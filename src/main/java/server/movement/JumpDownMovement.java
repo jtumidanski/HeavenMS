@@ -22,51 +22,52 @@
 package server.movement;
 
 import java.awt.Point;
+
 import tools.data.output.LittleEndianWriter;
 
 public class JumpDownMovement extends AbstractLifeMovement {
-    private Point pixelsPerSecond;
-    private int fh;
-    private int originFh;
+   private Point pixelsPerSecond;
+   private int fh;
+   private int originFh;
 
-    public JumpDownMovement(int type, Point position, int duration, int newstate) {
-        super(type, position, duration, newstate);
-    }
+   public JumpDownMovement(int type, Point position, int duration, int newstate) {
+      super(type, position, duration, newstate);
+   }
 
-    public Point getPixelsPerSecond() {
-        return pixelsPerSecond;
-    }
+   public Point getPixelsPerSecond() {
+      return pixelsPerSecond;
+   }
 
-    public void setPixelsPerSecond(Point wobble) {
-        this.pixelsPerSecond = wobble;
-    }
+   public void setPixelsPerSecond(Point wobble) {
+      this.pixelsPerSecond = wobble;
+   }
 
-    public int getFh() {
-        return fh;
-    }
+   public int getFh() {
+      return fh;
+   }
 
-    public void setFh(int fh) {
-        this.fh = fh;
-    }
+   public void setFh(int fh) {
+      this.fh = fh;
+   }
 
-    public int getOriginFh() {
-        return originFh;
-    }
+   public int getOriginFh() {
+      return originFh;
+   }
 
-    public void setOriginFh(int fh) {    // fh actually originFh, thanks Spoon for pointing this out
-        this.originFh = fh;
-    }
+   public void setOriginFh(int fh) {    // fh actually originFh, thanks Spoon for pointing this out
+      this.originFh = fh;
+   }
 
-    @Override
-    public void serialize(LittleEndianWriter lew) {
-        lew.write(getType());
-        lew.writeShort(getPosition().x);
-        lew.writeShort(getPosition().y);
-        lew.writeShort(pixelsPerSecond.x);
-        lew.writeShort(pixelsPerSecond.y);
-        lew.writeShort(fh);
-        lew.writeShort(originFh);
-        lew.write(getNewstate());
-        lew.writeShort(getDuration());
-    }
+   @Override
+   public void serialize(LittleEndianWriter lew) {
+      lew.write(getType());
+      lew.writeShort(getPosition().x);
+      lew.writeShort(getPosition().y);
+      lew.writeShort(pixelsPerSecond.x);
+      lew.writeShort(pixelsPerSecond.y);
+      lew.writeShort(fh);
+      lew.writeShort(originFh);
+      lew.write(getNewstate());
+      lew.writeShort(getDuration());
+   }
 }

@@ -57,13 +57,13 @@ import tools.Pair;
  * @author Ronan - concurrency protection
  */
 public class MapleHiredMerchant extends AbstractMapleMapObject {
+   private final List<MaplePlayerShopItem> items = new LinkedList<>();
    private int ownerId, itemId, mesos = 0;
    private int channel, world;
    private long start;
    private String ownerName = "";
    private String description = "";
    private MapleCharacter[] visitors = new MapleCharacter[3];
-   private final List<MaplePlayerShopItem> items = new LinkedList<>();
    private List<Pair<String, Byte>> messages = new LinkedList<>();
    private List<SoldItem> sold = new LinkedList<>();
    private AtomicBoolean open = new AtomicBoolean();
@@ -81,6 +81,22 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       this.ownerName = owner.getName();
       this.description = desc;
       this.map = owner.getMap();
+   }
+
+   private static boolean canBuy(MapleClient c, Item newItem) {    // thanks xiaokelvin (Conrad) for noticing a leaked test code here
+      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+   }
+
+   private static boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
+      List<Pair<Item, MapleInventoryType>> li = new ArrayList<>();
+      for (MaplePlayerShopItem item : items) {
+         Item it = item.getItem().copy();
+         it.setQuantity((short) (it.getQuantity() * item.getBundles()));
+
+         li.add(new Pair<>(it, it.getInventoryType()));
+      }
+
+      return MapleInventory.checkSpotsAndOwnership(chr, li);
    }
 
    public void broadcastToVisitorsThreadsafe(final byte[] packet) {
@@ -236,10 +252,6 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             chr.saveCharToDB(false);
          }
       }
-   }
-
-   private static boolean canBuy(MapleClient c, Item newItem) {    // thanks xiaokelvin (Conrad) for noticing a leaked test code here
-      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
    }
 
    private int getQuantityLeft(int itemid) {
@@ -503,6 +515,10 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       return description;
    }
 
+   public void setDescription(String description) {
+      this.description = description;
+   }
+
    public MapleCharacter[] getVisitors() {
       visitorLock.lock();
       try {
@@ -572,10 +588,6 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          }
       }
       return -1;
-   }
-
-   public void setDescription(String description) {
-      this.description = description;
    }
 
    public boolean isPublished() {
@@ -651,18 +663,6 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       con.close();
 
       FredrickProcessor.insertFredrickLog(this.ownerId);
-   }
-
-   private static boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
-      List<Pair<Item, MapleInventoryType>> li = new ArrayList<>();
-      for (MaplePlayerShopItem item : items) {
-         Item it = item.getItem().copy();
-         it.setQuantity((short) (it.getQuantity() * item.getBundles()));
-
-         li.add(new Pair<>(it, it.getInventoryType()));
-      }
-
-      return MapleInventory.checkSpotsAndOwnership(chr, li);
    }
 
    public int getChannel() {

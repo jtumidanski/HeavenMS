@@ -25,108 +25,107 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 
 /**
- *
  * @author Ronan
  */
 public class IntervalBuilder {
-        
-    private List<Line2D> intervalLimits = new ArrayList<>();
-    
-    protected ReadLock intervalRlock;
-    protected WriteLock intervalWlock;
-    
-    public IntervalBuilder() {
-        ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.INTERVAL, true);
-        intervalRlock = locks.readLock();
-        intervalWlock = locks.writeLock();
-    }
 
-    private void refitOverlappedIntervals(int st, int en, int newFrom, int newTo) {
-        List<Line2D> checkLimits = new ArrayList<>(intervalLimits.subList(st, en));
+   protected ReadLock intervalRlock;
+   protected WriteLock intervalWlock;
+   private List<Line2D> intervalLimits = new ArrayList<>();
 
-        float newLimitX1, newLimitX2;
-        if (!checkLimits.isEmpty()) {
-            Line2D firstLimit = checkLimits.get(0);
-            Line2D lastLimit = checkLimits.get(checkLimits.size() - 1);
+   public IntervalBuilder() {
+      ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.INTERVAL, true);
+      intervalRlock = locks.readLock();
+      intervalWlock = locks.writeLock();
+   }
 
-            newLimitX1 = (float) ((newFrom < firstLimit.getX1()) ? newFrom : firstLimit.getX1());
-            newLimitX2 = (float) ((newTo > lastLimit.getX2()) ? newTo : lastLimit.getX2());
+   private void refitOverlappedIntervals(int st, int en, int newFrom, int newTo) {
+      List<Line2D> checkLimits = new ArrayList<>(intervalLimits.subList(st, en));
 
-            for (Line2D limit : checkLimits) {
-                intervalLimits.remove(st);
-            }
-        } else {
-            newLimitX1 = newFrom;
-            newLimitX2 = newTo;
-        }
+      float newLimitX1, newLimitX2;
+      if (!checkLimits.isEmpty()) {
+         Line2D firstLimit = checkLimits.get(0);
+         Line2D lastLimit = checkLimits.get(checkLimits.size() - 1);
 
-        intervalLimits.add(st, new Line2D.Float((float) newLimitX1, 0, (float) newLimitX2, 0));
-    }
+         newLimitX1 = (float) ((newFrom < firstLimit.getX1()) ? newFrom : firstLimit.getX1());
+         newLimitX2 = (float) ((newTo > lastLimit.getX2()) ? newTo : lastLimit.getX2());
 
-    private int bsearchInterval(int point) {
-        int st = 0, en = intervalLimits.size() - 1;
+         for (Line2D limit : checkLimits) {
+            intervalLimits.remove(st);
+         }
+      } else {
+         newLimitX1 = newFrom;
+         newLimitX2 = newTo;
+      }
 
-        int mid, idx;
-        while (en >= st) {
-            idx = (st + en) / 2;
-            mid = (int) intervalLimits.get(idx).getX1();
+      intervalLimits.add(st, new Line2D.Float((float) newLimitX1, 0, (float) newLimitX2, 0));
+   }
 
-            if (mid == point) {
-                return idx;
-            } else if (mid < point) {
-                st = idx + 1;
-            } else {
-                en = idx - 1;
-            }
-        }
+   private int bsearchInterval(int point) {
+      int st = 0, en = intervalLimits.size() - 1;
 
-        return en;
-    }
+      int mid, idx;
+      while (en >= st) {
+         idx = (st + en) / 2;
+         mid = (int) intervalLimits.get(idx).getX1();
 
-    public void addInterval(int from, int to) {
-        intervalWlock.lock();
-        try {
-            int st = bsearchInterval(from);
-            if (st < 0) {
-                st = 0;
-            } else if (intervalLimits.get(st).getX2() < from) {
-                st += 1;
-            }
+         if (mid == point) {
+            return idx;
+         } else if (mid < point) {
+            st = idx + 1;
+         } else {
+            en = idx - 1;
+         }
+      }
 
-            int en = bsearchInterval(to);
-            if (en < st) en = st - 1;
+      return en;
+   }
 
-            refitOverlappedIntervals(st, en + 1, from, to);
-        } finally {
-            intervalWlock.unlock();
-        }
-    }
+   public void addInterval(int from, int to) {
+      intervalWlock.lock();
+      try {
+         int st = bsearchInterval(from);
+         if (st < 0) {
+            st = 0;
+         } else if (intervalLimits.get(st).getX2() < from) {
+            st += 1;
+         }
 
-    public boolean inInterval(int point) {
-        return inInterval(point, point);
-    }
-    
-    public boolean inInterval(int from, int to) {
-        intervalRlock.lock();
-        try {
-            int idx = bsearchInterval(from);
-            return idx >= 0 && to <= intervalLimits.get(idx).getX2();
-        } finally {
-            intervalRlock.unlock();
-        }
-    }
+         int en = bsearchInterval(to);
+         if (en < st) en = st - 1;
 
-    public void clear() {
-        intervalWlock.lock();
-        try {
-            intervalLimits.clear();
-        } finally {
-            intervalWlock.unlock();
-        }
-    }
-    
+         refitOverlappedIntervals(st, en + 1, from, to);
+      } finally {
+         intervalWlock.unlock();
+      }
+   }
+
+   public boolean inInterval(int point) {
+      return inInterval(point, point);
+   }
+
+   public boolean inInterval(int from, int to) {
+      intervalRlock.lock();
+      try {
+         int idx = bsearchInterval(from);
+         return idx >= 0 && to <= intervalLimits.get(idx).getX2();
+      } finally {
+         intervalRlock.unlock();
+      }
+   }
+
+   public void clear() {
+      intervalWlock.lock();
+      try {
+         intervalLimits.clear();
+      } finally {
+         intervalWlock.unlock();
+      }
+   }
+
 }

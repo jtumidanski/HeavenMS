@@ -21,72 +21,72 @@
  */
 package net.server.channel.handlers;
 
-import net.AbstractMaplePacketHandler;
 import client.MapleCharacter;
 import client.MapleClient;
+import client.autoban.AutobanManager;
+import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
-import client.autoban.AutobanManager;
-import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import net.AbstractMaplePacketHandler;
 import net.server.Server;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class PetFoodHandler extends AbstractMaplePacketHandler {
 
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        MapleCharacter chr = c.getPlayer();
-        AutobanManager abm = chr.getAutobanManager();
-        if (abm.getLastSpam(2) + 500 > currentServerTime()) {
-            c.announce(MaplePacketCreator.enableActions());
-            return;
-        }
-        abm.spam(2);
-        slea.readInt(); // timestamp issue detected thanks to Masterrulax
-        abm.setTimestamp(1, Server.getInstance().getCurrentTimestamp(), 3);
-        if (chr.getNoPets() == 0) {
-            c.announce(MaplePacketCreator.enableActions());
-            return;
-        }
-        int previousFullness = 100;
-        byte slot = 0;
-        MaplePet[] pets = chr.getPets();
-        for (byte i = 0; i < 3; i++) {
-            if (pets[i] != null) {
-                if (pets[i].getFullness() < previousFullness) {
-                    slot = i;
-                    previousFullness = pets[i].getFullness();
-                }
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      MapleCharacter chr = c.getPlayer();
+      AutobanManager abm = chr.getAutobanManager();
+      if (abm.getLastSpam(2) + 500 > currentServerTime()) {
+         c.announce(MaplePacketCreator.enableActions());
+         return;
+      }
+      abm.spam(2);
+      slea.readInt(); // timestamp issue detected thanks to Masterrulax
+      abm.setTimestamp(1, Server.getInstance().getCurrentTimestamp(), 3);
+      if (chr.getNoPets() == 0) {
+         c.announce(MaplePacketCreator.enableActions());
+         return;
+      }
+      int previousFullness = 100;
+      byte slot = 0;
+      MaplePet[] pets = chr.getPets();
+      for (byte i = 0; i < 3; i++) {
+         if (pets[i] != null) {
+            if (pets[i].getFullness() < previousFullness) {
+               slot = i;
+               previousFullness = pets[i].getFullness();
             }
-        }
-        
-        MaplePet pet = chr.getPet(slot);
-        if(pet == null) return;
-        
-        short pos = slea.readShort();
-        int itemId = slea.readInt();
-        
-        if (c.tryacquireClient()) {
-            try {
-                MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
-                useInv.lockInventory();
-                try {
-                    Item use = useInv.getItem(pos);
-                    if (use == null || (itemId / 10000) != 212 || use.getItemId() != itemId || use.getQuantity() < 1) {
-                        return;
-                    }
+         }
+      }
 
-                    pet.gainClosenessFullness(chr, (pet.getFullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptyness" to get +1 closeness
-                    MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, pos, (short) 1, false);
-                } finally {
-                    useInv.unlockInventory();
-                }
+      MaplePet pet = chr.getPet(slot);
+      if (pet == null) return;
+
+      short pos = slea.readShort();
+      int itemId = slea.readInt();
+
+      if (c.tryacquireClient()) {
+         try {
+            MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
+            useInv.lockInventory();
+            try {
+               Item use = useInv.getItem(pos);
+               if (use == null || (itemId / 10000) != 212 || use.getItemId() != itemId || use.getQuantity() < 1) {
+                  return;
+               }
+
+               pet.gainClosenessFullness(chr, (pet.getFullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptyness" to get +1 closeness
+               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, pos, (short) 1, false);
             } finally {
-                c.releaseClient();
+               useInv.unlockInventory();
             }
-        }
-    }
+         } finally {
+            c.releaseClient();
+         }
+      }
+   }
 }

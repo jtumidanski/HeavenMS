@@ -23,56 +23,55 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.inventory.MapleInventory;
 import client.inventory.Item;
+import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
-import net.AbstractMaplePacketHandler;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import net.AbstractMaplePacketHandler;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
- *
  * @author XoticStory; modified by kevintjuh93, Ronan
  */
 public final class UseSolomonHandler extends AbstractMaplePacketHandler {
 
-    @Override
-    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-        slea.readInt();
-        short slot = slea.readShort();
-        int itemId = slea.readInt();
-        MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-        
-        if (c.tryacquireClient()) {
+   @Override
+   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+      slea.readInt();
+      short slot = slea.readShort();
+      int itemId = slea.readInt();
+      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+
+      if (c.tryacquireClient()) {
+         try {
+            MapleCharacter chr = c.getPlayer();
+            MapleInventory inv = chr.getInventory(MapleInventoryType.USE);
+            inv.lockInventory();
             try {
-                MapleCharacter chr = c.getPlayer();
-                MapleInventory inv = chr.getInventory(MapleInventoryType.USE);
-                inv.lockInventory();
-                try {
-                    Item slotItem = inv.getItem(slot);
-                    if (slotItem == null) {
-                        return;
-                    }
-                    
-                    long gachaexp = ii.getExpById(itemId);
-                    if (slotItem.getItemId() != itemId || slotItem.getQuantity() <= 0 || chr.getLevel() > ii.getMaxLevelById(itemId)) {
-                        return;
-                    }
-                    if (gachaexp + chr.getGachaExp() > Integer.MAX_VALUE) {
-                        return;
-                    }
-                    chr.addGachaExp((int) gachaexp);
-                    MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, (short) 1, false);
-                } finally {
-                    inv.unlockInventory();
-                }
+               Item slotItem = inv.getItem(slot);
+               if (slotItem == null) {
+                  return;
+               }
+
+               long gachaexp = ii.getExpById(itemId);
+               if (slotItem.getItemId() != itemId || slotItem.getQuantity() <= 0 || chr.getLevel() > ii.getMaxLevelById(itemId)) {
+                  return;
+               }
+               if (gachaexp + chr.getGachaExp() > Integer.MAX_VALUE) {
+                  return;
+               }
+               chr.addGachaExp((int) gachaexp);
+               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, (short) 1, false);
             } finally {
-                c.releaseClient();
+               inv.unlockInventory();
             }
-        }
-        
-        c.announce(MaplePacketCreator.enableActions());
-    }
+         } finally {
+            c.releaseClient();
+         }
+      }
+
+      c.announce(MaplePacketCreator.enableActions());
+   }
 }

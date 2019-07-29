@@ -26,10 +26,10 @@ import client.processor.FredrickProcessor;
  * @author Ronan
  */
 public class DueyFredrickWorker implements Runnable {
-    
-    @Override
-    public void run() {
-        FredrickProcessor.runFredrickSchedule();
-        DueyProcessor.runDueyExpireSchedule();
-    }
+
+   @Override
+   public void run() {
+      FredrickProcessor.runFredrickSchedule();
+      DueyProcessor.runDueyExpireSchedule();
+   }
 }

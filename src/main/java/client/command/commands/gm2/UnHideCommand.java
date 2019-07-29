@@ -23,20 +23,20 @@
 */
 package client.command.commands.gm2;
 
+import client.MapleCharacter;
+import client.MapleClient;
 import client.SkillFactory;
 import client.command.Command;
-import client.MapleClient;
-import client.MapleCharacter;
 
 public class UnHideCommand extends Command {
-    {
-        setDescription("");
-    }
+   {
+      setDescription("");
+   }
 
-    @Override
-    public void execute(MapleClient c, String[] params) {
-        MapleCharacter player = c.getPlayer();
-        SkillFactory.getSkill(9101004).getEffect(SkillFactory.getSkill(9101004).getMaxLevel()).applyTo(player);
+   @Override
+   public void execute(MapleClient c, String[] params) {
+      MapleCharacter player = c.getPlayer();
+      SkillFactory.getSkill(9101004).getEffect(SkillFactory.getSkill(9101004).getMaxLevel()).applyTo(player);
 
-    }
+   }
 }

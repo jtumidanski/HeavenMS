@@ -22,42 +22,41 @@
 package server.events.gm;
 
 /**
- *
  * @author kevintjuh93
  */
 public class MapleCoconuts {
-	
-    private int id;
-    private int hits = 0;
-    private boolean hittable = false;
-    private long hittime = System.currentTimeMillis();
 
-    public MapleCoconuts(int id) {
-        this.id = id;
-    }
+   private int id;
+   private int hits = 0;
+   private boolean hittable = false;
+   private long hittime = System.currentTimeMillis();
 
-    public void hit() {
-        this.hittime = System.currentTimeMillis() + 750;
-        hits++;
-    }
+   public MapleCoconuts(int id) {
+      this.id = id;
+   }
 
-    public int getHits() {
-        return hits;
-    }
+   public void hit() {
+      this.hittime = System.currentTimeMillis() + 750;
+      hits++;
+   }
 
-    public void resetHits() {
-        hits = 0;
-    }
+   public int getHits() {
+      return hits;
+   }
 
-    public boolean isHittable() {
-        return hittable;
-    }
+   public void resetHits() {
+      hits = 0;
+   }
 
-    public void setHittable(boolean hittable) {
-        this.hittable = hittable;
-    }
+   public boolean isHittable() {
+      return hittable;
+   }
 
-    public long getHitTime() {
-        return hittime;
-    }
+   public void setHittable(boolean hittable) {
+      this.hittable = hittable;
+   }
+
+   public long getHitTime() {
+      return hittime;
+   }
 }

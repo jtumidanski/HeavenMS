@@ -28,7 +28,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,16 +66,16 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    private static final List<AtomicInteger> runningWorldRank = new ArrayList<>();
    private static final Map<Pair<Integer, Integer>, AtomicInteger> runningWorldJobRank = new HashMap<>();
 
+   static {
+      getRunningMetadata();
+   }
+
    private Map<Short, Integer> equips = new HashMap<>();
    private int scriptId, face, hair, gender, job;
    private byte skin;
    private String name = "";
    private int dir, FH, RX0, RX1, CY;
    private int worldRank, overallRank, worldJobRank, overallJobRank;
-
-   static {
-      getRunningMetadata();
-   }
 
    public MaplePlayerNPC(String name, int scriptId, int face, int hair, int gender, byte skin, Map<Short, Integer> equips, int dir, int FH, int RX0, int RX1, int CX, int CY, int oid) {
       this.equips = equips;
@@ -133,91 +132,6 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       } catch (SQLException e) {
          e.printStackTrace();
       }
-   }
-
-   public Map<Short, Integer> getEquips() {
-      return equips;
-   }
-
-   public int getScriptId() {
-      return scriptId;
-   }
-
-   public int getJob() {
-      return job;
-   }
-
-   public int getDirection() {
-      return dir;
-   }
-
-   public int getFH() {
-      return FH;
-   }
-
-   public int getRX0() {
-      return RX0;
-   }
-
-   public int getRX1() {
-      return RX1;
-   }
-
-   public int getCY() {
-      return CY;
-   }
-
-   public byte getSkin() {
-      return skin;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public int getFace() {
-      return face;
-   }
-
-   public int getHair() {
-      return hair;
-   }
-
-   public int getGender() {
-      return gender;
-   }
-
-   public int getWorldRank() {
-      return worldRank;
-   }
-
-   public int getOverallRank() {
-      return overallRank;
-   }
-
-   public int getWorldJobRank() {
-      return worldJobRank;
-   }
-
-   public int getOverallJobRank() {
-      return overallJobRank;
-   }
-
-   @Override
-   public MapleMapObjectType getType() {
-      return MapleMapObjectType.PLAYER_NPC;
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      client.announce(MaplePacketCreator.spawnPlayerNPC(this));
-      client.announce(MaplePacketCreator.getPlayerNPC(this));
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      client.announce(MaplePacketCreator.removeNPCController(this.getObjectId()));
-      client.announce(MaplePacketCreator.removePlayerNPC(this.getObjectId()));
    }
 
    private static void getRunningMetadata() {
@@ -312,32 +226,6 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       }
 
       return ret;
-   }
-
-   public void updatePlayerNPCPosition(MapleMap map, Point newPos) {
-      setPosition(newPos);
-      RX0 = newPos.x + 50;
-      RX1 = newPos.x - 50;
-      CY = newPos.y;
-      FH = map.getFootholds().findBelow(newPos).getId();
-
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
-         PreparedStatement ps = con.prepareStatement("UPDATE playernpcs SET x = ?, cy = ?, fh = ?, rx0 = ?, rx1 = ? WHERE id = ?");
-         ps.setInt(1, newPos.x);
-         ps.setInt(2, CY);
-         ps.setInt(3, FH);
-         ps.setInt(4, RX0);
-         ps.setInt(5, RX1);
-         ps.setInt(6, getObjectId());
-         ps.executeUpdate();
-
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
    }
 
    private static void fetchAvailableScriptIdsFromDb(byte branch, List<Integer> list) {
@@ -667,6 +555,117 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
             w.resetPlayerNpcMapData();
          }
 
+         con.close();
+      } catch (SQLException e) {
+         e.printStackTrace();
+      }
+   }
+
+   public Map<Short, Integer> getEquips() {
+      return equips;
+   }
+
+   public int getScriptId() {
+      return scriptId;
+   }
+
+   public int getJob() {
+      return job;
+   }
+
+   public int getDirection() {
+      return dir;
+   }
+
+   public int getFH() {
+      return FH;
+   }
+
+   public int getRX0() {
+      return RX0;
+   }
+
+   public int getRX1() {
+      return RX1;
+   }
+
+   public int getCY() {
+      return CY;
+   }
+
+   public byte getSkin() {
+      return skin;
+   }
+
+   public String getName() {
+      return name;
+   }
+
+   public int getFace() {
+      return face;
+   }
+
+   public int getHair() {
+      return hair;
+   }
+
+   public int getGender() {
+      return gender;
+   }
+
+   public int getWorldRank() {
+      return worldRank;
+   }
+
+   public int getOverallRank() {
+      return overallRank;
+   }
+
+   public int getWorldJobRank() {
+      return worldJobRank;
+   }
+
+   public int getOverallJobRank() {
+      return overallJobRank;
+   }
+
+   @Override
+   public MapleMapObjectType getType() {
+      return MapleMapObjectType.PLAYER_NPC;
+   }
+
+   @Override
+   public void sendSpawnData(MapleClient client) {
+      client.announce(MaplePacketCreator.spawnPlayerNPC(this));
+      client.announce(MaplePacketCreator.getPlayerNPC(this));
+   }
+
+   @Override
+   public void sendDestroyData(MapleClient client) {
+      client.announce(MaplePacketCreator.removeNPCController(this.getObjectId()));
+      client.announce(MaplePacketCreator.removePlayerNPC(this.getObjectId()));
+   }
+
+   public void updatePlayerNPCPosition(MapleMap map, Point newPos) {
+      setPosition(newPos);
+      RX0 = newPos.x + 50;
+      RX1 = newPos.x - 50;
+      CY = newPos.y;
+      FH = map.getFootholds().findBelow(newPos).getId();
+
+      try {
+         Connection con = DatabaseConnection.getConnection();
+
+         PreparedStatement ps = con.prepareStatement("UPDATE playernpcs SET x = ?, cy = ?, fh = ?, rx0 = ?, rx1 = ? WHERE id = ?");
+         ps.setInt(1, newPos.x);
+         ps.setInt(2, CY);
+         ps.setInt(3, FH);
+         ps.setInt(4, RX0);
+         ps.setInt(5, RX1);
+         ps.setInt(6, getObjectId());
+         ps.executeUpdate();
+
+         ps.close();
          con.close();
       } catch (SQLException e) {
          e.printStackTrace();

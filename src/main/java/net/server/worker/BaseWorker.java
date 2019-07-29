@@ -25,12 +25,13 @@ import net.server.world.World;
  * @author Ronan
  */
 public abstract class BaseWorker implements Runnable {
-    protected World wserv;
-    
-    @Override
-    public void run() {}
-    
-    public BaseWorker(World world) {
-        wserv = world;
-    }
+   protected World wserv;
+
+   public BaseWorker(World world) {
+      wserv = world;
+   }
+
+   @Override
+   public void run() {
+   }
 }

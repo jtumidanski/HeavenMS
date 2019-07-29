@@ -22,15 +22,14 @@ package net.server.channel.worker;
 import net.server.audit.locks.MonitoredLockType;
 
 /**
- *
  * @author Ronan
  */
 public class MobMistScheduler extends BaseScheduler {
-    public MobMistScheduler() {
-        super(MonitoredLockType.CHANNEL_MOBMIST);
-    }
-    
-    public void registerMistCancelAction(Runnable runAction, long delay) {
-        registerEntry(runAction, runAction, delay);
-    }
+   public MobMistScheduler() {
+      super(MonitoredLockType.CHANNEL_MOBMIST);
+   }
+
+   public void registerMistCancelAction(Runnable runAction, long delay) {
+      registerEntry(runAction, runAction, delay);
+   }
 }
