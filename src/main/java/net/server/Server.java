@@ -415,12 +415,11 @@ public class Server {
 
          Map<Integer, String> channelInfo = new HashMap<>();
          long bootTime = getCurrentTime();
-         for (int j = 1; j <= Integer.parseInt(p.getProperty("channels" + i)); j++) {
-            int channelid = j;
-            Channel channel = new Channel(i, channelid, bootTime);
+         for (int channelId = 1; channelId <= Integer.parseInt(p.getProperty("channels" + i)); channelId++) {
+            Channel channel = new Channel(i, channelId, bootTime);
 
             world.addChannel(channel);
-            channelInfo.put(channelid, channel.getIP());
+            channelInfo.put(channelId, channel.getIP());
          }
 
          channels.add(i, channelInfo);

@@ -1129,8 +1129,7 @@ public class MapleItemInformationProvider {
         if (defaultValue == 0) {
             return 0;
         }
-        int lMaxRange = maxRange;
-        return (short) (defaultValue + Math.floor(Randomizer.nextDouble() * (lMaxRange + 1)));
+        return (short) (defaultValue + Math.floor(Randomizer.nextDouble() * (maxRange + 1)));
     }
 
     public Equip randomizeUpgradeStats(Equip equip) {

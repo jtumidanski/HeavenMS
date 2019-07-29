@@ -408,8 +408,7 @@ public class MobSkill {
       int multiplier = facingLeft ? 1 : -1;
       Point mylt = new Point(lt.x * multiplier + posFrom.x, lt.y + posFrom.y);
       Point myrb = new Point(rb.x * multiplier + posFrom.x, rb.y + posFrom.y);
-      Rectangle bounds = new Rectangle(mylt.x, mylt.y, myrb.x - mylt.x, myrb.y - mylt.y);
-      return bounds;
+      return new Rectangle(mylt.x, mylt.y, myrb.x - mylt.x, myrb.y - mylt.y);
    }
 
    private List<MapleMapObject> getObjectsInRange(MapleMonster monster, MapleMapObjectType objectType) {

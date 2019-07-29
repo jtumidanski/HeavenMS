@@ -516,8 +516,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 	}
 
 	public MapleCharacter getMapleCharacter(String player) {
-		MapleCharacter target =  Server.getInstance().getWorld(c.getWorld()).getChannel(c.getChannel()).getPlayerStorage().getCharacterByName(player);
-		return target;
+		return Server.getInstance().getWorld(c.getWorld()).getChannel(c.getChannel()).getPlayerStorage().getCharacterByName(player);
 	}
 
 	public void logLeaf(String prize) {

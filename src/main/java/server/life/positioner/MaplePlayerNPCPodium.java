@@ -67,9 +67,8 @@ public class MaplePlayerNPCPodium {
     private static Point calcNextPos(int rank, int step) {
         int podiumPlatform = rank / step;
         int relativePos = (rank % step) + 1;
-        
-        Point pos = new Point(getPlatformPosX(podiumPlatform) + ((100 * relativePos) / (step + 1)), getPlatformPosY(podiumPlatform));
-        return pos;
+
+        return new Point(getPlatformPosX(podiumPlatform) + ((100 * relativePos) / (step + 1)), getPlatformPosY(podiumPlatform));
     }
     
     private static Point rearrangePlayerNpcs(MapleMap map, int newStep, List<MaplePlayerNPC> pnpcs) {

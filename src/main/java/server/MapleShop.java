@@ -97,8 +97,7 @@ public class MapleShop {
                         MapleInventoryManipulator.addById(c, itemId, quantity, "", -1);          
                         c.getPlayer().gainMeso(-amount, false);
                     } else {
-                        short slotMax = ii.getSlotMax(c, item.getItemId());
-                        quantity = slotMax;
+                        quantity = ii.getSlotMax(c, item.getItemId());
                         MapleInventoryManipulator.addById(c, itemId, quantity, "", -1);
                         c.getPlayer().gainMeso(-item.getPrice(), false);
                     }
@@ -118,8 +117,7 @@ public class MapleShop {
                         MapleInventoryManipulator.addById(c, itemId, quantity, "", -1);
                         MapleInventoryManipulator.removeById(c, MapleInventoryType.ETC, 4310000, amount, false, false);
                     } else {
-                        short slotMax = ii.getSlotMax(c, item.getItemId());
-                        quantity = slotMax;
+                        quantity = ii.getSlotMax(c, item.getItemId());
                         MapleInventoryManipulator.addById(c, itemId, quantity, "", -1);
                         MapleInventoryManipulator.removeById(c, MapleInventoryType.ETC, 4310000, amount, false, false);
                     }

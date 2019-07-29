@@ -1494,8 +1494,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          mapEim.registerPlayer(this, false);
       }
 
-      MapleMap to = target; // warps directly to the target intead of the target's map id, this allows GMs to patrol players inside instances.
-      changeMapInternal(to, pto.getPosition(), MaplePacketCreator.getWarpToMap(to, pto.getId(), this));
+      changeMapInternal(target, pto.getPosition(), MaplePacketCreator.getWarpToMap(target, pto.getId(), this));
       canWarpMap = false;
 
       canWarpCounter--;
@@ -2215,7 +2214,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return false;
       }
 
-      int accId = senderAccId, world = 0;
+      int world = 0;
       Connection con = null;
       try {
          con = DatabaseConnection.getConnection();
@@ -2270,7 +2269,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          try (PreparedStatement ps = con.prepareStatement("SELECT id, guildid, guildrank, name, allianceRank FROM characters WHERE id = ? AND accountid = ?")) {
             ps.setInt(1, cid);
-            ps.setInt(2, accId);
+            ps.setInt(2, senderAccId);
             try (ResultSet rs = ps.executeQuery()) {
                if (rs.next() && rs.getInt("guildid") > 0) {
                   Server.getInstance().deleteGuildCharacter(new MapleGuildCharacter(player, cid, 0, rs.getString("name"), (byte) -1, (byte) -1, 0, rs.getInt("guildrank"), rs.getInt("guildid"), false, rs.getInt("allianceRank")));
@@ -2382,7 +2381,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          con.close();
-         Server.getInstance().deleteCharacterEntry(accId, cid);
+         Server.getInstance().deleteCharacterEntry(senderAccId, cid);
          return true;
       } catch (SQLException e) {
          e.printStackTrace();
@@ -5577,8 +5576,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public final MapleQuestStatus getMapleQuestStatus(final int quest) {
       synchronized (quests) {
-         MapleQuestStatus mqs = quests.get((short) quest);
-         return mqs;
+         return quests.get((short) quest);
       }
    }
 
@@ -8877,22 +8875,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private int calcHpRatioUpdate(int curpoint, int maxpoint, int diffpoint) {
-      int curMax = maxpoint;
       int nextMax = Math.min(30000, maxpoint + diffpoint);
 
       float temp = curpoint * nextMax;
-      int ret = (int) Math.ceil(temp / curMax);
+      int ret = (int) Math.ceil(temp / maxpoint);
 
       transienthp = (maxpoint > nextMax) ? ((float) curpoint) / maxpoint : ((float) ret) / nextMax;
       return ret;
    }
 
    private int calcMpRatioUpdate(int curpoint, int maxpoint, int diffpoint) {
-      int curMax = maxpoint;
       int nextMax = Math.min(30000, maxpoint + diffpoint);
 
       float temp = curpoint * nextMax;
-      int ret = (int) Math.ceil(temp / curMax);
+      int ret = (int) Math.ceil(temp / maxpoint);
 
       transientmp = (maxpoint > nextMax) ? ((float) curpoint) / maxpoint : ((float) ret) / nextMax;
       return ret;

@@ -238,8 +238,7 @@ public class MapleLifeFactory {
                 
                 monsterStats.put(mid, stats);
             }
-            MapleMonster ret = new MapleMonster(mid, stats);
-            return ret;
+           return new MapleMonster(mid, stats);
         } catch(NullPointerException npe) {
             System.out.println("[SEVERE] MOB " + mid + " failed to load. Issue: " + npe.getMessage() + "\n\n");
             npe.printStackTrace();
