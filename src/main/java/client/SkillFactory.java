@@ -24,6 +24,9 @@ package client;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 
 import constants.skills.Aran;
 import constants.skills.Archer;
@@ -89,11 +92,91 @@ public class SkillFactory {
    private static Map<Integer, Skill> skills = new HashMap<>();
    private static MapleDataProvider datasource = MapleDataProviderFactory.getDataProvider(MapleDataProviderFactory.fileInWZPath("Skill.wz"));
 
-   public static Skill getSkill(int id) {
+   public static Optional<Skill> getSkill(int id) {
       if (!skills.isEmpty()) {
-         return skills.get(id);
+         return Optional.of(skills.get(id));
       }
-      return null;
+      return Optional.empty();
+   }
+
+   public static byte getSkillLevel(MapleCharacter character, int skillId) {
+      Optional<Skill> skill = getSkill(skillId);
+      return skill.map(character::getSkillLevel).orElse(Byte.valueOf("0"));
+   }
+
+   /**
+    * Executes a function given a skill
+    *
+    * @param character the character
+    * @param skillId   the skill identifier
+    * @param function  the function to apply
+    */
+   public static void executeForSkill(MapleCharacter character, int skillId, BiConsumer<Skill, Integer> function) {
+      Optional<Skill> skill = SkillFactory.getSkill(skillId);
+      if (skill.isPresent()) {
+         int skillLevel = character.getSkillLevel(skill.get());
+         function.accept(skill.get(), skillLevel);
+      }
+   }
+
+   /**
+    * Executes a function given a skill
+    *
+    * @param character the character
+    * @param skillId   the skill identifier
+    * @param function  the function to apply
+    */
+   public static <T> T applyForSkill(MapleCharacter character, int skillId, BiFunction<Skill, Integer, T> function, T defaultValue) {
+      Optional<Skill> skill = SkillFactory.getSkill(skillId);
+      if (skill.isPresent()) {
+         int skillLevel = character.getSkillLevel(skill.get());
+         return function.apply(skill.get(), skillLevel);
+      }
+      return defaultValue;
+   }
+
+   /**
+    * Executes a function if the user has a skill above level 0.
+    *
+    * @param character the character
+    * @param skillId   the skill identifier
+    * @param function  the function to execute
+    */
+   public static void executeIfHasSkill(MapleCharacter character, int skillId, BiConsumer<Skill, Integer> function) {
+      executeIfSkillMeetsConditional(character, skillId, (skill, skillLevel) -> skillLevel > 0, function);
+   }
+
+   /**
+    * Executes a function if the user has a skill that meets the conditional.
+    * @param character the character
+    * @param skillId the skill identifier
+    * @param conditional the condition to execute the function
+    * @param function the function to execute
+    */
+   public static void executeIfSkillMeetsConditional(MapleCharacter character, int skillId,
+                                                     BiFunction<Skill, Integer, Boolean> conditional,
+                                                     BiConsumer<Skill, Integer> function) {
+      executeForSkill(character, skillId, (skill, skillLevel) -> {
+         if (conditional.apply(skill, skillLevel)) {
+            function.accept(skill, skillLevel);
+         }
+      });
+   }
+
+   /**
+    * Executes a function if the user has a skill above level 0.
+    *
+    * @param character the character
+    * @param skillId   the skill identifier
+    * @param function  the function to execute
+    */
+   public static <T> T applyIfHasSkill(MapleCharacter character, int skillId, BiFunction<Skill, Integer, T> function, T defaultValue) {
+      return applyForSkill(character, skillId, (skill, skillLevel) -> {
+         if (skillLevel > 0) {
+            return function.apply(skill, skillLevel);
+         }
+         return defaultValue;
+      }, defaultValue);
    }
 
    public static void loadAllSkills() {

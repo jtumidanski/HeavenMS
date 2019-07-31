@@ -400,7 +400,9 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
             c.announce(MaplePacketCreator.updateGender(player));
             player.checkMessenger();
             c.announce(MaplePacketCreator.enableReport());
-            player.changeSkillLevel(SkillFactory.getSkill(10000000 * player.getJobType() + 12), (byte) (player.getLinkedLevel() / 10), 20, -1);
+
+            int skillId = 10000000 * player.getJobType() + 12;
+            player.changeSkillLevel(SkillFactory.getSkill(skillId).orElseThrow(), (byte) (player.getLinkedLevel() / 10), 20, -1);
             player.checkBerserk(player.isHidden());
 
             if (newcomer) {

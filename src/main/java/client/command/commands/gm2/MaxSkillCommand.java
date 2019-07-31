@@ -28,7 +28,6 @@ import java.io.File;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleJob;
-import client.Skill;
 import client.SkillFactory;
 import client.command.Command;
 import provider.MapleData;
@@ -44,8 +43,8 @@ public class MaxSkillCommand extends Command {
       MapleCharacter player = c.getPlayer();
       for (MapleData skill_ : MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img").getChildren()) {
          try {
-            Skill skill = SkillFactory.getSkill(Integer.parseInt(skill_.getName()));
-            player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1);
+            int skillId = Integer.parseInt(skill_.getName());
+            SkillFactory.getSkill(skillId).ifPresent(skill -> player.changeSkillLevel(skill, (byte) skill.getMaxLevel(), skill.getMaxLevel(), -1));
          } catch (NumberFormatException nfe) {
             nfe.printStackTrace();
             break;
@@ -54,11 +53,9 @@ public class MaxSkillCommand extends Command {
       }
 
       if (player.getJob().isA(MapleJob.ARAN1) || player.getJob().isA(MapleJob.LEGEND)) {
-         Skill skill = SkillFactory.getSkill(5001005);
-         player.changeSkillLevel(skill, (byte) -1, -1, -1);
+         SkillFactory.getSkill(5001005).ifPresent(skill -> player.changeSkillLevel(skill, (byte) -1, -1, -1));
       } else {
-         Skill skill = SkillFactory.getSkill(21001001);
-         player.changeSkillLevel(skill, (byte) -1, -1, -1);
+         SkillFactory.getSkill(21001001).ifPresent(skill -> player.changeSkillLevel(skill, (byte) -1, -1, -1));
       }
 
       player.yellowMessage("Skills maxed out.");

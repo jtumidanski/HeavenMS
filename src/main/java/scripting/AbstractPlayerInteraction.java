@@ -31,7 +31,6 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleQuestStatus;
-import client.Skill;
 import client.SkillFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
@@ -935,18 +934,19 @@ public class AbstractPlayerInteraction {
    }
 
    public void teachSkill(int skillid, byte level, byte masterLevel, long expiration, boolean force) {
-      Skill skill = SkillFactory.getSkill(skillid);
-      MapleCharacter.SkillEntry skillEntry = getPlayer().getSkills().get(skill);
-      if (skillEntry != null) {
-         if (!force && level > -1) {
-            getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.skillevel, level), Math.max(skillEntry.masterlevel, masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.expiration, expiration));
-            return;
+      SkillFactory.getSkill(skillid).ifPresent(skill -> {
+         MapleCharacter.SkillEntry skillEntry = getPlayer().getSkills().get(skill);
+         if (skillEntry != null) {
+            if (!force && level > -1) {
+               getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.skillevel, level), Math.max(skillEntry.masterlevel, masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.expiration, expiration));
+               return;
+            }
+         } else if (GameConstants.isAranSkills(skillid)) {
+            c.announce(MaplePacketCreator.showInfo("Effect/BasicEff.img/AranGetSkill"));
          }
-      } else if (GameConstants.isAranSkills(skillid)) {
-         c.announce(MaplePacketCreator.showInfo("Effect/BasicEff.img/AranGetSkill"));
-      }
 
-      getPlayer().changeSkillLevel(skill, level, masterLevel, expiration);
+         getPlayer().changeSkillLevel(skill, level, masterLevel, expiration);
+      });
    }
 
    public void removeEquipFromSlot(short slot) {

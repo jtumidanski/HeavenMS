@@ -36,11 +36,13 @@ public class BuffMeCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      SkillFactory.getSkill(4101004).getEffect(SkillFactory.getSkill(4101004).getMaxLevel()).applyTo(player);
-      SkillFactory.getSkill(2311003).getEffect(SkillFactory.getSkill(2311003).getMaxLevel()).applyTo(player);
-      SkillFactory.getSkill(1301007).getEffect(SkillFactory.getSkill(1301007).getMaxLevel()).applyTo(player);
-      SkillFactory.getSkill(2301004).getEffect(SkillFactory.getSkill(2301004).getMaxLevel()).applyTo(player);
-      SkillFactory.getSkill(1005).getEffect(SkillFactory.getSkill(1005).getMaxLevel()).applyTo(player);
+
+
+      SkillFactory.getSkill(4101004).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
+      SkillFactory.getSkill(2311003).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
+      SkillFactory.getSkill(1301007).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
+      SkillFactory.getSkill(2301004).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
+      SkillFactory.getSkill(1005).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
       player.healHpMp();
    }
 }

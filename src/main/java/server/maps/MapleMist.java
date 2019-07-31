@@ -101,7 +101,7 @@ public class MapleMist extends AbstractMapleMapObject {
    }
 
    public Skill getSourceSkill() {
-      return SkillFactory.getSkill(source.getSourceId());
+      return SkillFactory.getSkill(source.getSourceId()).orElse(null);
    }
 
    public boolean isMobMist() {
@@ -138,7 +138,10 @@ public class MapleMist extends AbstractMapleMapObject {
 
    public final byte[] makeSpawnData() {
       if (owner != null) {
-         return MaplePacketCreator.spawnMist(getObjectId(), owner.getId(), getSourceSkill().getId(), owner.getSkillLevel(SkillFactory.getSkill(source.getSourceId())), this);
+         return SkillFactory.applyForSkill(owner,
+               source.getSourceId(),
+               (skill, skillLevel) -> MaplePacketCreator.spawnMist(getObjectId(), owner.getId(), getSourceSkill().getId(), skillLevel, this),
+               new byte[0]);
       }
       return MaplePacketCreator.spawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this);
    }

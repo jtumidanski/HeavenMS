@@ -73,20 +73,18 @@ public class SkillAction extends MapleQuestAction {
    @Override
    public void run(MapleCharacter chr, Integer extSelection) {
       for (SkillData skill : skillData.values()) {
-         Skill skillObject = SkillFactory.getSkill(skill.getId());
-         if (skillObject == null) continue;
+         SkillFactory.getSkill(skill.getId()).ifPresent(skill1 -> {
+            boolean shouldLearn = false;
 
-         boolean shouldLearn = false;
+            if (skill.jobsContains(chr.getJob()) || skill1.isBeginnerSkill())
+               shouldLearn = true;
 
-         if (skill.jobsContains(chr.getJob()) || skillObject.isBeginnerSkill())
-            shouldLearn = true;
-
-         byte skillLevel = (byte) Math.max(skill.getLevel(), chr.getSkillLevel(skillObject));
-         int masterLevel = Math.max(skill.getMasterLevel(), chr.getMasterLevel(skillObject));
-         if (shouldLearn) {
-            chr.changeSkillLevel(skillObject, skillLevel, masterLevel, -1);
-         }
-
+            byte skillLevel = (byte) Math.max(skill.getLevel(), chr.getSkillLevel(skill1));
+            int masterLevel = Math.max(skill.getMasterLevel(), chr.getMasterLevel(skill1));
+            if (shouldLearn) {
+               chr.changeSkillLevel(skill1, skillLevel, masterLevel, -1);
+            }
+         });
       }
    }
 

@@ -25,6 +25,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
@@ -169,16 +170,22 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
                int jobid = chr.getJob().getId();
                if (jobid == 212 || jobid == 222 || jobid == 232) {
                   int id = jobid * 10000 + 1002;
-                  Skill manaReflectSkill = SkillFactory.getSkill(id);
-                  if (chr.isBuffFrom(MapleBuffStat.MANA_REFLECTION, manaReflectSkill) && chr.getSkillLevel(manaReflectSkill) > 0 && manaReflectSkill.getEffect(chr.getSkillLevel(manaReflectSkill)).makeChanceResult()) {
-                     int bouncedamage = (damage * manaReflectSkill.getEffect(chr.getSkillLevel(manaReflectSkill)).getX() / 100);
-                     if (bouncedamage > attacker.getMaxHp() / 5) {
-                        bouncedamage = attacker.getMaxHp() / 5;
+                  Optional<Skill> manaReflectSkill = SkillFactory.getSkill(id);
+                  if (manaReflectSkill.isPresent()) {
+                     Skill skill = manaReflectSkill.get();
+                     int skillLevel = chr.getSkillLevel(skill);
+
+                     if (chr.isBuffFrom(MapleBuffStat.MANA_REFLECTION, skill) && skillLevel > 0
+                           && skill.getEffect(skillLevel).makeChanceResult()) {
+                        int bouncedamage = (damage * manaReflectSkill.get().getEffect(skillLevel).getX() / 100);
+                        if (bouncedamage > attacker.getMaxHp() / 5) {
+                           bouncedamage = attacker.getMaxHp() / 5;
+                        }
+                        map.damageMonster(chr, attacker, bouncedamage);
+                        map.broadcastMessage(chr, MaplePacketCreator.damageMonster(oid, bouncedamage), true);
+                        chr.getClient().announce(MaplePacketCreator.showOwnBuffEffect(id, 5));
+                        map.broadcastMessage(chr, MaplePacketCreator.showBuffeffect(chr.getId(), id, 5), false);
                      }
-                     map.damageMonster(chr, attacker, bouncedamage);
-                     map.broadcastMessage(chr, MaplePacketCreator.damageMonster(oid, bouncedamage), true);
-                     chr.getClient().announce(MaplePacketCreator.showOwnBuffEffect(id, 5));
-                     map.broadcastMessage(chr, MaplePacketCreator.showBuffeffect(chr.getId(), id, 5), false);
                   }
                }
             }
@@ -214,10 +221,12 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
                }
                MapleStatEffect bPressure = chr.getBuffEffect(MapleBuffStat.COMBO_BARRIER);
                if (bPressure != null) {
-                  Skill skill = SkillFactory.getSkill(Aran.BODY_PRESSURE);
-                  if (!attacker.alreadyBuffedStats().contains(MonsterStatus.NEUTRALISE)) {
-                     if (!attacker.isBoss() && bPressure.makeChanceResult()) {
-                        attacker.applyStatus(chr, new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.NEUTRALISE, 1), skill, null, false), false, (bPressure.getDuration() / 10) * 2, false);
+                  Optional<Skill> skill = SkillFactory.getSkill(Aran.BODY_PRESSURE);
+                  if (skill.isPresent()) {
+                     if (!attacker.alreadyBuffedStats().contains(MonsterStatus.NEUTRALISE)) {
+                        if (!attacker.isBoss() && bPressure.makeChanceResult()) {
+                           attacker.applyStatus(chr, new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.NEUTRALISE, 1), skill.get(), null, false), false, (bPressure.getDuration() / 10) * 2, false);
+                        }
                      }
                   }
                }
@@ -229,15 +238,13 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
             }
          }
          if (damagefrom != -3 && damagefrom != -4) {
-            int achilles = 0;
-            Skill achilles1 = null;
             int jobid = chr.getJob().getId();
             if (jobid < 200 && jobid % 10 == 2) {
-               achilles1 = SkillFactory.getSkill(jobid * 10000 + (jobid == 112 ? 4 : 5));
-               achilles = chr.getSkillLevel(achilles1);
-            }
-            if (achilles != 0 && achilles1 != null) {
-               damage *= (achilles1.getEffect(achilles).getX() / 1000.0);
+               Optional<Skill> skill = SkillFactory.getSkill(jobid * 10000 + (jobid == 112 ? 4 : 5));
+               if (skill.isPresent()) {
+                  int skillLevel = chr.getSkillLevel(skill.get());
+                  damage *= (skill.get().getEffect(skillLevel).getX() / 1000.0);
+               }
             }
          }
          Integer mesoguard = chr.getBuffedValue(MapleBuffStat.MESOGUARD);

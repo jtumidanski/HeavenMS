@@ -37,19 +37,21 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
 
 import org.apache.mina.util.ConcurrentHashSet;
@@ -200,7 +202,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private MapleFamily family;
    private int familyId;
    private int bookCover;
-   private int battleshipHp = 0;
+   private int battleShipHp = 0;
    private int mesosTraded = 0;
    private int possibleReports = 10;
    private int ariantPoints, dojoPoints, vanquisherStage, dojoStage, dojoEnergy, vanquisherKills;
@@ -1541,7 +1543,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             ps.setInt(1, charid);
             rs = ps.executeQuery();
             while (rs.next()) {
-               ret.skills.put(SkillFactory.getSkill(rs.getInt("skillid")), new SkillEntry(rs.getByte("skilllevel"), rs.getInt("masterlevel"), rs.getLong("expiration")));
+               Optional<Skill> skill = SkillFactory.getSkill(rs.getInt("skillid"));
+               if (skill.isPresent()) {
+                  SkillEntry skillEntry = new SkillEntry(rs.getByte("skilllevel"), rs.getInt("masterlevel"), rs.getLong("expiration"));
+                  ret.skills.put((skill.get()), skillEntry);
+               }
             }
             rs.close();
             ps.close();
@@ -2278,17 +2284,18 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          skills[0] = Evan.BLESSING_OF_THE_ONYX;
          skills[1] = Evan.BLAZE;
       }
-      for (Integer skillId : skills) {
-         if (skillId != 0) {
-            Skill skill = SkillFactory.getSkill(skillId);
-            final int skilllevel = getSkillLevel(skill);
-            if (skilllevel > 0) {
-               continue;
-            }
 
-            changeSkillLevel(skill, (byte) 0, 10, -1);
-         }
-      }
+      Arrays.stream(skills)
+            .filter(id -> id != 0)
+            .mapToObj(SkillFactory::getSkill)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .forEach(skill -> {
+               int skillLevel = getSkillLevel(skill);
+               if (skillLevel > 0) {
+                  changeSkillLevel(skill, (byte) 0, 10, -1);
+               }
+            });
    }
 
    private void broadcastChangeJob() {
@@ -2694,7 +2701,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                if (value == 1 && ((returnMapid == 211000000 && thisMapid != 200082300) || returnMapid == 193000000)) {
                   return true;        //protection from cold
-               } else return value == 2 && (returnMapid == 230000000 || thisMapid == 200082300);        //breathing underwater
+               } else {
+                  return value == 2 && (returnMapid == 230000000 || thisMapid == 200082300);        //breathing underwater
+               }
             }
          }
       } finally {
@@ -2944,33 +2953,79 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.currentType = type;
    }
 
+   /**
+    * Executes a function given a skill
+    * @param skillId the skill identifier
+    * @param function the function to apply
+    */
+   private void executeForSkill(int skillId, BiConsumer<Skill, Integer> function) {
+      SkillFactory.executeForSkill(this, skillId, function);
+   }
+
+   /**
+    * Executes a function given a skill
+    * @param skillId the skill identifier
+    * @param function the function to apply
+    */
+   private boolean applyForSkill(int skillId, BiFunction<Skill, Integer, Boolean> function) {
+      return SkillFactory.applyForSkill(this, skillId, function, false);
+   }
+
+   /**
+    * Executes a function if the user has a skill above level 0.
+    *
+    * @param skillId  the skill identifier
+    * @param function the function to execute
+    */
+   private void executeIfHasSkill(int skillId, BiConsumer<Skill, Integer> function) {
+      SkillFactory.executeIfHasSkill(this, skillId, function);
+   }
+
+   /**
+    * Executes a function if the user has a skill above level 0.
+    *
+    * @param skillId  the skill identifier
+    * @param function the function to execute
+    */
+   private boolean applyIfHasSkill(int skillId, BiFunction<Skill, Integer, Boolean> function) {
+      return SkillFactory.applyIfHasSkill(this, skillId, function, false);
+   }
+
    public void checkBerserk(final boolean isHidden) {
       if (berserkSchedule != null) {
          berserkSchedule.cancel(false);
       }
       final MapleCharacter chr = this;
       if (job.equals(MapleJob.DARKKNIGHT)) {
-         Skill BerserkX = SkillFactory.getSkill(DarkKnight.BERSERK);
-         final int skilllevel = getSkillLevel(BerserkX);
-         if (skilllevel > 0) {
-            berserk = chr.getHp() * 100 / chr.getCurrentMaxHp() < BerserkX.getEffect(skilllevel).getX();
-            berserkSchedule = TimerManager.getInstance().register(new Runnable() {
-               @Override
-               public void run() {
-                  if (awayFromWorld.get()) {
-                     return;
-                  }
-
-                  client.announce(MaplePacketCreator.showOwnBerserk(skilllevel, berserk));
-                  if (!isHidden) {
-                     getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skilllevel, berserk), false);
-                  } else {
-                     getMap().broadcastGMMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skilllevel, berserk), false);
-                  }
-               }
-            }, 5000, 3000);
-         }
+         executeIfHasSkill(DarkKnight.BERSERK, (skill, skillLevel) -> scheduleBerserk(isHidden, chr, skill, skillLevel));
       }
+   }
+
+   /**
+    * Schedules a runnable for enabling the users berserk skill.
+    *
+    * @param isHidden   true if the source is hidden
+    * @param character  the character
+    * @param skill      the berserk skill
+    * @param skillLevel the level of berserk
+    */
+   private void scheduleBerserk(boolean isHidden, MapleCharacter character, Skill skill, Integer skillLevel) {
+      this.berserk = character.getHp() * 100 / character.getCurrentMaxHp() < skill.getEffect(skillLevel).getX();
+      berserkSchedule = TimerManager.getInstance().register(new Runnable() {
+         @Override
+         public void run() {
+            if (awayFromWorld.get()) {
+               return;
+            }
+
+            client.announce(MaplePacketCreator.showOwnBerserk(skillLevel, MapleCharacter.this.berserk));
+            if (!isHidden) {
+               getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
+            } else {
+               getMap().broadcastGMMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
+            }
+         }
+      }, 5000, 3000);
    }
 
    public void checkMessenger() {
@@ -3237,18 +3292,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void announceBattleshipHp() {
-      announce(MaplePacketCreator.skillCooldown(5221999, battleshipHp));
+      announce(MaplePacketCreator.skillCooldown(5221999, battleShipHp));
    }
 
    public void decreaseBattleshipHp(int decrease) {
-      this.battleshipHp -= decrease;
-      if (battleshipHp <= 0) {
-         Skill battleship = SkillFactory.getSkill(Corsair.BATTLE_SHIP);
-         int cooldown = battleship.getEffect(getSkillLevel(battleship)).getCooldown();
-         announce(MaplePacketCreator.skillCooldown(Corsair.BATTLE_SHIP, cooldown));
-         addCooldown(Corsair.BATTLE_SHIP, Server.getInstance().getCurrentTime(), (long) (cooldown * 1000));
-         removeCooldown(5221999);
-         cancelEffectFromBuffStat(MapleBuffStat.MONSTER_RIDING);
+      this.battleShipHp -= decrease;
+      if (battleShipHp <= 0) {
+         SkillFactory.getSkill(Corsair.BATTLE_SHIP).ifPresent(skill -> {
+                  int coolDown = skill.getEffect(getSkillLevel(skill)).getCooldown();
+                  announce(MaplePacketCreator.skillCooldown(Corsair.BATTLE_SHIP, coolDown));
+                  addCooldown(Corsair.BATTLE_SHIP, Server.getInstance().getCurrentTime(), (long) (coolDown * 1000));
+                  removeCooldown(5221999);
+                  cancelEffectFromBuffStat(MapleBuffStat.MONSTER_RIDING);
+               }
+         );
       } else {
          announceBattleshipHp();
          addCooldown(5221999, 0, Long.MAX_VALUE);
@@ -4115,11 +4172,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public int getBattleshipHp() {
-      return battleshipHp;
+      return battleShipHp;
    }
 
    public void setBattleshipHp(int battleshipHp) {
-      this.battleshipHp = battleshipHp;
+      this.battleShipHp = battleshipHp;
    }
 
    public BuddyList getBuddylist() {
@@ -4927,43 +4984,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (beholderBuffSchedule != null) {
             beholderBuffSchedule.cancel(false);
          }
-         Skill bHealing = SkillFactory.getSkill(DarkKnight.AURA_OF_BEHOLDER);
-         int bHealingLvl = getSkillLevel(bHealing);
-         if (bHealingLvl > 0) {
-            final MapleStatEffect healEffect = bHealing.getEffect(bHealingLvl);
-            int healInterval = healEffect.getX() * 1000;
-            beholderHealingSchedule = TimerManager.getInstance().register(new Runnable() {
-               @Override
-               public void run() {
-                  if (awayFromWorld.get()) {
-                     return;
-                  }
 
-                  addHP(healEffect.getHp());
-                  client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, 5), true);
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showOwnBuffEffect(beholder, 2), false);
-               }
-            }, healInterval, healInterval);
-         }
-         Skill bBuff = SkillFactory.getSkill(DarkKnight.HEX_OF_BEHOLDER);
-         if (getSkillLevel(bBuff) > 0) {
-            final MapleStatEffect buffEffect = bBuff.getEffect(getSkillLevel(bBuff));
-            int buffInterval = buffEffect.getX() * 1000;
-            beholderBuffSchedule = TimerManager.getInstance().register(new Runnable() {
-               @Override
-               public void run() {
-                  if (awayFromWorld.get()) {
-                     return;
-                  }
-
-                  buffEffect.applyTo(MapleCharacter.this);
-                  client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, (int) (Math.random() * 3) + 6), true);
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBuffeffect(getId(), beholder, 2), false);
-               }
-            }, buffInterval, buffInterval);
-         }
+         executeIfHasSkill(DarkKnight.AURA_OF_BEHOLDER, (skill, skillLevel) -> scheduleAuraOfBeholder(beholder, skill, skillLevel));
+         executeIfHasSkill(DarkKnight.HEX_OF_BEHOLDER, (skill, skillLevel) -> scheduleHexOfBeholder(beholder, skill, skillLevel));
       } else if (effect.isRecovery()) {
          int healInterval = (ServerConstants.USE_ULTRA_RECOVERY) ? 2000 : 5000;
          final byte heal = (byte) effect.getX();
@@ -5090,19 +5113,54 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       updateLocalStats();
    }
 
+   private void scheduleAuraOfBeholder(int beholder, Skill skill, Integer skillLevel) {
+      final MapleStatEffect healEffect = skill.getEffect(skillLevel);
+      int healInterval = healEffect.getX() * 1000;
+      beholderHealingSchedule = TimerManager.getInstance().register(new Runnable() {
+         @Override
+         public void run() {
+            if (awayFromWorld.get()) {
+               return;
+            }
+
+            addHP(healEffect.getHp());
+            client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
+            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, 5), true);
+            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showOwnBuffEffect(beholder, 2), false);
+         }
+      }, healInterval, healInterval);
+   }
+
+   private void scheduleHexOfBeholder(int beholder, Skill skill, Integer skillLevel) {
+      final MapleStatEffect buffEffect = skill.getEffect(skillLevel);
+      int buffInterval = buffEffect.getX() * 1000;
+      beholderBuffSchedule = TimerManager.getInstance().register(new Runnable() {
+         @Override
+         public void run() {
+            if (awayFromWorld.get()) {
+               return;
+            }
+
+            buffEffect.applyTo(MapleCharacter.this);
+            client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
+            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, (int) (Math.random() * 3) + 6), true);
+            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBuffeffect(getId(), beholder, 2), false);
+         }
+      }, buffInterval, buffInterval);
+   }
+
    public boolean unregisterChairBuff() {
       if (!ServerConstants.USE_CHAIR_EXTRAHEAL) {
          return false;
       }
 
       int skillId = getJobMapChair(job);
-      int skillLv = getSkillLevel(skillId);
-      if (skillLv > 0) {
-         MapleStatEffect mapChairSkill = SkillFactory.getSkill(skillId).getEffect(skillLv);
-         return cancelEffect(mapChairSkill, false, -1);
-      }
 
-      return false;
+
+      return applyIfHasSkill(skillId, (skill, skillLevel) -> {
+         MapleStatEffect statEffect = skill.getEffect(skillLevel);
+         return cancelEffect(statEffect, false, -1);
+      });
    }
 
    public boolean registerChairBuff() {
@@ -5111,14 +5169,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       int skillId = getJobMapChair(job);
-      int skillLv = getSkillLevel(skillId);
-      if (skillLv > 0) {
-         MapleStatEffect mapChairSkill = SkillFactory.getSkill(skillId).getEffect(skillLv);
-         mapChairSkill.applyTo(this);
+      return applyIfHasSkill(skillId, (skill, skillLevel) -> {
+         MapleStatEffect statEffect = skill.getEffect(skillLevel);
+         statEffect.applyTo(this);
          return true;
-      }
-
-      return false;
+      });
    }
 
    public int getChair() {
@@ -6544,7 +6599,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void giveCoolDowns(final int skillid, long starttime, long length) {
       if (skillid == 5221999) {
-         this.battleshipHp = (int) length;
+         this.battleShipHp = (int) length;
          addCooldown(skillid, 0, length);
       } else {
          long timeNow = Server.getInstance().getCurrentTime();
@@ -6578,45 +6633,54 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void handleEnergyChargeGain() { // to get here energychargelevel has to be > 0
-      Skill energycharge = isCygnus() ? SkillFactory.getSkill(ThunderBreaker.ENERGY_CHARGE) : SkillFactory.getSkill(Marauder.ENERGY_CHARGE);
-      MapleStatEffect ceffect;
-      ceffect = energycharge.getEffect(getSkillLevel(energycharge));
-      TimerManager tMan = TimerManager.getInstance();
-      if (energybar < 10000) {
-         energybar += 102;
-         if (energybar > 10000) {
-            energybar = 10000;
-         }
-         List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
-         setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
-         client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
-         client.announce(MaplePacketCreator.showOwnBuffEffect(energycharge.getId(), 2));
-         getMap().broadcastMessage(this, MaplePacketCreator.showBuffeffect(id, energycharge.getId(), 2));
-         getMap().broadcastMessage(this, MaplePacketCreator.giveForeignBuff(energybar, stat));
+      Optional<Skill> energyCharge;
+      if (isCygnus()) {
+         energyCharge = SkillFactory.getSkill(ThunderBreaker.ENERGY_CHARGE);
+      } else {
+         energyCharge = SkillFactory.getSkill(Marauder.ENERGY_CHARGE);
       }
-      if (energybar >= 10000 && energybar < 11000) {
-         energybar = 15000;
-         final MapleCharacter chr = this;
-         tMan.schedule(new Runnable() {
-            @Override
-            public void run() {
-               energybar = 0;
-               List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
-               setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
-               client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
-               getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(energybar, stat));
+
+      energyCharge.ifPresent(skill -> {
+         MapleStatEffect statEffect = skill.getEffect(getSkillLevel(skill));
+         TimerManager tMan = TimerManager.getInstance();
+         if (energybar < 10000) {
+            energybar += 102;
+            if (energybar > 10000) {
+               energybar = 10000;
             }
-         }, ceffect.getDuration());
-      }
+            List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
+            setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
+            client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
+            client.announce(MaplePacketCreator.showOwnBuffEffect(skill.getId(), 2));
+            getMap().broadcastMessage(this, MaplePacketCreator.showBuffeffect(id, skill.getId(), 2));
+            getMap().broadcastMessage(this, MaplePacketCreator.giveForeignBuff(energybar, stat));
+         }
+         if (energybar >= 10000 && energybar < 11000) {
+            energybar = 15000;
+            final MapleCharacter chr = this;
+            tMan.schedule(new Runnable() {
+               @Override
+               public void run() {
+                  energybar = 0;
+                  List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
+                  setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
+                  client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
+                  getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(energybar, stat));
+               }
+            }, statEffect.getDuration());
+         }
+      });
+
    }
 
    public void handleOrbconsume() {
       int skillid = isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
-      Skill combo = SkillFactory.getSkill(skillid);
-      List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, 1));
-      setBuffedValue(MapleBuffStat.COMBO, 1);
-      client.announce(MaplePacketCreator.giveBuff(skillid, combo.getEffect(getSkillLevel(combo)).getDuration() + (int) ((getBuffedStarttime(MapleBuffStat.COMBO) - System.currentTimeMillis())), stat));
-      getMap().broadcastMessage(this, MaplePacketCreator.giveForeignBuff(getId(), stat), false);
+      SkillFactory.getSkill(skillid).ifPresent(combo -> {
+         List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, 1));
+         setBuffedValue(MapleBuffStat.COMBO, 1);
+         client.announce(MaplePacketCreator.giveBuff(skillid, combo.getEffect(getSkillLevel(combo)).getDuration() + (int) ((getBuffedStarttime(MapleBuffStat.COMBO) - System.currentTimeMillis())), stat));
+         getMap().broadcastMessage(this, MaplePacketCreator.giveForeignBuff(getId(), stat), false);
+      });
    }
 
    public boolean hasEntered(String script) {
@@ -6951,11 +7015,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public synchronized void levelUp(boolean takeexp) {
-      Skill improvingMaxHP = null;
-      Skill improvingMaxMP = null;
-      int improvingMaxHPLevel = 0;
-      int improvingMaxMPLevel = 0;
-
       boolean isBeginner = isBeginnerJob();
       if (ServerConstants.USE_AUTOASSIGN_STARTERS_AP && isBeginner && level < 11) {
          effLock.lock();
@@ -6992,57 +7051,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          gainAp(remainingAp, true);
       }
 
-      int addhp = 0, addmp = 0;
-      if (isBeginner) {
-         addhp += Randomizer.rand(12, 16);
-         addmp += Randomizer.rand(10, 12);
-      } else if (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.DAWNWARRIOR1)) {
-         improvingMaxHP = isCygnus() ? SkillFactory.getSkill(DawnWarrior.MAX_HP_INCREASE) : SkillFactory.getSkill(Swordsman.IMPROVED_MAX_HP_INCREASE);
-         if (job.isA(MapleJob.CRUSADER)) {
-            improvingMaxMP = SkillFactory.getSkill(1210000);
-         } else if (job.isA(MapleJob.DAWNWARRIOR2)) {
-            improvingMaxMP = SkillFactory.getSkill(11110000);
-         }
-         improvingMaxHPLevel = getSkillLevel(improvingMaxHP);
-         addhp += Randomizer.rand(24, 28);
-         addmp += Randomizer.rand(4, 6);
-      } else if (job.isA(MapleJob.MAGICIAN) || job.isA(MapleJob.BLAZEWIZARD1)) {
-         improvingMaxMP = isCygnus() ? SkillFactory.getSkill(BlazeWizard.INCREASING_MAX_MP) : SkillFactory.getSkill(Magician.IMPROVED_MAX_MP_INCREASE);
-         improvingMaxMPLevel = getSkillLevel(improvingMaxMP);
-         addhp += Randomizer.rand(10, 14);
-         addmp += Randomizer.rand(22, 24);
-      } else if (job.isA(MapleJob.BOWMAN) || job.isA(MapleJob.THIEF) || (job.getId() > 1299 && job.getId() < 1500)) {
-         addhp += Randomizer.rand(20, 24);
-         addmp += Randomizer.rand(14, 16);
-      } else if (job.isA(MapleJob.GM)) {
-         addhp += 30000;
-         addmp += 30000;
-      } else if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
-         improvingMaxHP = isCygnus() ? SkillFactory.getSkill(ThunderBreaker.IMPROVE_MAX_HP) : SkillFactory.getSkill(5100000);
-         improvingMaxHPLevel = getSkillLevel(improvingMaxHP);
-         addhp += Randomizer.rand(22, 28);
-         addmp += Randomizer.rand(18, 23);
-      } else if (job.isA(MapleJob.ARAN1)) {
-         addhp += Randomizer.rand(44, 48);
-         int aids = Randomizer.rand(4, 8);
-         addmp += aids + Math.floor(aids * 0.1);
-      }
-      if (improvingMaxHPLevel > 0 && (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.PIRATE) || job.isA(MapleJob.DAWNWARRIOR1))) {
-         addhp += improvingMaxHP.getEffect(improvingMaxHPLevel).getX();
-      }
-      if (improvingMaxMPLevel > 0 && (job.isA(MapleJob.MAGICIAN) || job.isA(MapleJob.CRUSADER) || job.isA(MapleJob.BLAZEWIZARD1))) {
-         addmp += improvingMaxMP.getEffect(improvingMaxMPLevel).getX();
-      }
-
-      if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
-         if (getJobStyle() == MapleJob.MAGICIAN) {
-            addmp += localint_ / 20;
-         } else {
-            addmp += localint_ / 10;
-         }
-      }
-
-      addMaxMPMaxHP(addhp, addmp, true);
+      levelUpHealthAndManaPoints(isBeginner);
 
       if (takeexp) {
          exp.addAndGet(-ExpTable.getExpNeededForLevel(level));
@@ -7146,6 +7155,75 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       levelUpMessages();
       guildUpdate();
+   }
+
+   /**
+    * Address HP and MP additions on level up.
+    *
+    * @param isBeginner true if the character is a beginner
+    */
+   private void levelUpHealthAndManaPoints(boolean isBeginner) {
+      int improvingMaxHPSkillId = -1;
+      int improvingMaxMPSkillId = -1;
+
+      int addHp = 0, addMp = 0;
+      if (isBeginner) {
+         addHp += Randomizer.rand(12, 16);
+         addMp += Randomizer.rand(10, 12);
+      } else if (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.DAWNWARRIOR1)) {
+         improvingMaxHPSkillId = isCygnus() ? DawnWarrior.MAX_HP_INCREASE : Swordsman.IMPROVED_MAX_HP_INCREASE;
+         if (job.isA(MapleJob.CRUSADER)) {
+            improvingMaxMPSkillId = 1210000;
+         } else if (job.isA(MapleJob.DAWNWARRIOR2)) {
+            improvingMaxMPSkillId = 11110000;
+         }
+         addHp += Randomizer.rand(24, 28);
+         addMp += Randomizer.rand(4, 6);
+      } else if (job.isA(MapleJob.MAGICIAN) || job.isA(MapleJob.BLAZEWIZARD1)) {
+         improvingMaxMPSkillId = isCygnus() ? BlazeWizard.INCREASING_MAX_MP : Magician.IMPROVED_MAX_MP_INCREASE;
+         addHp += Randomizer.rand(10, 14);
+         addMp += Randomizer.rand(22, 24);
+      } else if (job.isA(MapleJob.BOWMAN) || job.isA(MapleJob.THIEF) || (job.getId() > 1299 && job.getId() < 1500)) {
+         addHp += Randomizer.rand(20, 24);
+         addMp += Randomizer.rand(14, 16);
+      } else if (job.isA(MapleJob.GM)) {
+         addHp += 30000;
+         addMp += 30000;
+      } else if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
+         improvingMaxHPSkillId = isCygnus() ? ThunderBreaker.IMPROVE_MAX_HP : 5100000;
+         addHp += Randomizer.rand(22, 28);
+         addMp += Randomizer.rand(18, 23);
+      } else if (job.isA(MapleJob.ARAN1)) {
+         addHp += Randomizer.rand(44, 48);
+         int aids = Randomizer.rand(4, 8);
+         addMp += aids + Math.floor(aids * 0.1);
+      }
+
+      Optional<Skill> improvingMaxHP = SkillFactory.getSkill(improvingMaxHPSkillId);
+      if (improvingMaxHP.isPresent()) {
+         int improvingMaxHPLevel = getSkillLevel(improvingMaxHP.get());
+         if (improvingMaxHPLevel > 0 && (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.PIRATE) || job.isA(MapleJob.DAWNWARRIOR1))) {
+            addHp += improvingMaxHP.get().getEffect(improvingMaxHPLevel).getX();
+         }
+      }
+
+      Optional<Skill> improvingMaxMP = SkillFactory.getSkill(improvingMaxMPSkillId);
+      if (improvingMaxMP.isPresent()) {
+         int improvingMaxMPLevel = getSkillLevel(improvingMaxMP.get());
+         if (improvingMaxMPLevel > 0 && (job.isA(MapleJob.MAGICIAN) || job.isA(MapleJob.CRUSADER) || job.isA(MapleJob.BLAZEWIZARD1))) {
+            addMp += improvingMaxMP.get().getEffect(improvingMaxMPLevel).getX();
+         }
+      }
+
+      if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
+         if (getJobStyle() == MapleJob.MAGICIAN) {
+            addMp += localint_ / 20;
+         } else {
+            addMp += localint_ / 10;
+         }
+      }
+
+      addMaxMPMaxHP(addHp, addMp, true);
    }
 
    public boolean leaveParty() {
@@ -7816,9 +7894,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          if (energybar == 15000) {
-            Skill energycharge = isCygnus() ? SkillFactory.getSkill(ThunderBreaker.ENERGY_CHARGE) : SkillFactory.getSkill(Marauder.ENERGY_CHARGE);
-            MapleStatEffect ceffect = energycharge.getEffect(getSkillLevel(energycharge));
-            localwatk += ceffect.getWatk();
+            executeForSkill(isCygnus() ? ThunderBreaker.ENERGY_CHARGE : Marauder.ENERGY_CHARGE, (skill, skillLevel) -> {
+               MapleStatEffect statEffect = skill.getEffect(skillLevel);
+               localwatk += statEffect.getWatk();
+            });
          }
 
          Integer mwarr = getBuffedValue(MapleBuffStat.MAPLE_WARRIOR);
@@ -7829,17 +7908,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             localluk += getLuk() * mwarr / 100;
          }
          if (job.isA(MapleJob.BOWMAN)) {
+
             Skill expert = null;
             if (job.isA(MapleJob.MARKSMAN)) {
-               expert = SkillFactory.getSkill(3220004);
+               executeForSkill(3220004, (skill, skillLevel) -> localwatk += skill.getEffect(skillLevel).getX());
             } else if (job.isA(MapleJob.BOWMASTER)) {
-               expert = SkillFactory.getSkill(3120005);
-            }
-            if (expert != null) {
-               int boostLevel = getSkillLevel(expert);
-               if (boostLevel > 0) {
-                  localwatk += expert.getEffect(boostLevel).getX();
-               }
+               executeForSkill(3120005, (skill, skillLevel) -> localwatk += skill.getEffect(skillLevel).getX());
             }
          }
 
@@ -8099,8 +8173,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void resetBattleshipHp() {
-      int bshipLevel = Math.max(getLevel() - 120, 0);  // thanks alex12 for noticing battleship HP issues for low-level players
-      this.battleshipHp = 400 * getSkillLevel(SkillFactory.getSkill(Corsair.BATTLE_SHIP)) + (bshipLevel * 200);
+      executeIfHasSkill(Corsair.BATTLE_SHIP, (skill, skillLevel) -> {
+         int battleshipLevel = Math.max(getLevel() - 120, 0);  // thanks alex12 for noticing battleship HP issues for low-level players
+         MapleCharacter.this.battleShipHp = 400 * skillLevel + (battleshipLevel * 200);
+      });
    }
 
    public void resetEnteredScript() {

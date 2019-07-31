@@ -163,16 +163,14 @@ public class EventInstanceManager {
 
    public void applyEventPlayersSkillBuff(int skillId, int skillLv) {
       List<MapleCharacter> players = getPlayerList();
-      Skill skill = SkillFactory.getSkill(skillId);
-
-      if (skill != null) {
+      SkillFactory.getSkill(skillId).ifPresent(skill -> {
          MapleStatEffect mse = skill.getEffect(Math.min(skillLv, skill.getMaxLevel()));
          if (mse != null) {
             for (MapleCharacter player : players) {
                mse.applyTo(player);
             }
          }
-      }
+      });
    }
 
    public void giveEventPlayersExp(int gain) {

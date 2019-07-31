@@ -646,11 +646,8 @@ public class AssignAPProcessor {
 
       if (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.DAWNWARRIOR1)) {
          if (!usedAPReset) {
-            Skill increaseHP = SkillFactory.getSkill(job.isA(MapleJob.DAWNWARRIOR1) ? DawnWarrior.MAX_HP_INCREASE : Warrior.IMPROVED_MAXHP);
-            int sLvl = player.getSkillLevel(increaseHP);
-
-            if (sLvl > 0)
-               MaxHP += increaseHP.getEffect(sLvl).getY();
+            int skillId = job.isA(MapleJob.DAWNWARRIOR1) ? DawnWarrior.MAX_HP_INCREASE : Warrior.IMPROVED_MAXHP;
+            MaxHP += SkillFactory.applyIfHasSkill(player, skillId, (skill, skillLevel) -> skill.getEffect(skillLevel).getY(), 0);
          }
 
          if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
@@ -704,11 +701,7 @@ public class AssignAPProcessor {
          }
       } else if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
          if (!usedAPReset) {
-            Skill increaseHP = SkillFactory.getSkill(Brawler.IMPROVE_MAX_HP);
-            int sLvl = player.getSkillLevel(increaseHP);
-
-            if (sLvl > 0)
-               MaxHP += increaseHP.getEffect(sLvl).getY();
+            MaxHP += SkillFactory.applyIfHasSkill(player, Brawler.IMPROVE_MAX_HP, (skill, skillLevel) -> skill.getEffect(skillLevel).getY(), 0);
          }
 
          if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
@@ -749,11 +742,8 @@ public class AssignAPProcessor {
          }
       } else if (job.isA(MapleJob.MAGICIAN) || job.isA(MapleJob.BLAZEWIZARD1)) {
          if (!usedAPReset) {
-            Skill increaseMP = SkillFactory.getSkill(job.isA(MapleJob.BLAZEWIZARD1) ? BlazeWizard.INCREASING_MAX_MP : Magician.IMPROVED_MAX_MP_INCREASE);
-            int sLvl = player.getSkillLevel(increaseMP);
-
-            if (sLvl > 0)
-               MaxMP += increaseMP.getEffect(sLvl).getY();
+            int skillId = job.isA(MapleJob.BLAZEWIZARD1) ? BlazeWizard.INCREASING_MAX_MP : Magician.IMPROVED_MAX_MP_INCREASE;
+            MaxMP += SkillFactory.applyIfHasSkill(player, skillId, (skill, skillLevel) -> skill.getEffect(skillLevel).getY(), 0);
          }
 
          if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {

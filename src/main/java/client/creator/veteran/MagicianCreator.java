@@ -19,6 +19,8 @@
 */
 package client.creator.veteran;
 
+import java.util.Optional;
+
 import client.MapleClient;
 import client.MapleJob;
 import client.Skill;
@@ -69,13 +71,17 @@ public class MagicianCreator extends CharacterFactory {
          recipe.setRemainingSp(recipe.getRemainingSp() - improveSp);
 
          int toUseSp = 5;
-         Skill improveMpRec = SkillFactory.getSkill(Magician.IMPROVED_MP_RECOVERY);
-         recipe.addStartingSkillLevel(improveMpRec, toUseSp);
-         improveSp -= toUseSp;
+         Optional<Skill> improveMpRecovery = SkillFactory.getSkill(Magician.IMPROVED_MP_RECOVERY);
+         if (improveMpRecovery.isPresent()) {
+            recipe.addStartingSkillLevel(improveMpRecovery.get(), toUseSp);
+            improveSp -= toUseSp;
+         }
 
          if (improveSp > 0) {
-            Skill improveMaxMp = SkillFactory.getSkill(Magician.IMPROVED_MAX_MP_INCREASE);
-            recipe.addStartingSkillLevel(improveMaxMp, improveSp);
+            Optional<Skill> improveMaxMpIncrease = SkillFactory.getSkill(Magician.IMPROVED_MAX_MP_INCREASE);
+            if (improveMaxMpIncrease.isPresent()) {
+               recipe.addStartingSkillLevel(improveMaxMpIncrease.get(), improveSp);
+            }
          }
       }
 

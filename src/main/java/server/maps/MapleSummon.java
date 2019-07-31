@@ -34,17 +34,20 @@ import tools.MaplePacketCreator;
 public class MapleSummon extends AbstractAnimatedMapleMapObject {
    private MapleCharacter owner;
    private byte skillLevel;
-   private int skill, hp;
+   private int skillId, hp;
    private SummonMovementType movementType;
 
-   public MapleSummon(MapleCharacter owner, int skill, Point pos, SummonMovementType movementType) {
+   public MapleSummon(MapleCharacter owner, int skillId, Point pos, SummonMovementType movementType) {
       this.owner = owner;
-      this.skill = skill;
-      this.skillLevel = owner.getSkillLevel(SkillFactory.getSkill(skill));
-      if (skillLevel == 0) throw new RuntimeException();
+      this.skillId = skillId;
 
-      this.movementType = movementType;
-      setPosition(pos);
+      SkillFactory.getSkill(skillId).ifPresent(skill -> {
+         this.skillLevel = owner.getSkillLevel(skill);
+         if (skillLevel == 0) throw new RuntimeException();
+
+         this.movementType = movementType;
+         setPosition(pos);
+      });
    }
 
    @Override
@@ -62,7 +65,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
    }
 
    public int getSkill() {
-      return skill;
+      return skillId;
    }
 
    public int getHP() {
@@ -78,7 +81,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
    }
 
    public boolean isStationary() {
-      return (skill == 3111002 || skill == 3211002 || skill == 5211001 || skill == 13111004);
+      return (skillId == 3111002 || skillId == 3211002 || skillId == 5211001 || skillId == 13111004);
    }
 
    public byte getSkillLevel() {
@@ -91,7 +94,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
    }
 
    public final boolean isPuppet() {
-      switch (skill) {
+      switch (skillId) {
          case 3111002:
          case 3211002:
          case 13111004:

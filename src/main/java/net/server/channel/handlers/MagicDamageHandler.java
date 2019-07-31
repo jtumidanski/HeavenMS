@@ -37,7 +37,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class MagicDamageHandler extends AbstractDealDamageHandler {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public final void handlePacket(SeekableLittleEndianAccessor accessor, MapleClient c) {
       MapleCharacter chr = c.getPlayer();
       //chr.setPetLootCd(currentServerTime());
 
@@ -47,7 +47,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler {
 		}
 		chr.getAutobanManager().spam(8);*/
 
-      AttackInfo attack = parseDamage(slea, chr, false, true);
+      AttackInfo attack = parseDamage(accessor, chr, false, true);
 
       if (chr.getBuffEffect(MapleBuffStat.MORPH) != null) {
          if (chr.getBuffEffect(MapleBuffStat.MORPH).isMorphWithoutAttack()) {
@@ -67,23 +67,25 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler {
 
       chr.getMap().broadcastMessage(chr, packet, false, true);
       MapleStatEffect effect = attack.getAttackEffect(chr, null);
-      Skill skill = SkillFactory.getSkill(attack.skill);
-      MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-      if (effect_.getCooldown() > 0) {
-         if (chr.skillIsCooling(attack.skill)) {
-            return;
-         } else {
-            c.announce(MaplePacketCreator.skillCooldown(attack.skill, effect_.getCooldown()));
-            chr.addCooldown(attack.skill, currentServerTime(), effect_.getCooldown() * 1000);
+
+      SkillFactory.getSkill(attack.skill).ifPresent(skill -> {
+         MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
+         if (effect_.getCooldown() > 0) {
+            if (!chr.skillIsCooling(attack.skill)) {
+               c.announce(MaplePacketCreator.skillCooldown(attack.skill, effect_.getCooldown()));
+               chr.addCooldown(attack.skill, currentServerTime(), effect_.getCooldown() * 1000);
+            }
          }
-      }
+      });
+
       applyAttack(attack, chr, effect.getAttackCount());
-      Skill eaterSkill = SkillFactory.getSkill((chr.getJob().getId() - (chr.getJob().getId() % 10)) * 10000);// MP Eater, works with right job
-      int eaterLevel = chr.getSkillLevel(eaterSkill);
-      if (eaterLevel > 0) {
+
+      // MP Eater, works with right job
+      int mpEaterSkillId = (chr.getJob().getId() - (chr.getJob().getId() % 10)) * 10000;
+      SkillFactory.executeIfHasSkill(chr, mpEaterSkillId, (skill, skillLevel) -> {
          for (Integer singleDamage : attack.allDamage.keySet()) {
-            eaterSkill.getEffect(eaterLevel).applyPassive(chr, chr.getMap().getMapObject(singleDamage), 0);
+            skill.getEffect(skillLevel).applyPassive(chr, chr.getMap().getMapObject(singleDamage), 0);
          }
-      }
+      });
    }
 }

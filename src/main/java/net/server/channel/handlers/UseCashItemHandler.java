@@ -25,6 +25,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -194,13 +195,16 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          if (itemId > 5050000) {
             int SPTo = slea.readInt();
             int SPFrom = slea.readInt();
-            Skill skillSPTo = SkillFactory.getSkill(SPTo);
-            Skill skillSPFrom = SkillFactory.getSkill(SPFrom);
-            byte curLevel = player.getSkillLevel(skillSPTo);
-            byte curLevelSPFrom = player.getSkillLevel(skillSPFrom);
-            if ((curLevel < skillSPTo.getMaxLevel()) && curLevelSPFrom > 0) {
-               player.changeSkillLevel(skillSPFrom, (byte) (curLevelSPFrom - 1), player.getMasterLevel(skillSPFrom), -1);
-               player.changeSkillLevel(skillSPTo, (byte) (curLevel + 1), player.getMasterLevel(skillSPTo), -1);
+            Optional<Skill> skillSPTo = SkillFactory.getSkill(SPTo);
+            Optional<Skill> skillSPFrom = SkillFactory.getSkill(SPFrom);
+
+            if (skillSPTo.isPresent() && skillSPFrom.isPresent()) {
+               byte curLevel = player.getSkillLevel(skillSPTo.get());
+               byte curLevelSPFrom = player.getSkillLevel(skillSPFrom.get());
+               if ((curLevel < skillSPTo.get().getMaxLevel()) && curLevelSPFrom > 0) {
+                  player.changeSkillLevel(skillSPFrom.get(), (byte) (curLevelSPFrom - 1), player.getMasterLevel(skillSPFrom.get()), -1);
+                  player.changeSkillLevel(skillSPTo.get(), (byte) (curLevel + 1), player.getMasterLevel(skillSPTo.get()), -1);
+               }
             }
          } else {
             int APTo = slea.readInt();

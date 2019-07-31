@@ -377,10 +377,9 @@ public enum ItemFactory {
          ps.executeUpdate();
          ps.close();
 
-         StringBuilder query = new StringBuilder();
-         query.append("DELETE `inventoryitems`, `inventoryequipment` FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `");
-         query.append(account ? "accountid" : "characterid").append("` = ?");
-         ps = con.prepareStatement(query.toString());
+         String query = "DELETE `inventoryitems`, `inventoryequipment` FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `" +
+               (account ? "accountid" : "characterid") + "` = ?";
+         ps = con.prepareStatement(query);
          ps.setInt(1, value);
          ps.setInt(2, id);
          ps.executeUpdate();

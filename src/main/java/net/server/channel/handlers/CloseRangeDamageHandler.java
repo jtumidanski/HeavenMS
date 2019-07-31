@@ -24,6 +24,7 @@ package net.server.channel.handlers;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
@@ -33,12 +34,19 @@ import client.Skill;
 import client.SkillFactory;
 import constants.GameConstants;
 import constants.ServerConstants;
+import constants.skills.Beginner;
 import constants.skills.Crusader;
 import constants.skills.DawnWarrior;
 import constants.skills.DragonKnight;
 import constants.skills.Hero;
+import constants.skills.Legend;
+import constants.skills.Marauder;
 import constants.skills.NightWalker;
+import constants.skills.Noblesse;
+import constants.skills.Paladin;
 import constants.skills.Rogue;
+import constants.skills.ThunderBreaker;
+import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
@@ -66,8 +74,10 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
          }
       }
 
-      if (chr.getDojoEnergy() < 10000 && (attack.skill == 1009 || attack.skill == 10001009 || attack.skill == 20001009)) // PE hacking or maybe just lagging
+      if (chr.getDojoEnergy() < 10000 && (attack.skill == Beginner.BAMBOO_RAIN || attack.skill == Noblesse.BAMBOO_RAIN || attack.skill == Legend.BAMBOO_THRUST)) {
+         // PE hacking or maybe just lagging
          return;
+      }
       if (chr.getMap().isDojoMap() && attack.numAttacked > 0) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_ATK);
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
@@ -82,47 +92,53 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
          }
          chr.handleOrbconsume();
       } else if (attack.numAttacked > 0) {
-         if (attack.skill != 1111008 && comboBuff != null) {
-            int orbcount = chr.getBuffedValue(MapleBuffStat.COMBO);
-            int oid = chr.isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
-            int advcomboid = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
-            Skill combo = SkillFactory.getSkill(oid);
-            Skill advcombo = SkillFactory.getSkill(advcomboid);
-            MapleStatEffect ceffect;
-            int advComboSkillLevel = chr.getSkillLevel(advcombo);
-            if (advComboSkillLevel > 0) {
-               ceffect = advcombo.getEffect(advComboSkillLevel);
-            } else {
-               int comboLv = chr.getSkillLevel(combo);
-               if (comboLv <= 0 || chr.isGM()) comboLv = SkillFactory.getSkill(oid).getMaxLevel();
+         if (attack.skill != Crusader.SHOUT && comboBuff != null) {
+            int orbCount = chr.getBuffedValue(MapleBuffStat.COMBO);
+            int comboId = chr.isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
+            int advancedComboId = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
 
-               if (comboLv > 0) ceffect = combo.getEffect(comboLv);
-               else ceffect = null;
+            MapleStatEffect ceffect;
+            ceffect = SkillFactory.applyIfHasSkill(chr, advancedComboId, Skill::getEffect, null);
+            if (ceffect == null) {
+               int comboLv = SkillFactory.getSkill(comboId).map(chr::getSkillLevel).orElse((byte) 0);
+               if (comboLv <= 0 || chr.isGM()) {
+                  comboLv = SkillFactory.getSkill(comboId).map(Skill::getMaxLevel).orElse(0);
+               }
+
+               if (comboLv > 0) {
+                  int finalComboLv = comboLv;
+                  ceffect = SkillFactory.getSkill(comboId).map(skill -> skill.getEffect(finalComboLv)).orElse(null);
+               } else {
+                  ceffect = null;
+               }
             }
+
             if (ceffect != null) {
-               if (orbcount < ceffect.getX() + 1) {
-                  int neworbcount = orbcount + 1;
+               if (orbCount < ceffect.getX() + 1) {
+                  int newOrbCount = orbCount + 1;
+                  int advComboSkillLevel = SkillFactory.getSkill(advancedComboId).map(chr::getSkillLevel).orElse((byte) 0);
                   if (advComboSkillLevel > 0 && ceffect.makeChanceResult()) {
-                     if (neworbcount <= ceffect.getX()) {
-                        neworbcount++;
+                     if (newOrbCount <= ceffect.getX()) {
+                        newOrbCount++;
                      }
                   }
 
-                  int olv = chr.getSkillLevel(oid);
-                  if (olv <= 0) olv = SkillFactory.getSkill(oid).getMaxLevel();
+                  final int comboLevel = chr.getSkillLevel(comboId) > 0
+                        ? chr.getSkillLevel(comboId)
+                        : SkillFactory.getSkill(comboId).map(Skill::getMaxLevel).orElse(0);
+                  int duration = SkillFactory.getSkill(comboId).map(skill -> skill.getEffect(comboLevel)).map(MapleStatEffect::getDuration).orElse(0);
 
-                  int duration = combo.getEffect(olv).getDuration();
-                  List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, neworbcount));
-                  chr.setBuffedValue(MapleBuffStat.COMBO, neworbcount);
+                  List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, newOrbCount));
+                  chr.setBuffedValue(MapleBuffStat.COMBO, newOrbCount);
                   duration -= (int) (currentServerTime() - chr.getBuffedStarttime(MapleBuffStat.COMBO));
-                  c.announce(MaplePacketCreator.giveBuff(oid, duration, stat));
+                  c.announce(MaplePacketCreator.giveBuff(comboId, duration, stat));
                   chr.getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(chr.getId(), stat), false);
                }
             }
-         } else if (chr.getSkillLevel(chr.isCygnus() ? SkillFactory.getSkill(15100004) : SkillFactory.getSkill(5110001)) > 0 && (chr.getJob().isA(MapleJob.MARAUDER) || chr.getJob().isA(MapleJob.THUNDERBREAKER2))) {
-            for (int i = 0; i < attack.numAttacked; i++) {
-               chr.handleEnergyChargeGain();
-            }
+         } else if (chr.getJob().isA(MapleJob.MARAUDER)) {
+            SkillFactory.executeIfHasSkill(chr, Marauder.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked));
+         } else if (chr.getJob().isA(MapleJob.THUNDERBREAKER2)) {
+            SkillFactory.executeIfHasSkill(chr, ThunderBreaker.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked));
          }
       }
       if (attack.numAttacked > 0 && attack.skill == DragonKnight.SACRIFICE) {
@@ -134,15 +150,16 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
 
          chr.safeAddHP(-1 * totDamageToOneMonster * attack.getAttackEffect(chr, null).getX() / 100);
       }
-      if (attack.numAttacked > 0 && attack.skill == 1211002) {
-         boolean advcharge_prob = false;
-         int advcharge_level = chr.getSkillLevel(SkillFactory.getSkill(1220010));
-         if (advcharge_level > 0) {
-            advcharge_prob = SkillFactory.getSkill(1220010).getEffect(advcharge_level).makeChanceResult();
-         }
-         if (!advcharge_prob) {
-            chr.cancelEffectFromBuffStat(MapleBuffStat.WK_CHARGE);
-         }
+      if (attack.numAttacked > 0 && attack.skill == WhiteKnight.CHARGE_BLOW) {
+         SkillFactory.executeIfHasSkill(chr, Paladin.ADVANCED_CHARGE, (skill, skillLevel) -> {
+            boolean advanceChargeProbability = false;
+            if (skillLevel > 0) {
+               advanceChargeProbability = skill.getEffect(skillLevel).makeChanceResult();
+            }
+            if (!advanceChargeProbability) {
+               chr.cancelEffectFromBuffStat(MapleBuffStat.WK_CHARGE);
+            }
+         });
       }
       int attackCount = 1;
       if (attack.skill != 0) {
@@ -160,25 +177,36 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
          c.announce(MaplePacketCreator.serverNotice(5, "As you used the secret skill, your energy bar has been reset."));
       } else if (attack.skill > 0) {
-         Skill skill = SkillFactory.getSkill(attack.skill);
-         MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-         if (effect_.getCooldown() > 0) {
-            if (chr.skillIsCooling(attack.skill)) {
-               return;
-            } else {
-               c.announce(MaplePacketCreator.skillCooldown(attack.skill, effect_.getCooldown()));
-               chr.addCooldown(attack.skill, currentServerTime(), effect_.getCooldown() * 1000);
+         SkillFactory.executeForSkill(chr, attack.skill, ((skill, skillLevel) -> {
+            MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
+            if (effect_.getCooldown() > 0) {
+               if (!chr.skillIsCooling(attack.skill)) {
+                  c.announce(MaplePacketCreator.skillCooldown(attack.skill, effect_.getCooldown()));
+                  chr.addCooldown(attack.skill, currentServerTime(), effect_.getCooldown() * 1000);
+               }
             }
-         }
+         }));
       }
-      if ((chr.getSkillLevel(SkillFactory.getSkill(NightWalker.VANISH)) > 0 || chr.getSkillLevel(SkillFactory.getSkill(Rogue.DARK_SIGHT)) > 0) && chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null) {// && chr.getBuffSource(MapleBuffStat.DARKSIGHT) != 9101004
-         chr.cancelEffectFromBuffStat(MapleBuffStat.DARKSIGHT);
-         chr.cancelBuffStats(MapleBuffStat.DARKSIGHT);
-      } else if (chr.getSkillLevel(SkillFactory.getSkill(WindArcher.WIND_WALK)) > 0 && chr.getBuffedValue(MapleBuffStat.WIND_WALK) != null) {
-         chr.cancelEffectFromBuffStat(MapleBuffStat.WIND_WALK);
-         chr.cancelBuffStats(MapleBuffStat.WIND_WALK);
+      if (chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null) {
+         SkillFactory.executeIfHasSkill(chr, NightWalker.VANISH, (skill, skillLevel) -> cancelDarkSight(chr));
+         SkillFactory.executeIfHasSkill(chr, Rogue.DARK_SIGHT, (skill, skillLevel) -> cancelDarkSight(chr));
+      } else if (chr.getBuffedValue(MapleBuffStat.WIND_WALK) != null) {
+         SkillFactory.executeIfHasSkill(chr, WindArcher.WIND_WALK, (skill, skillLevel) -> cancelWindWalk(chr));
       }
-
       applyAttack(attack, chr, attackCount);
+   }
+
+   private void chargeNEnergy(MapleCharacter character, int numberOfAttacks) {
+      IntStream.generate(() -> 1).limit(numberOfAttacks).forEach(id -> character.handleEnergyChargeGain());
+   }
+
+   private void cancelWindWalk(MapleCharacter chr) {
+      chr.cancelEffectFromBuffStat(MapleBuffStat.WIND_WALK);
+      chr.cancelBuffStats(MapleBuffStat.WIND_WALK);
+   }
+
+   private void cancelDarkSight(MapleCharacter chr) {
+      chr.cancelEffectFromBuffStat(MapleBuffStat.DARKSIGHT);
+      chr.cancelBuffStats(MapleBuffStat.DARKSIGHT);
    }
 }

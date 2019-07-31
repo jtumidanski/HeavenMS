@@ -1208,25 +1208,26 @@ public class MapleStatEffect {
    private void applyMonsterBuff(MapleCharacter applyfrom) {
       Rectangle bounds = calculateBoundingBox(applyfrom.getPosition(), applyfrom.isFacingLeft());
       List<MapleMapObject> affected = applyfrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.MONSTER));
-      Skill skill_ = SkillFactory.getSkill(sourceid);
-      int i = 0;
-      for (MapleMapObject mo : affected) {
-         MapleMonster monster = (MapleMonster) mo;
-         if (isDispel()) {
-            monster.debuffMob(skill_.getId());
-         } else {
-            if (makeChanceResult()) {
-               monster.applyStatus(applyfrom, new MonsterStatusEffect(getMonsterStati(), skill_, null, false), isPoison(), getDuration());
-               if (isCrash()) {
-                  monster.debuffMob(skill_.getId());
+      SkillFactory.getSkill(sourceid).ifPresent(skill_ -> {
+         int i = 0;
+         for (MapleMapObject mo : affected) {
+            MapleMonster monster = (MapleMonster) mo;
+            if (isDispel()) {
+               monster.debuffMob(skill_.getId());
+            } else {
+               if (makeChanceResult()) {
+                  monster.applyStatus(applyfrom, new MonsterStatusEffect(getMonsterStati(), skill_, null, false), isPoison(), getDuration());
+                  if (isCrash()) {
+                     monster.debuffMob(skill_.getId());
+                  }
                }
             }
+            i++;
+            if (i >= mobCount) {
+               break;
+            }
          }
-         i++;
-         if (i >= mobCount) {
-            break;
-         }
-      }
+      });
    }
 
    private Rectangle calculateBoundingBox(Point posFrom, boolean facingLeft) {
@@ -1493,11 +1494,8 @@ public class MapleStatEffect {
             boolean isCygnus = applyfrom.getJob().isA(MapleJob.BLAZEWIZARD2);
             boolean isEvan = applyfrom.getJob().isA(MapleJob.EVAN7);
             if (isAFpMage || isCygnus || isEvan || applyfrom.getJob().isA(MapleJob.IL_MAGE)) {
-               Skill amp = isAFpMage ? SkillFactory.getSkill(FPMage.ELEMENT_AMPLIFICATION) : (isCygnus ? SkillFactory.getSkill(BlazeWizard.ELEMENT_AMPLIFICATION) : (isEvan ? SkillFactory.getSkill(Evan.MAGIC_AMPLIFICATION) : SkillFactory.getSkill(ILMage.ELEMENT_AMPLIFICATION)));
-               int ampLevel = applyfrom.getSkillLevel(amp);
-               if (ampLevel > 0) {
-                  mod = amp.getEffect(ampLevel).getX() / 100.0;
-               }
+               int skillId = isAFpMage ? FPMage.ELEMENT_AMPLIFICATION : (isCygnus ? BlazeWizard.ELEMENT_AMPLIFICATION : (isEvan ? Evan.MAGIC_AMPLIFICATION : ILMage.ELEMENT_AMPLIFICATION));
+               mod = SkillFactory.applyIfHasSkill(applyfrom, skillId, (skill, skillLevel) -> skill.getEffect(skillLevel).getX() / 100.0, 0.0);
             }
             mpchange -= mpCon * mod;
             if (applyfrom.getBuffedValue(MapleBuffStat.INFINITY) != null) {
@@ -1529,8 +1527,13 @@ public class MapleStatEffect {
       if (chr.isCygnus()) {
          id = NightWalker.ALCHEMIST;
       }
-      int alchemistLevel = chr.getSkillLevel(SkillFactory.getSkill(id));
-      return alchemistLevel == 0 ? null : SkillFactory.getSkill(id).getEffect(alchemistLevel);
+
+      return SkillFactory.applyForSkill(chr, id, (skill, skillLevel) -> {
+         if (skillLevel != 0) {
+            return skill.getEffect(skillLevel);
+         }
+         return null;
+      }, null);
    }
 
    private boolean isGmBuff() {

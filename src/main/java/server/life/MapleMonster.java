@@ -33,10 +33,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.swing.text.html.Option;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
@@ -1230,11 +1233,16 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          if (from.getJob() == MapleJob.NIGHTLORD || from.getJob() == MapleJob.SHADOWER || from.getJob().isA(MapleJob.NIGHTWALKER3)) {
             int poisonLevel, matk, jobid = from.getJob().getId();
             int skillid = (jobid == 412 ? NightLord.VENOMOUS_STAR : (jobid == 422 ? Shadower.VENOMOUS_STAB : NightWalker.VENOM));
-            poisonLevel = from.getSkillLevel(SkillFactory.getSkill(skillid));
+
+            Optional<Skill> skill = SkillFactory.getSkill(skillid);
+            if (skill.isEmpty()) {
+               return false;
+            }
+            poisonLevel = from.getSkillLevel(skill.get());
             if (poisonLevel <= 0) {
                return false;
             }
-            matk = SkillFactory.getSkill(skillid).getEffect(poisonLevel).getMatk();
+            matk = skill.get().getEffect(poisonLevel).getMatk();
             int luk = from.getLuk();
             int maxDmg = (int) Math.ceil(Math.min(Short.MAX_VALUE, 0.2 * luk * matk));
             int minDmg = (int) Math.ceil(Math.min(Short.MAX_VALUE, 0.1 * luk * matk));
@@ -1266,15 +1274,17 @@ public class MapleMonster extends AbstractLoadedMapleLife {
             overtimeDelay = 3500;
             */
       } else if (status.getSkill().getId() == 4121004 || status.getSkill().getId() == 4221004) { // Ninja Ambush
-         final Skill skill = SkillFactory.getSkill(status.getSkill().getId());
-         final byte level = from.getSkillLevel(skill);
-         final int damage = (int) ((from.getStr() + from.getLuk()) * ((3.7 * skill.getEffect(level).getDamage()) / 100));
+         Optional<Skill> skill = SkillFactory.getSkill(status.getSkill().getId());
+         if (skill.isPresent()) {
+            final byte level = from.getSkillLevel(skill.get());
+            final int damage = (int) ((from.getStr() + from.getLuk()) * ((3.7 * skill.get().getEffect(level).getDamage()) / 100));
 
-         status.setValue(MonsterStatus.NINJA_AMBUSH, damage);
+            status.setValue(MonsterStatus.NINJA_AMBUSH, damage);
+
+            overtimeAction = new DamageTask(damage, from, status, 2);
+            overtimeDelay = 1000;
+         }
          animationTime = broadcastStatusEffect(status);
-
-         overtimeAction = new DamageTask(damage, from, status, 2);
-         overtimeDelay = 1000;
       } else {
          animationTime = broadcastStatusEffect(status);
       }

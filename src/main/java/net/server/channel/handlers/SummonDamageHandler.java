@@ -23,6 +23,7 @@ package net.server.channel.handlers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -85,8 +86,12 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler {
       if (summon == null) {
          return;
       }
-      Skill summonSkill = SkillFactory.getSkill(summon.getSkill());
-      MapleStatEffect summonEffect = summonSkill.getEffect(summon.getSkillLevel());
+      Optional<Skill> summonSkill = SkillFactory.getSkill(summon.getSkill());
+      if (summonSkill.isEmpty()) {
+         return;
+      }
+
+      MapleStatEffect summonEffect = summonSkill.get().getEffect(summon.getSkillLevel());
       slea.skip(4);
       List<SummonAttackEntry> allDamage = new ArrayList<>();
       byte direction = slea.readByte();
@@ -119,7 +124,7 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler {
 
             if (damage > 0 && summonEffect.getMonsterStati().size() > 0) {
                if (summonEffect.makeChanceResult()) {
-                  target.applyStatus(player, new MonsterStatusEffect(summonEffect.getMonsterStati(), summonSkill, null, false), summonEffect.isPoison(), 4000);
+                  target.applyStatus(player, new MonsterStatusEffect(summonEffect.getMonsterStati(), summonSkill.get(), null, false), summonEffect.isPoison(), 4000);
                }
             }
             player.getMap().damageMonster(player, target, damage);

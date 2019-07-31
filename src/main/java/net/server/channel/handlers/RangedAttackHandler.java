@@ -37,6 +37,7 @@ import constants.skills.Aran;
 import constants.skills.Buccaneer;
 import constants.skills.NightLord;
 import constants.skills.NightWalker;
+import constants.skills.Rogue;
 import constants.skills.Shadower;
 import constants.skills.ThunderBreaker;
 import constants.skills.WindArcher;
@@ -212,28 +213,39 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler {
             chr.getMap().broadcastMessage(chr, packet, false, true);
 
             if (attack.skill != 0) {
-               Skill skill = SkillFactory.getSkill(attack.skill);
-               MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-               if (effect_.getCooldown() > 0) {
+               int cooldown = SkillFactory.getSkill(attack.skill)
+                     .map(skill -> skill.getEffect(chr.getSkillLevel(skill)))
+                     .map(MapleStatEffect::getCooldown)
+                     .orElse(0);
+               if (cooldown > 0) {
                   if (chr.skillIsCooling(attack.skill)) {
                      return;
                   } else {
-                     c.announce(MaplePacketCreator.skillCooldown(attack.skill, effect_.getCooldown()));
-                     chr.addCooldown(attack.skill, currentServerTime(), effect_.getCooldown() * 1000);
+                     c.announce(MaplePacketCreator.skillCooldown(attack.skill, cooldown));
+                     chr.addCooldown(attack.skill, currentServerTime(), cooldown * 1000);
                   }
                }
             }
 
-            if (chr.getSkillLevel(SkillFactory.getSkill(NightWalker.VANISH)) > 0 && chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null && attack.numAttacked > 0 && chr.getBuffSource(MapleBuffStat.DARKSIGHT) != 9101004) {
-               chr.cancelEffectFromBuffStat(MapleBuffStat.DARKSIGHT);
-               chr.cancelBuffStats(MapleBuffStat.DARKSIGHT);
-            } else if (chr.getSkillLevel(SkillFactory.getSkill(WindArcher.WIND_WALK)) > 0 && chr.getBuffedValue(MapleBuffStat.WIND_WALK) != null && attack.numAttacked > 0) {
-               chr.cancelEffectFromBuffStat(MapleBuffStat.WIND_WALK);
-               chr.cancelBuffStats(MapleBuffStat.WIND_WALK);
+            //TODO - Investigate why this is inconsistent with the CloseRangeAttackHandler
+            if (chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null && attack.numAttacked > 0 && chr.getBuffSource(MapleBuffStat.DARKSIGHT) != 9101004) {
+               SkillFactory.executeIfHasSkill(chr, NightWalker.VANISH, (skill, skillLevel) -> cancelDarkSight(chr));
+            } else if (chr.getBuffedValue(MapleBuffStat.WIND_WALK) != null && attack.numAttacked > 0) {
+               SkillFactory.executeIfHasSkill(chr, WindArcher.WIND_WALK, (skill, skillLevel) -> cancelWindWalk(chr));
             }
 
             applyAttack(attack, chr, bulletCount);
          }
       }
+   }
+
+   private void cancelWindWalk(MapleCharacter chr) {
+      chr.cancelEffectFromBuffStat(MapleBuffStat.WIND_WALK);
+      chr.cancelBuffStats(MapleBuffStat.WIND_WALK);
+   }
+
+   private void cancelDarkSight(MapleCharacter chr) {
+      chr.cancelEffectFromBuffStat(MapleBuffStat.DARKSIGHT);
+      chr.cancelBuffStats(MapleBuffStat.DARKSIGHT);
    }
 }
