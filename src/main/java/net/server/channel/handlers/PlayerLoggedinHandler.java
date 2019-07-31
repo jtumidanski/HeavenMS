@@ -77,7 +77,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
    private static Set<Integer> attemptingLoginAccounts = new HashSet<>();
 
-   private static void showDueyNotification(MapleClient c, MapleCharacter player) {
+   private void showDueyNotification(MapleClient c, MapleCharacter player) {
       Connection con = null;
       PreparedStatement ps = null;
       PreparedStatement pss = null;
@@ -125,18 +125,13 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
    private static List<Pair<Long, PlayerBuffValueHolder>> getLocalStartTimes(List<PlayerBuffValueHolder> lpbvl) {
       List<Pair<Long, PlayerBuffValueHolder>> timedBuffs = new ArrayList<>();
-      long curtime = currentServerTime();
+      long currentServerTime = currentServerTime();
 
       for (PlayerBuffValueHolder pb : lpbvl) {
-         timedBuffs.add(new Pair<>(curtime - pb.usedTime, pb));
+         timedBuffs.add(new Pair<>(currentServerTime - pb.usedTime, pb));
       }
 
-      timedBuffs.sort(new Comparator<>() {
-         @Override
-         public int compare(Pair<Long, PlayerBuffValueHolder> p1, Pair<Long, PlayerBuffValueHolder> p2) {
-            return p1.getLeft().compareTo(p2.getLeft());
-         }
-      });
+      timedBuffs.sort(Comparator.comparing(Pair::getLeft));
 
       return timedBuffs;
    }
@@ -170,24 +165,24 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
       if (c.tryacquireClient()) { // thanks MedicOP for assisting on concurrency protection here
          try {
-            World wserv = server.getWorld(c.getWorld());
-            if (wserv == null) {
+            World world = server.getWorld(c.getWorld());
+            if (world == null) {
                c.disconnect(true, false);
                return;
             }
 
-            Channel cserv = wserv.getChannel(c.getChannel());
-            if (cserv == null) {
+            Channel channel = world.getChannel(c.getChannel());
+            if (channel == null) {
                c.setChannel(1);
-               cserv = wserv.getChannel(c.getChannel());
+               channel = world.getChannel(c.getChannel());
 
-               if (cserv == null) {
+               if (channel == null) {
                   c.disconnect(true, false);
                   return;
                }
             }
 
-            MapleCharacter player = wserv.getPlayerStorage().getCharacterById(cid);
+            MapleCharacter player = world.getPlayerStorage().getCharacterById(cid);
             boolean newcomer = false;
 
             IoSession session = c.getSession();
@@ -278,8 +273,8 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
             session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, remoteHwid.substring(hwidLen - 8, hwidLen));
             c.setHWID(remoteHwid);
 
-            cserv.addPlayer(player);
-            wserv.addPlayer(player);
+            channel.addPlayer(player);
+            world.addPlayer(player);
             player.setEnteredChannelWorld();
 
             List<PlayerBuffValueHolder> buffs = server.getPlayerBuffStorage().getBuffsFromStorage(cid);
@@ -314,8 +309,8 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
             BuddyList bl = player.getBuddylist();
             int[] buddyIds = bl.getBuddyIds();
-            wserv.loggedOn(player.getName(), player.getId(), c.getChannel(), buddyIds);
-            for (CharacterIdChannelPair onlineBuddy : wserv.multiBuddyFind(player.getId(), buddyIds)) {
+            world.loggedOn(player.getName(), player.getId(), c.getChannel(), buddyIds);
+            for (CharacterIdChannelPair onlineBuddy : world.multiBuddyFind(player.getId(), buddyIds)) {
                BuddylistEntry ble = bl.get(onlineBuddy.getCharacterId());
                ble.setChannel(onlineBuddy.getChannel());
                bl.put(ble);
@@ -324,60 +319,21 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
             c.announce(MaplePacketCreator.loadFamily(player));
             if (player.getFamilyId() > 0) {
-               MapleFamily f = wserv.getFamily(player.getFamilyId());
+               MapleFamily f = world.getFamily(player.getFamilyId());
                if (f == null) {
                   f = new MapleFamily(player.getId());
-                  wserv.addFamily(player.getFamilyId(), f);
+                  world.addFamily(player.getFamilyId(), f);
                }
                player.setFamily(f);
                c.announce(MaplePacketCreator.getFamilyInfo(f.getMember(player.getId())));
             }
             if (player.getGuildId() > 0) {
-               MapleGuild playerGuild = server.getGuild(player.getGuildId(), player.getWorld(), player);
-               if (playerGuild == null) {
-                  player.deleteGuild(player.getGuildId());
-                  player.getMGC().setGuildId(0);
-                  player.getMGC().setGuildRank(5);
-               } else {
-                  playerGuild.getMGC(player.getId()).setCharacter(player);
-                  player.setMGC(playerGuild.getMGC(player.getId()));
-                  server.setGuildMemberOnline(player, true, c.getChannel());
-                  c.announce(MaplePacketCreator.showGuildInfo(player));
-                  int allianceId = player.getGuild().getAllianceId();
-                  if (allianceId > 0) {
-                     MapleAlliance newAlliance = server.getAlliance(allianceId);
-                     if (newAlliance == null) {
-                        newAlliance = MapleAlliance.loadAlliance(allianceId);
-                        if (newAlliance != null) {
-                           server.addAlliance(allianceId, newAlliance);
-                        } else {
-                           player.getGuild().setAllianceId(0);
-                        }
-                     }
-                     if (newAlliance != null) {
-                        c.announce(MaplePacketCreator.updateAllianceInfo(newAlliance, c.getWorld()));
-                        c.announce(MaplePacketCreator.allianceNotice(newAlliance.getId(), newAlliance.getNotice()));
-
-                        if (newcomer) {
-                           server.allianceMessage(allianceId, MaplePacketCreator.allianceMemberOnline(player, true), player.getId(), -1);
-                        }
-                     }
-                  }
-               }
+               loggingInGuildOperations(c, server, player, newcomer);
             }
 
             player.showNote();
             if (player.getParty() != null) {
-               MaplePartyCharacter pchar = player.getMPC();
-
-               //Use this in case of enabling party HPbar HUD when logging in, however "you created a party" will appear on chat.
-               //c.announce(MaplePacketCreator.partyCreated(pchar));
-
-               pchar.setChannel(c.getChannel());
-               pchar.setMapId(player.getMapId());
-               pchar.setOnline(true);
-               wserv.updateParty(player.getParty().getId(), PartyOperation.LOG_ONOFF, pchar);
-               player.updatePartyMemberHP();
+               loggingInPartyOperations(c, world, player);
             }
 
             MapleInventory eqpInv = player.getInventory(MapleInventoryType.EQUIPPED);
@@ -407,17 +363,13 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
             if (newcomer) {
                for (MaplePet pet : player.getPets()) {
-                  if (pet != null)
-                     wserv.registerPetHunger(player, player.getPetIndex(pet));
+                  if (pet != null) {
+                     world.registerPetHunger(player, player.getPetIndex(pet));
+                  }
                }
 
                player.reloadQuestExpirations();
 
-                    /*
-                    if (!c.hasVotedAlready()){
-                        player.announce(MaplePacketCreator.earnTitleMessage("You can vote now! Vote and earn a vote point!"));
-                    }
-                    */
                if (player.isGM()) {
                   Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.earnTitleMessage((player.gmLevel() < 6 ? "GM " : "Admin ") + player.getName() + " has logged in"));
                }
@@ -448,23 +400,21 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
             player.commitExcludedItems();
             showDueyNotification(c, player);
 
-            if (player.getMap().getHPDec() > 0) player.resetHpDecreaseTask();
+            if (player.getMap().getHPDec() > 0) {
+               player.resetHpDecreaseTask();
+            }
 
             player.resetPlayerRates();
-            if (ServerConstants.USE_ADD_RATES_BY_LEVEL) player.setPlayerRates();
+            if (ServerConstants.USE_ADD_RATES_BY_LEVEL) {
+               player.setPlayerRates();
+            }
             player.setWorldRates();
             player.updateCouponRates();
 
             player.receivePartyMemberHP();
 
             if (player.getPartnerId() > 0) {
-               int partnerId = player.getPartnerId();
-               final MapleCharacter partner = wserv.getPlayerStorage().getCharacterById(partnerId);
-
-               if (partner != null && !partner.isAwayFromWorld()) {
-                  player.announce(Wedding.OnNotifyWeddingPartnerTransfer(partnerId, partner.getMapId()));
-                  partner.announce(Wedding.OnNotifyWeddingPartnerTransfer(player.getId(), player.getMapId()));
-               }
+               loggingInPartnerOperations(world, player);
             }
 
             if (newcomer) {
@@ -482,6 +432,67 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
          }
       } else {
          c.announce(MaplePacketCreator.getAfterLoginError(10));
+      }
+   }
+
+   private void loggingInPartnerOperations(World world, MapleCharacter player) {
+      int partnerId = player.getPartnerId();
+      final MapleCharacter partner = world.getPlayerStorage().getCharacterById(partnerId);
+
+      if (partner != null && !partner.isAwayFromWorld()) {
+         player.announce(Wedding.OnNotifyWeddingPartnerTransfer(partnerId, partner.getMapId()));
+         partner.announce(Wedding.OnNotifyWeddingPartnerTransfer(player.getId(), player.getMapId()));
+      }
+   }
+
+   private void loggingInPartyOperations(MapleClient c, World wserv, MapleCharacter player) {
+      MaplePartyCharacter pchar = player.getMPC();
+
+      //Use this in case of enabling party HPbar HUD when logging in, however "you created a party" will appear on chat.
+      //c.announce(MaplePacketCreator.partyCreated(pchar));
+
+      pchar.setChannel(c.getChannel());
+      pchar.setMapId(player.getMapId());
+      pchar.setOnline(true);
+      wserv.updateParty(player.getParty().getId(), PartyOperation.LOG_ONOFF, pchar);
+      player.updatePartyMemberHP();
+   }
+
+   private void loggingInGuildOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
+      MapleGuild playerGuild = server.getGuild(player.getGuildId(), player.getWorld(), player);
+      if (playerGuild == null) {
+         player.deleteGuild(player.getGuildId());
+         player.getMGC().setGuildId(0);
+         player.getMGC().setGuildRank(5);
+      } else {
+         playerGuild.getMGC(player.getId()).setCharacter(player);
+         player.setMGC(playerGuild.getMGC(player.getId()));
+         server.setGuildMemberOnline(player, true, client.getChannel());
+         client.announce(MaplePacketCreator.showGuildInfo(player));
+         loggingInAllianceOperations(client, server, player, newcomer);
+      }
+   }
+
+   private void loggingInAllianceOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
+      int allianceId = player.getGuild().getAllianceId();
+      if (allianceId > 0) {
+         MapleAlliance newAlliance = server.getAlliance(allianceId);
+         if (newAlliance == null) {
+            newAlliance = MapleAlliance.loadAlliance(allianceId);
+            if (newAlliance != null) {
+               server.addAlliance(allianceId, newAlliance);
+            } else {
+               player.getGuild().setAllianceId(0);
+            }
+         }
+         if (newAlliance != null) {
+            client.announce(MaplePacketCreator.updateAllianceInfo(newAlliance, client.getWorld()));
+            client.announce(MaplePacketCreator.allianceNotice(newAlliance.getId(), newAlliance.getNotice()));
+
+            if (newcomer) {
+               server.allianceMessage(allianceId, MaplePacketCreator.allianceMemberOnline(player, true), player.getId(), -1);
+            }
+         }
       }
    }
 }
