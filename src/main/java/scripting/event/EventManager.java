@@ -780,20 +780,18 @@ public class EventManager {
    }
 
    private void exportReadyGuild(Integer guildId) {
-      MapleGuild mg = server.getGuild(guildId);
+
       String callout = "[Guild Quest] Your guild has been registered to attend to the Sharenian Guild Quest at channel " + this.getChannelServer().getId()
             + " and HAS JUST STARTED THE STRATEGY PHASE. After 3 minutes, no more guild members will be allowed to join the effort."
             + " Check out Shuang at the excavation site in Perion for more info.";
-
-      mg.dropMessage(6, callout);
+      server.getGuild(guildId).ifPresent(guild -> guild.dropMessage(6, callout));
    }
 
    private void exportMovedQueueToGuild(Integer guildId, int place) {
-      MapleGuild mg = server.getGuild(guildId);
       String callout = "[Guild Quest] Your guild has been registered to attend to the Sharenian Guild Quest at channel " + this.getChannelServer().getId()
             + " and is currently on the " + GameConstants.ordinal(place) + " place on the waiting queue.";
 
-      mg.dropMessage(6, callout);
+      server.getGuild(guildId).ifPresent(guild -> guild.dropMessage(6, callout));
    }
 
    private List<Integer> getNextGuildQueue() {

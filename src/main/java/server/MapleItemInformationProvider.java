@@ -2137,8 +2137,9 @@ public class MapleItemInformationProvider {
       Map<String, Integer> skilldata = getSkillStats(skillBookId, player.getJob().getId());
       if (skilldata == null || skilldata.get("skillid") == 0) return false;
 
-      Skill skill2 = SkillFactory.getSkill(skilldata.get("skillid")).orElse(null);
-      return (skilldata.get("skillid") != 0 && ((player.getSkillLevel(skill2) >= skilldata.get("reqSkillLevel") || skilldata.get("reqSkillLevel") == 0) && player.getMasterLevel(skill2) < skilldata.get("masterLevel")));
+      return SkillFactory.getSkill(skilldata.get("skillid"))
+            .map(skill -> (skilldata.get("skillid") != 0 && ((player.getSkillLevel(skill) >= skilldata.get("reqSkillLevel") || skilldata.get("reqSkillLevel") == 0) && player.getMasterLevel(skill) < skilldata.get("masterLevel"))))
+            .orElse(false);
    }
 
    public List<Integer> usableMasteryBooks(MapleCharacter player) {

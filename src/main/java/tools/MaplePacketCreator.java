@@ -28,12 +28,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -2762,15 +2762,7 @@ public class MaplePacketCreator {
       mplew.writeShort(chr.getJob().getId());
       mplew.writeShort(chr.getFame());
       mplew.write(chr.getMarriageRing() != null ? 1 : 0);
-      String guildName = "";
-      String allianceName = "";
-      if (chr.getGuildId() > 0) {
-         MapleGuild mg = Server.getInstance().getGuild(chr.getGuildId());
-         guildName = mg.getName();
-         allianceName = Server.getInstance().getAlliance(chr.getGuild().getAllianceId()).map(MapleAlliance::getName).orElse("");
-      }
-      mplew.writeMapleAsciiString(guildName);
-      mplew.writeMapleAsciiString(allianceName);  // does not seem to work
+      writeGuildInfo(chr, mplew);
       mplew.write(0); // pMedalInfo, thanks to Arnah (Vertisy)
 
       MaplePet[] pets = chr.getPets();
@@ -2830,6 +2822,22 @@ public class MaplePacketCreator {
          mplew.writeShort(s);
       }
       return mplew.getPacket();
+   }
+
+   private static void writeGuildInfo(MapleCharacter chr, MaplePacketLittleEndianWriter mplew) {
+      if (chr.getGuildId() > 0) {
+         Server.getInstance().getGuild(chr.getGuildId()).ifPresentOrElse(guild -> {
+            mplew.writeMapleAsciiString(guild.getName());
+            String allianceName = Server.getInstance().getAlliance(guild.getAllianceId()).map(MapleAlliance::getName).orElse("");
+            mplew.writeMapleAsciiString(allianceName);
+         }, () -> {
+            mplew.writeMapleAsciiString("");
+            mplew.writeMapleAsciiString("");  // does not seem to work
+         });
+      } else {
+         mplew.writeMapleAsciiString("");
+         mplew.writeMapleAsciiString("");  // does not seem to work
+      }
    }
 
    /**
@@ -4413,39 +4421,40 @@ public class MaplePacketCreator {
          mplew.write(0);
          return mplew.getPacket();
       }
-      MapleGuild g = c.getClient().getWorldServer().getGuild(c.getMGC());
-      if (g == null) { //failed to read from DB - don't show a guild
+      c.getClient().getWorldServer().getGuild(c.getMGC()).ifPresentOrElse(guild -> {
+         mplew.write(1); //bInGuild
+         mplew.writeInt(guild.getId());
+         mplew.writeMapleAsciiString(guild.getName());
+         for (int i = 1; i <= 5; i++) {
+            mplew.writeMapleAsciiString(guild.getRankTitle(i));
+         }
+         Collection<MapleGuildCharacter> members = guild.getMembers();
+         mplew.write(members.size()); //then it is the size of all the members
+         for (MapleGuildCharacter mgc : members) {//and each of their character ids o_O
+            mplew.writeInt(mgc.getId());
+         }
+         for (MapleGuildCharacter mgc : members) {
+            mplew.writeAsciiString(getRightPaddedStr(mgc.getName(), '\0', 13));
+            mplew.writeInt(mgc.getJobId());
+            mplew.writeInt(mgc.getLevel());
+            mplew.writeInt(mgc.getGuildRank());
+            mplew.writeInt(mgc.isOnline() ? 1 : 0);
+            mplew.writeInt(guild.getSignature());
+            mplew.writeInt(mgc.getAllianceRank());
+         }
+         mplew.writeInt(guild.getCapacity());
+         mplew.writeShort(guild.getLogoBG());
+         mplew.write(guild.getLogoBGColor());
+         mplew.writeShort(guild.getLogo());
+         mplew.write(guild.getLogoColor());
+         mplew.writeMapleAsciiString(guild.getNotice());
+         mplew.writeInt(guild.getGP());
+         mplew.writeInt(guild.getAllianceId());
+
+      }, () -> {
+         //failed to read from DB - don't show a guild
          mplew.write(0);
-         return mplew.getPacket();
-      }
-      mplew.write(1); //bInGuild
-      mplew.writeInt(g.getId());
-      mplew.writeMapleAsciiString(g.getName());
-      for (int i = 1; i <= 5; i++) {
-         mplew.writeMapleAsciiString(g.getRankTitle(i));
-      }
-      Collection<MapleGuildCharacter> members = g.getMembers();
-      mplew.write(members.size()); //then it is the size of all the members
-      for (MapleGuildCharacter mgc : members) {//and each of their character ids o_O
-         mplew.writeInt(mgc.getId());
-      }
-      for (MapleGuildCharacter mgc : members) {
-         mplew.writeAsciiString(getRightPaddedStr(mgc.getName(), '\0', 13));
-         mplew.writeInt(mgc.getJobId());
-         mplew.writeInt(mgc.getLevel());
-         mplew.writeInt(mgc.getGuildRank());
-         mplew.writeInt(mgc.isOnline() ? 1 : 0);
-         mplew.writeInt(g.getSignature());
-         mplew.writeInt(mgc.getAllianceRank());
-      }
-      mplew.writeInt(g.getCapacity());
-      mplew.writeShort(g.getLogoBG());
-      mplew.write(g.getLogoBGColor());
-      mplew.writeShort(g.getLogo());
-      mplew.write(g.getLogoColor());
-      mplew.writeMapleAsciiString(g.getNotice());
-      mplew.writeInt(g.getGP());
-      mplew.writeInt(g.getAllianceId());
+      });
       return mplew.getPacket();
    }
 
@@ -6996,9 +7005,10 @@ public class MaplePacketCreator {
       }
       mplew.writeInt(alliance.getCapacity()); // probably capacity
       mplew.writeShort(0);
-      for (Integer guildid : alliance.getGuilds()) {
-         getGuildInfo(mplew, Server.getInstance().getGuild(guildid, world));
-      }
+      alliance.getGuilds().stream()
+            .map(guildId -> Server.getInstance().getGuild(guildId, world))
+            .flatMap(Optional::stream)
+            .forEach(guild -> getGuildInfo(mplew, guild));
       return mplew.getPacket();
    }
 
@@ -7007,9 +7017,10 @@ public class MaplePacketCreator {
       mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
       mplew.write(0x0D);
       mplew.writeInt(alliance.getGuilds().size());
-      for (Integer guild : alliance.getGuilds()) {
-         getGuildInfo(mplew, Server.getInstance().getGuild(guild, worldId));
-      }
+      alliance.getGuilds().stream()
+            .map(guildId -> Server.getInstance().getGuild(guildId, worldId))
+            .flatMap(Optional::stream)
+            .forEach(guild -> getGuildInfo(mplew, guild));
       return mplew.getPacket();
    }
 
@@ -7029,7 +7040,7 @@ public class MaplePacketCreator {
       mplew.writeInt(alliance.getCapacity());
       mplew.writeMapleAsciiString(alliance.getNotice());
       mplew.writeInt(newGuild);
-      getGuildInfo(mplew, Server.getInstance().getGuild(newGuild, c.getWorld(), null));
+      Server.getInstance().getGuild(newGuild, c.getWorld(), null).ifPresent(guild -> getGuildInfo(mplew, guild));
       return mplew.getPacket();
    }
 
@@ -7037,7 +7048,7 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
       mplew.write(0x0E);
-      mplew.writeInt(mc.getGuild().getAllianceId());
+      mplew.writeInt(mc.getGuild().map(MapleGuild::getAllianceId).orElse(0));
       mplew.writeInt(mc.getGuildId());
       mplew.writeInt(mc.getId());
       mplew.write(online ? 1 : 0);
@@ -7068,7 +7079,7 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
       mplew.write(0x18);
-      mplew.writeInt(mc.getGuild().getAllianceId());
+      mplew.writeInt(mc.getGuild().map(MapleGuild::getAllianceId).orElse(0));
       mplew.writeInt(mc.getGuildId());
       mplew.writeInt(mc.getId());
       mplew.writeInt(mc.getLevel());
@@ -7092,7 +7103,7 @@ public class MaplePacketCreator {
       mplew.writeInt(alliance.getCapacity());
       mplew.writeMapleAsciiString(alliance.getNotice());
       mplew.writeInt(expelledGuild);
-      getGuildInfo(mplew, Server.getInstance().getGuild(expelledGuild, worldId, null));
+      Server.getInstance().getGuild(expelledGuild, worldId, null).ifPresent(guild -> getGuildInfo(mplew, guild));
       mplew.write(0x01);
       return mplew.getPacket();
    }

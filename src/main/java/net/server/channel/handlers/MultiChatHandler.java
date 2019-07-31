@@ -70,14 +70,16 @@ public final class MultiChatHandler extends AbstractMaplePacketHandler {
          if (ServerConstants.USE_ENABLE_CHAT_LOG) {
             LogHelper.logChat(c, "Guild", chattext);
          }
-      } else if (type == 3 && player.getGuild() != null) {
-         int allianceId = player.getGuild().getAllianceId();
-         if (allianceId > 0) {
-            Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.multiChat(player.getName(), chattext, 3), player.getId(), -1);
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-               LogHelper.logChat(c, "Ally", chattext);
+      } else if (type == 3) {
+         player.getGuild().ifPresent(guild -> {
+            int allianceId = guild.getAllianceId();
+            if (allianceId > 0) {
+               Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.multiChat(player.getName(), chattext, 3), player.getId(), -1);
+               if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+                  LogHelper.logChat(c, "Ally", chattext);
+               }
             }
-         }
+         });
       }
       player.getAutobanManager().spam(7);
    }

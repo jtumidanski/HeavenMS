@@ -31,7 +31,6 @@ import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import net.server.Server;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
-import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildResponse;
 import net.server.world.MapleParty;
@@ -144,16 +143,14 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
 
       Server.getInstance().setGuildEmblem(mc.getGuildId(), emblemData.getBackground(), emblemData.getBackgroundColor(), emblemData.getLogo(), emblemData.getLogoColor());
 
-      if (mc.getGuild() != null && mc.getGuild().getAllianceId() > 0) {
-         mc.getAlliance().ifPresent(alliance -> {
-            byte[] packet = MaplePacketCreator.getGuildAlliances(alliance, c.getWorld());
-            Server.getInstance().allianceMessage(alliance.getId(), packet, -1, -1);
-         });
-      }
+      mc.getAlliance().ifPresent(alliance -> {
+         byte[] packet = MaplePacketCreator.getGuildAlliances(alliance, c.getWorld());
+         Server.getInstance().allianceMessage(alliance.getId(), packet, -1, -1);
+      });
 
       mc.gainMeso(-ServerConstants.CHANGE_EMBLEM_COST, true, false, true);
-      mc.getGuild().broadcastNameChanged();
-      mc.getGuild().broadcastEmblemChanged();
+      mc.getGuild().ifPresent(MapleGuild::broadcastNameChanged);
+      mc.getGuild().ifPresent(MapleGuild::broadcastEmblemChanged);
    }
 
    private void changeRank(GuildRankData rankData, MapleCharacter mc) {
@@ -177,14 +174,14 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
    }
 
    private void expelMember(GuildExpelData expelData, MapleCharacter mc) {
-      int allianceId;
-      allianceId = mc.getGuild().getAllianceId();
       if (mc.getGuildRank() > 2 || mc.getGuildId() <= 0) {
          System.out.println("[Hack] " + mc.getName() + " is trying to expel without rank 1 or 2.");
          return;
       }
 
       Server.getInstance().expelMember(mc.getMGC(), expelData.getPlayerName(), expelData.getPlayerId());
+
+      int allianceId = mc.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
          Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> alliance.updateAlliancePackets(mc));
       }
@@ -201,7 +198,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
 
       c.announce(MaplePacketCreator.showGuildInfo(null));
 
-      int allianceId = mc.getGuild().getAllianceId();
+      int allianceId = mc.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
          Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> alliance.updateAlliancePackets(mc));
       }
@@ -213,7 +210,6 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
    }
 
    private void joinGuild(GuildJoinData joinData, MapleClient c, MapleCharacter mc) {
-      int allianceId;
       if (mc.getGuildId() > 0) {
          System.out.println("[Hack] " + mc.getName() + " attempted to join a guild when s/he is already in one.");
          return;
@@ -241,14 +237,17 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
 
       c.announce(MaplePacketCreator.showGuildInfo(mc));
 
-      allianceId = mc.getGuild().getAllianceId();
+      int allianceId = mc.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
          Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> alliance.updateAlliancePackets(mc));
       }
 
       mc.saveGuildStatus(); // update database
-      mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildNameChanged(mc.getId(), mc.getGuild().getName())); // thanks Vcoc for pointing out an issue with updating guild tooltip to players in the map
-      mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildMarkChanged(mc.getId(), mc.getGuild()));
+      mc.getGuild().ifPresent(guild -> {
+         mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildNameChanged(mc.getId(), guild.getName())); // thanks Vcoc for pointing out an issue with updating guild tooltip to players in the map
+         mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildMarkChanged(mc.getId(), guild));
+      });
+
    }
 
    private void inviteToGuild(GuildInviteData inviteData, MapleClient c, MapleCharacter mc) {

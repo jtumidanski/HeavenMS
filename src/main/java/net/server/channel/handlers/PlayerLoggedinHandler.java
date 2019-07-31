@@ -32,8 +32,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import org.apache.mina.core.session.IoSession;
 
@@ -460,41 +460,43 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
    }
 
    private void loggingInGuildOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
-      MapleGuild playerGuild = server.getGuild(player.getGuildId(), player.getWorld(), player);
-      if (playerGuild == null) {
-         player.deleteGuild(player.getGuildId());
-         player.getMGC().setGuildId(0);
-         player.getMGC().setGuildRank(5);
-      } else {
-         playerGuild.getMGC(player.getId()).setCharacter(player);
-         player.setMGC(playerGuild.getMGC(player.getId()));
+      server.getGuild(player.getGuildId(), player.getWorld(), player).ifPresentOrElse(guild -> {
+         guild.getMGC(player.getId()).setCharacter(player);
+         player.setMGC(guild.getMGC(player.getId()));
          server.setGuildMemberOnline(player, true, client.getChannel());
          client.announce(MaplePacketCreator.showGuildInfo(player));
          loggingInAllianceOperations(client, server, player, newcomer);
-      }
+      }, () -> {
+         player.deleteGuild(player.getGuildId());
+         player.getMGC().setGuildId(0);
+         player.getMGC().setGuildRank(5);
+      });
    }
 
    private void loggingInAllianceOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
-      int allianceId = player.getGuild().getAllianceId();
+      int allianceId = player.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
-         MapleAlliance newAlliance = server.getAlliance(allianceId).orElseGet(() -> {
-            MapleAlliance alliance = MapleAlliance.loadAlliance(allianceId);
-            if (alliance != null) {
-               server.addAlliance(allianceId, alliance);
-            } else {
-               player.getGuild().setAllianceId(0);
-            }
-            return alliance;
-         });
+         server.getAlliance(allianceId)
+               .or(() -> loadAlliance(server, player, allianceId))
+               .ifPresent(alliance -> {
+                  client.announce(MaplePacketCreator.updateAllianceInfo(alliance, client.getWorld()));
+                  client.announce(MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()));
 
-         if (newAlliance != null) {
-            client.announce(MaplePacketCreator.updateAllianceInfo(newAlliance, client.getWorld()));
-            client.announce(MaplePacketCreator.allianceNotice(newAlliance.getId(), newAlliance.getNotice()));
+                  if (newcomer) {
+                     server.allianceMessage(allianceId, MaplePacketCreator.allianceMemberOnline(player, true), player.getId(), -1);
+                  }
+               });
+      }
+   }
 
-            if (newcomer) {
-               server.allianceMessage(allianceId, MaplePacketCreator.allianceMemberOnline(player, true), player.getId(), -1);
-            }
-         }
+   private Optional<MapleAlliance> loadAlliance(Server server, MapleCharacter player, int allianceId) {
+      Optional<MapleAlliance> alliance = MapleAlliance.loadAlliance(allianceId);
+      if (alliance.isPresent()) {
+         server.addAlliance(allianceId, alliance.get());
+         return alliance;
+      } else {
+         player.getGuild().ifPresent(guild -> guild.setAllianceId(0));
+         return Optional.empty();
       }
    }
 }

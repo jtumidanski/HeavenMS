@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.SortedMap;
@@ -386,7 +387,9 @@ public class World {
    }
 
    public boolean canUninstall() {
-      if (players.getSize() > 0) return false;
+      if (players.getSize() > 0) {
+         return false;
+      }
 
       for (Channel ch : this.getChannels()) {
          if (!ch.canUninstall()) {
@@ -417,12 +420,16 @@ public class World {
       Collection<MapleCharacter> list = getPlayerStorage().getAllCharacters();
 
       for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) continue;
+         if (!chr.isLoggedin()) {
+            continue;
+         }
          chr.revertWorldRates();
       }
       this.exprate = exp;
       for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) continue;
+         if (!chr.isLoggedin()) {
+            continue;
+         }
          chr.setWorldRates();
       }
    }
@@ -435,12 +442,16 @@ public class World {
       Collection<MapleCharacter> list = getPlayerStorage().getAllCharacters();
 
       for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) continue;
+         if (!chr.isLoggedin()) {
+            continue;
+         }
          chr.revertWorldRates();
       }
       this.droprate = drop;
       for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) continue;
+         if (!chr.isLoggedin()) {
+            continue;
+         }
          chr.setWorldRates();
       }
    }
@@ -461,12 +472,16 @@ public class World {
       Collection<MapleCharacter> list = getPlayerStorage().getAllCharacters();
 
       for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) continue;
+         if (!chr.isLoggedin()) {
+            continue;
+         }
          chr.revertWorldRates();
       }
       this.mesorate = meso;
       for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) continue;
+         if (!chr.isLoggedin()) {
+            continue;
+         }
          chr.setWorldRates();
       }
    }
@@ -629,15 +644,19 @@ public class World {
       }
    }
 
-   public MapleGuild getGuild(MapleGuildCharacter mgc) {
-      if (mgc == null) return null;
-
-      int gid = mgc.getGuildId();
-      MapleGuild g = Server.getInstance().getGuild(gid, mgc.getWorld(), mgc.getCharacter());
-      if (gsStore.get(gid) == null) {
-         gsStore.put(gid, new MapleGuildSummary(g));
+   public Optional<MapleGuild> getGuild(MapleGuildCharacter mgc) {
+      if (mgc == null) {
+         return Optional.empty();
       }
-      return g;
+
+      int guildId = mgc.getGuildId();
+
+      return Server.getInstance().getGuild(guildId, mgc.getWorld(), mgc.getCharacter()).map(guild -> {
+         if (gsStore.get(guildId) == null) {
+            gsStore.put(guildId, new MapleGuildSummary(guild));
+         }
+         return guild;
+      });
    }
 
    public boolean isWorldCapacityFull() {
@@ -664,10 +683,8 @@ public class World {
       if (gsStore.containsKey(gid)) {
          return gsStore.get(gid);
       } else {
-         MapleGuild g = Server.getInstance().getGuild(gid, wid, null);
-         if (g != null) {
-            gsStore.put(gid, new MapleGuildSummary(g));
-         }
+         Server.getInstance().getGuild(gid, wid, null)
+               .ifPresent(guild -> gsStore.put(gid, new MapleGuildSummary(guild)));
          return gsStore.get(gid);
       }
    }
@@ -677,15 +694,10 @@ public class World {
    }
 
    public void reloadGuildSummary() {
-      MapleGuild g;
       Server server = Server.getInstance();
       for (int i : gsStore.keySet()) {
-         g = server.getGuild(i, getId(), null);
-         if (g != null) {
-            gsStore.put(i, new MapleGuildSummary(g));
-         } else {
-            gsStore.remove(i);
-         }
+         server.getGuild(i, getId(), null)
+               .ifPresentOrElse(guild -> gsStore.put(i, new MapleGuildSummary(guild)), () -> gsStore.remove(i));
       }
    }
 
@@ -726,19 +738,20 @@ public class World {
          mc.getMGC().setGuildId(guildid);
          mc.getMGC().setGuildRank(rank);
 
-         if (bDifferentGuild) mc.getMGC().setAllianceRank(5);
+         if (bDifferentGuild) {
+            mc.getMGC().setAllianceRank(5);
+         }
 
          mc.saveGuildStatus();
       }
       if (bDifferentGuild) {
          if (mc.isLoggedinWorld()) {
-            MapleGuild guild = Server.getInstance().getGuild(guildid);
-            if (guild != null) {
+            Server.getInstance().getGuild(guildid).ifPresentOrElse(guild -> {
                mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildNameChanged(cid, guild.getName()));
                mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildMarkChanged(cid, guild));
-            } else {
+            }, () -> {
                mc.getMap().broadcastMessage(mc, MaplePacketCreator.guildNameChanged(cid, ""));
-            }
+            });
          }
       }
    }
@@ -803,7 +816,9 @@ public class World {
    public boolean addMarriageGuest(int marriageId, int playerId) {
       Set<Integer> guests = marriageGuests.get(marriageId);
       if (guests != null) {
-         if (guests.contains(playerId)) return false;
+         if (guests.contains(playerId)) {
+            return false;
+         }
 
          guests.add(playerId);
          return true;
@@ -850,7 +865,9 @@ public class World {
             }
          }
 
-         if (selectedPw == -1) return null;
+         if (selectedPw == -1) {
+            return null;
+         }
 
          possibleWeddings.clear();
          possibleWeddings.add(selectedPw);
@@ -1037,7 +1054,9 @@ public class World {
 
    public void removeMapPartyMembers(int partyid) {
       MapleParty party = getParty(partyid);
-      if (party == null) return;
+      if (party == null) {
+         return;
+      }
 
       for (MaplePartyCharacter mpc : party.getMembers()) {
          MapleCharacter mc = mpc.getPlayer();
@@ -1464,9 +1483,11 @@ public class World {
       activePetsLock.lock();
       try {
          int initProc;
-         if (Server.getInstance().getCurrentTime() - petUpdate > 55000)
+         if (Server.getInstance().getCurrentTime() - petUpdate > 55000) {
             initProc = ServerConstants.PET_EXHAUST_COUNT - 2;
-         else initProc = ServerConstants.PET_EXHAUST_COUNT - 1;
+         } else {
+            initProc = ServerConstants.PET_EXHAUST_COUNT - 1;
+         }
 
          activePets.put(key, initProc);
       } finally {
@@ -1498,7 +1519,9 @@ public class World {
 
       for (Map.Entry<Integer, Integer> dp : deployedPets.entrySet()) {
          MapleCharacter chr = this.getPlayerStorage().getCharacterById(dp.getKey() / 4);
-         if (chr == null || !chr.isLoggedinWorld()) continue;
+         if (chr == null || !chr.isLoggedinWorld()) {
+            continue;
+         }
 
          Integer dpVal = dp.getValue() + 1;
          if (dpVal == ServerConstants.PET_EXHAUST_COUNT) {
@@ -1524,9 +1547,11 @@ public class World {
       activeMountsLock.lock();
       try {
          int initProc;
-         if (Server.getInstance().getCurrentTime() - mountUpdate > 45000)
+         if (Server.getInstance().getCurrentTime() - mountUpdate > 45000) {
             initProc = ServerConstants.MOUNT_EXHAUST_COUNT - 2;
-         else initProc = ServerConstants.MOUNT_EXHAUST_COUNT - 1;
+         } else {
+            initProc = ServerConstants.MOUNT_EXHAUST_COUNT - 1;
+         }
 
          activeMounts.put(key, initProc);
       } finally {
@@ -1557,7 +1582,9 @@ public class World {
 
       for (Map.Entry<Integer, Integer> dp : deployedMounts.entrySet()) {
          MapleCharacter chr = this.getPlayerStorage().getCharacterById(dp.getKey());
-         if (chr == null || !chr.isLoggedinWorld()) continue;
+         if (chr == null || !chr.isLoggedinWorld()) {
+            continue;
+         }
 
          int dpVal = dp.getValue() + 1;
          if (dpVal == ServerConstants.MOUNT_EXHAUST_COUNT) {
@@ -1619,8 +1646,11 @@ public class World {
       activeMerchantsLock.lock();
       try {
          int initProc;
-         if (Server.getInstance().getCurrentTime() - merchantUpdate > 5 * 60 * 1000) initProc = 1;
-         else initProc = 0;
+         if (Server.getInstance().getCurrentTime() - merchantUpdate > 5 * 60 * 1000) {
+            initProc = 1;
+         } else {
+            initProc = 0;
+         }
 
          activeMerchants.put(hm.getOwnerId(), new Pair<>(hm, initProc));
       } finally {
@@ -1820,8 +1850,12 @@ public class World {
          }
       }
 
-      if (step != -1) pnpcStep.put(mapid, (byte) step);
-      if (podium != -1) pnpcPodium.put(mapid, (short) podium);
+      if (step != -1) {
+         pnpcStep.put(mapid, (byte) step);
+      }
+      if (podium != -1) {
+         pnpcPodium.put(mapid, (short) podium);
+      }
    }
 
    public int getPlayerNpcMapStep(int mapid) {
@@ -1899,7 +1933,9 @@ public class World {
 
       if (rc == null) {
          Pair<Integer, Pair<Integer, Integer>> couple = getRelationshipCoupleFromDb(relationshipId, true);
-         if (couple == null) return null;
+         if (couple == null) {
+            return null;
+         }
 
          pushRelationshipCouple(couple);
          rc = couple.getRight();
@@ -1913,7 +1949,9 @@ public class World {
 
       if (ret == null) {
          Pair<Integer, Pair<Integer, Integer>> couple = getRelationshipCoupleFromDb(playerId, false);
-         if (couple == null) return -1;
+         if (couple == null) {
+            return -1;
+         }
 
          pushRelationshipCouple(couple);
          ret = couple.getLeft();

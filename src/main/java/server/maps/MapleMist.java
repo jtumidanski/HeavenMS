@@ -23,6 +23,7 @@ package server.maps;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -100,8 +101,8 @@ public class MapleMist extends AbstractMapleMapObject {
       throw new UnsupportedOperationException();
    }
 
-   public Skill getSourceSkill() {
-      return SkillFactory.getSkill(source.getSourceId()).orElse(null);
+   public Optional<Skill> getSourceSkill() {
+      return SkillFactory.getSkill(source.getSourceId());
    }
 
    public boolean isMobMist() {
@@ -140,15 +141,19 @@ public class MapleMist extends AbstractMapleMapObject {
       if (owner != null) {
          return SkillFactory.applyForSkill(owner,
                source.getSourceId(),
-               (skill, skillLevel) -> MaplePacketCreator.spawnMist(getObjectId(), owner.getId(), getSourceSkill().getId(), skillLevel, this),
+               (skill, skillLevel) -> spawnMistForOwner(skillLevel),
                new byte[0]);
       }
       return MaplePacketCreator.spawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this);
    }
 
+   private byte[] spawnMistForOwner(Integer skillLevel) {
+      return getSourceSkill().map(skill -> MaplePacketCreator.spawnMist(getObjectId(), owner.getId(), skill.getId(), skillLevel, this)).orElse(new byte[0]);
+   }
+
    public final byte[] makeFakeSpawnData(int level) {
       if (owner != null) {
-         return MaplePacketCreator.spawnMist(getObjectId(), owner.getId(), getSourceSkill().getId(), level, this);
+         return spawnMistForOwner(level);
       }
       return MaplePacketCreator.spawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this);
    }

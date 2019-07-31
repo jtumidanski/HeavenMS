@@ -746,7 +746,7 @@ public class AbstractPlayerInteraction {
 
    public MapleGuild getGuild() {
       try {
-         return Server.getInstance().getGuild(getPlayer().getGuildId(), getPlayer().getWorld(), null);
+         return Server.getInstance().getGuild(getPlayer().getGuildId(), getPlayer().getWorld(), null).orElse(null);
       } catch (Exception e) {
          e.printStackTrace();
       }

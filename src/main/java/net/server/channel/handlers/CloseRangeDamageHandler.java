@@ -24,6 +24,7 @@ package net.server.channel.handlers;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import client.MapleBuffStat;
@@ -97,9 +98,8 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
             int comboId = chr.isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
             int advancedComboId = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
 
-            MapleStatEffect ceffect;
-            ceffect = SkillFactory.applyIfHasSkill(chr, advancedComboId, Skill::getEffect, null);
-            if (ceffect == null) {
+            Optional<MapleStatEffect> comboEffect = Optional.ofNullable(SkillFactory.applyIfHasSkill(chr, advancedComboId, Skill::getEffect, null));
+            if (comboEffect.isEmpty()) {
                int comboLv = SkillFactory.getSkill(comboId).map(chr::getSkillLevel).orElse((byte) 0);
                if (comboLv <= 0 || chr.isGM()) {
                   comboLv = SkillFactory.getSkill(comboId).map(Skill::getMaxLevel).orElse(0);
@@ -107,18 +107,18 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
 
                if (comboLv > 0) {
                   int finalComboLv = comboLv;
-                  ceffect = SkillFactory.getSkill(comboId).map(skill -> skill.getEffect(finalComboLv)).orElse(null);
+                  comboEffect = SkillFactory.getSkill(comboId).map(skill -> skill.getEffect(finalComboLv));
                } else {
-                  ceffect = null;
+                  comboEffect = Optional.empty();
                }
             }
 
-            if (ceffect != null) {
-               if (orbCount < ceffect.getX() + 1) {
+            if (comboEffect.isPresent()) {
+               if (orbCount < comboEffect.get().getX() + 1) {
                   int newOrbCount = orbCount + 1;
                   int advComboSkillLevel = SkillFactory.getSkill(advancedComboId).map(chr::getSkillLevel).orElse((byte) 0);
-                  if (advComboSkillLevel > 0 && ceffect.makeChanceResult()) {
-                     if (newOrbCount <= ceffect.getX()) {
+                  if (advComboSkillLevel > 0 && comboEffect.get().makeChanceResult()) {
+                     if (newOrbCount <= comboEffect.get().getX()) {
                         newOrbCount++;
                      }
                   }

@@ -1130,40 +1130,40 @@ public class Server {
       return MapleGuild.createGuild(leaderId, name);
    }
 
-   public MapleGuild getGuildByName(String name) {
+   public Optional<MapleGuild> getGuildByName(String name) {
       synchronized (guilds) {
          for (MapleGuild mg : guilds.values()) {
             if (mg.getName().equalsIgnoreCase(name)) {
-               return mg;
+               return Optional.of(mg);
             }
          }
 
-         return null;
+         return Optional.empty();
       }
    }
 
-   public MapleGuild getGuild(int id) {
+   public Optional<MapleGuild> getGuild(int id) {
       synchronized (guilds) {
          if (guilds.get(id) != null) {
-            return guilds.get(id);
+            return Optional.of(guilds.get(id));
          }
 
-         return null;
+         return Optional.empty();
       }
    }
 
-   public MapleGuild getGuild(int id, int world) {
+   public Optional<MapleGuild> getGuild(int id, int world) {
       return getGuild(id, world, null);
    }
 
-   public MapleGuild getGuild(int id, int world, MapleCharacter mc) {
+   public Optional<MapleGuild> getGuild(int id, int world, MapleCharacter mc) {
       synchronized (guilds) {
          if (guilds.get(id) != null) {
-            return guilds.get(id);
+            return Optional.of(guilds.get(id));
          }
          MapleGuild g = new MapleGuild(id, world);
          if (g.getId() == -1) {
-            return null;
+            return Optional.empty();
          }
 
          if (mc != null) {
@@ -1176,13 +1176,12 @@ public class Server {
          }
 
          guilds.put(id, g);
-         return g;
+         return Optional.of(g);
       }
    }
 
    public void setGuildMemberOnline(MapleCharacter mc, boolean bOnline, int channel) {
-      MapleGuild g = getGuild(mc.getGuildId(), mc.getWorld(), mc);
-      g.setOnline(mc.getId(), bOnline, channel);
+      getGuild(mc.getGuildId(), mc.getWorld(), mc).ifPresent(guild -> guild.setOnline(mc.getId(), bOnline, channel));
    }
 
    public int addGuildMember(MapleGuildCharacter mgc, MapleCharacter chr) {

@@ -1004,7 +1004,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       List<MapleStatEffect> buffList = new LinkedList<>();
       while (true) {
          Map<MapleStatEffect, Integer> leafStatCount = topologicalSortLeafStatCount(buffStack);
-         if (leafStatCount.isEmpty()) break;
+         if (leafStatCount.isEmpty()) {
+            break;
+         }
 
          List<MapleStatEffect> clearedNodes = topologicalSortRemoveLeafStats(stackedBuffStats, buffStack, leafStatCount);
          if (clearedNodes.isEmpty()) {
@@ -2427,7 +2429,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (this.guildid > 0) {
-         getGuild().broadcast(MaplePacketCreator.jobMessage(0, job.getId(), name), this.getId());
+         getGuild().ifPresent(guild -> guild.broadcast(MaplePacketCreator.jobMessage(0, job.getId(), name), this.getId()));
       }
       setMasteries(this.job.getId());
       guildUpdate();
@@ -2459,10 +2461,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          //family.broadcast(packet, id); not yet implemented
       }
 
-      MapleGuild guild = getGuild();
-      if (guild != null) {
-         guild.broadcast(packet, id);
-      }
+      getGuild().ifPresent(guild -> guild.broadcast(packet, id));
 
         /*
         if(partnerid > 0) {
@@ -2955,7 +2954,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    /**
     * Executes a function given a skill
-    * @param skillId the skill identifier
+    *
+    * @param skillId  the skill identifier
     * @param function the function to apply
     */
    private void executeForSkill(int skillId, BiConsumer<Skill, Integer> function) {
@@ -2964,7 +2964,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    /**
     * Executes a function given a skill
-    * @param skillId the skill identifier
+    *
+    * @param skillId  the skill identifier
     * @param function the function to apply
     */
    private boolean applyForSkill(int skillId, BiFunction<Skill, Integer, Boolean> function) {
@@ -4624,7 +4625,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private boolean isUpdatingEffect(Set<MapleStatEffect> activeEffects, MapleStatEffect mse) {
-      if (mse == null) return false;
+      if (mse == null) {
+         return false;
+      }
 
       // thanks xinyifly for noticing "Speed Infusion" crashing game when updating buffs during map transition
       boolean active = mse.isActive(this);
@@ -5613,7 +5616,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return getGender() == 0;
    }
 
-   public MapleGuild getGuild() {
+   public Optional<MapleGuild> getGuild() {
       try {
          return Server.getInstance().getGuild(getGuildId(), getWorld(), this);
       } catch (Exception ex) {
@@ -5624,7 +5627,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public Optional<MapleAlliance> getAlliance() {
       if (mgc != null) {
-         return Server.getInstance().getAlliance(getGuild().getAllianceId());
+         return getGuild().flatMap(guild -> Server.getInstance().getAlliance(guild.getAllianceId()));
       }
       return Optional.empty();
    }
@@ -5881,7 +5884,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          e.printStackTrace();
       }
 
-      if (elapsedDays > 100) elapsedDays = 100;
+      if (elapsedDays > 100) {
+         elapsedDays = 100;
+      }
 
       long netMeso = (long) merchantmeso; // negative mesos issues found thanks to Flash, Vcoc
       netMeso = (netMeso * (100 - elapsedDays)) / 100;
@@ -6618,10 +6623,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       try {
          Server.getInstance().memberLevelJobUpdate(this.mgc);
          //Server.getInstance().getGuild(guildid, world, mgc).gainGP(40);
-         int allianceId = getGuild().getAllianceId();
-         if (allianceId > 0) {
-            Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.updateAllianceJobLevel(this), getId(), -1);
-         }
+         getGuild()
+               .map(MapleGuild::getAllianceId)
+               .ifPresent(id -> Server.getInstance().allianceMessage(id, MaplePacketCreator.updateAllianceJobLevel(this), getId(), -1));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -6732,18 +6736,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void increaseGuildCapacity() {
-      int cost = MapleGuild.getIncreaseGuildCost(getGuild().getCapacity());
+      getGuild().ifPresent(guild -> {
+         int cost = MapleGuild.getIncreaseGuildCost(guild.getCapacity());
 
-      if (getMeso() < cost) {
-         dropMessage(1, "You don't have enough mesos.");
-         return;
-      }
+         if (getMeso() < cost) {
+            dropMessage(1, "You don't have enough mesos.");
+            return;
+         }
 
-      if (Server.getInstance().increaseGuildCapacity(guildid)) {
-         gainMeso(-cost, true, false, true);
-      } else {
-         dropMessage(1, "Your guild already reached the maximum capacity of players.");
-      }
+         if (Server.getInstance().increaseGuildCapacity(guildid)) {
+            gainMeso(-cost, true, false, true);
+         } else {
+            dropMessage(1, "Your guild already reached the maximum capacity of players.");
+         }
+      });
    }
 
    public boolean isActiveBuffedValue(int skillid) {
@@ -7110,7 +7116,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       silentPartyUpdate();
 
       if (this.guildid > 0) {
-         getGuild().broadcast(MaplePacketCreator.levelUpMessage(2, level, name), this.getId());
+         getGuild().ifPresent(guild -> guild.broadcast(MaplePacketCreator.levelUpMessage(2, level, name), this.getId()));
       }
 
       if (level % 20 == 0) {
@@ -7234,7 +7240,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (party != null) {
-         if (partyLeader) party.assignNewLeader(client);
+         if (partyLeader) {
+            party.assignNewLeader(client);
+         }
          MapleParty.leaveParty(party, client);
 
          return true;
@@ -7385,7 +7393,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void updateCouponRates() {
       MapleInventory cashInv = this.getInventory(MapleInventoryType.CASH);
-      if (cashInv == null) return;
+      if (cashInv == null) {
+         return;
+      }
 
       if (cpnLock.tryLock()) {
          effLock.lock();
@@ -10143,10 +10153,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void broadcastMarriageMessage() {
-      MapleGuild guild = this.getGuild();
-      if (guild != null) {
+      getGuild().ifPresent(guild -> {
          guild.broadcast(MaplePacketCreator.marriageMessage(0, name));
-      }
+      });
 
       MapleFamily family = this.getFamily();
       if (family != null) {

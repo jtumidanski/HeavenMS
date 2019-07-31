@@ -968,12 +968,8 @@ public class MapleClient {
 
    private void disconnectInternal(boolean shutdown, boolean cashshop) {//once per MapleClient instance
       if (player != null && player.isLoggedin() && player.getClient() != null) {
-         final int messengerid = player.getMessenger() == null ? 0 : player.getMessenger().getId();
          //final int fid = player.getFamilyId();
          final BuddyList bl = player.getBuddylist();
-         final MapleMessengerCharacter chrm = new MapleMessengerCharacter(player, 0);
-         final MapleGuildCharacter chrg = player.getMGC();
-         final MapleGuild guild = player.getGuild();
 
          player.cancelMagicDoor();
 
@@ -984,8 +980,9 @@ public class MapleClient {
             if (!(channel == -1 || shutdown)) {
                if (!cashshop) {
                   if (!this.serverTransition) { // meaning not changing channels
-                     if (messengerid > 0) {
-                        wserv.leaveMessenger(messengerid, chrm);
+                     int messengerId = player.getMessenger() == null ? 0 : player.getMessenger().getId();
+                     if (messengerId > 0) {
+                        wserv.leaveMessenger(messengerId, new MapleMessengerCharacter(player, 0));
                      }
                                                         /*
                                                         if (fid > 0) {
@@ -1001,11 +998,11 @@ public class MapleClient {
                            player.updateQuest(newStatus);
                         }
                      }
-                     if (guild != null) {
-                        final Server server = Server.getInstance();
-                        server.setGuildMemberOnline(player, false, player.getClient().getChannel());
+                     player.getGuild().ifPresent(guild -> {
+                        Server.getInstance().setGuildMemberOnline(player, false, player.getClient().getChannel());
                         player.getClient().announce(MaplePacketCreator.showGuildInfo(player));
-                     }
+
+                     });
                      if (bl != null) {
                         wserv.loggedOff(player.getName(), player.getId(), channel, player.getBuddylist().getBuddyIds());
                      }
@@ -1022,6 +1019,7 @@ public class MapleClient {
             FilePrinter.printError(FilePrinter.ACCOUNT_STUCK, e);
          } finally {
             if (!this.serverTransition) {
+               MapleGuildCharacter chrg = player.getMGC();
                if (chrg != null) {
                   chrg.setCharacter(null);
                }

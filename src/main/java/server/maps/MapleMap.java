@@ -2175,8 +2175,10 @@ public class MapleMap {
                List<MapleMapObject> affectedMonsters = getMapObjectsInBox(mist.getBox(), Collections.singletonList(MapleMapObjectType.MONSTER));
                for (MapleMapObject mo : affectedMonsters) {
                   if (mist.makeChanceResult()) {
-                     MonsterStatusEffect poisonEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.POISON, 1), mist.getSourceSkill(), null, false);
-                     ((MapleMonster) mo).applyStatus(mist.getOwner(), poisonEffect, true, duration);
+                     mist.getSourceSkill().ifPresent(skill -> {
+                        MonsterStatusEffect poisonEffect = new MonsterStatusEffect(Collections.singletonMap(MonsterStatus.POISON, 1), skill, null, false);
+                        ((MapleMonster) mo).applyStatus(mist.getOwner(), poisonEffect, true, duration);
+                     });
                   }
                }
             }
@@ -2191,7 +2193,9 @@ public class MapleMap {
                   if (mist.makeChanceResult()) {
                      MapleCharacter chr = (MapleCharacter) mo;
                      if (mist.getOwner().getId() == chr.getId() || mist.getOwner().getParty() != null && mist.getOwner().getParty().containsMembers(chr.getMPC())) {
-                        chr.addMP(mist.getSourceSkill().getEffect(chr.getSkillLevel(mist.getSourceSkill().getId())).getX() * chr.getMp() / 100);
+                        mist.getSourceSkill()
+                              .map(skill -> skill.getEffect(chr.getSkillLevel(skill.getId())))
+                              .ifPresent(effect -> chr.addMP(effect.getX() * chr.getMp() / 100));
                      }
                   }
                }
