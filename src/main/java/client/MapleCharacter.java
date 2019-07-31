@@ -5622,16 +5622,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public MapleAlliance getAlliance() {
+   public Optional<MapleAlliance> getAlliance() {
       if (mgc != null) {
-         try {
-            return Server.getInstance().getAlliance(getGuild().getAllianceId());
-         } catch (Exception ex) {
-            ex.printStackTrace();
-         }
+         return Server.getInstance().getAlliance(getGuild().getAllianceId());
       }
-
-      return null;
+      return Optional.empty();
    }
 
    public int getGuildId() {

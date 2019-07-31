@@ -2767,11 +2767,7 @@ public class MaplePacketCreator {
       if (chr.getGuildId() > 0) {
          MapleGuild mg = Server.getInstance().getGuild(chr.getGuildId());
          guildName = mg.getName();
-
-         MapleAlliance alliance = Server.getInstance().getAlliance(chr.getGuild().getAllianceId());
-         if (alliance != null) {
-            allianceName = alliance.getName();
-         }
+         allianceName = Server.getInstance().getAlliance(chr.getGuild().getAllianceId()).map(MapleAlliance::getName).orElse("");
       }
       mplew.writeMapleAsciiString(guildName);
       mplew.writeMapleAsciiString(allianceName);  // does not seem to work

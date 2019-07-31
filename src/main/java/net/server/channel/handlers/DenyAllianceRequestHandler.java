@@ -38,10 +38,7 @@ public final class DenyAllianceRequestHandler extends AbstractMaplePacketHandler
 
       MapleCharacter chr = c.getWorldServer().getPlayerStorage().getCharacterByName(inviterName);
       if (chr != null) {
-         MapleAlliance alliance = chr.getAlliance();
-         if (alliance != null) {
-            MapleAlliance.answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false);
-         }
+         chr.getAlliance().ifPresent(alliance -> MapleAlliance.answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false));
       }
    }
 }

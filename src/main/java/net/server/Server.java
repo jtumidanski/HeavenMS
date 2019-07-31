@@ -38,6 +38,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -49,7 +50,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.buffer.SimpleBufferAllocator;
-import org.apache.mina.core.filterchain.IoFilter;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
@@ -186,7 +186,9 @@ public class Server {
    }
 
    public static void cleanNxcodeCoupons(Connection con) throws SQLException {
-      if (!ServerConstants.USE_CLEAR_OUTDATED_COUPONS) return;
+      if (!ServerConstants.USE_CLEAR_OUTDATED_COUPONS) {
+         return;
+      }
 
       long timeClear = System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000;
 
@@ -313,7 +315,9 @@ public class Server {
                   characterCount++;
 
                   int cworld = rs.getByte("world");
-                  if (cworld >= wlen) continue;
+                  if (cworld >= wlen) {
+                     continue;
+                  }
 
                   if (cworld > curWorld) {
                      wchars.add(curWorld, chars);
@@ -401,7 +405,9 @@ public class Server {
             int world = rs.getInt("world"), map = rs.getInt("map"), step = rs.getInt("step"), podium = rs.getInt("podium");
 
             World w = wlist.get(world);
-            if (w != null) w.setPlayerNpcMapData(map, step, podium);
+            if (w != null) {
+               w.setPlayerNpcMapData(map, step, podium);
+            }
          }
 
          rs.close();
@@ -513,13 +519,19 @@ public class Server {
    public int addChannel(int worldid) {
       wldWLock.lock();
       try {
-         if (worldid >= worlds.size()) return -3;
+         if (worldid >= worlds.size()) {
+            return -3;
+         }
 
          Map<Integer, String> worldChannels = channels.get(worldid);
-         if (worldChannels == null) return -3;
+         if (worldChannels == null) {
+            return -3;
+         }
 
          int channelid = worldChannels.size();
-         if (channelid >= ServerConstants.CHANNEL_SIZE) return -2;
+         if (channelid >= ServerConstants.CHANNEL_SIZE) {
+            return -2;
+         }
 
          Properties p = loadWorldINI();
          if (p == null) {
@@ -543,7 +555,9 @@ public class Server {
 
    public int addWorld() {
       Properties p = loadWorldINI();
-      if (p == null) return -2;
+      if (p == null) {
+         return -2;
+      }
 
       int newWorld = initWorld(p);
       if (newWorld > -1) {
@@ -614,14 +628,18 @@ public class Server {
    public boolean removeChannel(int worldid) {   //lol don't!
       wldWLock.lock();
       try {
-         if (worldid >= worlds.size()) return false;
+         if (worldid >= worlds.size()) {
+            return false;
+         }
 
          World world = worlds.get(worldid);
          if (world != null) {
             int channel = world.removeChannel();
 
             Map<Integer, String> m = channels.get(worldid);
-            if (m != null) m.remove(channel);
+            if (m != null) {
+               m.remove(channel);
+            }
 
             return channel > -1;
          }
@@ -710,7 +728,9 @@ public class Server {
    public void commitActiveCoupons() {
       for (World world : getWorlds()) {
          for (MapleCharacter chr : world.getPlayerStorage().getAllCharacters()) {
-            if (!chr.isLoggedin()) continue;
+            if (!chr.isLoggedin()) {
+               continue;
+            }
 
             chr.updateCouponRates();
          }
@@ -902,8 +922,9 @@ public class Server {
 
       System.out.println("HeavenMS v" + ServerConstants.VERSION + " starting up.\r\n");
 
-      if (ServerConstants.SHUTDOWNHOOK)
+      if (ServerConstants.SHUTDOWNHOOK) {
          Runtime.getRuntime().addShutdownHook(new Thread(shutdown(false)));
+      }
 
       TimeZone.setDefault(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
 
@@ -972,7 +993,9 @@ public class Server {
 
       NewYearCardRecord.startPendingNewYearCardRequests();
 
-      if (ServerConstants.USE_THREAD_TRACKER) ThreadTracker.getInstance().registerThreadTrackerTask();
+      if (ServerConstants.USE_THREAD_TRACKER) {
+         ThreadTracker.getInstance().registerThreadTrackerTask();
+      }
 
       try {
          Integer worldCount = Math.min(GameConstants.WORLD_NAMES.length, Integer.parseInt(p.getProperty("worlds")));
@@ -1012,12 +1035,12 @@ public class Server {
       return subnetInfo;
    }
 
-   public MapleAlliance getAlliance(int id) {
+   public Optional<MapleAlliance> getAlliance(int id) {
       synchronized (alliances) {
          if (alliances.containsKey(id)) {
-            return alliances.get(id);
+            return Optional.of(alliances.get(id));
          }
-         return null;
+         return Optional.empty();
       }
    }
 
@@ -1145,8 +1168,9 @@ public class Server {
 
          if (mc != null) {
             mc.setMGC(g.getMGC(mc.getId()));
-            if (g.getMGC(mc.getId()) == null)
+            if (g.getMGC(mc.getId()) == null) {
                System.out.println("null for " + mc.getName() + " when loading guild " + id);
+            }
             g.getMGC(mc.getId()).setCharacter(mc);
             g.setOnline(mc.getId(), true, mc.getClient().getChannel());
          }
@@ -1286,7 +1310,9 @@ public class Server {
    }
 
    public void deleteGuildCharacter(MapleGuildCharacter mgc) {
-      if (mgc.getCharacter() != null) setGuildMemberOnline(mgc.getCharacter(), false, (byte) -1);
+      if (mgc.getCharacter() != null) {
+         setGuildMemberOnline(mgc.getCharacter(), false, (byte) -1);
+      }
       if (mgc.getGuildRank() > 1) {
          leaveGuild(mgc);
       } else {
@@ -1401,7 +1427,9 @@ public class Server {
       lgnWLock.lock();
       try {
          World wserv = this.getWorld(chrView.getWorld());
-         if (wserv != null) wserv.registerAccountCharacterView(chrView.getAccountID(), chrView);
+         if (wserv != null) {
+            wserv.registerAccountCharacterView(chrView.getAccountID(), chrView);
+         }
       } finally {
          lgnWLock.unlock();
       }
@@ -1422,7 +1450,9 @@ public class Server {
          MapleCharacter chrView = chr.generateCharacterEntry();
 
          World wserv = this.getWorld(chrView.getWorld());
-         if (wserv != null) wserv.registerAccountCharacterView(chrView.getAccountID(), chrView);
+         if (wserv != null) {
+            wserv.registerAccountCharacterView(chrView.getAccountID(), chrView);
+         }
       } finally {
          lgnWLock.unlock();
       }
@@ -1451,7 +1481,9 @@ public class Server {
          Integer world = worldChars.remove(chrid);
          if (world != null) {
             World wserv = this.getWorld(world);
-            if (wserv != null) wserv.unregisterAccountCharacterView(accountid, chrid);
+            if (wserv != null) {
+               wserv.unregisterAccountCharacterView(accountid, chrid);
+            }
          }
       } finally {
          lgnWLock.unlock();
@@ -1464,7 +1496,9 @@ public class Server {
          Integer chrid = chr.getId(), accountid = chr.getAccountID(), world = worldChars.get(chr.getId());
          if (world != null) {
             World wserv = this.getWorld(world);
-            if (wserv != null) wserv.unregisterAccountCharacterView(accountid, chrid);
+            if (wserv != null) {
+               wserv.unregisterAccountCharacterView(accountid, chrid);
+            }
          }
 
          worldChars.put(chrid, toWorld);
@@ -1472,7 +1506,9 @@ public class Server {
          MapleCharacter chrView = chr.generateCharacterEntry();
 
          World wserv = this.getWorld(toWorld);
-         if (wserv != null) wserv.registerAccountCharacterView(chrView.getAccountID(), chrView);
+         if (wserv != null) {
+            wserv.registerAccountCharacterView(chrView.getAccountID(), chrView);
+         }
       } finally {
          lgnWLock.unlock();
       }
@@ -1480,7 +1516,9 @@ public class Server {
 
    public Pair<Pair<Integer, List<MapleCharacter>>, List<Pair<Integer, List<MapleCharacter>>>> loadAccountCharlist(Integer accountId, int visibleWorlds) {
       List<World> wlist = this.getWorlds();
-      if (wlist.size() > visibleWorlds) wlist = wlist.subList(0, visibleWorlds);
+      if (wlist.size() > visibleWorlds) {
+         wlist = wlist.subList(0, visibleWorlds);
+      }
 
       List<Pair<Integer, List<MapleCharacter>>> accChars = new ArrayList<>(wlist.size() + 1);
       int chrTotal = 0;
@@ -1559,7 +1597,9 @@ public class Server {
 
             if (wserv != null) {
                for (MapleCharacter chr : wserv.getAllCharactersView()) {
-                  if (gmLevel < chr.gmLevel()) gmLevel = chr.gmLevel();
+                  if (gmLevel < chr.gmLevel()) {
+                     gmLevel = chr.gmLevel();
+                  }
                }
             }
          }
@@ -1593,7 +1633,9 @@ public class Server {
 
             for (MapleCharacter chr : wchars) {
                int cid = chr.getId();
-               if (gmLevel < chr.gmLevel()) gmLevel = chr.gmLevel();
+               if (gmLevel < chr.gmLevel()) {
+                  gmLevel = chr.gmLevel();
+               }
 
                chars.add(cid);
                worldChars.put(cid, wid);
@@ -1727,7 +1769,9 @@ public class Server {
 
    private synchronized void shutdownInternal(boolean restart) {
       System.out.println((restart ? "Restarting" : "Shutting down") + " the server!\r\n");
-      if (getWorlds() == null) return;//already shutdown
+      if (getWorlds() == null) {
+         return;//already shutdown
+      }
       for (World w : getWorlds()) {
          w.shutdown();
       }
@@ -1753,7 +1797,9 @@ public class Server {
 
       List<Channel> allChannels = getAllChannels();
 
-      if (ServerConstants.USE_THREAD_TRACKER) ThreadTracker.getInstance().cancelThreadTrackerTask();
+      if (ServerConstants.USE_THREAD_TRACKER) {
+         ThreadTracker.getInstance().cancelThreadTrackerTask();
+      }
 
       for (Channel ch : allChannels) {
          while (!ch.finishedShutdown()) {

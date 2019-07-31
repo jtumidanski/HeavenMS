@@ -27,6 +27,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -290,22 +291,26 @@ public class MapleAlliance {
    }
 
    public static boolean removeGuildFromAlliance(int allianceId, int guildId, int worldId) {
-      Server srv = Server.getInstance();
-      MapleAlliance alliance = srv.getAlliance(allianceId);
-
-      if (alliance.getLeader().getGuildId() == guildId) {
+      Server server = Server.getInstance();
+      Optional<MapleAlliance> allianceOptional = server.getAlliance(allianceId);
+      if (allianceOptional.isEmpty()) {
          return false;
       }
 
-      srv.allianceMessage(alliance.getId(), MaplePacketCreator.removeGuildFromAlliance(alliance, guildId, worldId), -1, -1);
-      srv.removeGuildFromAlliance(alliance.getId(), guildId);
+      if (allianceOptional.map(MapleAlliance::getLeader).map(MapleGuildCharacter::getGuildId).filter(id -> id == guildId).isPresent()) {
+         return false;
+      }
+
+      MapleAlliance alliance = allianceOptional.get();
+      server.allianceMessage(alliance.getId(), MaplePacketCreator.removeGuildFromAlliance(alliance, guildId, worldId), -1, -1);
+      server.removeGuildFromAlliance(alliance.getId(), guildId);
       removeGuildFromAllianceOnDb(guildId);
 
-      srv.allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, worldId), -1, -1);
-      srv.allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
-      srv.guildMessage(guildId, MaplePacketCreator.disbandAlliance(alliance.getId()));
+      server.allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, worldId), -1, -1);
+      server.allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
+      server.guildMessage(guildId, MaplePacketCreator.disbandAlliance(alliance.getId()));
 
-      alliance.dropMessage("[" + srv.getGuild(guildId, worldId).getName() + "] guild has left the union.");
+      alliance.dropMessage("[" + server.getGuild(guildId, worldId).getName() + "] guild has left the union.");
       return true;
    }
 

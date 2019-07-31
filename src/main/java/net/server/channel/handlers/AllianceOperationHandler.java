@@ -38,86 +38,87 @@ import tools.data.output.MaplePacketLittleEndianWriter;
  */
 public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
 
-   private static byte[] sendShowInfo(int allianceid, int playerid) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x02);
-      mplew.writeInt(allianceid);
-      mplew.writeInt(playerid);
-      return mplew.getPacket();
+   private static byte[] sendShowInfo(int allianceId, int playerId) {
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      writer.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
+      writer.write(0x02);
+      writer.writeInt(allianceId);
+      writer.writeInt(playerId);
+      return writer.getPacket();
    }
 
-   private static byte[] sendInvitation(int allianceid, int playerid, final String guildname) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x05);
-      mplew.writeInt(allianceid);
-      mplew.writeInt(playerid);
-      mplew.writeMapleAsciiString(guildname);
-      return mplew.getPacket();
+   private static byte[] sendInvitation(int allianceId, int playerId, final String guildName) {
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      writer.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
+      writer.write(0x05);
+      writer.writeInt(allianceId);
+      writer.writeInt(playerId);
+      writer.writeMapleAsciiString(guildName);
+      return writer.getPacket();
    }
 
-   private static byte[] sendChangeGuild(int allianceid, int playerid, int guildid, int option) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x07);
-      mplew.writeInt(allianceid);
-      mplew.writeInt(guildid);
-      mplew.writeInt(playerid);
-      mplew.write(option);
-      return mplew.getPacket();
+   private static byte[] sendChangeGuild(int allianceId, int playerId, int guildId, int option) {
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      writer.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
+      writer.write(0x07);
+      writer.writeInt(allianceId);
+      writer.writeInt(guildId);
+      writer.writeInt(playerId);
+      writer.write(option);
+      return writer.getPacket();
    }
 
-   private static byte[] sendChangeLeader(int allianceid, int playerid, int victim) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x08);
-      mplew.writeInt(allianceid);
-      mplew.writeInt(playerid);
-      mplew.writeInt(victim);
-      return mplew.getPacket();
+   private static byte[] sendChangeLeader(int allianceId, int playerId, int victim) {
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      writer.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
+      writer.write(0x08);
+      writer.writeInt(allianceId);
+      writer.writeInt(playerId);
+      writer.writeInt(victim);
+      return writer.getPacket();
    }
 
-   private static byte[] sendChangeRank(int allianceid, int playerid, int int1, byte byte1) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x09);
-      mplew.writeInt(allianceid);
-      mplew.writeInt(playerid);
-      mplew.writeInt(int1);
-      mplew.writeInt(byte1);
-      return mplew.getPacket();
+   private static byte[] sendChangeRank(int allianceId, int playerId, int int1, byte byte1) {
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      writer.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
+      writer.write(0x09);
+      writer.writeInt(allianceId);
+      writer.writeInt(playerId);
+      writer.writeInt(int1);
+      writer.writeInt(byte1);
+      return writer.getPacket();
    }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public final void handlePacket(SeekableLittleEndianAccessor accessor, MapleClient client) {
       MapleAlliance alliance = null;
-      MapleCharacter chr = c.getPlayer();
+      MapleCharacter chr = client.getPlayer();
 
       if (chr.getGuild() == null) {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
 
-      if (chr.getGuild().getAllianceId() > 0) {
-         alliance = chr.getAlliance();
+      int allianceId = chr.getGuild().getAllianceId();
+      if (allianceId > 0) {
+         alliance = chr.getAlliance().orElse(null);
       }
 
-      byte b = slea.readByte();
+      byte b = accessor.readByte();
       if (alliance == null) {
          if (b != 4) {
-            c.announce(MaplePacketCreator.enableActions());
+            client.announce(MaplePacketCreator.enableActions());
             return;
          }
       } else {
          if (b == 4) {
             chr.dropMessage(5, "Your guild is already registered on a guild alliance.");
-            c.announce(MaplePacketCreator.enableActions());
+            client.announce(MaplePacketCreator.enableActions());
             return;
          }
 
          if (chr.getMGC().getAllianceRank() > 2 || !alliance.getGuilds().contains(chr.getGuildId())) {
-            c.announce(MaplePacketCreator.enableActions());
+            client.announce(MaplePacketCreator.enableActions());
             return;
          }
       }
@@ -125,125 +126,138 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
       // "alliance" is only null at case 0x04
       switch (b) {
          case 0x01:
-            Server.getInstance().allianceMessage(alliance.getId(), sendShowInfo(chr.getGuild().getAllianceId(), chr.getId()), -1, -1);
+            Server.getInstance().allianceMessage(alliance.getId(), sendShowInfo(allianceId, chr.getId()), -1, -1);
+            alliance.saveToDB();
             break;
-         case 0x02: { // Leave Alliance
-            if (chr.getGuild().getAllianceId() == 0 || chr.getGuildId() < 1 || chr.getGuildRank() != 1) {
-               return;
-            }
-
-            MapleAlliance.removeGuildFromAlliance(chr.getGuild().getAllianceId(), chr.getGuildId(), chr.getWorld());
+         case 0x02:
+            leaveAlliance(allianceId, alliance, chr);
             break;
-         }
-         case 0x03: // Send Invite
-            String guildName = slea.readMapleAsciiString();
-
-            if (alliance.getGuilds().size() == alliance.getCapacity()) {
-               chr.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
-            } else {
-               MapleAlliance.sendInvitation(c, guildName, alliance.getId());
-            }
-
+         case 0x03:
+            sendInvite(new AllianceInviteData(accessor), client, alliance, chr);
             break;
-         case 0x04: { // Accept Invite
-            MapleGuild guild = chr.getGuild();
-            if (guild.getAllianceId() != 0 || chr.getGuildRank() != 1 || chr.getGuildId() < 1) {
-               return;
-            }
-
-            int allianceid = slea.readInt();
-            //slea.readMapleAsciiString();  //recruiter's guild name
-
-            alliance = Server.getInstance().getAlliance(allianceid);
-            if (alliance == null) {
-               return;
-            }
-
-            if (!MapleAlliance.answerInvitation(c.getPlayer().getId(), guild.getName(), alliance.getId(), true)) {
-               return;
-            }
-
-            if (alliance.getGuilds().size() == alliance.getCapacity()) {
-               chr.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
-               return;
-            }
-
-            int guildid = chr.getGuildId();
-
-            Server.getInstance().addGuildtoAlliance(alliance.getId(), guildid);
-            Server.getInstance().resetAllianceGuildPlayersRank(guildid);
-
-            chr.getMGC().setAllianceRank(2);
-            Server.getInstance().getGuild(chr.getGuildId()).getMGC(chr.getId()).setAllianceRank(2);
-            chr.saveGuildStatus();
-
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.addGuildToAlliance(alliance, guildid, c), -1, -1);
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.updateAllianceInfo(alliance, c.getWorld()), -1, -1);
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
-            guild.dropMessage("Your guild has joined the [" + alliance.getName() + "] union.");
-
+         case 0x04:
+            acceptInvite(new AllianceAcceptedInviteData(accessor), client, chr);
             break;
-         }
-         case 0x06: { // Expel Guild
-            int guildid = slea.readInt();
-            int allianceid = slea.readInt();
-            if (chr.getGuild().getAllianceId() == 0 || chr.getGuild().getAllianceId() != allianceid) {
-               return;
-            }
-
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.removeGuildFromAlliance(alliance, guildid, c.getWorld()), -1, -1);
-            Server.getInstance().removeGuildFromAlliance(alliance.getId(), guildid);
-
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, c.getWorld()), -1, -1);
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
-            Server.getInstance().guildMessage(guildid, MaplePacketCreator.disbandAlliance(allianceid));
-
-            alliance.dropMessage("[" + Server.getInstance().getGuild(guildid).getName() + "] guild has been expelled from the union.");
+         case 0x06:
+            expelGuild(new AllianceGuildExpelData(accessor), client, alliance, allianceId);
             break;
-         }
-         case 0x07: { // Change Alliance Leader
-            if (chr.getGuild().getAllianceId() == 0 || chr.getGuildId() < 1) {
-               return;
-            }
-            int victimid = slea.readInt();
-            MapleCharacter player = Server.getInstance().getWorld(c.getWorld()).getPlayerStorage().getCharacterById(victimid);
-            if (player.getAllianceRank() != 2) {
-               return;
-            }
-
-            //Server.getInstance().allianceMessage(alliance.getId(), sendChangeLeader(chr.getGuild().getAllianceId(), chr.getId(), slea.readInt()), -1, -1);
-            changeLeaderAllianceRank(alliance, player);
+         case 0x07:
+            changeAllianceLeader(new AllianceChangeLeaderData(accessor), client, alliance, chr);
             break;
-         }
          case 0x08:
-            String[] ranks = new String[5];
-            for (int i = 0; i < 5; i++) {
-               ranks[i] = slea.readMapleAsciiString();
-            }
-            Server.getInstance().setAllianceRanks(alliance.getId(), ranks);
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.changeAllianceRankTitle(alliance.getId(), ranks), -1, -1);
+            changeRanks(new AllianceRankData(accessor), alliance);
             break;
-         case 0x09: {
-            int int1 = slea.readInt();
-            byte byte1 = slea.readByte();
-
-            //Server.getInstance().allianceMessage(alliance.getId(), sendChangeRank(chr.getGuild().getAllianceId(), chr.getId(), int1, byte1), -1, -1);
-            MapleCharacter player = Server.getInstance().getWorld(c.getWorld()).getPlayerStorage().getCharacterById(int1);
-            changePlayerAllianceRank(alliance, player, (byte1 > 0));
-
+         case 0x09:
+            changePlayerAllianceRank(new AlliancePlayerRankData(accessor), client, alliance);
             break;
-         }
          case 0x0A:
-            String notice = slea.readMapleAsciiString();
-            Server.getInstance().setAllianceNotice(alliance.getId(), notice);
-            Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), notice), -1, -1);
-
-            alliance.dropMessage(5, "* Alliance Notice : " + notice);
+            setAllianceNotice(new AllianceNoticeData(accessor), alliance);
             break;
          default:
             chr.dropMessage("Feature not available");
       }
+   }
 
+   private void setAllianceNotice(AllianceNoticeData noticeData, MapleAlliance alliance) {
+      Server.getInstance().setAllianceNotice(alliance.getId(), noticeData.getNotice());
+      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), noticeData.getNotice()), -1, -1);
+
+      alliance.dropMessage(5, "* Alliance Notice : " + noticeData.getNotice());
+      alliance.saveToDB();
+   }
+
+   private void changePlayerAllianceRank(AlliancePlayerRankData playerRankData, MapleClient c, MapleAlliance alliance) {
+      //Server.getInstance().allianceMessage(alliance.getId(), sendChangeRank(allianceId, chr.getId(), int1, byte1), -1, -1);
+      MapleCharacter player = Server.getInstance().getWorld(c.getWorld()).getPlayerStorage().getCharacterById(playerRankData.getPlayerId());
+      changePlayerAllianceRank(alliance, player, playerRankData.isRankRaised());
+      alliance.saveToDB();
+   }
+
+   private void changeRanks(AllianceRankData rankData, MapleAlliance alliance) {
+
+      Server.getInstance().setAllianceRanks(alliance.getId(), rankData.getRanks());
+      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.changeAllianceRankTitle(alliance.getId(), rankData.getRanks()), -1, -1);
+      alliance.saveToDB();
+   }
+
+   private void changeAllianceLeader(AllianceChangeLeaderData leaderData, MapleClient c, MapleAlliance alliance, MapleCharacter chr) {
+      if (chr.getGuildId() < 1) {
+         return;
+      }
+      MapleCharacter player = Server.getInstance().getWorld(c.getWorld()).getPlayerStorage().getCharacterById(leaderData.getPlayerId());
+      if (player.getAllianceRank() != 2) {
+         return;
+      }
+
+      //Server.getInstance().allianceMessage(alliance.getId(), sendChangeLeader(allianceId, chr.getId(), slea.readInt()), -1, -1);
+      changeLeaderAllianceRank(alliance, player);
+      alliance.saveToDB();
+   }
+
+   private void expelGuild(AllianceGuildExpelData expelData, MapleClient c, MapleAlliance alliance, int allianceId) {
+      if (allianceId != expelData.getAllianceId()) {
+         return;
+      }
+
+      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.removeGuildFromAlliance(alliance, expelData.getGuildId(), c.getWorld()), -1, -1);
+      Server.getInstance().removeGuildFromAlliance(alliance.getId(), expelData.getGuildId());
+
+      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, c.getWorld()), -1, -1);
+      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
+      Server.getInstance().guildMessage(expelData.getGuildId(), MaplePacketCreator.disbandAlliance(expelData.getAllianceId()));
+
+      alliance.dropMessage("[" + Server.getInstance().getGuild(expelData.getGuildId()).getName() + "] guild has been expelled from the union.");
+      alliance.saveToDB();
+   }
+
+   private void acceptInvite(AllianceAcceptedInviteData inviteData, MapleClient c, MapleCharacter chr) {
+      MapleGuild guild = chr.getGuild();
+      if (guild.getAllianceId() != 0 || chr.getGuildRank() != 1 || chr.getGuildId() < 1) {
+         return;
+      }
+
+      Server.getInstance().getAlliance(inviteData.getAllianceId()).ifPresent(alliance -> {
+         if (!MapleAlliance.answerInvitation(c.getPlayer().getId(), guild.getName(), alliance.getId(), true)) {
+            return;
+         }
+
+         if (alliance.getGuilds().size() == alliance.getCapacity()) {
+            chr.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
+            return;
+         }
+
+         int guildId = chr.getGuildId();
+
+         Server.getInstance().addGuildtoAlliance(alliance.getId(), guildId);
+         Server.getInstance().resetAllianceGuildPlayersRank(guildId);
+
+         chr.getMGC().setAllianceRank(2);
+         Server.getInstance().getGuild(chr.getGuildId()).getMGC(chr.getId()).setAllianceRank(2);
+         chr.saveGuildStatus();
+
+         Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.addGuildToAlliance(alliance, guildId, c), -1, -1);
+         Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.updateAllianceInfo(alliance, c.getWorld()), -1, -1);
+         Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
+         guild.dropMessage("Your guild has joined the [" + alliance.getName() + "] union.");
+         alliance.saveToDB();
+      });
+   }
+
+   private void sendInvite(AllianceInviteData inviteData, MapleClient client, MapleAlliance alliance, MapleCharacter character) {
+      if (alliance.getGuilds().size() == alliance.getCapacity()) {
+         character.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
+      } else {
+         MapleAlliance.sendInvitation(client, inviteData.getGuildName(), alliance.getId());
+      }
+      alliance.saveToDB();
+   }
+
+   private void leaveAlliance(int allianceId, MapleAlliance alliance, MapleCharacter chr) {
+      if (chr.getGuildId() < 1 || chr.getGuildRank() != 1) {
+         return;
+      }
+
+      MapleAlliance.removeGuildFromAlliance(allianceId, chr.getGuildId(), chr.getWorld());
       alliance.saveToDB();
    }
 
@@ -262,12 +276,149 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
 
    private void changePlayerAllianceRank(MapleAlliance alliance, MapleCharacter chr, boolean raise) {
       int newRank = chr.getAllianceRank() + (raise ? -1 : 1);
-      if (newRank < 3 || newRank > 5) return;
+      if (newRank < 3 || newRank > 5) {
+         return;
+      }
 
       chr.getMGC().setAllianceRank(newRank);
       chr.saveGuildStatus();
 
       Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, chr.getWorld()), -1, -1);
       alliance.dropMessage("'" + chr.getName() + "' has been reassigned to '" + alliance.getRankTitle(newRank) + "' in this Alliance.");
+   }
+
+   private class AllianceNoticeData {
+      private String notice;
+
+      public AllianceNoticeData(String notice) {
+         this.notice = notice;
+      }
+
+      public AllianceNoticeData(SeekableLittleEndianAccessor accessor) {
+         this.notice = accessor.readMapleAsciiString();
+      }
+
+      public String getNotice() {
+         return notice;
+      }
+   }
+
+   private class AlliancePlayerRankData {
+      private int playerId;
+
+      private boolean rankRaised;
+
+      public AlliancePlayerRankData(int playerId, boolean rankRaised) {
+         this.playerId = playerId;
+         this.rankRaised = rankRaised;
+      }
+
+      public AlliancePlayerRankData(SeekableLittleEndianAccessor accessor) {
+         this.playerId = accessor.readInt();
+         this.rankRaised = accessor.readByte() > 0;
+      }
+
+      public int getPlayerId() {
+         return playerId;
+      }
+
+      public boolean isRankRaised() {
+         return rankRaised;
+      }
+   }
+
+   private class AllianceRankData {
+      private String[] ranks;
+
+      public AllianceRankData(String[] ranks) {
+         this.ranks = ranks;
+      }
+
+      public AllianceRankData(SeekableLittleEndianAccessor accessor) {
+         ranks = new String[5];
+         for (int i = 0; i < 5; i++) {
+            ranks[i] = accessor.readMapleAsciiString();
+         }
+      }
+
+      public String[] getRanks() {
+         return ranks;
+      }
+   }
+
+   private class AllianceChangeLeaderData {
+      private int playerId;
+
+      public AllianceChangeLeaderData(int playerId) {
+         this.playerId = playerId;
+      }
+
+      public AllianceChangeLeaderData(SeekableLittleEndianAccessor accessor) {
+         this.playerId = accessor.readInt();
+      }
+
+      public int getPlayerId() {
+         return playerId;
+      }
+   }
+
+   private class AllianceGuildExpelData {
+      private int guildId;
+
+      private int allianceId;
+
+      public AllianceGuildExpelData(int guildId, int allianceId) {
+         this.guildId = guildId;
+         this.allianceId = allianceId;
+      }
+
+      public AllianceGuildExpelData(SeekableLittleEndianAccessor accessor) {
+         this.guildId = accessor.readInt();
+         this.allianceId = accessor.readInt();
+      }
+
+      public int getGuildId() {
+         return guildId;
+      }
+
+      public int getAllianceId() {
+         return allianceId;
+      }
+   }
+
+   private class AllianceAcceptedInviteData {
+      private int allianceId;
+
+      private String guildName;
+
+      public AllianceAcceptedInviteData(int allianceId, String guildName) {
+         this.allianceId = allianceId;
+         this.guildName = guildName;
+      }
+
+      public AllianceAcceptedInviteData(SeekableLittleEndianAccessor accessor) {
+         this.allianceId = accessor.readInt();
+         //slea.readMapleAsciiString();  //recruiter's guild name
+      }
+
+      public int getAllianceId() {
+         return allianceId;
+      }
+   }
+
+   private class AllianceInviteData {
+      private String guildName;
+
+      public AllianceInviteData(String guildName) {
+         this.guildName = guildName;
+      }
+
+      public AllianceInviteData(SeekableLittleEndianAccessor accessor) {
+         this.guildName = accessor.readMapleAsciiString();
+      }
+
+      public String getGuildName() {
+         return guildName;
+      }
    }
 }

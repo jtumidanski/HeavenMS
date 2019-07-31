@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.apache.mina.core.session.IoSession;
 
@@ -476,15 +477,16 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
    private void loggingInAllianceOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
       int allianceId = player.getGuild().getAllianceId();
       if (allianceId > 0) {
-         MapleAlliance newAlliance = server.getAlliance(allianceId);
-         if (newAlliance == null) {
-            newAlliance = MapleAlliance.loadAlliance(allianceId);
-            if (newAlliance != null) {
-               server.addAlliance(allianceId, newAlliance);
+         MapleAlliance newAlliance = server.getAlliance(allianceId).orElseGet(() -> {
+            MapleAlliance alliance = MapleAlliance.loadAlliance(allianceId);
+            if (alliance != null) {
+               server.addAlliance(allianceId, alliance);
             } else {
                player.getGuild().setAllianceId(0);
             }
-         }
+            return alliance;
+         });
+
          if (newAlliance != null) {
             client.announce(MaplePacketCreator.updateAllianceInfo(newAlliance, client.getWorld()));
             client.announce(MaplePacketCreator.allianceNotice(newAlliance.getId(), newAlliance.getNotice()));

@@ -443,13 +443,13 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void upgradeAlliance() {
-      MapleAlliance alliance = Server.getInstance().getAlliance(c.getPlayer().getGuild().getAllianceId());
-      alliance.increaseCapacity(1);
-
-      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, c.getWorld()), -1, -1);
-      Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
-
-      c.announce(MaplePacketCreator.updateAllianceInfo(alliance, c.getWorld()));  // thanks Vcoc for finding an alliance update to leader issue
+      int allianceId = c.getPlayer().getGuild().getAllianceId();
+      Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> {
+         alliance.increaseCapacity(1);
+         Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.getGuildAlliances(alliance, c.getWorld()), -1, -1);
+         Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.allianceNotice(allianceId, alliance.getNotice()), -1, -1);
+         c.announce(MaplePacketCreator.updateAllianceInfo(alliance, c.getWorld()));  // thanks Vcoc for finding an alliance update to leader issue
+      });
    }
 
    public void disbandAlliance(MapleClient c, int allianceId) {
@@ -465,7 +465,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public int getAllianceCapacity() {
-      return Server.getInstance().getAlliance(getPlayer().getGuild().getAllianceId()).getCapacity();
+      return Server.getInstance().getAlliance(getPlayer().getGuild().getAllianceId()).map(MapleAlliance::getCapacity).orElse(0);
    }
 
    public boolean hasMerchant() {
