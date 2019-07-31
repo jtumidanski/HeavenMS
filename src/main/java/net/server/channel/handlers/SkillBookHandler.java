@@ -25,7 +25,6 @@ import java.util.Map;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.Skill;
 import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -48,60 +47,70 @@ public final class SkillBookHandler extends AbstractMaplePacketHandler {
       short slot = accessor.readShort();
       int itemId = accessor.readInt();
 
-      boolean canuse;
-      boolean success = false;
-      int skillId = 0;
-      int maxlevel = 0;
-
       MapleCharacter player = c.getPlayer();
       if (c.tryacquireClient()) {
+         int skillId;
          try {
             MapleInventory inv = player.getInventory(MapleInventoryType.USE);
             Item toUse = inv.getItem(slot);
             if (toUse == null || toUse.getItemId() != itemId) {
                return;
             }
-            Map<String, Integer> skilldata = MapleItemInformationProvider.getInstance().getSkillStats(toUse.getItemId(), player.getJob().getId());
-            if (skilldata == null) {
+            Map<String, Integer> skillData = MapleItemInformationProvider.getInstance().getSkillStats(toUse.getItemId(), player.getJob().getId());
+            if (skillData == null) {
                return;
             }
 
-            skillId = skilldata.get("skillid");
+            skillId = skillData.get("skillid");
             if (skillId == 0) {
-               canuse = false;
+               player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, false, false));
             } else {
-               Skill skill = SkillFactory.getSkill(skillId).orElseThrow();
-               if ((player.getSkillLevel(skill) >= skilldata.get("reqSkillLevel") || skilldata.get("reqSkillLevel") == 0) && player.getMasterLevel(skill) < skilldata.get("masterLevel")) {
-                  inv.lockInventory();
-                  try {
-                     Item used = inv.getItem(slot);
-                     if (used != toUse || toUse.getQuantity() < 1) {    // thanks ClouD for noticing skillbooks not being usable when stacked
+               SkillFactory.getSkill(skillId).ifPresentOrElse(skill -> {
+                  boolean meetsPrerequisiteLevel = (player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0);
+                  boolean notMastered = player.getMasterLevel(skill) < skillData.get("masterLevel");
+                  boolean bookCanBeUsed = meetsPrerequisiteLevel && notMastered;
+                  boolean success = false;
+                  if (bookCanBeUsed) {
+                     if (!consumeBook(c, slot, inv, toUse)) {
                         return;
                      }
-
-                     MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, (short) 1, false);
-                  } finally {
-                     inv.unlockInventory();
+                     if (MapleItemInformationProvider.rollSuccessChance(skillData.get("success"))) {
+                        success = true;
+                        player.changeSkillLevel(skill, player.getSkillLevel(skill), Math.max(skillData.get("masterLevel"), player.getMasterLevel(skill)), -1);
+                     } else {
+                        success = false;
+                     }
                   }
-
-                  canuse = true;
-                  if (MapleItemInformationProvider.rollSuccessChance(skilldata.get("success"))) {
-                     success = true;
-                     player.changeSkillLevel(skill, player.getSkillLevel(skill), Math.max(skilldata.get("masterLevel"), player.getMasterLevel(skill)), -1);
-                  } else {
-                     success = false;
-                     //player.dropMessage("The skill book lights up, but the skill winds up as if nothing happened.");
-                  }
-               } else {
-                  canuse = false;
-               }
+                  player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, bookCanBeUsed, success));
+               }, () -> player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, false, false)));
             }
          } finally {
             c.releaseClient();
          }
-
-         // thanks Vcoc for noting skill book result not showing for all in area
-         player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, maxlevel, canuse, success));
       }
+   }
+
+   /**
+    * Consumes the book.
+    *
+    * @param client the client
+    * @param slot   the slot to consume
+    * @param inv    the inventory to consume from
+    * @param toUse  the item to consume
+    * @return true if the book was successfully consumed
+    */
+   private boolean consumeBook(MapleClient client, short slot, MapleInventory inv, Item toUse) {
+      inv.lockInventory();
+      try {
+         Item used = inv.getItem(slot);
+         if (used != toUse || toUse.getQuantity() < 1) {
+            return false;
+         }
+
+         MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, slot, (short) 1, false);
+      } finally {
+         inv.unlockInventory();
+      }
+      return true;
    }
 }
