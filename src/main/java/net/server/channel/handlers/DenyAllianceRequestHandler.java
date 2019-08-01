@@ -19,6 +19,8 @@
 */
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
@@ -36,9 +38,10 @@ public final class DenyAllianceRequestHandler extends AbstractMaplePacketHandler
       String inviterName = slea.readMapleAsciiString();
       String guildName = slea.readMapleAsciiString();
 
-      MapleCharacter chr = c.getWorldServer().getPlayerStorage().getCharacterByName(inviterName);
-      if (chr != null) {
-         chr.getAlliance().ifPresent(alliance -> MapleAlliance.answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false));
-      }
+      c.getWorldServer().getPlayerStorage().getCharacterByName(inviterName)
+            .map(MapleCharacter::getAlliance)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .ifPresent(alliance -> MapleAlliance.answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false));
    }
 }

@@ -42,21 +42,16 @@ public class JailCommand extends Command {
          return;
       }
 
-      int minutesJailed = 5;
-      if (params.length >= 2) {
-         minutesJailed = Integer.valueOf(params[1]);
-         if (minutesJailed <= 0) {
-            player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
-            return;
-         }
+      int minutesJailed = params.length >= 2 ? Integer.valueOf(params[1]) : 5;
+
+      if (minutesJailed <= 0) {
+         player.yellowMessage("Syntax: !jail <playername> [<minutes>]");
+         return;
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
+      c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          victim.addJailExpirationTime(minutesJailed * 60 * 1000);
-
          int mapid = 300000012;
-
          if (victim.getMapId() != mapid) {    // those gone to jail won't be changing map anyway
             MapleMap target = c.getChannelServer().getMapFactory().getMap(mapid);
             MaplePortal targetPortal = target.getPortal(0);
@@ -66,9 +61,6 @@ public class JailCommand extends Command {
          } else {
             player.message(victim.getName() + "'s time in jail has been extended for " + minutesJailed + " minutes.");
          }
-
-      } else {
-         player.message("Player '" + params[0] + "' could not be found.");
-      }
+      }, () -> player.message("Player '" + params[0] + "' could not be found."));
    }
 }

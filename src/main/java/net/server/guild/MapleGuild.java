@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
@@ -60,6 +61,7 @@ public class MapleGuild {
    private int world;
    private Map<Integer, List<Integer>> notifications = new LinkedHashMap<>();
    private boolean bDirty = true;
+
    public MapleGuild(int guildid, int world) {
       this.world = world;
       members = new ArrayList<>();
@@ -156,17 +158,17 @@ public class MapleGuild {
    }
 
    public static MapleGuildResponse sendInvitation(MapleClient c, String targetName) {
-      MapleCharacter mc = c.getChannelServer().getPlayerStorage().getCharacterByName(targetName);
-      if (mc == null) {
+      Optional<MapleCharacter> mc = c.getChannelServer().getPlayerStorage().getCharacterByName(targetName);
+      if (mc.isEmpty()) {
          return MapleGuildResponse.NOT_IN_CHANNEL;
       }
-      if (mc.getGuildId() > 0) {
+      if (mc.get().getGuildId() > 0) {
          return MapleGuildResponse.ALREADY_IN_GUILD;
       }
 
       MapleCharacter sender = c.getPlayer();
-      if (MapleInviteCoordinator.createInvite(InviteType.GUILD, sender, sender.getGuildId(), mc.getId())) {
-         mc.getClient().announce(MaplePacketCreator.guildInvite(sender.getGuildId(), sender.getName()));
+      if (MapleInviteCoordinator.createInvite(InviteType.GUILD, sender, sender.getGuildId(), mc.get().getId())) {
+         mc.get().getClient().announce(MaplePacketCreator.guildInvite(sender.getGuildId(), sender.getName()));
          return null;
       } else {
          return MapleGuildResponse.MANAGING_INVITE;
@@ -265,7 +267,9 @@ public class MapleGuild {
             synchronized (notifications) {
                chl = notifications.get(mgc.getChannel());
             }
-            if (chl != null) chl.add(mgc.getId());
+            if (chl != null) {
+               chl.add(mgc.getId());
+            }
             //Unable to connect to Channel... error was here
          }
       } finally {
@@ -403,25 +407,26 @@ public class MapleGuild {
    public void broadcastNameChanged() {
       PlayerStorage ps = Server.getInstance().getWorld(world).getPlayerStorage();
 
-      for (MapleGuildCharacter mgc : getMembers()) {
-         MapleCharacter chr = ps.getCharacterById(mgc.getId());
-         if (chr == null || !chr.isLoggedinWorld()) continue;
-
-         byte[] packet = MaplePacketCreator.guildNameChanged(chr.getId(), this.getName());
-         chr.getMap().broadcastMessage(chr, packet);
-      }
+      getMembers().stream()
+            .map(member -> ps.getCharacterById(member.getId()))
+            .flatMap(Optional::stream)
+            .filter(MapleCharacter::isLoggedinWorld)
+            .forEach(character -> {
+               byte[] packet = MaplePacketCreator.guildNameChanged(character.getId(), this.getName());
+               character.getMap().broadcastMessage(character, packet);
+            });
    }
 
    public void broadcastEmblemChanged() {
       PlayerStorage ps = Server.getInstance().getWorld(world).getPlayerStorage();
-
-      for (MapleGuildCharacter mgc : getMembers()) {
-         MapleCharacter chr = ps.getCharacterById(mgc.getId());
-         if (chr == null || !chr.isLoggedinWorld()) continue;
-
-         byte[] packet = MaplePacketCreator.guildMarkChanged(chr.getId(), this);
-         chr.getMap().broadcastMessage(chr, packet);
-      }
+      getMembers().stream()
+            .map(member -> ps.getCharacterById(member.getId()))
+            .flatMap(Optional::stream)
+            .filter(MapleCharacter::isLoggedinWorld)
+            .forEach(character -> {
+               byte[] packet = MaplePacketCreator.guildMarkChanged(character.getId(), this);
+               character.getMap().broadcastMessage(character, packet);
+            });
    }
 
    public void broadcast(final byte[] packet) {
@@ -464,17 +469,34 @@ public class MapleGuild {
    public void guildMessage(final byte[] serverNotice) {
       membersLock.lock();
       try {
-         for (MapleGuildCharacter mgc : members) {
-            for (Channel cs : Server.getInstance().getChannelsFromWorld(world)) {
-               if (cs.getPlayerStorage().getCharacterById(mgc.getId()) != null) {
-                  cs.getPlayerStorage().getCharacterById(mgc.getId()).getClient().announce(serverNotice);
-                  break;
-               }
-            }
-         }
+         members.stream().map(this::getChannelForGuildMember).forEach(pair -> sendGuildMessageForPair(serverNotice, pair));
       } finally {
          membersLock.unlock();
       }
+   }
+
+   /**
+    * Sends a guild message for a <code>MapleGuildCharacter</code> - <code>Optional<Channel></code> pair.
+    * @param serverNotice the server notice
+    * @param pair the pair
+    */
+   private void sendGuildMessageForPair(byte[] serverNotice, Pair<MapleGuildCharacter, Optional<Channel>> pair) {
+      pair.getRight().ifPresent(channel -> channel.getPlayerStorage().getCharacterById(pair.getLeft().getId()).ifPresent(character -> character.getClient().announce(serverNotice)));
+   }
+
+   /**
+    * Given a guild member, create a pair with a channel the member is associated with.
+    *
+    * @param member the guild member
+    * @return a pair
+    */
+   private Pair<MapleGuildCharacter, Optional<Channel>> getChannelForGuildMember(MapleGuildCharacter member) {
+      return new Pair<>(
+            member,
+            Server.getInstance().getChannelsFromWorld(world).stream()
+                  .filter(channel -> channel.getPlayerStorage().getCharacterById(member.getId()).isPresent())
+                  .findFirst()
+      );
    }
 
    public void dropMessage(String message) {

@@ -43,23 +43,24 @@ public class SpCommand extends Command {
 
       if (params.length == 1) {
          int newSp = Integer.parseInt(params[0]);
-         if (newSp < 0) newSp = 0;
-         else if (newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
+         if (newSp < 0) {
+            newSp = 0;
+         } else if (newSp > ServerConstants.MAX_AP) {
+            newSp = ServerConstants.MAX_AP;
+         }
 
          player.updateRemainingSp(newSp);
       } else {
-         MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-         if (victim != null) {
+         c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
             int newSp = Integer.parseInt(params[1]);
-            if (newSp < 0) newSp = 0;
-            else if (newSp > ServerConstants.MAX_AP) newSp = ServerConstants.MAX_AP;
-
+            if (newSp < 0) {
+               newSp = 0;
+            } else if (newSp > ServerConstants.MAX_AP) {
+               newSp = ServerConstants.MAX_AP;
+            }
             victim.updateRemainingSp(newSp);
-
             player.dropMessage(5, "SP given.");
-         } else {
-            player.message("Player '" + params[0] + "' could not be found.");
-         }
+         }, () -> player.message("Player '" + params[0] + "' could not be found."));
       }
    }
 }

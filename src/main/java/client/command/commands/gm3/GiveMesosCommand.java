@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -66,9 +68,9 @@ public class GiveMesosCommand extends Command {
          }
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv_);
-      if (victim != null) {
-         victim.gainMeso((int) mesos_, true);
+      Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv_);
+      if (victim.isPresent()) {
+         victim.get().gainMeso((int) mesos_, true);
          player.message("MESO given.");
       } else {
          player.message("Player '" + recv_ + "' could not be found.");

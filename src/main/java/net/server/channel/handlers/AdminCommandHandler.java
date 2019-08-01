@@ -23,6 +23,7 @@ package net.server.channel.handlers;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -78,28 +79,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             c.getPlayer().yellowMessage("Please use !ban <IGN> <Reason>");
             break;
          case 0x04: // /block <name> <duration (in days)> <HACK/BOT/AD/HARASS/CURSE/SCAM/MISCONDUCT/SELL/ICASH/TEMP/GM/IPROGRAM/MEGAPHONE>
-            victim = slea.readMapleAsciiString();
-            int type = slea.readByte(); //reason
-            int duration = slea.readInt();
-            String description = slea.readMapleAsciiString();
-            String reason = c.getPlayer().getName() + " used /ban to ban";
-            target = c.getChannelServer().getPlayerStorage().getCharacterByName(victim);
-            if (target != null) {
-               String readableTargetName = MapleCharacter.makeMapleReadable(target.getName());
-               String ip = target.getClient().getSession().getRemoteAddress().toString().split(":")[0];
-               reason += readableTargetName + " (IP: " + ip + ")";
-               if (duration == -1) {
-                  target.ban(description + " " + reason);
-               } else {
-                  target.block(type, duration, description);
-                  target.sendPolice(duration, reason, 6000);
-               }
-               c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
-            } else if (MapleCharacter.ban(victim, reason, false)) {
-               c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
-            } else {
-               c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
-            }
+            blockCommand(slea, c);
             break;
          case 0x10: // /h, information by vana (and tele mode f1) ... hide ofcourse
             c.getPlayer().Hide(slea.readByte() == 1);
@@ -119,9 +99,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             }
             break;
          case 0x12: // Send
-            victim = slea.readMapleAsciiString();
-            int mapId = slea.readInt();
-            c.getChannelServer().getPlayerStorage().getCharacterByName(victim).changeMap(c.getChannelServer().getMapFactory().getMap(mapId));
+            changeMapCommand(slea, c);
             break;
          case 0x15: // Kill
             int mobToKill = slea.readInt();
@@ -156,15 +134,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             }
             break;
          case 0x1E: // Warn
-            victim = slea.readMapleAsciiString();
-            String message = slea.readMapleAsciiString();
-            target = c.getChannelServer().getPlayerStorage().getCharacterByName(victim);
-            if (target != null) {
-               target.getClient().announce(MaplePacketCreator.serverNotice(1, message));
-               c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 1));
-            } else {
-               c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 0));
-            }
+            warnCommand(slea, c);
             break;
          case 0x24:// /Artifact Ranking
             break;
@@ -178,6 +148,50 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
          default:
             System.out.println("New GM packet encountered (MODE : " + mode + ": " + slea.toString());
             break;
+      }
+   }
+
+   private void changeMapCommand(SeekableLittleEndianAccessor slea, MapleClient c) {
+      String victim;
+      victim = slea.readMapleAsciiString();
+      int mapId = slea.readInt();
+      c.getChannelServer().getPlayerStorage().getCharacterByName(victim)
+            .ifPresent(character -> character.changeMap(c.getChannelServer().getMapFactory().getMap(mapId)));
+   }
+
+   private void warnCommand(SeekableLittleEndianAccessor slea, MapleClient c) {
+      String victim = slea.readMapleAsciiString();
+      String message = slea.readMapleAsciiString();
+      c.getChannelServer().getPlayerStorage().getCharacterByName(victim).ifPresentOrElse(target -> {
+         target.getClient().announce(MaplePacketCreator.serverNotice(1, message));
+         c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 1));
+      }, () -> c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 0)));
+   }
+
+   private void blockCommand(SeekableLittleEndianAccessor slea, MapleClient c) {
+      String victim;
+      victim = slea.readMapleAsciiString();
+      int type = slea.readByte(); //reason
+      int duration = slea.readInt();
+      String description = slea.readMapleAsciiString();
+      String reason = c.getPlayer().getName() + " used /ban to ban";
+
+      Optional<MapleCharacter> target = c.getChannelServer().getPlayerStorage().getCharacterByName(victim);
+      if (target.isPresent()) {
+         String readableTargetName = MapleCharacter.makeMapleReadable(target.get().getName());
+         String ip = target.get().getClient().getSession().getRemoteAddress().toString().split(":")[0];
+         reason += readableTargetName + " (IP: " + ip + ")";
+         if (duration == -1) {
+            target.get().ban(description + " " + reason);
+         } else {
+            target.get().block(type, duration, description);
+            target.get().sendPolice(duration, reason, 6000);
+         }
+         c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+      } else if (MapleCharacter.ban(victim, reason, false)) {
+         c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+      } else {
+         c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
       }
    }
 }

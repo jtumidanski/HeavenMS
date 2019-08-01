@@ -43,21 +43,23 @@ public class ApCommand extends Command {
 
       if (params.length < 2) {
          int newAp = Integer.parseInt(params[0]);
-         if (newAp < 0) newAp = 0;
-         else if (newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
+         if (newAp < 0) {
+            newAp = 0;
+         } else if (newAp > ServerConstants.MAX_AP) {
+            newAp = ServerConstants.MAX_AP;
+         }
 
          player.changeRemainingAp(newAp, false);
       } else {
-         MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-         if (victim != null) {
+         c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
             int newAp = Integer.parseInt(params[1]);
-            if (newAp < 0) newAp = 0;
-            else if (newAp > ServerConstants.MAX_AP) newAp = ServerConstants.MAX_AP;
-
+            if (newAp < 0) {
+               newAp = 0;
+            } else if (newAp > ServerConstants.MAX_AP) {
+               newAp = ServerConstants.MAX_AP;
+            }
             victim.changeRemainingAp(newAp, false);
-         } else {
-            player.message("Player '" + params[0] + "' could not be found.");
-         }
+         }, () -> player.message("Player '" + params[0] + "' could not be found."));
       }
    }
 }

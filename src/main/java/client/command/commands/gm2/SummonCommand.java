@@ -23,6 +23,9 @@
 */
 package client.command.commands.gm2;
 
+import java.util.Optional;
+import java.util.function.Supplier;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -43,17 +46,10 @@ public class SummonCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim == null) {
-         //If victim isn't on current channel, loop all channels on current world.
+      MapleCharacter victim = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0])
+            .or(() -> getCharacterAcrossWorld(c, params[0]))
+            .orElseThrow();
 
-         for (Channel ch : Server.getInstance().getChannelsFromWorld(c.getWorld())) {
-            victim = ch.getPlayerStorage().getCharacterByName(params[0]);
-            if (victim != null) {
-               break;//We found the person, no need to continue the loop.
-            }
-         }
-      }
       if (victim != null) {
          if (!victim.isLoggedinWorld()) {
             player.dropMessage(6, "Player currently not logged in or unreachable.");
@@ -79,5 +75,12 @@ public class SummonCommand extends Command {
       } else {
          player.dropMessage(6, "Unknown player.");
       }
+   }
+
+   private Optional<MapleCharacter> getCharacterAcrossWorld(MapleClient c, String characterName) {
+      return Server.getInstance().getChannelsFromWorld(c.getWorld()).stream()
+            .map(channel -> channel.getPlayerStorage().getCharacterByName(characterName))
+            .flatMap(Optional::stream)
+            .findFirst();
    }
 }

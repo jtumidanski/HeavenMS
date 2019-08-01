@@ -17,13 +17,10 @@ public class GiveRpCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = client.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
+      client.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          victim.setRewardPoints(victim.getRewardPoints() + Integer.parseInt(params[1]));
          player.message("RP given. Player " + params[0] + " now has " + victim.getRewardPoints()
                + " reward points.");
-      } else {
-         player.message("Player '" + params[0] + "' could not be found.");
-      }
+      }, () -> player.message("Player '" + params[0] + "' could not be found."));
    }
 }

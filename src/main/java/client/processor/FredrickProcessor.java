@@ -222,10 +222,7 @@ public class FredrickProcessor {
 
                   World wserv = Server.getInstance().getWorld(cid.getRight());
                   if (wserv != null) {
-                     MapleCharacter chr = wserv.getPlayerStorage().getCharacterById(cid.getLeft());
-                     if (chr != null) {
-                        chr.setMerchantMeso(0);
-                     }
+                     wserv.getPlayerStorage().getCharacterById(cid.getLeft()).ifPresent(character -> character.setMerchantMeso(0));
                   }
                }
 

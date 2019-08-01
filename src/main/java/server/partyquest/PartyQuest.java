@@ -24,6 +24,7 @@ package server.partyquest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import net.server.Server;
@@ -44,14 +45,13 @@ public class PartyQuest {
       MaplePartyCharacter leader = party.getLeader();
       channel = leader.getChannel();
       world = leader.getWorld();
-      int mapid = leader.getMapId();
-      for (MaplePartyCharacter pchr : party.getMembers()) {
-         if (pchr.getChannel() == channel && pchr.getMapId() == mapid) {
-            MapleCharacter chr = Server.getInstance().getWorld(world).getChannel(channel).getPlayerStorage().getCharacterById(pchr.getId());
-            if (chr != null)
-               this.participants.add(chr);
-         }
-      }
+      int mapId = leader.getMapId();
+
+      party.getMembers().stream()
+            .filter(member -> member.getChannel() == channel && member.getMapId() == mapId)
+            .map(member -> Server.getInstance().getWorld(world).getChannel(channel).getPlayerStorage().getCharacterById(member.getId()))
+            .flatMap(Optional::stream)
+            .forEach(character -> participants.add(character));
    }
 
    public static int getExp(String PQ, int level) {
@@ -105,7 +105,9 @@ public class PartyQuest {
       synchronized (participants) {
          participants.remove(chr);
          chr.setPartyQuest(null);
-         if (participants.isEmpty()) super.finalize();
+         if (participants.isEmpty()) {
+            super.finalize();
+         }
          //System.gc();
       }
    }

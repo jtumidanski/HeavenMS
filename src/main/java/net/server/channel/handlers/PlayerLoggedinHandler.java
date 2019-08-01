@@ -183,7 +183,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
                }
             }
 
-            MapleCharacter player = world.getPlayerStorage().getCharacterById(cid);
+            MapleCharacter player = world.getPlayerStorage().getCharacterById(cid).orElse(null);
             boolean newcomer = false;
 
             IoSession session = c.getSession();
@@ -438,12 +438,10 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
 
    private void loggingInPartnerOperations(World world, MapleCharacter player) {
       int partnerId = player.getPartnerId();
-      final MapleCharacter partner = world.getPlayerStorage().getCharacterById(partnerId);
-
-      if (partner != null && !partner.isAwayFromWorld()) {
+      world.getPlayerStorage().getCharacterById(partnerId).filter(partner -> !partner.isAwayFromWorld()).ifPresent(partner -> {
          player.announce(Wedding.OnNotifyWeddingPartnerTransfer(partnerId, partner.getMapId()));
          partner.announce(Wedding.OnNotifyWeddingPartnerTransfer(player.getId(), player.getMapId()));
-      }
+      });
    }
 
    private void loggingInPartyOperations(MapleClient c, World wserv, MapleCharacter player) {

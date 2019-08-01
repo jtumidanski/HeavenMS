@@ -105,13 +105,12 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
       int leaderId = world.getMatchCheckerCoordinator().getMatchConfirmationLeaderid(mc.getId());
       if (leaderId != -1) {
          if (matchData.isResult() && world.getMatchCheckerCoordinator().isMatchConfirmationActive(mc.getId())) {
-            MapleCharacter leader = world.getPlayerStorage().getCharacterById(leaderId);
-            if (leader != null) {
+            world.getPlayerStorage().getCharacterById(leaderId).ifPresent(leader -> {
                int partyId = leader.getPartyId();
                if (partyId != -1) {
                   MapleParty.joinParty(mc, partyId, true);    // GMS gimmick "party to form guild" recalled thanks to Vcoc
                }
-            }
+            });
          }
 
          world.getMatchCheckerCoordinator().answerMatchConfirmation(mc.getId(), matchData.isResult());

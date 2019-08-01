@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -40,9 +42,9 @@ public class GiveVpCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
-         victim.getClient().addVotePoints(Integer.parseInt(params[1]));
+      Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+      if (victim.isPresent()) {
+         victim.get().getClient().addVotePoints(Integer.parseInt(params[1]));
          player.message("VP given.");
       } else {
          player.message("Player '" + params[0] + "' could not be found.");

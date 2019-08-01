@@ -57,7 +57,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
 
    public static void sendEngageProposal(final MapleClient c, final String name, final int itemid) {
       final int newBoxId = getBoxId(itemid);
-      final MapleCharacter target = c.getChannelServer().getPlayerStorage().getCharacterByName(name);
+      final MapleCharacter target = c.getChannelServer().getPlayerStorage().getCharacterByName(name).orElse(null);
       final MapleCharacter source = c.getPlayer();
 
       // TODO: get the correct packet bytes for these popups
@@ -184,10 +184,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
       chr.getClient().getWorldServer().deleteRelationship(chr.getId(), partnerid);
       MapleRing.removeRing(chr.getMarriageRing());
 
-      MapleCharacter partner = chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerid);
-      if (partner == null) {
-         eraseEngagementOffline(partnerid);
-      } else {
+      chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerid).ifPresentOrElse(partner -> {
          partner.dropMessage(5, chr.getName() + " has decided to break up the marriage.");
 
          //partner.announce(Wedding.OnMarriageResult((byte) 0)); ok, how to gracefully unengage someone without the need to cc?
@@ -196,7 +193,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
          partner.setPartnerId(-1);
          partner.setMarriageItemId(-1);
          partner.addMarriageRing(null);
-      }
+      }, () -> eraseEngagementOffline(partnerid));
 
       chr.dropMessage(5, "You have successfully break the marriage with " + MapleCharacter.getNameById(partnerid) + ".");
 
@@ -223,32 +220,29 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
    }
 
    private synchronized static void breakEngagement(MapleCharacter chr) {
-      int partnerid = chr.getPartnerId();
-      int marriageitemid = chr.getMarriageItemId();
+      int partnerId = chr.getPartnerId();
+      int marriageItemId = chr.getMarriageItemId();
 
-      chr.getClient().getWorldServer().deleteRelationship(chr.getId(), partnerid);
+      chr.getClient().getWorldServer().deleteRelationship(chr.getId(), partnerId);
 
-      MapleCharacter partner = chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerid);
-      if (partner == null) {
-         breakEngagementOffline(partnerid);
-      } else {
+      chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerId).ifPresentOrElse(partner -> {
          partner.dropMessage(5, chr.getName() + " has decided to break up the engagement.");
 
-         int partnerMarriageitemid = marriageitemid + ((chr.getGender() == 0) ? 1 : -1);
-         if (partner.haveItem(partnerMarriageitemid)) {
-            MapleInventoryManipulator.removeById(partner.getClient(), MapleInventoryType.ETC, partnerMarriageitemid, (short) 1, false, false);
+         int partnerMarriageItemId = marriageItemId + ((chr.getGender() == 0) ? 1 : -1);
+         if (partner.haveItem(partnerMarriageItemId)) {
+            MapleInventoryManipulator.removeById(partner.getClient(), MapleInventoryType.ETC, partnerMarriageItemId, (short) 1, false, false);
          }
 
          //partner.announce(Wedding.OnMarriageResult((byte) 0)); ok, how to gracefully unengage someone without the need to cc?
          partner.announce(Wedding.OnNotifyWeddingPartnerTransfer(0, 0));
          partner.setPartnerId(-1);
          partner.setMarriageItemId(-1);
-      }
+      }, () -> breakEngagementOffline(partnerId));
 
-      if (chr.haveItem(marriageitemid)) {
-         MapleInventoryManipulator.removeById(chr.getClient(), MapleInventoryType.ETC, marriageitemid, (short) 1, false, false);
+      if (chr.haveItem(marriageItemId)) {
+         MapleInventoryManipulator.removeById(chr.getClient(), MapleInventoryType.ETC, marriageItemId, (short) 1, false, false);
       }
-      chr.dropMessage(5, "You have successfully break the engagement with " + MapleCharacter.getNameById(partnerid) + ".");
+      chr.dropMessage(5, "You have successfully break the engagement with " + MapleCharacter.getNameById(partnerId) + ".");
 
       //chr.announce(Wedding.OnMarriageResult((byte) 0));
       chr.announce(Wedding.OnNotifyWeddingPartnerTransfer(0, 0));
@@ -317,7 +311,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
             name = slea.readMapleAsciiString();
             final int id = slea.readInt();
 
-            final MapleCharacter source = c.getWorldServer().getPlayerStorage().getCharacterByName(name);
+            final MapleCharacter source = c.getWorldServer().getPlayerStorage().getCharacterByName(name).orElse(null);
             final MapleCharacter target = c.getPlayer();
 
             if (source == null) {
@@ -410,7 +404,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
                      if (resStatus > 0) {
                         long expiration = cserv.getWeddingTicketExpireTime(resStatus + 1);
 
-                        MapleCharacter guestChr = c.getWorldServer().getPlayerStorage().getCharacterById(guest);
+                        MapleCharacter guestChr = c.getWorldServer().getPlayerStorage().getCharacterById(guest).orElse(null);
                         if (guestChr != null && MapleInventoryManipulator.checkSpace(guestChr.getClient(), newItemId, 1, "") && MapleInventoryManipulator.addById(guestChr.getClient(), newItemId, (short) 1, expiration)) {
                            guestChr.dropMessage(6, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding!");
                         } else {

@@ -40,8 +40,7 @@ public class UnJailCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
+      c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          if (victim.getJailExpirationTimeLeft() <= 0) {
             player.message("This player is already free.");
             return;
@@ -49,8 +48,6 @@ public class UnJailCommand extends Command {
          victim.removeJailExpirationTime();
          victim.message("By lack of concrete proof you are now unjailed. Enjoy freedom!");
          player.message(victim.getName() + " was unjailed.");
-      } else {
-         player.message("Player '" + params[0] + "' could not be found.");
-      }
+      }, () -> player.message("Player '" + params[0] + "' could not be found."));
    }
 }

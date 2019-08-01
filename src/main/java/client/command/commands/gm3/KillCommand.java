@@ -42,12 +42,9 @@ public class KillCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
+      c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          victim.updateHpMp(0);
          Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, player.getName() + " used !kill on " + victim.getName()));
-      } else {
-         player.message("Player '" + params[0] + "' could not be found.");
-      }
+      }, () -> player.message("Player '" + params[0] + "' could not be found."));
    }
 }

@@ -163,13 +163,13 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
             }
          } else {
             String name = slea.readMapleAsciiString();
-            MapleCharacter victim = c.getChannelServer().getPlayerStorage().getCharacterByName(name);
+            Optional<MapleCharacter> victim = c.getChannelServer().getPlayerStorage().getCharacterByName(name);
 
-            if (victim != null) {
-               MapleMap targetMap = victim.getMap();
+            if (victim.isPresent()) {
+               MapleMap targetMap = victim.get().getMap();
                if (!FieldLimit.CANNOTVIPROCK.check(targetMap.getFieldLimit()) && (targetMap.getForcedReturnId() == 999999999 || targetMap.getId() < 100000000)) {
-                  if (!victim.isGM() || victim.gmLevel() <= player.gmLevel()) {   // thanks Yoboes for noticing non-GM's being unreachable through rocks
-                     player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnpoint(victim.getPosition()));
+                  if (!victim.get().isGM() || victim.get().gmLevel() <= player.gmLevel()) {   // thanks Yoboes for noticing non-GM's being unreachable through rocks
+                     player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnpoint(victim.get().getPosition()));
                      success = true;
                   } else {
                      player.dropMessage(1, error1);
@@ -302,7 +302,7 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
                      slea.readByte();
                   }
                   if (tvType != 4) {
-                     victim = c.getChannelServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString());
+                     victim = c.getChannelServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString()).orElse(null);
                   }
                }
                List<String> messages = new LinkedList<>();

@@ -118,7 +118,9 @@ public class NewYearCardRecord {
 
    public static NewYearCardRecord loadNewYearCard(int cardid) {
       NewYearCardRecord nyc = Server.getInstance().getNewYearCard(cardid);
-      if (nyc != null) return nyc;
+      if (nyc != null) {
+         return nyc;
+      }
 
       try (Connection con = DatabaseConnection.getConnection()) {
          try (PreparedStatement ps = con.prepareStatement("SELECT * FROM newyear WHERE id = ?")) {
@@ -223,13 +225,11 @@ public class NewYearCardRecord {
 
                chr.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(chr, nyc, 0xE, 0));
 
-               MapleCharacter other = chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getReceiverId());
-               if (other != null && other.isLoggedinWorld()) {
+               chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getReceiverId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(other -> {
                   other.removeNewYearRecord(nyc);
                   other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
-
                   other.dropMessage(6, "[New Year] " + chr.getName() + " threw away the New Year card.");
-               }
+               });
             }
          } else {
             if (nyc.receiverId == cid) {
@@ -241,13 +241,13 @@ public class NewYearCardRecord {
 
                chr.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(chr, nyc, 0xE, 0));
 
-               MapleCharacter other = chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getSenderId());
-               if (other != null && other.isLoggedinWorld()) {
-                  other.removeNewYearRecord(nyc);
-                  other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
-
-                  other.dropMessage(6, "[New Year] " + chr.getName() + " threw away the New Year card.");
-               }
+               chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getSenderId())
+                     .filter(MapleCharacter::isLoggedinWorld)
+                     .ifPresent(other -> {
+                        other.removeNewYearRecord(nyc);
+                        other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
+                        other.dropMessage(6, "[New Year] " + chr.getName() + " threw away the New Year card.");
+                     });
             }
          }
       }
@@ -330,7 +330,9 @@ public class NewYearCardRecord {
    }
 
    public void startNewYearCardTask() {
-      if (sendTask != null) return;
+      if (sendTask != null) {
+         return;
+      }
 
       sendTask = TimerManager.getInstance().register(new Runnable() {
          @Override
@@ -345,10 +347,9 @@ public class NewYearCardRecord {
                return;
             }
 
-            MapleCharacter target = server.getWorld(world).getPlayerStorage().getCharacterById(receiverId);
-            if (target != null && target.isLoggedinWorld()) {
+            server.getWorld(world).getPlayerStorage().getCharacterById(receiverId).filter(MapleCharacter::isLoggedinWorld).ifPresent(target -> {
                target.announce(MaplePacketCreator.onNewYearCardRes(target, NewYearCardRecord.this, 0xC, 0));
-            }
+            });
          }
       }, 1000 * 60 * 60); //1 Hour
    }

@@ -22,6 +22,7 @@
 package net.server.channel.handlers;
 
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -75,8 +76,11 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
          }
          case 4: { // invite
             String name = slea.readMapleAsciiString();
-            MapleCharacter invited = world.getPlayerStorage().getCharacterByName(name);
-            if (invited != null) {
+            Optional<MapleCharacter> invitedOptional = world.getPlayerStorage().getCharacterByName(name);
+            if (invitedOptional.isEmpty()) {
+               c.announce(MaplePacketCreator.partyStatusMessage(19));
+            } else {
+               MapleCharacter invited = invitedOptional.get();
                if (invited.getLevel() < 10 && (!ServerConstants.USE_PARTY_FOR_STARTERS || player.getLevel() >= 10)) { //min requirement is level 10
                   c.announce(MaplePacketCreator.serverNotice(5, "The player you have invited does not meet the requirements."));
                   return;
@@ -106,8 +110,6 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
                } else {
                   c.announce(MaplePacketCreator.partyStatusMessage(16));
                }
-            } else {
-               c.announce(MaplePacketCreator.partyStatusMessage(19));
             }
             break;
          }

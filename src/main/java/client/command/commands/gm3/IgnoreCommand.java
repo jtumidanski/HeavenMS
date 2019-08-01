@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -42,19 +44,19 @@ public class IgnoreCommand extends Command {
          player.yellowMessage("Syntax: !ignore <ign>");
          return;
       }
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim == null) {
+      Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+      if (victim.isEmpty()) {
          player.message("Player '" + params[0] + "' could not be found on this world.");
          return;
       }
-      boolean monitored_ = MapleLogger.ignored.contains(victim.getId());
+      boolean monitored_ = MapleLogger.ignored.contains(victim.get().getId());
       if (monitored_) {
-         MapleLogger.ignored.remove(victim.getId());
+         MapleLogger.ignored.remove(victim.get().getId());
       } else {
-         MapleLogger.ignored.add(victim.getId());
+         MapleLogger.ignored.add(victim.get().getId());
       }
-      player.yellowMessage(victim.getName() + " is " + (!monitored_ ? "now being ignored." : "no longer being ignored."));
-      String message_ = player.getName() + (!monitored_ ? " has started ignoring " : " has stopped ignoring ") + victim.getName() + ".";
+      player.yellowMessage(victim.get().getName() + " is " + (!monitored_ ? "now being ignored." : "no longer being ignored."));
+      String message_ = player.getName() + (!monitored_ ? " has started ignoring " : " has stopped ignoring ") + victim.get().getName() + ".";
       Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, message_));
 
    }

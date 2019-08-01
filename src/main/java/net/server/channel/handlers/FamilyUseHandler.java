@@ -21,6 +21,8 @@
 */
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
@@ -76,14 +78,13 @@ public final class FamilyUseHandler extends AbstractMaplePacketHandler {
       }
       int[] repCost = {3, 5, 7, 8, 10, 12, 15, 20, 25, 40, 50};
       final int type = slea.readInt();
-      MapleCharacter victim;
       if (type == 0 || type == 1) {
-         victim = c.getChannelServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString());
-         if (victim != null) {
+         Optional<MapleCharacter> victim = c.getChannelServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString());
+         if (victim.isPresent()) {
             if (type == 0) {
-               c.getPlayer().changeMap(victim.getMap(), victim.getMap().getPortal(0));
+               c.getPlayer().changeMap(victim.get().getMap(), victim.get().getMap().getPortal(0));
             } else {
-               victim.changeMap(c.getPlayer().getMap(), c.getPlayer().getMap().getPortal(0));
+               victim.get().changeMap(c.getPlayer().getMap(), c.getPlayer().getMap().getPortal(0));
             }
          } else {
             return;

@@ -25,12 +25,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 
 import net.server.PlayerStorage;
 import tools.DatabaseConnection;
@@ -123,14 +125,12 @@ public class BuddyList {
       }
    }
 
-   public void broadcast(byte[] packet, PlayerStorage pstorage) {
-      for (int bid : getBuddyIds()) {
-         MapleCharacter chr = pstorage.getCharacterById(bid);
-
-         if (chr != null && chr.isLoggedinWorld()) {
-            chr.announce(packet);
-         }
-      }
+   public void broadcast(byte[] packet, PlayerStorage playerStorage) {
+      Arrays.stream(getBuddyIds())
+            .mapToObj(playerStorage::getCharacterById)
+            .flatMap(Optional::stream)
+            .filter(MapleCharacter::isLoggedinWorld)
+            .forEach(character -> character.announce(packet));
    }
 
    public void loadFromDb(int characterId) {

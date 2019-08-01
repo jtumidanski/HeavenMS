@@ -383,10 +383,7 @@ public class DueyProcessor {
             if (channel > -1) {
                Channel rcserv = c.getWorldServer().getChannel(channel);
                if (rcserv != null) {
-                  MapleCharacter rChr = rcserv.getPlayerStorage().getCharacterByName(recipient);
-                  if (rChr != null) {
-                     rClient = rChr.getClient();
-                  }
+                  rClient = rcserv.getPlayerStorage().getCharacterByName(recipient).map(MapleCharacter::getClient).orElse(null);
                }
             }
 

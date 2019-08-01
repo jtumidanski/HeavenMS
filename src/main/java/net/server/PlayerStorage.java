@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -56,7 +57,9 @@ public class PlayerStorage {
       wlock.lock();
       try {
          MapleCharacter mc = storage.remove(chr);
-         if (mc != null) nameStorage.remove(mc.getName().toLowerCase());
+         if (mc != null) {
+            nameStorage.remove(mc.getName().toLowerCase());
+         }
 
          return mc;
       } finally {
@@ -64,19 +67,19 @@ public class PlayerStorage {
       }
    }
 
-   public MapleCharacter getCharacterByName(String name) {
+   public Optional<MapleCharacter> getCharacterByName(String name) {
       rlock.lock();
       try {
-         return nameStorage.get(name.toLowerCase());
+         return Optional.ofNullable(nameStorage.get(name.toLowerCase()));
       } finally {
          rlock.unlock();
       }
    }
 
-   public MapleCharacter getCharacterById(int id) {
+   public Optional<MapleCharacter> getCharacterById(int id) {
       rlock.lock();
       try {
-         return storage.get(id);
+         return Optional.ofNullable(storage.get(id));
       } finally {
          rlock.unlock();
       }

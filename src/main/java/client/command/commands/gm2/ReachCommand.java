@@ -41,8 +41,7 @@ public class ReachCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null && victim.isLoggedin()) {
+      c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          if (player.getClient().getChannel() != victim.getClient().getChannel()) {
             player.dropMessage(5, "Player '" + victim.getName() + "' is at channel " + victim.getClient().getChannel() + ".");
          } else {
@@ -50,8 +49,6 @@ public class ReachCommand extends Command {
             player.saveLocationOnWarp();
             player.forceChangeMap(map, map.findClosestPortal(victim.getPosition()));
          }
-      } else {
-         player.dropMessage(6, "Unknown player.");
-      }
+      }, () -> player.dropMessage(6, "Unknown player."));
    }
 }

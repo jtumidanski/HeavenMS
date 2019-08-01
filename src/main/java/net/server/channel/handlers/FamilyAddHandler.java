@@ -21,6 +21,8 @@
 */
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
@@ -39,9 +41,9 @@ public final class FamilyAddHandler extends AbstractMaplePacketHandler {
       }
       System.out.println(slea.toString());
       String toAdd = slea.readMapleAsciiString();
-      MapleCharacter addChr = c.getChannelServer().getPlayerStorage().getCharacterByName(toAdd);
-      if (addChr != null) {
-         addChr.getClient().announce(MaplePacketCreator.sendFamilyInvite(c.getPlayer().getId(), toAdd));
+      Optional<MapleCharacter> addChr = c.getChannelServer().getPlayerStorage().getCharacterByName(toAdd);
+      if (addChr.isPresent()) {
+         addChr.get().getClient().announce(MaplePacketCreator.sendFamilyInvite(c.getPlayer().getId(), toAdd));
          c.getPlayer().dropMessage("The invite has been sent.");
       } else {
          c.getPlayer().dropMessage("The player cannot be found!");

@@ -41,13 +41,10 @@ public class FameCommand extends Command {
          return;
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
+      c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          victim.setFame(Integer.parseInt(params[1]));
          victim.updateSingleStat(MapleStat.FAME, victim.getFame());
          player.message("FAME given.");
-      } else {
-         player.message("Player '" + params[0] + "' could not be found.");
-      }
+      }, () -> player.message("Player '" + params[0] + "' could not be found."));
    }
 }

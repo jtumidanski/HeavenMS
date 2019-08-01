@@ -36,12 +36,11 @@ public class CheckDmgCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim != null) {
+      c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          int maxBase = victim.calculateMaxBaseDamage(victim.getTotalWatk());
          Integer watkBuff = victim.getBuffedValue(MapleBuffStat.WATK);
          Integer matkBuff = victim.getBuffedValue(MapleBuffStat.MATK);
-         Integer blessing = victim.getSkillLevel(10000000 * player.getJobType() + 12);
+         int blessing = victim.getSkillLevel(10000000 * player.getJobType() + 12);
          if (watkBuff == null) watkBuff = 0;
          if (matkBuff == null) matkBuff = 0;
 
@@ -49,8 +48,6 @@ public class CheckDmgCommand extends Command {
          player.dropMessage(5, "Cur WATK: " + victim.getTotalWatk() + " Cur MATK: " + victim.getTotalMagic());
          player.dropMessage(5, "Cur WATK Buff: " + watkBuff + " Cur MATK Buff: " + matkBuff + " Cur Blessing Level: " + blessing);
          player.dropMessage(5, victim.getName() + "'s maximum base damage (before skills) is " + maxBase);
-      } else {
-         player.message("Player '" + params[0] + "' could not be found on this world.");
-      }
+      }, () -> player.message("Player '" + params[0] + "' could not be found on this world."));
    }
 }

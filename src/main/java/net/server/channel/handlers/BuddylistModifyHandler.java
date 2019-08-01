@@ -27,6 +27,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
+import java.util.function.Supplier;
 
 import client.BuddyList;
 import client.BuddyList.BuddyAddResult;
@@ -86,14 +88,15 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
                World world = c.getWorldServer();
                CharacterIdNameBuddyCapacity charWithId;
                int channel;
-               MapleCharacter otherChar = c.getChannelServer().getPlayerStorage().getCharacterByName(addName);
-               if (otherChar != null) {
+               Optional<MapleCharacter> otherChar = c.getChannelServer().getPlayerStorage().getCharacterByName(addName);
+               if (otherChar.isPresent()) {
                   channel = c.getChannel();
-                  charWithId = new CharacterIdNameBuddyCapacity(otherChar.getId(), otherChar.getName(), otherChar.getBuddylist().getCapacity());
+                  charWithId = new CharacterIdNameBuddyCapacity(otherChar.get().getId(), otherChar.get().getName(), otherChar.get().getBuddylist().getCapacity());
                } else {
                   channel = world.find(addName);
                   charWithId = getCharacterIdAndNameFromDatabase(addName);
                }
+
                if (charWithId != null) {
                   BuddyAddResult buddyAddResult = null;
                   if (channel != -1) {
@@ -155,31 +158,15 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
       } else if (mode == 2) { // accept buddy
          int otherCid = slea.readInt();
          if (!buddylist.isFull()) {
-            try {
-               int channel = c.getWorldServer().find(otherCid);//worldInterface.find(otherCid);
-               String otherName = null;
-               MapleCharacter otherChar = c.getChannelServer().getPlayerStorage().getCharacterById(otherCid);
-               if (otherChar == null) {
-                  Connection con = DatabaseConnection.getConnection();
-                  try (PreparedStatement ps = con.prepareStatement("SELECT name FROM characters WHERE id = ?")) {
-                     ps.setInt(1, otherCid);
-                     try (ResultSet rs = ps.executeQuery()) {
-                        if (rs.next()) {
-                           otherName = rs.getString("name");
-                        }
-                     }
-                  }
-                  con.close();
-               } else {
-                  otherName = otherChar.getName();
-               }
-               if (otherName != null) {
-                  buddylist.put(new BuddylistEntry(otherName, "Default Group", otherCid, channel, true));
-                  c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
-                  notifyRemoteChannel(c, channel, otherCid, ADDED);
-               }
-            } catch (SQLException e) {
-               e.printStackTrace();
+            int channel = c.getWorldServer().find(otherCid);//worldInterface.find(otherCid);
+            Optional<String> otherName = c.getChannelServer().getPlayerStorage().getCharacterById(otherCid)
+                  .map(MapleCharacter::getName)
+                  .or(() -> Optional.ofNullable(getCharacterNameFromDatabase(otherCid)));
+
+            if (otherName.isPresent()) {
+               buddylist.put(new BuddylistEntry(otherName.get(), "Default Group", otherCid, channel, true));
+               c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
+               notifyRemoteChannel(c, channel, otherCid, ADDED);
             }
          }
          nextPendingRequest(c);
@@ -187,6 +174,24 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
          int otherCid = slea.readInt();
          player.deleteBuddy(otherCid);
       }
+   }
+
+   private String getCharacterNameFromDatabase(int otherCid) {
+      String result = null;
+      try {
+         Connection con = DatabaseConnection.getConnection();
+         try (PreparedStatement ps = con.prepareStatement("SELECT name FROM characters WHERE id = ?")) {
+            ps.setInt(1, otherCid);
+            try (ResultSet rs = ps.executeQuery()) {
+               if (rs.next()) {
+                  result = rs.getString("name");
+               }
+            }
+         }
+         con.close();
+      } catch (SQLException ignored) {
+      }
+      return result;
    }
 
    private void notifyRemoteChannel(MapleClient c, int remoteChannel, int otherCid, BuddyOperation operation) {

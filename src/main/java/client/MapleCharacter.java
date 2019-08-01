@@ -657,11 +657,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             try (ResultSet rs = ps.executeQuery()) {
                while (rs.next()) {
                   int buddyid = rs.getInt("buddyid");
-                  MapleCharacter buddy = Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(buddyid);
-
-                  if (buddy != null) {
-                     buddy.deleteBuddy(cid);
-                  }
+                  Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(buddyid).ifPresent(buddy -> buddy.deleteBuddy(cid));
                }
             }
          }
@@ -1410,11 +1406,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             int messengerid = rs.getInt("messengerid");
             int position = rs.getInt("messengerposition");
             if (messengerid > 0 && position < 4 && position > -1) {
-               MapleMessenger messenger = wserv.getMessenger(messengerid);
-               if (messenger != null) {
+               wserv.getMessenger(messengerid).ifPresent(messenger -> {
                   ret.messenger = messenger;
                   ret.messengerposition = position;
-               }
+               });
             }
             ret.loggedIn = true;
          }
@@ -2826,12 +2821,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       ownedMap = new WeakReference<>(map);
    }
 
-   public void notifyMapTransferToPartner(int mapid) {
+   public void notifyMapTransferToPartner(int mapId) {
       if (partnerId > 0) {
-         final MapleCharacter partner = getWorldServer().getPlayerStorage().getCharacterById(partnerId);
-         if (partner != null && !partner.isAwayFromWorld()) {
-            partner.announce(Wedding.OnNotifyWeddingPartnerTransfer(id, mapid));
-         }
+         getWorldServer().getPlayerStorage().getCharacterById(partnerId)
+               .filter(character -> !character.isAwayFromWorld())
+               .ifPresent(character -> character.announce(Wedding.OnNotifyWeddingPartnerTransfer(id, mapId)));
       }
    }
 
@@ -3030,11 +3024,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void checkMessenger() {
-      if (messenger != null && messengerposition < 4 && messengerposition > -1) {
-         World worldz = getWorldServer();
-         worldz.silentJoinMessenger(messenger.getId(), new MapleMessengerCharacter(this, messengerposition), messengerposition);
-         worldz.updateMessenger(getMessenger().getId(), name, client.getChannel());
-      }
+      getMessenger().ifPresent(messenger -> {
+         if (messengerposition > -1 && messengerposition < 4) {
+            World worldz = getWorldServer();
+            worldz.silentJoinMessenger(messenger.getId(), new MapleMessengerCharacter(this, messengerposition), messengerposition);
+            worldz.updateMessenger(messenger.getId(), name, client.getChannel());
+         }
+      });
    }
 
    public void controlMonster(MapleMonster monster) {
@@ -3729,9 +3725,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       getMap().broadcastUpdateCharLookMessage(this, this);
       equipchanged = true;
       updateLocalStats();
-      if (getMessenger() != null) {
-         getWorldServer().updateMessenger(getMessenger(), getName(), getWorld(), client.getChannel());
-      }
+      getMessenger().ifPresent(messenger -> getWorldServer().updateMessenger(messenger, getName(), getWorld(), client.getChannel()));
    }
 
    public void cancelDiseaseExpireTask() {
@@ -6002,8 +5996,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return maplemount;
    }
 
-   public MapleMessenger getMessenger() {
-      return messenger;
+   public Optional<MapleMessenger> getMessenger() {
+      return Optional.ofNullable(messenger);
    }
 
    public void setMessenger(MapleMessenger messenger) {
@@ -6251,17 +6245,16 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void closePlayerMessenger() {
-      MapleMessenger m = this.getMessenger();
-      if (m == null) {
-         return;
-      }
+      getMessenger().ifPresent(messenger -> {
+         World w = getWorldServer();
+         MapleMessengerCharacter messengerplayer = new MapleMessengerCharacter(this, this.getMessengerPosition());
 
-      World w = getWorldServer();
-      MapleMessengerCharacter messengerplayer = new MapleMessengerCharacter(this, this.getMessengerPosition());
+         w.leaveMessenger(messenger.getId(), messengerplayer);
+         this.setMessenger(null);
+         this.setMessengerPosition(4);
 
-      w.leaveMessenger(m.getId(), messengerplayer);
-      this.setMessenger(null);
-      this.setMessengerPosition(4);
+      });
+
    }
 
    public MaplePet[] getPets() {

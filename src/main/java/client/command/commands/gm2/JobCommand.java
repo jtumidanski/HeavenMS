@@ -46,20 +46,15 @@ public class JobCommand extends Command {
          player.changeJob(MapleJob.getById(jobid));
          player.equipChanged();
       } else if (params.length == 2) {
-         MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-
-         if (victim != null) {
-            int jobid = Integer.parseInt(params[1]);
-            if (jobid < 0 || jobid >= 2200) {
-               player.message("Jobid " + jobid + " is not available.");
+         c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
+            int jobId = Integer.parseInt(params[1]);
+            if (jobId < 0 || jobId >= 2200) {
+               player.message("Jobid " + jobId + " is not available.");
                return;
             }
-
-            victim.changeJob(MapleJob.getById(jobid));
+            victim.changeJob(MapleJob.getById(jobId));
             player.equipChanged();
-         } else {
-            player.message("Player '" + params[0] + "' could not be found.");
-         }
+         }, () -> player.message("Player '" + params[0] + "' could not be found."));
       } else {
          player.message("Syntax: !job <job id> <opt: IGN of another person>");
       }

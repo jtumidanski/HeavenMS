@@ -21,6 +21,8 @@
 */
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
@@ -37,9 +39,9 @@ public final class SpouseChatHandler extends AbstractMaplePacketHandler {
 
       int partnerId = c.getPlayer().getPartnerId();
       if (partnerId > 0) { // yay marriage
-         MapleCharacter spouse = c.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
-         if (spouse != null) {
-            spouse.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
+         Optional<MapleCharacter> spouse = c.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
+         if (spouse.isPresent()) {
+            spouse.get().announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
             c.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(c, "Spouse", msg);

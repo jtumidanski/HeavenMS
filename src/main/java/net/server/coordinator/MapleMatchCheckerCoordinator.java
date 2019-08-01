@@ -24,8 +24,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import net.server.PlayerStorage;
@@ -371,16 +373,12 @@ public class MapleMatchCheckerCoordinator {
       private Set<MapleCharacter> getMatchCharacters() {
          Set<MapleCharacter> players = new HashSet<>();
 
-         World wserv = Server.getInstance().getWorld(world);
-         if (wserv != null) {
-            PlayerStorage ps = wserv.getPlayerStorage();
-
-            for (Integer cid : getMatchPlayers()) {
-               MapleCharacter chr = ps.getCharacterById(cid);
-               if (chr != null) {
-                  players.add(chr);
-               }
-            }
+         World world = Server.getInstance().getWorld(this.world);
+         if (world != null) {
+            players = getMatchPlayers().stream()
+                  .map(id -> world.getPlayerStorage().getCharacterById(id))
+                  .flatMap(Optional::stream)
+                  .collect(Collectors.toSet());
          }
 
          return players;

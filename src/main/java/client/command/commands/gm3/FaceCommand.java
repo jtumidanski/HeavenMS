@@ -60,14 +60,11 @@ public class FaceCommand extends Command {
                player.yellowMessage("Face id '" + params[1] + "' does not exist.");
             }
 
-            MapleCharacter victim = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]);
-            if (victim == null) {
+            c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
                victim.setFace(itemId);
                victim.updateSingleStat(MapleStat.FACE, itemId);
                victim.equipChanged();
-            } else {
-               player.yellowMessage("Player '" + params[0] + "' has not been found on this channel.");
-            }
+            }, () -> player.yellowMessage("Player '" + params[0] + "' has not been found on this channel."));
          }
       } catch (Exception ignored) {
       }

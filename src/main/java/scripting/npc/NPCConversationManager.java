@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import client.MapleCharacter;
@@ -514,7 +515,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public MapleCharacter getMapleCharacter(String player) {
-      return Server.getInstance().getWorld(c.getWorld()).getChannel(c.getChannel()).getPlayerStorage().getCharacterByName(player);
+      return Server.getInstance().getWorld(c.getWorld()).getChannel(c.getChannel()).getPlayerStorage().getCharacterByName(player).orElse(null);
    }
 
    public void logLeaf(String prize) {
@@ -668,50 +669,34 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       try {
          final MapleMap map, mapExit;
          Channel cs = c.getChannelServer();
-         PlayerStorage ps = cs.getPlayerStorage();
-
          map = cs.getMapFactory().getMap(980000100 + 100 * field);
          mapExit = cs.getMapFactory().getMap(980000000);
-         for (MaplePartyCharacter mpc : c.getPlayer().getParty().getMembers()) {
-            final MapleCharacter mc;
-            mc = ps.getCharacterById(mpc.getId());
-            if (mc != null) {
-               mc.setChallenged(false);
-               mc.changeMap(map, map.getPortal(0));
-               mc.announce(MaplePacketCreator.serverNotice(6, LanguageConstants.getMessage(mc, LanguageConstants.CPQEntryLobby)));
-               TimerManager tMan = TimerManager.getInstance();
-               tMan.schedule(new Runnable() {
-                  @Override
-                  public void run() {
-                     mapClock(3 * 60);
-                  }
-               }, 1500);
 
-               mc.setCpqTimer(TimerManager.getInstance().schedule(new Runnable() {
-                  @Override
-                  public void run() {
-                     mc.changeMap(mapExit, mapExit.getPortal(0));
-                  }
-               }, 3 * 60 * 1000));
-            }
-         }
+         c.getPlayer().getParty().getMembers().stream()
+               .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+               .flatMap(Optional::stream)
+               .forEach(character -> {
+                  character.setChallenged(false);
+                  character.changeMap(map, map.getPortal(0));
+                  character.announce(MaplePacketCreator.serverNotice(6, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby)));
+                  TimerManager tMan = TimerManager.getInstance();
+                  tMan.schedule(() -> mapClock(3 * 60), 1500);
+                  character.setCpqTimer(TimerManager.getInstance().schedule(() -> character.changeMap(mapExit, mapExit.getPortal(0)), 3 * 60 * 1000));
+               });
       } catch (Exception ex) {
          ex.printStackTrace();
       }
    }
 
    public MapleCharacter getChrById(int id) {
-      return c.getChannelServer().getPlayerStorage().getCharacterById(id);
+      return c.getChannelServer().getPlayerStorage().getCharacterById(id).orElse(null);
    }
 
    public void cancelCPQLobby() {
-      PlayerStorage ps = c.getChannelServer().getPlayerStorage();
-      for (MaplePartyCharacter mpc : c.getPlayer().getParty().getMembers()) {
-         MapleCharacter mc = ps.getCharacterById(mpc.getId());
-         if (mc != null) {
-            mc.clearCpqTimer();
-         }
-      }
+      c.getPlayer().getParty().getMembers().parallelStream()
+            .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+            .flatMap(Optional::stream)
+            .forEach(MapleCharacter::clearCpqTimer);
    }
 
    private void warpoutCPQLobby(MapleMap lobbyMap) {
@@ -733,48 +718,40 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             if (challenger.getParty() == null) {
                throw new RuntimeException("Nao existe oponente!");
             }
-            PlayerStorage ps = c.getChannelServer().getPlayerStorage();
-            for (MaplePartyCharacter mpc : challenger.getParty().getMembers()) {
-               MapleCharacter mc = ps.getCharacterById(mpc.getId());
-               if (mc != null) {
-                  mc.changeMap(lobbyMap, lobbyMap.getPortal(0));
-                  TimerManager tMan = TimerManager.getInstance();
-                  tMan.schedule(new Runnable() {
-                     @Override
-                     public void run() {
-                        mapClock(10);
-                     }
-                  }, 1500);
-               }
-            }
-            for (MaplePartyCharacter mpc : getPlayer().getParty().getMembers()) {
-               MapleCharacter mc = ps.getCharacterById(mpc.getId());
-               if (mc != null) {
-                  TimerManager tMan = TimerManager.getInstance();
-                  tMan.schedule(new Runnable() {
-                     @Override
-                     public void run() {
-                        mapClock(10);
-                     }
-                  }, 1500);
-               }
-            }
+
+            challenger.getParty().getMembers().parallelStream()
+                  .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                  .flatMap(Optional::stream)
+                  .forEach(character -> {
+                     character.changeMap(lobbyMap, lobbyMap.getPortal(0));
+                     TimerManager tMan = TimerManager.getInstance();
+                     tMan.schedule(() -> mapClock(10), 1500);
+                  });
+
+            getPlayer().getParty().getMembers().parallelStream()
+                  .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                  .flatMap(Optional::stream)
+                  .forEach(character -> {
+                     TimerManager tMan = TimerManager.getInstance();
+                     tMan.schedule(() -> mapClock(10), 1500);
+                  });
          }
+
          final int mapid = c.getPlayer().getMapId() + 1;
          TimerManager tMan = TimerManager.getInstance();
          tMan.schedule(new Runnable() {
             @Override
             public void run() {
                try {
-                  PlayerStorage ps = c.getChannelServer().getPlayerStorage();
-                  for (MaplePartyCharacter mpc : getPlayer().getParty().getMembers()) {
-                     MapleCharacter mc = ps.getCharacterById(mpc.getId());
-                     mc.setMonsterCarnival(null);
-                  }
-                  for (MaplePartyCharacter mpc : challenger.getParty().getMembers()) {
-                     MapleCharacter mc = ps.getCharacterById(mpc.getId());
-                     mc.setMonsterCarnival(null);
-                  }
+                  getPlayer().getParty().getMembers().stream()
+                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                        .flatMap(Optional::stream)
+                        .forEach(character -> character.setMonsterCarnival(null));
+
+                  challenger.getParty().getMembers().stream()
+                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                        .flatMap(Optional::stream)
+                        .forEach(character -> character.setMonsterCarnival(null));
                } catch (NullPointerException npe) {
                   warpoutCPQLobby(lobbyMap);
                   return;
@@ -797,14 +774,14 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             if (challenger.getParty() == null) {
                throw new RuntimeException("Não existe oponente!");
             }
-            PlayerStorage ps = c.getChannelServer().getPlayerStorage();
-            for (MaplePartyCharacter mpc : challenger.getParty().getMembers()) {
-               MapleCharacter mc = ps.getCharacterById(mpc.getId());
-               if (mc != null) {
-                  mc.changeMap(lobbyMap, lobbyMap.getPortal(0));
-                  mapClock(10);
-               }
-            }
+
+            challenger.getParty().getMembers().stream()
+                  .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                  .flatMap(Optional::stream)
+                  .forEach(character -> {
+                     character.changeMap(lobbyMap, lobbyMap.getPortal(0));
+                     mapClock(10);
+                  });
          }
          final int mapid = c.getPlayer().getMapId() + 100;
          TimerManager tMan = TimerManager.getInstance();
@@ -812,15 +789,14 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             @Override
             public void run() {
                try {
-                  PlayerStorage ps = c.getChannelServer().getPlayerStorage();
-                  for (MaplePartyCharacter mpc : getPlayer().getParty().getMembers()) {
-                     MapleCharacter mc = ps.getCharacterById(mpc.getId());
-                     mc.setMonsterCarnival(null);
-                  }
-                  for (MaplePartyCharacter mpc : challenger.getParty().getMembers()) {
-                     MapleCharacter mc = ps.getCharacterById(mpc.getId());
-                     mc.setMonsterCarnival(null);
-                  }
+                  getPlayer().getParty().getMembers().stream()
+                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                        .flatMap(Optional::stream)
+                        .forEach(character -> character.setMonsterCarnival(null));
+                  challenger.getParty().getMembers().stream()
+                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+                        .flatMap(Optional::stream)
+                        .forEach(character -> character.setMonsterCarnival(null));
                } catch (NullPointerException npe) {
                   warpoutCPQLobby(lobbyMap);
                   return;
@@ -881,33 +857,20 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       try {
          final MapleMap map, mapExit;
          Channel cs = c.getChannelServer();
-         PlayerStorage ps = c.getChannelServer().getPlayerStorage();
-
          mapExit = cs.getMapFactory().getMap(980030000);
          map = cs.getMapFactory().getMap(980031000 + 1000 * field);
-         for (MaplePartyCharacter mpc : c.getPlayer().getParty().getMembers()) {
-            final MapleCharacter mc;
-            mc = ps.getCharacterById(mpc.getId());
-            if (mc != null) {
-               mc.setChallenged(false);
-               mc.changeMap(map, map.getPortal(0));
-               mc.announce(MaplePacketCreator.serverNotice(6, LanguageConstants.getMessage(mc, LanguageConstants.CPQEntryLobby)));
-               TimerManager tMan = TimerManager.getInstance();
-               tMan.schedule(new Runnable() {
-                  @Override
-                  public void run() {
-                     mapClock(3 * 60);
-                  }
-               }, 1500);
 
-               mc.setCpqTimer(TimerManager.getInstance().schedule(new Runnable() {
-                  @Override
-                  public void run() {
-                     mc.changeMap(mapExit, mapExit.getPortal(0));
-                  }
-               }, 3 * 60 * 1000));
-            }
-         }
+         c.getPlayer().getParty().getMembers().stream()
+               .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
+               .flatMap(Optional::stream)
+               .forEach(character -> {
+                  character.setChallenged(false);
+                  character.changeMap(map, map.getPortal(0));
+                  character.announce(MaplePacketCreator.serverNotice(6, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby)));
+                  TimerManager tMan = TimerManager.getInstance();
+                  tMan.schedule(() -> mapClock(3 * 60), 1500);
+                  character.setCpqTimer(TimerManager.getInstance().schedule(() -> character.changeMap(mapExit, mapExit.getPortal(0)), 3 * 60 * 1000));
+               });
       } catch (Exception ex) {
          ex.printStackTrace();
       }

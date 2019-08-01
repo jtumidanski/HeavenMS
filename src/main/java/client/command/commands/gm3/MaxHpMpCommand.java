@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -35,7 +37,7 @@ public class MaxHpMpCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      MapleCharacter victim = player;
+      Optional<MapleCharacter> victim = Optional.of(player);
 
       int statUpdate = 1;
       if (params.length >= 2) {
@@ -47,14 +49,14 @@ public class MaxHpMpCommand extends Command {
          player.yellowMessage("Syntax: !maxhpmp [<playername>] <value>");
       }
 
-      if (victim != null) {
-         int extraHp = victim.getCurrentMaxHp() - victim.getClientMaxHp();
-         int extraMp = victim.getCurrentMaxMp() - victim.getClientMaxMp();
+      if (victim.isPresent()) {
+         int extraHp = victim.get().getCurrentMaxHp() - victim.get().getClientMaxHp();
+         int extraMp = victim.get().getCurrentMaxMp() - victim.get().getClientMaxMp();
          statUpdate = Math.max(1 + Math.max(extraHp, extraMp), statUpdate);
 
          int maxhpUpdate = statUpdate - extraHp;
          int maxmpUpdate = statUpdate - extraMp;
-         victim.updateMaxHpMaxMp(maxhpUpdate, maxmpUpdate);
+         victim.get().updateMaxHpMaxMp(maxhpUpdate, maxmpUpdate);
       } else {
          player.message("Player '" + params[0] + "' could not be found on this world.");
       }

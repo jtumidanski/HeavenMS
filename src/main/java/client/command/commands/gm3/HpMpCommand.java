@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -35,7 +37,7 @@ public class HpMpCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      MapleCharacter victim = player;
+      Optional<MapleCharacter> victim = Optional.of(player);
       int statUpdate = 1;
 
       if (params.length == 2) {
@@ -47,8 +49,8 @@ public class HpMpCommand extends Command {
          player.yellowMessage("Syntax: !hpmp [<playername>] <value>");
       }
 
-      if (victim != null) {
-         victim.updateHpMp(statUpdate);
+      if (victim.isPresent()) {
+         victim.get().updateHpMp(statUpdate);
       } else {
          player.message("Player '" + params[0] + "' could not be found on this world.");
       }

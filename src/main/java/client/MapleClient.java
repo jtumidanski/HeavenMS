@@ -60,6 +60,7 @@ import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
+import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
@@ -980,7 +981,7 @@ public class MapleClient {
             if (!(channel == -1 || shutdown)) {
                if (!cashshop) {
                   if (!this.serverTransition) { // meaning not changing channels
-                     int messengerId = player.getMessenger() == null ? 0 : player.getMessenger().getId();
+                     int messengerId = player.getMessenger().map(MapleMessenger::getId).orElse(0);
                      if (messengerId > 0) {
                         wserv.leaveMessenger(messengerId, new MapleMessengerCharacter(player, 0));
                      }

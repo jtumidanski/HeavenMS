@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -42,19 +44,19 @@ public class MonitorCommand extends Command {
          player.yellowMessage("Syntax: !monitor <ign>");
          return;
       }
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
-      if (victim == null) {
+      Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
+      if (victim.isEmpty()) {
          player.message("Player '" + params[0] + "' could not be found on this world.");
          return;
       }
-      boolean monitored = MapleLogger.monitored.contains(victim.getId());
+      boolean monitored = MapleLogger.monitored.contains(victim.get().getId());
       if (monitored) {
-         MapleLogger.monitored.remove(victim.getId());
+         MapleLogger.monitored.remove(victim.get().getId());
       } else {
-         MapleLogger.monitored.add(victim.getId());
+         MapleLogger.monitored.add(victim.get().getId());
       }
-      player.yellowMessage(victim.getId() + " is " + (!monitored ? "now being monitored." : "no longer being monitored."));
-      String message = player.getName() + (!monitored ? " has started monitoring " : " has stopped monitoring ") + victim.getId() + ".";
+      player.yellowMessage(victim.get().getId() + " is " + (!monitored ? "now being monitored." : "no longer being monitored."));
+      String message = player.getName() + (!monitored ? " has started monitoring " : " has stopped monitoring ") + victim.get().getId() + ".";
       Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, message));
 
    }

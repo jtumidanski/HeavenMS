@@ -487,38 +487,20 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
                if (rs.next()) {
                   int price = rs.getInt("price") + 100 + (int) (rs.getInt("price") * 0.1); //taxes
                   if (c.getPlayer().getCashShop().getCash(4) >= price) { //FIX
-                     boolean alwaysnull = true;
+                     boolean alwaysNull = true;
                      for (Channel cserv : Server.getInstance().getAllChannels()) {
-                        MapleCharacter victim = cserv.getPlayerStorage().getCharacterById(rs.getInt("seller"));
-                        if (victim != null) {
-                           victim.getCashShop().gainCash(4, rs.getInt("price"));
-                           alwaysnull = false;
-                        }
+                        int basePrice = rs.getInt("price");
+                        alwaysNull = cserv.getPlayerStorage().getCharacterById(rs.getInt("seller")).map(victim -> {
+                           victim.getCashShop().gainCash(4, basePrice);
+                           return false;
+                        }).orElse(true);
                      }
-                     if (alwaysnull) {
-                        ResultSet rse;
-                        try (PreparedStatement pse = con.prepareStatement("SELECT accountid FROM characters WHERE id = ?")) {
-                           pse.setInt(1, rs.getInt("seller"));
-                           rse = pse.executeQuery();
-                           if (rse.next()) {
-                              try (PreparedStatement psee = con.prepareStatement("UPDATE accounts SET nxPrepaid = nxPrepaid + ? WHERE id = ?")) {
-                                 psee.setInt(1, rs.getInt("price"));
-                                 psee.setInt(2, rse.getInt("accountid"));
-                                 psee.executeUpdate();
-                              }
-                           }
-                        }
-                        rse.close();
+
+
+                     if (alwaysNull) {
+                        awardSellerCash(rs.getInt("seller"), rs.getInt("price"));
                      }
-                     PreparedStatement pse = con.prepareStatement("UPDATE mts_items SET seller = ?, transfer = 1 WHERE id = ?");
-                     pse.setInt(1, c.getPlayer().getId());
-                     pse.setInt(2, id);
-                     pse.executeUpdate();
-                     pse.close();
-                     pse = con.prepareStatement("DELETE FROM mts_cart WHERE itemid = ?");
-                     pse.setInt(1, id);
-                     pse.executeUpdate();
-                     pse.close();
+                     transferFromCart(c, id, con);
                      c.getPlayer().getCashShop().gainCash(4, -price);
                      c.enableCSActions();
                      c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
@@ -539,70 +521,87 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
                c.announce(MaplePacketCreator.MTSFailBuy());
             }
          } else if (op == 17) { //buy from cart
-            int id = slea.readInt(); //id of the item
-            Connection con = null;
-            PreparedStatement ps;
-            ResultSet rs;
-            try {
-               con = DatabaseConnection.getConnection();
-               ps = con.prepareStatement("SELECT * FROM mts_items WHERE id = ? ORDER BY id DESC");
-               ps.setInt(1, id);
-               rs = ps.executeQuery();
-               if (rs.next()) {
-                  int price = rs.getInt("price") + 100 + (int) (rs.getInt("price") * 0.1);
-                  if (c.getPlayer().getCashShop().getCash(4) >= price) {
-                     for (Channel cserv : Server.getInstance().getAllChannels()) {
-                        MapleCharacter victim = cserv.getPlayerStorage().getCharacterById(rs.getInt("seller"));
-                        if (victim != null) {
-                           victim.getCashShop().gainCash(4, rs.getInt("price"));
-                        } else {
-                           ResultSet rse;
-                           try (PreparedStatement pse = con.prepareStatement("SELECT accountid FROM characters WHERE id = ?")) {
-                              pse.setInt(1, rs.getInt("seller"));
-                              rse = pse.executeQuery();
-                              if (rse.next()) {
-                                 try (PreparedStatement psee = con.prepareStatement("UPDATE accounts SET nxPrepaid = nxPrepaid + ? WHERE id = ?")) {
-                                    psee.setInt(1, rs.getInt("price"));
-                                    psee.setInt(2, rse.getInt("accountid"));
-                                    psee.executeUpdate();
-                                 }
-                              }
-                           }
-                           rse.close();
-                        }
-                     }
-                     PreparedStatement pse = con.prepareStatement("UPDATE mts_items SET seller = ?, transfer = 1 WHERE id = ?");
-                     pse.setInt(1, c.getPlayer().getId());
-                     pse.setInt(2, id);
-                     pse.executeUpdate();
-                     pse.close();
-                     pse = con.prepareStatement("DELETE FROM mts_cart WHERE itemid = ?");
-                     pse.setInt(1, id);
-                     pse.executeUpdate();
-                     pse.close();
-                     c.getPlayer().getCashShop().gainCash(4, -price);
-                     c.announce(getCart(c.getPlayer().getId()));
-                     c.enableCSActions();
-                     c.announce(MaplePacketCreator.MTSConfirmBuy());
-                     c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
-                     c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-                     c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
-                  } else {
-                     c.announce(MaplePacketCreator.MTSFailBuy());
-                  }
-               }
-               rs.close();
-               ps.close();
-               con.close();
-            } catch (SQLException e) {
-               e.printStackTrace();
-               c.announce(MaplePacketCreator.MTSFailBuy());
-            }
+            buyFromCart(slea, c);
          } else {
             System.out.println("Unhandled OP(MTS): " + op + " Packet: " + slea.toString());
          }
       } else {
          c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
+      }
+   }
+
+   private void transferFromCart(MapleClient c, int id, Connection con) throws SQLException {
+      PreparedStatement pse = con.prepareStatement("UPDATE mts_items SET seller = ?, transfer = 1 WHERE id = ?");
+      pse.setInt(1, c.getPlayer().getId());
+      pse.setInt(2, id);
+      pse.executeUpdate();
+      pse.close();
+      pse = con.prepareStatement("DELETE FROM mts_cart WHERE itemid = ?");
+      pse.setInt(1, id);
+      pse.executeUpdate();
+      pse.close();
+   }
+
+   private void buyFromCart(SeekableLittleEndianAccessor slea, MapleClient c) {
+      int id = slea.readInt(); //id of the item
+      Connection con = null;
+      PreparedStatement ps;
+      ResultSet rs;
+      try {
+         con = DatabaseConnection.getConnection();
+         ps = con.prepareStatement("SELECT * FROM mts_items WHERE id = ? ORDER BY id DESC");
+         ps.setInt(1, id);
+         rs = ps.executeQuery();
+         if (rs.next()) {
+            int price = rs.getInt("price") + 100 + (int) (rs.getInt("price") * 0.1);
+            if (c.getPlayer().getCashShop().getCash(4) >= price) {
+               for (Channel cserv : Server.getInstance().getAllChannels()) {
+                  int sellerId = rs.getInt("seller");
+                  int basePrice = rs.getInt("price");
+
+                  cserv.getPlayerStorage().getCharacterById(sellerId)
+                        .ifPresentOrElse(victim -> victim.getCashShop().gainCash(4, basePrice),
+                              () -> awardSellerCash(sellerId, basePrice));
+               }
+               transferFromCart(c, id, con);
+               c.getPlayer().getCashShop().gainCash(4, -price);
+               c.announce(getCart(c.getPlayer().getId()));
+               c.enableCSActions();
+               c.announce(MaplePacketCreator.MTSConfirmBuy());
+               c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
+               c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
+               c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+            } else {
+               c.announce(MaplePacketCreator.MTSFailBuy());
+            }
+         }
+         rs.close();
+         ps.close();
+         con.close();
+      } catch (SQLException e) {
+         e.printStackTrace();
+         c.announce(MaplePacketCreator.MTSFailBuy());
+      }
+   }
+
+   private void awardSellerCash(int seller, int price) {
+      try {
+         Connection con = DatabaseConnection.getConnection();
+         ResultSet rse;
+         try (PreparedStatement pse = con.prepareStatement("SELECT accountid FROM characters WHERE id = ?")) {
+            pse.setInt(1, seller);
+            rse = pse.executeQuery();
+            if (rse.next()) {
+               try (PreparedStatement psee = con.prepareStatement("UPDATE accounts SET nxPrepaid = nxPrepaid + ? WHERE id = ?")) {
+                  psee.setInt(1, price);
+                  psee.setInt(2, rse.getInt("accountid"));
+                  psee.executeUpdate();
+               }
+            }
+         }
+         rse.close();
+      } catch (SQLException exception) {
+         exception.printStackTrace();
       }
    }
 

@@ -30,10 +30,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import net.server.PlayerStorage;
@@ -137,8 +139,9 @@ public class MapleExpedition {
          public void run() {
             if (registering) {
                exped.removeChannelExpedition(startMap.getChannelServer());
-               if (!silent)
+               if (!silent) {
                   startMap.broadcastMessage(MaplePacketCreator.serverNotice(6, "[Expedition] The time limit has been reached. Expedition has been disbanded."));
+               }
 
                dispose(false);
             }
@@ -165,8 +168,9 @@ public class MapleExpedition {
       finishRegistration();
       registerExpeditionAttempt();
       broadcastExped(MaplePacketCreator.removeClock());
-      if (!silent)
+      if (!silent) {
          broadcastExped(MaplePacketCreator.serverNotice(6, "[Expedition] The expedition has started! Good luck, brave heroes!"));
+      }
       startTime = System.currentTimeMillis();
       Server.getInstance().broadcastGMMessage(startMap.getWorld(), MaplePacketCreator.serverNotice(6, "[Expedition] " + type.toString() + " Expedition started with leader: " + leader.getName()));
    }
@@ -189,8 +193,9 @@ public class MapleExpedition {
 
       members.put(player.getId(), player.getName());
       player.announce(MaplePacketCreator.getClock((int) (startTime - System.currentTimeMillis()) / 1000));
-      if (!silent)
+      if (!silent) {
          broadcastExped(MaplePacketCreator.serverNotice(6, "[Expedition] " + player.getName() + " has joined the expedition!"));
+      }
       return "You have registered for the expedition successfully!";
    }
 
@@ -207,8 +212,9 @@ public class MapleExpedition {
 
       members.put(player.getId(), player.getName());
       player.announce(MaplePacketCreator.getClock((int) (startTime - System.currentTimeMillis()) / 1000));
-      if (!silent)
+      if (!silent) {
          broadcastExped(MaplePacketCreator.serverNotice(6, "[Expedition] " + player.getName() + " has joined the expedition!"));
+      }
       return 0; //"You have registered for the expedition successfully!";
    }
 
@@ -245,17 +251,21 @@ public class MapleExpedition {
          banned.add(cid);
          members.remove(cid);
 
-         if (!silent)
+         if (!silent) {
             broadcastExped(MaplePacketCreator.serverNotice(6, "[Expedition] " + chr.getValue() + " has been banned from the expedition."));
-
-         MapleCharacter player = startMap.getWorldServer().getPlayerStorage().getCharacterById(cid);
-         if (player != null && player.isLoggedinWorld()) {
-            player.announce(MaplePacketCreator.removeClock());
-            if (!silent) player.dropMessage(6, "[Expedition] You have been banned from this expedition.");
-            if (MapleExpeditionType.ARIANT.equals(type) || MapleExpeditionType.ARIANT1.equals(type) || MapleExpeditionType.ARIANT2.equals(type)) {
-               player.changeMap(980010000);
-            }
          }
+
+         startMap.getWorldServer().getPlayerStorage().getCharacterById(cid)
+               .filter(MapleCharacter::isLoggedinWorld).ifPresent(character -> {
+            character.announce(MaplePacketCreator.removeClock());
+            if (!silent) {
+               character.dropMessage(6, "[Expedition] You have been banned from this expedition.");
+            }
+            if (MapleExpeditionType.ARIANT.equals(type) || MapleExpeditionType.ARIANT1.equals(type) || MapleExpeditionType.ARIANT2.equals(type)) {
+               character.changeMap(980010000);
+            }
+
+         });
       }
    }
 
@@ -292,17 +302,11 @@ public class MapleExpedition {
    }
 
    public List<MapleCharacter> getActiveMembers() {    // thanks MedicOP for figuring out an issue with broadcasting packets to offline members
-      PlayerStorage ps = startMap.getWorldServer().getPlayerStorage();
-
-      List<MapleCharacter> activeMembers = new LinkedList<>();
-      for (Integer chrid : getMembers().keySet()) {
-         MapleCharacter chr = ps.getCharacterById(chrid);
-         if (chr != null && chr.isLoggedinWorld()) {
-            activeMembers.add(chr);
-         }
-      }
-
-      return activeMembers;
+      return getMembers().keySet().stream()
+            .map(id -> startMap.getWorldServer().getPlayerStorage().getCharacterById(id))
+            .flatMap(Optional::stream)
+            .filter(MapleCharacter::isLoggedinWorld)
+            .collect(Collectors.toList());
    }
 
    public Map<Integer, String> getMembers() {
@@ -330,7 +334,9 @@ public class MapleExpedition {
 
    public final boolean isExpeditionTeamTogether() {
       List<MapleCharacter> chars = getActiveMembers();
-      if (chars.size() <= 1) return true;
+      if (chars.size() <= 1) {
+         return true;
+      }
 
       Iterator<MapleCharacter> iterator = chars.iterator();
       MapleCharacter mc = iterator.next();
@@ -338,7 +344,9 @@ public class MapleExpedition {
 
       for (; iterator.hasNext(); ) {
          mc = iterator.next();
-         if (mc.getMapId() != mapId) return false;
+         if (mc.getMapId() != mapId) {
+            return false;
+         }
       }
 
       return true;
@@ -348,8 +356,9 @@ public class MapleExpedition {
       List<MapleCharacter> players = getActiveMembers();
 
       for (MapleCharacter chr : players) {
-         if (chr.getMapId() == warpFrom)
+         if (chr.getMapId() == warpFrom) {
             chr.changeMap(warpTo);
+         }
       }
    }
 
@@ -365,8 +374,9 @@ public class MapleExpedition {
       List<MapleCharacter> players = getActiveMembers();
 
       for (MapleCharacter chr : players) {
-         if (chr.getMapId() == warpFrom)
+         if (chr.getMapId() == warpFrom) {
             chr.changeMap(warpTo, toSp);
+         }
       }
    }
 

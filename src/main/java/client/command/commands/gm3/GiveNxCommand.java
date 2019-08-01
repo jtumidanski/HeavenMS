@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm3;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -72,9 +74,9 @@ public class GiveNxCommand extends Command {
          value = Integer.parseInt(params[0]);
       }
 
-      MapleCharacter victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv);
-      if (victim != null) {
-         victim.getCashShop().gainCash(type, value);
+      Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv);
+      if (victim.isPresent()) {
+         victim.get().getCashShop().gainCash(type, value);
          player.message(typeStr.toUpperCase() + " given.");
       } else {
          player.message("Player '" + recv + "' could not be found.");

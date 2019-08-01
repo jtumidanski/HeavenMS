@@ -23,6 +23,8 @@
 */
 package client.command.commands.gm4;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -41,8 +43,12 @@ public class PlayerNpcCommand extends Command {
          return;
       }
 
-      if (!MaplePlayerNPC.spawnPlayerNPC(player.getMapId(), player.getPosition(), c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]))) {
-         player.dropMessage(5, "Could not deploy PlayerNPC. Either there's no room available here or depleted out scriptids to use.");
+      Optional<MapleCharacter> target = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]);
+
+      if (target.isPresent()) {
+         if (!MaplePlayerNPC.spawnPlayerNPC(player.getMapId(), player.getPosition(), target.get())) {
+            player.dropMessage(5, "Could not deploy PlayerNPC. Either there's no room available here or depleted out scriptids to use.");
+         }
       }
    }
 }
