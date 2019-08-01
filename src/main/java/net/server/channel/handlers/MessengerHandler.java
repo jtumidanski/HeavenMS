@@ -39,7 +39,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class MessengerHandler extends AbstractMaplePacketHandler {
    @Override
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             byte mode = slea.readByte();
             MapleCharacter player = c.getPlayer();

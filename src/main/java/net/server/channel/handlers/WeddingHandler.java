@@ -33,7 +33,7 @@ public final class WeddingHandler extends AbstractMaplePacketHandler {
    @Override
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();
             final byte mode = slea.readByte();

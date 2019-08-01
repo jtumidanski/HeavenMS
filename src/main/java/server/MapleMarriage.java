@@ -69,7 +69,7 @@ public class MapleMarriage extends EventInstanceManager {
 
    public static List<Item> loadGiftItemsFromDb(MapleClient c, int cid) {
       List<Item> items = new LinkedList<>();
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             try {
                for (Pair<Item, MapleInventoryType> it : ItemFactory.MARRIAGE_GIFTS.loadItems(cid, false)) {
@@ -92,7 +92,7 @@ public class MapleMarriage extends EventInstanceManager {
          items.add(new Pair<>(it, it.getInventoryType()));
       }
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             try {
                Connection con = DatabaseConnection.getConnection();
@@ -129,7 +129,7 @@ public class MapleMarriage extends EventInstanceManager {
    }
 
    public List<Item> getGiftItems(MapleClient c, boolean groom) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             List<Item> gifts = getGiftItemsList(groom);
             synchronized (gifts) {

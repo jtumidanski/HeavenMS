@@ -33,7 +33,7 @@ public class ToggleExpCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             c.getPlayer().toggleExpGain();  // Vcoc's idea
          } finally {

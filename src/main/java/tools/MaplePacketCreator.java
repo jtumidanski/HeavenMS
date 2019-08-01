@@ -720,8 +720,8 @@ public class MaplePacketCreator {
 
       mplew.writeInt(1); // 1: Remove the "Select the world you want to play in"
 
-      mplew.write(ServerConstants.ENABLE_PIN && !c.canBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-      mplew.write(ServerConstants.ENABLE_PIC && !c.canBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
+      mplew.write(ServerConstants.ENABLE_PIN && c.cannotBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+      mplew.write(ServerConstants.ENABLE_PIC && c.cannotBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
 
       return mplew.getPacket();
    }
@@ -907,7 +907,7 @@ public class MaplePacketCreator {
          addCharEntry(mplew, chr, false);
       }
 
-      mplew.write(ServerConstants.ENABLE_PIC && !c.canBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2);
+      mplew.write(ServerConstants.ENABLE_PIC && c.cannotBypassPic() ? (c.getPic() == null || c.getPic().equals("") ? 0 : 1) : 2);
       mplew.writeInt(ServerConstants.COLLECTIVE_CHARSLOT ? chars.size() + c.getAvailableCharacterSlots() : c.getCharacterSlots());
       return mplew.getPacket();
    }

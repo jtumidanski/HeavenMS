@@ -44,7 +44,7 @@ public final class UseSolomonHandler extends AbstractMaplePacketHandler {
       int itemId = slea.readInt();
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();
             MapleInventory inv = chr.getInventory(MapleInventoryType.USE);

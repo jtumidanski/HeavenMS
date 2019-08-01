@@ -23,7 +23,7 @@ public class RaiseIncExpHandler extends AbstractMaplePacketHandler {
       short slot = slea.readShort();//nSlotPosition
       int itemid = slea.readInt();//nItemID
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
             QuestConsItem consItem = ii.getQuestConsumablesInfo(itemid);

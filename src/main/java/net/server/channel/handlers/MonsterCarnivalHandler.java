@@ -48,7 +48,7 @@ public final class MonsterCarnivalHandler extends AbstractMaplePacketHandler {
 
    @Override
    public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             try {
                int tab = slea.readByte();

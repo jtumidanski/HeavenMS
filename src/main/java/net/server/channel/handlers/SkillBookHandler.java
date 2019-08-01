@@ -48,7 +48,7 @@ public final class SkillBookHandler extends AbstractMaplePacketHandler {
       int itemId = accessor.readInt();
 
       MapleCharacter player = c.getPlayer();
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          int skillId;
          try {
             MapleInventory inv = player.getInventory(MapleInventoryType.USE);

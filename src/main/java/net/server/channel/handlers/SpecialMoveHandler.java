@@ -136,7 +136,7 @@ public final class SpecialMoveHandler extends AbstractMaplePacketHandler {
                skill.getEffect(skillLevel).applyEchoOfHero(chr);
             }
          } else {
-            if (c.tryacquireClient()) {
+            if (c.tryAcquireClient()) {
                try {
                   if (chr.canDoor()) {
                      chr.cancelMagicDoor();

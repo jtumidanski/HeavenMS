@@ -36,7 +36,7 @@ public class MapOwnerClaimCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();
 

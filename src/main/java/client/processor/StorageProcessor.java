@@ -54,7 +54,7 @@ public class StorageProcessor {
          return;
       }
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             if (mode == 4) { // take out
                byte type = slea.readByte();

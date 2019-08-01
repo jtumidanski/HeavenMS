@@ -16,7 +16,7 @@ public class RaiseUIStateHandler extends AbstractMaplePacketHandler {
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
       int questid = slea.readShort();
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleQuest quest = MapleQuest.getInstance(questid);
             MapleQuestStatus mqs = c.getPlayer().getQuest(quest);

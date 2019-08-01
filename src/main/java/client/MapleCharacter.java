@@ -7755,7 +7755,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void sitChair(int itemId) {
-      if (client.tryacquireClient()) {
+      if (client.tryAcquireClient()) {
          try {
             if (this.isLoggedinWorld()) {
                if (itemId >= 1000000) {    // sit on item chair

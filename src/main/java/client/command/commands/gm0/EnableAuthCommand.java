@@ -34,7 +34,7 @@ public class EnableAuthCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleLoginBypassCoordinator.getInstance().unregisterLoginBypassEntry(c.getNibbleHWID(), c.getAccID());
          } finally {

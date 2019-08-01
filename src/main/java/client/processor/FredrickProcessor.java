@@ -279,7 +279,7 @@ public class FredrickProcessor {
    }
 
    public static void fredrickRetrieveItems(MapleClient c) {     // thanks Gustav for pointing out the dupe on Fredrick handling
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();
 

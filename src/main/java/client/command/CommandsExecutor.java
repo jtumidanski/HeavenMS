@@ -241,7 +241,7 @@ public class CommandsExecutor {
    }
 
    public void handle(MapleClient client, String message) {
-      if (client.tryacquireClient()) {
+      if (client.tryAcquireClient()) {
          try {
             handleInternal(client, message);
          } finally {

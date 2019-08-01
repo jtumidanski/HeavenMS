@@ -222,7 +222,9 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
          thp = localmaxhp;
       }
 
-      if (this.hp != thp) this.transienthp = Float.NEGATIVE_INFINITY;
+      if (this.hp != thp) {
+         this.transienthp = Float.NEGATIVE_INFINITY;
+      }
       this.hp = thp;
 
       dispatchHpChanged(oldHp);
@@ -245,7 +247,9 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
          tmp = localmaxmp;
       }
 
-      if (this.mp != tmp) this.transientmp = Float.NEGATIVE_INFINITY;
+      if (this.mp != tmp) {
+         this.transientmp = Float.NEGATIVE_INFINITY;
+      }
       this.mp = tmp;
    }
 
@@ -259,7 +263,9 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
    }
 
    protected void setMaxHp(int hp_) {
-      if (this.maxhp < hp_) this.transienthp = Float.NEGATIVE_INFINITY;
+      if (this.maxhp < hp_) {
+         this.transienthp = Float.NEGATIVE_INFINITY;
+      }
       this.maxhp = hp_;
       this.clientmaxhp = Math.min(30000, hp_);
    }
@@ -274,7 +280,9 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
    }
 
    protected void setMaxMp(int mp_) {
-      if (this.maxmp < mp_) this.transientmp = Float.NEGATIVE_INFINITY;
+      if (this.maxmp < mp_) {
+         this.transientmp = Float.NEGATIVE_INFINITY;
+      }
       this.maxmp = mp_;
       this.clientmaxmp = Math.min(30000, mp_);
    }

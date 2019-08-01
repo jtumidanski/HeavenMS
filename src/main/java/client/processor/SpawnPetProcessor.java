@@ -40,7 +40,7 @@ public class SpawnPetProcessor {
    private static MapleDataProvider dataRoot = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Item.wz"));
 
    public static void processSpawnPet(MapleClient c, byte slot, boolean lead) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();
             MaplePet pet = chr.getInventory(MapleInventoryType.CASH).getItem(slot).getPet();

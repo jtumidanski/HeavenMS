@@ -82,7 +82,7 @@ public final class PlayerInteractionHandler extends AbstractMaplePacketHandler {
 
    @Override
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (!c.tryacquireClient()) {    // thanks GabrielSin for pointing dupes within player interactions
+      if (!c.tryAcquireClient()) {    // thanks GabrielSin for pointing dupes within player interactions
          c.announce(MaplePacketCreator.enableActions());
          return;
       }

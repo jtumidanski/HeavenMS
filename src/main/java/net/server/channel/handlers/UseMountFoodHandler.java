@@ -48,7 +48,7 @@ public final class UseMountFoodHandler extends AbstractMaplePacketHandler {
       MapleMount mount = chr.getMount();
       MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             Boolean mountLevelup = null;
 

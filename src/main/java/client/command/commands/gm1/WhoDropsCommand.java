@@ -49,7 +49,7 @@ public class WhoDropsCommand extends Command {
          return;
       }
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             String searchString = player.getLastCommandMessage();
             StringBuilder output = new StringBuilder();

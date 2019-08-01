@@ -314,7 +314,7 @@ public class DueyProcessor {
    }
 
    public static void dueySendItem(MapleClient c, byte invTypeId, short itemPos, short amount, int sendMesos, String sendMessage, String recipient, boolean quick) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             int fee = MapleTrade.getFee(sendMesos);
             if (!quick) {
@@ -397,7 +397,7 @@ public class DueyProcessor {
    }
 
    public static void dueyRemovePackage(MapleClient c, int packageid, boolean playerRemove) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             removePackageFromDB(packageid);
             c.announce(MaplePacketCreator.removeItemFromDuey(playerRemove, packageid));
@@ -408,7 +408,7 @@ public class DueyProcessor {
    }
 
    public static void dueyClaimPackage(MapleClient c, int packageId) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             try {
                DueyPackage dp = null;
@@ -470,7 +470,7 @@ public class DueyProcessor {
    }
 
    public static void dueySendTalk(MapleClient c, boolean quickDelivery) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             long timeNow = System.currentTimeMillis();
             if (timeNow - c.getPlayer().getNpcCooldown() < ServerConstants.BLOCK_NPC_RACE_CONDT) {

@@ -43,7 +43,7 @@ public class MaplePacketEncoder implements ProtocolEncoder {
       final MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
       try {
-         if (client.tryacquireEncoder()) {
+         if (client.tryAcquireEncoder()) {
             try {
                final MapleAESOFB send_crypto = client.getSendCrypto();
                final byte[] input = (byte[]) message;

@@ -37,7 +37,7 @@ public final class ServerlistRequestHandler extends AbstractMaplePacketHandler {
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
       Server server = Server.getInstance();
       List<World> worlds = server.getWorlds();
-      c.requestedServerlist(worlds.size());
+      c.requestedServerList(worlds.size());
 
       for (World world : worlds) {
          c.announce(MaplePacketCreator.getServerList(world.getId(), GameConstants.WORLD_NAMES[world.getId()], world.getFlag(), world.getEventMessage(), world.getChannels()));

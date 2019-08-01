@@ -19,7 +19,7 @@ public final class RPSActionHandler extends AbstractMaplePacketHandler {
       MapleCharacter chr = c.getPlayer();
       MapleRockPaperScissor rps = chr.getRPS();
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             if (slea.available() == 0 || !chr.getMap().containsNPC(9000019)) {
                if (rps != null) {

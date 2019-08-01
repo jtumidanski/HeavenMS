@@ -71,7 +71,7 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
 
    @Override
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             slea.readInt(); // whatever...
             short slot = slea.readShort();

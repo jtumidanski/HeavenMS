@@ -36,7 +36,7 @@ public final class ViewAllCharHandler extends AbstractMaplePacketHandler {
    @Override
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
       try {
-         if (!c.canRequestCharlist()) {   // client breaks if the charlist request pops too soon
+         if (!c.canRequestCharacterlist()) {   // client breaks if the charlist request pops too soon
             c.announce(MaplePacketCreator.showAllCharacter(0, 0));
             return;
          }
@@ -65,7 +65,7 @@ public final class ViewAllCharHandler extends AbstractMaplePacketHandler {
          c.announce(MaplePacketCreator.showAllCharacter(charsSize, unk));
 
          for (Pair<Integer, List<MapleCharacter>> wchars : worldChars) {
-            c.announce(MaplePacketCreator.showAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && !c.canBypassPic()));
+            c.announce(MaplePacketCreator.showAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && c.cannotBypassPic()));
          }
       } catch (Exception e) {
          e.printStackTrace();

@@ -164,7 +164,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
       final int cid = slea.readInt();
       final Server server = Server.getInstance();
 
-      if (c.tryacquireClient()) { // thanks MedicOP for assisting on concurrency protection here
+      if (c.tryAcquireClient()) { // thanks MedicOP for assisting on concurrency protection here
          try {
             World world = server.getWorld(c.getWorld());
             if (world == null) {

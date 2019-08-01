@@ -77,7 +77,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      if (c.tryacquireClient()) {     // thanks Thora for finding out an exploit within cash operations
+      if (c.tryAcquireClient()) {     // thanks Thora for finding out an exploit within cash operations
          try {
             final int action = slea.readByte();
             if (action == 0x03 || action == 0x1E) {

@@ -70,7 +70,7 @@ public class MapleInventoryManipulator {
       MapleCharacter chr = c.getPlayer();
       MapleInventoryType type = ItemConstants.getInventoryType(itemId);
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleInventory inv = chr.getInventory(type);
             inv.lockInventory();
@@ -185,7 +185,7 @@ public class MapleInventoryManipulator {
       MapleCharacter chr = c.getPlayer();
       MapleInventoryType type = item.getInventoryType();
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleInventory inv = chr.getInventory(type);
             inv.lockInventory();

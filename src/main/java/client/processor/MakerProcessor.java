@@ -49,7 +49,7 @@ public class MakerProcessor {
    private static MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
    public static void makerAction(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             int type = slea.readInt();
             int toCreate = slea.readInt();

@@ -69,7 +69,7 @@ public final class PetFoodHandler extends AbstractMaplePacketHandler {
       short pos = slea.readShort();
       int itemId = slea.readInt();
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
             useInv.lockInventory();

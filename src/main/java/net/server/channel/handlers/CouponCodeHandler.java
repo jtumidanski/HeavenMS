@@ -177,7 +177,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
       slea.skip(2);
       String code = slea.readMapleAsciiString();
 
-      if (c.tryacquireClient()) {
+      if (c.tryAcquireClient()) {
          try {
             Pair<Integer, List<Pair<Integer, Pair<Integer, Integer>>>> codeRes = getNXCodeResult(c.getPlayer(), code.toUpperCase());
             int type = codeRes.getLeft();
