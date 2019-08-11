@@ -42,10 +42,8 @@ public class DueyPackageProvider extends AbstractQueryExecutor {
 
    public Optional<DueyPackage> getById(Connection connection, int packageId) {
       String sql = "SELECT * FROM dueypackages dp WHERE PackageId = ?";
-      return get(connection, sql, ps -> ps.setInt(1, packageId), rs -> {
-         DueyPackageFromResultSetTransformer resultSetTransformer = new DueyPackageFromResultSetTransformer();
-         return Optional.of(resultSetTransformer.transform(rs));
-      });
+      DueyPackageFromResultSetTransformer resultSetTransformer = new DueyPackageFromResultSetTransformer();
+      return getNew(connection, sql, ps -> ps.setInt(1, packageId), resultSetTransformer::transform);
    }
 
    public List<Integer> getPackagesAfter(Connection connection, Timestamp timestamp) {

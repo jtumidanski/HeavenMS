@@ -3,7 +3,6 @@ package client.database.administrator;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
@@ -25,13 +24,7 @@ public class MtsItemAdministrator extends AbstractQueryExecutor implements Delet
    @Override
    public void deleteForCharacter(Connection connection, int characterId) {
       String getCartsSql = "SELECT id FROM mts_cart WHERE cid = ?";
-      List<Integer> result = getList(connection, getCartsSql, ps -> ps.setInt(1, characterId), rs -> {
-         List<Integer> cartIds = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            cartIds.add(rs.getInt("id"));
-         }
-         return cartIds;
-      });
+      List<Integer> result = getListNew(connection, getCartsSql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("id"));
 
       if (result.isEmpty()) {
          return;

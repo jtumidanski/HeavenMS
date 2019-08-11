@@ -1,7 +1,6 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -63,14 +62,8 @@ public class GuildProvider extends AbstractQueryExecutor {
 
    public List<GuildData> getGuildRankData(Connection connection) {
       String sql = "SELECT `name`, `GP`, `logoBG`, `logoBGColor`, `logo`, `logoColor` FROM guilds ORDER BY `GP` DESC LIMIT 50";
-      return getList(connection, sql, ps -> {
-      }, rs -> {
-         List<GuildData> guildData = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            guildData.add(new GuildData(rs.getString("name"), rs.getInt("GP"), rs.getInt("logo"), rs.getInt("logoColor"),
-                  rs.getInt("logoBG"), rs.getInt("logoBGColor")));
-         }
-         return guildData;
-      });
+      return getListNew(connection, sql, rs -> new GuildData(rs.getString("name"), rs.getInt("GP"),
+            rs.getInt("logo"), rs.getInt("logoColor"), rs.getInt("logoBG"),
+            rs.getInt("logoBGColor")));
    }
 }

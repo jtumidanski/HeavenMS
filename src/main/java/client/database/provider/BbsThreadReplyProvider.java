@@ -22,19 +22,14 @@ public class BbsThreadReplyProvider extends AbstractQueryExecutor {
    }
 
    public List<BbsThreadReplyData> getByThreadId(Connection connection, int threadId) {
-      BbsThreadReplyTransformer transformer = new BbsThreadReplyTransformer();
       String sql = "SELECT * FROM bbs_replies WHERE threadid = ?";
+      BbsThreadReplyTransformer transformer = new BbsThreadReplyTransformer();
       return getListNew(connection, sql, ps -> ps.setInt(1, threadId), transformer::transform);
    }
 
    public Optional<BbsThreadReplyData> getByReplyId(Connection connection, int replyId) {
-      BbsThreadReplyTransformer transformer = new BbsThreadReplyTransformer();
       String sql = "SELECT * FROM bbs_replies WHERE replyid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, replyId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(transformer.transform(rs));
-         }
-         return Optional.empty();
-      });
+      BbsThreadReplyTransformer transformer = new BbsThreadReplyTransformer();
+      return getNew(connection, sql, ps -> ps.setInt(1, replyId), transformer::transform);
    }
 }

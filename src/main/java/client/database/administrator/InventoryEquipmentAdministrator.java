@@ -54,4 +54,9 @@ public class InventoryEquipmentAdministrator extends AbstractQueryExecutor {
       String sql = "UPDATE inventoryequipment SET ringid=-1 WHERE ringid=?";
       batch(connection, sql, (ps, data) -> ps.setInt(1, data), Arrays.asList(ringId, partnerRingId));
    }
+
+   public void deleteById(Connection connection, int inventoryItemId) {
+      String sql = "DELETE FROM inventoryequipment WHERE inventoryitemid = ?";
+      execute(connection, sql, ps -> ps.setInt(1, inventoryItemId));
+   }
 }

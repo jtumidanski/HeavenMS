@@ -1,7 +1,6 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,16 +26,10 @@ public class PlayerNpcProvider extends AbstractQueryExecutor {
    public List<MaplePlayerNPC> getForMapAndWorld(Connection connection, int mapId, int worldId) {
       PlayerNpcFromResultSetTransformer resultSetTransformer = new PlayerNpcFromResultSetTransformer();
       String sql = "SELECT * FROM playernpcs WHERE map = ? AND world = ?";
-      List<MaplePlayerNPC> results = getList(connection, sql, ps -> {
+      List<MaplePlayerNPC> results = getListNew(connection, sql, ps -> {
          ps.setInt(1, mapId);
          ps.setInt(2, worldId);
-      }, rs -> {
-         List<MaplePlayerNPC> npcList = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            npcList.add(resultSetTransformer.transform(rs));
-         }
-         return npcList;
-      });
+      }, resultSetTransformer::transform);
 
       results.parallelStream().forEach(npc ->
             PlayerNpcEquipProvider.getInstance().getEquips(connection, npc.getObjectId())
@@ -48,96 +41,54 @@ public class PlayerNpcProvider extends AbstractQueryExecutor {
    public Optional<MaplePlayerNPC> getByScriptId(Connection connection, int scriptId) {
       PlayerNpcFromResultSetTransformer resultSetTransformer = new PlayerNpcFromResultSetTransformer();
       String sql = "SELECT * FROM playernpcs WHERE scriptid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, scriptId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(resultSetTransformer.transform(rs));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, ps -> ps.setInt(1, scriptId), resultSetTransformer::transform);
    }
 
    public Optional<MaplePlayerNPC> getById(Connection connection, int npcId) {
       PlayerNpcFromResultSetTransformer resultSetTransformer = new PlayerNpcFromResultSetTransformer();
       String sql = "SELECT * FROM playernpcs WHERE id = ?";
-      return get(connection, sql, ps -> ps.setInt(1, npcId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(resultSetTransformer.transform(rs));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, ps -> ps.setInt(1, npcId), resultSetTransformer::transform);
    }
 
    public int getMaxRank(Connection connection) {
       String sql = "SELECT max(overallrank) FROM playernpcs";
-      Optional<Integer> result = getSingle(connection, sql, ps -> {
-      }, 1);
+      Optional<Integer> result = getSingle(connection, sql, 1);
       return result.orElse(0);
    }
 
    public List<Pair<Integer, Integer>> getMaxRankByWorld(Connection connection) {
       String sql = "SELECT world, max(worldrank) FROM playernpcs GROUP BY world ORDER BY world";
-      return getList(connection, sql, ps -> {
-      }, rs -> {
-         List<Pair<Integer, Integer>> results = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            results.add(new Pair<>(rs.getInt(1), rs.getInt(2)));
-         }
-         return results;
-      });
+      return getListNew(connection, sql, rs -> new Pair<>(rs.getInt(1), rs.getInt(2)));
    }
 
    public List<Pair<Pair<Integer, Integer>, AtomicInteger>> getMaxRankByJobAndWorld(Connection connection) {
       String sql = "SELECT world, job, max(worldjobrank) FROM playernpcs GROUP BY world, job ORDER BY world, job";
-      return getList(connection, sql, ps -> {
-      }, rs -> {
-         List<Pair<Pair<Integer, Integer>, AtomicInteger>> results = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            Pair<Integer, Integer> worldJobPair = new Pair<>(rs.getInt(1), rs.getInt(2));
-            results.add(new Pair<>(worldJobPair, new AtomicInteger(rs.getInt(3) + 1)));
-         }
-         return results;
+      return getListNew(connection, sql, rs -> {
+         Pair<Integer, Integer> worldJobPair = new Pair<>(rs.getInt(1), rs.getInt(2));
+         return new Pair<>(worldJobPair, new AtomicInteger(rs.getInt(3) + 1));
       });
    }
 
    public List<Integer> getAvailableScripts(Connection connection, int lowerBound, int upperBound) {
       String sql = "SELECT scriptid FROM playernpcs WHERE scriptid >= ? AND scriptid < ? ORDER BY scriptid";
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setInt(1, lowerBound);
          ps.setInt(2, upperBound);
-      }, rs -> {
-         List<Integer> scripts = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            scripts.add(rs.getInt(1));
-         }
-         return scripts;
-      });
+      }, rs -> rs.getInt(1));
    }
 
    public List<Pair<Integer, Integer>> getLikeNameAndMap(Connection connection, String name, Integer mapId) {
       String sql = "SELECT id, map FROM playernpcs WHERE name LIKE ?" + (mapId != null ? " AND map = ?" : "");
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setString(1, name);
          if (mapId != null) {
             ps.setInt(2, mapId);
          }
-      }, rs -> {
-         List<Pair<Integer, Integer>> results = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            results.add(new Pair<>(rs.getInt("id"), rs.getInt("map")));
-         }
-         return results;
-      });
+      }, rs -> new Pair<>(rs.getInt("id"), rs.getInt("map")));
    }
 
    public List<Pair<Integer, Integer>> getWorldMapsWithPlayerNpcs(Connection connection) {
       String sql = "SELECT DISTINCT world, map FROM playernpcs";
-      return getList(connection, sql, ps -> {
-      }, rs -> {
-         List<Pair<Integer, Integer>> result = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            result.add(new Pair<>(rs.getInt("world"), rs.getInt("map")));
-         }
-         return result;
-      });
+      return getListNew(connection, sql, rs -> new Pair<>(rs.getInt("world"), rs.getInt("map")));
    }
 }

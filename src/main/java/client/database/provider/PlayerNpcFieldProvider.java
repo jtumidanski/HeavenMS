@@ -5,6 +5,7 @@ import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.PlayerNpcFieldData;
+import client.database.utility.PlayerNpcFieldTransformer;
 
 public class PlayerNpcFieldProvider extends AbstractQueryExecutor {
    private static PlayerNpcFieldProvider instance;
@@ -21,6 +22,7 @@ public class PlayerNpcFieldProvider extends AbstractQueryExecutor {
 
    public List<PlayerNpcFieldData> get(Connection connection) {
       String sql = "SELECT * FROM playernpcs_field";
-      return getListNew(connection, sql, ps -> {}, rs -> new PlayerNpcFieldData(rs.getInt("world"), rs.getInt("map"), rs.getInt("step"), rs.getInt("podium")));
+      PlayerNpcFieldTransformer transformer = new PlayerNpcFieldTransformer();
+      return getListNew(connection, sql, transformer::transform);
    }
 }

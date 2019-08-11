@@ -122,8 +122,7 @@ public class AccountProvider extends AbstractQueryExecutor {
 
    public int getAccountCount(Connection connection) {
       String sql = "SELECT count(*) FROM accounts";
-      Optional<Integer> result = getSingle(connection, sql, ps -> {
-      }, 1);
+      Optional<Integer> result = getSingle(connection, sql,1);
       return result.orElse(0);
    }
 

@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.MakerCreateData;
+import client.database.utility.MakerCreateTransformer;
 
 public class MakerCreateProvider extends AbstractQueryExecutor {
    private static MakerCreateProvider instance;
@@ -21,12 +22,7 @@ public class MakerCreateProvider extends AbstractQueryExecutor {
 
    public Optional<MakerCreateData> getMakerCreateDataForItem(Connection connection, int itemId) {
       String sql = "SELECT req_level, req_maker_level, req_meso, quantity FROM makercreatedata WHERE itemid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, itemId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(
-                  new MakerCreateData(rs.getInt("req_level"), rs.getInt("req_maker_level"), rs.getInt("req_meso"), rs.getInt("quantity")));
-         }
-         return Optional.empty();
-      });
+      MakerCreateTransformer transformer = new MakerCreateTransformer();
+      return getNew(connection, sql, ps -> ps.setInt(1, itemId), transformer::transform);
    }
 }

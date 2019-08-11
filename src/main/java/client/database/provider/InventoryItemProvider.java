@@ -3,7 +3,6 @@ package client.database.provider;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
@@ -27,7 +26,7 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
 
    public List<Pair<Item, MapleInventoryType>> getItemsByCharacterAndType(Connection connection, int characterId, int type, boolean loggedIn) {
       String sql = constructGetItemsByQuery(false, loggedIn);
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setInt(1, type);
          ps.setInt(2, characterId);
       }, this::processGetItemsByTypeResults);
@@ -35,7 +34,7 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
 
    public List<Pair<Item, MapleInventoryType>> getItemsByAccountAndType(Connection connection, int accountId, int type, boolean loggedIn) {
       String sql = constructGetItemsByQuery(true, loggedIn);
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setInt(1, type);
          ps.setInt(2, accountId);
       }, this::processGetItemsByTypeResults);
@@ -43,33 +42,28 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
 
    public List<Pair<Item, Integer>> getEquipsByCharacter(Connection connection, int characterId, boolean loggedIn) {
       String sql = constructGetEquipsByQuery(false, loggedIn);
-      return getList(connection, sql, ps -> ps.setInt(1, characterId), this::processGetEquipsByTypeResults);
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), this::processGetEquipsByTypeResults);
    }
 
    public List<Pair<Item, Integer>> getEquipsByAccount(Connection connection, int accountId, boolean loggedIn) {
       String sql = constructGetEquipsByQuery(true, loggedIn);
-      return getList(connection, sql, ps -> ps.setInt(1, accountId), this::processGetEquipsByTypeResults);
+      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), this::processGetEquipsByTypeResults);
    }
 
-   private List<Pair<Item, Integer>> processGetEquipsByTypeResults(ResultSet rs) throws SQLException {
+   private Pair<Item, Integer> processGetEquipsByTypeResults(ResultSet rs) throws SQLException {
       EquipFromResultSetTransformer equipTransformer = new EquipFromResultSetTransformer();
-      List<Pair<Item, Integer>> results = new ArrayList<>();
-      while (rs != null && rs.next()) {
-         Integer cid = rs.getInt("characterid");
-         results.add(new Pair<>(equipTransformer.transform(rs), cid));
-      }
-      return results;
+      Integer cid = rs.getInt("characterid");
+      return new Pair<>(equipTransformer.transform(rs), cid);
    }
 
-   private List<Pair<Item, MapleInventoryType>> processGetItemsByTypeResults(ResultSet resultSet) throws SQLException {
-      List<Pair<Item, MapleInventoryType>> results = new ArrayList<>();
+   private Pair<Item, MapleInventoryType> processGetItemsByTypeResults(ResultSet resultSet) throws SQLException {
       EquipFromResultSetTransformer equipTransformer = new EquipFromResultSetTransformer();
 
-      while (resultSet != null && resultSet.next()) {
+      if (resultSet != null && resultSet.next()) {
          MapleInventoryType inventoryType = MapleInventoryType.getByType(resultSet.getByte("inventorytype"));
          if (inventoryType != null) {
             if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
-               results.add(new Pair<>(equipTransformer.transform(resultSet), inventoryType));
+               return new Pair<>(equipTransformer.transform(resultSet), inventoryType);
             } else {
                Item item = new Item(resultSet.getInt("itemid"), (byte) resultSet.getInt("position"),
                      (short) resultSet.getInt("quantity"), resultSet.getInt("petid"));
@@ -77,11 +71,11 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
                item.setExpiration(resultSet.getLong("expiration"));
                item.setGiftFrom(resultSet.getString("giftFrom"));
                item.setFlag((short) resultSet.getInt("flag"));
-               results.add(new Pair<>(item, inventoryType));
+               return new Pair<>(item, inventoryType);
             }
          }
       }
-      return results;
+      return null;
    }
 
    private String constructGetItemsByQuery(boolean account, boolean loggedIn) {
@@ -110,5 +104,10 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
    public List<Integer> getPetsForCharacter(Connection connection, int characterId) {
       String sql = "SELECT petid FROM inventoryitems WHERE characterid = ? AND petid > -1";
       return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt(1));
+   }
+
+   public List<Pair<Integer, Integer>> get(Connection connection, int characterId) {
+      String sql = "SELECT inventoryitemid, petid FROM inventoryitems WHERE characterid = ?";
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new Pair<>(rs.getInt("inventoryitemid"), rs.getInt("petid")));
    }
 }

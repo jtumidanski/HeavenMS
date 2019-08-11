@@ -21,14 +21,12 @@ public class PetAdministrator extends AbstractQueryExecutor {
 
    public void unreferenceMissingPetsFromInventory(Connection connection) {
       String sql = "UPDATE inventoryitems SET petid = -1, expiration = 0 WHERE petid != -1 AND petid NOT IN (SELECT petid FROM pets)";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    public void deleteMissingPets(Connection connection) {
       String sql = "DELETE FROM pets WHERE petid NOT IN (SELECT petid FROM inventoryitems WHERE petid != -1)";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    public void deleteAllPetData(Connection connection, int petId) {

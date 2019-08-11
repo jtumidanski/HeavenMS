@@ -116,8 +116,7 @@ public class CharacterAdministrator extends AbstractQueryExecutor {
 
    public void removeAllMerchants(Connection connection) {
       String sql = "UPDATE characters SET HasMerchant = 0";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    public void eraseEngagement(Connection connection, int characterId) {
@@ -127,14 +126,12 @@ public class CharacterAdministrator extends AbstractQueryExecutor {
 
    public void resetAllJobRankMove(Connection connection) {
       String sql = "UPDATE characters SET jobRankMove = 0";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    public void resetAllRankMove(Connection connection) {
       String sql = "UPDATE characters SET rankMove = 0";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    public void updateJobRank(Connection connection, int characterId, int rank, int rankMove) {

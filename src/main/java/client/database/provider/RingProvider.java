@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import client.MapleRing;
 import client.database.AbstractQueryExecutor;
+import client.database.utility.RingTransformer;
 
 public class RingProvider extends AbstractQueryExecutor {
    private static RingProvider instance;
@@ -22,17 +23,12 @@ public class RingProvider extends AbstractQueryExecutor {
 
    public Optional<MapleRing> getRingById(Connection connection, int ringId) {
       String sql = "SELECT * FROM rings WHERE id = ?";
-      return get(connection, sql, ps -> ps.setInt(1, ringId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new MapleRing(ringId, rs.getInt("partnerRingId"), rs.getInt("partnerChrId"), rs.getInt("itemid"), rs.getString("partnerName")));
-         }
-         return Optional.empty();
-      });
+      RingTransformer transformer = new RingTransformer();
+      return getNew(connection, sql, ps -> ps.setInt(1, ringId), transformer::transform);
    }
 
    public List<Integer> getAll(Connection connection) {
       String sql = "SELECT id FROM rings";
-      return getListNew(connection, sql, ps -> {
-      }, rs -> rs.getInt("id"));
+      return getListNew(connection, sql, rs -> rs.getInt("id"));
    }
 }

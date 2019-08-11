@@ -24,19 +24,13 @@ public class NewYearCardProvider extends AbstractQueryExecutor {
    public List<NewYearCardRecord> getNotReceived(Connection connection) {
       NewYearCardRecordFromResultSetTransformer resultSetTransformer = new NewYearCardRecordFromResultSetTransformer();
       String sql = "SELECT * FROM newyear WHERE timereceived = 0 AND senderdiscard = 0";
-      return getListNew(connection, sql, ps -> {
-      }, resultSetTransformer::transform);
+      return getListNew(connection, sql, resultSetTransformer::transform);
    }
 
    public Optional<NewYearCardRecord> getById(Connection connection, int cardId) {
       NewYearCardRecordFromResultSetTransformer resultSetTransformer = new NewYearCardRecordFromResultSetTransformer();
       String sql = "SELECT * FROM newyear WHERE id = ?";
-      return get(connection, sql, ps -> ps.setInt(1, cardId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(resultSetTransformer.transform(rs));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, ps -> ps.setInt(1, cardId), resultSetTransformer::transform);
    }
 
    public List<NewYearCardRecord> getBySenderOrReceiver(Connection connection, int senderId, int receiverId) {

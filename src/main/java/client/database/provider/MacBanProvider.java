@@ -29,18 +29,13 @@ public class MacBanProvider extends AbstractQueryExecutor {
       }
       sql.append(")");
 
-      Optional<Integer> result = get(connection, sql.toString(), ps -> {
+      Optional<Integer> result = getNew(connection, sql.toString(), ps -> {
          int i = 0;
          for (String mac : macs) {
             i++;
             ps.setString(i, mac);
          }
-      }, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(rs.getInt(1));
-         }
-         return Optional.empty();
-      });
+      }, rs -> rs.getInt(1));
       return result.orElse(0);
    }
 }

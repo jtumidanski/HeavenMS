@@ -5,6 +5,7 @@ import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.KeyMapData;
+import client.database.utility.KeyMapTransformer;
 
 public class KeyMapProvider extends AbstractQueryExecutor {
    private static KeyMapProvider instance;
@@ -21,6 +22,7 @@ public class KeyMapProvider extends AbstractQueryExecutor {
 
    public List<KeyMapData> getForCharacter(Connection connection, int characterId) {
       String sql = "SELECT `key`,`type`,`action` FROM keymap WHERE characterid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new KeyMapData(rs.getInt("key"), rs.getInt("type"), rs.getInt("action")));
+      KeyMapTransformer transformer = new KeyMapTransformer();
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
    }
 }

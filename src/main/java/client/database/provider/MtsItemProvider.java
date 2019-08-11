@@ -66,22 +66,13 @@ public class MtsItemProvider extends AbstractQueryExecutor {
 
    public Optional<MTSItemInfo> getById(Connection connection, int id) {
       String sql = "SELECT * FROM mts_items WHERE id = ?";
-      return get(connection, sql, ps -> ps.setInt(1, id), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(produceItem(rs));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, ps -> ps.setInt(1, id), this::produceItem);
    }
 
    public Optional<Pair<Integer, Integer>> getSaleInfoById(Connection connection, int id) {
       String sql = "SELECT * FROM mts_items WHERE id = ? ORDER BY id DESC";
-      return get(connection, sql, ps -> ps.setInt(1, id), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new Pair<>(rs.getInt("seller"), rs.getInt("price")));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, ps -> ps.setInt(1, id),
+            rs -> new Pair<>(rs.getInt("seller"), rs.getInt("price")));
    }
 
    public List<MTSItemInfo> getTransferItems(Connection connection, int sellerId) {
@@ -91,15 +82,10 @@ public class MtsItemProvider extends AbstractQueryExecutor {
 
    public Optional<Item> getTransferItem(Connection connection, int characterId, int itemId) {
       String sql = "SELECT * FROM mts_items WHERE seller = ? AND transfer = 1  AND id= ? ORDER BY id DESC";
-      return get(connection, sql, ps -> {
+      return getNew(connection, sql, ps -> {
          ps.setInt(1, characterId);
          ps.setInt(2, itemId);
-      }, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(produceTransferItem(rs));
-         }
-         return Optional.empty();
-      });
+      }, this::produceTransferItem);
    }
 
    public boolean isItemForSaleBySomeoneElse(Connection connection, int itemId, int characterId) {

@@ -1,12 +1,12 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.NoteData;
+import client.database.utility.NoteTransformer;
 
 public class NoteProvider extends AbstractQueryExecutor {
    private static NoteProvider instance;
@@ -23,19 +23,8 @@ public class NoteProvider extends AbstractQueryExecutor {
 
    public List<NoteData> getFirstNote(Connection connection, String characterName) {
       String sql = "SELECT * FROM notes WHERE `to` = ? AND `deleted` = 0";
-      return getList(connection, sql, ps -> ps.setString(1, characterName), rs -> {
-         List<NoteData> noteData = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            noteData.add(new NoteData(
-                  rs.getInt("id"),
-                  rs.getString("from"),
-                  rs.getString("message"),
-                  rs.getLong("timestamp"),
-                  rs.getByte("fame")
-            ));
-         }
-         return noteData;
-      });
+      NoteTransformer transformer = new NoteTransformer();
+      return getListNew(connection, sql, ps -> ps.setString(1, characterName), transformer::transform);
    }
 
    public Optional<Integer> getFameForActiveNotes(Connection connection, int noteId) {

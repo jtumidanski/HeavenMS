@@ -1,7 +1,6 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,13 +28,10 @@ public class FamilyCharacterProvider extends AbstractQueryExecutor {
 
    public List<MapleFamilyEntry> getMapleFamily(Connection connection, int familyId) {
       String sql = "SELECT * FROM family_character WHERE familyid = ?";
-      return getList(connection, sql, ps -> ps.setInt(1, familyId), rs -> {
-         List<MapleFamilyEntry> familyEntries = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            familyEntries.add(new MapleFamilyEntry(familyId, rs.getInt("rank"), rs.getInt("reputation"), rs.getInt("totaljuniors"), rs.getString("name"), rs.getInt("juniorsadded"),
-                  rs.getInt("todaysrep"), rs.getInt("cid")));
-         }
-         return familyEntries;
-      });
+      return getListNew(connection, sql, ps -> ps.setInt(1, familyId),
+            rs -> new MapleFamilyEntry(familyId, rs.getInt("rank"), rs.getInt("reputation"),
+                  rs.getInt("totaljuniors"), rs.getString("name"),
+                  rs.getInt("juniorsadded"), rs.getInt("todaysrep"),
+                  rs.getInt("cid")));
    }
 }

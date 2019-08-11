@@ -22,13 +22,8 @@ public class BbsThreadAdministrator extends AbstractQueryExecutor {
 
    public void deleteThreadsFromCharacter(Connection connection, int characterId) {
       String getThreadSql = "SELECT threadid FROM bbs_threads WHERE postercid = ?";
-      List<Integer> result = getList(connection, getThreadSql, ps -> ps.setInt(1, characterId), rs -> {
-         List<Integer> threads = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            threads.add(rs.getInt("threadid"));
-         }
-         return threads;
-      });
+      List<Integer> result = getListNew(connection, getThreadSql, ps -> ps.setInt(1, characterId),
+            rs -> rs.getInt("threadid"));
 
       if (result.isEmpty()) {
          return;

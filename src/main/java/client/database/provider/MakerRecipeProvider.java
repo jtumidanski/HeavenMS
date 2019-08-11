@@ -22,24 +22,14 @@ public class MakerRecipeProvider extends AbstractQueryExecutor {
 
    public List<MakerRecipeData> getRecipeForItem(Connection connection, int itemId) {
       String sql = "SELECT req_item, count FROM makerrecipedata WHERE itemid = ?";
-      return getList(connection, sql, ps -> ps.setInt(1, itemId), rs -> {
-         List<MakerRecipeData> recipeDataList = new ArrayList<>();
-         if (rs != null && rs.next()) {
-            recipeDataList.add(new MakerRecipeData(rs.getInt("req_item"), rs.getInt("count")));
-         }
-         return recipeDataList;
-      });
+      return getListNew(connection, sql, ps -> ps.setInt(1, itemId),
+            rs -> new MakerRecipeData(rs.getInt("req_item"), rs.getInt("count")));
    }
 
    public List<MakerRecipeData> getMakerDisassembledItems(Connection connection, int itemId) {
       String sql = "SELECT req_item, count FROM makerrecipedata WHERE itemid = ? AND req_item >= 4260000 AND req_item < 4270000";
-      return getList(connection, sql, ps -> ps.setInt(1, itemId), rs -> {
-         List<MakerRecipeData> recipeDataList = new ArrayList<>();
-         if (rs != null && rs.next()) {
-            recipeDataList.add(new MakerRecipeData(rs.getInt("req_item"), rs.getInt("count") / 2));
-         }
-         return recipeDataList;
-      });
+      return getListNew(connection, sql, ps -> ps.setInt(1, itemId),
+            rs -> new MakerRecipeData(rs.getInt("req_item"), rs.getInt("count") / 2));
    }
 
 }

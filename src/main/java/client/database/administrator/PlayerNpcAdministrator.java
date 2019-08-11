@@ -103,16 +103,13 @@ public class PlayerNpcAdministrator extends AbstractQueryExecutor {
 
    public void deleteAllNpcs(Connection connection) {
       String deleteNpcSql = "DELETE FROM playernpcs";
-      execute(connection, deleteNpcSql, ps -> {
-      });
+      executeNoParam(connection, deleteNpcSql);
 
       String deleteNpcEquipSql = "DELETE FROM playernpcs_equip";
-      execute(connection, deleteNpcEquipSql, ps -> {
-      });
+      executeNoParam(connection, deleteNpcEquipSql);
 
       String deleteNpcFieldSql = "DELETE FROM playernpcs_field";
-      execute(connection, deleteNpcFieldSql, ps -> {
-      });
+      executeNoParam(connection, deleteNpcFieldSql);
    }
 
    public void updatePosition(Connection connection, int npcId, int x, int cy, int fh, int rx0, int rx1) {

@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.util.Optional;
 
 import client.database.AbstractQueryExecutor;
+import client.database.utility.MapleStorageTransformer;
 import server.MapleStorage;
 
 public class StorageProvider extends AbstractQueryExecutor {
@@ -21,14 +22,10 @@ public class StorageProvider extends AbstractQueryExecutor {
 
    public Optional<MapleStorage> getByAccountAndWorld(Connection connection, int accountId, int worldId) {
       String sql = "SELECT storageid, slots, meso FROM storages WHERE accountid = ? AND world = ?";
-      return get(connection, sql, ps -> {
+      MapleStorageTransformer transformer = new MapleStorageTransformer();
+      return getNew(connection, sql, ps -> {
          ps.setInt(1, accountId);
          ps.setInt(2, worldId);
-      }, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new MapleStorage(rs.getInt("storageid"), (byte) rs.getInt("slots"), rs.getInt("meso")));
-         }
-         return Optional.empty();
-      });
+      }, transformer::transform);
    }
 }

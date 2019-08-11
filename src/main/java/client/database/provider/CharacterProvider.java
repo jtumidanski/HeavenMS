@@ -1,18 +1,20 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import client.MapleCharacter;
 import client.database.AbstractQueryExecutor;
 import client.database.data.CharNameAndIdData;
 import client.database.data.CharacterData;
 import client.database.data.CharacterGuildData;
 import client.database.data.CharacterIdNameAccountId;
 import client.database.data.CharacterRankData;
+import client.database.utility.CharNameAndIdTransformer;
 import client.database.utility.CharacterFromResultSetTransformer;
+import client.database.utility.CharacterGuildTransformer;
+import client.database.utility.CharacterIdNameAccountIdTransformer;
+import client.database.utility.CharacterRankTransformer;
 import tools.Pair;
 
 public class CharacterProvider extends AbstractQueryExecutor {
@@ -38,28 +40,16 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public List<CharNameAndIdData> getCharacterInfoForWorld(Connection connection, int accountId, int worldId) {
       String sql = "SELECT id, name FROM characters WHERE accountid = ? AND world = ?";
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setInt(1, accountId);
          ps.setInt(2, worldId);
-      }, rs -> {
-         List<CharNameAndIdData> chars = new ArrayList<>(15);
-         while (rs != null && rs.next()) {
-            chars.add(new CharNameAndIdData(rs.getString("name"), rs.getInt("id")));
-         }
-         return chars;
-      });
+      }, rs -> new CharNameAndIdData(rs.getString("name"), rs.getInt("id")));
    }
 
    public CharNameAndIdData getCharacterInfoForName(Connection connection, String name) {
       String sql = "SELECT id, name, buddyCapacity FROM characters WHERE name LIKE ?";
-      Optional<CharNameAndIdData> result = get(connection, sql, ps -> {
-         ps.setString(1, name);
-      }, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new CharNameAndIdData(rs.getString("name"), rs.getInt("id"), rs.getInt("buddyCapacity")));
-         }
-         return Optional.empty();
-      });
+      CharNameAndIdTransformer transformer = new CharNameAndIdTransformer();
+      Optional<CharNameAndIdData> result = getNew(connection, sql, ps -> ps.setString(1, name), transformer::transform);
       return result.orElse(null);
    }
 
@@ -78,19 +68,13 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public Optional<CharacterGuildData> getGuildDataForCharacter(Connection connection, int characterId, int accountId) {
       String sql = "SELECT id, guildid, guildrank, name, allianceRank, level, job FROM characters WHERE id = ? AND accountid = ?";
+      CharacterGuildTransformer transformer = new CharacterGuildTransformer();
       return get(connection, sql, ps -> {
          ps.setInt(1, characterId);
          ps.setInt(2, accountId);
       }, rs -> {
-         if (rs.next() && rs.getInt("guildid") > 0) {
-            return Optional.of(new CharacterGuildData(
-                  rs.getInt("id"),
-                  rs.getInt("guildid"),
-                  rs.getInt("guildrank"),
-                  rs.getString("name"),
-                  rs.getInt("allianceRank"),
-                  rs.getInt("level"),
-                  rs.getInt("job")));
+         if (rs != null && rs.next() && rs.getInt("guildid") > 0) {
+            return Optional.of(transformer.transform(rs));
          }
          return Optional.empty();
       });
@@ -99,22 +83,8 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public List<CharacterGuildData> getGuildCharacterData(Connection connection, int guildId) {
       String sql = "SELECT id, guildid, guildrank, name, allianceRank, level, job FROM characters WHERE guildid = ? ORDER BY guildrank ASC, name ASC";
-      return getList(connection, sql, ps -> {
-         ps.setInt(1, guildId);
-      }, rs -> {
-         List<CharacterGuildData> guildCharacters = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            guildCharacters.add(new CharacterGuildData(
-                  rs.getInt("id"),
-                  rs.getInt("guildid"),
-                  rs.getInt("guildrank"),
-                  rs.getString("name"),
-                  rs.getInt("allianceRank"),
-                  rs.getInt("level"),
-                  rs.getInt("job")));
-         }
-         return guildCharacters;
-      });
+      CharacterGuildTransformer transformer = new CharacterGuildTransformer();
+      return getListNew(connection, sql, ps -> ps.setInt(1, guildId), transformer::transform);
    }
 
    public Optional<Pair<Integer, Integer>> getIdAndAccountIdForName(Connection connection, String name) {
@@ -155,13 +125,7 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public List<Integer> getCharacterLevels(Connection connection, int accountId) {
       String sql = "SELECT `level` FROM `characters` WHERE accountid = ?";
-      return getList(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
-         List<Integer> levels = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            levels.add(rs.getInt("level"));
-         }
-         return levels;
-      });
+      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), rs -> rs.getInt("level"));
    }
 
    public Optional<Integer> getGmLevel(Connection connection, String name) {
@@ -176,32 +140,29 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public Optional<CharacterIdNameAccountId> getByName(Connection connection, String name) {
       String sql = "SELECT `id`, `accountid`, `name` FROM `characters` WHERE `name` = ?";
-      return get(connection, sql, ps -> ps.setString(1, name), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new CharacterIdNameAccountId(rs.getInt("id"), rs.getInt("accountid"), rs.getString("name")));
-         }
-         return Optional.empty();
-      });
+      CharacterIdNameAccountIdTransformer transformer = new CharacterIdNameAccountIdTransformer();
+      return getNew(connection, sql, ps -> ps.setString(1, name), transformer::transform);
    }
 
    public List<CharacterRankData> getRankByJob(Connection connection, int worldId, int jobId) {
       String sql = "SELECT c.id, c.jobRank, c.jobRankMove, a.lastlogin AS lastlogin, a.loggedin FROM characters AS c LEFT JOIN accounts AS a ON c.accountid = a.id WHERE c.gm < 2 AND c.world = ? AND c.job DIV 100 = ? ORDER BY c.level DESC , c.exp DESC , c.lastExpGainTime ASC, c.fame DESC , c.meso DESC";
+      CharacterRankTransformer transformer = new CharacterRankTransformer();
       return getListNew(connection, sql, ps -> {
          ps.setInt(1, worldId);
          ps.setInt(2, jobId);
-      }, rs -> new CharacterRankData(rs.getLong("lastlogin"), rs.getInt("loggedin"), rs.getInt("jobRankMove"), rs.getInt("jobRank"), rs.getInt("id")));
+      }, transformer::transform);
    }
 
    public List<CharacterRankData> getRank(Connection connection, int worldId) {
       String sql = "SELECT c.id, c.rank, c.rankMove, a.lastlogin AS lastlogin, a.loggedin FROM characters AS c LEFT JOIN accounts AS a ON c.accountid = a.id WHERE c.gm < 2 AND c.world = ? ORDER BY c.level DESC , c.exp DESC , c.lastExpGainTime ASC, c.fame DESC , c.meso DESC";
-      return getListNew(connection, sql, ps -> ps.setInt(1, worldId),
-            rs -> new CharacterRankData(rs.getLong("lastlogin"), rs.getInt("loggedin"), rs.getInt("rankMove"), rs.getInt("rank"), rs.getInt("id")));
+      CharacterRankTransformer transformer = new CharacterRankTransformer();
+      return getListNew(connection, sql, ps -> ps.setInt(1, worldId), transformer::transform);
    }
 
    public Optional<CharacterData> getById(Connection connection, int characterId) {
       String sql = "SELECT * FROM characters WHERE id = ?";
       CharacterFromResultSetTransformer transformer = new CharacterFromResultSetTransformer();
-      return get(connection, sql, ps -> ps.setInt(1, characterId), rs -> Optional.ofNullable(transformer.transform(rs)));
+      return getNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
    }
 
    public List<CharacterData> getByAccountId(Connection connection, int accountId) {
@@ -212,17 +173,14 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public Optional<CharacterData> getHighestLevelOtherCharacterData(Connection connection, int accountId, int characterId) {
       String sql = "SELECT name, level FROM characters WHERE accountid = ? AND id != ? ORDER BY level DESC limit 1";
-      return get(connection, sql, ps -> {
+      return getNew(connection, sql, ps -> {
          ps.setInt(1, accountId);
          ps.setInt(2, characterId);
       }, rs -> {
-         if (rs != null && rs.next()) {
-            CharacterData characterData = new CharacterData();
-            characterData.setName(rs.getString("name"));
-            characterData.setLevel(rs.getInt("level"));
-            return Optional.of(characterData);
-         }
-         return Optional.empty();
+         CharacterData characterData = new CharacterData();
+         characterData.setName(rs.getString("name"));
+         characterData.setLevel(rs.getInt("level"));
+         return characterData;
       });
    }
 }

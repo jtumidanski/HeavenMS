@@ -1,7 +1,6 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
@@ -21,12 +20,6 @@ public class AllianceGuildProvider extends AbstractQueryExecutor {
 
    public List<Integer> getGuildsForAlliance(Connection connection, int allianceId) {
       String sql = "SELECT guildid FROM allianceguilds WHERE allianceid = ?";
-      return getList(connection, sql, ps -> ps.setInt(1, allianceId), rs -> {
-         List<Integer> ids = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            ids.add(rs.getInt("guildid"));
-         }
-         return ids;
-      });
+      return getListNew(connection, sql, ps -> ps.setInt(1, allianceId), rs -> rs.getInt("guildid"));
    }
 }

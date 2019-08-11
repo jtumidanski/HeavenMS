@@ -22,12 +22,7 @@ public class MonsterBookProvider extends AbstractQueryExecutor {
 
    public List<MonsterBookData> getDataForCharacter(Connection connection, int characterId) {
       String sql = "SELECT cardid, level FROM monsterbook WHERE charid = ? ORDER BY cardid ASC";
-      return getList(connection, sql, ps -> ps.setInt(1, characterId), rs -> {
-         List<MonsterBookData> monsterBookData = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            monsterBookData.add(new MonsterBookData(rs.getInt("cardid"), rs.getInt("level")));
-         }
-         return monsterBookData;
-      });
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
+            rs -> new MonsterBookData(rs.getInt("cardid"), rs.getInt("level")));
    }
 }

@@ -1,7 +1,6 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.LinkedList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
@@ -21,13 +20,6 @@ public class MacFilterProvider extends AbstractQueryExecutor {
 
    public List<String> getMacFilters(Connection connection) {
       String sql = "SELECT filter FROM macfilters";
-      return getList(connection, sql, ps -> {
-      }, rs -> {
-         List<String> filtered = new LinkedList<>();
-         while (rs.next()) {
-            filtered.add(rs.getString("filter"));
-         }
-         return filtered;
-      });
+      return getListNew(connection, sql, rs -> rs.getString("filter"));
    }
 }

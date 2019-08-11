@@ -5,6 +5,7 @@ import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.SavedLocationData;
+import client.database.utility.SavedLocationTransformer;
 
 public class SavedLocationProvider extends AbstractQueryExecutor {
    private static SavedLocationProvider instance;
@@ -21,7 +22,7 @@ public class SavedLocationProvider extends AbstractQueryExecutor {
 
    public List<SavedLocationData> getForCharacter(Connection connection, int characterId) {
       String sql = "SELECT `locationtype`,`map`,`portal` FROM savedlocations WHERE characterid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
-            rs -> new SavedLocationData(rs.getString("locationtype"), rs.getInt("map"), rs.getInt("portal")));
+      SavedLocationTransformer transformer = new SavedLocationTransformer();
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
    }
 }

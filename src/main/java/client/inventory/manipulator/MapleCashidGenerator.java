@@ -19,10 +19,6 @@
 */
 package client.inventory.manipulator;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,18 +33,6 @@ public class MapleCashidGenerator {
 
    private final static Set<Integer> existentCashids = new HashSet<>(10000);
    private static Integer runningCashid = 0;
-
-   private static void loadExistentCashIdsFromQuery(Connection con, String query) throws SQLException {
-      PreparedStatement ps = con.prepareStatement(query);
-      ResultSet rs = ps.executeQuery();
-
-      while (rs.next()) {
-         existentCashids.add(rs.getInt(1));
-      }
-
-      rs.close();
-      ps.close();
-   }
 
    public static synchronized void loadExistentCashIdsFromDb() {
       DatabaseConnection.withConnection(connection -> {

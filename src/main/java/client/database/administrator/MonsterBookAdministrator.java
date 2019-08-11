@@ -29,8 +29,7 @@ public class MonsterBookAdministrator extends AbstractQueryExecutor implements D
    //TODO - should this be a bulk insert? would it be more legible?
    public void save(Connection connection, int charId, Set<Map.Entry<Integer, Integer>> cardSet) {
       String sql = getSaveString(charId, cardSet);
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    private static String getSaveString(Integer charid, Set<Map.Entry<Integer, Integer>> cardSet) {

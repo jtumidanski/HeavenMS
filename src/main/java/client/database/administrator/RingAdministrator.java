@@ -18,6 +18,11 @@ public class RingAdministrator extends AbstractQueryExecutor {
    private RingAdministrator() {
    }
 
+   public void deleteRing(Connection connection, int ringId) {
+      String sql = "DELETE FROM rings WHERE id = ?";
+      execute(connection, sql, ps -> ps.setInt(1, ringId));
+   }
+
    public void deleteRing(Connection connection, int ringId, int partnerRingId) {
       String sql = "DELETE FROM rings WHERE id=?";
       batch(connection, sql, (ps, data) -> ps.setInt(1, data), Arrays.asList(ringId, partnerRingId));

@@ -39,7 +39,6 @@ public class HwidAccountAdministrator extends AbstractQueryExecutor {
 
    public void deleteExpired(Connection connection) {
       String sql = "DELETE FROM hwidaccounts WHERE expiresat < CURRENT_TIMESTAMP";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 }

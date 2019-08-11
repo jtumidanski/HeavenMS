@@ -23,18 +23,15 @@ public class ShopProvider extends AbstractQueryExecutor {
 
    public Optional<MapleShop> getById(Connection connection, int shopId) {
       String sql = "SELECT * FROM shops WHERE shopid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, shopId), this::processGetShopResultSet);
+      return getNew(connection, sql, ps -> ps.setInt(1, shopId), this::processGetShopResultSet);
    }
 
    public Optional<MapleShop> getByNPC(Connection connection, int npcId) {
       String sql = "SELECT * FROM shops WHERE npcid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, npcId), this::processGetShopResultSet);
+      return getNew(connection, sql, ps -> ps.setInt(1, npcId), this::processGetShopResultSet);
    }
 
-   private Optional<MapleShop> processGetShopResultSet(ResultSet rs) throws SQLException {
-      if (rs != null && rs.next()) {
-         return Optional.of(new MapleShop(rs.getInt("shopid"), rs.getInt("npcid")));
-      }
-      return Optional.empty();
+   private MapleShop processGetShopResultSet(ResultSet rs) throws SQLException {
+      return new MapleShop(rs.getInt("shopid"), rs.getInt("npcid"));
    }
 }

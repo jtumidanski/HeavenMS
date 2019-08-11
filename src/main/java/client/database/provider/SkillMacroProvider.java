@@ -5,6 +5,7 @@ import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.SkillMacroData;
+import client.database.utility.SkillMacroTransformer;
 
 public class SkillMacroProvider extends AbstractQueryExecutor {
    private static SkillMacroProvider instance;
@@ -21,7 +22,7 @@ public class SkillMacroProvider extends AbstractQueryExecutor {
 
    public List<SkillMacroData> getForCharacter(Connection connection, int characterId) {
       String sql = "SELECT * FROM skillmacros WHERE characterid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
-            rs -> new SkillMacroData(rs.getInt("position"), rs.getInt("skill1"), rs.getInt("skill2"), rs.getInt("skill3"), rs.getString("name"), rs.getInt("shout")));
+      SkillMacroTransformer transformer = new SkillMacroTransformer();
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
    }
 }

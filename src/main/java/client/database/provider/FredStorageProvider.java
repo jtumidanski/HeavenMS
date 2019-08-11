@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.FredStorageData;
+import client.database.utility.FredStorageDataTransformer;
 import client.processor.FredrickProcessor;
 
 public class FredStorageProvider extends AbstractQueryExecutor {
@@ -30,8 +31,7 @@ public class FredStorageProvider extends AbstractQueryExecutor {
 
    public List<FredStorageData> get(Connection connection) {
       String sql = "SELECT * FROM fredstorage f LEFT JOIN (SELECT id, name, world, lastLogoutTime FROM characters) AS c ON c.id = f.cid";
-      return getListNew(connection, sql, ps -> {
-      }, rs -> new FredStorageData(rs.getInt("cid"), rs.getString("name"), rs.getInt("world"),
-            rs.getTimestamp("timestamp"), rs.getInt("daynotes"), rs.getTimestamp("lastLogoutTime")));
+      FredStorageDataTransformer transformer = new FredStorageDataTransformer();
+      return getListNew(connection, sql, transformer::transform);
    }
 }

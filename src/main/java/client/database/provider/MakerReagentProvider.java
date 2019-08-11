@@ -21,11 +21,7 @@ public class MakerReagentProvider extends AbstractQueryExecutor {
 
    public Optional<MakerReagentData> getForItem(Connection connection, int itemId) {
       String sql = "SELECT stat, value FROM makerreagentdata WHERE itemid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, itemId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new MakerReagentData(rs.getString("stat"), rs.getInt("value")));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, ps -> ps.setInt(1, itemId),
+            rs -> new MakerReagentData(rs.getString("stat"), rs.getInt("value")));
    }
 }

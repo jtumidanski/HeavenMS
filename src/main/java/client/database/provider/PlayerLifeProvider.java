@@ -3,11 +3,11 @@ package client.database.provider;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.PlayerLifeData;
+import client.database.utility.PlayerLifeTransformer;
 import tools.Pair;
 
 public class PlayerLifeProvider extends AbstractQueryExecutor {
@@ -25,7 +25,7 @@ public class PlayerLifeProvider extends AbstractQueryExecutor {
 
    public List<Pair<Integer, Pair<Integer, Integer>>> get(Connection connection, int worldId, int mapId, String type, int lifeId) {
       String sql = "SELECT * FROM plife WHERE world = ? AND map = ? AND type LIKE ? AND life = ?";
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setInt(1, worldId);
          ps.setInt(2, mapId);
          ps.setString(3, type);
@@ -35,7 +35,7 @@ public class PlayerLifeProvider extends AbstractQueryExecutor {
 
    public List<Pair<Integer, Pair<Integer, Integer>>> get(Connection connection, int worldId, int mapId, String type, int xLower, int xUpper, int yLower, int yUpper) {
       String sql = "SELECT * FROM plife WHERE world = ? AND map = ? AND type LIKE ? AND x >= ? AND x <= ? AND y >= ? AND y <= ?";
-      return getList(connection, sql, ps -> {
+      return getListNew(connection, sql, ps -> {
          ps.setInt(1, worldId);
          ps.setInt(2, mapId);
          ps.setString(3, type);
@@ -48,30 +48,14 @@ public class PlayerLifeProvider extends AbstractQueryExecutor {
 
    public List<PlayerLifeData> getForMapAndWorld(Connection connection, int mapId, int worldId) {
       String sql = "SELECT * FROM plife WHERE map = ? and world = ?";
+      PlayerLifeTransformer transformer = new PlayerLifeTransformer();
       return getListNew(connection, sql, ps -> {
          ps.setInt(1, mapId);
          ps.setInt(2, worldId);
-      }, rs -> new PlayerLifeData(
-            rs.getInt("life"),
-            rs.getString("type"),
-            rs.getInt("cy"),
-            rs.getInt("f"),
-            rs.getInt("fh"),
-            rs.getInt("rx0"),
-            rs.getInt("rx1"),
-            rs.getInt("x"),
-            rs.getInt("y"),
-            rs.getInt("hide"),
-            rs.getInt("mobtime"),
-            rs.getInt("team")
-      ));
+      }, transformer::transform);
    }
 
-   private List<Pair<Integer, Pair<Integer, Integer>>> processPlayerLifeGet(ResultSet rs) throws SQLException {
-      List<Pair<Integer, Pair<Integer, Integer>>> results = new ArrayList<>();
-      while (rs != null && rs.next()) {
-         results.add(new Pair<>(rs.getInt("life"), new Pair<>(rs.getInt("x"), rs.getInt("y"))));
-      }
-      return results;
+   private Pair<Integer, Pair<Integer, Integer>> processPlayerLifeGet(ResultSet rs) throws SQLException {
+      return new Pair<>(rs.getInt("life"), new Pair<>(rs.getInt("x"), rs.getInt("y")));
    }
 }

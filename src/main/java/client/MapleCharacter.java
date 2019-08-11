@@ -25,11 +25,6 @@ package client;
 import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -69,6 +64,7 @@ import client.database.administrator.CoolDownAdministrator;
 import client.database.administrator.EventStatAdministrator;
 import client.database.administrator.FameLogAdministrator;
 import client.database.administrator.GuildAdministrator;
+import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
 import client.database.administrator.KeyMapAdministrator;
 import client.database.administrator.MedalMapAdministrator;
@@ -76,10 +72,12 @@ import client.database.administrator.MonsterBookAdministrator;
 import client.database.administrator.MtsCartAdministrator;
 import client.database.administrator.MtsItemAdministrator;
 import client.database.administrator.NoteAdministrator;
+import client.database.administrator.PetAdministrator;
 import client.database.administrator.PetIgnoreAdministrator;
 import client.database.administrator.PlayerDiseaseAdministrator;
 import client.database.administrator.QuestProgressAdministrator;
 import client.database.administrator.QuestStatusAdministrator;
+import client.database.administrator.RingAdministrator;
 import client.database.administrator.SavedLocationAdministrator;
 import client.database.administrator.ServerQueueAdministrator;
 import client.database.administrator.SkillAdministrator;
@@ -96,6 +94,7 @@ import client.database.provider.CoolDownProvider;
 import client.database.provider.EventStatProvider;
 import client.database.provider.FameLogProvider;
 import client.database.provider.FredStorageProvider;
+import client.database.provider.InventoryEquipmentProvider;
 import client.database.provider.InventoryItemProvider;
 import client.database.provider.KeyMapProvider;
 import client.database.provider.MedalMapProvider;
@@ -681,50 +680,19 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private static void cleanupInventoryEquipment(Connection connection, int cid) {
-      try (PreparedStatement ps = connection.prepareStatement("SELECT inventoryitemid, petid FROM inventoryitems WHERE characterid = ?")) {
-         ps.setInt(1, cid);
-
-         try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-               int inventoryitemid = rs.getInt("inventoryitemid");
-
-               try (PreparedStatement ps2 = connection.prepareStatement("SELECT ringid FROM inventoryequipment WHERE inventoryitemid = ?")) {
-                  ps2.setInt(1, inventoryitemid);
-
-                  try (ResultSet rs2 = ps2.executeQuery()) {
-                     while (rs2.next()) {
-                        int ringid = rs2.getInt("ringid");
-
-                        if (ringid > -1) {
-                           try (PreparedStatement ps3 = connection.prepareStatement("DELETE FROM rings WHERE id = ?")) {
-                              ps3.setInt(1, ringid);
-                              ps3.executeUpdate();
-                           }
-
-                           MapleCashidGenerator.freeCashId(ringid);
-                        }
-                     }
-                  }
-               }
-
-               try (PreparedStatement ps2 = connection.prepareStatement("DELETE FROM inventoryequipment WHERE inventoryitemid = ?")) {
-                  ps2.setInt(1, inventoryitemid);
-                  ps2.executeUpdate();
-               }
-
-               int petid = rs.getInt("petid");
-               if (petid > -1) {
-                  try (PreparedStatement ps2 = connection.prepareStatement("DELETE FROM pets WHERE petid = ?")) {
-                     ps2.setInt(1, petid);
-                     ps2.executeUpdate();
-                  }
-                  MapleCashidGenerator.freeCashId(petid);
-               }
-            }
+      InventoryItemProvider.getInstance().get(connection, cid).forEach(pair -> {
+         InventoryEquipmentProvider.getInstance().getRings(connection, pair.getLeft()).stream()
+               .filter(ringId -> ringId > 1)
+               .forEach(ringId -> {
+                  RingAdministrator.getInstance().deleteRing(connection, ringId);
+                  MapleCashidGenerator.freeCashId(ringId);
+               });
+         InventoryEquipmentAdministrator.getInstance().deleteById(connection, pair.getLeft());
+         if (pair.getRight() > -1) {
+            PetAdministrator.getInstance().deletePet(connection, pair.getRight());
+            MapleCashidGenerator.freeCashId(pair.getRight());
          }
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
+      });
    }
 
    private static void deleteQuestProgressWhereCharacterId(Connection con, int cid) {
@@ -2995,13 +2963,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       bl.remove(otherCid);
       client.announce(MaplePacketCreator.updateBuddylist(getBuddylist().getBuddies()));
       nextPendingRequest(client);
-   }
-
-   private void deleteWhereCharacterId(Connection con, String sql) throws SQLException {
-      try (PreparedStatement ps = con.prepareStatement(sql)) {
-         ps.setInt(1, id);
-         ps.executeUpdate();
-      }
    }
 
    private void stopChairTask() {

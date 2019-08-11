@@ -140,19 +140,6 @@ public class NewYearCardRecord {
    public static void removeAllNewYearCard(boolean send, MapleCharacter chr) {
       int cid = chr.getId();
 
-        /* not truly needed since it's going to be hard removed from the DB
-        String actor = (send ? "sender" : "receiver");
-
-        try (Connection con = DatabaseConnection.getConnection()) {
-            try (PreparedStatement ps = con.prepareStatement("UPDATE newyear SET " + actor + "id = 1, received = 0 WHERE " + actor + "id = ?")) {
-                ps.setInt(1, cid);
-                ps.executeUpdate();
-            }
-        } catch(SQLException sqle) {
-            sqle.printStackTrace();
-        }
-        */
-
       Set<NewYearCardRecord> set = new HashSet<>(chr.getNewYearRecords());
       for (NewYearCardRecord nyc : set) {
          if (send) {

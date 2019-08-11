@@ -136,8 +136,7 @@ public class AccountAdministrator extends AbstractQueryExecutor {
 
    public void logoutAllAccounts(Connection connection) {
       String sql = "UPDATE accounts SET loggedin = 0";
-      execute(connection, sql, ps -> {
-      });
+      executeNoParam(connection, sql);
    }
 
    public void saveNxInformation(Connection connection, int accountId, int nxCredit, int maplePoints, int nxPrepaid) {

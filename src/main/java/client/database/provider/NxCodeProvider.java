@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.NxCodeData;
+import client.database.utility.NxCodeTransformer;
 
 public class NxCodeProvider extends AbstractQueryExecutor {
    private static NxCodeProvider instance;
@@ -22,12 +23,8 @@ public class NxCodeProvider extends AbstractQueryExecutor {
 
    public Optional<NxCodeData> get(Connection connection, String code) {
       String sql = "SELECT * FROM nxcode WHERE code = ?";
-      return get(connection, sql, ps -> ps.setString(1, code), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new NxCodeData(rs.getString("retriever"), rs.getLong("expiration"), rs.getInt("id")));
-         }
-         return Optional.empty();
-      });
+      NxCodeTransformer transformer = new NxCodeTransformer();
+      return getNew(connection, sql, ps -> ps.setString(1, code), transformer::transform);
    }
 
    public List<Integer> getExpiredCodes(Connection connection, long time) {

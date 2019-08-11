@@ -1,11 +1,11 @@
 package client.database.provider;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.GiftData;
+import client.database.utility.GiftDataTransformer;
 
 public class GiftProvider extends AbstractQueryExecutor {
    private static GiftProvider instance;
@@ -22,12 +22,7 @@ public class GiftProvider extends AbstractQueryExecutor {
 
    public List<GiftData> getGiftsForCharacter(Connection connection, int characterId) {
       String sql = "SELECT * FROM `gifts` WHERE `to` = ?";
-      return getList(connection, sql, ps -> ps.setInt(1, characterId), rs -> {
-         List<GiftData> giftData = new ArrayList<>();
-         while (rs.next()) {
-            giftData.add(new GiftData(rs.getInt("sn"), rs.getInt("ringid"), rs.getString("message"), rs.getString("from")));
-         }
-         return giftData;
-      });
+      GiftDataTransformer transformer = new GiftDataTransformer();
+      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
    }
 }
