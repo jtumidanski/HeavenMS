@@ -23,14 +23,13 @@
 */
 package client.command.commands.gm1;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Objects;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import client.database.provider.DropDataProvider;
 import server.MapleItemInformationProvider;
 import server.life.MapleMonsterInformationProvider;
 import tools.DatabaseConnection;
@@ -53,38 +52,22 @@ public class WhoDropsCommand extends Command {
          try {
             String searchString = player.getLastCommandMessage();
             StringBuilder output = new StringBuilder();
-            Iterator<Pair<Integer, String>> listIterator = MapleItemInformationProvider.getInstance().getItemDataByName(searchString).iterator();
-            if (listIterator.hasNext()) {
-               int count = 1;
-               while (listIterator.hasNext() && count <= 3) {
-                  Pair<Integer, String> data = listIterator.next();
-                  output.append("#b").append(data.getRight()).append("#k is dropped by:\r\n");
-                  try {
-                     Connection con = DatabaseConnection.getConnection();
-                     PreparedStatement ps = con.prepareStatement("SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50");
-                     ps.setInt(1, data.getLeft());
-                     ResultSet rs = ps.executeQuery();
-                     while (rs.next()) {
-                        String resultName = MapleMonsterInformationProvider.getInstance().getMobNameFromId(rs.getInt("dropperid"));
-                        if (resultName != null) {
-                           output.append(resultName).append(", ");
-                        }
-                     }
-                     rs.close();
-                     ps.close();
-                     con.close();
-                  } catch (Exception e) {
-                     player.dropMessage(6, "There was a problem retrieving the required data. Please try again.");
-                     e.printStackTrace();
-                     return;
-                  }
-                  output.append("\r\n\r\n");
-                  count++;
-               }
-            } else {
+
+            ArrayList<Pair<Integer, String>> itemData = MapleItemInformationProvider.getInstance().getItemDataByName(searchString);
+            if (itemData.size() == 0) {
                player.dropMessage(5, "The item you searched for doesn't exist.");
                return;
             }
+
+            itemData.stream().limit(3).forEach(pair -> {
+               output.append("#b").append(pair.getRight()).append("#k is dropped by:\r\n");
+               DatabaseConnection.withConnectionResult(connection -> DropDataProvider.getInstance().getMonstersWhoDrop(connection, pair.getLeft()))
+                     .ifPresent(monsterIds -> monsterIds.stream()
+                           .map(id -> MapleMonsterInformationProvider.getInstance().getMobNameFromId(id))
+                           .filter(Objects::nonNull)
+                           .forEach(name -> output.append(name).append(", ")));
+               output.append("\r\n\r\n");
+            });
 
             c.getAbstractPlayerInteraction().npcTalk(9010000, output.toString());
          } finally {

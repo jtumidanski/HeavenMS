@@ -479,13 +479,8 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public boolean hasMerchantItems() {
-      try {
-         if (!ItemFactory.MERCHANT.loadItems(getPlayer().getId(), false).isEmpty()) {
-            return true;
-         }
-      } catch (SQLException e) {
-         e.printStackTrace();
-         return false;
+      if (!ItemFactory.MERCHANT.loadItems(getPlayer().getId(), false).isEmpty()) {
+         return true;
       }
       return getPlayer().getMerchantMeso() != 0;
    }

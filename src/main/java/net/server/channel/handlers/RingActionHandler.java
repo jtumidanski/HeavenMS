@@ -22,13 +22,13 @@
 package net.server.channel.handlers;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
+import client.database.administrator.CharacterAdministrator;
+import client.database.administrator.InventoryItemAdministrator;
+import client.database.provider.CharacterProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
@@ -131,55 +131,26 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
    }
 
    private static void eraseEngagementOffline(int characterId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         eraseEngagementOffline(characterId, con);
-         con.close();
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> eraseEngagementOffline(characterId, connection));
    }
 
-   private static void eraseEngagementOffline(int characterId, Connection con) throws SQLException {
-      PreparedStatement ps = con.prepareStatement("UPDATE characters SET marriageItemId=-1, partnerId=-1 WHERE id=?");
-      ps.setInt(1, characterId);
-      ps.executeUpdate();
-
-      ps.close();
+   private static void eraseEngagementOffline(int characterId, Connection con) {
+      CharacterAdministrator.getInstance().eraseEngagement(con, characterId);
    }
 
    private static void breakEngagementOffline(int characterId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT marriageItemId FROM characters WHERE id=?");
-         ps.setInt(1, characterId);
-         ResultSet rs = ps.executeQuery();
-         if (rs.next()) {
-            int marriageItemId = rs.getInt("marriageItemId");
-
-            if (marriageItemId > 0) {
-               PreparedStatement ps2 = con.prepareStatement("UPDATE inventoryitems SET expiration=0 WHERE itemid=? AND characterid=?");
-               ps2.setInt(1, marriageItemId);
-               ps2.setInt(2, characterId);
-
-               ps2.executeUpdate();
-               ps2.close();
-            }
-         }
-         rs.close();
-         ps.close();
-
-         eraseEngagementOffline(characterId, con);
-
-         con.close();
-      } catch (SQLException ex) {
-         System.out.println("Error updating offline breakup " + ex.getMessage());
-      }
+      DatabaseConnection.withConnection(connection -> {
+         CharacterProvider.getInstance().getMarriageItem(connection, characterId)
+               .ifPresent(itemId -> InventoryItemAdministrator.getInstance().expireItem(connection, itemId, characterId));
+         eraseEngagementOffline(characterId, connection);
+      });
    }
 
    private synchronized static void breakMarriage(MapleCharacter chr) {
       int partnerid = chr.getPartnerId();
-      if (partnerid <= 0) return;
+      if (partnerid <= 0) {
+         return;
+      }
 
       chr.getClient().getWorldServer().deleteRelationship(chr.getId(), partnerid);
       MapleRing.removeRing(chr.getMarriageRing());
@@ -390,48 +361,42 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
                return;
             }
 
-            try {
-               World wserv = c.getWorldServer();
-               Pair<Boolean, Boolean> registration = wserv.getMarriageQueuedLocation(marriageId);
+            World wserv = c.getWorldServer();
+            Pair<Boolean, Boolean> registration = wserv.getMarriageQueuedLocation(marriageId);
 
-               if (registration != null) {
-                  if (wserv.addMarriageGuest(marriageId, guest)) {
-                     boolean cathedral = registration.getLeft();
-                     int newItemId = cathedral ? 4031407 : 4031406;
+            if (registration != null) {
+               if (wserv.addMarriageGuest(marriageId, guest)) {
+                  boolean cathedral = registration.getLeft();
+                  int newItemId = cathedral ? 4031407 : 4031406;
 
-                     Channel cserv = c.getChannelServer();
-                     int resStatus = cserv.getWeddingReservationStatus(marriageId, cathedral);
-                     if (resStatus > 0) {
-                        long expiration = cserv.getWeddingTicketExpireTime(resStatus + 1);
+                  Channel cserv = c.getChannelServer();
+                  int resStatus = cserv.getWeddingReservationStatus(marriageId, cathedral);
+                  if (resStatus > 0) {
+                     long expiration = cserv.getWeddingTicketExpireTime(resStatus + 1);
 
-                        MapleCharacter guestChr = c.getWorldServer().getPlayerStorage().getCharacterById(guest).orElse(null);
-                        if (guestChr != null && MapleInventoryManipulator.checkSpace(guestChr.getClient(), newItemId, 1, "") && MapleInventoryManipulator.addById(guestChr.getClient(), newItemId, (short) 1, expiration)) {
-                           guestChr.dropMessage(6, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding!");
-                        } else {
-                           if (guestChr != null && guestChr.isLoggedinWorld()) {
-                              guestChr.dropMessage(6, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!");
-                           } else {
-                              c.getPlayer().sendNote(name, "You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!", (byte) 0);
-                           }
-
-                           Item weddingTicket = new Item(newItemId, (short) 0, (short) 1);
-                           weddingTicket.setExpiration(expiration);
-
-                           DueyProcessor.dueyCreatePackage(weddingTicket, 0, groom, guest);
-                        }
+                     MapleCharacter guestChr = c.getWorldServer().getPlayerStorage().getCharacterById(guest).orElse(null);
+                     if (guestChr != null && MapleInventoryManipulator.checkSpace(guestChr.getClient(), newItemId, 1, "") && MapleInventoryManipulator.addById(guestChr.getClient(), newItemId, (short) 1, expiration)) {
+                        guestChr.dropMessage(6, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding!");
                      } else {
-                        c.getPlayer().dropMessage(5, "Wedding is already under way. You cannot invite any more guests for the event.");
+                        if (guestChr != null && guestChr.isLoggedinWorld()) {
+                           guestChr.dropMessage(6, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!");
+                        } else {
+                           c.getPlayer().sendNote(name, "You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!", (byte) 0);
+                        }
+
+                        Item weddingTicket = new Item(newItemId, (short) 0, (short) 1);
+                        weddingTicket.setExpiration(expiration);
+
+                        DueyProcessor.dueyCreatePackage(weddingTicket, 0, groom, guest);
                      }
                   } else {
-                     c.getPlayer().dropMessage(5, "'" + name + "' is already invited for your marriage.");
+                     c.getPlayer().dropMessage(5, "Wedding is already under way. You cannot invite any more guests for the event.");
                   }
                } else {
-                  c.getPlayer().dropMessage(5, "Invitation was not sent to '" + name + "'. Either the time for your marriage reservation already came or it was not found.");
+                  c.getPlayer().dropMessage(5, "'" + name + "' is already invited for your marriage.");
                }
-
-            } catch (SQLException ex) {
-               ex.printStackTrace();
-               return;
+            } else {
+               c.getPlayer().dropMessage(5, "Invitation was not sent to '" + name + "'. Either the time for your marriage reservation already came or it was not found.");
             }
 
             c.getAbstractPlayerInteraction().gainItem(itemId, (short) -1);

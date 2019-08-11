@@ -42,14 +42,10 @@ public final class HiredMerchantRequest extends AbstractMaplePacketHandler {
       MapleCharacter chr = c.getPlayer();
       if (chr.getMap().getMapObjectsInRange(chr.getPosition(), 23000, Collections.singletonList(MapleMapObjectType.HIRED_MERCHANT)).isEmpty() && (GameConstants.isFreeMarketRoom(chr.getMapId()))) {
          if (!chr.hasMerchant()) {
-            try {
-               if (ItemFactory.MERCHANT.loadItems(chr.getId(), false).isEmpty() && chr.getMerchantMeso() == 0) {
-                  c.announce(MaplePacketCreator.hiredMerchantBox());
-               } else {
-                  chr.announce(MaplePacketCreator.retrieveFirstMessage());
-               }
-            } catch (SQLException ex) {
-               ex.printStackTrace();
+            if (ItemFactory.MERCHANT.loadItems(chr.getId(), false).isEmpty() && chr.getMerchantMeso() == 0) {
+               c.announce(MaplePacketCreator.hiredMerchantBox());
+            } else {
+               chr.announce(MaplePacketCreator.retrieveFirstMessage());
             }
          } else {
             chr.dropMessage(1, "You already have a store open.");

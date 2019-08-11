@@ -24,15 +24,13 @@ package server.maps;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import client.database.provider.PlayerLifeProvider;
+import client.database.provider.PlayerNpcProvider;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -89,36 +87,14 @@ public class MapleMapFactory {
    }
 
    private static void loadLifeFromDb(MapleMap map) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT * FROM plife WHERE map = ? and world = ?");
-         ps.setInt(1, map.getId());
-         ps.setInt(2, map.getWorld());
-
-         ResultSet rs = ps.executeQuery();
-         while (rs.next()) {
-            int id = rs.getInt("life");
-            String type = rs.getString("type");
-            int cy = rs.getInt("cy");
-            int f = rs.getInt("f");
-            int fh = rs.getInt("fh");
-            int rx0 = rs.getInt("rx0");
-            int rx1 = rs.getInt("rx1");
-            int x = rs.getInt("x");
-            int y = rs.getInt("y");
-            int hide = rs.getInt("hide");
-            int mobTime = rs.getInt("mobtime");
-            int team = rs.getInt("team");
-
-            loadLifeRaw(map, id, type, cy, f, fh, rx0, rx1, x, y, hide, mobTime, team);
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection ->
+            PlayerLifeProvider.getInstance().getForMapAndWorld(connection, map.getId(), map.getWorld())
+                  .forEach(playerLifeData -> loadLifeRaw(map, playerLifeData.getLifeId(), playerLifeData.getType(),
+                        playerLifeData.getCy(),
+                        playerLifeData.getF(), playerLifeData.getFh(), playerLifeData.getRx0(), playerLifeData.getRx1(),
+                        playerLifeData.getX(), playerLifeData.getY(), playerLifeData.getHide(),
+                        playerLifeData.getMobTime(), playerLifeData.getTeam())
+                  ));
    }
 
    private static void loadLifeRaw(MapleMap map, int id, String type, int cy, int f, int fh, int rx0, int rx1, int x, int y, int hide, int mobTime, int team) {
@@ -248,22 +224,7 @@ public class MapleMapFactory {
          map.setSeats(seats);
       }
       if (event == null) {
-         try {
-            Connection con = DatabaseConnection.getConnection();
-            try (PreparedStatement ps = con.prepareStatement("SELECT * FROM playernpcs WHERE map = ? AND world = ?")) {
-               ps.setInt(1, mapid);
-               ps.setInt(2, world);
-               try (ResultSet rs = ps.executeQuery()) {
-                  while (rs.next()) {
-                     map.addPlayerNPCMapObject(new MaplePlayerNPC(rs));
-                  }
-               }
-            }
-            con.close();
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
-
+         DatabaseConnection.withConnection(connection -> PlayerNpcProvider.getInstance().getForMapAndWorld(connection, mapid, world).forEach(map::addPlayerNPCMapObject));
          List<MaplePlayerNPC> dnpcs = MaplePlayerNPCFactory.getDeveloperNpcsFromMapid(mapid);
          if (dnpcs != null) {
             for (MaplePlayerNPC dnpc : dnpcs) {

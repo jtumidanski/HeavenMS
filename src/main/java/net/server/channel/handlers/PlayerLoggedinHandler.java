@@ -21,9 +21,6 @@
  */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -46,6 +43,8 @@ import client.MapleDisease;
 import client.MapleFamily;
 import client.MapleKeyBinding;
 import client.SkillFactory;
+import client.database.administrator.DueyPackageAdministrator;
+import client.database.provider.DueyPackageProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -79,49 +78,12 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
    private static Set<Integer> attemptingLoginAccounts = new HashSet<>();
 
    private void showDueyNotification(MapleClient c, MapleCharacter player) {
-      Connection con = null;
-      PreparedStatement ps = null;
-      PreparedStatement pss = null;
-      ResultSet rs = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         ps = con.prepareStatement("SELECT Type FROM dueypackages WHERE ReceiverId = ? AND Checked = 1 ORDER BY Type DESC");
-         ps.setInt(1, player.getId());
-         rs = ps.executeQuery();
-         if (rs.next()) {
-            try {
-               Connection con2 = DatabaseConnection.getConnection();
-               pss = con2.prepareStatement("UPDATE dueypackages SET Checked = 0 WHERE ReceiverId = ?");
-               pss.setInt(1, player.getId());
-               pss.executeUpdate();
-               pss.close();
-               con2.close();
-
-               c.announce(MaplePacketCreator.sendDueyParcelNotification(rs.getInt("Type") == 1));
-            } catch (SQLException e) {
-               e.printStackTrace();
-            }
-         }
-      } catch (SQLException e) {
-         e.printStackTrace();
-      } finally {
-         try {
-            if (rs != null) {
-               rs.close();
-            }
-            if (pss != null) {
-               pss.close();
-            }
-            if (ps != null) {
-               ps.close();
-            }
-            if (con != null) {
-               con.close();
-            }
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }
-      }
+      DatabaseConnection.withConnection(connection ->
+            DueyPackageProvider.getInstance().getPackageTypeForCharacter(connection, player.getId())
+                  .ifPresent(type -> {
+                     DueyPackageAdministrator.getInstance().uncheck(connection, player.getId());
+                     c.announce(MaplePacketCreator.sendDueyParcelNotification(type == 1));
+                  }));
    }
 
    private static List<Pair<Long, PlayerBuffValueHolder>> getLocalStartTimes(List<PlayerBuffValueHolder> lpbvl) {
@@ -200,12 +162,8 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
                   return;
                }
 
-               try {
-                  player = MapleCharacter.loadCharFromDB(cid, c, true);
-                  newcomer = true;
-               } catch (SQLException e) {
-                  e.printStackTrace();
-               }
+               player = MapleCharacter.loadCharFromDB(cid, c, true);
+               newcomer = true;
             } else {
                remoteHwid = player.getClient().getHWID();
             }

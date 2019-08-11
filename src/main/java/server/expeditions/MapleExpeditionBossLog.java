@@ -19,15 +19,15 @@
 */
 package server.expeditions;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
+import client.database.administrator.BossLogDailyAdministrator;
+import client.database.administrator.BossLogWeeklyAdministrator;
+import client.database.provider.BossLogDailyProvider;
+import client.database.provider.BossLogWeeklyProvider;
 import constants.ServerConstants;
 import tools.DatabaseConnection;
 import tools.Pair;
@@ -73,21 +73,13 @@ public class MapleExpeditionBossLog {
    private static void resetBossLogTable(boolean week, Calendar c) {
       List<Pair<Timestamp, BossLogEntry>> resetTimestamps = BossLogEntry.getBossLogResetTimestamps(c, week);
 
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
-         for (Pair<Timestamp, BossLogEntry> p : resetTimestamps) {
-            PreparedStatement ps = con.prepareStatement("DELETE FROM " + getBossLogTable(week) + " WHERE attempttime <= ? AND bosstype LIKE ?");
-            ps.setTimestamp(1, p.getLeft());
-            ps.setString(2, p.getRight().name());
-            ps.executeUpdate();
-            ps.close();
+      DatabaseConnection.withConnection(connection -> resetTimestamps.forEach(pair -> {
+         if (week) {
+            BossLogWeeklyAdministrator.getInstance().deleteByAttemptTimeAndBossType(connection, pair.getLeft(), pair.getRight().name());
+         } else {
+            BossLogDailyAdministrator.getInstance().deleteByAttemptTimeAndBossType(connection, pair.getLeft(), pair.getRight().name());
          }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      }));
    }
 
    private static String getBossLogTable(boolean week) {
@@ -95,41 +87,23 @@ public class MapleExpeditionBossLog {
    }
 
    private static int countPlayerEntries(int cid, BossLogEntry boss) {
-      int ret_count = 0;
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps;
-         ps = con.prepareStatement("SELECT COUNT(*) FROM " + getBossLogTable(boss.week) + " WHERE characterid = ? AND bosstype LIKE ?");
-         ps.setInt(1, cid);
-         ps.setString(2, boss.name());
-         ResultSet rs = ps.executeQuery();
-         if (rs.next()) {
-            ret_count = rs.getInt(1);
+      return DatabaseConnection.withConnectionResult(connection -> {
+         if (boss.week) {
+            return BossLogWeeklyProvider.getInstance().countEntriesForCharacter(connection, cid, boss.name());
          } else {
-            ret_count = -1;
+            return BossLogDailyProvider.getInstance().countEntriesForCharacter(connection, cid, boss.name());
          }
-         rs.close();
-         ps.close();
-         con.close();
-         return ret_count;
-      } catch (SQLException e) {
-         e.printStackTrace();
-         return -1;
-      }
+      }).orElse(-1);
    }
 
    private static void insertPlayerEntry(int cid, BossLogEntry boss) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("INSERT INTO " + getBossLogTable(boss.week) + " (characterid, bosstype) VALUES (?,?)");
-         ps.setInt(1, cid);
-         ps.setString(2, boss.name());
-         ps.executeUpdate();
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         if (boss.week) {
+            BossLogWeeklyAdministrator.getInstance().addAttempt(connection, cid, boss.name());
+         } else {
+            BossLogDailyAdministrator.getInstance().addAttempt(connection, cid, boss.name());
+         }
+      });
    }
 
    public static boolean attemptBoss(int cid, int channel, MapleExpedition exped, boolean log) {

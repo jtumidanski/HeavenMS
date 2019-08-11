@@ -23,12 +23,13 @@
 */
 package client.command.commands.gm3;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import client.database.administrator.AccountAdministrator;
+import client.database.provider.AccountProvider;
+import client.database.administrator.IpBanAdministrator;
+import client.database.administrator.MacBanAdministrator;
 import tools.DatabaseConnection;
 
 public class UnBanCommand extends Command {
@@ -44,25 +45,12 @@ public class UnBanCommand extends Command {
          return;
       }
 
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         int aid = MapleCharacter.getAccountIdByName(params[0]);
-
-         PreparedStatement p = con.prepareStatement("UPDATE accounts SET banned = -1 WHERE id = " + aid);
-         p.executeUpdate();
-
-         p = con.prepareStatement("DELETE FROM ipbans WHERE aid = " + aid);
-         p.executeUpdate();
-
-         p = con.prepareStatement("DELETE FROM macbans WHERE aid = " + aid);
-         p.executeUpdate();
-
-         con.close();
-      } catch (Exception e) {
-         e.printStackTrace();
-         player.message("Failed to unban " + params[0]);
-         return;
-      }
+      DatabaseConnection.withConnection(connection -> {
+         int aid = AccountProvider.getInstance().getAccountIdForName(connection, params[0]);
+         AccountAdministrator.getInstance().removePermaBan(connection, aid);
+         IpBanAdministrator.getInstance().removeIpBan(connection, aid);
+         MacBanAdministrator.getInstance().removeMacBan(connection, aid);
+      });
       player.message("Unbanned " + params[0]);
    }
 }

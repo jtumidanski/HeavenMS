@@ -26,9 +26,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.Security;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -60,9 +57,21 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.SkillFactory;
 import client.command.CommandsExecutor;
+import client.database.administrator.AccountAdministrator;
+import client.database.administrator.CharacterAdministrator;
+import client.database.administrator.NxCodeAdministrator;
+import client.database.administrator.NxCodeItemAdministrator;
+import client.database.administrator.PetAdministrator;
+import client.database.data.CharacterData;
+import client.database.data.WorldRankData;
+import client.database.provider.AccountProvider;
+import client.database.provider.CharacterProvider;
+import client.database.provider.GlobalUserRankProvider;
+import client.database.provider.NxCodeProvider;
+import client.database.provider.NxCouponProvider;
+import client.database.provider.PlayerNpcFieldProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
-import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleCashidGenerator;
 import client.newyear.NewYearCardRecord;
 import constants.GameConstants;
@@ -123,7 +132,7 @@ public class Server {
    private final Map<Integer, NewYearCardRecord> newyears = new HashMap<>();
    private final List<MapleClient> processDiseaseAnnouncePlayers = new LinkedList<>();
    private final List<MapleClient> registeredDiseaseAnnouncePlayers = new LinkedList<>();
-   private final List<List<Pair<String, Integer>>> playerRanking = new LinkedList<>();
+   private final List<WorldRankData> playerRanking = new LinkedList<>();
    private final Lock srvLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER);
    private final Lock disLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_DISEASES);
    private final ReentrantReadWriteLock wldLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_WORLDS, true);
@@ -185,103 +194,30 @@ public class Server {
       return Math.max(0, nextDay.getTimeInMillis() - System.currentTimeMillis());
    }
 
-   public static void cleanNxcodeCoupons(Connection con) throws SQLException {
+   public static void cleanNxcodeCoupons(Connection con) {
       if (!ServerConstants.USE_CLEAR_OUTDATED_COUPONS) {
          return;
       }
 
       long timeClear = System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000;
 
-      PreparedStatement ps = con.prepareStatement("SELECT * FROM nxcode WHERE expiration <= ?");
-      ps.setLong(1, timeClear);
-      ResultSet rs = ps.executeQuery();
-
-      if (!rs.isLast()) {
-         PreparedStatement ps2 = con.prepareStatement("DELETE FROM nxcode_items WHERE codeid = ?");
-         while (rs.next()) {
-            ps2.setInt(1, rs.getInt("id"));
-            ps2.addBatch();
-         }
-         ps2.executeBatch();
-         ps2.close();
-
-         ps2 = con.prepareStatement("DELETE FROM nxcode WHERE expiration <= ?");
-         ps2.setLong(1, timeClear);
-         ps2.executeUpdate();
-         ps2.close();
-      }
-
-      rs.close();
-      ps.close();
+      List<Integer> expiredCodes = NxCodeProvider.getInstance().getExpiredCodes(con, timeClear);
+      NxCodeItemAdministrator.getInstance().deleteItems(con, expiredCodes);
+      NxCodeAdministrator.getInstance().deleteExpired(con, timeClear);
    }
 
-   private static List<Pair<Integer, List<Pair<String, Integer>>>> updatePlayerRankingFromDB(int worldid) {
-      List<Pair<Integer, List<Pair<String, Integer>>>> rankSystem = new ArrayList<>();
-      List<Pair<String, Integer>> rankUpdate = new ArrayList<>(0);
-
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-
-         String worldQuery;
+   private static List<WorldRankData> updatePlayerRankingFromDB(int worldId) {
+      return DatabaseConnection.withConnectionResult(connection -> {
          if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
-            if (worldid >= 0) {
-               worldQuery = (" AND `characters`.`world` = " + worldid);
+            if (worldId >= 0) {
+               return GlobalUserRankProvider.getInstance().getWorldRanks(connection, worldId);
             } else {
-               worldQuery = (" AND `characters`.`world` >= 0 AND `characters`.`world` <= " + -worldid);
+               return GlobalUserRankProvider.getInstance().getWorldRanksRange(connection, -worldId);
             }
          } else {
-            worldQuery = (" AND `characters`.`world` >= 0 AND `characters`.`world` <= " + Math.abs(worldid));
+            return GlobalUserRankProvider.getInstance().getRanksWholeServer(connection, worldId);
          }
-
-         ps = con.prepareStatement("SELECT `characters`.`name`, `characters`.`level`, `characters`.`world` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` < 2 AND `accounts`.`banned` = '0'" + worldQuery + " ORDER BY " + (!ServerConstants.USE_WHOLE_SERVER_RANKING ? "world, " : "") + "level DESC, exp DESC, lastExpGainTime ASC LIMIT 50");
-         rs = ps.executeQuery();
-
-         if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
-            int currentWorld = -1;
-            while (rs.next()) {
-               int rsWorld = rs.getInt("world");
-               if (currentWorld < rsWorld) {
-                  currentWorld = rsWorld;
-                  rankUpdate = new ArrayList<>(50);
-                  rankSystem.add(new Pair<>(rsWorld, rankUpdate));
-               }
-
-               rankUpdate.add(new Pair<>(rs.getString("name"), rs.getInt("level")));
-            }
-         } else {
-            rankUpdate = new ArrayList<>(50);
-            rankSystem.add(new Pair<>(0, rankUpdate));
-
-            while (rs.next()) {
-               rankUpdate.add(new Pair<>(rs.getString("name"), rs.getInt("level")));
-            }
-         }
-
-         ps.close();
-         rs.close();
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (rs != null && !rs.isClosed()) {
-               rs.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
-      }
-
-      return rankSystem;
+      }).orElse(new ArrayList<>());
    }
 
    public static void main(String[] args) {
@@ -298,45 +234,34 @@ public class Server {
 
       List<MapleCharacter> chars = new LinkedList<>();
       int curWorld = 0;
-      try {
-         List<Pair<Item, Integer>> accEquips = ItemFactory.loadEquippedItems(accId, true, true);
-         Map<Integer, List<Item>> accPlayerEquips = new HashMap<>();
+      List<Pair<Item, Integer>> accEquips = ItemFactory.loadEquippedItems(accId, true, true);
+      Map<Integer, List<Item>> accPlayerEquips = new HashMap<>();
 
-         for (Pair<Item, Integer> ae : accEquips) {
-            List<Item> playerEquips = accPlayerEquips.computeIfAbsent(ae.getRight(), k -> new LinkedList<>());
-            playerEquips.add(ae.getLeft());
-         }
-
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM characters WHERE accountid = ? ORDER BY world, id")) {
-            ps.setInt(1, accId);
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  characterCount++;
-
-                  int cworld = rs.getByte("world");
-                  if (cworld >= wlen) {
-                     continue;
-                  }
-
-                  if (cworld > curWorld) {
-                     wchars.add(curWorld, chars);
-
-                     curWorld = cworld;
-                     chars = new LinkedList<>();
-                  }
-
-                  Integer cid = rs.getInt("id");
-                  chars.add(MapleCharacter.loadCharacterEntryFromDB(rs, accPlayerEquips.get(cid)));
-               }
-            }
-         }
-         con.close();
-
-         wchars.add(curWorld, chars);
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
+      for (Pair<Item, Integer> ae : accEquips) {
+         List<Item> playerEquips = accPlayerEquips.computeIfAbsent(ae.getRight(), k -> new LinkedList<>());
+         playerEquips.add(ae.getLeft());
       }
+
+      List<CharacterData> characterDataList = DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getByAccountId(connection, accId)).orElse(new ArrayList<>());
+      for (CharacterData characterData : characterDataList) {
+         characterCount++;
+
+         int cworld = characterData.getWorld();
+         if (cworld >= wlen) {
+            continue;
+         }
+
+         if (cworld > curWorld) {
+            wchars.add(curWorld, chars);
+
+            curWorld = cworld;
+            chars = new LinkedList<>();
+         }
+
+         chars.add(MapleCharacter.loadCharacterEntryFromDB(characterData, accPlayerEquips.get(characterData.getId())));
+      }
+
+      wchars.add(curWorld, chars);
 
       return new Pair<>(characterCount, wchars);
    }
@@ -394,28 +319,12 @@ public class Server {
    }
 
    private void loadPlayerNpcMapStepFromDb() {
-      try {
-         List<World> wlist = this.getWorlds();
-
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT * FROM playernpcs_field");
-
-         ResultSet rs = ps.executeQuery();
-         while (rs.next()) {
-            int world = rs.getInt("world"), map = rs.getInt("map"), step = rs.getInt("step"), podium = rs.getInt("podium");
-
-            World w = wlist.get(world);
-            if (w != null) {
-               w.setPlayerNpcMapData(map, step, podium);
-            }
+      DatabaseConnection.withConnection(connection -> PlayerNpcFieldProvider.getInstance().get(connection).forEach(fieldData -> {
+         World world = getWorld(fieldData.getWorldId());
+         if (world != null) {
+            world.setPlayerNpcMapData(fieldData.getMapId(), fieldData.getStep(), fieldData.getPodium());
          }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      }));
    }
 
    public World getWorld(int id) {
@@ -704,19 +613,8 @@ public class Server {
       return couponRates;
    }
 
-   private void loadCouponRates(Connection c) throws SQLException {
-      PreparedStatement ps = c.prepareStatement("SELECT couponid, rate FROM nxcoupons");
-      ResultSet rs = ps.executeQuery();
-
-      while (rs.next()) {
-         int cid = rs.getInt("couponid");
-         int rate = rs.getInt("rate");
-
-         couponRates.put(cid, rate);
-      }
-
-      rs.close();
-      ps.close();
+   private void loadCouponRates(Connection c) {
+      NxCouponProvider.getInstance().getCoupons(c).forEach(coupon -> couponRates.put(coupon.getCouponId(), coupon.getRate()));
    }
 
    public List<Integer> getActiveCoupons() {
@@ -751,45 +649,11 @@ public class Server {
       }
    }
 
-   public void updateActiveCoupons() throws SQLException {
+   public void updateActiveCoupons() {
       synchronized (activeCoupons) {
          activeCoupons.clear();
-         Calendar c = Calendar.getInstance();
-
-         int weekDay = c.get(Calendar.DAY_OF_WEEK);
-         int hourDay = c.get(Calendar.HOUR_OF_DAY);
-
-         Connection con = null;
-         try {
-            con = DatabaseConnection.getConnection();
-
-            int weekdayMask = (1 << weekDay);
-            PreparedStatement ps = con.prepareStatement("SELECT couponid FROM nxcoupons WHERE (activeday & ?) = ? AND starthour <= ? AND endhour > ?");
-            ps.setInt(1, weekdayMask);
-            ps.setInt(2, weekdayMask);
-            ps.setInt(3, hourDay);
-            ps.setInt(4, hourDay);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-               activeCoupons.add(rs.getInt("couponid"));
-            }
-
-            rs.close();
-            ps.close();
-
-            con.close();
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-
-            try {
-               if (con != null && !con.isClosed()) {
-                  con.close();
-               }
-            } catch (SQLException ex2) {
-               ex2.printStackTrace();
-            }
-         }
+         DatabaseConnection.withConnectionResult(connection -> NxCouponProvider.getInstance().getActiveCoupons(connection))
+               .ifPresent(result -> result.forEach(coupon -> activeCoupons.add(coupon.getCouponId())));
       }
    }
 
@@ -832,29 +696,22 @@ public class Server {
       }
    }
 
-   public List<Pair<String, Integer>> getWorldPlayerRanking(int worldid) {
+   public WorldRankData getWorldPlayerRanking(int worldId) {
       wldRLock.lock();
       try {
-         return new ArrayList<>(playerRanking.get(!ServerConstants.USE_WHOLE_SERVER_RANKING ? worldid : 0));
+         return playerRanking.get(!ServerConstants.USE_WHOLE_SERVER_RANKING ? worldId : 0);
       } finally {
          wldRLock.unlock();
       }
    }
 
-   private void installWorldPlayerRanking(int worldid) {
-      List<Pair<Integer, List<Pair<String, Integer>>>> ranking = updatePlayerRankingFromDB(worldid);
+   private void installWorldPlayerRanking(int worldId) {
+      List<WorldRankData> ranking = updatePlayerRankingFromDB(worldId);
       if (!ranking.isEmpty()) {
          wldWLock.lock();
          try {
-            if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
-               for (int i = playerRanking.size(); i <= worldid; i++) {
-                  playerRanking.add(new ArrayList<>(0));
-               }
-
-               playerRanking.add(worldid, ranking.get(0).getRight());
-            } else {
-               playerRanking.add(0, ranking.get(0).getRight());
-            }
+            playerRanking.clear();
+            playerRanking.addAll(ranking);
          } finally {
             wldWLock.unlock();
          }
@@ -869,16 +726,15 @@ public class Server {
                return;
             }
 
-            playerRanking.remove(playerRanking.size() - 1);
+            playerRanking.clear();
          } finally {
             wldWLock.unlock();
          }
       } else {
-         List<Pair<Integer, List<Pair<String, Integer>>>> ranking = updatePlayerRankingFromDB(-1 * (this.getWorldsSize() - 2));  // update ranking list
-
+         List<WorldRankData> ranking = updatePlayerRankingFromDB(-1 * (this.getWorldsSize() - 2));  // update ranking list
          wldWLock.lock();
          try {
-            playerRanking.add(0, ranking.get(0).getRight());
+            playerRanking.addAll(ranking);
          } finally {
             wldWLock.unlock();
          }
@@ -886,21 +742,12 @@ public class Server {
    }
 
    public void updateWorldPlayerRanking() {
-      List<Pair<Integer, List<Pair<String, Integer>>>> rankUpdates = updatePlayerRankingFromDB(-1 * (this.getWorldsSize() - 1));
+      List<WorldRankData> rankUpdates = updatePlayerRankingFromDB(-1 * (this.getWorldsSize() - 1));
       if (!rankUpdates.isEmpty()) {
          wldWLock.lock();
          try {
-            if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
-               for (int i = playerRanking.size(); i <= rankUpdates.get(rankUpdates.size() - 1).getLeft(); i++) {
-                  playerRanking.add(new ArrayList<>(0));
-               }
-
-               for (Pair<Integer, List<Pair<String, Integer>>> wranks : rankUpdates) {
-                  playerRanking.set(wranks.getLeft(), wranks.getRight());
-               }
-            } else {
-               playerRanking.set(0, rankUpdates.get(0).getRight());
-            }
+            playerRanking.clear();
+            playerRanking.addAll(rankUpdates);
          } finally {
             wldWLock.unlock();
          }
@@ -909,10 +756,18 @@ public class Server {
 
    private void initWorldPlayerRanking() {
       if (ServerConstants.USE_WHOLE_SERVER_RANKING) {
-         playerRanking.add(new ArrayList<>(0));
+         playerRanking.add(new WorldRankData(0));
       }
       updateWorldPlayerRanking();
    }
+
+   private void clearMissingPetsFromDb() {
+      DatabaseConnection.withConnection(connection -> {
+         PetAdministrator.getInstance().unreferenceMissingPetsFromInventory(connection);
+         PetAdministrator.getInstance().deleteMissingPets(connection);
+      });
+   }
+
 
    public void init() {
       Properties p = loadWorldINI();
@@ -928,26 +783,15 @@ public class Server {
 
       TimeZone.setDefault(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
 
-      Connection c = null;
-      try {
-         c = DatabaseConnection.getConnection();
-         PreparedStatement ps = c.prepareStatement("UPDATE accounts SET loggedin = 0");
-         ps.executeUpdate();
-         ps.close();
-         ps = c.prepareStatement("UPDATE characters SET HasMerchant = 0");
-         ps.executeUpdate();
-         ps.close();
-
-         cleanNxcodeCoupons(c);
-         loadCouponRates(c);
+      DatabaseConnection.withConnection(connection -> {
+         AccountAdministrator.getInstance().logoutAllAccounts(connection);
+         CharacterAdministrator.getInstance().removeAllMerchants(connection);
+         cleanNxcodeCoupons(connection);
+         loadCouponRates(connection);
          updateActiveCoupons();
+      });
 
-         c.close();
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
-
-      MaplePet.clearMissingPetsFromDb();
+      clearMissingPetsFromDb();
       MapleCashidGenerator.loadExistentCashIdsFromDb();
 
       IoBuffer.setUseDirectBuffer(false);
@@ -1547,24 +1391,12 @@ public class Server {
    }
 
    public void loadAllAccountsCharactersView() {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT id FROM accounts");
-         ResultSet rs = ps.executeQuery();
-
-         while (rs.next()) {
-            int accountId = rs.getInt("id");
-            if (isFirstAccountLogin(accountId)) {
-               loadAccountCharactersView(accountId, 0, 0);
-            }
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> AccountProvider.getInstance().getAllAccountIds(connection)
+            .forEach(accountId -> {
+               if (isFirstAccountLogin(accountId)) {
+                  loadAccountCharactersView(accountId, 0, 0);
+               }
+            }));
    }
 
    private boolean isFirstAccountLogin(Integer accId) {

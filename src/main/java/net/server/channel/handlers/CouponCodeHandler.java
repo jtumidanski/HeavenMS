@@ -24,18 +24,22 @@
 package net.server.channel.handlers;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.NxCodeAdministrator;
+import client.database.data.NxCodeData;
+import client.database.data.NxCodeItemData;
+import client.database.provider.NxCodeItemProvider;
+import client.database.provider.NxCodeProvider;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import net.AbstractMaplePacketHandler;
@@ -54,28 +58,19 @@ import tools.data.input.SeekableLittleEndianAccessor;
  */
 public final class CouponCodeHandler extends AbstractMaplePacketHandler {
 
-   private static List<Pair<Integer, Pair<Integer, Integer>>> getNXCodeItems(MapleCharacter chr, Connection con, int codeid) throws SQLException {
+   private static List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, Connection con, int codeid) {
       Map<Integer, Integer> couponItems = new HashMap<>();
       Map<Integer, Integer> couponPoints = new HashMap<>(5);
 
-      PreparedStatement ps = con.prepareStatement("SELECT * FROM nxcode_items WHERE codeid = ?");
-      ps.setInt(1, codeid);
-
-      ResultSet rs = ps.executeQuery();
-      while (rs.next()) {
-         int type = rs.getInt("type"), quantity = rs.getInt("quantity");
-         if (type < 5) {
-            couponPoints.merge(type, quantity, Integer::sum);
+      NxCodeItemProvider.getInstance().get(con, codeid).forEach(item -> {
+         if (item.getType() < 5) {
+            couponPoints.merge(item.getType(), item.getQuantity(), Integer::sum);
          } else {
-            int item = rs.getInt("item");
-            couponItems.merge(item, quantity, Integer::sum);
+            couponItems.merge(item.getItemId(), item.getQuantity(), Integer::sum);
          }
-      }
+      });
 
-      rs.close();
-      ps.close();
-
-      List<Pair<Integer, Pair<Integer, Integer>>> ret = new LinkedList<>();
+      List<NxCodeItemData> ret = new LinkedList<>();
       if (!couponItems.isEmpty()) {
          for (Entry<Integer, Integer> e : couponItems.entrySet()) {
             int item = e.getKey(), qty = e.getValue();
@@ -91,66 +86,57 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
                return null;
             }
 
-            ret.add(new Pair<>(5, new Pair<>(item, qty)));
+            ret.add(new NxCodeItemData(5, qty, item));
          }
       }
 
       if (!couponPoints.isEmpty()) {
          for (Entry<Integer, Integer> e : couponPoints.entrySet()) {
-            ret.add(new Pair<>(e.getKey(), new Pair<>(777, e.getValue())));
+            ret.add(new NxCodeItemData(e.getKey(), e.getValue(), 777));
          }
       }
 
       return ret;
    }
 
-   private static Pair<Integer, List<Pair<Integer, Pair<Integer, Integer>>>> getNXCodeResult(MapleCharacter chr, String code) {
+   private static Pair<Integer, List<NxCodeItemData>> getNXCodeResult(MapleCharacter chr, String code) {
       MapleClient c = chr.getClient();
-      List<Pair<Integer, Pair<Integer, Integer>>> ret = new LinkedList<>();
-      try {
-         if (!c.attemptCsCoupon()) {
-            return new Pair<>(-5, null);
-         }
 
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT * FROM nxcode WHERE code = ?");
-         ps.setString(1, code);
-
-         ResultSet rs = ps.executeQuery();
-         if (!rs.next()) {
-            return new Pair<>(-1, null);
-         }
-
-         if (rs.getString("retriever") != null) {
-            return new Pair<>(-2, null);
-         }
-
-         if (rs.getLong("expiration") < Server.getInstance().getCurrentTime()) {
-            return new Pair<>(-3, null);
-         }
-
-         int codeid = rs.getInt("id");
-         rs.close();
-         ps.close();
-
-         ret = getNXCodeItems(chr, con, codeid);
-         if (ret == null) {
-            return new Pair<>(-4, null);
-         }
-
-         ps = con.prepareStatement("UPDATE nxcode SET retriever = ? WHERE code = ?");
-         ps.setString(1, chr.getName());
-         ps.setString(2, code);
-         ps.executeUpdate();
-
-         ps.close();
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
+      if (!c.attemptCsCoupon()) {
+         return new Pair<>(-5, null);
       }
 
-      c.resetCsCoupon();
-      return new Pair<>(0, ret);
+      return DatabaseConnection.withConnectionResult(connection -> {
+         Pair<Integer, List<NxCodeItemData>> retVal;
+         Optional<NxCodeData> nxCode = NxCodeProvider.getInstance().get(connection, code);
+         if (nxCode.isEmpty()) {
+            retVal = new Pair<>(-1, new ArrayList<>());
+            return retVal;
+         }
+
+         if (nxCode.get().getRetriever() != null) {
+            retVal = new Pair<>(-2, new ArrayList<>());
+            return retVal;
+         }
+
+         if (nxCode.get().getExpiration() < Server.getInstance().getCurrentTime()) {
+            retVal = new Pair<>(-3, new ArrayList<>());
+            return retVal;
+         }
+
+         int codeid = nxCode.get().getId();
+
+         List<NxCodeItemData> ret = getNXCodeItems(chr, connection, codeid);
+         if (ret == null) {
+            retVal = new Pair<>(-4, new ArrayList<>());
+            return retVal;
+         }
+
+         NxCodeAdministrator.getInstance().setRetriever(connection, codeid, chr.getName());
+         c.resetCsCoupon();
+         retVal = new Pair<>(0, ret);
+         return retVal;
+      }).orElse(null);
    }
 
    private static int parseCouponResult(int res) {
@@ -179,7 +165,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
 
       if (c.tryAcquireClient()) {
          try {
-            Pair<Integer, List<Pair<Integer, Pair<Integer, Integer>>>> codeRes = getNXCodeResult(c.getPlayer(), code.toUpperCase());
+            Pair<Integer, List<NxCodeItemData>> codeRes = getNXCodeResult(c.getPlayer(), code.toUpperCase());
             int type = codeRes.getLeft();
             if (type < 0) {
                c.announce(MaplePacketCreator.showCashShopMessage((byte) parseCouponResult(type)));
@@ -191,9 +177,9 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
                int nxPrepaid = 0;
                int mesos = 0;
 
-               for (Pair<Integer, Pair<Integer, Integer>> p : codeRes.getRight()) {
-                  type = p.getLeft();
-                  int quantity = p.getRight().getRight();
+               for (NxCodeItemData codeItemData : codeRes.getRight()) {
+                  type = codeItemData.getType();
+                  int quantity = codeItemData.getQuantity();
 
                   CashShop cs = c.getPlayer().getCashShop();
                   switch (type) {
@@ -221,7 +207,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
                         break;
 
                      default:
-                        int item = p.getRight().getLeft();
+                        int item = codeItemData.getItemId();
 
                         short qty;
                         if (quantity > Short.MAX_VALUE) {

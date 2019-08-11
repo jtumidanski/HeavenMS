@@ -21,18 +21,19 @@
 */
 package client;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
+import client.database.administrator.MonsterBookAdministrator;
+import client.database.provider.MonsterBookProvider;
+import client.database.data.MonsterBookData;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.DatabaseConnection;
@@ -46,43 +47,6 @@ public final class MonsterBook {
    private int bookLevel = 1;
    private Map<Integer, Integer> cards = new LinkedHashMap<>();
    private Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.BOOK);
-
-   private static int saveStringConcat(char[] data, int pos, Integer i) {
-      return saveStringConcat(data, pos, i.toString());
-   }
-
-   private static int saveStringConcat(char[] data, int pos, String s) {
-      int len = s.length();
-      for (int j = 0; j < len; j++) {
-         data[pos + j] = s.charAt(j);
-      }
-
-      return pos + len;
-   }
-
-   private static String getSaveString(Integer charid, Set<Entry<Integer, Integer>> cardSet) {
-      semaphore.acquireUninterruptibly();
-      try {
-         char[] save = new char[400000]; // 500 * 10 * 10 * 8
-         int i = 0;
-
-         i = saveStringConcat(save, i, "INSERT INTO monsterbook VALUES ");
-
-         for (Entry<Integer, Integer> all : cardSet) {   // assuming maxsize 500 unique cards
-            i = saveStringConcat(save, i, "(");
-            i = saveStringConcat(save, i, charid);  //10 chars
-            i = saveStringConcat(save, i, ", ");
-            i = saveStringConcat(save, i, all.getKey());  //10 chars
-            i = saveStringConcat(save, i, ", ");
-            i = saveStringConcat(save, i, all.getValue());  //1 char due to being 0 ~ 5
-            i = saveStringConcat(save, i, "),");
-         }
-
-         return new String(save, 0, i - 1);
-      } finally {
-         semaphore.release();
-      }
-   }
 
    private Set<Entry<Integer, Integer>> getCardSet() {
       lock.lock();
@@ -183,28 +147,18 @@ public final class MonsterBook {
       }
    }
 
-   public void loadCards(final int charid) throws SQLException {
+   public void loadCards(final int charid) {
       lock.lock();
       try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT cardid, level FROM monsterbook WHERE charid = ? ORDER BY cardid ASC")) {
-            ps.setInt(1, charid);
-            try (ResultSet rs = ps.executeQuery()) {
-               int cardid, level;
-               while (rs.next()) {
-                  cardid = rs.getInt("cardid");
-                  level = rs.getInt("level");
-                  if (cardid / 1000 >= 2388) {
-                     specialCard++;
-                  } else {
-                     normalCard++;
-                  }
-                  cards.put(cardid, level);
-               }
+         List<MonsterBookData> monsterBookData = DatabaseConnection.withConnectionResult(connection -> MonsterBookProvider.getInstance().getDataForCharacter(connection, charid)).orElse(new ArrayList<>());
+         for (MonsterBookData bookData : monsterBookData) {
+            if (bookData.getCardId() / 1000 >= 2388) {
+               specialCard++;
+            } else {
+               normalCard++;
             }
+            cards.put(bookData.getCardId(), bookData.getLevel());
          }
-
-         con.close();
       } finally {
          lock.unlock();
       }
@@ -218,19 +172,15 @@ public final class MonsterBook {
       if (cardSet.isEmpty()) {
          return;
       }
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("DELETE FROM monsterbook WHERE charid = ?");
-         ps.setInt(1, charid);
-         ps.execute();
-         ps.close();
+      DatabaseConnection.withConnection(connection -> {
+         MonsterBookAdministrator.getInstance().deleteForCharacter(connection, charid);
 
-         ps = con.prepareStatement(getSaveString(charid, cardSet));
-         ps.execute();
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+         try {
+            semaphore.acquireUninterruptibly();
+            MonsterBookAdministrator.getInstance().save(connection, charid, cardSet);
+         } finally {
+            semaphore.release();
+         }
+      });
    }
 }

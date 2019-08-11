@@ -22,8 +22,6 @@ package tools;
 
 import java.awt.Point;
 import java.net.InetAddress;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -52,6 +50,10 @@ import client.MapleStat;
 import client.MonsterBook;
 import client.Skill;
 import client.SkillMacro;
+import client.database.data.BbsThreadData;
+import client.database.data.GlobalUserRank;
+import client.database.data.GuildData;
+import client.database.data.NoteData;
 import client.inventory.Equip;
 import client.inventory.Equip.ScrollResult;
 import client.inventory.Item;
@@ -4633,98 +4635,99 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static void addThread(final MaplePacketLittleEndianWriter mplew, ResultSet rs) throws SQLException {
-      mplew.writeInt(rs.getInt("localthreadid"));
-      mplew.writeInt(rs.getInt("postercid"));
-      mplew.writeMapleAsciiString(rs.getString("name"));
-      mplew.writeLong(getTime(rs.getLong("timestamp")));
-      mplew.writeInt(rs.getInt("icon"));
-      mplew.writeInt(rs.getInt("replycount"));
+   public static void addThread(final MaplePacketLittleEndianWriter mplew, BbsThreadData threadData) {
+      mplew.writeInt(threadData.getThreadId());
+      mplew.writeInt(threadData.getPosterCharacterId());
+      mplew.writeMapleAsciiString(threadData.getName());
+      mplew.writeLong(getTime(threadData.getTimestamp()));
+      mplew.writeInt(threadData.getIcon());
+      mplew.writeInt(threadData.getReplyCount());
    }
 
-   public static byte[] BBSThreadList(ResultSet rs, int start) throws SQLException {
+   public static byte[] BBSThreadList(List<BbsThreadData> threadData, int start) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.GUILD_BBS_PACKET.getValue());
       mplew.write(0x06);
-      if (!rs.last()) {
+      if (threadData.size() == 0) {
          mplew.write(0);
          mplew.writeInt(0);
          mplew.writeInt(0);
          return mplew.getPacket();
       }
-      int threadCount = rs.getRow();
-      if (rs.getInt("localthreadid") == 0) { //has a notice
+
+      int threadCount = threadData.size();
+
+      BbsThreadData firstThread = threadData.get(0);
+      if (firstThread.getThreadId() == 0) { //has a notice
          mplew.write(1);
-         addThread(mplew, rs);
+         addThread(mplew, firstThread);
          threadCount--; //one thread didn't count (because it's a notice)
       } else {
          mplew.write(0);
       }
-      if (!rs.absolute(start + 1)) { //seek to the thread before where we start
-         rs.first(); //uh, we're trying to start at a place past possible
-         start = 0;
+      if (start >= threadData.size()) { //seek to the thread before where we start
+         start = 0; //uh, we're trying to start at a place past possible
       }
       mplew.writeInt(threadCount);
       mplew.writeInt(Math.min(10, threadCount - start));
-      for (int i = 0; i < Math.min(10, threadCount - start); i++) {
-         addThread(mplew, rs);
-         rs.next();
+      for (int i = start; i < Math.min(10, threadCount - start); i++) {
+         addThread(mplew, threadData.get(i));
       }
       return mplew.getPacket();
    }
 
-   public static byte[] showThread(int localthreadid, ResultSet threadRS, ResultSet repliesRS) throws SQLException, RuntimeException {
+   public static byte[] showThread(int localthreadid, BbsThreadData threadData) throws RuntimeException {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.GUILD_BBS_PACKET.getValue());
       mplew.write(0x07);
       mplew.writeInt(localthreadid);
-      mplew.writeInt(threadRS.getInt("postercid"));
-      mplew.writeLong(getTime(threadRS.getLong("timestamp")));
-      mplew.writeMapleAsciiString(threadRS.getString("name"));
-      mplew.writeMapleAsciiString(threadRS.getString("startpost"));
-      mplew.writeInt(threadRS.getInt("icon"));
-      if (repliesRS != null) {
-         int replyCount = threadRS.getInt("replycount");
+      mplew.writeInt(threadData.getPosterCharacterId());
+      mplew.writeLong(getTime(threadData.getTimestamp()));
+      mplew.writeMapleAsciiString(threadData.getName());
+      mplew.writeMapleAsciiString(threadData.getStartPost());
+      mplew.writeInt(threadData.getIcon());
+      if (threadData.getReplyData() != null) {
+         int replyCount = threadData.getReplyCount();
          mplew.writeInt(replyCount);
-         int i;
-         for (i = 0; i < replyCount && repliesRS.next(); i++) {
-            mplew.writeInt(repliesRS.getInt("replyid"));
-            mplew.writeInt(repliesRS.getInt("postercid"));
-            mplew.writeLong(getTime(repliesRS.getLong("timestamp")));
-            mplew.writeMapleAsciiString(repliesRS.getString("content"));
+         if (replyCount != threadData.getReplyData().size()) {
+            throw new RuntimeException(String.valueOf(threadData.getThreadId()));
          }
-         if (i != replyCount || repliesRS.next()) {
-            throw new RuntimeException(String.valueOf(threadRS.getInt("threadid")));
-         }
+
+         threadData.getReplyData().forEach(replyData -> {
+            mplew.writeInt(replyData.getReplyId());
+            mplew.writeInt(replyData.getPosterCharacterId());
+            mplew.writeLong(getTime(replyData.getTimestamp()));
+            mplew.writeMapleAsciiString(replyData.getContent());
+         });
       } else {
          mplew.writeInt(0);
       }
       return mplew.getPacket();
    }
 
-   public static byte[] showGuildRanks(int npcid, ResultSet rs) throws SQLException {
+   public static byte[] showGuildRanks(int npcid, List<GuildData> rs) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.GUILD_OPERATION.getValue());
       mplew.write(0x49);
       mplew.writeInt(npcid);
-      if (!rs.last()) { //no guilds o.o
+      if (rs.size() == 0) { //no guilds o.o
          mplew.writeInt(0);
          return mplew.getPacket();
       }
-      mplew.writeInt(rs.getRow()); //number of entries
-      rs.beforeFirst();
-      while (rs.next()) {
-         mplew.writeMapleAsciiString(rs.getString("name"));
-         mplew.writeInt(rs.getInt("GP"));
-         mplew.writeInt(rs.getInt("logo"));
-         mplew.writeInt(rs.getInt("logoColor"));
-         mplew.writeInt(rs.getInt("logoBG"));
-         mplew.writeInt(rs.getInt("logoBGColor"));
+      mplew.writeInt(rs.size()); //number of entries
+
+      for (GuildData guildData : rs) {
+         mplew.writeMapleAsciiString(guildData.getName());
+         mplew.writeInt(guildData.getGp());
+         mplew.writeInt(guildData.getLogo());
+         mplew.writeInt(guildData.getLogoColor());
+         mplew.writeInt(guildData.getLogoBackground());
+         mplew.writeInt(guildData.getLogoBackgroundColor());
       }
       return mplew.getPacket();
    }
 
-   public static byte[] showPlayerRanks(int npcid, List<Pair<String, Integer>> worldRanking) {
+   public static byte[] showPlayerRanks(int npcid, List<GlobalUserRank> worldRanking) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.GUILD_OPERATION.getValue());
       mplew.write(0x49);
@@ -4734,9 +4737,9 @@ public class MaplePacketCreator {
          return mplew.getPacket();
       }
       mplew.writeInt(worldRanking.size());
-      for (Pair<String, Integer> wr : worldRanking) {
-         mplew.writeMapleAsciiString(wr.getLeft());
-         mplew.writeInt(wr.getRight());
+      for (GlobalUserRank wr : worldRanking) {
+         mplew.writeMapleAsciiString(wr.getName());
+         mplew.writeInt(wr.getLevel());
          mplew.writeInt(0);
          mplew.writeInt(0);
          mplew.writeInt(0);
@@ -5519,15 +5522,11 @@ public class MaplePacketCreator {
       mplew.skip(5);
       mplew.writeInt(chr.getMerchantNetMeso());
       mplew.write(0);
-      try {
-         List<Pair<Item, MapleInventoryType>> items = ItemFactory.MERCHANT.loadItems(chr.getId(), false);
-         mplew.write(items.size());
+      List<Pair<Item, MapleInventoryType>> items = ItemFactory.MERCHANT.loadItems(chr.getId(), false);
+      mplew.write(items.size());
 
-         for (Pair<Item, MapleInventoryType> item : items) {
-            addItemInfo(mplew, item.getLeft(), true);
-         }
-      } catch (SQLException e) {
-         e.printStackTrace();
+      for (Pair<Item, MapleInventoryType> item : items) {
+         addItemInfo(mplew, item.getLeft(), true);
       }
       mplew.skip(3);
       return mplew.getPacket();
@@ -6012,19 +6011,18 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] showNotes(ResultSet notes, int count) throws SQLException {
+   public static byte[] showNotes(List<NoteData> notes, int count) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.MEMO_RESULT.getValue());
       mplew.write(3);
       mplew.write(count);
-      for (int i = 0; i < count; i++) {
-         mplew.writeInt(notes.getInt("id"));
-         mplew.writeMapleAsciiString(notes.getString("from") + " ");//Stupid nexon forgot space lol
-         mplew.writeMapleAsciiString(notes.getString("message"));
-         mplew.writeLong(getTime(notes.getLong("timestamp")));
-         mplew.write(notes.getByte("fame"));//FAME :D
-         notes.next();
-      }
+      notes.forEach(note -> {
+         mplew.writeInt(note.getId());
+         mplew.writeMapleAsciiString(note.getFrom() + " "); //Stupid nexon forgot space lol
+         mplew.writeMapleAsciiString(note.getMessage());
+         mplew.writeLong(getTime(note.getTimestamp()));
+         mplew.write(note.getFame()); //FAME :D
+      });
       return mplew.getPacket();
    }
 

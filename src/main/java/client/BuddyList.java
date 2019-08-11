@@ -21,10 +21,6 @@
 */
 package client;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +30,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
+import client.database.administrator.BuddyAdministrator;
+import client.database.provider.BuddyProvider;
 import net.server.PlayerStorage;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
@@ -42,6 +40,7 @@ public class BuddyList {
    private Map<Integer, BuddylistEntry> buddies = new LinkedHashMap<>();
    private int capacity;
    private Deque<CharacterNameAndId> pendingRequests = new LinkedList<>();
+
    public BuddyList(int capacity) {
       this.capacity = capacity;
    }
@@ -134,29 +133,11 @@ public class BuddyList {
    }
 
    public void loadFromDb(int characterId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
-         PreparedStatement ps = con.prepareStatement("SELECT b.buddyid, b.pending, b.group, c.name as buddyname FROM buddies as b, characters as c WHERE c.id = b.buddyid AND b.characterid = ?");
-         ps.setInt(1, characterId);
-         ResultSet rs = ps.executeQuery();
-         while (rs.next()) {
-            if (rs.getInt("pending") == 1) {
-               pendingRequests.push(new CharacterNameAndId(rs.getInt("buddyid"), rs.getString("buddyname")));
-            } else {
-               put(new BuddylistEntry(rs.getString("buddyname"), rs.getString("group"), rs.getInt("buddyid"), (byte) -1, true));
-            }
-         }
-         rs.close();
-         ps.close();
-         ps = con.prepareStatement("DELETE FROM buddies WHERE pending = 1 AND characterid = ?");
-         ps.setInt(1, characterId);
-         ps.executeUpdate();
-         ps.close();
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         BuddyProvider.getInstance().getInfoForBuddies(connection, characterId).forEach(this::put);
+         BuddyProvider.getInstance().getInfoForPendingBuddies(connection, characterId).forEach(pendingBuddy -> pendingRequests.push(pendingBuddy));
+         BuddyAdministrator.getInstance().deletePendingForCharacter(connection, characterId);
+      });
    }
 
    public CharacterNameAndId pollPendingRequest() {

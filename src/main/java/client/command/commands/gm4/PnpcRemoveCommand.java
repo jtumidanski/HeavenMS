@@ -24,18 +24,13 @@
 package client.command.commands.gm4;
 
 import java.awt.Point;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import net.server.channel.Channel;
-import server.maps.MapleMap;
+import client.database.provider.PlayerLifeProvider;
 import tools.DatabaseConnection;
 import tools.Pair;
 
@@ -55,57 +50,18 @@ public class PnpcRemoveCommand extends Command {
       int xpos = pos.x;
       int ypos = pos.y;
 
-      List<Pair<Integer, Pair<Integer, Integer>>> toRemove = new LinkedList<>();
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps;
-
+      List<Pair<Integer, Pair<Integer, Integer>>> toRemove = DatabaseConnection.withConnectionResult(connection -> {
          if (npcId > -1) {
-            String select = "SELECT * FROM plife WHERE world = ? AND map = ? AND type LIKE ? AND life = ?";
-            ps = con.prepareStatement(select, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ps.setInt(1, player.getWorld());
-            ps.setInt(2, mapId);
-            ps.setString(3, "n");
-            ps.setInt(4, npcId);
+            return PlayerLifeProvider.getInstance().get(connection, player.getWorld(), mapId, "n", npcId);
          } else {
-            String select = "SELECT * FROM plife WHERE world = ? AND map = ? AND type LIKE ? AND x >= ? AND x <= ? AND y >= ? AND y <= ?";
-            ps = con.prepareStatement(select, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_UPDATABLE);
-            ps.setInt(1, player.getWorld());
-            ps.setInt(2, mapId);
-            ps.setString(3, "n");
-            ps.setInt(4, xpos - 50);
-            ps.setInt(5, xpos + 50);
-            ps.setInt(6, ypos - 50);
-            ps.setInt(7, ypos + 50);
+            return PlayerLifeProvider.getInstance().get(connection, player.getWorld(), mapId, "n", xpos - 50, xpos + 50, ypos - 50, ypos + 50);
          }
-
-         ResultSet rs = ps.executeQuery();
-         while (true) {
-            rs.beforeFirst();
-            if (!rs.next()) {
-               break;
-            }
-
-            toRemove.add(new Pair<>(rs.getInt("life"), new Pair<>(rs.getInt("x"), rs.getInt("y"))));
-            rs.deleteRow();
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-         player.dropMessage(5, "Failed to remove pNPC from the database.");
-      }
+      }).orElse(new ArrayList<>());
 
       if (!toRemove.isEmpty()) {
-         for (Channel ch : player.getWorldServer().getChannels()) {
-            MapleMap map = ch.getMapFactory().getMap(mapId);
-
-            for (Pair<Integer, Pair<Integer, Integer>> r : toRemove) {
-               map.destroyNPC(r.getLeft());
-            }
-         }
+         player.getWorldServer().getChannels().stream()
+               .map(channel -> channel.getMapFactory().getMap(mapId))
+               .forEach(map -> toRemove.forEach(pair -> map.destroyNPC(pair.getLeft())));
       }
 
       player.yellowMessage("Cleared " + toRemove.size() + " pNPC placements.");

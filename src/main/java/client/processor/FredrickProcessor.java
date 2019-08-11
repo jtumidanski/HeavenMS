@@ -24,16 +24,22 @@
 package client.processor;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.CharacterAdministrator;
+import client.database.administrator.FredStorageAdministrator;
+import client.database.administrator.InventoryItemAdministrator;
+import client.database.administrator.NoteAdministrator;
+import client.database.data.CharacterNameNote;
+import client.database.data.CharacterWorldData;
+import client.database.provider.FredStorageProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
@@ -100,182 +106,92 @@ public class FredrickProcessor {
    }
 
    public static void removeFredrickLog(int cid) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         removeFredrickLog(con, cid);
-         con.close();
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> removeFredrickLog(connection, cid));
    }
 
-   private static void removeFredrickLog(Connection con, int cid) throws SQLException {
-      try (PreparedStatement ps = con.prepareStatement("DELETE FROM `fredstorage` WHERE `cid` = ?")) {
-         ps.setInt(1, cid);
-         ps.execute();
-      }
+   private static void removeFredrickLog(Connection con, int cid) {
+      FredStorageAdministrator.getInstance().deleteForCharacter(con, cid);
    }
 
    public static void insertFredrickLog(int cid) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
-         removeFredrickLog(con, cid);
-         try (PreparedStatement ps = con.prepareStatement("INSERT INTO `fredstorage` (`cid`, `daynotes`, `timestamp`) VALUES (?, 0, ?)")) {
-            ps.setInt(1, cid);
-            ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
-            ps.execute();
-         }
-
-         con.close();
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         removeFredrickLog(connection, cid);
+         FredStorageAdministrator.getInstance().create(connection, cid);
+      });
    }
 
    public static void removeFredrickReminders(int cid) {
-      removeFredrickReminders(Collections.singletonList(new Pair<>(cid, 0)));
+      removeFredrickReminders(Collections.singletonList(new CharacterWorldData(cid, 0)));
    }
 
-   private static void removeFredrickReminders(List<Pair<Integer, Integer>> expiredCids) {
-      List<String> expiredCnames = new LinkedList<>();
-      for (Pair<Integer, Integer> id : expiredCids) {
-         String name = MapleCharacter.getNameById(id.getLeft());
-         if (name != null) {
-            expiredCnames.add(name);
-         }
-      }
-
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("DELETE FROM `notes` WHERE `from` LIKE ? AND `to` LIKE ?")) {
-            ps.setString(1, "FREDRICK");
-
-            for (String cname : expiredCnames) {
-               ps.setString(2, cname);
-               ps.executeBatch();
-            }
-         }
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+   private static void removeFredrickReminders(List<CharacterWorldData> expiredCids) {
+      DatabaseConnection.withConnection(connection ->
+            expiredCids.stream()
+                  .map(pair -> MapleCharacter.getNameById(pair.getCharacterId()))
+                  .filter(Objects::nonNull)
+                  .forEach(name -> NoteAdministrator.getInstance().deleteWhereNamesLike(connection, "FREDRICK", name)));
    }
 
    public static void runFredrickSchedule() {
-      try {
-         Connection con = DatabaseConnection.getConnection();
+      DatabaseConnection.withConnection(connection -> {
+         List<CharacterWorldData> expiredCharacterIds = new LinkedList<>();
+         List<CharacterNameNote> characterIdsToNotify = new LinkedList<>();
+         long curTime = System.currentTimeMillis();
 
-         List<Pair<Integer, Integer>> expiredCids = new LinkedList<>();
-         List<Pair<Pair<Integer, String>, Integer>> notifCids = new LinkedList<>();
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM fredstorage f LEFT JOIN (SELECT id, name, world, lastLogoutTime FROM characters) AS c ON c.id = f.cid")) {
-            try (ResultSet rs = ps.executeQuery()) {
-               long curTime = System.currentTimeMillis();
+         FredStorageProvider.getInstance().get(connection).forEach(fredStorageData -> {
+            int dayNotes = Math.min(dailyReminders.length - 1, fredStorageData.getDayNotes());
 
-               while (rs.next()) {
-                  int cid = rs.getInt("cid");
-                  int world = rs.getInt("world");
-                  Timestamp ts = rs.getTimestamp("timestamp");
-                  int daynotes = Math.min(dailyReminders.length - 1, rs.getInt("daynotes"));
+            int elapsedDays = timestampElapsedDays(fredStorageData.getTimestamp(), curTime);
+            if (elapsedDays > 100) {
+               expiredCharacterIds.add(new CharacterWorldData(fredStorageData.getCharacterId(), fredStorageData.getWorldId()));
+            } else {
+               int notifyDay = dailyReminders[dayNotes];
 
-                  int elapsedDays = timestampElapsedDays(ts, curTime);
-                  if (elapsedDays > 100) {
-                     expiredCids.add(new Pair<>(cid, world));
-                  } else {
-                     int notifDay = dailyReminders[daynotes];
-
-                     if (elapsedDays >= notifDay) {
-                        do {
-                           daynotes++;
-                           notifDay = dailyReminders[daynotes];
-                        } while (elapsedDays >= notifDay);
-
-                        Timestamp logoutTs = rs.getTimestamp("lastLogoutTime");
-                        int inactivityDays = timestampElapsedDays(logoutTs, curTime);
-
-                        if (inactivityDays < 7 || daynotes >= dailyReminders.length - 1) {  // don't spam inactive players
-                           String name = rs.getString("name");
-                           notifCids.add(new Pair<>(new Pair<>(cid, name), daynotes));
-                        }
-                     }
+               if (elapsedDays >= notifyDay) {
+                  do {
+                     dayNotes++;
+                     notifyDay = dailyReminders[dayNotes];
+                  } while (elapsedDays >= notifyDay);
+                  int inactivityDays = timestampElapsedDays(fredStorageData.getLastLogoutTime(), curTime);
+                  if (inactivityDays < 7 || dayNotes >= dailyReminders.length - 1) {  // don't spam inactive players
+                     characterIdsToNotify.add(new CharacterNameNote(fredStorageData.getCharacterId(), fredStorageData.getName(), dayNotes));
                   }
                }
             }
+         });
+
+         if (!expiredCharacterIds.isEmpty()) {
+            InventoryItemAdministrator.getInstance().deleteByCharacterAndTypeBatch(connection,
+                  expiredCharacterIds.stream().map(pair -> new Pair<>(ItemFactory.MERCHANT.getValue(), pair.getCharacterId())).collect(Collectors.toList()));
+
+            CharacterAdministrator.getInstance().setMerchantMesosBatch(connection, expiredCharacterIds.stream().map(pair -> new Pair<>(pair.getCharacterId(), 0)).collect(Collectors.toList()));
+
+            expiredCharacterIds.forEach(pair -> {
+               World world = Server.getInstance().getWorld(pair.getWorldId());
+               if (world != null) {
+                  world.getPlayerStorage().getCharacterById(pair.getCharacterId()).ifPresent(character -> character.setMerchantMeso(0));
+               }
+            });
+
+            removeFredrickReminders(expiredCharacterIds);
+            FredStorageAdministrator.getInstance().deleteForCharacterBatch(connection, expiredCharacterIds.stream().map(CharacterWorldData::getCharacterId).collect(Collectors.toList()));
          }
 
-         if (!expiredCids.isEmpty()) {
-            try (PreparedStatement ps = con.prepareStatement("DELETE FROM `inventoryitems` WHERE `type` = ? AND `characterid` = ?")) {
-               ps.setInt(1, ItemFactory.MERCHANT.getValue());
-
-               for (Pair<Integer, Integer> cid : expiredCids) {
-                  ps.setInt(2, cid.getLeft());
-                  ps.addBatch();
-               }
-
-               ps.executeBatch();
-            }
-
-            try (PreparedStatement ps = con.prepareStatement("UPDATE `characters` SET `MerchantMesos` = 0 WHERE `id` = ?")) {
-               for (Pair<Integer, Integer> cid : expiredCids) {
-                  ps.setInt(1, cid.getLeft());
-                  ps.addBatch();
-
-                  World wserv = Server.getInstance().getWorld(cid.getRight());
-                  if (wserv != null) {
-                     wserv.getPlayerStorage().getCharacterById(cid.getLeft()).ifPresent(character -> character.setMerchantMeso(0));
-                  }
-               }
-
-               ps.executeBatch();
-            }
-
-            removeFredrickReminders(expiredCids);
-
-            try (PreparedStatement ps = con.prepareStatement("DELETE FROM `fredstorage` WHERE `cid` = ?")) {
-               for (Pair<Integer, Integer> cid : expiredCids) {
-                  ps.setInt(1, cid.getLeft());
-                  ps.addBatch();
-               }
-
-               ps.executeBatch();
-            }
+         if (!characterIdsToNotify.isEmpty()) {
+            FredStorageAdministrator.getInstance().updateNotesBatch(connection,
+                  characterIdsToNotify.stream().map(pair -> new Pair<>(pair.getNote(), pair.getCharacterId())).collect(Collectors.toList()));
+            characterIdsToNotify.forEach(pair -> {
+               String msg = fredrickReminderMessage(pair.getNote() - 1);
+               MapleCharacter.sendNote(pair.getCharacterName(), "FREDRICK", msg, (byte) 0);
+            });
          }
-
-         if (!notifCids.isEmpty()) {
-            try (PreparedStatement ps = con.prepareStatement("UPDATE `fredstorage` SET `daynotes` = ? WHERE `cid` = ?")) {
-               for (Pair<Pair<Integer, String>, Integer> cid : notifCids) {
-                  ps.setInt(1, cid.getRight());
-                  ps.setInt(2, cid.getLeft().getLeft());
-                  ps.addBatch();
-
-                  String msg = fredrickReminderMessage(cid.getRight() - 1);
-                  MapleCharacter.sendNote(cid.getLeft().getRight(), "FREDRICK", msg, (byte) 0);
-               }
-
-               ps.executeBatch();
-            }
-         }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      });
    }
 
    private static boolean deleteFredrickItems(int cid) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("DELETE FROM `inventoryitems` WHERE `type` = ? AND `characterid` = ?")) {
-            ps.setInt(1, ItemFactory.MERCHANT.getValue());
-            ps.setInt(2, cid);
-            ps.execute();
-         }
-         con.close();
-         return true;
-      } catch (SQLException e) {
-         e.printStackTrace();
-         return false;
-      }
+      DatabaseConnection.withConnection(connection ->
+            InventoryItemAdministrator.getInstance().deleteForCharacterByType(connection, cid, ItemFactory.MERCHANT.getValue()));
+      return true;
    }
 
    public static void fredrickRetrieveItems(MapleClient c) {     // thanks Gustav for pointing out the dupe on Fredrick handling
@@ -284,37 +200,34 @@ public class FredrickProcessor {
             MapleCharacter chr = c.getPlayer();
 
             List<Pair<Item, MapleInventoryType>> items;
-            try {
-               items = ItemFactory.MERCHANT.loadItems(chr.getId(), false);
+            items = ItemFactory.MERCHANT.loadItems(chr.getId(), false);
 
-               byte response = canRetrieveFromFredrick(chr, items);
-               if (response != 0) {
-                  chr.announce(MaplePacketCreator.fredrickMessage(response));
-                  return;
+            byte response = canRetrieveFromFredrick(chr, items);
+            if (response != 0) {
+               chr.announce(MaplePacketCreator.fredrickMessage(response));
+               return;
+            }
+
+            chr.withdrawMerchantMesos();
+
+            if (deleteFredrickItems(chr.getId())) {
+               MapleHiredMerchant merchant = chr.getHiredMerchant();
+
+               if (merchant != null) {
+                  merchant.clearItems();
                }
 
-               chr.withdrawMerchantMesos();
-
-               if (deleteFredrickItems(chr.getId())) {
-                  MapleHiredMerchant merchant = chr.getHiredMerchant();
-
-                  if (merchant != null)
-                     merchant.clearItems();
-
-                  for (Pair<Item, MapleInventoryType> it : items) {
-                     Item item = it.getLeft();
-                     MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
-                     String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId());
-                     FilePrinter.print(FilePrinter.FREDRICK + chr.getName() + ".txt", chr.getName() + " gained " + item.getQuantity() + " " + itemName + " (" + item.getItemId() + ")");
-                  }
-
-                  chr.announce(MaplePacketCreator.fredrickMessage((byte) 0x1E));
-                  removeFredrickLog(chr.getId());
-               } else {
-                  chr.message("An unknown error has occured.");
+               for (Pair<Item, MapleInventoryType> it : items) {
+                  Item item = it.getLeft();
+                  MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
+                  String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId());
+                  FilePrinter.print(FilePrinter.FREDRICK + chr.getName() + ".txt", chr.getName() + " gained " + item.getQuantity() + " " + itemName + " (" + item.getItemId() + ")");
                }
-            } catch (SQLException ex) {
-               ex.printStackTrace();
+
+               chr.announce(MaplePacketCreator.fredrickMessage((byte) 0x1E));
+               removeFredrickLog(chr.getId());
+            } else {
+               chr.message("An unknown error has occurred.");
             }
          } finally {
             c.releaseClient();

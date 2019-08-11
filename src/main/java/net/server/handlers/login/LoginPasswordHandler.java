@@ -24,16 +24,12 @@ package net.server.handlers.login;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Calendar;
 
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
+import client.database.administrator.AccountAdministrator;
 import constants.ServerConstants;
 import net.MaplePacketHandler;
 import net.server.Server;
@@ -59,20 +55,6 @@ public final class LoginPasswordHandler implements MaplePacketHandler {
    private static void login(MapleClient c) {
       c.announce(MaplePacketCreator.getAuthSuccess(c));//why the fk did I do c.getAccountName()?
       Server.getInstance().registerLoginState(c);
-   }
-
-   private static void disposeSql(Connection con, PreparedStatement ps) {
-      try {
-         if (con != null) {
-            con.close();
-         }
-
-         if (ps != null) {
-            ps.close();
-         }
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
    }
 
    @Override
@@ -108,47 +90,24 @@ public final class LoginPasswordHandler implements MaplePacketHandler {
 
       slea.skip(6);   // localhost masked the initial part with zeroes...
       byte[] hwidNibbles = slea.read(4);
-      int loginok = c.login(login, pwd, HexTool.toCompressedString(hwidNibbles));
+      int loginStatus = c.login(login, pwd, HexTool.toCompressedString(hwidNibbles));
 
-      Connection con = null;
-      PreparedStatement ps = null;
-
-      if (ServerConstants.AUTOMATIC_REGISTER && loginok == 5) {
+      if (ServerConstants.AUTOMATIC_REGISTER && loginStatus == 5) {
          try {
-            con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("INSERT INTO accounts (name, password, birthday, tempban) VALUES (?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS); //Jayd: Added birthday, tempban
-            ps.setString(1, login);
-            ps.setString(2, ServerConstants.BCRYPT_MIGRATION ? BCrypt.hashpw(pwd, BCrypt.gensalt(12)) : hashpwSHA512(pwd));
-            ps.setString(3, "2018-06-20"); //Jayd's idea: was added to solve the MySQL 5.7 strict checking (birthday)
-            ps.setString(4, "2018-06-20"); //Jayd's idea: was added to solve the MySQL 5.7 strict checking (tempban)
-            ps.executeUpdate();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            rs.next();
-            c.setAccID(rs.getInt(1));
-            rs.close();
-         } catch (SQLException | NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            String password = ServerConstants.BCRYPT_MIGRATION ? BCrypt.hashpw(pwd, BCrypt.gensalt(12)) : hashpwSHA512(pwd);
+            DatabaseConnection.withConnection(connection -> c.setAccID(AccountAdministrator.getInstance().create(connection, login, password)));
+         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             c.setAccID(-1);
             e.printStackTrace();
-         } finally {
-            disposeSql(con, ps);
-            loginok = c.login(login, pwd, HexTool.toCompressedString(hwidNibbles));
          }
+
+         loginStatus = c.login(login, pwd, HexTool.toCompressedString(hwidNibbles));
       }
 
-      if (ServerConstants.BCRYPT_MIGRATION && (loginok <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
-         try {
-            con = DatabaseConnection.getConnection();
-            ps = con.prepareStatement("UPDATE accounts SET password = ? WHERE name = ?;");
-            ps.setString(1, BCrypt.hashpw(pwd, BCrypt.gensalt(12)));
-            ps.setString(2, login);
-            ps.executeUpdate();
-         } catch (SQLException e) {
-            e.printStackTrace();
-         } finally {
-            disposeSql(con, ps);
-            loginok = (loginok == -10) ? 0 : 23;
-         }
+      if (ServerConstants.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
+         String password = BCrypt.hashpw(pwd, BCrypt.gensalt(12));
+         DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().updatePasswordByName(connection, login, password));
+         loginStatus = (loginStatus == -10) ? 0 : 23;
       }
 
       if (c.hasBannedIP() || c.hasBannedMac()) {
@@ -162,11 +121,11 @@ public final class LoginPasswordHandler implements MaplePacketHandler {
             return;
          }
       }
-      if (loginok == 3) {
+      if (loginStatus == 3) {
          c.announce(MaplePacketCreator.getPermBan(c.getGReason()));//crashes but idc :D
          return;
-      } else if (loginok != 0) {
-         c.announce(MaplePacketCreator.getLoginFailed(loginok));
+      } else if (loginStatus != 0) {
+         c.announce(MaplePacketCreator.getLoginFailed(loginStatus));
          return;
       }
       if (c.finishLogin() == 0) {

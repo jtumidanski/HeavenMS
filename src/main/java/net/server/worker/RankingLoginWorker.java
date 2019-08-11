@@ -22,11 +22,13 @@
 package net.server.worker;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.function.Supplier;
 
 import client.MapleJob;
+import client.database.administrator.CharacterAdministrator;
+import client.database.data.CharacterRankData;
+import client.database.provider.CharacterProvider;
 import constants.ServerConstants;
 import net.server.Server;
 import tools.DatabaseConnection;
@@ -37,81 +39,55 @@ import tools.DatabaseConnection;
  * @author Ronan
  */
 public class RankingLoginWorker implements Runnable {
-   private Connection con;
    private long lastUpdate = System.currentTimeMillis();
 
-   private void resetMoveRank(boolean job) throws SQLException {
-      String query = "UPDATE characters SET " + (job ? "jobRankMove = 0" : "rankMove = 0");
-      PreparedStatement reset = con.prepareStatement(query);
-      reset.executeUpdate();
+   private interface TriConsumer<T, U, V> {
+      void apply(T t, U u, V v);
    }
 
-   private void updateRanking(int job, int world) throws SQLException {
-      String sqlCharSelect = "SELECT c.id, " + (job != -1 ? "c.jobRank, c.jobRankMove" : "c.rank, c.rankMove") + ", a.lastlogin AS lastlogin, a.loggedin FROM characters AS c LEFT JOIN accounts AS a ON c.accountid = a.id WHERE c.gm < 2 AND c.world = ? ";
-      if (job != -1) {
-         sqlCharSelect += "AND c.job DIV 100 = ? ";
-      }
-      sqlCharSelect += "ORDER BY c.level DESC , c.exp DESC , c.lastExpGainTime ASC, c.fame DESC , c.meso DESC";
-
-      PreparedStatement charSelect = con.prepareStatement(sqlCharSelect);
-      charSelect.setInt(1, world);
-      if (job != -1) {
-         charSelect.setInt(2, job);
-      }
-      ResultSet rs = charSelect.executeQuery();
-      PreparedStatement ps = con.prepareStatement("UPDATE characters SET " + (job != -1 ? "jobRank = ?, jobRankMove = ? " : "rank = ?, rankMove = ? ") + "WHERE id = ?");
+   private void performRanking(Supplier<List<CharacterRankData>> rankSupplier, TriConsumer<Integer, Integer, Integer> consumer) {
+      List<CharacterRankData> rankData = rankSupplier.get();
       int rank = 0;
-
-      while (rs.next()) {
+      for (CharacterRankData characterRankData : rankData) {
          int rankMove = 0;
          rank++;
-         if (rs.getLong("lastlogin") < lastUpdate || rs.getInt("loggedin") > 0) {
-            rankMove = rs.getInt((job != -1 ? "jobRankMove" : "rankMove"));
+         if (characterRankData.getLastLogin() < lastUpdate || characterRankData.getLoggedIn() > 0) {
+            rankMove = characterRankData.getMove();
          }
-         rankMove += rs.getInt((job != -1 ? "jobRank" : "rank")) - rank;
-         ps.setInt(1, rank);
-         ps.setInt(2, rankMove);
-         ps.setInt(3, rs.getInt("id"));
-         ps.executeUpdate();
+         rankMove += characterRankData.getRank() - rank;
+         consumer.apply(characterRankData.getCharacterId(), rank, rankMove);
       }
+   }
 
-      rs.close();
-      charSelect.close();
-      ps.close();
+   private void updateRanking(Connection connection, int job, int world) {
+      if (job != -1) {
+         performRanking(
+               () -> CharacterProvider.getInstance().getRankByJob(connection, world, job),
+               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateJobRank(connection, characterId, rank, rankMove)
+         );
+      } else {
+         performRanking(
+               () -> CharacterProvider.getInstance().getRank(connection, world),
+               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateRank(connection, characterId, rank, rankMove)
+         );
+      }
    }
 
    @Override
    public void run() {
-      try {
-         con = DatabaseConnection.getConnection();
-         con.setAutoCommit(false);
-
+      DatabaseConnection.withExplicitCommitConnection(connection -> {
          if (ServerConstants.USE_REFRESH_RANK_MOVE) {
-            resetMoveRank(true);
-            resetMoveRank(false);
+            CharacterAdministrator.getInstance().resetAllJobRankMove(connection);
+            CharacterAdministrator.getInstance().resetAllRankMove(connection);
          }
-
          for (int j = 0; j < Server.getInstance().getWorldsSize(); j++) {
-            updateRanking(-1, j);    //overall ranking
+            updateRanking(connection, -1, j);    //overall ranking
             for (int i = 0; i <= MapleJob.getMax(); i++) {
-               updateRanking(i, j);
+               updateRanking(connection, i, j);
             }
-            con.commit();
+            connection.commit();
          }
-
-         con.setAutoCommit(true);
-         lastUpdate = System.currentTimeMillis();
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-
-         try {
-            con.rollback();
-            con.setAutoCommit(true);
-            if (!con.isClosed()) con.close();
-         } catch (SQLException ex2) {
-            ex2.printStackTrace();
-         }
-      }
+      });
+      lastUpdate = System.currentTimeMillis();
    }
 }

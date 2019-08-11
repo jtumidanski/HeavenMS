@@ -19,13 +19,9 @@
 */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.newyear.NewYearCardRecord;
 import constants.ItemConstants;
@@ -43,26 +39,15 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class NewYearCardHandler extends AbstractMaplePacketHandler {
 
    private static int getReceiverId(String receiver, int world) {
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("SELECT id, world FROM characters WHERE name LIKE ?")) {
-            ps.setString(1, receiver);
-            try (ResultSet rs = ps.executeQuery()) {
-               if (rs.next()) {
-                  if (rs.getInt("world") == world) {
-                     return rs.getInt("id");
-                  }
-               }
-            }
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
-
-      return -1;
+      return DatabaseConnection.withConnectionResult(connection ->
+            CharacterProvider.getInstance().getCharacterForNameAndWorld(connection, receiver, world).get())
+            .orElse(-1);
    }
 
    private static int getValidNewYearCardStatus(int itemid, MapleCharacter player, short slot) {
-      if (!ItemConstants.isNewYearCardUse(itemid)) return 0x14;
+      if (!ItemConstants.isNewYearCardUse(itemid)) {
+         return 0x14;
+      }
 
       Item it = player.getInventory(ItemConstants.getInventoryType(itemid)).getItem(slot);
       return (it != null && it.getItemId() == itemid) ? 0 : 0x12;
@@ -125,8 +110,9 @@ public final class NewYearCardHandler extends AbstractMaplePacketHandler {
                   NewYearCardRecord.updateNewYearCard(newyear);
 
                   player.getAbstractPlayerInteraction().gainItem(4301000, (short) 1);
-                  if (!newyear.getMessage().isEmpty())
+                  if (!newyear.getMessage().isEmpty()) {
                      player.dropMessage(6, "[New Year] " + newyear.getSenderName() + ": " + newyear.getMessage());
+                  }
 
                   player.addNewYearRecord(newyear);
                   player.announce(MaplePacketCreator.onNewYearCardRes(player, newyear, 6, 0));    // successfully rcvd

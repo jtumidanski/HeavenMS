@@ -368,11 +368,7 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
       } else if (itemType == 509) {
          String sendTo = slea.readMapleAsciiString();
          String msg = slea.readMapleAsciiString();
-         try {
-            player.sendNote(sendTo, msg, (byte) 0);
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
+         player.sendNote(sendTo, msg, (byte) 0);
          remove(c, position, itemId);
       } else if (itemType == 510) {
          player.getMap().broadcastMessage(MaplePacketCreator.musicChange("Jukebox/Congratulation"));

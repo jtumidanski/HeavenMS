@@ -29,6 +29,7 @@ import java.util.Map;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
+import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -119,7 +120,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
             } else if (action == 0x04) {//TODO check for gender
                int birthday = slea.readInt();
                CashItem cItem = CashItemFactory.getItem(slea.readInt());
-               Map<String, String> recipient = MapleCharacter.getCharacterFromDatabase(slea.readMapleAsciiString());
+               CharacterIdNameAccountId recipient = MapleCharacter.getCharacterFromDatabase(slea.readMapleAsciiString());
                String message = slea.readMapleAsciiString();
                if (!canBuy(chr, cItem, cs.getCash(4)) || message.length() < 1 || message.length() > 73) {
                   c.enableCSActions();
@@ -131,20 +132,16 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                } else if (recipient == null) {
                   c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xA9));
                   return;
-               } else if (recipient.get("accountid").equals(String.valueOf(c.getAccID()))) {
+               } else if (recipient.getAccountId() == c.getAccID()) {
                   c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xA8));
                   return;
                }
-               cs.gift(Integer.parseInt(recipient.get("id")), chr.getName(), message, cItem.getSN());
-               c.announce(MaplePacketCreator.showGiftSucceed(recipient.get("name"), cItem));
+               cs.gift(recipient.getId(), chr.getName(), message, cItem.getSN());
+               c.announce(MaplePacketCreator.showGiftSucceed(recipient.getName(), cItem));
                cs.gainCash(4, cItem, chr.getWorld());
                c.announce(MaplePacketCreator.showCash(chr));
-               try {
-                  chr.sendNote(recipient.get("name"), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
-               } catch (SQLException ex) {
-                  ex.printStackTrace();
-               }
-               c.getChannelServer().getPlayerStorage().getCharacterByName(recipient.get("name")).ifPresent(MapleCharacter::showNote);
+               chr.sendNote(recipient.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
+               c.getChannelServer().getPlayerStorage().getCharacterByName(recipient.getName()).ifPresent(MapleCharacter::showNote);
             } else if (action == 0x05) { // Modify wish list
                cs.clearWishList();
                for (byte i = 0; i < 10; i++) {
@@ -345,11 +342,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
                cs.gainCash(payment, -itemRing.getPrice());
                chr.addFriendshipRing(MapleRing.loadFromDb(rings.getLeft()));
-               try {
-                  chr.sendNote(partner.getName(), text, (byte) 1);
-               } catch (SQLException ex) {
-                  ex.printStackTrace();
-               }
+               chr.sendNote(partner.getName(), text, (byte) 1);
                partner.showNote();
             }
          }, () -> chr.dropMessage(5, "The partner you specified cannot be found. Please make sure your partner is online and in the same channel."));
@@ -378,11 +371,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
                cs.gainCash(toCharge, itemRing, chr.getWorld());
                chr.addCrushRing(MapleRing.loadFromDb(rings.getLeft()));
-               try {
-                  chr.sendNote(partner.getName(), text, (byte) 1);
-               } catch (SQLException ex) {
-                  ex.printStackTrace();
-               }
+               chr.sendNote(partner.getName(), text, (byte) 1);
                partner.showNote();
             }
          }, () -> chr.getClient().announce(MaplePacketCreator.serverNotice(1, "The partner you specified cannot be found.\r\nPlease make sure your partner is online and in the same channel.")));

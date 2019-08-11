@@ -23,12 +23,7 @@ package net.server.channel.handlers;
 
 import static client.BuddyList.BuddyOperation.ADDED;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import client.BuddyList;
 import client.BuddyList.BuddyAddResult;
@@ -37,6 +32,10 @@ import client.BuddylistEntry;
 import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.BuddyAdministrator;
+import client.database.provider.BuddyProvider;
+import client.database.provider.CharacterProvider;
+import client.database.data.CharNameAndIdData;
 import net.AbstractMaplePacketHandler;
 import net.server.world.World;
 import tools.DatabaseConnection;
@@ -49,22 +48,6 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
       if (pendingBuddyRequest != null) {
          c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.getId(), c.getPlayer().getId(), pendingBuddyRequest.getName()));
       }
-   }
-
-   private CharacterIdNameBuddyCapacity getCharacterIdAndNameFromDatabase(String name) throws SQLException {
-      Connection con = DatabaseConnection.getConnection();
-      CharacterIdNameBuddyCapacity ret;
-      try (PreparedStatement ps = con.prepareStatement("SELECT id, name, buddyCapacity FROM characters WHERE name LIKE ?")) {
-         ps.setString(1, name);
-         try (ResultSet rs = ps.executeQuery()) {
-            ret = null;
-            if (rs.next()) {
-               ret = new CharacterIdNameBuddyCapacity(rs.getInt("id"), rs.getString("name"), rs.getInt("buddyCapacity"));
-            }
-         }
-      }
-      con.close();
-      return ret;
    }
 
    @Override
@@ -84,72 +67,50 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
          } else if (buddylist.isFull() && ble == null) {
             c.announce(MaplePacketCreator.serverNotice(1, "Your buddylist is already full"));
          } else if (ble == null) {
-            try {
-               World world = c.getWorldServer();
-               CharacterIdNameBuddyCapacity charWithId;
-               int channel;
-               Optional<MapleCharacter> otherChar = c.getChannelServer().getPlayerStorage().getCharacterByName(addName);
-               if (otherChar.isPresent()) {
-                  channel = c.getChannel();
-                  charWithId = new CharacterIdNameBuddyCapacity(otherChar.get().getId(), otherChar.get().getName(), otherChar.get().getBuddylist().getCapacity());
-               } else {
-                  channel = world.find(addName);
-                  charWithId = getCharacterIdAndNameFromDatabase(addName);
-               }
+            World world = c.getWorldServer();
+            CharNameAndIdData charWithId;
+            int channel;
+            Optional<MapleCharacter> otherChar = c.getChannelServer().getPlayerStorage().getCharacterByName(addName);
+            if (otherChar.isPresent()) {
+               channel = c.getChannel();
+               charWithId = new CharNameAndIdData(otherChar.get().getName(), otherChar.get().getId(), otherChar.get().getBuddylist().getCapacity());
+            } else {
+               channel = world.find(addName);
+               charWithId = DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName)).orElseThrow();
+            }
 
-               if (charWithId != null) {
-                  BuddyAddResult buddyAddResult = null;
-                  if (channel != -1) {
-                     buddyAddResult = world.requestBuddyAdd(addName, c.getChannel(), player.getId(), player.getName());
-                  } else {
-                     Connection con = DatabaseConnection.getConnection();
-                     PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) as buddyCount FROM buddies WHERE characterid = ? AND pending = 0");
-                     ps.setInt(1, charWithId.getId());
-                     ResultSet rs = ps.executeQuery();
-                     if (!rs.next()) {
-                        throw new RuntimeException("Result set expected");
-                     } else if (rs.getInt("buddyCount") >= charWithId.getBuddyCapacity()) {
-                        buddyAddResult = BuddyAddResult.BUDDYLIST_FULL;
-                     }
-                     rs.close();
-                     ps.close();
-                     ps = con.prepareStatement("SELECT pending FROM buddies WHERE characterid = ? AND buddyid = ?");
-                     ps.setInt(1, charWithId.getId());
-                     ps.setInt(2, player.getId());
-                     rs = ps.executeQuery();
-                     if (rs.next()) {
-                        buddyAddResult = BuddyAddResult.ALREADY_ON_LIST;
-                     }
-                     rs.close();
-                     ps.close();
-                     con.close();
-                  }
-                  if (buddyAddResult == BuddyAddResult.BUDDYLIST_FULL) {
-                     c.announce(MaplePacketCreator.serverNotice(1, "\"" + addName + "\"'s Buddylist is full"));
-                  } else {
-                     int displayChannel;
-                     displayChannel = -1;
-                     int otherCid = charWithId.getId();
-                     if (buddyAddResult == BuddyAddResult.ALREADY_ON_LIST && channel != -1) {
-                        displayChannel = channel;
-                        notifyRemoteChannel(c, channel, otherCid, ADDED);
-                     } else if (buddyAddResult != BuddyAddResult.ALREADY_ON_LIST && channel == -1) {
-                        Connection con = DatabaseConnection.getConnection();
-                        try (PreparedStatement ps = con.prepareStatement("INSERT INTO buddies (characterid, `buddyid`, `pending`) VALUES (?, ?, 1)")) {
-                           ps.setInt(1, charWithId.getId());
-                           ps.setInt(2, player.getId());
-                           ps.executeUpdate();
-                        }
-                        con.close();
-                     }
-                     buddylist.put(new BuddylistEntry(charWithId.getName(), group, otherCid, displayChannel, true));
-                     c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
-                  }
+            if (charWithId != null) {
+               BuddyAddResult buddyAddResult = null;
+               if (channel != -1) {
+                  buddyAddResult = world.requestBuddyAdd(addName, c.getChannel(), player.getId(), player.getName());
                } else {
-                  c.announce(MaplePacketCreator.serverNotice(1, "A character called \"" + addName + "\" does not exist"));
+                  int count = DatabaseConnection.withConnectionResult(connection -> BuddyProvider.getInstance().getBuddyCount(connection, charWithId.getId())).orElse(0);
+                  if (count >= charWithId.getBuddyCapacity()) {
+                     buddyAddResult = BuddyAddResult.BUDDYLIST_FULL;
+                  }
+
+                  boolean alreadyOnList = DatabaseConnection.withConnectionResult(connection -> BuddyProvider.getInstance().buddyIsPending(connection, charWithId.getId(), player.getId())).orElse(false);
+                  if (alreadyOnList) {
+                     buddyAddResult = BuddyAddResult.ALREADY_ON_LIST;
+                  }
                }
-            } catch (SQLException e) {
-               e.printStackTrace();
+               if (buddyAddResult == BuddyAddResult.BUDDYLIST_FULL) {
+                  c.announce(MaplePacketCreator.serverNotice(1, "\"" + addName + "\"'s Buddylist is full"));
+               } else {
+                  int displayChannel;
+                  displayChannel = -1;
+                  int otherCid = charWithId.getId();
+                  if (buddyAddResult == BuddyAddResult.ALREADY_ON_LIST && channel != -1) {
+                     displayChannel = channel;
+                     notifyRemoteChannel(c, channel, otherCid, ADDED);
+                  } else if (buddyAddResult != BuddyAddResult.ALREADY_ON_LIST && channel == -1) {
+                     DatabaseConnection.withConnection(connection -> BuddyAdministrator.getInstance().addBuddy(connection, charWithId.getId(), player.getId()));
+                  }
+                  buddylist.put(new BuddylistEntry(charWithId.getName(), group, otherCid, displayChannel, true));
+                  c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
+               }
+            } else {
+               c.announce(MaplePacketCreator.serverNotice(1, "A character called \"" + addName + "\" does not exist"));
             }
          } else {
             ble.changeGroup(group);
@@ -177,40 +138,13 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
    }
 
    private String getCharacterNameFromDatabase(int otherCid) {
-      String result = null;
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT name FROM characters WHERE id = ?")) {
-            ps.setInt(1, otherCid);
-            try (ResultSet rs = ps.executeQuery()) {
-               if (rs.next()) {
-                  result = rs.getString("name");
-               }
-            }
-         }
-         con.close();
-      } catch (SQLException ignored) {
-      }
-      return result;
+      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, otherCid)).orElse(null);
    }
 
    private void notifyRemoteChannel(MapleClient c, int remoteChannel, int otherCid, BuddyOperation operation) {
       MapleCharacter player = c.getPlayer();
       if (remoteChannel != -1) {
          c.getWorldServer().buddyChanged(otherCid, player.getId(), player.getName(), c.getChannel(), operation);
-      }
-   }
-
-   private static class CharacterIdNameBuddyCapacity extends CharacterNameAndId {
-      private int buddyCapacity;
-
-      public CharacterIdNameBuddyCapacity(int id, String name, int buddyCapacity) {
-         super(id, name);
-         this.buddyCapacity = buddyCapacity;
-      }
-
-      public int getBuddyCapacity() {
-         return buddyCapacity;
       }
    }
 }

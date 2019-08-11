@@ -21,12 +21,8 @@
  */
 package scripting.portal;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.MapleClient;
+import client.database.provider.CharacterProvider;
 import scripting.AbstractPlayerInteraction;
 import server.MaplePortal;
 import tools.DatabaseConnection;
@@ -46,40 +42,9 @@ public class PortalPlayerInteraction extends AbstractPlayerInteraction {
    }
 
    public boolean hasLevel30Character() {
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         ps = con.prepareStatement("SELECT `level` FROM `characters` WHERE accountid = ?");
-         ps.setInt(1, getPlayer().getAccountID());
-         rs = ps.executeQuery();
-         while (rs.next()) {
-            if (rs.getInt("level") >= 30) {
-               ps.close();
-               rs.close();
-               return true;
-            }
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (rs != null && !rs.isClosed()) {
-               rs.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }
-      }
-
-      return getPlayer().getLevel() >= 30;
+      return DatabaseConnection.withConnectionResult(connection ->
+            CharacterProvider.getInstance().getCharacterLevels(connection, getPlayer().getAccountID()).stream().anyMatch(level -> level >= 30)
+      ).orElse(getPlayer().getLevel() >= 30);
    }
 
    public void blockPortal() {

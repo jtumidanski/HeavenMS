@@ -19,10 +19,7 @@
 */
 package net.server.worker;
 
-import java.sql.SQLException;
-
 import net.server.Server;
-import tools.FilePrinter;
 
 /**
  * @author Ronan
@@ -31,11 +28,7 @@ import tools.FilePrinter;
 public class CouponWorker implements Runnable {
    @Override
    public void run() {
-      try {
-         Server.getInstance().updateActiveCoupons();
-         Server.getInstance().commitActiveCoupons();
-      } catch (SQLException sqle) {
-         FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, "Unexpected SQL error: " + sqle.getMessage());
-      }
+      Server.getInstance().updateActiveCoupons();
+      Server.getInstance().commitActiveCoupons();
    }
 }

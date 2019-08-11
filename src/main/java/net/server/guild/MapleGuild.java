@@ -21,10 +21,6 @@
 */
 package net.server.guild;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -37,6 +33,12 @@ import java.util.concurrent.locks.Lock;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.CharacterAdministrator;
+import client.database.provider.CharacterProvider;
+import client.database.administrator.GuildAdministrator;
+import client.database.provider.GuildProvider;
+import client.database.administrator.NoteAdministrator;
+import client.database.data.GuildData;
 import constants.ServerConstants;
 import net.server.PlayerStorage;
 import net.server.Server;
@@ -65,96 +67,47 @@ public class MapleGuild {
    public MapleGuild(int guildid, int world) {
       this.world = world;
       members = new ArrayList<>();
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT * FROM guilds WHERE guildid = " + guildid);
-         ResultSet rs = ps.executeQuery();
-         if (!rs.first()) {
-            id = -1;
-            ps.close();
-            rs.close();
-            return;
-         }
+      DatabaseConnection.withConnection(connection -> {
          id = guildid;
-         name = rs.getString("name");
-         gp = rs.getInt("GP");
-         logo = rs.getInt("logo");
-         logoColor = rs.getInt("logoColor");
-         logoBG = rs.getInt("logoBG");
-         logoBGColor = rs.getInt("logoBGColor");
-         capacity = rs.getInt("capacity");
-         for (int i = 1; i <= 5; i++) {
-            rankTitles[i - 1] = rs.getString("rank" + i + "title");
-         }
-         leader = rs.getInt("leader");
-         notice = rs.getString("notice");
-         signature = rs.getInt("signature");
-         allianceId = rs.getInt("allianceId");
-         ps.close();
-         rs.close();
-         ps = con.prepareStatement("SELECT id, name, level, job, guildrank, allianceRank FROM characters WHERE guildid = ? ORDER BY guildrank ASC, name ASC");
-         ps.setInt(1, guildid);
-         rs = ps.executeQuery();
-         if (!rs.first()) {
-            rs.close();
-            ps.close();
+         Optional<GuildData> guildData = GuildProvider.getInstance().getGuildDataById(connection, guildid);
+         if (guildData.isEmpty()) {
             return;
          }
-         do {
-            members.add(new MapleGuildCharacter(null, rs.getInt("id"), rs.getInt("level"), rs.getString("name"), (byte) -1, world, rs.getInt("job"), rs.getInt("guildrank"), guildid, false, rs.getInt("allianceRank")));
-         } while (rs.next());
 
-         ps.close();
-         rs.close();
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-         System.out.println("Unable to read guild information from sql: " + se);
-      }
+         guildData.ifPresent(data -> {
+            name = data.getName();
+            gp = data.getGp();
+            logo = data.getLogo();
+            logoColor = data.getLogoColor();
+            logoBG = data.getLogoBackground();
+            logoBGColor = data.getLogoBackgroundColor();
+            capacity = data.getCapacity();
+            rankTitles = data.getRankTitles();
+            leader = data.getLeaderId();
+            notice = data.getNotice();
+            signature = data.getSignature();
+            allianceId = data.getAllianceId();
+         });
+
+         CharacterProvider.getInstance().getGuildCharacterData(connection, guildid)
+               .forEach(data -> members.add(new MapleGuildCharacter(null, data.getId(), data.getLevel(),
+                     data.getName(), (byte) -1, world, data.getJob(), data.getGuildRank(), guildid, false,
+                     data.getAllianceRank())));
+      });
    }
 
    public static int createGuild(int leaderId, String name) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT guildid FROM guilds WHERE name = ?");
-         ps.setString(1, name);
-         ResultSet rs = ps.executeQuery();
-         if (rs.first()) {
-            ps.close();
-            rs.close();
+      Optional<Integer> result = DatabaseConnection.withConnectionResult(connection -> {
+         if (GuildProvider.getInstance().getByName(connection, name) != -1) {
             return 0;
          }
-         ps.close();
-         rs.close();
 
-         ps = con.prepareStatement("INSERT INTO guilds (`leader`, `name`, `signature`) VALUES (?, ?, ?)");
-         ps.setInt(1, leaderId);
-         ps.setString(2, name);
-         ps.setInt(3, (int) System.currentTimeMillis());
-         ps.execute();
-         ps.close();
-
-         ps = con.prepareStatement("SELECT guildid FROM guilds WHERE leader = ?");
-         ps.setInt(1, leaderId);
-         rs = ps.executeQuery();
-         rs.first();
-         int guildId = rs.getInt("guildid");
-         rs.close();
-         ps.close();
-
-         ps = con.prepareStatement("UPDATE characters SET guildid = ? WHERE id = ?");
-         ps.setInt(1, guildId);
-         ps.setInt(2, leaderId);
-         ps.executeUpdate();
-         ps.close();
-
-         con.close();
+         GuildAdministrator.getInstance().createGuild(connection, leaderId, name);
+         int guildId = GuildProvider.getInstance().getByLeader(connection, leaderId);
+         CharacterAdministrator.getInstance().updateGuild(connection, leaderId, guildId);
          return guildId;
-      } catch (Exception e) {
-         e.printStackTrace();
-         return 0;
-      }
+      });
+      return result.orElse(0);
    }
 
    public static MapleGuildResponse sendInvitation(MapleClient c, String targetName) {
@@ -204,7 +157,7 @@ public class MapleGuild {
 
       MapleMatchCheckerCoordinator mmce = guildLeader.getWorldServer().getMatchCheckerCoordinator();
       for (MapleCharacter chr : guildLeader.getMap().getAllPlayers()) {
-         if (chr.getParty() == null && chr.getGuild() == null && mmce.getMatchConfirmationLeaderid(chr.getId()) == -1) {
+         if (chr.getParty() == null && chr.getGuild().isEmpty() && mmce.getMatchConfirmationLeaderid(chr.getId()) == -1) {
             guildMembers.add(chr);
          }
       }
@@ -213,19 +166,9 @@ public class MapleGuild {
    }
 
    public static void displayGuildRanks(MapleClient c, int npcid) {
-      try {
-         ResultSet rs;
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT `name`, `GP`, `logoBG`, `logoBGColor`, `logo`, `logoColor` FROM guilds ORDER BY `GP` DESC LIMIT 50")) {
-            rs = ps.executeQuery();
-            c.announce(MaplePacketCreator.showGuildRanks(npcid, rs));
-         }
-         rs.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-         System.out.println("failed to display guild ranks. " + e);
-      }
+      DatabaseConnection.withConnection(connection -> {
+         c.announce(MaplePacketCreator.showGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection)));
+      });
    }
 
    public static int getIncreaseGuildCost(int size) {
@@ -280,40 +223,12 @@ public class MapleGuild {
    }
 
    public void writeToDB(boolean bDisband) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
+      DatabaseConnection.withConnection(connection -> {
          if (!bDisband) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("UPDATE guilds SET GP = ?, logo = ?, logoColor = ?, logoBG = ?, logoBGColor = ?, ");
-            for (int i = 0; i < 5; i++) {
-               builder.append("rank").append(i + 1).append("title = ?, ");
-            }
-            builder.append("capacity = ?, notice = ? WHERE guildid = ?");
-            try (PreparedStatement ps = con.prepareStatement(builder.toString())) {
-               ps.setInt(1, gp);
-               ps.setInt(2, logo);
-               ps.setInt(3, logoColor);
-               ps.setInt(4, logoBG);
-               ps.setInt(5, logoBGColor);
-               for (int i = 6; i < 11; i++) {
-                  ps.setString(i, rankTitles[i - 6]);
-               }
-               ps.setInt(11, capacity);
-               ps.setString(12, notice);
-               ps.setInt(13, this.id);
-               ps.execute();
-            }
+            GuildAdministrator.getInstance().update(connection, gp, logo, logoColor, logoBG, logoBGColor, rankTitles, capacity, notice, this.id);
          } else {
-            PreparedStatement ps = con.prepareStatement("UPDATE characters SET guildid = 0, guildrank = 5 WHERE guildid = ?");
-            ps.setInt(1, this.id);
-            ps.execute();
-            ps.close();
-            ps = con.prepareStatement("DELETE FROM guilds WHERE guildid = ?");
-            ps.setInt(1, this.id);
-            ps.execute();
-            ps.close();
-
+            CharacterAdministrator.getInstance().removeAllCharactersFromGuild(connection, this.id);
+            GuildAdministrator.getInstance().deleteGuild(connection, this.id);
             membersLock.lock();
             try {
                this.broadcast(MaplePacketCreator.guildDisband(this.id));
@@ -321,11 +236,7 @@ public class MapleGuild {
                membersLock.unlock();
             }
          }
-
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+      });
    }
 
    public int getId() {
@@ -477,8 +388,9 @@ public class MapleGuild {
 
    /**
     * Sends a guild message for a <code>MapleGuildCharacter</code> - <code>Optional<Channel></code> pair.
+    *
     * @param serverNotice the server notice
-    * @param pair the pair
+    * @param pair         the pair
     */
    private void sendGuildMessageForPair(byte[] serverNotice, Pair<MapleGuildCharacter, Optional<Channel>> pair) {
       pair.getRight().ifPresent(channel -> channel.getPlayerStorage().getCharacterById(pair.getLeft().getId()).ifPresent(character -> character.getClient().announce(serverNotice)));
@@ -593,9 +505,8 @@ public class MapleGuild {
       membersLock.lock();
       try {
          java.util.Iterator<MapleGuildCharacter> itr = members.iterator();
-         MapleGuildCharacter mgc;
          while (itr.hasNext()) {
-            mgc = itr.next();
+            MapleGuildCharacter mgc = itr.next();
             if (mgc.getId() == cid && initiator.getGuildRank() < mgc.getGuildRank()) {
                this.broadcast(MaplePacketCreator.memberLeft(mgc, true));
                itr.remove();
@@ -604,21 +515,8 @@ public class MapleGuild {
                   if (mgc.isOnline()) {
                      Server.getInstance().getWorld(mgc.getWorld()).setGuildAndRank(cid, 0, 5);
                   } else {
-                     try {
-                        Connection con = DatabaseConnection.getConnection();
-                        try (PreparedStatement ps = con.prepareStatement("INSERT INTO notes (`to`, `from`, `message`, `timestamp`) VALUES (?, ?, ?, ?)")) {
-                           ps.setString(1, mgc.getName());
-                           ps.setString(2, initiator.getName());
-                           ps.setString(3, "You have been expelled from the guild.");
-                           ps.setLong(4, System.currentTimeMillis());
-                           ps.executeUpdate();
-                        }
-
-                        con.close();
-                     } catch (SQLException e) {
-                        e.printStackTrace();
-                        System.out.println("expelMember - MapleGuild " + e);
-                     }
+                     DatabaseConnection.withConnection(
+                           connection -> NoteAdministrator.getInstance().sendNote(connection, mgc.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.valueOf("0")));
                      Server.getInstance().getWorld(mgc.getWorld()).setOfflineGuildStatus((short) 0, (byte) 5, cid);
                   }
                } catch (Exception re) {
@@ -809,44 +707,21 @@ public class MapleGuild {
 
    public void setAllianceId(int aid) {
       this.allianceId = aid;
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("UPDATE guilds SET allianceId = ? WHERE guildid = ?")) {
-            ps.setInt(1, aid);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-         }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> GuildAdministrator.getInstance().setAlliance(connection, id, aid));
    }
 
    public void resetAllianceGuildPlayersRank() {
+      membersLock.lock();
       try {
-         membersLock.lock();
-         try {
-            for (MapleGuildCharacter mgc : members) {
-               if (mgc.isOnline()) {
-                  mgc.setAllianceRank(5);
-               }
+         for (MapleGuildCharacter mgc : members) {
+            if (mgc.isOnline()) {
+               mgc.setAllianceRank(5);
             }
-         } finally {
-            membersLock.unlock();
          }
-
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("UPDATE characters SET allianceRank = ? WHERE guildid = ?")) {
-            ps.setInt(1, 5);
-            ps.setInt(2, id);
-            ps.executeUpdate();
-         }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
+      } finally {
+         membersLock.unlock();
       }
+      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().updateAllianceRank(connection, id, 5));
    }
 
    private enum BCOp {

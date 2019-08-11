@@ -21,13 +21,17 @@
  */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.BbsThreadAdministrator;
+import client.database.administrator.BbsThreadReplyAdministrator;
+import client.database.data.BbsThreadData;
+import client.database.data.BbsThreadReplyData;
+import client.database.provider.BbsThreadProvider;
+import client.database.provider.BbsThreadReplyProvider;
 import net.AbstractMaplePacketHandler;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
@@ -36,81 +40,38 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class BBSOperationHandler extends AbstractMaplePacketHandler {
 
    private static void listBBSThreads(MapleClient c, int start) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM bbs_threads WHERE guildid = ? ORDER BY localthreadid DESC")) {
-            ps.setInt(1, c.getPlayer().getGuildId());
-            try (ResultSet rs = ps.executeQuery()) {
-               c.announce(MaplePacketCreator.BBSThreadList(rs, start));
-            }
-         }
-
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         List<BbsThreadData> threadData = BbsThreadProvider.getInstance().getThreadsForGuild(connection, c.getPlayer().getGuildId());
+         c.announce(MaplePacketCreator.BBSThreadList(threadData, start));
+      });
    }
 
-   private static void newBBSReply(MapleClient c, int localthreadid, String text) {
+   private static void newBBSReply(MapleClient c, int localThreadId, String text) {
       if (c.getPlayer().getGuildId() <= 0) {
          return;
       }
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT threadid FROM bbs_threads WHERE guildid = ? AND localthreadid = ?");
-         ps.setInt(1, c.getPlayer().getGuildId());
-         ps.setInt(2, localthreadid);
-         ResultSet threadRS = ps.executeQuery();
-         if (!threadRS.next()) {
-            threadRS.close();
-            ps.close();
+
+      DatabaseConnection.withConnection(connection -> {
+         Optional<BbsThreadData> threadData = BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, localThreadId, c.getPlayer().getGuildId(), true);
+         if (threadData.isEmpty()) {
             return;
          }
-         int threadid = threadRS.getInt("threadid");
-         threadRS.close();
-         ps.close();
-         ps = con.prepareStatement("INSERT INTO bbs_replies " + "(`threadid`, `postercid`, `timestamp`, `content`) VALUES " + "(?, ?, ?, ?)");
-         ps.setInt(1, threadid);
-         ps.setInt(2, c.getPlayer().getId());
-         ps.setLong(3, currentServerTime());
-         ps.setString(4, text);
-         ps.execute();
-         ps.close();
-         ps = con.prepareStatement("UPDATE bbs_threads SET replycount = replycount + 1 WHERE threadid = ?");
-         ps.setInt(1, threadid);
-         ps.execute();
-         ps.close();
-         con.close();
-         displayThread(c, localthreadid);
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+         int threadId = threadData.get().getThreadId();
+         BbsThreadReplyAdministrator.getInstance().create(connection, threadId, c.getPlayer().getId(), text);
+         BbsThreadAdministrator.getInstance().incrementReplyCount(connection, threadId);
+      });
    }
 
-   private static void editBBSThread(MapleClient client, String title, String text, int icon, int localthreadid) {
+   private static void editBBSThread(MapleClient client, String title, String text, int icon, int localThreadId) {
       MapleCharacter c = client.getPlayer();
       if (c.getGuildId() < 1) {
          return;
       }
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("UPDATE bbs_threads SET `name` = ?, `timestamp` = ?, " + "`icon` = ?, " + "`startpost` = ? WHERE guildid = ? AND localthreadid = ? AND (postercid = ? OR ?)")) {
-            ps.setString(1, title);
-            ps.setLong(2, currentServerTime());
-            ps.setInt(3, icon);
-            ps.setString(4, text);
-            ps.setInt(5, c.getGuildId());
-            ps.setInt(6, localthreadid);
-            ps.setInt(7, c.getId());
-            ps.setBoolean(8, c.getGuildRank() < 3);
-            ps.execute();
-         }
-         con.close();
-         displayThread(client, localthreadid);
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+
+      DatabaseConnection.withConnection(connection -> {
+         BbsThreadAdministrator.getInstance().editThread(connection, localThreadId, c.getGuildId(), c.getId(), c.getGuildRank() < 3, title, icon, text);
+         displayThread(client, localThreadId);
+      });
    }
 
    private static void newBBSThread(MapleClient client, String title, String text, int icon, boolean bNotice) {
@@ -118,114 +79,59 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       if (c.getGuildId() <= 0) {
          return;
       }
-      int nextId = 0;
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps;
+
+      DatabaseConnection.withConnection(connection -> {
+         int nextId = 0;
          if (!bNotice) {
-            ps = con.prepareStatement("SELECT MAX(localthreadid) AS lastLocalId FROM bbs_threads WHERE guildid = ?");
-            ps.setInt(1, c.getGuildId());
-            try (ResultSet rs = ps.executeQuery()) {
-               rs.next();
-               nextId = rs.getInt("lastLocalId") + 1;
-            }
-            ps.close();
+            nextId = BbsThreadProvider.getInstance().getNextLocalThreadId(connection, c.getGuildId());
          }
-         ps = con.prepareStatement("INSERT INTO bbs_threads " + "(`postercid`, `name`, `timestamp`, `icon`, `startpost`, " + "`guildid`, `localthreadid`) " + "VALUES(?, ?, ?, ?, ?, ?, ?)");
-         ps.setInt(1, c.getId());
-         ps.setString(2, title);
-         ps.setLong(3, currentServerTime());
-         ps.setInt(4, icon);
-         ps.setString(5, text);
-         ps.setInt(6, c.getGuildId());
-         ps.setInt(7, nextId);
-         ps.execute();
-         ps.close();
-         con.close();
+         BbsThreadAdministrator.getInstance().create(connection, c.getId(), title, icon, text, c.getGuildId(), nextId);
          displayThread(client, nextId);
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
-
+      });
    }
 
-   public static void deleteBBSThread(MapleClient client, int localthreadid) {
+   public static void deleteBBSThread(MapleClient client, int localThreadId) {
       MapleCharacter mc = client.getPlayer();
       if (mc.getGuildId() <= 0) {
          return;
       }
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT threadid, postercid FROM bbs_threads WHERE guildid = ? AND localthreadid = ?");
-         ps.setInt(1, mc.getGuildId());
-         ps.setInt(2, localthreadid);
-         ResultSet threadRS = ps.executeQuery();
-         if (!threadRS.next()) {
-            threadRS.close();
-            ps.close();
+
+      DatabaseConnection.withConnection(connection -> {
+         Optional<BbsThreadData> threadData = BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, localThreadId, mc.getGuildId(), true);
+         if (threadData.isEmpty()) {
             return;
          }
-         if (mc.getId() != threadRS.getInt("postercid") && mc.getGuildRank() > 2) {
-            threadRS.close();
-            ps.close();
+         if (threadData.get().getPosterCharacterId() != mc.getId() && mc.getGuildRank() > 2) {
             return;
          }
-         int threadid = threadRS.getInt("threadid");
-         ps.close();
-         ps = con.prepareStatement("DELETE FROM bbs_replies WHERE threadid = ?");
-         ps.setInt(1, threadid);
-         ps.execute();
-         ps.close();
-         ps = con.prepareStatement("DELETE FROM bbs_threads WHERE threadid = ?");
-         ps.setInt(1, threadid);
-         ps.execute();
-         threadRS.close();
-         ps.close();
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+
+         int threadId = threadData.get().getThreadId();
+
+         BbsThreadReplyAdministrator.getInstance().deleteByThreadId(connection, threadId);
+         BbsThreadAdministrator.getInstance().deleteById(connection, threadId);
+      });
    }
 
-   public static void deleteBBSReply(MapleClient client, int replyid) {
+   public static void deleteBBSReply(MapleClient client, int replyId) {
       MapleCharacter mc = client.getPlayer();
       if (mc.getGuildId() <= 0) {
          return;
       }
-      int threadid;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT postercid, threadid FROM bbs_replies WHERE replyid = ?");
-         ps.setInt(1, replyid);
-         ResultSet rs = ps.executeQuery();
-         if (!rs.next()) {
-            rs.close();
-            ps.close();
+
+      DatabaseConnection.withConnection(connection -> {
+         Optional<BbsThreadReplyData> threadReplyData = BbsThreadReplyProvider.getInstance().getByReplyId(connection, replyId);
+         if (threadReplyData.isEmpty()) {
             return;
          }
-         if (mc.getId() != rs.getInt("postercid") && mc.getGuildRank() > 2) {
-            rs.close();
-            ps.close();
+         if (threadReplyData.get().getPosterCharacterId() != mc.getId() && mc.getGuildRank() > 2) {
             return;
          }
-         threadid = rs.getInt("threadid");
-         rs.close();
-         ps.close();
-         ps = con.prepareStatement("DELETE FROM bbs_replies WHERE replyid = ?");
-         ps.setInt(1, replyid);
-         ps.execute();
-         ps.close();
-         ps = con.prepareStatement("UPDATE bbs_threads SET replycount = replycount - 1 WHERE threadid = ?");
-         ps.setInt(1, threadid);
-         ps.execute();
-         ps.close();
-         con.close();
-         displayThread(client, threadid, false);
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+
+         int threadId = threadReplyData.get().getThreadId();
+         BbsThreadReplyAdministrator.getInstance().deleteById(connection, replyId);
+         BbsThreadAdministrator.getInstance().decrementReplyCount(connection, threadId);
+         displayThread(client, threadId, false);
+      });
    }
 
    public static void displayThread(MapleClient client, int threadid) {
@@ -237,40 +143,13 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       if (mc.getGuildId() <= 0) {
          return;
       }
-      Connection con;
-      try {
-         con = DatabaseConnection.getConnection();
-         PreparedStatement ps2;
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM bbs_threads WHERE guildid = ? AND " + (bIsThreadIdLocal ? "local" : "") + "threadid = ?")) {
-            ps.setInt(1, mc.getGuildId());
-            ps.setInt(2, threadid);
-            ResultSet threadRS = ps.executeQuery();
-            if (!threadRS.next()) {
-               threadRS.close();
-               ps.close();
-               return;
-            }
-            ResultSet repliesRS = null;
-            ps2 = null;
-            if (threadRS.getInt("replycount") >= 0) {
-               ps2 = con.prepareStatement("SELECT * FROM bbs_replies WHERE threadid = ?");
-               ps2.setInt(1, !bIsThreadIdLocal ? threadid : threadRS.getInt("threadid"));
-               repliesRS = ps2.executeQuery();
-            }
-            client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadRS.getInt("localthreadid"), threadRS, repliesRS));
-            repliesRS.close();
-         }
-         if (ps2 != null) {
-            ps2.close();
-         }
 
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      } catch (RuntimeException re) {//btw we get this everytime for some reason, but replies work!
-         re.printStackTrace();
-         System.out.println("The number of reply rows does not match the replycount in thread.");
-      }
+      DatabaseConnection.withConnection(connection -> {
+         BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal).ifPresent(threadData -> {
+            client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.getThreadId(), threadData));
+         });
+
+      });
    }
 
    private String correctLength(String in, int maxSize) {

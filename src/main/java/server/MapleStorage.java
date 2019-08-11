@@ -20,9 +20,6 @@ package server;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -30,9 +27,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 
 import client.MapleClient;
+import client.database.administrator.StorageAdministrator;
+import client.database.provider.StorageProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
@@ -61,58 +61,31 @@ public class MapleStorage {
    private List<Item> items;
    private Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.STORAGE, true);
 
-   private MapleStorage(int id, byte slots, int meso) {
+   public MapleStorage(int id, byte slots, int meso) {
       this.id = id;
       this.slots = slots;
       this.items = new LinkedList<>();
       this.meso = meso;
    }
 
-   private static MapleStorage create(int id, int world) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("INSERT INTO storages (accountid, world, slots, meso) VALUES (?, ?, 4, 0)")) {
-            ps.setInt(1, id);
-            ps.setInt(2, world);
-            ps.executeUpdate();
-         }
+   private static MapleStorage create(Connection connection, int id, int world) {
+      StorageAdministrator.getInstance().create(connection, id, world);
+      Optional<MapleStorage> mapleStorage = StorageProvider.getInstance().getByAccountAndWorld(connection, id, world);
+      return mapleStorage.map(MapleStorage::loadItemsForStorage).orElseThrow();
+   }
 
-         con.close();
-      } catch (Exception e) {
-         e.printStackTrace();
+   private static MapleStorage loadItemsForStorage(MapleStorage mapleStorage) {
+      for (Pair<Item, MapleInventoryType> item : ItemFactory.STORAGE.loadItems(mapleStorage.id, false)) {
+         mapleStorage.items.add(item.getLeft());
       }
-      return loadOrCreateFromDB(id, world);
+      return mapleStorage;
    }
 
    public static MapleStorage loadOrCreateFromDB(int id, int world) {
-      MapleStorage ret = null;
-      int storeId;
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT storageid, slots, meso FROM storages WHERE accountid = ? AND world = ?");
-         ps.setInt(1, id);
-         ps.setInt(2, world);
-         ResultSet rs = ps.executeQuery();
-         if (!rs.next()) {
-            rs.close();
-            ps.close();
-            con.close();
-            return create(id, world);
-         } else {
-            storeId = rs.getInt("storageid");
-            ret = new MapleStorage(storeId, (byte) rs.getInt("slots"), rs.getInt("meso"));
-            rs.close();
-            ps.close();
-            for (Pair<Item, MapleInventoryType> item : ItemFactory.STORAGE.loadItems(ret.id, false)) {
-               ret.items.add(item.getLeft());
-            }
-         }
-
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
-      return ret;
+      return DatabaseConnection.withConnectionResult(connection -> {
+         Optional<MapleStorage> mapleStorage = StorageProvider.getInstance().getByAccountAndWorld(connection, id, world);
+         return mapleStorage.map(MapleStorage::loadItemsForStorage).orElseGet(() -> create(connection, id, world));
+      }).orElseThrow();
    }
 
    public byte getSlots() {
@@ -131,24 +104,16 @@ public class MapleStorage {
    }
 
    public void saveToDB(Connection con) {
-      try {
-         try (PreparedStatement ps = con.prepareStatement("UPDATE storages SET slots = ?, meso = ? WHERE storageid = ?")) {
-            ps.setInt(1, slots);
-            ps.setInt(2, meso);
-            ps.setInt(3, id);
-            ps.executeUpdate();
-         }
-         List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
+      StorageAdministrator.getInstance().update(con, id, slots, meso);
 
-         List<Item> list = getItems();
-         for (Item item : list) {
-            itemsWithType.add(new Pair<>(item, item.getInventoryType()));
-         }
+      List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
 
-         ItemFactory.STORAGE.saveItems(itemsWithType, id, con);
-      } catch (SQLException ex) {
-         ex.printStackTrace();
+      List<Item> list = getItems();
+      for (Item item : list) {
+         itemsWithType.add(new Pair<>(item, item.getInventoryType()));
       }
+
+      ItemFactory.STORAGE.saveItems(itemsWithType, id, con);
    }
 
    public Item getItem(byte slot) {

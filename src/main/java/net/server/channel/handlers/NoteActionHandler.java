@@ -21,12 +21,9 @@
 */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.MapleClient;
+import client.database.administrator.NoteAdministrator;
+import client.database.provider.NoteProvider;
 import net.AbstractMaplePacketHandler;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
@@ -39,42 +36,26 @@ public final class NoteActionHandler extends AbstractMaplePacketHandler {
       if (action == 0 && c.getPlayer().getCashShop().getAvailableNotes() > 0) {
          String charname = slea.readMapleAsciiString();
          String message = slea.readMapleAsciiString();
-         try {
-            if (c.getPlayer().getCashShop().isOpened())
-               c.announce(MaplePacketCreator.showCashInventory(c));
-
-            c.getPlayer().sendNote(charname, message, (byte) 1);
-            c.getPlayer().getCashShop().decreaseNotes();
-         } catch (SQLException e) {
-            e.printStackTrace();
+         if (c.getPlayer().getCashShop().isOpened()) {
+            c.announce(MaplePacketCreator.showCashInventory(c));
          }
+
+         c.getPlayer().sendNote(charname, message, (byte) 1);
+         c.getPlayer().getCashShop().decreaseNotes();
       } else if (action == 1) {
          int num = slea.readByte();
          slea.readByte();
          slea.readByte();
-         int fame = 0;
-         for (int i = 0; i < num; i++) {
-            int id = slea.readInt();
-            slea.readByte(); //Fame, but we read it from the database :)
-            PreparedStatement ps;
-            try {
-               Connection con = DatabaseConnection.getConnection();
-               ps = con.prepareStatement("SELECT `fame` FROM notes WHERE id=? AND deleted=0");
-               ps.setInt(1, id);
-               ResultSet rs = ps.executeQuery();
-               if (rs.next())
-                  fame += rs.getInt("fame");
-               rs.close();
-
-               ps = con.prepareStatement("UPDATE notes SET `deleted` = 1 WHERE id = ?");
-               ps.setInt(1, id);
-               ps.executeUpdate();
-               ps.close();
-               con.close();
-            } catch (SQLException e) {
-               e.printStackTrace();
+         int fame = DatabaseConnection.withConnectionResult(connection -> {
+            int fameCount = 0;
+            for (int i = 0; i < num; i++) {
+               int id = slea.readInt();
+               slea.readByte(); //Fame, but we read it from the database :)
+               fameCount += NoteProvider.getInstance().getFameForActiveNotes(connection, id).orElse(0);
+               NoteAdministrator.getInstance().clearNote(connection, id);
             }
-         }
+            return fameCount;
+         }).orElse(0);
          if (fame > 0) {
             c.getPlayer().gainFame(fame);
          }

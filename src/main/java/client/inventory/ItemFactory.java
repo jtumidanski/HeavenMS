@@ -21,14 +21,16 @@
 package client.inventory;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
+import client.database.administrator.InventoryEquipmentAdministrator;
+import client.database.administrator.InventoryItemAdministrator;
+import client.database.provider.InventoryItemProvider;
+import client.database.administrator.InventoryMerchantAdministrator;
+import client.database.provider.InventoryMerchantProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.DatabaseConnection;
@@ -65,326 +67,113 @@ public enum ItemFactory {
       this.account = account;
    }
 
-   private static Equip loadEquipFromResultSet(ResultSet rs) throws SQLException {
-      Equip equip = new Equip(rs.getInt("itemid"), (short) rs.getInt("position"));
-      equip.setOwner(rs.getString("owner"));
-      equip.setQuantity((short) rs.getInt("quantity"));
-      equip.setAcc((short) rs.getInt("acc"));
-      equip.setAvoid((short) rs.getInt("avoid"));
-      equip.setDex((short) rs.getInt("dex"));
-      equip.setHands((short) rs.getInt("hands"));
-      equip.setHp((short) rs.getInt("hp"));
-      equip.setInt((short) rs.getInt("int"));
-      equip.setJump((short) rs.getInt("jump"));
-      equip.setVicious((short) rs.getInt("vicious"));
-      equip.setFlag((short) rs.getInt("flag"));
-      equip.setLuk((short) rs.getInt("luk"));
-      equip.setMatk((short) rs.getInt("matk"));
-      equip.setMdef((short) rs.getInt("mdef"));
-      equip.setMp((short) rs.getInt("mp"));
-      equip.setSpeed((short) rs.getInt("speed"));
-      equip.setStr((short) rs.getInt("str"));
-      equip.setWatk((short) rs.getInt("watk"));
-      equip.setWdef((short) rs.getInt("wdef"));
-      equip.setUpgradeSlots((byte) rs.getInt("upgradeslots"));
-      equip.setLevel(rs.getByte("level"));
-      equip.setItemExp(rs.getInt("itemexp"));
-      equip.setItemLevel(rs.getByte("itemlevel"));
-      equip.setExpiration(rs.getLong("expiration"));
-      equip.setGiftFrom(rs.getString("giftFrom"));
-      equip.setRingId(rs.getInt("ringid"));
-
-      return equip;
-   }
-
-   public static List<Pair<Item, Integer>> loadEquippedItems(int id, boolean isAccount, boolean login) throws SQLException {
-      List<Pair<Item, Integer>> items = new ArrayList<>();
-
-      StringBuilder query = new StringBuilder();
-      query.append("SELECT * FROM ");
-      query.append("(SELECT id, accountid FROM characters) AS accountterm ");
-      query.append("RIGHT JOIN ");
-      query.append("(SELECT * FROM (`inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`))) AS equipterm");
-      query.append(" ON accountterm.id=equipterm.characterid ");
-      query.append("WHERE accountterm.`");
-      query.append(isAccount ? "accountid" : "characterid");
-      query.append("` = ?");
-      query.append(login ? " AND `inventorytype` = " + MapleInventoryType.EQUIPPED.getType() : "");
-
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement(query.toString())) {
-            ps.setInt(1, id);
-
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  Integer cid = rs.getInt("characterid");
-                  items.add(new Pair<>(loadEquipFromResultSet(rs), cid));
-               }
-            }
-         }
+   public static List<Pair<Item, Integer>> loadEquippedItems(int id, boolean isAccount, boolean login) {
+      if (isAccount) {
+         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByAccount(connection, id, login)).orElse(new ArrayList<>());
+      } else {
+         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByCharacter(connection, id, login)).orElse(new ArrayList<>());
       }
-
-      return items;
    }
 
    public int getValue() {
       return value;
    }
 
-   public List<Pair<Item, MapleInventoryType>> loadItems(int id, boolean login) throws SQLException {
-      if (value != 6) return loadItemsCommon(id, login);
-      else return loadItemsMerchant(id, login);
+   public List<Pair<Item, MapleInventoryType>> loadItems(int id, boolean login) {
+      if (value != 6) {
+         return loadItemsCommon(id, login);
+      } else {
+         return loadItemsMerchant(id, login);
+      }
    }
 
-   public void saveItems(List<Pair<Item, MapleInventoryType>> items, int id, Connection con) throws SQLException {
+   public void saveItems(List<Pair<Item, MapleInventoryType>> items, int id, Connection con) {
       saveItems(items, null, id, con);
    }
 
-   public void saveItems(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, Connection con) throws SQLException {
+   public void saveItems(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, Connection con) {
       // thanks Arufonsu, MedicOP, BHB for pointing a "synchronized" bottleneck here
 
-      if (value != 6) saveItemsCommon(items, id, con);
-      else saveItemsMerchant(items, bundlesList, id, con);
-   }
-
-   private List<Pair<Item, MapleInventoryType>> loadItemsCommon(int id, boolean login) throws SQLException {
-      List<Pair<Item, MapleInventoryType>> items = new ArrayList<>();
-
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      Connection con = DatabaseConnection.getConnection();
-      try {
-         StringBuilder query = new StringBuilder();
-         query.append("SELECT * FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `");
-         query.append(account ? "accountid" : "characterid").append("` = ?");
-
-         if (login) {
-            query.append(" AND `inventorytype` = ").append(MapleInventoryType.EQUIPPED.getType());
-         }
-
-         ps = con.prepareStatement(query.toString());
-         ps.setInt(1, value);
-         ps.setInt(2, id);
-         rs = ps.executeQuery();
-
-         while (rs.next()) {
-            MapleInventoryType mit = MapleInventoryType.getByType(rs.getByte("inventorytype"));
-
-            if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-               items.add(new Pair<>(loadEquipFromResultSet(rs), mit));
-            } else {
-               Item item = new Item(rs.getInt("itemid"), (byte) rs.getInt("position"), (short) rs.getInt("quantity"), rs.getInt("petid"));
-               item.setOwner(rs.getString("owner"));
-               item.setExpiration(rs.getLong("expiration"));
-               item.setGiftFrom(rs.getString("giftFrom"));
-               item.setFlag((short) rs.getInt("flag"));
-               items.add(new Pair<>(item, mit));
-            }
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } finally {
-         if (rs != null && !rs.isClosed()) {
-            rs.close();
-         }
-         if (ps != null && !ps.isClosed()) {
-            ps.close();
-         }
-         if (con != null && !con.isClosed()) {
-            con.close();
-         }
+      if (value != 6) {
+         saveItemsCommon(items, id, con);
+      } else {
+         saveItemsMerchant(items, bundlesList, id, con);
       }
-      return items;
    }
 
-   private void saveItemsCommon(List<Pair<Item, MapleInventoryType>> items, int id, Connection con) throws SQLException {
-      PreparedStatement ps = null;
-      PreparedStatement pse = null;
-      ResultSet rs = null;
+   private List<Pair<Item, MapleInventoryType>> loadItemsCommon(int id, boolean login) {
+      if (account) {
+         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getItemsByAccountAndType(connection, id, value, login)).orElse(new ArrayList<>());
+      } else {
+         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getItemsByCharacterAndType(connection, id, value, login)).orElse(new ArrayList<>());
+      }
+   }
 
+   private void saveItemsCommon(List<Pair<Item, MapleInventoryType>> items, int id, Connection con) {
       Lock lock = locks[id % lockCount];
       lock.lock();
       try {
-         String query = "DELETE `inventoryitems`, `inventoryequipment` FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `" +
-               (account ? "accountid" : "characterid") + "` = ?";
-         ps = con.prepareStatement(query);
-         ps.setInt(1, value);
-         ps.setInt(2, id);
-         ps.executeUpdate();
-         ps.close();
-         ps = con.prepareStatement("INSERT INTO `inventoryitems` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+         if (account) {
+            InventoryItemAdministrator.getInstance().deleteForAccountByType(con, id, value);
+         } else {
+            InventoryItemAdministrator.getInstance().deleteForCharacterByType(con, id, value);
+         }
+
 
          if (!items.isEmpty()) {
             for (Pair<Item, MapleInventoryType> pair : items) {
                Item item = pair.getLeft();
                MapleInventoryType mit = pair.getRight();
-               ps.setInt(1, value);
-               ps.setString(2, account ? null : String.valueOf(id));
-               ps.setString(3, account ? String.valueOf(id) : null);
-               ps.setInt(4, item.getItemId());
-               ps.setInt(5, mit.getType());
-               ps.setInt(6, item.getPosition());
-               ps.setInt(7, item.getQuantity());
-               ps.setString(8, item.getOwner());
-               ps.setInt(9, item.getPetId());
-               ps.setInt(10, item.getFlag());
-               ps.setLong(11, item.getExpiration());
-               ps.setString(12, item.getGiftFrom());
-               ps.executeUpdate();
-
-               pse = con.prepareStatement("INSERT INTO `inventoryequipment` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+               int genKey = InventoryItemAdministrator.getInstance().create(con, value, account ? -1 : id, account ? id : -1,
+                     item.getItemId(), mit.getType(), item.getPosition(), item.getQuantity(), item.getOwner(),
+                     item.getPetId(), item.getFlag(), item.getExpiration(), item.getGiftFrom());
 
                if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-                  rs = ps.getGeneratedKeys();
-
-                  if (!rs.next()) {
-                     throw new RuntimeException("Inserting item failed.");
-                  }
-
-                  pse.setInt(1, rs.getInt(1));
-                  rs.close();
-
-                  Equip equip = (Equip) item;
-                  pse.setInt(2, equip.getUpgradeSlots());
-                  pse.setInt(3, equip.getLevel());
-                  pse.setInt(4, equip.getStr());
-                  pse.setInt(5, equip.getDex());
-                  pse.setInt(6, equip.getInt());
-                  pse.setInt(7, equip.getLuk());
-                  pse.setInt(8, equip.getHp());
-                  pse.setInt(9, equip.getMp());
-                  pse.setInt(10, equip.getWatk());
-                  pse.setInt(11, equip.getMatk());
-                  pse.setInt(12, equip.getWdef());
-                  pse.setInt(13, equip.getMdef());
-                  pse.setInt(14, equip.getAcc());
-                  pse.setInt(15, equip.getAvoid());
-                  pse.setInt(16, equip.getHands());
-                  pse.setInt(17, equip.getSpeed());
-                  pse.setInt(18, equip.getJump());
-                  pse.setInt(19, 0);
-                  pse.setInt(20, equip.getVicious());
-                  pse.setInt(21, equip.getItemLevel());
-                  pse.setInt(22, equip.getItemExp());
-                  pse.setInt(23, equip.getRingId());
-                  pse.executeUpdate();
+                  saveEquipItem(con, (Equip) item, genKey);
                }
-
-               pse.close();
             }
          }
-
-         ps.close();
       } finally {
-         if (ps != null && !ps.isClosed()) {
-            ps.close();
-         }
-         if (pse != null && !pse.isClosed()) {
-            pse.close();
-         }
-         if (rs != null && !rs.isClosed()) {
-            rs.close();
-         }
-
          lock.unlock();
       }
    }
 
-   private List<Pair<Item, MapleInventoryType>> loadItemsMerchant(int id, boolean login) throws SQLException {
-      List<Pair<Item, MapleInventoryType>> items = new ArrayList<>();
-
-      PreparedStatement ps = null, ps2 = null;
-      ResultSet rs = null, rs2 = null;
-      Connection con = DatabaseConnection.getConnection();
-      try {
-         StringBuilder query = new StringBuilder();
-         query.append("SELECT * FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `");
-         query.append(account ? "accountid" : "characterid").append("` = ?");
-
-         if (login) {
-            query.append(" AND `inventorytype` = ").append(MapleInventoryType.EQUIPPED.getType());
+   private List<Pair<Item, MapleInventoryType>> loadItemsMerchant(int id, boolean login) {
+      return DatabaseConnection.withConnectionResult(connection -> {
+         List<Pair<Item, MapleInventoryType>> results;
+         if (account) {
+            results = InventoryItemProvider.getInstance().getItemsByAccountAndType(connection, id, value, login);
+         } else {
+            results = InventoryItemProvider.getInstance().getItemsByCharacterAndType(connection, id, value, login);
          }
-
-         ps = con.prepareStatement(query.toString());
-         ps.setInt(1, value);
-         ps.setInt(2, id);
-         rs = ps.executeQuery();
-
-         while (rs.next()) {
-            ps2 = con.prepareStatement("SELECT `bundles` FROM `inventorymerchant` WHERE `inventoryitemid` = ?");
-            ps2.setInt(1, rs.getInt("inventoryitemid"));
-            rs2 = ps2.executeQuery();
-
-            short bundles = 0;
-            if (rs2.next()) {
-               bundles = rs2.getShort("bundles");
-            }
-
-            MapleInventoryType mit = MapleInventoryType.getByType(rs.getByte("inventorytype"));
-
-            if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-               items.add(new Pair<>(loadEquipFromResultSet(rs), mit));
+         return results.stream().map(original -> {
+            short bundles = InventoryMerchantProvider.getInstance().getBundleForItem(connection, original.getLeft().getItemId());
+            MapleInventoryType inventoryType = original.getRight();
+            if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
+               return original;
             } else {
                if (bundles > 0) {
-                  Item item = new Item(rs.getInt("itemid"), (byte) rs.getInt("position"), (short) (bundles * rs.getInt("quantity")), rs.getInt("petid"));
-                  item.setOwner(rs.getString("owner"));
-                  item.setExpiration(rs.getLong("expiration"));
-                  item.setGiftFrom(rs.getString("giftFrom"));
-                  item.setFlag((short) rs.getInt("flag"));
-                  items.add(new Pair<>(item, mit));
+                  original.getLeft().setQuantity((short) (bundles * original.getLeft().getQuantity()));
+                  return original;
                }
             }
-
-            rs2.close();
-            ps2.close();
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } finally {
-         if (rs2 != null && !rs2.isClosed()) {
-            rs2.close();
-         }
-         if (ps2 != null && !ps2.isClosed()) {
-            ps2.close();
-         }
-         if (rs != null && !rs.isClosed()) {
-            rs.close();
-         }
-         if (ps != null && !ps.isClosed()) {
-            ps.close();
-         }
-         if (con != null && !con.isClosed()) {
-            con.close();
-         }
-      }
-      return items;
+            return null;
+         }).collect(Collectors.toList());
+      }).orElse(new ArrayList<>());
    }
 
-   private void saveItemsMerchant(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, Connection con) throws SQLException {
-      PreparedStatement ps = null;
-      PreparedStatement pse = null;
-      ResultSet rs = null;
-
+   private void saveItemsMerchant(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, Connection con) {
       Lock lock = locks[id % lockCount];
       lock.lock();
       try {
-         ps = con.prepareStatement("DELETE FROM `inventorymerchant` WHERE `characterid` = ?");
-         ps.setInt(1, id);
-         ps.executeUpdate();
-         ps.close();
+         InventoryMerchantAdministrator.getInstance().deleteForCharacter(con, id);
+         if (account) {
+            InventoryItemAdministrator.getInstance().deleteForAccountByType(con, id, value);
 
-         String query = "DELETE `inventoryitems`, `inventoryequipment` FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `" +
-               (account ? "accountid" : "characterid") + "` = ?";
-         ps = con.prepareStatement(query);
-         ps.setInt(1, value);
-         ps.setInt(2, id);
-         ps.executeUpdate();
-         ps.close();
-         ps = con.prepareStatement("INSERT INTO `inventoryitems` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+         } else {
+            InventoryItemAdministrator.getInstance().deleteForCharacterByType(con, id, value);
+         }
+
 
          if (!items.isEmpty()) {
             int i = 0;
@@ -394,82 +183,27 @@ public enum ItemFactory {
                MapleInventoryType mit = pair.getRight();
                i++;
 
-               ps.setInt(1, value);
-               ps.setString(2, account ? null : String.valueOf(id));
-               ps.setString(3, account ? String.valueOf(id) : null);
-               ps.setInt(4, item.getItemId());
-               ps.setInt(5, mit.getType());
-               ps.setInt(6, item.getPosition());
-               ps.setInt(7, item.getQuantity());
-               ps.setString(8, item.getOwner());
-               ps.setInt(9, item.getPetId());
-               ps.setInt(10, item.getFlag());
-               ps.setLong(11, item.getExpiration());
-               ps.setString(12, item.getGiftFrom());
-               ps.executeUpdate();
-
-               rs = ps.getGeneratedKeys();
-               if (!rs.next()) {
-                  throw new RuntimeException("Inserting item failed.");
-               }
-
-               int genKey = rs.getInt(1);
-               rs.close();
-
-               pse = con.prepareStatement("INSERT INTO `inventorymerchant` VALUES (DEFAULT, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
-               pse.setInt(1, genKey);
-               pse.setInt(2, id);
-               pse.setInt(3, bundles);
-               pse.executeUpdate();
-               pse.close();
+               int genKey = InventoryItemAdministrator.getInstance().create(con, value, account ? -1 : id,
+                     account ? id : -1, item.getItemId(), mit.getType(), item.getPosition(), item.getQuantity(),
+                     item.getOwner(), item.getPetId(), item.getFlag(), item.getExpiration(), item.getGiftFrom());
+               InventoryMerchantAdministrator.getInstance().create(con, genKey, id, bundles);
 
                if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-                  pse = con.prepareStatement("INSERT INTO `inventoryequipment` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                  pse.setInt(1, genKey);
-
-                  Equip equip = (Equip) item;
-                  pse.setInt(2, equip.getUpgradeSlots());
-                  pse.setInt(3, equip.getLevel());
-                  pse.setInt(4, equip.getStr());
-                  pse.setInt(5, equip.getDex());
-                  pse.setInt(6, equip.getInt());
-                  pse.setInt(7, equip.getLuk());
-                  pse.setInt(8, equip.getHp());
-                  pse.setInt(9, equip.getMp());
-                  pse.setInt(10, equip.getWatk());
-                  pse.setInt(11, equip.getMatk());
-                  pse.setInt(12, equip.getWdef());
-                  pse.setInt(13, equip.getMdef());
-                  pse.setInt(14, equip.getAcc());
-                  pse.setInt(15, equip.getAvoid());
-                  pse.setInt(16, equip.getHands());
-                  pse.setInt(17, equip.getSpeed());
-                  pse.setInt(18, equip.getJump());
-                  pse.setInt(19, 0);
-                  pse.setInt(20, equip.getVicious());
-                  pse.setInt(21, equip.getItemLevel());
-                  pse.setInt(22, equip.getItemExp());
-                  pse.setInt(23, equip.getRingId());
-                  pse.executeUpdate();
-
-                  pse.close();
+                  saveEquipItem(con, (Equip) item, genKey);
                }
             }
          }
-
-         ps.close();
       } finally {
-         if (ps != null && !ps.isClosed()) {
-            ps.close();
-         }
-         if (pse != null && !pse.isClosed()) {
-            pse.close();
-         }
-         if (rs != null && !rs.isClosed()) {
-            rs.close();
-         }
-
          lock.unlock();
       }
+   }
+
+   private void saveEquipItem(Connection con, Equip item, int genKey) {
+      InventoryEquipmentAdministrator.getInstance().create(con, genKey, item.getUpgradeSlots(),
+            item.getLevel(), item.getStr(), item.getDex(), item.getInt(), item.getLuk(),
+            item.getHp(), item.getMp(), item.getWatk(), item.getMatk(), item.getWdef(),
+            item.getMdef(), item.getAcc(), item.getAvoid(), item.getHands(), item.getSpeed(),
+            item.getJump(), 0, item.getVicious(), item.getItemLevel(), item.getItemExp(),
+            item.getRingId());
    }
 }

@@ -26,6 +26,20 @@ public class MapleFamilyEntry {
    private int rank, reputation, totalReputation, todaysRep, totalJuniors, juniors, chrid;
    private String familyName;
 
+   public MapleFamilyEntry() {
+   }
+
+   public MapleFamilyEntry(int familyId, int rank, int reputation, int totalJuniors, String familyName, int juniors, int todaysRep, int chrid) {
+      this.familyId = familyId;
+      this.rank = rank;
+      this.reputation = reputation;
+      this.todaysRep = todaysRep;
+      this.totalJuniors = totalJuniors;
+      this.familyName = familyName;
+      this.juniors = juniors;
+      this.chrid = chrid;
+   }
+
    public int getId() {
       return familyId;
    }

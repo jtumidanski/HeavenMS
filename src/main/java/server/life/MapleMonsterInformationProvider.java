@@ -21,10 +21,6 @@
 package server.life;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,7 +28,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import client.database.provider.DropDataProvider;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import provider.MapleData;
@@ -45,13 +43,11 @@ import tools.Pair;
 import tools.Randomizer;
 
 public class MapleMonsterInformationProvider {
-   // Author : LightPepsi
-
    private static final MapleMonsterInformationProvider instance = new MapleMonsterInformationProvider();
    private final Map<Integer, List<MonsterDropEntry>> drops = new HashMap<>();
-   private final List<MonsterGlobalDropEntry> globaldrops = new ArrayList<>();
-   private final Map<Integer, List<MonsterGlobalDropEntry>> continentdrops = new HashMap<>();
-   private final Map<Integer, List<Integer>> dropsChancePool = new HashMap<>();    // thanks to ronan
+   private final List<MonsterGlobalDropEntry> globalDrops = new ArrayList<>();
+   private final Map<Integer, List<MonsterGlobalDropEntry>> continentDrops = new HashMap<>();
+   private final Map<Integer, List<Integer>> dropsChancePool = new HashMap<>();
    private final Set<Integer> hasNoMultiEquipDrops = new HashSet<>();
    private final Map<Integer, List<MonsterDropEntry>> extraMultiEquipDrops = new HashMap<>();
    private final Map<Pair<Integer, Integer>, Integer> mobAttackAnimationTime = new HashMap<>();
@@ -59,6 +55,7 @@ public class MapleMonsterInformationProvider {
    private final Map<Integer, Pair<Integer, Integer>> mobAttackInfo = new HashMap<>();
    private final Map<Integer, Boolean> mobBossCache = new HashMap<>();
    private final Map<Integer, String> mobNameCache = new HashMap<>();
+
    protected MapleMonsterInformationProvider() {
       retrieveGlobal();
    }
@@ -67,84 +64,32 @@ public class MapleMonsterInformationProvider {
       return instance;
    }
 
-   public static ArrayList<Pair<Integer, String>> getMobsIDsFromName(String search) {
+   public static List<Pair<Integer, String>> getMobsIDsFromName(String search) {
       MapleDataProvider dataProvider = MapleDataProviderFactory.getDataProvider(new File("wz/String.wz"));
-      ArrayList<Pair<Integer, String>> retMobs = new ArrayList<>();
       MapleData data = dataProvider.getData("Mob.img");
-      List<Pair<Integer, String>> mobPairList = new LinkedList<>();
-      for (MapleData mobIdData : data.getChildren()) {
-         int mobIdFromData = Integer.parseInt(mobIdData.getName());
-         String mobNameFromData = MapleDataTool.getString(mobIdData.getChildByPath("name"), "NO-NAME");
-         mobPairList.add(new Pair<>(mobIdFromData, mobNameFromData));
-      }
-      for (Pair<Integer, String> mobPair : mobPairList) {
-         if (mobPair.getRight().toLowerCase().contains(search.toLowerCase())) {
-            retMobs.add(mobPair);
-         }
-      }
-      return retMobs;
+
+      return data.getChildren().stream()
+            .map(mapleData -> new Pair<>(Integer.parseInt(mapleData.getName()), MapleDataTool.getString(mapleData.getChildByPath("name"), "NO-NAME")))
+            .filter(pair -> pair.getRight().toLowerCase().contains(search.toLowerCase()))
+            .collect(Collectors.toList());
    }
 
-   public final List<MonsterGlobalDropEntry> getRelevantGlobalDrops(int mapid) {
-      int continentid = mapid / 100000000;
+   public final List<MonsterGlobalDropEntry> getRelevantGlobalDrops(int mapId) {
+      int continentId = mapId / 100000000;
 
-      List<MonsterGlobalDropEntry> contiItems = continentdrops.get(continentid);
-      if (contiItems == null) {   // continent separated global drops found thanks to marcuswoon
-         contiItems = new ArrayList<>();
-
-         for (MonsterGlobalDropEntry e : globaldrops) {
-            if (e.continentid < 0 || e.continentid == continentid) {
-               contiItems.add(e);
-            }
-         }
-
-         continentdrops.put(continentid, contiItems);
+      List<MonsterGlobalDropEntry> continentItems = continentDrops.get(continentId);
+      if (continentItems == null) {   // continent separated global drops found thanks to marcuswoon
+         continentItems = globalDrops.stream()
+               .filter(entry -> entry.continentid < 0 || entry.continentid == continentId)
+               .collect(Collectors.toList());
+         continentDrops.put(continentId, continentItems);
       }
 
-      return contiItems;
+      return continentItems;
    }
 
    private void retrieveGlobal() {
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      Connection con = null;
-
-      try {
-         con = DatabaseConnection.getConnection();
-         ps = con.prepareStatement("SELECT * FROM drop_data_global WHERE chance > 0");
-         rs = ps.executeQuery();
-
-         while (rs.next()) {
-            globaldrops.add(
-                  new MonsterGlobalDropEntry(
-                        rs.getInt("itemid"),
-                        rs.getInt("chance"),
-                        rs.getByte("continent"),
-                        rs.getInt("minimum_quantity"),
-                        rs.getInt("maximum_quantity"),
-                        rs.getShort("questid")));
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         System.err.println("Error retrieving drop" + e);
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (rs != null && !rs.isClosed()) {
-               rs.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException ignore) {
-            ignore.printStackTrace();
-         }
-      }
+      DatabaseConnection.withConnection(connection -> globalDrops.addAll(DropDataProvider.getInstance().getGlobalDropData(connection)));
    }
 
    public List<MonsterDropEntry> retrieveEffectiveDrop(final int monsterId) {
@@ -194,41 +139,8 @@ public class MapleMonsterInformationProvider {
       if (drops.containsKey(monsterId)) {
          return drops.get(monsterId);
       }
-      final List<MonsterDropEntry> ret = new LinkedList<>();
-
-      PreparedStatement ps = null;
-      ResultSet rs = null;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-         ps = con.prepareStatement("SELECT itemid, chance, minimum_quantity, maximum_quantity, questid FROM drop_data WHERE dropperid = ?");
-         ps.setInt(1, monsterId);
-         rs = ps.executeQuery();
-
-         while (rs.next()) {
-            ret.add(new MonsterDropEntry(rs.getInt("itemid"), rs.getInt("chance"), rs.getInt("minimum_quantity"), rs.getInt("maximum_quantity"), rs.getShort("questid")));
-         }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-         return ret;
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (rs != null && !rs.isClosed()) {
-               rs.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException ignore) {
-            ignore.printStackTrace();
-            return ret;
-         }
-      }
+      List<MonsterDropEntry> ret = DatabaseConnection.withConnectionResult(connection ->
+            DropDataProvider.getInstance().getDropDataForMonster(connection, monsterId)).orElse(new ArrayList<>());
       drops.put(monsterId, ret);
       return ret;
    }
@@ -332,8 +244,8 @@ public class MapleMonsterInformationProvider {
       hasNoMultiEquipDrops.clear();
       extraMultiEquipDrops.clear();
       dropsChancePool.clear();
-      globaldrops.clear();
-      continentdrops.clear();
+      globalDrops.clear();
+      continentDrops.clear();
       retrieveGlobal();
    }
 }

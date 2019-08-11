@@ -21,11 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package server.maps;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -36,6 +31,8 @@ import java.util.concurrent.locks.Lock;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.CharacterAdministrator;
+import client.database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
@@ -308,30 +305,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                if (owner.isPresent()) {
                   owner.get().addMerchantMesos(price);
                } else {
-                  try {
-                     Connection con = DatabaseConnection.getConnection();
-
-                     long merchantMesos = 0;
-                     try (PreparedStatement ps = con.prepareStatement("SELECT MerchantMesos FROM characters WHERE id = ?")) {
-                        ps.setInt(1, ownerId);
-                        try (ResultSet rs = ps.executeQuery()) {
-                           if (rs.next()) {
-                              merchantMesos = rs.getInt(1);
-                           }
-                        }
-                     }
-                     merchantMesos += price;
-
-                     try (PreparedStatement ps = con.prepareStatement("UPDATE characters SET MerchantMesos = ? WHERE id = ?", Statement.RETURN_GENERATED_KEYS)) {
-                        ps.setInt(1, (int) Math.min(merchantMesos, Integer.MAX_VALUE));
-                        ps.setInt(2, ownerId);
-                        ps.executeUpdate();
-                     }
-
-                     con.close();
-                  } catch (Exception e) {
-                     e.printStackTrace();
-                  }
+                  final int priceIncrease = price;
+                  DatabaseConnection.withConnection(connection -> {
+                     long merchantMesos = CharacterProvider.getInstance().getMerchantMesos(connection, ownerId);
+                     merchantMesos += priceIncrease;
+                     CharacterAdministrator.getInstance().setMerchantMesos(connection, (int) Math.min(merchantMesos, Integer.MAX_VALUE), ownerId);
+                  });
                }
             } else {
                c.getPlayer().dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
@@ -381,30 +360,14 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
       Server.getInstance().getWorld(world).unregisterHiredMerchant(this);
 
-      try {
-         saveItems(true);
-         synchronized (items) {
-            items.clear();
-         }
-      } catch (SQLException ex) {
-         ex.printStackTrace();
+      saveItems(true);
+      synchronized (items) {
+         items.clear();
       }
 
-      Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId).ifPresentOrElse(character -> {
-         character.setHasMerchant(false);
-      }, () -> {
-         try {
-            Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement("UPDATE characters SET HasMerchant = 0 WHERE id = ?", Statement.RETURN_GENERATED_KEYS);
-            ps.setInt(1, ownerId);
-            ps.executeUpdate();
-
-            ps.close();
-            con.close();
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }
-      });
+      Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId).ifPresentOrElse(
+            character -> character.setHasMerchant(false),
+            () -> DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
 
       map = null;
    }
@@ -425,19 +388,9 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       this.removeOwner(c.getPlayer());
 
       try {
-         c.getWorldServer().getPlayerStorage().getCharacterById(ownerId).ifPresentOrElse(character -> { character.setHasMerchant(false); }, () -> {
-            try {
-               Connection con = DatabaseConnection.getConnection();
-               try (PreparedStatement ps = con.prepareStatement("UPDATE characters SET HasMerchant = 0 WHERE id = ?", Statement.RETURN_GENERATED_KEYS)) {
-                  ps.setInt(1, ownerId);
-                  ps.executeUpdate();
-               }
-               con.close();
-            } catch (SQLException e) {
-               e.printStackTrace();
-            }
-
-         });
+         c.getWorldServer().getPlayerStorage().getCharacterById(ownerId).ifPresentOrElse(
+               character -> character.setHasMerchant(false),
+               () -> DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
 
          List<MaplePlayerShopItem> copyItems = getItems();
          if (check(c.getPlayer(), copyItems) && !timeout) {
@@ -566,23 +519,13 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                items.remove(i);
             }
          }
-
-         try {
-            this.saveItems(false);
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }
+         this.saveItems(false);
       }
    }
 
    private void removeFromSlot(int slot) {
       items.remove(slot);
-
-      try {
-         this.saveItems(false);
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
+      this.saveItems(false);
    }
 
    private int getFreeSlot() {
@@ -645,7 +588,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       return list;
    }
 
-   public void saveItems(boolean shutdown) throws SQLException {
+   public void saveItems(boolean shutdown) {
       List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
       List<Short> bundles = new ArrayList<>();
 
@@ -664,10 +607,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          }
       }
 
-      Connection con = DatabaseConnection.getConnection();
-      ItemFactory.MERCHANT.saveItems(itemsWithType, bundles, this.ownerId, con);
-      con.close();
-
+      DatabaseConnection.withConnection(connection -> ItemFactory.MERCHANT.saveItems(itemsWithType, bundles, this.ownerId, connection));
       FredrickProcessor.insertFredrickLog(this.ownerId);
    }
 

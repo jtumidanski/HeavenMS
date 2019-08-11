@@ -19,8 +19,6 @@
 */
 package server;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -50,13 +48,8 @@ public class MapleMarriage extends EventInstanceManager {
    public static boolean claimGiftItems(MapleClient c, MapleCharacter chr) {
       List<Item> gifts = loadGiftItemsFromDb(c, chr.getId());
       if (MapleInventory.checkSpot(chr, gifts)) {
-         try {
-            Connection con = DatabaseConnection.getConnection();
-            ItemFactory.MARRIAGE_GIFTS.saveItems(new LinkedList<>(), chr.getId(), con);
-            con.close();
-         } catch (SQLException ignored) {
-         }
-
+         // TODO - Is this new LinkedList() a bug?
+         DatabaseConnection.withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(new LinkedList<>(), chr.getId(), connection));
          for (Item item : gifts) {
             MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
          }
@@ -71,12 +64,8 @@ public class MapleMarriage extends EventInstanceManager {
       List<Item> items = new LinkedList<>();
       if (c.tryAcquireClient()) {
          try {
-            try {
-               for (Pair<Item, MapleInventoryType> it : ItemFactory.MARRIAGE_GIFTS.loadItems(cid, false)) {
-                  items.add(it.getLeft());
-               }
-            } catch (SQLException sqle) {
-               sqle.printStackTrace();
+            for (Pair<Item, MapleInventoryType> it : ItemFactory.MARRIAGE_GIFTS.loadItems(cid, false)) {
+               items.add(it.getLeft());
             }
          } finally {
             c.releaseClient();
@@ -94,13 +83,7 @@ public class MapleMarriage extends EventInstanceManager {
 
       if (c.tryAcquireClient()) {
          try {
-            try {
-               Connection con = DatabaseConnection.getConnection();
-               ItemFactory.MARRIAGE_GIFTS.saveItems(items, cid, con);
-               con.close();
-            } catch (SQLException sqle) {
-               sqle.printStackTrace();
-            }
+            DatabaseConnection.withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(items, cid, connection));
          } finally {
             c.releaseClient();
          }

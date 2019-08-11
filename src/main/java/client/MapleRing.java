@@ -21,11 +21,9 @@
 */
 package client;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import client.database.administrator.InventoryEquipmentAdministrator;
+import client.database.administrator.RingAdministrator;
+import client.database.provider.RingProvider;
 import client.inventory.manipulator.MapleCashidGenerator;
 import tools.DatabaseConnection;
 import tools.Pair;
@@ -41,106 +39,50 @@ public class MapleRing implements Comparable<MapleRing> {
    private String partnerName;
    private boolean equipped = false;
 
-   public MapleRing(int id, int id2, int partnerId, int itemid, String partnername) {
+   public MapleRing(int id, int id2, int partnerId, int itemId, String partnerName) {
       this.ringId = id;
       this.ringId2 = id2;
       this.partnerId = partnerId;
-      this.itemId = itemid;
-      this.partnerName = partnername;
+      this.itemId = itemId;
+      this.partnerName = partnerName;
    }
 
    public static MapleRing loadFromDb(int ringId) {
-      try {
-         MapleRing ret = null;
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT * FROM rings WHERE id = ?"); // Get ring details..
-         ps.setInt(1, ringId);
-         ResultSet rs = ps.executeQuery();
-         if (rs.next()) {
-            ret = new MapleRing(ringId, rs.getInt("partnerRingId"), rs.getInt("partnerChrId"), rs.getInt("itemid"), rs.getString("partnerName"));
-         }
-         rs.close();
-         ps.close();
-         con.close();
-         return ret;
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-         return null;
-      }
+      return DatabaseConnection.withConnectionResult(connection -> RingProvider.getInstance().getRingById(connection, ringId).get()).orElseThrow();
    }
 
    public static void removeRing(final MapleRing ring) {
-      try {
-         if (ring == null) {
-            return;
-         }
+      if (ring == null) {
+         return;
+      }
 
-         Connection con = DatabaseConnection.getConnection();
-
-         PreparedStatement ps = con.prepareStatement("DELETE FROM rings WHERE id=?");
-         ps.setInt(1, ring.getRingId());
-         ps.addBatch();
-
-         ps.setInt(1, ring.getPartnerRingId());
-         ps.addBatch();
-
-         ps.executeBatch();
-         ps.close();
+      DatabaseConnection.withConnection(connection -> {
+         RingAdministrator.getInstance().deleteRing(connection, ring.getRingId(), ring.getPartnerRingId());
 
          MapleCashidGenerator.freeCashId(ring.getRingId());
          MapleCashidGenerator.freeCashId(ring.getPartnerRingId());
 
-         ps = con.prepareStatement("UPDATE inventoryequipment SET ringid=-1 WHERE ringid=?");
-         ps.setInt(1, ring.getRingId());
-         ps.addBatch();
-
-         ps.setInt(1, ring.getPartnerRingId());
-         ps.addBatch();
-
-         ps.executeBatch();
-         ps.close();
-
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
+         InventoryEquipmentAdministrator.getInstance().updateRing(connection, ring.getRingId(), ring.getPartnerRingId());
+      });
    }
 
-   public static Pair<Integer, Integer> createRing(int itemid, final MapleCharacter partner1, final MapleCharacter partner2) {
-      try {
-         if (partner1 == null) {
-            return new Pair<>(-3, -3);
-         } else if (partner2 == null) {
-            return new Pair<>(-2, -2);
-         }
-
-         int[] ringID = new int[2];
-         ringID[0] = MapleCashidGenerator.generateCashId();
-         ringID[1] = MapleCashidGenerator.generateCashId();
-
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("INSERT INTO rings (id, itemid, partnerRingId, partnerChrId, partnername) VALUES (?, ?, ?, ?, ?)");
-         ps.setInt(1, ringID[0]);
-         ps.setInt(2, itemid);
-         ps.setInt(3, ringID[1]);
-         ps.setInt(4, partner2.getId());
-         ps.setString(5, partner2.getName());
-         ps.executeUpdate();
-         ps.close();
-         ps = con.prepareStatement("INSERT INTO rings (id, itemid, partnerRingId, partnerChrId, partnername) VALUES (?, ?, ?, ?, ?)");
-         ps.setInt(1, ringID[1]);
-         ps.setInt(2, itemid);
-         ps.setInt(3, ringID[0]);
-         ps.setInt(4, partner1.getId());
-         ps.setString(5, partner1.getName());
-         ps.executeUpdate();
-         ps.close();
-         con.close();
-         return new Pair<>(ringID[0], ringID[1]);
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-         return new Pair<>(-1, -1);
+   public static Pair<Integer, Integer> createRing(int itemId, final MapleCharacter partner1, final MapleCharacter partner2) {
+      if (partner1 == null) {
+         return new Pair<>(-3, -3);
+      } else if (partner2 == null) {
+         return new Pair<>(-2, -2);
       }
+
+      int[] ringID = new int[2];
+      ringID[0] = MapleCashidGenerator.generateCashId();
+      ringID[1] = MapleCashidGenerator.generateCashId();
+
+      DatabaseConnection.withConnection(connection -> {
+         RingAdministrator.getInstance().addRing(connection, ringID[0], itemId, ringID[1], partner2.getId(), partner2.getName());
+         RingAdministrator.getInstance().addRing(connection, ringID[1], itemId, ringID[0], partner1.getId(), partner1.getName());
+      });
+
+      return new Pair<>(ringID[0], ringID[1]);
    }
 
    public int getRingId() {

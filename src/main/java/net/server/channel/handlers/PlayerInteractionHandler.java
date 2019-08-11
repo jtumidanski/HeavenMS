@@ -595,11 +595,7 @@ public final class PlayerInteractionHandler extends AbstractMaplePacketHandler {
                   chr.saveCharToDB(false);
                }
 
-               try {
-                  merchant.saveItems(false);   // thanks Masterrulax for realizing yet another dupe with merchants/Fredrick
-               } catch (SQLException ex) {
-                  ex.printStackTrace();
-               }
+               merchant.saveItems(false);   // thanks Masterrulax for realizing yet another dupe with merchants/Fredrick
             } else {
                c.announce(MaplePacketCreator.serverNotice(1, "You can't sell without owning a shop."));
             }

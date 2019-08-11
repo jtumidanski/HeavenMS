@@ -2,13 +2,17 @@ package tools;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import client.database.AbstractQueryExecutor;
+import client.database.SQLConsumer;
+import client.database.provider.AccountProvider;
 import constants.ServerConstants;
 
 /**
@@ -41,8 +45,11 @@ public class DatabaseConnection {
          // Make sure pool size is comfortable for the worst case scenario.
          // Under 100 accounts? Make it 10. Over 10000 accounts? Make it 30.
          int poolSize = (int) Math.ceil(0.00202020202 * getNumberOfAccounts() + 9.797979798);
-         if (poolSize < 10) poolSize = 10;
-         else if (poolSize > 30) poolSize = 30;
+         if (poolSize < 10) {
+            poolSize = 10;
+         } else if (poolSize > 30) {
+            poolSize = 30;
+         }
 
          config.setConnectionTimeout(30 * 1000);
          config.setMaximumPoolSize(poolSize);
@@ -80,19 +87,69 @@ public class DatabaseConnection {
       }
    }
 
-   private static int getNumberOfAccounts() {
+   public static void withConnection(Consumer<Connection> consumer) {
+      Connection connection = null;
       try {
-         Connection con = DriverManager.getConnection(ServerConstants.DB_URL, ServerConstants.DB_USER, ServerConstants.DB_PASS);
-         try (PreparedStatement ps = con.prepareStatement("SELECT count(*) FROM accounts")) {
-            try (ResultSet rs = ps.executeQuery()) {
-               rs.next();
-               return rs.getInt(1);
+         connection = DatabaseConnection.getConnection();
+         consumer.accept(connection);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            if (connection != null) {
+               connection.close();
             }
-         } finally {
-            con.close();
+         } catch (SQLException exception) {
+            exception.printStackTrace();
          }
-      } catch (SQLException sqle) {
-         return 20;
       }
+   }
+
+   public static void withExplicitCommitConnection(SQLConsumer<Connection> consumer) {
+      Connection connection = null;
+      try {
+         connection = DatabaseConnection.getConnection();
+         connection.setAutoCommit(false);
+
+         consumer.accept(connection);
+
+         connection.setAutoCommit(true);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            if (connection != null) {
+               connection.rollback();
+               connection.setAutoCommit(true);
+               connection.close();
+            }
+         } catch (SQLException exception) {
+            exception.printStackTrace();
+         }
+      }
+   }
+
+   public static <T> Optional<T> withConnectionResult(Function<Connection, T> function) {
+      Connection connection = null;
+      Optional<T> result = Optional.empty();
+      try {
+         connection = DatabaseConnection.getConnection();
+         result = Optional.of(function.apply(connection));
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            if (connection != null) {
+               connection.close();
+            }
+         } catch (SQLException exception) {
+            exception.printStackTrace();
+         }
+      }
+      return result;
+   }
+
+   private static int getNumberOfAccounts() {
+      return withConnectionResult(connection -> AccountProvider.getInstance().getAccountCount(connection)).orElse(0);
    }
 }

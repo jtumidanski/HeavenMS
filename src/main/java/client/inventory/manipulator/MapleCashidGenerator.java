@@ -26,6 +26,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import client.database.provider.PetProvider;
+import client.database.provider.RingProvider;
 import tools.DatabaseConnection;
 
 /**
@@ -49,25 +51,10 @@ public class MapleCashidGenerator {
    }
 
    public static synchronized void loadExistentCashIdsFromDb() {
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-
-         loadExistentCashIdsFromQuery(con, "SELECT id FROM rings");
-         loadExistentCashIdsFromQuery(con, "SELECT petid FROM pets");
-
-         con.close();
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      } finally {
-         try {
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
-      }
+      DatabaseConnection.withConnection(connection -> {
+         existentCashids.addAll(RingProvider.getInstance().getAll(connection));
+         existentCashids.addAll(PetProvider.getInstance().getAll(connection));
+      });
 
       runningCashid = 0;
       do {

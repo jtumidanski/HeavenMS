@@ -24,13 +24,11 @@
 package client.command.commands.gm4;
 
 import java.awt.Point;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import client.database.administrator.PlayerLifeAdministrator;
 import net.server.channel.Channel;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
@@ -67,37 +65,18 @@ public class PmobCommand extends Command {
          mob.setRx0(xpos + 50);
          mob.setRx1(xpos - 50);
          mob.setFh(fh);
-         try {
-            Connection con = DatabaseConnection.getConnection();
-            PreparedStatement ps = con.prepareStatement("INSERT INTO plife ( life, f, fh, cy, rx0, rx1, type, x, y, world, map, mobtime, hide ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )");
-            ps.setInt(1, mobId);
-            ps.setInt(2, 0);
-            ps.setInt(3, fh);
-            ps.setInt(4, ypos);
-            ps.setInt(5, xpos + 50);
-            ps.setInt(6, xpos - 50);
-            ps.setString(7, "m");
-            ps.setInt(8, xpos);
-            ps.setInt(9, ypos);
-            ps.setInt(10, player.getWorld());
-            ps.setInt(11, mapId);
-            ps.setInt(12, mobTime);
-            ps.setInt(13, 0);
-            ps.executeUpdate();
-            ps.close();
-            con.close();
 
-            for (Channel ch : player.getWorldServer().getChannels()) {
-               MapleMap map = ch.getMapFactory().getMap(mapId);
-               map.addMonsterSpawn(mob, mobTime, -1);
-               map.addAllMonsterSpawn(mob, mobTime, -1);
-            }
+         DatabaseConnection.withConnection(connection ->
+               PlayerLifeAdministrator.getInstance().create(connection, mobId, 0, fh, ypos, xpos + 50,
+                     xpos - 50, "m", xpos, ypos, player.getWorld(), mapId, mobTime, 0));
 
-            player.yellowMessage("Pmob created.");
-         } catch (SQLException e) {
-            e.printStackTrace();
-            player.dropMessage(5, "Failed to store pmob in the database.");
+         for (Channel ch : player.getWorldServer().getChannels()) {
+            MapleMap map = ch.getMapFactory().getMap(mapId);
+            map.addMonsterSpawn(mob, mobTime, -1);
+            map.addAllMonsterSpawn(mob, mobTime, -1);
          }
+
+         player.yellowMessage("Pmob created.");
       } else {
          player.dropMessage(5, "You have entered an invalid mob id.");
       }

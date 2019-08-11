@@ -22,10 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package net.server.world;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -57,6 +53,11 @@ import client.BuddyList.BuddyOperation;
 import client.BuddylistEntry;
 import client.MapleCharacter;
 import client.MapleFamily;
+import client.database.administrator.CharacterAdministrator;
+import client.database.administrator.MarriageAdministrator;
+import client.database.provider.MarriageProvider;
+import client.database.administrator.PlayerNpcAdministrator;
+import client.database.data.MarriageData;
 import constants.GameConstants;
 import constants.ServerConstants;
 import net.server.PlayerStorage;
@@ -225,90 +226,39 @@ public class World {
       return (chr.getId() << 2) + petSlot;
    }
 
-   private static void executePlayerNpcMapDataUpdate(Connection con, boolean isPodium, Map<Integer, ?> pnpcData, int value, int worldid, int mapid) throws SQLException {
-      PreparedStatement ps;
-      if (pnpcData.containsKey(mapid)) {
-         ps = con.prepareStatement("UPDATE playernpcs_field SET " + (isPodium ? "podium" : "step") + " = ? WHERE world = ? AND map = ?");
+   private static void executePlayerNpcMapDataUpdate(Connection con, boolean isPodium, Map<Integer, ?> playerNpcData, int value, int worldId, int mapId) {
+      if (playerNpcData.containsKey(mapId)) {
+         if (isPodium) {
+            PlayerNpcAdministrator.getInstance().setPodium(con, value, worldId, mapId);
+         } else {
+            PlayerNpcAdministrator.getInstance().setStep(con, value, worldId, mapId);
+         }
       } else {
-         ps = con.prepareStatement("INSERT INTO playernpcs_field (" + (isPodium ? "podium" : "step") + ", world, map) VALUES (?, ?, ?)");
+         if (isPodium) {
+            PlayerNpcAdministrator.getInstance().addPodium(con, value, worldId, mapId);
+         } else {
+            PlayerNpcAdministrator.getInstance().addStep(con, value, worldId, mapId);
+         }
       }
-
-      ps.setInt(1, value);
-      ps.setInt(2, worldid);
-      ps.setInt(3, mapid);
-      ps.executeUpdate();
-
-      ps.close();
    }
 
    private static Pair<Integer, Pair<Integer, Integer>> getRelationshipCoupleFromDb(int id, boolean usingMarriageId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         Integer mid = null, hid = null, wid = null;
-
-         PreparedStatement ps;
-         if (usingMarriageId) {
-            ps = con.prepareStatement("SELECT * FROM marriages WHERE marriageid = ?");
-            ps.setInt(1, id);
-         } else {
-            ps = con.prepareStatement("SELECT * FROM marriages WHERE husbandid = ? OR wifeid = ?");
-            ps.setInt(1, id);
-            ps.setInt(2, id);
-         }
-
-         ResultSet rs = ps.executeQuery();
-         if (rs.next()) {
-            mid = rs.getInt("marriageid");
-            hid = rs.getInt("husbandid");
-            wid = rs.getInt("wifeid");
-         }
-
-         rs.close();
-         ps.close();
-         con.close();
-
-         return (mid == null) ? null : new Pair<>(mid, new Pair<>(hid, wid));
-      } catch (SQLException se) {
-         se.printStackTrace();
-         return null;
+      Optional<MarriageData> marriageData;
+      if (usingMarriageId) {
+         marriageData = DatabaseConnection.withConnectionResult(connection -> MarriageProvider.getInstance().getById(connection, id).orElseThrow());
+      } else {
+         marriageData = DatabaseConnection.withConnectionResult(connection -> MarriageProvider.getInstance().getBySpouses(connection, id, id).orElseThrow());
       }
+
+      return marriageData.map(data -> new Pair<>(data.getId(), new Pair<>(data.getSpouse1(), data.getSpouse2()))).orElse(null);
    }
 
    private static int addRelationshipToDb(int groomId, int brideId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-
-         PreparedStatement ps = con.prepareStatement("INSERT INTO marriages (husbandid, wifeid) VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
-         ps.setInt(1, groomId);
-         ps.setInt(2, brideId);
-         ps.executeUpdate();
-
-         ResultSet rs = ps.getGeneratedKeys();
-         rs.next();
-         int ret = rs.getInt(1);
-
-         rs.close();
-         ps.close();
-         con.close();
-         return ret;
-      } catch (SQLException se) {
-         se.printStackTrace();
-         return -1;
-      }
+      return DatabaseConnection.withConnectionResult(connection -> MarriageAdministrator.getInstance().createMarriage(connection, groomId, brideId)).orElse(-1);
    }
 
    private static void deleteRelationshipFromDb(int playerId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("DELETE FROM marriages WHERE marriageid = ?");
-         ps.setInt(1, playerId);
-         ps.executeUpdate();
-
-         ps.close();
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> MarriageAdministrator.getInstance().endMarriage(connection, playerId));
    }
 
    public int getChannelsSize() {
@@ -710,19 +660,7 @@ public class World {
    }
 
    public void setOfflineGuildStatus(int guildid, int guildrank, int cid) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("UPDATE characters SET guildid = ?, guildrank = ? WHERE id = ?")) {
-            ps.setInt(1, guildid);
-            ps.setInt(2, guildrank);
-            ps.setInt(3, cid);
-            ps.execute();
-         }
-
-         con.close();
-      } catch (SQLException se) {
-         se.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, guildid, guildrank, cid));
    }
 
    public void setGuildAndRank(int cid, int guildid, int rank) {
@@ -1793,30 +1731,24 @@ public class World {
       setPlayerNpcMapData(mapid, step, podium, true);
    }
 
-   private void setPlayerNpcMapData(int mapid, int step, int podium, boolean silent) {
+   private void setPlayerNpcMapData(int mapId, int step, int podium, boolean silent) {
       if (!silent) {
-         try {
-            Connection con = DatabaseConnection.getConnection();
-
+         DatabaseConnection.withConnection(connection -> {
             if (step != -1) {
-               executePlayerNpcMapDataUpdate(con, false, pnpcStep, step, id, mapid);
+               executePlayerNpcMapDataUpdate(connection, false, pnpcStep, step, id, mapId);
             }
 
             if (podium != -1) {
-               executePlayerNpcMapDataUpdate(con, true, pnpcPodium, podium, id, mapid);
+               executePlayerNpcMapDataUpdate(connection, true, pnpcPodium, podium, id, mapId);
             }
-
-            con.close();
-         } catch (SQLException e) {
-            e.printStackTrace();
-         }
+         });
       }
 
       if (step != -1) {
-         pnpcStep.put(mapid, (byte) step);
+         pnpcStep.put(mapId, (byte) step);
       }
       if (podium != -1) {
-         pnpcPodium.put(mapid, (short) podium);
+         pnpcPodium.put(mapId, (short) podium);
       }
    }
 

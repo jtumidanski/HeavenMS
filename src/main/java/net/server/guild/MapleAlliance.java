@@ -21,16 +21,17 @@
 */
 package net.server.guild;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.AllianceAdministrator;
+import client.database.administrator.AllianceGuildAdministrator;
+import client.database.provider.AllianceGuildProvider;
+import client.database.provider.AllianceProvider;
+import client.database.data.AllianceData;
 import net.server.Server;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
@@ -65,25 +66,8 @@ public class MapleAlliance {
       if (name.contains(" ") || name.length() > 12) {
          return false;
       }
-      try {
-         ResultSet rs;
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("SELECT name FROM alliance WHERE name = ?")) {
-            ps.setString(1, name);
-            rs = ps.executeQuery();
-            if (rs.next()) {
-               ps.close();
-               rs.close();
-               return false;
-            }
-         }
-         rs.close();
-         con.close();
-         return true;
-      } catch (SQLException e) {
-         e.printStackTrace();
-         return false;
-      }
+      boolean allianceExists = DatabaseConnection.withConnectionResult(connection -> AllianceProvider.getInstance().allianceExists(connection, name)).orElse(false);
+      return !allianceExists;
    }
 
    private static List<MapleCharacter> getPartyGuildMasters(MapleParty party) {
@@ -152,35 +136,12 @@ public class MapleAlliance {
 
    public static MapleAlliance createAllianceOnDb(List<Integer> guilds, String name) {
       // will create an alliance, where the first guild listed is the leader and the alliance name MUST BE already checked for unicity.
-
-      int id = -1;
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("INSERT INTO `alliance` (`name`) VALUES (?)", PreparedStatement.RETURN_GENERATED_KEYS);
-
-         ps.setString(1, name);
-         ps.executeUpdate();
-         try (ResultSet rs = ps.getGeneratedKeys()) {
-            rs.next();
-            id = rs.getInt(1);
-         }
-
-         for (int guild : guilds) {
-            ps = con.prepareStatement("INSERT INTO `allianceguilds` (`allianceid`, `guildid`) VALUES (?, ?)");
-            ps.setInt(1, id);
-            ps.setInt(2, guild);
-            ps.executeUpdate();
-            ps.close();
-         }
-
-         ps.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-         return null;
-      }
-
-      return (new MapleAlliance(name, id));
+      int id = DatabaseConnection.withConnectionResult(connection -> {
+         int allianceId = AllianceAdministrator.getInstance().createAlliance(connection, name);
+         AllianceGuildAdministrator.getInstance().addGuilds(connection, allianceId, guilds);
+         return allianceId;
+      }).orElse(-1);
+      return new MapleAlliance(name, id);
    }
 
    public static Optional<MapleAlliance> loadAlliance(int id) {
@@ -188,111 +149,40 @@ public class MapleAlliance {
          return Optional.empty();
       }
       MapleAlliance alliance = new MapleAlliance(null, -1);
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("SELECT * FROM alliance WHERE id = ?");
-         ps.setInt(1, id);
-         ResultSet rs = ps.executeQuery();
-         if (!rs.next()) {
-            rs.close();
-            ps.close();
-            con.close();
-            return Optional.empty();
-         }
-         alliance.allianceId = id;
-         alliance.capacity = rs.getInt("capacity");
-         alliance.name = rs.getString("name");
-         alliance.notice = rs.getString("notice");
-
-         String[] ranks = new String[5];
-         ranks[0] = rs.getString("rank1");
-         ranks[1] = rs.getString("rank2");
-         ranks[2] = rs.getString("rank3");
-         ranks[3] = rs.getString("rank4");
-         ranks[4] = rs.getString("rank5");
-         alliance.rankTitles = ranks;
-
-         ps.close();
-         rs.close();
-
-         ps = con.prepareStatement("SELECT guildid FROM allianceguilds WHERE allianceid = ?");
-         ps.setInt(1, id);
-         rs = ps.executeQuery();
-
-         while (rs.next()) {
-            alliance.addGuild(rs.getInt("guildid"));
-         }
-
-         ps.close();
-         rs.close();
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         AllianceProvider.getInstance().getAllianceData(connection, id).ifPresent(data -> setData(id, alliance, data));
+         AllianceGuildProvider.getInstance().getGuildsForAlliance(connection, id).forEach(alliance::addGuild);
+      });
       return Optional.of(alliance);
    }
 
+   private static void setData(int id, MapleAlliance alliance, AllianceData data) {
+      alliance.allianceId = id;
+      alliance.capacity = data.getCapacity();
+      alliance.name = data.getName();
+      alliance.notice = data.getNotice();
+
+      String[] ranks = new String[5];
+      ranks[0] = data.getRank1();
+      ranks[1] = data.getRank2();
+      ranks[2] = data.getRank3();
+      ranks[3] = data.getRank4();
+      ranks[4] = data.getRank5();
+      alliance.rankTitles = ranks;
+   }
+
    public static void disbandAlliance(int allianceId) {
-      PreparedStatement ps = null;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
+      DatabaseConnection.withConnection(connection -> {
+         AllianceAdministrator.getInstance().deleteAlliance(connection, allianceId);
+         AllianceGuildAdministrator.getInstance().deleteForAlliance(connection, allianceId);
+      });
 
-         ps = con.prepareStatement("DELETE FROM `alliance` WHERE id = ?");
-         ps.setInt(1, allianceId);
-         ps.executeUpdate();
-         ps.close();
-
-         ps = con.prepareStatement("DELETE FROM `allianceguilds` WHERE allianceid = ?");
-         ps.setInt(1, allianceId);
-         ps.executeUpdate();
-         ps.close();
-
-         con.close();
-         Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.disbandAlliance(allianceId), -1, -1);
-         Server.getInstance().disbandAlliance(allianceId);
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }
-      }
+      Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.disbandAlliance(allianceId), -1, -1);
+      Server.getInstance().disbandAlliance(allianceId);
    }
 
    private static void removeGuildFromAllianceOnDb(int guildId) {
-      PreparedStatement ps = null;
-      Connection con = null;
-      try {
-         con = DatabaseConnection.getConnection();
-
-         ps = con.prepareStatement("DELETE FROM `allianceguilds` WHERE guildid = ?");
-         ps.setInt(1, guildId);
-         ps.executeUpdate();
-         ps.close();
-
-         con.close();
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      } finally {
-         try {
-            if (ps != null && !ps.isClosed()) {
-               ps.close();
-            }
-            if (con != null && !con.isClosed()) {
-               con.close();
-            }
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }
-      }
+      DatabaseConnection.withConnection(connection -> AllianceGuildAdministrator.getInstance().removeGuild(connection, guildId));
    }
 
    public static boolean removeGuildFromAlliance(int allianceId, int guildId, int worldId) {
@@ -364,39 +254,11 @@ public class MapleAlliance {
    }
 
    public void saveToDB() {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         PreparedStatement ps = con.prepareStatement("UPDATE `alliance` SET capacity = ?, notice = ?, rank1 = ?, rank2 = ?, rank3 = ?, rank4 = ?, rank5 = ? WHERE id = ?");
-         ps.setInt(1, this.capacity);
-         ps.setString(2, this.notice);
-
-         ps.setString(3, this.rankTitles[0]);
-         ps.setString(4, this.rankTitles[1]);
-         ps.setString(5, this.rankTitles[2]);
-         ps.setString(6, this.rankTitles[3]);
-         ps.setString(7, this.rankTitles[4]);
-
-         ps.setInt(8, this.allianceId);
-         ps.executeUpdate();
-         ps.close();
-
-         ps = con.prepareStatement("DELETE FROM `allianceguilds` WHERE allianceid = ?");
-         ps.setInt(1, this.allianceId);
-         ps.executeUpdate();
-         ps.close();
-
-         for (int guild : guilds) {
-            ps = con.prepareStatement("INSERT INTO `allianceguilds` (`allianceid`, `guildid`) VALUES (?, ?)");
-            ps.setInt(1, this.allianceId);
-            ps.setInt(2, guild);
-            ps.executeUpdate();
-            ps.close();
-         }
-
-         con.close();
-      } catch (SQLException e) {
-         e.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         AllianceAdministrator.getInstance().updateAlliance(connection, this.allianceId, this.capacity, this.notice, this.rankTitles[0], this.rankTitles[1], this.rankTitles[2], this.rankTitles[3], this.rankTitles[4]);
+         AllianceGuildAdministrator.getInstance().deleteForAlliance(connection, this.allianceId);
+         AllianceGuildAdministrator.getInstance().addGuilds(connection, this.allianceId, guilds);
+      });
    }
 
    public void updateAlliancePackets(MapleCharacter chr) {

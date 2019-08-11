@@ -19,15 +19,14 @@
 */
 package client.newyear;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
+import client.database.administrator.NewYearAdministrator;
+import client.database.provider.NewYearCardProvider;
 import net.server.Server;
 import server.TimerManager;
 import tools.DatabaseConnection;
@@ -73,92 +72,41 @@ public class NewYearCardRecord {
    }
 
    public static void saveNewYearCard(NewYearCardRecord newyear) {
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("INSERT INTO newyear VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")) {
-            ps.setInt(1, newyear.senderId);
-            ps.setString(2, newyear.senderName);
-            ps.setInt(3, newyear.receiverId);
-            ps.setString(4, newyear.receiverName);
-
-            ps.setString(5, newyear.stringContent);
-
-            ps.setBoolean(6, newyear.senderDiscardCard);
-            ps.setBoolean(7, newyear.receiverDiscardCard);
-            ps.setBoolean(8, newyear.receiverReceivedCard);
-
-            ps.setLong(9, newyear.dateSent);
-            ps.setLong(10, newyear.dateReceived);
-
-            ps.executeUpdate();
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-               rs.next();
-               newyear.id = rs.getInt(1);
-            }
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> {
+         newyear.id = NewYearAdministrator.getInstance().create(connection, newyear.getSenderId(), newyear.getSenderName(),
+               newyear.getReceiverId(), newyear.getReceiverName(), newyear.stringContent,
+               newyear.isSenderCardDiscarded(), newyear.isReceiverCardDiscarded(), newyear.isReceiverCardReceived(),
+               newyear.getDateSent(), newyear.getDateReceived());
+      });
    }
 
    public static void updateNewYearCard(NewYearCardRecord newyear) {
       newyear.receiverReceivedCard = true;
       newyear.dateReceived = System.currentTimeMillis();
 
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("UPDATE newyear SET received=1, timereceived=? WHERE id=?")) {
-            ps.setLong(1, newyear.dateReceived);
-            ps.setInt(2, newyear.id);
-
-            ps.executeUpdate();
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> NewYearAdministrator.getInstance().setReceived(connection,
+            newyear.getId(), newyear.getDateReceived()));
    }
 
-   public static NewYearCardRecord loadNewYearCard(int cardid) {
-      NewYearCardRecord nyc = Server.getInstance().getNewYearCard(cardid);
+   public static NewYearCardRecord loadNewYearCard(int cardId) {
+      NewYearCardRecord nyc = Server.getInstance().getNewYearCard(cardId);
       if (nyc != null) {
          return nyc;
       }
 
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM newyear WHERE id = ?")) {
-            ps.setInt(1, cardid);
-            try (ResultSet rs = ps.executeQuery()) {
-               if (rs.next()) {
-                  NewYearCardRecord newyear = new NewYearCardRecord(rs.getInt("senderid"), rs.getString("sendername"), rs.getInt("receiverid"), rs.getString("receivername"), rs.getString("message"));
-                  newyear.setExtraNewYearCardRecord(rs.getInt("id"), rs.getBoolean("senderdiscard"), rs.getBoolean("receiverdiscard"), rs.getBoolean("received"), rs.getLong("timesent"), rs.getLong("timereceived"));
-
-                  Server.getInstance().setNewYearCard(newyear);
-                  return newyear;
-               }
-            }
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
+      Optional<NewYearCardRecord> newYearCardRecord = DatabaseConnection.withConnectionResult(connection -> NewYearCardProvider.getInstance().getById(connection, cardId).get());
+      if (newYearCardRecord.isPresent()) {
+         Server.getInstance().setNewYearCard(newYearCardRecord.get());
+         return newYearCardRecord.get();
+      } else {
+         return null;
       }
-
-      return null;
    }
 
    public static void loadPlayerNewYearCards(MapleCharacter chr) {
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM newyear WHERE senderid = ? OR receiverid = ?")) {
-            ps.setInt(1, chr.getId());
-            ps.setInt(2, chr.getId());
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  NewYearCardRecord newyear = new NewYearCardRecord(rs.getInt("senderid"), rs.getString("sendername"), rs.getInt("receiverid"), rs.getString("receivername"), rs.getString("message"));
-                  newyear.setExtraNewYearCardRecord(rs.getInt("id"), rs.getBoolean("senderdiscard"), rs.getBoolean("receiverdiscard"), rs.getBoolean("received"), rs.getLong("timesent"), rs.getLong("timereceived"));
-
-                  chr.addNewYearRecord(newyear);
-               }
-            }
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection ->
+            NewYearCardProvider.getInstance().getBySenderOrReceiver(connection, chr.getId(), chr.getId())
+                  .forEach(chr::addNewYearRecord));
    }
 
    public static void printNewYearRecords(MapleCharacter chr) {
@@ -186,15 +134,7 @@ public class NewYearCardRecord {
 
    private static void deleteNewYearCard(int id) {
       Server.getInstance().removeNewYearCard(id);
-
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("DELETE FROM newyear WHERE id = ?")) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> NewYearAdministrator.getInstance().deleteById(connection, id));
    }
 
    public static void removeAllNewYearCard(boolean send, MapleCharacter chr) {
@@ -254,24 +194,10 @@ public class NewYearCardRecord {
    }
 
    public static void startPendingNewYearCardRequests() {
-      try (Connection con = DatabaseConnection.getConnection()) {
-         try (PreparedStatement ps = con.prepareStatement("SELECT * FROM newyear WHERE timereceived = 0 AND senderdiscard = 0")) {
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  NewYearCardRecord newyear = new NewYearCardRecord(rs.getInt("senderid"), rs.getString("sendername"), rs.getInt("receiverid"), rs.getString("receivername"), rs.getString("message"));
-                  newyear.setExtraNewYearCardRecord(rs.getInt("id"), rs.getBoolean("senderdiscard"), rs.getBoolean("receiverdiscard"), rs.getBoolean("received"), rs.getLong("timesent"), rs.getLong("timereceived"));
-
-                  Server.getInstance().setNewYearCard(newyear);
-                  newyear.startNewYearCardTask();
-               }
-            }
-         }
-      } catch (SQLException sqle) {
-         sqle.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> NewYearCardProvider.getInstance().getNotReceived(connection).forEach(newYearCard -> Server.getInstance().setNewYearCard(newYearCard)));
    }
 
-   private void setExtraNewYearCardRecord(int id, boolean senderDiscardCard, boolean receiverDiscardCard, boolean receiverReceivedCard, long dateSent, long dateReceived) {
+   public void setExtraNewYearCardRecord(int id, boolean senderDiscardCard, boolean receiverDiscardCard, boolean receiverReceivedCard, long dateSent, long dateReceived) {
       this.id = id;
       this.senderDiscardCard = senderDiscardCard;
       this.receiverDiscardCard = receiverDiscardCard;

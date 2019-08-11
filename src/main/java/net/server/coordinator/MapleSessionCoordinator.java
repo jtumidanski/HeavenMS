@@ -20,8 +20,6 @@
 package net.server.coordinator;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,11 +39,14 @@ import org.apache.mina.core.session.IoSession;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.database.administrator.HwidAccountAdministrator;
+import client.database.provider.HwidAccountProvider;
 import constants.ServerConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.DatabaseConnection;
+import tools.Pair;
 
 /**
  * @author Ronan
@@ -107,100 +108,52 @@ public class MapleSessionCoordinator {
       return 3600000 * (baseTime + subdegreeTime);
    }
 
-   private static void updateAccessAccount(Connection con, String remoteHwid, int accountId, int loginRelevance) throws SQLException {
+   private static void updateAccessAccount(Connection con, String remoteHwid, int accountId, int loginRelevance) {
       java.sql.Timestamp nextTimestamp = new java.sql.Timestamp(Server.getInstance().getCurrentTime() + hwidExpirationUpdate(loginRelevance));
       if (loginRelevance < Byte.MAX_VALUE) {
          loginRelevance++;
       }
-
-      try (PreparedStatement ps = con.prepareStatement("UPDATE hwidaccounts SET relevance = ?, expiresat = ? WHERE accountid = ? AND hwid LIKE ?")) {
-         ps.setInt(1, loginRelevance);
-         ps.setTimestamp(2, nextTimestamp);
-         ps.setInt(3, accountId);
-         ps.setString(4, remoteHwid);
-
-         ps.executeUpdate();
-      }
+      HwidAccountAdministrator.getInstance().updateByAccountId(con, accountId, remoteHwid, loginRelevance, nextTimestamp);
    }
 
-   private static void registerAccessAccount(Connection con, String remoteHwid, int accountId) throws SQLException {
-      try (PreparedStatement ps = con.prepareStatement("INSERT INTO hwidaccounts (accountid, hwid, expiresat) VALUES (?, ?, ?)")) {
-         ps.setInt(1, accountId);
-         ps.setString(2, remoteHwid);
-         ps.setTimestamp(3, new java.sql.Timestamp(Server.getInstance().getCurrentTime() + hwidExpirationUpdate(0)));
-
-         ps.executeUpdate();
-      }
+   private static void registerAccessAccount(Connection con, String remoteHwid, int accountId) {
+      HwidAccountAdministrator.getInstance().create(con, accountId, remoteHwid, new java.sql.Timestamp(Server.getInstance().getCurrentTime() + hwidExpirationUpdate(0)));
    }
 
    private static boolean associateHwidAccountIfAbsent(String remoteHwid, int accountId) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
+      return DatabaseConnection.withConnectionResult(connection -> {
          int hwidCount = 0;
-
-         try (PreparedStatement ps = con.prepareStatement("SELECT SQL_CACHE hwid FROM hwidaccounts WHERE accountid = ?")) {
-            ps.setInt(1, accountId);
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  String rsHwid = rs.getString("hwid");
-                  if (rsHwid.contentEquals(remoteHwid)) {
-                     return false;
-                  }
-
-                  hwidCount++;
-               }
+         List<String> hwids = HwidAccountProvider.getInstance().getHwidForAccount(connection, accountId);
+         for (String hwid : hwids) {
+            if (hwid.contentEquals(remoteHwid)) {
+               return false;
             }
-
-            if (hwidCount < ServerConstants.MAX_ALLOWED_ACCOUNT_HWID) {
-               registerAccessAccount(con, remoteHwid, accountId);
-               return true;
-            }
-         } finally {
-            con.close();
+            hwidCount++;
          }
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
-
-      return false;
+         if (hwidCount < ServerConstants.MAX_ALLOWED_ACCOUNT_HWID) {
+            registerAccessAccount(connection, remoteHwid, accountId);
+            return true;
+         }
+         return false;
+      }).orElse(false);
    }
 
    private static boolean attemptAccessAccount(String nibbleHwid, int accountId, boolean routineCheck) {
-      try {
-         Connection con = DatabaseConnection.getConnection();
+      return DatabaseConnection.withConnectionResult(connection -> {
          int hwidCount = 0;
-
-         try (PreparedStatement ps = con.prepareStatement("SELECT SQL_CACHE * FROM hwidaccounts WHERE accountid = ?")) {
-            ps.setInt(1, accountId);
-            try (ResultSet rs = ps.executeQuery()) {
-               while (rs.next()) {
-                  String rsHwid = rs.getString("hwid");
-                  if (rsHwid.endsWith(nibbleHwid)) {
-                     if (!routineCheck) {
-                        // better update HWID relevance as soon as the login is authenticated
-
-                        int loginRelevance = rs.getInt("relevance");
-                        updateAccessAccount(con, rsHwid, accountId, loginRelevance);
-                     }
-
-                     return true;
-                  }
-
-                  hwidCount++;
+         List<Pair<String, Integer>> results = HwidAccountProvider.getInstance().getForAccount(connection, accountId);
+         for (Pair<String, Integer> pair : results) {
+            if (pair.getLeft().endsWith(nibbleHwid)) {
+               if (!routineCheck) {
+                  // better update HWID relevance as soon as the login is authenticated
+                  updateAccessAccount(connection, pair.getLeft(), accountId, pair.getRight());
                }
-            }
-
-            if (hwidCount < ServerConstants.MAX_ALLOWED_ACCOUNT_HWID) {
                return true;
             }
-         } finally {
-            con.close();
+            hwidCount++;
          }
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
-
-      return false;
+         return hwidCount < ServerConstants.MAX_ALLOWED_ACCOUNT_HWID;
+      }).orElse(false);
    }
 
    public static String getSessionRemoteAddress(IoSession session) {
@@ -226,11 +179,7 @@ public class MapleSessionCoordinator {
          MapleClient client = new MapleClient(null, null, session);
          Integer cid = Server.getInstance().freeCharacteridInTransition(session);
          if (cid != null) {
-            try {
-               client.setAccID(MapleCharacter.loadCharFromDB(cid, client, false).getAccountID());
-            } catch (SQLException sqle) {
-               sqle.printStackTrace();
-            }
+            client.setAccID(MapleCharacter.loadCharFromDB(cid, client, false).getAccountID());
          }
 
          session.setAttribute(MapleClient.CLIENT_KEY, client);
@@ -259,7 +208,9 @@ public class MapleSessionCoordinator {
    }
 
    public boolean canStartLoginSession(IoSession session) {
-      if (!ServerConstants.DETERRED_MULTICLIENT) return true;
+      if (!ServerConstants.DETERRED_MULTICLIENT) {
+         return true;
+      }
 
       String remoteHost = getSessionRemoteAddress(session);
       Lock lock = getCoodinatorLock(remoteHost);
@@ -535,16 +486,7 @@ public class MapleSessionCoordinator {
    }
 
    public void runUpdateHwidHistory() {
-      try {
-         Connection con = DatabaseConnection.getConnection();
-         try (PreparedStatement ps = con.prepareStatement("DELETE FROM hwidaccounts WHERE expiresat < CURRENT_TIMESTAMP")) {
-            ps.execute();
-         } finally {
-            con.close();
-         }
-      } catch (SQLException ex) {
-         ex.printStackTrace();
-      }
+      DatabaseConnection.withConnection(connection -> HwidAccountAdministrator.getInstance().deleteExpired(connection));
 
       long timeNow = Server.getInstance().getCurrentTime();
       List<String> toRemove = new LinkedList<>();
