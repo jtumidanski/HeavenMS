@@ -10,12 +10,7 @@ import java.util.Optional;
 
 public abstract class AbstractQueryExecutor {
    protected <T> Optional<T> getSingle(Connection connection, String sql, int columnIndex) {
-      return get(connection, sql, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of((T) rs.getObject(columnIndex));
-         }
-         return Optional.empty();
-      });
+      return getSingle(connection, sql, null, columnIndex);
    }
 
    protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, int columnIndex) {
@@ -28,12 +23,7 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T> Optional<T> getSingle(Connection connection, String sql, String columnLabel) {
-      return get(connection, sql, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of((T) rs.getObject(columnLabel));
-         }
-         return Optional.empty();
-      });
+      return getSingle(connection, sql, null, columnLabel);
    }
 
    protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, String columnLabel) {
@@ -90,80 +80,36 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T> Optional<T> getNew(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         setParams.accept(ps);
-         ResultSet rs = ps.executeQuery();
+      return get(connection, sql, setParams, rs -> {
          if (rs != null && rs.next()) {
             return Optional.of(getResult.apply(rs));
          }
          return Optional.empty();
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return Optional.empty();
+      });
+   }
+
+   protected <T> Optional<T> getNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
+      return getNew(connection, sql, null, getResult);
    }
 
    @Deprecated
    protected <T> Optional<T> get(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, Optional<T>> getResult) {
-      Optional<T> result = Optional.empty();
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         setParams.accept(ps);
-         ResultSet rs = ps.executeQuery();
-         result = getResult.apply(rs);
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return result;
-   }
-
-   protected <T> Optional<T> getNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         ResultSet rs = ps.executeQuery();
-         if (rs != null && rs.next()) {
-            return Optional.of(getResult.apply(rs));
-         }
-         return Optional.empty();
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return Optional.empty();
+      return getInternal(connection, sql, setParams, getResult, Optional.empty());
    }
 
    @Deprecated
    protected <T> Optional<T> get(Connection connection, String sql, SQLFunction<ResultSet, Optional<T>> getResult) {
-      Optional<T> result = Optional.empty();
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         ResultSet rs = ps.executeQuery();
-         result = getResult.apply(rs);
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return result;
+      return get(connection, sql, null, getResult);
    }
 
    @Deprecated
    protected <T> List<T> getList(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, List<T>> getResult) {
-      List<T> result = new ArrayList<>();
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         setParams.accept(ps);
-         ResultSet rs = ps.executeQuery();
-         result = getResult.apply(rs);
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return result;
+      return getInternal(connection, sql, setParams, getResult, new ArrayList<>());
    }
 
    @Deprecated
    protected <T> List<T> getList(Connection connection, String sql, SQLFunction<ResultSet, List<T>> getResult) {
-      List<T> result = new ArrayList<>();
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         ResultSet rs = ps.executeQuery();
-         result = getResult.apply(rs);
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return result;
+      return getList(connection, sql, null, getResult);
    }
 
    protected <T> List<T> getListNew(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult) {
@@ -177,12 +123,20 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T> List<T> getListNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
-      return getList(connection, sql, rs -> {
-         List<T> result = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            result.add(getResult.apply(rs));
+      return getListNew(connection, sql, null, getResult);
+   }
+
+   private <T> T getInternal(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult, T default_) {
+      T result = default_;
+      try (PreparedStatement ps = connection.prepareStatement(sql)) {
+         if (setParams != null) {
+            setParams.accept(ps);
          }
-         return result;
-      });
+         ResultSet rs = ps.executeQuery();
+         result = getResult.apply(rs);
+      } catch (SQLException exception) {
+         exception.printStackTrace();
+      }
+      return result;
    }
 }
