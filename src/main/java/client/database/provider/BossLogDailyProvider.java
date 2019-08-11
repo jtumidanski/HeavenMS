@@ -18,12 +18,12 @@ public class BossLogDailyProvider extends AbstractQueryExecutor {
    private BossLogDailyProvider() {
    }
 
-   public int countEntriesForCharacter(Connection connection, int characterId, String type) {
+   public long countEntriesForCharacter(Connection connection, int characterId, String type) {
       String sql = "SELECT COUNT(*) FROM bosslog_daily WHERE characterid = ? AND bosstype LIKE ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> {
+      Optional<Long> result = getSingle(connection, sql, ps -> {
          ps.setInt(1, characterId);
          ps.setString(2, type);
       }, 1);
-      return result.orElse(-1);
+      return result.orElse(-1L);
    }
 }

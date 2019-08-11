@@ -48,7 +48,7 @@ public class MapleRing implements Comparable<MapleRing> {
    }
 
    public static MapleRing loadFromDb(int ringId) {
-      return DatabaseConnection.withConnectionResult(connection -> RingProvider.getInstance().getRingById(connection, ringId).get()).orElseThrow();
+      return DatabaseConnection.withConnectionResultOpt(connection -> RingProvider.getInstance().getRingById(connection, ringId)).orElseThrow();
    }
 
    public static void removeRing(final MapleRing ring) {

@@ -86,14 +86,14 @@ public class MapleExpeditionBossLog {
       return week ? "bosslog_weekly" : "bosslog_daily";
    }
 
-   private static int countPlayerEntries(int cid, BossLogEntry boss) {
+   private static long countPlayerEntries(int cid, BossLogEntry boss) {
       return DatabaseConnection.withConnectionResult(connection -> {
          if (boss.week) {
             return BossLogWeeklyProvider.getInstance().countEntriesForCharacter(connection, cid, boss.name());
          } else {
             return BossLogDailyProvider.getInstance().countEntriesForCharacter(connection, cid, boss.name());
          }
-      }).orElse(-1);
+      }).orElse(-1L);
    }
 
    private static void insertPlayerEntry(int cid, BossLogEntry boss) {

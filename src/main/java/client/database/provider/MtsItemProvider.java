@@ -35,13 +35,13 @@ public class MtsItemProvider extends AbstractQueryExecutor {
       }, this::produceItem);
    }
 
-   public int countByTabAndType(Connection connection, int tab, int type) {
+   public long countByTabAndType(Connection connection, int tab, int type) {
       String sql = "SELECT COUNT(*) FROM mts_items WHERE tab = ? AND type = ? AND transfer = 0";
-      Optional<Integer> result = getSingle(connection, sql, ps -> {
+      Optional<Long> result = getSingle(connection, sql, ps -> {
          ps.setInt(1, tab);
          ps.setInt(2, type);
       }, 1);
-      return result.orElse(0);
+      return result.orElse(0L);
    }
 
    public List<MTSItemInfo> getByTab(Connection connection, int tab, int limit) {
@@ -52,16 +52,16 @@ public class MtsItemProvider extends AbstractQueryExecutor {
       }, this::produceItem);
    }
 
-   public int countByTab(Connection connection, int tab) {
+   public long countByTab(Connection connection, int tab) {
       String sql = "SELECT COUNT(*) FROM mts_items WHERE tab = ? AND transfer = 0";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, tab), 1);
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql, ps -> ps.setInt(1, tab), 1);
+      return result.orElse(0L);
    }
 
-   public int countBySeller(Connection connection, int characterId) {
+   public long countBySeller(Connection connection, int characterId) {
       String sql = "SELECT COUNT(*) FROM mts_items WHERE seller = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
+      return result.orElse(0L);
    }
 
    public Optional<MTSItemInfo> getById(Connection connection, int id) {
@@ -102,7 +102,7 @@ public class MtsItemProvider extends AbstractQueryExecutor {
       return getListNew(connection, sql, ps -> ps.setInt(1, sellerId), this::produceItem);
    }
 
-   public int countSearchItems(Connection connection, int tab, int type, int characterId, String search, List<Pair<Integer, String>> items) {
+   public long countSearchItems(Connection connection, int tab, int type, int characterId, String search, List<Pair<Integer, String>> items) {
       StringBuilder clause = constructSearchClause(characterId, search, items);
       String sql;
       if (type != 0) {
@@ -110,13 +110,13 @@ public class MtsItemProvider extends AbstractQueryExecutor {
       } else {
          sql = "SELECT COUNT(*) FROM mts_items WHERE tab = ? " + clause + " AND transfer = 0";
       }
-      Optional<Integer> result = getSingle(connection, sql, ps -> {
+      Optional<Long> result = getSingle(connection, sql, ps -> {
          ps.setInt(1, tab);
          if (type != 0) {
             ps.setInt(2, type);
          }
       }, 1);
-      return result.orElse(0);
+      return result.orElse(0L);
    }
 
    public List<MTSItemInfo> getSearchItems(Connection connection, int tab, int type, int characterId, String search, int page, List<Pair<Integer, String>> items) {

@@ -59,20 +59,18 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
    private Pair<Item, MapleInventoryType> processGetItemsByTypeResults(ResultSet resultSet) throws SQLException {
       EquipFromResultSetTransformer equipTransformer = new EquipFromResultSetTransformer();
 
-      if (resultSet != null && resultSet.next()) {
-         MapleInventoryType inventoryType = MapleInventoryType.getByType(resultSet.getByte("inventorytype"));
-         if (inventoryType != null) {
-            if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
-               return new Pair<>(equipTransformer.transform(resultSet), inventoryType);
-            } else {
-               Item item = new Item(resultSet.getInt("itemid"), (byte) resultSet.getInt("position"),
-                     (short) resultSet.getInt("quantity"), resultSet.getInt("petid"));
-               item.setOwner(resultSet.getString("owner"));
-               item.setExpiration(resultSet.getLong("expiration"));
-               item.setGiftFrom(resultSet.getString("giftFrom"));
-               item.setFlag((short) resultSet.getInt("flag"));
-               return new Pair<>(item, inventoryType);
-            }
+      MapleInventoryType inventoryType = MapleInventoryType.getByType(resultSet.getByte("inventorytype"));
+      if (inventoryType != null) {
+         if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
+            return new Pair<>(equipTransformer.transform(resultSet), inventoryType);
+         } else {
+            Item item = new Item(resultSet.getInt("itemid"), (byte) resultSet.getInt("position"),
+                  (short) resultSet.getInt("quantity"), resultSet.getInt("petid"));
+            item.setOwner(resultSet.getString("owner"));
+            item.setExpiration(resultSet.getLong("expiration"));
+            item.setGiftFrom(resultSet.getString("giftFrom"));
+            item.setFlag((short) resultSet.getInt("flag"));
+            return new Pair<>(item, inventoryType);
          }
       }
       return null;

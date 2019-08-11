@@ -94,7 +94,7 @@ public class SkillFactory {
 
    public static Optional<Skill> getSkill(int id) {
       if (!skills.isEmpty()) {
-         return Optional.of(skills.get(id));
+         return Optional.ofNullable(skills.get(id));
       }
       return Optional.empty();
    }

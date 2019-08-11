@@ -52,14 +52,14 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    private static byte[] getMTS(int tab, int type, int page) {
       return DatabaseConnection.withConnectionResult(connection -> {
          List<MTSItemInfo> items = new ArrayList<>();
-         int pages = 0;
+         long pages;
          if (type != 0) {
             items.addAll(MtsItemProvider.getInstance().getByTabAndType(connection, tab, type, page * 16));
          } else {
             items.addAll(MtsItemProvider.getInstance().getByTab(connection, tab, page * 16));
          }
 
-         int count;
+         long count;
          if (type != 0) {
             count = MtsItemProvider.getInstance().countByTabAndType(connection, tab, type);
          } else {
@@ -70,7 +70,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
          if (count % 16 > 0) {
             pages++;
          }
-         return MaplePacketCreator.sendMTS(items, tab, type, page, pages); // resniff
+         return MaplePacketCreator.sendMTS(items, tab, type, page, (int) pages); // resniff
       }).orElseThrow();
    }
 
@@ -314,7 +314,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
 
          final short postedQuantity = quantity;
          DatabaseConnection.withConnection(connection -> {
-            int itemForSaleCount = MtsItemProvider.getInstance().countBySeller(connection, c.getPlayer().getId());
+            long itemForSaleCount = MtsItemProvider.getInstance().countBySeller(connection, c.getPlayer().getId());
             if (itemForSaleCount > 10) { //They have more than 10 items up for sale already!
                c.getPlayer().dropMessage(1, "You already have 10 items up for auction!");
                c.announce(getMTS(1, 0, 0));
@@ -437,13 +437,13 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       return DatabaseConnection.withConnectionResult(connection -> {
          List<MTSItemInfo> items = new ArrayList<>();
          MtsCartProvider.getInstance().getCartItems(connection, cid).forEach(itemId -> MtsItemProvider.getInstance().getById(connection, itemId).ifPresent(items::add));
-         int cartSize = MtsCartProvider.getInstance().countCartSize(connection, cid);
-         int pages = cartSize / 16;
+         long cartSize = MtsCartProvider.getInstance().countCartSize(connection, cid);
+         long pages = cartSize / 16;
          if (cartSize % 16 > 0) {
             pages += 1;
          }
 
-         return MaplePacketCreator.sendMTS(items, 4, 0, 0, pages);
+         return MaplePacketCreator.sendMTS(items, 4, 0, 0, (int) pages);
       }).orElseThrow();
    }
 
@@ -456,13 +456,13 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getSearchItems(connection, tab, type, characterId, search, page, ii.getAllItems()));
 
-         int searchCount = MtsItemProvider.getInstance().countSearchItems(connection, tab, type, characterId, search, ii.getAllItems());
-         int pages = searchCount / 16;
+         long searchCount = MtsItemProvider.getInstance().countSearchItems(connection, tab, type, characterId, search, ii.getAllItems());
+         long pages = searchCount / 16;
          if (searchCount % 16 > 0) {
             pages++;
          }
 
-         return MaplePacketCreator.sendMTS(items, tab, type, page, pages);
+         return MaplePacketCreator.sendMTS(items, tab, type, page, (int) pages);
       }).orElseThrow();
    }
 }

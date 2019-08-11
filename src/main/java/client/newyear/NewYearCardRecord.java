@@ -94,7 +94,7 @@ public class NewYearCardRecord {
          return nyc;
       }
 
-      Optional<NewYearCardRecord> newYearCardRecord = DatabaseConnection.withConnectionResult(connection -> NewYearCardProvider.getInstance().getById(connection, cardId).get());
+      Optional<NewYearCardRecord> newYearCardRecord = DatabaseConnection.withConnectionResultOpt(connection -> NewYearCardProvider.getInstance().getById(connection, cardId));
       if (newYearCardRecord.isPresent()) {
          Server.getInstance().setNewYearCard(newYearCardRecord.get());
          return newYearCardRecord.get();

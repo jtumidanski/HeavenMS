@@ -1006,7 +1006,7 @@ public class Server {
             return Optional.of(guilds.get(id));
          }
          MapleGuild g = new MapleGuild(id, world);
-         if (g.getId() == -1) {
+         if (g.getId() < 1) {
             return Optional.empty();
          }
 

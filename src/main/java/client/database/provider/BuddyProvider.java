@@ -34,15 +34,15 @@ public class BuddyProvider extends AbstractQueryExecutor {
    }
 
    public List<CharacterNameAndId> getInfoForPendingBuddies(Connection connection, int characterId) {
-      String sql = "SELECT b.buddyid, b.pending, b.group, c.name as buddyname FROM buddies as b, characters as c WHERE c.id = b.buddyid AND b.characterid = ? AND pending == 1";
+      String sql = "SELECT b.buddyid, b.pending, b.group, c.name as buddyname FROM buddies as b, characters as c WHERE c.id = b.buddyid AND b.characterid = ? AND pending = 1";
       return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
             rs -> new CharacterNameAndId(rs.getInt("buddyid"), rs.getString("buddyname")));
    }
 
-   public int getBuddyCount(Connection connection, int characterId) {
+   public long getBuddyCount(Connection connection, int characterId) {
       String sql = "SELECT COUNT(*) as buddyCount FROM buddies WHERE characterid = ? AND pending = 0";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), "buddyCount");
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), "buddyCount");
+      return result.orElse(0L);
    }
 
    public boolean buddyIsPending(Connection connection, int characterId, int buddyId) {

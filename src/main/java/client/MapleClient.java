@@ -211,7 +211,7 @@ public class MapleClient {
    }
 
    private List<CharNameAndIdData> loadCharactersInternal(int worldId) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForWorld(connection, accId, worldId)).get();
+      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForWorld(connection, accId, worldId)).orElse(new ArrayList<>());
    }
 
    public boolean isLoggedIn() {
@@ -219,7 +219,7 @@ public class MapleClient {
    }
 
    public boolean hasBannedIP() {
-      return DatabaseConnection.withConnectionResult(connection -> IpBanProvider.getInstance().getIpBanCount(connection, session.getRemoteAddress().toString())).orElse(0) > 0;
+      return DatabaseConnection.withConnectionResult(connection -> IpBanProvider.getInstance().getIpBanCount(connection, session.getRemoteAddress().toString())).orElse(0L) > 0;
    }
 
    public int getVoteTime() {
@@ -245,7 +245,7 @@ public class MapleClient {
       if (hwid == null) {
          return false;
       }
-      return DatabaseConnection.withConnectionResult(connection -> HwidBanProvider.getInstance().getHwidBanCount(connection, hwid)).orElse(0) > 1;
+      return DatabaseConnection.withConnectionResult(connection -> HwidBanProvider.getInstance().getHwidBanCount(connection, hwid)).orElse(0L) > 1;
    }
 
    public boolean hasBannedMac() {
@@ -359,7 +359,7 @@ public class MapleClient {
          return 6;   // thanks Survival_Project for finding out an issue with AUTOMATIC_REGISTER here
       }
 
-      Optional<AccountData> accountData = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getAccountDataByName(connection, login).get());
+      Optional<AccountData> accountData = DatabaseConnection.withConnectionResultOpt(connection -> AccountProvider.getInstance().getAccountDataByName(connection, login));
       if (accountData.isEmpty()) {
          accId = -2;
       } else {
@@ -492,6 +492,7 @@ public class MapleClient {
          return LOGIN_NOTLOGGEDIN;
       }
 
+      birthday = Calendar.getInstance();
       birthday.setTime(loginData.get().getBirthday());
 
       int state = loginData.get().getLoggedIn();
@@ -834,8 +835,8 @@ public class MapleClient {
          return true;
       }
 
-      byte tosStatus = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getTosStatus(connection, accId)).orElse(Byte.MIN_VALUE);
-      if (tosStatus == 1) {
+      boolean tosStatus = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getTosStatus(connection, accId)).orElse(false);
+      if (tosStatus) {
          disconnectForBeingAFaggot = true;
       }
       DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().acceptTos(connection, accId));

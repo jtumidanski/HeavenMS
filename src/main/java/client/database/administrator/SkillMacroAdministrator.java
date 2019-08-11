@@ -22,7 +22,7 @@ public class SkillMacroAdministrator extends AbstractQueryExecutor implements De
 
    @Override
    public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM skillmacros WHERE characterid_to = ?";
+      String sql = "DELETE FROM skillmacros WHERE characterid = ?";
       execute(connection, sql, ps -> ps.setInt(1, characterId));
    }
 

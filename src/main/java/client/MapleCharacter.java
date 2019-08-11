@@ -763,7 +763,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public static CharacterIdNameAccountId getCharacterFromDatabase(String name) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getByName(connection, name).get()).orElse(null);
+      return DatabaseConnection.withConnectionResultOpt(connection -> CharacterProvider.getInstance().getByName(connection, name)).orElse(null);
    }
 
    private static MapleStatEffect getEffectFromBuffSource(Map<MapleBuffStat, MapleBuffStatValueHolder> buffSource) {
@@ -975,6 +975,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          MapleCharacter mapleCharacter = loadFromCharacterData(characterData);
          mapleCharacter.client = client;
+         mapleCharacter.mgc = new MapleGuildCharacter(mapleCharacter);
          loadInventory(characterData.getId(), channelserver, mapleCharacter);
          World world = Server.getInstance().getWorld(characterData.getWorld());
          correctMarriageDatabaseData(characterData, mapleCharacter, world);
@@ -1297,7 +1298,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       mapleCharacter.dojoPoints = characterData.getDojoPoints();
       mapleCharacter.dojoStage = characterData.getLastDojoStage();
       mapleCharacter.dataString = characterData.getDataString();
-      mapleCharacter.mgc = new MapleGuildCharacter(mapleCharacter);
       mapleCharacter.buddylist = new BuddyList(characterData.getBuddyCapacity());
       mapleCharacter.lastExpGainTime = characterData.getLastExpGainTime().getTime();
       mapleCharacter.canRecvPartySearchInvite = characterData.hasPartyInvite();
@@ -7919,17 +7919,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          updateQuestInfo(connection);
 
          connection.commit();
-         connection.setAutoCommit(true);
 
 
          if (cashshop != null) {
             cashshop.save(connection);
          }
 
+         connection.commit();
+
          if (storage != null && usedStorage) {
             storage.saveToDB(connection);
             usedStorage = false;
          }
+
+         connection.commit();
       });
    }
 
@@ -7970,6 +7973,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       SavedLocationAdministrator.getInstance().deleteForCharacter(con, id);
 
       Collection<Pair<String, SavedLocation>> locations = Arrays.stream(SavedLocationType.values())
+            .filter(type -> savedLocations[type.ordinal()] != null)
             .map(type -> new Pair<>(type.name(), savedLocations[type.ordinal()]))
             .collect(Collectors.toList());
       SavedLocationAdministrator.getInstance().create(con, id, locations);
@@ -7982,7 +7986,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private void updateSkillMacros(Connection con) {
       SkillMacroAdministrator.getInstance().deleteForCharacter(con, id);
-      SkillMacroAdministrator.getInstance().create(con, id, Arrays.stream(skillMacros).collect(Collectors.toList()));
+      SkillMacroAdministrator.getInstance().create(con, id, Arrays.stream(skillMacros).filter(Objects::nonNull).collect(Collectors.toList()));
    }
 
    private void updateKeyMap(Connection con) {
@@ -9476,7 +9480,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public int getRewardPoints() {
-      return DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getRewardPoints(connection, accountid)).get();
+      return DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getRewardPoints(connection, accountid)).orElse(0);
    }
 
    public void setRewardPoints(int value) {
@@ -9492,7 +9496,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
       }
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().countReborns(connection, id)).get();
+      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().countReborns(connection, id)).orElse(0);
    }
 
    public void setReborns(int value) {

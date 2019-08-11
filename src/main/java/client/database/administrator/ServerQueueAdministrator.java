@@ -20,7 +20,7 @@ public class ServerQueueAdministrator extends AbstractQueryExecutor implements D
 
    @Override
    public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM server_queue WHERE characterid_to = ?";
+      String sql = "DELETE FROM server_queue WHERE characterid = ?";
       execute(connection, sql, ps -> ps.setInt(1, characterId));
    }
 }

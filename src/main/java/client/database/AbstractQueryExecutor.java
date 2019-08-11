@@ -16,7 +16,7 @@ public abstract class AbstractQueryExecutor {
    protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, int columnIndex) {
       return get(connection, sql, setParams, rs -> {
          if (rs != null && rs.next()) {
-            return Optional.of((T) rs.getObject(columnIndex));
+            return Optional.ofNullable((T) rs.getObject(columnIndex));
          }
          return Optional.empty();
       });
@@ -29,7 +29,7 @@ public abstract class AbstractQueryExecutor {
    protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, String columnLabel) {
       return get(connection, sql, setParams, rs -> {
          if (rs != null && rs.next()) {
-            return Optional.of((T) rs.getObject(columnLabel));
+            return Optional.ofNullable((T) rs.getObject(columnLabel));
          }
          return Optional.empty();
       });

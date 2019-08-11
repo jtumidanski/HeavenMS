@@ -24,7 +24,7 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
 
    @Override
    public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM skills WHERE characterid_to = ?";
+      String sql = "DELETE FROM skills WHERE characterid = ?";
       execute(connection, sql, ps -> ps.setInt(1, characterId));
    }
 

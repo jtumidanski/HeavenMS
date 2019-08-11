@@ -18,9 +18,9 @@ public class HwidBanProvider extends AbstractQueryExecutor {
    private HwidBanProvider() {
    }
 
-   public int getHwidBanCount(Connection connection, String hwid) {
+   public long getHwidBanCount(Connection connection, String hwid) {
       String sql = "SELECT COUNT(*) FROM hwidbans WHERE hwid LIKE ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, hwid), 1);
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql, ps -> ps.setString(1, hwid), 1);
+      return result.orElse(0L);
    }
 }

@@ -39,8 +39,8 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class NewYearCardHandler extends AbstractMaplePacketHandler {
 
    private static int getReceiverId(String receiver, int world) {
-      return DatabaseConnection.withConnectionResult(connection ->
-            CharacterProvider.getInstance().getCharacterForNameAndWorld(connection, receiver, world).get())
+      return DatabaseConnection.withConnectionResultOpt(connection ->
+            CharacterProvider.getInstance().getCharacterForNameAndWorld(connection, receiver, world))
             .orElse(-1);
    }
 

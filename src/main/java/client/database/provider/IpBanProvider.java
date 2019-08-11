@@ -18,9 +18,9 @@ public class IpBanProvider extends AbstractQueryExecutor {
    private IpBanProvider() {
    }
 
-   public int getIpBanCount(Connection connection, String ipAddress) {
+   public long getIpBanCount(Connection connection, String ipAddress) {
       String sql = "SELECT COUNT(*) FROM ipbans WHERE ? LIKE CONCAT(ip, '%')";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, ipAddress), 1);
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql, ps -> ps.setString(1, ipAddress), 1);
+      return result.orElse(0L);
    }
 }

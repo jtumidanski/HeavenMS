@@ -21,7 +21,7 @@ public class TeleportRockLocationAdministrator extends AbstractQueryExecutor imp
 
    @Override
    public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM trocklocations WHERE characterid_to = ?";
+      String sql = "DELETE FROM trocklocations WHERE characterid = ?";
       execute(connection, sql, ps -> ps.setInt(1, characterId));
    }
 

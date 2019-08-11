@@ -2053,7 +2053,7 @@ public class MapleItemInformationProvider {
             MakerRecipeProvider.getInstance().getRecipeForItem(connection, toCreate).forEach(data -> result.addReqItem(data.getRequiredItem(), data.getCount()));
             makerItemCache.put(toCreate, new MakerItemCreateEntry(result));
             return result;
-         }).get();
+         }).orElseThrow();
       }
 
       return makerEntry;

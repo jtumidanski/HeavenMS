@@ -61,8 +61,8 @@ import tools.Pair;
 public class DueyProcessor {
 
    private static Pair<Integer, Integer> getAccountCharacterIdFromCNAME(String name) {
-      return DatabaseConnection.withConnectionResult(connection ->
-            CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name).get()).orElse(null);
+      return DatabaseConnection.withConnectionResultOpt(connection ->
+            CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name)).orElse(null);
    }
 
    private static Timestamp getCurrentDate(boolean quick) {

@@ -27,10 +27,10 @@ public class MtsCartProvider extends AbstractQueryExecutor {
       }, "cid").isPresent();
    }
 
-   public int countCartSize(Connection connection, int characterId) {
+   public long countCartSize(Connection connection, int characterId) {
       String sql = "SELECT COUNT(*) FROM mts_cart WHERE cid = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
+      return result.orElse(0L);
    }
 
    public List<Integer> getCartItems(Connection connection, int characterId) {

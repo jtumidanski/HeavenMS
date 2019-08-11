@@ -38,10 +38,10 @@ public class AccountProvider extends AbstractQueryExecutor {
       return result.orElse(0);
    }
 
-   public byte getTosStatus(Connection connection, int accountId) {
+   public boolean getTosStatus(Connection connection, int accountId) {
       String sql = "SELECT `tos` FROM accounts WHERE id = ?";
-      Optional<Byte> result = getSingle(connection, sql, ps -> ps.setInt(1, accountId), "tos");
-      return result.orElse(Byte.MIN_VALUE);
+      Optional<Boolean> result = getSingle(connection, sql, ps -> ps.setInt(1, accountId), "tos");
+      return result.orElse(false);
    }
 
    public AccountLoginData getLoginData(Connection connection, int accountId) {
@@ -120,10 +120,10 @@ public class AccountProvider extends AbstractQueryExecutor {
       });
    }
 
-   public int getAccountCount(Connection connection) {
+   public long getAccountCount(Connection connection) {
       String sql = "SELECT count(*) FROM accounts";
-      Optional<Integer> result = getSingle(connection, sql,1);
-      return result.orElse(0);
+      Optional<Long> result = getSingle(connection, sql,1);
+      return result.orElse(0L);
    }
 
    public Optional<AccountData> getAccountDataById(Connection connection, int accountId) {

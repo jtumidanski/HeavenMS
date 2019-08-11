@@ -23,7 +23,7 @@ public class KeyMapAdministrator extends AbstractQueryExecutor implements Delete
 
    @Override
    public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM keymap WHERE characterid_to = ?";
+      String sql = "DELETE FROM keymap WHERE characterid = ?";
       execute(connection, sql, ps -> ps.setInt(1, characterId));
    }
 

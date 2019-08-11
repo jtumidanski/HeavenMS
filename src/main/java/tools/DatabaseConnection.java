@@ -10,7 +10,6 @@ import java.util.function.Function;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import client.database.AbstractQueryExecutor;
 import client.database.SQLConsumer;
 import client.database.provider.AccountProvider;
 import constants.ServerConstants;
@@ -25,7 +24,7 @@ public class DatabaseConnection {
 
    public DatabaseConnection() {
       try {
-         Class.forName("com.mysql.jdbc.Driver"); // touch the mysql driver
+         Class.forName("com.mysql.cj.jdbc.Driver"); // touch the mysql driver
       } catch (ClassNotFoundException e) {
          System.out.println("[SEVERE] SQL Driver Not Found. Consider death by clams.");
          e.printStackTrace();
@@ -44,7 +43,7 @@ public class DatabaseConnection {
 
          // Make sure pool size is comfortable for the worst case scenario.
          // Under 100 accounts? Make it 10. Over 10000 accounts? Make it 30.
-         int poolSize = (int) Math.ceil(0.00202020202 * getNumberOfAccounts() + 9.797979798);
+         int poolSize = (int) Math.ceil(0.00202020202 * 100 + 9.797979798);
          if (poolSize < 10) {
             poolSize = 10;
          } else if (poolSize > 30) {
@@ -63,28 +62,36 @@ public class DatabaseConnection {
    }
 
    public static Connection getConnection() throws SQLException {
+      if (ds == null) {
+         new DatabaseConnection();
+      }
+
+      Connection connection = null;
       if (ds != null) {
          try {
-            return ds.getConnection();
+            connection = ds.getConnection();
          } catch (SQLException sqle) {
             sqle.printStackTrace();
          }
-      }
+      } else {
+         int denies = 0;
+         while (true) {   // There is no way it can pass with a null out of here?
+            try {
+               connection = DriverManager.getConnection(ServerConstants.DB_URL, ServerConstants.DB_USER, ServerConstants.DB_PASS);
+               break;
+            } catch (SQLException sqle) {
+               denies++;
 
-      int denies = 0;
-      while (true) {   // There is no way it can pass with a null out of here?
-         try {
-            return DriverManager.getConnection(ServerConstants.DB_URL, ServerConstants.DB_USER, ServerConstants.DB_PASS);
-         } catch (SQLException sqle) {
-            denies++;
-
-            if (denies == 3) {
-               // Give up, throw exception. Nothing good will come from this.
-               FilePrinter.printError(FilePrinter.SQL_EXCEPTION, "SQL Driver refused to give a connection after " + denies + " tries. Problem: " + sqle.getMessage());
-               throw sqle;
+               if (denies == 3) {
+                  // Give up, throw exception. Nothing good will come from this.
+                  FilePrinter.printError(FilePrinter.SQL_EXCEPTION, "SQL Driver refused to give a connection after " + denies + " tries. Problem: " + sqle.getMessage());
+                  throw sqle;
+               }
             }
          }
       }
+
+      return connection;
    }
 
    public static void withConnection(Consumer<Connection> consumer) {
@@ -116,11 +123,17 @@ public class DatabaseConnection {
          connection.setAutoCommit(true);
       } catch (SQLException e) {
          e.printStackTrace();
-      } finally {
          try {
             if (connection != null) {
                connection.rollback();
                connection.setAutoCommit(true);
+            }
+         } catch (SQLException exception) {
+            exception.printStackTrace();
+         }
+      } finally {
+         try {
+            if (connection != null) {
                connection.close();
             }
          } catch (SQLException exception) {
@@ -149,7 +162,27 @@ public class DatabaseConnection {
       return result;
    }
 
-   private static int getNumberOfAccounts() {
-      return withConnectionResult(connection -> AccountProvider.getInstance().getAccountCount(connection)).orElse(0);
+   public static <T> Optional<T> withConnectionResultOpt(Function<Connection, Optional<T>> function) {
+      Connection connection = null;
+      Optional<T> result = Optional.empty();
+      try {
+         connection = DatabaseConnection.getConnection();
+         result = function.apply(connection);
+      } catch (SQLException e) {
+         e.printStackTrace();
+      } finally {
+         try {
+            if (connection != null) {
+               connection.close();
+            }
+         } catch (SQLException exception) {
+            exception.printStackTrace();
+         }
+      }
+      return result;
+   }
+
+   private static long getNumberOfAccounts() {
+      return withConnectionResult(connection -> AccountProvider.getInstance().getAccountCount(connection)).orElse(0L);
    }
 }

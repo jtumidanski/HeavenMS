@@ -14,6 +14,7 @@ import client.database.utility.CharNameAndIdTransformer;
 import client.database.utility.CharacterFromResultSetTransformer;
 import client.database.utility.CharacterGuildTransformer;
 import client.database.utility.CharacterIdNameAccountIdTransformer;
+import client.database.utility.CharacterJobRankTransformer;
 import client.database.utility.CharacterRankTransformer;
 import tools.Pair;
 
@@ -146,7 +147,7 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public List<CharacterRankData> getRankByJob(Connection connection, int worldId, int jobId) {
       String sql = "SELECT c.id, c.jobRank, c.jobRankMove, a.lastlogin AS lastlogin, a.loggedin FROM characters AS c LEFT JOIN accounts AS a ON c.accountid = a.id WHERE c.gm < 2 AND c.world = ? AND c.job DIV 100 = ? ORDER BY c.level DESC , c.exp DESC , c.lastExpGainTime ASC, c.fame DESC , c.meso DESC";
-      CharacterRankTransformer transformer = new CharacterRankTransformer();
+      CharacterJobRankTransformer transformer = new CharacterJobRankTransformer();
       return getListNew(connection, sql, ps -> {
          ps.setInt(1, worldId);
          ps.setInt(2, jobId);

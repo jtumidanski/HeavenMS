@@ -73,7 +73,7 @@ public class CharacterFromResultSetTransformer implements SqlTransformer<Charact
       mapleCharacter.setEtcSlotLimit(resultSet.getByte("etcslots"));
       mapleCharacter.setPartnerId(resultSet.getInt("partnerId"));
       mapleCharacter.setMarriageItemId(resultSet.getInt("marriageItemId"));
-      mapleCharacter.setPartyId(resultSet.getInt("partyId"));
+      mapleCharacter.setPartyId(resultSet.getInt("party"));
       mapleCharacter.setMessengerId(resultSet.getInt("messengerid"));
       mapleCharacter.setMessengerPosition(resultSet.getInt("messengerposition"));
 

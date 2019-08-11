@@ -84,8 +84,8 @@ public final class WhisperHandler extends AbstractMaplePacketHandler {
          }
       }, () -> {
          if (c.getPlayer().isGM()) { // not found
-            Optional<Integer> gmLevel = DatabaseConnection.withConnectionResult(connection ->
-                  CharacterProvider.getInstance().getGmLevel(connection, recipient).get());
+            Optional<Integer> gmLevel = DatabaseConnection.withConnectionResultOpt(connection ->
+                  CharacterProvider.getInstance().getGmLevel(connection, recipient));
             if (gmLevel.isPresent() && gmLevel.get() >= c.getPlayer().gmLevel()) {
                c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
                return;

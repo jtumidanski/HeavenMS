@@ -84,7 +84,7 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
                if (channel != -1) {
                   buddyAddResult = world.requestBuddyAdd(addName, c.getChannel(), player.getId(), player.getName());
                } else {
-                  int count = DatabaseConnection.withConnectionResult(connection -> BuddyProvider.getInstance().getBuddyCount(connection, charWithId.getId())).orElse(0);
+                  long count = DatabaseConnection.withConnectionResult(connection -> BuddyProvider.getInstance().getBuddyCount(connection, charWithId.getId())).orElse(0L);
                   if (count >= charWithId.getBuddyCapacity()) {
                      buddyAddResult = BuddyAddResult.BUDDYLIST_FULL;
                   }

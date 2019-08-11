@@ -116,7 +116,7 @@ public final class EnterMTSHandler extends AbstractMaplePacketHandler {
 
          DatabaseConnection.withConnection(connection -> {
             List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getByTab(connection, 1, 16));
-            int countForTab = MtsItemProvider.getInstance().countByTab(connection, 1);
+            long countForTab = MtsItemProvider.getInstance().countByTab(connection, 1);
             int pages = (int) Math.ceil(countForTab / 16);
 
             c.announce(MaplePacketCreator.sendMTS(items, 1, 0, 0, pages));
