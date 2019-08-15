@@ -50,6 +50,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import client.BuddyList;
 import client.BuddyList.BuddyAddResult;
 import client.BuddyList.BuddyOperation;
+import client.BuddyListProcessor;
 import client.BuddylistEntry;
 import client.MapleCharacter;
 import client.MapleFamily;
@@ -1171,7 +1172,7 @@ public class World {
                   return BuddyAddResult.BUDDYLIST_FULL;
                }
                if (!buddylist.contains(cidFrom)) {
-                  buddylist.addBuddyRequest(addChar.getClient(), cidFrom, nameFrom, channelFrom);
+                  BuddyListProcessor.getInstance().addBuddyRequest(addChar, cidFrom, nameFrom, channelFrom);
                } else if (buddylist.containsVisible(cidFrom)) {
                   return BuddyAddResult.ALREADY_ON_LIST;
                }

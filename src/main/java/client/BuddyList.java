@@ -21,20 +21,12 @@
 */
 package client;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Optional;
-
-import client.database.administrator.BuddyAdministrator;
-import client.database.provider.BuddyProvider;
-import net.server.PlayerStorage;
-import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 
 public class BuddyList {
    private Map<Integer, BuddylistEntry> buddies = new LinkedHashMap<>();
@@ -124,33 +116,16 @@ public class BuddyList {
       }
    }
 
-   public void broadcast(byte[] packet, PlayerStorage playerStorage) {
-      Arrays.stream(getBuddyIds())
-            .mapToObj(playerStorage::getCharacterById)
-            .flatMap(Optional::stream)
-            .filter(MapleCharacter::isLoggedinWorld)
-            .forEach(character -> character.announce(packet));
-   }
-
-   public void loadFromDb(int characterId) {
-      DatabaseConnection.withConnection(connection -> {
-         BuddyProvider.getInstance().getInfoForBuddies(connection, characterId).forEach(this::put);
-         BuddyProvider.getInstance().getInfoForPendingBuddies(connection, characterId).forEach(pendingBuddy -> pendingRequests.push(pendingBuddy));
-         BuddyAdministrator.getInstance().deletePendingForCharacter(connection, characterId);
-      });
+   public void addRequest(CharacterNameAndId buddy) {
+      pendingRequests.push(buddy);
    }
 
    public CharacterNameAndId pollPendingRequest() {
       return pendingRequests.pollLast();
    }
 
-   public void addBuddyRequest(MapleClient c, int cidFrom, String nameFrom, int channelFrom) {
-      put(new BuddylistEntry(nameFrom, "Default Group", cidFrom, channelFrom, false));
-      if (pendingRequests.isEmpty()) {
-         c.announce(MaplePacketCreator.requestBuddylistAdd(cidFrom, c.getPlayer().getId(), nameFrom));
-      } else {
-         pendingRequests.push(new CharacterNameAndId(cidFrom, nameFrom));
-      }
+   public boolean hasPendingRequest() {
+      return !pendingRequests.isEmpty();
    }
 
    public enum BuddyOperation {

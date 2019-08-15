@@ -1038,7 +1038,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                mapleCharacter.lastmonthfameids.add(fameLogData.getLeft());
             });
 
-            mapleCharacter.buddylist.loadFromDb(characterData.getId());
+            BuddyListProcessor.getInstance().loadFromDb(characterData.getId(), mapleCharacter.getBuddylist());
             mapleCharacter.storage = MapleStorage.loadOrCreateFromDB(characterData.getAccountId(), characterData.getWorld());
 
             mapleCharacter.reapplyLocalStats();
@@ -2077,7 +2077,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void broadcastAcquaintances(byte[] packet) {
-      buddylist.broadcast(packet, getWorldServer().getPlayerStorage());
+      BuddyListProcessor.getInstance().broadcast(packet, buddylist, getWorldServer().getPlayerStorage());
 
       if (family != null) {
          //family.broadcast(packet, id); not yet implemented
