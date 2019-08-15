@@ -193,6 +193,7 @@ import server.life.MobSkill;
 import server.life.MobSkillFactory;
 import server.maps.FieldLimit;
 import server.maps.MapleDoor;
+import server.maps.MapleDoorProcessor;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMap;
@@ -453,22 +454,22 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       petLootCd = Server.getInstance().getCurrentTime();
    }
 
-   private static MapleJob getJobStyleInternal(int jobid, byte opt) {
-      int jobtype = jobid / 100;
+   private static MapleJob getJobStyleInternal(int jobId, byte opt) {
+      int jobType = jobId / 100;
 
-      if (jobtype == MapleJob.WARRIOR.getId() / 100 || jobtype == MapleJob.DAWNWARRIOR1.getId() / 100 || jobtype == MapleJob.ARAN1.getId() / 100) {
+      if (jobType == MapleJob.WARRIOR.getId() / 100 || jobType == MapleJob.DAWNWARRIOR1.getId() / 100 || jobType == MapleJob.ARAN1.getId() / 100) {
          return (MapleJob.WARRIOR);
-      } else if (jobtype == MapleJob.MAGICIAN.getId() / 100 || jobtype == MapleJob.BLAZEWIZARD1.getId() / 100 || jobtype == MapleJob.EVAN1.getId() / 100) {
+      } else if (jobType == MapleJob.MAGICIAN.getId() / 100 || jobType == MapleJob.BLAZEWIZARD1.getId() / 100 || jobType == MapleJob.EVAN1.getId() / 100) {
          return (MapleJob.MAGICIAN);
-      } else if (jobtype == MapleJob.BOWMAN.getId() / 100 || jobtype == MapleJob.WINDARCHER1.getId() / 100) {
-         if (jobid / 10 == MapleJob.CROSSBOWMAN.getId() / 10) {
+      } else if (jobType == MapleJob.BOWMAN.getId() / 100 || jobType == MapleJob.WINDARCHER1.getId() / 100) {
+         if (jobId / 10 == MapleJob.CROSSBOWMAN.getId() / 10) {
             return (MapleJob.CROSSBOWMAN);
          } else {
             return (MapleJob.BOWMAN);
          }
-      } else if (jobtype == MapleJob.THIEF.getId() / 100 || jobtype == MapleJob.NIGHTWALKER1.getId() / 100) {
+      } else if (jobType == MapleJob.THIEF.getId() / 100 || jobType == MapleJob.NIGHTWALKER1.getId() / 100) {
          return (MapleJob.THIEF);
-      } else if (jobtype == MapleJob.PIRATE.getId() / 100 || jobtype == MapleJob.THUNDERBREAKER1.getId() / 100) {
+      } else if (jobType == MapleJob.PIRATE.getId() / 100 || jobType == MapleJob.THUNDERBREAKER1.getId() / 100) {
          if (opt == (byte) 0x80) {
             return (MapleJob.BRAWLER);
          } else {
@@ -556,82 +557,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       }
       return getIdByName(name) < 0 && Pattern.compile("[a-zA-Z0-9]{3,12}").matcher(name).matches();
-   }
-
-   private static void addPartyPlayerDoor(MapleCharacter target) {
-      MapleDoor targetDoor = target.getPlayerDoor();
-      if (targetDoor != null) {
-         target.applyPartyDoor(targetDoor, true);
-      }
-   }
-
-   private static void removePartyPlayerDoor(MapleParty party, MapleCharacter target) {
-      target.removePartyDoor(party);
-   }
-
-   private static void updatePartyTownDoors(MapleParty party, MapleCharacter target, MapleCharacter partyLeaver, List<MapleCharacter> partyMembers) {
-      if (partyLeaver != null) {
-         removePartyPlayerDoor(party, target);
-      } else {
-         addPartyPlayerDoor(target);
-      }
-
-      Map<Integer, MapleDoor> partyDoors = null;
-      if (!partyMembers.isEmpty()) {
-         partyDoors = party.getDoors();
-
-         for (MapleCharacter pchr : partyMembers) {
-            MapleDoor door = partyDoors.get(pchr.getId());
-            if (door != null) {
-               door.updateDoorPortal(pchr);
-            }
-         }
-
-         for (MapleDoor door : partyDoors.values()) {
-            for (MapleCharacter pchar : partyMembers) {
-               door.getTownDoor().sendDestroyData(pchar.getClient(), true);
-            }
-         }
-
-         if (partyLeaver != null) {
-            Collection<MapleDoor> leaverDoors = partyLeaver.getDoors();
-            for (MapleDoor door : leaverDoors) {
-               for (MapleCharacter pchar : partyMembers) {
-                  door.getTownDoor().sendDestroyData(pchar.getClient(), true);
-               }
-            }
-         }
-
-         List<Integer> histMembers = party.getMembersSortedByHistory();
-         for (Integer chrid : histMembers) {
-            MapleDoor door = partyDoors.get(chrid);
-
-            if (door != null) {
-               for (MapleCharacter pchar : partyMembers) {
-                  door.getTownDoor().sendSpawnData(pchar.getClient());
-               }
-            }
-         }
-      }
-
-      if (partyLeaver != null) {
-         Collection<MapleDoor> leaverDoors = partyLeaver.getDoors();
-
-         if (partyDoors != null) {
-            for (MapleDoor door : partyDoors.values()) {
-               door.getTownDoor().sendDestroyData(partyLeaver.getClient(), true);
-            }
-         }
-
-         for (MapleDoor door : leaverDoors) {
-            door.getTownDoor().sendDestroyData(partyLeaver.getClient(), true);
-         }
-
-         for (MapleDoor door : leaverDoors) {
-            door.updateDoorPortal(partyLeaver);
-            door.getTownDoor().sendSpawnData(partyLeaver.getClient());
-         }
-      }
    }
 
    public static boolean deleteCharFromDB(MapleCharacter player, int senderAccId) {
@@ -2402,7 +2327,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          map.updatePartyItemDropsToNewcomer(this, partyItems);
       }
 
-      updatePartyTownDoors(party, this, partyLeaver, partyMembers);
+      PartyProcessor.getInstance().updatePartyTownDoors(party, this, partyLeaver, partyMembers);
    }
 
    private Integer getVisitedMapIndex(MapleMap map) {
@@ -4307,7 +4232,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (effect.isMagicDoor()) {
-         MapleDoor.attemptRemoveDoor(this);
+         MapleDoorProcessor.getInstance().attemptRemoveDoor(this);
       } else if (effect.isMapChair()) {
          stopChairTask();
       }
@@ -4929,7 +4854,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return ret;
    }
 
-   private void removePartyDoor(MapleParty formerParty) {    // player is no longer registered at this party
+   public void removePartyDoor(MapleParty formerParty) {    // player is no longer registered at this party
       formerParty.removeDoor(id);
    }
 

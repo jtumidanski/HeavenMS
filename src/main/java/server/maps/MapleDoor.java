@@ -77,24 +77,6 @@ public class MapleDoor {
       }
    }
 
-   public static void attemptRemoveDoor(final MapleCharacter owner) {
-      final MapleDoor destroyDoor = owner.getPlayerDoor();
-      if (destroyDoor != null && destroyDoor.dispose()) {
-         long effectTimeLeft = 3000 - destroyDoor.getElapsedDeployTime();   // portal deployment effect duration
-         if (effectTimeLeft > 0) {
-            MapleMap town = destroyDoor.getTown();
-            town.getChannelServer().registerOverallAction(town.getId(), new Runnable() {
-               @Override
-               public void run() {
-                  destroyDoor.broadcastRemoveDoor(owner);   // thanks BHB88 for noticing doors crashing players when instantly cancelling buff
-               }
-            }, effectTimeLeft);
-         } else {
-            destroyDoor.broadcastRemoveDoor(owner);
-         }
-      }
-   }
-
    public void updateDoorPortal(MapleCharacter owner) {
       int slot = owner.fetchDoorSlot();
 
@@ -102,39 +84,6 @@ public class MapleDoor {
       if (nextTownPortal != null) {
          townPortal = nextTownPortal;
          areaDoor.update(nextTownPortal.getId(), nextTownPortal.getPosition());
-      }
-   }
-
-   private void broadcastRemoveDoor(MapleCharacter owner) {
-      MapleDoorObject areaDoor = this.getAreaDoor();
-      MapleDoorObject townDoor = this.getTownDoor();
-
-      MapleMap target = this.getTarget();
-      MapleMap town = this.getTown();
-
-      Collection<MapleCharacter> targetChars = target.getCharacters();
-      Collection<MapleCharacter> townChars = town.getCharacters();
-
-      target.removeMapObject(areaDoor);
-      town.removeMapObject(townDoor);
-
-      for (MapleCharacter chr : targetChars) {
-         areaDoor.sendDestroyData(chr.getClient());
-      }
-
-      for (MapleCharacter chr : townChars) {
-         townDoor.sendDestroyData(chr.getClient());
-      }
-
-      owner.removePartyDoor(false);
-
-      if (this.getTownPortal().getId() == 0x80) {
-         for (MapleCharacter chr : townChars) {
-            MapleDoor door = chr.getMainTownDoor();
-            if (door != null) {
-               townDoor.sendSpawnData(chr.getClient());
-            }
-         }
       }
    }
 
@@ -174,7 +123,7 @@ public class MapleDoor {
       return System.currentTimeMillis() - deployTime;
    }
 
-   private boolean dispose() {
+   public boolean dispose() {
       if (active) {
          active = false;
          return true;
