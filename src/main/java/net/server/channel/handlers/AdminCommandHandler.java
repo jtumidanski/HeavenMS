@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import client.BanProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MapleInventory;
@@ -189,7 +190,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             target.get().sendPolice(duration, reason, 6000);
          }
          c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
-      } else if (MapleCharacter.ban(victim, reason, false)) {
+      } else if (BanProcessor.getInstance().ban(victim, reason, false)) {
          c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
       } else {
          c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));

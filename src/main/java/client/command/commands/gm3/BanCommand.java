@@ -23,6 +23,7 @@
 */
 package client.command.commands.gm3;
 
+import client.BanProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -69,7 +70,7 @@ public class BanCommand extends Command {
             }
          }, 5000); //5 Seconds
          Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
-      } else if (MapleCharacter.ban(ign, reason, false)) {
+      } else if (BanProcessor.getInstance().ban(ign, reason, false)) {
          c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
          Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
       } else {
