@@ -227,9 +227,6 @@ import tools.packets.Wedding;
 public class MapleCharacter extends AbstractMapleCharacterObject {
    private static final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
    private static final String LEVEL_200 = "[Congrats] %s has reached Level %d! Congratulate %s on such an amazing achievement!";
-   private static final String[] BLOCKED_NAMES = {"admin", "owner", "moderator", "intern", "donor", "administrator", "FREDRICK", "help", "helper", "alert", "notice", "maplestory", "fuck", "wizet", "fucking", "negro", "fuk", "fuc", "penis", "pussy", "asshole", "gay",
-         "nigger", "homo", "suck", "cum", "shit", "shitty", "condom", "security", "official", "rape", "nigga", "sex", "tit", "boner", "orgy", "clit", "asshole", "fatass", "bitch", "support", "gamemaster", "cock", "gaay", "gm",
-         "operate", "master", "sysop", "party", "GameMaster", "community", "message", "event", "test", "meso", "Scania", "yata", "AsiaSoft", "henesys"};
    private static String[] ariantroomleader = new String[3];
    private static int[] ariantroomslot = new int[3];
    private final Map<Short, MapleQuestStatus> quests;
@@ -535,16 +532,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return ret;
    }
 
-   public static boolean canCreateChar(String name) {
-      String lname = name.toLowerCase();
-      for (String nameTest : BLOCKED_NAMES) {
-         if (lname.contains(nameTest)) {
-            return false;
-         }
-      }
-      return getIdByName(name) < 0 && Pattern.compile("[a-zA-Z0-9]{3,12}").matcher(name).matches();
-   }
-
    public static boolean deleteCharFromDB(MapleCharacter player, int senderAccId) {
       int cid = player.getId();
       if (!Server.getInstance().haveCharacterEntry(senderAccId, cid)) {    // thanks zera (EpiphanyMS) for pointing a critical exploit with non-authored character deletion request
@@ -669,10 +656,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public static int getAriantSlotsRoom(int room) {
       return ariantroomslot[room];
-   }
-
-   public static CharacterIdNameAccountId getCharacterFromDatabase(String name) {
-      return DatabaseConnection.withConnectionResultOpt(connection -> CharacterProvider.getInstance().getByName(connection, name)).orElse(null);
    }
 
    private static MapleStatEffect getEffectFromBuffSource(Map<MapleBuffStat, MapleBuffStatValueHolder> buffSource) {
@@ -846,14 +829,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          default:
             return Legend.MAP_CHAIR;
       }
-   }
-
-   public static int getIdByName(String name) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getIdForName(connection, name)).orElse(-1);
-   }
-
-   public static String getNameById(int id) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, id)).orElse(null);
    }
 
    private static String getTimeRemaining(long timeLeft) {

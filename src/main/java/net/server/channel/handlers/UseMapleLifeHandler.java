@@ -19,6 +19,7 @@
 */
 package net.server.channel.handlers;
 
+import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
@@ -43,7 +44,7 @@ public class UseMapleLifeHandler extends AbstractMaplePacketHandler {
       player.setLastUsedCashItem(timeNow);
 
       String name = slea.readMapleAsciiString();
-      if (MapleCharacter.canCreateChar(name)) {
+      if (CharacterProcessor.getInstance().canCreateChar(name)) {
          c.announce(MaplePacketCreator.sendMapleLifeCharacterInfo());
       } else {
          c.announce(MaplePacketCreator.sendMapleLifeNameError());

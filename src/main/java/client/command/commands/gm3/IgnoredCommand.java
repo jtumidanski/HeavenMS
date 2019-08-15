@@ -23,6 +23,7 @@
 */
 package client.command.commands.gm3;
 
+import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
@@ -37,7 +38,7 @@ public class IgnoredCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       for (Integer cid : MapleLogger.ignored) {
-         player.yellowMessage(MapleCharacter.getNameById(cid) + " is being ignored.");
+         player.yellowMessage(CharacterProcessor.getInstance().getNameById(cid) + " is being ignored.");
       }
    }
 }

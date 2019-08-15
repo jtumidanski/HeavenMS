@@ -19,9 +19,11 @@
 */
 package client.creator;
 
+import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleSkinColor;
+import client.database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
@@ -41,7 +43,7 @@ public abstract class CharacterFactory {
          return -3;
       }
 
-      if (!MapleCharacter.canCreateChar(name)) {
+      if (!CharacterProcessor.getInstance().canCreateChar(name)) {
          return -1;
       }
 

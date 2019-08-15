@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import client.BuddylistEntry;
+import client.CharacterProcessor;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.SkillEntry;
@@ -7457,8 +7458,8 @@ public class MaplePacketCreator {
             mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
             mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
          }
-         mplew.writeAsciiString(StringUtil.getRightPaddedStr(chr.getGender() == 0 ? chr.getName() : MapleCharacter.getNameById(chr.getPartnerId()), '\0', 13));
-         mplew.writeAsciiString(StringUtil.getRightPaddedStr(chr.getGender() == 0 ? MapleCharacter.getNameById(chr.getPartnerId()) : chr.getName(), '\0', 13));
+         mplew.writeAsciiString(StringUtil.getRightPaddedStr(chr.getGender() == 0 ? chr.getName() : CharacterProcessor.getInstance().getNameById(chr.getPartnerId()), '\0', 13));
+         mplew.writeAsciiString(StringUtil.getRightPaddedStr(chr.getGender() == 0 ? CharacterProcessor.getInstance().getNameById(chr.getPartnerId()) : chr.getName(), '\0', 13));
       } else {
          mplew.writeShort(0);
       }

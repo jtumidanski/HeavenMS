@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.NoteProcessor;
@@ -128,7 +129,7 @@ public class FredrickProcessor {
    private static void removeFredrickReminders(List<CharacterWorldData> expiredCids) {
       DatabaseConnection.withConnection(connection ->
             expiredCids.stream()
-                  .map(pair -> MapleCharacter.getNameById(pair.getCharacterId()))
+                  .map(pair -> CharacterProcessor.getInstance().getNameById(pair.getCharacterId()))
                   .filter(Objects::nonNull)
                   .forEach(name -> NoteAdministrator.getInstance().deleteWhereNamesLike(connection, "FREDRICK", name)));
    }

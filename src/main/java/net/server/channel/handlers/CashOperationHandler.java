@@ -24,6 +24,7 @@ package net.server.channel.handlers;
 import java.util.Calendar;
 import java.util.List;
 
+import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
@@ -120,7 +121,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
             } else if (action == 0x04) {//TODO check for gender
                int birthday = slea.readInt();
                CashItem cItem = CashItemFactory.getItem(slea.readInt());
-               CharacterIdNameAccountId recipient = MapleCharacter.getCharacterFromDatabase(slea.readMapleAsciiString());
+               CharacterIdNameAccountId recipient = CharacterProcessor.getInstance().getCharacterFromDatabase(slea.readMapleAsciiString());
                String message = slea.readMapleAsciiString();
                if (!canBuy(chr, cItem, cs.getCash(4)) || message.length() < 1 || message.length() > 73) {
                   c.enableCSActions();

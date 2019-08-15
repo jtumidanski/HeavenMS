@@ -49,6 +49,7 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
+import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.status.MonsterStatusEffect;
 import constants.ServerConstants;
@@ -782,7 +783,7 @@ public final class Channel {
       Pair<Integer, Integer> coupleId = wserv.getMarriageQueuedCouple(ret);
       Pair<Boolean, Set<Integer>> typeGuests = wserv.removeMarriageQueued(ret);
 
-      Pair<String, String> couple = new Pair<>(MapleCharacter.getNameById(coupleId.getLeft()), MapleCharacter.getNameById(coupleId.getRight()));
+      Pair<String, String> couple = new Pair<>(CharacterProcessor.getInstance().getNameById(coupleId.getLeft()), CharacterProcessor.getInstance().getNameById(coupleId.getRight()));
       wserv.dropMessage(6, couple.getLeft() + " and " + couple.getRight() + "'s wedding is going to be started at " + (cathedral ? "Cathedral" : "Chapel") + " on Channel " + channel + ".");
 
       return new Pair<>(typeGuests.getLeft(), new Pair<>(ret, typeGuests.getRight()));
