@@ -116,4 +116,20 @@ public class StringUtil {
       }
       return ret;
    }
+
+   /**
+    * Replaces difficult to read character sequences with an easier to read variant.
+    *
+    * @param in the difficult to read string
+    * @return a more readable string
+    */
+   public static String makeMapleReadable(String in) {
+      String i = in.replace('I', 'i');
+      i = i.replace('l', 'L');
+      i = i.replace("rn", "Rn");
+      i = i.replace("vv", "Vv");
+      i = i.replace("VV", "Vv");
+
+      return i;
+   }
 }

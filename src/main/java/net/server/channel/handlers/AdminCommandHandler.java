@@ -39,6 +39,7 @@ import server.maps.MapleMapObjectType;
 import server.quest.MapleQuest;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
+import tools.StringUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class AdminCommandHandler extends AbstractMaplePacketHandler {
@@ -178,7 +179,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
 
       Optional<MapleCharacter> target = c.getChannelServer().getPlayerStorage().getCharacterByName(victim);
       if (target.isPresent()) {
-         String readableTargetName = MapleCharacter.makeMapleReadable(target.get().getName());
+         String readableTargetName = StringUtil.makeMapleReadable(target.get().getName());
          String ip = target.get().getClient().getSession().getRemoteAddress().toString().split(":")[0];
          reason += readableTargetName + " (IP: " + ip + ")";
          if (duration == -1) {

@@ -71,7 +71,6 @@ import client.database.administrator.MedalMapAdministrator;
 import client.database.administrator.MonsterBookAdministrator;
 import client.database.administrator.MtsCartAdministrator;
 import client.database.administrator.MtsItemAdministrator;
-import client.database.administrator.NoteAdministrator;
 import client.database.administrator.PetAdministrator;
 import client.database.administrator.PetIgnoreAdministrator;
 import client.database.administrator.PlayerDiseaseAdministrator;
@@ -221,6 +220,7 @@ import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.Pair;
 import tools.Randomizer;
+import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
 import tools.packets.Wedding;
 
@@ -1233,16 +1233,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       mapleCharacter.setMarriageItemId(characterData.getMarriageItemId());
 
       return mapleCharacter;
-   }
-
-   public static String makeMapleReadable(String in) {
-      String i = in.replace('I', 'i');
-      i = i.replace('l', 'L');
-      i = i.replace("rn", "Rn");
-      i = i.replace("vv", "Vv");
-      i = i.replace("VV", "Vv");
-
-      return i;
    }
 
    public static void removeAriantRoom(int room) {
@@ -9003,7 +8993,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       announce(MaplePacketCreator.sendPolice(String.format("You have been blocked by the#b %s Police for HACK reason.#k", "HeavenMS")));
       TimerManager.getInstance().schedule(() -> client.disconnect(false, false), 5000);
 
-      Server.getInstance().broadcastGMMessage(this.getWorld(), MaplePacketCreator.serverNotice(6, MapleCharacter.makeMapleReadable(this.name) + " was autobanned for " + reason));
+      Server.getInstance().broadcastGMMessage(this.getWorld(), MaplePacketCreator.serverNotice(6, StringUtil.makeMapleReadable(this.name) + " was autobanned for " + reason));
    }
 
    public void block(int reason, int days, String desc) {

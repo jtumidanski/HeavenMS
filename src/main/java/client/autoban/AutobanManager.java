@@ -12,6 +12,7 @@ import client.MapleCharacter;
 import constants.ServerConstants;
 import net.server.Server;
 import tools.FilePrinter;
+import tools.StringUtil;
 
 /**
  * @author kevintjuh93
@@ -59,7 +60,7 @@ public class AutobanManager {
       }
       if (ServerConstants.USE_AUTOBAN_LOG) {
          // Lets log every single point too.
-         FilePrinter.print(FilePrinter.AUTOBAN_WARNING, MapleCharacter.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
+         FilePrinter.print(FilePrinter.AUTOBAN_WARNING, StringUtil.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
       }
    }
 

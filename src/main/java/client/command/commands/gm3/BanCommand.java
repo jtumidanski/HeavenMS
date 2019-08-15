@@ -31,6 +31,7 @@ import net.server.Server;
 import server.TimerManager;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.StringUtil;
 
 public class BanCommand extends Command {
    {
@@ -48,7 +49,7 @@ public class BanCommand extends Command {
       String reason = joinStringFrom(params, 1);
       MapleCharacter target = c.getChannelServer().getPlayerStorage().getCharacterByName(ign).orElse(null);
       if (target != null) {
-         String readableTargetName = MapleCharacter.makeMapleReadable(target.getName());
+         String readableTargetName = StringUtil.makeMapleReadable(target.getName());
          String ip = target.getClient().getSession().getRemoteAddress().toString().split(":")[0];
          //Ban ip
          if (ip.matches("/[0-9]{1,3}\\..*")) {
