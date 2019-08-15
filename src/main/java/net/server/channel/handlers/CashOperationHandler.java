@@ -27,6 +27,7 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
+import client.MapleRingProcessor;
 import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;
@@ -243,7 +244,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                   if (item instanceof Equip) {
                      Equip equip = (Equip) item;
                      if (equip.getRingId() >= 0) {
-                        MapleRing ring = MapleRing.loadFromDb(equip.getRingId());
+                        MapleRing ring = MapleRingProcessor.getInstance().loadFromDb(equip.getRingId());
                         chr.addPlayerRing(ring);
                      }
                   }
@@ -333,13 +334,13 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
             // Need to check to make sure its actually an equip and the right SN...
             if (itemRing.toItem() instanceof Equip) {
                Equip eqp = (Equip) itemRing.toItem();
-               Pair<Integer, Integer> rings = MapleRing.createRing(itemRing.getItemId(), chr, partner);
+               Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(itemRing.getItemId(), chr, partner);
                eqp.setRingId(rings.getLeft());
                cs.addToInventory(eqp);
                c.announce(MaplePacketCreator.showBoughtCashItem(eqp, c.getAccID()));
                cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
                cs.gainCash(payment, -itemRing.getPrice());
-               chr.addFriendshipRing(MapleRing.loadFromDb(rings.getLeft()));
+               chr.addFriendshipRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
                chr.sendNote(partner.getName(), text, (byte) 1);
                partner.showNote();
             }
@@ -362,13 +363,13 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
          c.getChannelServer().getPlayerStorage().getCharacterByName(recipientName).ifPresentOrElse(partner -> {
             if (itemRing.toItem() instanceof Equip) {
                Equip eqp = (Equip) itemRing.toItem();
-               Pair<Integer, Integer> rings = MapleRing.createRing(itemRing.getItemId(), chr, partner);
+               Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(itemRing.getItemId(), chr, partner);
                eqp.setRingId(rings.getLeft());
                cs.addToInventory(eqp);
                c.announce(MaplePacketCreator.showBoughtCashItem(eqp, c.getAccID()));
                cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
                cs.gainCash(toCharge, itemRing, chr.getWorld());
-               chr.addCrushRing(MapleRing.loadFromDb(rings.getLeft()));
+               chr.addCrushRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
                chr.sendNote(partner.getName(), text, (byte) 1);
                partner.showNote();
             }

@@ -1222,7 +1222,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
             Equip equip = (Equip) item.getLeft();
             if (equip.getRingId() > -1) {
-               MapleRing ring = MapleRing.loadFromDb(equip.getRingId());
+               MapleRing ring = MapleRingProcessor.getInstance().loadFromDb(equip.getRingId());
                if (item.getRight().equals(MapleInventoryType.EQUIPPED)) {
                   ring.equip();
                }

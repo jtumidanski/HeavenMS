@@ -25,7 +25,7 @@ import java.sql.Connection;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleRing;
+import client.MapleRingProcessor;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
 import client.database.provider.CharacterProvider;
@@ -153,7 +153,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
       }
 
       chr.getClient().getWorldServer().deleteRelationship(chr.getId(), partnerid);
-      MapleRing.removeRing(chr.getMarriageRing());
+      MapleRingProcessor.getInstance().removeRing(chr.getMarriageRing());
 
       chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerid).ifPresentOrElse(partner -> {
          partner.dropMessage(5, chr.getName() + " has decided to break up the marriage.");
@@ -243,20 +243,20 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
    }
 
    public static void giveMarriageRings(MapleCharacter player, MapleCharacter partner, int marriageRingId) {
-      Pair<Integer, Integer> rings = MapleRing.createRing(marriageRingId, player, partner);
+      Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(marriageRingId, player, partner);
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       Item ringObj = ii.getEquipById(marriageRingId);
       Equip ringEqp = (Equip) ringObj;
       ringEqp.setRingId(rings.getLeft());
-      player.addMarriageRing(MapleRing.loadFromDb(rings.getLeft()));
+      player.addMarriageRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
       MapleInventoryManipulator.addFromDrop(player.getClient(), ringEqp, false, -1);
       player.broadcastMarriageMessage();
 
       ringObj = ii.getEquipById(marriageRingId);
       ringEqp = (Equip) ringObj;
       ringEqp.setRingId(rings.getRight());
-      partner.addMarriageRing(MapleRing.loadFromDb(rings.getRight()));
+      partner.addMarriageRing(MapleRingProcessor.getInstance().loadFromDb(rings.getRight()));
       MapleInventoryManipulator.addFromDrop(partner.getClient(), ringEqp, false, -1);
       partner.broadcastMarriageMessage();
    }
