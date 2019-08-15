@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.NoteProcessor;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.FredStorageAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
@@ -182,7 +183,7 @@ public class FredrickProcessor {
                   characterIdsToNotify.stream().map(pair -> new Pair<>(pair.getNote(), pair.getCharacterId())).collect(Collectors.toList()));
             characterIdsToNotify.forEach(pair -> {
                String msg = fredrickReminderMessage(pair.getNote() - 1);
-               MapleCharacter.sendNote(pair.getCharacterName(), "FREDRICK", msg, (byte) 0);
+               NoteProcessor.getInstance().sendNote(pair.getCharacterName(), "FREDRICK", msg, (byte) 0);
             });
          }
       });

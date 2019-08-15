@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.NoteProcessor;
 import client.Skill;
 import client.SkillFactory;
 import client.creator.veteran.BowmanCreator;
@@ -367,7 +368,7 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
       } else if (itemType == 509) {
          String sendTo = slea.readMapleAsciiString();
          String msg = slea.readMapleAsciiString();
-         player.sendNote(sendTo, msg, (byte) 0);
+         NoteProcessor.getInstance().sendNote(sendTo, player.getName(), msg, (byte) 0);
          remove(c, position, itemId);
       } else if (itemType == 510) {
          player.getMap().broadcastMessage(MaplePacketCreator.musicChange("Jukebox/Congratulation"));

@@ -26,6 +26,7 @@ import java.sql.Connection;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRingProcessor;
+import client.NoteProcessor;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
 import client.database.provider.CharacterProvider;
@@ -381,7 +382,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
                         if (guestChr != null && guestChr.isLoggedinWorld()) {
                            guestChr.dropMessage(6, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!");
                         } else {
-                           c.getPlayer().sendNote(name, "You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!", (byte) 0);
+                           NoteProcessor.getInstance().sendNote(name, c.getPlayer().getName(), "You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!", (byte) 0);
                         }
 
                         Item weddingTicket = new Item(newItemId, (short) 0, (short) 1);

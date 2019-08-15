@@ -28,6 +28,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
 import client.MapleRingProcessor;
+import client.NoteProcessor;
 import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;
@@ -139,7 +140,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                c.announce(MaplePacketCreator.showGiftSucceed(recipient.getName(), cItem));
                cs.gainCash(4, cItem, chr.getWorld());
                c.announce(MaplePacketCreator.showCash(chr));
-               chr.sendNote(recipient.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
+               NoteProcessor.getInstance().sendNote(recipient.getName(), chr.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
                c.getChannelServer().getPlayerStorage().getCharacterByName(recipient.getName()).ifPresent(MapleCharacter::showNote);
             } else if (action == 0x05) { // Modify wish list
                cs.clearWishList();
@@ -341,7 +342,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
                cs.gainCash(payment, -itemRing.getPrice());
                chr.addFriendshipRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
-               chr.sendNote(partner.getName(), text, (byte) 1);
+               NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
                partner.showNote();
             }
          }, () -> chr.dropMessage(5, "The partner you specified cannot be found. Please make sure your partner is online and in the same channel."));
@@ -370,7 +371,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
                cs.gainCash(toCharge, itemRing, chr.getWorld());
                chr.addCrushRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
-               chr.sendNote(partner.getName(), text, (byte) 1);
+               NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
                partner.showNote();
             }
          }, () -> chr.getClient().announce(MaplePacketCreator.serverNotice(1, "The partner you specified cannot be found.\r\nPlease make sure your partner is online and in the same channel.")));

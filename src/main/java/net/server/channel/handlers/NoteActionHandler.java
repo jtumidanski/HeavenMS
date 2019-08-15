@@ -22,6 +22,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
+import client.NoteProcessor;
 import client.database.administrator.NoteAdministrator;
 import client.database.provider.NoteProvider;
 import net.AbstractMaplePacketHandler;
@@ -40,7 +41,7 @@ public final class NoteActionHandler extends AbstractMaplePacketHandler {
             c.announce(MaplePacketCreator.showCashInventory(c));
          }
 
-         c.getPlayer().sendNote(charname, message, (byte) 1);
+         NoteProcessor.getInstance().sendNote(charname, c.getPlayer().getName(), message, (byte) 1);
          c.getPlayer().getCashShop().decreaseNotes();
       } else if (action == 1) {
          int num = slea.readByte();

@@ -111,6 +111,7 @@ import client.inventory.Equip;
 import client.inventory.Equip.StatUpgrade;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
+import client.inventory.ItemProcessor;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryProof;
 import client.inventory.MapleInventoryType;
@@ -1247,10 +1248,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public static void removeAriantRoom(int room) {
       ariantroomleader[room] = "";
       ariantroomslot[room] = 0;
-   }
-
-   public static void sendNote(String to, String from, String msg, byte fame) {
-      DatabaseConnection.withConnection(connection -> NoteAdministrator.getInstance().sendNote(connection, to, from, msg, fame));
    }
 
    public static void setAriantRoomLeader(int room, String charname) {
@@ -8017,10 +8014,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void sendMacros() {
       // Always send the macro packet to fix a client side bug when switching characters.
       client.announce(MaplePacketCreator.getMacros(skillMacros));
-   }
-
-   public void sendNote(String to, String msg, byte fame) {
-      sendNote(to, this.getName(), msg, fame);
    }
 
    public void setBuddyCapacity(int capacity) {
