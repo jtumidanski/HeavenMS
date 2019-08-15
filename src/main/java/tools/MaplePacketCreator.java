@@ -207,7 +207,7 @@ public class MaplePacketCreator {
       mplew.writeShort(chr.getFame()); // fame
       mplew.writeInt(chr.getGachaExp()); //Gacha Exp
       mplew.writeInt(chr.getMapId()); // current map id
-      mplew.write(chr.getInitialSpawnpoint()); // spawnpoint
+      mplew.write(chr.getInitialSpawnPoint()); // spawnpoint
       mplew.writeInt(0);
    }
 

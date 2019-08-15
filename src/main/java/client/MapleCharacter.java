@@ -4564,7 +4564,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       buffEffectsCount.put(stat, val);
    }
 
-   public void registerEffect(MapleStatEffect effect, long starttime, long expirationtime, boolean isSilent) {
+   public void registerEffect(MapleStatEffect effect, long startTime, long expirationTime, boolean isSilent) {
       if (effect.isDragonBlood()) {
          prepareDragonBlood(effect);
       } else if (effect.isBerserk()) {
@@ -4641,12 +4641,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       effLock.lock();
       chrLock.lock();
       try {
-         Integer sourceid = effect.getBuffSourceId();
+         Integer sourceId = effect.getBuffSourceId();
          Map<MapleBuffStat, MapleBuffStatValueHolder> toDeploy;
-         Map<MapleBuffStat, MapleBuffStatValueHolder> appliedStatups = new LinkedHashMap<>();
+         Map<MapleBuffStat, MapleBuffStatValueHolder> appliedStatUps = new LinkedHashMap<>();
 
          for (Pair<MapleBuffStat, Integer> ps : effect.getStatups()) {
-            appliedStatups.put(ps.getLeft(), new MapleBuffStatValueHolder(effect, starttime, ps.getRight()));
+            appliedStatUps.put(ps.getLeft(), new MapleBuffStatValueHolder(effect, startTime, ps.getRight()));
          }
 
          boolean active = effect.isActive(this);
@@ -4655,15 +4655,15 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             Map<Integer, Pair<MapleStatEffect, Long>> retrievedEffects = new LinkedHashMap<>();
             Set<MapleBuffStat> retrievedStats = new LinkedHashSet<>();
 
-            for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statup : appliedStatups.entrySet()) {
-               MapleBuffStatValueHolder mbsvh = effects.get(statup.getKey());
-               MapleBuffStatValueHolder statMbsvh = statup.getValue();
+            for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statUp : appliedStatUps.entrySet()) {
+               MapleBuffStatValueHolder mbsvh = effects.get(statUp.getKey());
+               MapleBuffStatValueHolder statMbsvh = statUp.getValue();
 
                if (active) {
                   if (mbsvh == null || mbsvh.value < statMbsvh.value || (mbsvh.value == statMbsvh.value && mbsvh.effect.getStatups().size() <= statMbsvh.effect.getStatups().size())) {
-                     toDeploy.put(statup.getKey(), statMbsvh);
+                     toDeploy.put(statUp.getKey(), statMbsvh);
                   } else {
-                     if (!isSingletonStatup(statup.getKey())) {
+                     if (!isSingletonStatup(statUp.getKey())) {
                         for (Pair<MapleBuffStat, Integer> mbs : mbsvh.effect.getStatups()) {
                            retrievedStats.add(mbs.getLeft());
                         }
@@ -4671,32 +4671,32 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                   }
                }
 
-               addItemEffectHolderCount(statup.getKey());
+               addItemEffectHolderCount(statUp.getKey());
             }
 
             if (!isSilent) {
-               addItemEffectHolder(sourceid, expirationtime, appliedStatups);
-               for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statup : toDeploy.entrySet()) {
-                  effects.put(statup.getKey(), statup.getValue());
+               addItemEffectHolder(sourceId, expirationTime, appliedStatUps);
+               for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statUp : toDeploy.entrySet()) {
+                  effects.put(statUp.getKey(), statUp.getValue());
                }
 
                if (active) {
-                  retrievedEffects.put(sourceid, new Pair<>(effect, starttime));
+                  retrievedEffects.put(sourceId, new Pair<>(effect, startTime));
                }
 
                propagateBuffEffectUpdates(retrievedEffects, retrievedStats, new LinkedHashSet<>());
             }
          } else {
-            for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statup : appliedStatups.entrySet()) {
-               addItemEffectHolderCount(statup.getKey());
+            for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statUp : appliedStatUps.entrySet()) {
+               addItemEffectHolderCount(statUp.getKey());
             }
 
-            toDeploy = (active ? appliedStatups : new LinkedHashMap<>());
+            toDeploy = (active ? appliedStatUps : new LinkedHashMap<>());
          }
 
-         addItemEffectHolder(sourceid, expirationtime, appliedStatups);
-         for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statup : toDeploy.entrySet()) {
-            effects.put(statup.getKey(), statup.getValue());
+         addItemEffectHolder(sourceId, expirationTime, appliedStatUps);
+         for (Entry<MapleBuffStat, MapleBuffStatValueHolder> statUp : toDeploy.entrySet()) {
+            effects.put(statUp.getKey(), statUp.getValue());
          }
       } finally {
          chrLock.unlock();
@@ -5131,18 +5131,18 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return w.getMesoRate() * w.getQuestRate();
    }
 
-   public float getCardRate(int itemid) {
+   public float getCardRate(int itemId) {
       float rate = 100.0f;
 
-      if (itemid == 0) {
+      if (itemId == 0) {
          MapleStatEffect mseMeso = getBuffEffect(MapleBuffStat.MESO_UP_BY_ITEM);
          if (mseMeso != null) {
-            rate += mseMeso.getCardRate(mapid, itemid);
+            rate += mseMeso.getCardRate(mapid, itemId);
          }
       } else {
          MapleStatEffect mseItem = getBuffEffect(MapleBuffStat.ITEM_UP_BY_ITEM);
          if (mseItem != null) {
-            rate += mseItem.getCardRate(mapid, itemid);
+            rate += mseItem.getCardRate(mapid, itemId);
          }
       }
 
@@ -5211,7 +5211,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return Server.getInstance().getGuild(getGuildId(), getWorld(), this);
       } catch (Exception ex) {
          ex.printStackTrace();
-         return null;
+         return Optional.empty();
       }
    }
 
@@ -5258,7 +5258,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return id;
    }
 
-   public int getInitialSpawnpoint() {
+   public int getInitialSpawnPoint() {
       return initialSpawnPoint;
    }
 
@@ -5274,20 +5274,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.itemEffect = itemEffect;
    }
 
-   public boolean haveItemWithId(int itemid, boolean checkEquipped) {
-      return (inventory[ItemConstants.getInventoryType(itemid).ordinal()].findById(itemid) != null)
-            || (checkEquipped && inventory[MapleInventoryType.EQUIPPED.ordinal()].findById(itemid) != null);
+   public boolean haveItemWithId(int itemId, boolean checkEquipped) {
+      return (inventory[ItemConstants.getInventoryType(itemId).ordinal()].findById(itemId) != null)
+            || (checkEquipped && inventory[MapleInventoryType.EQUIPPED.ordinal()].findById(itemId) != null);
    }
 
-   public boolean haveItemEquipped(int itemid) {
-      return (inventory[MapleInventoryType.EQUIPPED.ordinal()].findById(itemid) != null);
+   public boolean haveItemEquipped(int itemId) {
+      return (inventory[MapleInventoryType.EQUIPPED.ordinal()].findById(itemId) != null);
    }
 
    public boolean haveWeddingRing() {
       int[] rings = {1112806, 1112803, 1112807, 1112809};
 
-      for (int ringid : rings) {
-         if (haveItemWithId(ringid, true)) {
+      for (int ringId : rings) {
+         if (haveItemWithId(ringId, true)) {
             return true;
          }
       }
@@ -5295,18 +5295,18 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return false;
    }
 
-   public int getItemQuantity(int itemid, boolean checkEquipped) {
-      int count = inventory[ItemConstants.getInventoryType(itemid).ordinal()].countById(itemid);
+   public int getItemQuantity(int itemId, boolean checkEquipped) {
+      int count = inventory[ItemConstants.getInventoryType(itemId).ordinal()].countById(itemId);
       if (checkEquipped) {
-         count += inventory[MapleInventoryType.EQUIPPED.ordinal()].countById(itemid);
+         count += inventory[MapleInventoryType.EQUIPPED.ordinal()].countById(itemId);
       }
       return count;
    }
 
-   public int getCleanItemQuantity(int itemid, boolean checkEquipped) {
-      int count = inventory[ItemConstants.getInventoryType(itemid).ordinal()].countNotOwnedById(itemid);
+   public int getCleanItemQuantity(int itemId, boolean checkEquipped) {
+      int count = inventory[ItemConstants.getInventoryType(itemId).ordinal()].countNotOwnedById(itemId);
       if (checkEquipped) {
-         count += inventory[MapleInventoryType.EQUIPPED.ordinal()].countNotOwnedById(itemid);
+         count += inventory[MapleInventoryType.EQUIPPED.ordinal()].countNotOwnedById(itemId);
       }
       return count;
    }
@@ -5377,8 +5377,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return mapid;
    }
 
-   public void setMapId(int mapid) {
-      this.mapid = mapid;
+   public void setMapId(int mapId) {
+      this.mapid = mapId;
    }
 
    public MapleRing getMarriageRing() {
@@ -5687,8 +5687,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean isPartyMember(int cid) {
-      for (MapleCharacter mpcu : getPartyMembers()) {
-         if (mpcu.getId() == cid) {
+      for (MapleCharacter partyMember : getPartyMembers()) {
+         if (partyMember.getId() == cid) {
             return true;
          }
       }
@@ -5755,13 +5755,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          mps.setOpen(false);
          getWorldServer().unregisterPlayerShop(mps);
 
-         for (MaplePlayerShopItem mpsi : mps.getItems()) {
-            if (mpsi.getBundles() >= 2) {
-               Item iItem = mpsi.getItem().copy();
-               iItem.setQuantity((short) (mpsi.getBundles() * iItem.getQuantity()));
+         for (MaplePlayerShopItem shopItem : mps.getItems()) {
+            if (shopItem.getBundles() >= 2) {
+               Item iItem = shopItem.getItem().copy();
+               iItem.setQuantity((short) (shopItem.getBundles() * iItem.getQuantity()));
                MapleInventoryManipulator.addFromDrop(this.getClient(), iItem, false);
-            } else if (mpsi.isExist()) {
-               MapleInventoryManipulator.addFromDrop(this.getClient(), mpsi.getItem(), true);
+            } else if (shopItem.isExist()) {
+               MapleInventoryManipulator.addFromDrop(this.getClient(), shopItem.getItem(), true);
             }
          }
          mps.closeShop();
@@ -5810,14 +5810,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void closePlayerMessenger() {
       getMessenger().ifPresent(messenger -> {
          World w = getWorldServer();
-         MapleMessengerCharacter messengerplayer = new MapleMessengerCharacter(this, this.getMessengerPosition());
+         MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(this, this.getMessengerPosition());
 
-         w.leaveMessenger(messenger.getId(), messengerplayer);
+         w.leaveMessenger(messenger.getId(), messengerCharacter);
          this.setMessenger(null);
          this.setMessengerPosition(4);
-
       });
-
    }
 
    public MaplePet[] getPets() {
@@ -7147,7 +7145,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       ret.fame = this.getFame();
       ret.gachaexp.set(this.getGachaExp());
       ret.mapid = this.getMapId();
-      ret.initialSpawnPoint = this.getInitialSpawnpoint();
+      ret.initialSpawnPoint = this.getInitialSpawnPoint();
 
       ret.inventory[MapleInventoryType.EQUIPPED.ordinal()] = this.getInventory(MapleInventoryType.EQUIPPED);
 
@@ -9559,8 +9557,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return this.FestivalPoints;
    }
 
-   public void setFestivalPoints(int pontos) {
-      this.FestivalPoints = pontos;
+   public void setFestivalPoints(int points) {
+      this.FestivalPoints = points;
    }
 
    public int getCP() {
@@ -9571,13 +9569,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.cp = a;
    }
 
-   public void addCP(int ammount) {
-      totalCP += ammount;
-      availableCP += ammount;
+   public void addCP(int amount) {
+      totalCP += amount;
+      availableCP += amount;
    }
 
-   public void useCP(int ammount) {
-      availableCP -= ammount;
+   public void useCP(int amount) {
+      availableCP -= amount;
    }
 
    public void gainCP(int gain) {
