@@ -650,10 +650,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          BuddyAdministrator.getInstance().deleteForCharacter(connection, cid);
          BbsThreadAdministrator.getInstance().deleteThreadsFromCharacter(connection, cid);
-         CharacterProvider.getInstance().getGuildDataForCharacter(connection, cid, senderAccId).ifPresent(result -> {
-            Server.getInstance().deleteGuildCharacter(
-                  new MapleGuildCharacter(player, cid, 0, result.getName(), (byte) -1, (byte) -1, 0, result.getGuildRank(), result.getGuildId(), false, result.getAllianceRank()));
-         });
+         CharacterProvider.getInstance().getGuildDataForCharacter(connection, cid, senderAccId).ifPresent(result -> Server.getInstance().deleteGuildCharacter(
+               new MapleGuildCharacter(player, cid, 0, result.getName(), (byte) -1, (byte) -1, 0, result.getGuildRank(), result.getGuildId(), false, result.getAllianceRank())));
          WishListAdministrator.getInstance().deleteForCharacter(connection, cid);
          CoolDownAdministrator.getInstance().deleteForCharacter(connection, cid);
          PlayerDiseaseAdministrator.getInstance().deleteForCharacter(connection, cid);
@@ -1029,13 +1027,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                mapleCharacter.skillMacros[position] = macro;
             });
 
-            KeyMapProvider.getInstance().getForCharacter(connection, characterData.getId()).forEach(keyMapData -> {
-               mapleCharacter.keymap.put(keyMapData.getKey(), new MapleKeyBinding(keyMapData.getType(), keyMapData.getAction()));
-            });
+            KeyMapProvider.getInstance().getForCharacter(connection, characterData.getId())
+                  .forEach(keyMapData -> mapleCharacter.keymap.put(keyMapData.getKey(), new MapleKeyBinding(keyMapData.getType(), keyMapData.getAction())));
 
-            SavedLocationProvider.getInstance().getForCharacter(connection, characterData.getId()).forEach(savedLocationData -> {
-               mapleCharacter.savedLocations[SavedLocationType.valueOf(savedLocationData.getLocationType()).ordinal()] = new SavedLocation(savedLocationData.getMapId(), savedLocationData.getPortalId());
-            });
+            SavedLocationProvider.getInstance().getForCharacter(connection, characterData.getId())
+                  .forEach(savedLocationData -> mapleCharacter.savedLocations[SavedLocationType.valueOf(savedLocationData.getLocationType()).ordinal()] = new SavedLocation(savedLocationData.getMapId(), savedLocationData.getPortalId()));
 
             FameLogProvider.getInstance().getForCharacter(connection, characterData.getId()).forEach(fameLogData -> {
                mapleCharacter.lastfametime = Math.max(mapleCharacter.lastfametime, fameLogData.getRight().getTime());

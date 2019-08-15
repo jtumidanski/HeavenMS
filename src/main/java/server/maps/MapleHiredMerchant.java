@@ -335,9 +335,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId());
       Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId)
             .filter(MapleCharacter::isLoggedinWorld)
-            .ifPresent(character -> {
-               character.dropMessage(6, "[Hired Merchant] Item '" + itemName + "'" + qtyStr + " has been sold for " + mesos + " mesos. (" + inStore + " left)");
-            });
+            .ifPresent(character -> character.dropMessage(6, "[Hired Merchant] Item '" + itemName + "'" + qtyStr + " has been sold for " + mesos + " mesos. (" + inStore + " left)"));
    }
 
    public void forceClose() {
@@ -570,14 +568,14 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
    public List<MaplePlayerShopItem> sendAvailableBundles(int itemid) {
       List<MaplePlayerShopItem> list = new LinkedList<>();
-      List<MaplePlayerShopItem> all = new ArrayList<>();
+      List<MaplePlayerShopItem> all;
 
       if (!open.get()) {
          return list;
       }
 
       synchronized (items) {
-         all.addAll(items);
+         all = new ArrayList<>(items);
       }
 
       for (MaplePlayerShopItem mpsi : all) {
@@ -631,10 +629,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
    public List<Pair<String, Byte>> getMessages() {
       synchronized (messages) {
-         List<Pair<String, Byte>> msgList = new LinkedList<>();
-         msgList.addAll(messages);
-
-         return msgList;
+         return new LinkedList<>(messages);
       }
    }
 

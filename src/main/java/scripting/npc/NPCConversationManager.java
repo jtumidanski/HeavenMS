@@ -23,7 +23,6 @@ package scripting.npc;
 
 import java.awt.Point;
 import java.io.File;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,7 +44,6 @@ import constants.GameConstants;
 import constants.ItemConstants;
 import constants.LanguageConstants;
 import constants.ServerConstants;
-import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;

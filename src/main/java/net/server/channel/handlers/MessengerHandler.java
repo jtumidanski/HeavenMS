@@ -116,32 +116,31 @@ public final class MessengerHandler extends AbstractMaplePacketHandler {
    private void joinMessenger(SeekableLittleEndianAccessor accessor, MapleCharacter player, World world) {
       int messengerId = accessor.readInt();
 
-      player.getMessenger().ifPresentOrElse(messenger -> {
-         MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, false);
-      }, () -> {
-         if (messengerId == 0) {
-            MapleInviteCoordinator.removeInvite(InviteType.MESSENGER, player.getId());
-            MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, 0);
-            MapleMessenger messenger = world.createMessenger(messengerCharacter);
-            player.setMessenger(messenger);
-            player.setMessengerPosition(0);
-         } else {
-            world.getMessenger(messengerId).ifPresent(messenger -> {
-               Pair<InviteResult, MapleCharacter> inviteRes = MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, true);
-               InviteResult res = inviteRes.getLeft();
-               if (res == InviteResult.ACCEPTED) {
-                  int position = messenger.getLowestPosition();
-                  MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, position);
-                  if (messenger.getMembers().size() < 3) {
-                     player.setMessenger(messenger);
-                     player.setMessengerPosition(position);
-                     world.joinMessenger(messenger.getId(), messengerCharacter, player.getName(), messengerCharacter.getChannel());
-                  }
+      player.getMessenger().ifPresentOrElse(messenger -> MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, false),
+            () -> {
+               if (messengerId == 0) {
+                  MapleInviteCoordinator.removeInvite(InviteType.MESSENGER, player.getId());
+                  MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, 0);
+                  MapleMessenger messenger = world.createMessenger(messengerCharacter);
+                  player.setMessenger(messenger);
+                  player.setMessengerPosition(0);
                } else {
-                  player.message("Could not verify your Maple Messenger accept since the invitation rescinded.");
+                  world.getMessenger(messengerId).ifPresent(messenger -> {
+                     Pair<InviteResult, MapleCharacter> inviteRes = MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, true);
+                     InviteResult res = inviteRes.getLeft();
+                     if (res == InviteResult.ACCEPTED) {
+                        int position = messenger.getLowestPosition();
+                        MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, position);
+                        if (messenger.getMembers().size() < 3) {
+                           player.setMessenger(messenger);
+                           player.setMessengerPosition(position);
+                           world.joinMessenger(messenger.getId(), messengerCharacter, player.getName(), messengerCharacter.getChannel());
+                        }
+                     } else {
+                        player.message("Could not verify your Maple Messenger accept since the invitation rescinded.");
+                     }
+                  });
                }
             });
-         }
-      });
    }
 }

@@ -166,9 +166,7 @@ public class MapleGuild {
    }
 
    public static void displayGuildRanks(MapleClient c, int npcid) {
-      DatabaseConnection.withConnection(connection -> {
-         c.announce(MaplePacketCreator.showGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection)));
-      });
+      DatabaseConnection.withConnection(connection -> c.announce(MaplePacketCreator.showGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection))));
    }
 
    public static int getIncreaseGuildCost(int size) {

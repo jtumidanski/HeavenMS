@@ -97,9 +97,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
          chr.getAlliance().ifPresentOrElse(
                alliance -> existingAllianceOperations(accessor, client, chr, b, allianceId, alliance),
                () -> registerGuildForAlliance(accessor, client, chr, b));
-      }, () -> {
-         client.announce(MaplePacketCreator.enableActions());
-      });
+      }, () -> client.announce(MaplePacketCreator.enableActions()));
    }
 
    private void registerGuildForAlliance(SeekableLittleEndianAccessor accessor, MapleClient client, MapleCharacter chr, byte b) {

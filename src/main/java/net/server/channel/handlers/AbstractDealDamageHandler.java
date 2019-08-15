@@ -649,7 +649,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
 
       // Find the base damage to base futher calculations on.
       // Several skills have their own formula in this section.
-      long calcDmgMax = 0;
+      long calcDmgMax;
 
       if (magic && ret.skill != 0) {
          calcDmgMax = (chr.getTotalMagic() * chr.getTotalMagic() / 1000 + chr.getTotalMagic()) / 30 + chr.getTotalInt() / 200;

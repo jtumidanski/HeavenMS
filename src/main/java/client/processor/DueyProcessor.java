@@ -24,7 +24,6 @@
 package client.processor;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
@@ -75,13 +74,11 @@ public class DueyProcessor {
    }
 
    private static void showDueyNotification(MapleClient c, MapleCharacter player) {
-      DatabaseConnection.withConnection(connection -> {
-         DueyPackageProvider.getInstance().get(connection, player.getId())
-               .ifPresent(pair -> {
-                  DueyPackageAdministrator.getInstance().uncheck(connection, player.getId());
-                  c.announce(MaplePacketCreator.sendDueyParcelReceived(pair.getLeft(), pair.getRight() == 1));
-               });
-      });
+      DatabaseConnection.withConnection(connection -> DueyPackageProvider.getInstance().get(connection, player.getId())
+            .ifPresent(pair -> {
+               DueyPackageAdministrator.getInstance().uncheck(connection, player.getId());
+               c.announce(MaplePacketCreator.sendDueyParcelReceived(pair.getLeft(), pair.getRight() == 1));
+            }));
    }
 
    private static void deletePackageFromInventoryDB(Connection con, int packageId) {

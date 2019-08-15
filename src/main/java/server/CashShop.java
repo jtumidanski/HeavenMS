@@ -23,7 +23,6 @@ package server;
 
 import java.io.File;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;

@@ -1,7 +1,6 @@
 package client.database.administrator;
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;

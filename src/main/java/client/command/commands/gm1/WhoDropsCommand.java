@@ -31,7 +31,6 @@ import client.MapleClient;
 import client.command.Command;
 import client.database.provider.DropDataProvider;
 import server.MapleItemInformationProvider;
-import server.life.MapleMonsterInformationProvider;
 import tools.DatabaseConnection;
 import tools.Pair;
 
@@ -59,13 +58,14 @@ public class WhoDropsCommand extends Command {
                return;
             }
 
-            itemData.stream().limit(3).forEach(pair -> {
-               output.append("#b").append(pair.getRight()).append("#k is dropped by:\r\n");
+            itemData.stream().limit(10).forEach(pair -> {
                DatabaseConnection.withConnectionResult(connection -> DropDataProvider.getInstance().getMonstersWhoDrop(connection, pair.getLeft()))
-                     .ifPresent(monsterIds -> monsterIds.stream()
-                           .map(id -> MapleMonsterInformationProvider.getInstance().getMobNameFromId(id))
-                           .filter(Objects::nonNull)
-                           .forEach(name -> output.append(name).append(", ")));
+                     .ifPresent(monsterIds -> {
+                        output.append("#v").append(pair.getLeft()).append("##k is dropped by:\r\n");
+                        monsterIds.stream()
+                              .filter(Objects::nonNull)
+                              .forEach(name -> output.append("#o").append(name).append("#, "));
+                     });
                output.append("\r\n\r\n");
             });
 

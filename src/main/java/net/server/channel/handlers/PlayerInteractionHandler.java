@@ -22,7 +22,6 @@
 package net.server.channel.handlers;
 
 import java.awt.Point;
-import java.sql.SQLException;
 
 import client.MapleCharacter;
 import client.MapleClient;

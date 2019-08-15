@@ -32,7 +32,6 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleJob;
 import client.MapleStat;
-import client.Skill;
 import client.SkillFactory;
 import client.autoban.AutobanFactory;
 import client.inventory.Equip;

@@ -40,7 +40,6 @@ import java.util.logging.Logger;
 import javax.script.ScriptException;
 
 import client.MapleCharacter;
-import client.Skill;
 import client.SkillFactory;
 import constants.ItemConstants;
 import constants.ServerConstants;

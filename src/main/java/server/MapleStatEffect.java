@@ -33,7 +33,6 @@ import client.MapleCharacter;
 import client.MapleDisease;
 import client.MapleJob;
 import client.MapleMount;
-import client.Skill;
 import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;

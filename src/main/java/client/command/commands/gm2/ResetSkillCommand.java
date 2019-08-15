@@ -28,7 +28,6 @@ import java.io.File;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleJob;
-import client.Skill;
 import client.SkillFactory;
 import client.command.Command;
 import provider.MapleData;

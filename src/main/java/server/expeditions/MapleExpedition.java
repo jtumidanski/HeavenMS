@@ -38,7 +38,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
 import client.MapleCharacter;
-import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;

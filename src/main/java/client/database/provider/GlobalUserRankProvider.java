@@ -9,8 +9,6 @@ import client.database.data.CharacterData;
 import client.database.data.GlobalUserRank;
 import client.database.data.WorldRankData;
 import client.database.utility.WorldRankTransformer;
-import constants.ServerConstants;
-import tools.Pair;
 
 public class GlobalUserRankProvider extends AbstractQueryExecutor {
    private static GlobalUserRankProvider instance;

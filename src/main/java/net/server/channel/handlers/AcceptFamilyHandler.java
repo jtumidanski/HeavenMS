@@ -21,7 +21,6 @@
  */
 package net.server.channel.handlers;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;

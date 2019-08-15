@@ -30,7 +30,6 @@ import java.util.concurrent.Semaphore;
 import java.util.stream.Collectors;
 
 import client.MapleCharacter;
-import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;

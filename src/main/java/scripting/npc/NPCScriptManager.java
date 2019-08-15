@@ -21,7 +21,6 @@
  */
 package scripting.npc;
 
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

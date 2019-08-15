@@ -101,12 +101,7 @@ public class MapleGachapon {
                if (gachaItems.length > 0) {
                   str.append("  #rTier ").append(i).append("#k:\r\n");
                   for (int itemid : gachaItems) {
-                     String itemName = ii.getName(itemid);
-                     if (itemName == null) {
-                        itemName = "MISSING NAME #" + itemid;
-                     }
-
-                     str.append("    ").append(itemName).append("\r\n");
+                     str.append("   #i").append(itemid).append("#");
                   }
 
                   str.append("\r\n");

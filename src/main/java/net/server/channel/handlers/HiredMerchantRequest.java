@@ -21,7 +21,6 @@
 */
 package net.server.channel.handlers;
 
-import java.sql.SQLException;
 import java.util.Collections;
 
 import client.MapleCharacter;

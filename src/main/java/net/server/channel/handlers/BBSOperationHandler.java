@@ -144,12 +144,8 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
-         BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal).ifPresent(threadData -> {
-            client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.getThreadId(), threadData));
-         });
-
-      });
+      DatabaseConnection.withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
+            .ifPresent(threadData -> client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.getThreadId(), threadData))));
    }
 
    private String correctLength(String in, int maxSize) {

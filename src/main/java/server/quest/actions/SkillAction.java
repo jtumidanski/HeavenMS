@@ -28,7 +28,6 @@ import java.util.Map;
 
 import client.MapleCharacter;
 import client.MapleJob;
-import client.Skill;
 import client.SkillFactory;
 import provider.MapleData;
 import provider.MapleDataTool;

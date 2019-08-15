@@ -72,12 +72,10 @@ public class NewYearCardRecord {
    }
 
    public static void saveNewYearCard(NewYearCardRecord newyear) {
-      DatabaseConnection.withConnection(connection -> {
-         newyear.id = NewYearAdministrator.getInstance().create(connection, newyear.getSenderId(), newyear.getSenderName(),
-               newyear.getReceiverId(), newyear.getReceiverName(), newyear.stringContent,
-               newyear.isSenderCardDiscarded(), newyear.isReceiverCardDiscarded(), newyear.isReceiverCardReceived(),
-               newyear.getDateSent(), newyear.getDateReceived());
-      });
+      DatabaseConnection.withConnection(connection -> newyear.id = NewYearAdministrator.getInstance().create(connection, newyear.getSenderId(), newyear.getSenderName(),
+            newyear.getReceiverId(), newyear.getReceiverName(), newyear.stringContent,
+            newyear.isSenderCardDiscarded(), newyear.isReceiverCardDiscarded(), newyear.isReceiverCardReceived(),
+            newyear.getDateSent(), newyear.getDateReceived()));
    }
 
    public static void updateNewYearCard(NewYearCardRecord newyear) {
@@ -260,9 +258,9 @@ public class NewYearCardRecord {
                return;
             }
 
-            server.getWorld(world).getPlayerStorage().getCharacterById(receiverId).filter(MapleCharacter::isLoggedinWorld).ifPresent(target -> {
-               target.announce(MaplePacketCreator.onNewYearCardRes(target, NewYearCardRecord.this, 0xC, 0));
-            });
+            server.getWorld(world).getPlayerStorage().getCharacterById(receiverId)
+                  .filter(MapleCharacter::isLoggedinWorld)
+                  .ifPresent(target -> target.announce(MaplePacketCreator.onNewYearCardRes(target, NewYearCardRecord.this, 0xC, 0)));
          }
       }, 1000 * 60 * 60); //1 Hour
    }

@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
-import server.MaplePortal;
 import tools.Pair;
 
 public class CharacterAdministrator extends AbstractQueryExecutor {

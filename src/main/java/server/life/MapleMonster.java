@@ -39,8 +39,6 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.swing.text.html.Option;
-
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;

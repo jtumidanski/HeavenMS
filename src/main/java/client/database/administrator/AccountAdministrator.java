@@ -100,9 +100,7 @@ public class AccountAdministrator extends AbstractQueryExecutor {
 
    public void removePermaBan(Connection connection, int accountId) {
       String sql = "UPDATE accounts SET banned = -1 WHERE id = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-      });
+      execute(connection, sql, ps -> ps.setInt(1, accountId));
    }
 
    public void setBan(Connection connection, int accountId, int reason, int days, String desc) {
