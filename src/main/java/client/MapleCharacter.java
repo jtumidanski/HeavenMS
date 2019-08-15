@@ -1266,17 +1266,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return !(ret <= 0 && transientpoint > 0.0f) ? ret : 1;
    }
 
-   private static boolean hasMergeFlag(Item item) {
-      return (item.getFlag() & ItemConstants.MERGE_UNTRADEABLE) == ItemConstants.MERGE_UNTRADEABLE;
-   }
-
-   private static void setMergeFlag(Item item) {
-      short flag = item.getFlag();
-      flag |= ItemConstants.MERGE_UNTRADEABLE;
-      flag |= ItemConstants.UNTRADEABLE;
-      item.setFlag(flag);
-   }
-
    private static List<Equip> getEquipsWithStat(List<Pair<Equip, Map<StatUpgrade, Short>>> equipped, StatUpgrade stat) {
       List<Equip> equippedWithStat = new LinkedList<>();
 
@@ -8443,7 +8432,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             List<Pair<StatUpgrade, Integer>> eqpStatups = eqpUpg.getValue();
             if (!eqpStatups.isEmpty()) {
                Equip eqp = eqpUpg.getKey();
-               setMergeFlag(eqp);
+               ItemProcessor.getInstance().setMergeFlag(eqp);
 
                String showStr = " '" + MapleItemInformationProvider.getInstance().getName(eqp.getItemId()) + "': ";
                String upgdStr = eqp.gainStats(eqpStatups).getLeft();
@@ -8475,7 +8464,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private void standaloneMerge(Map<StatUpgrade, Float> statups, MapleClient c, MapleInventoryType type, short slot, Item item) {
       short quantity;
-      if (item == null || (quantity = item.getQuantity()) < 1 || ii.isCash(item.getItemId()) || !ii.isUpgradeable(item.getItemId()) || hasMergeFlag(item)) {
+      if (item == null || (quantity = item.getQuantity()) < 1 || ii.isCash(item.getItemId()) || !ii.isUpgradeable(item.getItemId()) || ItemProcessor.getInstance().hasMergeFlag(item)) {
          return;
       }
 
