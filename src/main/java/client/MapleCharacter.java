@@ -3452,7 +3452,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                Set<Skill> keys = getSkills().keySet();
                for (Skill key : keys) {
                   SkillEntry skill = getSkills().get(key);
-                  if (skill.expiration != -1 && skill.expiration < currenttime) {
+                  if (skill.getExpiration() != -1 && skill.getExpiration() < currenttime) {
                      changeSkillLevel(key, (byte) -1, 0, -1);
                   }
                }
@@ -5389,7 +5389,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (skills.get(skill) == null) {
          return 0;
       }
-      return skills.get(skill).masterlevel;
+      return skills.get(skill).getMasterLevel();
    }
 
    public int getTotalStr() {
@@ -6011,14 +6011,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (ret == null) {
          return 0;
       }
-      return ret.skillevel;
+      return ret.getSkillLevel();
    }
 
    public byte getSkillLevel(Skill skill) {
       if (skills.get(skill) == null) {
          return 0;
       }
-      return skills.get(skill).skillevel;
+      return skills.get(skill).getSkillLevel();
    }
 
    public long getSkillExpiration(int skillId) {
@@ -6031,14 +6031,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (ret == null) {
          return -1;
       }
-      return ret.expiration;
+      return ret.getExpiration();
    }
 
    public long getSkillExpiration(Skill skill) {
       if (skills.get(skill) == null) {
          return -1;
       }
-      return skills.get(skill).expiration;
+      return skills.get(skill).getExpiration();
    }
 
    public MapleSkinColor getSkinColor() {
@@ -6510,7 +6510,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       for (Entry<Skill, SkillEntry> s : this.getSkills().entrySet()) {
          Skill skill = s.getKey();
          if (GameConstants.isInJobTree(skill.getId(), jobId) && !skill.isBeginnerSkill()) {
-            spUsed += s.getValue().skillevel;
+            spUsed += s.getValue().getSkillLevel();
          }
       }
 
@@ -9703,21 +9703,4 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public static class SkillEntry {
-
-      public int masterlevel;
-      public byte skillevel;
-      public long expiration;
-
-      public SkillEntry(byte skillevel, int masterlevel, long expiration) {
-         this.skillevel = skillevel;
-         this.masterlevel = masterlevel;
-         this.expiration = expiration;
-      }
-
-      @Override
-      public String toString() {
-         return skillevel + ":" + masterlevel;
-      }
-   }
 }

@@ -4,8 +4,8 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
 
-import client.MapleCharacter;
 import client.Skill;
+import client.SkillEntry;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
 
@@ -36,14 +36,14 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
       });
    }
 
-   public void create(Connection connection, int characterId, Set<Map .Entry<Skill, MapleCharacter.SkillEntry>> skills) {
+   public void create(Connection connection, int characterId, Set<Map .Entry<Skill, SkillEntry>> skills) {
       String sql = "INSERT INTO skills (characterid, skillid, skilllevel, masterlevel, expiration) VALUES (?, ?, ?, ?, ?)";
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, characterId);
          ps.setInt(2, data.getKey().getId());
-         ps.setInt(3, data.getValue().skillevel);
-         ps.setInt(4, data.getValue().masterlevel);
-         ps.setLong(5, data.getValue().expiration);
+         ps.setInt(3, data.getValue().getSkillLevel());
+         ps.setInt(4, data.getValue().getMasterLevel());
+         ps.setLong(5, data.getValue().getExpiration());
       }, skills);
    }
 }

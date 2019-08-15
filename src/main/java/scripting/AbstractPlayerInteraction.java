@@ -31,6 +31,7 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleQuestStatus;
+import client.SkillEntry;
 import client.SkillFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
@@ -935,10 +936,10 @@ public class AbstractPlayerInteraction {
 
    public void teachSkill(int skillid, byte level, byte masterLevel, long expiration, boolean force) {
       SkillFactory.getSkill(skillid).ifPresent(skill -> {
-         MapleCharacter.SkillEntry skillEntry = getPlayer().getSkills().get(skill);
+         SkillEntry skillEntry = getPlayer().getSkills().get(skill);
          if (skillEntry != null) {
             if (!force && level > -1) {
-               getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.skillevel, level), Math.max(skillEntry.masterlevel, masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.expiration, expiration));
+               getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.getSkillLevel(), level), Math.max(skillEntry.getMasterLevel(), masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.getExpiration(), expiration));
                return;
             }
          } else if (GameConstants.isAranSkills(skillid)) {

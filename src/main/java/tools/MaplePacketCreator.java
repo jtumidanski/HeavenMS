@@ -38,7 +38,7 @@ import java.util.TimeZone;
 import client.BuddylistEntry;
 import client.MapleBuffStat;
 import client.MapleCharacter;
-import client.MapleCharacter.SkillEntry;
+import client.SkillEntry;
 import client.MapleClient;
 import client.MapleDisease;
 import client.MapleFamilyEntry;
@@ -517,7 +517,7 @@ public class MaplePacketCreator {
 
    private static void addSkillInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
       mplew.write(0); // start of skills
-      Map<Skill, MapleCharacter.SkillEntry> skills = chr.getSkills();
+      Map<Skill, SkillEntry> skills = chr.getSkills();
       int skillsSize = skills.size();
       // We don't want to include any hidden skill in this, so subtract them from the size list and ignore them.
       for (Entry<Skill, SkillEntry> skill : skills.entrySet()) {
@@ -531,10 +531,10 @@ public class MaplePacketCreator {
             continue;
          }
          mplew.writeInt(skill.getKey().getId());
-         mplew.writeInt(skill.getValue().skillevel);
-         addExpirationTime(mplew, skill.getValue().expiration);
+         mplew.writeInt(skill.getValue().getSkillLevel());
+         addExpirationTime(mplew, skill.getValue().getExpiration());
          if (skill.getKey().isFourthJob()) {
-            mplew.writeInt(skill.getValue().masterlevel);
+            mplew.writeInt(skill.getValue().getMasterLevel());
          }
       }
       mplew.writeShort(chr.getAllCooldowns().size());
