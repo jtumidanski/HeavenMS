@@ -24,6 +24,7 @@ package client;
 import java.util.ArrayList;
 import java.util.List;
 
+import constants.skills.Evan;
 import server.MapleStatEffect;
 import server.life.Element;
 
@@ -53,10 +54,10 @@ public class Skill {
    }
 
    public boolean isFourthJob() {
-      if (job == 2212) {
+      if (job == MapleJob.EVAN4.getId()) {
          return false;
       }
-      if (id == 22170001 || id == 22171003 || id == 22171004 || id == 22181002 || id == 22181003) {
+      if (id == Evan.MAGIC_MASTERY || id == Evan.FLAME_WHEEL || id == Evan.HEROS_WILL || id == Evan.DARK_FOG || id == Evan.SOUL_STONE) {
          return true;
       }
       return job % 10 == 2;
