@@ -31,20 +31,11 @@ import tools.DatabaseConnection;
  * @author Jay Estrella - Mr.Trash :3
  */
 public class MapleFamily {
-   private static int id;
-   private static Map<Integer, MapleFamilyEntry> members = new HashMap<>();
+   private int id;
+   private Map<Integer, MapleFamilyEntry> members = new HashMap<>();
 
-   public MapleFamily(int cid) {
-      DatabaseConnection.withConnectionResult(connection ->
-            FamilyCharacterProvider.getInstance().getFamilyIdFromCharacter(connection, cid))
-            .ifPresent(result -> id = result);
-      getMapleFamily();
-   }
-
-   private static void getMapleFamily() {
-      DatabaseConnection.withConnectionResult(connection ->
-            FamilyCharacterProvider.getInstance().getMapleFamily(connection, id))
-            .ifPresent(result -> result.forEach(member -> members.put(member.getChrId(), member)));
+   public MapleFamily(int id) {
+      this.id = id;
    }
 
    public MapleFamilyEntry getMember(int cid) {
@@ -54,11 +45,11 @@ public class MapleFamily {
       return null;
    }
 
-   public Map<Integer, MapleFamilyEntry> getMembers() {
-      return members;
+   public void addMember(MapleFamilyEntry member) {
+      members.put(member.getChrId(), member);
    }
 
-   public void broadcast(byte[] packet) {
-      // family currently not developed
+   public Map<Integer, MapleFamilyEntry> getMembers() {
+      return members;
    }
 }

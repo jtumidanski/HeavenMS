@@ -9277,7 +9277,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       MapleFamily family = this.getFamily();
       if (family != null) {
-         family.broadcast(MaplePacketCreator.marriageMessage(1, name));
+         MapleFamilyProcessor.getInstance().broadcast(MaplePacketCreator.marriageMessage(1, name));
       }
    }
 

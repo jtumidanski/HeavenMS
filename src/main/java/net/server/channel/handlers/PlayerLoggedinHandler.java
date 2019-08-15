@@ -40,6 +40,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
 import client.MapleFamily;
+import client.MapleFamilyProcessor;
 import client.MapleKeyBinding;
 import client.SkillFactory;
 import client.database.administrator.DueyPackageAdministrator;
@@ -279,7 +280,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
             if (player.getFamilyId() > 0) {
                MapleFamily f = world.getFamily(player.getFamilyId());
                if (f == null) {
-                  f = new MapleFamily(player.getId());
+                  f = MapleFamilyProcessor.getInstance().loadFamilyForCharacter(player.getId());
                   world.addFamily(player.getFamilyId(), f);
                }
                player.setFamily(f);
