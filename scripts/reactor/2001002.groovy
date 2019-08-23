@@ -1,0 +1,74 @@
+package reactor
+
+import scripting.event.EventInstanceManager
+import scripting.reactor.ReactorActionManager
+
+import java.awt.*
+
+
+class Reactor2001002 {
+   ReactorActionManager rm
+
+   def act() {
+      if (rm.getEventInstance().getIntProperty("statusStg2") == -1) {
+         int rnd = Math.max(Math.floor(Math.random() * 14), 4).intValue()
+
+         rm.getEventInstance().setProperty("statusStg2", "" + rnd)
+         rm.getEventInstance().setProperty("statusStg2_c", "0")
+      }
+
+      int limit = rm.getEventInstance().getIntProperty("statusStg2")
+      int count = rm.getEventInstance().getIntProperty("statusStg2_c")
+      if (count >= limit) {
+         rm.dropItems()
+
+         EventInstanceManager eim = rm.getEventInstance()
+         eim.giveEventPlayersExp(3500)
+
+         eim.setProperty("statusStg2", "1")
+         eim.showClearEffect(true)
+      } else {
+         count++
+         rm.getEventInstance().setProperty("statusStg2_c", count)
+
+         int nextHashed = (11 * (count)) % 14
+
+         Point nextPos = rm.getMap().getReactorById(2001002 + nextHashed).getPosition()
+         rm.spawnMonster(9300040, 1, nextPos)
+      }
+   }
+
+   def hit() {
+
+   }
+
+   def touch() {
+
+   }
+
+   def untouch() {
+
+   }
+}
+
+Reactor2001002 getReactor() {
+   ReactorActionManager rm = (ReactorActionManager) getBinding().getVariable("rm")
+   getBinding().setVariable("reactor", new Reactor2001002(rm: rm))
+   return (Reactor2001002) getBinding().getVariable("reactor")
+}
+
+def act() {
+   getReactor().act()
+}
+
+def hit() {
+   getReactor().hit()
+}
+
+def touch() {
+   getReactor().touch()
+}
+
+def untouch() {
+   getReactor().untouch()
+}

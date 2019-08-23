@@ -56,16 +56,26 @@ public abstract class AbstractScriptManager {
          }
       }
       if (engine == null) {
-         File scriptFile = new File(path);
-         if (!scriptFile.exists()) {
+         String engineName = "";
+         File scriptFile = null;
+         if (new File(path + ".groovy").exists()) {
+            engineName = "groovy";
+            scriptFile = new File(path + ".groovy");
+         }
+         if (new File(path + ".js").exists()) {
+            engineName = "javascript";
+            scriptFile = new File(path + ".js");
+         }
+         if (scriptFile == null) {
             return null;
          }
-         engine = sem.getEngineByName("javascript");
+
+         engine = sem.getEngineByName(engineName);
          if (c != null) {
             c.setScriptEngine(path, engine);
          }
          try (FileReader fr = new FileReader(scriptFile)) {
-            if (ServerConstants.JAVA_8) {
+            if (ServerConstants.JAVA_8 && engineName.equals("javascript")) {
                engine.eval("load('nashorn:mozilla_compat.js');" + System.lineSeparator());
             }
             engine.eval(fr);
@@ -78,7 +88,9 @@ public abstract class AbstractScriptManager {
       return (Invocable) engine;
    }
 
+
    protected void resetContext(String path, MapleClient c) {
-      c.removeScriptEngine("scripts/" + path);
+      c.removeScriptEngine("scripts/" + path + ".js");
+      c.removeScriptEngine("scripts/" + path + ".groovy");
    }
 }

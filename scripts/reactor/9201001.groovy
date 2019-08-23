@@ -1,0 +1,48 @@
+package reactor
+
+
+import scripting.reactor.ReactorActionManager
+
+
+class Reactor9201001 {
+   ReactorActionManager rm
+
+   def act() {
+      rm.mapMessage(5, "A bright flash of light, then someone familiar appears in front of the blocked gate.")
+      rm.spawnNpc(9040003)
+   }
+
+   def hit() {
+
+   }
+
+   def touch() {
+
+   }
+
+   def untouch() {
+
+   }
+}
+
+Reactor9201001 getReactor() {
+   ReactorActionManager rm = (ReactorActionManager) getBinding().getVariable("rm")
+   getBinding().setVariable("reactor", new Reactor9201001(rm: rm))
+   return (Reactor9201001) getBinding().getVariable("reactor")
+}
+
+def act() {
+   getReactor().act()
+}
+
+def hit() {
+   getReactor().hit()
+}
+
+def touch() {
+   getReactor().touch()
+}
+
+def untouch() {
+   getReactor().untouch()
+}

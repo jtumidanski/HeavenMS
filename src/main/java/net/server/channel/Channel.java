@@ -190,7 +190,7 @@ public final class Channel {
    private static String[] getEvents() {
       List<String> events = new ArrayList<>();
       for (File file : new File("scripts/event").listFiles()) {
-         events.add(file.getName().substring(0, file.getName().length() - 3));
+         events.add(file.getName().substring(0, file.getName().length() - 7));
       }
       return events.toArray(new String[0]);
    }

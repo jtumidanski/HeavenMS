@@ -51,7 +51,7 @@ public class NPCScriptManager extends AbstractScriptManager {
    public boolean isNpcScriptAvailable(MapleClient c, String fileName) {
       Invocable iv = null;
       if (fileName != null) {
-         iv = getInvocable("npc/" + fileName + ".js", c);
+         iv = getInvocable("npc/" + fileName, c);
       }
 
       return iv != null;
@@ -86,7 +86,7 @@ public class NPCScriptManager extends AbstractScriptManager {
          }
          cms.put(c, cm);
          Invocable iv = null;
-         iv = getInvocable("npc/" + filename + ".js", c);
+         iv = getInvocable("npc/" + filename, c);
 
          if (iv == null) {
             c.getPlayer().dropMessage(1, npc + "");
@@ -122,15 +122,15 @@ public class NPCScriptManager extends AbstractScriptManager {
             Invocable iv = null;
             if (!itemScript) {
                if (fileName != null) {
-                  iv = getInvocable("npc/" + fileName + ".js", c);
+                  iv = getInvocable("npc/" + fileName, c);
                }
             } else {
                if (fileName != null) {     // thanks MiLin for drafting NPC-based item scripts
-                  iv = getInvocable("item/" + fileName + ".js", c);
+                  iv = getInvocable("item/" + fileName, c);
                }
             }
             if (iv == null) {
-               iv = getInvocable("npc/" + npc + ".js", c);
+               iv = getInvocable("npc/" + npc, c);
                cm.resetItemScript();
             }
             if (iv == null) {
@@ -143,6 +143,7 @@ public class NPCScriptManager extends AbstractScriptManager {
             try {
                iv.invokeFunction("start");
             } catch (final NoSuchMethodException nsme) {
+               nsme.printStackTrace();
                try {
                   iv.invokeFunction("start", chr);
                } catch (final NoSuchMethodException nsma) {
@@ -185,9 +186,9 @@ public class NPCScriptManager extends AbstractScriptManager {
 
       String scriptFolder = (cm.isItemScript() ? "item" : "npc");
       if (cm.getScriptName() != null) {
-         resetContext(scriptFolder + "/" + cm.getScriptName() + ".js", c);
+         resetContext(scriptFolder + "/" + cm.getScriptName(), c);
       } else {
-         resetContext(scriptFolder + "/" + cm.getNpc() + ".js", c);
+         resetContext(scriptFolder + "/" + cm.getNpc(), c);
       }
    }
 

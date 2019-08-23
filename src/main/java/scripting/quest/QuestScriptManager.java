@@ -59,10 +59,10 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            Invocable iv = getInvocable("quest/" + questid + ".js", c);
+            Invocable iv = getInvocable("quest/" + questid, c);
             if (iv == null) {
                if (GameConstants.isMedalQuest(questid)) {   // start generic medal quest
-                  iv = getInvocable("quest/medalQuest.js", c);
+                  iv = getInvocable("quest/medalQuest", c);
                } else {
                   FilePrinter.printError(FilePrinter.QUEST_UNCODED, "START Quest " + questid + " is uncoded.");
                }
@@ -111,10 +111,10 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            Invocable iv = getInvocable("quest/" + questid + ".js", c);
+            Invocable iv = getInvocable("quest/" + questid, c);
             if (iv == null) {
                if (GameConstants.isMedalQuest(questid)) {   // start generic medal quest
-                  iv = getInvocable("quest/medalQuest.js", c);
+                  iv = getInvocable("quest/medalQuest", c);
                } else {
                   FilePrinter.printError(FilePrinter.QUEST_UNCODED, "END Quest " + questid + " is uncoded.");
                   qm.dispose();
@@ -152,7 +152,7 @@ public class QuestScriptManager extends AbstractScriptManager {
       qms.remove(c);
       scripts.remove(c);
       c.getPlayer().setNpcCooldown(System.currentTimeMillis());
-      resetContext("quest/" + qm.getQuest() + ".js", c);
+      resetContext("quest/" + qm.getQuest(), c);
    }
 
    public void dispose(MapleClient c) {
