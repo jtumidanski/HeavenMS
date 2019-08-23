@@ -69,10 +69,17 @@ class NPC9201014 {
                   if (cm.haveItem(4031424)) {
                      if (cm.getPlayer().isMarried()) {   // thanks MedicOP for solving an issue here
                         if (cm.getInventory(2).getNextFreeSlot() >= 0) {
-                           int rand = Math.floor(Math.random() * bgPrizes.length).intValue()
-                           cm.gainItem(bgPrizes[rand][0], (short) bgPrizes[rand][1])
-
-                           cm.gainItem(4031424, (short) -1)
+                           int rand = Math.floor(Math.random() * 4).intValue()
+                           if (rand == 0) {
+                              cm.gainItem(2022179, (short) 10)
+                           } else if (rand == 1) {
+                              cm.gainItem(2022282, (short) 10)
+                           } else if (rand == 2) {
+                              cm.gainItem(2210005, (short) 5)
+                           } else if (rand == 3) {
+                              cm.gainItem(2210003, (short) 5)
+                           };
+                           cm.gainItem(4031424, (short) -1);
                            cm.dispose()
                         } else {
                            cm.sendOk("You don't have a free USE slot right now.")
@@ -88,20 +95,28 @@ class NPC9201014 {
                   }
                } else if (selection == 1) {
                   if (cm.haveItem(4031423)) {
-                     if (cm.getInventory(2).getNextFreeSlot() >= 0) {
-                        int rand = Math.floor(Math.random() * cmPrizes.length).intValue()
-                        cm.gainItem(cmPrizes[rand][0], (short) cmPrizes[rand][1])
-
-                        cm.gainItem(4031423, (short) -1)
-                        cm.dispose()
-                     } else {
-                        cm.sendOk("You don't have a free USE slot right now.")
-                        cm.dispose()
-                     }
+                     cm.sendSimple("You may choose your prize.\r\n#L0#Triangular Sushi#l\r\n#L1#50 power elixers#l\r\n#L2#10 Swiss Cheese#l\r\n#L3#3 Onyx Apples#l")
                   } else {
-                     cm.sendOk("You don't have an Onyx Chest.")
+                     cm.sendOk("You don't have an Onyx Chest")
                      cm.dispose()
                   }
+               }
+            } else if (status == 2) {
+               if (cm.getInventory(2).getNextFreeSlot() >= 0) {
+                  if (selection == 0) {
+                     cm.gainItem(2022011, (short) 10)
+                  } else if (selection == 1) {
+                     cm.gainItem(2000005, (short) 50)
+                  } else if (selection == 2) {
+                     cm.gainItem(2022273, (short) 10)
+                  } else if (selection == 3) {
+                     cm.gainItem(2022179, (short) 3)
+                  };
+                  cm.gainItem(4031423, (short) -1);
+                  cm.dispose();
+               } else {
+                  cm.sendOk("You don't have a free USE slot right now.")
+                  cm.dispose()
                }
             }
          } else {
