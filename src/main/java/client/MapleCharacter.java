@@ -4987,6 +4987,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public int getQuestExpRate() {
+      if (hasNoviceExpRate()) {
+         return 1;
+      }
+
       World w = getWorldServer();
       return w.getExpRate() * w.getQuestRate();
    }
