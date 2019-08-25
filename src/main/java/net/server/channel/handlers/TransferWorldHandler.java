@@ -20,8 +20,16 @@
 
 package net.server.channel.handlers;
 
+import java.sql.Timestamp;
+import java.util.Optional;
+
+import client.MapleCharacter;
 import client.MapleClient;
+import client.database.provider.WorldTransferProvider;
+import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
+import net.server.Server;
+import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
@@ -40,6 +48,29 @@ public final class TransferWorldHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      c.announce(MaplePacketCreator.sendWorldTransferRules(9));
+      MapleCharacter chr = c.getPlayer();
+      if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER || Server.getInstance().getWorldsSize() <= 1) {
+         c.announce(MaplePacketCreator.sendWorldTransferRules(9, c));
+         return;
+      }
+      int worldTransferError = chr.checkWorldTransferEligibility();
+      if (worldTransferError != 0) {
+         c.announce(MaplePacketCreator.sendWorldTransferRules(worldTransferError, c));
+         return;
+      }
+
+      Optional<Timestamp> completionTime = DatabaseConnection.withConnectionResult(connection -> WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()));
+
+      if (completionTime.isEmpty()) {
+         c.announce(MaplePacketCreator.sendWorldTransferRules(6, c));
+         return;
+      }
+
+      if (completionTime.get().getTime() + ServerConstants.WORLD_TRANSFER_COOLDOWN > System.currentTimeMillis()) {
+         c.announce(MaplePacketCreator.sendWorldTransferRules(7, c));
+         return;
+      }
+
+      c.announce(MaplePacketCreator.sendWorldTransferRules(0, c));
    }
 }

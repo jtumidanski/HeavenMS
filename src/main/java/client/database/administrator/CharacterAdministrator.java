@@ -1,10 +1,15 @@
 package client.database.administrator;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
+import client.database.provider.CharacterProvider;
+import tools.FilePrinter;
 import tools.Pair;
 
 public class CharacterAdministrator extends AbstractQueryExecutor {
@@ -266,5 +271,138 @@ public class CharacterAdministrator extends AbstractQueryExecutor {
          ps.setBoolean(55, partySearchInvite);
          ps.setInt(56, characterId);
       });
+   }
+
+   public void updateName(Connection connection, int characterId, String newName) {
+      String sql = "UPDATE characters SET name = ? WHERE id = ?";
+      execute(connection, sql, ps -> {
+         ps.setString(1, newName);
+         ps.setInt(2, characterId);
+      });
+   }
+
+   public void performNameChange(Connection connection, int characterId, String oldName, String newName, int nameChangeId) {
+      updateName(connection, characterId, newName);
+      RingAdministrator.getInstance().updatePartnerName(connection, newName, oldName);
+        /*try (PreparedStatement ps = con.prepareStatement("UPDATE playernpcs SET name = ? WHERE name = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE gifts SET `from` = ? WHERE `from` = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE dueypackages SET SenderName = ? WHERE SenderName = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE dueypackages SET SenderName = ? WHERE SenderName = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE inventoryitems SET owner = ? WHERE owner = ?")) { //GMS doesn't do this
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE mts_items SET owner = ? WHERE owner = ?")) { //GMS doesn't do this
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE newyear SET sendername = ? WHERE sendername = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE newyear SET receivername = ? WHERE receivername = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE notes SET `to` = ? WHERE `to` = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE notes SET `from` = ? WHERE `from` = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }
+        try (PreparedStatement ps = con.prepareStatement("UPDATE nxcode SET retriever = ? WHERE retriever = ?")) {
+            ps.setString(1, newName);
+            ps.setString(2, oldName);
+            ps.executeUpdate();
+        } catch(SQLException e) {
+            e.printStackTrace();
+            FilePrinter.printError(FilePrinter.CHANGE_CHARACTER_NAME, e, "Character ID : " + characterId);
+            return false;
+        }*/
+      if (nameChangeId != -1) {
+         NameChangeAdministrator.getInstance().markCompleted(connection, nameChangeId);
+      }
+   }
+
+   public void moveWorld(Connection connection, int characterId, int worldId, int oldMesoAmount) {
+      String sql = "UPDATE characters SET world = ?, meso = ?, guildid = ?, guildrank = ? WHERE id = ?";
+      execute(connection, sql, ps -> {
+         ps.setInt(1, worldId);
+         ps.setInt(2, Math.min(oldMesoAmount, 1000000)); //might want a limit in ServerConstants for this
+         ps.setInt(3, 0);
+         ps.setInt(4, 5);
+         ps.setInt(5, characterId);
+      });
+   }
+
+   public void performWorldTransfer(Connection connection, int characterId, int oldWorld, int newWorld, int worldTransferId) {
+      int mesos = CharacterProvider.getInstance().getMesosForCharacter(connection, characterId);
+      moveWorld(connection, characterId, newWorld, mesos);
+      BuddyAdministrator.getInstance().deleteForCharacterOrBuddyId(connection, characterId);
+      WorldTransferAdministrator.getInstance().markComplete(connection, worldTransferId);
    }
 }

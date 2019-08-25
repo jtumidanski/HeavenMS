@@ -25,6 +25,7 @@ package client;
 import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.sql.Connection;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,7 +49,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.mina.util.ConcurrentHashSet;
@@ -71,6 +71,7 @@ import client.database.administrator.MedalMapAdministrator;
 import client.database.administrator.MonsterBookAdministrator;
 import client.database.administrator.MtsCartAdministrator;
 import client.database.administrator.MtsItemAdministrator;
+import client.database.administrator.NameChangeAdministrator;
 import client.database.administrator.PetAdministrator;
 import client.database.administrator.PetIgnoreAdministrator;
 import client.database.administrator.PlayerDiseaseAdministrator;
@@ -83,8 +84,8 @@ import client.database.administrator.SkillAdministrator;
 import client.database.administrator.SkillMacroAdministrator;
 import client.database.administrator.TeleportRockLocationAdministrator;
 import client.database.administrator.WishListAdministrator;
+import client.database.administrator.WorldTransferAdministrator;
 import client.database.data.CharacterData;
-import client.database.data.CharacterIdNameAccountId;
 import client.database.provider.AccountProvider;
 import client.database.provider.AreaInfoProvider;
 import client.database.provider.BuddyProvider;
@@ -97,6 +98,7 @@ import client.database.provider.InventoryEquipmentProvider;
 import client.database.provider.InventoryItemProvider;
 import client.database.provider.KeyMapProvider;
 import client.database.provider.MedalMapProvider;
+import client.database.provider.NameChangeProvider;
 import client.database.provider.NoteProvider;
 import client.database.provider.PetIgnoreProvider;
 import client.database.provider.PlayerDiseaseProvider;
@@ -106,6 +108,7 @@ import client.database.provider.SavedLocationProvider;
 import client.database.provider.SkillMacroProvider;
 import client.database.provider.SkillProvider;
 import client.database.provider.TeleportRockProvider;
+import client.database.provider.WorldTransferProvider;
 import client.inventory.Equip;
 import client.inventory.Equip.StatUpgrade;
 import client.inventory.Item;
@@ -391,6 +394,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private int totCP = 0;
    private int FestivalPoints;
    private boolean challenged = false;
+   private boolean pendingNameChange; //only used to change name on logout, not to be relied upon elsewhere
 
    private MapleCharacter() {
       super.setListener(new AbstractCharacterListener() {
@@ -9320,6 +9324,124 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void removeJailExpirationTime() {
       jailExpiration = 0;
+   }
+
+   public boolean registerNameChange(String newName) {
+      long currentTimeMillis = System.currentTimeMillis();
+      DatabaseConnection.withConnection(connection -> {
+         Optional<Timestamp> completionTime = NameChangeProvider.getInstance().getCompletionTimeByCharacterId(connection, getId());
+         if (completionTime.isEmpty()) {
+            return;
+         }
+
+         if (completionTime.get().getTime() + ServerConstants.NAME_CHANGE_COOLDOWN > currentTimeMillis) {
+            return;
+         }
+
+         NameChangeAdministrator.getInstance().create(connection, getId(), getName(), newName);
+      });
+      return true;
+   }
+
+   public boolean cancelPendingNameChange() {
+      DatabaseConnection.withConnection(connection -> NameChangeAdministrator.getInstance().cancelPendingNameChange(connection, getId()));
+      return true;
+   }
+
+   public void doPendingNameChange() { //called on logout
+      if (!pendingNameChange) {
+         return;
+      }
+
+      DatabaseConnection.withConnection(connection ->
+            NameChangeProvider.getInstance().getPendingNameChangeForCharacter(connection, getId()).ifPresent(result -> {
+               CharacterAdministrator.getInstance().performNameChange(connection, result.getCharacterId(), result.getOldName(), result.getNewName(), result.getId());
+               FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + getName() + "\" to \"" + result.getNewName() + "\" at " + Calendar.getInstance().getTime().toString());
+            }));
+   }
+
+   public int checkWorldTransferEligibility() {
+      if (getLevel() < 20) {
+         return 2;
+      } else if (getClient().getTempBanCalendar() != null && getClient().getTempBanCalendar().getTimeInMillis() + (30 * 24 * 60 * 60 * 1000) < Calendar.getInstance().getTimeInMillis()) {
+         return 3;
+      } else if (isMarried()) {
+         return 4;
+      } else if (getGuildRank() < 2) {
+         return 5;
+      } else if (getFamily() != null) {
+         return 8;
+      } else {
+         return 0;
+      }
+   }
+
+   public static String checkWorldTransferEligibility(Connection con, int characterId, int oldWorld, int newWorld) {
+      if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER) {
+         return "World transfers disabled.";
+      }
+
+      int accountId = -1;
+
+      Optional<CharacterData> characterDataResult = CharacterProvider.getInstance().getById(con, characterId);
+      if (characterDataResult.isEmpty()) {
+         return "Character does not exist.";
+      }
+
+      CharacterData characterData = characterDataResult.get();
+
+      accountId = characterData.getAccountId();
+      if (characterData.getLevel() < 20) {
+         return "Character is under level 20.";
+      }
+      if (characterData.getFamilyId() != -1) {
+         return "Character is in family.";
+      }
+      if (characterData.getPartnerId() != 0) {
+         return "Character is married.";
+      }
+      if (characterData.getGuildId() != 0 && characterData.getGuildRank() < 2) {
+         return "Character is the leader of a guild.";
+      }
+
+      Calendar tempBan = AccountProvider.getInstance().getTempBanCalendar(con, accountId);
+      if (tempBan != null) {
+         return "Account has been banned.";
+      }
+
+      int charCountInNewWorld = CharacterProvider.getInstance().getCharactersInWorld(con, accountId, newWorld);
+      if (charCountInNewWorld >= 3) {
+         return "Too many characters on destination world.";
+      }
+
+      return null;
+   }
+
+   public boolean registerWorldTransfer(int newWorld) {
+      long currentTimeMillis = System.currentTimeMillis();
+      DatabaseConnection.withConnection(connection -> {
+         Timestamp completionTime = WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, getId());
+         if (completionTime == null) {
+            return;
+         }
+
+         if (completionTime.getTime() + ServerConstants.WORLD_TRANSFER_COOLDOWN > currentTimeMillis) {
+            return;
+         }
+
+         WorldTransferAdministrator.getInstance().create(connection, getId(), getWorld(), newWorld);
+      });
+      return true;
+   }
+
+   public boolean cancelPendingWorldTranfer() {
+      DatabaseConnection.withConnection(connection -> WorldTransferAdministrator.getInstance().cancelPendingForCharacter(connection, getId()));
+      return true;
+   }
+
+   public static boolean doWorldTransfer(Connection con, int characterId, int oldWorld, int newWorld, int worldTransferId) {
+      CharacterAdministrator.getInstance().performWorldTransfer(con, characterId, oldWorld, newWorld, worldTransferId);
+      return true;
    }
 
    public String getLastCommandMessage() {

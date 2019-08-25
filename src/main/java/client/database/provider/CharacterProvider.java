@@ -184,4 +184,17 @@ public class CharacterProvider extends AbstractQueryExecutor {
          return characterData;
       });
    }
+
+   public int getCharactersInWorld(Connection connection, int accountId, int worldId) {
+      String sql = "SELECT COUNT(*) AS rowcount FROM characters WHERE accountid = ? AND world = ?";
+      return getNew(connection, sql, ps -> {
+         ps.setInt(1, accountId);
+         ps.setInt(2, worldId);
+      }, rs -> rs.getInt("rowcount")).orElse(0);
+   }
+
+   public int getMesosForCharacter(Connection connection, int characterId) {
+      String sql = "SELECT meso FROM characters WHERE id = ?";
+      return getNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("meso")).orElse(0);
+   }
 }

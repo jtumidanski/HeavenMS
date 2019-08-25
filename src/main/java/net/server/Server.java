@@ -62,14 +62,17 @@ import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.NxCodeAdministrator;
 import client.database.administrator.NxCodeItemAdministrator;
 import client.database.administrator.PetAdministrator;
+import client.database.administrator.WorldTransferAdministrator;
 import client.database.data.CharacterData;
 import client.database.data.WorldRankData;
 import client.database.provider.AccountProvider;
 import client.database.provider.CharacterProvider;
 import client.database.provider.GlobalUserRankProvider;
+import client.database.provider.NameChangeProvider;
 import client.database.provider.NxCodeProvider;
 import client.database.provider.NxCouponProvider;
 import client.database.provider.PlayerNpcFieldProvider;
+import client.database.provider.WorldTransferProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.manipulator.MapleCashidGenerator;
@@ -111,6 +114,7 @@ import server.life.MaplePlayerNPCFactory;
 import server.quest.MapleQuest;
 import tools.AutoJCE;
 import tools.DatabaseConnection;
+import tools.FilePrinter;
 import tools.Pair;
 
 public class Server {
@@ -791,6 +795,8 @@ public class Server {
          updateActiveCoupons();
       });
 
+      applyAllNameChanges(); //name changes can be missed by INSTANT_NAME_CHANGE
+      applyAllWorldTransfers();
       clearMissingPetsFromDb();
       MapleCashidGenerator.loadExistentCashIdsFromDb();
 
@@ -1405,6 +1411,41 @@ public class Server {
          return !accountChars.containsKey(accId);
       } finally {
          lgnRLock.unlock();
+      }
+   }
+
+   private static void applyAllNameChanges() {
+      List<Pair<String, String>> changedNames = new LinkedList<>(); //logging only
+      DatabaseConnection.withConnection(connection ->
+            NameChangeProvider.getInstance().getPendingNameChanges(connection).forEach(result -> {
+               CharacterAdministrator.getInstance().performNameChange(connection, result.getCharacterId(), result.getOldName(), result.getNewName(), result.getId());
+               changedNames.add(new Pair<>(result.getOldName(), result.getNewName()));
+            }));
+      for (Pair<String, String> namePair : changedNames) {
+         FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + namePair.getLeft() + "\" to \"" + namePair.getRight() + "\" at " + Calendar.getInstance().getTime().toString());
+      }
+   }
+
+   private static void applyAllWorldTransfers() {
+      List<Pair<Integer, Pair<Integer, Integer>>> worldTransfers = new LinkedList<>(); //logging only <charid, <oldWorld, newWorld>>
+      DatabaseConnection.withConnection(connection ->
+            WorldTransferProvider.getInstance().getPendingTransfers(connection).forEach(result -> {
+               String reason = MapleCharacter.checkWorldTransferEligibility(connection, result.getCharacterId(), result.getFrom(), result.getTo());
+               if (reason != null) {
+                  WorldTransferAdministrator.getInstance().cancelById(connection, result.getId());
+                  FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer cancelled : Character ID " + result.getCharacterId() + " at " + Calendar.getInstance().getTime().toString() + ", Reason : " + reason);
+               } else {
+                  CharacterAdministrator.getInstance().performWorldTransfer(connection, result.getCharacterId(), result.getFrom(), result.getTo(), result.getId());
+
+                  worldTransfers.add(new Pair<>(result.getCharacterId(), new Pair<>(result.getFrom(), result.getTo())));
+               }
+            }));
+      //log
+      for (Pair<Integer, Pair<Integer, Integer>> worldTransferPair : worldTransfers) {
+         int charId = worldTransferPair.getLeft();
+         int oldWorld = worldTransferPair.getRight().getLeft();
+         int newWorld = worldTransferPair.getRight().getRight();
+         FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer applied : Character ID " + charId + " from World " + oldWorld + " to World " + newWorld + " at " + Calendar.getInstance().getTime().toString());
       }
    }
 

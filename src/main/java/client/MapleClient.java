@@ -107,6 +107,7 @@ public class MapleClient {
    public static final String CLIENT_REMOTE_ADDRESS = "REMOTE_IP";
    public static final String CLIENT_TRANSITION = "TRANSITION";
    private static final Lock[] loginLocks = new Lock[200];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
+   private Calendar tempBanCalendar;
 
    static {
       for (int i = 0; i < 200; i++) {
@@ -420,8 +421,18 @@ public class MapleClient {
       }
    }
 
+   public Calendar getTempBanCalendarFromDB() {
+      Calendar result = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getTempBanCalendar(connection, accId)).orElse(null);
+      tempBanCalendar = result;
+      return result;
+   }
+
    public Calendar getTempBanCalendar() {
-      return DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getTempBanCalendar(connection, accId)).orElse(null);
+      return tempBanCalendar;
+   }
+
+   public boolean hasBeenBanned() {
+      return tempBanCalendar != null;
    }
 
    public void updateHWID(String newHwid) {
@@ -668,6 +679,9 @@ public class MapleClient {
                player.saveCharToDB(true);
 
                player.logOff();
+               if (ServerConstants.INSTANT_NAME_CHANGE) {
+                  player.doPendingNameChange();
+               }
                clear();
             } else {
                getChannelServer().removePlayer(player);
@@ -907,6 +921,10 @@ public class MapleClient {
    }
 
    public short getAvailableCharacterWorldSlots() {
+      return (short) Math.max(0, characterSlots - Server.getInstance().getAccountWorldCharacterCount(accId, world));
+   }
+
+   public short getAvailableCharacterWorldSlots(int world) {
       return (short) Math.max(0, characterSlots - Server.getInstance().getAccountWorldCharacterCount(accId, world));
    }
 

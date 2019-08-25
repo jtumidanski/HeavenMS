@@ -52,4 +52,12 @@ public class BuddyAdministrator extends AbstractQueryExecutor implements DeleteF
          ps.setString(3, data.getGroup());
       }, buddies);
    }
+
+   public void deleteForCharacterOrBuddyId(Connection connection, int characterId) {
+      String sql = "DELETE FROM buddies WHERE characterid = ? OR buddyid = ?";
+      execute(connection, sql, ps -> {
+         ps.setInt(1, characterId);
+         ps.setInt(2, characterId);
+      });
+   }
 }

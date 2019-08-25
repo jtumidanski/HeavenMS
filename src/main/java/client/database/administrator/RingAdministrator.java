@@ -38,4 +38,12 @@ public class RingAdministrator extends AbstractQueryExecutor {
          ps.setString(5, partnerName);
       });
    }
+
+   public void updatePartnerName(Connection connection, String newName, String oldName) {
+      String sql = "UPDATE rings SET partnername = ? WHERE partnername = ?";
+      execute(connection, sql, ps -> {
+         ps.setString(1, newName);
+         ps.setString(2, oldName);
+      });
+   }
 }

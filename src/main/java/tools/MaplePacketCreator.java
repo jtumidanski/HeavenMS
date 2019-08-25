@@ -39,7 +39,6 @@ import client.BuddylistEntry;
 import client.CharacterProcessor;
 import client.MapleBuffStat;
 import client.MapleCharacter;
-import client.SkillEntry;
 import client.MapleClient;
 import client.MapleDisease;
 import client.MapleFamilyEntry;
@@ -50,6 +49,7 @@ import client.MapleRing;
 import client.MapleStat;
 import client.MonsterBook;
 import client.Skill;
+import client.SkillEntry;
 import client.SkillMacro;
 import client.database.data.BbsThreadData;
 import client.database.data.GlobalUserRank;
@@ -86,6 +86,7 @@ import net.server.guild.MapleGuildSummary;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
+import net.server.world.World;
 import server.CashShop.CashItem;
 import server.CashShop.CashItemFactory;
 import server.CashShop.SpecialCashItem;
@@ -6070,14 +6071,28 @@ public class MaplePacketCreator {
             8: must quit family,
             9: unknown error
         */
-   public static byte[] sendWorldTransferRules(int error) {
+   public static byte[] sendWorldTransferRules(int error, MapleClient c) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.CASHSHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT.getValue());
-      mplew.writeInt(0);
-      mplew.write(0);
+      mplew.writeInt(0); //ignored
       mplew.write(error);
       mplew.writeInt(0);
+      mplew.writeBool(error == 0); //0 = ?, otherwise list servers
+      if (error == 0) {
+         List<World> worlds = Server.getInstance().getWorlds();
+         mplew.writeInt(worlds.size());
+         for (World world : worlds) {
+            mplew.writeMapleAsciiString(GameConstants.WORLD_NAMES[world.getId()]);
+         }
+      }
+      return mplew.getPacket();
+   }
 
+   public static byte[] showWorldTransferSuccess(Item item, int accountId) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CASHSHOP_OPERATION.getValue());
+      mplew.write(0xA0);
+      addCashItemInformation(mplew, item, accountId);
       return mplew.getPacket();
    }
 
@@ -6097,11 +6112,20 @@ public class MaplePacketCreator {
    }
 
 
-   public static byte[] sendNameTransferCheck(boolean canUseName) {
+   public static byte[] sendNameTransferCheck(String availableName, boolean canUseName) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE.getValue());
-      mplew.writeShort(0);
+      //Send provided name back to client to add to temporary cache of checked & accepted names
+      mplew.writeMapleAsciiString(availableName);
       mplew.writeBool(!canUseName);
+      return mplew.getPacket();
+   }
+
+   public static byte[] showNameChangeSuccess(Item item, int accountId) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CASHSHOP_OPERATION.getValue());
+      mplew.write(0x9E);
+      addCashItemInformation(mplew, item, accountId);
       return mplew.getPacket();
    }
 
@@ -7681,8 +7705,20 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
+   public static byte[] showBoughtCashRing(Item ring, String recipient, int accountId) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CASHSHOP_OPERATION.getValue());
+      mplew.write(0x87);
+      addCashItemInformation(mplew, ring, accountId);
+      mplew.writeMapleAsciiString(recipient);
+      mplew.writeInt(ring.getItemId());
+      mplew.writeShort(1); //quantity
+      return mplew.getPacket();
+   }
+
    /*
     * 00 = Due to an unknown error, failed
+    * A3 = Request timed out. Please try again.
     * A4 = Due to an unknown error, failed + warpout
     * A5 = You don't have enough cash.
     * A6 = long as shet msg
@@ -7699,6 +7735,7 @@ public class MaplePacketCreator {
     * B2 = Expired Coupon
     * B3 = Coupon has been used already
     * B4 = Nexon internet cafes? lolfk
+    * B8 = Due to gender restrictions, the coupon cannot be used.
     * BB = inv full
     * BC = long as shet "(not?) available to purchase by a use at the premium" msg
     * BD = invalid gift recipient
@@ -7711,6 +7748,8 @@ public class MaplePacketCreator {
     * C4 = check birthday code
     * C7 = only available to users buying cash item, whatever msg too long
     * C8 = already applied for this
+    * CD = You have reached the daily purchase limit for the cash shop.
+    * D0 = coupon account limit reached
     * D2 = coupon system currently unavailable
     * D3 = item can only be used 15 days after registration
     * D4 = not enough gift tokens
@@ -7822,6 +7861,23 @@ public class MaplePacketCreator {
       mplew.writeShort(item.getPosition());
       addItemInfo(mplew, item, true);
 
+      return mplew.getPacket();
+   }
+
+   public static byte[] deleteCashItem(Item item) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CASHSHOP_OPERATION.getValue());
+      mplew.write(0x6C);
+      mplew.writeLong(item.getCashId());
+      return mplew.getPacket();
+   }
+
+   public static byte[] refundCashItem(Item item, int maplePoints) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CASHSHOP_OPERATION.getValue());
+      mplew.write(0x85);
+      mplew.writeLong(item.getCashId());
+      mplew.writeInt(maplePoints);
       return mplew.getPacket();
    }
 

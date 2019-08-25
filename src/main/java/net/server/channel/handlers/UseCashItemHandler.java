@@ -392,8 +392,9 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          pet.saveToDb();
 
          Item item = player.getInventory(MapleInventoryType.CASH).getItem(pet.getPosition());
-         if (item != null)
+         if (item != null) {
             player.forceUpdateItem(item);
+         }
 
          player.getMap().broadcastMessage(player, MaplePacketCreator.changePetName(player, newName, 1), true);
          c.announce(MaplePacketCreator.enableActions());
@@ -405,10 +406,14 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
       } else if (itemType == 523) {
          int itemid = slea.readInt();
 
-         if (!ServerConstants.USE_ENFORCE_ITEM_SUGGESTION) c.getWorldServer().addOwlItemSearch(itemid);
+         if (!ServerConstants.USE_ENFORCE_ITEM_SUGGESTION) {
+            c.getWorldServer().addOwlItemSearch(itemid);
+         }
          player.setOwlSearch(itemid);
          List<Pair<MaplePlayerShopItem, AbstractMapleMapObject>> hmsAvailable = c.getWorldServer().getAvailableItemBundles(itemid);
-         if (!hmsAvailable.isEmpty()) remove(c, position, itemId);
+         if (!hmsAvailable.isEmpty()) {
+            remove(c, position, itemId);
+         }
 
          c.announce(MaplePacketCreator.owlOfMinerva(c, itemid, hmsAvailable));
          c.announce(MaplePacketCreator.enableActions());
@@ -460,6 +465,24 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
             }
          }, 1000 * 10);
          remove(c, position, itemId);
+      } else if (itemType == 540) {
+         slea.readByte();
+         slea.readInt();
+         if (itemId == 5400000) { //name change
+            if (player.cancelPendingNameChange()) {
+               player.dropMessage(1, "Successfully canceled pending name change.");
+            } else {
+               player.dropMessage(1, "You do not have a pending name change.");
+            }
+         } else if (itemId == 5401000) { //world transfer
+            if (player.cancelPendingWorldTranfer()) {
+               player.dropMessage(1, "Successfully canceled pending world transfer.");
+            } else {
+               player.dropMessage(1, "You do not have a pending world transfer.");
+            }
+         }
+         remove(c, position, itemId);
+         c.announce(MaplePacketCreator.enableActions());
       } else if (itemType == 543) {
          if (itemId == 5432000 && !c.gainCharacterSlot()) {
             player.dropMessage(1, "You have already used up all 12 extra character slots.");
@@ -576,7 +599,9 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          }
 
          //should have a check here against PE hacks
-         if (itemId / 1000000 != 5) itemId = 0;
+         if (itemId / 1000000 != 5) {
+            itemId = 0;
+         }
 
          player.toggleBlockCashShop();
 
@@ -594,7 +619,9 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          TimerManager.getInstance().schedule(new Runnable() {
             @Override
             public void run() {
-               if (!player.isLoggedin()) return;
+               if (!player.isLoggedin()) {
+                  return;
+               }
 
                player.toggleBlockCashShop();
 

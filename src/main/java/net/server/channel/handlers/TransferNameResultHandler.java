@@ -35,6 +35,6 @@ public final class TransferNameResultHandler extends AbstractMaplePacketHandler 
    @Override
    public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
       String name = slea.readMapleAsciiString();
-      c.announce(MaplePacketCreator.sendNameTransferCheck(CharacterProcessor.getInstance().canCreateChar(name)));
+      c.announce(MaplePacketCreator.sendNameTransferCheck(name, CharacterProcessor.getInstance().canCreateChar(name)));
    }
 }

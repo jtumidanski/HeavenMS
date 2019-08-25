@@ -16342,6 +16342,17 @@ CREATE TABLE IF NOT EXISTS `mts_items` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `namechanges` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `characterid` int(11) NOT NULL,
+  `old` varchar(13) NOT NULL,
+  `new` varchar(13) NOT NULL,
+  `requestTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `completionTime` timestamp,
+  PRIMARY KEY (`id`),
+  INDEX (characterid)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
 CREATE TABLE IF NOT EXISTS `newyear` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `senderid` int(10) NOT NULL DEFAULT '-1',
@@ -21418,6 +21429,16 @@ CREATE TABLE IF NOT EXISTS `wishlists` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
+CREATE TABLE IF NOT EXISTS `worldtransfers` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `characterid` int(11) NOT NULL,
+  `from` tinyint(3) NOT NULL,
+  `to` tinyint(3) NOT NULL,
+  `requestTime` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `completionTime` timestamp,
+  PRIMARY KEY (`id`),
+  INDEX (characterid)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 ALTER TABLE `dueyitems`
   ADD CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`PackageId`) REFERENCES `dueypackages` (`PackageId`) ON DELETE CASCADE;
