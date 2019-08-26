@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleFamilyEntry;
 import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
@@ -534,12 +535,15 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    private void distributePlayerExperience(MapleCharacter chr, float exp, float partyBonusMod, int totalPartyLevel, boolean highestPartyDamager, boolean whiteExpGain, boolean hasPartySharers) {
       float playerExp = (ServerConstants.EXP_SPLIT_COMMON_MOD * chr.getLevel()) / totalPartyLevel;
-      if (highestPartyDamager) playerExp += ServerConstants.EXP_SPLIT_MVP_MOD;
+      if (highestPartyDamager) {
+         playerExp += ServerConstants.EXP_SPLIT_MVP_MOD;
+      }
 
       playerExp *= exp;
       float bonusExp = partyBonusMod * playerExp;
 
       this.giveExpToCharacter(chr, playerExp, bonusExp, whiteExpGain, hasPartySharers);
+      giveFamilyRep(chr.getFamilyEntry());
    }
 
    private void distributePartyExperience(Map<MapleCharacter, Long> partyParticipation, float expPerDmg, Set<MapleCharacter> underleveled, Map<Integer, Float> personalRatio, double sdevRatio) {
@@ -566,7 +570,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       int totalPartyLevel = 0;
 
       // thanks G h o s t, Alfred, Vcoc, BHB for poiting out a bug in detecting party members after membership transactions in a party took place
-      if (!ServerConstants.USE_ENFORCE_MOB_LEVEL_RANGE) {
+      if (ServerConstants.USE_ENFORCE_MOB_LEVEL_RANGE) {
          for (MapleCharacter member : partyParticipation.keySet().iterator().next().getPartyMembersOnSameMap()) {
             if (!leechInterval.inInterval(member.getLevel())) {
                underleveled.add(member);
@@ -592,6 +596,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
       for (MapleCharacter mc : expMembers) {
          distributePlayerExperience(mc, participationExp, partyBonusMod, totalPartyLevel, mc == participationMvp, isWhiteExpGain(mc, personalRatio, sdevRatio), hasPartySharers);
+         giveFamilyRep(mc.getFamilyEntry());
       }
    }
 
@@ -955,6 +960,16 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
       for (MonsterListener listener : listenersList) {
          listener.monsterHealed(trueHeal);
+      }
+   }
+
+   private void giveFamilyRep(MapleFamilyEntry entry) {
+      if (entry != null) {
+         int repGain = isBoss() ? ServerConstants.FAMILY_REP_PER_BOSS_KILL : ServerConstants.FAMILY_REP_PER_KILL;
+         if (getMaxHp() <= 1) {
+            repGain = 0; //don't count trash mobs
+         }
+         entry.giveReputationToSenior(repGain, true);
       }
    }
 

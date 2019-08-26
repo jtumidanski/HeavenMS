@@ -250,7 +250,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private int energybar;
    private int gmLevel;
    private int ci = 0;
-   private MapleFamily family;
+   private MapleFamilyEntry familyEntry;
    private int familyId;
    private int bookCover;
    private int battleShipHp = 0;
@@ -396,6 +396,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private int FestivalPoints;
    private boolean challenged = false;
    private boolean pendingNameChange; //only used to change name on logout, not to be relied upon elsewhere
+   private long loginTime;
 
    private MapleCharacter() {
       super.setListener(new AbstractCharacterListener() {
@@ -1925,6 +1926,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (this.guildid > 0) {
          getGuild().ifPresent(guild -> guild.broadcast(MaplePacketCreator.jobMessage(0, job.getId(), name), this.getId()));
       }
+
+      MapleFamily family = getFamily();
+      if(family != null) {
+         family.broadcast(MaplePacketCreator.jobMessage(1, job.getId(), name), this.getId());
+      }
+
       setMasteries(this.job.getId());
       guildUpdate();
 
@@ -1950,7 +1957,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void broadcastAcquaintances(byte[] packet) {
       BuddyListProcessor.getInstance().broadcast(packet, buddylist, getWorldServer().getPlayerStorage());
-
+      MapleFamily family = getFamily();
       if (family != null) {
          //family.broadcast(packet, id); not yet implemented
       }
@@ -5040,11 +5047,22 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public MapleFamily getFamily() {
-      return family;
+      if (familyEntry != null) {
+         return familyEntry.getFamily();
+      } else {
+         return null;
+      }
    }
 
-   public void setFamily(MapleFamily f) {
-      this.family = f;
+   public MapleFamilyEntry getFamilyEntry() {
+      return familyEntry;
+   }
+
+   public void setFamilyEntry(MapleFamilyEntry entry) {
+      if (entry != null) {
+         setFamilyId(entry.getFamily().getID());
+      }
+      this.familyEntry = entry;
    }
 
    public int getFamilyId() {
@@ -6583,6 +6601,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       levelUpMessages();
       guildUpdate();
+
+      MapleFamilyProcessor.getInstance().giveReputationToCharactersSenior(getFamilyEntry(), level, getName());
    }
 
    /**
@@ -7789,6 +7809,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          connection.commit();
 
+         MapleFamilyProcessor.getInstance().saveCharactersFamilyReputation(connection, getFamilyEntry());
 
          if (cashshop != null) {
             cashshop.save(connection);
@@ -9301,7 +9322,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          mpc = null;
          mgc = null;
          party = null;
-         family = null;
+         MapleFamilyEntry familyEntry = getFamilyEntry();
+         if(familyEntry != null) {
+            familyEntry.setCharacter(null);
+            setFamilyEntry(null);
+         }
 
          getWorldServer().registerTimedMapObject(() -> {
             client = null;  // clients still triggers handlers a few times after disconnecting
@@ -9314,6 +9339,18 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void logOff() {
       this.loggedIn = false;
       DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().logCharacterOut(connection, id));
+   }
+
+   public void setLoginTime(long time) {
+      this.loginTime = time;
+   }
+
+   public long getLoginTime() {
+      return loginTime;
+   }
+
+   public long getLoggedInTime() {
+      return System.currentTimeMillis() - loginTime;
    }
 
    public boolean isLoggedin() {

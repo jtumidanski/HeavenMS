@@ -29,18 +29,16 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.database.administrator.AllianceAdministrator;
 import client.database.administrator.AllianceGuildAdministrator;
+import client.database.data.AllianceData;
 import client.database.provider.AllianceGuildProvider;
 import client.database.provider.AllianceProvider;
-import client.database.data.AllianceData;
 import net.server.Server;
 import net.server.coordinator.MapleInviteCoordinator;
-import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.Pair;
 
 /**
  * @author XoticStory
@@ -230,11 +228,11 @@ public class MapleAlliance {
    }
 
    public static boolean answerInvitation(int targetId, String targetGuildName, int allianceId, boolean answer) {
-      Pair<InviteResult, MapleCharacter> res = MapleInviteCoordinator.answerInvite(InviteType.ALLIANCE, targetId, allianceId, answer);
+      MapleInviteCoordinator.MapleInviteResult res = MapleInviteCoordinator.answerInvite(InviteType.ALLIANCE, targetId, allianceId, answer);
 
       String msg;
-      MapleCharacter sender = res.getRight();
-      switch (res.getLeft()) {
+      MapleCharacter sender = res.from;
+      switch (res.result) {
          case ACCEPTED:
             return true;
 

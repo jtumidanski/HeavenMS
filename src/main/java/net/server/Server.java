@@ -55,6 +55,8 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleFamily;
+import client.MapleFamilyProcessor;
 import client.SkillFactory;
 import client.command.CommandsExecutor;
 import client.database.administrator.AccountAdministrator;
@@ -188,7 +190,7 @@ public class Server {
       return Math.max(0, nextHour.getTimeInMillis() - System.currentTimeMillis());
    }
 
-   private static long getTimeLeftForNextDay() {
+   public static long getTimeLeftForNextDay() {
       Calendar nextDay = Calendar.getInstance();
       nextDay.add(Calendar.DAY_OF_MONTH, 1);
       nextDay.set(Calendar.HOUR, 0);
@@ -861,6 +863,12 @@ public class Server {
          e.printStackTrace();//For those who get errors
          System.out.println("[SEVERE] Syntax error in 'world.ini'.");
          System.exit(0);
+      }
+
+      if (ServerConstants.USE_FAMILY_SYSTEM) {
+         timeToTake = System.currentTimeMillis();
+         MapleFamilyProcessor.getInstance().loadAllFamilies();
+         System.out.println("Families loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
       }
 
       acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);

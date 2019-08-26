@@ -405,4 +405,12 @@ public class CharacterAdministrator extends AbstractQueryExecutor {
       BuddyAdministrator.getInstance().deleteForCharacterOrBuddyId(connection, characterId);
       WorldTransferAdministrator.getInstance().markComplete(connection, worldTransferId);
    }
+
+   public void setFamilyId(Connection connection, int characterId, int familyId) {
+      String sql = "UPDATE characters SET familyid = ? WHERE id = ?";
+      execute(connection, sql, ps -> {
+         ps.setInt(1, familyId);
+         ps.setInt(2, characterId);
+      });
+   }
 }

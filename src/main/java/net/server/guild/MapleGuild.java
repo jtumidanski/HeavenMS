@@ -34,11 +34,11 @@ import java.util.concurrent.locks.Lock;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.database.administrator.CharacterAdministrator;
-import client.database.provider.CharacterProvider;
 import client.database.administrator.GuildAdministrator;
-import client.database.provider.GuildProvider;
 import client.database.administrator.NoteAdministrator;
 import client.database.data.GuildData;
+import client.database.provider.CharacterProvider;
+import client.database.provider.GuildProvider;
 import constants.ServerConstants;
 import net.server.PlayerStorage;
 import net.server.Server;
@@ -46,7 +46,6 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.Channel;
 import net.server.coordinator.MapleInviteCoordinator;
-import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.coordinator.MapleMatchCheckerCoordinator;
 import tools.DatabaseConnection;
@@ -129,11 +128,11 @@ public class MapleGuild {
    }
 
    public static boolean answerInvitation(int targetId, String targetName, int guildId, boolean answer) {
-      Pair<InviteResult, MapleCharacter> res = MapleInviteCoordinator.answerInvite(InviteType.GUILD, targetId, guildId, answer);
+      MapleInviteCoordinator.MapleInviteResult res = MapleInviteCoordinator.answerInvite(InviteType.GUILD, targetId, guildId, answer);
 
       MapleGuildResponse mgr;
-      MapleCharacter sender = res.getRight();
-      switch (res.getLeft()) {
+      MapleCharacter sender = res.from;
+      switch (res.result) {
          case ACCEPTED:
             return true;
 

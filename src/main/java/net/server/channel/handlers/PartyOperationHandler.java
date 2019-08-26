@@ -36,7 +36,6 @@ import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
 import tools.MaplePacketCreator;
-import tools.Pair;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class PartyOperationHandler extends AbstractMaplePacketHandler {
@@ -65,8 +64,8 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
          case 3: { // join
             int partyid = slea.readInt();
 
-            Pair<InviteResult, MapleCharacter> inviteRes = MapleInviteCoordinator.answerInvite(InviteType.PARTY, player.getId(), partyid, true);
-            InviteResult res = inviteRes.getLeft();
+            MapleInviteCoordinator.MapleInviteResult inviteRes = MapleInviteCoordinator.answerInvite(InviteType.PARTY, player.getId(), partyid, true);
+            InviteResult res = inviteRes.result;
             if (res == InviteResult.ACCEPTED) {
                MapleParty.joinParty(player, partyid, false);
             } else {

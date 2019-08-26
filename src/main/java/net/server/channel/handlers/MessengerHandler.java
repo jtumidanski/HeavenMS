@@ -126,8 +126,8 @@ public final class MessengerHandler extends AbstractMaplePacketHandler {
                   player.setMessengerPosition(0);
                } else {
                   world.getMessenger(messengerId).ifPresent(messenger -> {
-                     Pair<InviteResult, MapleCharacter> inviteRes = MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, true);
-                     InviteResult res = inviteRes.getLeft();
+                     MapleInviteCoordinator.MapleInviteResult inviteRes = MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, true);
+                     InviteResult res = inviteRes.result;
                      if (res == InviteResult.ACCEPTED) {
                         int position = messenger.getLowestPosition();
                         MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, position);

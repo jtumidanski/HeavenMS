@@ -21,35 +21,133 @@
  */
 package client;
 
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.Map;
-
-import client.database.provider.FamilyCharacterProvider;
-import tools.DatabaseConnection;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Jay Estrella - Mr.Trash :3
+ * @author Ubaware
  */
 public class MapleFamily {
-   private int id;
-   private Map<Integer, MapleFamilyEntry> members = new HashMap<>();
 
-   public MapleFamily(int id) {
-      this.id = id;
-   }
+   private static final AtomicInteger familyIDCounter = new AtomicInteger();
 
-   public MapleFamilyEntry getMember(int cid) {
-      if (members.containsKey(cid)) {
-         return members.get(cid);
+   private final int id, world;
+   private final Map<Integer, MapleFamilyEntry> members = new ConcurrentHashMap<>();
+   private MapleFamilyEntry leader;
+   private String name;
+   private String preceptsMessage = "";
+   private int totalGenerations;
+
+   public MapleFamily(int id, int world) {
+      int newId = id;
+      if (id == -1) {
+         // get next available family id
+         while (MapleFamilyProcessor.getInstance().idInUse(newId = familyIDCounter.incrementAndGet())) {
+         }
       }
-      return null;
+      this.id = newId;
+      this.world = world;
    }
 
-   public void addMember(MapleFamilyEntry member) {
-      members.put(member.getChrId(), member);
+   public int getID() {
+      return id;
    }
 
-   public Map<Integer, MapleFamilyEntry> getMembers() {
-      return members;
+   public int getWorld() {
+      return world;
+   }
+
+   public void setLeader(MapleFamilyEntry leader) {
+      this.leader = leader;
+      setName(leader.getName());
+   }
+
+   public MapleFamilyEntry getLeader() {
+      return leader;
+   }
+
+   private void setName(String name) {
+      this.name = name;
+   }
+
+   public int getTotalMembers() {
+      return members.size();
+   }
+
+   public int getTotalGenerations() {
+      return totalGenerations;
+   }
+
+   public void setTotalGenerations(int generations) {
+      this.totalGenerations = generations;
+   }
+
+   public String getName() {
+      return this.name;
+   }
+
+   public void setMessage(String message) {
+      this.preceptsMessage = message;
+   }
+
+   public String getMessage() {
+      return preceptsMessage;
+   }
+
+   public void addEntry(MapleFamilyEntry entry) {
+      members.put(entry.getChrId(), entry);
+   }
+
+   public void removeEntryBranch(MapleFamilyEntry root) {
+      members.remove(root.getChrId());
+      for (MapleFamilyEntry junior : root.getJuniors()) {
+         if (junior != null) {
+            removeEntryBranch(junior);
+         }
+      }
+   }
+
+   public void addEntryTree(MapleFamilyEntry root) {
+      members.put(root.getChrId(), root);
+      for (MapleFamilyEntry junior : root.getJuniors()) {
+         if (junior != null) {
+            addEntryTree(junior);
+         }
+      }
+   }
+
+   public MapleFamilyEntry getEntryByID(int cid) {
+      return members.get(cid);
+   }
+
+   public void broadcast(byte[] packet) {
+      broadcast(packet, -1);
+   }
+
+   public void broadcast(byte[] packet, int ignoreID) {
+      for (MapleFamilyEntry entry : members.values()) {
+         MapleCharacter chr = entry.getChr();
+         if (chr != null) {
+            if (chr.getId() == ignoreID) {
+               continue;
+            }
+            chr.getClient().announce(packet);
+         }
+      }
+   }
+
+   public void resetDailyReps() {
+      for (MapleFamilyEntry entry : members.values()) {
+         entry.setTodaysRep(0);
+         entry.setRepsToSenior(0);
+         entry.resetEntitlementUsages();
+      }
+   }
+
+   public Collection<MapleFamilyEntry> getMembers() {
+      return members.values();
    }
 }

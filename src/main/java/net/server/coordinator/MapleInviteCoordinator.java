@@ -34,29 +34,33 @@ import tools.Pair;
 public class MapleInviteCoordinator {
 
    // note: referenceFrom is a specific value that represents the "common association" created between the sender/recver parties
-   public static boolean createInvite(InviteType type, MapleCharacter from, Object referenceFrom, int targetCid) {
-      return type.addRequest(from, referenceFrom, targetCid);
+   public static boolean createInvite(InviteType type, MapleCharacter from, Object referenceFrom, int targetCid, Object... params) {
+      return type.addRequest(from, referenceFrom, targetCid, params);
    }
 
    public static boolean hasInvite(InviteType type, int targetCid) {
       return type.hasRequest(targetCid);
    }
 
-   public static Pair<InviteResult, MapleCharacter> answerInvite(InviteType type, int targetCid, Object referenceFrom, boolean answer) {
+   public static MapleInviteResult answerInvite(InviteType type, int targetCid, Object referenceFrom, boolean answer) {
       Map<Integer, Object> table = type.getRequestsTable();
 
       MapleCharacter from = null;
       InviteResult result = InviteResult.NOT_FOUND;
+      Pair<MapleCharacter, Object[]> inviteInfo = null;
 
       Object reference = table.get(targetCid);
       if (referenceFrom.equals(reference)) {
-         from = type.removeRequest(targetCid);
-         if (from != null && !from.isLoggedinWorld()) from = null;
+         inviteInfo = type.removeRequest(targetCid);
+         from = inviteInfo.getLeft();
+         if (from != null && !from.isLoggedinWorld()) {
+            from = null;
+         }
 
          result = answer ? InviteResult.ACCEPTED : InviteResult.DENIED;
       }
 
-      return new Pair<>(result, from);
+      return new MapleInviteResult(result, from, inviteInfo != null ? inviteInfo.getRight() : new Object[0]);
    }
 
    public static void removeInvite(InviteType type, int targetCid) {
@@ -96,7 +100,8 @@ public class MapleInviteCoordinator {
 
    public enum InviteType {
       //BUDDY, (not needed)
-      //FAMILY, (not implemented)
+      FAMILY,
+      FAMILY_SUMMON,
       MESSENGER,
       TRADE,
       PARTY,
@@ -106,11 +111,13 @@ public class MapleInviteCoordinator {
       final ConcurrentHashMap<Integer, Object> invites;
       final ConcurrentHashMap<Integer, MapleCharacter> inviteFrom;
       final ConcurrentHashMap<Integer, Integer> inviteTimeouts;
+      final ConcurrentHashMap<Integer, Object[]> inviteParams;
 
       InviteType() {
          invites = new ConcurrentHashMap<>();
          inviteTimeouts = new ConcurrentHashMap<>();
          inviteFrom = new ConcurrentHashMap<>();
+         inviteParams = new ConcurrentHashMap<>();
       }
 
       private Map<Integer, Object> getRequestsTable() {
@@ -121,15 +128,15 @@ public class MapleInviteCoordinator {
          return inviteTimeouts;
       }
 
-      private MapleCharacter removeRequest(Integer target) {
+      private Pair<MapleCharacter, Object[]> removeRequest(Integer target) {
          invites.remove(target);
          MapleCharacter from = inviteFrom.remove(target);
          inviteTimeouts.remove(target);
 
-         return from;
+         return new Pair<>(from, inviteParams.remove(target));
       }
 
-      private boolean addRequest(MapleCharacter from, Object referenceFrom, int targetCid) {
+      private boolean addRequest(MapleCharacter from, Object referenceFrom, int targetCid, Object[] params) {
          Object v = invites.putIfAbsent(targetCid, referenceFrom);
          if (v != null) {    // there was already an entry
             return false;
@@ -137,12 +144,25 @@ public class MapleInviteCoordinator {
 
          inviteFrom.put(targetCid, from);
          inviteTimeouts.put(targetCid, 0);
-
+         inviteParams.put(targetCid, params);
          return true;
       }
 
       private boolean hasRequest(int targetCid) {
          return invites.containsKey(targetCid);
+      }
+   }
+
+   public static class MapleInviteResult {
+
+      public final InviteResult result;
+      public final MapleCharacter from;
+      public final Object[] params;
+
+      private MapleInviteResult(InviteResult result, MapleCharacter from, Object[] params) {
+         this.result = result;
+         this.from = from;
+         this.params = params;
       }
    }
 }
