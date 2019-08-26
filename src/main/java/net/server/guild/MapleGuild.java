@@ -48,6 +48,7 @@ import net.server.channel.Channel;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.coordinator.MapleMatchCheckerCoordinator;
+import net.server.processor.MapleAllianceProcessor;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.Pair;
@@ -625,8 +626,8 @@ public class MapleGuild {
 
    public void disbandGuild() {
       if (allianceId > 0) {
-         if (!MapleAlliance.removeGuildFromAlliance(allianceId, id, world)) {
-            MapleAlliance.disbandAlliance(allianceId);
+         if (!MapleAllianceProcessor.getInstance().removeGuildFromAlliance(allianceId, id, world)) {
+            MapleAllianceProcessor.getInstance().disbandAlliance(allianceId);
          }
       }
 

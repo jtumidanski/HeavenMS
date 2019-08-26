@@ -25,6 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import net.server.guild.MapleAlliance;
+import net.server.processor.MapleAllianceProcessor;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -42,6 +43,6 @@ public final class DenyAllianceRequestHandler extends AbstractMaplePacketHandler
             .map(MapleCharacter::getAlliance)
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .ifPresent(alliance -> MapleAlliance.answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false));
+            .ifPresent(alliance -> MapleAllianceProcessor.getInstance().answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false));
    }
 }

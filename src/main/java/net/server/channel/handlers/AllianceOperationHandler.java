@@ -27,6 +27,7 @@ import net.AbstractMaplePacketHandler;
 import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
+import net.server.processor.MapleAllianceProcessor;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -214,7 +215,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
          }
 
          Server.getInstance().getAlliance(inviteData.getAllianceId()).ifPresent(alliance -> {
-            if (!MapleAlliance.answerInvitation(c.getPlayer().getId(), guild.getName(), alliance.getId(), true)) {
+            if (!MapleAllianceProcessor.getInstance().answerInvitation(c.getPlayer().getId(), guild.getName(), alliance.getId(), true)) {
                return;
             }
 
@@ -245,7 +246,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
       if (alliance.getGuilds().size() == alliance.getCapacity()) {
          character.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
       } else {
-         MapleAlliance.sendInvitation(client, inviteData.getGuildName(), alliance.getId());
+         MapleAllianceProcessor.getInstance().sendInvitation(client, inviteData.getGuildName(), alliance.getId());
       }
       alliance.saveToDB();
    }
@@ -255,7 +256,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      MapleAlliance.removeGuildFromAlliance(allianceId, chr.getGuildId(), chr.getWorld());
+      MapleAllianceProcessor.getInstance().removeGuildFromAlliance(allianceId, chr.getGuildId(), chr.getWorld());
       alliance.saveToDB();
    }
 

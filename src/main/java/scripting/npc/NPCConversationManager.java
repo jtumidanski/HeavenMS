@@ -49,6 +49,7 @@ import net.server.channel.Channel;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
+import net.server.processor.MapleAllianceProcessor;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import provider.MapleData;
@@ -452,15 +453,15 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void disbandAlliance(MapleClient c, int allianceId) {
-      MapleAlliance.disbandAlliance(allianceId);
+      MapleAllianceProcessor.getInstance().disbandAlliance(allianceId);
    }
 
    public boolean canBeUsedAllianceName(String name) {
-      return MapleAlliance.canBeUsedAllianceName(name);
+      return MapleAllianceProcessor.getInstance().canBeUsedAllianceName(name);
    }
 
    public MapleAlliance createAlliance(String name) {
-      return MapleAlliance.createAlliance(getParty(), name);
+      return MapleAllianceProcessor.getInstance().createAlliance(getParty(), name);
    }
 
    public int getAllianceCapacity() {

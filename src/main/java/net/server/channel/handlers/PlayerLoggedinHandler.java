@@ -62,6 +62,7 @@ import net.server.coordinator.MapleEventRecallCoordinator;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
+import net.server.processor.MapleAllianceProcessor;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
@@ -463,7 +464,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
    }
 
    private Optional<MapleAlliance> loadAlliance(Server server, MapleCharacter player, int allianceId) {
-      Optional<MapleAlliance> alliance = MapleAlliance.loadAlliance(allianceId);
+      Optional<MapleAlliance> alliance = MapleAllianceProcessor.getInstance().loadAlliance(allianceId);
       if (alliance.isPresent()) {
          server.addAlliance(allianceId, alliance.get());
          return alliance;
