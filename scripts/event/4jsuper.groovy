@@ -20,7 +20,7 @@ class Event4jsuper {
    int minMapId = 912010100
    int maxMapId = 912010200
    int eventTime = 4
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

@@ -58,11 +58,10 @@ class Quest21618 {
             }
 
             qm.sendNext("Step aside, behold the mighty prowess of Maha!!")
-         } else {
+         } else if (status == 1) {
+            qm.forceCompleteQuest()
             qm.gainItem(1902017, (short) -1)
             qm.gainItem(1902018, (short) 1)
-
-            qm.forceCompleteQuest()
             qm.dispose()
          }
       }

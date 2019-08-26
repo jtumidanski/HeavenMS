@@ -32,16 +32,15 @@ class Quest21613 {
             EventManager em = qm.getEventManager("Aran_3rdmount")
             if (em == null) {
                qm.sendOk("Sorry, but the 3rd mount quest (Wolves) is closed.")
-               qm.dispose()
             } else {
                if (!em.startInstance(qm.getPlayer())) {
                   qm.sendOk("There is currently someone in this map, come back later.")
                } else {
                   qm.forceStartQuest()
                }
-
-               qm.dispose()
             }
+         } else if (status == 4) {
+               qm.dispose()
          }
       }
    }

@@ -27,6 +27,7 @@ class Quest20200 {
             qm.startQuest()
             qm.completeQuest()
             qm.sendOk("If you wish to take the Knighthood Exam, please come to Ereve. Each Chief Knight will test your abilities, and if you meet their standards, then you will officially become a Knight.")
+         } else if (status == 2) {
             qm.dispose()
          }
       }

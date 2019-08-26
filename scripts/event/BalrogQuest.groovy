@@ -23,7 +23,7 @@ class EventBalrogQuest {
    int minMapId = 910520000
    int maxMapId = 910520000
    int eventTime = 10
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

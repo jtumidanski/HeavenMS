@@ -23,8 +23,9 @@ class Quest21300 {
       } else if (status == 1) {
          qm.sendAcceptDecline("But before doing that, I'll need you back in Rein for a bit. #bYour pole arm is reacting strange once again. It looks like it has something it wants to tell you. #kIt might be able to awaken your hidden powers, so please come immediately.")
       } else if (status == 2) {
-         qm.sendOk("Anyway, I thought it was really something that a weapon has its own identity, but seriously... this weapon does not stop talking. It first kept on crying because I wasn't really paying attention to its needs, and... ahh, please keep this a secret from the pole arm. I don't think it's a good idea to upset the weapon any further.")
          qm.forceStartQuest()
+         qm.sendOk("Anyway, I thought it was really something that a weapon has its own identity, but seriously... this weapon does not stop talking. It first kept on crying because I wasn't really paying attention to its needs, and... ahh, please keep this a secret from the pole arm. I don't think it's a good idea to upset the weapon any further.")
+      } else if (status == 3) {
          qm.dispose()
       }
    }

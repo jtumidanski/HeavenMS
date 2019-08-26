@@ -25,6 +25,7 @@ class Quest8233 {
          String reqs = "#r30 #t4032011##k"
          qm.sendOk("Very well. Get me #r" + reqs + "#k, asap. The NLC is counting on you.")
          qm.forceStartQuest()
+      } else if (status == 2) {
          qm.dispose()
       }
    }

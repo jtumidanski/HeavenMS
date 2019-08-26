@@ -24,10 +24,11 @@ class Quest3452 {
                qm.gainItem(2000011, (short) 50)
                qm.gainExp(8000)
                qm.forceCompleteQuest()
+               qm.dispose()
             } else {
                qm.sendNext("Hm? It looks like your inventory is full.")
             }
-
+         } else if (status == 2) {
             qm.dispose()
          }
       }

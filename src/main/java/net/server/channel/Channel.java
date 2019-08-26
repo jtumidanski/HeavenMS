@@ -62,6 +62,7 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.channel.processor.WeddingProcessor;
 import net.server.channel.worker.EventScheduler;
 import net.server.channel.worker.FaceExpressionScheduler;
 import net.server.channel.worker.MobAnimationScheduler;
@@ -231,10 +232,6 @@ public final class Channel {
       }
 
       return str.toString();
-   }
-
-   public static long getRelativeWeddingTicketExpireTime(int resSlot) {
-      return (resSlot * ServerConstants.WEDDING_RESERVATION_INTERVAL * 60 * 1000);
    }
 
    private static int getMonsterCarnivalRoom(boolean cpq1, int field) {
@@ -961,7 +958,7 @@ public final class Channel {
    }
 
    public long getWeddingTicketExpireTime(int resSlot) {
-      return ongoingStartTime + getRelativeWeddingTicketExpireTime(resSlot);
+      return ongoingStartTime + WeddingProcessor.getInstance().getRelativeWeddingTicketExpireTime(resSlot);
    }
 
    public String getWeddingReservationTimeLeft(Integer weddingId) {

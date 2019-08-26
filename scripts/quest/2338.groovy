@@ -25,7 +25,7 @@ class Quest2338 {
          if (status == 0) {
             if (qm.haveItem(2430014, 1)) {
                qm.sendNext("It looks like you already have one #b#t2430014##k on your inventory.")
-               qm.dispose()
+               status = 1
                return
             }
 
@@ -36,8 +36,9 @@ class Quest2338 {
             } else {
                qm.gainItem(2430014, (short) 1)
                qm.forceCompleteQuest()
+               qm.dispose()
             }
-
+         } else if (status == 2) {
             qm.dispose()
          }
       }

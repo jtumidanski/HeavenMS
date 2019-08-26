@@ -30,7 +30,7 @@ public class DueyPackage {
    private String sender = null;
    private Item item = null;
    private int mesos = 0;
-   private String message = "";
+   private String message = null;
    private Calendar timestamp;
    private int packageId = 0;
 
@@ -97,13 +97,15 @@ public class DueyPackage {
       }
    }
 
-   public void setSentTime(Timestamp ts) {
+   public void setSentTime(Timestamp ts, boolean quick) {
       Calendar cal = Calendar.getInstance();
       cal.setTimeInMillis(ts.getTime());
-      cal.set(Calendar.HOUR, 0);
-      cal.set(Calendar.MINUTE, 0);
-      cal.set(Calendar.SECOND, 0);
-      cal.set(Calendar.MILLISECOND, 0);
+
+      if (quick) {
+         if (System.currentTimeMillis() - ts.getTime() < 24 * 60 * 60 * 1000) {  // thanks inhyuk for noticing quick delivery packages unavailable to retrieve from the get-go
+            cal.add(Calendar.DATE, -1);
+         }
+      }
 
       this.timestamp = cal;
    }

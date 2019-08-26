@@ -52,11 +52,10 @@ class Quest21734 {
             qm.sendNext("They were after the #bcrystal seal of Victoria#k. These seals are what repels the Black Mage to further taking the continents into his grasp at once. Each continent has one, Victoria's now is safe and sound.")
          } else if (status == 2) {
             qm.sendNext("For your bravery inputted on these series of missions, I will now reward you properly. Behold, the #rCombo Drain#k Skill: that let's you heal back a portion of damage dealt to the monsters.")
-         } else {
+         } else if (status == 3) {
+            qm.forceCompleteQuest()
             qm.gainExp(12500)
             qm.teachSkill(21100005, (byte) 0, (byte) 20, -1) // combo drain
-
-            qm.forceCompleteQuest()
             qm.dispose()
          }
       }

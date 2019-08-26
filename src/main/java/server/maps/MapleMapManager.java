@@ -49,10 +49,6 @@ public class MapleMapManager {
       this.mapsWLock = rrwl.writeLock();
    }
 
-   public static float getMapRecoveryRate(int mapid) {
-      return MapleMapFactory.getMapRecoveryRate(mapid);
-   }
-
    public MapleMap resetMap(int mapid) {
       mapsWLock.lock();
       try {

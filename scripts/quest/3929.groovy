@@ -29,7 +29,7 @@ class Quest3929 {
          if (status == 0) {
             int c = 0
 
-            for (int i = 0; i < 4; i++ ) {
+            for (int i = 0; i < 4; i++) {
                if (qm.getQuestProgress(3929, i) == 1) {
                   c++
                }
@@ -52,7 +52,7 @@ class Quest3929 {
                   qm.sendNext("Hey, what are you trying to pull on? To pass my test you must to deliver all the foods to the Residential areas.")
                }
             }
-
+         } else if (status == 1) {
             qm.dispose()
          }
       }

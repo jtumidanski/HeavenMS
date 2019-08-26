@@ -83,6 +83,7 @@ class Quest8185 {
             //SpawnPetHandler.evolve(qm.getPlayer().getClient(), 5000029, after);
 
             qm.sendOk("#bSWEET! IT WORKED!#k Your dragon has grown beautifully! #rYou may find your new pet under your 'CASH' inventory.\r #kIt used to be a #b #i5000029##t5000029##k, and now it's \r a #b#i" + after + "##t" + after + "##k!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v" + after + "# #t" + after + "#")
+         } else if (status == 5) {
             qm.dispose()
          }
       }

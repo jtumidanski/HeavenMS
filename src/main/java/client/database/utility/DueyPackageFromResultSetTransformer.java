@@ -26,7 +26,7 @@ public class DueyPackageFromResultSetTransformer implements SqlTransformer<DueyP
 
       dueypack.setSender(resultSet.getString("SenderName"));
       dueypack.setMesos(resultSet.getInt("Mesos"));
-      dueypack.setSentTime(resultSet.getTimestamp("TimeStamp"));
+      dueypack.setSentTime(resultSet.getTimestamp("TimeStamp"), resultSet.getBoolean("Type"));
       dueypack.setMessage(resultSet.getString("Message"));
 
       return dueypack;

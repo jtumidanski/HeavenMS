@@ -54,15 +54,16 @@ class Quest21012 {
          if (qm.isQuestCompleted(21012)) {
             qm.getPlayer().dropMessage(1, "Unknown Error")
          } else if (qm.canHold(2000022) && qm.canHold(2000023)) {
+            qm.forceCompleteQuest()
             qm.gainExp(57)
             qm.gainItem(2000022, (short) 10)
             qm.gainItem(2000023, (short) 10)
-            qm.forceCompleteQuest()
             qm.sendOk("#b(Even if you're really the hero everyone says you are... What good are you without any skills?)", (byte) 3)
-            qm.dispose()
          } else {
             qm.getPlayer().dropMessage(1, "Your inventory is full")
+            qm.dispose()
          }
+      } else if (status == 2) {
          qm.dispose()
       }
    }

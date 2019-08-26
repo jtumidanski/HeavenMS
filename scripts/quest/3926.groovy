@@ -42,7 +42,7 @@ class Quest3926 {
             } else {
                qm.sendNext("Have you brought all the jewels from the Red Scorpions? They have to be delivered to the Residential areas of the Sand Bandits.")
             }
-
+         } else if (status == 1) {
             qm.dispose()
          }
       }

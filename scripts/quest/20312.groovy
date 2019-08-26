@@ -29,20 +29,18 @@ class Quest20312 {
             int nPSP = (qm.getPlayer().getLevel() - 70) * 3
             if (qm.getPlayer().getRemainingSp() > nPSP) {
                qm.sendNext("You still have way too much #bSP#k with you. You can't earn a new title like that, I strongly urge you to use more SP on your 1st and 2nd level skills.")
-               qm.dispose()
             } else {
                if (!qm.canHold(1142068)) {
                   qm.sendNext("If you wish to receive the medal befitting the title, you may want to make some room in your equipment inventory.")
-                  qm.dispose()
                } else {
+                  qm.completeQuest()
                   qm.gainItem(1142068, (short) 1)
                   qm.getPlayer().changeJob(MapleJob.BLAZEWIZARD3)
                   qm.sendOk("#h #, as of this moment, you are an Advanced Knight. From this moment on, you will train yourself with fervor as you will lead your group of Knights for the safety of this world. That fervor will provide you with plenty of courage.")
-                  qm.completeQuest()
-                  qm.dispose()
                }
             }
-
+         } else if (status == 3) {
+            qm.dispose()
          }
       }
    }

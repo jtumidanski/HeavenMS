@@ -25,10 +25,11 @@ class Quest29903 {
             if (qm.canHold(1142110)) {
                qm.gainItem(1142110)
                qm.forceCompleteQuest()
+               qm.dispose()
             } else {
                qm.sendNext("Please make room in your inventory")
             }//NOT GMS LIKE
-
+         } else if (status == 2) {
             qm.dispose()
          }
       }

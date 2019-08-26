@@ -24,10 +24,9 @@ class Quest2228 {
 
          if (status == 0) {
             qm.sendNext("Thank you for defeating #rFaust#k. That will finally settle my spirit to rest.")
-         } else {
-            qm.gainFame(8)
-
+         } else if (status == 1) {
             qm.forceCompleteQuest()
+            qm.gainFame(8)
             qm.dispose()
          }
       }

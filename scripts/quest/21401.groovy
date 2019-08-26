@@ -59,8 +59,8 @@ class Quest21401 {
       } else if(status == 1) {
          qm.sendYesNo("Anyway, I just noticed how high of a level you've reached. If you were able to control me in my state of rage, I think you're ready to handle more abilities.")
       } else if(status == 2) {
-         if(!qm.isQuestCompleted(21401)) {
-            if(!qm.canHold(1142132)) {
+         if (!qm.isQuestCompleted(21401)) {
+            if (!qm.canHold(1142132)) {
                qm.sendOk("Wow, your #bequip#k inventory is full. I need you to make at least 1 empty slot to complete this quest.")
                qm.dispose()
                return
@@ -78,6 +78,8 @@ class Quest21401 {
             qm.completeQuest()
          }
          qm.sendNext("Your skills have been restored. Those skills have been dormant for so long that you'll have to re-train yourself, but you'll be as good as new once you complete your training.")
+      } else if (status == 3) {
+         qm.dispose()
       }
    }
 

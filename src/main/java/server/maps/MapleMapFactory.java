@@ -48,8 +48,6 @@ import tools.StringUtil;
 
 public class MapleMapFactory {
 
-   private static Map<Integer, Float> mapRecoveryRateCache = new HashMap<>();
-
    private static MapleData nameData;
    private static MapleDataProvider mapSource;
 
@@ -301,8 +299,7 @@ public class MapleMapFactory {
 
       MapleData recData = infoData.getChildByPath("recovery");
       if (recData != null) {
-         float recoveryRate = MapleDataTool.getFloat(recData);
-         mapRecoveryRateCache.put(mapid, recoveryRate);
+         map.setRecovery(MapleDataTool.getFloat(recData));
       }
 
       HashMap<Integer, Integer> backTypes = new HashMap<>();
@@ -398,10 +395,5 @@ public class MapleMapFactory {
       }
       builder.append("/").append(mapid);
       return builder.toString();
-   }
-
-   public static float getMapRecoveryRate(int mapid) {
-      Float recRate = mapRecoveryRateCache.get(mapid);
-      return recRate != null ? recRate : 1.0f;
    }
 }

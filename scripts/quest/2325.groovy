@@ -26,9 +26,10 @@ class Quest2325 {
       } else if (status == 1) {
          qm.sendNextPrev("Don't be afriad, #b#p1300005##k sent me here.",  (byte) 2)
       } else if (status == 2) {
-         qm.sendOk("What? My brother sent you here? Ahhh... I am safe now. Thank you so much...")
          qm.forceCompleteQuest()
          qm.gainExp(6000)
+         qm.sendOk("What? My brother sent you here? Ahhh... I am safe now. Thank you so much...")
+      } else if (status == 3) {
          qm.dispose()
       }
    }

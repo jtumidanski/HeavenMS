@@ -2,7 +2,6 @@ package client.database.administrator;
 
 import java.sql.Connection;
 import java.sql.Timestamp;
-import java.util.Calendar;
 
 import client.database.AbstractQueryExecutor;
 
@@ -37,12 +36,7 @@ public class DueyPackageAdministrator extends AbstractQueryExecutor {
    public int create(Connection connection, int receipientId, String senderName, int mesos, String message, boolean quick) {
       String sql = "INSERT INTO `dueypackages` (ReceiverId, SenderName, Mesos, TimeStamp, Message, Type, Checked) VALUES (?, ?, ?, ?, ?, ?, 1)";
 
-      Calendar cal = Calendar.getInstance();
-      if (!quick) {
-         cal.add(Calendar.DATE, 1);
-      }
-
-      Timestamp timestamp = new Timestamp(cal.getTime().getTime());
+      Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
       return insertAndReturnKey(connection, sql, ps -> {
          ps.setInt(1, receipientId);

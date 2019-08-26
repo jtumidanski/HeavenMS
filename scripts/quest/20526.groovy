@@ -41,6 +41,7 @@ class Quest20526 {
             qm.gainItem(4220137)
          }
          qm.sendOk("Mimiana's egg can be raised by #bsharing your daily experiences with it#k. Once Mimiana fully grows up, please come see me. One more thing, I talked with #p2060005# beforehand and retrieved the #b#t4032117##k for you. The price to charge remains the same: #r10,000,000 mesos#k.")
+      } else if (status == 4) {
          qm.dispose()
       }
    }
@@ -66,13 +67,12 @@ class Quest20526 {
             return
          }
 
-         qm.sendOk("Okay, you now may mount Mimiana again. Take good care of it this time.")
-
+         qm.forceCompleteQuest()
          qm.gainItem(1902005, (short) 1)
          qm.gainItem(4220137, (short) -1)
          qm.gainMeso(-10000000)
-
-         qm.forceCompleteQuest()
+         qm.sendOk("Okay, you now may mount Mimiana again. Take good care of it this time.")
+      } else if (status == 2) {
          qm.dispose()
       }
    }

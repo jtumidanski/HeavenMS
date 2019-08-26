@@ -20,7 +20,7 @@ class EventElementalBattle {
    int minMapId = 922020100
    int maxMapId = 922020100
    int eventTime = 20
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

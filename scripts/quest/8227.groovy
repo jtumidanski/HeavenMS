@@ -28,7 +28,7 @@ class Quest8227 {
          } else {
             qm.sendOk("Hey. There's no slot on your ETC.")
          }
-
+      } else if (status == 2) {
          qm.dispose()
       }
    }
@@ -51,7 +51,7 @@ class Quest8227 {
          } else {
             qm.sendOk("You don't brought the coded letter Jack said? Come on, kid, we need that to decipher our enemies' next step!")
          }
-
+      } else if (status == 1) {
          qm.dispose()
       }
    }

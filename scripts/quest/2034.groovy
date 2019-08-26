@@ -9,7 +9,6 @@ class Quest2034 {
    int status = -1
 
    int item
-   MapleJob stance
 
    def start(Byte mode, Byte type, Integer selection) {
 
@@ -31,7 +30,7 @@ class Quest2034 {
             return
          }
 
-         stance = qm.getPlayer().getJobStyle()
+         MapleJob stance = qm.getPlayer().getJobStyle()
 
          if (stance == MapleJob.WARRIOR) {
             item = 1072003
@@ -49,11 +48,12 @@ class Quest2034 {
 
          qm.gainItem(item, (short) 1)
          qm.gainItem(4000007, (short) -150)
-
          qm.gainExp(2200)
          qm.completeQuest()
 
          qm.sendOk("Alright, if you need work sometime down the road, feel free to come back and see me. This town sure can use a person like you for help~")
+         qm.dispose()
+      } else if (status == 2) {
          qm.dispose()
       }
    }

@@ -41,6 +41,7 @@ class Quest21700 {
          }
       } else if (status == 6) {
          qm.sendPrev("You'll find a Training Center if you exit to the #bleft#k. There, you'll meet #b#p1202006##k. I'm a bit worried because I think he may be struggling with bouts of Alzheimer's, but he spent a long time researching skills to help you. I'm sure you'll learn a thing or two from him.")
+      } else if (status == 7) {
          qm.dispose()
       }
    }

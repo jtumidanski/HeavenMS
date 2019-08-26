@@ -33,6 +33,7 @@ class Quest3360 {
             qm.sendOk("The key code is #b" + pass + "#k. Got that? Put the key into the door of the secret passage, and you will be able to walk around the passage freely.")
             qm.forceStartQuest()
             qm.setStringQuestProgress(3360, 0, pass)
+         } else if (status == 3) {
             qm.dispose()
          }
       }
@@ -52,8 +53,9 @@ class Quest3360 {
                qm.sendNext("What's up? You haven't opened the Secret Passage yet?")
             } else {
                qm.forceCompleteQuest()
+               qm.dispose()
             }
-
+         } else if (status == 1) {
             qm.dispose()
          }
       }

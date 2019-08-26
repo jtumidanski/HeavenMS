@@ -27,7 +27,9 @@ class Quest2560 {
             qm.sendNext("Ook! Ook! (The monkey looks very dissatisfied.)")
          } else {
             qm.forceStartQuest()
+            qm.dispose()
          }
+      } else if (status == 4) {
          qm.dispose()
       }
    }

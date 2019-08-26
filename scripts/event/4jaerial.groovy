@@ -20,7 +20,7 @@ class Event4jaerial {
    int minMapId = 912020000
    int maxMapId = 912020000
    int eventTime = 2
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

@@ -5,7 +5,9 @@ import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
 import tools.MaplePacketCreator
 
-static def enter(PortalPlayerInteraction pi) {
+boolean leverSequenceExit = false
+
+def enterLeverSequence(PortalPlayerInteraction pi) {
    MapleMap map = pi.getMap()
 
    int jailn = (pi.getMap().getId() / 10) % 10
@@ -13,11 +15,13 @@ static def enter(PortalPlayerInteraction pi) {
 
    String mapProp = pi.getEventInstance().getProperty("jail" + jailn)
 
-   if(mapProp == null) {
+   if (mapProp == null) {
       int seq = 0
 
-      for(int i = 1; i <= maxToggles; i++) {
-         if(Math.random() < 0.5) seq += (1 << i)
+      for (int i = 1; i <= maxToggles; i++) {
+         if (Math.random() < 0.5) {
+            seq += (1 << i)
+         }
       }
 
       pi.getEventInstance().setProperty("jail" + jailn, seq)
@@ -25,15 +29,15 @@ static def enter(PortalPlayerInteraction pi) {
    }
 
    int mapProp2 = (mapProp).toInteger()
-   if(mapProp2 != 0) {
+   if (mapProp2 != 0) {
       int countMiss = 0
-      for(int i = 1; i <= maxToggles; i++) {
-         if(!(pi.getMap().getReactorByName("lever" + i).getState() == ((mapProp2 >> i) % 2).byteValue())) {
+      for (int i = 1; i <= maxToggles; i++) {
+         if (!(pi.getMap().getReactorByName("lever" + i).getState() == ((mapProp2 >> i) % 2).byteValue())) {
             countMiss++
          }
       }
 
-      if(countMiss > 0) {
+      if (countMiss > 0) {
          map.broadcastMessage(MaplePacketCreator.showEffect("quest/party/wrong_kor"))
          map.broadcastMessage(MaplePacketCreator.playSound("Party1/Failed"))
 
@@ -46,6 +50,31 @@ static def enter(PortalPlayerInteraction pi) {
       pi.getEventInstance().setProperty("jail" + jailn, "0")
    }
 
-   pi.playPortalSound(); pi.warp(pi.getMapId() + 2,0)
+   pi.playPortalSound(); pi.warp(pi.getMapId() + 2, 0)
    return true
+}
+
+def enterNoMobs(PortalPlayerInteraction pi) {
+   MapleMap map = pi.getMap()
+   int mobcount = map.countMonster(9300044)
+
+   if (mobcount > 0) {
+      pi.playerMessage(5, "Please use the levers to defeat all the threats before you proceed.")
+      return false
+   } else {
+
+      pi.playPortalSound(); pi.warp(pi.getMapId() + 2, 0)
+      return true
+   }
+}
+
+def enter(PortalPlayerInteraction pi) {
+   boolean ret
+   if (leverSequenceExit) {
+      ret = enterLeverSequence(pi)
+   } else {
+      ret = enterNoMobs(pi)
+   }
+
+   return ret
 }

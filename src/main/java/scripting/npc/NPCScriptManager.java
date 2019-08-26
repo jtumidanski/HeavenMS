@@ -190,6 +190,8 @@ public class NPCScriptManager extends AbstractScriptManager {
       } else {
          resetContext(scriptFolder + "/" + cm.getNpc(), c);
       }
+
+      c.getPlayer().flushDelayedUpdateQuests();
    }
 
    public void dispose(MapleClient c) {

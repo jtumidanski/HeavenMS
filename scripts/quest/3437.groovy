@@ -50,16 +50,13 @@ class Quest3437 {
          }
 
          qm.sendNext(talkStr)
-      }
-
-      if (status == 2) {
+      } else if (status == 2) {
+         qm.completeQuest()
          qm.gainItem(item, (short) 1)
          qm.gainItem(4000122, (short) -120)
-
          qm.gainExp(6100)
-         qm.completeQuest()
-
          qm.sendOk("Thank you so much for fulfilling your missions as one of the Mesorangers. I've told the Sector about your successful story, and the Sector seems to be very pleased with you, too. Hopefully you'll keep working with us. Bye~")
+      } else if (status == 3) {
          qm.dispose()
       }
    }

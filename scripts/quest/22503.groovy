@@ -29,6 +29,7 @@ class Quest22503 {
             qm.forceStartQuest()
             qm.sendNext("#b#b(Try giving #p1013000# some #t4032453#. You have to hunt a few #o1210100#s at the farm. Ten should be plenty...)")
          }
+      } else if (status == 4) {
          qm.dispose()
       }
    }

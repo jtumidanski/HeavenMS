@@ -64,6 +64,7 @@ import net.server.channel.handlers.EnterMTSHandler;
 import net.server.channel.handlers.FaceExpressionHandler;
 import net.server.channel.handlers.FamilyAddHandler;
 import net.server.channel.handlers.FamilyUseHandler;
+import net.server.channel.handlers.FieldDamageMobHandler;
 import net.server.channel.handlers.FredrickHandler;
 import net.server.channel.handlers.GeneralChatHandler;
 import net.server.channel.handlers.GiveFameHandler;
@@ -379,6 +380,7 @@ public final class PacketProcessor {
          registerHandler(RecvOpcode.PLAYER_MAP_TRANSFER, new PlayerMapTransitionHandler());
          registerHandler(RecvOpcode.USE_MAPLELIFE, new UseMapleLifeHandler());
          registerHandler(RecvOpcode.USE_CATCH_ITEM, new UseCatchItemHandler());
+         registerHandler(RecvOpcode.FIELD_DAMAGE_MOB, new FieldDamageMobHandler());
          registerHandler(RecvOpcode.MOB_DAMAGE_MOB_FRIENDLY, new MobDamageMobFriendlyHandler());
          registerHandler(RecvOpcode.PARTY_SEARCH_REGISTER, new PartySearchRegisterHandler());
          registerHandler(RecvOpcode.PARTY_SEARCH_START, new PartySearchStartHandler());

@@ -27,6 +27,7 @@ class Quest20520 {
          qm.forceStartQuest()
          qm.forceCompleteQuest()
          qm.sendOk("There's a special mount that only the Cygnus Knights can enjoy. If you are interested, visit #bEreve#k. I will give you more information on it.")
+      } else if (status == 3) {
          qm.dispose()
       }
    }

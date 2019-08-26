@@ -33,6 +33,7 @@ class Quest22007 {
             qm.gainExp(360)
             qm.showInfo("UI/tutorial/evan/9/0")
          }
+      } else if (status == 3) {
          qm.dispose()
       }
    }

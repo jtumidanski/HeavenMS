@@ -35,7 +35,7 @@ class Quest3345 {
             } else {
                qm.sendNext("Did you not seal the #rmagic circle beneath Magatia#k yet? It is a matter of great importance, please haste yourself.")
             }
-
+         } else if (status == 1) {
             qm.dispose()
          }
       }

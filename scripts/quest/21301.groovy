@@ -35,8 +35,9 @@ class Quest21301 {
       } else if (status == 5) {
          qm.sendNextPrev("...No hope, no dreams... Nooooo!!")
       } else if (status == 6) {
-         qm.sendNextPrev("#b(Maha is beginning to really get hysterical. I better leave right this minute. Maybe Lirin can do something about it.)",  (byte) 2)
          qm.completeQuest()
+         qm.sendNextPrev("#b(Maha is beginning to really get hysterical. I better leave right this minute. Maybe Lilin can do something about it.)", (byte) 2)
+      } else if (status == 7) {
          qm.dispose()
       }
    }

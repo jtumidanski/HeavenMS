@@ -35,12 +35,11 @@ class Quest6033 {
                qm.sendNext("Hey, what's wrong? I did tell you to make a monster crystal to pass my test, didn't I? Buying one or crafting before the start of the test is NOT part of the deal. Go craft me an #b#t4260003##k.")
                qm.dispose()
             }
-         } else {
+         } else if (status == 2) {
+            qm.forceCompleteQuest()
             int skillid = Math.floor(qm.getPlayer().getJob().getId() / 1000).intValue() * 10000000 + 1007
             qm.teachSkill(skillid, (byte) 2, (byte) 3, -1)
-
             qm.gainExp(230000)
-            qm.forceCompleteQuest()
             qm.dispose()
          }
       }

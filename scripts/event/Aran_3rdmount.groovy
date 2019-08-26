@@ -21,7 +21,7 @@ class EventAran_3rdmount {
    int minMapId = 914030000
    int maxMapId = 914030000
    int eventTime = 3
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

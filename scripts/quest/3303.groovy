@@ -30,8 +30,7 @@ class Quest3303 {
             qm.gainItem(oreArray[selection], (short) -2) // Take 2 ores
             qm.sendNext("Then wait for awhile. I'll go and get the stuff to help you pass the test of Chief Alcadno.")
             qm.forceCompleteQuest()
-            qm.dispose()
-         } else {
+         } else if (status == 1) {
             qm.dispose()
          }
       }

@@ -49,7 +49,7 @@ class Quest3314 {
             } else {
                qm.sendNext("You seem pretty normal, don't you? I can't detect any possible effect from my experiment on you. Go take the pill I asked you to take and show me the effects, will you?")
             }
-         } else {
+         } else if (status == 1) {
             qm.dispose()
          }
       }

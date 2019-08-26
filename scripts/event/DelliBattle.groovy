@@ -20,7 +20,7 @@ class EventDelliBattle {
    int minMapId = 925010300
    int maxMapId = 925010300
    int eventTime = 6
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

@@ -40,6 +40,7 @@ class Quest21703 {
       } else if (status == 7) {
          qm.forceStartQuest()
          qm.sendOk("Now go and take on those monstrous #o9300343#s!")
+      } else if (status == 8) {
          qm.dispose()
       }
    }
@@ -76,6 +77,7 @@ class Quest21703 {
          qm.sendNext("(You remembered the #bCombo Ability#k skill! You were skeptical of the training at first, since the old man suffers from Alzheimer's and all, but boy, was it effective!)", (byte) 2)
       } else if (status == 4) {
          qm.sendPrev("Now report back to #p1201000#. I know she'll be ecstatic when she sees the progress you've made!")
+      } else if (status == 5) {
          qm.dispose()
       }
    }

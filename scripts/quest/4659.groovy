@@ -31,6 +31,7 @@ class Quest4659 {
       } else if (status == 1) {
          if (qm.isQuestCompleted(4659)) {
             qm.getPlayer().dropMessage(1, "how did this get here?")
+            qm.dispose()
          } else if (qm.canHold(5000048)) {
             MaplePet pet = null
             int after
@@ -85,10 +86,11 @@ class Quest4659 {
 //            var petId = MaplePet.createPet(rand + 5000049, level, closeness, fullness);
 //            if (petId == -1) return;
 //            MapleInventoryManipulator.addById(qm.getClient(), rand+5000049, 1, "", petId);
+            qm.dispose()
          } else {
             qm.getPlayer().dropMessage(1, "Your inventory is full")
+            qm.dispose()
          }
-         qm.dispose()
       }
    }
 }

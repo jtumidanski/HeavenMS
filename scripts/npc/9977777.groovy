@@ -119,6 +119,7 @@ class NPC9977777 {
       addFeature("Rewarding system now looks up for item stacking.")
       addFeature("3rd job quiz with all 40-question pool available.")
       addFeature("Item raising functional.")
+      addFeature("Cleared issue with player movement during NPC talk.")
    }
 
    def writeFeatureTab_PlayerSocialNetwork() {

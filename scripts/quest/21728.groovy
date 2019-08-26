@@ -34,7 +34,7 @@ class Quest21728 {
                qm.gainExp(200)
                qm.forceCompleteQuest()
             }
-
+         } else if (status == 1) {
             qm.dispose()
          }
       }

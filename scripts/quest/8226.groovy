@@ -23,6 +23,7 @@ class Quest8226 {
       } else if (status == 1) {
          qm.sendOk("Your next mission is: defeat the Elderwraiths that roam this forest. These are a tough bunch though, so stay alert. I need you to bring me 100 #t4032010# as proof of your duty.")
          qm.forceStartQuest()
+      } else if (status == 2) {
          qm.dispose()
       }
    }

@@ -1684,11 +1684,11 @@ public class Server {
          }
       }
 
-      resetServerWorlds();
-
       ThreadManager.getInstance().stop();
       TimerManager.getInstance().purge();
       TimerManager.getInstance().stop();
+
+      resetServerWorlds();
 
       System.out.println("Worlds + Channels are offline.");
       acceptor.unbind();

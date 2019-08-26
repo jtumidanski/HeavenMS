@@ -403,7 +403,7 @@ public class MapleQuest {
             if (pid >= 8200000 && pid <= 8200012) {
                String pr = StringUtil.getLeftPaddedStr(Integer.toString(setProg), '0', 3);
                newStatus.setProgress(pid, pr);
-               c.announce(MaplePacketCreator.updateQuest(newStatus, false));
+               c.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, newStatus, false);
             }
          }
       }

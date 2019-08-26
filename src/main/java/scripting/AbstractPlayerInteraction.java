@@ -467,12 +467,12 @@ public class AbstractPlayerInteraction {
 
    public void resetAllQuestProgress(int qid) {
       getPlayer().getQuest(MapleQuest.getInstance(qid)).resetAllProgress();
-      getClient().announce(MaplePacketCreator.updateQuest(getPlayer().getQuest(MapleQuest.getInstance(qid)), false));
+      getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, getPlayer().getQuest(MapleQuest.getInstance(qid)), false);
    }
 
    public void resetQuestProgress(int qid, int pid) {
       getPlayer().getQuest(MapleQuest.getInstance(qid)).resetProgress(pid);
-      getClient().announce(MaplePacketCreator.updateQuest(getPlayer().getQuest(MapleQuest.getInstance(qid)), false));
+      getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, getPlayer().getQuest(MapleQuest.getInstance(qid)), false);
    }
 
    public boolean forceStartQuest(int id) {

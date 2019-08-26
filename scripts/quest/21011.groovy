@@ -31,6 +31,7 @@ class Quest21011 {
       } else if (status == 4) {
          qm.forceStartQuest()
          qm.sendOk("My brother #bPuir #kis just down the street, and he's been dying to meet you! I know you're busy, but could you please stop by and say hello to Puir? Please...")
+      } else if (status == 5) {
          qm.dispose()
       }
    }

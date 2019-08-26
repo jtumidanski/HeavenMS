@@ -20,7 +20,7 @@ class Event3rdJob_warrior {
    int minMapId = 108010300
    int maxMapId = 108010301
    int eventTime = 20
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    // After loading, ChannelServer
    def init() {

@@ -29,7 +29,6 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
-import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
@@ -64,16 +63,19 @@ public class ItemAction extends MapleQuestAction {
 
          Integer prop = null;
          MapleData propData = iEntry.getChildByPath("prop");
-         if (propData != null)
+         if (propData != null) {
             prop = MapleDataTool.getInt(propData);
+         }
 
          int gender = 2;
-         if (iEntry.getChildByPath("gender") != null)
+         if (iEntry.getChildByPath("gender") != null) {
             gender = MapleDataTool.getInt(iEntry.getChildByPath("gender"));
+         }
 
          int job = -1;
-         if (iEntry.getChildByPath("job") != null)
+         if (iEntry.getChildByPath("job") != null) {
             job = MapleDataTool.getInt(iEntry.getChildByPath("job"));
+         }
 
          items.add(new ItemData(Integer.parseInt(iEntry.getName()), id, count, prop, job, gender));
       }
@@ -108,8 +110,9 @@ public class ItemAction extends MapleQuestAction {
          }
          if (iEntry.getProp() != null) {
             if (iEntry.getProp() == -1) {
-               if (extSelection != extNum++)
+               if (extSelection != extNum++) {
                   continue;
+               }
             } else {
                accProps += iEntry.getProp();
 
@@ -178,18 +181,19 @@ public class ItemAction extends MapleQuestAction {
             }
 
          } else {
-            if (item.getCount() > 0) {
-               // Make sure they can hold the item.
-               Item toItem = new Item(item.getId(), (short) 0, (short) item.getCount());
-               gainList.add(new Pair<>(toItem, type));
-            } else {
+            // Make sure they can hold the item.
+            Item toItem = new Item(item.getId(), (short) 0, (short) item.getCount());
+            gainList.add(new Pair<>(toItem, type));
+
+            if (item.getCount() < 0) {
                // Make sure they actually have the item.
                int quantity = item.getCount() * -1;
 
                int freeSlotCount = chr.getInventory(type).freeSlotCountById(item.getId(), quantity);
                if (freeSlotCount == -1) {
-                  if (type.equals(MapleInventoryType.EQUIP) && chr.getInventory(MapleInventoryType.EQUIPPED).countById(item.getId()) > quantity)
+                  if (type.equals(MapleInventoryType.EQUIP) && chr.getInventory(MapleInventoryType.EQUIPPED).countById(item.getId()) > quantity) {
                      continue;
+                  }
 
                   chr.dropMessage(1, "Please check if you have enough items in your inventory.");
                   return false;
@@ -226,11 +230,33 @@ public class ItemAction extends MapleQuestAction {
          gainList.add(selected);
       }
 
-      if (!MapleInventory.checkSpots(chr, gainList, allSlotUsed, false)) {
+      if (!canHold(chr, gainList)) {
          chr.dropMessage(1, "Please check if you have enough space in your inventory.");
          return false;
       }
       return true;
+   }
+
+   private boolean canHold(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> gainList) {
+      List<Integer> toAddItemids = new LinkedList<>();
+      List<Integer> toAddQuantity = new LinkedList<>();
+      List<Integer> toRemoveItemids = new LinkedList<>();
+      List<Integer> toRemoveQuantity = new LinkedList<>();
+
+      for (Pair<Item, MapleInventoryType> item : gainList) {
+         Item it = item.getLeft();
+
+         if (it.getQuantity() > 0) {
+            toAddItemids.add(it.getItemId());
+            toAddQuantity.add((int) it.getQuantity());
+         } else {
+            toRemoveItemids.add(it.getItemId());
+            toRemoveQuantity.add(-1 * ((int) it.getQuantity()));
+         }
+      }
+
+      // thanks onechord for noticing quests unnecessarily giving out "full inventory" from quests that also takes items from players
+      return chr.getClient().getAbstractPlayerInteraction().canHoldAllAfterRemoving(toAddItemids, toAddQuantity, toRemoveItemids, toRemoveQuantity);
    }
 
    private boolean canGetItem(ItemData item, MapleCharacter chr) {

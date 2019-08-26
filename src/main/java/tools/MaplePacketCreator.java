@@ -1914,17 +1914,12 @@ public class MaplePacketCreator {
 
       Integer bv = chr.getBuffedValue(MapleBuffStat.MONSTER_RIDING);
       if (bv != null) {
-         if (bv.equals(Corsair.BATTLE_SHIP)) {
-            mplew.writeInt(1932000);
-            mplew.writeInt(Corsair.BATTLE_SHIP);
+         MapleMount mount = chr.getMount();
+         if (mount != null) {
+            mplew.writeInt(mount.getItemId());
+            mplew.writeInt(mount.getSkillId());
          } else {
-            final Item mount = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18);
-            if (mount != null) {
-               mplew.writeInt(mount.getItemId());
-               mplew.writeInt(1004);
-            } else {
-               mplew.writeLong(0);
-            }
+            mplew.writeLong(0);
          }
       } else {
          mplew.writeLong(0);
@@ -6947,14 +6942,14 @@ public class MaplePacketCreator {
    public static byte[] onCashItemGachaponOpenFailed() {
       MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.CASHSHOP_CASH_ITEM_GACHAPON_RESULT.getValue());
-      mplew.write(189);
+      mplew.write(0xE4);
       return mplew.getPacket();
    }
 
    public static byte[] onCashGachaponOpenSuccess(int accountid, long sn, int remainingBoxes, Item item, int itemid, int nSelectedItemCount, boolean bJackpot) {
       MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.CASHSHOP_CASH_ITEM_GACHAPON_RESULT.getValue());
-      mplew.write(190);
+      mplew.write(0xE5);   // subopcode thanks to Ubaware
       mplew.writeLong(sn);// sn of the box used
       mplew.writeInt(remainingBoxes);
       addCashItemInformation(mplew, item, accountid);
@@ -7227,7 +7222,7 @@ public class MaplePacketCreator {
             mplew.writeLong(getTime(dp.sentTimeInMilliseconds()));
 
             String msg = dp.getMessage();
-            if (!msg.isEmpty()) {
+            if (msg != null) {
                mplew.writeInt(1);
                mplew.writeAsciiString(msg);
                for (int i = msg.length(); i < 200; i++) {

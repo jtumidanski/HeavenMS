@@ -1,5 +1,6 @@
 package constants;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -11,6 +12,12 @@ import java.util.Map;
 import client.MapleDisease;
 import client.MapleJob;
 import constants.skills.Aran;
+import provider.MapleData;
+import provider.MapleDataDirectoryEntry;
+import provider.MapleDataFileEntry;
+import provider.MapleDataProvider;
+import provider.MapleDataProviderFactory;
+import provider.MapleDataTool;
 import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.quest.MapleQuest;
@@ -268,6 +275,8 @@ public class GameConstants {
          330000, 340000, 350000, 360000, 370000, 380000, 390000, 400000, 410000, 420000, 430000, 440000, 450000, 460000, 470000, 480000, 490000, 500000, 510000, 520000,
          530000, 550000, 570000, 590000, 610000, 630000, 650000, 670000, 690000, 710000, 730000, 750000, 770000, 790000, 810000, 830000, 850000, 870000, 890000, 910000};
    public static String[] WORLD_NAMES = {"Scania", "Bera", "Broa", "Windia", "Khaini", "Bellocan", "Mardia", "Kradia", "Yellonde", "Demethos", "Galicia", "El Nido", "Zenith", "Arcenia", "Kastia", "Judis", "Plana", "Kalluna", "Stius", "Croa", "Medere"};
+
+   public static final int MAX_FIELD_MOB_DAMAGE = getMaxObstacleMobDamageFromWz() * 2;
 
    public static int getPlayerBonusDropRate(int slot) {
       return (DROP_RATE_GAIN[slot]);
@@ -532,8 +541,12 @@ public class GameConstants {
 
       if (!isInBranchJobTree(skillJob, jobId, 0)) {
          for (int i = 1; i <= 3; i++) {
-            if (hasDivergedBranchJobTree(skillJob, jobId, i)) return false;
-            if (isInBranchJobTree(skillJob, jobId, i)) return (skillJob <= jobId);
+            if (hasDivergedBranchJobTree(skillJob, jobId, i)) {
+               return false;
+            }
+            if (isInBranchJobTree(skillJob, jobId, i)) {
+               return (skillJob <= jobId);
+            }
          }
       } else {
          return (skillJob <= jobId);
@@ -663,5 +676,32 @@ public class GameConstants {
          e.printStackTrace();
          return 0.0f;
       }
+   }
+
+   private static int getMaxObstacleMobDamageFromWz() {
+      MapleDataProvider mapSource = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Map.wz"));
+      int maxMobDmg = 0;
+
+      MapleDataDirectoryEntry root = mapSource.getRoot();
+      for (MapleDataDirectoryEntry objData : root.getSubdirectories()) {
+         if (!objData.getName().contentEquals("Obj")) {
+            continue;
+         }
+
+         for (MapleDataFileEntry obj : objData.getFiles()) {
+            for (MapleData l0 : mapSource.getData(objData.getName() + "/" + obj.getName()).getChildren()) {
+               for (MapleData l1 : l0.getChildren()) {
+                  for (MapleData l2 : l1.getChildren()) {
+                     int objDmg = MapleDataTool.getIntConvert("s1/mobdamage", l2, 0);
+                     if (maxMobDmg < objDmg) {
+                        maxMobDmg = objDmg;
+                     }
+                  }
+               }
+            }
+         }
+      }
+
+      return maxMobDmg;
    }
 }

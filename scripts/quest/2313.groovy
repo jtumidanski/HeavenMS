@@ -20,10 +20,10 @@ class Quest2313 {
       }
       if (status == 0) {
          qm.sendAcceptDecline("I have told our #bMinister of Home Affairs#k of your abilities. Please go pay a visit to him immediately.")
-      }
-      if (status == 1) {
+      } else if (status == 1) {
          qm.forceStartQuest()
          qm.sendOk("Save our kingdom! We believe in you!")
+      } else if (status == 2) {
          qm.dispose()
       }
    }

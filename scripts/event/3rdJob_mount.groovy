@@ -22,7 +22,7 @@ class Event3rdJob_mount {
    int minMapId = 923010000
    int maxMapId = 923010000
    int eventTime = 5
-   int[] lobbyRange = [0, 0]
+   int[] lobbyRange = [0, 7]
 
    int[] eventMaps = [923010000]
 

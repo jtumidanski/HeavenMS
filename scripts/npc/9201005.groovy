@@ -2,6 +2,7 @@ package npc
 
 import client.MapleCharacter
 import net.server.channel.Channel
+import net.server.channel.processor.WeddingProcessor
 import net.server.world.World
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
@@ -173,7 +174,7 @@ class NPC9201005 {
                                  if (resStatus > 0) {
                                     cm.gainItem((weddingType) ? weddingEntryTicketPremium : weddingEntryTicketCommon, (short) -1)
 
-                                    long expirationTime = cserv.getRelativeWeddingTicketExpireTime(resStatus)
+                                    long expirationTime = WeddingProcessor.getInstance().getRelativeWeddingTicketExpireTime(resStatus)
                                     cm.gainItem(weddingSendTicket, (short) 15, false, true, expirationTime)
                                     partner.getAbstractPlayerInteraction().gainItem(weddingSendTicket, (short) 15, false, true, expirationTime)
 
@@ -248,7 +249,7 @@ class NPC9201005 {
                         if (cm.canHold(weddingSendTicket, 3)) {
                            cm.gainItem(5251100, (short) -1)
 
-                           long expirationTime = cserv.getRelativeWeddingTicketExpireTime(resStatus)
+                           long expirationTime = WeddingProcessor.getInstance().getRelativeWeddingTicketExpireTime(resStatus)
                            cm.gainItem(weddingSendTicket, (short) 3, false, true, expirationTime)
                         } else {
                            cm.sendOk("Please have a free ETC slot available to get more invitations.")

@@ -64,15 +64,6 @@ public class DueyProcessor {
             CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name)).orElse(null);
    }
 
-   private static Timestamp getCurrentDate(boolean quick) {
-      Calendar cal = Calendar.getInstance();
-      if (!quick) {
-         cal.add(Calendar.DATE, 1);
-      }
-
-      return new Timestamp(cal.getTime().getTime());
-   }
-
    private static void showDueyNotification(MapleClient c, MapleCharacter player) {
       DatabaseConnection.withConnection(connection -> DueyPackageProvider.getInstance().get(connection, player.getId())
             .ifPresent(pair -> {
@@ -303,7 +294,11 @@ public class DueyProcessor {
             }
             c.getPlayer().setNpcCooldown(timeNow);
 
-            c.announce(MaplePacketCreator.sendDuey(quickDelivery ? 0x1A : 0x8, loadPackages(c.getPlayer())));
+            if (quickDelivery) {
+               c.announce(MaplePacketCreator.sendDuey(0x1A, null));
+            } else {
+               c.announce(MaplePacketCreator.sendDuey(0x8, loadPackages(c.getPlayer())));
+            }
          } finally {
             c.releaseClient();
          }
@@ -311,7 +306,7 @@ public class DueyProcessor {
    }
 
    public static void dueyCreatePackage(Item item, int mesos, String sender, int recipientCid) {
-      int packageId = createPackage(mesos, "", sender, recipientCid, false);
+      int packageId = createPackage(mesos, null, sender, recipientCid, false);
       if (packageId != -1) {
          insertPackageItem(packageId, item);
       }
@@ -330,6 +325,7 @@ public class DueyProcessor {
    }
 
    public enum Actions {
+      TOSERVER_RECV_ITEM(0x00),
       TOSERVER_SEND_ITEM(0x02),
       TOSERVER_CLAIM_PACKAGE(0x04),
       TOSERVER_REMOVE_PACKAGE(0x05),

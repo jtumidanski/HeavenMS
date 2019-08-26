@@ -28,11 +28,10 @@ class Quest21757 {
 
          if (status == 0) {
             qm.sendNext("Oh, a letter for the #rempress#k? From the #bheroes#k?!")
-         } else {
+         } else if (status == 1) {
+            qm.forceCompleteQuest()
             qm.gainExp(1000)
             qm.gainItem(4032330, (short) -1)
-            qm.forceCompleteQuest()
-
             qm.dispose()
          }
       }
