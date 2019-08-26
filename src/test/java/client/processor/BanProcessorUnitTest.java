@@ -6,24 +6,23 @@ import java.sql.SQLException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import client.database.administrator.AccountAdministrator;
 import client.database.provider.AccountProvider;
 import client.database.provider.CharacterProvider;
 import tools.DatabaseConnection;
+import tools.DatabaseTestBase;
 
-public class BanProcessorUnitTest {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({DatabaseConnection.class, AccountProvider.class, CharacterProvider.class, AccountAdministrator.class})
+public class BanProcessorUnitTest extends DatabaseTestBase {
    protected BanProcessor banProcessor;
-
-   @Mock
-   protected Connection connection;
-
-   @Spy
-   protected DatabaseConnection databaseConnection;
 
    @Mock
    protected AccountProvider accountProvider;
@@ -42,12 +41,18 @@ public class BanProcessorUnitTest {
 
    @Before
    public void setup() throws SQLException {
-      MockitoAnnotations.initMocks(this);
-      Mockito.doNothing().when(databaseConnection).initHikariDataSource();
-      Mockito.doReturn(connection).when(databaseConnection).getConnection();
-      Mockito.doCallRealMethod().when(databaseConnection).withConnectionResult(Mockito.any());
+      super.setup();
 
-      banProcessor = new BanProcessor(databaseConnection, accountProvider, characterProvider, accountAdministrator);
+      PowerMockito.mockStatic(AccountProvider.class);
+      Mockito.when(AccountProvider.getInstance()).thenReturn(accountProvider);
+
+      PowerMockito.mockStatic(CharacterProvider.class);
+      Mockito.when(CharacterProvider.getInstance()).thenReturn(characterProvider);
+
+      PowerMockito.mockStatic(AccountAdministrator.class);
+      Mockito.when(AccountAdministrator.getInstance()).thenReturn(accountAdministrator);
+
+      banProcessor = new BanProcessor();
    }
 
    @Test
