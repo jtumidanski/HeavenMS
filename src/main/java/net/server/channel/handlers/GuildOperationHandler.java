@@ -33,6 +33,7 @@ import net.server.Server;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildResponse;
+import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
 import net.server.world.World;
 import tools.MaplePacketCreator;
@@ -108,7 +109,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
             world.getPlayerStorage().getCharacterById(leaderId).ifPresent(leader -> {
                int partyId = leader.getPartyId();
                if (partyId != -1) {
-                  MapleParty.joinParty(mc, partyId, true);    // GMS gimmick "party to form guild" recalled thanks to Vcoc
+                  MaplePartyProcessor.getInstance().joinParty(mc, partyId, true);    // GMS gimmick "party to form guild" recalled thanks to Vcoc
                }
             });
          }
@@ -287,7 +288,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      if (!MapleParty.createParty(mc, true)) {
+      if (!MaplePartyProcessor.getInstance().createParty(mc, true)) {
          mc.dropMessage(1, "You cannot create a new Guild while in a party.");
          return;
       }

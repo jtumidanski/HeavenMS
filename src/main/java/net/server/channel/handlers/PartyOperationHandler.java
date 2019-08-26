@@ -31,6 +31,7 @@ import net.AbstractMaplePacketHandler;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
+import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
@@ -48,14 +49,14 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
       MapleParty party = player.getParty();
       switch (operation) {
          case 1: { // create
-            MapleParty.createParty(player, false);
+            MaplePartyProcessor.getInstance().createParty(player, false);
             break;
          }
          case 2: { // leave/disband
             if (party != null) {
                List<MapleCharacter> partymembers = player.getPartyMembers();
 
-               MapleParty.leaveParty(party, c);
+               MaplePartyProcessor.getInstance().leaveParty(party, c);
                player.updatePartySearchAvailability(true);
                player.partyOperationUpdate(party, partymembers);
             }
@@ -67,7 +68,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
             MapleInviteCoordinator.MapleInviteResult inviteRes = MapleInviteCoordinator.answerInvite(InviteType.PARTY, player.getId(), partyid, true);
             InviteResult res = inviteRes.result;
             if (res == InviteResult.ACCEPTED) {
-               MapleParty.joinParty(player, partyid, false);
+               MaplePartyProcessor.getInstance().joinParty(player, partyid, false);
             } else {
                c.announce(MaplePacketCreator.serverNotice(5, "You couldn't join the party due to an expired invitation request."));
             }
@@ -91,7 +92,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
 
                if (invited.getParty() == null) {
                   if (party == null) {
-                     if (!MapleParty.createParty(player, false)) {
+                     if (!MaplePartyProcessor.getInstance().createParty(player, false)) {
                         return;
                      }
 
@@ -114,7 +115,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
          }
          case 5: { // expel
             int cid = slea.readInt();
-            MapleParty.expelFromParty(party, c, cid);
+            MaplePartyProcessor.getInstance().expelFromParty(party, c, cid);
             break;
          }
          case 6: { // change leader

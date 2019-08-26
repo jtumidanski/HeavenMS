@@ -28,6 +28,7 @@ import net.server.Server;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
 
@@ -157,7 +158,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
          public void onMatchDeclined(int leaderid, Set<MapleCharacter> matchPlayers, String message) {
             for (MapleCharacter chr : matchPlayers) {
                if (chr.getId() == leaderid && chr.getClient() != null) {
-                  MapleParty.leaveParty(chr.getParty(), chr.getClient());
+                  MaplePartyProcessor.getInstance().leaveParty(chr.getParty(), chr.getClient());
                }
 
                if (chr.isLoggedinWorld()) {
@@ -186,7 +187,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
 
             for (MapleCharacter chr : matchPlayers) {
                if (chr.getId() == leaderid && chr.getClient() != null) {
-                  MapleParty.leaveParty(chr.getParty(), chr.getClient());
+                  MaplePartyProcessor.getInstance().leaveParty(chr.getParty(), chr.getClient());
                }
 
                if (chr.isLoggedinWorld()) {

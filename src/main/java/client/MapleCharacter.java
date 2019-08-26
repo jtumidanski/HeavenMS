@@ -170,6 +170,7 @@ import net.server.coordinator.MapleInviteCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
 import net.server.world.MapleParty;
@@ -6694,7 +6695,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (partyLeader) {
             party.assignNewLeader(client);
          }
-         MapleParty.leaveParty(party, client);
+         MaplePartyProcessor.getInstance().leaveParty(party, client);
 
          return true;
       } else {
