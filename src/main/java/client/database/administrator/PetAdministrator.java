@@ -3,7 +3,7 @@ package client.database.administrator;
 import java.sql.Connection;
 
 import client.database.AbstractQueryExecutor;
-import client.inventory.manipulator.MapleCashidGenerator;
+import client.inventory.manipulator.MapleCashIdGenerator;
 import server.MapleItemInformationProvider;
 
 public class PetAdministrator extends AbstractQueryExecutor {
@@ -40,7 +40,7 @@ public class PetAdministrator extends AbstractQueryExecutor {
    }
 
    public int createPet(Connection connection, int itemId, byte level, int closeness, int fullness) {
-      int ret = MapleCashidGenerator.generateCashId();
+      int ret = MapleCashIdGenerator.getInstance().generateCashId();
       String sql = "INSERT INTO pets (petid, name, level, closeness, fullness, summoned, flag) VALUES (?, ?, ?, ?, ?, 0, 0)";
       execute(connection, sql, ps -> {
          ps.setInt(1, ret);

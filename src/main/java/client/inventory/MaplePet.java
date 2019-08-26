@@ -27,7 +27,7 @@ import java.util.List;
 import client.MapleCharacter;
 import client.database.administrator.PetAdministrator;
 import client.database.provider.PetProvider;
-import client.inventory.manipulator.MapleCashidGenerator;
+import client.inventory.manipulator.MapleCashIdGenerator;
 import constants.ExpTable;
 import server.MapleItemInformationProvider;
 import server.movement.AbsoluteLifeMovement;
@@ -75,7 +75,7 @@ public class MaplePet extends Item {
    public static void deleteFromDb(MapleCharacter owner, int petid) {
       DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petid));
       owner.resetExcluded(petid);
-      MapleCashidGenerator.freeCashId(petid);
+      MapleCashIdGenerator.getInstance().freeCashId(petid);
    }
 
    public static int createPet(int itemid) {

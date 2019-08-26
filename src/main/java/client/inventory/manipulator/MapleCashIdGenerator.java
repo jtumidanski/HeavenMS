@@ -29,12 +29,23 @@ import tools.DatabaseConnection;
 /**
  * @author RonanLana
  */
-public class MapleCashidGenerator {
+public class MapleCashIdGenerator {
+   private static MapleCashIdGenerator instance;
+
+   private MapleCashIdGenerator() {
+   }
+
+   public static MapleCashIdGenerator getInstance() {
+      if (instance == null) {
+         instance = new MapleCashIdGenerator();
+      }
+      return instance;
+   }
 
    private final static Set<Integer> existentCashids = new HashSet<>(10000);
    private static Integer runningCashid = 0;
 
-   public static synchronized void loadExistentCashIdsFromDb() {
+   public synchronized void loadExistentCashIdsFromDb() {
       DatabaseConnection.getInstance().withConnection(connection -> {
          existentCashids.addAll(RingProvider.getInstance().getAll(connection));
          existentCashids.addAll(PetProvider.getInstance().getAll(connection));
@@ -46,7 +57,7 @@ public class MapleCashidGenerator {
       } while (existentCashids.contains(runningCashid));
    }
 
-   private static void getNextAvailableCashId() {
+   private void getNextAvailableCashId() {
       runningCashid++;
       if (runningCashid >= 777000000) {
          existentCashids.clear();
@@ -54,7 +65,7 @@ public class MapleCashidGenerator {
       }
    }
 
-   public static synchronized int generateCashId() {
+   public synchronized int generateCashId() {
       while (true) {
          if (!existentCashids.contains(runningCashid)) {
             int ret = runningCashid;
@@ -68,7 +79,7 @@ public class MapleCashidGenerator {
       }
    }
 
-   public static synchronized void freeCashId(int cashId) {
+   public synchronized void freeCashId(int cashId) {
       existentCashids.remove(cashId);
    }
 

@@ -121,7 +121,7 @@ import client.inventory.MaplePet;
 import client.inventory.MapleWeaponType;
 import client.inventory.ModifyInventory;
 import client.inventory.PetDataFactory;
-import client.inventory.manipulator.MapleCashidGenerator;
+import client.inventory.manipulator.MapleCashIdGenerator;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.newyear.NewYearCardRecord;
 import client.processor.BuddyListProcessor;
@@ -593,12 +593,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                .filter(ringId -> ringId > 1)
                .forEach(ringId -> {
                   RingAdministrator.getInstance().deleteRing(connection, ringId);
-                  MapleCashidGenerator.freeCashId(ringId);
+                  MapleCashIdGenerator.getInstance().freeCashId(ringId);
                });
          InventoryEquipmentAdministrator.getInstance().deleteById(connection, pair.getLeft());
          if (pair.getRight() > -1) {
             PetAdministrator.getInstance().deletePet(connection, pair.getRight());
-            MapleCashidGenerator.freeCashId(pair.getRight());
+            MapleCashIdGenerator.getInstance().freeCashId(pair.getRight());
          }
       });
    }

@@ -76,7 +76,7 @@ import client.database.provider.PlayerNpcFieldProvider;
 import client.database.provider.WorldTransferProvider;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
-import client.inventory.manipulator.MapleCashidGenerator;
+import client.inventory.manipulator.MapleCashIdGenerator;
 import client.newyear.NewYearCardRecord;
 import constants.GameConstants;
 import constants.ItemConstants;
@@ -800,7 +800,7 @@ public class Server {
       applyAllNameChanges(); //name changes can be missed by INSTANT_NAME_CHANGE
       applyAllWorldTransfers();
       clearMissingPetsFromDb();
-      MapleCashidGenerator.loadExistentCashIdsFromDb();
+      MapleCashIdGenerator.getInstance().loadExistentCashIdsFromDb();
 
       IoBuffer.setUseDirectBuffer(false);
       IoBuffer.setAllocator(new SimpleBufferAllocator());

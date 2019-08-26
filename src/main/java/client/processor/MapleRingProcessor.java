@@ -5,14 +5,14 @@ import client.MapleRing;
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.RingAdministrator;
 import client.database.provider.RingProvider;
-import client.inventory.manipulator.MapleCashidGenerator;
+import client.inventory.manipulator.MapleCashIdGenerator;
 import tools.DatabaseConnection;
 import tools.Pair;
 
 public class MapleRingProcessor {
    private static MapleRingProcessor instance;
 
-   private MapleRingProcessor() {
+   protected MapleRingProcessor() {
    }
 
    public static MapleRingProcessor getInstance() {
@@ -34,8 +34,8 @@ public class MapleRingProcessor {
       DatabaseConnection.getInstance().withConnection(connection -> {
          RingAdministrator.getInstance().deleteRing(connection, ring.getRingId(), ring.getPartnerRingId());
 
-         MapleCashidGenerator.freeCashId(ring.getRingId());
-         MapleCashidGenerator.freeCashId(ring.getPartnerRingId());
+         MapleCashIdGenerator.getInstance().freeCashId(ring.getRingId());
+         MapleCashIdGenerator.getInstance().freeCashId(ring.getPartnerRingId());
 
          InventoryEquipmentAdministrator.getInstance().updateRing(connection, ring.getRingId(), ring.getPartnerRingId());
       });
@@ -49,8 +49,8 @@ public class MapleRingProcessor {
       }
 
       int[] ringID = new int[2];
-      ringID[0] = MapleCashidGenerator.generateCashId();
-      ringID[1] = MapleCashidGenerator.generateCashId();
+      ringID[0] = MapleCashIdGenerator.getInstance().generateCashId();
+      ringID[1] = MapleCashIdGenerator.getInstance().generateCashId();
 
       DatabaseConnection.getInstance().withConnection(connection -> {
          RingAdministrator.getInstance().addRing(connection, ringID[0], itemId, ringID[1], partner2.getId(), partner2.getName());
