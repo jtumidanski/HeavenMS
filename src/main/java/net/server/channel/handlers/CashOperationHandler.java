@@ -24,12 +24,12 @@ package net.server.channel.handlers;
 import java.util.Calendar;
 import java.util.List;
 
-import client.CharacterProcessor;
+import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
-import client.MapleRingProcessor;
-import client.NoteProcessor;
+import client.processor.MapleRingProcessor;
+import client.processor.NoteProcessor;
 import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;

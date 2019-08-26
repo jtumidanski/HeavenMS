@@ -36,7 +36,7 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import client.BuddylistEntry;
-import client.CharacterProcessor;
+import client.processor.CharacterProcessor;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;

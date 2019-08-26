@@ -19,7 +19,7 @@
 */
 package net.server.channel.handlers;
 
-import client.CharacterProcessor;
+import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;

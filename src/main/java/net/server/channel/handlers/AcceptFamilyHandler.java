@@ -25,7 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
-import client.MapleFamilyProcessor;
+import client.processor.MapleFamilyProcessor;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import net.server.coordinator.MapleInviteCoordinator;

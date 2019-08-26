@@ -1,6 +1,6 @@
 package npc
 
-import client.CharacterProcessor
+import client.processor.CharacterProcessor
 import scripting.npc.NPCConversationManager
 
 /*

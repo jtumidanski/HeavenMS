@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import client.BanProcessor;
+import client.processor.BanProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MapleInventory;

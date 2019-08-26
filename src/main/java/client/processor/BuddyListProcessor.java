@@ -1,8 +1,12 @@
-package client;
+package client.processor;
 
 import java.util.Arrays;
 import java.util.Optional;
 
+import client.BuddyList;
+import client.BuddylistEntry;
+import client.CharacterNameAndId;
+import client.MapleCharacter;
 import client.database.administrator.BuddyAdministrator;
 import client.database.provider.BuddyProvider;
 import net.server.PlayerStorage;

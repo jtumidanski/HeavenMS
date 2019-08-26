@@ -27,6 +27,7 @@ import java.util.List;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.FamilyCharacterAdministrator;
 import client.database.administrator.FamilyEntitlementAdministrator;
+import client.processor.MapleFamilyProcessor;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.FilePrinter;

@@ -1,9 +1,10 @@
-package client;
+package client.processor;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import client.MapleCharacter;
 import net.server.world.MapleParty;
 import server.maps.MapleDoor;
 

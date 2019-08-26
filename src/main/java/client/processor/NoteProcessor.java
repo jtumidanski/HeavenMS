@@ -1,4 +1,4 @@
-package client;
+package client.processor;
 
 import client.database.administrator.NoteAdministrator;
 import tools.DatabaseConnection;

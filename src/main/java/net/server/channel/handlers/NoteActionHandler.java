@@ -22,7 +22,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.NoteProcessor;
+import client.processor.NoteProcessor;
 import client.database.administrator.NoteAdministrator;
 import client.database.provider.NoteProvider;
 import net.AbstractMaplePacketHandler;

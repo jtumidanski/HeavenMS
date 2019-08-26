@@ -9,7 +9,7 @@ package tools.packets;
 import java.util.ArrayList;
 import java.util.List;
 
-import client.CharacterProcessor;
+import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.inventory.Item;
 import tools.MaplePacketCreator;

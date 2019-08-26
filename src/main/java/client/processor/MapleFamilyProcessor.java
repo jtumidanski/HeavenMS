@@ -1,4 +1,4 @@
-package client;
+package client.processor;
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -6,6 +6,10 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import client.MapleCharacter;
+import client.MapleFamily;
+import client.MapleFamilyEntry;
+import client.MapleJob;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.FamilyCharacterAdministrator;
 import client.database.data.CharacterData;

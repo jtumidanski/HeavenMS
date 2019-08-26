@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import client.processor.MapleFamilyProcessor;
+
 /**
  * @author Jay Estrella - Mr.Trash :3
  * @author Ubaware

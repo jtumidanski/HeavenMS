@@ -31,10 +31,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import client.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.NoteProcessor;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.FredStorageAdministrator;
 import client.database.administrator.InventoryItemAdministrator;

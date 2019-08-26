@@ -55,8 +55,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleFamily;
-import client.MapleFamilyProcessor;
+import client.processor.MapleFamilyProcessor;
 import client.SkillFactory;
 import client.command.CommandsExecutor;
 import client.database.administrator.AccountAdministrator;

@@ -23,11 +23,11 @@ package net.server.channel.handlers;
 
 import java.sql.Connection;
 
-import client.CharacterProcessor;
+import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleRingProcessor;
-import client.NoteProcessor;
+import client.processor.MapleRingProcessor;
+import client.processor.NoteProcessor;
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
 import client.database.provider.CharacterProvider;

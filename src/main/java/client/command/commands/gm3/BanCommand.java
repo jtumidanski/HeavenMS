@@ -23,7 +23,7 @@
 */
 package client.command.commands.gm3;
 
-import client.BanProcessor;
+import client.processor.BanProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;

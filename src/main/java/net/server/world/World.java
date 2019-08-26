@@ -50,7 +50,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import client.BuddyList;
 import client.BuddyList.BuddyAddResult;
 import client.BuddyList.BuddyOperation;
-import client.BuddyListProcessor;
+import client.processor.BuddyListProcessor;
 import client.BuddylistEntry;
 import client.MapleCharacter;
 import client.MapleFamily;

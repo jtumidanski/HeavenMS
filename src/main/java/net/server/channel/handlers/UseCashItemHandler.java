@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.NoteProcessor;
+import client.processor.NoteProcessor;
 import client.Skill;
 import client.SkillFactory;
 import client.creator.veteran.BowmanCreator;

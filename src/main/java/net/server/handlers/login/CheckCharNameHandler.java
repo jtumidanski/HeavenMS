@@ -21,8 +21,7 @@
  */
 package net.server.handlers.login;
 
-import client.CharacterProcessor;
-import client.MapleCharacter;
+import client.processor.CharacterProcessor;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import tools.MaplePacketCreator;

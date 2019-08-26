@@ -1,5 +1,7 @@
-package client;
+package client.processor;
 
+import client.MapleCharacter;
+import client.MapleRing;
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.RingAdministrator;
 import client.database.provider.RingProvider;

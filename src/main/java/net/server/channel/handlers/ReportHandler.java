@@ -24,8 +24,7 @@ package net.server.channel.handlers;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
-import client.CharacterProcessor;
-import client.MapleCharacter;
+import client.processor.CharacterProcessor;
 import client.MapleClient;
 import client.database.administrator.ReportAdministrator;
 import net.AbstractMaplePacketHandler;
