@@ -1,6 +1,6 @@
 package npc
 
-
+import net.server.processor.MapleGuildProcessor
 import scripting.npc.NPCConversationManager
 
 /*
@@ -53,7 +53,7 @@ class NPC2010007 {
                   cm.sendOk("You can only increase your Guild's capacity if you are the leader.")
                   cm.dispose()
                } else {
-                  cm.sendYesNo("Increasing your Guild capacity by #b5#k costs #b " + cm.getPlayer().getGuild().get().getIncreaseGuildCost(cm.getPlayer().getGuild().get().getCapacity()) + " mesos#k, are you sure you want to continue?")
+                  cm.sendYesNo("Increasing your Guild capacity by #b5#k costs #b " + MapleGuildProcessor.getInstance().getIncreaseGuildCost(cm.getPlayer().getGuild().get().getCapacity()) + " mesos#k, are you sure you want to continue?")
                }
             }
          } else if (status == 2) {

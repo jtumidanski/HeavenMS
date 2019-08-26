@@ -93,6 +93,7 @@ import net.server.coordinator.MapleSessionCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MapleGuildProcessor;
 import net.server.worker.BossLogWorker;
 import net.server.worker.CharacterDiseaseWorker;
 import net.server.worker.CouponWorker;
@@ -984,7 +985,7 @@ public class Server {
    }
 
    public int createGuild(int leaderId, String name) {
-      return MapleGuild.createGuild(leaderId, name);
+      return MapleGuildProcessor.getInstance().createGuild(leaderId, name);
    }
 
    public Optional<MapleGuild> getGuildByName(String name) {

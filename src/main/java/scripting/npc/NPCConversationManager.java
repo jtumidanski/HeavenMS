@@ -50,6 +50,7 @@ import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchChec
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
+import net.server.processor.MapleGuildProcessor;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import provider.MapleData;
@@ -331,7 +332,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void displayGuildRanks() {
-      MapleGuild.displayGuildRanks(getClient(), npc);
+      MapleGuildProcessor.getInstance().displayGuildRanks(getClient(), npc);
    }
 
    public boolean canSpawnPlayerNpc(int mapid) {

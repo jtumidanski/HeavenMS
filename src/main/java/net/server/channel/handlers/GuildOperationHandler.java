@@ -33,6 +33,7 @@ import net.server.Server;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildResponse;
+import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
 import net.server.world.World;
@@ -220,7 +221,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      if (!MapleGuild.answerInvitation(joinData.getPlayerId(), mc.getName(), joinData.getGuildId(), true)) {
+      if (!MapleGuildProcessor.getInstance().answerInvitation(joinData.getPlayerId(), mc.getName(), joinData.getGuildId(), true)) {
          return;
       }
 
@@ -255,7 +256,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      MapleGuildResponse mgr = MapleGuild.sendInvitation(c, inviteData.getPlayerName());
+      MapleGuildResponse mgr = MapleGuildProcessor.getInstance().sendInvitation(c, inviteData.getPlayerName());
       if (mgr != null) {
          c.announce(mgr.getPacket(inviteData.getPlayerName()));
       }
@@ -275,7 +276,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      Set<MapleCharacter> eligibleMembers = new HashSet<>(MapleGuild.getEligiblePlayersForGuild(mc));
+      Set<MapleCharacter> eligibleMembers = new HashSet<>(MapleGuildProcessor.getInstance().getEligiblePlayersForGuild(mc));
       if (eligibleMembers.size() < ServerConstants.CREATE_GUILD_MIN_PARTNERS) {
          if (mc.getMap().getAllPlayers().size() < ServerConstants.CREATE_GUILD_MIN_PARTNERS) {
             // thanks NovaStory for noticing message in need of smoother info

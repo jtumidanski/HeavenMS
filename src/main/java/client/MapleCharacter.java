@@ -170,6 +170,7 @@ import net.server.coordinator.MapleInviteCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
@@ -6187,7 +6188,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void increaseGuildCapacity() {
       getGuild().ifPresent(guild -> {
-         int cost = MapleGuild.getIncreaseGuildCost(guild.getCapacity());
+         int cost = MapleGuildProcessor.getInstance().getIncreaseGuildCost(guild.getCapacity());
 
          if (getMeso() < cost) {
             dropMessage(1, "You don't have enough mesos.");
