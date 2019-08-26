@@ -102,7 +102,7 @@ public class MapleFamilyEntry {
       Server.getInstance().getWorld(oldFamily.getWorld()).removeFamily(oldFamily.getID());
 
       //db
-      DatabaseConnection.withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
          connection.setAutoCommit(false);
          boolean success = updateDBChangeFamily(connection, getChrId(), newFamily.getID(), senior.getChrId());
          for (MapleFamilyEntry junior : juniors) { // better to duplicate this than the SQL code
@@ -146,7 +146,7 @@ public class MapleFamilyEntry {
       doFullCount(); //to make sure all counts are correct
       // update db
 
-      DatabaseConnection.withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
          connection.setAutoCommit(false);
          boolean success = updateDBChangeFamily(connection, getChrId(), getFamily().getID(), 0);
 
@@ -363,7 +363,7 @@ public class MapleFamilyEntry {
    }
 
    private static boolean updateDBChangeFamily(int cid, int familyid, int seniorid) {
-      return DatabaseConnection.withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyid, seniorid)).orElse(false);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyid, seniorid)).orElse(false);
    }
 
    private static boolean updateDBChangeFamily(Connection con, int cid, int familyid, int seniorid) {
@@ -512,14 +512,14 @@ public class MapleFamilyEntry {
       if (entitlements[id] >= 1) {
          return false;
       }
-      DatabaseConnection.withConnection(connection -> FamilyEntitlementAdministrator.getInstance().create(connection, id, getChrId()));
+      DatabaseConnection.getInstance().withConnection(connection -> FamilyEntitlementAdministrator.getInstance().create(connection, id, getChrId()));
       entitlements[id]++;
       return true;
    }
 
    public boolean refundEntitlement(MapleFamilyEntitlement entitlement) {
       int id = entitlement.ordinal();
-      DatabaseConnection.withConnection(connection -> FamilyEntitlementAdministrator.getInstance().deleteByCharacterAndId(connection, getChrId(), id));
+      DatabaseConnection.getInstance().withConnection(connection -> FamilyEntitlementAdministrator.getInstance().deleteByCharacterAndId(connection, getChrId(), id));
       entitlements[id] = 0;
       return true;
    }
@@ -546,7 +546,7 @@ public class MapleFamilyEntry {
       if (!repChanged) {
          return true;
       }
-      DatabaseConnection.withConnection(this::saveReputation);
+      DatabaseConnection.getInstance().withConnection(this::saveReputation);
       return true;
    }
 

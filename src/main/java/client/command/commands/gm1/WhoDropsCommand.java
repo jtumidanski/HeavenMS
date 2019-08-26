@@ -59,7 +59,7 @@ public class WhoDropsCommand extends Command {
             }
 
             itemData.stream().limit(10).forEach(pair -> {
-               DatabaseConnection.withConnectionResult(connection -> DropDataProvider.getInstance().getMonstersWhoDrop(connection, pair.getLeft()))
+               DatabaseConnection.getInstance().withConnectionResult(connection -> DropDataProvider.getInstance().getMonstersWhoDrop(connection, pair.getLeft()))
                      .ifPresent(monsterIds -> {
                         output.append("#v").append(pair.getLeft()).append("##k is dropped by:\r\n");
                         monsterIds.stream()

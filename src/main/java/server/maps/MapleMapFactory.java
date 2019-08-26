@@ -85,7 +85,7 @@ public class MapleMapFactory {
    }
 
    private static void loadLifeFromDb(MapleMap map) {
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             PlayerLifeProvider.getInstance().getForMapAndWorld(connection, map.getId(), map.getWorld())
                   .forEach(playerLifeData -> loadLifeRaw(map, playerLifeData.getLifeId(), playerLifeData.getType(),
                         playerLifeData.getCy(),
@@ -222,7 +222,7 @@ public class MapleMapFactory {
          map.setSeats(seats);
       }
       if (event == null) {
-         DatabaseConnection.withConnection(connection -> PlayerNpcProvider.getInstance().getForMapAndWorld(connection, mapid, world).forEach(map::addPlayerNPCMapObject));
+         DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcProvider.getInstance().getForMapAndWorld(connection, mapid, world).forEach(map::addPlayerNPCMapObject));
          List<MaplePlayerNPC> dnpcs = MaplePlayerNPCFactory.getDeveloperNpcsFromMapid(mapid);
          if (dnpcs != null) {
             for (MaplePlayerNPC dnpc : dnpcs) {

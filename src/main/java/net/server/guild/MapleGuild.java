@@ -61,7 +61,7 @@ public class MapleGuild {
    public MapleGuild(int guildid, int world) {
       this.world = world;
       members = new ArrayList<>();
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          id = guildid;
          Optional<GuildData> guildData = GuildProvider.getInstance().getGuildDataById(connection, guildid);
          if (guildData.isEmpty()) {
@@ -132,7 +132,7 @@ public class MapleGuild {
    }
 
    public void writeToDB(boolean bDisband) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          if (!bDisband) {
             GuildAdministrator.getInstance().update(connection, gp, logo, logoColor, logoBG, logoBGColor, rankTitles, capacity, notice, this.id);
          } else {
@@ -424,7 +424,7 @@ public class MapleGuild {
                   if (mgc.isOnline()) {
                      Server.getInstance().getWorld(mgc.getWorld()).setGuildAndRank(cid, 0, 5);
                   } else {
-                     DatabaseConnection.withConnection(
+                     DatabaseConnection.getInstance().withConnection(
                            connection -> NoteAdministrator.getInstance().sendNote(connection, mgc.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.valueOf("0")));
                      Server.getInstance().getWorld(mgc.getWorld()).setOfflineGuildStatus((short) 0, (byte) 5, cid);
                   }
@@ -616,7 +616,7 @@ public class MapleGuild {
 
    public void setAllianceId(int aid) {
       this.allianceId = aid;
-      DatabaseConnection.withConnection(connection -> GuildAdministrator.getInstance().setAlliance(connection, id, aid));
+      DatabaseConnection.getInstance().withConnection(connection -> GuildAdministrator.getInstance().setAlliance(connection, id, aid));
    }
 
    public void resetAllianceGuildPlayersRank() {
@@ -630,7 +630,7 @@ public class MapleGuild {
       } finally {
          membersLock.unlock();
       }
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().updateAllianceRank(connection, id, 5));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateAllianceRank(connection, id, 5));
    }
 
    private enum BCOp {

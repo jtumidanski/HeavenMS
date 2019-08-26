@@ -550,7 +550,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return false;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          int world = CharacterProvider.getInstance().getWorldId(connection, cid);
 
          BuddyProvider.getInstance().getBuddies(connection, cid).stream()
@@ -862,7 +862,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public static MapleCharacter loadCharFromDB(int characterId, MapleClient client, boolean channelserver) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<CharacterData> characterDataOptional = CharacterProvider.getInstance().getById(connection, characterId);
          if (characterDataOptional.isEmpty()) {
             return null;
@@ -1484,7 +1484,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void ban(String reason) {
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setPermaBan(connection, accountid, reason));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setPermaBan(connection, accountid, reason));
    }
 
    public int calculateMaxBaseDamage(int watk, MapleWeaponType weapon) {
@@ -2435,7 +2435,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       } else {
          skills.remove(skill);
          this.client.announce(MaplePacketCreator.updateSkill(skill.getId(), newLevel, newMasterlevel, -1)); //Shouldn't use expiration anymore :)
-         DatabaseConnection.withConnection(connection -> SkillAdministrator.getInstance().deleteForSkillCharacter(connection, skill.getId(), id));
+         DatabaseConnection.getInstance().withConnection(connection -> SkillAdministrator.getInstance().deleteForSkillCharacter(connection, skill.getId(), id));
       }
    }
 
@@ -2815,7 +2815,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void deleteGuild(int guildId) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          CharacterAdministrator.getInstance().removeAllCharactersFromGuild(connection, guildId);
          GuildAdministrator.getInstance().deleteGuild(connection, guildId);
       });
@@ -5337,12 +5337,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void setMerchantMeso(int set) {
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchantMesos(connection, id, set));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setMerchantMesos(connection, id, set));
       merchantmeso = set;
    }
 
    public int getMerchantNetMeso() {
-      int elapsedDays = DatabaseConnection.withConnectionResult(connection -> FredStorageProvider.getInstance().get(connection, id)).orElseThrow();
+      int elapsedDays = DatabaseConnection.getInstance().withConnectionResult(connection -> FredStorageProvider.getInstance().get(connection, id)).orElseThrow();
 
       if (elapsedDays > 100) {
          elapsedDays = 100;
@@ -6163,7 +6163,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void hasGivenFame(MapleCharacter to) {
       lastfametime = System.currentTimeMillis();
       lastmonthfameids.add(to.getId());
-      DatabaseConnection.withConnection(connection -> FameLogAdministrator.getInstance().addForCharacter(connection, getId(), to.getId()));
+      DatabaseConnection.getInstance().withConnection(connection -> FameLogAdministrator.getInstance().addForCharacter(connection, getId(), to.getId()));
    }
 
    public boolean hasMerchant() {
@@ -7657,7 +7657,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public synchronized void saveCooldowns() {
       List<PlayerCoolDownValueHolder> listcd = getAllCooldowns();
       if (!listcd.isEmpty()) {
-         DatabaseConnection.withConnection(connection -> {
+         DatabaseConnection.getInstance().withConnection(connection -> {
             CoolDownAdministrator.getInstance().deleteForCharacter(connection, getId());
             CoolDownAdministrator.getInstance().addCoolDownsForCharacter(connection, getId(), listcd);
          });
@@ -7665,7 +7665,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       Map<MapleDisease, Pair<Long, MobSkill>> listds = getAllDiseases();
       if (!listds.isEmpty()) {
-         DatabaseConnection.withConnection(connection -> {
+         DatabaseConnection.getInstance().withConnection(connection -> {
             PlayerDiseaseAdministrator.getInstance().deleteForCharacter(connection, getId());
             PlayerDiseaseAdministrator.getInstance().addPlayerDiseasesForCharacter(connection, getId(), listds.entrySet());
          });
@@ -7673,7 +7673,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void saveGuildStatus() {
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, id, guildid, guildRank, allianceRank));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, id, guildid, guildRank, allianceRank));
    }
 
    public void saveLocationOnWarp() {  // suggestion to remember the map before warp command thanks to Lei
@@ -7721,7 +7721,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.events.put("rescueGaga", new RescueGaga(0));
 
 
-      DatabaseConnection.withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
          int key = CharacterAdministrator.getInstance().create(connection, str, dex, luk, int_, gmLevel, skinColor.getId(),
                gender, getJob().getId(), hair, face, mapid, Math.abs(meso.get()), accountid, name, world, hp, mp,
                maxhp, maxmp, level, remainingAp, remainingSp);
@@ -7790,7 +7790,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       Server.getInstance().updateCharacterEntry(this);
 
-      DatabaseConnection.withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
          updateCharacter(connection);
          updatePets();
          updatePetIgnores(connection);
@@ -8032,13 +8032,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void setHasMerchant(boolean set) {
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, id, set));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, id, set));
       hasMerchant = set;
    }
 
    public void addMerchantMesos(int add) {
       int newAmount = (int) Math.min((long) merchantmeso + add, Integer.MAX_VALUE);
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchantMesos(connection, id, newAmount));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setMerchantMesos(connection, id, newAmount));
       merchantmeso = newAmount;
    }
 
@@ -8221,7 +8221,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       FredrickProcessor.removeFredrickReminders(this.getId());
 
       this.name = name;
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setName(connection, id, name));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setName(connection, id, name));
    }
 
    public int getDoorSlot() {
@@ -8546,7 +8546,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void showNote() {
-      DatabaseConnection.withConnectionResult(connection -> NoteProvider.getInstance().getFirstNote(connection, name)).ifPresent(notes ->
+      DatabaseConnection.getInstance().withConnectionResult(connection -> NoteProvider.getInstance().getFirstNote(connection, name)).ifPresent(notes ->
             client.announce(MaplePacketCreator.showNotes(notes, notes.size())));
    }
 
@@ -9045,7 +9045,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void block(int reason, int days, String desc) {
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setBan(connection, accountid, reason, days, desc));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setBan(connection, accountid, reason, days, desc));
    }
 
    public boolean isBanned() {
@@ -9344,7 +9344,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void logOff() {
       this.loggedIn = false;
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().logCharacterOut(connection, id));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().logCharacterOut(connection, id));
    }
 
    public void setLoginTime(long time) {
@@ -9428,7 +9428,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean registerNameChange(String newName) {
       long currentTimeMillis = System.currentTimeMillis();
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          Optional<Timestamp> completionTime = NameChangeProvider.getInstance().getCompletionTimeByCharacterId(connection, getId());
          if (completionTime.isEmpty()) {
             return;
@@ -9444,7 +9444,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean cancelPendingNameChange() {
-      DatabaseConnection.withConnection(connection -> NameChangeAdministrator.getInstance().cancelPendingNameChange(connection, getId()));
+      DatabaseConnection.getInstance().withConnection(connection -> NameChangeAdministrator.getInstance().cancelPendingNameChange(connection, getId()));
       return true;
    }
 
@@ -9453,7 +9453,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return;
       }
 
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             NameChangeProvider.getInstance().getPendingNameChangeForCharacter(connection, getId()).ifPresent(result -> {
                CharacterAdministrator.getInstance().performNameChange(connection, result.getCharacterId(), result.getOldName(), result.getNewName(), result.getId());
                FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + getName() + "\" to \"" + result.getNewName() + "\" at " + Calendar.getInstance().getTime().toString());
@@ -9519,7 +9519,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean registerWorldTransfer(int newWorld) {
       long currentTimeMillis = System.currentTimeMillis();
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          Timestamp completionTime = WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, getId());
          if (completionTime == null) {
             return;
@@ -9535,7 +9535,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean cancelPendingWorldTranfer() {
-      DatabaseConnection.withConnection(connection -> WorldTransferAdministrator.getInstance().cancelPendingForCharacter(connection, getId()));
+      DatabaseConnection.getInstance().withConnection(connection -> WorldTransferAdministrator.getInstance().cancelPendingForCharacter(connection, getId()));
       return true;
    }
 
@@ -9553,11 +9553,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public int getRewardPoints() {
-      return DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getRewardPoints(connection, accountid)).orElse(0);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getRewardPoints(connection, accountid)).orElse(0);
    }
 
    public void setRewardPoints(int value) {
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setRewardPoints(connection, accountid, value));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setRewardPoints(connection, accountid, value));
    }
 
    public void addReborns() {
@@ -9569,7 +9569,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
       }
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().countReborns(connection, id)).orElse(0);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().countReborns(connection, id)).orElse(0);
    }
 
    public void setReborns(int value) {
@@ -9577,7 +9577,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
       }
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setReborns(connection, id, value));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setReborns(connection, id, value));
    }
 
    public void executeReborn() {
@@ -9743,7 +9743,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void setLanguage(int num) {
       getClient().setLanguage(num);
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setLanguage(connection, getClient().getAccID(), num));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setLanguage(connection, getClient().getAccID(), num));
    }
 
    public enum FameStatus {

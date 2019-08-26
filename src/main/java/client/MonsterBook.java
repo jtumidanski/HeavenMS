@@ -150,7 +150,7 @@ public final class MonsterBook {
    public void loadCards(final int charid) {
       lock.lock();
       try {
-         List<MonsterBookData> monsterBookData = DatabaseConnection.withConnectionResult(connection -> MonsterBookProvider.getInstance().getDataForCharacter(connection, charid)).orElse(new ArrayList<>());
+         List<MonsterBookData> monsterBookData = DatabaseConnection.getInstance().withConnectionResult(connection -> MonsterBookProvider.getInstance().getDataForCharacter(connection, charid)).orElse(new ArrayList<>());
          for (MonsterBookData bookData : monsterBookData) {
             if (bookData.getCardId() / 1000 >= 2388) {
                specialCard++;
@@ -172,7 +172,7 @@ public final class MonsterBook {
       if (cardSet.isEmpty()) {
          return;
       }
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          MonsterBookAdministrator.getInstance().deleteForCharacter(connection, charid);
 
          try {

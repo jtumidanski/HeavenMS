@@ -75,7 +75,7 @@ public class RankingLoginWorker implements Runnable {
 
    @Override
    public void run() {
-      DatabaseConnection.withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
          if (ServerConstants.USE_REFRESH_RANK_MOVE) {
             CharacterAdministrator.getInstance().resetAllJobRankMove(connection);
             CharacterAdministrator.getInstance().resetAllRankMove(connection);

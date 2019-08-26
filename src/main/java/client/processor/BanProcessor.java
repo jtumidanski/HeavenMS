@@ -14,19 +14,41 @@ public class BanProcessor {
       return ourInstance;
    }
 
-   private BanProcessor() {
+   private AccountProvider accountProvider;
+
+   private CharacterProvider characterProvider;
+
+   private AccountAdministrator accountAdministrator;
+
+   private DatabaseConnection databaseConnection;
+
+   protected BanProcessor() {
+      this.databaseConnection = DatabaseConnection.getInstance();
+      this.accountProvider = AccountProvider.getInstance();
+      this.characterProvider = CharacterProvider.getInstance();
+      this.accountAdministrator = AccountAdministrator.getInstance();
+   }
+
+   protected BanProcessor(DatabaseConnection databaseConnection,
+                          AccountProvider accountProvider,
+                          CharacterProvider characterProvider,
+                          AccountAdministrator accountAdministrator) {
+      this.databaseConnection = databaseConnection;
+      this.accountProvider = accountProvider;
+      this.characterProvider = characterProvider;
+      this.accountAdministrator = accountAdministrator;
    }
 
    public boolean ban(String id, String reason, boolean accountId) {
       Optional<Integer> theAccountId;
       if (accountId) {
-         theAccountId = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getAccountIdForName(connection, id));
+         theAccountId = databaseConnection.withConnectionResult(connection -> accountProvider.getAccountIdForName(connection, id));
       } else {
-         theAccountId = DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getAccountIdForName(connection, id));
+         theAccountId = databaseConnection.withConnectionResult(connection -> characterProvider.getAccountIdForName(connection, id));
       }
 
       if (theAccountId.isPresent()) {
-         DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setPermaBan(connection, theAccountId.get(), reason));
+         databaseConnection.withConnection(connection -> accountAdministrator.setPermaBan(connection, theAccountId.get(), reason));
          return true;
       }
       return false;

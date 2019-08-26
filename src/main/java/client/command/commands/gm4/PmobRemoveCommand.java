@@ -50,7 +50,7 @@ public class PmobRemoveCommand extends Command {
       int xpos = pos.x;
       int ypos = pos.y;
 
-      List<Pair<Integer, Pair<Integer, Integer>>> toRemove = DatabaseConnection.withConnectionResult(connection -> {
+      List<Pair<Integer, Pair<Integer, Integer>>> toRemove = DatabaseConnection.getInstance().withConnectionResult(connection -> {
          if (mobId > -1) {
             return PlayerLifeProvider.getInstance().get(connection, player.getWorld(), mapId, "n", mobId);
          } else {

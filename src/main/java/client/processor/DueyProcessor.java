@@ -60,12 +60,12 @@ import tools.Pair;
 public class DueyProcessor {
 
    private static Pair<Integer, Integer> getAccountCharacterIdFromCNAME(String name) {
-      return DatabaseConnection.withConnectionResultOpt(connection ->
+      return DatabaseConnection.getInstance().withConnectionResultOpt(connection ->
             CharacterProvider.getInstance().getIdAndAccountIdForName(connection, name)).orElse(null);
    }
 
    private static void showDueyNotification(MapleClient c, MapleCharacter player) {
-      DatabaseConnection.withConnection(connection -> DueyPackageProvider.getInstance().get(connection, player.getId())
+      DatabaseConnection.getInstance().withConnection(connection -> DueyPackageProvider.getInstance().get(connection, player.getId())
             .ifPresent(pair -> {
                DueyPackageAdministrator.getInstance().uncheck(connection, player.getId());
                c.announce(MaplePacketCreator.sendDueyParcelReceived(pair.getLeft(), pair.getRight() == 1));
@@ -77,26 +77,26 @@ public class DueyProcessor {
    }
 
    private static void removePackageFromDB(int packageId) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          DueyPackageAdministrator.getInstance().removePackage(connection, packageId);
          deletePackageFromInventoryDB(connection, packageId);
       });
    }
 
    private static List<DueyPackage> loadPackages(MapleCharacter chr) {
-      return DatabaseConnection.withConnectionResult(connection ->
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
             DueyPackageProvider.getInstance().getPackagesForReceiver(connection, chr.getId())).orElseThrow();
    }
 
    private static int createPackage(int mesos, String message, String sender, int toCid, boolean quick) {
-      return DatabaseConnection.withConnectionResult(connection ->
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
             DueyPackageAdministrator.getInstance().create(connection, toCid, sender, mesos, message, quick))
             .orElse(-1);
    }
 
    private static boolean insertPackageItem(int packageId, Item item) {
       Pair<Item, MapleInventoryType> dueyItem = new Pair<>(item, MapleInventoryType.getByType(item.getItemType()));
-      DatabaseConnection.withConnection(connection -> ItemFactory.DUEY.saveItems(Collections.singletonList(dueyItem), packageId, connection));
+      DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.DUEY.saveItems(Collections.singletonList(dueyItem), packageId, connection));
       return true;
    }
 
@@ -238,7 +238,7 @@ public class DueyProcessor {
    public static void dueyClaimPackage(MapleClient c, int packageId) {
       if (c.tryAcquireClient()) {
          try {
-            Optional<DueyPackage> dueyPackage = DatabaseConnection.withConnectionResult(connection ->
+            Optional<DueyPackage> dueyPackage = DatabaseConnection.getInstance().withConnectionResult(connection ->
                   DueyPackageProvider.getInstance().getById(connection, packageId).orElse(null));
 
             if (dueyPackage.isEmpty()) {
@@ -313,7 +313,7 @@ public class DueyProcessor {
    }
 
    public static void runDueyExpireSchedule() {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          Calendar c = Calendar.getInstance();
          c.add(Calendar.DATE, -30);
          Timestamp ts = new Timestamp(c.getTime().getTime());

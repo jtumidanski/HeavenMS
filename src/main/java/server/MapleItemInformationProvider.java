@@ -1556,7 +1556,7 @@ public class MapleItemInformationProvider {
    }
 
    private void loadCardIdData() {
-      DatabaseConnection.withConnection(connection -> MonsterCardProvider.getInstance().getMonsterCardData(connection).forEach(data -> monsterBookID.put(data.getCardId(), data.getMobId())));
+      DatabaseConnection.getInstance().withConnection(connection -> MonsterCardProvider.getInstance().getMonsterCardData(connection).forEach(data -> monsterBookID.put(data.getCardId(), data.getMobId())));
    }
 
    public int getCardMobId(int id) {
@@ -2009,7 +2009,7 @@ public class MapleItemInformationProvider {
          return null;
       }
 
-      statUpgd = DatabaseConnection.withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.getStat(), data.getValue())).get()).orElse(null);
+      statUpgd = DatabaseConnection.getInstance().withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.getStat(), data.getValue())).get()).orElse(null);
       statUpgradeMakerCache.put(itemId, statUpgd);
       return statUpgd;
    }
@@ -2020,7 +2020,7 @@ public class MapleItemInformationProvider {
          return itemId;
       }
 
-      List<Integer> monsterIds = DatabaseConnection.withConnectionResult(connection ->
+      List<Integer> monsterIds = DatabaseConnection.getInstance().withConnectionResult(connection ->
             DropDataProvider.getInstance().getMonstersWhoDrop(connection, leftoverId))
             .orElse(Collections.singletonList(-1));
       itemId = getCrystalForLevel(MapleLifeFactory.getMonsterLevel(monsterIds.get(0)) - 1);
@@ -2034,7 +2034,7 @@ public class MapleItemInformationProvider {
       if ((makerEntry = makerItemCache.get(toCreate)) != null) {
          return new MakerItemCreateEntry(makerEntry);
       } else {
-         makerEntry = DatabaseConnection.withConnectionResult(connection -> {
+         makerEntry = DatabaseConnection.getInstance().withConnectionResult(connection -> {
             int reqLevel = 0;
             int reqMakerLevel = 0;
             int cost = 0;
@@ -2080,7 +2080,7 @@ public class MapleItemInformationProvider {
    }
 
    public List<Pair<Integer, Integer>> getMakerDisassembledItems(Integer itemId) {
-      return DatabaseConnection.withConnectionResult(connection ->
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
             MakerRecipeProvider.getInstance().getMakerDisassembledItems(connection, itemId).stream()
                   .map(data -> new Pair<>(data.getRequiredItem(), data.getCount()))
                   .collect(Collectors.toList()))
@@ -2088,7 +2088,7 @@ public class MapleItemInformationProvider {
    }
 
    public int getMakerDisassembledFee(Integer itemId) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<MakerCreateData> makerCreateData = MakerCreateProvider.getInstance().getMakerCreateDataForItem(connection, itemId);
          if (makerCreateData.isEmpty()) {
             return -1;
@@ -2120,7 +2120,7 @@ public class MapleItemInformationProvider {
    }
 
    public Set<String> getWhoDrops(Integer itemId) {
-      return DatabaseConnection.withConnectionResult(connection ->
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
             DropDataProvider.getInstance().getMonstersWhoDrop(connection, itemId).stream()
                   .map(monsterId -> MapleMonsterInformationProvider.getInstance().getMobNameFromId(monsterId))
                   .collect(Collectors.toSet()))

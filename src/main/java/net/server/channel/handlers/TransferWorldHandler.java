@@ -59,7 +59,7 @@ public final class TransferWorldHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      Optional<Timestamp> completionTime = DatabaseConnection.withConnectionResult(connection -> WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()));
+      Optional<Timestamp> completionTime = DatabaseConnection.getInstance().withConnectionResult(connection -> WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()));
 
       if (completionTime.isEmpty()) {
          c.announce(MaplePacketCreator.sendWorldTransferRules(6, c));

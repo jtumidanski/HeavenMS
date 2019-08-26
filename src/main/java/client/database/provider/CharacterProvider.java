@@ -94,10 +94,10 @@ public class CharacterProvider extends AbstractQueryExecutor {
             rs -> Optional.of(new Pair<>(rs.getInt(2), rs.getInt(1))));
    }
 
-   public int getAccountIdForName(Connection connection, String name) {
+   public Integer getAccountIdForName(Connection connection, String name) {
       String sql = "SELECT accountid FROM characters WHERE name = ?";
       Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, name), 1);
-      return result.orElse(-1);
+      return result.orElse(null);
    }
 
    public int getAccountIdForCharacterId(Connection connection, int characterId) {

@@ -32,7 +32,7 @@ public class BuddyListProcessor {
    }
 
    public void loadFromDb(int characterId, BuddyList buddyList) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          BuddyProvider.getInstance().getInfoForBuddies(connection, characterId).forEach(buddyList::put);
          BuddyProvider.getInstance().getInfoForPendingBuddies(connection, characterId).forEach(buddyList::addRequest);
          BuddyAdministrator.getInstance().deletePendingForCharacter(connection, characterId);

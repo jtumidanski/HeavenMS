@@ -82,7 +82,7 @@ public class MapleStorage {
    }
 
    public static MapleStorage loadOrCreateFromDB(int id, int world) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<MapleStorage> mapleStorage = StorageProvider.getInstance().getByAccountAndWorld(connection, id, world);
          return mapleStorage.map(MapleStorage::loadItemsForStorage).orElseGet(() -> create(connection, id, world));
       }).orElseThrow();

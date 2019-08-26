@@ -35,7 +35,7 @@ public class MapleCashidGenerator {
    private static Integer runningCashid = 0;
 
    public static synchronized void loadExistentCashIdsFromDb() {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          existentCashids.addAll(RingProvider.getInstance().getAll(connection));
          existentCashids.addAll(PetProvider.getInstance().getAll(connection));
       });

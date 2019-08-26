@@ -53,7 +53,7 @@ public class MapleAlliance {
    }
 
    public void saveToDB() {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          AllianceAdministrator.getInstance().updateAlliance(connection, this.allianceId, this.capacity, this.notice, this.rankTitles[0], this.rankTitles[1], this.rankTitles[2], this.rankTitles[3], this.rankTitles[4]);
          AllianceGuildAdministrator.getInstance().deleteForAlliance(connection, this.allianceId);
          AllianceGuildAdministrator.getInstance().addGuilds(connection, this.allianceId, guilds);

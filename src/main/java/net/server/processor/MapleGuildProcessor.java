@@ -27,7 +27,7 @@ public class MapleGuildProcessor {
    }
 
    public int createGuild(int leaderId, String name) {
-      Optional<Integer> result = DatabaseConnection.withConnectionResult(connection -> {
+      Optional<Integer> result = DatabaseConnection.getInstance().withConnectionResult(connection -> {
          if (GuildProvider.getInstance().getByName(connection, name) != -1) {
             return 0;
          }
@@ -96,7 +96,7 @@ public class MapleGuildProcessor {
    }
 
    public void displayGuildRanks(MapleClient c, int npcid) {
-      DatabaseConnection.withConnection(connection -> c.announce(MaplePacketCreator.showGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection))));
+      DatabaseConnection.getInstance().withConnection(connection -> c.announce(MaplePacketCreator.showGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection))));
    }
 
    public int getIncreaseGuildCost(int size) {

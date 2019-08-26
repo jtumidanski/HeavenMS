@@ -211,7 +211,7 @@ public class MapleClient {
    }
 
    private List<CharNameAndIdData> loadCharactersInternal(int worldId) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForWorld(connection, accId, worldId)).orElse(new ArrayList<>());
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForWorld(connection, accId, worldId)).orElse(new ArrayList<>());
    }
 
    public boolean isLoggedIn() {
@@ -219,14 +219,14 @@ public class MapleClient {
    }
 
    public boolean hasBannedIP() {
-      return DatabaseConnection.withConnectionResult(connection -> IpBanProvider.getInstance().getIpBanCount(connection, session.getRemoteAddress().toString())).orElse(0L) > 0;
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> IpBanProvider.getInstance().getIpBanCount(connection, session.getRemoteAddress().toString())).orElse(0L) > 0;
    }
 
    public int getVoteTime() {
       if (voteTime != -1) {
          return voteTime;
       }
-      voteTime = DatabaseConnection.withConnectionResult(connection -> BitVotingRecordProvider.getInstance().getVoteDate(connection, accountName)).orElse(-1);
+      voteTime = DatabaseConnection.getInstance().withConnectionResult(connection -> BitVotingRecordProvider.getInstance().getVoteDate(connection, accountName)).orElse(-1);
       return voteTime;
    }
 
@@ -245,37 +245,37 @@ public class MapleClient {
       if (hwid == null) {
          return false;
       }
-      return DatabaseConnection.withConnectionResult(connection -> HwidBanProvider.getInstance().getHwidBanCount(connection, hwid)).orElse(0L) > 1;
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> HwidBanProvider.getInstance().getHwidBanCount(connection, hwid)).orElse(0L) > 1;
    }
 
    public boolean hasBannedMac() {
       if (macs.isEmpty()) {
          return false;
       }
-      return DatabaseConnection.withConnectionResult(connection -> MacBanProvider.getInstance().getMacBanCount(connection, macs)).orElse(0) > 1;
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MacBanProvider.getInstance().getMacBanCount(connection, macs)).orElse(0) > 1;
    }
 
    private void loadHWIDIfNecessary() {
       if (hwid == null) {
-         hwid = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getHwid(connection, accId)).orElse(null);
+         hwid = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getHwid(connection, accId)).orElse(null);
       }
    }
 
    private void loadMacsIfNecessary() {
       if (macs.isEmpty()) {
-         DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getMacs(connection, accId)).ifPresent(result -> macs.addAll(result));
+         DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getMacs(connection, accId)).ifPresent(result -> macs.addAll(result));
       }
    }
 
    public void banHWID() {
       loadHWIDIfNecessary();
-      DatabaseConnection.withConnection(connection -> HwidBanAdministrator.getInstance().banHwid(connection, hwid));
+      DatabaseConnection.getInstance().withConnection(connection -> HwidBanAdministrator.getInstance().banHwid(connection, hwid));
    }
 
    public void banMacs() {
       loadMacsIfNecessary();
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          List<String> filtered = MacFilterProvider.getInstance().getMacFilters(connection);
          MacBanAdministrator.getInstance().addMacBan(connection, accId, macs, filtered);
       });
@@ -303,7 +303,7 @@ public class MapleClient {
 
    public void setPin(String pin) {
       this.pin = pin;
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setPin(connection, accId, pin));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setPin(connection, accId, pin));
    }
 
    public boolean checkPin(String other) {
@@ -329,7 +329,7 @@ public class MapleClient {
 
    public void setPic(String pic) {
       this.pic = pic;
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setPic(connection, accId, pic));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setPic(connection, accId, pic));
    }
 
    public boolean checkPic(String other) {
@@ -359,7 +359,7 @@ public class MapleClient {
          return 6;   // thanks Survival_Project for finding out an issue with AUTOMATIC_REGISTER here
       }
 
-      Optional<AccountData> accountData = DatabaseConnection.withConnectionResultOpt(connection -> AccountProvider.getInstance().getAccountDataByName(connection, login));
+      Optional<AccountData> accountData = DatabaseConnection.getInstance().withConnectionResultOpt(connection -> AccountProvider.getInstance().getAccountDataByName(connection, login));
       if (accountData.isEmpty()) {
          accId = -2;
       } else {
@@ -422,7 +422,7 @@ public class MapleClient {
    }
 
    public Calendar getTempBanCalendarFromDB() {
-      Calendar result = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getTempBanCalendar(connection, accId)).orElse(null);
+      Calendar result = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getTempBanCalendar(connection, accId)).orElse(null);
       tempBanCalendar = result;
       return result;
    }
@@ -449,7 +449,7 @@ public class MapleClient {
 
          this.hwid = hwid.toString();
 
-         DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setHwid(connection, accId, hwid.toString()));
+         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setHwid(connection, accId, hwid.toString()));
       } else {
          this.disconnect(false, false); // Invalid HWID...
       }
@@ -467,7 +467,7 @@ public class MapleClient {
          }
       }
 
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setMacs(connection, accId, newMacData.toString()));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setMacs(connection, accId, newMacData.toString()));
    }
 
    public int getAccID() {
@@ -484,7 +484,7 @@ public class MapleClient {
          MapleSessionCoordinator.getInstance().updateOnlineSession(this.getSession());
       }
 
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setLoggedInStatus(connection, accId, newState));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setLoggedInStatus(connection, accId, newState));
 
       if (newState == LOGIN_NOTLOGGEDIN) {
          loggedIn = false;
@@ -497,7 +497,7 @@ public class MapleClient {
    }
 
    public int getLoginState() {  // 0 = LOGIN_NOTLOGGEDIN, 1= LOGIN_SERVER_TRANSITION, 2 = LOGIN_LOGGEDIN
-      Optional<AccountLoginData> loginData = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getLoginData(connection, accId));
+      Optional<AccountLoginData> loginData = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getLoginData(connection, accId));
       if (loginData.isEmpty()) {
          return LOGIN_NOTLOGGEDIN;
       }
@@ -518,7 +518,7 @@ public class MapleClient {
       if (state == LOGIN_LOGGEDIN) {
          loggedIn = true;
       } else if (state == LOGIN_SERVER_TRANSITION) {
-         DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().setLoggedInStatus(connection, accId, 0));
+         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setLoggedInStatus(connection, accId, 0));
       } else {
          loggedIn = false;
       }
@@ -848,16 +848,16 @@ public class MapleClient {
          return true;
       }
 
-      boolean tosStatus = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getTosStatus(connection, accId)).orElse(false);
+      boolean tosStatus = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getTosStatus(connection, accId)).orElse(false);
       if (tosStatus) {
          disconnectForBeingAFaggot = true;
       }
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().acceptTos(connection, accId));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().acceptTos(connection, accId));
       return disconnectForBeingAFaggot;
    }
 
    public int getVotePoints() {
-      votePoints = DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getVotePoints(connection, accId)).orElse(0);
+      votePoints = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getVotePoints(connection, accId)).orElse(0);
       return votePoints;
    }
 
@@ -877,7 +877,7 @@ public class MapleClient {
    }
 
    private void saveVotePoints() {
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().updateVotePoints(connection, accId, votePoints));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updateVotePoints(connection, accId, votePoints));
    }
 
    public void lockClient() {
@@ -938,14 +938,14 @@ public class MapleClient {
 
    public synchronized boolean gainCharacterSlot() {
       if (characterSlots < 15) {
-         DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().updateSlotCount(connection, accId, this.characterSlots += 1));
+         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updateSlotCount(connection, accId, this.characterSlots += 1));
          return true;
       }
       return false;
    }
 
    public final byte getGReason() {
-      return DatabaseConnection.withConnectionResult(connection -> AccountProvider.getInstance().getGReason(connection, accId)).orElse(Byte.MIN_VALUE);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getGReason(connection, accId)).orElse(Byte.MIN_VALUE);
    }
 
    public byte getGender() {
@@ -954,7 +954,7 @@ public class MapleClient {
 
    public void setGender(byte gender) {
       this.gender = gender;
-      DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().updateGender(connection, accId, gender));
+      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updateGender(connection, accId, gender));
    }
 
    private void announceDisableServerMessage() {

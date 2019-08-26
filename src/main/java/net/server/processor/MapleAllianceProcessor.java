@@ -35,7 +35,7 @@ public class MapleAllianceProcessor {
       if (name.contains(" ") || name.length() > 12) {
          return false;
       }
-      boolean allianceExists = DatabaseConnection.withConnectionResult(connection -> AllianceProvider.getInstance().allianceExists(connection, name)).orElse(false);
+      boolean allianceExists = DatabaseConnection.getInstance().withConnectionResult(connection -> AllianceProvider.getInstance().allianceExists(connection, name)).orElse(false);
       return !allianceExists;
    }
 
@@ -105,7 +105,7 @@ public class MapleAllianceProcessor {
 
    private MapleAlliance createAllianceOnDb(List<Integer> guilds, String name) {
       // will create an alliance, where the first guild listed is the leader and the alliance name MUST BE already checked for unicity.
-      int id = DatabaseConnection.withConnectionResult(connection -> {
+      int id = DatabaseConnection.getInstance().withConnectionResult(connection -> {
          int allianceId = AllianceAdministrator.getInstance().createAlliance(connection, name);
          AllianceGuildAdministrator.getInstance().addGuilds(connection, allianceId, guilds);
          return allianceId;
@@ -118,7 +118,7 @@ public class MapleAllianceProcessor {
          return Optional.empty();
       }
       MapleAlliance alliance = new MapleAlliance(null, -1);
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          AllianceProvider.getInstance().getAllianceData(connection, id).ifPresent(data -> setData(id, alliance, data));
          AllianceGuildProvider.getInstance().getGuildsForAlliance(connection, id).forEach(alliance::addGuild);
       });
@@ -141,7 +141,7 @@ public class MapleAllianceProcessor {
    }
 
    public void disbandAlliance(int allianceId) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          AllianceAdministrator.getInstance().deleteAlliance(connection, allianceId);
          AllianceGuildAdministrator.getInstance().deleteForAlliance(connection, allianceId);
       });
@@ -176,7 +176,7 @@ public class MapleAllianceProcessor {
    }
 
    private void removeGuildFromAllianceOnDb(int guildId) {
-      DatabaseConnection.withConnection(connection -> AllianceGuildAdministrator.getInstance().removeGuild(connection, guildId));
+      DatabaseConnection.getInstance().withConnection(connection -> AllianceGuildAdministrator.getInstance().removeGuild(connection, guildId));
    }
 
    public void sendInvitation(MapleClient c, String targetGuildName, int allianceId) {

@@ -95,7 +95,7 @@ public final class LoginPasswordHandler implements MaplePacketHandler {
       if (ServerConstants.AUTOMATIC_REGISTER && loginStatus == 5) {
          try {
             String password = ServerConstants.BCRYPT_MIGRATION ? BCrypt.hashpw(pwd, BCrypt.gensalt(12)) : hashpwSHA512(pwd);
-            DatabaseConnection.withConnection(connection -> c.setAccID(AccountAdministrator.getInstance().create(connection, login, password)));
+            DatabaseConnection.getInstance().withConnection(connection -> c.setAccID(AccountAdministrator.getInstance().create(connection, login, password)));
          } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             c.setAccID(-1);
             e.printStackTrace();
@@ -106,7 +106,7 @@ public final class LoginPasswordHandler implements MaplePacketHandler {
 
       if (ServerConstants.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
          String password = BCrypt.hashpw(pwd, BCrypt.gensalt(12));
-         DatabaseConnection.withConnection(connection -> AccountAdministrator.getInstance().updatePasswordByName(connection, login, password));
+         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updatePasswordByName(connection, login, password));
          loginStatus = (loginStatus == -10) ? 0 : 23;
       }
 

@@ -252,20 +252,20 @@ public class World {
    private static Pair<Integer, Pair<Integer, Integer>> getRelationshipCoupleFromDb(int id, boolean usingMarriageId) {
       Optional<MarriageData> marriageData;
       if (usingMarriageId) {
-         marriageData = DatabaseConnection.withConnectionResult(connection -> MarriageProvider.getInstance().getById(connection, id).orElseThrow());
+         marriageData = DatabaseConnection.getInstance().withConnectionResult(connection -> MarriageProvider.getInstance().getById(connection, id).orElseThrow());
       } else {
-         marriageData = DatabaseConnection.withConnectionResult(connection -> MarriageProvider.getInstance().getBySpouses(connection, id, id).orElseThrow());
+         marriageData = DatabaseConnection.getInstance().withConnectionResult(connection -> MarriageProvider.getInstance().getBySpouses(connection, id, id).orElseThrow());
       }
 
       return marriageData.map(data -> new Pair<>(data.getId(), new Pair<>(data.getSpouse1(), data.getSpouse2()))).orElse(null);
    }
 
    private static int addRelationshipToDb(int groomId, int brideId) {
-      return DatabaseConnection.withConnectionResult(connection -> MarriageAdministrator.getInstance().createMarriage(connection, groomId, brideId)).orElse(-1);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MarriageAdministrator.getInstance().createMarriage(connection, groomId, brideId)).orElse(-1);
    }
 
    private static void deleteRelationshipFromDb(int playerId) {
-      DatabaseConnection.withConnection(connection -> MarriageAdministrator.getInstance().endMarriage(connection, playerId));
+      DatabaseConnection.getInstance().withConnection(connection -> MarriageAdministrator.getInstance().endMarriage(connection, playerId));
    }
 
    public int getChannelsSize() {
@@ -679,7 +679,7 @@ public class World {
    }
 
    public void setOfflineGuildStatus(int guildid, int guildrank, int cid) {
-      DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, guildid, guildrank, cid));
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, guildid, guildrank, cid));
    }
 
    public void setGuildAndRank(int cid, int guildid, int rank) {
@@ -1730,7 +1730,7 @@ public class World {
 
    private void setPlayerNpcMapData(int mapId, int step, int podium, boolean silent) {
       if (!silent) {
-         DatabaseConnection.withConnection(connection -> {
+         DatabaseConnection.getInstance().withConnection(connection -> {
             if (step != -1) {
                executePlayerNpcMapDataUpdate(connection, false, pnpcStep, step, id, mapId);
             }

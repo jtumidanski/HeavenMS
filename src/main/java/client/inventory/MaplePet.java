@@ -60,7 +60,7 @@ public class MaplePet extends Item {
 
    public static MaplePet loadFromDb(int itemid, short position, int petid) {
       MaplePet ret = new MaplePet(itemid, position, petid);
-      DatabaseConnection.withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petid)).ifPresent(petData -> {
+      DatabaseConnection.getInstance().withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petid)).ifPresent(petData -> {
          ret.setName(petData.getName());
          ret.setCloseness(petData.getCloseness());
          ret.setLevel(petData.getLevel());
@@ -73,7 +73,7 @@ public class MaplePet extends Item {
    }
 
    public static void deleteFromDb(MapleCharacter owner, int petid) {
-      DatabaseConnection.withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petid));
+      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petid));
       owner.resetExcluded(petid);
       MapleCashidGenerator.freeCashId(petid);
    }
@@ -83,11 +83,11 @@ public class MaplePet extends Item {
    }
 
    public static int createPet(int itemid, byte level, int closeness, int fullness) {
-      return DatabaseConnection.withConnectionResult(connection -> PetAdministrator.getInstance().createPet(connection, itemid, level, closeness, fullness)).orElse(-1);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> PetAdministrator.getInstance().createPet(connection, itemid, level, closeness, fullness)).orElse(-1);
    }
 
    public void saveToDb() {
-      DatabaseConnection.withConnection(connection -> PetAdministrator.getInstance().updatePet(connection, getName(), getLevel(), getCloseness(), getFullness(), isSummoned(), getPetFlag(), getUniqueId()));
+      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().updatePet(connection, getName(), getLevel(), getCloseness(), getFullness(), isSummoned(), getPetFlag(), getUniqueId()));
    }
 
    public String getName() {

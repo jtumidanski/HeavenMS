@@ -91,10 +91,10 @@ public class AccountProvider extends AbstractQueryExecutor {
       return result.orElse(-1);
    }
 
-   public int getAccountIdForName(Connection connection, String name) {
+   public Integer getAccountIdForName(Connection connection, String name) {
       String sql = "SELECT id FROM accounts WHERE name = ?";
       Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, name), 1);
-      return result.orElse(-1);
+      return result.orElse(null);
    }
 
    public AccountCashShopData getAccountCashShopData(Connection connection, int accountId) {
@@ -122,7 +122,7 @@ public class AccountProvider extends AbstractQueryExecutor {
 
    public long getAccountCount(Connection connection) {
       String sql = "SELECT count(*) FROM accounts";
-      Optional<Long> result = getSingle(connection, sql,1);
+      Optional<Long> result = getSingle(connection, sql, 1);
       return result.orElse(0L);
    }
 
@@ -140,6 +140,7 @@ public class AccountProvider extends AbstractQueryExecutor {
 
    public List<Integer> getAllAccountIds(Connection connection) {
       String sql = "SELECT id FROM accounts";
-      return getListNew(connection, sql, ps -> {}, rs -> rs.getInt("id"));
+      return getListNew(connection, sql, ps -> {
+      }, rs -> rs.getInt("id"));
    }
 }

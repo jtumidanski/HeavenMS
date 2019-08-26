@@ -63,7 +63,7 @@ public final class TransferNameHandler extends AbstractMaplePacketHandler {
       }
 
       //sql queries
-      Optional<Timestamp> completionTime = DatabaseConnection.withConnectionResult(connection -> NameChangeProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()).orElse(null));
+      Optional<Timestamp> completionTime = DatabaseConnection.getInstance().withConnectionResult(connection -> NameChangeProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()).orElse(null));
 
       if (completionTime.isEmpty()) {
          c.announce(MaplePacketCreator.sendNameTransferRules(1));

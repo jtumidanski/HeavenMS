@@ -72,7 +72,7 @@ public class NewYearCardRecord {
    }
 
    public static void saveNewYearCard(NewYearCardRecord newyear) {
-      DatabaseConnection.withConnection(connection -> newyear.id = NewYearAdministrator.getInstance().create(connection, newyear.getSenderId(), newyear.getSenderName(),
+      DatabaseConnection.getInstance().withConnection(connection -> newyear.id = NewYearAdministrator.getInstance().create(connection, newyear.getSenderId(), newyear.getSenderName(),
             newyear.getReceiverId(), newyear.getReceiverName(), newyear.stringContent,
             newyear.isSenderCardDiscarded(), newyear.isReceiverCardDiscarded(), newyear.isReceiverCardReceived(),
             newyear.getDateSent(), newyear.getDateReceived()));
@@ -82,7 +82,7 @@ public class NewYearCardRecord {
       newyear.receiverReceivedCard = true;
       newyear.dateReceived = System.currentTimeMillis();
 
-      DatabaseConnection.withConnection(connection -> NewYearAdministrator.getInstance().setReceived(connection,
+      DatabaseConnection.getInstance().withConnection(connection -> NewYearAdministrator.getInstance().setReceived(connection,
             newyear.getId(), newyear.getDateReceived()));
    }
 
@@ -92,7 +92,7 @@ public class NewYearCardRecord {
          return nyc;
       }
 
-      Optional<NewYearCardRecord> newYearCardRecord = DatabaseConnection.withConnectionResultOpt(connection -> NewYearCardProvider.getInstance().getById(connection, cardId));
+      Optional<NewYearCardRecord> newYearCardRecord = DatabaseConnection.getInstance().withConnectionResultOpt(connection -> NewYearCardProvider.getInstance().getById(connection, cardId));
       if (newYearCardRecord.isPresent()) {
          Server.getInstance().setNewYearCard(newYearCardRecord.get());
          return newYearCardRecord.get();
@@ -102,7 +102,7 @@ public class NewYearCardRecord {
    }
 
    public static void loadPlayerNewYearCards(MapleCharacter chr) {
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             NewYearCardProvider.getInstance().getBySenderOrReceiver(connection, chr.getId(), chr.getId())
                   .forEach(chr::addNewYearRecord));
    }
@@ -132,7 +132,7 @@ public class NewYearCardRecord {
 
    private static void deleteNewYearCard(int id) {
       Server.getInstance().removeNewYearCard(id);
-      DatabaseConnection.withConnection(connection -> NewYearAdministrator.getInstance().deleteById(connection, id));
+      DatabaseConnection.getInstance().withConnection(connection -> NewYearAdministrator.getInstance().deleteById(connection, id));
    }
 
    public static void removeAllNewYearCard(boolean send, MapleCharacter chr) {
@@ -179,7 +179,7 @@ public class NewYearCardRecord {
    }
 
    public static void startPendingNewYearCardRequests() {
-      DatabaseConnection.withConnection(connection -> NewYearCardProvider.getInstance().getNotReceived(connection).forEach(newYearCard -> Server.getInstance().setNewYearCard(newYearCard)));
+      DatabaseConnection.getInstance().withConnection(connection -> NewYearCardProvider.getInstance().getNotReceived(connection).forEach(newYearCard -> Server.getInstance().setNewYearCard(newYearCard)));
    }
 
    public void setExtraNewYearCardRecord(int id, boolean senderDiscardCard, boolean receiverDiscardCard, boolean receiverReceivedCard, long dateSent, long dateReceived) {

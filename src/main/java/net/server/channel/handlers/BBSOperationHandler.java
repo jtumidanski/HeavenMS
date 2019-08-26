@@ -40,7 +40,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class BBSOperationHandler extends AbstractMaplePacketHandler {
 
    private static void listBBSThreads(MapleClient c, int start) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          List<BbsThreadData> threadData = BbsThreadProvider.getInstance().getThreadsForGuild(connection, c.getPlayer().getGuildId());
          c.announce(MaplePacketCreator.BBSThreadList(threadData, start));
       });
@@ -51,7 +51,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          Optional<BbsThreadData> threadData = BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, localThreadId, c.getPlayer().getGuildId(), true);
          if (threadData.isEmpty()) {
             return;
@@ -68,7 +68,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          BbsThreadAdministrator.getInstance().editThread(connection, localThreadId, c.getGuildId(), c.getId(), c.getGuildRank() < 3, title, icon, text);
          displayThread(client, localThreadId);
       });
@@ -80,7 +80,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          int nextId = 0;
          if (!bNotice) {
             nextId = BbsThreadProvider.getInstance().getNextLocalThreadId(connection, c.getGuildId());
@@ -96,7 +96,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          Optional<BbsThreadData> threadData = BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, localThreadId, mc.getGuildId(), true);
          if (threadData.isEmpty()) {
             return;
@@ -118,7 +118,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          Optional<BbsThreadReplyData> threadReplyData = BbsThreadReplyProvider.getInstance().getByReplyId(connection, replyId);
          if (threadReplyData.isEmpty()) {
             return;
@@ -144,7 +144,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
+      DatabaseConnection.getInstance().withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
             .ifPresent(threadData -> client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.getThreadId(), threadData))));
    }
 

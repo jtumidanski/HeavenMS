@@ -80,7 +80,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
    private static Set<Integer> attemptingLoginAccounts = new HashSet<>();
 
    private void showDueyNotification(MapleClient c, MapleCharacter player) {
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             DueyPackageProvider.getInstance().getPackageTypeForCharacter(connection, player.getId())
                   .ifPresent(type -> {
                      DueyPackageAdministrator.getInstance().uncheck(connection, player.getId());

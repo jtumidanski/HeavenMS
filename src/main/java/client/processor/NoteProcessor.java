@@ -14,6 +14,6 @@ public class NoteProcessor {
    }
 
    public void sendNote(String to, String from, String msg, byte fame) {
-      DatabaseConnection.withConnection(connection -> NoteAdministrator.getInstance().sendNote(connection, to, from, msg, fame));
+      DatabaseConnection.getInstance().withConnection(connection -> NoteAdministrator.getInstance().sendNote(connection, to, from, msg, fame));
    }
 }

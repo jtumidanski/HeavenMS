@@ -23,7 +23,7 @@ public class MapleRingProcessor {
    }
 
    public MapleRing loadFromDb(int ringId) {
-      return DatabaseConnection.withConnectionResultOpt(connection -> RingProvider.getInstance().getRingById(connection, ringId)).orElseThrow();
+      return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> RingProvider.getInstance().getRingById(connection, ringId)).orElseThrow();
    }
 
    public void removeRing(final MapleRing ring) {
@@ -31,7 +31,7 @@ public class MapleRingProcessor {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          RingAdministrator.getInstance().deleteRing(connection, ring.getRingId(), ring.getPartnerRingId());
 
          MapleCashidGenerator.freeCashId(ring.getRingId());
@@ -52,7 +52,7 @@ public class MapleRingProcessor {
       ringID[0] = MapleCashidGenerator.generateCashId();
       ringID[1] = MapleCashidGenerator.generateCashId();
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          RingAdministrator.getInstance().addRing(connection, ringID[0], itemId, ringID[1], partner2.getId(), partner2.getName());
          RingAdministrator.getInstance().addRing(connection, ringID[1], itemId, ringID[0], partner1.getId(), partner1.getName());
       });

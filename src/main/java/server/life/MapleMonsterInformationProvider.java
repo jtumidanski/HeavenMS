@@ -89,7 +89,7 @@ public class MapleMonsterInformationProvider {
    }
 
    private void retrieveGlobal() {
-      DatabaseConnection.withConnection(connection -> globalDrops.addAll(DropDataProvider.getInstance().getGlobalDropData(connection)));
+      DatabaseConnection.getInstance().withConnection(connection -> globalDrops.addAll(DropDataProvider.getInstance().getGlobalDropData(connection)));
    }
 
    public List<MonsterDropEntry> retrieveEffectiveDrop(final int monsterId) {
@@ -139,7 +139,7 @@ public class MapleMonsterInformationProvider {
       if (drops.containsKey(monsterId)) {
          return drops.get(monsterId);
       }
-      List<MonsterDropEntry> ret = DatabaseConnection.withConnectionResult(connection ->
+      List<MonsterDropEntry> ret = DatabaseConnection.getInstance().withConnectionResult(connection ->
             DropDataProvider.getInstance().getDropDataForMonster(connection, monsterId)).orElse(new ArrayList<>());
       drops.put(monsterId, ret);
       return ret;

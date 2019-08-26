@@ -120,7 +120,7 @@ public class MapleSessionCoordinator {
    }
 
    private static boolean associateHwidAccountIfAbsent(String remoteHwid, int accountId) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          int hwidCount = 0;
          List<String> hwids = HwidAccountProvider.getInstance().getHwidForAccount(connection, accountId);
          for (String hwid : hwids) {
@@ -138,7 +138,7 @@ public class MapleSessionCoordinator {
    }
 
    private static boolean attemptAccessAccount(String nibbleHwid, int accountId, boolean routineCheck) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          int hwidCount = 0;
          List<Pair<String, Integer>> results = HwidAccountProvider.getInstance().getForAccount(connection, accountId);
          for (Pair<String, Integer> pair : results) {
@@ -485,7 +485,7 @@ public class MapleSessionCoordinator {
    }
 
    public void runUpdateHwidHistory() {
-      DatabaseConnection.withConnection(connection -> HwidAccountAdministrator.getInstance().deleteExpired(connection));
+      DatabaseConnection.getInstance().withConnection(connection -> HwidAccountAdministrator.getInstance().deleteExpired(connection));
 
       long timeNow = Server.getInstance().getCurrentTime();
       List<String> toRemove = new LinkedList<>();

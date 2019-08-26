@@ -306,7 +306,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                   owner.get().addMerchantMesos(price);
                } else {
                   final int priceIncrease = price;
-                  DatabaseConnection.withConnection(connection -> {
+                  DatabaseConnection.getInstance().withConnection(connection -> {
                      long merchantMesos = CharacterProvider.getInstance().getMerchantMesos(connection, ownerId);
                      merchantMesos += priceIncrease;
                      CharacterAdministrator.getInstance().setMerchantMesos(connection, (int) Math.min(merchantMesos, Integer.MAX_VALUE), ownerId);
@@ -365,7 +365,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
       Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId).ifPresentOrElse(
             character -> character.setHasMerchant(false),
-            () -> DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
+            () -> DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
 
       map = null;
    }
@@ -388,7 +388,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       try {
          c.getWorldServer().getPlayerStorage().getCharacterById(ownerId).ifPresentOrElse(
                character -> character.setHasMerchant(false),
-               () -> DatabaseConnection.withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
+               () -> DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
 
          List<MaplePlayerShopItem> copyItems = getItems();
          if (check(c.getPlayer(), copyItems) && !timeout) {
@@ -605,7 +605,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          }
       }
 
-      DatabaseConnection.withConnection(connection -> ItemFactory.MERCHANT.saveItems(itemsWithType, bundles, this.ownerId, connection));
+      DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.MERCHANT.saveItems(itemsWithType, bundles, this.ownerId, connection));
       FredrickProcessor.insertFredrickLog(this.ownerId);
    }
 

@@ -42,7 +42,7 @@ public class PortalPlayerInteraction extends AbstractPlayerInteraction {
    }
 
    public boolean hasLevel30Character() {
-      return DatabaseConnection.withConnectionResult(connection ->
+      return DatabaseConnection.getInstance().withConnectionResult(connection ->
             CharacterProvider.getInstance().getCharacterLevels(connection, getPlayer().getAccountID()).stream().anyMatch(level -> level >= 30)
       ).orElse(getPlayer().getLevel() >= 30);
    }

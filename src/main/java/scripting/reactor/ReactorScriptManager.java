@@ -83,7 +83,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
    public List<ReactorDropEntry> getDrops(int rid) {
       List<ReactorDropEntry> ret = drops.get(rid);
       if (ret == null) {
-         ret = DatabaseConnection.withConnectionResult(connection -> ReactorDropProvider.getInstance().getDropsForReactor(connection, rid)).orElseThrow();
+         ret = DatabaseConnection.getInstance().withConnectionResult(connection -> ReactorDropProvider.getInstance().getDropsForReactor(connection, rid)).orElseThrow();
          drops.put(rid, ret);
       }
       return ret;

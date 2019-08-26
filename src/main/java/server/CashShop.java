@@ -85,7 +85,7 @@ public class CashShop {
          factory = ItemFactory.CASH_OVERALL;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          AccountCashShopData cashShopData = AccountProvider.getInstance().getAccountCashShopData(connection, accountId);
          this.nxCredit = cashShopData.getNxCredit();
          this.maplePoint = cashShopData.getMaplePoint();
@@ -210,12 +210,12 @@ public class CashShop {
    }
 
    public void gift(int recipient, String from, String message, int sn, int ringid) {
-      DatabaseConnection.withConnection(connection -> GiftAdministrator.getInstance().createGift(connection, recipient, from, message, sn, ringid));
+      DatabaseConnection.getInstance().withConnection(connection -> GiftAdministrator.getInstance().createGift(connection, recipient, from, message, sn, ringid));
    }
 
    public List<Pair<Item, String>> loadGifts() {
       List<Pair<Item, String>> gifts = new ArrayList<>();
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          GiftProvider.getInstance().getGiftsForCharacter(connection, characterId).forEach(gift -> loadGift(gifts, gift));
          GiftAdministrator.getInstance().deleteAllGiftsForCharacter(connection, characterId);
       });
@@ -446,7 +446,7 @@ public class CashShop {
             }
          }
 
-         DatabaseConnection.withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
+         DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
       }
 
       public static CashItem getRandomCashItem() {
@@ -482,7 +482,7 @@ public class CashShop {
 
       public static void reloadSpecialCashItems() {//Yay?
          specialcashitems.clear();
-         DatabaseConnection.withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
+         DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
       }
    }
 }

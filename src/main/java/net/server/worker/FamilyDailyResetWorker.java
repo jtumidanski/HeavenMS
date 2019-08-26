@@ -31,7 +31,7 @@ public class FamilyDailyResetWorker implements Runnable {
       resetTime.set(Calendar.MINUTE, 0);
       resetTime.set(Calendar.SECOND, 0);
       resetTime.set(Calendar.MILLISECOND, 0);
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          FamilyCharacterAdministrator.getInstance().resetReputationOlderThan(connection, resetTime.getTimeInMillis());
          FamilyEntitlementAdministrator.getInstance().deleteOlderThan(connection, resetTime.getTimeInMillis());
       });

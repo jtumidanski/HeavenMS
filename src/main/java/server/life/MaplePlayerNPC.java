@@ -117,7 +117,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    }
 
    private static void getRunningMetadata() {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          getRunningOverallRanks(connection);
          getRunningWorldRanks(connection);
          getRunningWorldJobRanks(connection);
@@ -155,7 +155,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    }
 
    public static boolean canSpawnPlayerNpc(String name, int mapid) {
-      return DatabaseConnection.withConnectionResult(connection -> PlayerNpcProvider.getInstance().getLikeNameAndMap(connection, name, mapid).stream().findFirst().isPresent()).orElse(false);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> PlayerNpcProvider.getInstance().getLikeNameAndMap(connection, name, mapid).stream().findFirst().isPresent()).orElse(false);
    }
 
    private static void fetchAvailableScriptIdsFromDb(byte branch, List<Integer> list) {
@@ -163,7 +163,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       int branchSid = 9900000 + (branch * 100);
       int nextBranchSid = branchSid + branchLen;
 
-      Set<Integer> usedScriptIds = DatabaseConnection.withConnectionResult(connection ->
+      Set<Integer> usedScriptIds = DatabaseConnection.getInstance().withConnectionResult(connection ->
             new HashSet<>(PlayerNpcProvider.getInstance().getAvailableScripts(connection, branchSid, nextBranchSid)))
             .orElseThrow();
 
@@ -231,7 +231,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       int jobId = (chr.getJob().getId() / 100) * 100;
 
       final Point actualPosition = pos;
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<MaplePlayerNPC> playerNPC = PlayerNpcProvider.getInstance().getByScriptId(connection, scriptId);
          if (playerNPC.isPresent()) {
             return playerNPC.get();
@@ -251,7 +251,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       mapIds.add(chr.getWorld());
       Set<Integer> mapIdsToUpdate = new HashSet<>();
 
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             PlayerNpcProvider.getInstance().getLikeNameAndMap(connection, chr.getName(), map.getId())
                   .forEach(pair -> {
                      mapIdsToUpdate.add(pair.getRight());
@@ -350,7 +350,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
 
    public static void removeAllPlayerNPC() {
       int worldSize = Server.getInstance().getWorldsSize();
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          PlayerNpcProvider.getInstance().getWorldMapsWithPlayerNpcs(connection).stream()
                .filter(result -> result.getLeft() >= worldSize)
                .forEach(result -> {
@@ -462,6 +462,6 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       CY = newPos.y;
       FH = map.getFootholds().findBelow(newPos).getId();
 
-      DatabaseConnection.withConnection(connection -> PlayerNpcAdministrator.getInstance().updatePosition(connection, newPos.x, CY, FH, RX0, RX1, getObjectId()));
+      DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcAdministrator.getInstance().updatePosition(connection, newPos.x, CY, FH, RX0, RX1, getObjectId()));
    }
 }

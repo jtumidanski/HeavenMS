@@ -47,7 +47,7 @@ public final class NoteActionHandler extends AbstractMaplePacketHandler {
          int num = slea.readByte();
          slea.readByte();
          slea.readByte();
-         int fame = DatabaseConnection.withConnectionResult(connection -> {
+         int fame = DatabaseConnection.getInstance().withConnectionResult(connection -> {
             int fameCount = 0;
             for (int i = 0; i < num; i++) {
                int id = slea.readInt();

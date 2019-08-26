@@ -66,7 +66,7 @@ public class PnpcCommand extends Command {
 
       if (npc != null && !npc.getName().equals("MISSINGNO")) {
 
-         DatabaseConnection.withConnection(connection ->
+         DatabaseConnection.getInstance().withConnection(connection ->
                PlayerLifeAdministrator.getInstance().create(connection, npcId, 0, fh, ypos, xpos + 50,
                      xpos - 50, "n", xpos, ypos, player.getWorld(), mapId, -1, 0));
 

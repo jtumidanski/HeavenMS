@@ -66,7 +66,7 @@ public class PmobCommand extends Command {
          mob.setRx1(xpos - 50);
          mob.setFh(fh);
 
-         DatabaseConnection.withConnection(connection ->
+         DatabaseConnection.getInstance().withConnection(connection ->
                PlayerLifeAdministrator.getInstance().create(connection, mobId, 0, fh, ypos, xpos + 50,
                      xpos - 50, "m", xpos, ypos, player.getWorld(), mapId, mobTime, 0));
 

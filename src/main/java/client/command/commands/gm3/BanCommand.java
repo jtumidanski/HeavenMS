@@ -54,7 +54,7 @@ public class BanCommand extends Command {
          String ip = target.getClient().getSession().getRemoteAddress().toString().split(":")[0];
          //Ban ip
          if (ip.matches("/[0-9]{1,3}\\..*")) {
-            DatabaseConnection.withConnection(connection -> IpBanAdministrator.getInstance().banIp(connection, ip, target.getClient().getAccID()));
+            DatabaseConnection.getInstance().withConnection(connection -> IpBanAdministrator.getInstance().banIp(connection, ip, target.getClient().getAccID()));
          }
          target.getClient().banMacs();
          reason = c.getPlayer().getName() + " banned " + readableTargetName + " for " + reason + " (IP: " + ip + ") " + "(MAC: " + c.getMacs() + ")";

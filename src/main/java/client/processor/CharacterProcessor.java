@@ -31,14 +31,14 @@ public class CharacterProcessor {
    }
 
    public int getIdByName(String name) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getIdForName(connection, name)).orElse(-1);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getIdForName(connection, name)).orElse(-1);
    }
 
    public String getNameById(int id) {
-      return DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, id)).orElse(null);
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, id)).orElse(null);
    }
 
    public CharacterIdNameAccountId getCharacterFromDatabase(String name) {
-      return DatabaseConnection.withConnectionResultOpt(connection -> CharacterProvider.getInstance().getByName(connection, name)).orElse(null);
+      return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> CharacterProvider.getInstance().getByName(connection, name)).orElse(null);
    }
 }

@@ -213,7 +213,7 @@ public class Server {
    }
 
    private static List<WorldRankData> updatePlayerRankingFromDB(int worldId) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
             if (worldId >= 0) {
                return GlobalUserRankProvider.getInstance().getWorldRanks(connection, worldId);
@@ -248,7 +248,7 @@ public class Server {
          playerEquips.add(ae.getLeft());
       }
 
-      List<CharacterData> characterDataList = DatabaseConnection.withConnectionResult(connection -> CharacterProvider.getInstance().getByAccountId(connection, accId)).orElse(new ArrayList<>());
+      List<CharacterData> characterDataList = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getByAccountId(connection, accId)).orElse(new ArrayList<>());
       for (CharacterData characterData : characterDataList) {
          characterCount++;
 
@@ -325,7 +325,7 @@ public class Server {
    }
 
    private void loadPlayerNpcMapStepFromDb() {
-      DatabaseConnection.withConnection(connection -> PlayerNpcFieldProvider.getInstance().get(connection).forEach(fieldData -> {
+      DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcFieldProvider.getInstance().get(connection).forEach(fieldData -> {
          World world = getWorld(fieldData.getWorldId());
          if (world != null) {
             world.setPlayerNpcMapData(fieldData.getMapId(), fieldData.getStep(), fieldData.getPodium());
@@ -658,7 +658,7 @@ public class Server {
    public void updateActiveCoupons() {
       synchronized (activeCoupons) {
          activeCoupons.clear();
-         DatabaseConnection.withConnectionResult(connection -> NxCouponProvider.getInstance().getActiveCoupons(connection))
+         DatabaseConnection.getInstance().withConnectionResult(connection -> NxCouponProvider.getInstance().getActiveCoupons(connection))
                .ifPresent(result -> result.forEach(coupon -> activeCoupons.add(coupon.getCouponId())));
       }
    }
@@ -768,7 +768,7 @@ public class Server {
    }
 
    private void clearMissingPetsFromDb() {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          PetAdministrator.getInstance().unreferenceMissingPetsFromInventory(connection);
          PetAdministrator.getInstance().deleteMissingPets(connection);
       });
@@ -789,7 +789,7 @@ public class Server {
 
       TimeZone.setDefault(TimeZone.getTimeZone(ServerConstants.TIMEZONE));
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          AccountAdministrator.getInstance().logoutAllAccounts(connection);
          CharacterAdministrator.getInstance().removeAllMerchants(connection);
          cleanNxcodeCoupons(connection);
@@ -1405,7 +1405,7 @@ public class Server {
    }
 
    public void loadAllAccountsCharactersView() {
-      DatabaseConnection.withConnection(connection -> AccountProvider.getInstance().getAllAccountIds(connection)
+      DatabaseConnection.getInstance().withConnection(connection -> AccountProvider.getInstance().getAllAccountIds(connection)
             .forEach(accountId -> {
                if (isFirstAccountLogin(accountId)) {
                   loadAccountCharactersView(accountId, 0, 0);
@@ -1424,7 +1424,7 @@ public class Server {
 
    private static void applyAllNameChanges() {
       List<Pair<String, String>> changedNames = new LinkedList<>(); //logging only
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             NameChangeProvider.getInstance().getPendingNameChanges(connection).forEach(result -> {
                CharacterAdministrator.getInstance().performNameChange(connection, result.getCharacterId(), result.getOldName(), result.getNewName(), result.getId());
                changedNames.add(new Pair<>(result.getOldName(), result.getNewName()));
@@ -1436,7 +1436,7 @@ public class Server {
 
    private static void applyAllWorldTransfers() {
       List<Pair<Integer, Pair<Integer, Integer>>> worldTransfers = new LinkedList<>(); //logging only <charid, <oldWorld, newWorld>>
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             WorldTransferProvider.getInstance().getPendingTransfers(connection).forEach(result -> {
                String reason = MapleCharacter.checkWorldTransferEligibility(connection, result.getCharacterId(), result.getFrom(), result.getTo());
                if (reason != null) {

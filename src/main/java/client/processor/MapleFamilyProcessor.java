@@ -40,7 +40,7 @@ public class MapleFamilyProcessor {
 
    public void loadAllFamilies() {
       List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<Pair<Pair<Integer, Integer>, MapleFamilyEntry>>(200); // <<world, seniorid> familyEntry>
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
             int cid = familyData.getCharacterId();
             String name = null;
@@ -124,7 +124,7 @@ public class MapleFamilyProcessor {
    }
 
    public void saveAllMembersRep(MapleFamily mapleFamily) { //was used for autosave worker, but character autosave should be enough
-      DatabaseConnection.withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
          connection.setAutoCommit(false);
          boolean success = true;
          for (MapleFamilyEntry entry : mapleFamily.getMembers()) {
@@ -150,7 +150,7 @@ public class MapleFamilyProcessor {
    public void setMessage(MapleFamily mapleFamily, String message, boolean save) {
       mapleFamily.setMessage(message);
       if (save) {
-         DatabaseConnection.withConnection(connection -> FamilyCharacterAdministrator.getInstance().updatePrecepts(connection, mapleFamily.getLeader().getChrId(), message));
+         DatabaseConnection.getInstance().withConnection(connection -> FamilyCharacterAdministrator.getInstance().updatePrecepts(connection, mapleFamily.getLeader().getChrId(), message));
       }
    }
 
@@ -187,7 +187,7 @@ public class MapleFamilyProcessor {
    }
 
    public void insertNewFamilyRecord(int characterID, int familyID, int seniorID, boolean updateChar) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          FamilyCharacterAdministrator.getInstance().create(connection, characterID, familyID, seniorID);
          if (updateChar) {
             CharacterAdministrator.getInstance().setFamilyId(connection, characterID, familyID);

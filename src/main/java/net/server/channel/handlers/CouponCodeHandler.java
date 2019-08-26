@@ -106,7 +106,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
          return new Pair<>(-5, null);
       }
 
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Pair<Integer, List<NxCodeItemData>> retVal;
          Optional<NxCodeData> nxCode = NxCodeProvider.getInstance().get(connection, code);
          if (nxCode.isEmpty()) {

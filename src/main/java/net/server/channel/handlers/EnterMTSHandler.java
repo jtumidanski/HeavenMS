@@ -114,7 +114,7 @@ public final class EnterMTSHandler extends AbstractMaplePacketHandler {
          c.announce(MaplePacketCreator.MTSWantedListingOver(0, 0));
          c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
 
-         DatabaseConnection.withConnection(connection -> {
+         DatabaseConnection.getInstance().withConnection(connection -> {
             List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getByTab(connection, 1, 16));
             long countForTab = MtsItemProvider.getInstance().countByTab(connection, 1);
             int pages = (int) Math.ceil(countForTab / 16);
@@ -127,10 +127,10 @@ public final class EnterMTSHandler extends AbstractMaplePacketHandler {
    }
 
    private List<MTSItemInfo> getNotYetSold(int cid) {
-      return DatabaseConnection.withConnectionResult(connection -> MtsItemProvider.getInstance().getUnsoldItems(connection, cid)).orElseThrow();
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MtsItemProvider.getInstance().getUnsoldItems(connection, cid)).orElseThrow();
    }
 
    private List<MTSItemInfo> getTransfer(int cid) {
-      return DatabaseConnection.withConnectionResult(connection -> MtsItemProvider.getInstance().getTransferItems(connection, cid)).orElse(new ArrayList<>());
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MtsItemProvider.getInstance().getTransferItems(connection, cid)).orElse(new ArrayList<>());
    }
 }

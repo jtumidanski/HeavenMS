@@ -100,7 +100,7 @@ public class MapleShop {
    }
 
    public static MapleShop createFromDB(int id, boolean isShopId) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<MapleShop> ret;
          if (isShopId) {
             ret = ShopProvider.getInstance().getById(connection, id);

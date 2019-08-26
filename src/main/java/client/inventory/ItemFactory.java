@@ -69,9 +69,9 @@ public enum ItemFactory {
 
    public static List<Pair<Item, Integer>> loadEquippedItems(int id, boolean isAccount, boolean login) {
       if (isAccount) {
-         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByAccount(connection, id, login)).orElse(new ArrayList<>());
+         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByAccount(connection, id, login)).orElse(new ArrayList<>());
       } else {
-         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByCharacter(connection, id, login)).orElse(new ArrayList<>());
+         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByCharacter(connection, id, login)).orElse(new ArrayList<>());
       }
    }
 
@@ -103,9 +103,9 @@ public enum ItemFactory {
 
    private List<Pair<Item, MapleInventoryType>> loadItemsCommon(int id, boolean login) {
       if (account) {
-         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getItemsByAccountAndType(connection, id, value, login)).orElse(new ArrayList<>());
+         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getItemsByAccountAndType(connection, id, value, login)).orElse(new ArrayList<>());
       } else {
-         return DatabaseConnection.withConnectionResult(connection -> InventoryItemProvider.getInstance().getItemsByCharacterAndType(connection, id, value, login)).orElse(new ArrayList<>());
+         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getItemsByCharacterAndType(connection, id, value, login)).orElse(new ArrayList<>());
       }
    }
 
@@ -139,7 +139,7 @@ public enum ItemFactory {
    }
 
    private List<Pair<Item, MapleInventoryType>> loadItemsMerchant(int id, boolean login) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          List<Pair<Item, MapleInventoryType>> results;
          if (account) {
             results = InventoryItemProvider.getInstance().getItemsByAccountAndType(connection, id, value, login);

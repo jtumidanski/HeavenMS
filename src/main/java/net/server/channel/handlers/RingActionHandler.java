@@ -133,7 +133,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
    }
 
    private static void eraseEngagementOffline(int characterId) {
-      DatabaseConnection.withConnection(connection -> eraseEngagementOffline(characterId, connection));
+      DatabaseConnection.getInstance().withConnection(connection -> eraseEngagementOffline(characterId, connection));
    }
 
    private static void eraseEngagementOffline(int characterId, Connection con) {
@@ -141,7 +141,7 @@ public final class RingActionHandler extends AbstractMaplePacketHandler {
    }
 
    private static void breakEngagementOffline(int characterId) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          CharacterProvider.getInstance().getMarriageItem(connection, characterId)
                .ifPresent(itemId -> InventoryItemAdministrator.getInstance().expireItem(connection, itemId, characterId));
          eraseEngagementOffline(characterId, connection);

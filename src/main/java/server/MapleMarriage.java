@@ -49,7 +49,7 @@ public class MapleMarriage extends EventInstanceManager {
       List<Item> gifts = loadGiftItemsFromDb(c, chr.getId());
       if (MapleInventory.checkSpot(chr, gifts)) {
          // TODO - Is this new LinkedList() a bug?
-         DatabaseConnection.withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(new LinkedList<>(), chr.getId(), connection));
+         DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(new LinkedList<>(), chr.getId(), connection));
          for (Item item : gifts) {
             MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
          }
@@ -83,7 +83,7 @@ public class MapleMarriage extends EventInstanceManager {
 
       if (c.tryAcquireClient()) {
          try {
-            DatabaseConnection.withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(items, cid, connection));
+            DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(items, cid, connection));
          } finally {
             c.releaseClient();
          }

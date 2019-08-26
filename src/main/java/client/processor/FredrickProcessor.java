@@ -106,7 +106,7 @@ public class FredrickProcessor {
    }
 
    public static void removeFredrickLog(int cid) {
-      DatabaseConnection.withConnection(connection -> removeFredrickLog(connection, cid));
+      DatabaseConnection.getInstance().withConnection(connection -> removeFredrickLog(connection, cid));
    }
 
    private static void removeFredrickLog(Connection con, int cid) {
@@ -114,7 +114,7 @@ public class FredrickProcessor {
    }
 
    public static void insertFredrickLog(int cid) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          removeFredrickLog(connection, cid);
          FredStorageAdministrator.getInstance().create(connection, cid);
       });
@@ -125,7 +125,7 @@ public class FredrickProcessor {
    }
 
    private static void removeFredrickReminders(List<CharacterWorldData> expiredCids) {
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             expiredCids.stream()
                   .map(pair -> CharacterProcessor.getInstance().getNameById(pair.getCharacterId()))
                   .filter(Objects::nonNull)
@@ -133,7 +133,7 @@ public class FredrickProcessor {
    }
 
    public static void runFredrickSchedule() {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          List<CharacterWorldData> expiredCharacterIds = new LinkedList<>();
          List<CharacterNameNote> characterIdsToNotify = new LinkedList<>();
          long curTime = System.currentTimeMillis();
@@ -189,7 +189,7 @@ public class FredrickProcessor {
    }
 
    private static boolean deleteFredrickItems(int cid) {
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             InventoryItemAdministrator.getInstance().deleteForCharacterByType(connection, cid, ItemFactory.MERCHANT.getValue()));
       return true;
    }

@@ -45,7 +45,7 @@ public class UnBanCommand extends Command {
          return;
       }
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          int aid = AccountProvider.getInstance().getAccountIdForName(connection, params[0]);
          AccountAdministrator.getInstance().removePermaBan(connection, aid);
          IpBanAdministrator.getInstance().removeIpBan(connection, aid);

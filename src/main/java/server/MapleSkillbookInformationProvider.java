@@ -226,7 +226,7 @@ public class MapleSkillbookInformationProvider {
    }
 
    private static void fetchSkillbooksFromReactors() {
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             ReactorDropProvider.getInstance().getDropIds(connection, skillbookMinItemid, skillbookMaxItemid)
                   .forEach(id -> foundSkillbooks.put(id, SkillBookEntry.REACTOR)));
    }

@@ -50,7 +50,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public final class MTSHandler extends AbstractMaplePacketHandler {
 
    private static byte[] getMTS(int tab, int type, int page) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          List<MTSItemInfo> items = new ArrayList<>();
          long pages;
          if (type != 0) {
@@ -120,7 +120,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    private void buyItem(SeekableLittleEndianAccessor slea, MapleClient c) {
       int id = slea.readInt(); //id of the item
 
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             MtsItemProvider.getInstance().getSaleInfoById(connection, id).ifPresentOrElse(info -> {
                int price = info.getRight() + 100 + (int) (info.getRight() * 0.1); //taxes
                if (c.getPlayer().getCashShop().getCash(4) >= price) { //FIX
@@ -159,7 +159,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
 
    private void deleteFromCart(SeekableLittleEndianAccessor slea, MapleClient c) {
       int id = slea.readInt(); //id of the item
-      DatabaseConnection.withConnection(connection -> MtsCartAdministrator.getInstance().removeItemFromCart(connection, id, c.getPlayer().getId()));
+      DatabaseConnection.getInstance().withConnection(connection -> MtsCartAdministrator.getInstance().removeItemFromCart(connection, id, c.getPlayer().getId()));
 
       c.announce(getCart(c.getPlayer().getId()));
       c.enableCSActions();
@@ -170,7 +170,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    private void addToCart(SeekableLittleEndianAccessor slea, MapleClient c) {
       int id = slea.readInt(); //id of the item
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          boolean itemForSaleBySomeoneElse = MtsItemProvider.getInstance().isItemForSaleBySomeoneElse(connection, id, c.getPlayer().getId());
          if (itemForSaleBySomeoneElse) {
             boolean itemAlreadyInCart = MtsCartProvider.getInstance().isItemInCart(connection, c.getPlayer().getId(), id);
@@ -190,7 +190,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    private void transferItem(SeekableLittleEndianAccessor slea, MapleClient c) {
       int id = slea.readInt(); //id of the item
 
-      DatabaseConnection.withConnection(connection -> MtsItemProvider.getInstance().getTransferItem(connection, c.getPlayer().getId(), id)
+      DatabaseConnection.getInstance().withConnection(connection -> MtsItemProvider.getInstance().getTransferItem(connection, c.getPlayer().getId(), id)
             .ifPresent(item -> {
                item.setPosition(c.getPlayer().getInventory(ItemConstants.getInventoryType(item.getItemId())).getNextFreeSlot());
                MtsItemAdministrator.getInstance().deleteTransferItem(connection, id, c.getPlayer().getId());
@@ -207,7 +207,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    private void cancelSale(SeekableLittleEndianAccessor slea, MapleClient c) {
       int id = slea.readInt(); //id of the item
 
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          MtsItemAdministrator.getInstance().cancelSale(connection, c.getPlayer().getId(), id);
          MtsCartAdministrator.getInstance().removeItemFromCarts(connection, id);
       });
@@ -313,7 +313,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       if (i != null && c.getPlayer().getMeso() >= 5000) {
 
          final short postedQuantity = quantity;
-         DatabaseConnection.withConnection(connection -> {
+         DatabaseConnection.getInstance().withConnection(connection -> {
             long itemForSaleCount = MtsItemProvider.getInstance().countBySeller(connection, c.getPlayer().getId());
             if (itemForSaleCount > 10) { //They have more than 10 items up for sale already!
                c.getPlayer().dropMessage(1, "You already have 10 items up for auction!");
@@ -394,7 +394,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    private void buyFromCart(SeekableLittleEndianAccessor slea, MapleClient c) {
       int id = slea.readInt(); //id of the item
 
-      DatabaseConnection.withConnection(connection ->
+      DatabaseConnection.getInstance().withConnection(connection ->
             MtsItemProvider.getInstance().getSaleInfoById(connection, id).ifPresentOrElse(info -> {
                int price = info.getRight() + 100 + (int) (info.getRight() * 0.1);
                if (c.getPlayer().getCashShop().getCash(4) >= price) {
@@ -423,18 +423,18 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    }
 
    private void awardSellerCash(int seller, int price) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          int accountId = CharacterProvider.getInstance().getAccountIdForCharacterId(connection, seller);
          AccountAdministrator.getInstance().awardNxPrepaid(connection, accountId, price);
       });
    }
 
    public List<MTSItemInfo> getNotYetSold(int cid) {
-      return DatabaseConnection.withConnectionResult(connection -> MtsItemProvider.getInstance().getUnsoldItems(connection, cid)).orElseThrow();
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MtsItemProvider.getInstance().getUnsoldItems(connection, cid)).orElseThrow();
    }
 
    public byte[] getCart(int cid) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          List<MTSItemInfo> items = new ArrayList<>();
          MtsCartProvider.getInstance().getCartItems(connection, cid).forEach(itemId -> MtsItemProvider.getInstance().getById(connection, itemId).ifPresent(items::add));
          long cartSize = MtsCartProvider.getInstance().countCartSize(connection, cid);
@@ -448,11 +448,11 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    }
 
    public List<MTSItemInfo> getTransfer(int cid) {
-      return DatabaseConnection.withConnectionResult(connection -> MtsItemProvider.getInstance().getTransferItems(connection, cid)).orElse(new ArrayList<>());
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MtsItemProvider.getInstance().getTransferItems(connection, cid)).orElse(new ArrayList<>());
    }
 
    public byte[] getMTSSearch(int tab, int type, int characterId, String search, int page) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getSearchItems(connection, tab, type, characterId, search, page, ii.getAllItems()));
 

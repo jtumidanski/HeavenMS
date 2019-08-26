@@ -73,7 +73,7 @@ public class MapleExpeditionBossLog {
    private static void resetBossLogTable(boolean week, Calendar c) {
       List<Pair<Timestamp, BossLogEntry>> resetTimestamps = BossLogEntry.getBossLogResetTimestamps(c, week);
 
-      DatabaseConnection.withConnection(connection -> resetTimestamps.forEach(pair -> {
+      DatabaseConnection.getInstance().withConnection(connection -> resetTimestamps.forEach(pair -> {
          if (week) {
             BossLogWeeklyAdministrator.getInstance().deleteByAttemptTimeAndBossType(connection, pair.getLeft(), pair.getRight().name());
          } else {
@@ -87,7 +87,7 @@ public class MapleExpeditionBossLog {
    }
 
    private static long countPlayerEntries(int cid, BossLogEntry boss) {
-      return DatabaseConnection.withConnectionResult(connection -> {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          if (boss.week) {
             return BossLogWeeklyProvider.getInstance().countEntriesForCharacter(connection, cid, boss.name());
          } else {
@@ -97,7 +97,7 @@ public class MapleExpeditionBossLog {
    }
 
    private static void insertPlayerEntry(int cid, BossLogEntry boss) {
-      DatabaseConnection.withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(connection -> {
          if (boss.week) {
             BossLogWeeklyAdministrator.getInstance().addAttempt(connection, cid, boss.name());
          } else {

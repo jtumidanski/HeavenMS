@@ -22,48 +22,55 @@ import constants.ServerConstants;
 public class DatabaseConnection {
    private static HikariDataSource ds;
 
-   public DatabaseConnection() {
+   private static DatabaseConnection ourInstance = new DatabaseConnection();
+
+   public static DatabaseConnection getInstance() {
+      return ourInstance;
+   }
+
+   private DatabaseConnection() {
       try {
          Class.forName("com.mysql.cj.jdbc.Driver"); // touch the mysql driver
       } catch (ClassNotFoundException e) {
          System.out.println("[SEVERE] SQL Driver Not Found. Consider death by clams.");
          e.printStackTrace();
       }
-
       ds = null;
-
-      if (ServerConstants.DB_CONNECTION_POOL) {
-         // Connection Pool on database ftw!
-
-         HikariConfig config = new HikariConfig();
-         config.setJdbcUrl(ServerConstants.DB_URL);
-
-         config.setUsername(ServerConstants.DB_USER);
-         config.setPassword(ServerConstants.DB_PASS);
-
-         // Make sure pool size is comfortable for the worst case scenario.
-         // Under 100 accounts? Make it 10. Over 10000 accounts? Make it 30.
-         int poolSize = (int) Math.ceil(0.00202020202 * 100 + 9.797979798);
-         if (poolSize < 10) {
-            poolSize = 10;
-         } else if (poolSize > 30) {
-            poolSize = 30;
-         }
-
-         config.setConnectionTimeout(30 * 1000);
-         config.setMaximumPoolSize(poolSize);
-
-         config.addDataSourceProperty("cachePrepStmts", true);
-         config.addDataSourceProperty("prepStmtCacheSize", 25);
-         config.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
-
-         ds = new HikariDataSource(config);
-      }
    }
 
-   public static Connection getConnection() throws SQLException {
+   public void initHikariDataSource() {
+      // Connection Pool on database ftw!
+
+      HikariConfig config = new HikariConfig();
+      config.setJdbcUrl(ServerConstants.DB_URL);
+
+      config.setUsername(ServerConstants.DB_USER);
+      config.setPassword(ServerConstants.DB_PASS);
+
+      // Make sure pool size is comfortable for the worst case scenario.
+      // Under 100 accounts? Make it 10. Over 10000 accounts? Make it 30.
+      int poolSize = (int) Math.ceil(0.00202020202 * 100 + 9.797979798);
+      if (poolSize < 10) {
+         poolSize = 10;
+      } else if (poolSize > 30) {
+         poolSize = 30;
+      }
+
+      config.setConnectionTimeout(30 * 1000);
+      config.setMaximumPoolSize(poolSize);
+
+      config.addDataSourceProperty("cachePrepStmts", true);
+      config.addDataSourceProperty("prepStmtCacheSize", 25);
+      config.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
+
+      ds = new HikariDataSource(config);
+   }
+
+   public Connection getConnection() throws SQLException {
       if (ds == null) {
-         new DatabaseConnection();
+         if (ServerConstants.DB_CONNECTION_POOL) {
+            initHikariDataSource();
+         }
       }
 
       Connection connection = null;
@@ -94,10 +101,10 @@ public class DatabaseConnection {
       return connection;
    }
 
-   public static void withConnection(Consumer<Connection> consumer) {
+   public void withConnection(Consumer<Connection> consumer) {
       Connection connection = null;
       try {
-         connection = DatabaseConnection.getConnection();
+         connection = getConnection();
          consumer.accept(connection);
       } catch (SQLException e) {
          e.printStackTrace();
@@ -112,10 +119,10 @@ public class DatabaseConnection {
       }
    }
 
-   public static void withExplicitCommitConnection(SQLConsumer<Connection> consumer) {
+   public void withExplicitCommitConnection(SQLConsumer<Connection> consumer) {
       Connection connection = null;
       try {
-         connection = DatabaseConnection.getConnection();
+         connection = getConnection();
          connection.setAutoCommit(false);
 
          consumer.accept(connection);
@@ -142,12 +149,12 @@ public class DatabaseConnection {
       }
    }
 
-   public static <T> Optional<T> withConnectionResult(Function<Connection, T> function) {
+   public <T> Optional<T> withConnectionResult(Function<Connection, T> function) {
       Connection connection = null;
       Optional<T> result = Optional.empty();
       try {
-         connection = DatabaseConnection.getConnection();
-         result = Optional.of(function.apply(connection));
+         connection = getConnection();
+         result = Optional.ofNullable(function.apply(connection));
       } catch (SQLException e) {
          e.printStackTrace();
       } finally {
@@ -162,11 +169,11 @@ public class DatabaseConnection {
       return result;
    }
 
-   public static <T> Optional<T> withConnectionResultOpt(Function<Connection, Optional<T>> function) {
+   public <T> Optional<T> withConnectionResultOpt(Function<Connection, Optional<T>> function) {
       Connection connection = null;
       Optional<T> result = Optional.empty();
       try {
-         connection = DatabaseConnection.getConnection();
+         connection = getConnection();
          result = function.apply(connection);
       } catch (SQLException e) {
          e.printStackTrace();
@@ -182,7 +189,7 @@ public class DatabaseConnection {
       return result;
    }
 
-   private static long getNumberOfAccounts() {
+   private long getNumberOfAccounts() {
       return withConnectionResult(connection -> AccountProvider.getInstance().getAccountCount(connection)).orElse(0L);
    }
 }
