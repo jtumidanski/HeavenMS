@@ -25,6 +25,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.script.Invocable;
+import javax.script.ScriptEngine;
 
 import client.MapleClient;
 import client.MapleQuestStatus;
@@ -59,10 +60,10 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            Invocable iv = getInvocable("quest/" + questid, c);
+            ScriptEngine iv = getScriptEngine("quest/" + questid, c);
             if (iv == null) {
                if (GameConstants.isMedalQuest(questid)) {   // start generic medal quest
-                  iv = getInvocable("quest/medalQuest", c);
+                  iv = getScriptEngine("quest/medalQuest", c);
                } else {
                   FilePrinter.printError(FilePrinter.QUEST_UNCODED, "START Quest " + questid + " is uncoded.");
                }
@@ -71,10 +72,10 @@ public class QuestScriptManager extends AbstractScriptManager {
                qm.dispose();
                return;
             }
-            engine.put("qm", qm);
-            scripts.put(c, iv);
+            iv.put("qm", qm);
+            scripts.put(c, (Invocable) iv);
             c.setClickedNPC();
-            iv.invokeFunction("start", (byte) 1, (byte) 0, 0);
+            ((Invocable) iv).invokeFunction("start", (byte) 1, (byte) 0, 0);
          }
       } catch (final UndeclaredThrowableException ute) {
          FilePrinter.printError(FilePrinter.QUEST + questid + ".txt", ute);
@@ -111,20 +112,20 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            Invocable iv = getInvocable("quest/" + questid, c);
+            ScriptEngine iv = getScriptEngine("quest/" + questid, c);
             if (iv == null) {
                if (GameConstants.isMedalQuest(questid)) {   // start generic medal quest
-                  iv = getInvocable("quest/medalQuest", c);
+                  iv = getScriptEngine("quest/medalQuest", c);
                } else {
                   FilePrinter.printError(FilePrinter.QUEST_UNCODED, "END Quest " + questid + " is uncoded.");
                   qm.dispose();
                   return;
                }
             }
-            engine.put("qm", qm);
-            scripts.put(c, iv);
+            iv.put("qm", qm);
+            scripts.put(c, (Invocable) iv);
             c.setClickedNPC();
-            iv.invokeFunction("end", (byte) 1, (byte) 0, 0);
+            ((Invocable) iv).invokeFunction("end", (byte) 1, (byte) 0, 0);
          }
       } catch (final UndeclaredThrowableException ute) {
          FilePrinter.printError(FilePrinter.QUEST + questid + ".txt", ute);

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import client.MapleCharacter;
@@ -49,9 +50,9 @@ public class NPCScriptManager extends AbstractScriptManager {
    }
 
    public boolean isNpcScriptAvailable(MapleClient c, String fileName) {
-      Invocable iv = null;
+      ScriptEngine iv = null;
       if (fileName != null) {
-         iv = getInvocable("npc/" + fileName, c);
+         iv = getScriptEngine("npc/" + fileName, c);
       }
 
       return iv != null;
@@ -85,21 +86,21 @@ public class NPCScriptManager extends AbstractScriptManager {
             return;
          }
          cms.put(c, cm);
-         Invocable iv = null;
-         iv = getInvocable("npc/" + filename, c);
+         ScriptEngine iv = null;
+         iv = getScriptEngine("npc/" + filename, c);
 
          if (iv == null) {
             c.getPlayer().dropMessage(1, npc + "");
             cm.dispose();
             return;
          }
-         engine.put("cm", cm);
-         scripts.put(c, iv);
+         iv.put("cm", cm);
+         scripts.put(c, (Invocable) iv);
          try {
-            iv.invokeFunction("start", chrs);
+            ((Invocable) iv).invokeFunction("start", chrs);
          } catch (final NoSuchMethodException nsme) {
             try {
-               iv.invokeFunction("start", chrs);
+               ((Invocable) iv).invokeFunction("start", chrs);
             } catch (final NoSuchMethodException nsma) {
                nsma.printStackTrace();
             }
@@ -119,33 +120,33 @@ public class NPCScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             cms.put(c, cm);
-            Invocable iv = null;
+            ScriptEngine iv = null;
             if (!itemScript) {
                if (fileName != null) {
-                  iv = getInvocable("npc/" + fileName, c);
+                  iv = getScriptEngine("npc/" + fileName, c);
                }
             } else {
                if (fileName != null) {     // thanks MiLin for drafting NPC-based item scripts
-                  iv = getInvocable("item/" + fileName, c);
+                  iv = getScriptEngine("item/" + fileName, c);
                }
             }
             if (iv == null) {
-               iv = getInvocable("npc/" + npc, c);
+               iv = getScriptEngine("npc/" + npc, c);
                cm.resetItemScript();
             }
             if (iv == null) {
                dispose(c);
                return false;
             }
-            engine.put(engineName, cm);
-            scripts.put(c, iv);
+            iv.put(engineName, cm);
+            scripts.put(c, (Invocable) iv);
             c.setClickedNPC();
             try {
-               iv.invokeFunction("start");
+               ((Invocable) iv).invokeFunction("start");
             } catch (final NoSuchMethodException nsme) {
                nsme.printStackTrace();
                try {
-                  iv.invokeFunction("start", chr);
+                  ((Invocable) iv).invokeFunction("start", chr);
                } catch (final NoSuchMethodException nsma) {
                   nsma.printStackTrace();
                }

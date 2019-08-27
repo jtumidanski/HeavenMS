@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import client.MapleClient;
@@ -49,14 +50,14 @@ public class ReactorScriptManager extends AbstractScriptManager {
 
    public void onHit(MapleClient c, MapleReactor reactor) {
       try {
-         Invocable iv = getInvocable("reactor/" + reactor.getId(), c);
+         ScriptEngine iv = getScriptEngine("reactor/" + reactor.getId(), c);
          if (iv == null) {
             return;
          }
 
-         ReactorActionManager rm = new ReactorActionManager(c, reactor, iv);
-         engine.put("rm", rm);
-         iv.invokeFunction("hit");
+         ReactorActionManager rm = new ReactorActionManager(c, reactor, (Invocable) iv);
+         iv.put("rm", rm);
+         ((Invocable) iv).invokeFunction("hit");
       } catch (final NoSuchMethodException ignored) {
       } //do nothing, hit is OPTIONAL
 
@@ -67,14 +68,14 @@ public class ReactorScriptManager extends AbstractScriptManager {
 
    public void act(MapleClient c, MapleReactor reactor) {
       try {
-         Invocable iv = getInvocable("reactor/" + reactor.getId(), c);
+         ScriptEngine iv = getScriptEngine("reactor/" + reactor.getId(), c);
          if (iv == null) {
             return;
          }
 
-         ReactorActionManager rm = new ReactorActionManager(c, reactor, iv);
-         engine.put("rm", rm);
-         iv.invokeFunction("act");
+         ReactorActionManager rm = new ReactorActionManager(c, reactor, (Invocable) iv);
+         iv.put("rm", rm);
+         ((Invocable) iv).invokeFunction("act");
       } catch (final ScriptException | NoSuchMethodException | NullPointerException e) {
          FilePrinter.printError(FilePrinter.REACTOR + reactor.getId() + ".txt", e);
       }
@@ -103,17 +104,17 @@ public class ReactorScriptManager extends AbstractScriptManager {
 
    private void touching(MapleClient c, MapleReactor reactor, boolean touching) {
       try {
-         Invocable iv = getInvocable("reactor/" + reactor.getId(), c);
+         ScriptEngine iv = getScriptEngine("reactor/" + reactor.getId(), c);
          if (iv == null) {
             return;
          }
 
-         ReactorActionManager rm = new ReactorActionManager(c, reactor, iv);
-         engine.put("rm", rm);
+         ReactorActionManager rm = new ReactorActionManager(c, reactor, (Invocable) iv);
+         iv.put("rm", rm);
          if (touching) {
-            iv.invokeFunction("touch");
+            ((Invocable) iv).invokeFunction("touch");
          } else {
-            iv.invokeFunction("untouch");
+            ((Invocable) iv).invokeFunction("untouch");
          }
       } catch (final ScriptException | NoSuchMethodException | NullPointerException ute) {
          FilePrinter.printError(FilePrinter.REACTOR + reactor.getId() + ".txt", ute);

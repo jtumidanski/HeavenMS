@@ -26,6 +26,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
+import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
@@ -38,59 +39,48 @@ import tools.FilePrinter;
  */
 public abstract class AbstractScriptManager {
 
-   protected ScriptEngine engine;
-   private ScriptEngineManager sem;
+   private ScriptEngineFactory sef;
 
    protected AbstractScriptManager() {
-      sem = new ScriptEngineManager();
+      sef = new ScriptEngineManager().getEngineByName("groovy").getFactory();
    }
 
-   protected Invocable getInvocable(String path, MapleClient c) {
+   protected ScriptEngine getScriptEngine(String path) {
       path = "scripts/" + path;
-      engine = null;
-      if (c != null) {
-         try {
-            engine = c.getScriptEngine(path);
-         } catch (NullPointerException npe) {
-            c = null;   // player disconnected
-         }
+      String engineName = "";
+      File scriptFile = null;
+      if (new File(path + ".groovy").exists()) {
+         engineName = "groovy";
+         scriptFile = new File(path + ".groovy");
       }
+      if (scriptFile == null) {
+         return null;
+      }
+
+      ScriptEngine engine = sef.getScriptEngine();
+      try (FileReader fr = new FileReader(scriptFile)) {
+         engine.eval(fr);
+      } catch (final ScriptException | IOException t) {
+         FilePrinter.printError(FilePrinter.INVOCABLE + path.substring(12), t, path);
+         return null;
+      }
+      return engine;
+   }
+
+   protected ScriptEngine getScriptEngine(String path, MapleClient c) {
+      String cachePath = "scripts/" + path;
+      ScriptEngine engine = c.getScriptEngine(cachePath);
+
       if (engine == null) {
-         String engineName = "";
-         File scriptFile = null;
-         if (new File(path + ".groovy").exists()) {
-            engineName = "groovy";
-            scriptFile = new File(path + ".groovy");
-         }
-         if (new File(path + ".js").exists()) {
-            engineName = "javascript";
-            scriptFile = new File(path + ".js");
-         }
-         if (scriptFile == null) {
-            return null;
-         }
-
-         engine = sem.getEngineByName(engineName);
-         if (c != null) {
-            c.setScriptEngine(path, engine);
-         }
-         try (FileReader fr = new FileReader(scriptFile)) {
-            if (ServerConstants.JAVA_8 && engineName.equals("javascript")) {
-               engine.eval("load('nashorn:mozilla_compat.js');" + System.lineSeparator());
-            }
-            engine.eval(fr);
-         } catch (final ScriptException | IOException t) {
-            FilePrinter.printError(FilePrinter.INVOCABLE + path.substring(12), t, path);
-            return null;
-         }
+         engine = getScriptEngine(cachePath);
+         c.setScriptEngine(path, engine);
       }
 
-      return (Invocable) engine;
+      return engine;
    }
 
 
    protected void resetContext(String path, MapleClient c) {
-      c.removeScriptEngine("scripts/" + path + ".js");
       c.removeScriptEngine("scripts/" + path + ".groovy");
    }
 }
