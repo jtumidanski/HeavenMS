@@ -21,6 +21,7 @@
  */
 package net;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -196,16 +197,10 @@ import net.server.handlers.login.ViewAllCharSelectedWithPicHandler;
 public final class PacketProcessor {
 
    private final static Map<String, PacketProcessor> instances = new LinkedHashMap<>();
-   private MaplePacketHandler[] handlers;
+   private Map<Integer, MaplePacketHandler> handlers;
 
    private PacketProcessor() {
-      int maxRecvOp = 0;
-      for (RecvOpcode op : RecvOpcode.values()) {
-         if (op.getValue() > maxRecvOp) {
-            maxRecvOp = op.getValue();
-         }
-      }
-      handlers = new MaplePacketHandler[maxRecvOp + 1];
+      handlers = new HashMap<>();
    }
 
    public synchronized static PacketProcessor getProcessor(int world, int channel) {
@@ -220,16 +215,15 @@ public final class PacketProcessor {
    }
 
    public MaplePacketHandler getHandler(short packetId) {
-      if (packetId > handlers.length) {
+      if (packetId > handlers.size()) {
          return null;
       }
-      MaplePacketHandler handler = handlers[packetId];
-      return handler;
+      return handlers.get(packetId);
    }
 
    public void registerHandler(RecvOpcode code, MaplePacketHandler handler) {
       try {
-         handlers[code.getValue()] = handler;
+         handlers.put(code.getValue(), handler);
       } catch (ArrayIndexOutOfBoundsException e) {
          e.printStackTrace();
          System.out.println("Error registering handler - " + code.name());
@@ -237,7 +231,7 @@ public final class PacketProcessor {
    }
 
    public void reset(int channel) {
-      handlers = new MaplePacketHandler[handlers.length];
+      handlers = new HashMap<>();
 
       registerHandler(RecvOpcode.PONG, new KeepAliveHandler());
       registerHandler(RecvOpcode.CUSTOM_PACKET, new CustomPacketHandler());
