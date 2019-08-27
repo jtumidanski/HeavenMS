@@ -40,6 +40,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.database.administrator.HwidAccountAdministrator;
 import client.database.provider.HwidAccountProvider;
+import client.processor.CharacterProcessor;
 import constants.ServerConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
@@ -178,7 +179,7 @@ public class MapleSessionCoordinator {
          MapleClient client = new MapleClient(null, null, session);
          Integer cid = Server.getInstance().freeCharacteridInTransition(session);
          if (cid != null) {
-            client.setAccID(MapleCharacter.loadCharFromDB(cid, client, false).getAccountID());
+            client.setAccID(CharacterProcessor.getInstance().loadCharFromDB(cid, client, false).getAccountID());
          }
 
          session.setAttribute(MapleClient.CLIENT_KEY, client);

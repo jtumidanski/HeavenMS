@@ -159,7 +159,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       }
    }
 
-   private void setRemainingAp(int remainingAp) {
+   public void setRemainingAp(int remainingAp) {
       this.remainingAp = remainingAp;
    }
 
@@ -190,7 +190,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       }
    }
 
-   private void setHpMpApUsed(int mpApUsed) {
+   public void setHpMpApUsed(int mpApUsed) {
       this.hpMpApUsed = mpApUsed;
    }
 
@@ -262,7 +262,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       }
    }
 
-   protected void setMaxHp(int hp_) {
+   public void setMaxHp(int hp_) {
       if (this.maxhp < hp_) {
          this.transienthp = Float.NEGATIVE_INFINITY;
       }
@@ -279,7 +279,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       }
    }
 
-   protected void setMaxMp(int mp_) {
+   public void setMaxMp(int mp_) {
       if (this.maxmp < mp_) {
          this.transientmp = Float.NEGATIVE_INFINITY;
       }
@@ -434,7 +434,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       changeHpMp(newhp, newmp, false);
    }
 
-   protected void changeHpMp(int newhp, int newmp, boolean silent) {
+   public void changeHpMp(int newhp, int newmp, boolean silent) {
       changeHpMpPool(newhp, newmp, Short.MIN_VALUE, Short.MIN_VALUE, silent);
    }
 

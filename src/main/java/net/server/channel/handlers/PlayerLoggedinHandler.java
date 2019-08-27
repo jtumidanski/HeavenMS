@@ -50,6 +50,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
+import client.processor.CharacterProcessor;
 import constants.GameConstants;
 import constants.ScriptableNPCConstants;
 import constants.ServerConstants;
@@ -164,7 +165,7 @@ public final class PlayerLoggedinHandler extends AbstractMaplePacketHandler {
                   return;
                }
 
-               player = MapleCharacter.loadCharFromDB(cid, c, true);
+               player = CharacterProcessor.getInstance().loadCharFromDB(cid, c, true);
                newcomer = true;
             } else {
                remoteHwid = player.getClient().getHWID();

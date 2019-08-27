@@ -55,6 +55,7 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.processor.CharacterProcessor;
 import client.processor.MapleFamilyProcessor;
 import client.SkillFactory;
 import client.command.CommandsExecutor;
@@ -264,7 +265,7 @@ public class Server {
             chars = new LinkedList<>();
          }
 
-         chars.add(MapleCharacter.loadCharacterEntryFromDB(characterData, accPlayerEquips.get(characterData.getId())));
+         chars.add(CharacterProcessor.getInstance().loadCharacterEntryFromDB(characterData, accPlayerEquips.get(characterData.getId())));
       }
 
       wchars.add(curWorld, chars);
@@ -1438,7 +1439,7 @@ public class Server {
       List<Pair<Integer, Pair<Integer, Integer>>> worldTransfers = new LinkedList<>(); //logging only <charid, <oldWorld, newWorld>>
       DatabaseConnection.getInstance().withConnection(connection ->
             WorldTransferProvider.getInstance().getPendingTransfers(connection).forEach(result -> {
-               String reason = MapleCharacter.checkWorldTransferEligibility(connection, result.getCharacterId(), result.getFrom(), result.getTo());
+               String reason = CharacterProcessor.getInstance().checkWorldTransferEligibility(connection, result.getCharacterId(), result.getFrom(), result.getTo());
                if (reason != null) {
                   WorldTransferAdministrator.getInstance().cancelById(connection, result.getId());
                   FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer cancelled : Character ID " + result.getCharacterId() + " at " + Calendar.getInstance().getTime().toString() + ", Reason : " + reason);

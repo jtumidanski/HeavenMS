@@ -59,6 +59,8 @@ import client.database.provider.IpBanProvider;
 import client.database.provider.MacBanProvider;
 import client.database.provider.MacFilterProvider;
 import client.inventory.MapleInventoryType;
+import client.processor.BuffStatProcessor;
+import client.processor.CharacterProcessor;
 import constants.GameConstants;
 import constants.ServerConstants;
 import net.server.Server;
@@ -201,7 +203,7 @@ public class MapleClient {
    public List<MapleCharacter> loadCharacters(int serverId) {
       List<MapleCharacter> chars = new ArrayList<>(15);
       for (CharNameAndIdData cni : loadCharactersInternal(serverId)) {
-         chars.add(MapleCharacter.loadCharFromDB(cni.getId(), this, false));
+         chars.add(CharacterProcessor.getInstance().loadCharFromDB(cni.getId(), this, false));
       }
       return chars;
    }
@@ -751,7 +753,7 @@ public class MapleClient {
    }
 
    public boolean deleteCharacter(int cid, int senderAccId) {
-      MapleCharacter chr = MapleCharacter.loadCharFromDB(cid, this, false);
+      MapleCharacter chr = CharacterProcessor.getInstance().loadCharFromDB(cid, this, false);
 
       Integer partyId = chr.getWorldServer().getCharacterPartyid(cid);
       if (partyId != null) {
@@ -765,7 +767,7 @@ public class MapleClient {
          this.setPlayer(null);
       }
 
-      return MapleCharacter.deleteCharFromDB(chr, senderAccId);
+      return CharacterProcessor.getInstance().deleteCharFromDB(chr, senderAccId);
    }
 
    public String getAccountName() {

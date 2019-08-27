@@ -36,4 +36,16 @@ public class GameData {
    public int getTies() {
       return ties;
    }
+
+   public void incrementWins() {
+      wins++;
+   }
+
+   public void incrementLosses() {
+      losses++;
+   }
+
+   public void incrementTies() {
+      ties++;
+   }
 }
