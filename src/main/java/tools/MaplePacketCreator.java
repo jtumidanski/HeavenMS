@@ -106,6 +106,7 @@ import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
+import server.maps.MapleSoldItem;
 import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMiniGame;
@@ -5721,9 +5722,9 @@ public class MaplePacketCreator {
          mplew.writeShort(0);
          mplew.writeShort(hm.getTimeOpen());
          mplew.write(firstTime ? 1 : 0);
-         List<MapleHiredMerchant.SoldItem> sold = hm.getSold();
+         List<MapleSoldItem> sold = hm.getSold();
          mplew.write(sold.size());
-         for (MapleHiredMerchant.SoldItem s : sold) {
+         for (MapleSoldItem s : sold) {
             mplew.writeInt(s.getItemId());
             mplew.writeShort(s.getQuantity());
             mplew.writeInt(s.getMesos());

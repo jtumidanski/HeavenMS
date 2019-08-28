@@ -22,12 +22,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package server.maps;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -46,6 +50,7 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;
 import server.MapleTrade;
+import server.processor.maps.MapleHiredMerchantProcessor;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.Pair;
@@ -59,11 +64,11 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
    private int ownerId, itemId, mesos = 0;
    private int channel, world;
    private long start;
-   private String ownerName = "";
-   private String description = "";
+   private String ownerName;
+   private String description;
    private MapleCharacter[] visitors = new MapleCharacter[3];
    private List<Pair<String, Byte>> messages = new LinkedList<>();
-   private List<SoldItem> sold = new LinkedList<>();
+   private List<MapleSoldItem> sold = new LinkedList<>();
    private AtomicBoolean open = new AtomicBoolean();
    private boolean published = false;
    private MapleMap map;
@@ -81,22 +86,6 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       this.map = owner.getMap();
    }
 
-   private static boolean canBuy(MapleClient c, Item newItem) {    // thanks xiaokelvin (Conrad) for noticing a leaked test code here
-      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
-   }
-
-   private static boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
-      List<Pair<Item, MapleInventoryType>> li = new ArrayList<>();
-      for (MaplePlayerShopItem item : items) {
-         Item it = item.getItem().copy();
-         it.setQuantity((short) (it.getQuantity() * item.getBundles()));
-
-         li.add(new Pair<>(it, it.getInventoryType()));
-      }
-
-      return MapleInventory.checkSpotsAndOwnership(chr, li);
-   }
-
    public void broadcastToVisitorsThreadsafe(final byte[] packet) {
       visitorLock.lock();
       try {
@@ -107,23 +96,15 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
    }
 
    private void broadcastToVisitors(final byte[] packet) {
-      for (MapleCharacter visitor : visitors) {
-         if (visitor != null) {
-            visitor.getClient().announce(packet);
-         }
-      }
+      Arrays.stream(visitors).filter(Objects::nonNull).forEach(visitor -> visitor.getClient().announce(packet));
    }
 
    public byte[] getShopRoomInfo() {
       visitorLock.lock();
       try {
-         byte count = 0;
+         byte count;
          if (this.isOpen()) {
-            for (MapleCharacter visitor : visitors) {
-               if (visitor != null) {
-                  count++;
-               }
-            }
+            count = (byte) Arrays.stream(visitors).filter(Objects::nonNull).count();
          } else {
             count = (byte) (visitors.length + 1);
          }
@@ -179,12 +160,11 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
    }
 
    private int getVisitorSlot(MapleCharacter visitor) {
-      for (int i = 0; i < 3; i++) {
-         if (visitors[i] != null && visitors[i].getId() == visitor.getId()) {
-            return i;
-         }
-      }
-      return -1; //Actually 0 because of the +1's.
+      //Actually 0 because of the +1's.
+      return IntStream.range(0, visitors.length)
+            .filter(i -> visitors[i] != null && visitors[i].getId() == visitor.getId())
+            .findFirst()
+            .orElse(-1);
    }
 
    private void removeAllVisitors() {
@@ -254,15 +234,10 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
    private int getQuantityLeft(int itemid) {
       synchronized (items) {
-         int count = 0;
-
-         for (MaplePlayerShopItem mpsi : items) {
-            if (mpsi.getItem().getItemId() == itemid) {
-               count += (mpsi.getBundles() * mpsi.getItem().getQuantity());
-            }
-         }
-
-         return count;
+         return items.stream()
+               .filter(shopItem -> shopItem.getItem().getItemId() == itemid)
+               .mapToInt(shopItem -> (shopItem.getBundles() * shopItem.getItem().getQuantity()))
+               .sum();
       }
    }
 
@@ -284,12 +259,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
          int price = (int) Math.min((float) pItem.getPrice() * quantity, Integer.MAX_VALUE);
          if (c.getPlayer().getMeso() >= price) {
-            if (canBuy(c, newItem)) {
+            if (MapleHiredMerchantProcessor.getInstance().canBuy(c, newItem)) {
                c.getPlayer().gainMeso(-price, false);
                price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
 
                synchronized (sold) {
-                  sold.add(new SoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), newItem.getQuantity(), price));
+                  sold.add(new MapleSoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), newItem.getQuantity(), price));
                }
 
                pItem.setBundles((short) (pItem.getBundles() - quantity));
@@ -391,16 +366,16 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                () -> DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setMerchant(connection, ownerId, false)));
 
          List<MaplePlayerShopItem> copyItems = getItems();
-         if (check(c.getPlayer(), copyItems) && !timeout) {
-            for (MaplePlayerShopItem mpsi : copyItems) {
-               if (mpsi.isExist()) {
-                  if (mpsi.getItem().getInventoryType().equals(MapleInventoryType.EQUIP)) {
-                     MapleInventoryManipulator.addFromDrop(c, mpsi.getItem(), false);
-                  } else {
-                     MapleInventoryManipulator.addById(c, mpsi.getItem().getItemId(), (short) (mpsi.getBundles() * mpsi.getItem().getQuantity()), mpsi.getItem().getOwner(), -1, mpsi.getItem().getFlag(), mpsi.getItem().getExpiration());
-                  }
+         if (MapleHiredMerchantProcessor.getInstance().check(c.getPlayer(), copyItems) && !timeout) {
+            copyItems.stream().filter(MaplePlayerShopItem::isExist).forEach(shopItem -> {
+               if (shopItem.getItem().getInventoryType().equals(MapleInventoryType.EQUIP)) {
+                  MapleInventoryManipulator.addFromDrop(c, shopItem.getItem(), false);
+               } else {
+                  Item item = shopItem.getItem();
+                  short quantity = (short) (shopItem.getBundles() * item.getQuantity());
+                  MapleInventoryManipulator.addById(c, item.getItemId(), quantity, item.getOwner(), -1, item.getFlag(), item.getExpiration());
                }
-            }
+            });
 
             synchronized (items) {
                items.clear();
@@ -566,44 +541,40 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       broadcastToVisitorsThreadsafe(MaplePacketCreator.hiredMerchantChat(message, slot));
    }
 
-   public List<MaplePlayerShopItem> sendAvailableBundles(int itemid) {
-      List<MaplePlayerShopItem> list = new LinkedList<>();
+   public List<MaplePlayerShopItem> sendAvailableBundles(int itemId) {
       List<MaplePlayerShopItem> all;
 
       if (!open.get()) {
-         return list;
+         return new LinkedList<>();
       }
 
       synchronized (items) {
          all = new ArrayList<>(items);
       }
 
-      for (MaplePlayerShopItem mpsi : all) {
-         if (mpsi.getItem().getItemId() == itemid && mpsi.getBundles() > 0 && mpsi.isExist()) {
-            list.add(mpsi);
-         }
-      }
-      return list;
+      return all.stream()
+            .filter(shopItem -> shopItem.getItem().getItemId() == itemId && shopItem.getBundles() > 0 && shopItem.isExist())
+            .collect(Collectors.toList());
    }
 
    public void saveItems(boolean shutdown) {
       List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
       List<Short> bundles = new ArrayList<>();
 
-      for (MaplePlayerShopItem pItems : getItems()) {
-         Item newItem = pItems.getItem();
-         short newBundle = pItems.getBundles();
+      getItems().forEach(shopItem -> {
+         Item newItem = shopItem.getItem();
+         short newBundle = shopItem.getBundles();
 
          if (shutdown) { //is "shutdown" really necessary?
-            newItem.setQuantity(pItems.getItem().getQuantity());
+            newItem.setQuantity(shopItem.getItem().getQuantity());
          } else {
-            newItem.setQuantity(pItems.getItem().getQuantity());
+            newItem.setQuantity(shopItem.getItem().getQuantity());
          }
          if (newBundle > 0) {
             itemsWithType.add(new Pair<>(newItem, newItem.getInventoryType()));
             bundles.add(newBundle);
          }
-      }
+      });
 
       DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.MERCHANT.saveItems(itemsWithType, bundles, this.ownerId, connection));
       FredrickProcessor.insertFredrickLog(this.ownerId);
@@ -641,7 +612,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       return map;
    }
 
-   public List<SoldItem> getSold() {
+   public List<MapleSoldItem> getSold() {
       synchronized (sold) {
          return Collections.unmodifiableList(sold);
       }
@@ -665,33 +636,4 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       client.announce(MaplePacketCreator.spawnHiredMerchantBox(this));
    }
 
-   public class SoldItem {
-
-      int itemid, mesos;
-      short quantity;
-      String buyer;
-
-      public SoldItem(String buyer, int itemid, short quantity, int mesos) {
-         this.buyer = buyer;
-         this.itemid = itemid;
-         this.quantity = quantity;
-         this.mesos = mesos;
-      }
-
-      public String getBuyer() {
-         return buyer;
-      }
-
-      public int getItemId() {
-         return itemid;
-      }
-
-      public short getQuantity() {
-         return quantity;
-      }
-
-      public int getMesos() {
-         return mesos;
-      }
-   }
 }
