@@ -30,7 +30,6 @@ public class MapleFoothold implements Comparable<MapleFoothold> {
    private Point p1;
    private Point p2;
    private int id;
-   private int next, prev;
 
    public MapleFoothold(Point p1, Point p2, int id) {
       this.p1 = p1;
@@ -81,21 +80,5 @@ public class MapleFoothold implements Comparable<MapleFoothold> {
 
    public int getId() {
       return id;
-   }
-
-   public int getNext() {
-      return next;
-   }
-
-   public void setNext(int next) {
-      this.next = next;
-   }
-
-   public int getPrev() {
-      return prev;
-   }
-
-   public void setPrev(int prev) {
-      this.prev = prev;
    }
 }

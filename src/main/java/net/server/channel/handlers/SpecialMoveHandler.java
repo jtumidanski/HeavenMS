@@ -39,6 +39,7 @@ import net.AbstractMaplePacketHandler;
 import net.server.Server;
 import server.MapleStatEffect;
 import server.life.MapleMonster;
+import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
@@ -81,7 +82,7 @@ public final class SpecialMoveHandler extends AbstractMaplePacketHandler {
             return;
          } else if (skillid != Corsair.BATTLE_SHIP) {
             int cooldownTime = effect.getCooldown();
-            if (MapleStatEffect.isHerosWill(skillid) && ServerConstants.USE_FAST_REUSE_HERO_WILL) {
+            if (StatEffectProcessor.getInstance().isHerosWill(skillid) && ServerConstants.USE_FAST_REUSE_HERO_WILL) {
                cooldownTime /= 60;
             }
 

@@ -87,6 +87,7 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import server.MapleStatEffect;
 import server.life.Element;
+import server.processor.StatEffectProcessor;
 
 public class SkillFactory {
    private static Map<Integer, Skill> skills = new HashMap<>();
@@ -457,7 +458,7 @@ public class SkillFactory {
       }
 
       for (MapleData level : data.getChildByPath("level")) {
-         ret.addLevelEffect(MapleStatEffect.loadSkillEffectFromData(level, id, isBuff));
+         ret.addLevelEffect(StatEffectProcessor.getInstance().loadSkillEffectFromData(level, id, isBuff));
       }
       ret.setAnimationTime(0);
       if (effect != null) {

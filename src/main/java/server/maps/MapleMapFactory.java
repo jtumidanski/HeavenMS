@@ -185,8 +185,6 @@ public class MapleMapFactory {
                int x2 = MapleDataTool.getInt(footHold.getChildByPath("x2"));
                int y2 = MapleDataTool.getInt(footHold.getChildByPath("y2"));
                MapleFoothold fh = new MapleFoothold(new Point(x1, y1), new Point(x2, y2), Integer.parseInt(footHold.getName()));
-               fh.setPrev(MapleDataTool.getInt(footHold.getChildByPath("prev")));
-               fh.setNext(MapleDataTool.getInt(footHold.getChildByPath("next")));
                if (fh.getX1() < lBound.x) {
                   lBound.x = fh.getX1();
                }

@@ -41,12 +41,12 @@ import client.MapleClient;
 import client.MapleJob;
 import client.SkillFactory;
 import client.autoban.AutobanFactory;
+import client.database.data.MakerCreateData;
 import client.database.provider.DropDataProvider;
 import client.database.provider.MakerCreateProvider;
 import client.database.provider.MakerReagentProvider;
 import client.database.provider.MakerRecipeProvider;
 import client.database.provider.MonsterCardProvider;
-import client.database.data.MakerCreateData;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -68,6 +68,7 @@ import provider.MapleDataTool;
 import server.MakerItemFactory.MakerItemCreateEntry;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonsterInformationProvider;
+import server.processor.StatEffectProcessor;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
@@ -1318,7 +1319,7 @@ public class MapleItemInformationProvider {
          if (spec == null) {
             spec = item.getChildByPath("spec");
          }
-         ret = MapleStatEffect.loadItemEffectFromData(spec, itemId);
+         ret = StatEffectProcessor.getInstance().loadItemEffectFromData(spec, itemId);
          itemEffects.put(itemId, ret);
       }
       return ret;
