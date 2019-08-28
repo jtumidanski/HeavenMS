@@ -233,7 +233,18 @@ public class MapleInventory implements Iterable<Item> {
    public void setSlotLimit(int newLimit) {
       lock.lock();
       try {
-         slotLimit = (byte) newLimit;
+         if (newLimit < slotLimit) {
+            List<Short> toRemove = new LinkedList<>();
+            for (Item it : list()) {
+               if (it.getPosition() > newLimit) {
+                  toRemove.add(it.getPosition());
+               }
+            }
+
+            for (Short slot : toRemove) {
+               removeSlot(slot);
+            }
+         }
       } finally {
          lock.unlock();
       }

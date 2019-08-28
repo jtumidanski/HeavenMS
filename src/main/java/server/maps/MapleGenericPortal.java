@@ -30,7 +30,6 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import scripting.portal.PortalScriptManager;
-import server.MaplePortal;
 import tools.MaplePacketCreator;
 
 public class MapleGenericPortal implements MaplePortal {

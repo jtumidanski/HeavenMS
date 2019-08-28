@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.processor.AssignSPProcessor;
 import client.processor.NoteProcessor;
 import client.Skill;
 import client.SkillFactory;
@@ -194,6 +195,10 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
 
          if (itemId > 5050000) {
             int SPTo = slea.readInt();
+            if (!AssignSPProcessor.canSPAssign(c, SPTo)) {  // exploit found thanks to Arnah
+               return;
+            }
+
             int SPFrom = slea.readInt();
             Optional<Skill> skillSPTo = SkillFactory.getSkill(SPTo);
             Optional<Skill> skillSPFrom = SkillFactory.getSkill(SPFrom);

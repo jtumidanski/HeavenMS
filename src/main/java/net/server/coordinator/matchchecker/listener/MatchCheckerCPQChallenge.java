@@ -67,7 +67,14 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                break;
             }
 
-            List<MaplePartyCharacter> chrMembers = new LinkedList<>(leader.getParty().getMembers());
+            MapleCharacter chr = leader;
+
+            List<MaplePartyCharacter> chrMembers = new LinkedList<>();
+            for (MaplePartyCharacter mpc : chr.getParty().getMembers()) {
+               if (mpc.isOnline()) {
+                  chrMembers.add(mpc);
+               }
+            }
 
             if (message.contentEquals("cpq1")) {
                NPCScriptManager.getInstance().start("cpqchallenge", ldr.getClient(), npcid, chrMembers);
@@ -75,7 +82,7 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                NPCScriptManager.getInstance().start("cpqchallenge2", ldr.getClient(), npcid, chrMembers);
             }
 
-            cm.sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomSent));
+            cm.sendOk(LanguageConstants.getMessage(chr, LanguageConstants.CPQChallengeRoomSent));
          }
 
          @Override

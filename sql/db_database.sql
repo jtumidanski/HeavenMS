@@ -21401,6 +21401,7 @@ CREATE TABLE IF NOT EXISTS `skills` (
   `masterlevel` int(11) NOT NULL DEFAULT '0',
   `expiration` bigint(20) NOT NULL DEFAULT '-1',
   PRIMARY KEY (`id`)
+  UNIQUE INDEX `skillpair` (`skillid`, `characterid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 CREATE TABLE IF NOT EXISTS `specialcashitems` (

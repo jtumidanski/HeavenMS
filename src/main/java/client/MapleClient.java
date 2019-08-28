@@ -59,7 +59,6 @@ import client.database.provider.IpBanProvider;
 import client.database.provider.MacBanProvider;
 import client.database.provider.MacFilterProvider;
 import client.inventory.MapleInventoryType;
-import client.processor.BuffStatProcessor;
 import client.processor.CharacterProcessor;
 import constants.GameConstants;
 import constants.ServerConstants;
@@ -77,6 +76,7 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
+import net.server.world.announcer.MapleAnnouncerCoordinator;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
@@ -124,6 +124,7 @@ public class MapleClient {
    private MapleAESOFB send;
    private MapleAESOFB receive;
    private MapleCharacter player;
+   private MapleAnnouncerCoordinator announcer = MapleAnnouncerCoordinator.getInstance();
    private int channel = 1;
    private int accId = -4;
    private boolean loggedIn = false;
@@ -150,12 +151,21 @@ public class MapleClient {
    private int visibleWorlds;
    private long lastNpcClick;
    private long sessionId;
+   private long lastPacket = System.currentTimeMillis();
    private int lang = 0;
 
    public MapleClient(MapleAESOFB send, MapleAESOFB receive, IoSession session) {
       this.send = send;
       this.receive = receive;
       this.session = session;
+   }
+
+   public void updateLastPacket() {
+      lastPacket = System.currentTimeMillis();
+   }
+
+   public long getLastPacket() {
+      return lastPacket;
    }
 
    private static boolean checkHash(String hash, String type, String password) {
@@ -536,9 +546,9 @@ public class MapleClient {
       MapleMap map = player.getMap();
       final MapleParty party = player.getParty();
       final int idz = player.getId();
-      final MaplePartyCharacter maplePartyCharacter = new MaplePartyCharacter(player);
 
       if (party != null) {
+         final MaplePartyCharacter maplePartyCharacter = new MaplePartyCharacter(player);
          maplePartyCharacter.setOnline(false);
          world.updateParty(party.getId(), PartyOperation.LOG_ONOFF, maplePartyCharacter);
          if (party.getLeader().getId() == idz && map != null) {
@@ -784,6 +794,12 @@ public class MapleClient {
 
    public void setWorld(int world) {
       this.world = world;
+      World wserv = Server.getInstance().getWorld(world);
+      if (wserv != null) {
+         this.announcer = wserv.getAnnouncerCoordinator();
+      } else {
+         this.announcer = MapleAnnouncerCoordinator.getInstance();
+      }
    }
 
    public void pongReceived() {
@@ -991,7 +1007,7 @@ public class MapleClient {
    }
 
    public synchronized void announce(final byte[] packet) {//MINA CORE IS A FUCKING BITCH AND I HATE IT <3
-      session.write(packet);
+      announcer.append(session, packet);
    }
 
    public void announceHint(String msg, int length) {

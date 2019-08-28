@@ -30,7 +30,7 @@ import client.MapleClient;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import net.AbstractMaplePacketHandler;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import server.MapleTrade;
 import server.maps.MapleMap;
 import tools.FilePrinter;

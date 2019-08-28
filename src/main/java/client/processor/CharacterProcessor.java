@@ -83,8 +83,7 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
-import server.MaplePortal;
-import server.MapleStorage;
+import server.maps.MaplePortal;
 import server.events.RescueGaga;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
@@ -487,7 +486,7 @@ public class CharacterProcessor {
             FameLogProvider.getInstance().getForCharacter(connection, characterData.getId()).forEach(fameLogData -> mapleCharacter.giveFame(fameLogData.getLeft(), fameLogData.getRight().getTime()));
 
             BuddyListProcessor.getInstance().loadFromDb(characterData.getId(), mapleCharacter.getBuddylist());
-            mapleCharacter.setStorage(MapleStorage.loadOrCreateFromDB(characterData.getAccountId(), characterData.getWorld()));
+            mapleCharacter.setStorage(world.getAccountStorage(characterData.getAccountId()));
 
             mapleCharacter.reapplyLocalStats();
             mapleCharacter.changeHpMp(mapleCharacter.getHp(), mapleCharacter.getMp(), true);

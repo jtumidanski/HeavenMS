@@ -46,4 +46,15 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
          ps.setLong(5, data.getValue().getExpiration());
       }, skills);
    }
+
+   public void replace(Connection connection, int characterId, Set<Map .Entry<Skill, SkillEntry>> skills) {
+      String sql = "REPLACE INTO skills (characterid, skillid, skilllevel, masterlevel, expiration) VALUES (?, ?, ?, ?, ?)";
+      batch(connection, sql, (ps, data) -> {
+         ps.setInt(1, characterId);
+         ps.setInt(2, data.getKey().getId());
+         ps.setInt(3, data.getValue().getSkillLevel());
+         ps.setInt(4, data.getValue().getMasterLevel());
+         ps.setLong(5, data.getValue().getExpiration());
+      }, skills);
+   }
 }

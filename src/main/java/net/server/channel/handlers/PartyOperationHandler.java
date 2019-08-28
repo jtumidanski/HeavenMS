@@ -54,7 +54,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
          }
          case 2: { // leave/disband
             if (party != null) {
-               List<MapleCharacter> partymembers = player.getPartyMembers();
+               List<MapleCharacter> partymembers = player.getPartyMembersOnline();
 
                MaplePartyProcessor.getInstance().leaveParty(party, c);
                player.updatePartySearchAvailability(true);

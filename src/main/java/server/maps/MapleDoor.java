@@ -22,11 +22,9 @@
 package server.maps;
 
 import java.awt.Point;
-import java.util.Collection;
 
 import client.MapleCharacter;
 import constants.ServerConstants;
-import server.MaplePortal;
 import tools.Pair;
 
 /**

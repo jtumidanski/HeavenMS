@@ -17,14 +17,12 @@ class NPC2010009 {
 
    int choice
    String guildName
-   MapleCharacter[] partymembers
 
    int allianceCost = 2000000
    int increaseCost = 1000000
    int allianceLimit = 5
 
    def start() {
-      partymembers = cm.getPartyMembers()
       status = -1
       action((byte) 1, (byte) 0, 0)
    }

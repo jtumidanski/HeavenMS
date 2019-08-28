@@ -84,9 +84,13 @@ public class MapleAllianceProcessor {
    private List<MapleCharacter> getPartyGuildMasters(MapleParty party) {
       List<MapleCharacter> mcl = new LinkedList<>();
 
-      for (MaplePartyCharacter mpc : party.getMembers()) {
-         if (mpc.getPlayer().getGuildRank() == 1 && mpc.getPlayer().getMapId() == party.getLeader().getPlayer().getMapId()) {
-            mcl.add(mpc.getPlayer());
+      for(MaplePartyCharacter mpc: party.getMembers()) {
+         MapleCharacter chr = mpc.getPlayer();
+         if (chr != null) {
+            MapleCharacter lchr = party.getLeader().getPlayer();
+            if (chr.getGuildRank() == 1 && lchr != null && chr.getMapId() == lchr.getMapId()) {
+               mcl.add(chr);
+            }
          }
       }
 

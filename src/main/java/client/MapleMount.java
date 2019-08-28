@@ -55,6 +55,10 @@ public class MapleMount {
       return skillid;
    }
 
+   public void setSkillId(int newskillid) {
+      this.skillid = newskillid;
+   }
+
    /**
     * 1902000 - Hog
     * 1902001 - Silver Mane

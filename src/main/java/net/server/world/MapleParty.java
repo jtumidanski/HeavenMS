@@ -134,6 +134,23 @@ public class MapleParty {
       }
    }
 
+   public List<MaplePartyCharacter> getPartyMembersOnline() {
+      lock.lock();
+      try {
+         List<MaplePartyCharacter> ret = new LinkedList<>();
+
+         for (MaplePartyCharacter mpc : members) {
+            if (mpc.isOnline()) {
+               ret.add(mpc);
+            }
+         }
+
+         return ret;
+      } finally {
+         lock.unlock();
+      }
+   }
+
    // used whenever entering PQs: will draw every party member that can attempt a target PQ while ingnoring those unfit.
    public Collection<MaplePartyCharacter> getEligibleMembers() {
       return Collections.unmodifiableList(pqMembers);

@@ -158,7 +158,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          exp = Integer.MIN_VALUE;
       }
 
-      return (int) exp;
+      return (int) Math.round(exp);
    }
 
    private static void aggroMonsterControl(MapleClient c, MapleMonster mob, boolean immediateAggro) {

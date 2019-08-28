@@ -35,7 +35,7 @@ import client.MapleClient;
 import client.command.Command;
 import constants.GameConstants;
 import net.server.Server;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.maps.MapleMapManager;

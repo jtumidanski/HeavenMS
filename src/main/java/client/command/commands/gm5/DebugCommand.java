@@ -31,7 +31,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import server.TimerManager;
 import server.life.MapleMonster;
 import server.life.SpawnPoint;

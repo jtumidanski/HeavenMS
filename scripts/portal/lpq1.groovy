@@ -2,7 +2,7 @@ package portal
 
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
-import server.MaplePortal
+import server.maps.MaplePortal
 import server.maps.MapleMap
 
 static def enter(PortalPlayerInteraction pi) {

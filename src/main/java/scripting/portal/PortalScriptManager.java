@@ -36,7 +36,7 @@ import javax.script.ScriptException;
 
 import client.MapleClient;
 import constants.ServerConstants;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import tools.FilePrinter;
 
 public class PortalScriptManager {

@@ -30,7 +30,7 @@ public class MonsterCarnival {
    private ScheduledFuture<?> timer, effectTimer, respawnTask;
    private long startTime = 0;
    private int summonsR = 0, summonsB = 0, room = 0;
-   private MapleCharacter leader1, leader2, Grupo1, Grupo2;
+   private MapleCharacter leader1, leader2, team1, team2;
    private int redCP, blueCP, redTotalCP, blueTotalCP, redTimeupCP, blueTimeupCP;
    private boolean cpq1;
 
@@ -60,7 +60,7 @@ public class MonsterCarnival {
                   if (p1.getLeader().getId() == character.getId()) {
                      leader1 = character;
                   }
-                  Grupo1 = character;
+                  team1 = character;
                });
          p2.getMembers().stream()
                .map(member -> cs.getPlayerStorage().getCharacterById(member.getId()))
@@ -74,15 +74,21 @@ public class MonsterCarnival {
                   if (p2.getLeader().getId() == character.getId()) {
                      leader2 = character;
                   }
-                  Grupo2 = character;
+                  team2 = character;
                });
 
-         if (Grupo1 == null || Grupo2 == null) {
-            for (MaplePartyCharacter mpc : p2.getMembers()) {
-               mpc.getPlayer().dropMessage(5, LanguageConstants.getMessage(mpc.getPlayer(), LanguageConstants.CPQError));
+         if (team1 == null || team2 == null) {
+            for (MaplePartyCharacter mpc : p1.getMembers()) {
+               MapleCharacter chr = mpc.getPlayer();
+               if (chr != null) {
+                  chr.dropMessage(5, LanguageConstants.getMessage(chr, LanguageConstants.CPQError));
+               }
             }
             for (MaplePartyCharacter mpc : p2.getMembers()) {
-               mpc.getPlayer().dropMessage(5, LanguageConstants.getMessage(mpc.getPlayer(), LanguageConstants.CPQError));
+               MapleCharacter chr = mpc.getPlayer();
+               if (chr != null) {
+                  chr.dropMessage(5, LanguageConstants.getMessage(chr, LanguageConstants.CPQError));
+               }
             }
             return;
          }

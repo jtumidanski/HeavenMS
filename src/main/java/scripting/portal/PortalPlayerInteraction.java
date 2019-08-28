@@ -24,7 +24,7 @@ package scripting.portal;
 import client.MapleClient;
 import client.database.provider.CharacterProvider;
 import scripting.AbstractPlayerInteraction;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 

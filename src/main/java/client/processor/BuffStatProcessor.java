@@ -188,4 +188,16 @@ public class BuffStatProcessor {
             return true;
       }
    }
+
+   public static boolean isPriorityBuffSourceid(int sourceid) {
+      switch(sourceid) {
+         case -2022631:
+         case -2022632:
+         case -2022633:
+            return true;
+
+         default:
+            return false;
+      }
+   }
 }

@@ -41,35 +41,48 @@ import tools.MaplePacketCreator;
  */
 public class AssignSPProcessor {
 
+   public static boolean canSPAssign(MapleClient c, int skillid) {
+      if (skillid == Aran.HIDDEN_FULL_DOUBLE || skillid == Aran.HIDDEN_FULL_TRIPLE || skillid == Aran.HIDDEN_OVER_DOUBLE || skillid == Aran.HIDDEN_OVER_TRIPLE) {
+         c.announce(MaplePacketCreator.enableActions());
+         return false;
+      }
+
+      MapleCharacter player = c.getPlayer();
+      int remainingSp = player.getRemainingSps()[GameConstants.getSkillBook(skillid / 10000)];
+      boolean isBeginnerSkill = false;
+      if ((!GameConstants.isPqSkillMap(player.getMapId()) && GameConstants.isPqSkill(skillid)) || (!player.isGM() && GameConstants.isGMSkills(skillid)) || (!GameConstants.isInJobTree(skillid, player.getJob().getId()) && !player.isGM())) {
+         AutobanFactory.PACKET_EDIT.alert(player, "tried to packet edit in distributing sp.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use skill " + skillid + " without it being in their job.");
+
+         final MapleClient client = c;
+         ThreadManager.getInstance().newTask(new Runnable() {
+            @Override
+            public void run() {
+               client.disconnect(true, false);
+            }
+         });
+
+         return false;
+      }
+
+      return true;
+   }
+
    public static void SPAssignAction(MapleClient c, int skillid) {
       c.lockClient();
       try {
-         if (skillid == Aran.HIDDEN_FULL_DOUBLE || skillid == Aran.HIDDEN_FULL_TRIPLE || skillid == Aran.HIDDEN_OVER_DOUBLE || skillid == Aran.HIDDEN_OVER_TRIPLE) {
-            c.announce(MaplePacketCreator.enableActions());
+         if (!canSPAssign(c, skillid)) {
             return;
          }
 
          MapleCharacter player = c.getPlayer();
          int remainingSp = player.getRemainingSps()[GameConstants.getSkillBook(skillid / 10000)];
          boolean isBeginnerSkill = false;
-         if ((!GameConstants.isPqSkillMap(player.getMapId()) && GameConstants.isPqSkill(skillid)) || (!player.isGM() && GameConstants.isGMSkills(skillid)) || (!GameConstants.isInJobTree(skillid, player.getJob().getId()) && !player.isGM())) {
-            AutobanFactory.PACKET_EDIT.alert(player, "tried to packet edit in distributing sp.");
-            FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use skill " + skillid + " without it being in their job.");
 
-            final MapleClient client = c;
-            ThreadManager.getInstance().newTask(new Runnable() {
-               @Override
-               public void run() {
-                  client.disconnect(true, false);
-               }
-            });
-
-            return;
-         }
          if (skillid % 10000000 > 999 && skillid % 10000000 < 1003) {
             int total = 0;
             for (int i = 0; i < 3; i++) {
-               total += SkillFactory.applyForSkill(player, player.getJobType() * 10000000 + 1000 + i, (skill, skillLevel) ->  skillLevel, 0);
+               total += SkillFactory.applyForSkill(player, player.getJobType() * 10000000 + 1000 + i, (skill, skillLevel) -> skillLevel, 0);
             }
             remainingSp = Math.min((player.getLevel() - 1), 6) - total;
             isBeginnerSkill = true;
@@ -81,7 +94,7 @@ public class AssignSPProcessor {
             int curLevel = player.getSkillLevel(skill);
 
             int masterLevel = player.getMasterLevel(skill);
-            if ((remainingSp > 0 && curLevel + 1 <= (skill.isFourthJob() ? masterLevel: skill.getMaxLevel()))) {
+            if ((remainingSp > 0 && curLevel + 1 <= (skill.isFourthJob() ? masterLevel : skill.getMaxLevel()))) {
                if (!isBeginnerSkill) {
                   player.gainSp(-1, GameConstants.getSkillBook(skillid / 10000), false);
                } else {

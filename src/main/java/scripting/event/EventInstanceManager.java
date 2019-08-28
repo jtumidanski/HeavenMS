@@ -54,7 +54,7 @@ import net.server.world.MaplePartyCharacter;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.worker.EventScriptScheduler;
 import server.MapleItemInformationProvider;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import server.MapleStatEffect;
 import server.ThreadManager;
 import server.TimerManager;
@@ -356,9 +356,13 @@ public class EventInstanceManager {
    }
 
    public void registerParty(MapleParty party, MapleMap map) {
-      for (MaplePartyCharacter pc : party.getEligibleMembers()) {
-         MapleCharacter c = map.getCharacterById(pc.getId());
-         registerPlayer(c);
+      for (MaplePartyCharacter mpc : party.getEligibleMembers()) {
+         if (mpc.isOnline()) {   // thanks resinate
+            MapleCharacter chr = map.getCharacterById(mpc.getId());
+            if (chr != null) {
+               registerPlayer(chr);
+            }
+         }
       }
    }
 
@@ -460,7 +464,7 @@ public class EventInstanceManager {
       } // optional
    }
 
-   public synchronized void changedLeader(final MapleCharacter ldr) {
+   public synchronized void changedLeader(final MaplePartyCharacter ldr) {
       try {
          invokeScriptFunction("changedLeader", EventInstanceManager.this, ldr);
       } catch (ScriptException | NoSuchMethodException ex) {

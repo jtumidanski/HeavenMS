@@ -130,7 +130,9 @@ public class MapleInventoryManipulator {
                      nItem.setOwner(owner);
                   }
                   c.announce(MaplePacketCreator.modifyInventory(true, Collections.singletonList(new ModifyInventory(0, nItem))));
-                  if (sandboxItem) chr.setHasSandboxItem();
+                  if (sandboxItem) {
+                     chr.setHasSandboxItem();
+                  }
                   if ((ItemConstants.isRechargeable(itemId)) && quantity == 0) {
                      break;
                   }
@@ -150,7 +152,9 @@ public class MapleInventoryManipulator {
                return false;
             }
             c.announce(MaplePacketCreator.modifyInventory(true, Collections.singletonList(new ModifyInventory(0, nItem))));
-            if (MapleInventoryManipulator.isSandboxItem(nItem)) chr.setHasSandboxItem();
+            if (MapleInventoryManipulator.isSandboxItem(nItem)) {
+               chr.setHasSandboxItem();
+            }
          }
       } else if (quantity == 1) {
          Item nEquip = ii.getEquipById(itemId);
@@ -166,7 +170,9 @@ public class MapleInventoryManipulator {
             return false;
          }
          c.announce(MaplePacketCreator.modifyInventory(true, Collections.singletonList(new ModifyInventory(0, nEquip))));
-         if (MapleInventoryManipulator.isSandboxItem(nEquip)) chr.setHasSandboxItem();
+         if (MapleInventoryManipulator.isSandboxItem(nEquip)) {
+            chr.setHasSandboxItem();
+         }
       } else {
          throw new RuntimeException("Trying to create equip with non-one quantity");
       }
@@ -252,7 +258,9 @@ public class MapleInventoryManipulator {
                nItem.setPosition(newSlot);
                item.setPosition(newSlot);
                c.announce(MaplePacketCreator.modifyInventory(true, Collections.singletonList(new ModifyInventory(0, nItem))));
-               if (MapleInventoryManipulator.isSandboxItem(nItem)) chr.setHasSandboxItem();
+               if (MapleInventoryManipulator.isSandboxItem(nItem)) {
+                  chr.setHasSandboxItem();
+               }
             }
          } else {
             Item nItem = new Item(item.getItemId(), (short) 0, quantity, petId);
@@ -268,7 +276,9 @@ public class MapleInventoryManipulator {
             nItem.setPosition(newSlot);
             item.setPosition(newSlot);
             c.announce(MaplePacketCreator.modifyInventory(true, Collections.singletonList(new ModifyInventory(0, nItem))));
-            if (MapleInventoryManipulator.isSandboxItem(nItem)) chr.setHasSandboxItem();
+            if (MapleInventoryManipulator.isSandboxItem(nItem)) {
+               chr.setHasSandboxItem();
+            }
             c.announce(MaplePacketCreator.enableActions());
          }
       } else if (quantity == 1) {
@@ -280,7 +290,9 @@ public class MapleInventoryManipulator {
          }
          item.setPosition(newSlot);
          c.announce(MaplePacketCreator.modifyInventory(true, Collections.singletonList(new ModifyInventory(0, item))));
-         if (MapleInventoryManipulator.isSandboxItem(item)) chr.setHasSandboxItem();
+         if (MapleInventoryManipulator.isSandboxItem(item)) {
+            chr.setHasSandboxItem();
+         }
       } else {
          FilePrinter.printError(FilePrinter.ITEM, "Tried to pickup Equip id " + item.getItemId() + " containing more than 1 quantity --> " + quantity);
          c.announce(MaplePacketCreator.getInventoryFull());
@@ -682,8 +694,27 @@ public class MapleInventoryManipulator {
       chr.equipChanged();
    }
 
-   public static void drop(MapleClient c, MapleInventoryType type, short src, short quantity) {
+
+   private static boolean isDisappearingItemDrop(Item it) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+      if (ii.isDropRestricted(it.getItemId())) {
+         return true;
+      } else if (ii.isCash(it.getItemId())) {
+         if (ServerConstants.USE_ENFORCE_UNMERCHABLE_CASH) {     // thanks Ari for noticing cash drops not available server-side
+            return true;
+         } else if (ItemConstants.isPet(it.getItemId()) && ServerConstants.USE_ENFORCE_UNMERCHABLE_PET) {
+            return true;
+         }
+      } else if (isDroppedItemRestricted(it)) {
+         return true;
+      } else if (ItemConstants.isWeddingRing(it.getItemId())) {
+         return true;
+      }
+
+      return false;
+   }
+
+   public static void drop(MapleClient c, MapleInventoryType type, short src, short quantity) {
       if (src < 0) {
          type = MapleInventoryType.EQUIPPED;
       }
@@ -696,14 +727,21 @@ public class MapleInventoryManipulator {
          return;
       }
       int itemId = source.getItemId();
-      if (ItemConstants.isPet(itemId)) {
-         return;
-      }
 
       MapleMap map = chr.getMap();
       if ((!ItemConstants.isRechargeable(itemId) && source.getQuantity() < quantity) || quantity < 0) {
          return;
       }
+
+      int petid = source.getPetId();
+      if (petid > -1) {
+         int petIdx = chr.getPetIndex(petid);
+         if (petIdx > -1) {
+            MaplePet pet = chr.getPet(petIdx);
+            chr.unequipPet(pet, true);
+         }
+      }
+
       Point dropPos = new Point(chr.getPosition());
       if (quantity < source.getQuantity() && !ItemConstants.isRechargeable(itemId)) {
          Item target = source.copy();
@@ -719,11 +757,9 @@ public class MapleInventoryManipulator {
                NewYearCardRecord.removeAllNewYearCard(false, chr);
                c.getAbstractPlayerInteraction().removeAll(4301000);
             }
-         } else if (ItemConstants.isWeddingRing(source.getItemId())) {
-            map.disappearingItemDrop(chr, chr, target, dropPos);
          }
 
-         if (ii.isDropRestricted(target.getItemId()) || ii.isCash(target.getItemId()) || isDroppedItemRestricted(target)) {
+         if (isDisappearingItemDrop(target)) {
             map.disappearingItemDrop(chr, chr, target, dropPos);
          } else {
             map.spawnItemDrop(chr, chr, target, dropPos, true, true);
@@ -752,11 +788,9 @@ public class MapleInventoryManipulator {
                NewYearCardRecord.removeAllNewYearCard(false, chr);
                c.getAbstractPlayerInteraction().removeAll(4301000);
             }
-         } else if (ItemConstants.isWeddingRing(source.getItemId())) {
-            map.disappearingItemDrop(chr, chr, source, dropPos);
          }
 
-         if (ii.isDropRestricted(itemId) || ii.isCash(itemId) || isDroppedItemRestricted(source)) {
+         if (isDisappearingItemDrop(source)) {
             map.disappearingItemDrop(chr, chr, source, dropPos);
          } else {
             map.spawnItemDrop(chr, chr, source, dropPos, true, true);

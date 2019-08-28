@@ -137,26 +137,13 @@ public class AbstractPlayerInteraction {
    }
 
    public void warpParty(int id, int portalId, int fromMinId, int fromMaxId) {
-      for (MapleCharacter mc : getPartyMembers()) {
-         if (mc.getMapId() >= fromMinId && mc.getMapId() <= fromMaxId) {
-            mc.changeMap(id, portalId);
-         }
-      }
-   }
-
-   public List<MapleCharacter> getPartyMembers() {
-      if (getPlayer().getParty() == null) {
-         return null;
-      }
-      List<MapleCharacter> chars = new LinkedList<>();
-      for (Channel channel : Server.getInstance().getChannelsFromWorld(getPlayer().getWorld())) {
-         for (MapleCharacter chr : channel.getPartyMembers(getPlayer().getParty())) {
-            if (chr != null) {
-               chars.add(chr);
+      for (MapleCharacter mc : this.getPlayer().getPartyMembersOnline()) {
+         if (mc.isLoggedinWorld()) {
+            if(mc.getMapId() >= fromMinId && mc.getMapId() <= fromMaxId) {
+               mc.changeMap(id, portalId);
             }
          }
       }
-      return chars;
    }
 
    public MapleMap getWarpMap(int map) {
@@ -802,9 +789,14 @@ public class AbstractPlayerInteraction {
          removeAll(id);
          return;
       }
-      for (MaplePartyCharacter chr : getParty().getMembers()) {
-         if (chr != null && chr.isOnline() && chr.getPlayer().getClient() != null) {
-            removeAll(id, chr.getPlayer().getClient());
+      for (MaplePartyCharacter mpc : getParty().getMembers()) {
+         if (mpc == null || !mpc.isOnline()) {
+            continue;
+         }
+
+         MapleCharacter chr = mpc.getPlayer();
+         if (chr != null && chr.getClient() != null){
+            removeAll(id, chr.getClient());
          }
       }
    }
@@ -834,9 +826,14 @@ public class AbstractPlayerInteraction {
       int size = party.getMembers().size();
 
       if (instance) {
-         for (MaplePartyCharacter member : party.getMembers()) {
-            if (member == null || !member.isOnline() || member.getPlayer().getEventInstance() == null) {
+         for(MaplePartyCharacter member: party.getMembers()) {
+            if(member == null || !member.isOnline()){
                size--;
+            } else {
+               MapleCharacter chr = member.getPlayer();
+               if(chr != null && chr.getEventInstance() == null) {
+                  size--;
+               }
             }
          }
       }
@@ -847,6 +844,9 @@ public class AbstractPlayerInteraction {
             continue;
          }
          MapleCharacter player = member.getPlayer();
+         if(player == null) {
+            continue;
+         }
          if (instance && player.getEventInstance() == null) {
             continue; // They aren't in the instance, don't give EXP.
          }

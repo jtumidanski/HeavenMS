@@ -37,7 +37,7 @@ import constants.ItemConstants;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import server.MapleItemInformationProvider;
-import server.MaplePortal;
+import server.maps.MaplePortal;
 import server.MapleTrade;
 import server.maps.FieldLimit;
 import server.maps.MapleHiredMerchant;

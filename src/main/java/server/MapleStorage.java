@@ -58,13 +58,12 @@ public class MapleStorage {
    private int meso;
    private byte slots;
    private Map<MapleInventoryType, List<Item>> typeItems = new HashMap<>();
-   private List<Item> items;
+   private List<Item> items = new LinkedList<>();
    private Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.STORAGE, true);
 
    public MapleStorage(int id, byte slots, int meso) {
       this.id = id;
       this.slots = slots;
-      this.items = new LinkedList<>();
       this.meso = meso;
    }
 
@@ -93,14 +92,19 @@ public class MapleStorage {
    }
 
    public synchronized boolean gainSlots(int slots) {
-      slots += this.slots;
+      lock.lock();
+      try {
+         slots += this.slots;
 
-      if (slots <= 48) {
-         this.slots = (byte) slots;
-         return true;
+         if (slots <= 48) {
+            this.slots = (byte) slots;
+            return true;
+         }
+
+         return false;
+      } finally {
+         lock.unlock();
       }
-
-      return false;
    }
 
    public void saveToDB(Connection con) {
@@ -125,29 +129,33 @@ public class MapleStorage {
       }
    }
 
-   public Item takeOut(byte slot) {
-      Item ret;
-
+   public boolean takeOut(Item item) {
       lock.lock();
       try {
-         ret = items.remove(slot);
+         boolean ret = items.remove(item);
 
-         MapleInventoryType type = ret.getInventoryType();
+         MapleInventoryType type = item.getInventoryType();
          typeItems.put(type, new ArrayList<>(filterItems(type)));
+
+         return ret;
       } finally {
          lock.unlock();
       }
-
-      return ret;
    }
 
-   public void store(Item item) {
+   public boolean store(Item item) {
       lock.lock();
       try {
+         if (isFull()) { // thanks Optimist for noticing unrestricted amount of insertions here
+            return false;
+         }
+
          items.add(item);
 
          MapleInventoryType type = item.getInventoryType();
          typeItems.put(type, new ArrayList<>(filterItems(type)));
+
+         return true;
       } finally {
          lock.unlock();
       }

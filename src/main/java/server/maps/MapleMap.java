@@ -69,7 +69,6 @@ import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import scripting.map.MapScriptManager;
 import server.MapleItemInformationProvider;
-import server.MaplePortal;
 import server.MapleStatEffect;
 import server.TimerManager;
 import server.events.gm.MapleCoconut;

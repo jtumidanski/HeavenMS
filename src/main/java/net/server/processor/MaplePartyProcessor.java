@@ -154,7 +154,7 @@ public class MaplePartyProcessor {
             if (expelled != null) {
                MapleCharacter emc = expelled.getPlayer();
                if (emc != null) {
-                  List<MapleCharacter> partyMembers = emc.getPartyMembers();
+                  List<MapleCharacter> partyMembers = emc.getPartyMembersOnline();
 
                   MapleMap map = emc.getMap();
                   if (map != null) {

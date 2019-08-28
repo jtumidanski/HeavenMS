@@ -108,6 +108,7 @@ import net.server.worker.RankingLoginWorker;
 import net.server.worker.ReleaseLockWorker;
 import net.server.worker.RespawnWorker;
 import net.server.world.World;
+import net.server.world.announcer.MapleAnnouncerCoordinator;
 import server.CashShop.CashItemFactory;
 import server.MapleSkillbookInformationProvider;
 import server.ThreadManager;
@@ -271,6 +272,32 @@ public class Server {
       wchars.add(curWorld, chars);
 
       return new Pair<>(characterCount, wchars);
+   }
+
+   public void loadAccountStorages(MapleClient c) {
+      int accountId = c.getAccID();
+      Set<Integer> accWorlds = new HashSet<>();
+      lgnWLock.lock();
+      try {
+         Set<Integer> chars = accountChars.get(accountId);
+
+         for (Integer cid : chars) {
+            Integer worldid = worldChars.get(cid);
+            if (worldid != null) {
+               accWorlds.add(worldid);
+            }
+         }
+      } finally {
+         lgnWLock.unlock();
+      }
+
+      List<World> worldList = this.getWorlds();
+      for (Integer worldid : accWorlds) {
+         if (worldid < worldList.size()) {
+            World wserv = worldList.get(worldid);
+            wserv.registerAccountStorage(accountId);
+         }
+      }
    }
 
    private static String getRemoteIp(IoSession session) {
@@ -866,11 +893,16 @@ public class Server {
          System.exit(0);
       }
 
+      MapleAnnouncerCoordinator.getInstance().init();
+      System.out.println();
+
       if (ServerConstants.USE_FAMILY_SYSTEM) {
          timeToTake = System.currentTimeMillis();
          MapleFamilyProcessor.getInstance().loadAllFamilies();
          System.out.println("Families loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
       }
+
+      System.out.println();
 
       acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 30);
       acceptor.setHandler(new MapleServerHandler());
