@@ -171,7 +171,7 @@ import server.life.MaplePlayerNPC;
 import server.life.MobSkill;
 import server.maps.FieldLimit;
 import server.maps.MapleDoor;
-import server.maps.MapleDoorProcessor;
+import server.processor.maps.MapleDoorProcessor;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMap;

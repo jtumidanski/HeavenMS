@@ -1,8 +1,9 @@
-package server.maps;
-
-import java.util.Collection;
+package server.processor.maps;
 
 import client.MapleCharacter;
+import server.maps.MapleDoor;
+import server.maps.MapleDoorObject;
+import server.maps.MapleMap;
 
 public class MapleDoorProcessor {
    private static MapleDoorProcessor ourInstance = new MapleDoorProcessor();
@@ -20,12 +21,8 @@ public class MapleDoorProcessor {
          long effectTimeLeft = 3000 - destroyDoor.getElapsedDeployTime();   // portal deployment effect duration
          if (effectTimeLeft > 0) {
             MapleMap town = destroyDoor.getTown();
-            town.getChannelServer().registerOverallAction(town.getId(), new Runnable() {
-               @Override
-               public void run() {
-                  broadcastRemoveDoor(destroyDoor, owner);   // thanks BHB88 for noticing doors crashing players when instantly cancelling buff
-               }
-            }, effectTimeLeft);
+            // thanks BHB88 for noticing doors crashing players when instantly cancelling buff
+            town.getChannelServer().registerOverallAction(town.getId(), () -> broadcastRemoveDoor(destroyDoor, owner), effectTimeLeft);
          } else {
             broadcastRemoveDoor(destroyDoor, owner);
          }
@@ -39,29 +36,19 @@ public class MapleDoorProcessor {
       MapleMap target = destroyDoor.getTarget();
       MapleMap town = destroyDoor.getTown();
 
-      Collection<MapleCharacter> targetChars = target.getCharacters();
-      Collection<MapleCharacter> townChars = town.getCharacters();
-
       target.removeMapObject(areaDoor);
       town.removeMapObject(townDoor);
 
-      for (MapleCharacter chr : targetChars) {
-         areaDoor.sendDestroyData(chr.getClient());
-      }
+      target.getCharacters().forEach(character -> areaDoor.sendDestroyData(character.getClient()));
+      town.getCharacters().forEach(character -> townDoor.sendDestroyData(character.getClient()));
 
-      for (MapleCharacter chr : townChars) {
-         townDoor.sendDestroyData(chr.getClient());
-      }
 
       owner.removePartyDoor(false);
 
       if (destroyDoor.getTownPortal().getId() == 0x80) {
-         for (MapleCharacter chr : townChars) {
-            MapleDoor door = chr.getMainTownDoor();
-            if (door != null) {
-               townDoor.sendSpawnData(chr.getClient());
-            }
-         }
+         town.getCharacters().stream()
+               .filter(character -> character.getMainTownDoor() != null)
+               .forEach(character -> townDoor.sendSpawnData(character.getClient()));
       }
    }
 }
