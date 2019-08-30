@@ -7,7 +7,6 @@ import java.util.Date;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.Item;
-import net.server.Server;
 import server.MapleItemInformationProvider;
 import server.MapleTrade;
 import server.expeditions.MapleExpedition;
@@ -35,7 +34,7 @@ public class LogHelper {
    }
 
    public static void logExpedition(MapleExpedition expedition) {
-      Server.getInstance().broadcastGMMessage(expedition.getLeader().getWorld(), MaplePacketCreator.serverNotice(6, expedition.getType().toString() + " Expedition with leader " + expedition.getLeader().getName() + " finished after " + getTimeString(expedition.getStartTime())));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(expedition.getLeader().getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, expedition.getType().toString() + " Expedition with leader " + expedition.getLeader().getName() + " finished after " + getTimeString(expedition.getStartTime()));
 
       StringBuilder log = new StringBuilder(expedition.getType().toString() + " EXPEDITION\r\n");
       log.append(getTimeString(expedition.getStartTime())).append("\r\n");

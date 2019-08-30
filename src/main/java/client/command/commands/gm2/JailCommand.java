@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import server.maps.MaplePortal;
 import server.maps.MapleMap;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class JailCommand extends Command {
    {
@@ -57,10 +59,10 @@ public class JailCommand extends Command {
             MaplePortal targetPortal = target.getPortal(0);
             victim.saveLocationOnWarp();
             victim.changeMap(target, targetPortal);
-            player.message(victim.getName() + " was jailed for " + minutesJailed + " minutes.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + " was jailed for " + minutesJailed + " minutes.");
          } else {
-            player.message(victim.getName() + "'s time in jail has been extended for " + minutesJailed + " minutes.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + "'s time in jail has been extended for " + minutesJailed + " minutes.");
          }
-      }, () -> player.message("Player '" + params[0] + "' could not be found."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
    }
 }

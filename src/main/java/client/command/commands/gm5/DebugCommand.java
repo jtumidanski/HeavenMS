@@ -31,13 +31,15 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
-import server.maps.MaplePortal;
 import server.TimerManager;
 import server.life.MapleMonster;
 import server.life.SpawnPoint;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import server.maps.MaplePortal;
 import server.maps.MapleReactor;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class DebugCommand extends Command {
    private final static String[] debugTypes = {"monster", "packet", "portal", "spawnpoint", "pos", "map", "mobsp", "event", "areas", "reactors", "servercoupons", "playercoupons", "timer", "marriage", "buff", ""};
@@ -71,7 +73,7 @@ public class DebugCommand extends Command {
             for (MapleMapObject monstermo : monsters) {
                MapleMonster monster = (MapleMonster) monstermo;
                MapleCharacter controller = monster.getController();
-               player.message("Monster ID: " + monster.getId() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Monster ID: " + monster.getId() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
             }
             break;
 
@@ -81,24 +83,28 @@ public class DebugCommand extends Command {
 
          case "portal":
             MaplePortal portal = player.getMap().findClosestPortal(player.getPosition());
-            if (portal != null)
-               player.dropMessage(6, "Closest portal: " + portal.getId() + " '" + portal.getName() + "' Type: " + portal.getType() + " --> toMap: " + portal.getTargetMapId() + " scriptname: '" + portal.getScriptName() + "' state: " + (portal.getPortalState() ? 1 : 0) + ".");
-            else player.dropMessage(6, "There is no portal on this map.");
+            if (portal != null) {
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Closest portal: " + portal.getId() + " '" + portal.getName() + "' Type: " + portal.getType() + " --> toMap: " + portal.getTargetMapId() + " scriptname: '" + portal.getScriptName() + "' state: " + (portal.getPortalState() ? 1 : 0) + ".");
+            } else {
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "There is no portal on this map.");
+            }
             break;
 
          case "spawnpoint":
             SpawnPoint sp = player.getMap().findClosestSpawnpoint(player.getPosition());
-            if (sp != null)
-               player.dropMessage(6, "Closest mob spawn point: " + " Position: x " + sp.getPosition().getX() + " y " + sp.getPosition().getY() + " Spawns mobid: '" + sp.getMonsterId() + "' --> canSpawn: " + !sp.getDenySpawn() + " canSpawnRightNow: " + sp.shouldSpawn() + ".");
-            else player.dropMessage(6, "There is no mob spawn point on this map.");
+            if (sp != null) {
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Closest mob spawn point: " + " Position: x " + sp.getPosition().getX() + " y " + sp.getPosition().getY() + " Spawns mobid: '" + sp.getMonsterId() + "' --> canSpawn: " + !sp.getDenySpawn() + " canSpawnRightNow: " + sp.shouldSpawn() + ".");
+            } else {
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "There is no mob spawn point on this map.");
+            }
             break;
 
          case "pos":
-            player.dropMessage(6, "Current map position: (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ").");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current map position: (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ").");
             break;
 
          case "map":
-            player.dropMessage(6, "Current map id " + player.getMap().getId() + ", event: '" + ((player.getMap().getEventInstance() != null) ? player.getMap().getEventInstance().getName() : "null") + "'; Players: " + player.getMap().getAllPlayers().size() + ", Mobs: " + player.getMap().countMonsters() + ", Reactors: " + player.getMap().countReactors() + ", Items: " + player.getMap().countItems() + ", Objects: " + player.getMap().getMapObjects().size() + ".");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current map id " + player.getMap().getId() + ", event: '" + ((player.getMap().getEventInstance() != null) ? player.getMap().getEventInstance().getName() : "null") + "'; Players: " + player.getMap().getAllPlayers().size() + ", Mobs: " + player.getMap().countMonsters() + ", Reactors: " + player.getMap().countReactors() + ", Items: " + player.getMap().countItems() + ", Objects: " + player.getMap().getMapObjects().size() + ".");
             break;
 
          case "mobsp":
@@ -106,26 +112,29 @@ public class DebugCommand extends Command {
             break;
 
          case "event":
-            if (player.getEventInstance() == null) player.dropMessage(6, "Player currently not in an event.");
-            else player.dropMessage(6, "Current event name: " + player.getEventInstance().getName() + ".");
+            if (player.getEventInstance() == null) {
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Player currently not in an event.");
+            } else {
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current event name: " + player.getEventInstance().getName() + ".");
+            }
             break;
 
          case "areas":
-            player.dropMessage(6, "Configured areas on map " + player.getMapId() + ":");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Configured areas on map " + player.getMapId() + ":");
 
             byte index = 0;
             for (Rectangle rect : player.getMap().getAreas()) {
-               player.dropMessage(6, "Id: " + index + " -> posX: " + rect.getX() + " posY: '" + rect.getY() + "' dX: " + rect.getWidth() + " dY: " + rect.getHeight() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Id: " + index + " -> posX: " + rect.getX() + " posY: '" + rect.getY() + "' dX: " + rect.getWidth() + " dY: " + rect.getHeight() + ".");
                index++;
             }
             break;
 
          case "reactors":
-            player.dropMessage(6, "Current reactor states on map " + player.getMapId() + ":");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current reactor states on map " + player.getMapId() + ":");
 
             for (MapleMapObject mmo : player.getMap().getReactors()) {
                MapleReactor mr = (MapleReactor) mmo;
-               player.dropMessage(6, "Id: " + mr.getId() + " Oid: " + mr.getObjectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.getPosition().getX() + " y " + mr.getPosition().getY() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Id: " + mr.getId() + " Oid: " + mr.getObjectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.getPosition().getX() + " y " + mr.getPosition().getY() + ".");
             }
             break;
 
@@ -136,7 +145,7 @@ public class DebugCommand extends Command {
                s.append(i).append(" ");
             }
 
-            player.dropMessage(6, s.toString());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, s.toString());
             break;
 
          case "playercoupons":
@@ -145,12 +154,12 @@ public class DebugCommand extends Command {
                st.append(i).append(" ");
             }
 
-            player.dropMessage(6, st.toString());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, st.toString());
             break;
 
          case "timer":
             TimerManager tMan = TimerManager.getInstance();
-            player.dropMessage(6, "Total Task: " + tMan.getTaskCount() + " Current Task: " + tMan.getQueuedTasks() + " Active Task: " + tMan.getActiveCount() + " Completed Task: " + tMan.getCompletedTaskCount());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Total Task: " + tMan.getTaskCount() + " Current Task: " + tMan.getQueuedTasks() + " Active Task: " + tMan.getActiveCount() + " Completed Task: " + tMan.getCompletedTaskCount());
             break;
 
          case "marriage":

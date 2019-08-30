@@ -26,7 +26,8 @@ package client.command.commands.gm4;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class TravelRateCommand extends Command {
    {
@@ -43,6 +44,6 @@ public class TravelRateCommand extends Command {
 
       int travelrate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setTravelRate(travelrate);
-      c.getWorldServer().broadcastPacket(MaplePacketCreator.serverNotice(6, "[Rate] Travel Rate has been changed to " + travelrate + "x."));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Travel Rate has been changed to " + travelrate + "x.");
    }
 }

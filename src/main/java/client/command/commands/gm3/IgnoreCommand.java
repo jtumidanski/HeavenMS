@@ -31,6 +31,8 @@ import client.command.Command;
 import net.server.Server;
 import tools.MapleLogger;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class IgnoreCommand extends Command {
    {
@@ -46,7 +48,7 @@ public class IgnoreCommand extends Command {
       }
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
       if (victim.isEmpty()) {
-         player.message("Player '" + params[0] + "' could not be found on this world.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world.");
          return;
       }
       boolean monitored_ = MapleLogger.ignored.contains(victim.get().getId());
@@ -57,7 +59,6 @@ public class IgnoreCommand extends Command {
       }
       player.yellowMessage(victim.get().getName() + " is " + (!monitored_ ? "now being ignored." : "no longer being ignored."));
       String message_ = player.getName() + (!monitored_ ? " has started ignoring " : " has stopped ignoring ") + victim.get().getName() + ".";
-      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, message_));
-
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, message_);
    }
 }

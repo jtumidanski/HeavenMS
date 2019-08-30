@@ -33,7 +33,9 @@ import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
 import net.server.world.World;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class MessengerHandler extends AbstractMaplePacketHandler {
@@ -137,7 +139,7 @@ public final class MessengerHandler extends AbstractMaplePacketHandler {
                            world.joinMessenger(messenger.getId(), messengerCharacter, player.getName(), messengerCharacter.getChannel());
                         }
                      } else {
-                        player.message("Could not verify your Maple Messenger accept since the invitation rescinded.");
+                        MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not verify your Maple Messenger accept since the invitation rescinded.");
                      }
                   });
                }

@@ -19,12 +19,17 @@
 */
 package net.server.channel.handlers;
 
+import java.util.Collection;
+
+import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class FamilySeparateHandler extends AbstractMaplePacketHandler {
@@ -71,7 +76,9 @@ public class FamilySeparateHandler extends AbstractMaplePacketHandler {
       if (senior.getSenior() != null) {
          senior.getSenior().gainReputation(-(repCost / 2), false);
       }
-      forkOn.announceToSenior(MaplePacketCreator.serverNotice(5, forkOn.getName() + " has left the family."), true);
+
+      Collection<MapleCharacter> recipients = forkOn.getSeniors(true);
+      MessageBroadcaster.getInstance().sendServerNotice(recipients, ServerNoticeType.PINK_TEXT, forkOn.getName() + " has left the family.");
       forkOn.fork();
       c.announce(MaplePacketCreator.getFamilyInfo(forkOn)); //pedigree info will be requested by the client if the window is open
       forkOn.updateSeniorFamilyInfo(true);

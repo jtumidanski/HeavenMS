@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -52,7 +54,7 @@ class EventAreaBossSeruf {
       int posY = 520
       posX = Math.floor((Math.random() * 2300) - 1500).intValue()
       theSeaweedTower.spawnMonsterOnGroundBelow(seruf, new Point(posX, posY))
-      theSeaweedTower.broadcastMessage(MaplePacketCreator.serverNotice(6, "A strange shell has appeared from a grove of seaweed"))
+      MessageBroadcaster.getInstance().sendMapServerNotice(theSeaweedTower, ServerNoticeType.LIGHT_BLUE,"A strange shell has appeared from a grove of seaweed")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -121,7 +123,7 @@ class EventAreaBossSeruf {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

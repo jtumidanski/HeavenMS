@@ -3,6 +3,8 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleReactor
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    pi.removeAll(4001162)
@@ -15,7 +17,7 @@ static def enter(PortalPlayerInteraction pi) {
    // thanks Chloek3, seth1 for noticing fragments not being awarded properly
    if (spring != null && spring.getState() > 0) {
       if (!pi.canHold(4001198, 1)) {
-         pi.playerMessage(5, "Check for a free space on your ETC inventory before entering this portal.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Check for a free space on your ETC inventory before entering this portal.")
          return false
       }
 

@@ -29,7 +29,9 @@ import client.command.Command;
 import net.server.Server;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 
 public class GmCommand extends Command {
@@ -48,14 +50,14 @@ public class GmCommand extends Command {
       };
       MapleCharacter player = c.getPlayer();
       if (params.length < 1 || params[0].length() < 3) { // #goodbye 'hi'
-         player.dropMessage(5, "Your message was too short. Please provide as much detail as possible.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Your message was too short. Please provide as much detail as possible.");
          return;
       }
       String message = player.getLastCommandMessage();
       Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[GM Message]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message));
-      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(1, message));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, message);
       FilePrinter.printError(FilePrinter.COMMAND_GM, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
-      player.dropMessage(5, "Your message '" + message + "' was sent to GMs.");
-      player.dropMessage(5, tips[Randomizer.nextInt(tips.length)]);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Your message '" + message + "' was sent to GMs.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, tips[Randomizer.nextInt(tips.length)]);
    }
 }

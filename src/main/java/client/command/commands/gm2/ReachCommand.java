@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.maps.MapleMap;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ReachCommand extends Command {
    {
@@ -43,12 +45,12 @@ public class ReachCommand extends Command {
 
       c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          if (player.getClient().getChannel() != victim.getClient().getChannel()) {
-            player.dropMessage(5, "Player '" + victim.getName() + "' is at channel " + victim.getClient().getChannel() + ".");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + victim.getName() + "' is at channel " + victim.getClient().getChannel() + ".");
          } else {
             MapleMap map = victim.getMap();
             player.saveLocationOnWarp();
             player.forceChangeMap(map, map.findClosestPortal(victim.getPosition()));
          }
-      }, () -> player.dropMessage(6, "Unknown player."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Unknown player."));
    }
 }

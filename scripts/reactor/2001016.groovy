@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2001016 {
@@ -11,7 +13,7 @@ class Reactor2001016 {
       rm.getMap().killAllMonsters()
       rm.getMap().allowSummonState(false)
       rm.spawnMonster(9300039, 260, 490)
-      rm.mapMessage(5, "As the air on the tower outskirts starts to become more dense, Papa Pixie appears.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "As the air on the tower outskirts starts to become more dense, Papa Pixie appears.")
    }
 
    def hit() {

@@ -28,6 +28,8 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class GiveNxCommand extends Command {
    {
@@ -77,9 +79,9 @@ public class GiveNxCommand extends Command {
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv);
       if (victim.isPresent()) {
          victim.get().getCashShop().gainCash(type, value);
-         player.message(typeStr.toUpperCase() + " given.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, typeStr.toUpperCase() + " given.");
       } else {
-         player.message("Player '" + recv + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + recv + "' could not be found.");
       }
    }
 }

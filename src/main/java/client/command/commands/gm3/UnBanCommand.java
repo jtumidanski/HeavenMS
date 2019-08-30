@@ -31,6 +31,8 @@ import client.database.provider.AccountProvider;
 import client.database.administrator.IpBanAdministrator;
 import client.database.administrator.MacBanAdministrator;
 import tools.DatabaseConnection;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class UnBanCommand extends Command {
    {
@@ -51,6 +53,6 @@ public class UnBanCommand extends Command {
          IpBanAdministrator.getInstance().removeIpBan(connection, aid);
          MacBanAdministrator.getInstance().removeMacBan(connection, aid);
       });
-      player.message("Unbanned " + params[0]);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Unbanned " + params[0]);
    }
 }

@@ -26,6 +26,8 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class EndEventCommand extends Command {
    {
@@ -36,6 +38,6 @@ public class EndEventCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       c.getChannelServer().setEvent(null);
-      player.dropMessage(5, "You have ended the event. No more players may join.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have ended the event. No more players may join.");
    }
 }

@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    long entryTime = pi.getPlayer().getEventInstance().getProperty("entryTimestamp").toLong()
@@ -14,7 +16,7 @@ static def enter(PortalPlayerInteraction pi) {
       return true
    }
    else { //cannot proceed while allies can still enter
-      pi.playerMessage(5, "The portal will open in about " + timeLeft + " seconds.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal will open in about " + timeLeft + " seconds.")
       return false
    }
 }

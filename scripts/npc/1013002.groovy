@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -17,7 +19,7 @@ class NPC1013002 {
 
    def start() {
       cm.forceCompleteQuest(22011)
-      cm.playerMessage(5, "You have acquired a Dragon Egg.")
+      MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "You have acquired a Dragon Egg.")
       cm.warp(900090103, 0)
       cm.dispose()
    }

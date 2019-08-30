@@ -34,6 +34,8 @@ import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
 import tools.DatabaseConnection;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class PmobCommand extends Command {
    {
@@ -78,7 +80,7 @@ public class PmobCommand extends Command {
 
          player.yellowMessage("Pmob created.");
       } else {
-         player.dropMessage(5, "You have entered an invalid mob id.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have entered an invalid mob id.");
       }
    }
 }

@@ -2,6 +2,8 @@ package reactor
 
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor9208002 {
@@ -27,7 +29,7 @@ class Reactor9208002 {
                   eim.setProperty("stage1combo", prevCombo)
                   if (prevCombo.length() == (3 * (stage + 3))) { //end of displaying
                      eim.setProperty("stage1status", "active")
-                     rm.mapMessage(5, "The combo has been displayed; Proceed with caution.")
+                     MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The combo has been displayed; Proceed with caution.")
                      eim.setProperty("stage1guess", "")
                   }
                }

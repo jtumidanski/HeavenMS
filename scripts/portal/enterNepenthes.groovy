@@ -3,6 +3,8 @@ package portal
 import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -20,7 +22,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(920030000, 2)
          return true
       } else {
-         pi.message("Someone is already challenging the area.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Someone is already challenging the area.")
          return false
       }
    } else {

@@ -70,6 +70,8 @@ import server.quest.requirements.NpcRequirement;
 import server.quest.requirements.PetRequirement;
 import server.quest.requirements.QuestRequirement;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 
 /**
@@ -308,7 +310,7 @@ public class MapleQuest {
       for (MapleQuestRequirement r : startReqs.values()) {
          if (!r.check(c, npcid)) {
             if (r.getType().getType() == MapleQuestRequirementType.INTERVAL.getType()) {
-               c.message("This quest will become available again in approximately " + getIntervalTimeLeft(c, (IntervalRequirement) r) + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "This quest will become available again in approximately " + getIntervalTimeLeft(c, (IntervalRequirement) r) + ".");
             }
             return false;
          }
@@ -325,7 +327,7 @@ public class MapleQuest {
             return false;
          } else if (!r.check(c, npcid)) {
             if (r.getType() == MapleQuestRequirementType.MESO) { // TODO: find a way to tell the client about the new MESO requirement type.
-               c.dropMessage(5, "You don't have enough mesos to complete this quest.");
+               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "You don't have enough mesos to complete this quest.");
             }
             return false;
          }

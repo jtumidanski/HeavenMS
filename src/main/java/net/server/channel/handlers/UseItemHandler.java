@@ -33,6 +33,8 @@ import net.AbstractMaplePacketHandler;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -88,7 +90,7 @@ public final class UseItemHandler extends AbstractMaplePacketHandler {
             if (ii.getItemEffect(toUse.getItemId()).applyTo(chr)) {
                remove(c, slot);
             } else {
-               chr.dropMessage(5, "You cannot recover from a banish state at the moment.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot recover from a banish state at the moment.");
             }
             return;
          }

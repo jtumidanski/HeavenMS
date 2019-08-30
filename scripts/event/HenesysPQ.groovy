@@ -7,7 +7,8 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class EventHenesysPQ {
    EventManager em
@@ -185,7 +186,7 @@ class EventHenesysPQ {
    }
 
    def bunnyDefeated(EventInstanceManager eim) {
-      eim.dropMessage(5, "Due to your failure to protect the Moon Bunny, you have been transported to the Exile Map.")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Due to your failure to protect the Moon Bunny, you have been transported to the Exile Map.")
       end(eim)
    }
 
@@ -194,7 +195,7 @@ class EventHenesysPQ {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }
@@ -223,7 +224,7 @@ class EventHenesysPQ {
          int cakes = eim.getIntProperty("bunnyCake") + 1
          eim.setIntProperty("bunnyCake", cakes)
 
-         mob.getMap().broadcastMessage(MaplePacketCreator.serverNotice(6, "The Moon Bunny made rice cake number " + cakes + "."))
+         MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, "The Moon Bunny made rice cake number " + cakes + ".")
       }
    }
 
@@ -231,7 +232,7 @@ class EventHenesysPQ {
       if (mob.getId() == 9300061) {
          int bunnyDamage = eim.getIntProperty("bunnyDamaged") + 1
          if (bunnyDamage > 5) {
-            mob.getMap().broadcastMessage(MaplePacketCreator.serverNotice(6, "The Moon Bunny is feeling sick. Please protect it so it can make delicious rice cakes."))
+            MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, "The Moon Bunny is feeling sick. Please protect it so it can make delicious rice cakes.")
             eim.setIntProperty("bunnyDamaged", 0)
          }
       }

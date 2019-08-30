@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    int baseid = 100020000
@@ -19,7 +21,7 @@ static def enter(PortalPlayerInteraction pi) {
                }
             }
          } else {
-            pi.playerMessage(5, "Only solo or party leaders are supposed to enter the Mini-Dungeon.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Only solo or party leaders are supposed to enter the Mini-Dungeon.")
             return false
          }
       } else {
@@ -31,7 +33,7 @@ static def enter(PortalPlayerInteraction pi) {
             }
          }
       }
-      pi.playerMessage(5, "All of the Mini-Dungeons are in use right now, please try again later.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "All of the Mini-Dungeons are in use right now, please try again later.")
       return false
    } else {
       pi.playPortalSound()

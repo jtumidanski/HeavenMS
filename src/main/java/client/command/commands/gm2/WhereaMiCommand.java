@@ -32,6 +32,8 @@ import server.life.MapleMonster;
 import server.life.MapleNPC;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class WhereaMiCommand extends Command {
    {
@@ -69,20 +71,20 @@ public class WhereaMiCommand extends Command {
 
       player.yellowMessage("Players on this map:");
       for (MapleCharacter chr : chars) {
-         player.dropMessage(5, ">> " + chr.getName() + " - " + chr.getId() + " - Oid: " + chr.getObjectId());
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + chr.getName() + " - " + chr.getId() + " - Oid: " + chr.getObjectId());
       }
 
       if (!playernpcs.isEmpty()) {
          player.yellowMessage("PlayerNPCs on this map:");
          for (MaplePlayerNPC pnpc : playernpcs) {
-            player.dropMessage(5, ">> " + pnpc.getName() + " - Scriptid: " + pnpc.getScriptId() + " - Oid: " + pnpc.getObjectId());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + pnpc.getName() + " - Scriptid: " + pnpc.getScriptId() + " - Oid: " + pnpc.getObjectId());
          }
       }
 
       if (!npcs.isEmpty()) {
          player.yellowMessage("NPCs on this map:");
          for (MapleNPC npc : npcs) {
-            player.dropMessage(5, ">> " + npc.getName() + " - " + npc.getId() + " - Oid: " + npc.getObjectId());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + npc.getName() + " - " + npc.getId() + " - Oid: " + npc.getObjectId());
          }
       }
 
@@ -90,7 +92,7 @@ public class WhereaMiCommand extends Command {
          player.yellowMessage("Monsters on this map:");
          for (MapleMonster mob : mobs) {
             if (mob.isAlive()) {
-               player.dropMessage(5, ">> " + mob.getName() + " - " + mob.getId() + " - Oid: " + mob.getObjectId());
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + mob.getName() + " - " + mob.getId() + " - Oid: " + mob.getObjectId());
             }
          }
       }

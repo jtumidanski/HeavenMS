@@ -24,6 +24,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -36,7 +38,7 @@ public class UseMapleLifeHandler extends AbstractMaplePacketHandler {
       long timeNow = currentServerTime();
 
       if (timeNow - player.getLastUsedCashItem() < 3000) {
-         player.dropMessage(5, "Please wait a moment before trying again.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a moment before trying again.");
          c.announce(MaplePacketCreator.sendMapleLifeError(3));
          c.announce(MaplePacketCreator.enableActions());
          return;

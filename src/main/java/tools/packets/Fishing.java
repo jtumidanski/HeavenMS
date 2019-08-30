@@ -27,6 +27,8 @@ import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author FateJiki (RaGeZONE)
@@ -56,9 +58,9 @@ public class Fishing {
       double baitLikelihood = 0.0002 * chr.getWorldServer().getFishingRate() * baitLevel;   // can improve 10.0 at "max level 50000" on rate 1x
 
       if (ServerConstants.USE_DEBUG) {
-         chr.dropMessage(5, "----- FISHING RESULT -----");
-         chr.dropMessage(5, "Likelihoods - Year: " + yearLikelihood + " Time: " + timeLikelihood + " Meso: " + baitLikelihood);
-         chr.dropMessage(5, "Score rolls - Year: " + (0.23 * yearLikelihood) + " Time: " + (0.77 * timeLikelihood) + " Meso: " + baitLikelihood);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "----- FISHING RESULT -----");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Likelihoods - Year: " + yearLikelihood + " Time: " + timeLikelihood + " Meso: " + baitLikelihood);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Score rolls - Year: " + (0.23 * yearLikelihood) + " Time: " + (0.77 * timeLikelihood) + " Meso: " + baitLikelihood);
       }
 
       return (0.23 * yearLikelihood) + (0.77 * timeLikelihood) + (baitLikelihood) > 57.777;
@@ -72,12 +74,12 @@ public class Fishing {
       }
 
       if (!GameConstants.isFishingArea(chr.getMapId())) {
-         chr.dropMessage("You are not in a fishing area!");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "You are not in a fishing area!");
          return;
       }
 
       if (chr.getLevel() < 30) {
-         chr.dropMessage(5, "You must be above level 30 to fish!");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You must be above level 30 to fish!");
          return;
       }
 
@@ -115,7 +117,7 @@ public class Fishing {
                break;
          }
 
-         chr.getMap().dropMessage(6, chr.getName() + " found " + rewardStr);
+         MessageBroadcaster.getInstance().sendMapServerNotice(chr.getMap(), ServerNoticeType.LIGHT_BLUE, chr.getName() + " found " + rewardStr);
       }
 
       chr.announce(MaplePacketCreator.showInfo(fishingEffect));

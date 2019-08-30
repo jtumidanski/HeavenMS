@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import constants.ServerConstants;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class StatStrCommand extends Command {
    {
@@ -42,7 +44,7 @@ public class StatStrCommand extends Command {
          try {
             amount = Math.min(Integer.parseInt(params[0]), remainingAp);
          } catch (NumberFormatException e) {
-            player.dropMessage("That is not a valid number!");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "That is not a valid number!");
             return;
          }
       } else {
@@ -50,7 +52,7 @@ public class StatStrCommand extends Command {
       }
 
       if (!player.assignStr(Math.max(amount, 0))) {
-         player.dropMessage("Please make sure your AP is not over " + ServerConstants.MAX_AP + " and you have enough to distribute.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "Please make sure your AP is not over " + ServerConstants.MAX_AP + " and you have enough to distribute.");
       }
    }
 }

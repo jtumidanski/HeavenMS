@@ -26,6 +26,8 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ClearDropsCommand extends Command {
    {
@@ -36,6 +38,6 @@ public class ClearDropsCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       player.getMap().clearDrops(player);
-      player.dropMessage(5, "Cleared dropped items");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Cleared dropped items");
    }
 }

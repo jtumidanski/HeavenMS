@@ -99,8 +99,10 @@ import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.data.input.LittleEndianAccessor;
 
 public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandler {
@@ -497,7 +499,7 @@ public abstract class AbstractDealDamageHandler extends AbstractMaplePacketHandl
                                  api.gainItem(shellId, (short) -1, false);
                                  totDamageToOneMonster *= player.getLevel();
                               } else {
-                                 player.dropMessage(5, "You have ran out of shells to activate the hidden power of Three Snails.");
+                                 MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have ran out of shells to activate the hidden power of Three Snails.");
                               }
                            } else {
                               totDamageToOneMonster = 0;

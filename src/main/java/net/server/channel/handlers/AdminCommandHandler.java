@@ -25,12 +25,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import client.processor.BanProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.BanProcessor;
 import net.AbstractMaplePacketHandler;
 import server.MapleItemInformationProvider;
 import server.life.MapleLifeFactory;
@@ -39,7 +39,9 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.quest.MapleQuest;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.data.input.SeekableLittleEndianAccessor;
 
@@ -94,7 +96,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
                      sb.append(mc.getName());
                      sb.append(" ");
                   }
-                  c.getPlayer().message(sb.toString());
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, sb.toString());
                   break;
                case 12:// /uclip and entering a map
                   break;
@@ -126,12 +128,12 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             break;
          case 0x18: // Maple & Mobhp
             int mobHp = slea.readInt();
-            c.getPlayer().dropMessage("Monsters HP");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, "Monsters HP");
             List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
             for (MapleMapObject mobs : monsters) {
                MapleMonster monster = (MapleMonster) mobs;
                if (monster.getId() == mobHp) {
-                  c.getPlayer().dropMessage(monster.getName() + ": " + monster.getHp());
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, monster.getName() + ": " + monster.getHp());
                }
             }
             break;
@@ -165,7 +167,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
       String victim = slea.readMapleAsciiString();
       String message = slea.readMapleAsciiString();
       c.getChannelServer().getPlayerStorage().getCharacterByName(victim).ifPresentOrElse(target -> {
-         target.getClient().announce(MaplePacketCreator.serverNotice(1, message));
+         MessageBroadcaster.getInstance().sendServerNotice(target, ServerNoticeType.POP_UP, message);
          c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 1));
       }, () -> c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 0)));
    }

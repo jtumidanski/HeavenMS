@@ -5,6 +5,8 @@ import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType
 import server.maps.MapleMapManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -146,7 +148,7 @@ class NPC2101014 {
             int res = cm.createExpedition(exped, true, 0, arenaPlayers)
             if (res == 0) {
                cm.warp(map, 0)
-               cm.getPlayer().dropMessage("Your arena was created successfully. Wait for people to join the battle.")
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.NOTICE, "Your arena was created successfully. Wait for people to join the battle.")
             } else if (res > 0) {
                cm.sendOk("Sorry, you've already reached the quota of attempts for this expedition! Try again another day...")
             } else {

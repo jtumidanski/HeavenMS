@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getMap().countMonsters() == 0) {
@@ -11,11 +13,11 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(140010210, 0)
          return true
       } else {
-         pi.playerMessage(5, "Free a slot on your inventory before receiving the couse clear's token.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Free a slot on your inventory before receiving the couse clear's token.")
          return false
       }
    } else {
-      pi.playerMessage(5, "Defeat all wolves before exiting the stage.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Defeat all wolves before exiting the stage.")
       return false
    }
 }

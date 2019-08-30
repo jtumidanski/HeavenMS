@@ -20,6 +20,8 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MapleAllianceProcessor {
    private static MapleAllianceProcessor ourInstance = new MapleAllianceProcessor();
@@ -84,7 +86,7 @@ public class MapleAllianceProcessor {
    private List<MapleCharacter> getPartyGuildMasters(MapleParty party) {
       List<MapleCharacter> mcl = new LinkedList<>();
 
-      for(MaplePartyCharacter mpc: party.getMembers()) {
+      for (MaplePartyCharacter mpc : party.getMembers()) {
          MapleCharacter chr = mpc.getPlayer();
          if (chr != null) {
             MapleCharacter lchr = party.getLeader().getPlayer();
@@ -175,7 +177,7 @@ public class MapleAllianceProcessor {
       server.guildMessage(guildId, MaplePacketCreator.disbandAlliance(alliance.getId()));
 
       String guildName = server.getGuild(guildId, worldId).map(MapleGuild::getName).orElse("");
-      alliance.dropMessage("[" + guildName + "] guild has left the union.");
+      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.NOTICE, "[" + guildName + "] guild has left the union.");
       return true;
    }
 
@@ -186,20 +188,20 @@ public class MapleAllianceProcessor {
    public void sendInvitation(MapleClient c, String targetGuildName, int allianceId) {
       Server.getInstance().getGuildByName(targetGuildName).ifPresentOrElse(guild -> {
          if (guild.getAllianceId() > 0) {
-            c.getPlayer().dropMessage(5, "The entered guild is already registered on a guild alliance.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The entered guild is already registered on a guild alliance.");
          } else {
             MapleCharacter victim = guild.getMGC(guild.getLeaderId()).getCharacter();
             if (victim == null) {
-               c.getPlayer().dropMessage(5, "The master of the guild that you offered an invitation is currently not online.");
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The master of the guild that you offered an invitation is currently not online.");
             } else {
                if (MapleInviteCoordinator.createInvite(MapleInviteCoordinator.InviteType.ALLIANCE, c.getPlayer(), allianceId, victim.getId())) {
                   victim.getClient().announce(MaplePacketCreator.allianceInvite(allianceId, c.getPlayer()));
                } else {
-                  c.getPlayer().dropMessage(5, "The master of the guild that you offered an invitation is currently managing another invite.");
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The master of the guild that you offered an invitation is currently managing another invite.");
                }
             }
          }
-      }, () -> c.getPlayer().dropMessage(5, "The entered guild does not exist."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The entered guild does not exist."));
    }
 
    public boolean answerInvitation(int targetId, String targetGuildName, int allianceId, boolean answer) {
@@ -220,7 +222,7 @@ public class MapleAllianceProcessor {
       }
 
       if (sender != null) {
-         sender.dropMessage(5, msg);
+         MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.PINK_TEXT, msg);
       }
 
       return false;

@@ -30,6 +30,8 @@ import net.AbstractMaplePacketHandler;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class GeneralChatHandler extends AbstractMaplePacketHandler {
@@ -53,7 +55,7 @@ public final class GeneralChatHandler extends AbstractMaplePacketHandler {
       } else if (heading != '/') {
          int show = slea.readByte();
          if (chr.getMap().isMuted() && !chr.isGM()) {
-            chr.dropMessage(5, "The map you are in is currently muted. Please try again later.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "The map you are in is currently muted. Please try again later.");
             return;
          }
 

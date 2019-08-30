@@ -28,6 +28,8 @@ import server.events.gm.MapleCoconut;
 import server.events.gm.MapleCoconuts;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -69,10 +71,10 @@ public final class CoconutHandler extends AbstractMaplePacketHandler {
             event.fallCoconut();
             if (c.getPlayer().getTeam() == 0) {
                event.addMapleScore();
-               map.broadcastMessage(MaplePacketCreator.serverNotice(5, c.getPlayer().getName() + " of Team Maple knocks down a coconut."));
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, c.getPlayer().getName() + " of Team Maple knocks down a coconut.");
             } else {
                event.addStoryScore();
-               map.broadcastMessage(MaplePacketCreator.serverNotice(5, c.getPlayer().getName() + " of Team Story knocks down a coconut."));
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, c.getPlayer().getName() + " of Team Story knocks down a coconut.");
             }
             map.broadcastMessage(MaplePacketCreator.coconutScore(event.getMapleScore(), event.getStoryScore()));
          }

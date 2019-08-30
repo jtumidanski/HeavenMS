@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMapId() == 130030001) {
@@ -10,7 +12,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(130030002, 0)
          return true
       } else {
-         pi.message("Please click on the NPC first to receive a quest.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please click on the NPC first to receive a quest.")
       }
    } else if (pi.getPlayer().getMapId() == 130030002) {
       if (pi.isQuestCompleted(20011)) {
@@ -18,7 +20,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(130030003, 0)
          return true
       } else {
-         pi.message("Please complete the required quest before proceeding.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please complete the required quest before proceeding.")
       }
    } else if (pi.getPlayer().getMapId() == 130030003) {
       if (pi.isQuestCompleted(20012)) {
@@ -26,7 +28,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(130030004, 0)
          return true
       } else {
-         pi.message("Please complete the required quest before proceeding.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please complete the required quest before proceeding.")
       }
    } else if (pi.getPlayer().getMapId() == 130030004) {
       if (pi.isQuestCompleted(20013)) {
@@ -34,7 +36,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(130030005, 0)
          return true
       } else {
-         pi.message("Please complete the required quest before proceeding.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please complete the required quest before proceeding.")
       }
    }
 

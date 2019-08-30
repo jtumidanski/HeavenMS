@@ -24,6 +24,7 @@ package net.server.channel.handlers;
 import java.sql.Timestamp;
 import java.util.Calendar;
 
+import client.MapleCharacter;
 import client.processor.CharacterProcessor;
 import client.MapleClient;
 import client.database.administrator.ReportAdministrator;
@@ -31,6 +32,8 @@ import net.AbstractMaplePacketHandler;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /*
@@ -56,7 +59,7 @@ public final class ReportHandler extends AbstractMaplePacketHandler {
             c.announce(MaplePacketCreator.reportResponse((byte) 2));
             return;
          }
-         Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, victim + " was reported for: " + description));
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, victim + " was reported for: " + description);
          addReport(c.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(victim), 0, description, null);
       } else if (type == 1) {
          String chatlog = slea.readMapleAsciiString();
@@ -72,10 +75,10 @@ public final class ReportHandler extends AbstractMaplePacketHandler {
                return;
             }
          }
-         Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, victim + " was reported for: " + description));
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, victim + " was reported for: " + description);
          addReport(c.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(victim), reason, description, chatlog);
       } else {
-         Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, c.getPlayer().getName() + " is probably packet editing. Got unknown report type, which is impossible."));
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, c.getPlayer().getName() + " is probably packet editing. Got unknown report type, which is impossible.");
       }
    }
 

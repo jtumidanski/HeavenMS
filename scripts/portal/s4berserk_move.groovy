@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMap().countMonsters() == 0) {
@@ -9,6 +11,6 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(910500200, "out00")
       return true
    }
-   pi.getPlayer().dropMessage(5, "You must defeat all the monsters first.")
+   MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You must defeat all the monsters first.")
    return true
 }

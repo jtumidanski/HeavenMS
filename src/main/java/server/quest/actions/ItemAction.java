@@ -39,8 +39,10 @@ import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 
 /**
  * @author Tyler (Twdtwd)
@@ -195,7 +197,7 @@ public class ItemAction extends MapleQuestAction {
                      continue;
                   }
 
-                  chr.dropMessage(1, "Please check if you have enough items in your inventory.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough items in your inventory.");
                   return false;
                } else {
                   int idx = type.getType() - 1;   // more slots available from the given items!
@@ -217,7 +219,7 @@ public class ItemAction extends MapleQuestAction {
 
             result = MapleInventoryManipulator.checkSpaceProgressively(c, it.getLeft().getItemId(), it.getLeft().getQuantity(), "", rndUsed.get(idx), false);
             if (result % 2 == 0) {
-               chr.dropMessage(1, "Please check if you have enough space in your inventory.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
                return false;
             }
 
@@ -231,7 +233,7 @@ public class ItemAction extends MapleQuestAction {
       }
 
       if (!canHold(chr, gainList)) {
-         chr.dropMessage(1, "Please check if you have enough space in your inventory.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
          return false;
       }
       return true;
@@ -290,7 +292,7 @@ public class ItemAction extends MapleQuestAction {
             int missingQty = item.getCount() - chr.countItem(itemid);
             if (missingQty > 0) {
                if (!chr.canHold(itemid, missingQty)) {
-                  chr.dropMessage(1, "Please check if you have enough space in your inventory.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
                   return false;
                }
 

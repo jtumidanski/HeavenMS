@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if(pi.isQuestStarted(3935) && !pi.haveItem(4031574, 1)) {
@@ -10,7 +12,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(926000010)
          return true
       } else {
-         pi.message("Someone is already trying this map.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Someone is already trying this map.")
          return false
       }
    } else {

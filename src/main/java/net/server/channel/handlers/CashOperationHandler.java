@@ -24,18 +24,18 @@ package net.server.channel.handlers;
 import java.util.Calendar;
 import java.util.List;
 
-import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleRing;
-import client.processor.MapleRingProcessor;
-import client.processor.NoteProcessor;
 import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.CharacterProcessor;
+import client.processor.MapleRingProcessor;
+import client.processor.NoteProcessor;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
@@ -46,7 +46,9 @@ import server.CashShop.CashItemFactory;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class CashOperationHandler extends AbstractMaplePacketHandler {
@@ -99,7 +101,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                      c.enableCSActions();
                      return;
                   } else if (ItemConstants.isRateCoupon(cItem.getItemId()) && !ServerConstants.USE_SUPPLY_RATE_COUPONS) {
-                     chr.dropMessage(1, "Rate coupons are currently unavailable to purchase.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Rate coupons are currently unavailable to purchase.");
                      c.enableCSActions();
                      return;
                   } else if (ItemConstants.isMapleLife(cItem.getItemId()) && chr.getLevel() < 30) {
@@ -230,7 +232,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                   cs.gainCash(cash, cItem, chr.getWorld());
                   c.announce(MaplePacketCreator.showCash(chr));
                } else {
-                  chr.dropMessage(1, "You have already used up all 12 extra character slots.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have already used up all 12 extra character slots.");
                   c.enableCSActions();
                   return;
                }
@@ -268,11 +270,11 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                   c.enableCSActions();
                   return;
                } else if (c.getPlayer().getPetIndex(item.getPetId()) > -1) {
-                  chr.getClient().announce(MaplePacketCreator.serverNotice(1, "You cannot put the pet you currently equip into the Cash Shop inventory."));
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot put the pet you currently equip into the Cash Shop inventory.");
                   c.enableCSActions();
                   return;
                } else if (ItemConstants.isWeddingRing(item.getItemId()) || ItemConstants.isWeddingToken(item.getItemId())) {
-                  chr.getClient().announce(MaplePacketCreator.serverNotice(1, "You cannot put relationship items into the Cash Shop inventory."));
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot put relationship items into the Cash Shop inventory.");
                   c.enableCSActions();
                   return;
                }
@@ -443,7 +445,7 @@ public final class CashOperationHandler extends AbstractMaplePacketHandler {
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
                partner.showNote();
             }
-         }, () -> chr.getClient().announce(MaplePacketCreator.serverNotice(1, "The partner you specified cannot be found.\r\nPlease make sure your partner is online and in the same channel.")));
+         }, () -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "The partner you specified cannot be found.\r\nPlease make sure your partner is online and in the same channel."));
       } else {
          c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
       }

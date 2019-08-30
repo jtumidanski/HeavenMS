@@ -51,7 +51,9 @@ import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
@@ -175,7 +177,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
 
          chr.setDojoEnergy(0);
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
-         c.announce(MaplePacketCreator.serverNotice(5, "As you used the secret skill, your energy bar has been reset."));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
       } else if (attack.skill > 0) {
          SkillFactory.executeForSkill(chr, attack.skill, ((skill, skillLevel) -> {
             MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));

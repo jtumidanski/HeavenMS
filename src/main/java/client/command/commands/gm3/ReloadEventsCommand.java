@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import net.server.channel.Channel;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ReloadEventsCommand extends Command {
    {
@@ -40,6 +42,6 @@ public class ReloadEventsCommand extends Command {
       for (Channel ch : Server.getInstance().getAllChannels()) {
          ch.reloadEventScriptManager();
       }
-      player.dropMessage(5, "Reloaded Events");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Reloaded Events");
    }
 }

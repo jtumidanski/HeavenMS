@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleJob;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class JobCommand extends Command {
    {
@@ -39,7 +41,7 @@ public class JobCommand extends Command {
       if (params.length == 1) {
          int jobid = Integer.parseInt(params[0]);
          if (jobid < 0 || jobid >= 2200) {
-            player.message("Jobid " + jobid + " is not available.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Jobid " + jobid + " is not available.");
             return;
          }
 
@@ -49,14 +51,14 @@ public class JobCommand extends Command {
          c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
             int jobId = Integer.parseInt(params[1]);
             if (jobId < 0 || jobId >= 2200) {
-               player.message("Jobid " + jobId + " is not available.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Jobid " + jobId + " is not available.");
                return;
             }
             victim.changeJob(MapleJob.getById(jobId));
             player.equipChanged();
-         }, () -> player.message("Player '" + params[0] + "' could not be found."));
+         }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
       } else {
-         player.message("Syntax: !job <job id> <opt: IGN of another person>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Syntax: !job <job id> <opt: IGN of another person>");
       }
    }
 }

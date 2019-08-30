@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import constants.ServerConstants;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ApCommand extends Command {
    {
@@ -59,7 +61,7 @@ public class ApCommand extends Command {
                newAp = ServerConstants.MAX_AP;
             }
             victim.changeRemainingAp(newAp, false);
-         }, () -> player.message("Player '" + params[0] + "' could not be found."));
+         }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
       }
    }
 }

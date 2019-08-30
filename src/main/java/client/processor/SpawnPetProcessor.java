@@ -32,6 +32,8 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author RonanLana - just added locking on OdinMS' SpawnPetHandler method body
@@ -50,7 +52,7 @@ public class SpawnPetProcessor {
             if (petid == 5000028 || petid == 5000047) //Handles Dragon AND Robos
             {
                if (chr.haveItem(petid + 1)) {
-                  chr.dropMessage(5, "You can't hatch your " + (petid == 5000028 ? "Dragon egg" : "Robo egg") + " if you already have a Baby " + (petid == 5000028 ? "Dragon." : "Robo."));
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You can't hatch your " + (petid == 5000028 ? "Dragon egg" : "Robo egg") + " if you already have a Baby " + (petid == 5000028 ? "Dragon." : "Robo."));
                   c.announce(MaplePacketCreator.enableActions());
                   return;
                } else {

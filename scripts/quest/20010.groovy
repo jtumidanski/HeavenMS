@@ -2,6 +2,8 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Quest20010 {
    QuestActionManager qm
@@ -50,7 +52,7 @@ class Quest20010 {
                qm.guideHint(3)
                qm.forceCompleteQuest()
             } else {
-               qm.getPlayer().dropMessage(1, "Your inventory is full")
+               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full")
             }
 
             qm.dispose()

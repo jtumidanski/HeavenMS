@@ -29,6 +29,8 @@ import client.command.Command;
 import net.server.Server;
 import net.server.world.World;
 import server.TimerManager;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ShutdownCommand extends Command {
    {
@@ -64,7 +66,7 @@ public class ShutdownCommand extends Command {
 
          for (World w : Server.getInstance().getWorlds()) {
             for (MapleCharacter chr : w.getPlayerStorage().getAllCharacters()) {
-               chr.dropMessage("Server is undergoing maintenance process, and will be shutdown in " + strTime + ". Prepare yourself to quit safely in the mean time.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Server is undergoing maintenance process, and will be shutdown in " + strTime + ". Prepare yourself to quit safely in the mean time.");
             }
          }
       }

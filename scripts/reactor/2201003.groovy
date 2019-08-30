@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2201003 {
@@ -9,10 +11,10 @@ class Reactor2201003 {
 
    def act() {
       if (rm.getPlayer().getMapId() == 922010900) {
-         rm.mapMessage(5, "Alishar has been summoned.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Alishar has been summoned.")
          rm.spawnMonster(9300012, 941, 184)
       } else if (rm.getPlayer().getMapId() == 922010700) {
-         rm.mapMessage(5, "Rombard has been summoned somewhere in the map.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Rombard has been summoned somewhere in the map.")
          rm.spawnMonster(9300010, 1, -211)
       }
    }

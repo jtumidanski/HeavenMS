@@ -2,6 +2,8 @@ package portal
 
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    try {
@@ -10,11 +12,11 @@ static def enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(925100200, 0) //next
          return true
       } else {
-         pi.playerMessage(5, "The portal is not opened yet.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal is not opened yet.")
          return false
       }
    } catch (e) {
-      pi.playerMessage(5, "Error: " + e)
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Error: " + e)
    }
 
    return false

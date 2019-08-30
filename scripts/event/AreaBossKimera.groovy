@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -52,7 +53,7 @@ class EventAreaBossKimera {
       int posY = 180
       posX = (Math.floor(Math.random() * 900) - 900).intValue()
       labSecretBasementPath.spawnMonsterOnGroundBelow(chimera, new Point(posX, posY))
-      labSecretBasementPath.broadcastMessage(MaplePacketCreator.serverNotice(6, "Kimera has appeared out of the darkness of the underground with a glitter in her eyes."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(labSecretBasementPath, ServerNoticeType.LIGHT_BLUE, "Kimera has appeared out of the darkness of the underground with a glitter in her eyes.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -121,7 +122,7 @@ class EventAreaBossKimera {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

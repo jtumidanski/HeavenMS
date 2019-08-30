@@ -26,6 +26,8 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class PosCommand extends Command {
    {
@@ -38,7 +40,7 @@ public class PosCommand extends Command {
       float xpos = player.getPosition().x;
       float ypos = player.getPosition().y;
       float fh = player.getMap().getFootholds().findBelow(player.getPosition()).getId();
-      player.dropMessage(6, "Position: (" + xpos + ", " + ypos + ")");
-      player.dropMessage(6, "Foothold ID: " + fh);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Position: (" + xpos + ", " + ypos + ")");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Foothold ID: " + fh);
    }
 }

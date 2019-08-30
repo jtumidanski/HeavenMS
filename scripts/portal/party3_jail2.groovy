@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if(pi.getEventInstance().getIntProperty("statusStg8") == 1) {
@@ -10,7 +12,7 @@ static def enter(PortalPlayerInteraction pi) {
       return true
    }
    else {
-      pi.playerMessage(5, "The storage is currently inaccessible, as the powers of the Pixies remains active within the tower.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The storage is currently inaccessible, as the powers of the Pixies remains active within the tower.")
       return false
    }
 }

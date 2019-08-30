@@ -6,6 +6,8 @@ import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -248,10 +250,10 @@ class NPC9201044 {
 
                                  if (guessedRight == 6) { //6 unused slots on this stage
                                     cm.sendNext("All ropes weigh differently. Think your next course of action, then try again.")
-                                    cm.mapMessage(5, "Amos: Hmm... All ropes weigh differently.")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: Hmm... All ropes weigh differently.")
                                  } else {
                                     cm.sendNext("One rope weigh the same. Think your next course of action, then try again.")
-                                    cm.mapMessage(5, "Amos: Hmm... One rope weigh the same.")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: Hmm... One rope weigh the same.")
                                  }
                               } else {
                                  spawnMobs(playersRight)
@@ -260,7 +262,7 @@ class NPC9201044 {
                                     eim.setProperty("stage2combo", "")
 
                                     cm.sendNext("You have failed to discover the right combination, now it shall be reset. Start over again!")
-                                    cm.mapMessage(5, "Amos: You have failed to discover the right combination, now it shall be reset. Start over again!")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: You have failed to discover the right combination, now it shall be reset. Start over again!")
                                  }
                               }
 

@@ -2,6 +2,8 @@ package reactor
 
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -17,7 +19,7 @@ class Reactor2401000 {
          EventInstanceManager eim = rm.getEventInstance()
          eim.restartEventTimer(60 * 60000)
       }
-      rm.mapMessage(6, "From the depths of his cave, here comes Horntail!")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "From the depths of his cave, here comes Horntail!")
    }
 
    def hit() {

@@ -39,7 +39,9 @@ import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author Matze
@@ -56,6 +58,7 @@ public class MapleTrade {
    private MapleCharacter chr;
    private byte number;
    private boolean fullTrade = false;
+
    public MapleTrade(byte number, MapleCharacter c) {
       chr = c;
       this.number = number;
@@ -88,34 +91,34 @@ public class MapleTrade {
 
          if (!local.fitsMeso()) {
             cancelTrade(local.getChr(), TradeResult.UNSUCCESSFUL);
-            c.message("There is not enough meso inventory space to complete the trade.");
-            partner.getChr().message("Partner does not have enough meso inventory space to complete the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "There is not enough meso inventory space to complete the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "Partner does not have enough meso inventory space to complete the trade.");
             return;
          } else if (!partner.fitsMeso()) {
             cancelTrade(partner.getChr(), TradeResult.UNSUCCESSFUL);
-            c.message("Partner does not have enough meso inventory space to complete the trade.");
-            partner.getChr().message("There is not enough meso inventory space to complete the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "Partner does not have enough meso inventory space to complete the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "There is not enough meso inventory space to complete the trade.");
             return;
          }
 
          if (!local.fitsInInventory()) {
             if (local.fitsUniquesInInventory()) {
                cancelTrade(local.getChr(), TradeResult.UNSUCCESSFUL);
-               c.message("There is not enough inventory space to complete the trade.");
-               partner.getChr().message("Partner does not have enough inventory space to complete the trade.");
+               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "There is not enough inventory space to complete the trade.");
+               MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "Partner does not have enough inventory space to complete the trade.");
             } else {
                cancelTrade(local.getChr(), TradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
-               partner.getChr().message("Partner cannot hold more than one one-of-a-kind item at a time.");
+               MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "Partner cannot hold more than one one-of-a-kind item at a time.");
             }
             return;
          } else if (!partner.fitsInInventory()) {
             if (partner.fitsUniquesInInventory()) {
                cancelTrade(partner.getChr(), TradeResult.UNSUCCESSFUL);
-               c.message("Partner does not have enough inventory space to complete the trade.");
-               partner.getChr().message("There is not enough inventory space to complete the trade.");
+               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "Partner does not have enough inventory space to complete the trade.");
+               MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "There is not enough inventory space to complete the trade.");
             } else {
                cancelTrade(partner.getChr(), TradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
-               c.message("Partner cannot hold more than one one-of-a-kind item at a time.");
+               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "Partner cannot hold more than one one-of-a-kind item at a time.");
             }
             return;
          }
@@ -123,7 +126,7 @@ public class MapleTrade {
          if (local.getChr().getLevel() < 15) {
             if (local.getChr().getMesosTraded() + local.exchangeMeso > 1000000) {
                cancelTrade(local.getChr(), TradeResult.NO_RESPONSE);
-               local.getChr().getClient().announce(MaplePacketCreator.serverNotice(1, "Characters under level 15 may not trade more than 1 million mesos per day."));
+               MessageBroadcaster.getInstance().sendServerNotice(local.getChr(), ServerNoticeType.POP_UP, "Characters under level 15 may not trade more than 1 million mesos per day.");
                return;
             } else {
                local.getChr().addMesosTraded(local.exchangeMeso);
@@ -131,7 +134,7 @@ public class MapleTrade {
          } else if (partner.getChr().getLevel() < 15) {
             if (partner.getChr().getMesosTraded() + partner.exchangeMeso > 1000000) {
                cancelTrade(partner.getChr(), TradeResult.NO_RESPONSE);
-               partner.getChr().getClient().announce(MaplePacketCreator.serverNotice(1, "Characters under level 15 may not trade more than 1 million mesos per day."));
+               MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.POP_UP, "Characters under level 15 may not trade more than 1 million mesos per day.");
                return;
             } else {
                partner.getChr().addMesosTraded(partner.exchangeMeso);
@@ -149,7 +152,9 @@ public class MapleTrade {
 
    private static void cancelTradeInternal(MapleCharacter chr, byte selfResult, byte partnerResult) {
       MapleTrade trade = chr.getTrade();
-      if (trade == null) return;
+      if (trade == null) {
+         return;
+      }
 
       trade.cancel(selfResult);
       if (trade.getPartner() != null) {
@@ -181,7 +186,9 @@ public class MapleTrade {
 
    public static void cancelTrade(MapleCharacter chr, TradeResult result) {
       MapleTrade trade = chr.getTrade();
-      if (trade == null) return;
+      if (trade == null) {
+         return;
+      }
 
       trade.cancelHandshake(result.getValue());
    }
@@ -207,14 +214,14 @@ public class MapleTrade {
    public static void inviteTrade(MapleCharacter c1, MapleCharacter c2) {
       if (MapleInviteCoordinator.hasInvite(InviteType.TRADE, c1.getId())) {
          if (hasTradeInviteBack(c1, c2)) {
-            c1.message("You are already managing this player's trade invitation.");
+            MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "You are already managing this player's trade invitation.");
          } else {
-            c1.message("You are already managing someone's trade invitation.");
+            MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "You are already managing someone's trade invitation.");
          }
 
          return;
       } else if (c1.getTrade().isFullTrade()) {
-         c1.message("You are already in a trade.");
+         MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "You are already in a trade.");
          return;
       }
 
@@ -227,12 +234,12 @@ public class MapleTrade {
             c1.getClient().announce(MaplePacketCreator.getTradeStart(c1.getClient(), c1.getTrade(), (byte) 0));
             c2.getClient().announce(MaplePacketCreator.tradeInvite(c1));
          } else {
-            c1.message("The other player is already trading with someone else.");
+            MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "The other player is already trading with someone else.");
             cancelTrade(c1, TradeResult.NO_RESPONSE);
             MapleInviteCoordinator.answerInvite(InviteType.TRADE, c2.getId(), c1.getId(), false);
          }
       } else {
-         c1.message("The other player is already managing someone else's trade invitation.");
+         MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "The other player is already managing someone else's trade invitation.");
          cancelTrade(c1, TradeResult.NO_RESPONSE);
       }
    }
@@ -248,10 +255,10 @@ public class MapleTrade {
             c1.getTrade().setFullTrade(true);
             c2.getTrade().setFullTrade(true);
          } else {
-            c1.message("The other player has already closed the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "The other player has already closed the trade.");
          }
       } else {
-         c1.message("This trade invitation already rescinded.");
+         MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "This trade invitation already rescinded.");
          cancelTrade(c1, TradeResult.NO_RESPONSE);
       }
    }
@@ -262,7 +269,7 @@ public class MapleTrade {
          if (trade.getPartner() != null) {
             MapleCharacter other = trade.getPartner().getChr();
             if (MapleInviteCoordinator.answerInvite(InviteType.TRADE, c.getId(), other.getId(), false).result == InviteResult.DENIED) {
-               other.message(c.getName() + " has declined your trade request.");
+               MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.PINK_TEXT, c.getName() + " has declined your trade request.");
             }
 
             other.getTrade().cancel(TradeResult.PARTNER_CANCEL.getValue());
@@ -300,9 +307,9 @@ public class MapleTrade {
 
          chr.gainMeso(exchangeMeso - fee, show, true, show);
          if (fee > 0) {
-            chr.dropMessage(1, "Transaction completed. You received " + GameConstants.numberWithCommas(exchangeMeso - fee) + " mesos due to trade fees.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Transaction completed. You received " + GameConstants.numberWithCommas(exchangeMeso - fee) + " mesos due to trade fees.");
          } else {
-            chr.dropMessage(1, "Transaction completed. You received " + GameConstants.numberWithCommas(exchangeMeso) + " mesos.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Transaction completed. You received " + GameConstants.numberWithCommas(exchangeMeso) + " mesos.");
          }
 
          result = TradeResult.NO_RESPONSE.getValue();

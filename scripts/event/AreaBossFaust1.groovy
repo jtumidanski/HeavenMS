@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -49,7 +51,7 @@ class EventAreaBossFaust1 {
       }
 
       theForestOfEvil1.spawnMonsterOnGroundBelow(faust1, new Point(456, 278))
-      theForestOfEvil1.broadcastMessage(MaplePacketCreator.serverNotice(6, "Faust appeared amidst the blue fog."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(theForestOfEvil1, ServerNoticeType.LIGHT_BLUE, "Faust appeared amidst the blue fog.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -118,7 +120,7 @@ class EventAreaBossFaust1 {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

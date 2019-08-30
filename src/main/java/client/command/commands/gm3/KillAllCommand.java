@@ -33,6 +33,8 @@ import server.life.MapleMonster;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class KillAllCommand extends Command {
    {
@@ -52,6 +54,6 @@ public class KillAllCommand extends Command {
             count++;
          }
       }
-      player.dropMessage(5, "Killed " + count + " monsters.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Killed " + count + " monsters.");
    }
 }

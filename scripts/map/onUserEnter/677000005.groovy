@@ -4,6 +4,8 @@ import client.MapleCharacter
 import scripting.map.MapScriptMethods
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -22,7 +24,7 @@ class Map677000005 {
       }
 
       map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), pos)
-      player.message(mobName + " has appeared!")
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, mobName + " has appeared!")
    }
 }
 

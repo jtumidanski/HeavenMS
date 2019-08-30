@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleStat;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class FameCommand extends Command {
    {
@@ -44,7 +46,7 @@ public class FameCommand extends Command {
       c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          victim.setFame(Integer.parseInt(params[1]));
          victim.updateSingleStat(MapleStat.FAME, victim.getFame());
-         player.message("FAME given.");
-      }, () -> player.message("Player '" + params[0] + "' could not be found."));
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "FAME given.");
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
    }
 }

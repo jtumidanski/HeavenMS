@@ -205,7 +205,9 @@ import client.command.commands.gm6.SpawnAllPNpcsCommand;
 import client.command.commands.gm6.SupplyRateCouponCommand;
 import client.command.commands.gm6.WarpWorldCommand;
 import tools.FilePrinter;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 public class CommandsExecutor {
 
@@ -249,7 +251,7 @@ public class CommandsExecutor {
             client.releaseClient();
          }
       } else {
-         client.getPlayer().dropMessage(5, "Try again in a while... Latest commands are currently being processed.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Try again in a while... Latest commands are currently being processed.");
       }
    }
 

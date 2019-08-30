@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getMap().getReactorByName("jnr32_out").getState() == (byte) 1) {
@@ -9,7 +11,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(926110200, 2)
       return true
    } else {
-      pi.playerMessage(5, "The door is not opened yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The door is not opened yet.")
       return false
    }
 }

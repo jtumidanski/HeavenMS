@@ -32,7 +32,9 @@ import client.command.Command;
 import client.database.provider.DropDataProvider;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 public class WhoDropsCommand extends Command {
    {
@@ -43,7 +45,7 @@ public class WhoDropsCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.dropMessage(5, "Please do @whodrops <item name>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please do @whodrops <item name>");
          return;
       }
 
@@ -54,7 +56,7 @@ public class WhoDropsCommand extends Command {
 
             ArrayList<Pair<Integer, String>> itemData = MapleItemInformationProvider.getInstance().getItemDataByName(searchString);
             if (itemData.size() == 0) {
-               player.dropMessage(5, "The item you searched for doesn't exist.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The item you searched for doesn't exist.");
                return;
             }
 
@@ -74,7 +76,7 @@ public class WhoDropsCommand extends Command {
             c.releaseClient();
          }
       } else {
-         player.dropMessage(5, "Please wait a while for your request to be processed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a while for your request to be processed.");
       }
    }
 }

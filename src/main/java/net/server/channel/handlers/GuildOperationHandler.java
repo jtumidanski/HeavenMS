@@ -35,9 +35,10 @@ import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildResponse;
 import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
-import net.server.world.MapleParty;
 import net.server.world.World;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class GuildOperationHandler extends AbstractMaplePacketHandler {
@@ -138,7 +139,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
          return;
       }
       if (mc.getMeso() < ServerConstants.CHANGE_EMBLEM_COST) {
-         c.announce(MaplePacketCreator.serverNotice(1, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CHANGE_EMBLEM_COST) + " mesos to change the Guild emblem."));
+         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CHANGE_EMBLEM_COST) + " mesos to change the Guild emblem.");
          return;
       }
 
@@ -231,7 +232,7 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
 
       int s = Server.getInstance().addGuildMember(mc.getMGC(), mc);
       if (s == 0) {
-         mc.dropMessage(1, "The guild you are trying to join is already full.");
+         MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "The guild you are trying to join is already full.");
          mc.getMGC().setGuildId(0);
          return;
       }
@@ -264,15 +265,15 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
 
    private void createGuild(GuildCreationData creationData, MapleClient c, MapleCharacter mc) {
       if (mc.getGuildId() > 0) {
-         mc.dropMessage(1, "You cannot create a new Guild while in one.");
+         MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "You cannot create a new Guild while in one.");
          return;
       }
       if (mc.getMeso() < ServerConstants.CREATE_GUILD_COST) {
-         mc.dropMessage(1, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CREATE_GUILD_COST) + " mesos to create a Guild.");
+         MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CREATE_GUILD_COST) + " mesos to create a Guild.");
          return;
       }
       if (!isGuildNameAcceptable(creationData.getGuildName())) {
-         mc.dropMessage(1, "The Guild name you have chosen is not accepted.");
+         MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "The Guild name you have chosen is not accepted.");
          return;
       }
 
@@ -280,17 +281,17 @@ public final class GuildOperationHandler extends AbstractMaplePacketHandler {
       if (eligibleMembers.size() < ServerConstants.CREATE_GUILD_MIN_PARTNERS) {
          if (mc.getMap().getAllPlayers().size() < ServerConstants.CREATE_GUILD_MIN_PARTNERS) {
             // thanks NovaStory for noticing message in need of smoother info
-            mc.dropMessage(1, "Your Guild doesn't have enough cofounders present here and therefore cannot be created at this time.");
+            MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "Your Guild doesn't have enough cofounders present here and therefore cannot be created at this time.");
          } else {
             // players may be unaware of not belonging on a party in order to become eligible, thanks Hair (Legalize) for pointing this out
-            mc.dropMessage(1, "Please make sure everyone you are trying to invite is neither on a guild nor on a party.");
+            MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "Please make sure everyone you are trying to invite is neither on a guild nor on a party.");
          }
 
          return;
       }
 
       if (!MaplePartyProcessor.getInstance().createParty(mc, true)) {
-         mc.dropMessage(1, "You cannot create a new Guild while in a party.");
+         MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.POP_UP, "You cannot create a new Guild while in a party.");
          return;
       }
 

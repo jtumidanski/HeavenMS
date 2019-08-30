@@ -9,6 +9,8 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -368,12 +370,12 @@ class NPC9201002 {
 
                                     giveCoupleBlessings(eim, player, partner)
 
-                                    cm.getMap().dropMessage(6, "High Priest John: By the power vested in me through the mighty Maple tree, I now pronounce you  Husband and Wife. You may kiss the bride!")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "High Priest John: By the power vested in me through the mighty Maple tree, I now pronounce you  Husband and Wife. You may kiss the bride!")
                                     eim.schedule("showMarriedMsg", 2 * 1000)
                                  }
                               } else {
                                  eim.setIntProperty("confirmedVows", player.getId())
-                                 cm.getMap().dropMessage(6, "Wedding Assistant: " + player.getName() + " has confirmed vows! Alright, one step away to make it official. Tighten your seatbelts!")
+                                 MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: " + player.getName() + " has confirmed vows! Alright, one step away to make it official. Tighten your seatbelts!")
                               }
 
                               break

@@ -2,10 +2,12 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (!pi.canHold(4001261, 1)) {
-      pi.playerMessage(5, "Please make 1 ETC room.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please make 1 ETC room.")
       return false
    }
    pi.gainItem(4001261, (short) 1)

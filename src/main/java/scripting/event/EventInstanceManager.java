@@ -66,7 +66,9 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author Matze
@@ -262,12 +264,6 @@ public class EventInstanceManager {
          invokeScriptFunction("playerExit", EventInstanceManager.this, chr);
       } catch (ScriptException | NoSuchMethodException ex) {
          ex.printStackTrace();
-      }
-   }
-
-   public void dropMessage(int type, String message) {
-      for (MapleCharacter chr : getPlayers()) {
-         chr.dropMessage(type, message);
       }
    }
 

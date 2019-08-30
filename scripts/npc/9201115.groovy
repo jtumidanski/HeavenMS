@@ -3,6 +3,8 @@ package npc
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleMonster
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -50,7 +52,7 @@ class NPC9201115 {
                cm.sendNext("Tonight, we have a feast of a squad of Maplers.. ahaha...")
             } else if (status == 2) {
                cm.sendNext("Let our specially trained Master Guardians escort you!")
-               cm.mapMessage(6, "Engarde! Master Guardians approach!")
+               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Engarde! Master Guardians approach!")
                for (int i = 0; i < 10; i++) {
                   MapleMonster mob = eim.getMonster(9400594)
                   cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276))
@@ -68,7 +70,7 @@ class NPC9201115 {
                   cm.sendOk("Eh. What is this? You've defeated them?")
                } else if (status == 1) {
                   cm.sendNext("Well, no matter! The Twisted Masters will be glad to welcome you.")
-                  cm.mapMessage(6, "Twisted Masters approach!")
+                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Twisted Masters approach!")
 
                   //Margana
                   MapleMonster mob = eim.getMonster(9400590)
@@ -96,7 +98,7 @@ class NPC9201115 {
          } else if (eim.getIntProperty("glpq6") == 2) {
             if (cm.getMap().countMonsters() == 0) {
                cm.sendOk("WHAT? Ugh... this can't be happening.")
-               cm.mapMessage(5, "The portal to the next stage has opened!")
+               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The portal to the next stage has opened!")
                eim.setIntProperty("glpq6", 3)
 
                eim.showClearEffect(true)

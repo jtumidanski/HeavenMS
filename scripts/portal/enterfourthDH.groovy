@@ -3,10 +3,12 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.hasItem(4032125) || pi.hasItem(4032126) || pi.hasItem(4032127) || pi.hasItem(4032128) || pi.hasItem(4032129)) {
-      pi.playerMessage(5, "You already have the proof of ability.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You already have the proof of ability.")
       return false
    }
 
@@ -20,11 +22,11 @@ static def enter(PortalPlayerInteraction pi) {
          pi.spawnMonster(9300294, 87, 88)
          return true
       } else {
-         pi.playerMessage(5, "Someone is already attempting to defeat the boss. Better come back later.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Someone is already attempting to defeat the boss. Better come back later.")
          return false
       }
    } else {
-      pi.playerMessage(5, "You cannot access this hall.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You cannot access this hall.")
       return false
    }
 }

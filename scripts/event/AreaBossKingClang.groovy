@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -51,7 +53,7 @@ class EventAreaBossKingClang {
       int posY = 140
       posX = Math.floor((Math.random() * 2400) - 1600).intValue()
       hotSand.spawnMonsterOnGroundBelow(kingClang, new Point(posX, posY))
-      hotSand.broadcastMessage(MaplePacketCreator.serverNotice(6, "A strange turban shell has appeared on the beach."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(hotSand, ServerNoticeType.LIGHT_BLUE, "A strange turban shell has appeared on the beach.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -120,7 +122,7 @@ class EventAreaBossKingClang {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

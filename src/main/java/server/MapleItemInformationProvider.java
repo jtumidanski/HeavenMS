@@ -72,8 +72,10 @@ import server.processor.StatEffectProcessor;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 
 /**
@@ -1828,7 +1830,7 @@ public class MapleItemInformationProvider {
       int id = equip.getItemId();
 
       if (ItemConstants.isWeddingRing(id) && chr.hasJustMarried()) {
-         chr.dropMessage(5, "The Wedding Ring cannot be equipped on this map.");  // will dc everyone due to doubled couple effect
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "The Wedding Ring cannot be equipped on this map.");  // will dc everyone due to doubled couple effect
          return false;
       }
 

@@ -3,6 +3,8 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleReactor
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    String name = pi.getPortal().getName().substring(2, 4)
@@ -11,7 +13,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(670010600, "gt" + name + "PIB")
       return true
    } else {
-      pi.message("The gate is not opened yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The gate is not opened yet.")
       return false
    }
 }

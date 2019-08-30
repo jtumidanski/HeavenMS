@@ -7,6 +7,8 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class EventCygnus_Magic_Library {
    EventManager em
@@ -123,7 +125,7 @@ class EventCygnus_Magic_Library {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }
@@ -204,7 +206,7 @@ class EventCygnus_Magic_Library {
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
       eim.unregisterPlayer(player)
       player.getMap().removePlayer(player)
-      player.setMap(entryMap)
+      player.setMapId(entryMap)
    }
 
    // Happens when carnival PQ is started. - Unused for now.

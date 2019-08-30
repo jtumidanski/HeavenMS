@@ -9,9 +9,10 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
-import java.awt.Point
+import java.awt.*
 
 class EventAreaBossKingSageCat {
    EventManager em
@@ -51,7 +52,7 @@ class EventAreaBossKingSageCat {
       int posY = 540
       posX = Math.floor((Math.random() * 1300) - 500).intValue()
       goblinForest2.spawnMonsterOnGroundBelow(kingSageCat, new Point(posX, posY))
-      goblinForest2.broadcastMessage(MaplePacketCreator.serverNotice(6, "The ghostly air around here has become stronger. The unpleasant sound of a cat crying can be heard."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(goblinForest2, ServerNoticeType.LIGHT_BLUE, "The ghostly air around here has become stronger. The unpleasant sound of a cat crying can be heard.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -120,7 +121,7 @@ class EventAreaBossKingSageCat {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

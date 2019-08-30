@@ -3,6 +3,8 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class GiveRpCommand extends Command {
    {
@@ -19,8 +21,8 @@ public class GiveRpCommand extends Command {
 
       client.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          victim.setRewardPoints(victim.getRewardPoints() + Integer.parseInt(params[1]));
-         player.message("RP given. Player " + params[0] + " now has " + victim.getRewardPoints()
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "RP given. Player " + params[0] + " now has " + victim.getRewardPoints()
                + " reward points.");
-      }, () -> player.message("Player '" + params[0] + "' could not be found."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
    }
 }

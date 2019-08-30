@@ -29,6 +29,8 @@ import client.command.Command;
 import net.server.Server;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 
 public class ReportBugCommand extends Command {
@@ -41,14 +43,14 @@ public class ReportBugCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         player.dropMessage(5, "Message too short and not sent. Please do @bug <bug>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Message too short and not sent. Please do @bug <bug>");
          return;
       }
       String message = player.getLastCommandMessage();
       Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[Bug]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message));
-      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(1, message));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, message);
       FilePrinter.printError(FilePrinter.COMMAND_BUG, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
-      player.dropMessage(5, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");
 
    }
 }

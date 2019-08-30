@@ -30,6 +30,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import server.maps.MapleMap;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class SummonCommand extends Command {
    {
@@ -50,12 +52,12 @@ public class SummonCommand extends Command {
 
       if (victim != null) {
          if (!victim.isLoggedinWorld()) {
-            player.dropMessage(6, "Player currently not logged in or unreachable.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Player currently not logged in or unreachable.");
             return;
          }
 
          if (player.getClient().getChannel() != victim.getClient().getChannel()) {//And then change channel if needed.
-            victim.dropMessage("Changing channel, please wait a moment.");
+            MessageBroadcaster.getInstance().sendServerNotice(victim, ServerNoticeType.NOTICE, "Changing channel, please wait a moment.");
             victim.getClient().changeChannel(player.getClient().getChannel());
          }
 
@@ -71,7 +73,7 @@ public class SummonCommand extends Command {
          victim.saveLocationOnWarp();
          victim.forceChangeMap(map, map.findClosestPortal(player.getPosition()));
       } else {
-         player.dropMessage(6, "Unknown player.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Unknown player.");
       }
    }
 

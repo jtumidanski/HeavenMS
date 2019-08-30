@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -48,7 +50,7 @@ class NPCPupeteerPassword {
             } else if (cm.isQuestStarted(21731) && cm.getQuestProgress(21731, 9300346) == 0) {
                cm.warp(910510001, 1)
             } else {
-               cm.playerMessage(5, "Although you said the right answer, some mysterious forces is blocking the way in.")
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Although you said the right answer, some mysterious forces is blocking the way in.")
             }
 
             cm.dispose()

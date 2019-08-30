@@ -26,6 +26,8 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class UnJailCommand extends Command {
    {
@@ -42,12 +44,12 @@ public class UnJailCommand extends Command {
 
       c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          if (victim.getJailExpirationTimeLeft() <= 0) {
-            player.message("This player is already free.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "This player is already free.");
             return;
          }
          victim.removeJailExpirationTime();
-         victim.message("By lack of concrete proof you are now unjailed. Enjoy freedom!");
-         player.message(victim.getName() + " was unjailed.");
-      }, () -> player.message("Player '" + params[0] + "' could not be found."));
+         MessageBroadcaster.getInstance().sendServerNotice(victim, ServerNoticeType.PINK_TEXT, "By lack of concrete proof you are now unjailed. Enjoy freedom!");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + " was unjailed.");
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
    }
 }

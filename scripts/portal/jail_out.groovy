@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    long jailedTime = pi.getJailTimeLeft()
@@ -14,7 +16,7 @@ static def enter(PortalPlayerInteraction pi) {
       int minutes = (Math.floor(jailedTime / (1000 * 60)) % 60)
       int hours = (Math.floor(jailedTime / (1000 * 60 * 60)) % 24)
 
-      pi.playerMessage(5, "You have been caught in bad behaviour by the Maple POLICE. You've got to stay here for " + hours + " hours " + minutes + " minutes " + seconds + " seconds yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You have been caught in bad behaviour by the Maple POLICE. You've got to stay here for " + hours + " hours " + minutes + " minutes " + seconds + " seconds yet.")
       return false
    }
 }

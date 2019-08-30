@@ -29,6 +29,8 @@ import net.server.Server;
 import net.server.guild.MapleAlliance;
 import net.server.processor.MapleAllianceProcessor;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
@@ -128,7 +130,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
             sendInvite(new AllianceInviteData(accessor), client, alliance, chr);
             break;
          case 0x04:
-            chr.dropMessage(5, "Your guild is already registered on a guild alliance.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Your guild is already registered on a guild alliance.");
             client.announce(MaplePacketCreator.enableActions());
             break;
          case 0x06:
@@ -147,7 +149,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
             setAllianceNotice(new AllianceNoticeData(accessor), alliance);
             break;
          default:
-            chr.dropMessage("Feature not available");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Feature not available");
       }
    }
 
@@ -155,7 +157,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
       Server.getInstance().setAllianceNotice(alliance.getId(), noticeData.getNotice());
       Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), noticeData.getNotice()), -1, -1);
 
-      alliance.dropMessage(5, "* Alliance Notice : " + noticeData.getNotice());
+      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "* Alliance Notice : " + noticeData.getNotice());
       alliance.saveToDB();
    }
 
@@ -203,7 +205,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
          Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
          Server.getInstance().guildMessage(expelData.getGuildId(), MaplePacketCreator.disbandAlliance(expelData.getAllianceId()));
 
-         alliance.dropMessage("[" + guild.getName() + "] guild has been expelled from the union.");
+         MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "[" + guild.getName() + "] guild has been expelled from the union.");
          alliance.saveToDB();
       });
    }
@@ -220,7 +222,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
             }
 
             if (alliance.getGuilds().size() == alliance.getCapacity()) {
-               chr.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Your alliance cannot comport any more guilds at the moment.");
                return;
             }
 
@@ -236,7 +238,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
             Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.addGuildToAlliance(alliance, guildId, c), -1, -1);
             Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.updateAllianceInfo(alliance, c.getWorld()), -1, -1);
             Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()), -1, -1);
-            guild.dropMessage("Your guild has joined the [" + alliance.getName() + "] union.");
+            MessageBroadcaster.getInstance().sendGuildServerNotice(guild, ServerNoticeType.PINK_TEXT, "Your guild has joined the [" + alliance.getName() + "] union.");
             alliance.saveToDB();
          });
       });
@@ -244,7 +246,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
 
    private void sendInvite(AllianceInviteData inviteData, MapleClient client, MapleAlliance alliance, MapleCharacter character) {
       if (alliance.getGuilds().size() == alliance.getCapacity()) {
-         character.dropMessage(5, "Your alliance cannot comport any more guilds at the moment.");
+         MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, "Your alliance cannot comport any more guilds at the moment.");
       } else {
          MapleAllianceProcessor.getInstance().sendInvitation(client, inviteData.getGuildName(), alliance.getId());
       }
@@ -269,7 +271,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
          newLeader.saveGuildStatus();
 
          Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, newLeader.getWorld()), -1, -1);
-         alliance.dropMessage("'" + newLeader.getName() + "' has been appointed as the new head of this Alliance.");
+         MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "'" + newLeader.getName() + "' has been appointed as the new head of this Alliance.");
       });
    }
 
@@ -283,7 +285,7 @@ public final class AllianceOperationHandler extends AbstractMaplePacketHandler {
       chr.saveGuildStatus();
 
       Server.getInstance().allianceMessage(alliance.getId(), MaplePacketCreator.getGuildAlliances(alliance, chr.getWorld()), -1, -1);
-      alliance.dropMessage("'" + chr.getName() + "' has been reassigned to '" + alliance.getRankTitle(newRank) + "' in this Alliance.");
+      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "'" + chr.getName() + "' has been reassigned to '" + alliance.getRankTitle(newRank) + "' in this Alliance.");
    }
 
    private class AllianceNoticeData {

@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor9201001 {
    ReactorActionManager rm
 
    def act() {
-      rm.mapMessage(5, "A bright flash of light, then someone familiar appears in front of the blocked gate.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "A bright flash of light, then someone familiar appears in front of the blocked gate.")
       rm.spawnNpc(9040003)
    }
 

@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import server.events.gm.MapleEvent;
 import server.maps.FieldLimit;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class JoinEventCommand extends Command {
    {
@@ -52,16 +54,16 @@ public class JoinEventCommand extends Command {
                   player.saveLocationOnWarp();
                   player.changeMap(event.getMapId());
                } else {
-                  player.dropMessage(5, "The limit of players for the event has already been reached.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The limit of players for the event has already been reached.");
                }
             } else {
-               player.dropMessage(5, "You are already in the event.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You are already in the event.");
             }
          } else {
-            player.dropMessage(5, "There is currently no event in progress.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "There is currently no event in progress.");
          }
       } else {
-         player.dropMessage(5, "You are currently in a map where you can't join an event.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You are currently in a map where you can't join an event.");
       }
    }
 }

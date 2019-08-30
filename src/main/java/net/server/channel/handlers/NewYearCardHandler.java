@@ -29,6 +29,8 @@ import net.AbstractMaplePacketHandler;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -111,7 +113,7 @@ public final class NewYearCardHandler extends AbstractMaplePacketHandler {
 
                   player.getAbstractPlayerInteraction().gainItem(4301000, (short) 1);
                   if (!newyear.getMessage().isEmpty()) {
-                     player.dropMessage(6, "[New Year] " + newyear.getSenderName() + ": " + newyear.getMessage());
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] " + newyear.getSenderName() + ": " + newyear.getMessage());
                   }
 
                   player.addNewYearRecord(newyear);
@@ -121,17 +123,17 @@ public final class NewYearCardHandler extends AbstractMaplePacketHandler {
 
                   c.getWorldServer().getPlayerStorage().getCharacterById(newyear.getSenderId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(sender -> {
                      sender.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(sender, newyear, 0xD, 0));
-                     sender.dropMessage(6, "[New Year] Your addressee successfully received the New Year card.");
+                     MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, "[New Year] Your addressee successfully received the New Year card.");
                   });
                } else {
                   player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
                }
             } else {
-               player.dropMessage(6, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
             }
          } else {
             if (newyear == null) {
-               player.dropMessage(6, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
             }
          }
       }

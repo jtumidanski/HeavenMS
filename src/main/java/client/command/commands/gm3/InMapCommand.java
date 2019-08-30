@@ -26,6 +26,8 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class InMapCommand extends Command {
    {
@@ -39,7 +41,6 @@ public class InMapCommand extends Command {
       for (MapleCharacter chr : player.getMap().getCharacters()) {
          st.append(chr.getName()).append(" ");
       }
-      player.message(st.toString());
-
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, st.toString());
    }
 }

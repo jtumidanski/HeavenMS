@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor1209000 {
@@ -11,7 +13,7 @@ class Reactor1209000 {
       if (rm.isQuestStarted(6400)) {
          rm.setQuestProgress(6400, 0, 2)
       }
-      rm.message("Real Bart has found. Return to Jonathan through portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Real Bart has found. Return to Jonathan through portal.")
    }
 
    def hit() {

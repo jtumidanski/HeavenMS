@@ -4,6 +4,8 @@ import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -35,7 +37,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(925100500, 0)
       return true
    } else {
-      pi.playerMessage(5, "The portal is not opened yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal is not opened yet.")
       return false
    }
 }

@@ -29,6 +29,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.maps.SavedLocationType;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ClearSavedLocationsCommand extends Command {
    {
@@ -42,7 +44,7 @@ public class ClearSavedLocationsCommand extends Command {
       if (params.length > 0) {
          victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
          if (victim.isEmpty()) {
-            player.get().message("Player '" + params[0] + "' could not be found.");
+            MessageBroadcaster.getInstance().sendServerNotice(player.get(), ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found.");
             return;
          }
       } else {
@@ -53,6 +55,6 @@ public class ClearSavedLocationsCommand extends Command {
          victim.get().clearSavedLocation(type);
       }
 
-      player.get().message("Cleared " + params[0] + "'s saved locations.");
+      MessageBroadcaster.getInstance().sendServerNotice(player.get(), ServerNoticeType.PINK_TEXT, "Cleared " + params[0] + "'s saved locations.");
    }
 }

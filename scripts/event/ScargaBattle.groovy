@@ -7,6 +7,8 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class EventScargaBattle {
    EventManager em
@@ -105,7 +107,7 @@ class EventScargaBattle {
 
    // Warp player in etc..
    def playerEntry(EventInstanceManager eim, MapleCharacter player) {
-      eim.dropMessage(5, "[Expedition] " + player.getName() + " has entered the map.")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has entered the map.")
       MapleMap map = eim.getMapInstance(entryMap)
       player.changeMap(map, map.getPortal(0))
    }
@@ -128,11 +130,11 @@ class EventScargaBattle {
    def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
       if (mapid < minMapId || mapid > maxMapId) {
          if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
-            eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
             eim.unregisterPlayer(player)
             end(eim)
          } else {
-            eim.dropMessage(5, "[Expedition] " + player.getName() + " has left the instance.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
             eim.unregisterPlayer(player)
          }
       }
@@ -152,7 +154,7 @@ class EventScargaBattle {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }
@@ -200,10 +202,10 @@ class EventScargaBattle {
    def playerRevive(EventInstanceManager eim, MapleCharacter player) {
       if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
          eim.unregisterPlayer(player)
-         eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
          end(eim)
       } else {
-         eim.dropMessage(5, "[Expedition] " + player.getName() + " has left the instance.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
          eim.unregisterPlayer(player)
       }
    }
@@ -213,11 +215,11 @@ class EventScargaBattle {
    // return x that is < 0 - Deregister player normally + Dispose instance if there x player or below, if it's leader = boot all
    def playerDisconnected(EventInstanceManager eim, MapleCharacter player) {
       if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
-         eim.dropMessage(5, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
          eim.unregisterPlayer(player)
          end(eim)
       } else {
-         eim.dropMessage(5, "[Expedition] " + player.getName() + " has left the instance.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
          eim.unregisterPlayer(player)
       }
    }

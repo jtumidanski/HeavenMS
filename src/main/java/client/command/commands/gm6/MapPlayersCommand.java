@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import net.server.world.World;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MapPlayersCommand extends Command {
    {
@@ -50,6 +52,6 @@ public class MapPlayersCommand extends Command {
             }
          }
       }
-      player.message("Players on mapid " + map + ": " + names);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Players on mapid " + map + ": " + names);
    }
 }

@@ -4,6 +4,8 @@ import constants.GameConstants
 import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -104,7 +106,7 @@ class NPC2101017 {
                      cm.dispose()
                   }
                } else if (selection == 4) {
-                  cm.mapMessage(5, "The Leader of the arena left.")
+                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The Leader of the arena left.")
                   expedicao.warpExpeditionTeam(980010000)
                   cm.endExpedition(expedicao)
                   cm.dispose()

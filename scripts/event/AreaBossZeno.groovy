@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -49,7 +50,7 @@ class EventAreaBossZeno {
       }
 
       graysPrairie.spawnMonsterOnGroundBelow(zeno, new Point(-4224, 776))
-      graysPrairie.broadcastMessage(MaplePacketCreator.serverNotice(6, "Zeno has appeared with a heavy sound of machinery."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(graysPrairie, ServerNoticeType.LIGHT_BLUE, "Zeno has appeared with a heavy sound of machinery.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -118,7 +119,7 @@ class EventAreaBossZeno {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

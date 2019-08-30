@@ -22,7 +22,8 @@ package client.command.commands.gm4;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Ronan
@@ -42,6 +43,6 @@ public class BossDropRateCommand extends Command {
 
       int bossdroprate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setBossDropRate(bossdroprate);
-      c.getWorldServer().broadcastPacket(MaplePacketCreator.serverNotice(6, "[Rate] Boss Drop Rate has been changed to " + bossdroprate + "x."));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Boss Drop Rate has been changed to " + bossdroprate + "x.");
    }
 }

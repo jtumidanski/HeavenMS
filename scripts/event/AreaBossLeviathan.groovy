@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.Point
 
@@ -51,7 +53,7 @@ class EventAreaBossLeviathan {
       int posY = 1125
       posX = Math.floor((Math.random() * 600) - 300).intValue()
       leviathansCanyon.spawnMonsterOnGroundBelow(leviathan, new Point(posX, posY))
-      leviathansCanyon.broadcastMessage(MaplePacketCreator.serverNotice(6, "Leviathan emerges from the canyon and the cold icy wind blows."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(leviathansCanyon, ServerNoticeType.LIGHT_BLUE, "Leviathan emerges from the canyon and the cold icy wind blows.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -120,7 +122,7 @@ class EventAreaBossLeviathan {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

@@ -32,8 +32,10 @@ import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 
 public class Equip extends Item {
 
@@ -525,7 +527,7 @@ public class Equip extends Item {
       c.getPlayer().equipChanged();
 
       showLevelupMessage(showStr, c); // thanks to Polaris dev team !
-      c.getPlayer().dropMessage(6, lvupStr);
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, lvupStr);
 
       c.announce(MaplePacketCreator.showEquipmentLevelUp());
       c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showForeignEffect(c.getPlayer().getId(), 15));

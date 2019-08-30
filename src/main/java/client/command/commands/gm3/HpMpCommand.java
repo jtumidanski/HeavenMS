@@ -28,6 +28,8 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class HpMpCommand extends Command {
    {
@@ -52,7 +54,7 @@ public class HpMpCommand extends Command {
       if (victim.isPresent()) {
          victim.get().updateHpMp(statUpdate);
       } else {
-         player.message("Player '" + params[0] + "' could not be found on this world.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world.");
       }
    }
 }

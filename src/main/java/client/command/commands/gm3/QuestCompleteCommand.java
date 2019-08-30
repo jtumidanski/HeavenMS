@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.quest.MapleQuest;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class QuestCompleteCommand extends Command {
    {
@@ -52,9 +54,9 @@ public class QuestCompleteCommand extends Command {
             c.getAbstractPlayerInteraction().forceCompleteQuest(questId);
          }
 
-         player.dropMessage(5, "QUEST " + questId + " completed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " completed.");
       } else {
-         player.dropMessage(5, "QUESTID " + questId + " not started or already completed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUESTID " + questId + " not started or already completed.");
       }
    }
 }

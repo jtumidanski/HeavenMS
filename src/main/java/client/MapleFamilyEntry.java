@@ -20,7 +20,9 @@
 package client;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -447,6 +449,26 @@ public class MapleFamilyEntry {
       this.totalJuniors = totalJuniors;
    }
 
+   public Collection<MapleCharacter> getSeniors(boolean includeSuperSenior) {
+      Collection<MapleCharacter> result = new ArrayList<>();
+      MapleFamilyEntry senior = getSenior();
+      if (senior != null) {
+         MapleCharacter seniorChr = senior.getChr();
+         if (seniorChr != null) {
+            result.add(seniorChr);
+         }
+         senior = senior.getSenior();
+         if (includeSuperSenior && senior != null) {
+            seniorChr = senior.getChr();
+            if (seniorChr != null) {
+               result.add(seniorChr);
+            }
+         }
+      }
+      return result;
+   }
+
+   @Deprecated
    public void announceToSenior(byte[] packet, boolean includeSuperSenior) {
       MapleFamilyEntry senior = getSenior();
       if (senior != null) {

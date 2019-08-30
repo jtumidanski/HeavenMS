@@ -33,6 +33,8 @@ import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Tyler (Twdtwd)
@@ -81,7 +83,7 @@ public class ItemRequirement extends MapleQuestRequirement {
             } else {
                if (count < countNeeded) {
                   if (chr.getInventory(MapleInventoryType.EQUIPPED).countById(itemId) + count >= countNeeded) {
-                     chr.dropMessage(5, "Unequip the required " + ii.getName(itemId) + " before trying this quest operation.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Unequip the required " + ii.getName(itemId) + " before trying this quest operation.");
                      return false;
                   }
                }

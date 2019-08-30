@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.quest.MapleQuest;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class QuestResetCommand extends Command {
    {
@@ -48,9 +50,9 @@ public class QuestResetCommand extends Command {
          MapleQuest quest = MapleQuest.getInstance(questid_);
          if (quest != null) {
             quest.reset(player);
-            player.dropMessage(5, "QUEST " + questid_ + " reseted.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questid_ + " reseted.");
          } else {    // should not occur
-            player.dropMessage(5, "QUESTID " + questid_ + " is invalid.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUESTID " + questid_ + " is invalid.");
          }
       }
    }

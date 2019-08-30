@@ -2,6 +2,8 @@ package quest
 
 import client.inventory.MaplePet
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Quest4659 {
    QuestActionManager qm
@@ -30,7 +32,7 @@ class Quest4659 {
          qm.sendNext("Great job on finding your evolution materials. I will now give you a robot.")
       } else if (status == 1) {
          if (qm.isQuestCompleted(4659)) {
-            qm.getPlayer().dropMessage(1, "how did this get here?")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "how did this get here?")
             qm.dispose()
          } else if (qm.canHold(5000048)) {
             MaplePet pet = null
@@ -44,7 +46,7 @@ class Quest4659 {
                }
             }
             if (i == 3) {
-               qm.getPlayer().message("Pet could not be evolved.")
+               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "Pet could not be evolved.")
                qm.dispose()
                return
             }
@@ -88,7 +90,7 @@ class Quest4659 {
 //            MapleInventoryManipulator.addById(qm.getClient(), rand+5000049, 1, "", petId);
             qm.dispose()
          } else {
-            qm.getPlayer().dropMessage(1, "Your inventory is full")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full")
             qm.dispose()
          }
       }

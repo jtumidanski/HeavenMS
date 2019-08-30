@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2110000 {
    ReactorActionManager rm
 
    def act() {
-      rm.playerMessage(5, "An unknown force has moved you to the starting point.")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "An unknown force has moved you to the starting point.")
       rm.warp(280010000, 0)
    }
 

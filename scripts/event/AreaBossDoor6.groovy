@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -53,7 +54,7 @@ class EventAreaBossDoor6 {
 
       MapleMonster boss = MapleLifeFactory.getMonster(bossMobid)
       map.spawnMonsterOnGroundBelow(boss, bossPos)
-      map.broadcastMessage(MaplePacketCreator.serverNotice(6, bossMsg))
+      MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, bossMsg)
 
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
@@ -123,7 +124,7 @@ class EventAreaBossDoor6 {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

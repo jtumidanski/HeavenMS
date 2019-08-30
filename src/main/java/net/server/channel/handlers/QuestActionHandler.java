@@ -29,6 +29,8 @@ import net.AbstractMaplePacketHandler;
 import scripting.quest.QuestScriptManager;
 import server.life.MapleNPC;
 import server.quest.MapleQuest;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -58,7 +60,7 @@ public final class QuestActionHandler extends AbstractMaplePacketHandler {
 
          Point npcP = npc.getPosition();
          if (Math.abs(npcP.getX() - playerP.getX()) > 1200 || Math.abs(npcP.getY() - playerP.getY()) > 800) {
-            player.dropMessage(5, "Approach the NPC to fulfill this quest operation.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Approach the NPC to fulfill this quest operation.");
             return false;
          }
       }

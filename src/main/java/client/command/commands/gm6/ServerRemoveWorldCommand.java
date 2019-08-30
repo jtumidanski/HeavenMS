@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import server.ThreadManager;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ServerRemoveWorldCommand extends Command {
    {
@@ -40,7 +42,7 @@ public class ServerRemoveWorldCommand extends Command {
 
       final int rwid = Server.getInstance().getWorldsSize() - 1;
       if (rwid <= 0) {
-         player.dropMessage(5, "Unable to remove world 0.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Unable to remove world 0.");
          return;
       }
 
@@ -49,14 +51,14 @@ public class ServerRemoveWorldCommand extends Command {
          public void run() {
             if (Server.getInstance().removeWorld()) {
                if (player.isLoggedinWorld()) {
-                  player.dropMessage(5, "Successfully removed a world. Current world count: " + Server.getInstance().getWorldsSize() + ".");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Successfully removed a world. Current world count: " + Server.getInstance().getWorldsSize() + ".");
                }
             } else {
                if (player.isLoggedinWorld()) {
                   if (rwid < 0) {
-                     player.dropMessage(5, "No registered worlds to remove.");
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "No registered worlds to remove.");
                   } else {
-                     player.dropMessage(5, "Failed to remove world " + rwid + ". Check if there are people currently playing there.");
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Failed to remove world " + rwid + ". Check if there are people currently playing there.");
                   }
                }
             }

@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor3001000 {
    ReactorActionManager rm
 
    def act() {
-      rm.playerMessage(5, "Poison Golem has been spawned.")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Poison Golem has been spawned.")
       rm.spawnMonster(9300180,1)
    }
 

@@ -2,10 +2,12 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getEventInstance().getIntProperty("glpq1") == 0) {
-      pi.getEventInstance().dropMessage(5, "This path is currently blocked.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getEventInstance().getPlayers(), ServerNoticeType.PINK_TEXT, "This path is currently blocked.")
       return false
 
    } else {

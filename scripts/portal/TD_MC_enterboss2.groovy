@@ -4,6 +4,8 @@ import net.server.world.MapleParty
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestCompleted(2331)) {
@@ -12,11 +14,11 @@ static def enter(PortalPlayerInteraction pi) {
    }
 
    if (pi.isQuestCompleted(2333) && pi.isQuestStarted(2331) && !pi.hasItem(4001318)) {
-      pi.getPlayer().message("Lost the Royal Seal, eh? Worry not! Kevin's code here to save your hide.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Lost the Royal Seal, eh? Worry not! Kevin's code here to save your hide.")
       if (pi.canHold(4001318)) {
          pi.gainItem(4001318, (short) 1)
       } else {
-         pi.getPlayer().message("Hey, how do you plan to hold this Seal when your inventory is full?")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Hey, how do you plan to hold this Seal when your inventory is full?")
       }
    }
 
@@ -26,7 +28,7 @@ static def enter(PortalPlayerInteraction pi) {
       return true
    } else if (pi.isQuestStarted(2332) && pi.hasItem(4032388)) {
       pi.forceCompleteQuest(2332, 1300002)
-      pi.getPlayer().message("You've found the princess!")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You've found the princess!")
       pi.giveCharacterExp(4400, pi.getPlayer())
 
       EventManager em = pi.getEventManager("MK_PrimeMinister")
@@ -39,7 +41,7 @@ static def enter(PortalPlayerInteraction pi) {
                pi.playPortalSound()
                return true
             } else {
-               pi.message("Another party is already challenging the boss in this channel.")
+               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
                return false
             }
          }
@@ -48,7 +50,7 @@ static def enter(PortalPlayerInteraction pi) {
             pi.playPortalSound()
             return true
          } else {
-            pi.message("Another party is already challenging the boss in this channel.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
             return false
          }
       }
@@ -63,7 +65,7 @@ static def enter(PortalPlayerInteraction pi) {
                pi.playPortalSound()
                return true
             } else {
-               pi.message("Another party is already challenging the boss in this channel.")
+               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
                return false
             }
          }
@@ -72,12 +74,12 @@ static def enter(PortalPlayerInteraction pi) {
             pi.playPortalSound()
             return true
          } else {
-            pi.message("Another party is already challenging the boss in this channel.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
             return false
          }
       }
    } else {
-      pi.getPlayer().message("The door seems to be locked. Perhaps I can find a key to open it...")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The door seems to be locked. Perhaps I can find a key to open it...")
       return false
    }
 }

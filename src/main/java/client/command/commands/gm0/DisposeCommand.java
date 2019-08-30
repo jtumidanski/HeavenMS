@@ -27,6 +27,8 @@ import client.MapleClient;
 import client.command.Command;
 import scripting.npc.NPCScriptManager;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class DisposeCommand extends Command {
    {
@@ -38,6 +40,6 @@ public class DisposeCommand extends Command {
       NPCScriptManager.getInstance().dispose(c);
       c.announce(MaplePacketCreator.enableActions());
       c.removeClickedNPC();
-      c.getPlayer().message("You've been disposed.");
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "You've been disposed.");
    }
 }

@@ -106,7 +106,9 @@ import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author Matze
@@ -383,11 +385,11 @@ public class MapleStatEffect {
             MapleInventoryManipulator.addFromDrop(applyto.getClient(), new Item(4006000, (short) 0, (short) 1), false);
 
             if (door.getOwnerId() == -3) {
-               applyto.dropMessage(5, "Mystic Door cannot be cast far from a spawn point. Nearest one is at " + door.getDoorStatus().getRight() + "pts " + door.getDoorStatus().getLeft());
+               MessageBroadcaster.getInstance().sendServerNotice(applyto, ServerNoticeType.PINK_TEXT, "Mystic Door cannot be cast far from a spawn point. Nearest one is at " + door.getDoorStatus().getRight() + "pts " + door.getDoorStatus().getLeft());
             } else if (door.getOwnerId() == -2) {
-               applyto.dropMessage(5, "Mystic Door cannot be cast on a slope, try elsewhere.");
+               MessageBroadcaster.getInstance().sendServerNotice(applyto, ServerNoticeType.PINK_TEXT, "Mystic Door cannot be cast on a slope, try elsewhere.");
             } else {
-               applyto.dropMessage(5, "There are no door portals available for the town at this moment. Try again later.");
+               MessageBroadcaster.getInstance().sendServerNotice(applyto, ServerNoticeType.PINK_TEXT, "There are no door portals available for the town at this moment. Try again later.");
             }
 
             applyto.cancelBuffStats(MapleBuffStat.SOULARROW);  // cancel door buff

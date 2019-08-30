@@ -2,13 +2,15 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class QuestunidentifiedQuest {
    QuestActionManager qm
    int status = -1
 
    def start(Byte mode, Byte type, Integer selection) {
-      qm.getPlayer().dropMessage("Quest: " + qm.getQuest() + " is not found, please report this.")
+      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.NOTICE, "Quest: " + qm.getQuest() + " is not found, please report this.")
       qm.dispose()
    }
 

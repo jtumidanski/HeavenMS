@@ -2,10 +2,12 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (!pi.haveItem(4031346)) {
-      pi.getPlayer().dropMessage(6, "You need a magic seed to use this portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "You need a magic seed to use this portal.")
       return false
    }
    if (pi.getPlayer().getMapId() == 240010100) {

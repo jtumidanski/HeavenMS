@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2516000 {
    ReactorActionManager rm
 
    def act() {
-      rm.mapMessage(5, "As Lord Pirate dies, Wu Yang is released!")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "As Lord Pirate dies, Wu Yang is released!")
       rm.spawnNpc(2094001)
    }
 

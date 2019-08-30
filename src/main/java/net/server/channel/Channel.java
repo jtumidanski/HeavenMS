@@ -49,8 +49,8 @@ import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.SocketSessionConfig;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
-import client.processor.CharacterProcessor;
 import client.MapleCharacter;
+import client.processor.CharacterProcessor;
 import client.status.MonsterStatusEffect;
 import constants.ServerConstants;
 import net.MapleServerHandler;
@@ -83,7 +83,9 @@ import server.maps.MapleMapManager;
 import server.maps.MapleMiniDungeon;
 import server.maps.MapleMiniDungeonInfo;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 public final class Channel {
 
@@ -781,7 +783,7 @@ public final class Channel {
       Pair<Boolean, Set<Integer>> typeGuests = wserv.removeMarriageQueued(ret);
 
       Pair<String, String> couple = new Pair<>(CharacterProcessor.getInstance().getNameById(coupleId.getLeft()), CharacterProcessor.getInstance().getNameById(coupleId.getRight()));
-      wserv.dropMessage(6, couple.getLeft() + " and " + couple.getRight() + "'s wedding is going to be started at " + (cathedral ? "Cathedral" : "Chapel") + " on Channel " + channel + ".");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, couple.getLeft() + " and " + couple.getRight() + "'s wedding is going to be started at " + (cathedral ? "Cathedral" : "Chapel") + " on Channel " + channel + ".");
 
       return new Pair<>(typeGuests.getLeft(), new Pair<>(ret, typeGuests.getRight()));
    }
@@ -998,12 +1000,6 @@ public final class Channel {
          return (isOngoingWeddingGuest(cathedral, guestId)) ? getWorldServer().getRelationshipCouple(getOngoingWedding(cathedral)) : null;
       } finally {
          lock.unlock();
-      }
-   }
-
-   public void dropMessage(int type, String message) {
-      for (MapleCharacter player : getPlayerStorage().getAllCharacters()) {
-         player.dropMessage(type, message);
       }
    }
 

@@ -2,13 +2,15 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getJob().getJobNiche() == 2) {
       pi.playPortalSound(); pi.warp(610030521, 0)
       return true
    } else {
-      pi.playerMessage(5, "Only mages may enter this portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Only mages may enter this portal.")
       return false
    }
 }

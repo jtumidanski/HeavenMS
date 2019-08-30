@@ -3,6 +3,8 @@ package portal
 import client.MapleCharacter
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleReactor
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    long currwarp = System.currentTimeMillis()
@@ -30,18 +32,18 @@ static def enter(PortalPlayerInteraction pi) {
                         MapleCharacter chr = pIter.next()
 
                         for (int j = i; j >= 0; j--) {
-                           chr.message("You received " + chr.addDojoPointsByMap(mapId - 100 * j) + " training points. Your total training points score is now " + chr.getDojoPoints() + ".")
+                           MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You received " + chr.addDojoPointsByMap(mapId - 100 * j) + " training points. Your total training points score is now " + chr.getDojoPoints() + ".")
                         }
 
                         chr.changeMap(restMapId, 0)
                      }
                   }
                } else {
-                  pi.getPlayer().message("You received " + pi.getPlayer().addDojoPointsByMap(pi.getMapId()) + " training points. Your total training points score is now " + pi.getPlayer().getDojoPoints() + ".")
+                  MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You received " + pi.getPlayer().addDojoPointsByMap(pi.getMapId()) + " training points. Your total training points score is now " + pi.getPlayer().getDojoPoints() + ".")
                   pi.playPortalSound(); pi.warp(pi.getPlayer().getMap().getId() + 100, 0)
                }
             } else {
-               pi.getPlayer().message("You received " + pi.getPlayer().addDojoPointsByMap(pi.getMapId()) + " training points. Your total training points score is now " + pi.getPlayer().getDojoPoints() + ".")
+               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You received " + pi.getPlayer().addDojoPointsByMap(pi.getMapId()) + " training points. Your total training points score is now " + pi.getPlayer().getDojoPoints() + ".")
                pi.playPortalSound(); pi.warp(pi.getPlayer().getMap().getId() + 100, 0)
             }
          } else {
@@ -50,7 +52,7 @@ static def enter(PortalPlayerInteraction pi) {
          }
          return true
       } else {
-         pi.getPlayer().message("The door is not open yet.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The door is not open yet.")
          return false
       }
    } else {

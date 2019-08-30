@@ -35,6 +35,8 @@ import server.MapleItemInformationProvider;
 import server.MapleStorage;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -50,7 +52,7 @@ public class StorageProcessor {
       byte mode = slea.readByte();
 
       if (chr.getLevel() < 15) {
-         chr.dropMessage(1, "You may only use the storage once you have reached level 15.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You may only use the storage once you have reached level 15.");
          c.announce(MaplePacketCreator.enableActions());
          return;
       }

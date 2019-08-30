@@ -23,11 +23,10 @@
 */
 package client.command.commands.gm3;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import net.server.Server;
-import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class RipCommand extends Command {
    {
@@ -36,7 +35,6 @@ public class RipCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      MapleCharacter player = c.getPlayer();
-      Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + joinStringFrom(params, 1)));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[RIP]: " + joinStringFrom(params, 1));
    }
 }

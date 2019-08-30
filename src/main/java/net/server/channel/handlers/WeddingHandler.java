@@ -22,6 +22,8 @@ import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import server.MapleMarriage;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packets.Wedding;
 
@@ -116,11 +118,11 @@ public final class WeddingHandler extends AbstractMaplePacketHandler {
 
                            c.announce(Wedding.OnWeddingGiftResult((byte) 0xF, marriage.getWishlistItems(groomWishlist), marriage.getGiftItems(c, groomWishlist)));
                         } else {
-                           c.getPlayer().dropMessage(1, "Free a slot on your inventory before collecting this item.");
+                           MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Free a slot on your inventory before collecting this item.");
                            c.announce(Wedding.OnWeddingGiftResult((byte) 0xE, marriage.getWishlistItems(groomWishlist), marriage.getGiftItems(c, groomWishlist)));
                         }
                      } else {
-                        c.getPlayer().dropMessage(1, "You have already collected this item.");
+                        MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You have already collected this item.");
                         c.announce(Wedding.OnWeddingGiftResult((byte) 0xE, marriage.getWishlistItems(groomWishlist), marriage.getGiftItems(c, groomWishlist)));
                      }
                   }
@@ -135,11 +137,11 @@ public final class WeddingHandler extends AbstractMaplePacketHandler {
                         MapleInventoryManipulator.addFromDrop(c, item, true);
                         c.announce(Wedding.OnWeddingGiftResult((byte) 0xF, Collections.singletonList(""), items));
                      } else {
-                        c.getPlayer().dropMessage(1, "Free a slot on your inventory before collecting this item.");
+                        MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Free a slot on your inventory before collecting this item.");
                         c.announce(Wedding.OnWeddingGiftResult((byte) 0xE, Collections.singletonList(""), items));
                      }
                   } catch (Exception e) {
-                     c.getPlayer().dropMessage(1, "You have already collected this item.");
+                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You have already collected this item.");
                      c.announce(Wedding.OnWeddingGiftResult((byte) 0xE, Collections.singletonList(""), items));
                   }
                }

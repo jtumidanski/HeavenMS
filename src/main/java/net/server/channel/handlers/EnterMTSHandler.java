@@ -36,6 +36,8 @@ import server.maps.FieldLimit;
 import server.maps.MapleMiniDungeonInfo;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 
@@ -54,19 +56,19 @@ public final class EnterMTSHandler extends AbstractMaplePacketHandler {
          }
 
          if (chr.getEventInstance() != null) {
-            c.announce(MaplePacketCreator.serverNotice(5, "Entering Cash Shop or MTS are disabled when registered on an event."));
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Entering Cash Shop or MTS are disabled when registered on an event.");
             c.announce(MaplePacketCreator.enableActions());
             return;
          }
 
          if (MapleMiniDungeonInfo.isDungeonMap(chr.getMapId())) {
-            c.announce(MaplePacketCreator.serverNotice(5, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon."));
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
             c.announce(MaplePacketCreator.enableActions());
             return;
          }
 
          if (FieldLimit.CANNOTMIGRATE.check(chr.getMap().getFieldLimit())) {
-            chr.dropMessage(1, "You can't do it here in this map.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't do it here in this map.");
             c.announce(MaplePacketCreator.enableActions());
             return;
          }

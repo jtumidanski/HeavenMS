@@ -4,6 +4,8 @@ import client.inventory.Item
 import client.inventory.MapleInventoryType
 import client.inventory.MaplePet
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -24,7 +26,7 @@ class NPCwaterOfLife {
 
       dList = cm.getDriedPets()
       if (dList.size() == 0) {
-         cm.playerMessage(5, "You currently do not own a pet that needs to be treated with Water of Life.")
+         MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "You currently do not own a pet that needs to be treated with Water of Life.")
          cm.dispose()
          return
       }

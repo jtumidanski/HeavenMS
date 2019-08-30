@@ -32,7 +32,9 @@ import provider.MapleDataTool;
 import server.TimerManager;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 
 /**
  * @author FloppyDisk
@@ -58,7 +60,7 @@ public final class MapleOxQuiz {
       double x = chr.getPosition().getX();
       double y = chr.getPosition().getY();
       if ((x > -234 && y > -26 && answer == 0) || (x < -234 && y > -26 && answer == 1)) {
-         chr.dropMessage("Correct!");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Correct!");
          return true;
       }
       return false;
@@ -97,7 +99,7 @@ public final class MapleOxQuiz {
             }
             //send question
             if (map.getCharacters().size() - number <= 2) {
-               map.broadcastMessage(MaplePacketCreator.serverNotice(6, "The event has ended"));
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The event has ended");
                map.getPortal("join00").setPortalStatus(true);
                map.setOx(null);
                map.setOxQuiz(false);

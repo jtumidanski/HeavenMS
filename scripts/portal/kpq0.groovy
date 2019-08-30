@@ -3,6 +3,8 @@ package portal
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    EventInstanceManager eim = pi.getPlayer().getEventInstance()
@@ -14,7 +16,7 @@ static def enter(PortalPlayerInteraction pi) {
       return true
    }
    else {
-      pi.getPlayer().dropMessage(5, "The portal is not opened yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal is not opened yet.")
       return false
    }
 }

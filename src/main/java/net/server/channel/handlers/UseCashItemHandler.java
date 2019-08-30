@@ -28,8 +28,6 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.processor.AssignSPProcessor;
-import client.processor.NoteProcessor;
 import client.Skill;
 import client.SkillFactory;
 import client.creator.veteran.BowmanCreator;
@@ -47,7 +45,9 @@ import client.inventory.ModifyInventory;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.AssignAPProcessor;
+import client.processor.AssignSPProcessor;
 import client.processor.DueyProcessor;
+import client.processor.NoteProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
@@ -64,7 +64,9 @@ import server.maps.MapleMap;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MapleTVEffect;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class UseCashItemHandler extends AbstractMaplePacketHandler {
@@ -109,7 +111,7 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
 
       long timeNow = currentServerTime();
       if (timeNow - player.getLastUsedCashItem() < 3000) {
-         player.dropMessage(1, "You have used a cash item recently. Wait a moment, then try again.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You have used a cash item recently. Wait a moment, then try again.");
          c.announce(MaplePacketCreator.enableActions());
          return;
       }
@@ -157,10 +159,10 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
                   player.forceChangeMap(targetMap, targetMap.getRandomPlayerSpawnpoint());
                   success = true;
                } else {
-                  player.dropMessage(1, error1);
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);
                }
             } else {
-               player.dropMessage(1, "You cannot teleport between continents with this teleport rock.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You cannot teleport between continents with this teleport rock.");
             }
          } else {
             String name = slea.readMapleAsciiString();
@@ -173,13 +175,13 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
                      player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnpoint(victim.get().getPosition()));
                      success = true;
                   } else {
-                     player.dropMessage(1, error1);
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);
                   }
                } else {
-                  player.dropMessage(1, "You cannot teleport to this map.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You cannot teleport to this map.");
                }
             } else {
-               player.dropMessage(1, "Player could not be found in this channel.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Player could not be found in this channel.");
             }
          }
 
@@ -282,14 +284,14 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          switch ((itemId / 1000) % 10) {
             case 1: // Megaphone
                if (player.getLevel() > 9) {
-                  player.getClient().getChannelServer().broadcastPacket(MaplePacketCreator.serverNotice(2, medal + player.getName() + " : " + slea.readMapleAsciiString()));
+                  MessageBroadcaster.getInstance().sendServerNotice(player.getClient().getChannelServer().getPlayerStorage().getAllCharacters(), ServerNoticeType.MEGAPHONE, medal + player.getName() + " : " + slea.readMapleAsciiString());
                } else {
-                  player.dropMessage(1, "You may not use this until you're level 10.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You may not use this until you're level 10.");
                   return;
                }
                break;
             case 2: // Super megaphone
-               Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(3, c.getChannel(), medal + player.getName() + " : " + slea.readMapleAsciiString(), (slea.readByte() != 0)));
+               MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), c.getChannel(), ServerNoticeType.SUPER_MEGAPHONE, medal + player.getName() + " : " + slea.readMapleAsciiString(), (slea.readByte() != 0));
                break;
             case 5: // Maple TV
                int tvType = itemId % 10;
@@ -322,12 +324,12 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
                slea.readInt();
 
                if (!MapleTVEffect.broadcastMapleTVIfNotActive(player, victim, messages, tvType)) {
-                  player.dropMessage(1, "MapleTV is already in use.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "MapleTV is already in use.");
                   return;
                }
 
                if (megassenger) {
-                  Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(3, c.getChannel(), medal + player.getName() + " : " + builder.toString(), ear));
+                  MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), c.getChannel(), ServerNoticeType.SUPER_MEGAPHONE, medal + player.getName() + " : " + builder.toString(), ear);
                }
 
                break;
@@ -446,7 +448,7 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          DueyProcessor.dueySendTalk(c, true);
       } else if (itemType == 537) {
          if (GameConstants.isFreeMarketRoom(player.getMapId())) {
-            player.dropMessage(5, "You cannot use the chalkboard here.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You cannot use the chalkboard here.");
             player.getClient().announce(MaplePacketCreator.enableActions());
             return;
          }
@@ -482,7 +484,7 @@ public final class UseCashItemHandler extends AbstractMaplePacketHandler {
          c.announce(MaplePacketCreator.enableActions());
       } else if (itemType == 543) {
          if (itemId == 5432000 && !c.gainCharacterSlot()) {
-            player.dropMessage(1, "You have already used up all 12 extra character slots.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You have already used up all 12 extra character slots.");
             c.announce(MaplePacketCreator.enableActions());
             return;
          }

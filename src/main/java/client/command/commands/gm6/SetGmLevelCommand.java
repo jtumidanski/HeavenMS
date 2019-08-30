@@ -28,6 +28,8 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class SetGmLevelCommand extends Command {
    {
@@ -48,10 +50,10 @@ public class SetGmLevelCommand extends Command {
          target.get().setGMLevel(newLevel);
          target.get().getClient().setGMLevel(newLevel);
 
-         target.get().dropMessage("You are now a level " + newLevel + " GM. See @commands for a list of available commands.");
-         player.dropMessage(target + " is now a level " + newLevel + " GM.");
+         MessageBroadcaster.getInstance().sendServerNotice(target.get(), ServerNoticeType.NOTICE, "You are now a level " + newLevel + " GM. See @commands for a list of available commands.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, target + " is now a level " + newLevel + " GM.");
       } else {
-         player.dropMessage("Player '" + params[0] + "' was not found on this channel.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "Player '" + params[0] + "' was not found on this channel.");
       }
    }
 }

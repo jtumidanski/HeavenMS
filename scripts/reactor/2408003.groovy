@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2408003 {
@@ -21,7 +23,7 @@ class Reactor2408003 {
          rm.getPlayer().getEventInstance().setProperty("canEnter", "false")
       }
       rm.spawnFakeMonster(8800000)
-      rm.mapMessage(6, "A gigantic creature is approaching from the deep cave.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "A gigantic creature is approaching from the deep cave.")
       //rm.createMapMonitor(rm.getPlayer().getMap().getId(),"ps00");
       switch (rm.getPlayer().getMap().getId()) {
          case 240060000:

@@ -82,6 +82,8 @@ import server.partyquest.Pyramid.PyramidMode;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.packets.Wedding;
 
 /**
@@ -673,7 +675,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
                .forEach(character -> {
                   character.setChallenged(false);
                   character.changeMap(map, map.getPortal(0));
-                  character.announce(MaplePacketCreator.serverNotice(6, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby)));
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby));
                   TimerManager tMan = TimerManager.getInstance();
                   tMan.schedule(() -> mapClock(3 * 60), 1500);
                   character.setCpqTimer(TimerManager.getInstance().schedule(() -> character.changeMap(mapExit, mapExit.getPortal(0)), 3 * 60 * 1000));
@@ -861,7 +863,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
                .forEach(character -> {
                   character.setChallenged(false);
                   character.changeMap(map, map.getPortal(0));
-                  character.announce(MaplePacketCreator.serverNotice(6, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby)));
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby));
                   TimerManager tMan = TimerManager.getInstance();
                   tMan.schedule(() -> mapClock(3 * 60), 1500);
                   character.setCpqTimer(TimerManager.getInstance().schedule(() -> character.changeMap(mapExit, mapExit.getPortal(0)), 3 * 60 * 1000));

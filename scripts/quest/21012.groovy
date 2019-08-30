@@ -2,6 +2,8 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Quest21012 {
    QuestActionManager qm
@@ -52,7 +54,7 @@ class Quest21012 {
          qm.sendOk("Hm... Your expression tells me that the exercise didn't jog any memories. But don't you worry. They'll come back, eventually. Here, drink this potion and power up!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v2000022# 10 #t2000022#\r\n#v2000023# 10 #t2000023#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 57 exp")
       } else if (status == 1) {
          if (qm.isQuestCompleted(21012)) {
-            qm.getPlayer().dropMessage(1, "Unknown Error")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Unknown Error")
          } else if (qm.canHold(2000022) && qm.canHold(2000023)) {
             qm.forceCompleteQuest()
             qm.gainExp(57)
@@ -60,7 +62,7 @@ class Quest21012 {
             qm.gainItem(2000023, (short) 10)
             qm.sendOk("#b(Even if you're really the hero everyone says you are... What good are you without any skills?)", (byte) 3)
          } else {
-            qm.getPlayer().dropMessage(1, "Your inventory is full")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full")
             qm.dispose()
          }
       } else if (status == 2) {

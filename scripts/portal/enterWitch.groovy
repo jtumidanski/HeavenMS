@@ -1,6 +1,8 @@
 package portal
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestCompleted(20404)) {
@@ -20,7 +22,7 @@ static def enter(PortalPlayerInteraction pi) {
 
 
    } else {
-      pi.playerMessage(5, "I shouldn't go here.. it's creepy!")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "I shouldn't go here.. it's creepy!")
       return false
    }
 }

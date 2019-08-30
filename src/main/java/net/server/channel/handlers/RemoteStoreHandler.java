@@ -27,6 +27,8 @@ import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import server.maps.MapleHiredMerchant;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -52,7 +54,7 @@ public class RemoteStoreHandler extends AbstractMaplePacketHandler {
          }
          return;
       } else {
-         chr.dropMessage(1, "You don't have a Merchant open.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You don't have a Merchant open.");
       }
       c.announce(MaplePacketCreator.enableActions());
    }

@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -48,7 +50,7 @@ class EventAreaBossMano {
       }
 
       thicketAroundTheBeach3.spawnMonsterOnGroundBelow(mano, new Point(279, -496))
-      thicketAroundTheBeach3.broadcastMessage(MaplePacketCreator.serverNotice(6, "A cool breeze was felt when Mano appeared."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(thicketAroundTheBeach3, ServerNoticeType.LIGHT_BLUE, "A cool breeze was felt when Mano appeared.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -117,7 +119,7 @@ class EventAreaBossMano {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

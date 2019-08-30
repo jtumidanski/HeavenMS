@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(1041)) {
@@ -13,7 +15,7 @@ static def enter(PortalPlayerInteraction pi) {
    } else if (pi.isQuestStarted(1044)) {
       pi.playPortalSound(); pi.warp(1010400, 4)
    } else {
-      pi.message("Only the adventurers that have been trained by Mai may enter.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Only the adventurers that have been trained by Mai may enter.")
       return false
    }
    return true

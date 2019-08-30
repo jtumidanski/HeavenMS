@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.Point
 
@@ -46,7 +48,7 @@ class EventAreaBossDyle {
          return
       }
       dangeroudCroko1.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(6220000), new Point(90, 119))
-      dangeroudCroko1.broadcastMessage(MaplePacketCreator.serverNotice(6, "The huge crocodile Dyle has come out from the swamp."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(dangeroudCroko1, ServerNoticeType.LIGHT_BLUE, "The huge crocodile Dyle has come out from the swamp.")
       setupTask = em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -115,7 +117,7 @@ class EventAreaBossDyle {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

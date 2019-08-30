@@ -28,6 +28,8 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MaxHpMpCommand extends Command {
    {
@@ -58,7 +60,7 @@ public class MaxHpMpCommand extends Command {
          int maxmpUpdate = statUpdate - extraMp;
          victim.get().updateMaxHpMaxMp(maxhpUpdate, maxmpUpdate);
       } else {
-         player.message("Player '" + params[0] + "' could not be found on this world.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world.");
       }
    }
 }

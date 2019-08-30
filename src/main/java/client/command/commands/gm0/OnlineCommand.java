@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import net.server.channel.Channel;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 
 public class OnlineCommand extends Command {
@@ -42,7 +44,7 @@ public class OnlineCommand extends Command {
          player.yellowMessage("Players in Channel " + ch.getId() + ":");
          for (MapleCharacter chr : ch.getPlayerStorage().getAllCharacters()) {
             if (!chr.isGM()) {
-               player.message(" >> " + StringUtil.makeMapleReadable(chr.getName()) + " is at " + chr.getMap().getMapName() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, " >> " + StringUtil.makeMapleReadable(chr.getName()) + " is at " + chr.getMap().getMapName() + ".");
             }
          }
       }

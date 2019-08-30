@@ -8,6 +8,8 @@ import scripting.event.EventManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 import tools.packets.Wedding
 
 import java.awt.*
@@ -126,7 +128,7 @@ class EventWeddingCathedral {
 
    def stopBlessings(EventInstanceManager eim) {
       MapleMap mapobj = eim.getMapInstance(entryMap + 10)
-      mapobj.dropMessage(6, "Wedding Assistant: Alright people, our couple are preparing their vows to each other right now.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(mapobj, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: Alright people, our couple are preparing their vows to each other right now.")
 
       eim.setIntProperty("weddingStage", 2)
    }
@@ -217,7 +219,7 @@ class EventWeddingCathedral {
             chr.changeMap(entryMap + 10, "we00")
          }
 
-         mapobj.dropMessage(6, "Wedding Assistant: The couple are heading to the altar, hurry hurry talk to me to arrange your seat.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(mapobj, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: The couple are heading to the altar, hurry hurry talk to me to arrange your seat.")
 
          eim.setIntProperty("weddingStage", 1)
          eim.schedule("showStartMsg", startMsgTime * 60 * 1000)
@@ -234,7 +236,7 @@ class EventWeddingCathedral {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

@@ -35,6 +35,8 @@ import scripting.AbstractScriptManager;
 import server.MapleItemInformationProvider.ScriptedItem;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Matze
@@ -90,7 +92,7 @@ public class NPCScriptManager extends AbstractScriptManager {
          iv = getScriptEngine("npc/" + filename, c);
 
          if (iv == null) {
-            c.getPlayer().dropMessage(1, npc + "");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, npc + "");
             cm.dispose();
             return;
          }

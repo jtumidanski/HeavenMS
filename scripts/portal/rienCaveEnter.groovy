@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(21201) || pi.isQuestStarted(21302)) { //aran first job
@@ -9,7 +11,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(140030000, 1)
       return true
    } else {
-      pi.playerMessage(5, "Something seems to be blocking this portal!")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Something seems to be blocking this portal!")
       return false
    }
 }

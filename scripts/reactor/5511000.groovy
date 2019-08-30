@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor5511000 {
@@ -16,7 +18,7 @@ class Reactor5511000 {
    def summonBoss() {
       rm.spawnMonster(9420542, -527, 637)
       rm.changeMusic("Bgm09/TimeAttack")
-      rm.mapMessage(6, "Beware! The furious Targa has shown himself!")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Beware! The furious Targa has shown himself!")
    }
 
    def hit() {

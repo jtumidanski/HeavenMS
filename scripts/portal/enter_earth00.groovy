@@ -2,10 +2,12 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (!pi.haveItem(4031890)) {
-      pi.getPlayer().dropMessage(6, "You need a warp card to activate this portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "You need a warp card to activate this portal.")
       return false
    }
 

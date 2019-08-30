@@ -7,6 +7,8 @@ import scripting.AbstractPlayerInteraction
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -243,12 +245,12 @@ class NPC9201011 {
 
                                  giveCoupleBlessings(eim, player, partner)
 
-                                 cm.getMap().dropMessage(6, "Wayne: I'll call it out right now, and it shall go on: you guys are the key of the other's lock, a lace of a pendant. That's it, snog yourselves!")
+                                 MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "Wayne: I'll call it out right now, and it shall go on: you guys are the key of the other's lock, a lace of a pendant. That's it, snog yourselves!")
                                  eim.schedule("showMarriedMsg", 2 * 1000)
                               }
                            } else {
                               eim.setIntProperty("confirmedVows", player.getId())
-                              cm.getMap().dropMessage(6, "Wedding Assistant: " + player.getName() + " has confirmed vows! Alright, one step away to make it official. Tighten your seatbelts!")
+                              MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: " + player.getName() + " has confirmed vows! Alright, one step away to make it official. Tighten your seatbelts!")
                            }
 
                            break

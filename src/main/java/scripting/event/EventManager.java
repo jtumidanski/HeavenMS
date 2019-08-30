@@ -60,6 +60,8 @@ import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
 import server.quest.MapleQuest;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.exceptions.EventInstanceInProgressException;
 //import jdk.nashorn.api.scripting.ScriptUtils;
 
@@ -821,14 +823,14 @@ public class EventManager {
       String callout = "[Guild Quest] Your guild has been registered to attend to the Sharenian Guild Quest at channel " + this.getChannelServer().getId()
             + " and HAS JUST STARTED THE STRATEGY PHASE. After 3 minutes, no more guild members will be allowed to join the effort."
             + " Check out Shuang at the excavation site in Perion for more info.";
-      server.getGuild(guildId).ifPresent(guild -> guild.dropMessage(6, callout));
+      server.getGuild(guildId).ifPresent(guild -> MessageBroadcaster.getInstance().sendGuildServerNotice(guild, ServerNoticeType.LIGHT_BLUE, callout));
    }
 
    private void exportMovedQueueToGuild(Integer guildId, int place) {
       String callout = "[Guild Quest] Your guild has been registered to attend to the Sharenian Guild Quest at channel " + this.getChannelServer().getId()
             + " and is currently on the " + GameConstants.ordinal(place) + " place on the waiting queue.";
 
-      server.getGuild(guildId).ifPresent(guild -> guild.dropMessage(6, callout));
+      server.getGuild(guildId).ifPresent(guild -> MessageBroadcaster.getInstance().sendGuildServerNotice(guild, ServerNoticeType.LIGHT_BLUE, callout));
    }
 
    private List<Integer> getNextGuildQueue() {

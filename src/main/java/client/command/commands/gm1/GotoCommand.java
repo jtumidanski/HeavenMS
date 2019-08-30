@@ -40,6 +40,8 @@ import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MapleMiniDungeonInfo;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class GotoCommand extends Command {
 
@@ -87,13 +89,13 @@ public class GotoCommand extends Command {
       }
 
       if (!player.isAlive()) {
-         player.dropMessage(1, "This command cannot be used when you're dead.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command cannot be used when you're dead.");
          return;
       }
 
       if (!player.isGM()) {
          if (player.getEventInstance() != null || MapleMiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
-            player.dropMessage(1, "This command can not be used in this map.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command can not be used in this map.");
             return;
          }
       }

@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    int mapid = pi.getPlayer().getMap().getId()
@@ -28,7 +30,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.warp(mapid + 10, "right00")
          return true
       }
-      pi.getPlayer().dropMessage(5, "You cannot access this area.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You cannot access this area.")
       return false
    }
 }

@@ -3,6 +3,8 @@ package npc
 import constants.ServerConstants
 import net.server.world.MapleParty
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -352,7 +354,7 @@ class NPC2091005 {
                   int dojoMapId = cm.getPlayer().getMap().getId()
 
                   cm.warp(925020002, 0)
-                  cm.getPlayer().message("Can you make up your mind please?")
+                  MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Can you make up your mind please?")
 
                   cm.getClient().getChannelServer().freeDojoSectionIfEmpty(dojoMapId)
                }

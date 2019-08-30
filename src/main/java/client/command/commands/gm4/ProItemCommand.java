@@ -32,6 +32,8 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ProItemCommand extends Command {
    {
@@ -86,7 +88,7 @@ public class ProItemCommand extends Command {
          hardsetItemStats((Equip) it, stat, spdjmp);
          MapleInventoryManipulator.addFromDrop(c, it);
       } else {
-         player.dropMessage(6, "Make sure it's an equippable item.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Make sure it's an equippable item.");
       }
    }
 }

@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getMap().getMonsters().isEmpty()) {
@@ -16,7 +18,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(nextStage)
       return true
    } else {
-      pi.getPlayer().dropMessage(6, "Defeat all monsters before proceeding to the next stage.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Defeat all monsters before proceeding to the next stage.")
       return false
    }
 }

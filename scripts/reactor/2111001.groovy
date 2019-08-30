@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2111001 {
@@ -18,7 +20,7 @@ class Reactor2111001 {
          rm.spawnMonster(i)
       }
       rm.createMapMonitor(280030000, "ps00")
-      rm.mapMessage(5, "Zakum is summoned by the force of Eye of Fire.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Zakum is summoned by the force of Eye of Fire.")
    }
 
    def hit() {

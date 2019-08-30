@@ -29,6 +29,8 @@ import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class SpouseChatHandler extends AbstractMaplePacketHandler {
@@ -47,10 +49,10 @@ public final class SpouseChatHandler extends AbstractMaplePacketHandler {
                LogHelper.logChat(c, "Spouse", msg);
             }
          } else {
-            c.getPlayer().dropMessage(5, "Your spouse is currently offline.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Your spouse is currently offline.");
          }
       } else {
-         c.getPlayer().dropMessage(5, "You don't have a spouse.");
+         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "You don't have a spouse.");
       }
    }
 }

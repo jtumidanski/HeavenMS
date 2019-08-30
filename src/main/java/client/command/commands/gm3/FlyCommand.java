@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class FlyCommand extends Command {
    {
@@ -56,6 +58,6 @@ public class FlyCommand extends Command {
          srv.changeFly(c.getAccID(), false);
       }
 
-      player.dropMessage(6, sendStr);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, sendStr);
    }
 }

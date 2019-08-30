@@ -35,6 +35,8 @@ import server.life.MapleNPC;
 import server.maps.MapleMap;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class PnpcCommand extends Command {
    {
@@ -53,7 +55,7 @@ public class PnpcCommand extends Command {
       int mapId = player.getMapId();
       int npcId = Integer.parseInt(params[0]);
       if (player.getMap().containsNPC(npcId)) {
-         player.dropMessage(5, "This map already contains the specified NPC.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "This map already contains the specified NPC.");
          return;
       }
 
@@ -85,7 +87,7 @@ public class PnpcCommand extends Command {
 
          player.yellowMessage("Pnpc created.");
       } else {
-         player.dropMessage(5, "You have entered an invalid NPC id.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have entered an invalid NPC id.");
       }
    }
 }

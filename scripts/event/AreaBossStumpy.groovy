@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -52,7 +54,7 @@ class EventAreaBossStumpy {
       int posY = 1280
       posX = Math.floor((Math.random() * 800) + 400).intValue()
       eastRockyMountain5.spawnMonsterOnGroundBelow(stumpy, new Point(posX, posY))
-      eastRockyMountain5.broadcastMessage(MaplePacketCreator.serverNotice(6, "Stumpy has appeared with a stumping sound that rings the Stone Mountain."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(eastRockyMountain5, ServerNoticeType.LIGHT_BLUE,"Stumpy has appeared with a stumping sound that rings the Stone Mountain.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -121,7 +123,7 @@ class EventAreaBossStumpy {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

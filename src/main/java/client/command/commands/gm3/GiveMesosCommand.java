@@ -28,6 +28,8 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class GiveMesosCommand extends Command {
    {
@@ -71,9 +73,9 @@ public class GiveMesosCommand extends Command {
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv_);
       if (victim.isPresent()) {
          victim.get().gainMeso((int) mesos_, true);
-         player.message("MESO given.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "MESO given.");
       } else {
-         player.message("Player '" + recv_ + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + recv_ + "' could not be found.");
       }
    }
 }

@@ -97,6 +97,8 @@ import tools.HexTool;
 import tools.LogHelper;
 import tools.MapleAESOFB;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MapleClient {
 
@@ -1025,14 +1027,14 @@ public class MapleClient {
          announce(MaplePacketCreator.enableActions());
          return;
       } else if (MapleMiniDungeonInfo.isDungeonMap(player.getMapId())) {
-         announce(MaplePacketCreator.serverNotice(5, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon."));
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
          announce(MaplePacketCreator.enableActions());
          return;
       }
 
       String[] socket = Server.getInstance().getInetSocket(getWorld(), channel);
       if (socket == null) {
-         announce(MaplePacketCreator.serverNotice(1, "Channel " + channel + " is currently disabled. Try another channel."));
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Channel " + channel + " is currently disabled. Try another channel.");
          announce(MaplePacketCreator.enableActions());
          return;
       }

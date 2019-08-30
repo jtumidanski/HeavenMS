@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -46,7 +48,7 @@ class NPC2050014 {
                      cm.gainItem(4031117, (short) 1)
                      cm.setQuestProgress(3421, 0, progress)
                   } else {
-                     cm.getPlayer().dropMessage(1, "Have a ETC slot available for this item.")
+                     MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.POP_UP, "Have a ETC slot available for this item.")
                   }
                }
             }

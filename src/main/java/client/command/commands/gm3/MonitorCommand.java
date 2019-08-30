@@ -28,9 +28,9 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import net.server.Server;
 import tools.MapleLogger;
-import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MonitorCommand extends Command {
    {
@@ -46,7 +46,7 @@ public class MonitorCommand extends Command {
       }
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
       if (victim.isEmpty()) {
-         player.message("Player '" + params[0] + "' could not be found on this world.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world.");
          return;
       }
       boolean monitored = MapleLogger.monitored.contains(victim.get().getId());
@@ -57,7 +57,7 @@ public class MonitorCommand extends Command {
       }
       player.yellowMessage(victim.get().getId() + " is " + (!monitored ? "now being monitored." : "no longer being monitored."));
       String message = player.getName() + (!monitored ? " has started monitoring " : " has stopped monitoring ") + victim.get().getId() + ".";
-      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.serverNotice(5, message));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, message);
 
    }
 }

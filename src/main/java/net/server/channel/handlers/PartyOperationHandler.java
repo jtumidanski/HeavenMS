@@ -37,6 +37,8 @@ import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class PartyOperationHandler extends AbstractMaplePacketHandler {
@@ -70,7 +72,7 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
             if (res == InviteResult.ACCEPTED) {
                MaplePartyProcessor.getInstance().joinParty(player, partyid, false);
             } else {
-               c.announce(MaplePacketCreator.serverNotice(5, "You couldn't join the party due to an expired invitation request."));
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You couldn't join the party due to an expired invitation request.");
             }
             break;
          }
@@ -82,11 +84,11 @@ public final class PartyOperationHandler extends AbstractMaplePacketHandler {
             } else {
                MapleCharacter invited = invitedOptional.get();
                if (invited.getLevel() < 10 && (!ServerConstants.USE_PARTY_FOR_STARTERS || player.getLevel() >= 10)) { //min requirement is level 10
-                  c.announce(MaplePacketCreator.serverNotice(5, "The player you have invited does not meet the requirements."));
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The player you have invited does not meet the requirements.");
                   return;
                }
                if (ServerConstants.USE_PARTY_FOR_STARTERS && invited.getLevel() >= 10 && player.getLevel() < 10) {    //trying to invite high level
-                  c.announce(MaplePacketCreator.serverNotice(5, "The player you have invited does not meet the requirements."));
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The player you have invited does not meet the requirements.");
                   return;
                }
 

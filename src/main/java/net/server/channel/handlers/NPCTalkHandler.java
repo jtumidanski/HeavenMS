@@ -31,6 +31,8 @@ import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class NPCTalkHandler extends AbstractMaplePacketHandler {
@@ -50,7 +52,9 @@ public final class NPCTalkHandler extends AbstractMaplePacketHandler {
       MapleMapObject obj = c.getPlayer().getMap().getMapObject(oid);
       if (obj instanceof MapleNPC) {
          MapleNPC npc = (MapleNPC) obj;
-         if (ServerConstants.USE_DEBUG) c.getPlayer().dropMessage(5, "Talking to NPC " + npc.getId());
+         if (ServerConstants.USE_DEBUG) {
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Talking to NPC " + npc.getId());
+         }
 
          if (npc.getId() == 9010009) {   //is duey
             DueyProcessor.dueySendTalk(c, false);

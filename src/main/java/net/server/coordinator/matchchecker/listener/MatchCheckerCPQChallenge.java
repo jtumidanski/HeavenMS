@@ -27,9 +27,12 @@ import client.MapleCharacter;
 import constants.LanguageConstants;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
+import net.server.guild.MapleAlliance;
 import net.server.world.MaplePartyCharacter;
 import scripting.npc.NPCConversationManager;
 import scripting.npc.NPCScriptManager;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Ronan
@@ -111,7 +114,7 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
          @Override
          public void onMatchDeclined(int leaderid, Set<MapleCharacter> matchPlayers, String message) {
             MapleCharacter chr = getChallenger(leaderid, matchPlayers);
-            chr.dropMessage(5, LanguageConstants.getMessage(chr, LanguageConstants.CPQChallengeRoomDenied));
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQChallengeRoomDenied));
          }
 
          @Override

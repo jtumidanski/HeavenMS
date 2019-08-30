@@ -53,7 +53,9 @@ import server.MapleTrade;
 import server.processor.maps.MapleHiredMerchantProcessor;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author XoticStory
@@ -214,7 +216,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                iitem.setQuantity((short) (shopItem.getItem().getQuantity() * shopItem.getBundles()));
 
                if (!MapleInventory.checkSpot(chr, iitem)) {
-                  chr.announce(MaplePacketCreator.serverNotice(1, "Have a slot available on your inventory to claim back the item."));
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
                   chr.announce(MaplePacketCreator.enableActions());
                   return;
                }
@@ -288,12 +290,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                   });
                }
             } else {
-               c.getPlayer().dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please clear a slot before buying this item.");
                c.announce(MaplePacketCreator.enableActions());
                return;
             }
          } else {
-            c.getPlayer().dropMessage(1, "You don't have enough mesos to purchase this item.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos to purchase this item.");
             c.announce(MaplePacketCreator.enableActions());
             return;
          }
@@ -310,7 +312,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId());
       Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId)
             .filter(MapleCharacter::isLoggedinWorld)
-            .ifPresent(character -> character.dropMessage(6, "[Hired Merchant] Item '" + itemName + "'" + qtyStr + " has been sold for " + mesos + " mesos. (" + inStore + " left)"));
+            .ifPresent(character ->  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, "[Hired Merchant] Item '" + itemName + "'" + qtyStr + " has been sold for " + mesos + " mesos. (" + inStore + " left)"));
    }
 
    public void forceClose() {

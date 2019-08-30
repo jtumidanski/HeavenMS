@@ -33,8 +33,10 @@ import net.server.Server;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.RewardItem;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -73,7 +75,7 @@ public final class ItemRewardHandler extends AbstractMaplePacketHandler {
                String msg = reward.worldmsg;
                msg.replaceAll("/name", c.getPlayer().getName());
                msg.replaceAll("/item", ii.getName(reward.itemid));
-               Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, msg));
+               MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, msg);
             }
             break;
          }

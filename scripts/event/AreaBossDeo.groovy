@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -48,7 +49,7 @@ class EventAreaBossDeo {
       }
 
       royalCatthusDesert.spawnMonsterOnGroundBelow(deo, new Point(645, 275))
-      royalCatthusDesert.broadcastMessage(MaplePacketCreator.serverNotice(6, "Deo slowly appeared out of the sand dust."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(royalCatthusDesert, ServerNoticeType.LIGHT_BLUE, "Deo slowly appeared out of the sand dust.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -117,7 +118,7 @@ class EventAreaBossDeo {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

@@ -2,6 +2,8 @@ package quest
 
 import client.inventory.MaplePet
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Quest8185 {
    QuestActionManager qm
@@ -50,7 +52,7 @@ class Quest8185 {
                }
             }
             if (i == 3) {
-               qm.getPlayer().message("Pet could not be evolved.")
+               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "Pet could not be evolved.")
                qm.dispose()
                return
             }

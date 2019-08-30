@@ -28,6 +28,8 @@ import client.autoban.AutobanFactory;
 import net.AbstractMaplePacketHandler;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class GiveFameHandler extends AbstractMaplePacketHandler {
@@ -54,7 +56,7 @@ public final class GiveFameHandler extends AbstractMaplePacketHandler {
                player.hasGivenFame(target);
             }
          } else {
-            player.message("Could not process the request, since this character currently has the minimum/maximum level of fame.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not process the request, since this character currently has the minimum/maximum level of fame.");
          }
       } else {
          c.announce(MaplePacketCreator.giveFameErrorResponse(status == FameStatus.NOT_TODAY ? 3 : 4));

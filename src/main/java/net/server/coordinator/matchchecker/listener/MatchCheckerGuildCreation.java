@@ -31,6 +31,8 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Ronan
@@ -81,30 +83,30 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
             matchPlayers.remove(leader);
 
             if (leader.getGuildId() > 0) {
-               leader.dropMessage(1, "You cannot create a new Guild while in one.");
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You cannot create a new Guild while in one.");
                broadcastGuildCreationDismiss(matchPlayers);
                return;
             }
             int partyid = leader.getPartyId();
             if (partyid == -1 || !leader.isPartyLeader()) {
-               leader.dropMessage(1, "You cannot establish the creation of a new Guild without leading a party.");
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You cannot establish the creation of a new Guild without leading a party.");
                broadcastGuildCreationDismiss(matchPlayers);
                return;
             }
             if (leader.getMapId() != 200000301) {
-               leader.dropMessage(1, "You cannot establish the creation of a new Guild outside of the Guild Headquarters.");
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You cannot establish the creation of a new Guild outside of the Guild Headquarters.");
                broadcastGuildCreationDismiss(matchPlayers);
                return;
             }
             for (MapleCharacter chr : matchPlayers) {
                if (leader.getMap().getCharacterById(chr.getId()) == null) {
-                  leader.dropMessage(1, "You cannot establish the creation of a new Guild if one of the members is not present here.");
+                  MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You cannot establish the creation of a new Guild if one of the members is not present here.");
                   broadcastGuildCreationDismiss(matchPlayers);
                   return;
                }
             }
             if (leader.getMeso() < ServerConstants.CREATE_GUILD_COST) {
-               leader.dropMessage(1, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CREATE_GUILD_COST) + " mesos to create a Guild.");
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CREATE_GUILD_COST) + " mesos to create a Guild.");
                broadcastGuildCreationDismiss(matchPlayers);
                return;
             }
@@ -123,7 +125,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
             Server.getInstance().changeRank(gid, leader.getId(), 1);
 
             leader.announce(MaplePacketCreator.showGuildInfo(leader));
-            leader.dropMessage(1, "You have successfully created a Guild.");
+            MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You have successfully created a Guild.");
 
             for (MapleCharacter chr : matchPlayers) {
                boolean cofounder = chr.getPartyId() == partyid;
@@ -139,9 +141,9 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                   chr.announce(MaplePacketCreator.showGuildInfo(chr));
 
                   if (cofounder) {
-                     chr.dropMessage(1, "You have successfully cofounded a Guild.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have successfully cofounded a Guild.");
                   } else {
-                     chr.dropMessage(1, "You have successfully joined the new Guild.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have successfully joined the new Guild.");
                   }
                }
 
@@ -191,7 +193,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                }
 
                if (chr.isLoggedinWorld()) {
-                  chr.message(msg);
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, msg);
                   chr.announce(MaplePacketCreator.genericGuildMessage((byte) 0x26));
                }
             }

@@ -29,6 +29,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.life.MaplePlayerNPC;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class PlayerNpcCommand extends Command {
    {
@@ -47,7 +49,7 @@ public class PlayerNpcCommand extends Command {
 
       if (target.isPresent()) {
          if (!MaplePlayerNPC.spawnPlayerNPC(player.getMapId(), player.getPosition(), target.get())) {
-            player.dropMessage(5, "Could not deploy PlayerNPC. Either there's no room available here or depleted out scriptids to use.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not deploy PlayerNPC. Either there's no room available here or depleted out scriptids to use.");
          }
       }
    }

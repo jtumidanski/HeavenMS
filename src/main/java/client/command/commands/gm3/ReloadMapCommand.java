@@ -29,6 +29,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.maps.MapleMap;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ReloadMapCommand extends Command {
    {
@@ -47,7 +49,7 @@ public class ReloadMapCommand extends Command {
          chr.saveLocationOnWarp();
          chr.changeMap(newMap);
          if (chr.getId() != callerid)
-            chr.dropMessage("You have been relocated due to map reloading. Sorry for the inconvenience.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "You have been relocated due to map reloading. Sorry for the inconvenience.");
       }
       newMap.respawn();
    }

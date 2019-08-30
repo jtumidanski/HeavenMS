@@ -28,6 +28,8 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class GiveVpCommand extends Command {
    {
@@ -45,9 +47,9 @@ public class GiveVpCommand extends Command {
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
       if (victim.isPresent()) {
          victim.get().getClient().addVotePoints(Integer.parseInt(params[1]));
-         player.message("VP given.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "VP given.");
       } else {
-         player.message("Player '" + params[0] + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found.");
       }
    }
 }

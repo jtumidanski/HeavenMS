@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -50,7 +51,7 @@ class EventAreaBossNineTailedFox {
       int posY = 33
       posX = Math.floor((Math.random() * 1300) - 800).intValue()
       moonRidge.spawnMonsterOnGroundBelow(nineTailedFox, new Point(posX, posY))
-      moonRidge.broadcastMessage(MaplePacketCreator.serverNotice(6, "As the moon light dims, a long fox cry can be heard and the presence of the old fox can be felt"))
+      MessageBroadcaster.getInstance().sendMapServerNotice(moonRidge, ServerNoticeType.LIGHT_BLUE, "As the moon light dims, a long fox cry can be heard and the presence of the old fox can be felt")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -119,7 +120,7 @@ class EventAreaBossNineTailedFox {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

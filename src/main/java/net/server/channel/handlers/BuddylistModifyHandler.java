@@ -40,6 +40,8 @@ import net.AbstractMaplePacketHandler;
 import net.server.world.World;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
@@ -63,9 +65,9 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
          }
          BuddylistEntry ble = buddylist.get(addName);
          if (ble != null && !ble.isVisible() && group.equals(ble.getGroup())) {
-            c.announce(MaplePacketCreator.serverNotice(1, "You already have \"" + ble.getName() + "\" on your Buddylist"));
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You already have \"" + ble.getName() + "\" on your Buddylist");
          } else if (buddylist.isFull() && ble == null) {
-            c.announce(MaplePacketCreator.serverNotice(1, "Your buddylist is already full"));
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Your buddylist is already full");
          } else if (ble == null) {
             World world = c.getWorldServer();
             CharNameAndIdData charWithId;
@@ -95,7 +97,7 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
                   }
                }
                if (buddyAddResult == BuddyAddResult.BUDDYLIST_FULL) {
-                  c.announce(MaplePacketCreator.serverNotice(1, "\"" + addName + "\"'s Buddylist is full"));
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "\"" + addName + "\"'s Buddylist is full");
                } else {
                   int displayChannel;
                   displayChannel = -1;
@@ -110,7 +112,7 @@ public class BuddylistModifyHandler extends AbstractMaplePacketHandler {
                   c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
                }
             } else {
-               c.announce(MaplePacketCreator.serverNotice(1, "A character called \"" + addName + "\" does not exist"));
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
             }
          } else {
             ble.changeGroup(group);

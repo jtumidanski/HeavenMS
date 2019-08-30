@@ -32,6 +32,8 @@ import net.server.Server;
 import server.TimerManager;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 
 public class BanCommand extends Command {
@@ -69,10 +71,10 @@ public class BanCommand extends Command {
                rip.getClient().disconnect(false, false);
             }
          }, 5000); //5 Seconds
-         Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[RIP]: " + ign + " has been banned.");
       } else if (BanProcessor.getInstance().ban(ign, reason, false)) {
          c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
-         Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.serverNotice(6, "[RIP]: " + ign + " has been banned."));
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[RIP]: " + ign + " has been banned.");
       } else {
          c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
       }

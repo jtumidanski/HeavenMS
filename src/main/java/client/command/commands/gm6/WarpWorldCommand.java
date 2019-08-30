@@ -31,6 +31,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class WarpWorldCommand extends Command {
    {
@@ -59,11 +61,11 @@ public class WarpWorldCommand extends Command {
             c.announce(MaplePacketCreator.getChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
          } catch (UnknownHostException | NumberFormatException ex) {
             ex.printStackTrace();
-            player.message("Unexpected error when changing worlds, are you sure the world you are trying to warp to has the same amount of channels?");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Unexpected error when changing worlds, are you sure the world you are trying to warp to has the same amount of channels?");
          }
 
       } else {
-         player.message("Invalid world; highest number available: " + (server.getWorldsSize() - 1));
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Invalid world; highest number available: " + (server.getWorldsSize() - 1));
       }
    }
 }

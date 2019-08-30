@@ -2,6 +2,8 @@ package portal
 
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    EventInstanceManager eim = pi.getEventInstance()
@@ -14,14 +16,14 @@ static def enter(PortalPlayerInteraction pi) {
    //3 Yetis
    if (questProgress == 3 && !pi.hasItem(4032388)) {
       if (pi.canHold(4032388)) {
-         pi.getPlayer().message("You have aquired a key to the Wedding Hall. King Pepe must have dropped it.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You have acquired a key to the Wedding Hall. King Pepe must have dropped it.")
          pi.gainItem(4032388, (short) 1)
 
          pi.playPortalSound()
          pi.warp(106021400, 2)
          return true
       } else {
-         pi.getPlayer().message("Please make room in your ETC inventory.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please make room in your ETC inventory.")
          return false
       }
    } else {

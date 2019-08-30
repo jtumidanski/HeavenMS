@@ -31,6 +31,8 @@ import net.server.Server;
 import server.TimerManager;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Ronan - credits to Eric for showing the New Year opcodes and handler layout
@@ -108,25 +110,25 @@ public class NewYearCardRecord {
    }
 
    public static void printNewYearRecords(MapleCharacter chr) {
-      chr.dropMessage(5, "New Years: " + chr.getNewYearRecords().size());
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "New Years: " + chr.getNewYearRecords().size());
 
       for (NewYearCardRecord nyc : chr.getNewYearRecords()) {
-         chr.dropMessage(5, "-------------------------------");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "-------------------------------");
 
-         chr.dropMessage(5, "Id: " + nyc.id);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Id: " + nyc.id);
 
-         chr.dropMessage(5, "Sender id: " + nyc.senderId);
-         chr.dropMessage(5, "Sender name: " + nyc.senderName);
-         chr.dropMessage(5, "Sender discard: " + nyc.senderDiscardCard);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Sender id: " + nyc.senderId);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Sender name: " + nyc.senderName);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Sender discard: " + nyc.senderDiscardCard);
 
-         chr.dropMessage(5, "Receiver id: " + nyc.receiverId);
-         chr.dropMessage(5, "Receiver name: " + nyc.receiverName);
-         chr.dropMessage(5, "Receiver discard: " + nyc.receiverDiscardCard);
-         chr.dropMessage(5, "Received: " + nyc.receiverReceivedCard);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Receiver id: " + nyc.receiverId);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Receiver name: " + nyc.receiverName);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Receiver discard: " + nyc.receiverDiscardCard);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Received: " + nyc.receiverReceivedCard);
 
-         chr.dropMessage(5, "Message: " + nyc.stringContent);
-         chr.dropMessage(5, "Date sent: " + nyc.dateSent);
-         chr.dropMessage(5, "Date recv: " + nyc.dateReceived);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Message: " + nyc.stringContent);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Date sent: " + nyc.dateSent);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Date recv: " + nyc.dateReceived);
       }
    }
 
@@ -153,7 +155,7 @@ public class NewYearCardRecord {
                chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getReceiverId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(other -> {
                   other.removeNewYearRecord(nyc);
                   other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
-                  other.dropMessage(6, "[New Year] " + chr.getName() + " threw away the New Year card.");
+                  MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
                });
             }
          } else {
@@ -171,7 +173,7 @@ public class NewYearCardRecord {
                      .ifPresent(other -> {
                         other.removeNewYearRecord(nyc);
                         other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
-                        other.dropMessage(6, "[New Year] " + chr.getName() + " threw away the New Year card.");
+                        MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
                      });
             }
          }

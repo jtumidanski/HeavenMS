@@ -26,6 +26,8 @@ package client.command.commands.gm6;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class GetAccCommand extends Command {
    {
@@ -40,7 +42,7 @@ public class GetAccCommand extends Command {
          return;
       }
       c.getWorldServer().getPlayerStorage().getCharacterByName(params[0])
-            .ifPresentOrElse(victim -> player.message(victim.getName() + "'s account name is " + victim.getClient().getAccountName() + "."),
-                  () -> player.message("Player '" + params[0] + "' could not be found on this world."));
+            .ifPresentOrElse(victim -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + "'s account name is " + victim.getClient().getAccountName() + "."),
+                  () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world."));
    }
 }

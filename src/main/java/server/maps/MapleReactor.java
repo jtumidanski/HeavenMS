@@ -34,7 +34,9 @@ import scripting.reactor.ReactorScriptManager;
 import server.TimerManager;
 import server.partyquest.GuardianSpawnPoint;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author Lerk
@@ -253,7 +255,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                attackHit = wHit;
 
                if (ServerConstants.USE_DEBUG) {
-                  c.getPlayer().dropMessage(5, "Hitted REACTOR " + this.getId() + " with POS " + charPos + " , STANCE " + stance + " , SkillID " + skillid + " , STATE " + stats.getType(state) + " STATESIZE " + stats.getStateSize(state));
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Hitted REACTOR " + this.getId() + " with POS " + charPos + " , STANCE " + stance + " , SkillID " + skillid + " , STATE " + stats.getType(state) + " STATESIZE " + stats.getStateSize(state));
                }
                ReactorScriptManager.getInstance().onHit(c, this);
 

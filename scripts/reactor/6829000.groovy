@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor6829000 {
    ReactorActionManager rm
 
    def act() {
-      rm.playerMessage(5, "Enjoy Halloween!")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Enjoy Halloween!")
       rm.spawnMonster(9400202, 10)
    }
 

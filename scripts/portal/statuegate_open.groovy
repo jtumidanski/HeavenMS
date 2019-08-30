@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMap().getReactorByName("statuegate").getState() == (byte) 1) {
@@ -9,7 +11,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(990000301, 0)
       return true
    } else {
-      pi.getPlayer().dropMessage(5, "The gate is closed.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The gate is closed.")
       return false
    }
 }

@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getLevel() <= 30) {
@@ -9,7 +11,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(990000640, 1)
       return true
    } else {
-      pi.getPlayer().dropMessage(5, "You cannot proceed past this point.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You cannot proceed past this point.")
       return false
    }
 }

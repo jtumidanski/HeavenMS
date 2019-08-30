@@ -1255,25 +1255,6 @@ public class MaplePacketCreator {
       return serverMessage(type, (byte) 0, message, false, false, 0);
    }
 
-   /**
-    * Gets a server notice packet.
-    * <p>
-    * Possible values for <code>type</code>:<br> 0: [Notice]<br> 1: Popup<br>
-    * 2: Megaphone<br> 3: Super Megaphone<br> 4: Scrolling message at top<br>
-    * 5: Pink Text<br> 6: Lightblue Text
-    *
-    * @param type    The type of the notice.
-    * @param message The message to convey.
-    * @return The server notice packet.
-    */
-   public static byte[] serverNotice(int type, String message, int npc) {
-      return serverMessage(type, 0, message, false, false, npc);
-   }
-
-   public static byte[] serverNotice(int type, int channel, String message) {
-      return serverMessage(type, channel, message, false, false, 0);
-   }
-
    public static byte[] serverNotice(int type, int channel, String message, boolean smegaEar) {
       return serverMessage(type, channel, message, false, smegaEar, 0);
    }

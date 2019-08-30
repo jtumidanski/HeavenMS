@@ -10,6 +10,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -52,7 +54,7 @@ class EventAreaBossSnackBar {
       int[] rndPos = setPos[Math.floor(Math.random() * setPos.length).intValue()]
 
       snackBarMap.spawnMonsterOnGroundBelow(snackBar, new Point(rndPos[0], rndPos[1]))
-      snackBarMap.broadcastMessage(MaplePacketCreator.serverNotice(6, "Slowly, a suspicious food stand opens up on a strangely remote place."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(snackBarMap, ServerNoticeType.LIGHT_BLUE, "Slowly, a suspicious food stand opens up on a strangely remote place.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -121,7 +123,7 @@ class EventAreaBossSnackBar {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

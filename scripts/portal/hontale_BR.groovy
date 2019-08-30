@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMapId() == 240060000) {
@@ -9,7 +11,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(240060100, 0)
          return true
       } else {
-         pi.getPlayer().dropMessage(6, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
          return false
       }
    } else if (pi.getPlayer().getMapId() == 240060100) {
@@ -17,7 +19,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(240060200, 0)
          return true
       } else {
-         pi.getPlayer().dropMessage(6, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
          return false
       }
    }

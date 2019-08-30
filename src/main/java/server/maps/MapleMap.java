@@ -97,9 +97,11 @@ import server.processor.maps.MapleMapObjectTypeProcessor;
 import server.processor.maps.MapleMapProcessor;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 
 public class MapleMap {
 
@@ -1233,19 +1235,19 @@ public class MapleMap {
    }
 
    public void broadcastBalrogVictory(String leaderName) {
-      getWorldServer().dropMessage(6, "[Victory] " + leaderName + "'s party has successfully defeated the Balrog! Praise to them, they finished with " + countAlivePlayers() + " players alive.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] " + leaderName + "'s party has successfully defeated the Balrog! Praise to them, they finished with " + countAlivePlayers() + " players alive.");
    }
 
    public void broadcastHorntailVictory() {
-      getWorldServer().dropMessage(6, "[Victory] To the crew that have finally conquered Horned Tail after numerous attempts, I salute thee! You are the true heroes of Leafre!!");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] To the crew that have finally conquered Horned Tail after numerous attempts, I salute thee! You are the true heroes of Leafre!!");
    }
 
    public void broadcastZakumVictory() {
-      getWorldServer().dropMessage(6, "[Victory] At last, the tree of evil that for so long overwhelmed Ossyria has fallen. To the crew that managed to finally conquer Zakum, after numerous attempts, victory! You are the true heroes of Ossyria!!");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] At last, the tree of evil that for so long overwhelmed Ossyria has fallen. To the crew that managed to finally conquer Zakum, after numerous attempts, victory! You are the true heroes of Ossyria!!");
    }
 
    public void broadcastPinkBeanVictory(int channel) {
-      getWorldServer().dropMessage(6, "[Victory] In a swift stroke of sorts, the crew that has attempted Pink Bean at channel " + channel + " has ultimately defeated it. The Temple of Time shines radiantly once again, the day finally coming back, as the crew that managed to finally conquer it returns victoriously from the battlefield!!");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] In a swift stroke of sorts, the crew that has attempted Pink Bean at channel " + channel + " has ultimately defeated it. The Temple of Time shines radiantly once again, the day finally coming back, as the crew that managed to finally conquer it returns victoriously from the battlefield!!");
    }
 
    private boolean removeKilledMonsterObject(MapleMonster monster) {
@@ -2629,10 +2631,12 @@ public class MapleMap {
       }
    }
 
+   @Deprecated
    public void broadcastMessage(final byte[] packet) {
       broadcastMessage(null, packet, Double.POSITIVE_INFINITY, null);
    }
 
+   @Deprecated
    public void broadcastGMMessage(final byte[] packet) {
       broadcastGMMessage(null, packet, Double.POSITIVE_INFINITY, null);
    }
@@ -2794,14 +2798,6 @@ public class MapleMap {
       } finally {
          chrRLock.unlock();
       }
-   }
-
-   public void dropMessage(int type, String message) {
-      broadcastStringMessage(type, message);
-   }
-
-   public void broadcastStringMessage(int type, String message) {
-      broadcastMessage(MaplePacketCreator.serverNotice(type, message));
    }
 
    private void sendObjectPlacement(MapleClient mapleClient) {
@@ -2985,10 +2981,10 @@ public class MapleMap {
    }
 
    public void reportMonsterSpawnPoints(MapleCharacter chr) {
-      chr.dropMessage(6, "Mob spawnpoints on map " + getId() + ", with available Mob SPs " + monsterSpawn.size() + ", used " + spawnedMonstersOnMap.get() + ":");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, "Mob spawnpoints on map " + getId() + ", with available Mob SPs " + monsterSpawn.size() + ", used " + spawnedMonstersOnMap.get() + ":");
       getAllMonsterSpawn().stream()
             .map(this::getSpawnPointMessage)
-            .forEach(message -> chr.dropMessage(6, message));
+            .forEach(message -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, message));
    }
 
    public Map<Integer, MapleCharacter> getMapPlayers() {
@@ -3827,7 +3823,7 @@ public class MapleMap {
       long timeNow = Server.getInstance().getCurrentTime();
       if (timeNow - mapOwnerLastActivityTime > 60000) {
          if (unclaimOwnership(mapOwner)) {
-            this.dropMessage(5, "This lawn is now free real estate.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
          }
       }
    }

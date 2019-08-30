@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import constants.ServerConstants;
 import server.maps.MapleMap;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MapOwnerClaimCommand extends Command {
    {
@@ -47,21 +49,21 @@ public class MapOwnerClaimCommand extends Command {
                      ownedMap.unclaimOwnership(chr);
 
                      if (chr.getMap() == ownedMap) {
-                        chr.dropMessage(5, "This lawn is now free real estate.");
+                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
                         return;
                      }
                   }
 
                   if (chr.getMap().claimOwnership(chr)) {
-                     chr.dropMessage(5, "You have leased this lawn for a while, until you leave here or after 1 minute of inactivity.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You have leased this lawn for a while, until you leave here or after 1 minute of inactivity.");
                   } else {
-                     chr.dropMessage(5, "This lawn has already been leased by a player.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn has already been leased by a player.");
                   }
                } else {
-                  chr.dropMessage(5, "This lawn cannot be leased.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn cannot be leased.");
                }
             } else {
-               chr.dropMessage(5, "Feature unavailable.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Feature unavailable.");
             }
          } finally {
             c.releaseClient();

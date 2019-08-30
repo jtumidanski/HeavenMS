@@ -3,6 +3,8 @@ package npc
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.maps.MapleReactor
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -44,7 +46,7 @@ class NPC2112005 {
                   eim.setIntProperty("npcShocked", 1)
 
                   cm.sendNext("Oh? You got a letter for me? On times like this, what should it be... Gasp! Something big is going on, guys. Rally yourselves, from now on things will be harder than ever!")
-                  eim.dropMessage(6, "Juliet seemed very much in shock after reading Romeo's Letter.")
+                  MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "Juliet seemed very much in shock after reading Romeo's Letter.")
 
                   cm.dispose()
                } else if (eim.getIntProperty("statusStg4") == 1) {

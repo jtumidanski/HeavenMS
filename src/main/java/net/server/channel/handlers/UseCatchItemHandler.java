@@ -32,6 +32,8 @@ import net.server.Server;
 import server.MapleItemInformationProvider;
 import server.life.MapleMonster;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -95,7 +97,7 @@ public final class UseCatchItemHandler extends AbstractMaplePacketHandler {
                            chr.getMap().broadcastMessage(MaplePacketCreator.catchMonster(monsterid, itemId, (byte) 0));
                         }
                      } else {
-                        chr.dropMessage(5, "Make a ETC slot available before using this item.");
+                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Make a ETC slot available before using this item.");
                      }
 
                      abm.spam(10);
@@ -180,7 +182,7 @@ public final class UseCatchItemHandler extends AbstractMaplePacketHandler {
                   MapleInventoryManipulator.removeById(c, MapleInventoryType.USE, itemId, 1, true, true);
                   MapleInventoryManipulator.addById(c, 2022323, (short) 1, "", -1);
                } else {
-                  chr.message("You cannot use the Fishing Net yet.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot use the Fishing Net yet.");
                }
                c.announce(MaplePacketCreator.enableActions());
             }
@@ -208,7 +210,7 @@ public final class UseCatchItemHandler extends AbstractMaplePacketHandler {
                         c.announce(MaplePacketCreator.catchMessage(0));
                      }
                   } else {
-                     chr.message("You cannot use the Fishing Net yet.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot use the Fishing Net yet.");
                   }
                }
             }

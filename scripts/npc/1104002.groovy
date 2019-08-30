@@ -3,6 +3,8 @@ package npc
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -30,7 +32,7 @@ class NPC1104002 {
          MapleMap mapobj = cm.getMap()
 
          if (mode == 0 && type > 0) {
-            cm.getPlayer().dropMessage(5, "Eleanor: Oh, lost the Empress and still challenging us? Now you've done it! Prepare yourself!!!")
+            MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Eleanor: Oh, lost the Empress and still challenging us? Now you've done it! Prepare yourself!!!")
 
             mapobj.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9001010), new Point(850, 0))
             mapobj.destroyNPC(1104002)

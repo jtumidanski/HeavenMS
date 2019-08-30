@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2200002 {
    ReactorActionManager rm
 
    def act() {
-      rm.mapMessage(5, "An unknown force has warped you into a trap.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "An unknown force has warped you into a trap.")
       rm.warpMap(922010201)
    }
 

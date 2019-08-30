@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2200000 {
    ReactorActionManager rm
 
    def act() {
-      rm.playerMessage(5, "Gotcha! Try again next time!")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Gotcha! Try again next time!")
       rm.warp(221023200)
    }
 

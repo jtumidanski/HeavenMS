@@ -7,6 +7,8 @@ import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -139,7 +141,7 @@ class NPC9105004 {
             MapleMonster snowman = MapleLifeFactory.getMonster(9400317 + (5 * difficulty))
             mapobj.spawnMonsterOnGroundBelow(snowman, new Point(-180, 15))
             eim.setIntProperty("snowmanLevel", 1)
-            eim.dropMessage(5, "The snowman appeared on the field! Protect it using all means necessary!")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The snowman appeared on the field! Protect it using all means necessary!")
 
             eim.setIntProperty("statusStg1", 0)
             cm.dispose()
@@ -150,7 +152,7 @@ class NPC9105004 {
                return
             }
 
-            mapobj.broadcastStringMessage(5, "As the snowman grows to it's prime, the Scrooge appears!")
+            MessageBroadcaster.getInstance().sendMapServerNotice(mapobj, ServerNoticeType.PINK_TEXT, "As the snowman grows to it's prime, the Scrooge appears!")
             eim.getEm().getIv().invokeFunction("snowmanHeal", eim)
 
             MapleMonster boss = MapleLifeFactory.getMonster(9400318 + difficulty)

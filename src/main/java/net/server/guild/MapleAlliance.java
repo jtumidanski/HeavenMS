@@ -31,6 +31,8 @@ import client.database.administrator.AllianceGuildAdministrator;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author XoticStory
@@ -157,19 +159,6 @@ public class MapleAlliance {
                .map(guild -> guild.get().getMGC(guild.get().getLeaderId()))
                .filter(character -> character.getAllianceRank() == 1)
                .findFirst().orElseThrow();
-      }
-   }
-
-   public void dropMessage(String message) {
-      dropMessage(5, message);
-   }
-
-   public void dropMessage(int type, String message) {
-      synchronized (guilds) {
-         guilds.stream()
-               .map(guildId -> Server.getInstance().getGuild(guildId))
-               .filter(Optional::isPresent)
-               .forEach(guild -> guild.get().dropMessage(type, message));
       }
    }
 

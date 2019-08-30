@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -49,7 +50,7 @@ class EventAreaBossEliza1 {
       }
 
       stairwayToTheSky2.spawnMonsterOnGroundBelow(eliza, new Point(208, 83))
-      stairwayToTheSky2.broadcastMessage(MaplePacketCreator.serverNotice(6, "Eliza has appeared with a black whirlwind."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(stairwayToTheSky2, ServerNoticeType.LIGHT_BLUE, "Eliza has appeared with a black whirlwind.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -118,7 +119,7 @@ class EventAreaBossEliza1 {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

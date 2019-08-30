@@ -41,6 +41,8 @@ import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class SpecialMoveHandler extends AbstractMaplePacketHandler {
@@ -72,9 +74,11 @@ public final class SpecialMoveHandler extends AbstractMaplePacketHandler {
          skillLevel = 1;
          chr.setDojoEnergy(0);
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
-         c.announce(MaplePacketCreator.serverNotice(5, "As you used the secret skill, your energy bar has been reset."));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
       }
-      if (skillLevel == 0 || skillLevel != __skillLevel) return;
+      if (skillLevel == 0 || skillLevel != __skillLevel) {
+         return;
+      }
 
       MapleStatEffect effect = skill.getEffect(skillLevel);
       if (effect.getCooldown() > 0) {
@@ -143,7 +147,7 @@ public final class SpecialMoveHandler extends AbstractMaplePacketHandler {
                      chr.cancelMagicDoor();
                      skill.getEffect(skillLevel).applyTo(chr, pos);
                   } else {
-                     chr.message("Please wait 5 seconds before casting Mystic Door again.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Please wait 5 seconds before casting Mystic Door again.");
                   }
                } finally {
                   c.releaseClient();

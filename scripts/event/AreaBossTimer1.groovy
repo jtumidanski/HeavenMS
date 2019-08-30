@@ -9,7 +9,8 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -52,7 +53,7 @@ class EventAreaBossTimer1 {
       int posY = 1030
       posX = Math.floor((Math.random() * 770) - 770).intValue()
       whirlpoolOfTime.spawnMonsterOnGroundBelow(timer1, new Point(posX, posY))
-      whirlpoolOfTime.broadcastMessage(MaplePacketCreator.serverNotice(6, "Tick-Tock Tick-Tock! Timer makes it's presence known."))
+      MessageBroadcaster.getInstance().sendMapServerNotice(whirlpoolOfTime, ServerNoticeType.LIGHT_BLUE,"Tick-Tock Tick-Tock! Timer makes it's presence known.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 
@@ -121,7 +122,7 @@ class EventAreaBossTimer1 {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

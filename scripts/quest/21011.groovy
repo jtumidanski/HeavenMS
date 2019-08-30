@@ -2,6 +2,8 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Quest21011 {
    QuestActionManager qm
@@ -59,14 +61,14 @@ class Quest21011 {
          qm.sendYesNo("This isn't good enough to replace your weapon, but #bcarry this sword with you for now#k. It's my gift to you. A hero can't be walking around empty-handed.\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v1302000# 1 #t1302000#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 35 exp")
       } else if (status == 5) {
          if (qm.isQuestCompleted(21011)) {
-            qm.getPlayer().dropMessage(1, "Unknown Error")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Unknown Error")
          } else if (qm.canHold(1302000)) {
             qm.gainItem(1302000, (short) 1)
             qm.gainExp(35)
             qm.forceCompleteQuest()
             qm.sendNext("#b(Your skills are nowhere close to being hero-like... But a sword? Have you ever even held a sword in your lifetime? You can't remember... How do you even equip it?)", (byte) 3)
          } else {
-            qm.getPlayer().dropMessage(1, "Your inventory is full")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full")
          }
       } else if (status == 6) {
          qm.guideHint(16)

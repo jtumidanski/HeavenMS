@@ -26,6 +26,8 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MuteMapCommand extends Command {
    {
@@ -37,10 +39,10 @@ public class MuteMapCommand extends Command {
       MapleCharacter player = c.getPlayer();
       if (player.getMap().isMuted()) {
          player.getMap().setMuted(false);
-         player.dropMessage(5, "The map you are in has been un-muted.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The map you are in has been un-muted.");
       } else {
          player.getMap().setMuted(true);
-         player.dropMessage(5, "The map you are in has been muted.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The map you are in has been muted.");
       }
    }
 }

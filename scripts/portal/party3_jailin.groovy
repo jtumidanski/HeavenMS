@@ -4,6 +4,8 @@ package portal
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 boolean leverSequenceExit = false
 
@@ -41,7 +43,7 @@ def enterLeverSequence(PortalPlayerInteraction pi) {
          map.broadcastMessage(MaplePacketCreator.showEffect("quest/party/wrong_kor"))
          map.broadcastMessage(MaplePacketCreator.playSound("Party1/Failed"))
 
-         pi.playerMessage(5, "The right combination of levers is needed to pass. " + countMiss + " lever(s) are misplaced.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The right combination of levers is needed to pass. " + countMiss + " lever(s) are misplaced.")
          return false
       }
 
@@ -59,7 +61,7 @@ def enterNoMobs(PortalPlayerInteraction pi) {
    int mobcount = map.countMonster(9300044)
 
    if (mobcount > 0) {
-      pi.playerMessage(5, "Please use the levers to defeat all the threats before you proceed.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please use the levers to defeat all the threats before you proceed.")
       return false
    } else {
 

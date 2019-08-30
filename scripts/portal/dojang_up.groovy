@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMap().getMonsterById(9300216) != null) {
@@ -13,7 +15,7 @@ static def enter(PortalPlayerInteraction pi) {
          pi.getPlayer().setVanquisherKills(pi.getPlayer().getVanquisherKills() + 1)
       }
    } else {
-      pi.getPlayer().message("There are still some monsters remaining.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "There are still some monsters remaining.")
    }
    pi.enableActions()
    return true

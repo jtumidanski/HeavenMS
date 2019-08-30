@@ -2,6 +2,8 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class QuestmedalQuest {
    QuestActionManager qm
@@ -12,7 +14,7 @@ class QuestmedalQuest {
       qm.forceCompleteQuest()
 
       String medalname = qm.getMedalName()
-      qm.message("<" + medalname + "> is not coded.")
+      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalname + "> is not coded.")
       qm.earnTitle("<" + medalname + "> has been awarded.")
       qm.dispose()
    }
@@ -21,7 +23,7 @@ class QuestmedalQuest {
       qm.forceCompleteQuest()
 
       String medalname = qm.getMedalName()
-      qm.message("<" + medalname + "> is not coded.")
+      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalname + "> is not coded.")
       qm.earnTitle("<" + medalname + "> has been awarded.")
       qm.dispose()
    }

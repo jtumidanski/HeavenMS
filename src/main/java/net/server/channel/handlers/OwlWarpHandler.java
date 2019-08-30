@@ -25,6 +25,8 @@ import net.AbstractMaplePacketHandler;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /*
@@ -38,7 +40,7 @@ public final class OwlWarpHandler extends AbstractMaplePacketHandler {
       int mapid = slea.readInt();
 
       if (ownerid == c.getPlayer().getId()) {
-         c.announce(MaplePacketCreator.serverNotice(1, "You cannot visit your own shop."));
+         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You cannot visit your own shop.");
          return;
       }
 
@@ -47,8 +49,11 @@ public final class OwlWarpHandler extends AbstractMaplePacketHandler {
       if (hm == null || hm.getMapId() != mapid || !hm.hasItem(c.getPlayer().getOwlSearch())) {
          ps = c.getWorldServer().getPlayerShop(ownerid);
          if (ps == null || ps.getMapId() != mapid || !ps.hasItem(c.getPlayer().getOwlSearch())) {
-            if (hm == null && ps == null) c.announce(MaplePacketCreator.getOwlMessage(1));
-            else c.announce(MaplePacketCreator.getOwlMessage(3));
+            if (hm == null && ps == null) {
+               c.announce(MaplePacketCreator.getOwlMessage(1));
+            } else {
+               c.announce(MaplePacketCreator.getOwlMessage(3));
+            }
             return;
          }
 
@@ -59,18 +64,21 @@ public final class OwlWarpHandler extends AbstractMaplePacketHandler {
 
                   if (ps.isOpen()) {   //change map has a delay, must double check
                      if (!ps.visitShop(c.getPlayer())) {
-                        if (!ps.isBanned(c.getPlayer().getName())) c.announce(MaplePacketCreator.getOwlMessage(2));
-                        else c.announce(MaplePacketCreator.getOwlMessage(17));
+                        if (!ps.isBanned(c.getPlayer().getName())) {
+                           c.announce(MaplePacketCreator.getOwlMessage(2));
+                        } else {
+                           c.announce(MaplePacketCreator.getOwlMessage(17));
+                        }
                      }
                   } else {
                      //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
                      c.announce(MaplePacketCreator.getOwlMessage(18));
                   }
                } else {
-                  c.announce(MaplePacketCreator.serverNotice(1, "That shop is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'."));
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "That shop is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
                }
             } else {
-               c.announce(MaplePacketCreator.serverNotice(1, "That shop is currently located outside of the FM area. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'."));
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "That shop is currently located outside of the FM area. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
             }
          } else {
             //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
@@ -95,10 +103,10 @@ public final class OwlWarpHandler extends AbstractMaplePacketHandler {
                      c.announce(MaplePacketCreator.getOwlMessage(18));
                   }
                } else {
-                  c.announce(MaplePacketCreator.serverNotice(1, "That merchant is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'."));
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "That merchant is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
                }
             } else {
-               c.announce(MaplePacketCreator.serverNotice(1, "That merchant is currently located outside of the FM area. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'."));
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "That merchant is currently located outside of the FM area. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
             }
          } else {
             //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));

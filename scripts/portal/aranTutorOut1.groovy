@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(21000)) {
@@ -14,7 +16,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(914000200, 1)
       return true
    } else {
-      pi.message("You can only exit after you accept the quest from Athena Pierce, who is to your right.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You can only exit after you accept the quest from Athena Pierce, who is to your right.")
       return false
    }
 }

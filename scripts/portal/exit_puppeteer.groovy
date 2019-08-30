@@ -2,10 +2,12 @@ package portal
 
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.getMap().countMonster(9300285) > 0) {
-      pi.getPlayer().message("Defeat the Puppeteer before leaving.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Defeat the Puppeteer before leaving.")
       return false
    } else {
       EventInstanceManager eim = pi.getEventInstance()

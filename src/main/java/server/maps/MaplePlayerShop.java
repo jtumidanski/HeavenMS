@@ -42,7 +42,9 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleTrade;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
 /**
@@ -186,14 +188,19 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                   visitor.setSlot(-1);    //absolutely cant remove player slot for late players without dc'ing them... heh
 
                   for (int j = i; j < 2; j++) {
-                     if (visitors[j] != null) owner.announce(MaplePacketCreator.getPlayerShopRemoveVisitor(j + 1));
+                     if (visitors[j] != null) {
+                        owner.announce(MaplePacketCreator.getPlayerShopRemoveVisitor(j + 1));
+                     }
                      visitors[j] = visitors[j + 1];
-                     if (visitors[j] != null) visitors[j].setSlot(j);
+                     if (visitors[j] != null) {
+                        visitors[j].setSlot(j);
+                     }
                   }
                   visitors[2] = null;
                   for (int j = i; j < 2; j++) {
-                     if (visitors[j] != null)
+                     if (visitors[j] != null) {
                         owner.announce(MaplePacketCreator.getPlayerShopNewVisitor(visitors[j], j + 1));
+                     }
                   }
 
                   this.broadcastRestoreToVisitors();
@@ -220,7 +227,9 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    public boolean addItem(MaplePlayerShopItem item) {
       synchronized (items) {
-         if (items.size() >= 16) return false;
+         if (items.size() >= 16) {
+            return false;
+         }
 
          items.add(item);
          return true;
@@ -240,7 +249,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                iitem.setQuantity((short) (shopItem.getItem().getQuantity() * shopItem.getBundles()));
 
                if (!MapleInventory.checkSpot(chr, iitem)) {
-                  chr.announce(MaplePacketCreator.serverNotice(1, "Have a slot available on your inventory to claim back the item."));
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
                   chr.announce(MaplePacketCreator.enableActions());
                   return;
                }
@@ -285,7 +294,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                if (c.getPlayer().getMeso() >= price) {
                   if (canBuy(c, newItem)) {
                      if (!owner.canHoldMeso(price)) {
-                        owner.dropMessage(1, "Transaction failed since the shop owner can't hold any more mesos.");
+                        MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, "Transaction failed since the shop owner can't hold any more mesos.");
                         c.announce(MaplePacketCreator.enableActions());
                         return false;
                      }
@@ -308,16 +317,16 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                            owner.setPlayerShop(null);
                            this.setOpen(false);
                            this.closeShop();
-                           owner.dropMessage(1, "Your items are sold out, and therefore your shop is closed.");
+                           MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, "Your items are sold out, and therefore your shop is closed.");
                         }
                      }
                   } else {
-                     c.getPlayer().dropMessage(1, "Your inventory is full. Please clear a slot before buying this item.");
+                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please clear a slot before buying this item.");
                      c.announce(MaplePacketCreator.enableActions());
                      return false;
                   }
                } else {
-                  c.getPlayer().dropMessage(1, "You don't have enough mesos to purchase this item.");
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos to purchase this item.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
@@ -419,7 +428,9 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
       synchronized (chatLog) {
          chatLog.add(new Pair<>(c.getPlayer(), chat));
-         if (chatLog.size() > 25) chatLog.remove(0);
+         if (chatLog.size() > 25) {
+            chatLog.remove(0);
+         }
          chatSlot.put(c.getPlayer().getId(), s);
       }
 
@@ -528,14 +539,14 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    public synchronized boolean visitShop(MapleCharacter chr) {
       if (this.isBanned(chr.getName())) {
-         chr.dropMessage(1, "You have been banned from this store.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have been banned from this store.");
          return false;
       }
 
       visitorLock.lock();
       try {
          if (!open.get()) {
-            chr.dropMessage(1, "This store is not yet open.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "This store is not yet open.");
             return false;
          }
 

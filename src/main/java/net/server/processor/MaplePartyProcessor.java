@@ -15,6 +15,8 @@ import scripting.event.EventInstanceManager;
 import server.maps.MapleMap;
 import server.partyquest.MonsterCarnival;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class MaplePartyProcessor {
    private static MaplePartyProcessor ourInstance = new MaplePartyProcessor();
@@ -33,7 +35,7 @@ public class MaplePartyProcessor {
             player.announce(MaplePacketCreator.partyStatusMessage(10));
             return false;
          } else if (player.getAriantColiseum() != null) {
-            player.dropMessage(5, "You cannot request a party creation while participating the Ariant Battle Arena.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You cannot request a party creation while participating the Ariant Battle Arena.");
             return false;
          }
 
@@ -84,11 +86,11 @@ public class MaplePartyProcessor {
                }
             }
          } else {
-            player.announce(MaplePacketCreator.serverNotice(5, "You couldn't join the party since it had already been disbanded."));
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You couldn't join the party since it had already been disbanded.");
          }
       } else {
          if (!silentCheck) {
-            player.announce(MaplePacketCreator.serverNotice(5, "You can't join the party as you are already in one."));
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You can't join the party as you are already in one.");
          }
       }
 

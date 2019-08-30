@@ -36,7 +36,9 @@ import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.partyquest.MonsterCarnival;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 
@@ -89,7 +91,7 @@ public final class MonsterCarnivalHandler extends AbstractMaplePacketHandler {
                } else if (tab == 1) { //debuffs
                   final List<Integer> skillid = c.getPlayer().getMap().getSkillIds();
                   if (num >= skillid.size()) {
-                     c.getPlayer().dropMessage(5, "An unexpected error has occurred.");
+                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "An unexpected error has occurred.");
                      c.announce(MaplePacketCreator.enableActions());
                      return;
                   }

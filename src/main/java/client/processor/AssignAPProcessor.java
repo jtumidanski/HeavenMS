@@ -45,7 +45,9 @@ import constants.skills.Magician;
 import constants.skills.Warrior;
 import server.ThreadManager;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -55,7 +57,9 @@ public class AssignAPProcessor {
 
    public static void APAutoAssignAction(SeekableLittleEndianAccessor slea, MapleClient c) {
       MapleCharacter chr = c.getPlayer();
-      if (chr.getRemainingAp() < 1) return;
+      if (chr.getRemainingAp() < 1) {
+         return;
+      }
 
       Collection<Item> equippedC = chr.getInventory(MapleInventoryType.EQUIPPED).list();
 
@@ -85,13 +89,19 @@ public class AssignAPProcessor {
 
             for (Item item : equippedC) {   //selecting the biggest AP value of each stat from each equipped item.
                nEquip = (Equip) item;
-               if (nEquip.getStr() > 0) eqpStrList.add(nEquip.getStr());
+               if (nEquip.getStr() > 0) {
+                  eqpStrList.add(nEquip.getStr());
+               }
                str += nEquip.getStr();
 
-               if (nEquip.getDex() > 0) eqpDexList.add(nEquip.getDex());
+               if (nEquip.getDex() > 0) {
+                  eqpDexList.add(nEquip.getDex());
+               }
                dex += nEquip.getDex();
 
-               if (nEquip.getLuk() > 0) eqpLukList.add(nEquip.getLuk());
+               if (nEquip.getLuk() > 0) {
+                  eqpLukList.add(nEquip.getLuk());
+               }
                luk += nEquip.getLuk();
 
                //if(nEquip.getInt() > 0) eqpIntList.add(nEquip.getInt()); //not needed...
@@ -118,18 +128,25 @@ public class AssignAPProcessor {
 
             MapleJob stance = c.getPlayer().getJobStyle(opt);
             int prStat = 0, scStat = 0, trStat = 0, temp, tempAp = remainingAp, CAP;
-            if (tempAp < 1) return;
+            if (tempAp < 1) {
+               return;
+            }
 
             MapleStat primary, secondary, tertiary = MapleStat.LUK;
             switch (stance) {
                case MAGICIAN:
                   CAP = 165;
                   scStat = (chr.getLevel() + 3) - (chr.getLuk() + luk - eqpLuk);
-                  if (scStat < 0) scStat = 0;
+                  if (scStat < 0) {
+                     scStat = 0;
+                  }
                   scStat = Math.min(scStat, tempAp);
 
-                  if (tempAp > scStat) tempAp -= scStat;
-                  else tempAp = 0;
+                  if (tempAp > scStat) {
+                     tempAp -= scStat;
+                  } else {
+                     tempAp = 0;
+                  }
 
                   prStat = tempAp;
                   int_ = prStat;
@@ -152,11 +169,16 @@ public class AssignAPProcessor {
                case BOWMAN:
                   CAP = 125;
                   scStat = (chr.getLevel() + 5) - (chr.getStr() + str - eqpStr);
-                  if (scStat < 0) scStat = 0;
+                  if (scStat < 0) {
+                     scStat = 0;
+                  }
                   scStat = Math.min(scStat, tempAp);
 
-                  if (tempAp > scStat) tempAp -= scStat;
-                  else tempAp = 0;
+                  if (tempAp > scStat) {
+                     tempAp -= scStat;
+                  } else {
+                     tempAp = 0;
+                  }
 
                   prStat = tempAp;
                   dex = prStat;
@@ -179,11 +201,16 @@ public class AssignAPProcessor {
                case CROSSBOWMAN:
                   CAP = 120;
                   scStat = chr.getLevel() - (chr.getStr() + str - eqpStr);
-                  if (scStat < 0) scStat = 0;
+                  if (scStat < 0) {
+                     scStat = 0;
+                  }
                   scStat = Math.min(scStat, tempAp);
 
-                  if (tempAp > scStat) tempAp -= scStat;
-                  else tempAp = 0;
+                  if (tempAp > scStat) {
+                     tempAp -= scStat;
+                  } else {
+                     tempAp = 0;
+                  }
 
                   prStat = tempAp;
                   dex = prStat;
@@ -208,7 +235,9 @@ public class AssignAPProcessor {
                   scStat = 0;
                   if (chr.getDex() < 80) {
                      scStat = (2 * chr.getLevel()) - (chr.getDex() + dex - eqpDex);
-                     if (scStat < 0) scStat = 0;
+                     if (scStat < 0) {
+                        scStat = 0;
+                     }
 
                      scStat = Math.min(80 - chr.getDex(), scStat);
                      scStat = Math.min(tempAp, scStat);
@@ -216,7 +245,9 @@ public class AssignAPProcessor {
                   }
 
                   temp = (chr.getLevel() + 40) - Math.max(80, scStat + chr.getDex() + dex - eqpDex);
-                  if (temp < 0) temp = 0;
+                  if (temp < 0) {
+                     temp = 0;
+                  }
                   temp = Math.min(tempAp, temp);
                   scStat += temp;
                   tempAp -= temp;
@@ -225,7 +256,9 @@ public class AssignAPProcessor {
                   if (chr.getStr() >= Math.max(13, (int) (0.4 * chr.getLevel()))) {
                      if (chr.getStr() < 50) {
                         trStat = (chr.getLevel() - 10) - (chr.getStr() + str - eqpStr);
-                        if (trStat < 0) trStat = 0;
+                        if (trStat < 0) {
+                           trStat = 0;
+                        }
 
                         trStat = Math.min(50 - chr.getStr(), trStat);
                         trStat = Math.min(tempAp, trStat);
@@ -233,7 +266,9 @@ public class AssignAPProcessor {
                      }
 
                      temp = (20 + (chr.getLevel() / 2)) - Math.max(50, trStat + chr.getStr() + str - eqpStr);
-                     if (temp < 0) temp = 0;
+                     if (temp < 0) {
+                        temp = 0;
+                     }
                      temp = Math.min(tempAp, temp);
                      trStat += temp;
                      tempAp -= temp;
@@ -282,7 +317,9 @@ public class AssignAPProcessor {
                      scStat = 0;
                      if (chr.getDex() < 80) {
                         scStat = (2 * chr.getLevel()) - (chr.getDex() + dex - eqpDex);
-                        if (scStat < 0) scStat = 0;
+                        if (scStat < 0) {
+                           scStat = 0;
+                        }
 
                         scStat = Math.min(80 - chr.getDex(), scStat);
                         scStat = Math.min(tempAp, scStat);
@@ -290,7 +327,9 @@ public class AssignAPProcessor {
                      }
 
                      temp = (chr.getLevel() + 40) - Math.max(80, scStat + chr.getDex() + dex - eqpDex);
-                     if (temp < 0) temp = 0;
+                     if (temp < 0) {
+                        temp = 0;
+                     }
                      temp = Math.min(tempAp, temp);
                      scStat += temp;
                      tempAp -= temp;
@@ -298,7 +337,9 @@ public class AssignAPProcessor {
                      scStat = 0;
                      if (chr.getDex() < 96) {
                         scStat = (int) (2.4 * chr.getLevel()) - (chr.getDex() + dex - eqpDex);
-                        if (scStat < 0) scStat = 0;
+                        if (scStat < 0) {
+                           scStat = 0;
+                        }
 
                         scStat = Math.min(96 - chr.getDex(), scStat);
                         scStat = Math.min(tempAp, scStat);
@@ -306,7 +347,9 @@ public class AssignAPProcessor {
                      }
 
                      temp = 96 + (int) (1.2 * (chr.getLevel() - 40)) - Math.max(96, scStat + chr.getDex() + dex - eqpDex);
-                     if (temp < 0) temp = 0;
+                     if (temp < 0) {
+                        temp = 0;
+                     }
                      temp = Math.min(tempAp, temp);
                      scStat += temp;
                      tempAp -= temp;
@@ -348,7 +391,7 @@ public class AssignAPProcessor {
 
             //----------------------------------------------------------------------------------------
 
-            c.announce(MaplePacketCreator.serverNotice(1, "Better AP applications detected:\r\nSTR: +" + statGain[0] + "\r\nDEX: +" + statGain[1] + "\r\nINT: +" + statGain[3] + "\r\nLUK: +" + statGain[2]));
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Better AP applications detected:\r\nSTR: +" + statGain[0] + "\r\nDEX: +" + statGain[1] + "\r\nINT: +" + statGain[3] + "\r\nLUK: +" + statGain[2]);
          } else {
             if (slea.available() < 16) {
                AutobanFactory.PACKET_EDIT.alert(chr, "Didn't send full packet for Auto Assign.");
@@ -387,7 +430,9 @@ public class AssignAPProcessor {
    }
 
    private static int gainStatByType(MapleStat type, int[] statGain, int gain, int[] statUpdate) {
-      if (gain <= 0) return 0;
+      if (gain <= 0) {
+         return 0;
+      }
 
       int newVal = 0;
       if (type.equals(MapleStat.STR)) {
@@ -435,7 +480,9 @@ public class AssignAPProcessor {
    }
 
    private static MapleStat getQuaternaryStat(MapleJob stance) {
-      if (stance != MapleJob.MAGICIAN) return MapleStat.INT;
+      if (stance != MapleJob.MAGICIAN) {
+         return MapleStat.INT;
+      }
       return MapleStat.STR;
    }
 
@@ -447,48 +494,48 @@ public class AssignAPProcessor {
          switch (APFrom) {
             case 64: // str
                if (player.getStr() < 5) {
-                  player.message("You don't have the minimum STR required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum STR required to swap.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                if (!player.assignStr(-1)) {
-                  player.message("Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                break;
             case 128: // dex
                if (player.getDex() < 5) {
-                  player.message("You don't have the minimum DEX required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum DEX required to swap.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                if (!player.assignDex(-1)) {
-                  player.message("Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                break;
             case 256: // int
                if (player.getInt() < 5) {
-                  player.message("You don't have the minimum INT required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum INT required to swap.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                if (!player.assignInt(-1)) {
-                  player.message("Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                break;
             case 512: // luk
                if (player.getLuk() < 5) {
-                  player.message("You don't have the minimum LUK required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum LUK required to swap.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
                if (!player.assignLuk(-1)) {
-                  player.message("Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
@@ -496,14 +543,14 @@ public class AssignAPProcessor {
             case 2048: // HP
                if (ServerConstants.USE_ENFORCE_HPMP_SWAP) {
                   if (APTo != 8192) {
-                     player.message("You can only swap HP ability points to MP.");
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You can only swap HP ability points to MP.");
                      c.announce(MaplePacketCreator.enableActions());
                      return false;
                   }
                }
 
                if (player.getHpMpApUsed() < 1) {
-                  player.message("You don't have enough HPMP stat points to spend on AP Reset.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have enough HPMP stat points to spend on AP Reset.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
@@ -511,7 +558,7 @@ public class AssignAPProcessor {
                int hp = player.getMaxHp();
                int level_ = player.getLevel();
                if (hp < level_ * 14 + 148) {
-                  player.message("You don't have the minimum HP pool required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum HP pool required to swap.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
@@ -527,14 +574,14 @@ public class AssignAPProcessor {
             case 8192: // MP
                if (ServerConstants.USE_ENFORCE_HPMP_SWAP) {
                   if (APTo != 2048) {
-                     player.message("You can only swap MP ability points to HP.");
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You can only swap MP ability points to HP.");
                      c.announce(MaplePacketCreator.enableActions());
                      return false;
                   }
                }
 
                if (player.getHpMpApUsed() < 1) {
-                  player.message("You don't have enough HPMP stat points to spend on AP Reset.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have enough HPMP stat points to spend on AP Reset.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
@@ -555,7 +602,7 @@ public class AssignAPProcessor {
                }
 
                if (!canWash) {
-                  player.message("You don't have the minimum MP pool required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum MP pool required to swap.");
                   c.announce(MaplePacketCreator.enableActions());
                   return false;
                }
@@ -592,42 +639,42 @@ public class AssignAPProcessor {
       switch (apTo) {
          case 64:
             if (!chr.assignStr(1)) {
-               chr.message("Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
                chr.announce(MaplePacketCreator.enableActions());
                return false;
             }
             break;
          case 128: // Dex
             if (!chr.assignDex(1)) {
-               chr.message("Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
                chr.announce(MaplePacketCreator.enableActions());
                return false;
             }
             break;
          case 256: // Int
             if (!chr.assignInt(1)) {
-               chr.message("Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
                chr.announce(MaplePacketCreator.enableActions());
                return false;
             }
             break;
          case 512: // Luk
             if (!chr.assignLuk(1)) {
-               chr.message("Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
                chr.announce(MaplePacketCreator.enableActions());
                return false;
             }
             break;
          case 2048:
             if (!chr.assignHP(calcHpChange(chr, usedAPReset), 1)) {
-               chr.message("Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
                chr.announce(MaplePacketCreator.enableActions());
                return false;
             }
             break;
          case 8192:
             if (!chr.assignMP(calcMpChange(chr, usedAPReset), 1)) {
-               chr.message("Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
                chr.announce(MaplePacketCreator.enableActions());
                return false;
             }

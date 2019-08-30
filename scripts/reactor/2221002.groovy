@@ -2,6 +2,8 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2221002 {
@@ -9,7 +11,7 @@ class Reactor2221002 {
 
    def act() {
       rm.spawnMonster(7130402, -340, 100)
-      rm.mapMessage(5, "Here comes Green King Goblin!")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Here comes Green King Goblin!")
    }
 
    def hit() {

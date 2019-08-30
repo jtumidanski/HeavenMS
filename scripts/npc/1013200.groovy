@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -21,7 +23,7 @@ class NPC1013200 {
       } else {
          cm.gainItem(4032449, true)
          cm.forceCompleteQuest(22015)
-         cm.playerMessage(5, "You have rescued the Piglet.")
+         MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "You have rescued the Piglet.")
       }
       cm.dispose()
    }

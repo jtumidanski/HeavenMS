@@ -3,6 +3,8 @@ package quest
 import client.MapleJob
 import client.inventory.MapleInventoryType
 import scripting.quest.QuestActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Quest3414 {
    QuestActionManager qm
@@ -27,7 +29,7 @@ class Quest3414 {
          qm.sendNext("Whoa... this is it!!! With this sample, the studies that are taking place in Omega Sector will be reinvigorated with results! I am also at a loss for words for finding someone that is more talented than me at hunting. I'll have to get back on track! Anyway, for your job well done, I'll have to reward you accordingly.")
       } else if (status == 1) {
          if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() < 1) {
-            qm.getPlayer().dropMessage(1, "USE inventory full.")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "USE inventory full.")
             qm.dispose()
             return
          }

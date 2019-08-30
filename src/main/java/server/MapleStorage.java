@@ -44,7 +44,9 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author Matze
@@ -201,7 +203,7 @@ public class MapleStorage {
 
    public void sendStorage(MapleClient c, int npcId) {
       if (c.getPlayer().getLevel() < 15) {
-         c.getPlayer().dropMessage(1, "You may only use the storage once you have reached level 15.");
+         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You may only use the storage once you have reached level 15.");
          c.announce(MaplePacketCreator.enableActions());
          return;
       }

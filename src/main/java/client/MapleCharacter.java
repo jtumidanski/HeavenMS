@@ -97,7 +97,6 @@ import client.inventory.ModifyInventory;
 import client.inventory.PetDataFactory;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.newyear.NewYearCardRecord;
-import client.processor.BuddyListProcessor;
 import client.processor.BuffStatProcessor;
 import client.processor.ChairProcessor;
 import client.processor.CharacterProcessor;
@@ -171,7 +170,6 @@ import server.life.MaplePlayerNPC;
 import server.life.MobSkill;
 import server.maps.FieldLimit;
 import server.maps.MapleDoor;
-import server.processor.maps.MapleDoorProcessor;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMap;
@@ -192,13 +190,16 @@ import server.partyquest.AriantColiseum;
 import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
 import server.partyquest.PartyQuest;
+import server.processor.maps.MapleDoorProcessor;
 import server.quest.MapleQuest;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MapleStringUtil;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
 import tools.packets.Wedding;
@@ -1051,7 +1052,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             for (Item item : new ArrayList<>(inv.list())) {
                if (MapleInventoryManipulator.isSandboxItem(item)) {
                   MapleInventoryManipulator.removeFromSlot(client, invType, item.getPosition(), item.getQuantity(), false);
-                  dropMessage(5, "[" + ii.getName(item.getItemId()) + "] has passed its trial conditions and will be removed from your inventory.");
+                  MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "[" + ii.getName(item.getItemId()) + "] has passed its trial conditions and will be removed from your inventory.");
                }
             }
          } finally {
@@ -1315,30 +1316,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       if (ServerConstants.USE_ANNOUNCE_CHANGEJOB) {
          if (!this.isGM()) {
-            broadcastAcquaintances(6, "[" + GameConstants.ordinal(GameConstants.getJobBranch(newJob)) + " Job] " + name + " has just become a " + GameConstants.getJobName(this.job.getId()) + ".");    // thanks Vcoc for noticing job name appearing in uppercase here
+            String message = "[" + GameConstants.ordinal(GameConstants.getJobBranch(newJob)) + " Job] " + name + " has just become a " + GameConstants.getJobName(this.job.getId()) + ".";
+            MessageBroadcaster.getInstance().sendServerNoticeToAcquaintances(this, ServerNoticeType.LIGHT_BLUE, message);
          }
       }
-   }
-
-   public void broadcastAcquaintances(int type, String message) {
-      broadcastAcquaintances(MaplePacketCreator.serverNotice(type, message));
-   }
-
-   public void broadcastAcquaintances(byte[] packet) {
-      BuddyListProcessor.getInstance().broadcast(packet, buddylist, getWorldServer().getPlayerStorage());
-      MapleFamily family = getFamily();
-      if (family != null) {
-         //family.broadcast(packet, id); not yet implemented
-      }
-
-      getGuild().ifPresent(guild -> guild.broadcast(packet, id));
-
-        /*
-        if(partnerid > 0) {
-            partner.announce(packet); not yet implemented
-        }
-        */
-      announce(packet);
    }
 
    public void changeKeybinding(int key, MapleKeyBinding keybinding) {
@@ -1424,7 +1405,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       long banTime = System.currentTimeMillis();
 
       if (msg != null) {
-         dropMessage(5, msg);
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, msg);
       }
 
       MapleMap map_ = getWarpMap(mapid);
@@ -2551,14 +2532,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       startHpDecreaseTask((lastHpTask > ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL) ? ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL : lastHpTask);
    }
 
-   public void dropMessage(String message) {
-      dropMessage(0, message);
-   }
-
-   public void dropMessage(int type, String message) {
-      client.announce(MaplePacketCreator.serverNotice(type, message));
-   }
-
    public void enteredScript(String script, int mapid) {
       if (!entered.containsKey(mapid)) {
          entered.put(mapid, script);
@@ -2747,7 +2720,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                         if (replace.left > 0) {
                            toadd.add(replace.left);
                            if (!replace.right.isEmpty()) {
-                              dropMessage(replace.right);
+                              MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, replace.right);
                            }
                         }
                         for (Integer itemid : toadd) {
@@ -5680,14 +5653,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int cost = MapleGuildProcessor.getInstance().getIncreaseGuildCost(guild.getCapacity());
 
          if (getMeso() < cost) {
-            dropMessage(1, "You don't have enough mesos.");
+            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.POP_UP, "You don't have enough mesos.");
             return;
          }
 
          if (Server.getInstance().increaseGuildCapacity(guildid)) {
             gainMeso(-cost, true, false, true);
          } else {
-            dropMessage(1, "Your guild already reached the maximum capacity of players.");
+            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.POP_UP, "Your guild already reached the maximum capacity of players.");
          }
       });
    }
@@ -5753,14 +5726,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       long timeNow = Server.getInstance().getCurrentTime();
 
       if (timeNow - lastDeathtime > ServerConstants.BUYBACK_RETURN_MINUTES * 60 * 1000) {
-         this.dropMessage(5, "The period of time to decide has expired, therefore you are unable to buyback.");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "The period of time to decide has expired, therefore you are unable to buyback.");
          return false;
       }
 
       long nextBuybacktime = getNextBuybackTime();
       if (timeNow < nextBuybacktime) {
          long timeLeft = nextBuybacktime - timeNow;
-         this.dropMessage(5, "Next buyback available in " + MapleStringUtil.getTimeRemaining(timeLeft) + ".");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "Next buyback available in " + MapleStringUtil.getTimeRemaining(timeLeft) + ".");
          return false;
       }
 
@@ -5768,7 +5741,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       int fee = getBuybackFee();
 
       if (!canBuyback(fee, usingMesos)) {
-         this.dropMessage(5, "You don't have " + fee + " " + (usingMesos ? "mesos" : "NX") + " to buyback.");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "You don't have " + fee + " " + (usingMesos ? "mesos" : "NX") + " to buyback.");
          return false;
       }
 
@@ -5998,7 +5971,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                }
 
                final String names = (getMedalText() + name);
-               getWorldServer().broadcastPacket(MaplePacketCreator.serverNotice(6, String.format(LEVEL_200, names, maxClassLevel, names)));
+               MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, String.format(LEVEL_200, names, maxClassLevel, names));
             }
          }
 
@@ -6553,10 +6526,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void message(String m) {
-      dropMessage(5, m);
-   }
-
    public void yellowMessage(String m) {
       announce(MaplePacketCreator.sendYellowTip(m));
    }
@@ -6631,7 +6600,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       }
       if (possesed > 0) {
-         message("You have used a safety charm, so your EXP points have not been decreased.");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "You have used a safety charm, so your EXP points have not been decreased.");
          MapleInventoryManipulator.removeById(client, ItemConstants.getInventoryType(charmID[i]), charmID[i], 1, true, false);
       } else if (getJob() != MapleJob.BEGINNER) { //Hmm...
          if (!FieldLimit.NO_EXP_DECREASE.check(getMap().getFieldLimit())) {  // thanks Conrad for noticing missing FieldLimit check
@@ -7653,11 +7622,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       inventory[type.ordinal()] = inv;
    }
 
-   @Deprecated
-   public void setMap(int PmapId) {
-      this.mapid = PmapId;
-   }
-
    public void setMiniGamePoints(MapleCharacter visitor, int winnerslot, boolean omok) {
       GameData thisGameData;
       GameData visitorGameData;
@@ -7883,7 +7847,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
          }
 
-         dropMessage(6, "EQUIPMENT MERGE operation results:");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "EQUIPMENT MERGE operation results:");
          for (Entry<Equip, List<Pair<StatUpgrade, Integer>>> eqpUpg : equipUpgrades.entrySet()) {
             List<Pair<StatUpgrade, Integer>> eqpStatups = eqpUpg.getValue();
             if (!eqpStatups.isEmpty()) {
@@ -7896,7 +7860,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                this.forceUpdateItem(eqp);
 
                showStr += upgdStr;
-               dropMessage(6, showStr);
+               MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, showStr);
             }
          }
 
@@ -8058,7 +8022,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          pet.setFullness(15);
          pet.saveToDb();
          unequipPet(pet, true);
-         dropMessage(6, "Your pet grew hungry! Treat it some pet food to keep it healthy!");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your pet grew hungry! Treat it some pet food to keep it healthy!");
       } else {
          pet.setFullness(newFullness);
          pet.saveToDb();
@@ -8077,7 +8041,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (tiredness > 99) {
             maplemount.setTiredness(99);
             this.dispelSkill(this.getJobType() * 10000000 + 1004);
-            this.dropMessage(6, "Your mount grew tired! Treat it some revitalizer before riding it again!");
+            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your mount grew tired! Treat it some revitalizer before riding it again!");
             return false;
          }
       }
@@ -8513,7 +8477,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       announce(MaplePacketCreator.sendPolice(String.format("You have been blocked by the#b %s Police for HACK reason.#k", "HeavenMS")));
       TimerManager.getInstance().schedule(() -> client.disconnect(false, false), 5000);
 
-      Server.getInstance().broadcastGMMessage(this.getWorld(), MaplePacketCreator.serverNotice(6, StringUtil.makeMapleReadable(this.name) + " was autobanned for " + reason));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, StringUtil.makeMapleReadable(this.name) + " was autobanned for " + reason);
    }
 
    public void block(int reason, int days, String desc) {
@@ -8640,7 +8604,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             public void run() {
                if (pendantExp < 3) {
                   pendantExp++;
-                  message("Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
+                  MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, "Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
                } else {
                   pendantOfSpirit.cancel(false);
                }

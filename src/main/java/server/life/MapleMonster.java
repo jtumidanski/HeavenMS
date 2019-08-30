@@ -76,8 +76,10 @@ import server.maps.MapleMapObjectType;
 import server.maps.MapleSummon;
 import tools.IntervalBuilder;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
+import tools.ServerNoticeType;
 
 public class MapleMonster extends AbstractLoadedMapleLife {
 
@@ -488,7 +490,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
 
       if (ServerConstants.USE_DEBUG) {
-         from.dropMessage(5, "Hitted MOB " + this.getId() + ", OID " + this.getObjectId());
+         MessageBroadcaster.getInstance().sendServerNotice(from, ServerNoticeType.PINK_TEXT, "Hitted MOB " + this.getId() + ", OID " + this.getObjectId());
       }
 
       if (!fake) {
@@ -780,7 +782,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          Pair<Integer, String> timeMob = reviveMap.getTimeMob();
          if (timeMob != null) {
             if (toSpawn.contains(timeMob.getLeft())) {
-               reviveMap.broadcastMessage(MaplePacketCreator.serverNotice(6, timeMob.getRight()));
+               MessageBroadcaster.getInstance().sendMapServerNotice(reviveMap, ServerNoticeType.LIGHT_BLUE, timeMob.getRight());
             }
          }
 

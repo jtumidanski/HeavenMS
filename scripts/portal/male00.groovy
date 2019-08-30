@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    int gender = pi.getPlayer().getGender()
@@ -10,7 +12,7 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(670010200, 3)
       return true
    } else {
-      pi.getPlayer().dropMessage(5, "You cannot proceed past here.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You cannot proceed past here.")
       return false
    }
 }

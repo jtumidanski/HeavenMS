@@ -2,13 +2,15 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor2111000 {
    ReactorActionManager rm
 
    def act() {
-      rm.playerMessage(5, "Oh noes! Monsters in the chest!")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Oh noes! Monsters in the chest!")
       rm.spawnMonster(9300004,3)
    }
 

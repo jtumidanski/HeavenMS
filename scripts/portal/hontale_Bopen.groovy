@@ -4,6 +4,8 @@ import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MaplePortal
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    int nextMap
@@ -21,7 +23,7 @@ static def enter(PortalPlayerInteraction pi) {
       avail = eim.getProperty("1stageclear")
       if (avail == null) {
          // do nothing; send message to player
-         pi.getPlayer().dropMessage(6, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
          return false
       } else {
          pi.playPortalSound()
@@ -37,7 +39,7 @@ static def enter(PortalPlayerInteraction pi) {
       avail = eim.getProperty("2stageclear")
       if (avail == null) {
          // do nothing; send message to player
-         pi.getPlayer().dropMessage(6, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
          return false
       } else {
          pi.playPortalSound()
@@ -53,7 +55,7 @@ static def enter(PortalPlayerInteraction pi) {
       avail = eim.getProperty("3stageclear")
       if (avail == null) {
          // do nothing; send message to player
-         pi.getPlayer().dropMessage(6, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
          return false
       } else {
          pi.playPortalSound()
@@ -69,7 +71,7 @@ static def enter(PortalPlayerInteraction pi) {
       avail = eim.getProperty("4stageclear")
       if (avail == null) {
          // do nothing; send message to player
-         pi.getPlayer().dropMessage(6, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
          return false
       } else {
          pi.playPortalSound()
@@ -86,13 +88,13 @@ static def enter(PortalPlayerInteraction pi) {
       if (avail == null) {
          if (pi.haveItem(4001092) && pi.isEventLeader()) {
             eim.showClearEffect()
-            pi.getPlayer().dropMessage(6, "The leader's key break the seal for a flash...")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "The leader's key break the seal for a flash...")
             pi.playPortalSound()
             pi.getPlayer().changeMap(target, targetPortal)
             eim.setIntProperty("5stageclear", 1)
             return true
          } else {
-            pi.getPlayer().dropMessage(6, "Horntail\'s Seal is blocking this door. Only the leader with the key can lift this seal.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is blocking this door. Only the leader with the key can lift this seal.")
             return false
          }
       } else {

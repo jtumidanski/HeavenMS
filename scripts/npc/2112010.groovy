@@ -6,6 +6,8 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import server.maps.MapleMapObject
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -92,7 +94,7 @@ class NPC2112010 {
                      cm.sendOk("Behold! The pinnacle of Magatia's alchemy studies! Hahahahahahaha...")
                   } else if (state == 0) {
                      cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest alchemy, #rFrankenroid#k.")
-                     eim.dropMessage(5, "Yulete: I present you my newest weapon, brought by the finest alchemy, Frankenroid!")
+                     MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: I present you my newest weapon, brought by the finest alchemy, Frankenroid!")
 
                      MapleMap mapobj = eim.getMapInstance(926110401)
                      MapleMonster bossobj = MapleLifeFactory.getMonster(9300151)
@@ -102,7 +104,7 @@ class NPC2112010 {
                      eim.setIntProperty("yuletePassed", -1)
                   } else {
                      cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the #rmighty Frankenroid#k!")
-                     eim.dropMessage(5, "Yulete: I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the mighty Frankenroid!!")
+                     MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the mighty Frankenroid!!")
 
                      MapleMap mapobj = eim.getMapInstance(926110401)
                      MapleMonster bossobj = MapleLifeFactory.getMonster(9300152)

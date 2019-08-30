@@ -6,6 +6,8 @@ import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -132,7 +134,7 @@ class NPC9201113 {
                cm.sendOk("The expedition will begin and you will now be escorted to the #bEntrance to CWKPQ Altar#k.")
                status = 4
             } else if (selection == 3) {
-               player.getMap().broadcastMessage(MaplePacketCreator.serverNotice(6, expedition.getLeader().getName() + " has ended the expedition."))
+               MessageBroadcaster.getInstance().sendMapServerNotice(player.getMap(), ServerNoticeType.LIGHT_BLUE, expedition.getLeader().getName() + " has ended the expedition.")
                cm.endExpedition(expedition)
                cm.sendOk("The expedition has now ended. Sometimes the best strategy is to run away.")
                cm.dispose()

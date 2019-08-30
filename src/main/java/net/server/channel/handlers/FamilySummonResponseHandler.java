@@ -12,6 +12,8 @@ import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.coordinator.MapleInviteCoordinator.MapleInviteResult;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class FamilySummonResponseHandler extends AbstractMaplePacketHandler {
@@ -39,7 +41,7 @@ public class FamilySummonResponseHandler extends AbstractMaplePacketHandler {
          inviterEntry.refundEntitlement(MapleFamilyEntitlement.SUMMON_FAMILY);
          inviterEntry.gainReputation(MapleFamilyEntitlement.SUMMON_FAMILY.getRepCost(), false); //refund rep cost if declined
          inviter.announce(MaplePacketCreator.getFamilyInfo(inviterEntry));
-         inviter.dropMessage(5, c.getPlayer().getName() + " has denied the summon request.");
+         MessageBroadcaster.getInstance().sendServerNotice(inviter, ServerNoticeType.PINK_TEXT, c.getPlayer().getName() + " has denied the summon request.");
       }
    }
 

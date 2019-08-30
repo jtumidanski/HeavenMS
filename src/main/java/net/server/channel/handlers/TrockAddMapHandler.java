@@ -26,6 +26,8 @@ import client.MapleClient;
 import net.AbstractMaplePacketHandler;
 import server.maps.FieldLimit;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -54,7 +56,7 @@ public final class TrockAddMapHandler extends AbstractMaplePacketHandler {
 
             c.announce(MaplePacketCreator.trockRefreshMapList(chr, false, vip));
          } else {
-            chr.message("You may not save this map.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You may not save this map.");
          }
       }
    }

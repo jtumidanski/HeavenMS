@@ -28,6 +28,8 @@ import net.AbstractMaplePacketHandler;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -61,7 +63,7 @@ public final class FamilyAddHandler extends AbstractMaplePacketHandler {
       } else {
          MapleInviteCoordinator.createInvite(InviteType.FAMILY, chr, addChr, addChr.getId());
          addChr.getClient().announce(MaplePacketCreator.sendFamilyInvite(chr.getId(), chr.getName()));
-         chr.dropMessage("The invite has been sent.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The invite has been sent.");
          c.announce(MaplePacketCreator.enableActions());
       }
    }

@@ -8,6 +8,8 @@ import scripting.event.EventManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 import java.util.List
@@ -159,7 +161,7 @@ class EventMK_PrimeMinister2 {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }
@@ -253,7 +255,7 @@ class EventMK_PrimeMinister2 {
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
       eim.unregisterPlayer(player)
       player.getMap().removePlayer(player)
-      player.setMap(entryMap)
+      player.setMapId(entryMap)
    }
 
    // Happens when carnival PQ is started. - Unused for now.

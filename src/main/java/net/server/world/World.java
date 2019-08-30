@@ -103,7 +103,9 @@ import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 import tools.packets.Fishing;
 
 /**
@@ -1915,12 +1917,6 @@ public class World {
       relationshipCouples.remove(relationshipId);
       relationships.remove(playerId);
       relationships.remove(partnerId);
-   }
-
-   public void dropMessage(int type, String message) {
-      for (MapleCharacter player : getPlayerStorage().getAllCharacters()) {
-         player.dropMessage(type, message);
-      }
    }
 
    public boolean registerFisherPlayer(MapleCharacter chr, int baitLevel) {

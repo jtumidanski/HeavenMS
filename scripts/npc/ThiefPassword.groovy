@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -39,7 +41,7 @@ class NPCThiefPassword {
             if (cm.isQuestCompleted(3925)) {
                cm.warp(260010402)
             } else {
-               cm.playerMessage(5, "Although you said the right answer, the door will not budge.")
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Although you said the right answer, the door will not budge.")
             }
 
             cm.dispose()

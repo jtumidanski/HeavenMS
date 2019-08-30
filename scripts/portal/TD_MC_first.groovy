@@ -2,6 +2,8 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestCompleted(2260) ||
@@ -20,6 +22,6 @@ static def enter(PortalPlayerInteraction pi) {
       pi.warp(106020000, 0)
       return true
    }
-   pi.playerMessage(5, "A strange force is blocking you from entering.")
+   MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "A strange force is blocking you from entering.")
    return false
 }

@@ -29,6 +29,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class TimerCommand extends Command {
    {
@@ -55,7 +57,7 @@ public class TimerCommand extends Command {
             }
          }
       } else {
-         player.message("Player '" + params[0] + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found.");
       }
    }
 }

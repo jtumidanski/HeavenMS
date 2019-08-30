@@ -28,6 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import net.server.world.World;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class DCAllCommand extends Command {
    {
@@ -44,6 +46,6 @@ public class DCAllCommand extends Command {
             }
          }
       }
-      player.message("All players successfully disconnected.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "All players successfully disconnected.");
    }
 }

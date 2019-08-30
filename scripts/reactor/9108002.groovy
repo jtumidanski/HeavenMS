@@ -4,6 +4,8 @@ import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 import server.maps.MapleMap
 import server.maps.MapleReactor
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 
 class Reactor9108002 {
@@ -18,7 +20,7 @@ class Reactor9108002 {
          eim.setProperty("stage", newStage)
          react.forceHitReactor((byte) (react.getState() + 1))
          if (eim.getProperty("stage") == "6") {
-            rm.mapMessage(6, "Protect the Moon Bunny!!!")
+            MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Protect the Moon Bunny!!!")
             MapleMap map = eim.getMapInstance(rm.getReactor().getMap().getId())
             map.allowSummonState(true)
             map.spawnMonsterOnGroundBelow(9300061, -183, -433)

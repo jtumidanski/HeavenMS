@@ -45,7 +45,6 @@ import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import net.server.Server;
-import net.server.channel.Channel;
 import net.server.guild.MapleGuild;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
@@ -69,7 +68,9 @@ import server.partyquest.PartyQuest;
 import server.partyquest.Pyramid;
 import server.quest.MapleQuest;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 public class AbstractPlayerInteraction {
 
@@ -139,7 +140,7 @@ public class AbstractPlayerInteraction {
    public void warpParty(int id, int portalId, int fromMinId, int fromMaxId) {
       for (MapleCharacter mc : this.getPlayer().getPartyMembersOnline()) {
          if (mc.isLoggedinWorld()) {
-            if(mc.getMapId() >= fromMinId && mc.getMapId() <= fromMaxId) {
+            if (mc.getMapId() >= fromMinId && mc.getMapId() <= fromMaxId) {
                mc.changeMap(id, portalId);
             }
          }
@@ -528,7 +529,7 @@ public class AbstractPlayerInteraction {
 
       target = getPlayer().getPet(slot);
       if (target == null) {
-         getPlayer().message("Pet could not be evolved...");
+         MessageBroadcaster.getInstance().sendServerNotice(getPlayer(), ServerNoticeType.PINK_TEXT, "Pet could not be evolved...");
          return (null);
       }
 
@@ -642,7 +643,7 @@ public class AbstractPlayerInteraction {
          }
 
          if (!MapleInventoryManipulator.checkSpace(c, id, quantity, "")) {
-            c.getPlayer().dropMessage(1, "Your inventory is full. Please remove an item from your " + ItemConstants.getInventoryType(id).name() + " inventory.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please remove an item from your " + ItemConstants.getInventoryType(id).name() + " inventory.");
             return null;
          }
          if (ItemConstants.getInventoryType(id) == MapleInventoryType.EQUIP) {
@@ -670,18 +671,6 @@ public class AbstractPlayerInteraction {
 
    public void changeMusic(String songName) {
       getPlayer().getMap().broadcastMessage(MaplePacketCreator.musicChange(songName));
-   }
-
-   public void playerMessage(int type, String message) {
-      c.announce(MaplePacketCreator.serverNotice(type, message));
-   }
-
-   public void message(String message) {
-      getPlayer().message(message);
-   }
-
-   public void mapMessage(int type, String message) {
-      getPlayer().getMap().broadcastMessage(MaplePacketCreator.serverNotice(type, message));
    }
 
    public void mapEffect(String path) {
@@ -724,12 +713,6 @@ public class AbstractPlayerInteraction {
    public void showInfo(String path) {
       c.announce(MaplePacketCreator.showInfo(path));
       c.announce(MaplePacketCreator.enableActions());
-   }
-
-   public void guildMessage(int type, String message) {
-      if (getGuild() != null) {
-         getGuild().guildMessage(MaplePacketCreator.serverNotice(type, message));
-      }
    }
 
    public MapleGuild getGuild() {
@@ -795,7 +778,7 @@ public class AbstractPlayerInteraction {
          }
 
          MapleCharacter chr = mpc.getPlayer();
-         if (chr != null && chr.getClient() != null){
+         if (chr != null && chr.getClient() != null) {
             removeAll(id, chr.getClient());
          }
       }
@@ -826,12 +809,12 @@ public class AbstractPlayerInteraction {
       int size = party.getMembers().size();
 
       if (instance) {
-         for(MaplePartyCharacter member: party.getMembers()) {
-            if(member == null || !member.isOnline()){
+         for (MaplePartyCharacter member : party.getMembers()) {
+            if (member == null || !member.isOnline()) {
                size--;
             } else {
                MapleCharacter chr = member.getPlayer();
-               if(chr != null && chr.getEventInstance() == null) {
+               if (chr != null && chr.getEventInstance() == null) {
                   size--;
                }
             }
@@ -844,7 +827,7 @@ public class AbstractPlayerInteraction {
             continue;
          }
          MapleCharacter player = member.getPlayer();
-         if(player == null) {
+         if (player == null) {
             continue;
          }
          if (instance && player.getEventInstance() == null) {

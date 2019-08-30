@@ -4,6 +4,8 @@ import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 import java.awt.*
 
@@ -20,11 +22,11 @@ static def enter(PortalPlayerInteraction pi) {
          //pi.getPlayer().announce(Packages.tools.MaplePacketCreator.questProgress(21203, "21203"));
          return true
       }
-      pi.message("The mirror is blank due to many players recalling their memories. Please wait and try again.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The mirror is blank due to many players recalling their memories. Please wait and try again.")
       return false
    } else if (pi.isQuestStarted(21302) && !pi.isQuestCompleted(21303)) { // Third Job
       if (pi.getPlayerCount(108010701) > 0 || pi.getPlayerCount(108010702) > 0) {
-         pi.message("The mirror is blank due to many players recalling their memories. Please wait and try again.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The mirror is blank due to many players recalling their memories. Please wait and try again.")
          return false
       } else {
          MapleMap map = pi.getClient().getChannelServer().getMapFactory().getMap(108010702)
@@ -36,7 +38,7 @@ static def enter(PortalPlayerInteraction pi) {
          return true
       }
    } else {
-      pi.message("You have already passed your test, there is no need to access the mirror again.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You have already passed your test, there is no need to access the mirror again.")
       return false
    }
 }

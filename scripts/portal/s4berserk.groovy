@@ -3,6 +3,8 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 static def enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(6153) && pi.haveItem(4031475)) {
@@ -14,11 +16,11 @@ static def enter(PortalPlayerInteraction pi) {
 
          return true
       } else {
-         pi.getPlayer().message("Some other player is currently inside.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Some other player is currently inside.")
          return false
       }
    } else {
-      pi.getPlayer().message("A mysterious force won't let you in.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "A mysterious force won't let you in.")
       return false
    }
 }

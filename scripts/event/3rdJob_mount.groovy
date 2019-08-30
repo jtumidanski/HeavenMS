@@ -9,6 +9,8 @@ import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 class Event3rdJob_mount {
    EventManager em
@@ -38,7 +40,7 @@ class Event3rdJob_mount {
          int oldHp = eim.getIntProperty("whog_hp")
 
          if (oldHp - hp > 1000) {    // or 800, if using mobHP / eventTime
-            eim.dropMessage(6, "Please protect the pig from the aliens!")  // thanks Vcoc
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "Please protect the pig from the aliens!")  // thanks Vcoc
          }
          eim.setIntProperty("whog_hp", hp)
       }
@@ -146,7 +148,7 @@ class Event3rdJob_mount {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            player.dropMessage(6, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
             playerExit(eim, player)
          }
       }

@@ -286,6 +286,7 @@ public class MapleGuild {
       }
    }
 
+
    public void guildMessage(final byte[] serverNotice) {
       membersLock.lock();
       try {
@@ -318,23 +319,6 @@ public class MapleGuild {
                   .filter(channel -> channel.getPlayerStorage().getCharacterById(member.getId()).isPresent())
                   .findFirst()
       );
-   }
-
-   public void dropMessage(String message) {
-      dropMessage(5, message);
-   }
-
-   public void dropMessage(int type, String message) {
-      membersLock.lock();
-      try {
-         for (MapleGuildCharacter mgc : members) {
-            if (mgc.getCharacter() != null) {
-               mgc.getCharacter().dropMessage(type, message);
-            }
-         }
-      } finally {
-         membersLock.unlock();
-      }
    }
 
    public void broadcastMessage(byte[] packet) {

@@ -3,6 +3,8 @@ package npc
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.maps.MapleReactor
+import tools.MessageBroadcaster
+import tools.ServerNoticeType
 
 /*
 	NPC Name: 		
@@ -81,13 +83,13 @@ class NPC9040009 {
                         } else {
                            cm.sendOk("Very good. You still have more to complete, however. Talk to me again when you're ready.")
                            eim.setProperty("stage1phase", stage + 1)
-                           cm.mapMessage(5, "You have completed part " + stage + " of the Gatekeeper Test.")
+                           MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "You have completed part " + stage + " of the Gatekeeper Test.")
                         }
 
                      } else {
                         eim.showWrongEffect()
                         cm.sendOk("You have failed this test.")
-                        cm.mapMessage(5, "You have failed the Gatekeeper Test.")
+                        MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "You have failed the Gatekeeper Test.")
                         eim.setProperty("stage1phase", "1")
                      }
                      eim.setProperty("stage1status", "waiting")
@@ -99,7 +101,7 @@ class NPC9040009 {
                } else if (status == 1) {
                   int[] reactors = getReactors()
                   int[] combo = makeCombo(reactors)
-                  cm.mapMessage(5, "Please wait while the combination is revealed.")
+                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Please wait while the combination is revealed.")
                   int delay = 5000
                   for (int i = 0; i < combo.length; i++) {
                      cm.getPlayer().getMap().getReactorByOid(combo[i]).delayedHitReactor(cm.getClient(), delay + 3500 * i)

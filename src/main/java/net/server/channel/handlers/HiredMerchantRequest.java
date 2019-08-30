@@ -34,6 +34,8 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.maps.MaplePlayerShop;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
@@ -78,10 +80,10 @@ public final class HiredMerchantRequest extends AbstractMaplePacketHandler {
                chr.announce(MaplePacketCreator.retrieveFirstMessage());
             }
          } else {
-            chr.dropMessage(1, "You already have a store open.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You already have a store open.");
          }
       } else {
-         chr.dropMessage(1, "You cannot open your hired merchant here.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot open your hired merchant here.");
       }
    }
 }

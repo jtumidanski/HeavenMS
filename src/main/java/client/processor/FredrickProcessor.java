@@ -52,7 +52,9 @@ import server.maps.MapleHiredMerchant;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.ServerNoticeType;
 
 /**
  * @author RonanLana - synchronization of Fredrick modules & operation results
@@ -227,7 +229,7 @@ public class FredrickProcessor {
                chr.announce(MaplePacketCreator.fredrickMessage((byte) 0x1E));
                removeFredrickLog(chr.getId());
             } else {
-               chr.message("An unknown error has occurred.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "An unknown error has occurred.");
             }
          } finally {
             c.releaseClient();

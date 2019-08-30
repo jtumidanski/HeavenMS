@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.life.MapleMonsterInformationProvider;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 public class ReloadDropsCommand extends Command {
    {
@@ -37,6 +39,6 @@ public class ReloadDropsCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       MapleMonsterInformationProvider.getInstance().clearDrops();
-      player.dropMessage(5, "Reloaded Drops");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Reloaded Drops");
    }
 }
