@@ -215,10 +215,7 @@ public final class PacketProcessor {
    }
 
    public MaplePacketHandler getHandler(short packetId) {
-      if (packetId > handlers.size()) {
-         return null;
-      }
-      return handlers.get(packetId);
+      return handlers.get(Integer.valueOf(packetId));
    }
 
    public void registerHandler(RecvOpcode code, MaplePacketHandler handler) {

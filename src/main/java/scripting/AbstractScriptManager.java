@@ -72,7 +72,7 @@ public abstract class AbstractScriptManager {
       ScriptEngine engine = c.getScriptEngine(cachePath);
 
       if (engine == null) {
-         engine = getScriptEngine(cachePath);
+         engine = getScriptEngine(path);
          c.setScriptEngine(path, engine);
       }
 

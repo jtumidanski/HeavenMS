@@ -12,7 +12,7 @@ import scripting.npc.NPCConversationManager
 
 class NPC12101 {
    NPCConversationManager cm
-   int status = -1
+   int status = 0
    int sel = -1
 
    def start() {
@@ -26,7 +26,8 @@ class NPC12101 {
             status -= 2
             start()
          } else if (mode == 0) {
-            status -= 2
+            status -= 3
+            action((byte) 1, type, selection)
          } else {
             cm.dispose()
          }

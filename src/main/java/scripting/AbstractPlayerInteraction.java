@@ -323,7 +323,7 @@ public class AbstractPlayerInteraction {
 
                List<Pair<Item, MapleInventoryType>> addItems = prepareProofInventoryItems(toAdd);
 
-               boolean canHold = MapleInventory.checkSpots(c.getPlayer(), addItems, true);
+               boolean canHold = MapleInventory.checkSpots(c.getPlayer(), addItems, false);
                if (!canHold) {
                   return false;
                }
