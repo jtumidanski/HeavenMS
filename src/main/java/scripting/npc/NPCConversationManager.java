@@ -904,7 +904,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          }
       }
       if (leader != null) {
-         if (!leader.isChallenged()) {
+         if (leader.canBeChallenged()) {
             if (!sendCPQChallenge("cpq2", leader.getId())) {
                sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomAnswer));
             }
@@ -935,7 +935,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          }
       }
       if (leader != null) {
-         if (!leader.isChallenged()) {
+         if (leader.canBeChallenged()) {
             if (!sendCPQChallenge("cpq1", leader.getId())) {
                sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomAnswer));
             }

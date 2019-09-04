@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -100,7 +99,6 @@ import client.newyear.NewYearCardRecord;
 import client.processor.BuffStatProcessor;
 import client.processor.ChairProcessor;
 import client.processor.CharacterProcessor;
-import client.processor.FredrickProcessor;
 import client.processor.MapleFamilyProcessor;
 import client.processor.MapleJobProcessor;
 import client.processor.PartyProcessor;
@@ -206,11 +204,9 @@ import tools.packets.Wedding;
 
 public class MapleCharacter extends AbstractMapleCharacterObject {
    private static final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-   private static String[] ariantroomleader = new String[3];
-   private static int[] ariantroomslot = new int[3];
    private final Map<Short, MapleQuestStatus> quests;
-   public AriantColiseum ariantColiseum;
-   public short totalCP, availableCP;
+   private AriantColiseum ariantColiseum;
+   private short totalCP, availableCP;
    private int world;
    private int accountid, id, level;
    private int rank, rankMove, jobRank, jobRankMove;
@@ -234,7 +230,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private int possibleReports = 10;
    private int ariantPoints, dojoPoints, vanquisherStage, dojoStage, dojoEnergy, vanquisherKills;
    private int expRate = 1, mesoRate = 1, dropRate = 1, expCoupon = 1, mesoCoupon = 1, dropCoupon = 1;
-   //private int omokwins, omokties, omoklosses, matchcardwins, matchcardties, matchcardlosses;
    private GameData omok;
    private GameData matchCard;
    private int owlSearch;
@@ -438,14 +433,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       petLootCd = Server.getInstance().getCurrentTime();
    }
 
-   public static String getAriantRoomLeaderName(int room) {
-      return ariantroomleader[room];
-   }
-
-   public static int getAriantSlotsRoom(int room) {
-      return ariantroomslot[room];
-   }
-
    public void setMount(MapleMount mapleMount) {
       maplemount = mapleMount;
    }
@@ -560,19 +547,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.matchCard = matchCard;
    }
 
-   public static void removeAriantRoom(int room) {
-      ariantroomleader[room] = "";
-      ariantroomslot[room] = 0;
-   }
-
-   public static void setAriantRoomLeader(int room, String charname) {
-      ariantroomleader[room] = charname;
-   }
-
-   public static void setAriantSlotRoom(int room, int slot) {
-      ariantroomslot[room] = slot;
-   }
-
    private static int calcTransientRatio(float transientpoint) {
       int ret = (int) transientpoint;
       return !(ret <= 0 && transientpoint > 0.0f) ? ret : 1;
@@ -679,10 +653,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public long getPetLootCd() {
       return petLootCd;
-   }
-
-   public void setPetLootCd(long cd) {
-      petLootCd = cd;
    }
 
    public boolean getCS() {
@@ -792,10 +762,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          this.dojoPoints += pts;
       }
       return pts;
-   }
-
-   public void addFame(int famechange) {
-      this.fame += famechange;
    }
 
    public void addFriendshipRing(MapleRing r) {
@@ -922,14 +888,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       lastcombo = time;
    }
 
-   public int getLastMobCount() { //Used for skills that have mobCount at 1. (a/b)
-      return lastmobcount;
-   }
-
-   public void setLastMobCount(byte count) {
-      lastmobcount = count;
-   }
-
    public boolean cannotEnterCashShop() {
       return blockCashShop;
    }
@@ -955,7 +913,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.initialSpawnPoint = portal.getId();
    }
 
-   public String getMedalText() {
+   private String getMedalText() {
       String medal = "";
       final Item medalItem = getInventory(MapleInventoryType.EQUIPPED).getItem((short) -49);
       if (medalItem != null) {
@@ -964,7 +922,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return medal;
    }
 
-   public void Hide(boolean hide, boolean login) {
+   private void Hide(boolean hide, boolean login) {
       if (isGM() && hide != this.hidden) {
          if (!hide) {
             this.hidden = false;
@@ -1068,7 +1026,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.ci = type;
    }
 
-   public void setMasteries(int jobId) {
+   private void setMasteries(int jobId) {
       int[] skills = new int[4];
       for (int i = 0; i > skills.length; i++) {
          skills[i] = 0; //that initialization meng
@@ -1158,15 +1116,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       }
 
-      TimerManager.getInstance().schedule(new Runnable() {    // need to delay to ensure clientside has finished reloading character data
-         @Override
-         public void run() {
-            MapleCharacter thisChr = MapleCharacter.this;
-            MapleMap map = thisChr.getMap();
+      // need to delay to ensure clientside has finished reloading character data
+      TimerManager.getInstance().schedule(() -> {
+         MapleCharacter thisChr = MapleCharacter.this;
+         MapleMap map = thisChr.getMap();
 
-            if (map != null) {
-               map.broadcastMessage(thisChr, MaplePacketCreator.showForeignEffect(thisChr.getId(), 8), false);
-            }
+         if (map != null) {
+            map.broadcastMessage(thisChr, MaplePacketCreator.showForeignEffect(thisChr.getId(), 8), false);
          }
       }, 777);
    }
@@ -1324,7 +1280,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       broadcastStance();
    }
 
-   public void broadcastStance() {
+   private void broadcastStance() {
       map.broadcastMessage(this, MaplePacketCreator.movePlayer(id, this.getIdleMovement(), getIdleMovementDataLength()), false);
    }
 
@@ -1417,11 +1373,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void changeMap(int map, String portal) {
       MapleMap warpMap = getWarpMap(map);
       changeMap(warpMap, warpMap.getPortal(portal));
-   }
-
-   public void changeMap(int map, MaplePortal portal) {
-      MapleMap warpMap = getWarpMap(map);
-      changeMap(warpMap, portal);
    }
 
    public void changeMap(MapleMap to) {
@@ -1759,16 +1710,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    /**
-    * Executes a function given a skill
-    *
-    * @param skillId  the skill identifier
-    * @param function the function to apply
-    */
-   private boolean applyForSkill(int skillId, BiFunction<Skill, Integer, Boolean> function) {
-      return SkillFactory.applyForSkill(this, skillId, function, false);
-   }
-
-   /**
     * Executes a function if the user has a skill above level 0.
     *
     * @param skillId  the skill identifier
@@ -1806,19 +1747,16 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     */
    private void scheduleBerserk(boolean isHidden, MapleCharacter character, Skill skill, Integer skillLevel) {
       this.berserk = character.getHp() * 100 / character.getCurrentMaxHp() < skill.getEffect(skillLevel).getX();
-      scheduler.add(MapleCharacterScheduler.Type.BERSERK, new Runnable() {
-         @Override
-         public void run() {
-            if (awayFromWorld.get()) {
-               return;
-            }
+      scheduler.add(MapleCharacterScheduler.Type.BERSERK, () -> {
+         if (awayFromWorld.get()) {
+            return;
+         }
 
-            client.announce(MaplePacketCreator.showOwnBerserk(skillLevel, MapleCharacter.this.berserk));
-            if (!isHidden) {
-               getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
-            } else {
-               getMap().broadcastGMMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
-            }
+         client.announce(MaplePacketCreator.showOwnBerserk(skillLevel, MapleCharacter.this.berserk));
+         if (!isHidden) {
+            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
+         } else {
+            getMap().broadcastGMMessage(MapleCharacter.this, MaplePacketCreator.showBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
          }
       }, 5000, 3000);
    }
@@ -1871,7 +1809,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void releaseControlledMonsters() {
+   private void releaseControlledMonsters() {
       Collection<MapleMonster> controlledMonsters;
 
       cpnLock.lock();
@@ -1959,7 +1897,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             final byte[] pickupPacket = MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex);
 
             Item mItem = mapitem.getItem();
-            boolean hasSpaceInventory = true;
+            boolean hasSpaceInventory;
             if (mapitem.getItemId() == 4031865 || mapitem.getItemId() == 4031866 || mapitem.getMeso() > 0 || ii.isConsumeOnPickup(mapitem.getItemId()) || (hasSpaceInventory = MapleInventoryManipulator.checkSpace(client, mapitem.getItemId(), mItem.getQuantity(), mItem.getOwner()))) {
                int mapId = this.getMapId();
 
@@ -2195,24 +2133,21 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       chrLock.lock();
       try {
          stopChairTask();
-         scheduler.add(MapleCharacterScheduler.Type.CHAIR_RECOVERY, new Runnable() {
-            @Override
-            public void run() {
-               updateChairHealStats();
-               final int healHP = localchairhp;
-               final int healMP = localchairmp;
+         scheduler.add(MapleCharacterScheduler.Type.CHAIR_RECOVERY, () -> {
+            updateChairHealStats();
+            final int healHP = localchairhp;
+            final int healMP = localchairmp;
 
-               if (MapleCharacter.this.getHp() < localmaxhp) {
-                  byte recHP = (byte) (healHP / ServerConstants.CHAIR_EXTRA_HEAL_MULTIPLIER);
+            if (MapleCharacter.this.getHp() < localmaxhp) {
+               byte recHP = (byte) (healHP / ServerConstants.CHAIR_EXTRA_HEAL_MULTIPLIER);
 
-                  client.announce(MaplePacketCreator.showOwnRecovery(recHP));
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showRecovery(id, recHP), false);
-               } else if (MapleCharacter.this.getMp() >= localmaxmp) {
-                  stopChairTask();    // optimizing schedule management when player is already with full pool.
-               }
-
-               addMPHP(healHP, healMP);
+               client.announce(MaplePacketCreator.showOwnRecovery(recHP));
+               getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showRecovery(id, recHP), false);
+            } else if (MapleCharacter.this.getMp() >= localmaxmp) {
+               stopChairTask();    // optimizing schedule management when player is already with full pool.
             }
+
+            addMPHP(healHP, healMP);
          }, healInterval, healInterval);
       } finally {
          chrLock.unlock();
@@ -2240,23 +2175,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void startExtraTaskInternal(final byte healHP, final byte healMP, final short healInterval) {
       extraRecInterval = healInterval;
 
-      scheduler.add(MapleCharacterScheduler.Type.EXTRA_RECOVERY, new Runnable() {
-         @Override
-         public void run() {
-            if (getBuffSource(MapleBuffStat.HPREC) == -1 && getBuffSource(MapleBuffStat.MPREC) == -1) {
-               stopExtraTask();
-               return;
-            }
-
-            if (MapleCharacter.this.getHp() < localmaxhp) {
-               if (healHP > 0) {
-                  client.announce(MaplePacketCreator.showOwnRecovery(healHP));
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showRecovery(id, healHP), false);
-               }
-            }
-
-            addMPHP(healHP, healMP);
+      scheduler.add(MapleCharacterScheduler.Type.EXTRA_RECOVERY, () -> {
+         if (getBuffSource(MapleBuffStat.HPREC) == -1 && getBuffSource(MapleBuffStat.MPREC) == -1) {
+            stopExtraTask();
+            return;
          }
+
+         if (MapleCharacter.this.getHp() < localmaxhp) {
+            if (healHP > 0) {
+               client.announce(MaplePacketCreator.showOwnRecovery(healHP));
+               getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showRecovery(id, healHP), false);
+            }
+         }
+
+         addMPHP(healHP, healMP);
       }, healInterval, healInterval);
    }
 
@@ -2293,7 +2225,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public final int getDiseasesSize() {
+   private int getDiseasesSize() {
       chrLock.lock();
       try {
          return diseases.size();
@@ -2437,7 +2369,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void dispelSkill(int skillid) {
+   private void dispelSkill(int skillid) {
       List<MapleBuffStatValueHolder> allBuffs = getAllStatups();
       for (MapleBuffStatValueHolder mbsvh : allBuffs) {
          if (skillid == 0) {
@@ -2493,27 +2425,24 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void diseaseExpireTask() {
-      scheduler.addIfNotExists(MapleCharacterScheduler.Type.DISEASE_EXPIRE, new Runnable() {
-         @Override
-         public void run() {
-            Set<MapleDisease> toExpire = new LinkedHashSet<>();
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.DISEASE_EXPIRE, () -> {
+         Set<MapleDisease> toExpire = new LinkedHashSet<>();
 
-            chrLock.lock();
-            try {
-               long curTime = Server.getInstance().getCurrentTime();
+         chrLock.lock();
+         try {
+            long curTime = Server.getInstance().getCurrentTime();
 
-               for (Entry<MapleDisease, Long> de : diseaseExpires.entrySet()) {
-                  if (de.getValue() < curTime) {
-                     toExpire.add(de.getKey());
-                  }
+            for (Entry<MapleDisease, Long> de : diseaseExpires.entrySet()) {
+               if (de.getValue() < curTime) {
+                  toExpire.add(de.getKey());
                }
-            } finally {
-               chrLock.unlock();
             }
+         } finally {
+            chrLock.unlock();
+         }
 
-            for (MapleDisease d : toExpire) {
-               dispelDebuff(d);
-            }
+         for (MapleDisease d : toExpire) {
+            dispelDebuff(d);
          }
       }, 1500);
    }
@@ -2523,31 +2452,28 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void buffExpireTask() {
-      scheduler.addIfNotExists(MapleCharacterScheduler.Type.BUFF_EXPIRE, new Runnable() {
-         @Override
-         public void run() {
-            Set<Entry<Integer, Long>> es;
-            List<MapleBuffStatValueHolder> toCancel = new ArrayList<>();
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.BUFF_EXPIRE, () -> {
+         Set<Entry<Integer, Long>> es;
+         List<MapleBuffStatValueHolder> toCancel = new ArrayList<>();
 
-            effLock.lock();
-            chrLock.lock();
-            try {
-               es = new LinkedHashSet<>(buffExpires.entrySet());
+         effLock.lock();
+         chrLock.lock();
+         try {
+            es = new LinkedHashSet<>(buffExpires.entrySet());
 
-               long curTime = Server.getInstance().getCurrentTime();
-               for (Entry<Integer, Long> bel : es) {
-                  if (curTime >= bel.getValue()) {
-                     toCancel.add(buffEffects.get(bel.getKey()).entrySet().iterator().next().getValue());    //rofl
-                  }
+            long curTime = Server.getInstance().getCurrentTime();
+            for (Entry<Integer, Long> bel : es) {
+               if (curTime >= bel.getValue()) {
+                  toCancel.add(buffEffects.get(bel.getKey()).entrySet().iterator().next().getValue());    //rofl
                }
-            } finally {
-               chrLock.unlock();
-               effLock.unlock();
             }
+         } finally {
+            chrLock.unlock();
+            effLock.unlock();
+         }
 
-            for (MapleBuffStatValueHolder mbsvh : toCancel) {
-               cancelEffect(mbsvh.effect, false, mbsvh.startTime);
-            }
+         for (MapleBuffStatValueHolder mbsvh : toCancel) {
+            cancelEffect(mbsvh.effect, false, mbsvh.startTime);
          }
       }, 1500);
    }
@@ -2557,27 +2483,24 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void skillCooldownTask() {
-      scheduler.addIfNotExists(MapleCharacterScheduler.Type.SKILL_COOLDOWN, new Runnable() {
-         @Override
-         public void run() {
-            Set<Entry<Integer, MapleCoolDownValueHolder>> es;
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.SKILL_COOLDOWN, () -> {
+         Set<Entry<Integer, MapleCoolDownValueHolder>> es;
 
-            effLock.lock();
-            chrLock.lock();
-            try {
-               es = new LinkedHashSet<>(coolDowns.entrySet());
-            } finally {
-               chrLock.unlock();
-               effLock.unlock();
-            }
+         effLock.lock();
+         chrLock.lock();
+         try {
+            es = new LinkedHashSet<>(coolDowns.entrySet());
+         } finally {
+            chrLock.unlock();
+            effLock.unlock();
+         }
 
-            long curTime = Server.getInstance().getCurrentTime();
-            for (Entry<Integer, MapleCoolDownValueHolder> bel : es) {
-               MapleCoolDownValueHolder mcdvh = bel.getValue();
-               if (curTime >= mcdvh.startTime + mcdvh.length) {
-                  removeCooldown(mcdvh.skillId);
-                  client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId, 0));
-               }
+         long curTime = Server.getInstance().getCurrentTime();
+         for (Entry<Integer, MapleCoolDownValueHolder> bel : es) {
+            MapleCoolDownValueHolder mcdvh = bel.getValue();
+            if (curTime >= mcdvh.startTime + mcdvh.length) {
+               removeCooldown(mcdvh.skillId);
+               client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId, 0));
             }
          }
       }, 1500);
@@ -2588,76 +2511,73 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void expirationTask() {
-      scheduler.addIfNotExists(MapleCharacterScheduler.Type.ITEM_EXPIRE, new Runnable() {
-         @Override
-         public void run() {
-            boolean deletedCoupon = false;
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.ITEM_EXPIRE, () -> {
+         boolean deletedCoupon = false;
 
-            long expiration, currenttime = System.currentTimeMillis();
-            Set<Skill> keys = getSkills().keySet();
-            for (Skill key : keys) {
-               SkillEntry skill = getSkills().get(key);
-               if (skill.getExpiration() != -1 && skill.getExpiration() < currenttime) {
-                  changeSkillLevel(key, (byte) -1, 0, -1);
+         long expiration, currenttime = System.currentTimeMillis();
+         Set<Skill> keys = getSkills().keySet();
+         for (Skill key : keys) {
+            SkillEntry skill = getSkills().get(key);
+            if (skill.getExpiration() != -1 && skill.getExpiration() < currenttime) {
+               changeSkillLevel(key, (byte) -1, 0, -1);
+            }
+         }
+
+         List<Item> toberemove = new ArrayList<>();
+         for (MapleInventory inv : inventory) {
+            for (Item item : inv.list()) {
+               expiration = item.getExpiration();
+
+               if (expiration != -1 && (expiration < currenttime) && ((item.getFlag() & ItemConstants.LOCK) == ItemConstants.LOCK)) {
+                  short lock = item.getFlag();
+                  lock &= ~(ItemConstants.LOCK);
+                  item.setFlag(lock); //Probably need a check, else people can make expiring items into permanent items...
+                  item.setExpiration(-1);
+                  forceUpdateItem(item);   //TEST :3
+               } else if (expiration != -1 && expiration < currenttime) {
+                  if (!ItemConstants.isPet(item.getItemId())) {
+                     client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
+                     toberemove.add(item);
+                     if (ItemConstants.isRateCoupon(item.getItemId())) {
+                        deletedCoupon = true;
+                     }
+                  } else {
+                     if (ItemConstants.isExpirablePet(item.getItemId())) {
+                        client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
+                        toberemove.add(item);
+                     } else {
+                        item.setExpiration(-1);
+                        forceUpdateItem(item);
+                     }
+                  }
                }
             }
 
-            List<Item> toberemove = new ArrayList<>();
-            for (MapleInventory inv : inventory) {
-               for (Item item : inv.list()) {
-                  expiration = item.getExpiration();
+            if (!toberemove.isEmpty()) {
+               for (Item item : toberemove) {
+                  MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
+               }
 
-                  if (expiration != -1 && (expiration < currenttime) && ((item.getFlag() & ItemConstants.LOCK) == ItemConstants.LOCK)) {
-                     short lock = item.getFlag();
-                     lock &= ~(ItemConstants.LOCK);
-                     item.setFlag(lock); //Probably need a check, else people can make expiring items into permanent items...
-                     item.setExpiration(-1);
-                     forceUpdateItem(item);   //TEST :3
-                  } else if (expiration != -1 && expiration < currenttime) {
-                     if (!ItemConstants.isPet(item.getItemId())) {
-                        client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
-                        toberemove.add(item);
-                        if (ItemConstants.isRateCoupon(item.getItemId())) {
-                           deletedCoupon = true;
-                        }
-                     } else {
-                        if (ItemConstants.isExpirablePet(item.getItemId())) {
-                           client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
-                           toberemove.add(item);
-                        } else {
-                           item.setExpiration(-1);
-                           forceUpdateItem(item);
-                        }
+               MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+               for (Item item : toberemove) {
+                  List<Integer> toadd = new ArrayList<>();
+                  Pair<Integer, String> replace = ii.getReplaceOnExpire(item.getItemId());
+                  if (replace.left > 0) {
+                     toadd.add(replace.left);
+                     if (!replace.right.isEmpty()) {
+                        MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, replace.right);
                      }
+                  }
+                  for (Integer itemid : toadd) {
+                     MapleInventoryManipulator.addById(client, itemid, (short) 1);
                   }
                }
 
-               if (!toberemove.isEmpty()) {
-                  for (Item item : toberemove) {
-                     MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
-                  }
+               toberemove.clear();
+            }
 
-                  MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-                  for (Item item : toberemove) {
-                     List<Integer> toadd = new ArrayList<>();
-                     Pair<Integer, String> replace = ii.getReplaceOnExpire(item.getItemId());
-                     if (replace.left > 0) {
-                        toadd.add(replace.left);
-                        if (!replace.right.isEmpty()) {
-                           MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, replace.right);
-                        }
-                     }
-                     for (Integer itemid : toadd) {
-                        MapleInventoryManipulator.addById(client, itemid, (short) 1);
-                     }
-                  }
-
-                  toberemove.clear();
-               }
-
-               if (deletedCoupon) {
-                  updateCouponRates();
-               }
+            if (deletedCoupon) {
+               updateCouponRates();
             }
          }
       }, 60000);
@@ -2728,7 +2648,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       loseExp(loss, show, inChat, true);
    }
 
-   public void loseExp(int loss, boolean show, boolean inChat, boolean white) {
+   private void loseExp(int loss, boolean show, boolean inChat, boolean white) {
       gainExpInternal(-loss, 0, 0, show, inChat, white);
    }
 
@@ -2910,10 +2830,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return battleShipHp;
    }
 
-   public void setBattleshipHp(int battleshipHp) {
-      this.battleShipHp = battleshipHp;
-   }
-
    public BuddyList getBuddylist() {
       return buddylist;
    }
@@ -2979,17 +2895,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public Set<Integer> getAvailableBuffs() {
-      effLock.lock();
-      chrLock.lock();
-      try {
-         return new LinkedHashSet<>(buffEffects.keySet());
-      } finally {
-         chrLock.unlock();
-         effLock.unlock();
-      }
-   }
-
    private List<MapleBuffStatValueHolder> getAllStatups() {
       effLock.lock();
       chrLock.lock();
@@ -3021,22 +2926,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
          }
          return new ArrayList<>(ret.values());
-      } finally {
-         chrLock.unlock();
-         effLock.unlock();
-      }
-   }
-
-   public List<Pair<MapleBuffStat, Integer>> getAllActiveStatups() {
-      effLock.lock();
-      chrLock.lock();
-      try {
-         List<Pair<MapleBuffStat, Integer>> ret = new ArrayList<>();
-         for (MapleBuffStat mbs : effects.keySet()) {
-            MapleBuffStatValueHolder mbsvh = effects.get(mbs);
-            ret.add(new Pair<>(mbs, mbsvh.value));
-         }
-         return ret;
       } finally {
          chrLock.unlock();
          effLock.unlock();
@@ -3096,20 +2985,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       }
 
-      ret.sort(new Comparator<>() {
-         @Override
-         public int compare(Pair<MapleBuffStat, Integer> p1, Pair<MapleBuffStat, Integer> p2) {
-            return p1.getLeft().compareTo(p2.getLeft());
-         }
-      });
+      ret.sort((p1, p2) -> p1.getLeft().compareTo(p2.getLeft()));
 
       if (!singletonStatups.isEmpty()) {
-         Collections.sort(singletonStatups, new Comparator<Pair<MapleBuffStat, Integer>>() {
-            @Override
-            public int compare(Pair<MapleBuffStat, Integer> p1, Pair<MapleBuffStat, Integer> p2) {
-               return p1.getLeft().compareTo(p2.getLeft());
-            }
-         });
+         singletonStatups.sort((p1, p2) -> p1.getLeft().compareTo(p2.getLeft()));
 
          ret.addAll(singletonStatups);
       }
@@ -3148,22 +3027,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       buffExpires.remove(sourceid);
-   }
-
-   private void dropWorstEffectFromItemEffectHolder(MapleBuffStat mbs) {
-      Integer min = Integer.MAX_VALUE;
-      Integer srcid = -1;
-      for (Entry<Integer, Map<MapleBuffStat, MapleBuffStatValueHolder>> bpl : buffEffects.entrySet()) {
-         MapleBuffStatValueHolder mbsvh = bpl.getValue().get(mbs);
-         if (mbsvh != null) {
-            if (mbsvh.value < min) {
-               min = mbsvh.value;
-               srcid = bpl.getKey();
-            }
-         }
-      }
-
-      removeEffectFromItemEffectHolder(srcid, mbs);
    }
 
    private MapleBuffStatValueHolder fetchBestEffectFromItemEffectHolder(MapleBuffStat mbs) {
@@ -3224,19 +3087,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          System.out.println("IN ACTION:");
          for (Entry<MapleBuffStat, MapleBuffStatValueHolder> bpl : effects.entrySet()) {
             System.out.println(bpl.getKey().name() + " -> " + MapleItemInformationProvider.getInstance().getName(bpl.getValue().effect.getSourceId()));
-         }
-      } finally {
-         chrLock.unlock();
-         effLock.unlock();
-      }
-   }
-
-   public void debugListAllBuffsCount() {
-      effLock.lock();
-      chrLock.lock();
-      try {
-         for (Entry<MapleBuffStat, Byte> mbsl : buffEffectsCount.entrySet()) {
-            System.out.println(mbsl.getKey().name() + " -> " + mbsl.getValue());
          }
       } finally {
          chrLock.unlock();
@@ -3646,10 +3496,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       Map<MapleBuffStatValueHolder, MapleStatEffect> yokeStats = new LinkedHashMap<>();
 
       // priority buffsources: override buffstats for the client to perceive those as "currently buffed"
-      Set<MapleBuffStatValueHolder> mbsvhList = new LinkedHashSet<>();
-      for (MapleBuffStatValueHolder mbsvh : getAllStatups()) {
-         mbsvhList.add(mbsvh);
-      }
+      Set<MapleBuffStatValueHolder> mbsvhList = new LinkedHashSet<>(getAllStatups());
 
       for (MapleBuffStatValueHolder mbsvh : mbsvhList) {
          MapleStatEffect mse = mbsvh.effect;
@@ -3759,9 +3606,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       for (Pair<Integer, Pair<MapleStatEffect, Long>> lmse : toUpdateEffects) {
          Pair<MapleStatEffect, Long> msel = lmse.getRight();
 
-         for (Pair<MapleBuffStat, Integer> statup : getActiveStatupsFromSourceid(lmse.getLeft())) {
-            activeStatups.add(statup);
-         }
+         activeStatups.addAll(getActiveStatupsFromSourceid(lmse.getLeft()));
 
          msel.getLeft().updateBuffEffect(this, activeStatups, msel.getRight());
          activeStatups.clear();
@@ -3771,9 +3616,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       for (Pair<Integer, Pair<MapleStatEffect, Long>> lmse : priorityEffects) {
          Pair<MapleStatEffect, Long> msel = lmse.getRight();
 
-         for (Pair<MapleBuffStat, Integer> statup : getActiveStatupsFromSourceid(lmse.getLeft())) {
-            activeStatups.add(statup);
-         }
+         activeStatups.addAll(getActiveStatupsFromSourceid(lmse.getLeft()));
 
          msel.getLeft().updateBuffEffect(this, activeStatups, msel.getRight());
          activeStatups.clear();
@@ -3816,24 +3659,21 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          chrLock.lock();
          try {
             scheduler.cancel(MapleCharacterScheduler.Type.RECOVERY);
-            scheduler.add(MapleCharacterScheduler.Type.RECOVERY, new Runnable() {
-               @Override
-               public void run() {
-                  if (getBuffSource(MapleBuffStat.RECOVERY) == -1) {
-                     chrLock.lock();
-                     try {
-                        scheduler.cancel(MapleCharacterScheduler.Type.RECOVERY);
-                     } finally {
-                        chrLock.unlock();
-                     }
-
-                     return;
+            scheduler.add(MapleCharacterScheduler.Type.RECOVERY, () -> {
+               if (getBuffSource(MapleBuffStat.RECOVERY) == -1) {
+                  chrLock.lock();
+                  try {
+                     scheduler.cancel(MapleCharacterScheduler.Type.RECOVERY);
+                  } finally {
+                     chrLock.unlock();
                   }
 
-                  addHP(heal);
-                  client.announce(MaplePacketCreator.showOwnRecovery(heal));
-                  getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showRecovery(id, heal), false);
+                  return;
                }
+
+               addHP(heal);
+               client.announce(MaplePacketCreator.showOwnRecovery(heal));
+               getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showRecovery(id, heal), false);
             }, healInterval, healInterval);
          } finally {
             chrLock.unlock();
@@ -3944,36 +3784,30 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void scheduleAuraOfBeholder(int beholder, Skill skill, Integer skillLevel) {
       final MapleStatEffect healEffect = skill.getEffect(skillLevel);
       int healInterval = healEffect.getX() * 1000;
-      scheduler.add(MapleCharacterScheduler.Type.BEHODLER_HEAL, new Runnable() {
-         @Override
-         public void run() {
-            if (awayFromWorld.get()) {
-               return;
-            }
-
-            addHP(healEffect.getHp());
-            client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
-            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, 5), true);
-            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showOwnBuffEffect(beholder, 2), false);
+      scheduler.add(MapleCharacterScheduler.Type.BEHODLER_HEAL, () -> {
+         if (awayFromWorld.get()) {
+            return;
          }
+
+         addHP(healEffect.getHp());
+         client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
+         getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, 5), true);
+         getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showOwnBuffEffect(beholder, 2), false);
       }, healInterval, healInterval);
    }
 
    private void scheduleHexOfBeholder(int beholder, Skill skill, Integer skillLevel) {
       final MapleStatEffect buffEffect = skill.getEffect(skillLevel);
       int buffInterval = buffEffect.getX() * 1000;
-      scheduler.add(MapleCharacterScheduler.Type.BEHOLDER_BUFF, new Runnable() {
-         @Override
-         public void run() {
-            if (awayFromWorld.get()) {
-               return;
-            }
-
-            buffEffect.applyTo(MapleCharacter.this);
-            client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
-            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, (int) (Math.random() * 3) + 6), true);
-            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBuffeffect(getId(), beholder, 2), false);
+      scheduler.add(MapleCharacterScheduler.Type.BEHOLDER_BUFF, () -> {
+         if (awayFromWorld.get()) {
+            return;
          }
+
+         buffEffect.applyTo(MapleCharacter.this);
+         client.announce(MaplePacketCreator.showOwnBuffEffect(beholder, 2));
+         getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.summonSkill(getId(), beholder, (int) (Math.random() * 3) + 6), true);
+         getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBuffeffect(getId(), beholder, 2), false);
       }, buffInterval, buffInterval);
    }
 
@@ -3991,7 +3825,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       });
    }
 
-   public boolean registerChairBuff() {
+   private boolean registerChairBuff() {
       if (!ServerConstants.USE_CHAIR_EXTRAHEAL) {
          return false;
       }
@@ -4172,10 +4006,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return energybar;
    }
 
-   public void setEnergyBar(int set) {
-      energybar = set;
-   }
-
    public EventInstanceManager getEventInstance() {
       evtLock.lock();
       try {
@@ -4273,7 +4103,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public Map<Integer, Set<Integer>> getExcluded() {
+   private Map<Integer, Set<Integer>> getExcluded() {
       chrLock.lock();
       try {
          return Collections.unmodifiableMap(excluded);
@@ -4553,7 +4383,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return count;
    }
 
-   public int getCleanItemQuantity(int itemId, boolean checkEquipped) {
+   private int getCleanItemQuantity(int itemId, boolean checkEquipped) {
       int count = inventory[ItemConstants.getInventoryType(itemId).ordinal()].countNotOwnedById(itemId);
       if (checkEquipped) {
          count += inventory[MapleInventoryType.EQUIPPED.ordinal()].countNotOwnedById(itemId);
@@ -4583,14 +4413,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public Map<Integer, MapleKeyBinding> getKeymap() {
       return keymap;
-   }
-
-   public long getLastHealed() {
-      return lastHealed;
-   }
-
-   public void setLastHealed(long time) {
-      this.lastHealed = time;
    }
 
    public long getLastUsedCashItem() {
@@ -4670,7 +4492,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return isCygnus() ? 120 : 200;
    }
 
-   public int getMaxLevel() {
+   private int getMaxLevel() {
       if (!ServerConstants.USE_ENFORCE_JOB_LEVEL_RANGE || isGmJob()) {
          return getMaxClassLevel();
       }
@@ -4830,20 +4652,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.name = name;
    }
 
-   public int getNextEmptyPetIndex() {
-      petLock.lock();
-      try {
-         for (int i = 0; i < 3; i++) {
-            if (pets[i] == null) {
-               return i;
-            }
-         }
-         return 3;
-      } finally {
-         petLock.unlock();
-      }
-   }
-
    public int getNoPets() {
       petLock.lock();
       try {
@@ -4995,11 +4803,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       resetPlayerAggro();
    }
 
-   public void closeNpcShop() {
+   private void closeNpcShop() {
       setShop(null);
    }
 
-   public void closeTrade() {
+   private void closeTrade() {
       MapleTrade.cancelTrade(this, MapleTrade.TradeResult.PARTNER_CANCEL);
    }
 
@@ -5145,7 +4953,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public final MapleQuestStatus getMapleQuestStatus(final int quest) {
+   private MapleQuestStatus getMapleQuestStatus(final int quest) {
       synchronized (quests) {
          return quests.get((short) quest);
       }
@@ -5157,16 +4965,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             return new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
          }
          return quests.get(quest.getId());
-      }
-   }
-
-   public final void setQuestAdd(final MapleQuest quest, final byte status, final String customData) {
-      synchronized (quests) {
-         if (!quests.containsKey(quest.getId())) {
-            final MapleQuestStatus stat = new MapleQuestStatus(quest, MapleQuestStatus.Status.getById((int) status));
-            stat.setCustomData(customData);
-            quests.put(quest.getId(), stat);
-         }
       }
    }
 
@@ -5184,12 +4982,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public final MapleQuestStatus getQuestNoAdd(final MapleQuest quest) {
       synchronized (quests) {
          return quests.get(quest.getId());
-      }
-   }
-
-   public final MapleQuestStatus getQuestRemove(final MapleQuest quest) {
-      synchronized (quests) {
-         return quests.remove(quest.getId());
       }
    }
 
@@ -5303,10 +5095,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void setSkinColor(MapleSkinColor skinColor) {
       this.skinColor = skinColor;
-   }
-
-   public int getSlot() {
-      return slots;
    }
 
    public void setSlot(int slotid) {
@@ -5479,15 +5267,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (energybar >= 10000 && energybar < 11000) {
             energybar = 15000;
             final MapleCharacter chr = this;
-            tMan.schedule(new Runnable() {
-               @Override
-               public void run() {
-                  energybar = 0;
-                  List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
-                  setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
-                  client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
-                  getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(energybar, stat));
-               }
+            tMan.schedule(() -> {
+               energybar = 0;
+               List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
+               setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
+               client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
+               getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(energybar, stat));
             }, statEffect.getDuration());
          }
       });
@@ -5532,14 +5317,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean haveItem(int itemid) {
       return getItemQuantity(itemid, ItemConstants.isEquipment(itemid)) > 0;
-   }
-
-   public boolean haveCleanItem(int itemid) {
-      return getCleanItemQuantity(itemid, ItemConstants.isEquipment(itemid)) > 0;
-   }
-
-   public boolean hasEmptySlot(int itemId) {
-      return getInventory(ItemConstants.getInventoryType(itemId)).getNextFreeSlot() > -1;
    }
 
    public boolean hasEmptySlot(byte invType) {
@@ -5676,7 +5453,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return job.getId() >= 2000 && job.getId() <= 2112;
    }
 
-   public boolean isBeginnerJob() {
+   private boolean isBeginnerJob() {
       return (job.getId() == 0 || job.getId() == 1000 || job.getId() == 2000);
    }
 
@@ -5858,12 +5635,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (level == maxClassLevel) {
             if (!this.isGM()) {
                if (ServerConstants.PLAYERNPC_AUTODEPLOY) {
-                  ThreadManager.getInstance().newTask(new Runnable() {
-                     @Override
-                     public void run() {
-                        MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapid(job), MapleCharacter.this);
-                     }
-                  });
+                  ThreadManager.getInstance().newTask(() -> MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapid(job), MapleCharacter.this));
                }
 
                final String names = (getMedalText() + name);
@@ -5931,12 +5703,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             MapleInventoryManipulator.addById(client, 4310000, (short) 1, "", -1);
          }
       } else if (level == 10) {
-         Runnable r = new Runnable() {
-            @Override
-            public void run() {
-               if (leaveParty()) {
-                  showHint("You have reached #blevel 10#k, therefore you must leave your #rstarter party#k.");
-               }
+         Runnable r = () -> {
+            if (leaveParty()) {
+               showHint("You have reached #blevel 10#k, therefore you must leave your #rstarter party#k.");
             }
          };
 
@@ -6135,16 +5904,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.dropRate *= GameConstants.getPlayerBonusDropRate(this.level / 20);
    }
 
-   public void revertLastPlayerRates() {
+   private void revertLastPlayerRates() {
       this.expRate /= GameConstants.getPlayerBonusExpRate((this.level - 1) / 20);
       this.mesoRate /= GameConstants.getPlayerBonusMesoRate((this.level - 1) / 20);
       this.dropRate /= GameConstants.getPlayerBonusDropRate((this.level - 1) / 20);
-   }
-
-   public void revertPlayerRates() {
-      this.expRate /= GameConstants.getPlayerBonusExpRate(this.level / 20);
-      this.mesoRate /= GameConstants.getPlayerBonusMesoRate(this.level / 20);
-      this.dropRate /= GameConstants.getPlayerBonusDropRate(this.level / 20);
    }
 
    public void setWorldRates() {
@@ -6303,7 +6066,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       mse.applyTo(this);
    }
 
-   public void dispelBuffCoupons() {
+   private void dispelBuffCoupons() {
       List<MapleBuffStatValueHolder> allBuffs = getAllStatups();
 
       for (MapleBuffStatValueHolder mbsvh : allBuffs) {
@@ -6596,17 +6359,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private void prepareDragonBlood(final MapleStatEffect bloodEffect) {
       scheduler.cancel(MapleCharacterScheduler.Type.DRAGON_BLOOD);
-      scheduler.add(MapleCharacterScheduler.Type.DRAGON_BLOOD, new Runnable() {
-         @Override
-         public void run() {
-            if (awayFromWorld.get()) {
-               return;
-            }
-
-            addHP(-bloodEffect.getX());
-            announce(MaplePacketCreator.showOwnBuffEffect(bloodEffect.getSourceId(), 5));
-            getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBuffeffect(getId(), bloodEffect.getSourceId(), 5), false);
+      scheduler.add(MapleCharacterScheduler.Type.DRAGON_BLOOD, () -> {
+         if (awayFromWorld.get()) {
+            return;
          }
+
+         addHP(-bloodEffect.getX());
+         announce(MaplePacketCreator.showOwnBuffEffect(bloodEffect.getSourceId(), 5));
+         getMap().broadcastMessage(MapleCharacter.this, MaplePacketCreator.showBuffeffect(getId(), bloodEffect.getSourceId(), 5), false);
       }, 4000, 4000);
    }
 
@@ -6702,7 +6462,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
          if (job.isA(MapleJob.BOWMAN)) {
 
-            Skill expert = null;
             if (job.isA(MapleJob.MARKSMAN)) {
                executeForSkill(3220004, (skill, skillLevel) -> localwatk += skill.getEffect(skillLevel).getX());
             } else if (job.isA(MapleJob.BOWMASTER)) {
@@ -6870,7 +6629,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void removeCooldown(int skillId) {
+   private void removeCooldown(int skillId) {
       effLock.lock();
       chrLock.lock();
       try {
@@ -6881,7 +6640,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void removePet(MaplePet pet, boolean shift_left) {
+   private void removePet(MaplePet pet, boolean shift_left) {
       petLock.lock();
       try {
          int slot = -1;
@@ -6978,18 +6737,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       entered.remove(map.getId());
    }
 
-   public void resetEnteredScript(int mapId) {
-      entered.remove(mapId);
-   }
-
-   public void resetEnteredScript(String script) {
-      for (int mapId : entered.keySet()) {
-         if (entered.get(mapId).equals(script)) {
-            entered.remove(mapId);
-         }
-      }
-   }
-
    public synchronized void saveCooldowns() {
       List<PlayerCoolDownValueHolder> listcd = getAllCooldowns();
       if (!listcd.isEmpty()) {
@@ -7058,10 +6805,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
 
       DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         int key = CharacterAdministrator.getInstance().create(connection, str, dex, luk, int_, gmLevel, skinColor.getId(),
+         this.id = CharacterAdministrator.getInstance().create(connection, str, dex, luk, int_, gmLevel, skinColor.getId(),
                gender, getJob().getId(), hair, face, mapid, Math.abs(meso.get()), accountid, name, world, hp, mp,
                maxhp, maxmp, level, remainingAp, remainingSp);
-         this.id = key;
 
          // Select a keybinding method
          int[] selectedKey;
@@ -7303,12 +7049,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void sendPolice(int greason, String reason, int duration) {
       announce(MaplePacketCreator.sendPolice(String.format("You have been blocked by the#b %s Police for %s.#k", "HeavenMS", reason)));
       this.isbanned = true;
-      TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            client.disconnect(false, false);
-         }
-      }, duration);
+      TimerManager.getInstance().schedule(() -> client.disconnect(false, false), duration);
    }
 
    public void sendPolice(String text) {
@@ -7421,16 +7162,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       final boolean chrDied = playerDied;
-      Runnable r = new Runnable() {
-         @Override
-         public void run() {
-            updatePartyMemberHP();    // thanks BHB (BHB88) for detecting a deadlock case within player stats.
+      Runnable r = () -> {
+         updatePartyMemberHP();    // thanks BHB (BHB88) for detecting a deadlock case within player stats.
 
-            if (chrDied) {
-               playerDead();
-            } else {
-               checkBerserk(isHidden());
-            }
+         if (chrDied) {
+            playerDead();
+         } else {
+            checkBerserk(isHidden());
          }
       };
       if (map != null) {
@@ -7512,10 +7250,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void setInventory(MapleInventoryType type, MapleInventory inv) {
-      inventory[type.ordinal()] = inv;
-   }
-
    public void setMiniGamePoints(MapleCharacter visitor, int winnerslot, boolean omok) {
       GameData thisGameData;
       GameData visitorGameData;
@@ -7539,19 +7273,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void closeRPS() {
+   private void closeRPS() {
       MapleRockPaperScissor rps = this.rps;
       if (rps != null) {
          rps.dispose(client);
          setRPS(null);
       }
-   }
-
-   public void changeName(String name) {
-      FredrickProcessor.removeFredrickReminders(this.getId());
-
-      this.name = name;
-      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setName(connection, id, name));
    }
 
    public int getDoorSlot() {
@@ -7573,10 +7300,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public byte getSlots(int type) {
       return type == MapleInventoryType.CASH.getType() ? 96 : inventory[type].getSlotLimit();
-   }
-
-   public boolean gainSlots(int type, int slots) {
-      return gainSlots(type, slots, true);
    }
 
    public boolean gainSlots(int type, int slots, boolean update) {
@@ -7613,7 +7336,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public int sellAllItemsFromPosition(MapleItemInformationProvider ii, MapleInventoryType type, short pos) {
+   private int sellAllItemsFromPosition(MapleItemInformationProvider ii, MapleInventoryType type, short pos) {
       int mesoGain = 0;
 
       MapleInventory inv = getInventory(type);
@@ -7715,7 +7438,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             */
 
          for (Entry<StatUpgrade, Float> e : statups.entrySet()) {
-            Double ev = Math.sqrt(e.getValue());
+            double ev = Math.sqrt(e.getValue());
 
             Set<Equip> extraEquipped = new LinkedHashSet<>(equipUpgrades.keySet());
             List<Equip> statEquipped = getEquipsWithStat(upgradeableEquipped, e.getKey());
@@ -7764,7 +7487,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void mergeAllItemsFromPosition(Map<StatUpgrade, Float> statups, short pos) {
+   private void mergeAllItemsFromPosition(Map<StatUpgrade, Float> statups, short pos) {
       MapleInventory inv = getInventory(MapleInventoryType.EQUIP);
       inv.lockInventory();
       try {
@@ -7947,26 +7670,17 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       startMapEffect(msg, itemId, 30000);
    }
 
-   public void startMapEffect(String msg, int itemId, int duration) {
+   private void startMapEffect(String msg, int itemId, int duration) {
       final MapleMapEffect mapEffect = new MapleMapEffect(msg, itemId);
       getClient().announce(mapEffect.makeStartData());
       TimerManager.getInstance().schedule(() -> getClient().announce(mapEffect.makeDestroyData()), duration);
-   }
-
-   public void unequipAllPets() {
-      for (int i = 0; i < 3; i++) {
-         MaplePet pet = getPet(i);
-         if (pet != null) {
-            unequipPet(pet, true);
-         }
-      }
    }
 
    public void unequipPet(MaplePet pet, boolean shift_left) {
       unequipPet(pet, shift_left, false);
    }
 
-   public void unequipPet(MaplePet pet, boolean shift_left, boolean hunger) {
+   private void unequipPet(MaplePet pet, boolean shift_left, boolean hunger) {
       byte petIdx = this.getPetIndex(pet);
       MaplePet chrPet = this.getPet(petIdx);
 
@@ -8308,10 +8022,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       newyears.remove(newyear);
    }
 
-   public void portalDelay(long delay) {
-      this.portaldelay = System.currentTimeMillis() + delay;
-   }
-
    public long portalDelay() {
       return portaldelay;
    }
@@ -8346,10 +8056,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       announce(MaplePacketCreator.updateAreaInfo(area, info));
    }
 
-   public String getAreaInfo(int area) {
-      return area_info.get((short) area);
-   }
-
    public Map<Short, String> getAreaInfos() {
       return area_info;
    }
@@ -8382,15 +8088,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return viptrockmaps;
    }
 
-   public int getTrockSize() {
-      int ret = trockmaps.indexOf(999999999);
-      if (ret == -1) {
-         ret = 5;
-      }
-
-      return ret;
-   }
-
    public void deleteFromTrocks(int map) {
       trockmaps.remove(Integer.valueOf(map));
       while (trockmaps.size() < 10) {
@@ -8405,21 +8102,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public boolean isTrockMap(int id) {
-      int index = trockmaps.indexOf(id);
-      return index != -1;
-   }
-
-   public int getVipTrockSize() {
-      int ret = viptrockmaps.indexOf(999999999);
-
-      if (ret == -1) {
-         ret = 10;
-      }
-
-      return ret;
-   }
-
    public void deleteFromVipTrocks(int map) {
       viptrockmaps.remove(Integer.valueOf(map));
       while (viptrockmaps.size() < 10) {
@@ -8432,11 +8114,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (index != -1) {
          viptrockmaps.set(index, getMapId());
       }
-   }
-
-   public boolean isVipTrockMap(int id) {
-      int index = viptrockmaps.indexOf(id);
-      return index != -1;
    }
 
    public AutobanManager getAutobanManager() {
@@ -8484,15 +8161,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void equipPendantOfSpirit() {
-      scheduler.addIfNotExists(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT, new Runnable() {
-         @Override
-         public void run() {
-            if (pendantExp < 3) {
-               pendantExp++;
-               MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, "Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
-            } else {
-               scheduler.cancel(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT);
-            }
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT, () -> {
+         if (pendantExp < 3) {
+            pendantExp++;
+            MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, "Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
+         } else {
+            scheduler.cancel(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT);
          }
       }, 3600000); //1 hour
    }
@@ -8601,10 +8275,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.loginTime = time;
    }
 
-   public long getLoginTime() {
-      return loginTime;
-   }
-
    public long getLoggedInTime() {
       return System.currentTimeMillis() - loginTime;
    }
@@ -8614,16 +8284,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean getWhiteChat() {
-      return !isGM() ? false : whiteChat;
+      return isGM() && whiteChat;
    }
 
    public void toggleWhiteChat() {
       whiteChat = !whiteChat;
-   }
-
-   // These need to be renamed, but I am too lazy right now to go through the scripts and rename them...
-   public String getPartyQuestItems() {
-      return dataString;
    }
 
    public boolean gotPartyQuestItem(String partyquestchar) {
@@ -8648,10 +8313,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public MapleDragon getDragon() {
       return dragon;
-   }
-
-   public void setDragon(MapleDragon dragon) {
-      this.dragon = dragon;
    }
 
    public long getJailExpirationTimeLeft() {
@@ -8764,7 +8425,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setRewardPoints(connection, accountid, value));
    }
 
-   public void addReborns() {
+   private void addReborns() {
       setReborns(getReborns() + 1);
    }
 
@@ -8776,7 +8437,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().countReborns(connection, id)).orElse(0);
    }
 
-   public void setReborns(int value) {
+   private void setReborns(int value) {
       if (!ServerConstants.USE_REBIRTH_SYSTEM) {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
@@ -8814,8 +8475,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.ola = ola;
    }
 
-   // MCPQ
-
    public MapleFitness getFitness() {
       return fitness;
    }
@@ -8848,7 +8507,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return cp;
    }
 
-   public void setCP(int a) {
+   private void setCP(int a) {
       this.cp = a;
    }
 
@@ -8887,12 +8546,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return totCP;
    }
 
-   public void setTotalCP(int a) {
+   private void setTotalCP(int a) {
       this.totCP = a;
-   }
-
-   public int getAvailableCP() {
-      return availableCP;
    }
 
    public void resetCP() {
@@ -8917,16 +8572,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.ariantColiseum = ariantColiseum;
    }
 
-   public MonsterCarnivalParty getMonsterCarnivalParty() {
-      return this.monsterCarnivalParty;
-   }
-
    public void setMonsterCarnivalParty(MonsterCarnivalParty mcp) {
       this.monsterCarnivalParty = mcp;
    }
 
-   public boolean isChallenged() {
-      return challenged;
+   public boolean canBeChallenged() {
+      return !challenged;
    }
 
    public void setChallenged(boolean challenged) {
@@ -8947,11 +8598,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public int getLanguage() {
       return getClient().getLanguage();
-   }
-
-   public void setLanguage(int num) {
-      getClient().setLanguage(num);
-      DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setLanguage(connection, getClient().getAccID(), num));
    }
 
    public enum FameStatus {
