@@ -86,7 +86,7 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
             blockCommand(slea, c);
             break;
          case 0x10: // /h, information by vana (and tele mode f1) ... hide ofcourse
-            c.getPlayer().Hide(slea.readByte() == 1);
+            c.getPlayer().hide(slea.readByte() == 1);
             break;
          case 0x11: // Entering a map
             switch (slea.readByte()) {

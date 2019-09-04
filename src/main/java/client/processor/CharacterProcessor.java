@@ -1,6 +1,8 @@
 package client.processor;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +23,7 @@ import client.Skill;
 import client.SkillEntry;
 import client.SkillFactory;
 import client.SkillMacro;
+import client.creator.CharacterFactoryRecipe;
 import client.database.administrator.AreaInfoAdministrator;
 import client.database.administrator.BbsThreadAdministrator;
 import client.database.administrator.BuddyAdministrator;
@@ -83,11 +86,11 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
-import server.maps.MaplePortal;
 import server.events.RescueGaga;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
 import server.maps.MapleMapManager;
+import server.maps.MaplePortal;
 import server.maps.SavedLocation;
 import server.maps.SavedLocationType;
 import server.quest.MapleQuest;
@@ -621,4 +624,73 @@ public class CharacterProcessor {
 
       return ret;
    }
+
+
+   public final boolean insertNewChar(MapleCharacter character, CharacterFactoryRecipe recipe) {
+      character.init(recipe.getStr(), recipe.getDex(), recipe.getInt(), recipe.getLuk(), recipe.getMaxHp(), recipe.getMaxMp(), recipe.getMeso());
+      character.setMaxHp(recipe.getMaxHp());
+      character.setMaxMp(recipe.getMaxMp());
+      character.setLevel(recipe.getLevel());
+      character.setRemainingAp(recipe.getRemainingAp());
+      character.setRemainingSp(GameConstants.getSkillBook(character.getJob().getId()), recipe.getRemainingSp());
+      character.setMapId(recipe.getMap());
+
+      List<Pair<Skill, Integer>> startingSkills = recipe.getStartingSkillLevel();
+      for (Pair<Skill, Integer> skEntry : startingSkills) {
+         Skill skill = skEntry.getLeft();
+         character.changeSkillLevel(skill, skEntry.getRight().byteValue(), skill.getMaxLevel(), -1);
+      }
+
+      List<Pair<Item, MapleInventoryType>> itemsWithType = recipe.getStartingItems();
+      for (Pair<Item, MapleInventoryType> itEntry : itemsWithType) {
+         character.getInventory(itEntry.getRight()).addItem(itEntry.getLeft());
+      }
+
+      character.getEvents().put("rescueGaga", new RescueGaga(0));
+
+
+      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
+         int key = CharacterAdministrator.getInstance().create(connection, character.getStr(), character.getDex(), character.getLuk(), character.getInt(), character.gmLevel(), character.getSkinColor().getId(),
+               character.getGender(), character.getJob().getId(), character.getHair(), character.getFace(), character.getMapId(), Math.abs(character.getMeso()), character.getAccountID(), character.getName(), character.getWorld(), character.getHp(), character.getMp(),
+               character.getMaxHp(), character.getMaxMp(), character.getLevel(), character.getRemainingAp(), character.getRemainingSps());
+         character.setId(key);
+
+         // Select a keybinding method
+         int[] selectedKey;
+         int[] selectedType;
+         int[] selectedAction;
+
+         if (ServerConstants.USE_CUSTOM_KEYSET) {
+            selectedKey = GameConstants.getCustomKey(true);
+            selectedType = GameConstants.getCustomType(true);
+            selectedAction = GameConstants.getCustomAction(true);
+         } else {
+            selectedKey = GameConstants.getCustomKey(false);
+            selectedType = GameConstants.getCustomType(false);
+            selectedAction = GameConstants.getCustomAction(false);
+         }
+
+
+         for (int i = 0; i < selectedKey.length; i++) {
+            KeyMapAdministrator.getInstance().create(connection, character.getId(), selectedKey[i], selectedType[i], selectedAction[i]);
+         }
+
+         List<Pair<Item, MapleInventoryType>> itemsByType = new ArrayList<>();
+
+         Arrays.stream(MapleInventoryType.values())
+               .map(character::getInventory)
+               .forEach(inventory -> inventory.list()
+                     .forEach(item -> itemsByType.add(new Pair<>(item, inventory.getType()))));
+
+         ItemFactory.INVENTORY.saveItems(itemsByType, character.getId(), connection);
+
+         if (!character.getSkills().isEmpty()) {
+            SkillAdministrator.getInstance().create(connection, character.getId(), character.getSkills().entrySet());
+         }
+
+         connection.commit();
+      });
+      return true;
+   }
+
 }

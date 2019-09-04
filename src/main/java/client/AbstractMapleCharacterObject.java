@@ -315,7 +315,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       listener.onAnnounceStatPoolUpdate();
    }
 
-   private void setRemainingSp(int remainingSp, int skillbook) {
+   public void setRemainingSp(int remainingSp, int skillbook) {
       this.remainingSp[skillbook] = remainingSp;
    }
 

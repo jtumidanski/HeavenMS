@@ -363,6 +363,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this();
       this.id = id;
       this.accountid = accountId;
+      init(str, dex, int_, luk, hp, mp, meso);
+   }
+
+   public void init(int str, int dex, int int_, int luk, int hp, int mp, int meso) {
       this.str = str;
       this.dex = dex;
       this.int_ = int_;
@@ -922,7 +926,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return medal;
    }
 
-   private void Hide(boolean hide, boolean login) {
+   private void hide(boolean hide, boolean login) {
       if (isGM() && hide != this.hidden) {
          if (!hide) {
             this.hidden = false;
@@ -948,12 +952,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void Hide(boolean hide) {
-      Hide(hide, false);
+   public void hide(boolean hide) {
+      hide(hide, false);
    }
 
    public void toggleHide(boolean login) {
-      Hide(!hidden);
+      hide(!hidden);
    }
 
    public void cancelMagicDoor() {
@@ -4338,6 +4342,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return id;
    }
 
+   public void setId(int id) {
+      this.id = id;
+   }
+
    public int getInitialSpawnPoint() {
       return initialSpawnPoint;
    }
@@ -6773,78 +6781,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void saveLocation(String type) {
       MaplePortal closest = map.findClosestPortal(getPosition());
       savedLocations[SavedLocationType.fromString(type).ordinal()] = new SavedLocation(getMapId(), closest != null ? closest.getId() : 0);
-   }
-
-   public final boolean insertNewChar(CharacterFactoryRecipe recipe) {
-      str = recipe.getStr();
-      dex = recipe.getDex();
-      int_ = recipe.getInt();
-      luk = recipe.getLuk();
-      setMaxHp(recipe.getMaxHp());
-      setMaxMp(recipe.getMaxMp());
-      hp = maxhp;
-      mp = maxmp;
-      level = recipe.getLevel();
-      remainingAp = recipe.getRemainingAp();
-      remainingSp[GameConstants.getSkillBook(job.getId())] = recipe.getRemainingSp();
-      mapid = recipe.getMap();
-      meso.set(recipe.getMeso());
-
-      List<Pair<Skill, Integer>> startingSkills = recipe.getStartingSkillLevel();
-      for (Pair<Skill, Integer> skEntry : startingSkills) {
-         Skill skill = skEntry.getLeft();
-         this.changeSkillLevel(skill, skEntry.getRight().byteValue(), skill.getMaxLevel(), -1);
-      }
-
-      List<Pair<Item, MapleInventoryType>> itemsWithType = recipe.getStartingItems();
-      for (Pair<Item, MapleInventoryType> itEntry : itemsWithType) {
-         this.getInventory(itEntry.getRight()).addItem(itEntry.getLeft());
-      }
-
-      this.events.put("rescueGaga", new RescueGaga(0));
-
-
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         this.id = CharacterAdministrator.getInstance().create(connection, str, dex, luk, int_, gmLevel, skinColor.getId(),
-               gender, getJob().getId(), hair, face, mapid, Math.abs(meso.get()), accountid, name, world, hp, mp,
-               maxhp, maxmp, level, remainingAp, remainingSp);
-
-         // Select a keybinding method
-         int[] selectedKey;
-         int[] selectedType;
-         int[] selectedAction;
-
-         if (ServerConstants.USE_CUSTOM_KEYSET) {
-            selectedKey = GameConstants.getCustomKey(true);
-            selectedType = GameConstants.getCustomType(true);
-            selectedAction = GameConstants.getCustomAction(true);
-         } else {
-            selectedKey = GameConstants.getCustomKey(false);
-            selectedType = GameConstants.getCustomType(false);
-            selectedAction = GameConstants.getCustomAction(false);
-         }
-
-
-         for (int i = 0; i < selectedKey.length; i++) {
-            KeyMapAdministrator.getInstance().create(connection, id, selectedKey[i], selectedType[i], selectedAction[i]);
-         }
-
-         List<Pair<Item, MapleInventoryType>> itemsByType = new ArrayList<>();
-         for (MapleInventory iv : inventory) {
-            for (Item item : iv.list()) {
-               itemsByType.add(new Pair<>(item, iv.getType()));
-            }
-         }
-
-         ItemFactory.INVENTORY.saveItems(itemsByType, id, connection);
-
-         if (!skills.isEmpty()) {
-            SkillAdministrator.getInstance().create(connection, id, skills.entrySet());
-         }
-
-         connection.commit();
-      });
-      return true;
    }
 
    public void saveCharToDB() {

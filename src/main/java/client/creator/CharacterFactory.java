@@ -87,7 +87,7 @@ public abstract class CharacterFactory {
          equipped.addItemFromDB(eq_weapon.copy());
       }
 
-      if (!newchar.insertNewChar(recipe)) {
+      if (!CharacterProcessor.getInstance().insertNewChar(newchar, recipe)) {
          return -2;
       }
       c.announce(MaplePacketCreator.addNewCharEntry(newchar));
