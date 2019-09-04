@@ -1416,54 +1416,22 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void changeMap(int map) {
-      MapleMap warpMap;
-      EventInstanceManager eim = getEventInstance();
-
-      if (eim != null) {
-         warpMap = eim.getMapInstance(map);
-      } else {
-         warpMap = client.getChannelServer().getMapFactory().getMap(map);
-      }
-
+      MapleMap warpMap = getWarpMap(map);
       changeMap(warpMap, warpMap.getRandomPlayerSpawnpoint());
    }
 
    public void changeMap(int map, int portal) {
-      MapleMap warpMap;
-      EventInstanceManager eim = getEventInstance();
-
-      if (eim != null) {
-         warpMap = eim.getMapInstance(map);
-      } else {
-         warpMap = client.getChannelServer().getMapFactory().getMap(map);
-      }
-
+      MapleMap warpMap = getWarpMap(map);
       changeMap(warpMap, warpMap.getPortal(portal));
    }
 
    public void changeMap(int map, String portal) {
-      MapleMap warpMap;
-      EventInstanceManager eim = getEventInstance();
-
-      if (eim != null) {
-         warpMap = eim.getMapInstance(map);
-      } else {
-         warpMap = client.getChannelServer().getMapFactory().getMap(map);
-      }
-
+      MapleMap warpMap = getWarpMap(map);
       changeMap(warpMap, warpMap.getPortal(portal));
    }
 
    public void changeMap(int map, MaplePortal portal) {
-      MapleMap warpMap;
-      EventInstanceManager eim = getEventInstance();
-
-      if (eim != null) {
-         warpMap = eim.getMapInstance(map);
-      } else {
-         warpMap = client.getChannelServer().getMapFactory().getMap(map);
-      }
-
+      MapleMap warpMap = getWarpMap(map);
       changeMap(warpMap, portal);
    }
 
