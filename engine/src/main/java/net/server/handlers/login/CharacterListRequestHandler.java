@@ -22,33 +22,34 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.reader.CharacterListRequestReader;
+import net.server.login.packet.CharacterListRequestPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CharlistRequestHandler extends AbstractMaplePacketHandler {
+public final class CharacterListRequestHandler extends AbstractPacketHandler<CharacterListRequestPacket, CharacterListRequestReader> {
+   @Override
+   public Class<CharacterListRequestReader> getReaderClass() {
+      return CharacterListRequestReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readByte();
-      int world = slea.readByte();
-
-      World wserv = Server.getInstance().getWorld(world);
-      if (wserv == null || wserv.isWorldCapacityFull()) {
-         c.announce(MaplePacketCreator.getServerStatus(2));
+   public void handlePacket(CharacterListRequestPacket packet, MapleClient client) {
+      World world = Server.getInstance().getWorld(packet.world());
+      if (world == null || world.isWorldCapacityFull()) {
+         client.announce(MaplePacketCreator.getServerStatus(2));
          return;
       }
 
-      int channel = slea.readByte() + 1;
-      if (wserv.getChannel(channel) == null) {
-         c.announce(MaplePacketCreator.getServerStatus(2));
+      if (world.getChannel(packet.channel()) == null) {
+         client.announce(MaplePacketCreator.getServerStatus(2));
          return;
       }
 
-      c.setWorld(world);
-      c.setChannel(channel);
-      c.sendCharList(world);
+      client.setWorld(packet.world());
+      client.setChannel(packet.channel());
+      client.sendCharList(packet.world());
    }
 }

@@ -22,23 +22,27 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.reader.ServerStatusRequestReader;
+import net.server.login.packet.ServerStatusRequestPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class ServerStatusRequestHandler extends AbstractMaplePacketHandler {
+public final class ServerStatusRequestHandler extends AbstractPacketHandler<ServerStatusRequestPacket, ServerStatusRequestReader> {
+   @Override
+   public Class<ServerStatusRequestReader> getReaderClass() {
+      return ServerStatusRequestReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte world = (byte) slea.readShort();
-      World wserv = Server.getInstance().getWorld(world);
-      if (wserv != null) {
-         int status = wserv.getWorldCapacityStatus();
-         c.announce(MaplePacketCreator.getServerStatus(status));
+   public void handlePacket(ServerStatusRequestPacket packet, MapleClient client) {
+      World world = Server.getInstance().getWorld(packet.world());
+      if (world != null) {
+         int status = world.getWorldCapacityStatus();
+         client.announce(MaplePacketCreator.getServerStatus(status));
       } else {
-         c.announce(MaplePacketCreator.getServerStatus(2));
+         client.announce(MaplePacketCreator.getServerStatus(2));
       }
    }
 }

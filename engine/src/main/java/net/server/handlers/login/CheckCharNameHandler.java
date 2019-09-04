@@ -21,17 +21,21 @@
  */
 package net.server.handlers.login;
 
-import client.processor.CharacterProcessor;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import client.processor.CharacterProcessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.CheckCharacterNameReader;
+import net.server.login.packet.CheckCharacterNamePacket;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CheckCharNameHandler extends AbstractMaplePacketHandler {
+public final class CheckCharNameHandler extends AbstractPacketHandler<CheckCharacterNamePacket, CheckCharacterNameReader> {
+   @Override
+   public Class<CheckCharacterNameReader> getReaderClass() {
+      return CheckCharacterNameReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String name = slea.readMapleAsciiString();
-      c.announce(MaplePacketCreator.charNameResponse(name, !CharacterProcessor.getInstance().canCreateChar(name)));
+   public void handlePacket(CheckCharacterNamePacket packet, MapleClient client) {
+      client.announce(MaplePacketCreator.charNameResponse(packet.name(), !CharacterProcessor.getInstance().canCreateChar(packet.name())));
    }
 }

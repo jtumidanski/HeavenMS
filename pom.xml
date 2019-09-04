@@ -15,6 +15,15 @@
 
     <name>HeavenMS</name>
 
+    <dependencies>
+        <dependency>
+            <groupId>groupId</groupId>
+            <artifactId>engine</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
+
     <properties>
         <maven.compiler.source>1.11</maven.compiler.source>
         <maven.compiler.target>1.11</maven.compiler.target>

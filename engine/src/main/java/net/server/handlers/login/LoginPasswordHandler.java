@@ -31,107 +31,112 @@ import org.apache.mina.core.session.IoSession;
 import client.MapleClient;
 import client.database.administrator.AccountAdministrator;
 import constants.ServerConstants;
-import net.MaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.reader.LoginPasswordReader;
 import net.server.coordinator.MapleSessionCoordinator;
+import net.server.login.packet.LoginPasswordPacket;
 import tools.BCrypt;
 import tools.DatabaseConnection;
 import tools.HexTool;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class LoginPasswordHandler implements MaplePacketHandler {
+public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPacket, LoginPasswordReader> {
+   @Override
+   public Class<LoginPasswordReader> getReaderClass() {
+      return LoginPasswordReader.class;
+   }
 
-   private static String hashpwSHA512(String pwd) throws NoSuchAlgorithmException, UnsupportedEncodingException {
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      String remoteHost = getRemoteIp(client.getSession());
+      if (!remoteHost.contentEquals("null")) {
+         if (ServerConstants.USE_IP_VALIDATION) {    // thanks Alex (CanIGetaPR) for suggesting IP validation as a server flag
+            if (remoteHost.startsWith("127.")) {
+               if (!ServerConstants.LOCALSERVER) { // thanks Mills for noting HOST can also have a field named "localhost"
+                  client.announce(MaplePacketCreator.getLoginFailed(13));  // cannot login as localhost if it's not a local server
+                  return false;
+               }
+            } else {
+               if (ServerConstants.LOCALSERVER) {
+                  client.announce(MaplePacketCreator.getLoginFailed(13));  // cannot login as non-localhost if it's a local server
+                  return false;
+               }
+            }
+         }
+      } else {
+         client.announce(MaplePacketCreator.getLoginFailed(14));          // thanks Alchemist for noting remoteHost could be null
+         return false;
+      }
+      return true;
+   }
+
+   @Override
+   public void handlePacket(LoginPasswordPacket packet, MapleClient client) {
+      client.setAccountName(packet.login());
+
+      int loginStatus = client.login(packet.login(), packet.password(), HexTool.toCompressedString(packet.hwid()));
+
+      if (ServerConstants.AUTOMATIC_REGISTER && loginStatus == 5) {
+         try {
+            String password = ServerConstants.BCRYPT_MIGRATION ? BCrypt.hashpw(packet.password(), BCrypt.gensalt(12)) : hashpwSHA512(packet.password());
+            DatabaseConnection.getInstance().withConnection(connection -> client.setAccID(AccountAdministrator.getInstance().create(connection, packet.login(), password)));
+         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            client.setAccID(-1);
+            e.printStackTrace();
+         }
+
+         loginStatus = client.login(packet.login(), packet.password(), HexTool.toCompressedString(packet.hwid()));
+      }
+
+      if (ServerConstants.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
+         String password = BCrypt.hashpw(packet.password(), BCrypt.gensalt(12));
+         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updatePasswordByName(connection, packet.login(), password));
+         loginStatus = (loginStatus == -10) ? 0 : 23;
+      }
+
+      if (client.hasBannedIP() || client.hasBannedMac()) {
+         client.announce(MaplePacketCreator.getLoginFailed(3));
+         return;
+      }
+      Calendar tempban = client.getTempBanCalendarFromDB();
+      if (tempban != null) {
+         if (tempban.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
+            client.announce(MaplePacketCreator.getTempBan(tempban.getTimeInMillis(), client.getGReason()));
+            return;
+         }
+      }
+      if (loginStatus == 3) {
+         client.announce(MaplePacketCreator.getPermBan(client.getGReason()));//crashes but idc :D
+         return;
+      } else if (loginStatus != 0) {
+         client.announce(MaplePacketCreator.getLoginFailed(loginStatus));
+         return;
+      }
+      if (client.finishLogin() == 0) {
+         login(client);
+      } else {
+         client.announce(MaplePacketCreator.getLoginFailed(7));
+      }
+   }
+
+   private String hashpwSHA512(String pwd) throws NoSuchAlgorithmException, UnsupportedEncodingException {
       MessageDigest digester = MessageDigest.getInstance("SHA-512");
       digester.update(pwd.getBytes("UTF-8"), 0, pwd.length());
       return HexTool.toString(digester.digest()).replace(" ", "").toLowerCase();
    }
 
-   private static String getRemoteIp(IoSession session) {
+   private String getRemoteIp(IoSession session) {
       return MapleSessionCoordinator.getSessionRemoteAddress(session);
    }
 
-   private static void login(MapleClient c) {
-      c.announce(MaplePacketCreator.getAuthSuccess(c));//why the fk did I do c.getAccountName()?
-      Server.getInstance().registerLoginState(c);
+   private void login(MapleClient client) {
+      client.announce(MaplePacketCreator.getAuthSuccess(client));//why the fk did I do client.getAccountName()?
+      Server.getInstance().registerLoginState(client);
    }
 
    @Override
-   public boolean validateState(MapleClient c) {
-      return !c.isLoggedIn();
-   }
-
-   @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String remoteHost = getRemoteIp(c.getSession());
-      if (!remoteHost.contentEquals("null")) {
-         if (ServerConstants.USE_IP_VALIDATION) {    // thanks Alex (CanIGetaPR) for suggesting IP validation as a server flag
-            if (remoteHost.startsWith("127.")) {
-               if (!ServerConstants.LOCALSERVER) { // thanks Mills for noting HOST can also have a field named "localhost"
-                  c.announce(MaplePacketCreator.getLoginFailed(13));  // cannot login as localhost if it's not a local server
-                  return;
-               }
-            } else {
-               if (ServerConstants.LOCALSERVER) {
-                  c.announce(MaplePacketCreator.getLoginFailed(13));  // cannot login as non-localhost if it's a local server
-                  return;
-               }
-            }
-         }
-      } else {
-         c.announce(MaplePacketCreator.getLoginFailed(14));          // thanks Alchemist for noting remoteHost could be null
-         return;
-      }
-
-      String login = slea.readMapleAsciiString();
-      String pwd = slea.readMapleAsciiString();
-      c.setAccountName(login);
-
-      slea.skip(6);   // localhost masked the initial part with zeroes...
-      byte[] hwidNibbles = slea.read(4);
-      int loginStatus = c.login(login, pwd, HexTool.toCompressedString(hwidNibbles));
-
-      if (ServerConstants.AUTOMATIC_REGISTER && loginStatus == 5) {
-         try {
-            String password = ServerConstants.BCRYPT_MIGRATION ? BCrypt.hashpw(pwd, BCrypt.gensalt(12)) : hashpwSHA512(pwd);
-            DatabaseConnection.getInstance().withConnection(connection -> c.setAccID(AccountAdministrator.getInstance().create(connection, login, password)));
-         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
-            c.setAccID(-1);
-            e.printStackTrace();
-         }
-
-         loginStatus = c.login(login, pwd, HexTool.toCompressedString(hwidNibbles));
-      }
-
-      if (ServerConstants.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
-         String password = BCrypt.hashpw(pwd, BCrypt.gensalt(12));
-         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updatePasswordByName(connection, login, password));
-         loginStatus = (loginStatus == -10) ? 0 : 23;
-      }
-
-      if (c.hasBannedIP() || c.hasBannedMac()) {
-         c.announce(MaplePacketCreator.getLoginFailed(3));
-         return;
-      }
-      Calendar tempban = c.getTempBanCalendarFromDB();
-      if (tempban != null) {
-         if (tempban.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
-            c.announce(MaplePacketCreator.getTempBan(tempban.getTimeInMillis(), c.getGReason()));
-            return;
-         }
-      }
-      if (loginStatus == 3) {
-         c.announce(MaplePacketCreator.getPermBan(c.getGReason()));//crashes but idc :D
-         return;
-      } else if (loginStatus != 0) {
-         c.announce(MaplePacketCreator.getLoginFailed(loginStatus));
-         return;
-      }
-      if (c.finishLogin() == 0) {
-         login(c);
-      } else {
-         c.announce(MaplePacketCreator.getLoginFailed(7));
-      }
+   public boolean validateState(MapleClient client) {
+      return !client.isLoggedIn();
    }
 }

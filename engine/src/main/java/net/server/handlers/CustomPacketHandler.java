@@ -22,15 +22,21 @@
 package net.server.handlers;
 
 import client.MapleClient;
-import net.MaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.CustomPacket;
+import net.server.packet.reader.CustomReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public class CustomPacketHandler implements MaplePacketHandler {
+public class CustomPacketHandler extends AbstractPacketHandler<CustomPacket, CustomReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (slea.available() > 0 && c.getGMLevel() == 4) {//w/e
-         c.announce(MaplePacketCreator.customPacket(slea.read((int) slea.available())));
+   public Class<CustomReader> getReaderClass() {
+      return CustomReader.class;
+   }
+
+   @Override
+   public void handlePacket(CustomPacket packet, MapleClient client) {
+      if (packet.bytes().length > 0 && client.getGMLevel() == 4) {
+         client.announce(MaplePacketCreator.customPacket(packet.bytes()));
       }
    }
 

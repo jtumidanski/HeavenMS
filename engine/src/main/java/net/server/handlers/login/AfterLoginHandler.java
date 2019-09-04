@@ -22,43 +22,41 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.AfterLoginReader;
 import net.server.coordinator.MapleSessionCoordinator;
+import net.server.login.packet.AfterLoginPacket;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class AfterLoginHandler extends AbstractMaplePacketHandler {
+public final class AfterLoginHandler extends AbstractPacketHandler<AfterLoginPacket, AfterLoginReader> {
+   @Override
+   public Class<AfterLoginReader> getReaderClass() {
+      return AfterLoginReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte c2 = slea.readByte();
-      byte c3 = 5;
-      if (slea.available() > 0) {
-         c3 = slea.readByte();
-      }
-      if (c2 == 1 && c3 == 1) {
-         if (c.getPin() == null || c.getPin().equals("")) {
-            c.announce(MaplePacketCreator.registerPin());
+   public void handlePacket(AfterLoginPacket packet, MapleClient client) {
+      if (packet.byte1() == 1 && packet.byte2() == 1) {
+         if (client.getPin() == null || client.getPin().equals("")) {
+            client.announce(MaplePacketCreator.registerPin());
          } else {
-            c.announce(MaplePacketCreator.requestPin());
+            client.announce(MaplePacketCreator.requestPin());
          }
-      } else if (c2 == 1 && c3 == 0) {
-         String pin = slea.readMapleAsciiString();
-         if (c.checkPin(pin)) {
-            c.announce(MaplePacketCreator.pinAccepted());
+      } else if (packet.byte1() == 1 && packet.byte2() == 0) {
+         if (client.checkPin(packet.pin())) {
+            client.announce(MaplePacketCreator.pinAccepted());
          } else {
-            c.announce(MaplePacketCreator.requestPinAfterFailure());
+            client.announce(MaplePacketCreator.requestPinAfterFailure());
          }
-      } else if (c2 == 2 && c3 == 0) {
-         String pin = slea.readMapleAsciiString();
-         if (c.checkPin(pin)) {
-            c.announce(MaplePacketCreator.registerPin());
+      } else if (packet.byte1() == 2 && packet.byte2() == 0) {
+         if (client.checkPin(packet.pin())) {
+            client.announce(MaplePacketCreator.registerPin());
          } else {
-            c.announce(MaplePacketCreator.requestPinAfterFailure());
+            client.announce(MaplePacketCreator.requestPinAfterFailure());
          }
-      } else if (c2 == 0 && c3 == 5) {
-         MapleSessionCoordinator.getInstance().closeSession(c.getSession(), null);
-         c.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
+      } else if (packet.byte1() == 0 && packet.byte2() == 5) {
+         MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);
+         client.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
       }
    }
 }

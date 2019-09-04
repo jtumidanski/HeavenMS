@@ -26,49 +26,52 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.Pair;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class ViewAllCharHandler extends AbstractMaplePacketHandler {
+public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      try {
-         if (!c.canRequestCharacterlist()) {   // client breaks if the charlist request pops too soon
-            c.announce(MaplePacketCreator.showAllCharacter(0, 0));
-            return;
-         }
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
-         int accountId = c.getAccID();
-         Pair<Pair<Integer, List<MapleCharacter>>, List<Pair<Integer, List<MapleCharacter>>>> loginBlob = Server.getInstance().loadAccountCharlist(accountId, c.getVisibleWorlds());
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      if (!client.canRequestCharacterlist()) {   // client breaks if the charlist request pops too soon
+         client.announce(MaplePacketCreator.showAllCharacter(0, 0));
+         return;
+      }
 
-         List<Pair<Integer, List<MapleCharacter>>> worldChars = loginBlob.getRight();
-         int chrTotal = loginBlob.getLeft().getLeft();
-         List<MapleCharacter> lastwchars = loginBlob.getLeft().getRight();
+      int accountId = client.getAccID();
+      Pair<Pair<Integer, List<MapleCharacter>>, List<Pair<Integer, List<MapleCharacter>>>> loginBlob = Server.getInstance().loadAccountCharlist(accountId, client.getVisibleWorlds());
 
-         if (chrTotal > 9) {
-            int padRight = chrTotal % 3;
-            if (padRight > 0 && lastwchars != null) {
-               MapleCharacter chr = lastwchars.get(lastwchars.size() - 1);
+      List<Pair<Integer, List<MapleCharacter>>> worldChars = loginBlob.getRight();
+      int chrTotal = loginBlob.getLeft().getLeft();
+      List<MapleCharacter> lastwchars = loginBlob.getLeft().getRight();
 
-               for (int i = padRight; i < 3; i++) { // filling the remaining slots with the last character loaded
-                  chrTotal++;
-                  lastwchars.add(chr);
-               }
+      if (chrTotal > 9) {
+         int padRight = chrTotal % 3;
+         if (padRight > 0 && lastwchars != null) {
+            MapleCharacter chr = lastwchars.get(lastwchars.size() - 1);
+
+            for (int i = padRight; i < 3; i++) { // filling the remaining slots with the last character loaded
+               chrTotal++;
+               lastwchars.add(chr);
             }
          }
+      }
 
-         int charsSize = chrTotal;
-         int unk = charsSize + (3 - charsSize % 3); //rowSize?
-         c.announce(MaplePacketCreator.showAllCharacter(charsSize, unk));
+      int charsSize = chrTotal;
+      int unk = charsSize + (3 - charsSize % 3); //rowSize?
+      client.announce(MaplePacketCreator.showAllCharacter(charsSize, unk));
 
-         for (Pair<Integer, List<MapleCharacter>> wchars : worldChars) {
-            c.announce(MaplePacketCreator.showAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && c.cannotBypassPic()));
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
+      for (Pair<Integer, List<MapleCharacter>> wchars : worldChars) {
+         client.announce(MaplePacketCreator.showAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && client.cannotBypassPic()));
       }
    }
 }

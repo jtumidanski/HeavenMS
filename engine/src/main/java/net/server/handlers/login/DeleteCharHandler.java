@@ -22,26 +22,29 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.DeleteCharacterReader;
+import net.server.login.packet.DeleteCharacterPacket;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class DeleteCharHandler extends AbstractMaplePacketHandler {
+public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharacterPacket, DeleteCharacterReader> {
+   @Override
+   public Class<DeleteCharacterReader> getReaderClass() {
+      return DeleteCharacterReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String pic = slea.readMapleAsciiString();
-      int cid = slea.readInt();
-      if (c.checkPic(pic)) {
-         if (c.deleteCharacter(cid, c.getAccID())) {
-            FilePrinter.print(FilePrinter.DELETED_CHAR + c.getAccountName() + ".txt", c.getAccountName() + " deleted CID: " + cid);
-            c.announce(MaplePacketCreator.deleteCharResponse(cid, 0));
+   public void handlePacket(DeleteCharacterPacket packet, MapleClient client) {
+      if (client.checkPic(packet.pic())) {
+         if (client.deleteCharacter(packet.characterId(), client.getAccID())) {
+            FilePrinter.print(FilePrinter.DELETED_CHAR + client.getAccountName() + ".txt", client.getAccountName() + " deleted CID: " + packet.characterId());
+            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0));
          } else {
-            c.announce(MaplePacketCreator.deleteCharResponse(cid, 0x14));
+            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x14));
          }
       } else {
-         c.announce(MaplePacketCreator.deleteCharResponse(cid, 0x14));
+         client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x14));
       }
    }
 }

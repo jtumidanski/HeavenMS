@@ -22,13 +22,19 @@
 package net.server.handlers;
 
 import client.MapleClient;
-import net.MaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 
-public class KeepAliveHandler implements MaplePacketHandler {
+public class KeepAliveHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      c.pongReceived();
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      client.pongReceived();
    }
 
    @Override

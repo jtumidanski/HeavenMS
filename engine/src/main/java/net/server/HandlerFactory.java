@@ -151,9 +151,9 @@ import net.server.handlers.KeepAliveHandler;
 import net.server.handlers.LoginRequiringNoOpHandler;
 import net.server.handlers.login.AcceptToSHandler;
 import net.server.handlers.login.AfterLoginHandler;
-import net.server.handlers.login.CharSelectedHandler;
+import net.server.handlers.login.CharacterSelectedHandler;
 import net.server.handlers.login.CharSelectedWithPicHandler;
-import net.server.handlers.login.CharlistRequestHandler;
+import net.server.handlers.login.CharacterListRequestHandler;
 import net.server.handlers.login.CheckCharNameHandler;
 import net.server.handlers.login.CreateCharHandler;
 import net.server.handlers.login.DeleteCharHandler;
@@ -163,7 +163,7 @@ import net.server.handlers.login.RegisterPicHandler;
 import net.server.handlers.login.RegisterPinHandler;
 import net.server.handlers.login.RelogRequestHandler;
 import net.server.handlers.login.ServerStatusRequestHandler;
-import net.server.handlers.login.ServerlistRequestHandler;
+import net.server.handlers.login.ServerListRequestHandler;
 import net.server.handlers.login.SetGenderHandler;
 import net.server.handlers.login.ViewAllCharHandler;
 import net.server.handlers.login.ViewAllCharRegisterPicHandler;
@@ -197,14 +197,12 @@ public class HandlerFactory {
    private void registerLoginHandlers(PacketProcessor packetProcessor) {
       packetProcessor.registerHandler(RecvOpcode.ACCEPT_TOS, new AcceptToSHandler());
       packetProcessor.registerHandler(RecvOpcode.AFTER_LOGIN, new AfterLoginHandler());
-      packetProcessor.registerHandler(RecvOpcode.SERVERLIST_REREQUEST, new ServerlistRequestHandler());
-      packetProcessor.registerHandler(RecvOpcode.CHARLIST_REQUEST, new CharlistRequestHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.CHAR_SELECT, new CharSelectedHandler());
-
+      packetProcessor.registerHandler(RecvOpcode.SERVERLIST_REREQUEST, new ServerListRequestHandler());
+      packetProcessor.registerHandler(RecvOpcode.CHARLIST_REQUEST, new CharacterListRequestHandler());
+      packetProcessor.registerHandler(RecvOpcode.CHAR_SELECT, new CharacterSelectedHandler());
       packetProcessor.registerHandler(RecvOpcode.LOGIN_PASSWORD, new LoginPasswordHandler());
       packetProcessor.registerHandler(RecvOpcode.RELOG, new RelogRequestHandler());
-      packetProcessor.registerHandler(RecvOpcode.SERVERLIST_REQUEST, new ServerlistRequestHandler());
+      packetProcessor.registerHandler(RecvOpcode.SERVERLIST_REQUEST, new ServerListRequestHandler());
       packetProcessor.registerHandler(RecvOpcode.SERVERSTATUS_REQUEST, new ServerStatusRequestHandler());
       packetProcessor.registerHandler(RecvOpcode.CHECK_CHAR_NAME, new CheckCharNameHandler());
       packetProcessor.registerHandler(RecvOpcode.CREATE_CHAR, new CreateCharHandler());

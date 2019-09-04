@@ -23,30 +23,37 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.reader.SetGenderReader;
 import net.server.coordinator.MapleSessionCoordinator;
+import net.server.login.packet.SetGenderPacket;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93
  */
-public class SetGenderHandler extends AbstractMaplePacketHandler {
+public class SetGenderHandler extends AbstractPacketHandler<SetGenderPacket, SetGenderReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.getGender() == 10) { //Packet shouldn't come if Gender isn't 10.
-         byte confirmed = slea.readByte();
-         if (confirmed == 0x01) {
-            c.setGender(slea.readByte());
-            c.announce(MaplePacketCreator.getAuthSuccess(c));
+   public Class<SetGenderReader> getReaderClass() {
+      return SetGenderReader.class;
+   }
 
-            Server.getInstance().registerLoginState(c);
-         } else {
-            MapleSessionCoordinator.getInstance().closeSession(c.getSession(), null);
-            c.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
-         }
+   @Override
+   public void handlePacket(SetGenderPacket packet, MapleClient client) {
+      if (packet.confirmed() == 0x01) {
+         client.setGender(packet.gender());
+         client.announce(MaplePacketCreator.getAuthSuccess(client));
+
+         Server.getInstance().registerLoginState(client);
+      } else {
+         MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);
+         client.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
       }
    }
 
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      return client.getGender() == 10;
+   }
 }

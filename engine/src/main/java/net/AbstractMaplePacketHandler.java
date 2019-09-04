@@ -24,6 +24,7 @@ package net;
 import client.MapleClient;
 import net.server.Server;
 
+@Deprecated
 public abstract class AbstractMaplePacketHandler implements MaplePacketHandler {
    protected static long currentServerTime() {
       return Server.getInstance().getCurrentTime();

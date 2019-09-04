@@ -29,14 +29,47 @@ import client.MapleClient;
 import client.creator.novice.BeginnerCreator;
 import client.creator.novice.LegendCreator;
 import client.creator.novice.NoblesseCreator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.CreateCharacterReader;
+import net.server.login.packet.CreateCharacterPacket;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CreateCharHandler extends AbstractMaplePacketHandler {
+public final class CreateCharHandler extends AbstractPacketHandler<CreateCharacterPacket, CreateCharacterReader> {
+   @Override
+   public Class<CreateCharacterReader> getReaderClass() {
+      return CreateCharacterReader.class;
+   }
 
-   private final static Set<Integer> IDs = new HashSet<>(Arrays.asList(1302000, 1312004, 1322005, 1442079,// weapons
+   @Override
+   public void handlePacket(CreateCharacterPacket packet, MapleClient client) {
+      int[] items = new int[]{packet.weapon(), packet.top(), packet.bottom(), packet.shoes(), packet.hair(), packet.face()};
+      for (int item : items) {
+         if (!isLegal(item)) {
+            FilePrinter.printError(FilePrinter.EXPLOITS + packet.name() + ".txt", "Owner from account '" + client.getAccountName() + "' tried to packet edit in char creation.");
+            client.disconnect(true, false);
+            return;
+         }
+      }
+
+      int status;
+      if (packet.job() == 0) { // Knights of Cygnus
+         status = NoblesseCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
+      } else if (packet.job() == 1) { // Adventurer
+         status = BeginnerCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
+      } else if (packet.job() == 2) { // Aran
+         status = LegendCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
+      } else {
+         client.announce(MaplePacketCreator.deleteCharResponse(0, 9));
+         return;
+      }
+
+      if (status == -2) {
+         client.announce(MaplePacketCreator.deleteCharResponse(0, 9));
+      }
+   }
+
+   private final Set<Integer> IDs = new HashSet<>(Arrays.asList(1302000, 1312004, 1322005, 1442079,// weapons
          1040002, 1040006, 1040010, 1041002, 1041006, 1041010, 1041011, 1042167,// bottom
          1060002, 1060006, 1061002, 1061008, 1062115, // top
          1072001, 1072005, 1072037, 1072038, 1072383,// shoes
@@ -45,50 +78,7 @@ public final class CreateCharHandler extends AbstractMaplePacketHandler {
          //#NeverTrustStevenCode
    ));
 
-   private static boolean isLegal(Integer toCompare) {
+   private boolean isLegal(Integer toCompare) {
       return IDs.contains(toCompare);
-   }
-
-
-   @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String name = slea.readMapleAsciiString();
-      int job = slea.readInt();
-      int face = slea.readInt();
-
-      int hair = slea.readInt();
-      int haircolor = slea.readInt();
-      int skincolor = slea.readInt();
-
-      int top = slea.readInt();
-      int bottom = slea.readInt();
-      int shoes = slea.readInt();
-      int weapon = slea.readInt();
-      int gender = slea.readByte();
-
-      int[] items = new int[]{weapon, top, bottom, shoes, hair, face};
-      for (int item : items) {
-         if (!isLegal(item)) {
-            FilePrinter.printError(FilePrinter.EXPLOITS + name + ".txt", "Owner from account '" + c.getAccountName() + "' tried to packet edit in char creation.");
-            c.disconnect(true, false);
-            return;
-         }
-      }
-
-      int status;
-      if (job == 0) { // Knights of Cygnus
-         status = NoblesseCreator.createCharacter(c, name, face, hair + haircolor, skincolor, top, bottom, shoes, weapon, gender);
-      } else if (job == 1) { // Adventurer
-         status = BeginnerCreator.createCharacter(c, name, face, hair + haircolor, skincolor, top, bottom, shoes, weapon, gender);
-      } else if (job == 2) { // Aran
-         status = LegendCreator.createCharacter(c, name, face, hair + haircolor, skincolor, top, bottom, shoes, weapon, gender);
-      } else {
-         c.announce(MaplePacketCreator.deleteCharResponse(0, 9));
-         return;
-      }
-
-      if (status == -2) {
-         c.announce(MaplePacketCreator.deleteCharResponse(0, 9));
-      }
    }
 }

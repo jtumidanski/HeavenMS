@@ -1,30 +1,36 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.login.packet.AcceptToSPacket;
+import net.server.channel.packet.reader.AcceptToSReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93
  */
-public final class AcceptToSHandler extends AbstractMaplePacketHandler {
+public final class AcceptToSHandler extends AbstractPacketHandler<AcceptToSPacket, AcceptToSReader> {
+   @Override
+   public Class<AcceptToSReader> getReaderClass() {
+      return AcceptToSReader.class;
+   }
+
+   @Override
+   public void handlePacket(AcceptToSPacket packet, MapleClient client) {
+      if (packet.bytes().length == 0 || client.acceptToS()) {
+         //Client dc's but just because I am cool I do this (:
+         client.disconnect(false, false);
+         return;
+      }
+      if (client.finishLogin() == 0) {
+         client.announce(MaplePacketCreator.getAuthSuccess(client));
+      } else {
+         client.announce(MaplePacketCreator.getLoginFailed(9));//shouldn't happen XD
+      }
+   }
 
    @Override
    public boolean validateState(MapleClient c) {
       return !c.isLoggedIn();
-   }
-
-   @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (slea.available() == 0 || slea.readByte() != 1 || c.acceptToS()) {
-         c.disconnect(false, false);//Client dc's but just because I am cool I do this (:
-         return;
-      }
-      if (c.finishLogin() == 0) {
-         c.announce(MaplePacketCreator.getAuthSuccess(c));
-      } else {
-         c.announce(MaplePacketCreator.getLoginFailed(9));//shouldn't happen XD
-      }
    }
 }

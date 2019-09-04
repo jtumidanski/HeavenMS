@@ -25,25 +25,30 @@ import java.util.List;
 
 import client.MapleClient;
 import constants.GameConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import net.server.world.World;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class ServerlistRequestHandler extends AbstractMaplePacketHandler {
+public final class ServerListRequestHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
       Server server = Server.getInstance();
       List<World> worlds = server.getWorlds();
-      c.requestedServerList(worlds.size());
+      client.requestedServerList(worlds.size());
 
       for (World world : worlds) {
-         c.announce(MaplePacketCreator.getServerList(world.getId(), GameConstants.WORLD_NAMES[world.getId()], world.getFlag(), world.getEventMessage(), world.getChannels()));
+         client.announce(MaplePacketCreator.getServerList(world.getId(), GameConstants.WORLD_NAMES[world.getId()], world.getFlag(), world.getEventMessage(), world.getChannels()));
       }
-      c.announce(MaplePacketCreator.getEndOfServerList());
-      c.announce(MaplePacketCreator.selectWorld(0));//too lazy to make a check lol
-      c.announce(MaplePacketCreator.sendRecommended(server.worldRecommendedList()));
+      client.announce(MaplePacketCreator.getEndOfServerList());
+      client.announce(MaplePacketCreator.selectWorld(0));//too lazy to make a check lol
+      client.announce(MaplePacketCreator.sendRecommended(server.worldRecommendedList()));
    }
 }

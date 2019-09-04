@@ -23,17 +23,25 @@ package net.server.handlers.login;
 
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class RelogRequestHandler extends AbstractMaplePacketHandler {
+public final class RelogRequestHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public boolean validateState(MapleClient c) {
-      return !c.isLoggedIn();
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
    }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      c.announce(MaplePacketCreator.getRelogResponse());
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      client.announce(MaplePacketCreator.getRelogResponse());
+   }
+
+   @Override
+   public boolean validateState(MapleClient c) {
+      return !c.isLoggedIn();
    }
 }

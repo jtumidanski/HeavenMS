@@ -27,7 +27,7 @@ import java.net.UnknownHostException;
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
-import net.server.AbstractPackerHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.login.packet.CharacterSelectedPacket;
 import net.server.channel.packet.reader.CharacterSelectedReader;
@@ -36,7 +36,7 @@ import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public final class CharSelectedHandler extends AbstractPackerHandler<CharacterSelectedPacket, CharacterSelectedReader> {
+public final class CharacterSelectedHandler extends AbstractPacketHandler<CharacterSelectedPacket, CharacterSelectedReader> {
    @Override
    public Class<CharacterSelectedReader> getReaderClass() {
       return CharacterSelectedReader.class;

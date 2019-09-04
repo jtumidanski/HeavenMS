@@ -6,15 +6,77 @@ import java.net.UnknownHostException;
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.reader.CharacterSelectedWithPicReader;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
+import net.server.login.packet.CharacterSelectedWithPicPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public class CharSelectedWithPicHandler extends AbstractMaplePacketHandler {
+public class CharSelectedWithPicHandler extends AbstractPacketHandler<CharacterSelectedWithPicPacket, CharacterSelectedWithPicReader> {
+   @Override
+   public Class<CharacterSelectedWithPicReader> getReaderClass() {
+      return CharacterSelectedWithPicReader.class;
+   }
+
+   @Override
+   public void handlePacket(CharacterSelectedWithPicPacket packet, MapleClient client) {
+      if (!packet.hwid().matches("[0-9A-F]{12}_[0-9A-F]{8}")) {
+         client.announce(MaplePacketCreator.getAfterLoginError(17));
+         return;
+      }
+
+      client.updateMacs(packet.macs());
+      client.updateHWID(packet.hwid());
+
+      IoSession session = client.getSession();
+
+      if (client.hasBannedMac() || client.hasBannedHWID()) {
+         MapleSessionCoordinator.getInstance().closeSession(client.getSession(), true);
+         return;
+      }
+
+      Server server = Server.getInstance();
+      if (!server.haveCharacterEntry(client.getAccID(), packet.characterId())) {
+         MapleSessionCoordinator.getInstance().closeSession(client.getSession(), true);
+         return;
+      }
+
+      if (client.checkPic(packet.pic())) {
+         client.setWorld(server.getCharacterWorld(packet.characterId()));
+         World wserv = client.getWorldServer();
+         if (wserv == null || wserv.isWorldCapacityFull()) {
+            client.announce(MaplePacketCreator.getAfterLoginError(10));
+            return;
+         }
+
+         String[] socket = server.getInetSocket(client.getWorld(), client.getChannel());
+         if (socket == null) {
+            client.announce(MaplePacketCreator.getAfterLoginError(10));
+            return;
+         }
+
+         AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
+         if (res != AntiMulticlientResult.SUCCESS) {
+            client.announce(MaplePacketCreator.getAfterLoginError(parseAntiMulticlientError(res)));
+            return;
+         }
+
+         server.unregisterLoginState(client);
+         client.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
+         server.setCharacteridInTransition(session, packet.characterId());
+
+         try {
+            client.announce(MaplePacketCreator.getServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), packet.characterId()));
+         } catch (UnknownHostException | NumberFormatException e) {
+            e.printStackTrace();
+         }
+      } else {
+         client.announce(MaplePacketCreator.wrongPic());
+      }
+   }
 
    private static int parseAntiMulticlientError(AntiMulticlientResult res) {
       switch (res) {
@@ -32,69 +94,6 @@ public class CharSelectedWithPicHandler extends AbstractMaplePacketHandler {
 
          default:
             return 9;
-      }
-   }
-
-   @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String pic = slea.readMapleAsciiString();
-      int charId = slea.readInt();
-
-      String macs = slea.readMapleAsciiString();
-      String hwid = slea.readMapleAsciiString();
-
-      if (!hwid.matches("[0-9A-F]{12}_[0-9A-F]{8}")) {
-         c.announce(MaplePacketCreator.getAfterLoginError(17));
-         return;
-      }
-
-      c.updateMacs(macs);
-      c.updateHWID(hwid);
-
-      IoSession session = c.getSession();
-
-      if (c.hasBannedMac() || c.hasBannedHWID()) {
-         MapleSessionCoordinator.getInstance().closeSession(c.getSession(), true);
-         return;
-      }
-
-      Server server = Server.getInstance();
-      if (!server.haveCharacterEntry(c.getAccID(), charId)) {
-         MapleSessionCoordinator.getInstance().closeSession(c.getSession(), true);
-         return;
-      }
-
-      if (c.checkPic(pic)) {
-         c.setWorld(server.getCharacterWorld(charId));
-         World wserv = c.getWorldServer();
-         if (wserv == null || wserv.isWorldCapacityFull()) {
-            c.announce(MaplePacketCreator.getAfterLoginError(10));
-            return;
-         }
-
-         String[] socket = server.getInetSocket(c.getWorld(), c.getChannel());
-         if (socket == null) {
-            c.announce(MaplePacketCreator.getAfterLoginError(10));
-            return;
-         }
-
-         AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, c.getAccID(), hwid);
-         if (res != AntiMulticlientResult.SUCCESS) {
-            c.announce(MaplePacketCreator.getAfterLoginError(parseAntiMulticlientError(res)));
-            return;
-         }
-
-         server.unregisterLoginState(c);
-         c.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
-         server.setCharacteridInTransition(session, charId);
-
-         try {
-            c.announce(MaplePacketCreator.getServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), charId));
-         } catch (UnknownHostException | NumberFormatException e) {
-            e.printStackTrace();
-         }
-      } else {
-         c.announce(MaplePacketCreator.wrongPic());
       }
    }
 }

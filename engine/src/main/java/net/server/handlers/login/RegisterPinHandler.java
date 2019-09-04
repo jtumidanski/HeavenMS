@@ -22,29 +22,33 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.RegisterPinReader;
 import net.server.coordinator.MapleSessionCoordinator;
+import net.server.login.packet.RegisterPinPacket;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /*
  * @author Rob
  */
-public final class RegisterPinHandler extends AbstractMaplePacketHandler {
+public final class RegisterPinHandler extends AbstractPacketHandler<RegisterPinPacket, RegisterPinReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte c2 = slea.readByte();
-      if (c2 == 0) {
-         MapleSessionCoordinator.getInstance().closeSession(c.getSession(), null);
-         c.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
-      } else {
-         String pin = slea.readMapleAsciiString();
-         if (pin != null) {
-            c.setPin(pin);
-            c.announce(MaplePacketCreator.pinRegistered());
+   public Class<RegisterPinReader> getReaderClass() {
+      return RegisterPinReader.class;
+   }
 
-            MapleSessionCoordinator.getInstance().closeSession(c.getSession(), null);
-            c.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
+   @Override
+   public void handlePacket(RegisterPinPacket packet, MapleClient client) {
+      if (packet.byte1() == 0) {
+         MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);
+         client.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
+      } else {
+         if (packet.pin() != null) {
+            client.setPin(packet.pin());
+            client.announce(MaplePacketCreator.pinRegistered());
+
+            MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);
+            client.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
          }
       }
    }
