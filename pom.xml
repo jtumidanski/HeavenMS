@@ -6,7 +6,11 @@
 
     <groupId>groupId</groupId>
     <artifactId>HeavenMS</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>engine</module>
+    </modules>
 
     <name>HeavenMS</name>
 
