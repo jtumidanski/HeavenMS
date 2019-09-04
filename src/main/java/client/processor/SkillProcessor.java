@@ -19,7 +19,7 @@ public class SkillProcessor {
    private SkillProcessor() {
    }
 
-   public static boolean dispelSkills(int skillid) {
+   public boolean dispelSkills(int skillid) {
       switch (skillid) {
          case DarkKnight.BEHOLDER:
          case FPArchMage.ELQUINES:

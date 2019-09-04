@@ -189,7 +189,7 @@ public class BuffStatProcessor {
       }
    }
 
-   public static boolean isPriorityBuffSourceid(int sourceid) {
+   public boolean isPriorityBuffSourceid(int sourceid) {
       switch(sourceid) {
          case -2022631:
          case -2022632:
