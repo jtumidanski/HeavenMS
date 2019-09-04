@@ -304,19 +304,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private EnumMap<MapleDisease, Pair<MapleDiseaseValueHolder, MobSkill>> diseases = new EnumMap<>(MapleDisease.class);
    private MapleDoor pdoor = null;
    private Map<MapleQuest, Long> questExpirations = new LinkedHashMap<>();
-   private ScheduledFuture<?> dragonBloodSchedule;
-   private ScheduledFuture<?> hpDecreaseTask;
-   private ScheduledFuture<?> beholderHealingSchedule, beholderBuffSchedule, berserkSchedule;
-   private ScheduledFuture<?> skillCooldownTask = null;
-   private ScheduledFuture<?> buffExpireTask = null;
-   private ScheduledFuture<?> itemExpireTask = null;
-   private ScheduledFuture<?> diseaseExpireTask = null;
-   private ScheduledFuture<?> questExpireTask = null;
-   private ScheduledFuture<?> recoveryTask = null;
-   private ScheduledFuture<?> extraRecoveryTask = null;
-   private ScheduledFuture<?> chairRecoveryTask = null;
-   private ScheduledFuture<?> pendantOfSpirit = null; //1122017
-   private ScheduledFuture<?> cpqSchedule = null;
+   private MapleCharacterScheduler scheduler;
    private Lock chrLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHARACTER_CHR, true);
    private Lock evtLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHARACTER_EVT, true);
    private Lock petLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHARACTER_PET, true);
@@ -390,6 +378,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private MapleCharacter() {
+      scheduler = new MapleCharacterScheduler();
       super.setListener(new AbstractCharacterListener() {
          @Override
          public void onHpChanged(int oldHp) {
@@ -1800,9 +1789,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void checkBerserk(final boolean isHidden) {
-      if (berserkSchedule != null) {
-         berserkSchedule.cancel(false);
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.BERSERK);
       final MapleCharacter chr = this;
       if (job.equals(MapleJob.DARKKNIGHT)) {
          executeIfHasSkill(DarkKnight.BERSERK, (skill, skillLevel) -> scheduleBerserk(isHidden, chr, skill, skillLevel));
@@ -1819,7 +1806,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
     */
    private void scheduleBerserk(boolean isHidden, MapleCharacter character, Skill skill, Integer skillLevel) {
       this.berserk = character.getHp() * 100 / character.getCurrentMaxHp() < skill.getEffect(skillLevel).getX();
-      berserkSchedule = TimerManager.getInstance().register(new Runnable() {
+      scheduler.add(MapleCharacterScheduler.Type.BERSERK, new Runnable() {
          @Override
          public void run() {
             if (awayFromWorld.get()) {
@@ -2161,10 +2148,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void stopChairTask() {
       chrLock.lock();
       try {
-         if (chairRecoveryTask != null) {
-            chairRecoveryTask.cancel(false);
-            chairRecoveryTask = null;
-         }
+         scheduler.cancel(MapleCharacterScheduler.Type.CHAIR_RECOVERY);
       } finally {
          chrLock.unlock();
       }
@@ -2210,11 +2194,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       chrLock.lock();
       try {
-         if (chairRecoveryTask != null) {
-            stopChairTask();
-         }
-
-         chairRecoveryTask = TimerManager.getInstance().register(new Runnable() {
+         stopChairTask();
+         scheduler.add(MapleCharacterScheduler.Type.CHAIR_RECOVERY, new Runnable() {
             @Override
             public void run() {
                updateChairHealStats();
@@ -2241,10 +2222,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void stopExtraTask() {
       chrLock.lock();
       try {
-         if (extraRecoveryTask != null) {
-            extraRecoveryTask.cancel(false);
-            extraRecoveryTask = null;
-         }
+         scheduler.cancel(MapleCharacterScheduler.Type.EXTRA_RECOVERY);
       } finally {
          chrLock.unlock();
       }
@@ -2262,7 +2240,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void startExtraTaskInternal(final byte healHP, final byte healMP, final short healInterval) {
       extraRecInterval = healInterval;
 
-      extraRecoveryTask = TimerManager.getInstance().register(new Runnable() {
+      scheduler.add(MapleCharacterScheduler.Type.EXTRA_RECOVERY, new Runnable() {
          @Override
          public void run() {
             if (getBuffSource(MapleBuffStat.HPREC) == -1 && getBuffSource(MapleBuffStat.MPREC) == -1) {
@@ -2488,14 +2466,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void startHpDecreaseTask(long lastHpTask) {
-      hpDecreaseTask = TimerManager.getInstance().register(this::doHurtHp, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL - lastHpTask);
+      scheduler.add(MapleCharacterScheduler.Type.HP_DECREASE, this::doHurtHp, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL - lastHpTask);
    }
 
    public void resetHpDecreaseTask() {
-      if (hpDecreaseTask != null) {
-         hpDecreaseTask.cancel(false);
-      }
-
+      scheduler.cancel(MapleCharacterScheduler.Type.HP_DECREASE);
       long lastHpTask = Server.getInstance().getCurrentTime() - lastHpDec;
       startHpDecreaseTask((lastHpTask > ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL) ? ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL : lastHpTask);
    }
@@ -2514,198 +2489,178 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void cancelDiseaseExpireTask() {
-      if (diseaseExpireTask != null) {
-         diseaseExpireTask.cancel(false);
-         diseaseExpireTask = null;
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.DISEASE_EXPIRE);
    }
 
    public void diseaseExpireTask() {
-      if (diseaseExpireTask == null) {
-         diseaseExpireTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               Set<MapleDisease> toExpire = new LinkedHashSet<>();
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.DISEASE_EXPIRE, new Runnable() {
+         @Override
+         public void run() {
+            Set<MapleDisease> toExpire = new LinkedHashSet<>();
 
-               chrLock.lock();
-               try {
-                  long curTime = Server.getInstance().getCurrentTime();
+            chrLock.lock();
+            try {
+               long curTime = Server.getInstance().getCurrentTime();
 
-                  for (Entry<MapleDisease, Long> de : diseaseExpires.entrySet()) {
-                     if (de.getValue() < curTime) {
-                        toExpire.add(de.getKey());
-                     }
+               for (Entry<MapleDisease, Long> de : diseaseExpires.entrySet()) {
+                  if (de.getValue() < curTime) {
+                     toExpire.add(de.getKey());
                   }
-               } finally {
-                  chrLock.unlock();
                }
-
-               for (MapleDisease d : toExpire) {
-                  dispelDebuff(d);
-               }
+            } finally {
+               chrLock.unlock();
             }
-         }, 1500);
-      }
+
+            for (MapleDisease d : toExpire) {
+               dispelDebuff(d);
+            }
+         }
+      }, 1500);
    }
 
    public void cancelBuffExpireTask() {
-      if (buffExpireTask != null) {
-         buffExpireTask.cancel(false);
-         buffExpireTask = null;
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.BUFF_EXPIRE);
    }
 
    public void buffExpireTask() {
-      if (buffExpireTask == null) {
-         buffExpireTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               Set<Entry<Integer, Long>> es;
-               List<MapleBuffStatValueHolder> toCancel = new ArrayList<>();
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.BUFF_EXPIRE, new Runnable() {
+         @Override
+         public void run() {
+            Set<Entry<Integer, Long>> es;
+            List<MapleBuffStatValueHolder> toCancel = new ArrayList<>();
 
-               effLock.lock();
-               chrLock.lock();
-               try {
-                  es = new LinkedHashSet<>(buffExpires.entrySet());
+            effLock.lock();
+            chrLock.lock();
+            try {
+               es = new LinkedHashSet<>(buffExpires.entrySet());
 
-                  long curTime = Server.getInstance().getCurrentTime();
-                  for (Entry<Integer, Long> bel : es) {
-                     if (curTime >= bel.getValue()) {
-                        toCancel.add(buffEffects.get(bel.getKey()).entrySet().iterator().next().getValue());    //rofl
-                     }
+               long curTime = Server.getInstance().getCurrentTime();
+               for (Entry<Integer, Long> bel : es) {
+                  if (curTime >= bel.getValue()) {
+                     toCancel.add(buffEffects.get(bel.getKey()).entrySet().iterator().next().getValue());    //rofl
                   }
-               } finally {
-                  chrLock.unlock();
-                  effLock.unlock();
                }
-
-               for (MapleBuffStatValueHolder mbsvh : toCancel) {
-                  cancelEffect(mbsvh.effect, false, mbsvh.startTime);
-               }
+            } finally {
+               chrLock.unlock();
+               effLock.unlock();
             }
-         }, 1500);
-      }
+
+            for (MapleBuffStatValueHolder mbsvh : toCancel) {
+               cancelEffect(mbsvh.effect, false, mbsvh.startTime);
+            }
+         }
+      }, 1500);
    }
 
    public void cancelSkillCooldownTask() {
-      if (skillCooldownTask != null) {
-         skillCooldownTask.cancel(false);
-         skillCooldownTask = null;
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.SKILL_COOLDOWN);
    }
 
    public void skillCooldownTask() {
-      if (skillCooldownTask == null) {
-         skillCooldownTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               Set<Entry<Integer, MapleCoolDownValueHolder>> es;
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.SKILL_COOLDOWN, new Runnable() {
+         @Override
+         public void run() {
+            Set<Entry<Integer, MapleCoolDownValueHolder>> es;
 
-               effLock.lock();
-               chrLock.lock();
-               try {
-                  es = new LinkedHashSet<>(coolDowns.entrySet());
-               } finally {
-                  chrLock.unlock();
-                  effLock.unlock();
-               }
+            effLock.lock();
+            chrLock.lock();
+            try {
+               es = new LinkedHashSet<>(coolDowns.entrySet());
+            } finally {
+               chrLock.unlock();
+               effLock.unlock();
+            }
 
-               long curTime = Server.getInstance().getCurrentTime();
-               for (Entry<Integer, MapleCoolDownValueHolder> bel : es) {
-                  MapleCoolDownValueHolder mcdvh = bel.getValue();
-                  if (curTime >= mcdvh.startTime + mcdvh.length) {
-                     removeCooldown(mcdvh.skillId);
-                     client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId, 0));
-                  }
+            long curTime = Server.getInstance().getCurrentTime();
+            for (Entry<Integer, MapleCoolDownValueHolder> bel : es) {
+               MapleCoolDownValueHolder mcdvh = bel.getValue();
+               if (curTime >= mcdvh.startTime + mcdvh.length) {
+                  removeCooldown(mcdvh.skillId);
+                  client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId, 0));
                }
             }
-         }, 1500);
-      }
+         }
+      }, 1500);
    }
 
    public void cancelExpirationTask() {
-      if (itemExpireTask != null) {
-         itemExpireTask.cancel(false);
-         itemExpireTask = null;
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.ITEM_EXPIRE);
    }
 
    public void expirationTask() {
-      if (itemExpireTask == null) {
-         itemExpireTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               boolean deletedCoupon = false;
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.ITEM_EXPIRE, new Runnable() {
+         @Override
+         public void run() {
+            boolean deletedCoupon = false;
 
-               long expiration, currenttime = System.currentTimeMillis();
-               Set<Skill> keys = getSkills().keySet();
-               for (Skill key : keys) {
-                  SkillEntry skill = getSkills().get(key);
-                  if (skill.getExpiration() != -1 && skill.getExpiration() < currenttime) {
-                     changeSkillLevel(key, (byte) -1, 0, -1);
-                  }
-               }
-
-               List<Item> toberemove = new ArrayList<>();
-               for (MapleInventory inv : inventory) {
-                  for (Item item : inv.list()) {
-                     expiration = item.getExpiration();
-
-                     if (expiration != -1 && (expiration < currenttime) && ((item.getFlag() & ItemConstants.LOCK) == ItemConstants.LOCK)) {
-                        short lock = item.getFlag();
-                        lock &= ~(ItemConstants.LOCK);
-                        item.setFlag(lock); //Probably need a check, else people can make expiring items into permanent items...
-                        item.setExpiration(-1);
-                        forceUpdateItem(item);   //TEST :3
-                     } else if (expiration != -1 && expiration < currenttime) {
-                        if (!ItemConstants.isPet(item.getItemId())) {
-                           client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
-                           toberemove.add(item);
-                           if (ItemConstants.isRateCoupon(item.getItemId())) {
-                              deletedCoupon = true;
-                           }
-                        } else {
-                           if (ItemConstants.isExpirablePet(item.getItemId())) {
-                              client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
-                              toberemove.add(item);
-                           } else {
-                              item.setExpiration(-1);
-                              forceUpdateItem(item);
-                           }
-                        }
-                     }
-                  }
-
-                  if (!toberemove.isEmpty()) {
-                     for (Item item : toberemove) {
-                        MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
-                     }
-
-                     MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-                     for (Item item : toberemove) {
-                        List<Integer> toadd = new ArrayList<>();
-                        Pair<Integer, String> replace = ii.getReplaceOnExpire(item.getItemId());
-                        if (replace.left > 0) {
-                           toadd.add(replace.left);
-                           if (!replace.right.isEmpty()) {
-                              MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, replace.right);
-                           }
-                        }
-                        for (Integer itemid : toadd) {
-                           MapleInventoryManipulator.addById(client, itemid, (short) 1);
-                        }
-                     }
-
-                     toberemove.clear();
-                  }
-
-                  if (deletedCoupon) {
-                     updateCouponRates();
-                  }
+            long expiration, currenttime = System.currentTimeMillis();
+            Set<Skill> keys = getSkills().keySet();
+            for (Skill key : keys) {
+               SkillEntry skill = getSkills().get(key);
+               if (skill.getExpiration() != -1 && skill.getExpiration() < currenttime) {
+                  changeSkillLevel(key, (byte) -1, 0, -1);
                }
             }
-         }, 60000);
-      }
+
+            List<Item> toberemove = new ArrayList<>();
+            for (MapleInventory inv : inventory) {
+               for (Item item : inv.list()) {
+                  expiration = item.getExpiration();
+
+                  if (expiration != -1 && (expiration < currenttime) && ((item.getFlag() & ItemConstants.LOCK) == ItemConstants.LOCK)) {
+                     short lock = item.getFlag();
+                     lock &= ~(ItemConstants.LOCK);
+                     item.setFlag(lock); //Probably need a check, else people can make expiring items into permanent items...
+                     item.setExpiration(-1);
+                     forceUpdateItem(item);   //TEST :3
+                  } else if (expiration != -1 && expiration < currenttime) {
+                     if (!ItemConstants.isPet(item.getItemId())) {
+                        client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
+                        toberemove.add(item);
+                        if (ItemConstants.isRateCoupon(item.getItemId())) {
+                           deletedCoupon = true;
+                        }
+                     } else {
+                        if (ItemConstants.isExpirablePet(item.getItemId())) {
+                           client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
+                           toberemove.add(item);
+                        } else {
+                           item.setExpiration(-1);
+                           forceUpdateItem(item);
+                        }
+                     }
+                  }
+               }
+
+               if (!toberemove.isEmpty()) {
+                  for (Item item : toberemove) {
+                     MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
+                  }
+
+                  MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                  for (Item item : toberemove) {
+                     List<Integer> toadd = new ArrayList<>();
+                     Pair<Integer, String> replace = ii.getReplaceOnExpire(item.getItemId());
+                     if (replace.left > 0) {
+                        toadd.add(replace.left);
+                        if (!replace.right.isEmpty()) {
+                           MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, replace.right);
+                        }
+                     }
+                     for (Integer itemid : toadd) {
+                        MapleInventoryManipulator.addById(client, itemid, (short) 1);
+                     }
+                  }
+
+                  toberemove.clear();
+               }
+
+               if (deletedCoupon) {
+                  updateCouponRates();
+               }
+            }
+         }
+      }, 60000);
    }
 
    public void forceUpdateItem(Item item) {
@@ -3374,10 +3329,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                effects.remove(mbs);
 
                if (mbs == MapleBuffStat.RECOVERY) {
-                  if (recoveryTask != null) {
-                     recoveryTask.cancel(false);
-                     recoveryTask = null;
-                  }
+                  scheduler.cancel(MapleCharacterScheduler.Type.RECOVERY);
                } else if (mbs == MapleBuffStat.SUMMON || mbs == MapleBuffStat.PUPPET) {
                   int summonId = mbsvh.effect.getSourceId();
 
@@ -3391,30 +3343,19 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                      if (summon.isPuppet()) {
                         map.removePlayerPuppet(this);
                      } else if (summon.getSkill() == DarkKnight.BEHOLDER) {
-                        if (beholderHealingSchedule != null) {
-                           beholderHealingSchedule.cancel(false);
-                           beholderHealingSchedule = null;
-                        }
-                        if (beholderBuffSchedule != null) {
-                           beholderBuffSchedule.cancel(false);
-                           beholderBuffSchedule = null;
-                        }
+                        scheduler.cancel(MapleCharacterScheduler.Type.BEHODLER_HEAL);
+                        scheduler.cancel(MapleCharacterScheduler.Type.BEHOLDER_BUFF);
                      }
                   }
                } else if (mbs == MapleBuffStat.DRAGONBLOOD) {
-                  dragonBloodSchedule.cancel(false);
-                  dragonBloodSchedule = null;
+                  scheduler.cancel(MapleCharacterScheduler.Type.DRAGON_BLOOD);
                } else if (mbs == MapleBuffStat.HPREC || mbs == MapleBuffStat.MPREC) {
                   if (mbs == MapleBuffStat.HPREC) {
                      extraHpRec = 0;
                   } else {
                      extraMpRec = 0;
                   }
-
-                  if (extraRecoveryTask != null) {
-                     extraRecoveryTask.cancel(false);
-                     extraRecoveryTask = null;
-                  }
+                  scheduler.cancel(MapleCharacterScheduler.Type.EXTRA_RECOVERY);
 
                   if (extraHpRec != 0 || extraMpRec != 0) {
                      startExtraTaskInternal(extraHpRec, extraMpRec, extraRecInterval);
@@ -3864,13 +3805,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          checkBerserk(isHidden());
       } else if (effect.isBeholder()) {
          final int beholder = DarkKnight.BEHOLDER;
-         if (beholderHealingSchedule != null) {
-            beholderHealingSchedule.cancel(false);
-         }
-         if (beholderBuffSchedule != null) {
-            beholderBuffSchedule.cancel(false);
-         }
-
+         scheduler.cancel(MapleCharacterScheduler.Type.BEHODLER_HEAL);
+         scheduler.cancel(MapleCharacterScheduler.Type.BEHOLDER_BUFF);
          executeIfHasSkill(DarkKnight.AURA_OF_BEHOLDER, (skill, skillLevel) -> scheduleAuraOfBeholder(beholder, skill, skillLevel));
          executeIfHasSkill(DarkKnight.HEX_OF_BEHOLDER, (skill, skillLevel) -> scheduleHexOfBeholder(beholder, skill, skillLevel));
       } else if (effect.isRecovery()) {
@@ -3879,20 +3815,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          chrLock.lock();
          try {
-            if (recoveryTask != null) {
-               recoveryTask.cancel(false);
-            }
-
-            recoveryTask = TimerManager.getInstance().register(new Runnable() {
+            scheduler.cancel(MapleCharacterScheduler.Type.RECOVERY);
+            scheduler.add(MapleCharacterScheduler.Type.RECOVERY, new Runnable() {
                @Override
                public void run() {
                   if (getBuffSource(MapleBuffStat.RECOVERY) == -1) {
                      chrLock.lock();
                      try {
-                        if (recoveryTask != null) {
-                           recoveryTask.cancel(false);
-                           recoveryTask = null;
-                        }
+                        scheduler.cancel(MapleCharacterScheduler.Type.RECOVERY);
                      } finally {
                         chrLock.unlock();
                      }
@@ -4014,7 +3944,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void scheduleAuraOfBeholder(int beholder, Skill skill, Integer skillLevel) {
       final MapleStatEffect healEffect = skill.getEffect(skillLevel);
       int healInterval = healEffect.getX() * 1000;
-      beholderHealingSchedule = TimerManager.getInstance().register(new Runnable() {
+      scheduler.add(MapleCharacterScheduler.Type.BEHODLER_HEAL, new Runnable() {
          @Override
          public void run() {
             if (awayFromWorld.get()) {
@@ -4032,7 +3962,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void scheduleHexOfBeholder(int beholder, Skill skill, Integer skillLevel) {
       final MapleStatEffect buffEffect = skill.getEffect(skillLevel);
       int buffInterval = buffEffect.getX() * 1000;
-      beholderBuffSchedule = TimerManager.getInstance().register(new Runnable() {
+      scheduler.add(MapleCharacterScheduler.Type.BEHOLDER_BUFF, new Runnable() {
          @Override
          public void run() {
             if (awayFromWorld.get()) {
@@ -5788,9 +5718,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       releaseControlledMonsters();
       visibleMapObjects.clear();
       setChair(-1);
-      if (hpDecreaseTask != null) {
-         hpDecreaseTask.cancel(false);
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.HP_DECREASE);
 
       AriantColiseum arena = this.getAriantColiseum();
       if (arena != null) {
@@ -6667,10 +6595,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void prepareDragonBlood(final MapleStatEffect bloodEffect) {
-      if (dragonBloodSchedule != null) {
-         dragonBloodSchedule.cancel(false);
-      }
-      dragonBloodSchedule = TimerManager.getInstance().register(new Runnable() {
+      scheduler.cancel(MapleCharacterScheduler.Type.DRAGON_BLOOD);
+      scheduler.add(MapleCharacterScheduler.Type.DRAGON_BLOOD, new Runnable() {
          @Override
          public void run() {
             if (awayFromWorld.get()) {
@@ -8212,10 +8138,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void cancelQuestExpirationTask() {
       evtLock.lock();
       try {
-         if (questExpireTask != null) {
-            questExpireTask.cancel(false);
-            questExpireTask = null;
-         }
+         scheduler.cancel(MapleCharacterScheduler.Type.QUEST_EXPIRE);
       } finally {
          evtLock.unlock();
       }
@@ -8238,9 +8161,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       evtLock.lock();
       try {
          if (!questExpirations.isEmpty()) {
-            if (questExpireTask == null) {
-               questExpireTask = TimerManager.getInstance().register(this::runQuestExpireTask, 10 * 1000);
-            }
+            scheduler.addIfNotExists(MapleCharacterScheduler.Type.QUEST_EXPIRE, this::runQuestExpireTask, 10 * 1000);
          }
       } finally {
          evtLock.unlock();
@@ -8266,8 +8187,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             if (questExpirations.isEmpty()) {
-               questExpireTask.cancel(false);
-               questExpireTask = null;
+               scheduler.cancel(MapleCharacterScheduler.Type.QUEST_EXPIRE);
             }
          }
       } finally {
@@ -8278,9 +8198,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void registerQuestExpire(MapleQuest quest, long time) {
       evtLock.lock();
       try {
-         if (questExpireTask == null) {
-            questExpireTask = TimerManager.getInstance().register(this::runQuestExpireTask, 10 * 1000);
-         }
+         scheduler.addIfNotExists(MapleCharacterScheduler.Type.QUEST_EXPIRE, this::runQuestExpireTask, 10 * 1000);
 
          questExpirations.put(quest, Server.getInstance().getCurrentTime() + time);
       } finally {
@@ -8566,26 +8484,21 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void equipPendantOfSpirit() {
-      if (pendantOfSpirit == null) {
-         pendantOfSpirit = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               if (pendantExp < 3) {
-                  pendantExp++;
-                  MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, "Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
-               } else {
-                  pendantOfSpirit.cancel(false);
-               }
+      scheduler.addIfNotExists(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT, new Runnable() {
+         @Override
+         public void run() {
+            if (pendantExp < 3) {
+               pendantExp++;
+               MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, "Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
+            } else {
+               scheduler.cancel(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT);
             }
-         }, 3600000); //1 hour
-      }
+         }
+      }, 3600000); //1 hour
    }
 
    private void unequipPendantOfSpirit() {
-      if (pendantOfSpirit != null) {
-         pendantOfSpirit.cancel(false);
-         pendantOfSpirit = null;
-      }
+      scheduler.cancel(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT);
       pendantExp = 0;
    }
 
@@ -8641,86 +8554,19 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void setCpqTimer(ScheduledFuture timer) {
-      this.cpqSchedule = timer;
+      scheduler.add(MapleCharacterScheduler.Type.CARNIVAL_PQ, timer);
    }
 
    public void clearCpqTimer() {
-      if (cpqSchedule != null) {
-         cpqSchedule.cancel(true);
-      }
-      cpqSchedule = null;
+      scheduler.cancel(MapleCharacterScheduler.Type.CARNIVAL_PQ);
    }
 
    public final void empty(final boolean remove) {
-      if (dragonBloodSchedule != null) {
-         dragonBloodSchedule.cancel(true);
-      }
-      dragonBloodSchedule = null;
-
-      if (hpDecreaseTask != null) {
-         hpDecreaseTask.cancel(true);
-      }
-      hpDecreaseTask = null;
-
-      if (beholderHealingSchedule != null) {
-         beholderHealingSchedule.cancel(true);
-      }
-      beholderHealingSchedule = null;
-
-      if (beholderBuffSchedule != null) {
-         beholderBuffSchedule.cancel(true);
-      }
-      beholderBuffSchedule = null;
-
-      if (berserkSchedule != null) {
-         berserkSchedule.cancel(true);
-      }
-      berserkSchedule = null;
+      scheduler.cancelAll();
 
       unregisterChairBuff();
-      cancelBuffExpireTask();
-      cancelDiseaseExpireTask();
-      cancelSkillCooldownTask();
-      cancelExpirationTask();
-
-      if (questExpireTask != null) {
-         questExpireTask.cancel(true);
-      }
-      questExpireTask = null;
-
-      if (recoveryTask != null) {
-         recoveryTask.cancel(true);
-      }
-      recoveryTask = null;
-
-      if (extraRecoveryTask != null) {
-         extraRecoveryTask.cancel(true);
-      }
-      extraRecoveryTask = null;
-
-      // already done on unregisterChairBuff
-        /* if (chairRecoveryTask != null) { chairRecoveryTask.cancel(true); }
-        chairRecoveryTask = null; */
-
-      if (pendantOfSpirit != null) {
-         pendantOfSpirit.cancel(true);
-      }
-      pendantOfSpirit = null;
-
-      clearCpqTimer();
 
       evtLock.lock();
-      try {
-         if (questExpireTask != null) {
-            questExpireTask.cancel(false);
-            questExpireTask = null;
-
-            questExpirations.clear();
-            questExpirations = null;
-         }
-      } finally {
-         evtLock.unlock();
-      }
 
       if (maplemount != null) {
          maplemount.empty();
