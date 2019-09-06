@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    EventInstanceManager eim = pi.getEventInstance()
    int area = eim.getIntProperty("statusStg5")
    int reg = 2

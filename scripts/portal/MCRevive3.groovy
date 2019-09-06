@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int portal = 0
    switch (pi.getPlayer().getTeam()) {
       case 0:

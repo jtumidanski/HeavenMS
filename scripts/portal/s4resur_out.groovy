@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if(pi.isQuestStarted(6134)) {
       if(pi.canHold(4031448)) {
          pi.gainItem(4031448, (short) 1)

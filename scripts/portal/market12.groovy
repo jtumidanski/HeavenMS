@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMapId() != 910000000) {
       pi.getPlayer().saveLocation("FREE_MARKET")
       pi.playPortalSound()

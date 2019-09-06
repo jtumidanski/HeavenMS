@@ -9,7 +9,7 @@ import tools.ServerNoticeType
 
 import java.awt.*
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getMap().getReactorByName("sMob1").getState() >= 1 && pi.getMap().getReactorByName("sMob2").getState() >= 1 && pi.getMap().getReactorByName("sMob3").getState() >= 1 && pi.getMap().getReactorByName("sMob4").getState() >= 1 && pi.getMap().getMonsters().size() == 0) {
       EventInstanceManager eim = pi.getEventInstance()
 

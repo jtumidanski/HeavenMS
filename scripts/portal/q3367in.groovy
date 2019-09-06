@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(3367)) {
       if (pi.getQuestProgress(3367, 31) < pi.getItemQuantity(4031797)) {
          pi.gainItem(4031797, (short) (pi.getQuestProgress(3367, 31) - pi.getItemQuantity(4031797)))

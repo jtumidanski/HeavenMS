@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    //TODO
    // pi.setDirectionStatus(true)
    pi.lockUI()

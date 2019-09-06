@@ -35,7 +35,6 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import client.MapleClient;
-import constants.ServerConstants;
 import server.maps.MaplePortal;
 import tools.FilePrinter;
 
@@ -44,9 +43,10 @@ public class PortalScriptManager {
    private static PortalScriptManager instance = new PortalScriptManager();
    private Map<String, PortalScript> scripts = new HashMap<>();
    private ScriptEngineFactory sef;
+
    private PortalScriptManager() {
       ScriptEngineManager sem = new ScriptEngineManager();
-      sef = sem.getEngineByName("javascript").getFactory();
+      sef = sem.getEngineByName("groovy").getFactory();
    }
 
    public static PortalScriptManager getInstance() {
@@ -57,7 +57,7 @@ public class PortalScriptManager {
       if (scripts.containsKey(scriptName)) {
          return scripts.get(scriptName);
       }
-      File scriptFile = new File("scripts/portal/" + scriptName + ".js");
+      File scriptFile = new File("scripts/portal/" + scriptName + ".groovy");
       if (!scriptFile.exists()) {
          scripts.put(scriptName, null);
          return null;
@@ -66,12 +66,6 @@ public class PortalScriptManager {
       ScriptEngine portal = sef.getScriptEngine();
       try {
          fr = new FileReader(scriptFile);
-
-         // java 8 support here thanks to Arufonsu
-         if (ServerConstants.JAVA_8) {
-            portal.eval("load('nashorn:mozilla_compat.js');" + System.lineSeparator());
-         }
-
          ((Compilable) portal).compile(fr).eval();
       } catch (ScriptException | IOException | UndeclaredThrowableException e) {
          FilePrinter.printError(FilePrinter.PORTAL + scriptName + ".txt", e);

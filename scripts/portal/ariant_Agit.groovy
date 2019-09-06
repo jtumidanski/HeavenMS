@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestCompleted(3928) && pi.isQuestCompleted(3931) && pi.isQuestCompleted(3934)) {
       pi.playPortalSound(); pi.warp(260000201, 1)
       return true

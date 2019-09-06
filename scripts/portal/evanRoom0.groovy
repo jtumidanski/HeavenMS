@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    pi.blockPortal()
    if (pi.containsAreaInfo((short) 22014, "mo30=o")) {
       return false

@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if(pi.isQuestStarted(2224) || pi.isQuestStarted(2226) || pi.isQuestCompleted(2227)) {
       int hourDay = pi.getHourOfDay()
       if(!((hourDay >= 0 && hourDay < 7) || hourDay >= 17)) {

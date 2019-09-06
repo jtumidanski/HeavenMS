@@ -6,7 +6,7 @@ import server.maps.MapleReactor
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    String name = pi.getPortal().getName().substring(2, 4)
    MapleReactor gate = pi.getPlayer().getMap().getReactorByName("gate" + name)
    if (gate != null && gate.getState() == (byte) 4) {

@@ -8,7 +8,7 @@ import tools.ServerNoticeType
 
 import java.awt.*
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestActive(21739)) {
       MapleMap mapobj1 = pi.getWarpMap(920030000)
       MapleMap mapobj2 = pi.getWarpMap(920030001)

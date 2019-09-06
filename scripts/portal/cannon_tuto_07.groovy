@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    pi.setDirectionStatus(true)
    pi.lockUI()
    pi.spawnNPC(579711, 1096012, -51, -97, 0, true)//A2 01 01 7F D8 08 00 4C B9 10 00 CD FF 9F FF 01 8A 00 9B FF FF FF 01

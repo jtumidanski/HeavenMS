@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMap().getReactorByName("kinggate").getState() == (byte) 1) {
       pi.playPortalSound()
       pi.warp(990000900, 1)

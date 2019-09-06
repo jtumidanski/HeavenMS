@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getJob().getId() == 2000) {
       if (pi.isQuestStarted(21015)) {
          pi.showInfoText("You must exit to the right in order to find Murupas.")

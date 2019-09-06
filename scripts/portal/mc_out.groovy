@@ -4,7 +4,7 @@ package portal
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int returnMap = pi.getPlayer().getSavedLocation("MONSTER_CARNIVAL")
    if (returnMap < 0) {
       returnMap = 102000000 // Just Incase there is no saved location.

@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int mapid = pi.getPlayer().getMap().getId()
 
    if (mapid == 103040410 && pi.isQuestCompleted(2287)) {

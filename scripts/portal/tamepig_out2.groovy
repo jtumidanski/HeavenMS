@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (!(pi.haveItem(4031507, 5) && pi.haveItem(4031508, 5) && pi.isQuestStarted(6002))) {
       pi.removeAll(4031507)
       pi.removeAll(4031508)

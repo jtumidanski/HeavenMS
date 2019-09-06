@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestCompleted(1008)) {
       pi.showInfo("UI/tutorial.img/22")
    } else if (pi.isQuestCompleted(1020)) {

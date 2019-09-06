@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if(pi.isQuestStarted(6241) || pi.isQuestStarted(6243)) {
       if(pi.getWarpMap(924000100).countPlayers() == 0) {
          pi.resetMapObjects(924000100)

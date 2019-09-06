@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int mapId = pi.getPlayer().getSavedLocation("MIRROR")
 
    pi.playPortalSound()

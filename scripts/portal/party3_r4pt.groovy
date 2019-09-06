@@ -3,7 +3,7 @@ package portal
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    EventInstanceManager eim = pi.getEventInstance()
    if (eim.getProperty("stage4_comb") == null) {
       int r = Math.floor((Math.random() * 3)).intValue() + 1

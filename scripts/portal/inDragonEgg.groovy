@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    pi.playPortalSound()
    if (pi.isQuestStarted(22005)) {
       pi.playPortalSound(); pi.warp(900020100, 0)

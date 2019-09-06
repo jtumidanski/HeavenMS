@@ -6,7 +6,7 @@ import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getMap().getMonsters().size() == 0 && passedGrindMode(pi.getMap(), pi.getEventInstance())) {
       pi.playPortalSound(); pi.warp(925100300, 0) //next
       return true

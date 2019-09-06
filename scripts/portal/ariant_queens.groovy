@@ -10,7 +10,7 @@ static def isTigunMorphed(MapleCharacter ch) {
    return ch.getBuffSource(MapleBuffStat.MORPH) == 2210005
 }
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if(isTigunMorphed(pi.getPlayer())) {
       return false
    } else {

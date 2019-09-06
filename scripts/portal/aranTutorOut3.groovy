@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    //lol nexon does this xD
    pi.teachSkill(20000016, (byte) 0, (byte) -1, -1)
    //nexon sends updatePlayerStats MapleStat.AVAILABLESP 0

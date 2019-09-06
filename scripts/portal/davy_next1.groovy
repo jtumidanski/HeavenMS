@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    try {
       EventInstanceManager eim = pi.getEventInstance()
       if (eim != null && eim.getProperty("stage2") == "3") {

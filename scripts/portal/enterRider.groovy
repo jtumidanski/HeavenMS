@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(21610) && pi.haveItem(4001193, 1)) {
       EventManager em = pi.getEventManager("Aran_2ndmount")
       if (em == null) {

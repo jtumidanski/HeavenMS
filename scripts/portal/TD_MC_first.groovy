@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestCompleted(2260) ||
          pi.isQuestStarted(2300) || pi.isQuestCompleted(2300) ||
          pi.isQuestStarted(2301) || pi.isQuestCompleted(2301) ||

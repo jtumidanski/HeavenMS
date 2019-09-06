@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getJob().getId() == 2000 && !pi.isQuestCompleted(21014)) {
       pi.playPortalSound(); pi.warp(140000000, "st00")
    } else {

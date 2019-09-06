@@ -3,7 +3,7 @@ package portal
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    String mapplayer = "stage6_comb" + (pi.getMapId() % 10)
    EventInstanceManager eim = pi.getEventInstance()
 

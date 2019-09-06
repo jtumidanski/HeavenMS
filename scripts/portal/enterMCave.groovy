@@ -9,7 +9,7 @@ import tools.ServerNoticeType
 
 import java.awt.*
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(21201)) { // Second Job
       for (int i = 108000700; i < 108000709; i++) {
          if (pi.getPlayerCount(i) > 0 && pi.getPlayerCount(i + 10) > 0) {

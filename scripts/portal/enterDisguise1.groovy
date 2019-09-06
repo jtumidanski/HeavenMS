@@ -7,7 +7,7 @@ import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int jobtype = 0
    if (pi.isQuestStarted(20301) || pi.isQuestStarted(20302) || pi.isQuestStarted(20303) || pi.isQuestStarted(20304) || pi.isQuestStarted(20305)) {
       MapleMap map = pi.getClient().getChannelServer().getMapFactory().getMap(108010600 + (10 * jobtype))

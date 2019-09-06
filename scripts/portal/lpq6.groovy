@@ -4,7 +4,7 @@ import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    EventInstanceManager eim = pi.getPlayer().getEventInstance()
    MapleMap target = eim.getMapInstance(922010800)
    if (eim.getProperty("7stageclear") != null) {

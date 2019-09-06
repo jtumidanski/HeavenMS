@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int[] backPortals = [6, 8, 9, 11]
    int idx = pi.getEventInstance().gridCheck(pi.getPlayer())
 

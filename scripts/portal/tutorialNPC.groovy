@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getLevel() <= 10 && pi.getPlayer().getJob().getId() == 0) {
       int m = pi.getPlayer().getMap().getId()
       int npcid = 0

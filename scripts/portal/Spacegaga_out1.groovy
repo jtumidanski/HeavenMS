@@ -3,7 +3,7 @@ package portal
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    EventInstanceManager eim = pi.getPlayer().getEventInstance()
    int fc = eim.getIntProperty("falls")
 

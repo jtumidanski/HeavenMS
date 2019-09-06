@@ -3,7 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int questProgress = pi.getQuestProgress(2330, 3300005) + pi.getQuestProgress(2330, 3300006) + pi.getQuestProgress(2330, 3300007) //3 Yetis
 
    if(pi.isQuestStarted(2330) && questProgress < 3){

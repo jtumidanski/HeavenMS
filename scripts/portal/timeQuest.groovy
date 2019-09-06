@@ -5,7 +5,7 @@ import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-static def enter(PortalPlayerInteraction pi) {
+boolean enter(PortalPlayerInteraction pi) {
    int mapid = pi.getPlayer().getMapId()
    pi.playPortalSound()
    int map = ((mapid - 270010000) / 100).intValue()
