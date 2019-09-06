@@ -22,20 +22,22 @@
 package net.server.handlers;
 
 import client.MapleClient;
-import net.MaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 
-public final class LoginRequiringNoOpHandler implements MaplePacketHandler {
-   private static LoginRequiringNoOpHandler instance = new LoginRequiringNoOpHandler();
-
-   public static LoginRequiringNoOpHandler getInstance() {
-      return instance;
+public final class LoginRequiringNoOpHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
    }
 
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
    }
 
-   public boolean validateState(MapleClient c) {
-      return c.isLoggedIn();
+   @Override
+   public boolean validateState(MapleClient client) {
+      return client.isLoggedIn();
    }
 }

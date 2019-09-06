@@ -25,26 +25,78 @@ import java.awt.Point;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.QuestActionPacket;
+import net.server.channel.packet.reader.QuestActionReader;
 import scripting.quest.QuestScriptManager;
 import server.life.MapleNPC;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  */
-public final class QuestActionHandler extends AbstractMaplePacketHandler {
+public final class QuestActionHandler extends AbstractPacketHandler<QuestActionPacket, QuestActionReader> {
+   @Override
+   public Class<QuestActionReader> getReaderClass() {
+      return QuestActionReader.class;
+   }
 
-   // isNpcNearby credits to GabrielSin
-   private static boolean isNpcNearby(SeekableLittleEndianAccessor slea, MapleCharacter player, MapleQuest quest, int npcId) {
+   @Override
+   public void handlePacket(QuestActionPacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
+      MapleQuest quest = MapleQuest.getInstance(packet.questId());
+
+      if (packet.action() == 0) { // Restore lost item, Credits Darter ( Rajan )
+         quest.restoreLostItem(player, packet.itemId());
+      } else if (packet.action() == 1) { //Start Quest
+         if (!isNpcNearby(packet, player, quest, packet.npc())) {
+            return;
+         }
+
+         if (quest.canStart(player, packet.npc())) {
+            quest.start(player, packet.npc());
+         }
+      } else if (packet.action() == 2) { // Complete Quest
+         if (!isNpcNearby(packet, player, quest, packet.npc())) {
+            return;
+         }
+
+         if (quest.canComplete(player, packet.npc())) {
+            if (packet.selection() > -1) {
+               quest.complete(player, packet.npc(), packet.selection());
+            } else {
+               quest.complete(player, packet.npc());
+            }
+         }
+      } else if (packet.action() == 3) {// forfeit quest
+         quest.forfeit(player);
+      } else if (packet.action() == 4) { // scripted start quest
+         if (!isNpcNearby(packet, player, quest, packet.npc())) {
+            return;
+         }
+
+         if (quest.canStart(player, packet.npc())) {
+            QuestScriptManager.getInstance().start(client, packet.questId(), packet.npc());
+         }
+      } else if (packet.action() == 5) { // scripted end quests
+         if (!isNpcNearby(packet, player, quest, packet.npc())) {
+            return;
+         }
+
+         if (quest.canComplete(player, packet.npc())) {
+            QuestScriptManager.getInstance().end(client, packet.questId(), packet.npc());
+         }
+      }
+   }
+
+   private boolean isNpcNearby(QuestActionPacket packet, MapleCharacter player, MapleQuest quest, int npcId) {
       Point playerP;
       Point pos = player.getPosition();
 
-      if (slea.available() >= 4) {
-         playerP = new Point(slea.readShort(), slea.readShort());
+      if (packet.x() != -1 && packet.y() != -1) {
+         playerP = new Point(packet.x(), packet.y());
          if (playerP.distance(pos) > 1000) {     // thanks Darter (YungMoozi) for reporting unchecked player position
             playerP = pos;
          }
@@ -66,62 +118,5 @@ public final class QuestActionHandler extends AbstractMaplePacketHandler {
       }
 
       return true;
-   }
-
-   @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte action = slea.readByte();
-      short questid = slea.readShort();
-      MapleCharacter player = c.getPlayer();
-      MapleQuest quest = MapleQuest.getInstance(questid);
-
-      if (action == 0) { // Restore lost item, Credits Darter ( Rajan )
-         slea.readInt();
-         int itemid = slea.readInt();
-         quest.restoreLostItem(player, itemid);
-      } else if (action == 1) { //Start Quest
-         int npc = slea.readInt();
-         if (!isNpcNearby(slea, player, quest, npc)) {
-            return;
-         }
-
-         if (quest.canStart(player, npc)) {
-            quest.start(player, npc);
-         }
-      } else if (action == 2) { // Complete Quest
-         int npc = slea.readInt();
-         if (!isNpcNearby(slea, player, quest, npc)) {
-            return;
-         }
-
-         if (quest.canComplete(player, npc)) {
-            if (slea.available() >= 2) {
-               int selection = slea.readShort();
-               quest.complete(player, npc, selection);
-            } else {
-               quest.complete(player, npc);
-            }
-         }
-      } else if (action == 3) {// forfeit quest
-         quest.forfeit(player);
-      } else if (action == 4) { // scripted start quest
-         int npc = slea.readInt();
-         if (!isNpcNearby(slea, player, quest, npc)) {
-            return;
-         }
-
-         if (quest.canStart(player, npc)) {
-            QuestScriptManager.getInstance().start(c, questid, npc);
-         }
-      } else if (action == 5) { // scripted end quests
-         int npc = slea.readInt();
-         if (!isNpcNearby(slea, player, quest, npc)) {
-            return;
-         }
-
-         if (quest.canComplete(player, npc)) {
-            QuestScriptManager.getInstance().end(c, questid, npc);
-         }
-      }
    }
 }

@@ -29,66 +29,66 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
-import server.maps.MaplePortal;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ChangeMapPacket;
+import net.server.channel.packet.reader.ChangeMapReader;
 import server.MapleTrade;
 import server.maps.MapleMap;
+import server.maps.MaplePortal;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class ChangeMapHandler extends AbstractMaplePacketHandler {
+public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacket, ChangeMapReader> {
+   @Override
+   public Class<ChangeMapReader> getReaderClass() {
+      return ChangeMapReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
+   public void handlePacket(ChangeMapPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
 
       if (chr.isChangingMaps() || chr.isBanned()) {
          if (chr.isChangingMaps()) {
             FilePrinter.printError(FilePrinter.PORTAL_STUCK + chr.getName() + ".txt", "Player " + chr.getName() + " got stuck when changing maps. Timestamp: " + Calendar.getInstance().getTime().toString() + " Last visited mapids: " + chr.getLastVisitedMapids());
          }
 
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
       if (chr.getTrade() != null) {
          MapleTrade.cancelTrade(chr, MapleTrade.TradeResult.UNSUCCESSFUL_ANOTHER_MAP);
       }
-      if (slea.available() == 0) { //Cash Shop :)
+      if (packet.cashShop()) { //Cash Shop :)
          if (!chr.getCashShop().isOpened()) {
-            c.disconnect(false, false);
+            client.disconnect(false, false);
             return;
          }
-         String[] socket = c.getChannelServer().getIP().split(":");
+         String[] socket = client.getChannelServer().getIP().split(":");
          chr.getCashShop().open(false);
 
-         c.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
+         client.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
          chr.setSessionTransitionState();
          try {
-            c.announce(MaplePacketCreator.getChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
+            client.announce(MaplePacketCreator.getChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
          } catch (UnknownHostException ex) {
             ex.printStackTrace();
          }
       } else {
          if (chr.getCashShop().isOpened()) {
-            c.disconnect(false, false);
+            client.disconnect(false, false);
             return;
          }
          try {
-            slea.readByte(); // 1 = from dying 0 = regular portals
-            int targetid = slea.readInt();
-            String startwp = slea.readMapleAsciiString();
-            MaplePortal portal = chr.getMap().getPortal(startwp);
-            slea.readByte();
-            boolean wheel = slea.readShort() > 0;
+            MaplePortal portal = chr.getMap().getPortal(packet.startWarp());
 
-            if (targetid != -1) {
+            if (packet.targetId() != -1) {
                if (!chr.isAlive()) {
                   MapleMap map = chr.getMap();
-                  if (wheel && chr.haveItemWithId(5510000, false)) {
+                  if (packet.wheel() && chr.haveItemWithId(5510000, false)) {
                      // thanks lucasziron for showing revivePlayer() also being triggered by Wheel
 
-                     MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, 5510000, 1, true, false);
+                     MapleInventoryManipulator.removeById(client, MapleInventoryType.CASH, 5510000, 1, true, false);
                      chr.announce(MaplePacketCreator.showWheelsLeft(chr.getItemQuantity(5510000, false)));
 
                      chr.updateHp(50);
@@ -104,40 +104,40 @@ public final class ChangeMapHandler extends AbstractMaplePacketHandler {
                   }
                } else {
                   if (chr.isGM()) {
-                     MapleMap to = chr.getWarpMap(targetid);
+                     MapleMap to = chr.getWarpMap(packet.targetId());
                      chr.changeMap(to, to.getPortal(0));
                   } else {
                      final int divi = chr.getMapId() / 100;
                      boolean warp = false;
                      if (divi == 0) {
-                        if (targetid == 10000) {
+                        if (packet.targetId() == 10000) {
                            warp = true;
                         }
                      } else if (divi == 20100) {
-                        if (targetid == 104000000) {
-                           c.announce(MaplePacketCreator.lockUI(false));
-                           c.announce(MaplePacketCreator.disableUI(false));
+                        if (packet.targetId() == 104000000) {
+                           client.announce(MaplePacketCreator.lockUI(false));
+                           client.announce(MaplePacketCreator.disableUI(false));
                            warp = true;
                         }
                      } else if (divi == 9130401) { // Only allow warp if player is already in Intro map, or else = hack
-                        if (targetid == 130000000 || targetid / 100 == 9130401) { // Cygnus introduction
+                        if (packet.targetId() == 130000000 || packet.targetId() / 100 == 9130401) { // Cygnus introduction
                            warp = true;
                         }
                      } else if (divi == 9140900) { // Aran Introduction
-                        if (targetid == 914090011 || targetid == 914090012 || targetid == 914090013 || targetid == 140090000) {
+                        if (packet.targetId() == 914090011 || packet.targetId() == 914090012 || packet.targetId() == 914090013 || packet.targetId() == 140090000) {
                            warp = true;
                         }
                      } else if (divi / 10 == 1020) { // Adventurer movie clip Intro
-                        if (targetid == 1020000) {
+                        if (packet.targetId() == 1020000) {
                            warp = true;
                         }
                      } else if (divi / 10 >= 980040 && divi / 10 <= 980045) {
-                        if (targetid == 980040000) {
+                        if (packet.targetId() == 980040000) {
                            warp = true;
                         }
                      }
                      if (warp) {
-                        final MapleMap to = chr.getWarpMap(targetid);
+                        final MapleMap to = chr.getWarpMap(packet.targetId());
                         chr.changeMap(to, to.getPortal(0));
                      }
                   }
@@ -145,8 +145,8 @@ public final class ChangeMapHandler extends AbstractMaplePacketHandler {
             }
 
             if (portal != null && !portal.getPortalStatus()) {
-               c.announce(MaplePacketCreator.blockedMessage(1));
-               c.announce(MaplePacketCreator.enableActions());
+               client.announce(MaplePacketCreator.blockedMessage(1));
+               client.announce(MaplePacketCreator.enableActions());
                return;
             }
 
@@ -158,13 +158,13 @@ public final class ChangeMapHandler extends AbstractMaplePacketHandler {
 
             if (portal != null) {
                if (portal.getPosition().distanceSq(chr.getPosition()) > 400000) {
-                  c.announce(MaplePacketCreator.enableActions());
+                  client.announce(MaplePacketCreator.enableActions());
                   return;
                }
 
-               portal.enterPortal(c);
+               portal.enterPortal(client);
             } else {
-               c.announce(MaplePacketCreator.enableActions());
+               client.announce(MaplePacketCreator.enableActions());
             }
          } catch (Exception e) {
             e.printStackTrace();

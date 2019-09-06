@@ -24,38 +24,46 @@ package net.server.channel.handlers;
 import client.MapleClient;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ItemMovePacket;
+import net.server.channel.packet.reader.ItemMoveReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  */
-public final class ItemMoveHandler extends AbstractMaplePacketHandler {
+public final class ItemMoveHandler extends AbstractPacketHandler<ItemMovePacket, ItemMoveReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.skip(4);
-      if (c.getPlayer().getAutobanManager().getLastSpam(6) + 300 > currentServerTime()) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+   public boolean successfulProcess(MapleClient client) {
+      if (client.getPlayer().getAutobanManager().getLastSpam(6) + 300 > currentServerTime()) {
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
+      return true;
+   }
 
-      MapleInventoryType type = MapleInventoryType.getByType(slea.readByte());
-      short src = slea.readShort();     //is there any reason to use byte instead of short in src and action?
-      short action = slea.readShort();
-      short quantity = slea.readShort();
+   @Override
+   public Class<ItemMoveReader> getReaderClass() {
+      return ItemMoveReader.class;
+   }
 
-      if (src < 0 && action > 0) {
-         MapleInventoryManipulator.unequip(c, src, action);
-      } else if (action < 0) {
-         MapleInventoryManipulator.equip(c, src, action);
-      } else if (action == 0) {
-         MapleInventoryManipulator.drop(c, type, src, quantity);
+   @Override
+   public void handlePacket(ItemMovePacket packet, MapleClient client) {
+      MapleInventoryType type = MapleInventoryType.getByType(packet.inventoryType());
+
+      if (packet.source() < 0 && packet.action() > 0) {
+         MapleInventoryManipulator.unequip(client, packet.source(), packet.action());
+      } else if (packet.action() < 0) {
+         MapleInventoryManipulator.equip(client, packet.source(), packet.action());
+      } else if (packet.action() == 0) {
+         MapleInventoryManipulator.drop(client, type, packet.source(), packet.quantity());
       } else {
-         MapleInventoryManipulator.move(c, type, src, action);
+         MapleInventoryManipulator.move(client, type, packet.source(), packet.action());
       }
 
-      if (c.getPlayer().getMap().getHPDec() > 0) c.getPlayer().resetHpDecreaseTask();
-      c.getPlayer().getAutobanManager().spam(6);
+      if (client.getPlayer().getMap().getHPDec() > 0) {
+         client.getPlayer().resetHpDecreaseTask();
+      }
+      client.getPlayer().getAutobanManager().spam(6);
    }
 }

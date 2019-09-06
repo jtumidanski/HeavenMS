@@ -27,50 +27,53 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.database.provider.WorldTransferProvider;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.TransferWorldPacket;
+import net.server.channel.packet.reader.TransferWorldReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan
  */
-public final class TransferWorldHandler extends AbstractMaplePacketHandler {
+public final class TransferWorldHandler extends AbstractPacketHandler<TransferWorldPacket, TransferWorldReader> {
+   @Override
+   public Class<TransferWorldReader> getReaderClass() {
+      return TransferWorldReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readInt(); //cid
-      int birthday = slea.readInt();
-      if (!CashOperationHandler.checkBirthday(c, birthday)) {
-         c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
-         c.announce(MaplePacketCreator.enableActions());
+   public void handlePacket(TransferWorldPacket packet, MapleClient client) {
+      if (!CashOperationHandler.checkBirthday(client, packet.birthday())) {
+         client.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
 
-      MapleCharacter chr = c.getPlayer();
+      MapleCharacter chr = client.getPlayer();
       if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER || Server.getInstance().getWorldsSize() <= 1) {
-         c.announce(MaplePacketCreator.sendWorldTransferRules(9, c));
+         client.announce(MaplePacketCreator.sendWorldTransferRules(9, client));
          return;
       }
       int worldTransferError = chr.checkWorldTransferEligibility();
       if (worldTransferError != 0) {
-         c.announce(MaplePacketCreator.sendWorldTransferRules(worldTransferError, c));
+         client.announce(MaplePacketCreator.sendWorldTransferRules(worldTransferError, client));
          return;
       }
 
       Optional<Timestamp> completionTime = DatabaseConnection.getInstance().withConnectionResult(connection -> WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()));
 
       if (completionTime.isEmpty()) {
-         c.announce(MaplePacketCreator.sendWorldTransferRules(6, c));
+         client.announce(MaplePacketCreator.sendWorldTransferRules(6, client));
          return;
       }
 
       if (completionTime.get().getTime() + ServerConstants.WORLD_TRANSFER_COOLDOWN > System.currentTimeMillis()) {
-         c.announce(MaplePacketCreator.sendWorldTransferRules(7, c));
+         client.announce(MaplePacketCreator.sendWorldTransferRules(7, client));
          return;
       }
 
-      c.announce(MaplePacketCreator.sendWorldTransferRules(0, c));
+      client.announce(MaplePacketCreator.sendWorldTransferRules(0, client));
    }
 }

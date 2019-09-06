@@ -29,6 +29,9 @@ import client.autoban.AutobanFactory;
 import client.database.provider.CharacterProvider;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.WhisperPacket;
+import net.server.channel.packet.reader.WhisperReader;
 import net.server.world.World;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
@@ -39,111 +42,113 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Matze
  */
-public final class WhisperHandler extends AbstractMaplePacketHandler {
+public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket, WhisperReader> {
+   @Override
+   public Class<WhisperReader> getReaderClass() {
+      return WhisperReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte mode = slea.readByte();
-      if (mode == 6) { // whisper
-         whisper(slea, c);
-      } else if (mode == 5) { // - /find
-         find(slea, c);
-      } else if (mode == 0x44) {
-         buddyFind(slea, c);
+   public void handlePacket(WhisperPacket packet, MapleClient client) {
+      switch (packet.mode()) {
+         case 6:
+            whisper(packet, client);
+            break;
+         case 5:
+            find(packet, client);
+            break;
+         case 0x44:
+            buddyFind(packet, client);
+            break;
       }
    }
 
-   private void buddyFind(SeekableLittleEndianAccessor slea, MapleClient c) {
+   private void buddyFind(WhisperPacket packet, MapleClient client) {
       //Buddy find, thanks to Atoot
-
-      String recipient = slea.readMapleAsciiString();
-      c.getWorldServer().getPlayerStorage().getCharacterByName(recipient).filter(player -> c.getPlayer().gmLevel() >= player.gmLevel()).ifPresent(player -> {
+      client.getWorldServer().getPlayerStorage().getCharacterByName(packet.recipient()).filter(player -> client.getPlayer().gmLevel() >= player.gmLevel()).ifPresent(player -> {
          if (player.getCashShop().isOpened()) {  // in CashShop
-            c.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), -1, 2));
+            client.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), -1, 2));
          } else if (player.isAwayFromWorld()) {  // in MTS
-            c.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), -1, 0));
-         } else if (player.getClient().getChannel() != c.getChannel()) { // in another channel
-            c.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), player.getClient().getChannel() - 1, 3));
+            client.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), -1, 0));
+         } else if (player.getClient().getChannel() != client.getChannel()) { // in another channel
+            client.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), player.getClient().getChannel() - 1, 3));
          } else {
-            c.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), player.getMap().getId(), 1));
+            client.announce(MaplePacketCreator.getBuddyFindReply(player.getName(), player.getMap().getId(), 1));
          }
       });
    }
 
-   private void find(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String recipient = slea.readMapleAsciiString();
-      c.getWorldServer().getPlayerStorage().getCharacterByName(recipient).filter(victim -> c.getPlayer().gmLevel() >= victim.gmLevel()).ifPresentOrElse(victim -> {
+   private void find(WhisperPacket packet, MapleClient client) {
+      client.getWorldServer().getPlayerStorage().getCharacterByName(packet.recipient()).filter(victim -> client.getPlayer().gmLevel() >= victim.gmLevel()).ifPresentOrElse(victim -> {
          if (victim.getCashShop().isOpened()) {  // in CashShop
-            c.announce(MaplePacketCreator.getFindReply(victim.getName(), -1, 2));
+            client.announce(MaplePacketCreator.getFindReply(victim.getName(), -1, 2));
          } else if (victim.isAwayFromWorld()) {  // in MTS
-            c.announce(MaplePacketCreator.getFindReply(victim.getName(), -1, 0));
-         } else if (victim.getClient().getChannel() != c.getChannel()) { // in another channel, issue detected thanks to MedicOP
-            c.announce(MaplePacketCreator.getFindReply(victim.getName(), victim.getClient().getChannel() - 1, 3));
+            client.announce(MaplePacketCreator.getFindReply(victim.getName(), -1, 0));
+         } else if (victim.getClient().getChannel() != client.getChannel()) { // in another channel, issue detected thanks to MedicOP
+            client.announce(MaplePacketCreator.getFindReply(victim.getName(), victim.getClient().getChannel() - 1, 3));
          } else {
-            c.announce(MaplePacketCreator.getFindReply(victim.getName(), victim.getMap().getId(), 1));
+            client.announce(MaplePacketCreator.getFindReply(victim.getName(), victim.getMap().getId(), 1));
          }
       }, () -> {
-         if (c.getPlayer().isGM()) { // not found
+         if (client.getPlayer().isGM()) { // not found
             Optional<Integer> gmLevel = DatabaseConnection.getInstance().withConnectionResultOpt(connection ->
-                  CharacterProvider.getInstance().getGmLevel(connection, recipient));
-            if (gmLevel.isPresent() && gmLevel.get() >= c.getPlayer().gmLevel()) {
-               c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+                  CharacterProvider.getInstance().getGmLevel(connection, packet.recipient()));
+            if (gmLevel.isPresent() && gmLevel.get() >= client.getPlayer().gmLevel()) {
+               client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 0));
                return;
             }
-            byte channel = (byte) (c.getWorldServer().find(recipient) - 1);
+            byte channel = (byte) (client.getWorldServer().find(packet.recipient()) - 1);
             if (channel > -1) {
-               c.announce(MaplePacketCreator.getFindReply(recipient, channel, 3));
+               client.announce(MaplePacketCreator.getFindReply(packet.recipient(), channel, 3));
             } else {
-               c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+               client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 0));
             }
          } else {
-            c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+            client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 0));
          }
       });
    }
 
-   private void whisper(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String recipient = slea.readMapleAsciiString();
-      String text = slea.readMapleAsciiString();
-      Optional<MapleCharacter> player = c.getChannelServer().getPlayerStorage().getCharacterByName(recipient);
-      if (c.getPlayer().getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
+   private void whisper(WhisperPacket packet, MapleClient client) {
+      Optional<MapleCharacter> player = client.getChannelServer().getPlayerStorage().getCharacterByName(packet.recipient());
+      if (client.getPlayer().getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
          return;
       }
-      if (text.length() > Byte.MAX_VALUE) {
-         AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with whispers.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to send text with length of " + text.length());
-         c.disconnect(true, false);
+      if (packet.message().length() > Byte.MAX_VALUE) {
+         AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit with whispers.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         client.disconnect(true, false);
          return;
       }
       if (player.isPresent()) {
-         player.get().getClient().announce(MaplePacketCreator.getWhisper(c.getPlayer().getName(), c.getChannel(), text));
+         player.get().getClient().announce(MaplePacketCreator.getWhisper(client.getPlayer().getName(), client.getChannel(), packet.message()));
          if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-            LogHelper.logChat(c, "Whisper To " + player.get().getName(), text);
+            LogHelper.logChat(client, "Whisper To " + player.get().getName(), packet.message());
          }
-         if (player.get().isHidden() && player.get().gmLevel() >= c.getPlayer().gmLevel()) {
-            c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+         if (player.get().isHidden() && player.get().gmLevel() >= client.getPlayer().gmLevel()) {
+            client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 0));
          } else {
-            c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 1));
+            client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 1));
          }
       } else {// not found
-         World world = c.getWorldServer();
-         if (world.isConnected(recipient)) {
-            world.whisper(c.getPlayer().getName(), recipient, c.getChannel(), text);
+         World world = client.getWorldServer();
+         if (world.isConnected(packet.recipient())) {
+            world.whisper(client.getPlayer().getName(), packet.recipient(), client.getChannel(), packet.message());
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-               LogHelper.logChat(c, "Whisper To " + recipient, text);
+               LogHelper.logChat(client, "Whisper To " + packet.recipient(), packet.message());
             }
-            player = world.getPlayerStorage().getCharacterByName(recipient);
+            player = world.getPlayerStorage().getCharacterByName(packet.recipient());
             if (player.isPresent()) {
-               if (player.get().isHidden() && player.get().gmLevel() >= c.getPlayer().gmLevel()) {
-                  c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+               if (player.get().isHidden() && player.get().gmLevel() >= client.getPlayer().gmLevel()) {
+                  client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 0));
                } else {
-                  c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 1));
+                  client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 1));
                }
             }
          } else {
-            c.announce(MaplePacketCreator.getWhisperReply(recipient, (byte) 0));
+            client.announce(MaplePacketCreator.getWhisperReply(packet.recipient(), (byte) 0));
          }
       }
-      c.getPlayer().getAutobanManager().spam(7);
+      client.getPlayer().getAutobanManager().spam(7);
    }
 }

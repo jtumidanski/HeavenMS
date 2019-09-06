@@ -20,20 +20,24 @@
 
 package net.server.channel.handlers;
 
-import client.processor.CharacterProcessor;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import client.processor.CharacterProcessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.TransferNameResultPacket;
+import net.server.channel.packet.reader.TransferNameResultReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan
  */
-public final class TransferNameResultHandler extends AbstractMaplePacketHandler {
+public final class TransferNameResultHandler extends AbstractPacketHandler<TransferNameResultPacket, TransferNameResultReader> {
+   @Override
+   public Class<TransferNameResultReader> getReaderClass() {
+      return TransferNameResultReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String name = slea.readMapleAsciiString();
-      c.announce(MaplePacketCreator.sendNameTransferCheck(name, CharacterProcessor.getInstance().canCreateChar(name)));
+   public void handlePacket(TransferNameResultPacket packet, MapleClient client) {
+      client.announce(MaplePacketCreator.sendNameTransferCheck(packet.name(), CharacterProcessor.getInstance().canCreateChar(packet.name())));
    }
 }

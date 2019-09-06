@@ -28,37 +28,40 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.database.provider.NameChangeProvider;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.TransferNamePacket;
+import net.server.channel.packet.reader.TransferNameReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan
  */
-public final class TransferNameHandler extends AbstractMaplePacketHandler {
+public final class TransferNameHandler extends AbstractPacketHandler<TransferNamePacket, TransferNameReader> {
+   @Override
+   public Class<TransferNameReader> getReaderClass() {
+      return TransferNameReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readInt(); //cid
-      int birthday = slea.readInt();
-      if (!CashOperationHandler.checkBirthday(c, birthday)) {
-         c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
-         c.announce(MaplePacketCreator.enableActions());
+   public void handlePacket(TransferNamePacket packet, MapleClient client) {
+      if (!CashOperationHandler.checkBirthday(client, packet.birthday())) {
+         client.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
 
       if (!ServerConstants.ALLOW_CASHSHOP_NAME_CHANGE) {
-         c.announce(MaplePacketCreator.sendNameTransferRules(4));
+         client.announce(MaplePacketCreator.sendNameTransferRules(4));
          return;
       }
 
-      MapleCharacter chr = c.getPlayer();
+      MapleCharacter chr = client.getPlayer();
       if (chr.getLevel() < 10) {
-         c.announce(MaplePacketCreator.sendNameTransferRules(4));
+         client.announce(MaplePacketCreator.sendNameTransferRules(4));
          return;
-      } else if (c.getTempBanCalendar() != null && c.getTempBanCalendar().getTimeInMillis() + (30 * 24 * 60 * 60 * 1000) < Calendar.getInstance().getTimeInMillis()) {
-         c.announce(MaplePacketCreator.sendNameTransferRules(2));
+      } else if (client.getTempBanCalendar() != null && client.getTempBanCalendar().getTimeInMillis() + (30 * 24 * 60 * 60 * 1000) < Calendar.getInstance().getTimeInMillis()) {
+         client.announce(MaplePacketCreator.sendNameTransferRules(2));
          return;
       }
 
@@ -66,15 +69,16 @@ public final class TransferNameHandler extends AbstractMaplePacketHandler {
       Optional<Timestamp> completionTime = DatabaseConnection.getInstance().withConnectionResult(connection -> NameChangeProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()).orElse(null));
 
       if (completionTime.isEmpty()) {
-         c.announce(MaplePacketCreator.sendNameTransferRules(1));
+         client.announce(MaplePacketCreator.sendNameTransferRules(1));
          return;
       }
 
       if (completionTime.get().getTime() + ServerConstants.NAME_CHANGE_COOLDOWN > System.currentTimeMillis()) {
-         c.announce(MaplePacketCreator.sendNameTransferRules(3));
+         client.announce(MaplePacketCreator.sendNameTransferRules(3));
          return;
       }
 
-      c.announce(MaplePacketCreator.sendNameTransferRules(0));
+      client.announce(MaplePacketCreator.sendNameTransferRules(0));
+
    }
 }

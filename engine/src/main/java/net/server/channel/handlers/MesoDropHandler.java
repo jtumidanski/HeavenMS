@@ -23,45 +23,54 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.MesoDropPacket;
+import net.server.channel.packet.reader.MesoDropReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  * @author Ronan - concurrency protection
  */
-public final class MesoDropHandler extends AbstractMaplePacketHandler {
+public final class MesoDropHandler extends AbstractPacketHandler<MesoDropPacket, MesoDropReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter player = c.getPlayer();
+   public boolean successfulProcess(MapleClient client) {
+      MapleCharacter player = client.getPlayer();
       if (!player.isAlive()) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
-      slea.skip(4);
-      int meso = slea.readInt();
+      return true;
+   }
 
-      if (c.tryAcquireClient()) {     // thanks imbee for noticing players not being able to throw mesos too fast, dampening gameplay of some classes
+   @Override
+   public Class<MesoDropReader> getReaderClass() {
+      return MesoDropReader.class;
+   }
+
+   @Override
+   public void handlePacket(MesoDropPacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
+      if (client.tryAcquireClient()) {     // thanks imbee for noticing players not being able to throw mesos too fast, dampening gameplay of some classes
          try {
-            if (meso <= player.getMeso() && meso > 9 && meso < 50001) {
-               player.gainMeso(-meso, false, true, false);
+            if (packet.meso() <= player.getMeso() && packet.meso() > 9 && packet.meso() < 50001) {
+               player.gainMeso(-packet.meso(), false, true, false);
             } else {
-               c.announce(MaplePacketCreator.enableActions());
+               client.announce(MaplePacketCreator.enableActions());
                return;
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       } else {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
 
-      if (player.attemptCatchFish(meso)) {
-         player.getMap().disappearingMesoDrop(meso, player, player, player.getPosition());
+      if (player.attemptCatchFish(packet.meso())) {
+         player.getMap().disappearingMesoDrop(packet.meso(), player, player, player.getPosition());
       } else {
-         player.getMap().spawnMesoDrop(meso, player.getPosition(), player, player, true, (byte) 2);
+         player.getMap().spawnMesoDrop(packet.meso(), player.getPosition(), player, player, true, (byte) 2);
       }
    }
 }

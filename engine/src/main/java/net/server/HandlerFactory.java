@@ -223,7 +223,7 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.CHECK_CHAR_NAME, new TransferNameResultHandler());
       packetProcessor.registerHandler(RecvOpcode.WORLD_TRANSFER, new TransferWorldHandler());
       packetProcessor.registerHandler(RecvOpcode.CHANGE_CHANNEL, new ChangeChannelHandler());
-      packetProcessor.registerHandler(RecvOpcode.STRANGE_DATA, LoginRequiringNoOpHandler.getInstance());
+      packetProcessor.registerHandler(RecvOpcode.STRANGE_DATA, new LoginRequiringNoOpHandler());
       packetProcessor.registerHandler(RecvOpcode.GENERAL_CHAT, new GeneralChatHandler());
       packetProcessor.registerHandler(RecvOpcode.WHISPER, new WhisperHandler());
       packetProcessor.registerHandler(RecvOpcode.NPC_TALK, new NPCTalkHandler());
@@ -236,13 +236,15 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.MESO_DROP, new MesoDropHandler());
       packetProcessor.registerHandler(RecvOpcode.PLAYER_LOGGEDIN, new PlayerLoggedinHandler());
       packetProcessor.registerHandler(RecvOpcode.CHANGE_MAP, new ChangeMapHandler());
+      packetProcessor.registerHandler(RecvOpcode.USE_CASH_ITEM, new UseCashItemHandler());
+
       packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
       packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
       packetProcessor.registerHandler(RecvOpcode.RANGED_ATTACK, new RangedAttackHandler());
       packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
       packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
-      packetProcessor.registerHandler(RecvOpcode.USE_CASH_ITEM, new UseCashItemHandler());
+
       packetProcessor.registerHandler(RecvOpcode.USE_ITEM, new UseItemHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_RETURN_SCROLL, new UseItemHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_UPGRADE_SCROLL, new ScrollHandler());

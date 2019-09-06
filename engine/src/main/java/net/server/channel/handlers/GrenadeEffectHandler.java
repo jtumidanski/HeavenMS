@@ -25,34 +25,35 @@ import client.MapleCharacter;
 import client.MapleClient;
 import constants.skills.Gunslinger;
 import constants.skills.NightWalker;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.GrenadeEffectPacket;
+import net.server.channel.packet.reader.GrenadeEffectReader;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /*
  * @author GabrielSin
  */
-public class GrenadeEffectHandler extends AbstractMaplePacketHandler {
+public class GrenadeEffectHandler extends AbstractPacketHandler<GrenadeEffectPacket, GrenadeEffectReader> {
+   @Override
+   public Class<GrenadeEffectReader> getReaderClass() {
+      return GrenadeEffectReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      Point position = new Point(slea.readInt(), slea.readInt());
-      int keyDown = slea.readInt();
-      int skillId = slea.readInt();
-
-      switch (skillId) {
+   public void handlePacket(GrenadeEffectPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      Point position = new Point(packet.x(), packet.y());
+      switch (packet.skillId()) {
          case NightWalker.POISON_BOMB:
          case Gunslinger.GRENADE:
-            int skillLevel = chr.getSkillLevel(skillId);
+            int skillLevel = chr.getSkillLevel(packet.skillId());
             if (skillLevel > 0) {
-               chr.getMap().broadcastMessage(chr, MaplePacketCreator.throwGrenade(chr.getId(), position, keyDown, skillId, skillLevel), position);
+               chr.getMap().broadcastMessage(chr, MaplePacketCreator.throwGrenade(chr.getId(), position, packet.keyDown(), packet.skillId(), skillLevel), position);
             }
             break;
          default:
-            FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "The skill id: " + skillId + " is not coded in " + this.getClass().getName() + ".");
+            FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "The skill id: " + packet.skillId() + " is not coded in " + this.getClass().getName() + ".");
       }
    }
-
 }

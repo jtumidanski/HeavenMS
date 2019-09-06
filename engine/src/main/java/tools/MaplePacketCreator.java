@@ -94,6 +94,7 @@ import server.CashShop.SpecialCashItem;
 import server.DueyPackage;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;
+import server.MaplePacketOpCodes;
 import server.MapleShopItem;
 import server.MapleTrade;
 import server.events.gm.MapleSnowball;
@@ -8069,10 +8070,10 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] sendVegaScroll(int op) {
+   public static byte[] sendVegaScroll(MaplePacketOpCodes.VegaScroll op) {
       MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
       mplew.writeShort(SendOpcode.VEGA_SCROLL.getValue());
-      mplew.write(op);
+      mplew.write(op.getValue());
       return mplew.getPacket();
    }
 

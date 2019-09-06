@@ -27,6 +27,9 @@ import client.autoban.AutobanFactory;
 import client.command.CommandsExecutor;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.GeneralChatPacket;
+import net.server.channel.packet.reader.GeneralChatReader;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
@@ -34,40 +37,43 @@ import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class GeneralChatHandler extends AbstractMaplePacketHandler {
+public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatPacket, GeneralChatReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      String s = slea.readMapleAsciiString();
-      MapleCharacter chr = c.getPlayer();
+   public Class<GeneralChatReader> getReaderClass() {
+      return GeneralChatReader.class;
+   }
+
+   @Override
+   public void handlePacket(GeneralChatPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       if (chr.getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
-      if (s.length() > Byte.MAX_VALUE && !chr.isGM()) {
-         AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit in General Chat.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to send text with length of " + s.length());
-         c.disconnect(true, false);
+      if (packet.message().length() > Byte.MAX_VALUE && !chr.isGM()) {
+         AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit in General Chat.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         client.disconnect(true, false);
          return;
       }
-      char heading = s.charAt(0);
-      if (CommandsExecutor.isCommand(c, s)) {
-         CommandsExecutor.getInstance().handle(c, s);
+      char heading = packet.message().charAt(0);
+      if (CommandsExecutor.isCommand(client, packet.message())) {
+         CommandsExecutor.getInstance().handle(client, packet.message());
       } else if (heading != '/') {
-         int show = slea.readByte();
          if (chr.getMap().isMuted() && !chr.isGM()) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "The map you are in is currently muted. Please try again later.");
             return;
          }
 
          if (!chr.isHidden()) {
-            chr.getMap().broadcastMessage(MaplePacketCreator.getChatText(chr.getId(), s, chr.getWhiteChat(), show));
+            chr.getMap().broadcastMessage(MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-               LogHelper.logChat(c, "General", s);
+               LogHelper.logChat(client, "General", packet.message());
             }
          } else {
-            chr.getMap().broadcastGMMessage(MaplePacketCreator.getChatText(chr.getId(), s, chr.getWhiteChat(), show));
+            chr.getMap().broadcastGMMessage(MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-               LogHelper.logChat(c, "GM General", s);
+               LogHelper.logChat(client, "GM General", packet.message());
             }
          }
 

@@ -35,4 +35,8 @@ public abstract class AbstractPacketHandler<T extends MaplePacket, U extends Pac
    public boolean validateState(MapleClient c) {
       return c.isLoggedIn();
    }
+
+   protected long currentServerTime() {
+      return Server.getInstance().getCurrentTime();
+   }
 }
