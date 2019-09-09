@@ -54,7 +54,7 @@ public class MaplePortalFactory {
       int x = MapleDataTool.getInt(portal.getChildByPath("x"));
       int y = MapleDataTool.getInt(portal.getChildByPath("y"));
       myPortal.setPosition(new Point(x, y));
-      String script = MapleDataTool.getString("script", portal, null);
+      String script = MapleDataTool.getString("script/src/main/groovy", portal, null);
       if (script != null && script.equals("")) {
          script = null;
       }

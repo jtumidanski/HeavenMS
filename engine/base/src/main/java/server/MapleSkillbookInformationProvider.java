@@ -303,7 +303,7 @@ public class MapleSkillbookInformationProvider {
    }
 
    private static void fetchSkillbooksFromScripts() {
-      filterScriptDirectorySearchMatchingData("scripts");
+      filterScriptDirectorySearchMatchingData("script/src/main/groovy");
    }
 
    private static void loadSkillbooks() {

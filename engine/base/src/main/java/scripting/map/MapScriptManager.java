@@ -56,7 +56,7 @@ public class MapScriptManager {
    }
 
    public boolean scriptExists(String scriptName, boolean firstUser) {
-      File scriptFile = new File("scripts/map/" + (firstUser ? "onFirstUserEnter/" : "onUserEnter/") + scriptName + ".js");
+      File scriptFile = new File("script/src/main/groovy/map/" + (firstUser ? "onFirstUserEnter/" : "onUserEnter/") + scriptName + ".js");
       return scriptFile.exists();
    }
 
@@ -71,7 +71,7 @@ public class MapScriptManager {
       }
       String type = firstUser ? "onFirstUserEnter/" : "onUserEnter/";
 
-      File scriptFile = new File("scripts/map/" + type + scriptName + ".js");
+      File scriptFile = new File("script/src/main/groovy/map/" + type + scriptName + ".js");
       if (!scriptExists(scriptName, firstUser)) {
          return;
       }

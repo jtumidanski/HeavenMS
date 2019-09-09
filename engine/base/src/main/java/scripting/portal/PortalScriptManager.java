@@ -57,7 +57,7 @@ public class PortalScriptManager {
       if (scripts.containsKey(scriptName)) {
          return scripts.get(scriptName);
       }
-      File scriptFile = new File("scripts/portal/" + scriptName + ".groovy");
+      File scriptFile = new File("script/src/main/groovy/portal/" + scriptName + ".groovy");
       if (!scriptFile.exists()) {
          scripts.put(scriptName, null);
          return null;

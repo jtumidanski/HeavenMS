@@ -46,7 +46,7 @@ public abstract class AbstractScriptManager {
    }
 
    protected ScriptEngine getScriptEngine(String path) {
-      path = "scripts/" + path;
+      path = "script/src/main/groovy/" + path;
       String engineName = "";
       File scriptFile = null;
       if (new File(path + ".groovy").exists()) {
@@ -68,7 +68,7 @@ public abstract class AbstractScriptManager {
    }
 
    protected ScriptEngine getScriptEngine(String path, MapleClient c) {
-      String cachePath = "scripts/" + path;
+      String cachePath = "script/src/main/groovy/" + path;
       ScriptEngine engine = c.getScriptEngine(cachePath);
 
       if (engine == null) {
@@ -81,6 +81,6 @@ public abstract class AbstractScriptManager {
 
 
    protected void resetContext(String path, MapleClient c) {
-      c.removeScriptEngine("scripts/" + path + ".groovy");
+      c.removeScriptEngine("script/src/main/groovy/" + path + ".groovy");
    }
 }
