@@ -39,19 +39,20 @@ import constants.skills.NightWalker;
 import constants.skills.Paladin;
 import constants.skills.ThunderBreaker;
 import constants.skills.WindArcher;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.SkillEffectPacket;
+import net.server.channel.packet.reader.SkillEffectReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class SkillEffectHandler extends AbstractMaplePacketHandler {
+public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectPacket, SkillEffectReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int skillId = slea.readInt();
-      int level = slea.readByte();
-      byte flags = slea.readByte();
-      int speed = slea.readByte();
-      byte aids = slea.readByte();//Mmmk
-      switch (skillId) {
+   public Class<SkillEffectReader> getReaderClass() {
+      return SkillEffectReader.class;
+   }
+
+   @Override
+   public void handlePacket(SkillEffectPacket packet, MapleClient client) {
+      switch (packet.skillId()) {
          case FPMage.EXPLOSION:
          case FPArchMage.BIG_BANG:
          case ILArchMage.BIG_BANG:
@@ -70,11 +71,10 @@ public final class SkillEffectHandler extends AbstractMaplePacketHandler {
          case Hero.MONSTER_MAGNET:
          case Evan.FIRE_BREATH:
          case Evan.ICE_BREATH:
-            c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.skillEffect(c.getPlayer(), skillId, level, flags, speed, aids), false);
+            client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.skillEffect(client.getPlayer(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false);
             return;
          default:
-            System.out.println(c.getPlayer() + " entered SkillEffectHandler without being handled using " + skillId + ".");
-            return;
+            System.out.println(client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");
       }
    }
 }

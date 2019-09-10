@@ -269,6 +269,10 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.CANCEL_CHAIR, new CancelChairHandler());
       packetProcessor.registerHandler(RecvOpcode.DAMAGE_REACTOR, new ReactorHitHandler());
       packetProcessor.registerHandler(RecvOpcode.GUILD_OPERATION, new GuildOperationHandler());
+      packetProcessor.registerHandler(RecvOpcode.DENY_GUILD_REQUEST, new DenyGuildRequestHandler());
+      packetProcessor.registerHandler(RecvOpcode.BBS_OPERATION, new BBSOperationHandler());
+      packetProcessor.registerHandler(RecvOpcode.SKILL_EFFECT, new SkillEffectHandler());
+      packetProcessor.registerHandler(RecvOpcode.MESSENGER, new MessengerHandler());
 
       packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
       packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
@@ -280,10 +284,6 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
       packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
 
-      packetProcessor.registerHandler(RecvOpcode.DENY_GUILD_REQUEST, new DenyGuildRequestHandler());
-      packetProcessor.registerHandler(RecvOpcode.BBS_OPERATION, new BBSOperationHandler());
-      packetProcessor.registerHandler(RecvOpcode.SKILL_EFFECT, new SkillEffectHandler());
-      packetProcessor.registerHandler(RecvOpcode.MESSENGER, new MessengerHandler());
       packetProcessor.registerHandler(RecvOpcode.NPC_ACTION, new NPCAnimationHandler());
       packetProcessor.registerHandler(RecvOpcode.CHECK_CASH, new TouchingCashShopHandler());
       packetProcessor.registerHandler(RecvOpcode.CASHSHOP_OPERATION, new CashOperationHandler());

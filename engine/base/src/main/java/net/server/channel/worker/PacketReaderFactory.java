@@ -8,6 +8,7 @@ import net.server.MaplePacket;
 import net.server.PacketReader;
 import net.server.channel.packet.reader.AcceptToSReader;
 import net.server.channel.packet.reader.AfterLoginReader;
+import net.server.channel.packet.reader.BBSOperationReader;
 import net.server.channel.packet.reader.BuddyReader;
 import net.server.channel.packet.reader.CancelBuffReader;
 import net.server.channel.packet.reader.CancelChairReader;
@@ -23,6 +24,7 @@ import net.server.channel.packet.reader.CheckCharacterNameReader;
 import net.server.channel.packet.reader.CreateCharacterReader;
 import net.server.channel.packet.reader.DamageSummonReader;
 import net.server.channel.packet.reader.DeleteCharacterReader;
+import net.server.channel.packet.reader.DenyGuildRequestReader;
 import net.server.channel.packet.reader.DenyPartyRequestReader;
 import net.server.channel.packet.reader.DistributeAPReader;
 import net.server.channel.packet.reader.DistributeSPReader;
@@ -39,6 +41,7 @@ import net.server.channel.packet.reader.ItemPickupReader;
 import net.server.channel.packet.reader.KeymapChangeReader;
 import net.server.channel.packet.reader.LoginPasswordReader;
 import net.server.channel.packet.reader.MesoDropReader;
+import net.server.channel.packet.reader.MessengerReader;
 import net.server.channel.packet.reader.MultiChatReader;
 import net.server.channel.packet.reader.NPCMoreTalkReader;
 import net.server.channel.packet.reader.NPCShopReader;
@@ -54,6 +57,7 @@ import net.server.channel.packet.reader.RegisterPinReader;
 import net.server.channel.packet.reader.ScrollReader;
 import net.server.channel.packet.reader.ServerStatusRequestReader;
 import net.server.channel.packet.reader.SetGenderReader;
+import net.server.channel.packet.reader.SkillEffectReader;
 import net.server.channel.packet.reader.StorageReader;
 import net.server.channel.packet.reader.TransferNameReader;
 import net.server.channel.packet.reader.TransferNameResultReader;
@@ -145,6 +149,10 @@ public class PacketReaderFactory {
       readers.put(CancelChairReader.class, new CancelChairReader());
       readers.put(ReactorHitReader.class, new ReactorHitReader());
       readers.put(GuildOperationReader.class, new GuildOperationReader());
+      readers.put(DenyGuildRequestReader.class, new DenyGuildRequestReader());
+      readers.put(BBSOperationReader.class, new BBSOperationReader());
+      readers.put(SkillEffectReader.class, new SkillEffectReader());
+      readers.put(MessengerReader.class, new MessengerReader());
    }
 
    public <T extends MaplePacket> Optional<T> read(Class<? extends PacketReader<T>> readerClass, SeekableLittleEndianAccessor accessor) {

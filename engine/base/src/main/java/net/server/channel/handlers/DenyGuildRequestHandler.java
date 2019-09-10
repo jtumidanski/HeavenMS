@@ -22,20 +22,23 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
-import net.server.guild.MapleGuild;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.guild.DenyGuildRequestPacket;
+import net.server.channel.packet.reader.DenyGuildRequestReader;
 import net.server.processor.MapleGuildProcessor;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Xterminator
  */
-public final class DenyGuildRequestHandler extends AbstractMaplePacketHandler {
+public final class DenyGuildRequestHandler extends AbstractPacketHandler<DenyGuildRequestPacket, DenyGuildRequestReader> {
+   @Override
+   public Class<DenyGuildRequestReader> getReaderClass() {
+      return DenyGuildRequestReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readByte();
-      c.getWorldServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString())
-            .ifPresent(from -> MapleGuildProcessor.getInstance().answerInvitation(c.getPlayer().getId(), c.getPlayer().getName(), from.getGuildId(), false));
+   public void handlePacket(DenyGuildRequestPacket packet, MapleClient client) {
+      client.getWorldServer().getPlayerStorage().getCharacterByName(packet.characterName())
+            .ifPresent(from -> MapleGuildProcessor.getInstance().answerInvitation(client.getPlayer().getId(), client.getPlayer().getName(), from.getGuildId(), false));
    }
 }

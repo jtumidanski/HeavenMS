@@ -25,7 +25,14 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.messenger.BaseMessengerPacket;
+import net.server.channel.packet.messenger.CloseMessenger;
+import net.server.channel.packet.messenger.JoinMessengerPacket;
+import net.server.channel.packet.messenger.MessengerChat;
+import net.server.channel.packet.messenger.MessengerDecline;
+import net.server.channel.packet.messenger.MessengerInvite;
+import net.server.channel.packet.reader.MessengerReader;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
@@ -34,48 +41,53 @@ import net.server.world.MapleMessengerCharacter;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
-import tools.Pair;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MessengerHandler extends AbstractMaplePacketHandler {
+public final class MessengerHandler extends AbstractPacketHandler<BaseMessengerPacket, MessengerReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.tryAcquireClient()) {
+   public Class<MessengerReader> getReaderClass() {
+      return MessengerReader.class;
+   }
+
+   @Override
+   public void handlePacket(BaseMessengerPacket packet, MapleClient client) {
+      if (client.tryAcquireClient()) {
          try {
-            byte mode = slea.readByte();
-            MapleCharacter player = c.getPlayer();
-            World world = c.getWorldServer();
-            //MapleMessenger messenger = player.getMessenger();
-            switch (mode) {
-               case 0x00:
-                  joinMessenger(slea, player, world);
-                  break;
-               case 0x02:
-                  player.closePlayerMessenger();
-                  break;
-               case 0x03:
-                  messengerInvite(slea, c, player, world);
-                  break;
-               case 0x05:
-                  String targeted = slea.readMapleAsciiString();
-                  world.declineChat(targeted, player);
-                  break;
-               case 0x06:
-                  player.getMessenger().ifPresent(messenger -> {
-                     MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, player.getMessengerPosition());
-                     String input = slea.readMapleAsciiString();
-                     world.messengerChat(messenger, input, messengerCharacter.getName());
-                  });
-                  break;
+            MapleCharacter player = client.getPlayer();
+            World world = client.getWorldServer();
+            if (packet instanceof JoinMessengerPacket) {
+               joinMessenger(player, world, ((JoinMessengerPacket) packet).messengerId());
+            } else if (packet instanceof CloseMessenger) {
+               closeMessenger(player);
+            } else if (packet instanceof MessengerInvite) {
+               messengerInvite(client, player, world, ((MessengerInvite) packet).input());
+            } else if (packet instanceof MessengerDecline) {
+               declineChat((MessengerDecline) packet, player, world);
+            } else if (packet instanceof MessengerChat) {
+               chat((MessengerChat) packet, player, world);
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }
 
-   private void messengerInvite(SeekableLittleEndianAccessor accessor, MapleClient c, MapleCharacter player, World world) {
+   private void chat(MessengerChat packet, MapleCharacter player, World world) {
+      player.getMessenger().ifPresent(messenger -> {
+         MapleMessengerCharacter messengerCharacter = new MapleMessengerCharacter(player, player.getMessengerPosition());
+         world.messengerChat(messenger, packet.input(), messengerCharacter.getName());
+      });
+   }
+
+   private void declineChat(MessengerDecline packet, MapleCharacter player, World world) {
+      world.declineChat(packet.target(), player);
+   }
+
+   private void closeMessenger(MapleCharacter player) {
+      player.closePlayerMessenger();
+   }
+
+   private void messengerInvite(MapleClient c, MapleCharacter player, World world, String input) {
       MapleMessenger messenger;
       if (player.getMessenger().isEmpty()) {
          c.announce(MaplePacketCreator.messengerChat(player.getName() + " : This Maple Messenger is currently unavailable. Please quit this chat."));
@@ -88,8 +100,6 @@ public final class MessengerHandler extends AbstractMaplePacketHandler {
          c.announce(MaplePacketCreator.messengerChat(player.getName() + " : You cannot have more than 3 people in the Maple Messenger"));
          return;
       }
-
-      String input = accessor.readMapleAsciiString();
 
       Optional<MapleCharacter> target = c.getChannelServer().getPlayerStorage().getCharacterByName(input);
       if (target.isEmpty()) {
@@ -115,9 +125,7 @@ public final class MessengerHandler extends AbstractMaplePacketHandler {
       }
    }
 
-   private void joinMessenger(SeekableLittleEndianAccessor accessor, MapleCharacter player, World world) {
-      int messengerId = accessor.readInt();
-
+   private void joinMessenger(MapleCharacter player, World world, int messengerId) {
       player.getMessenger().ifPresentOrElse(messenger -> MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messengerId, false),
             () -> {
                if (messengerId == 0) {

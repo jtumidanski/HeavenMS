@@ -32,21 +32,81 @@ import client.database.data.BbsThreadData;
 import client.database.data.BbsThreadReplyData;
 import client.database.provider.BbsThreadProvider;
 import client.database.provider.BbsThreadReplyProvider;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.bbs.BaseBBSOperationPacket;
+import net.server.channel.packet.bbs.DeleteReplyPacket;
+import net.server.channel.packet.bbs.DeleteThreadPacket;
+import net.server.channel.packet.bbs.DisplayThreadPacket;
+import net.server.channel.packet.bbs.EditBBSThreadPacket;
+import net.server.channel.packet.bbs.ListThreadsPacket;
+import net.server.channel.packet.bbs.NewBBSThreadPacket;
+import net.server.channel.packet.bbs.ReplyToThreadPacket;
+import net.server.channel.packet.reader.BBSOperationReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class BBSOperationHandler extends AbstractMaplePacketHandler {
+public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOperationPacket, BBSOperationReader> {
+   @Override
+   public Class<BBSOperationReader> getReaderClass() {
+      return BBSOperationReader.class;
+   }
 
-   private static void listBBSThreads(MapleClient c, int start) {
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      return client.getPlayer().getGuildId() >= 1;
+   }
+
+   @Override
+   public void handlePacket(BaseBBSOperationPacket packet, MapleClient client) {
+      if (packet instanceof NewBBSThreadPacket) {
+         newThread((NewBBSThreadPacket) packet, client);
+      } else if (packet instanceof EditBBSThreadPacket) {
+         editThread((EditBBSThreadPacket) packet, client);
+      } else if (packet instanceof DeleteThreadPacket) {
+         deleteBBSThread(client, ((DeleteThreadPacket) packet).threadId());
+      } else if (packet instanceof ListThreadsPacket) {
+         listBBSThreads(client, ((ListThreadsPacket) packet).start() * 10);
+      } else if (packet instanceof DisplayThreadPacket) {
+         displayThread(client, ((DisplayThreadPacket) packet).threadId());
+      } else if (packet instanceof ReplyToThreadPacket) {
+         newBBSReply(client, ((ReplyToThreadPacket) packet).threadId(), ((ReplyToThreadPacket) packet).message());
+      } else if (packet instanceof DeleteReplyPacket) {
+         deleteBBSReply(client, ((DeleteReplyPacket) packet).replyId());
+      } else {
+         System.out.println("Unhandled BBS mode: " + packet.toString());
+      }
+   }
+
+   private void editThread(EditBBSThreadPacket packet, MapleClient client) {
+      if (packet.icon() >= 0x64 && packet.icon() <= 0x6a) {
+         if (!client.getPlayer().haveItemWithId(5290000 + packet.icon() - 0x64, false)) {
+            return;
+         }
+      } else if (packet.icon() < 0 || packet.icon() > 3) {
+         return;
+      }
+      editBBSThread(client, packet.title(), packet.text(), packet.icon(), packet.threadId());
+   }
+
+   private void newThread(NewBBSThreadPacket packet, MapleClient client) {
+      if (packet.icon() >= 0x64 && packet.icon() <= 0x6a) {
+         if (!client.getPlayer().haveItemWithId(5290000 + packet.icon() - 0x64, false)) {
+            return;
+         }
+      } else if (packet.icon() < 0 || packet.icon() > 3) {
+         return;
+      }
+      newBBSThread(client, packet.title(), packet.text(), packet.icon(), packet.isNotice());
+   }
+
+   private void listBBSThreads(MapleClient c, int start) {
       DatabaseConnection.getInstance().withConnection(connection -> {
          List<BbsThreadData> threadData = BbsThreadProvider.getInstance().getThreadsForGuild(connection, c.getPlayer().getGuildId());
          c.announce(MaplePacketCreator.BBSThreadList(threadData, start));
       });
    }
 
-   private static void newBBSReply(MapleClient c, int localThreadId, String text) {
+   private void newBBSReply(MapleClient c, int localThreadId, String text) {
       if (c.getPlayer().getGuildId() <= 0) {
          return;
       }
@@ -62,7 +122,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       });
    }
 
-   private static void editBBSThread(MapleClient client, String title, String text, int icon, int localThreadId) {
+   private void editBBSThread(MapleClient client, String title, String text, int icon, int localThreadId) {
       MapleCharacter c = client.getPlayer();
       if (c.getGuildId() < 1) {
          return;
@@ -74,7 +134,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       });
    }
 
-   private static void newBBSThread(MapleClient client, String title, String text, int icon, boolean bNotice) {
+   private void newBBSThread(MapleClient client, String title, String text, int icon, boolean bNotice) {
       MapleCharacter c = client.getPlayer();
       if (c.getGuildId() <= 0) {
          return;
@@ -90,7 +150,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       });
    }
 
-   public static void deleteBBSThread(MapleClient client, int localThreadId) {
+   private void deleteBBSThread(MapleClient client, int localThreadId) {
       MapleCharacter mc = client.getPlayer();
       if (mc.getGuildId() <= 0) {
          return;
@@ -112,7 +172,7 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       });
    }
 
-   public static void deleteBBSReply(MapleClient client, int replyId) {
+   private void deleteBBSReply(MapleClient client, int replyId) {
       MapleCharacter mc = client.getPlayer();
       if (mc.getGuildId() <= 0) {
          return;
@@ -134,11 +194,11 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
       });
    }
 
-   public static void displayThread(MapleClient client, int threadid) {
+   private void displayThread(MapleClient client, int threadid) {
       displayThread(client, threadid, true);
    }
 
-   public static void displayThread(MapleClient client, int threadid, boolean bIsThreadIdLocal) {
+   private void displayThread(MapleClient client, int threadid, boolean bIsThreadIdLocal) {
       MapleCharacter mc = client.getPlayer();
       if (mc.getGuildId() <= 0) {
          return;
@@ -146,66 +206,5 @@ public final class BBSOperationHandler extends AbstractMaplePacketHandler {
 
       DatabaseConnection.getInstance().withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
             .ifPresent(threadData -> client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.getThreadId(), threadData))));
-   }
-
-   private String correctLength(String in, int maxSize) {
-      return in.length() > maxSize ? in.substring(0, maxSize) : in;
-   }
-
-   @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.getPlayer().getGuildId() < 1) {
-         return;
-      }
-      byte mode = slea.readByte();
-      int localthreadid = 0;
-      switch (mode) {
-         case 0:
-            boolean bEdit = slea.readByte() == 1;
-            if (bEdit) {
-               localthreadid = slea.readInt();
-            }
-            boolean bNotice = slea.readByte() == 1;
-            String title = correctLength(slea.readMapleAsciiString(), 25);
-            String text = correctLength(slea.readMapleAsciiString(), 600);
-            int icon = slea.readInt();
-            if (icon >= 0x64 && icon <= 0x6a) {
-               if (!c.getPlayer().haveItemWithId(5290000 + icon - 0x64, false)) {
-                  return;
-               }
-            } else if (icon < 0 || icon > 3) {
-               return;
-            }
-            if (!bEdit) {
-               newBBSThread(c, title, text, icon, bNotice);
-            } else {
-               editBBSThread(c, title, text, icon, localthreadid);
-            }
-            break;
-         case 1:
-            localthreadid = slea.readInt();
-            deleteBBSThread(c, localthreadid);
-            break;
-         case 2:
-            int start = slea.readInt();
-            listBBSThreads(c, start * 10);
-            break;
-         case 3: // list thread + reply, followed by id (int)
-            localthreadid = slea.readInt();
-            displayThread(c, localthreadid);
-            break;
-         case 4: // reply
-            localthreadid = slea.readInt();
-            text = correctLength(slea.readMapleAsciiString(), 25);
-            newBBSReply(c, localthreadid, text);
-            break;
-         case 5: // delete reply
-            slea.readInt(); // we don't use this
-            int replyid = slea.readInt();
-            deleteBBSReply(c, replyid);
-            break;
-         default:
-            //System.out.println("Unhandled BBS mode: " + slea.toString());
-      }
    }
 }
