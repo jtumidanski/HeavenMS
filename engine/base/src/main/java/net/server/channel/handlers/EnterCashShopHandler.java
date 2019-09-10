@@ -23,37 +23,43 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import server.maps.MapleMiniDungeonInfo;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Flav
  */
-public class EnterCashShopHandler extends AbstractMaplePacketHandler {
+public class EnterCashShopHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
       try {
-         MapleCharacter mc = c.getPlayer();
+         MapleCharacter mc = client.getPlayer();
 
          if (mc.cannotEnterCashShop()) {
-            c.announce(MaplePacketCreator.enableActions());
+            client.announce(MaplePacketCreator.enableActions());
             return;
          }
 
          if (mc.getEventInstance() != null) {
             MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.PINK_TEXT, "Entering Cash Shop or MTS are disabled when registered on an event.");
-            c.announce(MaplePacketCreator.enableActions());
+            client.announce(MaplePacketCreator.enableActions());
             return;
          }
 
          if (MapleMiniDungeonInfo.isDungeonMap(mc.getMapId())) {
             MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
-            c.announce(MaplePacketCreator.enableActions());
+            client.announce(MaplePacketCreator.enableActions());
             return;
          }
 
@@ -80,13 +86,13 @@ public class EnterCashShopHandler extends AbstractMaplePacketHandler {
          mc.forfeitExpirableQuests();
          mc.cancelQuestExpirationTask();
 
-         c.announce(MaplePacketCreator.openCashShop(c, false));
-         c.announce(MaplePacketCreator.showCashInventory(c));
-         c.announce(MaplePacketCreator.showGifts(mc.getCashShop().loadGifts()));
-         c.announce(MaplePacketCreator.showWishList(mc, false));
-         c.announce(MaplePacketCreator.showCash(mc));
+         client.announce(MaplePacketCreator.openCashShop(client, false));
+         client.announce(MaplePacketCreator.showCashInventory(client));
+         client.announce(MaplePacketCreator.showGifts(mc.getCashShop().loadGifts()));
+         client.announce(MaplePacketCreator.showWishList(mc, false));
+         client.announce(MaplePacketCreator.showCash(mc));
 
-         c.getChannelServer().removePlayer(mc);
+         client.getChannelServer().removePlayer(mc);
          mc.getMap().removePlayer(mc);
          mc.getCashShop().open(true);
          mc.saveCharToDB();

@@ -25,30 +25,37 @@ import client.MapleCharacter;
 import client.MapleClient;
 import constants.ItemConstants;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.FaceExpressionPacket;
+import net.server.channel.packet.reader.FaceExpressionReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class FaceExpressionHandler extends AbstractMaplePacketHandler {
+public final class FaceExpressionHandler extends AbstractPacketHandler<FaceExpressionPacket, FaceExpressionReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      int emote = slea.readInt();
+   public Class<FaceExpressionReader> getReaderClass() {
+      return FaceExpressionReader.class;
+   }
 
-      if (emote > 7) {
-         int itemid = 5159992 + emote;   // thanks Rajan (Darter) for reporting unchecked emote itemid
+   @Override
+   public void handlePacket(FaceExpressionPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+
+      if (packet.emote() > 7) {
+         int itemid = 5159992 + packet.emote();   // thanks Rajan (Darter) for reporting unchecked emote itemid
          if (!ItemConstants.isFaceExpression(itemid) || chr.getInventory(ItemConstants.getInventoryType(itemid)).findById(itemid) == null) {
             return;
          }
-      } else if (emote < 1) {
+      } else if (packet.emote() < 1) {
          return;
       }
 
-      if (c.tryAcquireClient()) {
+      if (client.tryAcquireClient()) {
          try {   // expecting players never intends to wear the emote 0 (default face, that changes back after 5sec timeout)
             if (chr.isLoggedinWorld()) {
-               chr.changeFaceExpression(emote);
+               chr.changeFaceExpression(packet.emote());
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

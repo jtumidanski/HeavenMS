@@ -25,62 +25,80 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.MultiChatPacket;
+import net.server.channel.packet.reader.MultiChatReader;
 import net.server.world.World;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MultiChatHandler extends AbstractMaplePacketHandler {
+public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacket, MultiChatReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter player = c.getPlayer();
-      if (player.getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
-         return;
-      }
+   public Class<MultiChatReader> getReaderClass() {
+      return MultiChatReader.class;
+   }
 
-      int type = slea.readByte(); // 0 for buddys, 1 for partys
-      int numRecipients = slea.readByte();
-      int[] recipients = new int[numRecipients];
-      for (int i = 0; i < numRecipients; i++) {
-         recipients[i] = slea.readInt();
-      }
-      String chattext = slea.readMapleAsciiString();
-      if (chattext.length() > Byte.MAX_VALUE && !player.isGM()) {
-         AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit chats.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to send text with length of " + chattext.length());
-         c.disconnect(true, false);
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      MapleCharacter player = client.getPlayer();
+      return player.getAutobanManager().getLastSpam(7) + 200 <= currentServerTime();
+   }
+
+   @Override
+   public void handlePacket(MultiChatPacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
+
+      if (packet.message().length() > Byte.MAX_VALUE && !player.isGM()) {
+         AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit chats.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
+         client.disconnect(true, false);
          return;
       }
-      World world = c.getWorldServer();
-      if (type == 0) {
-         world.buddyChat(recipients, player.getId(), player.getName(), chattext);
-         if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-            LogHelper.logChat(c, "Buddy", chattext);
-         }
-      } else if (type == 1 && player.getParty() != null) {
-         world.partyChat(player.getParty(), chattext, player.getName());
-         if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-            LogHelper.logChat(c, "Party", chattext);
-         }
-      } else if (type == 2 && player.getGuildId() > 0) {
-         Server.getInstance().guildChat(player.getGuildId(), player.getName(), player.getId(), chattext);
-         if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-            LogHelper.logChat(c, "Guild", chattext);
-         }
-      } else if (type == 3) {
-         player.getGuild().ifPresent(guild -> {
-            int allianceId = guild.getAllianceId();
-            if (allianceId > 0) {
-               Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.multiChat(player.getName(), chattext, 3), player.getId(), -1);
-               if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-                  LogHelper.logChat(c, "Ally", chattext);
-               }
-            }
-         });
+      World world = client.getWorldServer();
+      if (packet.theType() == 0) {
+         buddyChat(packet, client, player, world);
+      } else if (packet.theType() == 1 && player.getParty() != null) {
+         partyChat(packet, client, player, world);
+      } else if (packet.theType() == 2 && player.getGuildId() > 0) {
+         guildChat(packet, client, player);
+      } else if (packet.theType() == 3) {
+         allianceChat(packet, client, player);
       }
       player.getAutobanManager().spam(7);
+   }
+
+   private void allianceChat(MultiChatPacket packet, MapleClient client, MapleCharacter player) {
+      player.getGuild().ifPresent(guild -> {
+         int allianceId = guild.getAllianceId();
+         if (allianceId > 0) {
+            Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.multiChat(player.getName(), packet.message(), 3), player.getId(), -1);
+            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+               LogHelper.logChat(client, "Ally", packet.message());
+            }
+         }
+      });
+   }
+
+   private void guildChat(MultiChatPacket packet, MapleClient client, MapleCharacter player) {
+      Server.getInstance().guildChat(player.getGuildId(), player.getName(), player.getId(), packet.message());
+      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+         LogHelper.logChat(client, "Guild", packet.message());
+      }
+   }
+
+   private void partyChat(MultiChatPacket packet, MapleClient client, MapleCharacter player, World world) {
+      world.partyChat(player.getParty(), packet.message(), player.getName());
+      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+         LogHelper.logChat(client, "Party", packet.message());
+      }
+   }
+
+   private void buddyChat(MultiChatPacket packet, MapleClient client, MapleCharacter player, World world) {
+      world.buddyChat(packet.recipientIds(), player.getId(), player.getName(), packet.message());
+      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+         LogHelper.logChat(client, "Buddy", packet.message());
+      }
    }
 }

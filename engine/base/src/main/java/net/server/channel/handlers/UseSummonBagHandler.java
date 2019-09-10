@@ -25,32 +25,39 @@ import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseItemPacket;
+import net.server.channel.packet.reader.UseItemReader;
 import server.MapleItemInformationProvider;
 import server.life.MapleLifeFactory;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author AngelSL
  */
-public final class UseSummonBagHandler extends AbstractMaplePacketHandler {
+public final class UseSummonBagHandler extends AbstractPacketHandler<UseItemPacket, UseItemReader> {
+   @Override
+   public Class<UseItemReader> getReaderClass() {
+      return UseItemReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      //[4A 00][6C 4C F2 02][02 00][63 0B 20 00]
-      if (!c.getPlayer().isAlive()) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+   public boolean successfulProcess(MapleClient client) {
+      if (!client.getPlayer().isAlive()) {
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
-      slea.readInt();
-      short slot = slea.readShort();
-      int itemId = slea.readInt();
-      Item toUse = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(slot);
-      if (toUse != null && toUse.getQuantity() > 0 && toUse.getItemId() == itemId) {
-         MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, (short) 1, false);
-         int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(itemId);
+      return true;
+   }
+
+   @Override
+   public void handlePacket(UseItemPacket packet, MapleClient c) {
+      //[4A 00][6C 4C F2 02][02 00][63 0B 20 00]
+      Item toUse = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(packet.slot());
+      if (toUse != null && toUse.getQuantity() > 0 && toUse.getItemId() == packet.itemId()) {
+         MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, packet.slot(), (short) 1, false);
+         int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(packet.itemId());
          for (int[] toSpawnChild : toSpawn) {
             if (Randomizer.nextInt(100) < toSpawnChild[1]) {
                c.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), c.getPlayer().getPosition());

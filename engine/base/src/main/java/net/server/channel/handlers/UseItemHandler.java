@@ -29,51 +29,61 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseItemPacket;
+import net.server.channel.packet.reader.UseItemReader;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  */
-public final class UseItemHandler extends AbstractMaplePacketHandler {
+public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket, UseItemReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
+   public Class<UseItemReader> getReaderClass() {
+      return UseItemReader.class;
+   }
+
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
 
       if (!chr.isAlive()) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
+      return true;
+   }
+
+   @Override
+   public void handlePacket(UseItemPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-      slea.readInt();
-      short slot = slea.readShort();
-      int itemId = slea.readInt();
-      Item toUse = chr.getInventory(MapleInventoryType.USE).getItem(slot);
-      if (toUse != null && toUse.getQuantity() > 0 && toUse.getItemId() == itemId) {
-         if (itemId == 2022178 || itemId == 2050004) {
+
+      Item toUse = chr.getInventory(MapleInventoryType.USE).getItem(packet.slot());
+      if (toUse != null && toUse.getQuantity() > 0 && toUse.getItemId() == packet.itemId()) {
+         if (packet.itemId() == 2022178 || packet.itemId() == 2050004) {
             chr.dispelDebuffs();
-            remove(c, slot);
+            remove(client, packet.slot());
             return;
-         } else if (itemId == 2050001) {
+         } else if (packet.itemId() == 2050001) {
             chr.dispelDebuff(MapleDisease.DARKNESS);
-            remove(c, slot);
+            remove(client, packet.slot());
             return;
-         } else if (itemId == 2050002) {
+         } else if (packet.itemId() == 2050002) {
             chr.dispelDebuff(MapleDisease.WEAKEN);
             chr.dispelDebuff(MapleDisease.SLOW);
-            remove(c, slot);
+            remove(client, packet.slot());
             return;
-         } else if (itemId == 2050003) {
+         } else if (packet.itemId() == 2050003) {
             chr.dispelDebuff(MapleDisease.SEAL);
             chr.dispelDebuff(MapleDisease.CURSE);
-            remove(c, slot);
+            remove(client, packet.slot());
             return;
-         } else if (ItemConstants.isTownScroll(itemId)) {
+         } else if (ItemConstants.isTownScroll(packet.itemId())) {
             int banMap = chr.getMapId();
             int banSp = chr.getMap().findClosestPlayerSpawnpoint(chr.getPosition()).getId();
             long banTime = currentServerTime();
@@ -83,19 +93,19 @@ public final class UseItemHandler extends AbstractMaplePacketHandler {
                   chr.setBanishPlayerData(banMap, banSp, banTime);
                }
 
-               remove(c, slot);
+               remove(client, packet.slot());
             }
             return;
-         } else if (ItemConstants.isAntibanishScroll(itemId)) {
+         } else if (ItemConstants.isAntibanishScroll(packet.itemId())) {
             if (ii.getItemEffect(toUse.getItemId()).applyTo(chr)) {
-               remove(c, slot);
+               remove(client, packet.slot());
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot recover from a banish state at the moment.");
             }
             return;
          }
 
-         remove(c, slot);
+         remove(client, packet.slot());
 
          if (toUse.getItemId() != 2022153) {
             ii.getItemEffect(toUse.getItemId()).applyTo(chr);

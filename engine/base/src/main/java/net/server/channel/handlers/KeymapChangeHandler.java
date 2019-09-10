@@ -21,8 +21,8 @@
  */
 package net.server.channel.handlers;
 
+import java.util.Arrays;
 import java.util.Optional;
-import java.util.stream.IntStream;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -31,43 +31,50 @@ import client.Skill;
 import client.SkillFactory;
 import client.inventory.MapleInventoryType;
 import constants.GameConstants;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.keymap.AutoHPKeymapChangePacket;
+import net.server.channel.packet.keymap.AutoMPKeymapChangePacket;
+import net.server.channel.packet.keymap.BaseKeymapChangePacket;
+import net.server.channel.packet.keymap.KeyTypeAction;
+import net.server.channel.packet.keymap.RegularKeymapChangePacket;
+import net.server.channel.packet.reader.KeymapChangeReader;
 
-public final class KeymapChangeHandler extends AbstractMaplePacketHandler {
+public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapChangePacket, KeymapChangeReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor accessor, MapleClient c) {
-      if (accessor.available() >= 8) {
-         int mode = accessor.readInt();
-         if (mode == 0) {
-            int numChanges = accessor.readInt();
-            IntStream.generate(() -> 1).limit(numChanges).forEach(id -> changeKeyBinding(new KeyTypeAction(accessor), c.getPlayer()));
-         } else if (mode == 1) { // Auto HP Potion
-            int itemID = accessor.readInt();
-            if (itemID != 0 && c.getPlayer().getInventory(MapleInventoryType.USE).findById(itemID) == null) {
-               c.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
+   public Class<KeymapChangeReader> getReaderClass() {
+      return KeymapChangeReader.class;
+   }
+
+   @Override
+   public void handlePacket(BaseKeymapChangePacket packet, MapleClient client) {
+      if (packet.available()) {
+         if (packet instanceof RegularKeymapChangePacket) {
+            Arrays.stream(((RegularKeymapChangePacket) packet).changes()).forEach(change -> changeKeyBinding(change, client.getPlayer()));
+         } else if (packet instanceof AutoHPKeymapChangePacket) {
+            if (((AutoHPKeymapChangePacket) packet).itemId() != 0 && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoHPKeymapChangePacket) packet).itemId()) == null) {
+               client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
-            c.getPlayer().changeKeybinding(91, new MapleKeyBinding(7, itemID));
-         } else if (mode == 2) { // Auto MP Potion
-            int itemID = accessor.readInt();
-            if (itemID != 0 && c.getPlayer().getInventory(MapleInventoryType.USE).findById(itemID) == null) {
-               c.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
+            client.getPlayer().changeKeybinding(91, new MapleKeyBinding(7, ((AutoHPKeymapChangePacket) packet).itemId()));
+         } else if (packet instanceof AutoMPKeymapChangePacket) {
+            if (((AutoMPKeymapChangePacket) packet).itemId() != 0 && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoMPKeymapChangePacket) packet).itemId()) == null) {
+               client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
-            c.getPlayer().changeKeybinding(92, new MapleKeyBinding(7, itemID));
+            client.getPlayer().changeKeybinding(92, new MapleKeyBinding(7, ((AutoMPKeymapChangePacket) packet).itemId()));
          }
       }
    }
 
    /**
     * Reads a key binding change and makes it happen (if it is a valid change).
+    *
     * @param keyTypeAction information about the new key binding
-    * @param character the character being changed
+    * @param character     the character being changed
     */
    private void changeKeyBinding(KeyTypeAction keyTypeAction, MapleCharacter character) {
-      if (keyTypeAction.getType() == 1) {
-         Optional<Skill> skill = SkillFactory.getSkill(keyTypeAction.getAction());
+      if (keyTypeAction.theType() == 1) {
+         Optional<Skill> skill = SkillFactory.getSkill(keyTypeAction.action());
          if (skill.isPresent()) {
             int skillId = skill.get().getId();
             boolean isBannedSkill = GameConstants.bannedBindSkills(skillId);
@@ -78,38 +85,6 @@ public final class KeymapChangeHandler extends AbstractMaplePacketHandler {
             }
          }
       }
-      character.changeKeybinding(keyTypeAction.getKey(), new MapleKeyBinding(keyTypeAction.getType(), keyTypeAction.getAction()));
-   }
-
-   private class KeyTypeAction {
-      private int key;
-
-      private int type;
-
-      private int action;
-
-      public KeyTypeAction(int key, int type, int action) {
-         this.key = key;
-         this.type = type;
-         this.action = action;
-      }
-
-      public KeyTypeAction(SeekableLittleEndianAccessor accessor) {
-         this.key = accessor.readInt();
-         this.type = accessor.readByte();
-         this.action = accessor.readInt();
-      }
-
-      public int getKey() {
-         return key;
-      }
-
-      public int getType() {
-         return type;
-      }
-
-      public int getAction() {
-         return action;
-      }
+      character.changeKeybinding(keyTypeAction.key(), new MapleKeyBinding(keyTypeAction.theType(), keyTypeAction.action()));
    }
 }

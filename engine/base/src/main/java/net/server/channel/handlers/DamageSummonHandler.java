@@ -24,31 +24,32 @@ package net.server.channel.handlers;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.DamageSummonPacket;
+import net.server.channel.packet.reader.DamageSummonReader;
 import server.maps.MapleMapObject;
 import server.maps.MapleSummon;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class DamageSummonHandler extends AbstractMaplePacketHandler {
+public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummonPacket, DamageSummonReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int oid = slea.readInt();
-      slea.skip(1);   // -1
-      int damage = slea.readInt();
-      int monsterIdFrom = slea.readInt();
+   public Class<DamageSummonReader> getReaderClass() {
+      return DamageSummonReader.class;
+   }
 
-      MapleCharacter player = c.getPlayer();
-      MapleMapObject mmo = player.getMap().getMapObject(oid);
+   @Override
+   public void handlePacket(DamageSummonPacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
+      MapleMapObject mmo = player.getMap().getMapObject(packet.objectId());
 
-      if (mmo != null && mmo instanceof MapleSummon) {
+      if (mmo instanceof MapleSummon) {
          MapleSummon summon = (MapleSummon) mmo;
 
-         summon.addHP(-damage);
+         summon.addHP(-packet.damage());
          if (summon.getHP() <= 0) {
             player.cancelEffectFromBuffStat(MapleBuffStat.PUPPET);
          }
-         player.getMap().broadcastMessage(player, MaplePacketCreator.damageSummon(player.getId(), oid, damage, monsterIdFrom), summon.getPosition());
+         player.getMap().broadcastMessage(player, MaplePacketCreator.damageSummon(player.getId(), packet.objectId(), packet.damage(), packet.monsterIdFrom()), summon.getPosition());
       }
    }
 }

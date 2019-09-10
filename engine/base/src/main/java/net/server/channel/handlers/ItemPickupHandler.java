@@ -25,31 +25,34 @@ import java.awt.Point;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ItemPickupPacket;
+import net.server.channel.packet.reader.ItemPickupReader;
 import server.maps.MapleMapObject;
 import tools.FilePrinter;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  * @author Ronan
  */
-public final class ItemPickupHandler extends AbstractMaplePacketHandler {
+public final class ItemPickupHandler extends AbstractPacketHandler<ItemPickupPacket, ItemPickupReader> {
+   @Override
+   public Class<ItemPickupReader> getReaderClass() {
+      return ItemPickupReader.class;
+   }
 
    @Override
-   public final void handlePacket(final SeekableLittleEndianAccessor slea, final MapleClient c) {
-      slea.readInt(); //Timestamp
-      slea.readByte();
-      slea.readPos(); //cpos
-      int oid = slea.readInt();
-      MapleCharacter chr = c.getPlayer();
-      MapleMapObject ob = chr.getMap().getMapObject(oid);
-      if (ob == null) return;
+   public void handlePacket(ItemPickupPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      MapleMapObject ob = chr.getMap().getMapObject(packet.objectId());
+      if (ob == null) {
+         return;
+      }
 
       Point charPos = chr.getPosition();
       Point obPos = ob.getPosition();
       if (Math.abs(charPos.getX() - obPos.getX()) > 800 || Math.abs(charPos.getY() - obPos.getY()) > 600) {
-         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to pick up an item too far away. Mapid: " + chr.getMapId() + " Player pos: " + charPos + " Object pos: " + obPos);
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to pick up an item too far away. Mapid: " + chr.getMapId() + " Player pos: " + charPos + " Object pos: " + obPos);
          return;
       }
 

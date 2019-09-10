@@ -24,24 +24,32 @@ package net.server.channel.handlers;
 import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseItemEffectPacket;
+import net.server.channel.packet.reader.UseItemEffectReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class UseItemEffectHandler extends AbstractMaplePacketHandler {
+public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEffectPacket, UseItemEffectReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public Class<UseItemEffectReader> getReaderClass() {
+      return UseItemEffectReader.class;
+   }
+
+   @Override
+   public void handlePacket(UseItemEffectPacket packet, MapleClient client) {
       Item toUse;
-      int itemId = slea.readInt();
+      int itemId = packet.itemId();
       if (itemId == 4290001 || itemId == 4290000) {
-         toUse = c.getPlayer().getInventory(MapleInventoryType.ETC).findById(itemId);
+         toUse = client.getPlayer().getInventory(MapleInventoryType.ETC).findById(itemId);
       } else {
-         toUse = c.getPlayer().getInventory(MapleInventoryType.CASH).findById(itemId);
+         toUse = client.getPlayer().getInventory(MapleInventoryType.CASH).findById(itemId);
       }
       if (toUse == null || toUse.getQuantity() < 1) {
-         if (itemId != 0) return;
+         if (itemId != 0) {
+            return;
+         }
       }
-      c.getPlayer().setItemEffect(itemId);
-      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.itemEffect(c.getPlayer().getId(), itemId), false);
+      client.getPlayer().setItemEffect(itemId);
+      client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.itemEffect(client.getPlayer().getId(), itemId), false);
    }
 }

@@ -23,16 +23,18 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.processor.AssignAPProcessor;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.DistributeAPPacket;
+import net.server.channel.packet.reader.DistributeAPReader;
 
-public final class DistributeAPHandler extends AbstractMaplePacketHandler {
+public final class DistributeAPHandler extends AbstractPacketHandler<DistributeAPPacket, DistributeAPReader> {
+   @Override
+   public Class<DistributeAPReader> getReaderClass() {
+      return DistributeAPReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readInt();
-      int num = slea.readInt();
-
-      AssignAPProcessor.APAssignAction(c, num);
+   public void handlePacket(DistributeAPPacket packet, MapleClient client) {
+      AssignAPProcessor.APAssignAction(client, packet.number());
    }
 }

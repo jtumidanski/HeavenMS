@@ -12,7 +12,7 @@ import net.server.channel.handlers.AutoAggroHandler;
 import net.server.channel.handlers.AutoAssignHandler;
 import net.server.channel.handlers.BBSOperationHandler;
 import net.server.channel.handlers.BeholderHandler;
-import net.server.channel.handlers.BuddylistModifyHandler;
+import net.server.channel.handlers.BuddyListModifyHandler;
 import net.server.channel.handlers.CancelBuffHandler;
 import net.server.channel.handlers.CancelChairHandler;
 import net.server.channel.handlers.CancelDebuffHandler;
@@ -237,14 +237,6 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.PLAYER_LOGGEDIN, new PlayerLoggedinHandler());
       packetProcessor.registerHandler(RecvOpcode.CHANGE_MAP, new ChangeMapHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_CASH_ITEM, new UseCashItemHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
-      packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.RANGED_ATTACK, new RangedAttackHandler());
-      packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
-
       packetProcessor.registerHandler(RecvOpcode.USE_ITEM, new UseItemHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_RETURN_SCROLL, new UseItemHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_UPGRADE_SCROLL, new ScrollHandler());
@@ -253,7 +245,6 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.HEAL_OVER_TIME, new HealOvertimeHandler());
       packetProcessor.registerHandler(RecvOpcode.ITEM_PICKUP, new ItemPickupHandler());
       packetProcessor.registerHandler(RecvOpcode.CHAR_INFO_REQUEST, new CharInfoRequestHandler());
-      packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_INNER_PORTAL, new InnerPortalHandler());
       packetProcessor.registerHandler(RecvOpcode.CANCEL_BUFF, new CancelBuffHandler());
       packetProcessor.registerHandler(RecvOpcode.CANCEL_ITEM_EFFECT, new CancelItemEffectHandler());
@@ -272,14 +263,23 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.ENTER_MTS, new EnterMTSHandler());
       packetProcessor.registerHandler(RecvOpcode.ENTER_CASHSHOP, new EnterCashShopHandler());
       packetProcessor.registerHandler(RecvOpcode.DAMAGE_SUMMON, new DamageSummonHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
-      packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.BUDDYLIST_MODIFY, new BuddylistModifyHandler());
+      packetProcessor.registerHandler(RecvOpcode.BUDDYLIST_MODIFY, new BuddyListModifyHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_ITEMEFFECT, new UseItemEffectHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_CHAIR, new UseChairHandler());
       packetProcessor.registerHandler(RecvOpcode.CANCEL_CHAIR, new CancelChairHandler());
       packetProcessor.registerHandler(RecvOpcode.DAMAGE_REACTOR, new ReactorHitHandler());
       packetProcessor.registerHandler(RecvOpcode.GUILD_OPERATION, new GuildOperationHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
+      packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.RANGED_ATTACK, new RangedAttackHandler());
+      packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
+      packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
+      packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
+
       packetProcessor.registerHandler(RecvOpcode.DENY_GUILD_REQUEST, new DenyGuildRequestHandler());
       packetProcessor.registerHandler(RecvOpcode.BBS_OPERATION, new BBSOperationHandler());
       packetProcessor.registerHandler(RecvOpcode.SKILL_EFFECT, new SkillEffectHandler());

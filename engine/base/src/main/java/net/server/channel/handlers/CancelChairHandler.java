@@ -24,19 +24,25 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.CancelChairPacket;
+import net.server.channel.packet.reader.CancelChairReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CancelChairHandler extends AbstractMaplePacketHandler {
+public final class CancelChairHandler extends AbstractPacketHandler<CancelChairPacket, CancelChairReader> {
+   @Override
+   public Class<CancelChairReader> getReaderClass() {
+      return CancelChairReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readShort();
-      MapleCharacter mc = c.getPlayer();
+   public void handlePacket(CancelChairPacket packet, MapleClient client) {
+      MapleCharacter mc = client.getPlayer();
 
-      if (id >= mc.getMap().getSeats()) {
+      if (packet.itemId() >= mc.getMap().getSeats()) {
          return;
       }
 
-      mc.sitChair(id);
+      mc.sitChair(packet.itemId());
    }
 }

@@ -23,26 +23,29 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.CharacterInfoRequestPacket;
+import net.server.channel.packet.reader.CharacterInfoRequestReader;
 import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CharInfoRequestHandler extends AbstractMaplePacketHandler {
+public final class CharInfoRequestHandler extends AbstractPacketHandler<CharacterInfoRequestPacket, CharacterInfoRequestReader> {
+   @Override
+   public Class<CharacterInfoRequestReader> getReaderClass() {
+      return CharacterInfoRequestReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.skip(4);
-      int cid = slea.readInt();
-      MapleMapObject target = c.getPlayer().getMap().getMapObject(cid);
+   public void handlePacket(CharacterInfoRequestPacket packet, MapleClient client) {
+      MapleMapObject target = client.getPlayer().getMap().getMapObject(packet.characterId());
       if (target != null) {
          if (target instanceof MapleCharacter) {
             MapleCharacter player = (MapleCharacter) target;
 
-            if (c.getPlayer().getId() != player.getId()) {
-               player.exportExcludedItems(c);
+            if (client.getPlayer().getId() != player.getId()) {
+               player.exportExcludedItems(client);
             }
-            c.announce(MaplePacketCreator.charInfo(player));
+            client.announce(MaplePacketCreator.charInfo(player));
          }
       }
    }

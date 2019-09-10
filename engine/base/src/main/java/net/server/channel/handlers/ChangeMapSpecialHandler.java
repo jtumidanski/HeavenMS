@@ -22,31 +22,34 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
-import server.maps.MaplePortal;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ChangeMapSpecialPacket;
+import net.server.channel.packet.reader.ChangeMapSpecialReader;
 import server.MapleTrade;
 import server.MapleTrade.TradeResult;
+import server.maps.MaplePortal;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class ChangeMapSpecialHandler extends AbstractMaplePacketHandler {
+public final class ChangeMapSpecialHandler extends AbstractPacketHandler<ChangeMapSpecialPacket, ChangeMapSpecialReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readByte();
-      String startwp = slea.readMapleAsciiString();
-      slea.readShort();
-      MaplePortal portal = c.getPlayer().getMap().getPortal(startwp);
-      if (portal == null || c.getPlayer().portalDelay() > currentServerTime() || c.getPlayer().getBlockedPortals().contains(portal.getScriptName())) {
-         c.announce(MaplePacketCreator.enableActions());
+   public Class<ChangeMapSpecialReader> getReaderClass() {
+      return ChangeMapSpecialReader.class;
+   }
+
+   @Override
+   public void handlePacket(ChangeMapSpecialPacket packet, MapleClient client) {
+      MaplePortal portal = client.getPlayer().getMap().getPortal(packet.startWarp());
+      if (portal == null || client.getPlayer().portalDelay() > currentServerTime() || client.getPlayer().getBlockedPortals().contains(portal.getScriptName())) {
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
-      if (c.getPlayer().isChangingMaps() || c.getPlayer().isBanned()) {
-         c.announce(MaplePacketCreator.enableActions());
+      if (client.getPlayer().isChangingMaps() || client.getPlayer().isBanned()) {
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
-      if (c.getPlayer().getTrade() != null) {
-         MapleTrade.cancelTrade(c.getPlayer(), TradeResult.UNSUCCESSFUL_ANOTHER_MAP);
+      if (client.getPlayer().getTrade() != null) {
+         MapleTrade.cancelTrade(client.getPlayer(), TradeResult.UNSUCCESSFUL_ANOTHER_MAP);
       }
-      portal.enterPortal(c);
+      portal.enterPortal(client);
    }
 }

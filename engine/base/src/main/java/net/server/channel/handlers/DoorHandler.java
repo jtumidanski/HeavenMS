@@ -23,38 +23,41 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.DoorPacket;
+import net.server.channel.packet.reader.DoorReader;
 import server.maps.MapleDoorObject;
 import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  */
-public final class DoorHandler extends AbstractMaplePacketHandler {
+public final class DoorHandler extends AbstractPacketHandler<DoorPacket, DoorReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int ownerid = slea.readInt();
-      slea.readByte(); // specifies if backwarp or not, 1 town to target, 0 target to town
+   public Class<DoorReader> getReaderClass() {
+      return DoorReader.class;
+   }
 
-      MapleCharacter chr = c.getPlayer();
+   @Override
+   public void handlePacket(DoorPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       if (chr.isChangingMaps() || chr.isBanned()) {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
 
       for (MapleMapObject obj : chr.getMap().getMapObjects()) {
          if (obj instanceof MapleDoorObject) {
             MapleDoorObject door = (MapleDoorObject) obj;
-            if (door.getOwnerId() == ownerid) {
+            if (door.getOwnerId() == packet.ownerId()) {
                door.warp(chr);
                return;
             }
          }
       }
 
-      c.announce(MaplePacketCreator.blockedMessage(6));
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.blockedMessage(6));
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

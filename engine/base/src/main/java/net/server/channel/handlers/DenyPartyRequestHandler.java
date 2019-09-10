@@ -24,21 +24,26 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.party.DenyPartyRequestPacket;
+import net.server.channel.packet.reader.DenyPartyRequestReader;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class DenyPartyRequestHandler extends AbstractMaplePacketHandler {
+public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPartyRequestPacket, DenyPartyRequestReader> {
+   @Override
+   public Class<DenyPartyRequestReader> getReaderClass() {
+      return DenyPartyRequestReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readByte();
-      String[] cname = slea.readMapleAsciiString().split("PS: ");
-
-      c.getChannelServer().getPlayerStorage().getCharacterByName(cname[cname.length - 1]).ifPresent(characterFrom -> {
-         MapleCharacter chr = c.getPlayer();
+   public void handlePacket(DenyPartyRequestPacket packet, MapleClient client) {
+      String[] cname = packet.message().split("PS: ");
+      client.getChannelServer().getPlayerStorage().getCharacterByName(cname[cname.length - 1]).ifPresent(characterFrom -> {
+         MapleCharacter chr = client.getPlayer();
          if (MapleInviteCoordinator.answerInvite(InviteType.PARTY, chr.getId(), characterFrom.getPartyId(), false).result == InviteResult.DENIED) {
             chr.updatePartySearchAvailability(chr.getParty() == null);
             characterFrom.getClient().announce(MaplePacketCreator.partyStatusMessage(23, chr.getName()));

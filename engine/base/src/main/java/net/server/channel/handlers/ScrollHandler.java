@@ -38,16 +38,21 @@ import client.inventory.MapleInventoryType;
 import client.inventory.ModifyInventory;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ScrollPacket;
+import net.server.channel.packet.reader.ScrollReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze
  * @author Frz
  */
-public final class ScrollHandler extends AbstractMaplePacketHandler {
+public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket, ScrollReader> {
+   @Override
+   public Class<ScrollReader> getReaderClass() {
+      return ScrollReader.class;
+   }
 
    private static void announceCannotScroll(MapleClient c, boolean legendarySpirit) {
       if (legendarySpirit) {
@@ -60,59 +65,52 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
    private static boolean canScroll(int scrollid, int itemid) {
       int sid = scrollid / 100;
 
-      switch (sid) {
-         case 20492: //scroll for accessory (pendant, belt, ring)
-            return canScroll(2041100, itemid) || canScroll(2041200, itemid) || canScroll(2041300, itemid);
-
-         default:
-            return (scrollid / 100) % 100 == (itemid / 10000) % 100;
+      if (sid == 20492) { //scroll for accessory (pendant, belt, ring)
+         return canScroll(2041100, itemid) || canScroll(2041200, itemid) || canScroll(2041300, itemid);
       }
+      return (scrollid / 100) % 100 == (itemid / 10000) % 100;
    }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.tryAcquireClient()) {
+   public void handlePacket(ScrollPacket packet, MapleClient client) {
+      if (client.tryAcquireClient()) {
          try {
-            slea.readInt(); // whatever...
-            short slot = slea.readShort();
-            short dst = slea.readShort();
-            byte ws = (byte) slea.readShort();
             boolean isWhiteScroll = false; // white scroll being used?
             boolean hasLegendarySpirit = false; // legendary spirit skill
-            if ((ws & 2) == 2) {
+            if ((packet.whiteScroll() & 2) == 2) {
                isWhiteScroll = true;
             }
 
             MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-            MapleCharacter chr = c.getPlayer();
-            Equip toScroll = (Equip) chr.getInventory(MapleInventoryType.EQUIPPED).getItem(dst);
+            MapleCharacter chr = client.getPlayer();
+            Equip toScroll = (Equip) chr.getInventory(MapleInventoryType.EQUIPPED).getItem(packet.destination());
 
             Optional<Skill> legendarySpirit = SkillFactory.getSkill(1003);
-            if (legendarySpirit.isPresent() && chr.getSkillLevel(legendarySpirit.get()) > 0 && dst >= 0) {
+            if (legendarySpirit.isPresent() && chr.getSkillLevel(legendarySpirit.get()) > 0 && packet.destination() >= 0) {
                hasLegendarySpirit = true;
-               toScroll = (Equip) chr.getInventory(MapleInventoryType.EQUIP).getItem(dst);
+               toScroll = (Equip) chr.getInventory(MapleInventoryType.EQUIP).getItem(packet.destination());
             }
 
             byte oldLevel = toScroll.getLevel();
             byte oldSlots = toScroll.getUpgradeSlots();
             MapleInventory useInventory = chr.getInventory(MapleInventoryType.USE);
-            Item scroll = useInventory.getItem(slot);
+            Item scroll = useInventory.getItem(packet.slot());
             Item wscroll = null;
 
             if (ItemConstants.isCleanSlate(scroll.getItemId())) {
                Map<String, Integer> eqStats = ii.getEquipStats(toScroll.getItemId());  // clean slate issue found thanks to Masterrulax
                if (eqStats == null || eqStats.get("tuc") == 0) {
-                  announceCannotScroll(c, hasLegendarySpirit);
+                  announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
             } else if (!ItemConstants.isModifierScroll(scroll.getItemId()) && toScroll.getUpgradeSlots() < 1) {
-               announceCannotScroll(c, hasLegendarySpirit);   // thanks onechord for noticing zero upgrade slots freezing Legendary Scroll UI
+               announceCannotScroll(client, hasLegendarySpirit);   // thanks onechord for noticing zero upgrade slots freezing Legendary Scroll UI
                return;
             }
 
             List<Integer> scrollReqs = ii.getScrollReqs(scroll.getItemId());
             if (scrollReqs.size() > 0 && !scrollReqs.contains(toScroll.getItemId())) {
-               announceCannotScroll(c, hasLegendarySpirit);
+               announceCannotScroll(client, hasLegendarySpirit);
                return;
             }
             if (isWhiteScroll) {
@@ -124,13 +122,13 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
 
             if (!ItemConstants.isChaosScroll(scroll.getItemId()) && !ItemConstants.isCleanSlate(scroll.getItemId())) {
                if (!canScroll(scroll.getItemId(), toScroll.getItemId())) {
-                  announceCannotScroll(c, hasLegendarySpirit);
+                  announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
             }
 
             if (ItemConstants.isCleanSlate(scroll.getItemId()) && !ii.canUseCleanSlate(toScroll)) {
-               announceCannotScroll(c, hasLegendarySpirit);
+               announceCannotScroll(client, hasLegendarySpirit);
                return;
             }
 
@@ -145,20 +143,20 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
             useInventory.lockInventory();
             try {
                if (scroll.getQuantity() < 1) {
-                  announceCannotScroll(c, hasLegendarySpirit);
+                  announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
 
                if (isWhiteScroll && !ItemConstants.isCleanSlate(scroll.getItemId())) {
                   if (wscroll.getQuantity() < 1) {
-                     announceCannotScroll(c, hasLegendarySpirit);
+                     announceCannotScroll(client, hasLegendarySpirit);
                      return;
                   }
 
-                  MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, wscroll.getPosition(), (short) 1, false, false);
+                  MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, wscroll.getPosition(), (short) 1, false, false);
                }
 
-               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, scroll.getPosition(), (short) 1, false);
+               MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, scroll.getPosition(), (short) 1, false);
             } finally {
                useInventory.unlockInventory();
             }
@@ -167,7 +165,7 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
             if (scrollSuccess == Equip.ScrollResult.CURSE) {
                if (!ItemConstants.isWeddingRing(toScroll.getItemId())) {
                   mods.add(new ModifyInventory(3, toScroll));
-                  if (dst < 0) {
+                  if (packet.destination() < 0) {
                      MapleInventory inv = chr.getInventory(MapleInventoryType.EQUIPPED);
 
                      inv.lockInventory();
@@ -198,13 +196,13 @@ public final class ScrollHandler extends AbstractMaplePacketHandler {
                mods.add(new ModifyInventory(3, scrolled));
                mods.add(new ModifyInventory(0, scrolled));
             }
-            c.announce(MaplePacketCreator.modifyInventory(true, mods));
+            client.announce(MaplePacketCreator.modifyInventory(true, mods));
             chr.getMap().broadcastMessage(MaplePacketCreator.getScrollEffect(chr.getId(), scrollSuccess, hasLegendarySpirit, isWhiteScroll));
-            if (dst < 0 && (scrollSuccess == Equip.ScrollResult.SUCCESS || scrollSuccess == Equip.ScrollResult.CURSE)) {
+            if (packet.destination() < 0 && (scrollSuccess == Equip.ScrollResult.SUCCESS || scrollSuccess == Equip.ScrollResult.CURSE)) {
                chr.equipChanged();
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

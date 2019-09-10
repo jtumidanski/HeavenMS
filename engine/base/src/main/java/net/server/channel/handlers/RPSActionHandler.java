@@ -2,69 +2,72 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.RPSActionReader;
+import net.server.channel.packet.rps.AnswerPacket;
+import net.server.channel.packet.rps.BaseRPSActionPacket;
+import net.server.channel.packet.rps.ContinuePacket;
+import net.server.channel.packet.rps.LeavePacket;
+import net.server.channel.packet.rps.RetryPacket;
+import net.server.channel.packet.rps.StartGamePacket;
+import net.server.channel.packet.rps.TimeOverPacket;
 import server.minigame.MapleRockPaperScissor;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @Author Arnah
  * @Website http://Vertisy.ca/
  * @since Aug 15, 2016
  */
-public final class RPSActionHandler extends AbstractMaplePacketHandler {
+public final class RPSActionHandler extends AbstractPacketHandler<BaseRPSActionPacket, RPSActionReader> {
+   @Override
+   public Class<RPSActionReader> getReaderClass() {
+      return RPSActionReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
+   public void handlePacket(BaseRPSActionPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       MapleRockPaperScissor rps = chr.getRPS();
 
-      if (c.tryAcquireClient()) {
+      if (client.tryAcquireClient()) {
          try {
-            if (slea.available() == 0 || !chr.getMap().containsNPC(9000019)) {
+            if (packet.available() || !chr.getMap().containsNPC(9000019)) {
                if (rps != null) {
-                  rps.dispose(c);
+                  rps.dispose(client);
                }
                return;
             }
-            final byte mode = slea.readByte();
-            switch (mode) {
-               case 0: // start game
-               case 5: // retry
-                  if (rps != null) {
-                     rps.reward(c);
-                  }
-                  if (chr.getMeso() >= 1000) {
-                     chr.setRPS(new MapleRockPaperScissor(c, mode));
-                  } else {
-                     c.announce(MaplePacketCreator.rpsMesoError(-1));
-                  }
-                  break;
-               case 1: // answer
-                  if (rps == null || !rps.answer(c, slea.readByte())) {
-                     c.announce(MaplePacketCreator.rpsMode((byte) 0x0D));// 13
-                  }
-                  break;
-               case 2: // time over
-                  if (rps == null || !rps.timeOut(c)) {
-                     c.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
-                  }
-                  break;
-               case 3: // continue
-                  if (rps == null || !rps.nextRound(c)) {
-                     c.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
-                  }
-                  break;
-               case 4: // leave
-                  if (rps != null) {
-                     rps.dispose(c);
-                  } else {
-                     c.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
-                  }
-                  break;
+            if (packet instanceof StartGamePacket || packet instanceof RetryPacket) {
+               if (rps != null) {
+                  rps.reward(client);
+               }
+               if (chr.getMeso() >= 1000) {
+                  chr.setRPS(new MapleRockPaperScissor(client, packet.mode()));
+               } else {
+                  client.announce(MaplePacketCreator.rpsMesoError(-1));
+               }
+            } else if (packet instanceof AnswerPacket) {
+               if (rps == null || !rps.answer(client, ((AnswerPacket) packet).answer())) {
+                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));// 13
+               }
+            } else if (packet instanceof TimeOverPacket) {
+               if (rps == null || !rps.timeOut(client)) {
+                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
+               }
+            } else if (packet instanceof ContinuePacket) {
+               if (rps == null || !rps.nextRound(client)) {
+                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
+               }
+            } else if (packet instanceof LeavePacket) {
+               if (rps != null) {
+                  rps.dispose(client);
+               } else {
+                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
+               }
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }
