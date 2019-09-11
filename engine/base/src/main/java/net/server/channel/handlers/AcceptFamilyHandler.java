@@ -27,36 +27,40 @@ import client.MapleFamily;
 import client.MapleFamilyEntry;
 import client.processor.MapleFamilyProcessor;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.family.AcceptFamilyPacket;
+import net.server.channel.packet.reader.AcceptFamilyReader;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.coordinator.MapleInviteCoordinator.MapleInviteResult;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Jay Estrella
  * @author Ubaware
  */
-public final class AcceptFamilyHandler extends AbstractMaplePacketHandler {
+public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamilyPacket, AcceptFamilyReader> {
+   @Override
+   public Class<AcceptFamilyReader> getReaderClass() {
+      return AcceptFamilyReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (!ServerConstants.USE_FAMILY_SYSTEM) {
-         return;
-      }
-      MapleCharacter chr = c.getPlayer();
-      int inviterId = slea.readInt();
-      slea.readMapleAsciiString();
-      boolean accept = slea.readByte() != 0;
+   public boolean successfulProcess(MapleClient client) {
+      return ServerConstants.USE_FAMILY_SYSTEM;
+   }
+
+   @Override
+   public void handlePacket(AcceptFamilyPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       // String inviterName = slea.readMapleAsciiString();
-      c.getWorldServer().getPlayerStorage().getCharacterById(inviterId).ifPresent(inviter -> {
-         MapleInviteResult inviteResult = MapleInviteCoordinator.answerInvite(InviteType.FAMILY, c.getPlayer().getId(), c.getPlayer(), accept);
+      client.getWorldServer().getPlayerStorage().getCharacterById(packet.inviterId()).ifPresent(inviter -> {
+         MapleInviteResult inviteResult = MapleInviteCoordinator.answerInvite(InviteType.FAMILY, client.getPlayer().getId(), client.getPlayer(), packet.accept());
          if (inviteResult.result == InviteResult.NOT_FOUND) {
             return; //was never invited. (or expired on server only somehow?)
          }
-         if (accept) {
+         if (packet.accept()) {
             if (inviter.getFamily() != null) {
                if (chr.getFamily() == null) {
                   MapleFamilyEntry newEntry = new MapleFamilyEntry(inviter.getFamily(), chr.getId(), chr.getName(), chr.getLevel(), chr.getJob());
@@ -89,8 +93,8 @@ public final class AcceptFamilyHandler extends AbstractMaplePacketHandler {
                   chr.announce(MaplePacketCreator.sendFamilyMessage(76, 0));
                   return;
                }
-               MapleFamily newFamily = new MapleFamily(-1, c.getWorld());
-               c.getWorldServer().addFamily(newFamily.getID(), newFamily);
+               MapleFamily newFamily = new MapleFamily(-1, client.getWorld());
+               client.getWorldServer().addFamily(newFamily.getID(), newFamily);
                MapleFamilyEntry inviterEntry = new MapleFamilyEntry(newFamily, inviter.getId(), inviter.getName(), inviter.getLevel(), inviter.getJob());
                inviterEntry.setCharacter(inviter);
                newFamily.setLeader(inviter.getFamilyEntry());
@@ -109,15 +113,15 @@ public final class AcceptFamilyHandler extends AbstractMaplePacketHandler {
                   chr.getFamilyEntry().join(inviterEntry);
                }
             }
-            c.getPlayer().getFamily().broadcast(MaplePacketCreator.sendFamilyJoinResponse(true, c.getPlayer().getName()), c.getPlayer().getId());
-            c.announce(MaplePacketCreator.getSeniorMessage(inviter.getName()));
-            c.announce(MaplePacketCreator.getFamilyInfo(chr.getFamilyEntry()));
+            client.getPlayer().getFamily().broadcast(MaplePacketCreator.sendFamilyJoinResponse(true, client.getPlayer().getName()), client.getPlayer().getId());
+            client.announce(MaplePacketCreator.getSeniorMessage(inviter.getName()));
+            client.announce(MaplePacketCreator.getFamilyInfo(chr.getFamilyEntry()));
             chr.getFamilyEntry().updateSeniorFamilyInfo(true);
          } else {
-            inviter.announce(MaplePacketCreator.sendFamilyJoinResponse(false, c.getPlayer().getName()));
+            inviter.announce(MaplePacketCreator.sendFamilyJoinResponse(false, client.getPlayer().getName()));
          }
       });
 
-      c.announce(MaplePacketCreator.sendFamilyMessage(0, 0));
+      client.announce(MaplePacketCreator.sendFamilyMessage(0, 0));
    }
 }

@@ -24,42 +24,59 @@ package net.server.channel.handlers;
 import client.MapleClient;
 import client.processor.DueyProcessor;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.duey.BaseDueyPacket;
+import net.server.channel.packet.duey.DueyClaimPackagePacket;
+import net.server.channel.packet.duey.DueyReceiveItemPacket;
+import net.server.channel.packet.duey.DueyRemovePackagePacket;
+import net.server.channel.packet.duey.DueySendItemPacket;
+import net.server.channel.packet.reader.DueyReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class DueyHandler extends AbstractMaplePacketHandler {
+public final class DueyHandler extends AbstractPacketHandler<BaseDueyPacket, DueyReader> {
+   @Override
+   public Class<DueyReader> getReaderClass() {
+      return DueyReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public boolean successfulProcess(MapleClient client) {
       if (!ServerConstants.USE_DUEY) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
+      return true;
+   }
 
-      byte operation = slea.readByte();
-      if (operation == DueyProcessor.Actions.TOSERVER_RECV_ITEM.getCode()) {
-         DueyProcessor.dueySendTalk(c, false);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_SEND_ITEM.getCode()) {
-         byte inventId = slea.readByte();
-         short itemPos = slea.readShort();
-         short amount = slea.readShort();
-         int mesos = slea.readInt();
-         String recipient = slea.readMapleAsciiString();
-         boolean quick = slea.readByte() != 0;
-         String message = quick ? slea.readMapleAsciiString() : null;
-
-         DueyProcessor.dueySendItem(c, inventId, itemPos, amount, mesos, message, recipient, quick);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_REMOVE_PACKAGE.getCode()) {
-         int packageid = slea.readInt();
-
-         DueyProcessor.dueyRemovePackage(c, packageid, true);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_CLAIM_PACKAGE.getCode()) {
-         int packageid = slea.readInt();
-
-         DueyProcessor.dueyClaimPackage(c, packageid);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_CLAIM_PACKAGE.getCode()) {
-         DueyProcessor.dueySendTalk(c, false);
+   @Override
+   public void handlePacket(BaseDueyPacket packet, MapleClient client) {
+      if (packet instanceof DueyReceiveItemPacket) {
+         receiveItem(client);
+      } else if (packet instanceof DueySendItemPacket) {
+         sendItem(client, (DueySendItemPacket) packet);
+      } else if (packet instanceof DueyClaimPackagePacket) {
+         claimPackage(client, ((DueyClaimPackagePacket) packet).packageId());
+      } else if (packet instanceof DueyRemovePackagePacket) {
+         removePackage(client, ((DueyRemovePackagePacket) packet).packageId());
       }
+   }
+
+   private void sendItem(MapleClient client, DueySendItemPacket packet) {
+      DueyProcessor.dueySendItem(client, packet.inventoryId(),
+            packet.itemPosition(), packet.amount(),
+            packet.mesos(), packet.message(),
+            packet.recipient(), packet.quick());
+   }
+
+   private void claimPackage(MapleClient c, int packageId) {
+      DueyProcessor.dueyClaimPackage(c, packageId);
+   }
+
+   private void removePackage(MapleClient c, int packageId) {
+      DueyProcessor.dueyRemovePackage(c, packageId, true);
+   }
+
+   private void receiveItem(MapleClient c) {
+      DueyProcessor.dueySendTalk(c, false);
    }
 }

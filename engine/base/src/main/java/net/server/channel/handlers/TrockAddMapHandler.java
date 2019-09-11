@@ -23,38 +23,44 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.AddTeleportRockMapPacket;
+import net.server.channel.packet.BaseTeleportRockMapPacket;
+import net.server.channel.packet.DeleteTeleportRockMapPacket;
+import net.server.channel.packet.reader.TeleportRockMapReader;
 import server.maps.FieldLimit;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93
  */
-public final class TrockAddMapHandler extends AbstractMaplePacketHandler {
+public final class TrockAddMapHandler extends AbstractPacketHandler<BaseTeleportRockMapPacket, TeleportRockMapReader> {
+   @Override
+   public Class<TeleportRockMapReader> getReaderClass() {
+      return TeleportRockMapReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      byte type = slea.readByte();
-      boolean vip = slea.readByte() == 1;
-      if (type == 0x00) {
-         int mapId = slea.readInt();
-         if (vip)
-            chr.deleteFromVipTrocks(mapId);
-         else
-            chr.deleteFromTrocks(mapId);
-         c.announce(MaplePacketCreator.trockRefreshMapList(chr, true, vip));
-      } else if (type == 0x01) {
+   public void handlePacket(BaseTeleportRockMapPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      if (packet instanceof DeleteTeleportRockMapPacket) {
+         if (packet.vip()) {
+            chr.deleteFromVipTrocks(((DeleteTeleportRockMapPacket) packet).mapId());
+         } else {
+            chr.deleteFromTrocks(((DeleteTeleportRockMapPacket) packet).mapId());
+         }
+         client.announce(MaplePacketCreator.trockRefreshMapList(chr, true, packet.vip()));
+      } else if (packet instanceof AddTeleportRockMapPacket) {
          if (!FieldLimit.CANNOTVIPROCK.check(chr.getMap().getFieldLimit())) {
-            if (vip)
+            if (packet.vip()) {
                chr.addVipTrockMap();
-            else
+            } else {
                chr.addTrockMap();
+            }
 
-            c.announce(MaplePacketCreator.trockRefreshMapList(chr, false, vip));
+            client.announce(MaplePacketCreator.trockRefreshMapList(chr, false, packet.vip()));
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You may not save this map.");
          }

@@ -24,25 +24,29 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.processor.FredrickProcessor;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.fredrick.BaseFrederickPacket;
+import net.server.channel.packet.reader.FrederickReader;
 
 /**
  * @author kevintjuh93
  */
-public class FredrickHandler extends AbstractMaplePacketHandler {
+public class FredrickHandler extends AbstractPacketHandler<BaseFrederickPacket, FrederickReader> {
+   @Override
+   public Class<FrederickReader> getReaderClass() {
+      return FrederickReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      byte operation = slea.readByte();
+   public void handlePacket(BaseFrederickPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
 
-      switch (operation) {
+      switch (packet.operation()) {
          case 0x19: //Will never come...
             //c.announce(MaplePacketCreator.getFredrick((byte) 0x24));
             break;
          case 0x1A:
-            FredrickProcessor.fredrickRetrieveItems(c);
+            FredrickProcessor.fredrickRetrieveItems(client);
             break;
          case 0x1C: //Exit
             break;

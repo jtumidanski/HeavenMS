@@ -22,7 +22,9 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.MobDamageMobFriendlyPacket;
+import net.server.channel.packet.reader.MobDamageMobFriendlyReader;
 import scripting.event.EventInstanceManager;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
@@ -30,23 +32,23 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Xotic & BubblesDev
  */
 
-public final class MobDamageMobFriendlyHandler extends AbstractMaplePacketHandler {
+public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<MobDamageMobFriendlyPacket, MobDamageMobFriendlyReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int attacker = slea.readInt();
-      slea.readInt();
-      int damaged = slea.readInt();
+   public Class<MobDamageMobFriendlyReader> getReaderClass() {
+      return MobDamageMobFriendlyReader.class;
+   }
 
-      MapleMap map = c.getPlayer().getMap();
-      MapleMonster monster = map.getMonsterByOid(damaged);
+   @Override
+   public void handlePacket(MobDamageMobFriendlyPacket packet, MapleClient client) {
+      MapleMap map = client.getPlayer().getMap();
+      MapleMonster monster = map.getMonsterByOid(packet.damage());
 
-      if (monster == null || map.getMonsterByOid(attacker) == null) {
+      if (monster == null || map.getMonsterByOid(packet.attacker()) == null) {
          return;
       }
 
@@ -85,6 +87,6 @@ public final class MobDamageMobFriendlyHandler extends AbstractMaplePacketHandle
       }
 
       map.broadcastMessage(MaplePacketCreator.MobDamageMobFriendly(monster, damage, remainingHp), monster.getPosition());
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

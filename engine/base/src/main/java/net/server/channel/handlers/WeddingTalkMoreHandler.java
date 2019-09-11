@@ -21,28 +21,33 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import scripting.event.EventInstanceManager;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packets.Wedding;
 
 /**
  * @author Ronan
  */
-public final class WeddingTalkMoreHandler extends AbstractMaplePacketHandler {
+public final class WeddingTalkMoreHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      EventInstanceManager eim = c.getPlayer().getEventInstance();
-      if (eim != null && !(c.getPlayer().getId() == eim.getIntProperty("groomId") || c.getPlayer().getId() == eim.getIntProperty("brideId"))) {
-         eim.gridInsert(c.getPlayer(), 1);
-         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "High Priest John: Your blessings have been added to their love. What a noble act for a lovely couple!");
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      EventInstanceManager eim = client.getPlayer().getEventInstance();
+      if (eim != null && !(client.getPlayer().getId() == eim.getIntProperty("groomId") || client.getPlayer().getId() == eim.getIntProperty("brideId"))) {
+         eim.gridInsert(client.getPlayer(), 1);
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "High Priest John: Your blessings have been added to their love. What a noble act for a lovely couple!");
       }
 
-      c.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

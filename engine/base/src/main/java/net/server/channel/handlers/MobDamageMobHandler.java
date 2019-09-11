@@ -28,20 +28,26 @@ import client.MapleClient;
 import client.autoban.AutobanFactory;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.MobDamageMobPacket;
+import net.server.channel.packet.reader.MobDamageMobReader;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleMap;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Jay Estrella
  * @author Ronan
  */
-public final class MobDamageMobHandler extends AbstractMaplePacketHandler {
-   private static int calcMaxDamage(MapleMonster attacker, MapleMonster damaged, boolean magic) {
+public final class MobDamageMobHandler extends AbstractPacketHandler<MobDamageMobPacket, MobDamageMobReader> {
+   @Override
+   public Class<MobDamageMobReader> getReaderClass() {
+      return MobDamageMobReader.class;
+   }
+
+   private int calcMaxDamage(MapleMonster attacker, MapleMonster damaged, boolean magic) {
       int attackerAtk, damagedDef, attackerLevel = attacker.getLevel();
       double maxDamage;
       if (magic) {
@@ -65,7 +71,7 @@ public final class MobDamageMobHandler extends AbstractMaplePacketHandler {
       return (int) maxDamage;
    }
 
-   private static int calcModifier(MapleMonster monster, MonsterStatus buff, MonsterStatus nerf) {
+   private int calcModifier(MapleMonster monster, MonsterStatus buff, MonsterStatus nerf) {
       int atkModifier;
       final Map<MonsterStatus, MonsterStatusEffect> monsterStati = monster.getStati();
 
@@ -85,30 +91,25 @@ public final class MobDamageMobHandler extends AbstractMaplePacketHandler {
    }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int from = slea.readInt();
-      slea.readInt();
-      int to = slea.readInt();
-      boolean magic = slea.readByte() == 0;
-      int dmg = slea.readInt();
-      MapleCharacter chr = c.getPlayer();
-
+   public void handlePacket(MobDamageMobPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       MapleMap map = chr.getMap();
-      MapleMonster attacker = map.getMonsterByOid(from);
-      MapleMonster damaged = map.getMonsterByOid(to);
+      MapleMonster attacker = map.getMonsterByOid(packet.from());
+      MapleMonster damaged = map.getMonsterByOid(packet.to());
 
       if (attacker != null && damaged != null) {
-         int maxDmg = calcMaxDamage(attacker, damaged, magic);     // thanks Darter (YungMoozi) for reporting unchecked dmg
+         int maxDmg = calcMaxDamage(attacker, damaged, packet.magic());     // thanks Darter (YungMoozi) for reporting unchecked dmg
 
+         int dmg = packet.damage();
          if (dmg > maxDmg) {
-            AutobanFactory.DAMAGE_HACK.alert(c.getPlayer(), "Possible packet editing hypnotize damage exploit.");   // thanks Rien dev team
+            AutobanFactory.DAMAGE_HACK.alert(client.getPlayer(), "Possible packet editing hypnotize damage exploit.");   // thanks Rien dev team
 
-            FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " had hypnotized " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(attacker.getId()) + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(damaged.getId()) + " with damage " + dmg + " (max: " + maxDmg + ")");
+            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " had hypnotized " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(attacker.getId()) + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(damaged.getId()) + " with damage " + dmg + " (max: " + maxDmg + ")");
             dmg = maxDmg;
          }
 
          map.damageMonster(chr, damaged, dmg);
-         map.broadcastMessage(chr, MaplePacketCreator.damageMonster(to, dmg), false);
+         map.broadcastMessage(chr, MaplePacketCreator.damageMonster(packet.to(), dmg), false);
       }
    }
 }

@@ -28,8 +28,9 @@ import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
-import net.AbstractMaplePacketHandler;
-import net.server.Server;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ItemRewardPacket;
+import net.server.channel.packet.reader.ItemRewardReader;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.RewardItem;
 import tools.MaplePacketCreator;
@@ -37,27 +38,29 @@ import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Jay Estrella
  * @author kevintjuh93
  */
-public final class ItemRewardHandler extends AbstractMaplePacketHandler {
+public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPacket, ItemRewardReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte slot = (byte) slea.readShort();
-      int itemId = slea.readInt(); // will load from xml I don't care.
+   public Class<ItemRewardReader> getReaderClass() {
+      return ItemRewardReader.class;
+   }
 
-      Item it = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(slot);   // null check here thanks to Thora
-      if (it == null || it.getItemId() != itemId || c.getPlayer().getInventory(MapleInventoryType.USE).countById(itemId) < 1)
+   @Override
+   public void handlePacket(ItemRewardPacket packet, MapleClient client) {
+      Item it = client.getPlayer().getInventory(MapleInventoryType.USE).getItem(packet.slot());   // null check here thanks to Thora
+      if (it == null || it.getItemId() != packet.itemId() || client.getPlayer().getInventory(MapleInventoryType.USE).countById(packet.itemId()) < 1) {
          return;
+      }
 
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-      Pair<Integer, List<RewardItem>> rewards = ii.getItemReward(itemId);
+      Pair<Integer, List<RewardItem>> rewards = ii.getItemReward(packet.itemId());
       for (RewardItem reward : rewards.getRight()) {
-         if (!MapleInventoryManipulator.checkSpace(c, reward.itemid, reward.quantity, "")) {
-            c.announce(MaplePacketCreator.getShowInventoryFull());
+         if (!MapleInventoryManipulator.checkSpace(client, reward.itemid, reward.quantity, "")) {
+            client.announce(MaplePacketCreator.getShowInventoryFull());
             break;
          }
          if (Randomizer.nextInt(rewards.getLeft()) < reward.prob) {//Is it even possible to get an item with prob 1?
@@ -66,20 +69,20 @@ public final class ItemRewardHandler extends AbstractMaplePacketHandler {
                if (reward.period != -1) {
                   item.setExpiration(currentServerTime() + (reward.period * 60 * 60 * 10));
                }
-               MapleInventoryManipulator.addFromDrop(c, item, false);
+               MapleInventoryManipulator.addFromDrop(client, item, false);
             } else {
-               MapleInventoryManipulator.addById(c, reward.itemid, reward.quantity, "", -1);
+               MapleInventoryManipulator.addById(client, reward.itemid, reward.quantity, "", -1);
             }
-            MapleInventoryManipulator.removeById(c, MapleInventoryType.USE, itemId, 1, false, false);
+            MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, packet.itemId(), 1, false, false);
             if (reward.worldmsg != null) {
                String msg = reward.worldmsg;
-               msg.replaceAll("/name", c.getPlayer().getName());
+               msg.replaceAll("/name", client.getPlayer().getName());
                msg.replaceAll("/item", ii.getName(reward.itemid));
-               MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, msg);
+               MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, msg);
             }
             break;
          }
       }
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

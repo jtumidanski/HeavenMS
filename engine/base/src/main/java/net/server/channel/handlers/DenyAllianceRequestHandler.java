@@ -23,26 +23,26 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
-import net.server.guild.MapleAlliance;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.alliance.DenyAllianceRequestPacket;
+import net.server.channel.packet.reader.DenyAllianceRequestReader;
 import net.server.processor.MapleAllianceProcessor;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan
  */
-public final class DenyAllianceRequestHandler extends AbstractMaplePacketHandler {
+public final class DenyAllianceRequestHandler extends AbstractPacketHandler<DenyAllianceRequestPacket, DenyAllianceRequestReader> {
+   @Override
+   public Class<DenyAllianceRequestReader> getReaderClass() {
+      return DenyAllianceRequestReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readByte();
-      String inviterName = slea.readMapleAsciiString();
-      String guildName = slea.readMapleAsciiString();
-
-      c.getWorldServer().getPlayerStorage().getCharacterByName(inviterName)
+   public void handlePacket(DenyAllianceRequestPacket packet, MapleClient client) {
+      client.getWorldServer().getPlayerStorage().getCharacterByName(packet.inviterName())
             .map(MapleCharacter::getAlliance)
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .ifPresent(alliance -> MapleAllianceProcessor.getInstance().answerInvitation(c.getPlayer().getId(), guildName, alliance.getId(), false));
+            .ifPresent(alliance -> MapleAllianceProcessor.getInstance().answerInvitation(client.getPlayer().getId(), packet.guildName(), alliance.getId(), false));
    }
 }

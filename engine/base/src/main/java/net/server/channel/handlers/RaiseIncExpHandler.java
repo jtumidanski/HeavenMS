@@ -6,27 +6,28 @@ import client.MapleClient;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseItemUIPacket;
+import net.server.channel.packet.reader.UseItemUIReader;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.QuestConsItem;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Xari
  * @author Ronan - added concurrency protection and quest progress limit
  */
-public class RaiseIncExpHandler extends AbstractMaplePacketHandler {
+public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket, UseItemUIReader> {
+   @Override
+   public Class<UseItemUIReader> getReaderClass() {
+      return UseItemUIReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte inventorytype = slea.readByte();//nItemIT
-      short slot = slea.readShort();//nSlotPosition
-      int itemid = slea.readInt();//nItemID
-
-      if (c.tryAcquireClient()) {
+   public void handlePacket(UseItemUIPacket packet, MapleClient client) {
+      if (client.tryAcquireClient()) {
          try {
             MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-            QuestConsItem consItem = ii.getQuestConsumablesInfo(itemid);
+            QuestConsItem consItem = ii.getQuestConsumablesInfo(packet.itemId());
             if (consItem == null) {
                return;
             }
@@ -35,23 +36,23 @@ public class RaiseIncExpHandler extends AbstractMaplePacketHandler {
             Map<Integer, Integer> consumables = consItem.items;
 
             int consId;
-            MapleInventory inv = c.getPlayer().getInventory(MapleInventoryType.getByType(inventorytype));
+            MapleInventory inv = client.getPlayer().getInventory(MapleInventoryType.getByType(packet.inventoryType()));
             inv.lockInventory();
             try {
-               consId = inv.getItem(slot).getItemId();
-               if (!consumables.containsKey(consId) || !c.getPlayer().haveItem(consId)) {
+               consId = inv.getItem(packet.slot()).getItemId();
+               if (!consumables.containsKey(consId) || !client.getPlayer().haveItem(consId)) {
                   return;
                }
 
-               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.getByType(inventorytype), slot, (short) 1, false, true);
+               MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.getByType(packet.inventoryType()), packet.slot(), (short) 1, false, true);
             } finally {
                inv.unlockInventory();
             }
 
-            int nextValue = Math.min(consumables.get(consId) + Integer.parseInt(c.getPlayer().getQuestInfo(questid)), consItem.exp * consItem.grade);
-            c.getPlayer().updateQuestInfo(questid, "" + nextValue);
+            int nextValue = Math.min(consumables.get(consId) + Integer.parseInt(client.getPlayer().getQuestInfo(questid)), consItem.exp * consItem.grade);
+            client.getPlayer().updateQuestInfo(questid, "" + nextValue);
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

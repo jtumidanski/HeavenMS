@@ -26,34 +26,35 @@ import java.util.Collection;
 import client.MapleClient;
 import constants.skills.DarkKnight;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.BeholderPacket;
+import net.server.channel.packet.reader.BeholderReader;
 import server.maps.MapleSummon;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author BubblesDev
  */
-public final class BeholderHandler extends AbstractMaplePacketHandler {//Summon Skills noobs
+//TODO is anything actually happening here?
+public final class BeholderHandler extends AbstractPacketHandler<BeholderPacket, BeholderReader> {
+   @Override
+   public Class<BeholderReader> getReaderClass() {
+      return BeholderReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public void handlePacket(BeholderPacket packet, MapleClient client) {
       //System.out.println(slea.toString());
-      Collection<MapleSummon> summons = c.getPlayer().getSummonsValues();
-      int oid = slea.readInt();
+      Collection<MapleSummon> summons = client.getPlayer().getSummonsValues();
       MapleSummon summon = null;
       for (MapleSummon sum : summons) {
-         if (sum.getObjectId() == oid) {
+         if (sum.getObjectId() == packet.objectId()) {
             summon = sum;
          }
       }
       if (summon != null) {
-         int skillId = slea.readInt();
-         if (skillId == DarkKnight.AURA_OF_BEHOLDER) {
-            slea.readShort(); //Not sure.
-         } else if (skillId == DarkKnight.HEX_OF_BEHOLDER) {
-            slea.readByte(); //Not sure.
-         }            //show to others here
       } else {
-         c.getPlayer().clearSummons();
+         client.getPlayer().clearSummons();
       }
    }
 }

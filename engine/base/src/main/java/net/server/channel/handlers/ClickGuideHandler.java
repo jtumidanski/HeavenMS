@@ -24,20 +24,26 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.MapleJob;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import scripting.npc.NPCScriptManager;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93
  */
-public class ClickGuideHandler extends AbstractMaplePacketHandler {
+public class ClickGuideHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.getPlayer().getJob().equals(MapleJob.NOBLESSE)) {
-         NPCScriptManager.getInstance().start(c, 1101008, null);
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      if (client.getPlayer().getJob().equals(MapleJob.NOBLESSE)) {
+         NPCScriptManager.getInstance().start(client, 1101008, null);
       } else {
-         NPCScriptManager.getInstance().start(c, 1202000, null);
+         NPCScriptManager.getInstance().start(client, 1202000, null);
       }
    }
 

@@ -21,28 +21,34 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.inventory.Item;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import server.CashShop;
 import tools.MaplePacketCreator;
 import tools.Pair;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author RonanLana
  */
-public class CashShopSurpriseHandler extends AbstractMaplePacketHandler {
+public class CashShopSurpriseHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      CashShop cs = c.getPlayer().getCashShop();
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      CashShop cs = client.getPlayer().getCashShop();
 
       if (cs.isOpened()) {
          Pair<Item, Item> cssResult = cs.openCashShopSurprise();
 
          if (cssResult != null) {
             Item cssItem = cssResult.getLeft(), cssBox = cssResult.getRight();
-            c.announce(MaplePacketCreator.onCashGachaponOpenSuccess(c.getAccID(), cssBox.getSN(), cssBox.getQuantity(), cssItem, cssItem.getItemId(), cssItem.getQuantity(), true));
+            client.announce(MaplePacketCreator.onCashGachaponOpenSuccess(client.getAccID(), cssBox.getSN(), cssBox.getQuantity(), cssItem, cssItem.getItemId(), cssItem.getQuantity(), true));
          } else {
-            c.announce(MaplePacketCreator.onCashItemGachaponOpenFailed());
+            client.announce(MaplePacketCreator.onCashItemGachaponOpenFailed());
          }
       }
    }

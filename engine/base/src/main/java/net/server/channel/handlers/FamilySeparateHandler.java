@@ -26,33 +26,40 @@ import client.MapleClient;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.family.FamilySeparatePacket;
+import net.server.channel.packet.reader.FamilySeparateReader;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public class FamilySeparateHandler extends AbstractMaplePacketHandler {
+public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparatePacket, FamilySeparateReader> {
+   @Override
+   public Class<FamilySeparateReader> getReaderClass() {
+      return FamilySeparateReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public boolean successfulProcess(MapleClient client) {
       if (!ServerConstants.USE_FAMILY_SYSTEM) {
-         return;
+         return false;
       }
-      MapleFamily oldFamily = c.getPlayer().getFamily();
-      if (oldFamily == null) {
-         return;
-      }
-      MapleFamilyEntry forkOn = null;
+      MapleFamily oldFamily = client.getPlayer().getFamily();
+      return oldFamily != null;
+   }
+
+   @Override
+   public void handlePacket(FamilySeparatePacket packet, MapleClient client) {
+      MapleFamilyEntry forkOn;
       boolean isSenior;
-      if (slea.available() > 0) { //packet 0x95 doesn't send id, since there is only one senior
-         forkOn = c.getPlayer().getFamily().getEntryByID(slea.readInt());
-         if (!c.getPlayer().getFamilyEntry().isJunior(forkOn)) {
+      if (packet.available()) { //packet 0x95 doesn't send id, since there is only one senior
+         forkOn = client.getPlayer().getFamily().getEntryByID(packet.characterId());
+         if (!client.getPlayer().getFamilyEntry().isJunior(forkOn)) {
             return; //packet editing?
          }
          isSenior = true;
       } else {
-         forkOn = c.getPlayer().getFamilyEntry();
+         forkOn = client.getPlayer().getFamilyEntry();
          isSenior = false;
       }
       if (forkOn == null) {
@@ -63,14 +70,14 @@ public class FamilySeparateHandler extends AbstractMaplePacketHandler {
       if (senior == null) {
          return;
       }
-      int levelDiff = Math.abs(c.getPlayer().getLevel() - senior.getLevel());
+      int levelDiff = Math.abs(client.getPlayer().getLevel() - senior.getLevel());
       int cost = 2500 * levelDiff;
       cost += levelDiff * levelDiff;
-      if (c.getPlayer().getMeso() < cost) {
-         c.announce(MaplePacketCreator.sendFamilyMessage(isSenior ? 81 : 80, cost));
+      if (client.getPlayer().getMeso() < cost) {
+         client.announce(MaplePacketCreator.sendFamilyMessage(isSenior ? 81 : 80, cost));
          return;
       }
-      c.getPlayer().gainMeso(-cost);
+      client.getPlayer().gainMeso(-cost);
       int repCost = separateRepCost(forkOn);
       senior.gainReputation(-repCost, false);
       if (senior.getSenior() != null) {
@@ -80,13 +87,13 @@ public class FamilySeparateHandler extends AbstractMaplePacketHandler {
       Collection<MapleCharacter> recipients = forkOn.getSeniors(true);
       MessageBroadcaster.getInstance().sendServerNotice(recipients, ServerNoticeType.PINK_TEXT, forkOn.getName() + " has left the family.");
       forkOn.fork();
-      c.announce(MaplePacketCreator.getFamilyInfo(forkOn)); //pedigree info will be requested by the client if the window is open
+      client.announce(MaplePacketCreator.getFamilyInfo(forkOn)); //pedigree info will be requested by the client if the window is open
       forkOn.updateSeniorFamilyInfo(true);
-      c.announce(MaplePacketCreator.sendFamilyMessage(1, 0));
+      client.announce(MaplePacketCreator.sendFamilyMessage(1, 0));
    }
 
 
-   private static int separateRepCost(MapleFamilyEntry junior) {
+   private int separateRepCost(MapleFamilyEntry junior) {
       int level = junior.getLevel();
       int ret = level / 20;
       ret += 10;

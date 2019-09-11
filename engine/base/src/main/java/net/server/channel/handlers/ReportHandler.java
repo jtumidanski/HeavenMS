@@ -25,64 +25,67 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 
 import client.MapleCharacter;
-import client.processor.CharacterProcessor;
 import client.MapleClient;
 import client.database.administrator.ReportAdministrator;
-import net.AbstractMaplePacketHandler;
-import net.server.Server;
+import client.processor.CharacterProcessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.ReportReader;
+import net.server.channel.packet.report.BaseReportPacket;
+import net.server.channel.packet.report.ReportPacket;
+import net.server.channel.packet.report.ReportWithChatPacket;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /*
  *
  * @author BubblesDev
  */
-public final class ReportHandler extends AbstractMaplePacketHandler {
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int type = slea.readByte(); //01 = Conversation claim 00 = illegal program
-      String victim = slea.readMapleAsciiString();
-      int reason = slea.readByte();
-      String description = slea.readMapleAsciiString();
-      if (type == 0) {
-         if (c.getPlayer().getPossibleReports() > 0) {
-            if (c.getPlayer().getMeso() > 299) {
-               c.getPlayer().decreaseReports();
-               c.getPlayer().gainMeso(-300, true);
+public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket, ReportReader> {
+   @Override
+   public Class<ReportReader> getReaderClass() {
+      return ReportReader.class;
+   }
+
+   @Override
+   public void handlePacket(BaseReportPacket packet, MapleClient client) {
+      if (packet instanceof ReportPacket) {
+         if (client.getPlayer().getPossibleReports() > 0) {
+            if (client.getPlayer().getMeso() > 299) {
+               client.getPlayer().decreaseReports();
+               client.getPlayer().gainMeso(-300, true);
             } else {
-               c.announce(MaplePacketCreator.reportResponse((byte) 4));
+               client.announce(MaplePacketCreator.reportResponse((byte) 4));
                return;
             }
          } else {
-            c.announce(MaplePacketCreator.reportResponse((byte) 2));
+            client.announce(MaplePacketCreator.reportResponse((byte) 2));
             return;
          }
-         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, victim + " was reported for: " + description);
-         addReport(c.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(victim), 0, description, null);
-      } else if (type == 1) {
-         String chatlog = slea.readMapleAsciiString();
-         if (chatlog == null) {
+         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, packet.victim() + " was reported for: " + packet.description());
+         addReport(client.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(packet.victim()), 0, packet.description(), null);
+      } else if (packet instanceof ReportWithChatPacket) {
+         if (((ReportWithChatPacket) packet).chatLog() == null) {
             return;
          }
-         if (c.getPlayer().getPossibleReports() > 0) {
-            if (c.getPlayer().getMeso() > 299) {
-               c.getPlayer().decreaseReports();
-               c.getPlayer().gainMeso(-300, true);
+         if (client.getPlayer().getPossibleReports() > 0) {
+            if (client.getPlayer().getMeso() > 299) {
+               client.getPlayer().decreaseReports();
+               client.getPlayer().gainMeso(-300, true);
             } else {
-               c.announce(MaplePacketCreator.reportResponse((byte) 4));
+               client.announce(MaplePacketCreator.reportResponse((byte) 4));
                return;
             }
          }
-         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, victim + " was reported for: " + description);
-         addReport(c.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(victim), reason, description, chatlog);
+         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, packet.victim() + " was reported for: " + packet.description());
+         addReport(client.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(packet.victim()), packet.reason(), packet.description(), ((ReportWithChatPacket) packet).chatLog());
       } else {
-         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, c.getPlayer().getName() + " is probably packet editing. Got unknown report type, which is impossible.");
+         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, client.getPlayer().getName() + " is probably packet editing. Got unknown report type, which is impossible.");
       }
    }
 
-   public void addReport(int reporterid, int victimid, int reason, String description, String chatlog) {
+   private void addReport(int reporterid, int victimid, int reason, String description, String chatlog) {
       Calendar calendar = Calendar.getInstance();
       Timestamp currentTimestamp = new java.sql.Timestamp(calendar.getTime().getTime());
 

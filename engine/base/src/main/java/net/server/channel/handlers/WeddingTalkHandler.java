@@ -21,32 +21,36 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.reader.WeddingTalkReader;
+import net.server.channel.packet.wedding.BaseWeddingTalkPacket;
 import scripting.event.EventInstanceManager;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packets.Wedding;
 
 /**
  * @author Ronan
  */
-public final class WeddingTalkHandler extends AbstractMaplePacketHandler {
+public final class WeddingTalkHandler extends AbstractPacketHandler<BaseWeddingTalkPacket, WeddingTalkReader> {
+   @Override
+   public Class<WeddingTalkReader> getReaderClass() {
+      return WeddingTalkReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte action = slea.readByte();
-      if (action == 1) {
-         EventInstanceManager eim = c.getPlayer().getEventInstance();
+   public void handlePacket(BaseWeddingTalkPacket packet, MapleClient client) {
+      if (packet.action() == 1) {
+         EventInstanceManager eim = client.getPlayer().getEventInstance();
 
-         if (eim != null && !(c.getPlayer().getId() == eim.getIntProperty("groomId") || c.getPlayer().getId() == eim.getIntProperty("brideId"))) {
-            c.announce(Wedding.OnWeddingProgress(false, 0, 0, (byte) 2));
+         if (eim != null && !(client.getPlayer().getId() == eim.getIntProperty("groomId") || client.getPlayer().getId() == eim.getIntProperty("brideId"))) {
+            client.announce(Wedding.OnWeddingProgress(false, 0, 0, (byte) 2));
          } else {
-            c.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
+            client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
          }
       } else {
-         c.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
+         client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
       }
 
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

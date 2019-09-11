@@ -23,20 +23,30 @@ import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ubaware
  */
-public final class OpenFamilyHandler extends AbstractMaplePacketHandler {
+public final class OpenFamilyHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (!ServerConstants.USE_FAMILY_SYSTEM) {
-         return;
-      }
-      MapleCharacter chr = c.getPlayer();
-      c.announce(MaplePacketCreator.getFamilyInfo(chr.getFamilyEntry()));
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      return ServerConstants.USE_FAMILY_SYSTEM;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      client.announce(MaplePacketCreator.getFamilyInfo(chr.getFamilyEntry()));
    }
 }
 

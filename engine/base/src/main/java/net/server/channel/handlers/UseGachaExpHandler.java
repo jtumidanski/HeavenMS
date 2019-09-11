@@ -24,29 +24,33 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.autoban.AutobanFactory;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93; modified by Ronan
  */
-public class UseGachaExpHandler extends AbstractMaplePacketHandler {
+public class UseGachaExpHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-
-      if (c.tryAcquireClient()) {
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      if (client.tryAcquireClient()) {
          try {
-            if (c.getPlayer().getGachaExp() <= 0) {
-               AutobanFactory.GACHA_EXP.autoban(c.getPlayer(), "Player tried to redeem GachaEXP, but had none to redeem.");
+            if (client.getPlayer().getGachaExp() <= 0) {
+               AutobanFactory.GACHA_EXP.autoban(client.getPlayer(), "Player tried to redeem GachaEXP, but had none to redeem.");
             }
-            c.getPlayer().gainGachaExp();
+            client.getPlayer().gainGachaExp();
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
 
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

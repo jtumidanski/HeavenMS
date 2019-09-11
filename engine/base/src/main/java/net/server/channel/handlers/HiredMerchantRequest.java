@@ -28,24 +28,29 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.ItemFactory;
 import constants.GameConstants;
-import net.AbstractMaplePacketHandler;
-import server.maps.MaplePortal;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.maps.MaplePlayerShop;
+import server.maps.MaplePortal;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author XoticStory
  */
-public final class HiredMerchantRequest extends AbstractMaplePacketHandler {
+public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       try {
          for (MapleMapObject mmo : chr.getMap().getMapObjectsInRange(chr.getPosition(), 23000, Arrays.asList(MapleMapObjectType.HIRED_MERCHANT, MapleMapObjectType.PLAYER))) {
             if (mmo instanceof MapleCharacter) {
@@ -75,7 +80,7 @@ public final class HiredMerchantRequest extends AbstractMaplePacketHandler {
       if (GameConstants.isFreeMarketRoom(chr.getMapId())) {
          if (!chr.hasMerchant()) {
             if (ItemFactory.MERCHANT.loadItems(chr.getId(), false).isEmpty() && chr.getMerchantMeso() == 0) {
-               c.announce(MaplePacketCreator.hiredMerchantBox());
+               client.announce(MaplePacketCreator.hiredMerchantBox());
             } else {
                chr.announce(MaplePacketCreator.retrieveFirstMessage());
             }

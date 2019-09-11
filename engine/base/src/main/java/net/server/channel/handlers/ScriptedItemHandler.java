@@ -24,32 +24,36 @@ package net.server.channel.handlers;
 import client.MapleClient;
 import client.inventory.Item;
 import constants.ItemConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.ScriptedItemPacket;
+import net.server.channel.packet.reader.ScriptedItemReader;
 import scripting.item.ItemScriptManager;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.ScriptedItem;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Jay Estrella
  */
-public final class ScriptedItemHandler extends AbstractMaplePacketHandler {
+public final class ScriptedItemHandler extends AbstractPacketHandler<ScriptedItemPacket, ScriptedItemReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readInt(); // trash stamp, thanks RMZero213
-      short itemSlot = slea.readShort(); // item slot, thanks RMZero213
-      int itemId = slea.readInt();
+   public Class<ScriptedItemReader> getReaderClass() {
+      return ScriptedItemReader.class;
+   }
 
+   @Override
+   public void handlePacket(ScriptedItemPacket packet, MapleClient client) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-      ScriptedItem info = ii.getScriptedItemInfo(itemId);
-      if (info == null) return;
+      ScriptedItem info = ii.getScriptedItemInfo(packet.itemId());
+      if (info == null) {
+         return;
+      }
 
-      Item item = c.getPlayer().getInventory(ItemConstants.getInventoryType(itemId)).getItem(itemSlot);
-      if (item == null || item.getItemId() != itemId || item.getQuantity() < 1) {
+      Item item = client.getPlayer().getInventory(ItemConstants.getInventoryType(packet.itemId())).getItem(packet.itemSlot());
+      if (item == null || item.getItemId() != packet.itemId() || item.getQuantity() < 1) {
          return;
       }
 
       ItemScriptManager ism = ItemScriptManager.getInstance();
-      ism.runItemScript(c, info);
+      ism.runItemScript(client, info);
    }
 }

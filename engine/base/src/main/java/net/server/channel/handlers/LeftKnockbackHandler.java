@@ -24,15 +24,24 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93
  */
-public class LeftKnockbackHandler extends AbstractMaplePacketHandler {
-   public void handlePacket(SeekableLittleEndianAccessor slea, final MapleClient c) {
-      c.announce(MaplePacketCreator.leftKnockBack());
-      c.announce(MaplePacketCreator.enableActions());
+public class LeftKnockbackHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      client.announce(MaplePacketCreator.leftKnockBack());
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

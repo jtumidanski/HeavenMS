@@ -22,38 +22,40 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.GameConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.FieldDamageMobPacket;
+import net.server.channel.packet.reader.FieldDamageMobReader;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleMap;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public class FieldDamageMobHandler extends AbstractMaplePacketHandler {
+public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobPacket, FieldDamageMobReader> {
+   @Override
+   public Class<FieldDamageMobReader> getReaderClass() {
+      return FieldDamageMobReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int mobOid = slea.readInt();    // packet structure found thanks to Darter (Rajan)
-      int dmg = slea.readInt();
-
-      MapleCharacter chr = c.getPlayer();
+   public void handlePacket(FieldDamageMobPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       MapleMap map = chr.getMap();
 
       if (map.getEnvironment().isEmpty()) {   // no environment objects activated to actually hit the mob
-         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack.");
          return;
       }
 
-      MapleMonster mob = map.getMonsterByOid(mobOid);
+      MapleMonster mob = map.getMonsterByOid(packet.mobId());
       if (mob != null) {
-         if (dmg < 0 || dmg > GameConstants.MAX_FIELD_MOB_DAMAGE) {
-            FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.getId()) + " with damage " + dmg);
+
+         if (packet.damage() < 0 || packet.damage() > GameConstants.MAX_FIELD_MOB_DAMAGE) {
+            map.broadcastMessage(chr, MaplePacketCreator.damageMonster(packet.mobId(), packet.damage()), true);
+            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.getId()) + " with damage " + packet.damage());
             return;
          }
-
-         map.broadcastMessage(chr, MaplePacketCreator.damageMonster(mobOid, dmg), true);
-         map.damageMonster(chr, mob, dmg);
       }
+      map.damageMonster(chr, mob, packet.damage());
    }
 }

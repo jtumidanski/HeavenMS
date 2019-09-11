@@ -26,33 +26,37 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.SpouseChatPacket;
+import net.server.channel.packet.reader.SpouseChatReader;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class SpouseChatHandler extends AbstractMaplePacketHandler {
+public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPacket, SpouseChatReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.readMapleAsciiString();//recipient
-      String msg = slea.readMapleAsciiString();
+   public Class<SpouseChatReader> getReaderClass() {
+      return SpouseChatReader.class;
+   }
 
-      int partnerId = c.getPlayer().getPartnerId();
+   @Override
+   public void handlePacket(SpouseChatPacket packet, MapleClient client) {
+
+      int partnerId = client.getPlayer().getPartnerId();
       if (partnerId > 0) { // yay marriage
-         Optional<MapleCharacter> spouse = c.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
+         Optional<MapleCharacter> spouse = client.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
          if (spouse.isPresent()) {
-            spouse.get().announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
-            c.announce(MaplePacketCreator.OnCoupleMessage(c.getPlayer().getName(), msg, true));
+            spouse.get().announce(MaplePacketCreator.OnCoupleMessage(client.getPlayer().getName(), packet.message(), true));
+            client.announce(MaplePacketCreator.OnCoupleMessage(client.getPlayer().getName(), packet.message(), true));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-               LogHelper.logChat(c, "Spouse", msg);
+               LogHelper.logChat(client, "Spouse", packet.message());
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Your spouse is currently offline.");
+            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Your spouse is currently offline.");
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "You don't have a spouse.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "You don't have a spouse.");
       }
    }
 }

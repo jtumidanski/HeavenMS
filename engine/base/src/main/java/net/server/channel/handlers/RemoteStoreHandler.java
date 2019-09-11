@@ -24,38 +24,44 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import server.maps.MapleHiredMerchant;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93 :3
  */
-public class RemoteStoreHandler extends AbstractMaplePacketHandler {
-   private static MapleHiredMerchant getMerchant(MapleClient c) {
-      if (c.getPlayer().hasMerchant()) {
-         return c.getWorldServer().getHiredMerchant(c.getPlayer().getId());
-      }
-      return null;
+public class RemoteStoreHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
    }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      MapleHiredMerchant hm = getMerchant(c);
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      MapleHiredMerchant hm = getMerchant(client);
       if (hm != null && hm.isOwner(chr)) {
          if (hm.getChannel() == chr.getClient().getChannel()) {
             hm.visitShop(chr);
          } else {
-            c.announce(MaplePacketCreator.remoteChannelChange((byte) (hm.getChannel() - 1)));
+            client.announce(MaplePacketCreator.remoteChannelChange((byte) (hm.getChannel() - 1)));
          }
          return;
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You don't have a Merchant open.");
       }
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.enableActions());
+   }
+
+   private MapleHiredMerchant getMerchant(MapleClient c) {
+      if (c.getPlayer().hasMerchant()) {
+         return c.getWorldServer().getHiredMerchant(c.getPlayer().getId());
+      }
+      return null;
    }
 }

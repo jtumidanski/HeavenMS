@@ -30,80 +30,88 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.pet.PetAutoPotPacket;
+import net.server.channel.packet.reader.PetAutoPotReader;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan - multi-pot consumption feature
  */
-public final class PetAutoPotHandler extends AbstractMaplePacketHandler {
-   short slot;
-   int itemId;
-   Item toUse;
-   List<Item> toUseList;
-
-   boolean hasHpGain, hasMpGain;
-   int maxHp, maxMp, curHp, curMp;
-   double incHp, incMp;
+public final class PetAutoPotHandler extends AbstractPacketHandler<PetAutoPotPacket, PetAutoPotReader> {
+   @Override
+   public Class<PetAutoPotReader> getReaderClass() {
+      return PetAutoPotReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (!c.getPlayer().isAlive()) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+   public boolean successfulProcess(MapleClient client) {
+      if (!client.getPlayer().isAlive()) {
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
+      return true;
+   }
 
-      slea.readByte();
-      slea.readLong();
-      slea.readInt();
-      slot = slea.readShort();
-      itemId = slea.readInt();
-
-      MapleCharacter chr = c.getPlayer();
+   @Override
+   public void handlePacket(PetAutoPotPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
 
-      int useCount = 0, qtyCount = 0;
+      short slot = packet.slot();
+      int useCount = 0;
       MapleStatEffect stat = null;
 
       useInv.lockInventory();
+
       try {
-         toUse = useInv.getItem(slot);
+         Item toUse = useInv.getItem(slot);
 
          if (toUse != null) {
-            if (toUse.getItemId() != itemId) {
-               c.announce(MaplePacketCreator.enableActions());
+            if (toUse.getItemId() != packet.itemId()) {
+               client.announce(MaplePacketCreator.enableActions());
                return;
             }
 
-            toUseList = null;
+            List<Item> toUseList = null;
 
             // from now on, toUse becomes the "cursor" for the current pot being used
             if (toUse.getQuantity() <= 0) {
-               if (!cursorOnNextAvailablePot(chr)) {
-                  c.announce(MaplePacketCreator.enableActions());
+               // depleted out the current slot, fetch for more
+               SeekResult result = findNextAvailablePot(chr, packet.itemId(), toUseList);
+               if (!result.isAvailable()) {
+                  client.announce(MaplePacketCreator.enableActions());
                   return;
+               } else {
+                  toUseList = result.getToUseList();
+                  toUse = result.getToUse();
+                  slot = result.getSlot();
                }
             }
 
             stat = MapleItemInformationProvider.getInstance().getItemEffect(toUse.getItemId());
-            hasHpGain = stat.getHp() > 0 || stat.getHpRate() > 0.0;
-            hasMpGain = stat.getMp() > 0 || stat.getMpRate() > 0.0;
+            boolean hasHpGain = stat.getHp() > 0 || stat.getHpRate() > 0.0;
+            boolean hasMpGain = stat.getMp() > 0 || stat.getMpRate() > 0.0;
 
-            maxHp = chr.getCurrentMaxHp();
-            maxMp = chr.getCurrentMaxMp();
+            int maxHp = chr.getCurrentMaxHp();
+            int maxMp = chr.getCurrentMaxMp();
 
-            curHp = chr.getHp();
-            curMp = chr.getMp();
+            int curHp = chr.getHp();
+            int curMp = chr.getMp();
 
-            incHp = stat.getHp();
-            if (incHp <= 0 && hasHpGain) incHp = Math.ceil(maxHp * stat.getHpRate());
+            double incHp = stat.getHp();
+            if (incHp <= 0 && hasHpGain) {
+               incHp = Math.ceil(maxHp * stat.getHpRate());
+            }
 
-            incMp = stat.getMp();
-            if (incMp <= 0 && hasMpGain) incMp = Math.ceil(maxMp * stat.getMpRate());
+            double incMp = stat.getMp();
+            if (incMp <= 0 && hasMpGain) {
+               incMp = Math.ceil(maxMp * stat.getMpRate());
+            }
 
+            int qtyCount = 0;
             if (ServerConstants.USE_COMPULSORY_AUTOPOT) {
                if (hasHpGain) {
                   qtyCount = (int) Math.ceil(((ServerConstants.PET_AUTOHP_RATIO * maxHp) - curHp) / incHp);
@@ -118,7 +126,7 @@ public final class PetAutoPotHandler extends AbstractMaplePacketHandler {
 
             while (true) {
                short qtyToUse = (short) Math.min(qtyCount, toUse.getQuantity());
-               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, qtyToUse, false);
+               MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, slot, qtyToUse, false);
 
                curHp += (incHp * qtyToUse);
                curMp += (incMp * qtyToUse);
@@ -128,9 +136,13 @@ public final class PetAutoPotHandler extends AbstractMaplePacketHandler {
 
                if (toUse.getQuantity() == 0 && qtyCount > 0) {
                   // depleted out the current slot, fetch for more
-
-                  if (!cursorOnNextAvailablePot(chr)) {
+                  SeekResult result = findNextAvailablePot(chr, packet.itemId(), toUseList);
+                  if (!result.isAvailable()) {
                      break;    // no more pots available
+                  } else {
+                     toUseList = result.getToUseList();
+                     toUse = result.getToUse();
+                     slot = result.getSlot();
                   }
                } else {
                   break;    // gracefully finished it's job, quit the loop
@@ -148,23 +160,54 @@ public final class PetAutoPotHandler extends AbstractMaplePacketHandler {
       chr.announce(MaplePacketCreator.enableActions());
    }
 
-   private boolean cursorOnNextAvailablePot(MapleCharacter chr) {
+   private SeekResult findNextAvailablePot(MapleCharacter chr, int itemId, List<Item> toUseList) {
       if (toUseList == null) {
          toUseList = chr.getInventory(MapleInventoryType.USE).linkedListById(itemId);
       }
 
-      toUse = null;
       while (!toUseList.isEmpty()) {
          Item it = toUseList.remove(0);
-
          if (it.getQuantity() > 0) {
-            toUse = it;
-            slot = it.getPosition();
-
-            return true;
+            return new SeekResult(it, toUseList, it.getPosition());
          }
       }
+      return new SeekResult();
+   }
 
-      return false;
+   private class SeekResult {
+      private boolean available;
+
+      private Item toUse;
+
+      private List<Item> toUseList;
+
+      private short slot;
+
+      public SeekResult(Item toUse, List<Item> toUseList, short slot) {
+         this.toUse = toUse;
+         this.toUseList = toUseList;
+         this.slot = slot;
+         this.available = true;
+      }
+
+      public SeekResult() {
+         available = false;
+      }
+
+      public boolean isAvailable() {
+         return available;
+      }
+
+      public Item getToUse() {
+         return toUse;
+      }
+
+      public List<Item> getToUseList() {
+         return toUseList;
+      }
+
+      public short getSlot() {
+         return slot;
+      }
    }
 }

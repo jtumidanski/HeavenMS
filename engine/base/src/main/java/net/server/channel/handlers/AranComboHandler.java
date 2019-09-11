@@ -26,13 +26,19 @@ import client.MapleClient;
 import client.SkillFactory;
 import constants.GameConstants;
 import constants.skills.Aran;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 
-public class AranComboHandler extends AbstractMaplePacketHandler {
+public class AranComboHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor accessor, MapleClient c) {
-      final MapleCharacter player = c.getPlayer();
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      final MapleCharacter player = client.getPlayer();
       SkillFactory.executeForSkill(player, Aran.COMBO_ABILITY, (skill, skillLevel) -> {
          if (GameConstants.isAran(player.getJob().getId()) && (skillLevel > 0 || player.getJob().getId() == 2000)) {
             final long currentTime = currentServerTime();
@@ -52,7 +58,9 @@ public class AranComboHandler extends AbstractMaplePacketHandler {
                case 80:
                case 90:
                case 100:
-                  if (player.getJob().getId() != 2000 && (combo / 10) > skillLevel) break;
+                  if (player.getJob().getId() != 2000 && (combo / 10) > skillLevel) {
+                     break;
+                  }
                   skill.getEffect(combo / 10).applyComboBuff(player, combo);
                   break;
             }

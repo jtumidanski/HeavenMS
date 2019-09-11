@@ -24,34 +24,36 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MaplePet;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
-//import tools.MaplePacketCreator;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.pet.PetExcludeItemsPacket;
+import net.server.channel.packet.reader.PetExcludeItemsReader;
 
 /**
  * @author BubblesDev
  * @author Ronan
  */
-public final class PetExcludeItemsHandler extends AbstractMaplePacketHandler {
+public final class PetExcludeItemsHandler extends AbstractPacketHandler<PetExcludeItemsPacket, PetExcludeItemsReader> {
+   @Override
+   public Class<PetExcludeItemsReader> getReaderClass() {
+      return PetExcludeItemsReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      final int petId = slea.readInt();
-      slea.skip(4);
-
-      MapleCharacter chr = c.getPlayer();
-      byte petIndex = chr.getPetIndex(petId);
-      if (petIndex < 0) return;
+   public void handlePacket(PetExcludeItemsPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
+      byte petIndex = chr.getPetIndex(packet.petId());
+      if (petIndex < 0) {
+         return;
+      }
 
       final MaplePet pet = chr.getPet(petIndex);
       if (pet == null) {
          return;
       }
 
-      chr.resetExcluded(petId);
-      byte amount = slea.readByte();
-      for (int i = 0; i < amount; i++) {
-         chr.addExcluded(petId, slea.readInt());
+      chr.resetExcluded(packet.petId());
+      for (int i = 0; i < packet.amount(); i++) {
+         chr.addExcluded(packet.petId(), packet.itemIds()[i]);
       }
       chr.commitExcludedItems();
    }

@@ -19,26 +19,34 @@
 */
 package net.server.channel.handlers;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.family.OpenFamilyPedigreePacket;
+import net.server.channel.packet.reader.OpenFamilyPedigreeReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ubaware
  */
-public final class OpenFamilyPedigreeHandler extends AbstractMaplePacketHandler {
+public final class OpenFamilyPedigreeHandler extends AbstractPacketHandler<OpenFamilyPedigreePacket, OpenFamilyPedigreeReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (!ServerConstants.USE_FAMILY_SYSTEM) {
-         return;
-      }
-      MapleCharacter target = c.getChannelServer().getPlayerStorage().getCharacterByName(slea.readMapleAsciiString()).get();
-      if (target != null && target.getFamily() != null) {
-         c.announce(MaplePacketCreator.showPedigree(target.getFamilyEntry()));
-      }
+   public Class<OpenFamilyPedigreeReader> getReaderClass() {
+      return OpenFamilyPedigreeReader.class;
+   }
+
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      return ServerConstants.USE_FAMILY_SYSTEM;
+   }
+
+   @Override
+   public void handlePacket(OpenFamilyPedigreePacket packet, MapleClient client) {
+      client.getChannelServer().getPlayerStorage().getCharacterByName(packet.characterName()).ifPresent(target -> {
+         if (target.getFamily() != null) {
+            client.announce(MaplePacketCreator.showPedigree(target.getFamilyEntry()));
+         }
+      });
    }
 }
 

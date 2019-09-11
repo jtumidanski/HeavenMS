@@ -23,42 +23,54 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.SnowballPacket;
+import net.server.channel.packet.reader.SnowballReader;
 import server.events.gm.MapleSnowball;
 import server.maps.MapleMap;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author kevintjuh93
  */
-public final class SnowballHandler extends AbstractMaplePacketHandler {
+public final class SnowballHandler extends AbstractPacketHandler<SnowballPacket, SnowballReader> {
+   @Override
+   public Class<SnowballReader> getReaderClass() {
+      return SnowballReader.class;
+   }
 
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   @Override
+   public void handlePacket(SnowballPacket packet, MapleClient client) {
       //D3 00 02 00 00 A5 01
-      MapleCharacter chr = c.getPlayer();
+      MapleCharacter chr = client.getPlayer();
       MapleMap map = chr.getMap();
       final MapleSnowball snowball = map.getSnowball(chr.getTeam());
       final MapleSnowball othersnowball = map.getSnowball(chr.getTeam() == 0 ? (byte) 1 : 0);
-      int what = slea.readByte();
-      //slea.skip(4);
 
-      if (snowball == null || othersnowball == null || snowball.getSnowmanHP() == 0) return;
-      if ((currentServerTime() - chr.getLastSnowballAttack()) < 500) return;
-      if (chr.getTeam() != (what % 2)) return;
+      if (snowball == null || othersnowball == null || snowball.getSnowmanHP() == 0) {
+         return;
+      }
+      if ((currentServerTime() - chr.getLastSnowballAttack()) < 500) {
+         return;
+      }
+      if (chr.getTeam() != (packet.what() % 2)) {
+         return;
+      }
 
       chr.setLastSnowballAttack(currentServerTime());
       int damage = 0;
-      if (what < 2 && othersnowball.getSnowmanHP() > 0)
+      if (packet.what() < 2 && othersnowball.getSnowmanHP() > 0) {
          damage = 10;
-      else if (what == 2 || what == 3) {
-         if (Math.random() < 0.03)
+      } else if (packet.what() == 2 || packet.what() == 3) {
+         if (Math.random() < 0.03) {
             damage = 45;
-         else
+         } else {
             damage = 15;
+         }
       }
 
-      if (what >= 0 && what <= 4)
-         snowball.hit(what, damage);
+      if (packet.what() >= 0 && packet.what() <= 4) {
+         snowball.hit(packet.what(), damage);
+      }
 
    }
 }

@@ -5,7 +5,9 @@ import client.MapleClient;
 import client.MapleFamilyEntitlement;
 import client.MapleFamilyEntry;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.family.FamilySummonResponsePacket;
+import net.server.channel.packet.reader.FamilySummonResponseReader;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
@@ -14,18 +16,21 @@ import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public class FamilySummonResponseHandler extends AbstractMaplePacketHandler {
+public class FamilySummonResponseHandler extends AbstractPacketHandler<FamilySummonResponsePacket, FamilySummonResponseReader> {
+   @Override
+   public Class<FamilySummonResponseReader> getReaderClass() {
+      return FamilySummonResponseReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (!ServerConstants.USE_FAMILY_SYSTEM) {
-         return;
-      }
-      slea.readMapleAsciiString(); //family name
-      boolean accept = slea.readByte() != 0;
-      MapleInviteResult inviteResult = MapleInviteCoordinator.answerInvite(InviteType.FAMILY_SUMMON, c.getPlayer().getId(), c.getPlayer(), accept);
+   public boolean successfulProcess(MapleClient client) {
+      return ServerConstants.USE_FAMILY_SYSTEM;
+   }
+
+   @Override
+   public void handlePacket(FamilySummonResponsePacket packet, MapleClient client) {
+      MapleInviteResult inviteResult = MapleInviteCoordinator.answerInvite(InviteType.FAMILY_SUMMON, client.getPlayer().getId(), client.getPlayer(), packet.accept());
       if (inviteResult.result == InviteResult.NOT_FOUND) {
          return;
       }
@@ -35,13 +40,13 @@ public class FamilySummonResponseHandler extends AbstractMaplePacketHandler {
          return;
       }
       MapleMap map = (MapleMap) inviteResult.params[0];
-      if (accept && inviter.getMap() == map) { //cancel if inviter has changed maps
-         c.getPlayer().changeMap(map, map.getPortal(0));
+      if (packet.accept() && inviter.getMap() == map) { //cancel if inviter has changed maps
+         client.getPlayer().changeMap(map, map.getPortal(0));
       } else {
          inviterEntry.refundEntitlement(MapleFamilyEntitlement.SUMMON_FAMILY);
          inviterEntry.gainReputation(MapleFamilyEntitlement.SUMMON_FAMILY.getRepCost(), false); //refund rep cost if declined
          inviter.announce(MaplePacketCreator.getFamilyInfo(inviterEntry));
-         MessageBroadcaster.getInstance().sendServerNotice(inviter, ServerNoticeType.PINK_TEXT, c.getPlayer().getName() + " has denied the summon request.");
+         MessageBroadcaster.getInstance().sendServerNotice(inviter, ServerNoticeType.PINK_TEXT, client.getPlayer().getName() + " has denied the summon request.");
       }
    }
 

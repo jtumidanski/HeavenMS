@@ -25,28 +25,47 @@ import client.database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.newyear.NewYearCardRecord;
 import constants.ItemConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.newyear.BaseNewYearCardPacket;
+import net.server.channel.packet.newyear.CardAcceptedPacket;
+import net.server.channel.packet.newyear.CardHasBeenSentPacket;
+import net.server.channel.packet.reader.NewYearCardReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan
  * <p>
  * Header layout thanks to Eric
  */
-public final class NewYearCardHandler extends AbstractMaplePacketHandler {
+public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearCardPacket, NewYearCardReader> {
+   @Override
+   public Class<NewYearCardReader> getReaderClass() {
+      return NewYearCardReader.class;
+   }
 
-   private static int getReceiverId(String receiver, int world) {
+   @Override
+   public void handlePacket(BaseNewYearCardPacket packet, MapleClient client) {
+      final MapleCharacter player = client.getPlayer();
+      if (packet instanceof CardHasBeenSentPacket) {
+         cardHasBeenSent(client, player, ((CardHasBeenSentPacket) packet).slot(),
+               ((CardHasBeenSentPacket) packet).itemId(), ((CardHasBeenSentPacket) packet).receiver(),
+               ((CardHasBeenSentPacket) packet).message());
+      } else if (packet instanceof CardAcceptedPacket) {
+         cardAccepted(client, player, ((CardAcceptedPacket) packet).cardId());
+      }
+   }
+
+   private int getReceiverId(String receiver, int world) {
       return DatabaseConnection.getInstance().withConnectionResultOpt(connection ->
             CharacterProvider.getInstance().getCharacterForNameAndWorld(connection, receiver, world))
             .orElse(-1);
    }
 
-   private static int getValidNewYearCardStatus(int itemid, MapleCharacter player, short slot) {
+   private int getValidNewYearCardStatus(int itemid, MapleCharacter player, short slot) {
       if (!ItemConstants.isNewYearCardUse(itemid)) {
          return 0x14;
       }
@@ -55,87 +74,76 @@ public final class NewYearCardHandler extends AbstractMaplePacketHandler {
       return (it != null && it.getItemId() == itemid) ? 0 : 0x12;
    }
 
-   @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      final MapleCharacter player = c.getPlayer();
-      byte reqMode = slea.readByte();                 //[00] -> NewYearReq (0 = Send)
+   private void cardAccepted(MapleClient c, MapleCharacter player, int cardId) {
+      NewYearCardRecord newYear = NewYearCardRecord.loadNewYearCard(cardId);
 
-      if (reqMode == 0) {  // card has been sent
-         if (player.haveItem(2160101)) {  // new year's card
-            short slot = slea.readShort();                      //[00 2C] -> nPOS (Item Slot Pos)
-            int itemid = slea.readInt();                        //[00 20 F5 E5] -> nItemID (item id)
+      if (newYear != null && newYear.getReceiverId() == player.getId() && !newYear.isReceiverCardReceived()) {
+         if (!newYear.isSenderCardDiscarded()) {
+            if (player.canHold(4301000, 1)) {
+               newYear.stopNewYearCardTask();
+               NewYearCardRecord.updateNewYearCard(newYear);
 
-            int status = getValidNewYearCardStatus(itemid, player, slot);
-            if (status == 0) {
-               if (player.canHold(4300000, 1)) {
-                  String receiver = slea.readMapleAsciiString();  //[04 00 54 65 73 74] -> sReceiverName (person to send to)
+               player.getAbstractPlayerInteraction().gainItem(4301000, (short) 1);
+               if (!newYear.getMessage().isEmpty()) {
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] " + newYear.getSenderName() + ": " + newYear.getMessage());
+               }
 
-                  int receiverid = getReceiverId(receiver, c.getWorld());
-                  if (receiverid != -1) {
-                     if (receiverid != c.getPlayer().getId()) {
-                        String message = slea.readMapleAsciiString();   //[06 00 4C 65 74 74 65 72] -> sContent (message)
+               player.addNewYearRecord(newYear);
+               player.announce(MaplePacketCreator.onNewYearCardRes(player, newYear, 6, 0));    // successfully rcvd
 
-                        NewYearCardRecord newyear = new NewYearCardRecord(player.getId(), player.getName(), receiverid, receiver, message);
-                        NewYearCardRecord.saveNewYearCard(newyear);
-                        player.addNewYearRecord(newyear);
+               player.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(player, newYear, 0xD, 0));
 
-                        player.getAbstractPlayerInteraction().gainItem(2160101, (short) -1);
-                        player.getAbstractPlayerInteraction().gainItem(4300000, (short) 1);
+               c.getWorldServer().getPlayerStorage().getCharacterById(newYear.getSenderId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(sender -> {
+                  sender.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(sender, newYear, 0xD, 0));
+                  MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, "[New Year] Your addressee successfully received the New Year card.");
+               });
+            } else {
+               player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
+            }
+         } else {
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
+         }
+      } else {
+         if (newYear == null) {
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
+         }
+      }
+   }
 
-                        Server.getInstance().setNewYearCard(newyear);
-                        newyear.startNewYearCardTask();
-                        player.announce(MaplePacketCreator.onNewYearCardRes(player, newyear, 4, 0));    // successfully sent
-                     } else {
-                        player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0xF));   // cannot send to yourself
-                     }
+   private void cardHasBeenSent(MapleClient c, MapleCharacter player, short slot, int itemid, String receiver, String message) {
+      if (player.haveItem(2160101)) {  // new year's card
+         int status = getValidNewYearCardStatus(itemid, player, slot);
+         if (status == 0) {
+            if (player.canHold(4300000, 1)) {
+
+               int receiverid = getReceiverId(receiver, c.getWorld());
+               if (receiverid != -1) {
+                  if (receiverid != c.getPlayer().getId()) {
+
+                     NewYearCardRecord newyear = new NewYearCardRecord(player.getId(), player.getName(), receiverid, receiver, message);
+                     NewYearCardRecord.saveNewYearCard(newyear);
+                     player.addNewYearRecord(newyear);
+
+                     player.getAbstractPlayerInteraction().gainItem(2160101, (short) -1);
+                     player.getAbstractPlayerInteraction().gainItem(4300000, (short) 1);
+
+                     Server.getInstance().setNewYearCard(newyear);
+                     newyear.startNewYearCardTask();
+                     player.announce(MaplePacketCreator.onNewYearCardRes(player, newyear, 4, 0));    // successfully sent
                   } else {
-                     player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x13));  // cannot find such character
+                     player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0xF));   // cannot send to yourself
                   }
                } else {
-                  player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
+                  player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x13));  // cannot find such character
                }
             } else {
-               player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, status));  // item and inventory errors
+               player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
             }
          } else {
-            player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x11));  // have no card to send
+            player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, status));  // item and inventory errors
          }
-      } else {    //receiver accepted the card
-         int cardid = slea.readInt();
-
-         NewYearCardRecord newyear = NewYearCardRecord.loadNewYearCard(cardid);
-
-         if (newyear != null && newyear.getReceiverId() == player.getId() && !newyear.isReceiverCardReceived()) {
-            if (!newyear.isSenderCardDiscarded()) {
-               if (player.canHold(4301000, 1)) {
-                  newyear.stopNewYearCardTask();
-                  NewYearCardRecord.updateNewYearCard(newyear);
-
-                  player.getAbstractPlayerInteraction().gainItem(4301000, (short) 1);
-                  if (!newyear.getMessage().isEmpty()) {
-                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] " + newyear.getSenderName() + ": " + newyear.getMessage());
-                  }
-
-                  player.addNewYearRecord(newyear);
-                  player.announce(MaplePacketCreator.onNewYearCardRes(player, newyear, 6, 0));    // successfully rcvd
-
-                  player.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(player, newyear, 0xD, 0));
-
-                  c.getWorldServer().getPlayerStorage().getCharacterById(newyear.getSenderId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(sender -> {
-                     sender.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(sender, newyear, 0xD, 0));
-                     MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, "[New Year] Your addressee successfully received the New Year card.");
-                  });
-               } else {
-                  player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
-               }
-            } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
-            }
-         } else {
-            if (newyear == null) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
-            }
-         }
+      } else {
+         player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x11));  // have no card to send
       }
    }
 }

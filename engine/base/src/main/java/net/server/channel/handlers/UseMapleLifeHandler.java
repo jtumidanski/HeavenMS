@@ -19,38 +19,43 @@
 */
 package net.server.channel.handlers;
 
-import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import client.processor.CharacterProcessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseMapleLifePacket;
+import net.server.channel.packet.reader.UseMapleLifeReader;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author RonanLana
  */
-public class UseMapleLifeHandler extends AbstractMaplePacketHandler {
+public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacket, UseMapleLifeReader> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter player = c.getPlayer();
+   public Class<UseMapleLifeReader> getReaderClass() {
+      return UseMapleLifeReader.class;
+   }
+
+   @Override
+   public void handlePacket(UseMapleLifePacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
       long timeNow = currentServerTime();
 
       if (timeNow - player.getLastUsedCashItem() < 3000) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a moment before trying again.");
-         c.announce(MaplePacketCreator.sendMapleLifeError(3));
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.sendMapleLifeError(3));
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
       player.setLastUsedCashItem(timeNow);
 
-      String name = slea.readMapleAsciiString();
-      if (CharacterProcessor.getInstance().canCreateChar(name)) {
-         c.announce(MaplePacketCreator.sendMapleLifeCharacterInfo());
+      if (CharacterProcessor.getInstance().canCreateChar(packet.name())) {
+         client.announce(MaplePacketCreator.sendMapleLifeCharacterInfo());
       } else {
-         c.announce(MaplePacketCreator.sendMapleLifeNameError());
+         client.announce(MaplePacketCreator.sendMapleLifeNameError());
       }
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

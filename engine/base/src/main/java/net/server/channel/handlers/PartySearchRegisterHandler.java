@@ -23,14 +23,21 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Quasar
  */
-public class PartySearchRegisterHandler extends AbstractMaplePacketHandler {
+public class PartySearchRegisterHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
    }
 }

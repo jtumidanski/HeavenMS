@@ -22,15 +22,20 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseDeathItemPacket;
+import net.server.channel.packet.reader.UseDeathItemReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class UseDeathItemHandler extends AbstractMaplePacketHandler {
+public final class UseDeathItemHandler extends AbstractPacketHandler<UseDeathItemPacket, UseDeathItemReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int itemId = slea.readInt();
-      c.getPlayer().setItemEffect(itemId);
-      c.announce(MaplePacketCreator.itemEffect(c.getPlayer().getId(), itemId));
+   public Class<UseDeathItemReader> getReaderClass() {
+      return UseDeathItemReader.class;
+   }
+
+   @Override
+   public void handlePacket(UseDeathItemPacket packet, MapleClient client) {
+      client.getPlayer().setItemEffect(packet.itemId());
+      client.announce(MaplePacketCreator.itemEffect(client.getPlayer().getId(), packet.itemId()));
    }
 }

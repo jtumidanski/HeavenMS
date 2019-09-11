@@ -26,19 +26,24 @@ import java.util.List;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.Pair;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Ronan
  */
-public final class PlayerMapTransitionHandler extends AbstractMaplePacketHandler {
+public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       chr.setMapTransitionComplete();
 
       int beaconid = chr.getBuffSource(MapleBuffStat.HOMING_BEACON);
