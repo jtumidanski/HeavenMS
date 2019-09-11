@@ -42,23 +42,24 @@ import client.database.provider.NxCodeItemProvider;
 import client.database.provider.NxCodeProvider;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.CouponCodePacket;
+import net.server.channel.packet.reader.CouponCodeReader;
 import server.CashShop;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.Pair;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Penguins (Acrylic)
  * @author Ronan (HeavenMS)
  */
-public final class CouponCodeHandler extends AbstractMaplePacketHandler {
+public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePacket, CouponCodeReader> {
 
-   private static List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, Connection con, int codeid) {
+   private List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, Connection con, int codeid) {
       Map<Integer, Integer> couponItems = new HashMap<>();
       Map<Integer, Integer> couponPoints = new HashMap<>(5);
 
@@ -99,7 +100,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
       return ret;
    }
 
-   private static Pair<Integer, List<NxCodeItemData>> getNXCodeResult(MapleCharacter chr, String code) {
+   private Pair<Integer, List<NxCodeItemData>> getNXCodeResult(MapleCharacter chr, String code) {
       MapleClient c = chr.getClient();
 
       if (!c.attemptCsCoupon()) {
@@ -139,7 +140,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
       }).orElse(null);
    }
 
-   private static int parseCouponResult(int res) {
+   private int parseCouponResult(int res) {
       switch (res) {
          case -1:
             return 0xB0;
@@ -159,16 +160,18 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
    }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.skip(2);
-      String code = slea.readMapleAsciiString();
+   public Class<CouponCodeReader> getReaderClass() {
+      return CouponCodeReader.class;
+   }
 
-      if (c.tryAcquireClient()) {
+   @Override
+   public void handlePacket(CouponCodePacket packet, MapleClient client) {
+      if (client.tryAcquireClient()) {
          try {
-            Pair<Integer, List<NxCodeItemData>> codeRes = getNXCodeResult(c.getPlayer(), code.toUpperCase());
+            Pair<Integer, List<NxCodeItemData>> codeRes = getNXCodeResult(client.getPlayer(), packet.code().toUpperCase());
             int type = codeRes.getLeft();
             if (type < 0) {
-               c.announce(MaplePacketCreator.showCashShopMessage((byte) parseCouponResult(type)));
+               client.announce(MaplePacketCreator.showCashShopMessage((byte) parseCouponResult(type)));
             } else {
                List<Item> cashItems = new LinkedList<>();
                List<Pair<Integer, Integer>> items = new LinkedList<>();
@@ -181,10 +184,10 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
                   type = codeItemData.getType();
                   int quantity = codeItemData.getQuantity();
 
-                  CashShop cs = c.getPlayer().getCashShop();
+                  CashShop cs = client.getPlayer().getCashShop();
                   switch (type) {
                      case 0:
-                        c.getPlayer().gainMeso(quantity, false); //mesos
+                        client.getPlayer().gainMeso(quantity, false); //mesos
                         mesos += quantity;
                         break;
                      case 4:
@@ -224,7 +227,7 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
                            cs.addToInventory(it);
                            cashItems.add(it);
                         } else {
-                           MapleInventoryManipulator.addById(c, item, qty, "", -1);
+                           MapleInventoryManipulator.addById(client, item, qty, "", -1);
                            items.add(new Pair<>((int) qty, item));
                         }
                         break;
@@ -240,14 +243,14 @@ public final class CouponCodeHandler extends AbstractMaplePacketHandler {
                   }
                }
                if (nxCredit != 0 || nxPrepaid != 0) { //coupon packet can only show maple points (afaik)
-                  c.announce(MaplePacketCreator.showBoughtQuestItem(0));
+                  client.announce(MaplePacketCreator.showBoughtQuestItem(0));
                } else {
-                  c.announce(MaplePacketCreator.showCouponRedeemedItems(c.getAccID(), maplePoints, mesos, cashItems, items));
+                  client.announce(MaplePacketCreator.showCouponRedeemedItems(client.getAccID(), maplePoints, mesos, cashItems, items));
                }
-               c.enableCSActions();
+               client.enableCSActions();
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

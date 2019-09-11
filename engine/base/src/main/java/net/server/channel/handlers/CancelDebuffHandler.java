@@ -23,12 +23,19 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CancelDebuffHandler extends AbstractMaplePacketHandler {//TIP: BAD STUFF LOL!
+public final class CancelDebuffHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {//TIP: BAD STUFF LOL!
+   @Override
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
         /*List<MapleDisease> diseases = c.getPlayer().getDiseases();
          List<MapleDisease> diseases_ = new ArrayList<MapleDisease>();
          for (MapleDisease disease : diseases) {

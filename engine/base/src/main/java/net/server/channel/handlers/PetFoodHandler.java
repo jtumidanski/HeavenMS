@@ -29,26 +29,30 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.pet.PetFoodPacket;
+import net.server.channel.packet.reader.PetFoodReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class PetFoodHandler extends AbstractMaplePacketHandler {
+public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket, PetFoodReader> {
+   @Override
+   public Class<PetFoodReader> getReaderClass() {
+      return PetFoodReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
+   public void handlePacket(PetFoodPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       AutobanManager abm = chr.getAutobanManager();
       if (abm.getLastSpam(2) + 500 > currentServerTime()) {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
       abm.spam(2);
-      slea.readInt(); // timestamp issue detected thanks to Masterrulax
       abm.setTimestamp(1, Server.getInstance().getCurrentTimestamp(), 3);
       if (chr.getNoPets() == 0) {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
       int previousFullness = 100;
@@ -64,28 +68,27 @@ public final class PetFoodHandler extends AbstractMaplePacketHandler {
       }
 
       MaplePet pet = chr.getPet(slot);
-      if (pet == null) return;
+      if (pet == null) {
+         return;
+      }
 
-      short pos = slea.readShort();
-      int itemId = slea.readInt();
-
-      if (c.tryAcquireClient()) {
+      if (client.tryAcquireClient()) {
          try {
             MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
             useInv.lockInventory();
             try {
-               Item use = useInv.getItem(pos);
-               if (use == null || (itemId / 10000) != 212 || use.getItemId() != itemId || use.getQuantity() < 1) {
+               Item use = useInv.getItem(packet.position());
+               if (use == null || (packet.itemId() / 10000) != 212 || use.getItemId() != packet.itemId() || use.getQuantity() < 1) {
                   return;
                }
 
                pet.gainClosenessFullness(chr, (pet.getFullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptyness" to get +1 closeness
-               MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, pos, (short) 1, false);
+               MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, packet.position(), (short) 1, false);
             } finally {
                useInv.unlockInventory();
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

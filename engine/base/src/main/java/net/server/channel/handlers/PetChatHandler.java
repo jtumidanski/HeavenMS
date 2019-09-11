@@ -24,34 +24,34 @@ package net.server.channel.handlers;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.pet.PetChatPacket;
+import net.server.channel.packet.reader.PetChatReader;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class PetChatHandler extends AbstractMaplePacketHandler {
+public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket, PetChatReader> {
+   @Override
+   public Class<PetChatReader> getReaderClass() {
+      return PetChatReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int petId = slea.readInt();
-      slea.readInt();
-      slea.readByte();
-      int act = slea.readByte();
-      byte pet = c.getPlayer().getPetIndex(petId);
-      if ((pet < 0 || pet > 3) || (act < 0 || act > 9)) {
+   public void handlePacket(PetChatPacket packet, MapleClient client) {
+      byte pet = client.getPlayer().getPetIndex(packet.petId());
+      if ((pet < 0 || pet > 3) || (packet.act() < 0 || packet.act() > 9)) {
          return;
       }
-      String text = slea.readMapleAsciiString();
-      if (text.length() > Byte.MAX_VALUE) {
-         AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with pets.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to send text with length of " + text.length());
-         c.disconnect(true, false);
+      if (packet.text().length() > Byte.MAX_VALUE) {
+         AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit with pets.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.text().length());
+         client.disconnect(true, false);
          return;
       }
-      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.petChat(c.getPlayer().getId(), pet, act, text), true);
+      client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.petChat(client.getPlayer().getId(), pet, packet.act(), packet.text()), true);
       if (ServerConstants.USE_ENABLE_CHAT_LOG) {
-         LogHelper.logChat(c, "Pet", text);
+         LogHelper.logChat(client, "Pet", packet.text());
       }
    }
 }

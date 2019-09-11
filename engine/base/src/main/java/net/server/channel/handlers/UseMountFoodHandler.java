@@ -29,33 +29,35 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ExpTable;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.UseMountFoodPacket;
+import net.server.channel.packet.reader.UseMountFoodReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author PurpleMadness
  * @author Ronan
  */
-public final class UseMountFoodHandler extends AbstractMaplePacketHandler {
+public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoodPacket, UseMountFoodReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.skip(4);
-      short pos = slea.readShort();
-      int itemid = slea.readInt();
+   public Class<UseMountFoodReader> getReaderClass() {
+      return UseMountFoodReader.class;
+   }
 
-      MapleCharacter chr = c.getPlayer();
+   @Override
+   public void handlePacket(UseMountFoodPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       MapleMount mount = chr.getMount();
       MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
 
-      if (c.tryAcquireClient()) {
+      if (client.tryAcquireClient()) {
          try {
             Boolean mountLevelup = null;
 
             useInv.lockInventory();
             try {
-               Item item = useInv.getItem(pos);
-               if (item != null && item.getItemId() == itemid && mount != null) {
+               Item item = useInv.getItem(packet.position());
+               if (item != null && item.getItemId() == packet.itemId() && mount != null) {
                   int curTiredness = mount.getTiredness();
                   int healedTiredness = Math.min(curTiredness, 30);
 
@@ -73,7 +75,7 @@ public final class UseMountFoodHandler extends AbstractMaplePacketHandler {
                      mountLevelup = levelup;
                   }
 
-                  MapleInventoryManipulator.removeById(c, MapleInventoryType.USE, itemid, 1, true, false);
+                  MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, packet.itemId(), 1, true, false);
                }
             } finally {
                useInv.unlockInventory();
@@ -83,7 +85,7 @@ public final class UseMountFoodHandler extends AbstractMaplePacketHandler {
                chr.getMap().broadcastMessage(MaplePacketCreator.updateMount(chr.getId(), mount, mountLevelup));
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

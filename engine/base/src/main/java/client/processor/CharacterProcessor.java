@@ -22,7 +22,6 @@ import client.MapleSkinColor;
 import client.Skill;
 import client.SkillEntry;
 import client.SkillFactory;
-import client.SkillMacro;
 import client.creator.CharacterFactoryRecipe;
 import client.database.administrator.AreaInfoAdministrator;
 import client.database.administrator.BbsThreadAdministrator;
@@ -82,6 +81,7 @@ import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import net.server.Server;
+import net.server.SkillMacro;
 import net.server.guild.MapleGuildCharacter;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
@@ -474,8 +474,8 @@ public class CharacterProcessor {
 
             SkillMacroProvider.getInstance().getForCharacter(connection, characterData.getId()).forEach(skillMacroData -> {
                int position = skillMacroData.getPosition();
-               SkillMacro macro = new SkillMacro(skillMacroData.getSkill1Id(), skillMacroData.getSkill2Id(),
-                     skillMacroData.getSkill3Id(), skillMacroData.getName(), skillMacroData.getShout(),
+               SkillMacro macro = new SkillMacro(skillMacroData.getName(), skillMacroData.getShout(), skillMacroData.getSkill1Id(), skillMacroData.getSkill2Id(),
+                     skillMacroData.getSkill3Id(),
                      position);
                mapleCharacter.updateMacros(position, macro);
             });

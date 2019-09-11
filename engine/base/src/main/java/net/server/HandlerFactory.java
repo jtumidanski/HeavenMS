@@ -273,23 +273,11 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.BBS_OPERATION, new BBSOperationHandler());
       packetProcessor.registerHandler(RecvOpcode.SKILL_EFFECT, new SkillEffectHandler());
       packetProcessor.registerHandler(RecvOpcode.MESSENGER, new MessengerHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
-      packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.RANGED_ATTACK, new RangedAttackHandler());
-      packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
-      packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
-      packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.NPC_ACTION, new NPCAnimationHandler());
       packetProcessor.registerHandler(RecvOpcode.CHECK_CASH, new TouchingCashShopHandler());
+      packetProcessor.registerHandler(RecvOpcode.SPAWN_PET, new SpawnPetHandler());
+      packetProcessor.registerHandler(RecvOpcode.NPC_ACTION, new NPCAnimationHandler());
       packetProcessor.registerHandler(RecvOpcode.CASHSHOP_OPERATION, new CashOperationHandler());
       packetProcessor.registerHandler(RecvOpcode.COUPON_CODE, new CouponCodeHandler());
-      packetProcessor.registerHandler(RecvOpcode.SPAWN_PET, new SpawnPetHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
       packetProcessor.registerHandler(RecvOpcode.PET_CHAT, new PetChatHandler());
       packetProcessor.registerHandler(RecvOpcode.PET_COMMAND, new PetCommandHandler());
       packetProcessor.registerHandler(RecvOpcode.PET_FOOD, new PetFoodHandler());
@@ -303,6 +291,18 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.CLOSE_CHALKBOARD, new CloseChalkboardHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_MOUNT_FOOD, new UseMountFoodHandler());
       packetProcessor.registerHandler(RecvOpcode.MTS_OPERATION, new MTSHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
+      packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.RANGED_ATTACK, new RangedAttackHandler());
+      packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
+      packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
+      packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
+
       packetProcessor.registerHandler(RecvOpcode.RING_ACTION, new RingActionHandler());
       packetProcessor.registerHandler(RecvOpcode.SPOUSE_CHAT, new SpouseChatHandler());
       packetProcessor.registerHandler(RecvOpcode.PET_AUTO_POT, new PetAutoPotHandler());

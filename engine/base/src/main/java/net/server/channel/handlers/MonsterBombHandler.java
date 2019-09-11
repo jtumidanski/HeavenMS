@@ -22,22 +22,27 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.MonsterBombPacket;
+import net.server.channel.packet.reader.MonsterBombReader;
 import server.life.MapleMonster;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MonsterBombHandler extends AbstractMaplePacketHandler {
+public final class MonsterBombHandler extends AbstractPacketHandler<MonsterBombPacket, MonsterBombReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int oid = slea.readInt();
-      MapleMonster monster = c.getPlayer().getMap().getMonsterByOid(oid);
-      if (!c.getPlayer().isAlive() || monster == null) {
+   public Class<MonsterBombReader> getReaderClass() {
+      return MonsterBombReader.class;
+   }
+
+   @Override
+   public void handlePacket(MonsterBombPacket packet, MapleClient client) {
+      MapleMonster monster = client.getPlayer().getMap().getMonsterByOid(packet.objectId());
+      if (!client.getPlayer().isAlive() || monster == null) {
          return;
       }
       if (monster.getId() == 8500003 || monster.getId() == 8500004) {
          monster.getMap().broadcastMessage(MaplePacketCreator.killMonster(monster.getObjectId(), 4));
-         c.getPlayer().getMap().removeMapObject(oid);
+         client.getPlayer().getMap().removeMapObject(packet.objectId());
       }
    }
 }

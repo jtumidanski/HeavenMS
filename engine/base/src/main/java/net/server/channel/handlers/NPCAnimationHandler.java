@@ -22,30 +22,35 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
 import net.opcodes.SendOpcode;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.npc.BaseNPCAnimationPacket;
+import net.server.channel.packet.npc.NPCMovePacket;
+import net.server.channel.packet.npc.NPCTalkPacket;
+import net.server.channel.packet.reader.NPCAnimationReader;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
-public final class NPCAnimationHandler extends AbstractMaplePacketHandler {
+public final class NPCAnimationHandler extends AbstractPacketHandler<BaseNPCAnimationPacket, NPCAnimationReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      if (c.getPlayer().isChangingMaps()) {
+   public Class<NPCAnimationReader> getReaderClass() {
+      return NPCAnimationReader.class;
+   }
+
+   @Override
+   public void handlePacket(BaseNPCAnimationPacket packet, MapleClient client) {
+      if (client.getPlayer().isChangingMaps()) {
          return;
       }
 
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      int length = (int) slea.available();
-      if (length == 6) { // NPC Talk
-         mplew.writeShort(SendOpcode.NPC_ACTION.getValue());
-         mplew.writeInt(slea.readInt());
-         mplew.writeShort(slea.readShort());
-         c.announce(mplew.getPacket());
-      } else if (length > 6) { // NPC Move
-         byte[] bytes = slea.read(length - 9);
-         mplew.writeShort(SendOpcode.NPC_ACTION.getValue());
-         mplew.write(bytes);
-         c.announce(mplew.getPacket());
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      if (packet instanceof NPCTalkPacket) {
+         writer.writeShort(SendOpcode.NPC_ACTION.getValue());
+         writer.writeInt(((NPCTalkPacket) packet).first());
+         writer.writeShort(((NPCTalkPacket) packet).second());
+      } else if (packet instanceof NPCMovePacket) {
+         writer.writeShort(SendOpcode.NPC_ACTION.getValue());
+         writer.write(((NPCMovePacket) packet).movement());
       }
+      client.announce(writer.getPacket());
    }
 }

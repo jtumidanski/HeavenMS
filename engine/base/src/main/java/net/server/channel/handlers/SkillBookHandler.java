@@ -30,30 +30,36 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.SkillBookPacket;
+import net.server.channel.packet.reader.SkillBookReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class SkillBookHandler extends AbstractMaplePacketHandler {
+public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacket, SkillBookReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor accessor, MapleClient c) {
-      if (!c.getPlayer().isAlive()) {
-         c.announce(MaplePacketCreator.enableActions());
-         return;
+   public Class<SkillBookReader> getReaderClass() {
+      return SkillBookReader.class;
+   }
+
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      if (!client.getPlayer().isAlive()) {
+         client.announce(MaplePacketCreator.enableActions());
+         return false;
       }
+      return true;
+   }
 
-      accessor.readInt();
-      short slot = accessor.readShort();
-      int itemId = accessor.readInt();
-
-      MapleCharacter player = c.getPlayer();
-      if (c.tryAcquireClient()) {
+   @Override
+   public void handlePacket(SkillBookPacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
+      if (client.tryAcquireClient()) {
          int skillId;
          try {
             MapleInventory inv = player.getInventory(MapleInventoryType.USE);
-            Item toUse = inv.getItem(slot);
-            if (toUse == null || toUse.getItemId() != itemId) {
+            Item toUse = inv.getItem(packet.slot());
+            if (toUse == null || toUse.getItemId() != packet.itemId()) {
                return;
             }
             Map<String, Integer> skillData = MapleItemInformationProvider.getInstance().getSkillStats(toUse.getItemId(), player.getJob().getId());
@@ -71,7 +77,7 @@ public final class SkillBookHandler extends AbstractMaplePacketHandler {
                   boolean bookCanBeUsed = meetsPrerequisiteLevel && notMastered;
                   boolean success = false;
                   if (bookCanBeUsed) {
-                     if (!consumeBook(c, slot, inv, toUse)) {
+                     if (!consumeBook(client, packet.slot(), inv, toUse)) {
                         return;
                      }
                      if (MapleItemInformationProvider.rollSuccessChance(skillData.get("success"))) {
@@ -85,7 +91,7 @@ public final class SkillBookHandler extends AbstractMaplePacketHandler {
                }, () -> player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, false, false)));
             }
          } finally {
-            c.releaseClient();
+            client.releaseClient();
          }
       }
    }

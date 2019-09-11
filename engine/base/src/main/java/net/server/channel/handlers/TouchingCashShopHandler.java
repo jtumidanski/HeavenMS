@@ -23,15 +23,23 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.packet.NoOpPacket;
+import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Terry Han (Acrylic)
  */
-public final class TouchingCashShopHandler extends AbstractMaplePacketHandler {
+public final class TouchingCashShopHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      c.announce(MaplePacketCreator.showCash(c.getPlayer()));
+   public Class<NoOpReader> getReaderClass() {
+      return NoOpReader.class;
+   }
+
+   @Override
+   public void handlePacket(NoOpPacket packet, MapleClient client) {
+      client.announce(MaplePacketCreator.showCash(client.getPlayer()));
    }
 }

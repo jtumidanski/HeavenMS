@@ -22,21 +22,20 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.SkillMacro;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.SkillMacroPacket;
+import net.server.channel.packet.reader.SkillMacroReader;
 
-public final class SkillMacroHandler extends AbstractMaplePacketHandler {
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int num = slea.readByte();
-      for (int i = 0; i < num; i++) {
-         String name = slea.readMapleAsciiString();
-         int shout = slea.readByte();
-         int skill1 = slea.readInt();
-         int skill2 = slea.readInt();
-         int skill3 = slea.readInt();
-         SkillMacro macro = new SkillMacro(skill1, skill2, skill3, name, shout, i);
-         c.getPlayer().updateMacros(i, macro);
+public final class SkillMacroHandler extends AbstractPacketHandler<SkillMacroPacket, SkillMacroReader> {
+   @Override
+   public Class<SkillMacroReader> getReaderClass() {
+      return SkillMacroReader.class;
+   }
+
+   @Override
+   public void handlePacket(SkillMacroPacket packet, MapleClient client) {
+      for (int i = 0; i < packet.macros().length; i++) {
+         client.getPlayer().updateMacros(i, packet.macros()[i]);
       }
    }
 }

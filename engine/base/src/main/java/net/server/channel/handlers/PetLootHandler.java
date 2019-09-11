@@ -27,35 +27,39 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MaplePet;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.pet.PetLootPacket;
+import net.server.channel.packet.reader.PetLootReader;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author TheRamon
  * @author Ronan
  */
-public final class PetLootHandler extends AbstractMaplePacketHandler {
+public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket, PetLootReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public Class<PetLootReader> getReaderClass() {
+      return PetLootReader.class;
+   }
+
+   @Override
+   public void handlePacket(PetLootPacket packet, MapleClient c) {
       MapleCharacter chr = c.getPlayer();
       if (currentServerTime() - chr.getPetLootCd() < ServerConstants.PET_LOOT_UPON_ATTACK) {
          c.announce(MaplePacketCreator.enableActions());
          return;
       }
 
-      int petIndex = chr.getPetIndex(slea.readInt());
+      int petIndex = chr.getPetIndex(packet.petIndex());
       MaplePet pet = chr.getPet(petIndex);
       if (pet == null || !pet.isSummoned()) {
          c.announce(MaplePacketCreator.enableActions());
          return;
       }
 
-      slea.skip(13);
-      int oid = slea.readInt();
-      MapleMapObject ob = chr.getMap().getMapObject(oid);
+      MapleMapObject ob = chr.getMap().getMapObject(packet.objectId());
       try {
          MapleMapItem mapitem = (MapleMapItem) ob;
          if (mapitem.getMeso() > 0) {

@@ -36,7 +36,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import client.BuddylistEntry;
-import client.processor.CharacterProcessor;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
@@ -51,7 +50,6 @@ import client.MapleStat;
 import client.MonsterBook;
 import client.Skill;
 import client.SkillEntry;
-import client.SkillMacro;
 import client.database.data.BbsThreadData;
 import client.database.data.GlobalUserRank;
 import client.database.data.GuildData;
@@ -65,6 +63,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
 import client.newyear.NewYearCardRecord;
+import client.processor.CharacterProcessor;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
 import constants.ExpTable;
@@ -77,6 +76,7 @@ import constants.skills.ThunderBreaker;
 import net.opcodes.SendOpcode;
 import net.server.PlayerCoolDownValueHolder;
 import net.server.Server;
+import net.server.SkillMacro;
 import net.server.channel.Channel;
 import net.server.channel.handlers.PlayerInteractionHandler;
 import net.server.channel.handlers.SummonDamageHandler.SummonAttackEntry;
@@ -107,7 +107,6 @@ import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
-import server.maps.MapleSoldItem;
 import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMiniGame;
@@ -116,6 +115,7 @@ import server.maps.MapleMist;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MapleReactor;
+import server.maps.MapleSoldItem;
 import server.maps.MapleSummon;
 import server.movement.LifeMovementFragment;
 import tools.data.input.SeekableLittleEndianAccessor;
@@ -5083,11 +5083,11 @@ public class MaplePacketCreator {
       for (int i = 0; i < 5; i++) {
          SkillMacro macro = macros[i];
          if (macro != null) {
-            mplew.writeMapleAsciiString(macro.getName());
-            mplew.write(macro.getShout());
-            mplew.writeInt(macro.getSkill1());
-            mplew.writeInt(macro.getSkill2());
-            mplew.writeInt(macro.getSkill3());
+            mplew.writeMapleAsciiString(macro.name());
+            mplew.write(macro.shout());
+            mplew.writeInt(macro.skill1());
+            mplew.writeInt(macro.skill2());
+            mplew.writeInt(macro.skill3());
          }
       }
       return mplew.getPacket();
@@ -8259,7 +8259,7 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   private static byte[] MassacreResult(byte nRank,int nIncExp) {
+   private static byte[] MassacreResult(byte nRank, int nIncExp) {
       //CField_MassacreResult__OnMassacreResult @ 0x005617C5
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.PYRAMID_SCORE.getValue()); //MASSACRERESULT | 0x009E
@@ -8297,7 +8297,7 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   private static byte[] Tournament__SetPrize(byte bSetPrize, byte bHasPrize,int nItemID1,int nItemID2) {
+   private static byte[] Tournament__SetPrize(byte bSetPrize, byte bHasPrize, int nItemID1, int nItemID2) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.TOURNAMENT_SET_PRIZE.getValue());
 
@@ -8307,8 +8307,7 @@ public class MaplePacketCreator {
 
       mplew.write(bHasPrize);
 
-      if(bHasPrize != 0)
-      {
+      if (bHasPrize != 0) {
          mplew.writeInt(nItemID1);
          mplew.writeInt(nItemID2);
       }

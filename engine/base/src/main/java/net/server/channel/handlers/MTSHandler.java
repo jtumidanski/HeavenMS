@@ -38,20 +38,35 @@ import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.Channel;
+import net.server.channel.packet.mts.AddToCartPacket;
+import net.server.channel.packet.mts.BaseMTSPacket;
+import net.server.channel.packet.mts.BuyAuctionItemNowPacket;
+import net.server.channel.packet.mts.BuyAuctionItemPacket;
+import net.server.channel.packet.mts.BuyItemFromCartPacket;
+import net.server.channel.packet.mts.CancelSalePacket;
+import net.server.channel.packet.mts.CancelWantedCartPacket;
+import net.server.channel.packet.mts.ChangePagePacket;
+import net.server.channel.packet.mts.DeleteFromCartPacket;
+import net.server.channel.packet.mts.ListWantedItemPacket;
+import net.server.channel.packet.mts.PlaceItemForSalePacket;
+import net.server.channel.packet.mts.PutItemUpForActionPacket;
+import net.server.channel.packet.mts.SearchPacket;
+import net.server.channel.packet.mts.SendOfferForWantedPacket;
+import net.server.channel.packet.mts.TransferItemPacket;
+import net.server.channel.packet.reader.MTSReader;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MTSHandler extends AbstractMaplePacketHandler {
-
-   private static byte[] getMTS(int tab, int type, int page) {
+//TODO this needs a lot more work.
+public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket, MTSReader> {
+   private byte[] getMTS(int tab, int type, int page) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          List<MTSItemInfo> items = new ArrayList<>();
          long pages;
@@ -77,40 +92,49 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
    }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public Class<MTSReader> getReaderClass() {
+      return MTSReader.class;
+   }
+
+   @Override
+   public boolean successfulProcess(MapleClient client) {
+      return client.getPlayer().getCashShop().isOpened();
+   }
+
+   @Override
+   public final void handlePacket(BaseMTSPacket packet, MapleClient c) {
       // TODO add karma-to-untradeable flag on sold items here
 
-      if (!c.getPlayer().getCashShop().isOpened()) {
-         return;
-      }
-      if (slea.available() > 0) {
-         byte op = slea.readByte();
-         if (op == 2) { //put item up for sale
-            putItemUpForSale(slea, c);
-         } else if (op == 3) { //send offer for wanted item
-         } else if (op == 4) { //list wanted item
-            listWantedItem(slea);
-         } else if (op == 5) { //change page
-            changePage(slea, c);
-         } else if (op == 6) { //search
-            search(slea, c);
-         } else if (op == 7) { //cancel sale
-            cancelSale(slea, c);
-         } else if (op == 8) { //transfer item from transfer inv.
-            transferItem(slea, c);
-         } else if (op == 9) { //add to cart
-            addToCart(slea, c);
-         } else if (op == 10) { //delete from cart
-            deleteFromCart(slea, c);
-         } else if (op == 12) { //put item up for auction
-         } else if (op == 13) { //cancel wanted cart thing
-         } else if (op == 14) { //buy auction item now
-         } else if (op == 16) { //buy
-            buyItem(slea, c);
-         } else if (op == 17) { //buy from cart
-            buyFromCart(slea, c);
+      if (packet.available()) {
+         byte op = packet.operation();
+         if (packet instanceof PlaceItemForSalePacket) {
+            putItemUpForSale(c, ((PlaceItemForSalePacket) packet).quantity(), ((PlaceItemForSalePacket) packet).price(),
+                  ((PlaceItemForSalePacket) packet).itemId(), ((PlaceItemForSalePacket) packet).slot());
+         } else if (packet instanceof SendOfferForWantedPacket) {
+         } else if (packet instanceof ListWantedItemPacket) {
+         } else if (packet instanceof ChangePagePacket) {
+            changePage(c, ((ChangePagePacket) packet).tab(), ((ChangePagePacket) packet).theType(),
+                  ((ChangePagePacket) packet).page());
+         } else if (packet instanceof SearchPacket) {
+            search(c, ((SearchPacket) packet).tab(), ((SearchPacket) packet).theType(), ((SearchPacket) packet).ci(),
+                  ((SearchPacket) packet).search());
+         } else if (packet instanceof CancelSalePacket) {
+            cancelSale(c, ((CancelSalePacket) packet).itemId());
+         } else if (packet instanceof TransferItemPacket) {
+            transferItem(c, ((TransferItemPacket) packet).itemId());
+         } else if (packet instanceof AddToCartPacket) {
+            addToCart(c, ((AddToCartPacket) packet).itemId());
+         } else if (packet instanceof DeleteFromCartPacket) {
+            deleteFromCart(c, ((DeleteFromCartPacket) packet).itemId());
+         } else if (packet instanceof PutItemUpForActionPacket) {
+         } else if (packet instanceof CancelWantedCartPacket) {
+         } else if (packet instanceof BuyAuctionItemNowPacket) {
+         } else if (packet instanceof BuyAuctionItemPacket) {
+            buyItem(c, ((BuyAuctionItemPacket) packet).itemId());
+         } else if (packet instanceof BuyItemFromCartPacket) {
+            buyFromCart(c, ((BuyItemFromCartPacket) packet).itemId());
          } else {
-            System.out.println("Unhandled OP(MTS): " + op + " Packet: " + slea.toString());
+            System.out.println("Unhandled OP(MTS): " + op + " Packet: " + packet.toString());
          }
       } else {
          c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
@@ -119,9 +143,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
 
 
    //TODO - why is this different then MTSHandler.buyFromCart ?
-   private void buyItem(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readInt(); //id of the item
-
+   private void buyItem(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection ->
             MtsItemProvider.getInstance().getSaleInfoById(connection, id).ifPresentOrElse(info -> {
                int price = info.getRight() + 100 + (int) (info.getRight() * 0.1); //taxes
@@ -159,8 +181,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
             }, () -> c.announce(MaplePacketCreator.MTSFailBuy())));
    }
 
-   private void deleteFromCart(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readInt(); //id of the item
+   private void deleteFromCart(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection -> MtsCartAdministrator.getInstance().removeItemFromCart(connection, id, c.getPlayer().getId()));
 
       c.announce(getCart(c.getPlayer().getId()));
@@ -169,9 +190,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
    }
 
-   private void addToCart(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readInt(); //id of the item
-
+   private void addToCart(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection -> {
          boolean itemForSaleBySomeoneElse = MtsItemProvider.getInstance().isItemForSaleBySomeoneElse(connection, id, c.getPlayer().getId());
          if (itemForSaleBySomeoneElse) {
@@ -189,9 +208,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       });
    }
 
-   private void transferItem(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readInt(); //id of the item
-
+   private void transferItem(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection -> MtsItemProvider.getInstance().getTransferItem(connection, c.getPlayer().getId(), id)
             .ifPresent(item -> {
                item.setPosition(c.getPlayer().getInventory(ItemConstants.getInventoryType(item.getItemId())).getNextFreeSlot());
@@ -206,9 +223,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
             }));
    }
 
-   private void cancelSale(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readInt(); //id of the item
-
+   private void cancelSale(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection -> {
          MtsItemAdministrator.getInstance().cancelSale(connection, c.getPlayer().getId(), id);
          MtsCartAdministrator.getInstance().removeItemFromCarts(connection, id);
@@ -220,12 +235,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
    }
 
-   private void search(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int tab = slea.readInt();
-      int type = slea.readInt();
-      slea.readInt();
-      int ci = slea.readInt();
-      String search = slea.readMapleAsciiString();
+   private void search(MapleClient c, int tab, int type, int ci, String search) {
       c.getPlayer().setSearch(search);
       c.getPlayer().changeTab(tab);
       c.getPlayer().changeType(type);
@@ -238,18 +248,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
    }
 
-   private void listWantedItem(SeekableLittleEndianAccessor slea) {
-      slea.readInt();
-      slea.readInt();
-      slea.readInt();
-      slea.readShort();
-      slea.readMapleAsciiString();
-   }
-
-   private void changePage(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int tab = slea.readInt();
-      int type = slea.readInt();
-      int page = slea.readInt();
+   private void changePage(MapleClient c, int tab, int type, int page) {
       c.getPlayer().changePage(page);
       if (tab == 4 && type == 0) {
          c.announce(getCart(c.getPlayer().getId()));
@@ -266,51 +265,11 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
    }
 
-   private void putItemUpForSale(SeekableLittleEndianAccessor slea, MapleClient c) {
-      byte itemtype = slea.readByte();
-      int itemid = slea.readInt();
-      slea.readShort();
-      slea.skip(7);
-      short stars = 1;
-      if (itemtype == 1) {
-         slea.skip(32);
-      } else {
-         stars = slea.readShort();
-      }
-      slea.readMapleAsciiString(); //another useless thing (owner)
-      if (itemtype == 1) {
-         slea.skip(32);
-      } else {
-         slea.readShort();
-      }
-      short slot;
-      short quantity;
-      if (itemtype != 1) {
-         if (itemid / 10000 == 207 || itemid / 10000 == 233) {
-            slea.skip(8);
-         }
-         slot = (short) slea.readInt();
-      } else {
-         slot = (short) slea.readInt();
-      }
-      if (itemtype != 1) {
-         if (itemid / 10000 == 207 || itemid / 10000 == 233) {
-            quantity = stars;
-            slea.skip(4);
-         } else {
-            quantity = (short) slea.readInt();
-         }
-      } else {
-         quantity = (byte) slea.readInt();
-      }
-      int price = slea.readInt();
-      if (itemtype == 1) {
-         quantity = 1;
-      }
-      if (quantity < 0 || price < 110 || c.getPlayer().getItemQuantity(itemid, false) < quantity) {
+   private void putItemUpForSale(MapleClient c, short quantity, int price, int itemId, short slot) {
+      if (quantity < 0 || price < 110 || c.getPlayer().getItemQuantity(itemId, false) < quantity) {
          return;
       }
-      MapleInventoryType invType = ItemConstants.getInventoryType(itemid);
+      MapleInventoryType invType = ItemConstants.getInventoryType(itemId);
       Item i = c.getPlayer().getInventory(invType).getItem(slot).copy();
       if (i != null && c.getPlayer().getMeso() >= 5000) {
 
@@ -393,9 +352,7 @@ public final class MTSHandler extends AbstractMaplePacketHandler {
       MtsCartAdministrator.getInstance().removeItemFromCarts(con, id);
    }
 
-   private void buyFromCart(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int id = slea.readInt(); //id of the item
-
+   private void buyFromCart(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection ->
             MtsItemProvider.getInstance().getSaleInfoById(connection, id).ifPresentOrElse(info -> {
                int price = info.getRight() + 100 + (int) (info.getRight() * 0.1);

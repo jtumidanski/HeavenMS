@@ -22,44 +22,53 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.processor.NoteProcessor;
 import client.database.administrator.NoteAdministrator;
 import client.database.provider.NoteProvider;
-import net.AbstractMaplePacketHandler;
+import client.processor.NoteProcessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.BaseNoteActionPacket;
+import net.server.channel.packet.ClearNotePacket;
+import net.server.channel.packet.SendNotePacket;
+import net.server.channel.packet.reader.NoteActionReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class NoteActionHandler extends AbstractMaplePacketHandler {
+public final class NoteActionHandler extends AbstractPacketHandler<BaseNoteActionPacket, NoteActionReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int action = slea.readByte();
-      if (action == 0 && c.getPlayer().getCashShop().getAvailableNotes() > 0) {
-         String charname = slea.readMapleAsciiString();
-         String message = slea.readMapleAsciiString();
-         if (c.getPlayer().getCashShop().isOpened()) {
-            c.announce(MaplePacketCreator.showCashInventory(c));
-         }
+   public Class<NoteActionReader> getReaderClass() {
+      return NoteActionReader.class;
+   }
 
-         NoteProcessor.getInstance().sendNote(charname, c.getPlayer().getName(), message, (byte) 1);
-         c.getPlayer().getCashShop().decreaseNotes();
-      } else if (action == 1) {
-         int num = slea.readByte();
-         slea.readByte();
-         slea.readByte();
-         int fame = DatabaseConnection.getInstance().withConnectionResult(connection -> {
-            int fameCount = 0;
-            for (int i = 0; i < num; i++) {
-               int id = slea.readInt();
-               slea.readByte(); //Fame, but we read it from the database :)
-               fameCount += NoteProvider.getInstance().getFameForActiveNotes(connection, id).orElse(0);
-               NoteAdministrator.getInstance().clearNote(connection, id);
-            }
-            return fameCount;
-         }).orElse(0);
-         if (fame > 0) {
-            c.getPlayer().gainFame(fame);
-         }
+   @Override
+   public void handlePacket(BaseNoteActionPacket packet, MapleClient client) {
+      if (packet instanceof SendNotePacket && client.getPlayer().getCashShop().getAvailableNotes() > 0) {
+         sendNote((SendNotePacket) packet, client);
+      } else if (packet instanceof ClearNotePacket) {
+         clearNotes((ClearNotePacket) packet, client);
       }
+   }
+
+   private void clearNotes(ClearNotePacket packet, MapleClient client) {
+      int fame = DatabaseConnection.getInstance().withConnectionResult(connection -> {
+         int fameCount = 0;
+         for (int i = 0; i < packet.ids().length; i++) {
+            int id = packet.ids()[i];
+            fameCount += NoteProvider.getInstance().getFameForActiveNotes(connection, id).orElse(0);
+            NoteAdministrator.getInstance().clearNote(connection, id);
+         }
+         return fameCount;
+      }).orElse(0);
+      if (fame > 0) {
+         client.getPlayer().gainFame(fame);
+      }
+   }
+
+   private void sendNote(SendNotePacket packet, MapleClient client) {
+      if (client.getPlayer().getCashShop().isOpened()) {
+         client.announce(MaplePacketCreator.showCashInventory(client));
+      }
+
+      NoteProcessor.getInstance().sendNote(packet.characterName(), client.getPlayer().getName(), packet.message(), (byte) 1);
+      client.getPlayer().getCashShop().decreaseNotes();
    }
 }
