@@ -49,6 +49,10 @@ import constants.skills.Rogue;
 import constants.skills.ThunderBreaker;
 import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
+import net.server.PacketReader;
+import net.server.channel.packet.AttackPacket;
+import net.server.channel.packet.reader.DamageReader;
+import net.server.channel.worker.PacketReaderFactory;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
@@ -56,19 +60,22 @@ import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
+public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket, DamageReader> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      //chr.setPetLootCd(currentServerTime());
-        
-        /*long timeElapsed = currentServerTime() - chr.getAutobanManager().getLastSpam(8);
-        if(timeElapsed < 300) {
-                AutobanFactory.FAST_ATTACK.alert(chr, "Time: " + timeElapsed);
-        }
-        chr.getAutobanManager().spam(8);*/
+   public Class<DamageReader> getReaderClass() {
+      return DamageReader.class;
+   }
 
-      AttackInfo attack = parseDamage(slea, chr, false, false);
+   @Override
+   public void handlePacket(SeekableLittleEndianAccessor accessor, MapleClient client) {
+      DamageReader damageReader = (DamageReader) PacketReaderFactory.getInstance().get(getReaderClass());
+      handlePacket(damageReader.read(accessor, client.getPlayer(), false, false), client);
+   }
+
+   @Override
+   public final void handlePacket(AttackPacket attack, MapleClient c) {
+      MapleCharacter chr = c.getPlayer();
+
       if (chr.getBuffEffect(MapleBuffStat.MORPH) != null) {
          if (chr.getBuffEffect(MapleBuffStat.MORPH).isMorphWithoutAttack()) {
             // How are they attacking when the client won't let them?
@@ -77,25 +84,25 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
          }
       }
 
-      if (chr.getDojoEnergy() < 10000 && (attack.skill == Beginner.BAMBOO_RAIN || attack.skill == Noblesse.BAMBOO_RAIN || attack.skill == Legend.BAMBOO_THRUST)) {
+      if (chr.getDojoEnergy() < 10000 && (attack.skill() == Beginner.BAMBOO_RAIN || attack.skill() == Noblesse.BAMBOO_RAIN || attack.skill() == Legend.BAMBOO_THRUST)) {
          // PE hacking or maybe just lagging
          return;
       }
-      if (chr.getMap().isDojoMap() && attack.numAttacked > 0) {
+      if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_ATK);
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
       }
 
-      chr.getMap().broadcastMessage(chr, MaplePacketCreator.closeRangeAttack(chr, attack.skill, attack.skilllevel, attack.stance, attack.numAttackedAndDamage, attack.allDamage, attack.speed, attack.direction, attack.display), false, true);
+      chr.getMap().broadcastMessage(chr, MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, true);
       int numFinisherOrbs = 0;
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);
-      if (GameConstants.isFinisherSkill(attack.skill)) {
+      if (GameConstants.isFinisherSkill(attack.skill())) {
          if (comboBuff != null) {
             numFinisherOrbs = comboBuff - 1;
          }
          chr.handleOrbconsume();
-      } else if (attack.numAttacked > 0) {
-         if (attack.skill != Crusader.SHOUT && comboBuff != null) {
+      } else if (attack.numAttacked() > 0) {
+         if (attack.skill() != Crusader.SHOUT && comboBuff != null) {
             int orbCount = chr.getBuffedValue(MapleBuffStat.COMBO);
             int comboId = chr.isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
             int advancedComboId = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
@@ -138,21 +145,21 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
                }
             }
          } else if (chr.getJob().isA(MapleJob.MARAUDER)) {
-            SkillFactory.executeIfHasSkill(chr, Marauder.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked));
+            SkillFactory.executeIfHasSkill(chr, Marauder.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
          } else if (chr.getJob().isA(MapleJob.THUNDERBREAKER2)) {
-            SkillFactory.executeIfHasSkill(chr, ThunderBreaker.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked));
+            SkillFactory.executeIfHasSkill(chr, ThunderBreaker.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
          }
       }
-      if (attack.numAttacked > 0 && attack.skill == DragonKnight.SACRIFICE) {
+      if (attack.numAttacked() > 0 && attack.skill() == DragonKnight.SACRIFICE) {
          int totDamageToOneMonster = 0; // sacrifice attacks only 1 mob with 1 attack
-         final Iterator<List<Integer>> dmgIt = attack.allDamage.values().iterator();
+         final Iterator<List<Integer>> dmgIt = attack.getDamage().values().iterator();
          if (dmgIt.hasNext()) {
             totDamageToOneMonster = dmgIt.next().get(0);
          }
 
-         chr.safeAddHP(-1 * totDamageToOneMonster * attack.getAttackEffect(chr, null).getX() / 100);
+         chr.safeAddHP(-1 * totDamageToOneMonster * getAttackEffect(attack, chr, null).getX() / 100);
       }
-      if (attack.numAttacked > 0 && attack.skill == WhiteKnight.CHARGE_BLOW) {
+      if (attack.numAttacked() > 0 && attack.skill() == WhiteKnight.CHARGE_BLOW) {
          SkillFactory.executeIfHasSkill(chr, Paladin.ADVANCED_CHARGE, (skill, skillLevel) -> {
             boolean advanceChargeProbability = false;
             if (skillLevel > 0) {
@@ -164,13 +171,13 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
          });
       }
       int attackCount = 1;
-      if (attack.skill != 0) {
-         attackCount = attack.getAttackEffect(chr, null).getAttackCount();
+      if (attack.skill() != 0) {
+         attackCount = getAttackEffect(attack, chr, null).getAttackCount();
       }
-      if (numFinisherOrbs == 0 && GameConstants.isFinisherSkill(attack.skill)) {
+      if (numFinisherOrbs == 0 && GameConstants.isFinisherSkill(attack.skill())) {
          return;
       }
-      if (attack.skill % 10000000 == 1009) { // bamboo
+      if (attack.skill() % 10000000 == 1009) { // bamboo
          if (chr.getDojoEnergy() < 10000) { // PE hacking or maybe just lagging
             return;
          }
@@ -178,13 +185,13 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler {
          chr.setDojoEnergy(0);
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
-      } else if (attack.skill > 0) {
-         SkillFactory.executeForSkill(chr, attack.skill, ((skill, skillLevel) -> {
+      } else if (attack.skill() > 0) {
+         SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> {
             MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
             if (effect_.getCooldown() > 0) {
-               if (!chr.skillIsCooling(attack.skill)) {
-                  c.announce(MaplePacketCreator.skillCooldown(attack.skill, effect_.getCooldown()));
-                  chr.addCooldown(attack.skill, currentServerTime(), effect_.getCooldown() * 1000);
+               if (!chr.skillIsCooling(attack.skill())) {
+                  c.announce(MaplePacketCreator.skillCooldown(attack.skill(), effect_.getCooldown()));
+                  chr.addCooldown(attack.skill(), currentServerTime(), effect_.getCooldown() * 1000);
                }
             }
          }));

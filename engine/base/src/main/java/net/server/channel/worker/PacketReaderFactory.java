@@ -28,6 +28,7 @@ import net.server.channel.packet.reader.CheckCharacterNameReader;
 import net.server.channel.packet.reader.CoconutReader;
 import net.server.channel.packet.reader.CouponCodeReader;
 import net.server.channel.packet.reader.CreateCharacterReader;
+import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.packet.reader.DamageSummonReader;
 import net.server.channel.packet.reader.DeleteCharacterReader;
 import net.server.channel.packet.reader.DenyAllianceRequestReader;
@@ -99,6 +100,7 @@ import net.server.channel.packet.reader.SnowballReader;
 import net.server.channel.packet.reader.SpawnPetReader;
 import net.server.channel.packet.reader.SpouseChatReader;
 import net.server.channel.packet.reader.StorageReader;
+import net.server.channel.packet.reader.SummonDamageReader;
 import net.server.channel.packet.reader.TeleportRockMapReader;
 import net.server.channel.packet.reader.TouchReactorReader;
 import net.server.channel.packet.reader.TransferNameReader;
@@ -253,11 +255,17 @@ public class PacketReaderFactory {
       readers.put(WeddingTalkReader.class, new WeddingTalkReader());
       readers.put(RaiseUIStateReader.class, new RaiseUIStateReader());
       readers.put(UseItemUIReader.class, new UseItemUIReader());
+      readers.put(DamageReader.class, new DamageReader());
+      readers.put(SummonDamageReader.class, new SummonDamageReader());
+   }
+
+   public <T extends MaplePacket> PacketReader<T> get(Class<? extends PacketReader<T>> readerClass) {
+      return (PacketReader<T>) readers.get(readerClass);
    }
 
    public <T extends MaplePacket> Optional<T> read(Class<? extends PacketReader<T>> readerClass, SeekableLittleEndianAccessor accessor) {
       if (readers.containsKey(readerClass)) {
-         PacketReader<T> reader = readers.get(readerClass);
+         PacketReader<T> reader = get(readerClass);
          return Optional.of(reader.read(accessor));
       } else {
          return Optional.empty();

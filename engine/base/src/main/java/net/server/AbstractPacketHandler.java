@@ -15,12 +15,16 @@ public abstract class AbstractPacketHandler<T extends MaplePacket, U extends Pac
          return;
       }
 
-      Optional<T> packet = PacketReaderFactory.getInstance().read(getReaderClass(), accessor);
+      Optional<T> packet = readPacket(accessor);
       if (packet.isEmpty()) {
          FilePrinter.printError(FilePrinter.PACKET_HANDLER, "Cannot find reader for packet: " + getReaderClass());
          return;
       }
       handlePacket(packet.get(), client);
+   }
+
+   protected Optional<T> readPacket(SeekableLittleEndianAccessor accessor) {
+      return PacketReaderFactory.getInstance().read(getReaderClass(), accessor);
    }
 
    public boolean successfulProcess(MapleClient client) {

@@ -346,27 +346,37 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.WATER_OF_LIFE, new UseWaterOfLifeHandler());
       packetProcessor.registerHandler(RecvOpcode.OPEN_ITEMUI, new RaiseUIStateHandler());
       packetProcessor.registerHandler(RecvOpcode.USE_ITEMUI, new RaiseIncExpHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
       packetProcessor.registerHandler(RecvOpcode.CLOSE_RANGE_ATTACK, new CloseRangeDamageHandler());
       packetProcessor.registerHandler(RecvOpcode.RANGED_ATTACK, new RangedAttackHandler());
       packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
-      packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
       packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
       packetProcessor.registerHandler(RecvOpcode.TOUCH_MONSTER_ATTACK, new TouchMonsterDamageHandler());
-      packetProcessor.registerHandler(RecvOpcode.AUTO_DISTRIBUTE_AP, new AutoAssignHandler());
-      packetProcessor.registerHandler(RecvOpcode.MAKER_SKILL, new MakerSkillHandler());
-      packetProcessor.registerHandler(RecvOpcode.USE_FAMILY, new FamilyUseHandler());
-      packetProcessor.registerHandler(RecvOpcode.ADMIN_COMMAND, new AdminCommandHandler());
-      packetProcessor.registerHandler(RecvOpcode.ALLIANCE_OPERATION, new AllianceOperationHandler());
-      packetProcessor.registerHandler(RecvOpcode.ITEM_SORT2, new InventorySortHandler());
-      packetProcessor.registerHandler(RecvOpcode.MONSTER_CARNIVAL, new MonsterCarnivalHandler());
-      packetProcessor.registerHandler(RecvOpcode.ADMIN_CHAT, new AdminChatHandler());
+
+
+      packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_DRAGON, new MoveDragonHandler());
 
+      packetProcessor.registerHandler(RecvOpcode.MAKER_SKILL, new MakerSkillHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.USE_FAMILY, new FamilyUseHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.ADMIN_COMMAND, new AdminCommandHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.ALLIANCE_OPERATION, new AllianceOperationHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.ITEM_SORT2, new InventorySortHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.MONSTER_CARNIVAL, new MonsterCarnivalHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.ADMIN_CHAT, new AdminChatHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
+
+      packetProcessor.registerHandler(RecvOpcode.AUTO_DISTRIBUTE_AP, new AutoAssignHandler());
    }
 }
