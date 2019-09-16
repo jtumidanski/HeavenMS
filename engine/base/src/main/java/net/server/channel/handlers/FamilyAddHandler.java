@@ -37,7 +37,7 @@ import tools.ServerNoticeType;
  * @author Jay Estrella
  * @author Ubaware
  */
-public final class FamilyAddHandler extends AbstractPacketHandler<FamilyAddPacket, FamilyAddReader> {
+public final class FamilyAddHandler extends AbstractPacketHandler<FamilyAddPacket> {
    @Override
    public Class<FamilyAddReader> getReaderClass() {
       return FamilyAddReader.class;

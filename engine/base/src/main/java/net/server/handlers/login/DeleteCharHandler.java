@@ -28,7 +28,7 @@ import net.server.login.packet.DeleteCharacterPacket;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
-public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharacterPacket, DeleteCharacterReader> {
+public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharacterPacket> {
    @Override
    public Class<DeleteCharacterReader> getReaderClass() {
       return DeleteCharacterReader.class;

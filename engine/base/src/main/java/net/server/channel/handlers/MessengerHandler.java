@@ -43,7 +43,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public final class MessengerHandler extends AbstractPacketHandler<BaseMessengerPacket, MessengerReader> {
+public final class MessengerHandler extends AbstractPacketHandler<BaseMessengerPacket> {
    @Override
    public Class<MessengerReader> getReaderClass() {
       return MessengerReader.class;

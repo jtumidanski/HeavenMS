@@ -30,7 +30,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Xterminator
  */
-public final class CloseChalkboardHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class CloseChalkboardHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

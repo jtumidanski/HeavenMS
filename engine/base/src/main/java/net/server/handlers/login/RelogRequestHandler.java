@@ -29,7 +29,7 @@ import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class RelogRequestHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class RelogRequestHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

@@ -33,7 +33,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket, GiveFameReader> {
+public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket> {
    @Override
    public Class<GiveFameReader> getReaderClass() {
       return GiveFameReader.class;

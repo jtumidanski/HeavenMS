@@ -151,9 +151,9 @@ import net.server.handlers.KeepAliveHandler;
 import net.server.handlers.LoginRequiringNoOpHandler;
 import net.server.handlers.login.AcceptToSHandler;
 import net.server.handlers.login.AfterLoginHandler;
-import net.server.handlers.login.CharacterSelectedHandler;
 import net.server.handlers.login.CharSelectedWithPicHandler;
 import net.server.handlers.login.CharacterListRequestHandler;
+import net.server.handlers.login.CharacterSelectedHandler;
 import net.server.handlers.login.CheckCharNameHandler;
 import net.server.handlers.login.CreateCharHandler;
 import net.server.handlers.login.DeleteCharHandler;
@@ -162,8 +162,8 @@ import net.server.handlers.login.LoginPasswordHandler;
 import net.server.handlers.login.RegisterPicHandler;
 import net.server.handlers.login.RegisterPinHandler;
 import net.server.handlers.login.RelogRequestHandler;
-import net.server.handlers.login.ServerStatusRequestHandler;
 import net.server.handlers.login.ServerListRequestHandler;
+import net.server.handlers.login.ServerStatusRequestHandler;
 import net.server.handlers.login.SetGenderHandler;
 import net.server.handlers.login.ViewAllCharHandler;
 import net.server.handlers.login.ViewAllCharRegisterPicHandler;
@@ -351,32 +351,25 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.MAGIC_ATTACK, new MagicDamageHandler());
       packetProcessor.registerHandler(RecvOpcode.SUMMON_ATTACK, new SummonDamageHandler());
       packetProcessor.registerHandler(RecvOpcode.TOUCH_MONSTER_ATTACK, new TouchMonsterDamageHandler());
-
+      packetProcessor.registerHandler(RecvOpcode.USE_FAMILY, new FamilyUseHandler());
+      packetProcessor.registerHandler(RecvOpcode.ITEM_SORT2, new InventorySortHandler());
+      packetProcessor.registerHandler(RecvOpcode.MONSTER_CARNIVAL, new MonsterCarnivalHandler());
+      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
+      packetProcessor.registerHandler(RecvOpcode.AUTO_DISTRIBUTE_AP, new AutoAssignHandler());
+      packetProcessor.registerHandler(RecvOpcode.ADMIN_CHAT, new AdminChatHandler());
+      packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
+      packetProcessor.registerHandler(RecvOpcode.ALLIANCE_OPERATION, new AllianceOperationHandler());
 
       packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
-      packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_DRAGON, new MoveDragonHandler());
 
       packetProcessor.registerHandler(RecvOpcode.MAKER_SKILL, new MakerSkillHandler());
 
-      packetProcessor.registerHandler(RecvOpcode.USE_FAMILY, new FamilyUseHandler());
-
       packetProcessor.registerHandler(RecvOpcode.ADMIN_COMMAND, new AdminCommandHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.ALLIANCE_OPERATION, new AllianceOperationHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.ITEM_SORT2, new InventorySortHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.MONSTER_CARNIVAL, new MonsterCarnivalHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.ADMIN_CHAT, new AdminChatHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.TAKE_DAMAGE, new TakeDamageHandler());
 
       packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
 
-      packetProcessor.registerHandler(RecvOpcode.AUTO_DISTRIBUTE_AP, new AutoAssignHandler());
    }
 }

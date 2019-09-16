@@ -31,7 +31,7 @@ import tools.Pair;
 /**
  * @author RonanLana
  */
-public class CashShopSurpriseHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class CashShopSurpriseHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

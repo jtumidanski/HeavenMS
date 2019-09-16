@@ -36,7 +36,7 @@ import tools.Randomizer;
 /**
  * @author AngelSL
  */
-public final class UseSummonBagHandler extends AbstractPacketHandler<UseItemPacket, UseItemReader> {
+public final class UseSummonBagHandler extends AbstractPacketHandler<UseItemPacket> {
    @Override
    public Class<UseItemReader> getReaderClass() {
       return UseItemReader.class;

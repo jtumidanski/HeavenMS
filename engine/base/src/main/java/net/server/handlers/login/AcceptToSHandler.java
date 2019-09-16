@@ -9,7 +9,7 @@ import tools.MaplePacketCreator;
 /**
  * @author kevintjuh93
  */
-public final class AcceptToSHandler extends AbstractPacketHandler<AcceptToSPacket, AcceptToSReader> {
+public final class AcceptToSHandler extends AbstractPacketHandler<AcceptToSPacket> {
    @Override
    public Class<AcceptToSReader> getReaderClass() {
       return AcceptToSReader.class;

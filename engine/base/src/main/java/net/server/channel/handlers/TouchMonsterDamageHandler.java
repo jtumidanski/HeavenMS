@@ -29,7 +29,7 @@ import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class TouchMonsterDamageHandler extends AbstractDealDamageHandler<AttackPacket, DamageReader> {
+public final class TouchMonsterDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
    public Class<DamageReader> getReaderClass() {
       return DamageReader.class;

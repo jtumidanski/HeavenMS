@@ -32,11 +32,12 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.ModifyInventory;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.packet.InventorySortPacket;
+import net.server.channel.packet.reader.InventorySortReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author BubblesDev
@@ -71,8 +72,9 @@ class PairedQuicksort {
       intersect.add(A.size());
 
       for (int ind = 0; ind < intersect.size() - 1; ind++) {
-         if (intersect.get(ind + 1) > intersect.get(ind))
+         if (intersect.get(ind + 1) > intersect.get(ind)) {
             MapleQuicksort(intersect.get(ind), intersect.get(ind + 1) - 1, A, secondarySort);
+         }
       }
    }
 
@@ -211,8 +213,12 @@ class PairedQuicksort {
       }
 
 
-      if (Esq < j) MapleQuicksort(Esq, j, A, sort);
-      if (i < Dir) MapleQuicksort(i, Dir, A, sort);
+      if (Esq < j) {
+         MapleQuicksort(Esq, j, A, sort);
+      }
+      if (i < Dir) {
+         MapleQuicksort(i, Dir, A, sort);
+      }
    }
 
    private int[] BinarySearchElement(ArrayList<Item> A, int rangeId) {
@@ -258,28 +264,31 @@ class PairedQuicksort {
    }
 }
 
-public final class InventorySortHandler extends AbstractMaplePacketHandler {
+public final class InventorySortHandler extends AbstractPacketHandler<InventorySortPacket> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      MapleCharacter chr = c.getPlayer();
-      slea.readInt();
+   public Class<InventorySortReader> getReaderClass() {
+      return InventorySortReader.class;
+   }
+
+   @Override
+   public void handlePacket(InventorySortPacket packet, MapleClient client) {
+      MapleCharacter chr = client.getPlayer();
       chr.getAutobanManager().setTimestamp(3, Server.getInstance().getCurrentTimestamp(), 4);
 
       if (!ServerConstants.USE_ITEM_SORT) {
-         c.announce(MaplePacketCreator.enableActions());
+         client.announce(MaplePacketCreator.enableActions());
          return;
       }
 
-      byte invType = slea.readByte();
-      if (invType < 1 || invType > 5) {
-         c.disconnect(false, false);
+      if (packet.inventoryType() < 1 || packet.inventoryType() > 5) {
+         client.disconnect(false, false);
          return;
       }
 
       ArrayList<Item> itemarray = new ArrayList<>();
       List<ModifyInventory> mods = new ArrayList<>();
 
-      MapleInventory inventory = chr.getInventory(MapleInventoryType.getByType(invType));
+      MapleInventory inventory = chr.getInventory(MapleInventoryType.getByType(packet.inventoryType()));
       inventory.lockInventory();
       try {
          for (short i = 1; i <= inventory.getSlotLimit(); i++) {
@@ -294,7 +303,7 @@ public final class InventorySortHandler extends AbstractMaplePacketHandler {
             mods.add(new ModifyInventory(3, item));
          }
 
-         int invTypeCriteria = (MapleInventoryType.getByType(invType) == MapleInventoryType.EQUIP) ? 3 : 1;
+         int invTypeCriteria = (MapleInventoryType.getByType(packet.inventoryType()) == MapleInventoryType.EQUIP) ? 3 : 1;
          int sortCriteria = (ServerConstants.USE_ITEM_SORT_BY_NAME) ? 2 : 0;
          PairedQuicksort pq = new PairedQuicksort(itemarray, sortCriteria, invTypeCriteria);
 
@@ -307,8 +316,8 @@ public final class InventorySortHandler extends AbstractMaplePacketHandler {
          inventory.unlockInventory();
       }
 
-      c.announce(MaplePacketCreator.modifyInventory(true, mods));
-      c.announce(MaplePacketCreator.finishedSort2(invType));
-      c.announce(MaplePacketCreator.enableActions());
+      client.announce(MaplePacketCreator.modifyInventory(true, mods));
+      client.announce(MaplePacketCreator.finishedSort2(packet.inventoryType()));
+      client.announce(MaplePacketCreator.enableActions());
    }
 }

@@ -30,7 +30,7 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 
-public class AranComboHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class AranComboHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

@@ -32,7 +32,7 @@ import tools.FilePrinter;
 /**
  * @author Matze
  */
-public final class NPCShopHandler extends AbstractPacketHandler<NPCShopPacket, NPCShopReader> {
+public final class NPCShopHandler extends AbstractPacketHandler<NPCShopPacket> {
    @Override
    public Class<NPCShopReader> getReaderClass() {
       return NPCShopReader.class;

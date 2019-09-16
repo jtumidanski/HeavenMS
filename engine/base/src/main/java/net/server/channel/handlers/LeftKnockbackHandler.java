@@ -33,7 +33,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author kevintjuh93
  */
-public class LeftKnockbackHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class LeftKnockbackHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

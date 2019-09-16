@@ -104,7 +104,7 @@ import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
 
-public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseCashItemPacket, UseCashItemReader> {
+public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseCashItemPacket> {
 
    private void remove(MapleClient client, short position, int itemId) {
       MapleInventory cashInv = client.getPlayer().getInventory(MapleInventoryType.CASH);

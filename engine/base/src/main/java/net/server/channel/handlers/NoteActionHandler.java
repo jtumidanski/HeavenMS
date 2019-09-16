@@ -33,7 +33,7 @@ import net.server.channel.packet.reader.NoteActionReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 
-public final class NoteActionHandler extends AbstractPacketHandler<BaseNoteActionPacket, NoteActionReader> {
+public final class NoteActionHandler extends AbstractPacketHandler<BaseNoteActionPacket> {
    @Override
    public Class<NoteActionReader> getReaderClass() {
       return NoteActionReader.class;

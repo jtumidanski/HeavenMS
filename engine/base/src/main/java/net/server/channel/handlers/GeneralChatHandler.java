@@ -37,7 +37,7 @@ import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatPacket, GeneralChatReader> {
+public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatPacket> {
    @Override
    public Class<GeneralChatReader> getReaderClass() {
       return GeneralChatReader.class;

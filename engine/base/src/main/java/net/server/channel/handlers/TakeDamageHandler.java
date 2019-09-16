@@ -42,7 +42,9 @@ import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import constants.skills.Aran;
-import net.AbstractMaplePacketHandler;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.TakeDamagePacket;
+import net.server.channel.packet.reader.TakeDamageReader;
 import server.MapleStatEffect;
 import server.life.MapleLifeFactory.loseItem;
 import server.life.MapleMonster;
@@ -55,29 +57,30 @@ import server.maps.MapleMapObject;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class TakeDamageHandler extends AbstractMaplePacketHandler {
+public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePacket> {
+   @Override
+   public Class<TakeDamageReader> getReaderClass() {
+      return TakeDamageReader.class;
+   }
 
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public void handlePacket(TakeDamagePacket packet, MapleClient client) {
       List<MapleCharacter> banishPlayers = new ArrayList<>();
 
-      MapleCharacter chr = c.getPlayer();
-      slea.readInt();
-      byte damagefrom = slea.readByte();
-      slea.readByte(); //Element
-      int damage = slea.readInt();
-      int oid = 0, monsteridfrom = 0, pgmr = 0, direction = 0;
+      MapleCharacter chr = client.getPlayer();
+      int damagefrom = packet.damageFrom();
+      int monsteridfrom = packet.monsterIdFrom();
+      int damage = packet.damage();
+      byte direction = packet.direction();
+
+      int oid = 0, pgmr = 0;
       int pos_x = 0, pos_y = 0, fake = 0;
       boolean is_pgmr = false, is_pg = true, is_deadly = false;
       int mpattack = 0;
       MapleMonster attacker = null;
       final MapleMap map = chr.getMap();
       if (damagefrom != -3 && damagefrom != -4) {
-         monsteridfrom = slea.readInt();
-         oid = slea.readInt();
-
          try {
             MapleMapObject mmo = map.getMapObject(oid);
             if (mmo instanceof MapleMonster) {
@@ -118,7 +121,7 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
                               inv.lockInventory();
                               try {
                                  qty = Math.min(chr.countItem(loseItem.getId()), dropCount);
-                                 MapleInventoryManipulator.removeById(c, type, loseItem.getId(), qty, false, false);
+                                 MapleInventoryManipulator.removeById(client, type, loseItem.getId(), qty, false, false);
                               } finally {
                                  inv.unlockInventory();
                               }
@@ -149,8 +152,6 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
 
             return;
          }
-
-         direction = slea.readByte();
       }
       if (damagefrom != -1 && damagefrom != -2 && attacker != null) {
          MobAttackInfo attackInfo = MobAttackInfoFactory.getMobAttackInfo(attacker, damagefrom);
@@ -283,7 +284,7 @@ public final class TakeDamageHandler extends AbstractMaplePacketHandler {
       }
       if (GameConstants.isDojo(map.getId())) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_DMG);
-         c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         client.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
       }
 
       for (MapleCharacter player : banishPlayers) {  // chill, if this list ever gets non-empty an attacker does exist, trust me :)

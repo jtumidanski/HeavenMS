@@ -29,7 +29,7 @@ import net.server.channel.packet.reader.CharacterInfoRequestReader;
 import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
 
-public final class CharInfoRequestHandler extends AbstractPacketHandler<CharacterInfoRequestPacket, CharacterInfoRequestReader> {
+public final class CharInfoRequestHandler extends AbstractPacketHandler<CharacterInfoRequestPacket> {
    @Override
    public Class<CharacterInfoRequestReader> getReaderClass() {
       return CharacterInfoRequestReader.class;

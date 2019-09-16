@@ -8,7 +8,7 @@ import net.server.channel.packet.family.FamilyPreceptsPacket;
 import net.server.channel.packet.reader.FamilyPreceptsReader;
 import tools.MaplePacketCreator;
 
-public class FamilyPreceptsHandler extends AbstractPacketHandler<FamilyPreceptsPacket, FamilyPreceptsReader> {
+public class FamilyPreceptsHandler extends AbstractPacketHandler<FamilyPreceptsPacket> {
    @Override
    public Class<FamilyPreceptsReader> getReaderClass() {
       return FamilyPreceptsReader.class;

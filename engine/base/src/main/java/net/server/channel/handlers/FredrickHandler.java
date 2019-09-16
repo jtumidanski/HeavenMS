@@ -31,7 +31,7 @@ import net.server.channel.packet.reader.FrederickReader;
 /**
  * @author kevintjuh93
  */
-public class FredrickHandler extends AbstractPacketHandler<BaseFrederickPacket, FrederickReader> {
+public class FredrickHandler extends AbstractPacketHandler<BaseFrederickPacket> {
    @Override
    public Class<FrederickReader> getReaderClass() {
       return FrederickReader.class;

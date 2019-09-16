@@ -30,7 +30,7 @@ import net.server.channel.packet.npc.NPCTalkPacket;
 import net.server.channel.packet.reader.NPCAnimationReader;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
-public final class NPCAnimationHandler extends AbstractPacketHandler<BaseNPCAnimationPacket, NPCAnimationReader> {
+public final class NPCAnimationHandler extends AbstractPacketHandler<BaseNPCAnimationPacket> {
    @Override
    public Class<NPCAnimationReader> getReaderClass() {
       return NPCAnimationReader.class;

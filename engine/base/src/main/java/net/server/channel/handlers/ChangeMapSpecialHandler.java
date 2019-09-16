@@ -30,7 +30,7 @@ import server.MapleTrade.TradeResult;
 import server.maps.MaplePortal;
 import tools.MaplePacketCreator;
 
-public final class ChangeMapSpecialHandler extends AbstractPacketHandler<ChangeMapSpecialPacket, ChangeMapSpecialReader> {
+public final class ChangeMapSpecialHandler extends AbstractPacketHandler<ChangeMapSpecialPacket> {
    @Override
    public Class<ChangeMapSpecialReader> getReaderClass() {
       return ChangeMapSpecialReader.class;

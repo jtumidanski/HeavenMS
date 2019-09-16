@@ -36,7 +36,7 @@ import net.server.channel.packet.CancelBuffPacket;
 import net.server.channel.packet.reader.CancelBuffReader;
 import tools.MaplePacketCreator;
 
-public final class CancelBuffHandler extends AbstractPacketHandler<CancelBuffPacket, CancelBuffReader> {
+public final class CancelBuffHandler extends AbstractPacketHandler<CancelBuffPacket> {
    @Override
    public Class<CancelBuffReader> getReaderClass() {
       return CancelBuffReader.class;

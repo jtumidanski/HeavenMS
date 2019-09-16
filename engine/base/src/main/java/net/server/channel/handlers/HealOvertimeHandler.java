@@ -32,7 +32,7 @@ import net.server.channel.packet.reader.HealOvertimeReader;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 
-public final class HealOvertimeHandler extends AbstractPacketHandler<HealOvertimePacket, HealOvertimeReader> {
+public final class HealOvertimeHandler extends AbstractPacketHandler<HealOvertimePacket> {
    @Override
    public Class<HealOvertimeReader> getReaderClass() {
       return HealOvertimeReader.class;

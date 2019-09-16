@@ -31,7 +31,7 @@ import server.maps.MapleReactor;
 /**
  * @author Generic
  */
-public final class TouchReactorHandler extends AbstractPacketHandler<TouchReactorPacket, TouchReactorReader> {
+public final class TouchReactorHandler extends AbstractPacketHandler<TouchReactorPacket> {
    @Override
    public Class<TouchReactorReader> getReaderClass() {
       return TouchReactorReader.class;

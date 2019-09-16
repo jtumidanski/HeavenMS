@@ -53,8 +53,6 @@ public final class AdminCommandHandler extends AbstractMaplePacketHandler {
          return;
       }
       byte mode = slea.readByte();
-      String victim;
-      MapleCharacter target;
       switch (mode) {
          case 0x00: // Level1~Level8 & Package1~Package2
             int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(slea.readInt());

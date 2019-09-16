@@ -29,7 +29,6 @@ import java.util.Map;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
-import client.MapleClient;
 import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
@@ -74,7 +73,6 @@ import net.server.AbstractPacketHandler;
 import net.server.MaplePacket;
 import net.server.PacketReader;
 import net.server.channel.packet.AttackPacket;
-import net.server.channel.packet.reader.DamageReader;
 import scripting.AbstractPlayerInteraction;
 import server.MapleStatEffect;
 import server.TimerManager;
@@ -94,9 +92,8 @@ import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public abstract class AbstractDealDamageHandler<T extends MaplePacket, U extends PacketReader<T>> extends AbstractPacketHandler<T, U> {
+public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends AbstractPacketHandler<T> {
    // TODO move this
    public static MapleStatEffect getAttackEffect(AttackPacket attackInfo, MapleCharacter chr, Skill theSkill) {
       Skill mySkill = theSkill;

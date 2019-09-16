@@ -30,7 +30,7 @@ import net.server.channel.packet.FaceExpressionPacket;
 import net.server.channel.packet.reader.FaceExpressionReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class FaceExpressionHandler extends AbstractPacketHandler<FaceExpressionPacket, FaceExpressionReader> {
+public final class FaceExpressionHandler extends AbstractPacketHandler<FaceExpressionPacket> {
    @Override
    public Class<FaceExpressionReader> getReaderClass() {
       return FaceExpressionReader.class;

@@ -42,7 +42,7 @@ import tools.ServerNoticeType;
 /**
  * @author XoticStory
  */
-public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

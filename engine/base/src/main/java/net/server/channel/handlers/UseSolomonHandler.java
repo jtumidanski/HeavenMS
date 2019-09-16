@@ -36,7 +36,7 @@ import tools.MaplePacketCreator;
 /**
  * @author XoticStory; modified by kevintjuh93, Ronan
  */
-public final class UseSolomonHandler extends AbstractPacketHandler<UseSolomonPacket, UseSolomonReader> {
+public final class UseSolomonHandler extends AbstractPacketHandler<UseSolomonPacket> {
    @Override
    public Class<UseSolomonReader> getReaderClass() {
       return UseSolomonReader.class;

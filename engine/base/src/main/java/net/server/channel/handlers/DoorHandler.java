@@ -33,7 +33,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Matze
  */
-public final class DoorHandler extends AbstractPacketHandler<DoorPacket, DoorReader> {
+public final class DoorHandler extends AbstractPacketHandler<DoorPacket> {
    @Override
    public Class<DoorReader> getReaderClass() {
       return DoorReader.class;

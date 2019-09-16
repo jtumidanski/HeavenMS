@@ -13,7 +13,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Xari
  */
-public class RaiseUIStateHandler extends AbstractPacketHandler<RaiseUIStatePacket, RaiseUIStateReader> {
+public class RaiseUIStateHandler extends AbstractPacketHandler<RaiseUIStatePacket> {
    @Override
    public Class<RaiseUIStateReader> getReaderClass() {
       return RaiseUIStateReader.class;

@@ -35,7 +35,7 @@ import net.server.channel.packet.pet.PetFoodPacket;
 import net.server.channel.packet.reader.PetFoodReader;
 import tools.MaplePacketCreator;
 
-public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket, PetFoodReader> {
+public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
    @Override
    public Class<PetFoodReader> getReaderClass() {
       return PetFoodReader.class;

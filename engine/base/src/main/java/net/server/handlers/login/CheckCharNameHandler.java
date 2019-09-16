@@ -28,7 +28,7 @@ import net.server.channel.packet.reader.CheckCharacterNameReader;
 import net.server.login.packet.CheckCharacterNamePacket;
 import tools.MaplePacketCreator;
 
-public final class CheckCharNameHandler extends AbstractPacketHandler<CheckCharacterNamePacket, CheckCharacterNameReader> {
+public final class CheckCharNameHandler extends AbstractPacketHandler<CheckCharacterNamePacket> {
    @Override
    public Class<CheckCharacterNameReader> getReaderClass() {
       return CheckCharacterNameReader.class;

@@ -41,7 +41,7 @@ import tools.DatabaseConnection;
 import tools.HexTool;
 import tools.MaplePacketCreator;
 
-public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPacket, LoginPasswordReader> {
+public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPacket> {
    @Override
    public Class<LoginPasswordReader> getReaderClass() {
       return LoginPasswordReader.class;

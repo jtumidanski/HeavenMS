@@ -26,7 +26,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SkillMacroPacket;
 import net.server.channel.packet.reader.SkillMacroReader;
 
-public final class SkillMacroHandler extends AbstractPacketHandler<SkillMacroPacket, SkillMacroReader> {
+public final class SkillMacroHandler extends AbstractPacketHandler<SkillMacroPacket> {
    @Override
    public Class<SkillMacroReader> getReaderClass() {
       return SkillMacroReader.class;

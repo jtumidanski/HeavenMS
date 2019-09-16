@@ -32,7 +32,7 @@ import net.server.channel.packet.reader.PetCommandReader;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
 
-public final class PetCommandHandler extends AbstractPacketHandler<PetCommandPacket, PetCommandReader> {
+public final class PetCommandHandler extends AbstractPacketHandler<PetCommandPacket> {
    @Override
    public Class<PetCommandReader> getReaderClass() {
       return PetCommandReader.class;

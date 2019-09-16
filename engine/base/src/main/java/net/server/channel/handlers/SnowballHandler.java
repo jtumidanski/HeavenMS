@@ -32,7 +32,7 @@ import server.maps.MapleMap;
 /**
  * @author kevintjuh93
  */
-public final class SnowballHandler extends AbstractPacketHandler<SnowballPacket, SnowballReader> {
+public final class SnowballHandler extends AbstractPacketHandler<SnowballPacket> {
    @Override
    public Class<SnowballReader> getReaderClass() {
       return SnowballReader.class;

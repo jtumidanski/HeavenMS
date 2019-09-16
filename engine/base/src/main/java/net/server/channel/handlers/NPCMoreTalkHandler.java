@@ -31,7 +31,7 @@ import scripting.quest.QuestScriptManager;
 /**
  * @author Matze
  */
-public final class NPCMoreTalkHandler extends AbstractPacketHandler<NPCMoreTalkPacket, NPCMoreTalkReader> {
+public final class NPCMoreTalkHandler extends AbstractPacketHandler<NPCMoreTalkPacket> {
    @Override
    public Class<NPCMoreTalkReader> getReaderClass() {
       return NPCMoreTalkReader.class;

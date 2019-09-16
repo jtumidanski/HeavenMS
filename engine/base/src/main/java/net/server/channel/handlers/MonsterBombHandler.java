@@ -28,7 +28,7 @@ import net.server.channel.packet.reader.MonsterBombReader;
 import server.life.MapleMonster;
 import tools.MaplePacketCreator;
 
-public final class MonsterBombHandler extends AbstractPacketHandler<MonsterBombPacket, MonsterBombReader> {
+public final class MonsterBombHandler extends AbstractPacketHandler<MonsterBombPacket> {
    @Override
    public Class<MonsterBombReader> getReaderClass() {
       return MonsterBombReader.class;

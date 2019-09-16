@@ -29,7 +29,7 @@ import net.server.channel.packet.UseItemEffectPacket;
 import net.server.channel.packet.reader.UseItemEffectReader;
 import tools.MaplePacketCreator;
 
-public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEffectPacket, UseItemEffectReader> {
+public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEffectPacket> {
    @Override
    public Class<UseItemEffectReader> getReaderClass() {
       return UseItemEffectReader.class;

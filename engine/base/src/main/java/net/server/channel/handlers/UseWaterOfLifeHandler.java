@@ -28,7 +28,7 @@ import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class UseWaterOfLifeHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class UseWaterOfLifeHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

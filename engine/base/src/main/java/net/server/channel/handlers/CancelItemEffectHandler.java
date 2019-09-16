@@ -27,7 +27,7 @@ import net.server.channel.packet.CancelItemEffectPacket;
 import net.server.channel.packet.reader.CancelItemEffectReader;
 import server.MapleItemInformationProvider;
 
-public final class CancelItemEffectHandler extends AbstractPacketHandler<CancelItemEffectPacket, CancelItemEffectReader> {
+public final class CancelItemEffectHandler extends AbstractPacketHandler<CancelItemEffectPacket> {
    @Override
    public Class<CancelItemEffectReader> getReaderClass() {
       return CancelItemEffectReader.class;

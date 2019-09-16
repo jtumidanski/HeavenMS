@@ -37,7 +37,7 @@ import tools.ServerNoticeType;
  * @author Xotic & BubblesDev
  */
 
-public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<MobDamageMobFriendlyPacket, MobDamageMobFriendlyReader> {
+public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<MobDamageMobFriendlyPacket> {
    @Override
    public Class<MobDamageMobFriendlyReader> getReaderClass() {
       return MobDamageMobFriendlyReader.class;

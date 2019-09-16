@@ -36,7 +36,7 @@ import tools.ServerNoticeType;
 /**
  * @author kevintjuh93
  */
-public final class CoconutHandler extends AbstractPacketHandler<CoconutPacket, CoconutReader> {
+public final class CoconutHandler extends AbstractPacketHandler<CoconutPacket> {
    @Override
    public Class<CoconutReader> getReaderClass() {
       return CoconutReader.class;

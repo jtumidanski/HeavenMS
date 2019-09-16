@@ -36,7 +36,7 @@ import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public final class CharacterSelectedHandler extends AbstractPacketHandler<CharacterSelectedPacket, CharacterSelectedReader> {
+public final class CharacterSelectedHandler extends AbstractPacketHandler<CharacterSelectedPacket> {
    @Override
    public Class<CharacterSelectedReader> getReaderClass() {
       return CharacterSelectedReader.class;

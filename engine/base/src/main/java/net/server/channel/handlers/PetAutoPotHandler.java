@@ -40,7 +40,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Ronan - multi-pot consumption feature
  */
-public final class PetAutoPotHandler extends AbstractPacketHandler<PetAutoPotPacket, PetAutoPotReader> {
+public final class PetAutoPotHandler extends AbstractPacketHandler<PetAutoPotPacket> {
    @Override
    public Class<PetAutoPotReader> getReaderClass() {
       return PetAutoPotReader.class;

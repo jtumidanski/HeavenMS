@@ -32,7 +32,7 @@ import scripting.npc.NPCScriptManager;
 /**
  * @author kevintjuh93
  */
-public class ClickGuideHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class ClickGuideHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

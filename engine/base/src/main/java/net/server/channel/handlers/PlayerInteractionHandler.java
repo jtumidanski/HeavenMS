@@ -92,7 +92,7 @@ import tools.ServerNoticeType;
  * @author Matze
  * @author Ronan - concurrency safety & reviewed minigames
  */
-public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePlayerInteractionPacket, PlayerInteractionReader> {
+public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePlayerInteractionPacket> {
    @Override
    public Class<PlayerInteractionReader> getReaderClass() {
       return PlayerInteractionReader.class;

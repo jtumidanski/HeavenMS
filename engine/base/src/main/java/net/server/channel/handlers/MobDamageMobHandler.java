@@ -41,7 +41,7 @@ import tools.MaplePacketCreator;
  * @author Jay Estrella
  * @author Ronan
  */
-public final class MobDamageMobHandler extends AbstractPacketHandler<MobDamageMobPacket, MobDamageMobReader> {
+public final class MobDamageMobHandler extends AbstractPacketHandler<MobDamageMobPacket> {
    @Override
    public Class<MobDamageMobReader> getReaderClass() {
       return MobDamageMobReader.class;

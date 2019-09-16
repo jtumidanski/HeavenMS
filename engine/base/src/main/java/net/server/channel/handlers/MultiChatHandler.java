@@ -34,7 +34,7 @@ import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
 
-public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacket, MultiChatReader> {
+public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacket> {
    @Override
    public Class<MultiChatReader> getReaderClass() {
       return MultiChatReader.class;

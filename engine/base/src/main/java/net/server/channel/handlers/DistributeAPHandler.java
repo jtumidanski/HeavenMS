@@ -27,7 +27,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.DistributeAPPacket;
 import net.server.channel.packet.reader.DistributeAPReader;
 
-public final class DistributeAPHandler extends AbstractPacketHandler<DistributeAPPacket, DistributeAPReader> {
+public final class DistributeAPHandler extends AbstractPacketHandler<DistributeAPPacket> {
    @Override
    public Class<DistributeAPReader> getReaderClass() {
       return DistributeAPReader.class;

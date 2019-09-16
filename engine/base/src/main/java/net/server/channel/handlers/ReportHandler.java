@@ -42,7 +42,7 @@ import tools.ServerNoticeType;
  *
  * @author BubblesDev
  */
-public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket, ReportReader> {
+public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket> {
    @Override
    public Class<ReportReader> getReaderClass() {
       return ReportReader.class;

@@ -45,7 +45,7 @@ import server.maps.MapleSummon;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
-public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonDamagePacket, SummonDamageReader> {
+public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonDamagePacket> {
    @Override
    public Class<SummonDamageReader> getReaderClass() {
       return SummonDamageReader.class;

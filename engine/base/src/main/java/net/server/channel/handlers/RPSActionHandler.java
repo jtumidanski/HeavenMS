@@ -19,7 +19,7 @@ import tools.MaplePacketCreator;
  * @Website http://Vertisy.ca/
  * @since Aug 15, 2016
  */
-public final class RPSActionHandler extends AbstractPacketHandler<BaseRPSActionPacket, RPSActionReader> {
+public final class RPSActionHandler extends AbstractPacketHandler<BaseRPSActionPacket> {
    @Override
    public Class<RPSActionReader> getReaderClass() {
       return RPSActionReader.class;

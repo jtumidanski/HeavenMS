@@ -29,7 +29,7 @@ import net.server.channel.packet.CancelChairPacket;
 import net.server.channel.packet.reader.CancelChairReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CancelChairHandler extends AbstractPacketHandler<CancelChairPacket, CancelChairReader> {
+public final class CancelChairHandler extends AbstractPacketHandler<CancelChairPacket> {
    @Override
    public Class<CancelChairReader> getReaderClass() {
       return CancelChairReader.class;

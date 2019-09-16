@@ -28,7 +28,7 @@ import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CancelDebuffHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {//TIP: BAD STUFF LOL!
+public final class CancelDebuffHandler extends AbstractPacketHandler<NoOpPacket> {//TIP: BAD STUFF LOL!
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

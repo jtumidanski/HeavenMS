@@ -17,7 +17,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public class FamilySummonResponseHandler extends AbstractPacketHandler<FamilySummonResponsePacket, FamilySummonResponseReader> {
+public class FamilySummonResponseHandler extends AbstractPacketHandler<FamilySummonResponsePacket> {
    @Override
    public Class<FamilySummonResponseReader> getReaderClass() {
       return FamilySummonResponseReader.class;

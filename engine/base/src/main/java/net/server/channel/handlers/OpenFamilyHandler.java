@@ -32,7 +32,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Ubaware
  */
-public final class OpenFamilyHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class OpenFamilyHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

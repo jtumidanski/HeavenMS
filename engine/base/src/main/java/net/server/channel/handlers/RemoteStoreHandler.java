@@ -35,7 +35,7 @@ import tools.ServerNoticeType;
 /**
  * @author kevintjuh93 :3
  */
-public class RemoteStoreHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class RemoteStoreHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

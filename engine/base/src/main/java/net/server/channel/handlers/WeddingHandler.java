@@ -34,7 +34,7 @@ import tools.packets.Wedding;
 /**
  * @author By Drago/Dragohe4rt
  */
-public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacket, WeddingReader> {
+public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacket> {
    @Override
    public Class<WeddingReader> getReaderClass() {
       return WeddingReader.class;

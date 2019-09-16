@@ -33,7 +33,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparatePacket, FamilySeparateReader> {
+public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparatePacket> {
    @Override
    public Class<FamilySeparateReader> getReaderClass() {
       return FamilySeparateReader.class;

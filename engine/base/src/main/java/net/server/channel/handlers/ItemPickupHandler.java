@@ -35,7 +35,7 @@ import tools.FilePrinter;
  * @author Matze
  * @author Ronan
  */
-public final class ItemPickupHandler extends AbstractPacketHandler<ItemPickupPacket, ItemPickupReader> {
+public final class ItemPickupHandler extends AbstractPacketHandler<ItemPickupPacket> {
    @Override
    public Class<ItemPickupReader> getReaderClass() {
       return ItemPickupReader.class;

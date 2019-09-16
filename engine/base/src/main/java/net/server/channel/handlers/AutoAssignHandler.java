@@ -23,16 +23,21 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.processor.AssignAPProcessor;
-import net.AbstractMaplePacketHandler;
-import tools.data.input.SeekableLittleEndianAccessor;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.AssignAPPacket;
+import net.server.channel.packet.reader.AssignAPReader;
 
 /**
  * @author Generic, Ronan
  */
-public class AutoAssignHandler extends AbstractMaplePacketHandler {
+public class AutoAssignHandler extends AbstractPacketHandler<AssignAPPacket> {
+   @Override
+   public Class<AssignAPReader> getReaderClass() {
+      return AssignAPReader.class;
+   }
 
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      AssignAPProcessor.APAutoAssignAction(slea, c);
+   public void handlePacket(AssignAPPacket packet, MapleClient client) {
+      AssignAPProcessor.APAutoAssignAction(client, packet.jobId(), packet.types(), packet.gains());
    }
 }

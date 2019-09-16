@@ -37,7 +37,7 @@ import tools.ServerNoticeType;
  * @author BubblesDev
  * @author Ronan
  */
-public class PartySearchStartHandler extends AbstractPacketHandler<PartySearchStartPacket, PartySearchStartReader> {
+public class PartySearchStartHandler extends AbstractPacketHandler<PartySearchStartPacket> {
    @Override
    public Class<PartySearchStartReader> getReaderClass() {
       return PartySearchStartReader.class;

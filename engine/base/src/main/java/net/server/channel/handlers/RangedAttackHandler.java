@@ -48,7 +48,7 @@ import tools.MaplePacketCreator;
 import tools.Randomizer;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackPacket, DamageReader> {
+public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
    public Class<DamageReader> getReaderClass() {
       return DamageReader.class;

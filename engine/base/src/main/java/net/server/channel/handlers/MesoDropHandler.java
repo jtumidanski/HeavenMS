@@ -32,7 +32,7 @@ import tools.MaplePacketCreator;
  * @author Matze
  * @author Ronan - concurrency protection
  */
-public final class MesoDropHandler extends AbstractPacketHandler<MesoDropPacket, MesoDropReader> {
+public final class MesoDropHandler extends AbstractPacketHandler<MesoDropPacket> {
    @Override
    public boolean successfulProcess(MapleClient client) {
       MapleCharacter player = client.getPlayer();

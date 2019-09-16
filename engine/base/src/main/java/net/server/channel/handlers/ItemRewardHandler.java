@@ -43,7 +43,7 @@ import tools.ServerNoticeType;
  * @author Jay Estrella
  * @author kevintjuh93
  */
-public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPacket, ItemRewardReader> {
+public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPacket> {
    @Override
    public Class<ItemRewardReader> getReaderClass() {
       return ItemRewardReader.class;

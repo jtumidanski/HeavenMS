@@ -28,7 +28,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseChairPacket;
 import net.server.channel.packet.reader.UseChairReader;
 
-public final class UseChairHandler extends AbstractPacketHandler<UseChairPacket, UseChairReader> {
+public final class UseChairHandler extends AbstractPacketHandler<UseChairPacket> {
    @Override
    public Class<UseChairReader> getReaderClass() {
       return UseChairReader.class;

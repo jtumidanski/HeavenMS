@@ -45,7 +45,7 @@ import net.server.channel.packet.reader.BBSOperationReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 
-public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOperationPacket, BBSOperationReader> {
+public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOperationPacket> {
    @Override
    public Class<BBSOperationReader> getReaderClass() {
       return BBSOperationReader.class;

@@ -37,7 +37,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Ronan
  */
-public final class TransferWorldHandler extends AbstractPacketHandler<TransferWorldPacket, TransferWorldReader> {
+public final class TransferWorldHandler extends AbstractPacketHandler<TransferWorldPacket> {
    @Override
    public Class<TransferWorldReader> getReaderClass() {
       return TransferWorldReader.class;

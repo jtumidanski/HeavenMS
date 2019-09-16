@@ -31,7 +31,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Quasar
  */
-public class PartySearchRegisterHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class PartySearchRegisterHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

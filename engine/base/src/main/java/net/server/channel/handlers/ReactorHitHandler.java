@@ -30,7 +30,7 @@ import server.maps.MapleReactor;
 /**
  * @author Lerk
  */
-public final class ReactorHitHandler extends AbstractPacketHandler<ReactorHitPacket, ReactorHitReader> {
+public final class ReactorHitHandler extends AbstractPacketHandler<ReactorHitPacket> {
    @Override
    public Class<ReactorHitReader> getReaderClass() {
       return ReactorHitReader.class;

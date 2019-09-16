@@ -48,7 +48,7 @@ import tools.MaplePacketCreator;
  * @author Matze
  * @author Frz
  */
-public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket, ScrollReader> {
+public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
    @Override
    public Class<ScrollReader> getReaderClass() {
       return ScrollReader.class;

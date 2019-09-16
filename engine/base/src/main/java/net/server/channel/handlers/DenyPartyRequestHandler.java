@@ -33,7 +33,7 @@ import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPartyRequestPacket, DenyPartyRequestReader> {
+public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPartyRequestPacket> {
    @Override
    public Class<DenyPartyRequestReader> getReaderClass() {
       return DenyPartyRequestReader.class;

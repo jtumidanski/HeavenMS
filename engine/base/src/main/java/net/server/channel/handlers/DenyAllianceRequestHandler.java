@@ -31,7 +31,7 @@ import net.server.processor.MapleAllianceProcessor;
 /**
  * @author Ronan
  */
-public final class DenyAllianceRequestHandler extends AbstractPacketHandler<DenyAllianceRequestPacket, DenyAllianceRequestReader> {
+public final class DenyAllianceRequestHandler extends AbstractPacketHandler<DenyAllianceRequestPacket> {
    @Override
    public Class<DenyAllianceRequestReader> getReaderClass() {
       return DenyAllianceRequestReader.class;

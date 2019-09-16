@@ -27,7 +27,7 @@ import net.server.channel.packet.reader.MobBanishPlayerReader;
 import server.life.MapleLifeFactory.BanishInfo;
 import server.life.MapleMonster;
 
-public final class MobBanishPlayerHandler extends AbstractPacketHandler<MobBanishPlayerPacket, MobBanishPlayerReader> {
+public final class MobBanishPlayerHandler extends AbstractPacketHandler<MobBanishPlayerPacket> {
    @Override
    public Class<MobBanishPlayerReader> getReaderClass() {
       return MobBanishPlayerReader.class;

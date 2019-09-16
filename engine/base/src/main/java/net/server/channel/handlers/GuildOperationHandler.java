@@ -53,7 +53,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuildOperationPacket, GuildOperationReader> {
+public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuildOperationPacket> {
    @Override
    public Class<GuildOperationReader> getReaderClass() {
       return GuildOperationReader.class;

@@ -38,7 +38,7 @@ import server.maps.MaplePortal;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
-public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacket, ChangeMapReader> {
+public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacket> {
    @Override
    public Class<ChangeMapReader> getReaderClass() {
       return ChangeMapReader.class;

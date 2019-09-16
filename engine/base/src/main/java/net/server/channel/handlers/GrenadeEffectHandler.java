@@ -34,7 +34,7 @@ import tools.MaplePacketCreator;
 /*
  * @author GabrielSin
  */
-public class GrenadeEffectHandler extends AbstractPacketHandler<GrenadeEffectPacket, GrenadeEffectReader> {
+public class GrenadeEffectHandler extends AbstractPacketHandler<GrenadeEffectPacket> {
    @Override
    public Class<GrenadeEffectReader> getReaderClass() {
       return GrenadeEffectReader.class;

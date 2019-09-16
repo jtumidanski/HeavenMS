@@ -21,30 +21,30 @@
 */
 package net.server.channel.handlers;
 
-import java.util.List;
-
 import client.MapleCharacter;
 import client.MapleClient;
-import server.movement.LifeMovementFragment;
+import net.server.AbstractPacketHandler;
+import net.server.channel.packet.pet.PetMovementPacket;
+import net.server.channel.packet.reader.PetMovementReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MovePetHandler extends AbstractMovementPacketHandler {
+public final class MovePetHandler extends AbstractPacketHandler<PetMovementPacket> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int petId = slea.readInt();
-      slea.readLong();
-//        Point startPos = StreamUtil.readShortPoint(slea);
-      List<LifeMovementFragment> res = parseMovement(slea);
-      if (res == null || res.isEmpty()) {
+   public Class<PetMovementReader> getReaderClass() {
+      return PetMovementReader.class;
+   }
+
+   @Override
+   public void handlePacket(PetMovementPacket packet, MapleClient client) {
+      if (packet.commands() == null || packet.commands().isEmpty()) {
          return;
       }
-      MapleCharacter player = c.getPlayer();
-      byte slot = player.getPetIndex(petId);
+      MapleCharacter player = client.getPlayer();
+      byte slot = player.getPetIndex(packet.petId());
       if (slot == -1) {
          return;
       }
-      player.getPet(slot).updatePosition(res);
-      player.getMap().broadcastMessage(player, MaplePacketCreator.movePet(player.getId(), petId, slot, res), false);
+      player.getPet(slot).updatePosition(packet.commands());
+      player.getMap().broadcastMessage(player, MaplePacketCreator.movePet(player.getId(), packet.petId(), slot, packet.commands()), false);
    }
 }

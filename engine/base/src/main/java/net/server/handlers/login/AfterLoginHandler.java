@@ -28,7 +28,7 @@ import net.server.coordinator.MapleSessionCoordinator;
 import net.server.login.packet.AfterLoginPacket;
 import tools.MaplePacketCreator;
 
-public final class AfterLoginHandler extends AbstractPacketHandler<AfterLoginPacket, AfterLoginReader> {
+public final class AfterLoginHandler extends AbstractPacketHandler<AfterLoginPacket> {
    @Override
    public Class<AfterLoginReader> getReaderClass() {
       return AfterLoginReader.class;

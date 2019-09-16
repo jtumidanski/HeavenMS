@@ -37,7 +37,7 @@ import server.MapleStatEffect;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPacket, DamageReader> {
+public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
    public Class<DamageReader> getReaderClass() {
       return DamageReader.class;

@@ -49,7 +49,7 @@ import tools.ServerNoticeType;
 /**
  * @author Matze
  */
-public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacket, StorageReader> {
+public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacket> {
    @Override
    public Class<StorageReader> getReaderClass() {
       return StorageReader.class;

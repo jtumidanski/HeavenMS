@@ -78,7 +78,7 @@ import tools.MaplePacketCreator;
 import tools.Pair;
 import tools.packets.Wedding;
 
-public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLoggedInPacket, PlayerLoggedInReader> {
+public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLoggedInPacket> {
    private static Set<Integer> attemptingLoginAccounts = new HashSet<>();
 
    @Override

@@ -65,7 +65,7 @@ import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
 //TODO this needs a lot more work.
-public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket, MTSReader> {
+public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
    private byte[] getMTS(int tab, int type, int page) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          List<MTSItemInfo> items = new ArrayList<>();

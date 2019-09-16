@@ -41,7 +41,7 @@ import tools.ServerNoticeType;
 /**
  * @author Matze
  */
-public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket, UseItemReader> {
+public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
    @Override
    public Class<UseItemReader> getReaderClass() {
       return UseItemReader.class;

@@ -48,7 +48,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacket, BuddyReader> {
+public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacket> {
    @Override
    public Class<BuddyReader> getReaderClass() {
       return BuddyReader.class;

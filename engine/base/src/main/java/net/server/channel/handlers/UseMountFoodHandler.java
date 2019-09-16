@@ -38,7 +38,7 @@ import tools.MaplePacketCreator;
  * @author PurpleMadness
  * @author Ronan
  */
-public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoodPacket, UseMountFoodReader> {
+public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoodPacket> {
    @Override
    public Class<UseMountFoodReader> getReaderClass() {
       return UseMountFoodReader.class;

@@ -29,7 +29,7 @@ import net.server.channel.packet.DistributeSPPacket;
 import net.server.channel.packet.reader.DistributeSPReader;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class DistributeSPHandler extends AbstractPacketHandler<DistributeSPPacket, DistributeSPReader> {
+public final class DistributeSPHandler extends AbstractPacketHandler<DistributeSPPacket> {
    @Override
    public Class<DistributeSPReader> getReaderClass() {
       return DistributeSPReader.class;

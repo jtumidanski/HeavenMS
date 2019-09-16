@@ -33,7 +33,7 @@ import tools.packets.Wedding;
 /**
  * @author Ronan
  */
-public final class WeddingTalkMoreHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class WeddingTalkMoreHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

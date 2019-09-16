@@ -27,7 +27,7 @@ import net.server.packet.CustomPacket;
 import net.server.packet.reader.CustomReader;
 import tools.MaplePacketCreator;
 
-public class CustomPacketHandler extends AbstractPacketHandler<CustomPacket, CustomReader> {
+public class CustomPacketHandler extends AbstractPacketHandler<CustomPacket> {
    @Override
    public Class<CustomReader> getReaderClass() {
       return CustomReader.class;

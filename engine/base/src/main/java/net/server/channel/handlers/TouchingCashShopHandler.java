@@ -32,7 +32,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Terry Han (Acrylic)
  */
-public final class TouchingCashShopHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class TouchingCashShopHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

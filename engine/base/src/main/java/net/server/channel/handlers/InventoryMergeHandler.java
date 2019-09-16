@@ -35,7 +35,7 @@ import net.server.channel.packet.reader.InventoryMergeReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 
-public final class InventoryMergeHandler extends AbstractPacketHandler<InventoryMergePacket, InventoryMergeReader> {
+public final class InventoryMergeHandler extends AbstractPacketHandler<InventoryMergePacket> {
    @Override
    public boolean successfulProcess(MapleClient client) {
       MapleCharacter chr = client.getPlayer();

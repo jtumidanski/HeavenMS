@@ -32,7 +32,7 @@ import tools.MaplePacketCreator;
 /**
  * @author kevintjuh93; modified by Ronan
  */
-public class UseGachaExpHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class UseGachaExpHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

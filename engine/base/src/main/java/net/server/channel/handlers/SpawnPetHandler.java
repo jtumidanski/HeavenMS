@@ -27,7 +27,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SpawnPetPacket;
 import net.server.channel.packet.reader.SpawnPetReader;
 
-public final class SpawnPetHandler extends AbstractPacketHandler<SpawnPetPacket, SpawnPetReader> {
+public final class SpawnPetHandler extends AbstractPacketHandler<SpawnPetPacket> {
    @Override
    public Class<SpawnPetReader> getReaderClass() {
       return SpawnPetReader.class;

@@ -32,7 +32,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Matze
  */
-public final class ItemMoveHandler extends AbstractPacketHandler<ItemMovePacket, ItemMoveReader> {
+public final class ItemMoveHandler extends AbstractPacketHandler<ItemMovePacket> {
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (client.getPlayer().getAutobanManager().getLastSpam(6) + 300 > currentServerTime()) {

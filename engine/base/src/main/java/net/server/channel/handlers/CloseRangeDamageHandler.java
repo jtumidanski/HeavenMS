@@ -60,7 +60,7 @@ import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket, DamageReader> {
+public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
    public Class<DamageReader> getReaderClass() {
       return DamageReader.class;

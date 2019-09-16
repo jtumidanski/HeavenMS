@@ -37,7 +37,7 @@ import net.server.world.World;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
 
-public final class ViewAllCharSelectedHandler extends AbstractPacketHandler<ViewAllCharactersSelectedPacket, ViewAllCharactersSelectedReader> {
+public final class ViewAllCharSelectedHandler extends AbstractPacketHandler<ViewAllCharactersSelectedPacket> {
    @Override
    public Class<ViewAllCharactersSelectedReader> getReaderClass() {
       return ViewAllCharactersSelectedReader.class;

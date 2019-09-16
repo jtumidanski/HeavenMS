@@ -42,7 +42,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Matze
  */
-public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket, WhisperReader> {
+public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
    @Override
    public Class<WhisperReader> getReaderClass() {
       return WhisperReader.class;

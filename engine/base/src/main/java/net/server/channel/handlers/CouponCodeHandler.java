@@ -57,7 +57,7 @@ import tools.Pair;
  * @author Penguins (Acrylic)
  * @author Ronan (HeavenMS)
  */
-public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePacket, CouponCodeReader> {
+public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePacket> {
 
    private List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, Connection con, int codeid) {
       Map<Integer, Integer> couponItems = new HashMap<>();

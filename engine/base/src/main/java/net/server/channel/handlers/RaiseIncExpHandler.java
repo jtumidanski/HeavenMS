@@ -16,7 +16,7 @@ import server.MapleItemInformationProvider.QuestConsItem;
  * @author Xari
  * @author Ronan - added concurrency protection and quest progress limit
  */
-public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket, UseItemUIReader> {
+public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
    @Override
    public Class<UseItemUIReader> getReaderClass() {
       return UseItemUIReader.class;

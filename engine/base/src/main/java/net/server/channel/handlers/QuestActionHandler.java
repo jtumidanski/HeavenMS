@@ -37,7 +37,7 @@ import tools.ServerNoticeType;
 /**
  * @author Matze
  */
-public final class QuestActionHandler extends AbstractPacketHandler<QuestActionPacket, QuestActionReader> {
+public final class QuestActionHandler extends AbstractPacketHandler<QuestActionPacket> {
    @Override
    public Class<QuestActionReader> getReaderClass() {
       return QuestActionReader.class;

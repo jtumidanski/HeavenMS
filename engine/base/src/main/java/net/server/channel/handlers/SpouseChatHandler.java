@@ -34,7 +34,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPacket, SpouseChatReader> {
+public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPacket> {
    @Override
    public Class<SpouseChatReader> getReaderClass() {
       return SpouseChatReader.class;

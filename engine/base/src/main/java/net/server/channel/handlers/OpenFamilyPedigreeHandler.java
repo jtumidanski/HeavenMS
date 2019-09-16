@@ -29,7 +29,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Ubaware
  */
-public final class OpenFamilyPedigreeHandler extends AbstractPacketHandler<OpenFamilyPedigreePacket, OpenFamilyPedigreeReader> {
+public final class OpenFamilyPedigreeHandler extends AbstractPacketHandler<OpenFamilyPedigreePacket> {
    @Override
    public Class<OpenFamilyPedigreeReader> getReaderClass() {
       return OpenFamilyPedigreeReader.class;

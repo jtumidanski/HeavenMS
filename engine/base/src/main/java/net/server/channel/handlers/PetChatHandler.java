@@ -31,7 +31,7 @@ import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
 
-public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket, PetChatReader> {
+public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket> {
    @Override
    public Class<PetChatReader> getReaderClass() {
       return PetChatReader.class;

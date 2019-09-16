@@ -26,7 +26,7 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 
-public final class PartySearchUpdateHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class PartySearchUpdateHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

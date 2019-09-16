@@ -27,7 +27,7 @@ import net.server.channel.packet.UseDeathItemPacket;
 import net.server.channel.packet.reader.UseDeathItemReader;
 import tools.MaplePacketCreator;
 
-public final class UseDeathItemHandler extends AbstractPacketHandler<UseDeathItemPacket, UseDeathItemReader> {
+public final class UseDeathItemHandler extends AbstractPacketHandler<UseDeathItemPacket> {
    @Override
    public Class<UseDeathItemReader> getReaderClass() {
       return UseDeathItemReader.class;

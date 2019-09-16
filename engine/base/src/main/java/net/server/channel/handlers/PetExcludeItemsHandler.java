@@ -32,7 +32,7 @@ import net.server.channel.packet.reader.PetExcludeItemsReader;
  * @author BubblesDev
  * @author Ronan
  */
-public final class PetExcludeItemsHandler extends AbstractPacketHandler<PetExcludeItemsPacket, PetExcludeItemsReader> {
+public final class PetExcludeItemsHandler extends AbstractPacketHandler<PetExcludeItemsPacket> {
    @Override
    public Class<PetExcludeItemsReader> getReaderClass() {
       return PetExcludeItemsReader.class;

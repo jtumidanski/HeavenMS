@@ -67,7 +67,7 @@ import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
 
-public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOperationPacket, CashOperationReader> {
+public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOperationPacket> {
 
    public static boolean checkBirthday(MapleClient c, int idate) {
       int year = idate / 10000;

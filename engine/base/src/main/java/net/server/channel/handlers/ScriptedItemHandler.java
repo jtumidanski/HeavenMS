@@ -34,7 +34,7 @@ import server.MapleItemInformationProvider.ScriptedItem;
 /**
  * @author Jay Estrella
  */
-public final class ScriptedItemHandler extends AbstractPacketHandler<ScriptedItemPacket, ScriptedItemReader> {
+public final class ScriptedItemHandler extends AbstractPacketHandler<ScriptedItemPacket> {
    @Override
    public Class<ScriptedItemReader> getReaderClass() {
       return ScriptedItemReader.class;

@@ -33,7 +33,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 /**
  * @author Matze
  */
-public final class ChangeChannelHandler extends AbstractPacketHandler<ChangeChannelPacket, ChangeChannelReader> {
+public final class ChangeChannelHandler extends AbstractPacketHandler<ChangeChannelPacket> {
    @Override
    public Class<ChangeChannelReader> getReaderClass() {
       return ChangeChannelReader.class;

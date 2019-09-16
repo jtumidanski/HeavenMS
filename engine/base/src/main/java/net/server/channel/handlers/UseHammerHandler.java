@@ -30,7 +30,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Jay Estrella
  */
-public final class UseHammerHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class UseHammerHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

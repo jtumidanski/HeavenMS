@@ -31,7 +31,7 @@ import server.maps.MapleMapObject;
 import server.maps.MapleSummon;
 import tools.MaplePacketCreator;
 
-public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummonPacket, DamageSummonReader> {
+public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummonPacket> {
    @Override
    public Class<DamageSummonReader> getReaderClass() {
       return DamageSummonReader.class;

@@ -32,7 +32,7 @@ import net.server.packet.reader.NoOpReader;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public final class ServerListRequestHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class ServerListRequestHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

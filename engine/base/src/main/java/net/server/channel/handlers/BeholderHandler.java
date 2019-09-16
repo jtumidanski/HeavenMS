@@ -36,7 +36,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
  * @author BubblesDev
  */
 //TODO is anything actually happening here?
-public final class BeholderHandler extends AbstractPacketHandler<BeholderPacket, BeholderReader> {
+public final class BeholderHandler extends AbstractPacketHandler<BeholderPacket> {
    @Override
    public Class<BeholderReader> getReaderClass() {
       return BeholderReader.class;

@@ -29,7 +29,7 @@ import net.server.login.packet.ServerStatusRequestPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public final class ServerStatusRequestHandler extends AbstractPacketHandler<ServerStatusRequestPacket, ServerStatusRequestReader> {
+public final class ServerStatusRequestHandler extends AbstractPacketHandler<ServerStatusRequestPacket> {
    @Override
    public Class<ServerStatusRequestReader> getReaderClass() {
       return ServerStatusRequestReader.class;

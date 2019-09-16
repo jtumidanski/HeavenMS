@@ -15,7 +15,7 @@ import net.server.login.packet.CharacterSelectedWithPicPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public class CharSelectedWithPicHandler extends AbstractPacketHandler<CharacterSelectedWithPicPacket, CharacterSelectedWithPicReader> {
+public class CharSelectedWithPicHandler extends AbstractPacketHandler<CharacterSelectedWithPicPacket> {
    @Override
    public Class<CharacterSelectedWithPicReader> getReaderClass() {
       return CharacterSelectedWithPicReader.class;

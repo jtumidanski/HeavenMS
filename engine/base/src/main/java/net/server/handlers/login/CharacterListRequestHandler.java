@@ -29,7 +29,7 @@ import net.server.login.packet.CharacterListRequestPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public final class CharacterListRequestHandler extends AbstractPacketHandler<CharacterListRequestPacket, CharacterListRequestReader> {
+public final class CharacterListRequestHandler extends AbstractPacketHandler<CharacterListRequestPacket> {
    @Override
    public Class<CharacterListRequestReader> getReaderClass() {
       return CharacterListRequestReader.class;

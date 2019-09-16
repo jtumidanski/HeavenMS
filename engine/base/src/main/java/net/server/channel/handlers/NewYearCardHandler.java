@@ -41,7 +41,7 @@ import tools.ServerNoticeType;
  * <p>
  * Header layout thanks to Eric
  */
-public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearCardPacket, NewYearCardReader> {
+public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearCardPacket> {
    @Override
    public Class<NewYearCardReader> getReaderClass() {
       return NewYearCardReader.class;

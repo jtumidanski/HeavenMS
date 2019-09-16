@@ -31,7 +31,7 @@ import tools.MaplePacketCreator;
 /*
  * @author Rob
  */
-public final class RegisterPinHandler extends AbstractPacketHandler<RegisterPinPacket, RegisterPinReader> {
+public final class RegisterPinHandler extends AbstractPacketHandler<RegisterPinPacket> {
    @Override
    public Class<RegisterPinReader> getReaderClass() {
       return RegisterPinReader.class;

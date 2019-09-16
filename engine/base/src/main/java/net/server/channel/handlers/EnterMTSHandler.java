@@ -44,7 +44,7 @@ import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 
-public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

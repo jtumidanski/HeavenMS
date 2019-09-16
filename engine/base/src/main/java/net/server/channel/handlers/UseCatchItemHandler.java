@@ -40,7 +40,7 @@ import tools.ServerNoticeType;
 /**
  * @author kevintjuh93
  */
-public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchItemPacket, UseCatchItemReader> {
+public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchItemPacket> {
    @Override
    public Class<UseCatchItemReader> getReaderClass() {
       return UseCatchItemReader.class;

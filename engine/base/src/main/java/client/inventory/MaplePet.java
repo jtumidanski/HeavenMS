@@ -248,9 +248,9 @@ public class MaplePet extends Item {
       for (LifeMovementFragment move : movement) {
          if (move instanceof LifeMovement) {
             if (move instanceof AbsoluteLifeMovement) {
-               this.setPos(move.getPosition());
+               this.setPos(move.position());
             }
-            this.setStance(((LifeMovement) move).getNewstate());
+            this.setStance(((LifeMovement) move).newState());
          }
       }
    }

@@ -36,7 +36,7 @@ import tools.ServerNoticeType;
 /**
  * @author kevintjuh93
  */
-public final class TrockAddMapHandler extends AbstractPacketHandler<BaseTeleportRockMapPacket, TeleportRockMapReader> {
+public final class TrockAddMapHandler extends AbstractPacketHandler<BaseTeleportRockMapPacket> {
    @Override
    public Class<TeleportRockMapReader> getReaderClass() {
       return TeleportRockMapReader.class;

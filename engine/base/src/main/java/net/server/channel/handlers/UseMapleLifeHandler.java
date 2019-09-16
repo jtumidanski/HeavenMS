@@ -32,7 +32,7 @@ import tools.ServerNoticeType;
 /**
  * @author RonanLana
  */
-public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacket, UseMapleLifeReader> {
+public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacket> {
    @Override
    public Class<UseMapleLifeReader> getReaderClass() {
       return UseMapleLifeReader.class;

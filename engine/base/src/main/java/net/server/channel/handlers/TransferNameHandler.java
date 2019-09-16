@@ -37,7 +37,7 @@ import tools.MaplePacketCreator;
 /**
  * @author Ronan
  */
-public final class TransferNameHandler extends AbstractPacketHandler<TransferNamePacket, TransferNameReader> {
+public final class TransferNameHandler extends AbstractPacketHandler<TransferNamePacket> {
    @Override
    public Class<TransferNameReader> getReaderClass() {
       return TransferNameReader.class;

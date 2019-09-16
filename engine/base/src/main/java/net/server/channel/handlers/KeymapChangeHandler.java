@@ -39,7 +39,7 @@ import net.server.channel.packet.keymap.KeyTypeAction;
 import net.server.channel.packet.keymap.RegularKeymapChangePacket;
 import net.server.channel.packet.reader.KeymapChangeReader;
 
-public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapChangePacket, KeymapChangeReader> {
+public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapChangePacket> {
    @Override
    public Class<KeymapChangeReader> getReaderClass() {
       return KeymapChangeReader.class;

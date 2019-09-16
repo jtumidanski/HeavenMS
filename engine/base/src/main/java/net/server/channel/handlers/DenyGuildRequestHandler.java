@@ -30,7 +30,7 @@ import net.server.processor.MapleGuildProcessor;
 /**
  * @author Xterminator
  */
-public final class DenyGuildRequestHandler extends AbstractPacketHandler<DenyGuildRequestPacket, DenyGuildRequestReader> {
+public final class DenyGuildRequestHandler extends AbstractPacketHandler<DenyGuildRequestPacket> {
    @Override
    public Class<DenyGuildRequestReader> getReaderClass() {
       return DenyGuildRequestReader.class;

@@ -35,7 +35,7 @@ import net.server.login.packet.CreateCharacterPacket;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
-public final class CreateCharHandler extends AbstractPacketHandler<CreateCharacterPacket, CreateCharacterReader> {
+public final class CreateCharHandler extends AbstractPacketHandler<CreateCharacterPacket> {
    @Override
    public Class<CreateCharacterReader> getReaderClass() {
       return CreateCharacterReader.class;

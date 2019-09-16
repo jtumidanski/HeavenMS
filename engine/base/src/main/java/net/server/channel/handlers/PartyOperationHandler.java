@@ -48,7 +48,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public final class PartyOperationHandler extends AbstractPacketHandler<BasePartyOperationPacket, PartyOperationReader> {
+public final class PartyOperationHandler extends AbstractPacketHandler<BasePartyOperationPacket> {
    @Override
    public Class<PartyOperationReader> getReaderClass() {
       return PartyOperationReader.class;

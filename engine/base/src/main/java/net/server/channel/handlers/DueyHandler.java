@@ -33,7 +33,7 @@ import net.server.channel.packet.duey.DueySendItemPacket;
 import net.server.channel.packet.reader.DueyReader;
 import tools.MaplePacketCreator;
 
-public final class DueyHandler extends AbstractPacketHandler<BaseDueyPacket, DueyReader> {
+public final class DueyHandler extends AbstractPacketHandler<BaseDueyPacket> {
    @Override
    public Class<DueyReader> getReaderClass() {
       return DueyReader.class;

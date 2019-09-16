@@ -32,7 +32,7 @@ import scripting.npc.NPCScriptManager;
 /**
  * @author Generic
  */
-public final class RemoteGachaponHandler extends AbstractPacketHandler<RemoteGachaponPacket, RemoteGachaponReader> {
+public final class RemoteGachaponHandler extends AbstractPacketHandler<RemoteGachaponPacket> {
    @Override
    public Class<RemoteGachaponReader> getReaderClass() {
       return RemoteGachaponReader.class;

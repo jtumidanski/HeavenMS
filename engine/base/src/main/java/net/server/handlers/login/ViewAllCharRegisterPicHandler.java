@@ -16,7 +16,7 @@ import net.server.world.World;
 import tools.MaplePacketCreator;
 import tools.Randomizer;
 
-public final class ViewAllCharRegisterPicHandler extends AbstractPacketHandler<ViewAllCharactersRegisterPicPacket, ViewAllCharactersRegisterPicReader> {
+public final class ViewAllCharRegisterPicHandler extends AbstractPacketHandler<ViewAllCharactersRegisterPicPacket> {
    @Override
    public Class<ViewAllCharactersRegisterPicReader> getReaderClass() {
       return ViewAllCharactersRegisterPicReader.class;

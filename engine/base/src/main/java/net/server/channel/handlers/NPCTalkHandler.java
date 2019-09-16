@@ -36,7 +36,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket, NPCTalkReader> {
+public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (!client.getPlayer().isAlive()) {

@@ -35,7 +35,7 @@ import tools.ServerNoticeType;
 /**
  * @author Flav
  */
-public class EnterCashShopHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public class EnterCashShopHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

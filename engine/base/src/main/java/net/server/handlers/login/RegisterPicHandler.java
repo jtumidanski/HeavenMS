@@ -15,7 +15,7 @@ import net.server.login.packet.RegisterPicPacket;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 
-public final class RegisterPicHandler extends AbstractPacketHandler<RegisterPicPacket, RegisterPicReader> {
+public final class RegisterPicHandler extends AbstractPacketHandler<RegisterPicPacket> {
    @Override
    public Class<RegisterPicReader> getReaderClass() {
       return RegisterPicReader.class;

@@ -27,7 +27,7 @@ import net.server.channel.packet.MonsterBookCoverPacket;
 import net.server.channel.packet.reader.MonsterBookCoverReader;
 import tools.MaplePacketCreator;
 
-public final class MonsterBookCoverHandler extends AbstractPacketHandler<MonsterBookCoverPacket, MonsterBookCoverReader> {
+public final class MonsterBookCoverHandler extends AbstractPacketHandler<MonsterBookCoverPacket> {
    @Override
    public Class<MonsterBookCoverReader> getReaderClass() {
       return MonsterBookCoverReader.class;

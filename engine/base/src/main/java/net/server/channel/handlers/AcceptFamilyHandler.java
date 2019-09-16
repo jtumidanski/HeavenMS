@@ -40,7 +40,7 @@ import tools.MaplePacketCreator;
  * @author Jay Estrella
  * @author Ubaware
  */
-public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamilyPacket, AcceptFamilyReader> {
+public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamilyPacket> {
    @Override
    public Class<AcceptFamilyReader> getReaderClass() {
       return AcceptFamilyReader.class;

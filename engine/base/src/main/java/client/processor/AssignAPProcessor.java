@@ -55,7 +55,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
  */
 public class AssignAPProcessor {
 
-   public static void APAutoAssignAction(SeekableLittleEndianAccessor slea, MapleClient c) {
+   public static void APAutoAssignAction(MapleClient c, byte job, int types[], int gains[]) {
       MapleCharacter chr = c.getPlayer();
       if (chr.getRemainingAp() < 1) {
          return;
@@ -73,12 +73,11 @@ public class AssignAPProcessor {
          statGain[3] = 0;
 
          int remainingAp = chr.getRemainingAp();
-         slea.skip(8);
 
          if (ServerConstants.USE_SERVER_AUTOASSIGNER) {
             // --------- Ronan Lana's AUTOASSIGNER ---------
             // This method excels for assigning APs in such a way to cover all equipments AP requirements.
-            byte opt = slea.readByte();     // useful for pirate autoassigning
+            byte opt = job;     // useful for pirate autoassigning
 
             int str = 0, dex = 0, luk = 0, int_ = 0;
             List<Short> eqpStrList = new ArrayList<>();
@@ -393,7 +392,7 @@ public class AssignAPProcessor {
 
             MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Better AP applications detected:\r\nSTR: +" + statGain[0] + "\r\nDEX: +" + statGain[1] + "\r\nINT: +" + statGain[3] + "\r\nLUK: +" + statGain[2]);
          } else {
-            if (slea.available() < 16) {
+            if (types.length != 2 || gains.length != 2) {
                AutobanFactory.PACKET_EDIT.alert(chr, "Didn't send full packet for Auto Assign.");
 
                final MapleClient client = c;
@@ -408,8 +407,8 @@ public class AssignAPProcessor {
             }
 
             for (int i = 0; i < 2; i++) {
-               int type = slea.readInt();
-               int tempVal = slea.readInt();
+               int type = types[i];
+               int tempVal = gains[i];
                if (tempVal < 0 || tempVal > remainingAp) {
                   return;
                }

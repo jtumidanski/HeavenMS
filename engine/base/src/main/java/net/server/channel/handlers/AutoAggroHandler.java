@@ -29,7 +29,7 @@ import net.server.channel.packet.reader.AutoAggroReader;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
 
-public final class AutoAggroHandler extends AbstractPacketHandler<AutoAggroPacket, AutoAggroReader> {
+public final class AutoAggroHandler extends AbstractPacketHandler<AutoAggroPacket> {
    @Override
    public Class<AutoAggroReader> getReaderClass() {
       return AutoAggroReader.class;

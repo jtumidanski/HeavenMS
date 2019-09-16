@@ -44,7 +44,7 @@ import net.server.channel.packet.SkillEffectPacket;
 import net.server.channel.packet.reader.SkillEffectReader;
 import tools.MaplePacketCreator;
 
-public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectPacket, SkillEffectReader> {
+public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectPacket> {
    @Override
    public Class<SkillEffectReader> getReaderClass() {
       return SkillEffectReader.class;

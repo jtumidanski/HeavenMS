@@ -31,7 +31,7 @@ import server.maps.MapleMap;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 
-public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobPacket, FieldDamageMobReader> {
+public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobPacket> {
    @Override
    public Class<FieldDamageMobReader> getReaderClass() {
       return FieldDamageMobReader.class;

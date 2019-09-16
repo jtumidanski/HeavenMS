@@ -38,7 +38,7 @@ import tools.MaplePacketCreator;
  * @author TheRamon
  * @author Ronan
  */
-public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket, PetLootReader> {
+public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket> {
    @Override
    public Class<PetLootReader> getReaderClass() {
       return PetLootReader.class;

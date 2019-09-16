@@ -25,29 +25,8 @@ import java.awt.Point;
 
 import tools.data.output.LittleEndianWriter;
 
-public class ChairMovement extends AbstractLifeMovement {
-   private int fh;
+public interface LifeMovementFragment {
+   void serialize(LittleEndianWriter lew);
 
-   public ChairMovement(int type, Point position, int duration, int newstate) {
-      super(type, position, duration, newstate);
-   }
-
-   public int getFh() {
-      return fh;
-   }
-
-   public void setFh(int fh) {
-      this.fh = fh;
-   }
-
-   @Override
-   public void serialize(LittleEndianWriter lew) {
-      lew.write(getType());
-      lew.writeShort(getPosition().x);
-      lew.writeShort(getPosition().y);
-      lew.writeShort(fh);
-      lew.write(getNewstate());
-      lew.writeShort(getDuration());
-   }
+   Point position();
 }
-

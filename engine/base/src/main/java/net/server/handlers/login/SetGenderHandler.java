@@ -33,7 +33,7 @@ import tools.MaplePacketCreator;
 /**
  * @author kevintjuh93
  */
-public class SetGenderHandler extends AbstractPacketHandler<SetGenderPacket, SetGenderReader> {
+public class SetGenderHandler extends AbstractPacketHandler<SetGenderPacket> {
    @Override
    public Class<SetGenderReader> getReaderClass() {
       return SetGenderReader.class;

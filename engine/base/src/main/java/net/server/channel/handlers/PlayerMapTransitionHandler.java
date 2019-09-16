@@ -35,7 +35,7 @@ import tools.Pair;
 /**
  * @author Ronan
  */
-public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOpPacket, NoOpReader> {
+public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;

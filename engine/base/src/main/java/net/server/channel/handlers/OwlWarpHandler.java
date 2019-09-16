@@ -33,7 +33,7 @@ import tools.ServerNoticeType;
 /*
  * @author Ronan
  */
-public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket, OwlWarpReader> {
+public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
    @Override
    public Class<OwlWarpReader> getReaderClass() {
       return OwlWarpReader.class;

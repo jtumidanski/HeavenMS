@@ -36,7 +36,7 @@ import net.server.channel.packet.reader.SkillBookReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 
-public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacket, SkillBookReader> {
+public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacket> {
    @Override
    public Class<SkillBookReader> getReaderClass() {
       return SkillBookReader.class;
