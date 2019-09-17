@@ -50,7 +50,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import client.BuddyList;
 import client.BuddyList.BuddyAddResult;
 import client.BuddyList.BuddyOperation;
-import client.processor.BuddyListProcessor;
 import client.BuddylistEntry;
 import client.MapleCharacter;
 import client.MapleFamily;
@@ -59,6 +58,7 @@ import client.database.administrator.MarriageAdministrator;
 import client.database.administrator.PlayerNpcAdministrator;
 import client.database.data.MarriageData;
 import client.database.provider.MarriageProvider;
+import client.processor.BuddyListProcessor;
 import constants.GameConstants;
 import constants.ServerConstants;
 import net.server.PlayerStorage;
@@ -90,7 +90,6 @@ import net.server.worker.ServerMessageWorker;
 import net.server.worker.TimedMapObjectWorker;
 import net.server.worker.TimeoutWorker;
 import net.server.worker.WeddingReservationWorker;
-import net.server.world.announcer.MapleAnnouncerCoordinator;
 import scripting.event.EventInstanceManager;
 import server.MapleStorage;
 import server.TimerManager;
@@ -103,9 +102,7 @@ import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.MessageBroadcaster;
 import tools.Pair;
-import tools.ServerNoticeType;
 import tools.packets.Fishing;
 
 /**
@@ -130,7 +127,6 @@ public class World {
    private PlayerStorage players = new PlayerStorage();
    private MapleMatchCheckerCoordinator matchChecker = new MapleMatchCheckerCoordinator();
    private MaplePartySearchCoordinator partySearch = new MaplePartySearchCoordinator();
-   private MapleAnnouncerCoordinator announcer = new MapleAnnouncerCoordinator();
 
    private ReadLock chnRLock = chnLock.readLock();
    private WriteLock chnWLock = chnLock.writeLock();
@@ -219,13 +215,11 @@ public class World {
       partySearchSchedule = tman.register(new PartySearchWorker(this), 10 * 1000, 10 * 1000);
       timeoutSchedule = tman.register(new TimeoutWorker(this), 10 * 1000, 10 * 1000);
 
-      if(ServerConstants.USE_FAMILY_SYSTEM) {
+      if (ServerConstants.USE_FAMILY_SYSTEM) {
          long timeLeft = Server.getTimeLeftForNextDay();
          FamilyDailyResetWorker.resetEntitlementUsage(this);
          tman.register(new FamilyDailyResetWorker(this), 24 * 60 * 60 * 1000, timeLeft);
       }
-
-      announcer.init();
    }
 
    private static List<Entry<Integer, SortedMap<Integer, MapleCharacter>>> getSortedAccountCharacterView(Map<Integer, SortedMap<Integer, MapleCharacter>> map) {
@@ -606,10 +600,6 @@ public class World {
       return partySearch;
    }
 
-   public MapleAnnouncerCoordinator getAnnouncerCoordinator() {
-      return announcer;
-   }
-
    public void addPlayer(MapleCharacter chr) {
       players.addPlayer(chr);
    }
@@ -660,7 +650,7 @@ public class World {
    }
 
    public Collection<MapleFamily> getFamilies() {
-      synchronized(families) {
+      synchronized (families) {
          return Collections.unmodifiableCollection((Collection<MapleFamily>) families.values());
       }
    }
@@ -1028,7 +1018,7 @@ public class World {
             if (mc != null) {
                EventInstanceManager eim = mc.getEventInstance();
 
-               if(eim != null && eim.isEventLeader(mc)) {
+               if (eim != null && eim.isEventLeader(mc)) {
                   eim.changedLeader(target);
                } else {
                   int oldLeaderMapid = mc.getMapId();
@@ -1036,7 +1026,7 @@ public class World {
                   if (MapleMiniDungeonInfo.isDungeonMap(oldLeaderMapid)) {
                      if (oldLeaderMapid != target.getMapId()) {
                         MapleMiniDungeon mmd = mc.getClient().getChannelServer().getMiniDungeon(oldLeaderMapid);
-                        if(mmd != null) {
+                        if (mmd != null) {
                            mmd.close();
                         }
                      }

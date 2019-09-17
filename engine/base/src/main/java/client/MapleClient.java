@@ -76,7 +76,6 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
-import net.server.world.announcer.MapleAnnouncerCoordinator;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
@@ -123,10 +122,10 @@ public class MapleClient {
    private final Semaphore actionsSemaphore = new Semaphore(7);
    private final Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CLIENT, true);
    private final Lock encoderLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CLIENT_ENCODER, true);
+   private final Lock announcerLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CLIENT_ANNOUNCER, true);
    private MapleAESOFB send;
    private MapleAESOFB receive;
    private MapleCharacter player;
-   private MapleAnnouncerCoordinator announcer = MapleAnnouncerCoordinator.getInstance();
    private int channel = 1;
    private int accId = -4;
    private boolean loggedIn = false;
@@ -796,12 +795,6 @@ public class MapleClient {
 
    public void setWorld(int world) {
       this.world = world;
-      World wserv = Server.getInstance().getWorld(world);
-      if (wserv != null) {
-         this.announcer = wserv.getAnnouncerCoordinator();
-      } else {
-         this.announcer = MapleAnnouncerCoordinator.getInstance();
-      }
    }
 
    public void pongReceived() {
@@ -1009,7 +1002,12 @@ public class MapleClient {
    }
 
    public synchronized void announce(final byte[] packet) {//MINA CORE IS A FUCKING BITCH AND I HATE IT <3
-      announcer.append(session, packet);
+      announcerLock.lock();
+      try {
+         session.write(packet);
+      } finally {
+         announcerLock.unlock();
+      }
    }
 
    public void announceHint(String msg, int length) {

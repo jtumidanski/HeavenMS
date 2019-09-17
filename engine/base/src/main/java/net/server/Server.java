@@ -55,8 +55,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.processor.CharacterProcessor;
-import client.processor.MapleFamilyProcessor;
 import client.SkillFactory;
 import client.command.CommandsExecutor;
 import client.database.administrator.AccountAdministrator;
@@ -79,6 +77,8 @@ import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.manipulator.MapleCashIdGenerator;
 import client.newyear.NewYearCardRecord;
+import client.processor.CharacterProcessor;
+import client.processor.MapleFamilyProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.OpcodeConstants;
@@ -108,7 +108,6 @@ import net.server.worker.RankingLoginWorker;
 import net.server.worker.ReleaseLockWorker;
 import net.server.worker.RespawnWorker;
 import net.server.world.World;
-import net.server.world.announcer.MapleAnnouncerCoordinator;
 import server.CashShop.CashItemFactory;
 import server.MapleSkillbookInformationProvider;
 import server.ThreadManager;
@@ -893,7 +892,6 @@ public class Server {
          System.exit(0);
       }
 
-      MapleAnnouncerCoordinator.getInstance().init();
       System.out.println();
 
       if (ServerConstants.USE_FAMILY_SYSTEM) {
