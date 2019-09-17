@@ -247,6 +247,14 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   damage *= (skill.get().getEffect(skillLevel).getX() / 1000.0);
                }
             }
+
+            Optional<Skill> highDef = SkillFactory.getSkill(Aran.HIGH_DEFENSE);
+            if (highDef.isPresent()) {
+               int hdLevel = chr.getSkillLevel(highDef.get());
+               if (hdLevel > 0) {
+                  damage *= (highDef.get().getEffect(hdLevel).getX() / 1000.0);
+               }
+            }
          }
          Integer mesoguard = chr.getBuffedValue(MapleBuffStat.MESOGUARD);
          if (chr.getBuffedValue(MapleBuffStat.MAGIC_GUARD) != null && mpattack == 0) {

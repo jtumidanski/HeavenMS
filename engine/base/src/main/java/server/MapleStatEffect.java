@@ -1009,10 +1009,10 @@ public class MapleStatEffect {
    }
 
    private int getMorph(MapleCharacter chr) {
-      if (morphId % 10 == 0) {
-         return morphId + chr.getGender();
+      if (morphId == 1000 || morphId == 1001 || morphId == 1003) { // morph skill
+         return chr.getGender() == 0 ? morphId : morphId + 100;
       }
-      return morphId + 100 * chr.getGender();
+      return morphId;
    }
 
    public SummonMovementType getSummonMovementType() {
