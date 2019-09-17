@@ -41,7 +41,7 @@ class NPC2133004 {
             }
          } else if (status == 1) {
             if (!cm.haveItem(4001163)) {
-               cm.warp(930000800)
+               cm.warp(930000800, 0)
             } else {
                cm.getEventInstance().warpEventTeam(930000600)
             }

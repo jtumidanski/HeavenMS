@@ -106,6 +106,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    private List<Integer> stolenItems = new ArrayList<>(5);
    private int team;
    private int parentMobOid = 0;
+   private int spawnEffect = 0;
    private ScheduledFuture<?> monsterItemDrop = null;
    private Runnable removeAfterAction = null;
    private boolean availablePuppetUpdate = true;
@@ -185,6 +186,14 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       mp = stats.getMp();
 
       maxHpPlusHeal.set(hp.get());
+   }
+
+   public int getSpawnEffect() {
+      return spawnEffect;
+   }
+
+   public void setSpawnEffect(int spawnEffect) {
+      this.spawnEffect = spawnEffect;
    }
 
    public void disableDrops() {
@@ -1074,6 +1083,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    @Override
    public void sendDestroyData(MapleClient client) {
       client.announce(MaplePacketCreator.killMonster(getObjectId(), false));
+      client.announce(MaplePacketCreator.killMonster(getObjectId(), true));
    }
 
    @Override

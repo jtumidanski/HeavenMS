@@ -47,7 +47,7 @@ class NPC1052007 {
          } else if (selection == 1) {
             if (cm.haveItem(4031036) || cm.haveItem(4031037) || cm.haveItem(4031038)) {
                text += " You will be brought in immediately. Which ticket you would like to use?#b"
-               for (def i = 0; i < 3; i++ ) {
+               for (def i = 0; i < 3; i++) {
                   if (cm.haveItem(4031036 + i)) {
                      text += "\r\n#b#L" + (i + 1) + "##t" + (4031036 + i) + "#"
                   }
@@ -76,7 +76,8 @@ class NPC1052007 {
             ticketSelection = selection
             if (ticketSelection > -1) {
                cm.gainItem(4031035 + ticketSelection, (short) -1)
-               cm.warp(103000897 + (ticketSelection * 3))
+               // thanks IxianMace for noticing a few scripts having misplaced warp SP's
+               cm.warp(103000897 + (ticketSelection * 3), "st00")
                hasTicket = false
                cm.dispose()
                return

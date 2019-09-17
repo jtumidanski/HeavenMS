@@ -252,7 +252,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
             if (highDef.isPresent()) {
                int hdLevel = chr.getSkillLevel(highDef.get());
                if (hdLevel > 0) {
-                  damage *= (highDef.get().getEffect(hdLevel).getX() / 1000.0);
+                  damage *= Math.ceil(highDef.get().getEffect(hdLevel).getX() / 1000.0);
                }
             }
          }

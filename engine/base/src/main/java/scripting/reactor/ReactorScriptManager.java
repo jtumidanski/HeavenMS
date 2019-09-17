@@ -55,7 +55,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
             return;
          }
 
-         ReactorActionManager rm = new ReactorActionManager(c, reactor, (Invocable) iv);
+         ReactorActionManager rm = new ReactorActionManager(c, reactor, iv);
          iv.put("rm", rm);
          ((Invocable) iv).invokeFunction("hit");
       } catch (final NoSuchMethodException ignored) {
@@ -73,7 +73,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
             return;
          }
 
-         ReactorActionManager rm = new ReactorActionManager(c, reactor, (Invocable) iv);
+         ReactorActionManager rm = new ReactorActionManager(c, reactor, iv);
          iv.put("rm", rm);
          ((Invocable) iv).invokeFunction("act");
       } catch (final ScriptException | NoSuchMethodException | NullPointerException e) {
@@ -109,7 +109,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
             return;
          }
 
-         ReactorActionManager rm = new ReactorActionManager(c, reactor, (Invocable) iv);
+         ReactorActionManager rm = new ReactorActionManager(c, reactor, iv);
          iv.put("rm", rm);
          if (touching) {
             ((Invocable) iv).invokeFunction("touch");

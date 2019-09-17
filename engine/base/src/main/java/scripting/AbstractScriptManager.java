@@ -47,10 +47,8 @@ public abstract class AbstractScriptManager {
 
    protected ScriptEngine getScriptEngine(String path) {
       path = "script/src/main/groovy/" + path;
-      String engineName = "";
       File scriptFile = null;
       if (new File(path + ".groovy").exists()) {
-         engineName = "groovy";
          scriptFile = new File(path + ".groovy");
       }
       if (scriptFile == null) {

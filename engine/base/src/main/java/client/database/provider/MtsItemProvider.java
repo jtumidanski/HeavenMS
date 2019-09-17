@@ -187,6 +187,11 @@ public class MtsItemProvider extends AbstractQueryExecutor {
          equip.setWdef((short) resultSet.getInt("wdef"));
          equip.setUpgradeSlots((byte) resultSet.getInt("upgradeslots"));
          equip.setLevel((byte) resultSet.getInt("level"));
+         equip.setItemLevel(resultSet.getByte("itemlevel"));
+         equip.setItemExp(resultSet.getInt("itemexp"));
+         equip.setRingId(resultSet.getInt("ringid"));
+         equip.setExpiration(resultSet.getLong("expiration"));
+         equip.setGiftFrom(resultSet.getString("giftFrom"));
          equip.setFlag((short) resultSet.getInt("flag"));
          return new MTSItemInfo(equip, resultSet.getInt("price"), resultSet.getInt("id"), resultSet.getInt("seller"), resultSet.getString("sellername"), resultSet.getString("sell_ends"));
       }
@@ -221,6 +226,11 @@ public class MtsItemProvider extends AbstractQueryExecutor {
          equip.setLevel((byte) resultSet.getInt("level"));
          equip.setVicious((byte) resultSet.getInt("vicious"));
          equip.setFlag((short) resultSet.getInt("flag"));
+         equip.setItemLevel(resultSet.getByte("itemlevel"));
+         equip.setItemExp(resultSet.getInt("itemexp"));
+         equip.setRingId(resultSet.getInt("ringid"));
+         equip.setExpiration(resultSet.getLong("expiration"));
+         equip.setGiftFrom(resultSet.getString("giftFrom"));
          item = equip.copy();
       }
       return item;

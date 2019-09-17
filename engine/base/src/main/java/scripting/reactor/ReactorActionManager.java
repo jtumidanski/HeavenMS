@@ -29,6 +29,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Invocable;
+import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import client.MapleCharacter;
@@ -59,10 +60,10 @@ import tools.MaplePacketCreator;
  */
 public class ReactorActionManager extends AbstractPlayerInteraction {
    private MapleReactor reactor;
-   private Invocable iv;
+   private ScriptEngine iv;
    private ScheduledFuture<?> sprayTask = null;
 
-   public ReactorActionManager(MapleClient c, MapleReactor reactor, Invocable iv) {
+   public ReactorActionManager(MapleClient c, MapleReactor reactor, ScriptEngine iv) {
       super(c);
       this.reactor = reactor;
       this.iv = iv;
@@ -329,7 +330,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
          @Override
          public void run() {
             try {
-               iv.invokeFunction(methodName, eim);
+               ((Invocable) iv).invokeFunction(methodName, eim);
             } catch (ScriptException | NoSuchMethodException ex) {
                Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -342,7 +343,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
          @Override
          public void run() {
             try {
-               iv.invokeFunction(methodName, (Object) null);
+               ((Invocable) iv).invokeFunction(methodName, (Object) null);
             } catch (ScriptException | NoSuchMethodException ex) {
                Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
             }

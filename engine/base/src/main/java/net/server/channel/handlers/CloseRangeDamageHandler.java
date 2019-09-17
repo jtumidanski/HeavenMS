@@ -49,7 +49,6 @@ import constants.skills.Rogue;
 import constants.skills.ThunderBreaker;
 import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
-import net.server.PacketReader;
 import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;

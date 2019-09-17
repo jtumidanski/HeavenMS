@@ -42,56 +42,62 @@ public class MtsItemAdministrator extends AbstractQueryExecutor implements Delet
       });
    }
 
-   public void createItem(Connection connection, int tab, int type, int itemId, int quantity, int characterId, int price, String owner, String characterName, String date) {
-      String sql = "INSERT INTO mts_items (tab, type, itemid, quantity, seller, price, owner, sellername, sell_ends) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+   public void createItem(Connection connection, int tab, int type, int itemId, int quantity, long expiration, String giftFrom, int characterId, int price, String owner, String characterName, String date) {
+      String sql = "INSERT INTO mts_items (tab, type, itemid, quantity, seller, expiration, giftFrom, price, owner, sellername, sell_ends) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       execute(connection, sql, ps -> {
-         baseInsertParam(tab, type, itemId, quantity, characterId, price, ps);
-         ps.setString(7, owner);
-         ps.setString(8, characterName);
-         ps.setString(9, date);
+         baseInsertParam(tab, type, itemId, quantity, expiration, giftFrom, characterId, price, ps);
+         ps.setString(9, owner);
+         ps.setString(10, characterName);
+         ps.setString(11, date);
       });
    }
 
-   private void baseInsertParam(int tab, int type, int itemId, int quantity, int characterId, int price, PreparedStatement ps) throws SQLException {
+   private void baseInsertParam(int tab, int type, int itemId, int quantity, long expiration, String giftFrom, int characterId, int price, PreparedStatement ps) throws SQLException {
       ps.setInt(1, tab);
       ps.setInt(2, type);
       ps.setInt(3, itemId);
       ps.setInt(4, quantity);
-      ps.setInt(5, characterId);
-      ps.setInt(6, price);
+      ps.setLong(5, expiration);
+      ps.setString(6, giftFrom);
+      ps.setInt(7, characterId);
+      ps.setInt(8, price);
    }
 
-   public void createEquip(Connection connection, int tab, int type, int itemId, int quantity, int characterId,
+   public void createEquip(Connection connection, int tab, int type, int itemId, int quantity, long expiration, String giftFrom, int characterId,
                            int price, int upgradeSlots, int level, int strength, int dexterity, int intelligence,
                            int luck, int hp, int mp, int weaponAttack, int magicAttack, int weaponDefense,
                            int magicDefense, int accuracy, int avoidability, int hands, int speed, int jump,
-                           int locked, String owner, String characterName, String date, int vicious, int flag) {
-      String sql = "INSERT INTO mts_items (tab, type, itemid, quantity, seller, price, upgradeslots, level, str, dex, `int`, luk, hp, mp, watk, matk, wdef, mdef, acc, avoid, hands, speed, jump, locked, owner, sellername, sell_ends, vicious, flag) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                           int locked, String owner, String characterName, String date, int vicious, int flag,
+                           int itemExp, byte itemLevel, int ringId) {
+      String sql = "INSERT INTO mts_items (tab, type, itemid, quantity, seller, price, upgradeslots, level, str, dex, `int`, luk, hp, mp, watk, matk, wdef, mdef, acc, avoid, hands, speed, jump, locked, owner, sellername, sell_ends, vicious, flag, itemexp, itemlevel, ringid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       execute(connection, sql, ps -> {
-         baseInsertParam(tab, type, itemId, quantity, characterId, price, ps);
-         ps.setInt(7, upgradeSlots);
-         ps.setInt(8, level);
-         ps.setInt(9, strength);
-         ps.setInt(10, dexterity);
-         ps.setInt(11, intelligence);
-         ps.setInt(12, luck);
-         ps.setInt(13, hp);
-         ps.setInt(14, mp);
-         ps.setInt(15, weaponAttack);
-         ps.setInt(16, magicAttack);
-         ps.setInt(17, weaponDefense);
-         ps.setInt(18, magicDefense);
-         ps.setInt(19, accuracy);
-         ps.setInt(20, avoidability);
-         ps.setInt(21, hands);
-         ps.setInt(22, speed);
-         ps.setInt(23, jump);
-         ps.setInt(24, locked);
-         ps.setString(25, owner);
-         ps.setString(26, characterName);
-         ps.setString(27, date);
-         ps.setInt(28, vicious);
-         ps.setInt(29, flag);
+         baseInsertParam(tab, type, itemId, quantity, expiration, giftFrom, characterId, price, ps);
+         ps.setInt(9, upgradeSlots);
+         ps.setInt(10, level);
+         ps.setInt(11, strength);
+         ps.setInt(12, dexterity);
+         ps.setInt(13, intelligence);
+         ps.setInt(14, luck);
+         ps.setInt(15, hp);
+         ps.setInt(16, mp);
+         ps.setInt(17, weaponAttack);
+         ps.setInt(18, magicAttack);
+         ps.setInt(19, weaponDefense);
+         ps.setInt(20, magicDefense);
+         ps.setInt(21, accuracy);
+         ps.setInt(22, avoidability);
+         ps.setInt(23, hands);
+         ps.setInt(24, speed);
+         ps.setInt(25, jump);
+         ps.setInt(26, locked);
+         ps.setString(27, owner);
+         ps.setString(28, characterName);
+         ps.setString(29, date);
+         ps.setInt(30, vicious);
+         ps.setInt(31, flag);
+         ps.setInt(32, itemExp);
+         ps.setByte(33, itemLevel);    // thanks Jefe for noticing missing itemlevel labels
+         ps.setInt(34, ringId);
       });
    }
 

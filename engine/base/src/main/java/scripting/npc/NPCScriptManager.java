@@ -45,7 +45,7 @@ public class NPCScriptManager extends AbstractScriptManager {
 
    private static NPCScriptManager instance = new NPCScriptManager();
    private Map<MapleClient, NPCConversationManager> cms = new HashMap<>();
-   private Map<MapleClient, Invocable> scripts = new HashMap<>();
+   private Map<MapleClient, ScriptEngine> scripts = new HashMap<>();
 
    public static NPCScriptManager getInstance() {
       return instance;
@@ -97,7 +97,7 @@ public class NPCScriptManager extends AbstractScriptManager {
             return;
          }
          iv.put("cm", cm);
-         scripts.put(c, (Invocable) iv);
+         scripts.put(c, iv);
          try {
             ((Invocable) iv).invokeFunction("start", chrs);
          } catch (final NoSuchMethodException nsme) {
@@ -141,7 +141,7 @@ public class NPCScriptManager extends AbstractScriptManager {
                return false;
             }
             iv.put(engineName, cm);
-            scripts.put(c, (Invocable) iv);
+            scripts.put(c, iv);
             c.setClickedNPC();
             try {
                ((Invocable) iv).invokeFunction("start");
@@ -166,11 +166,11 @@ public class NPCScriptManager extends AbstractScriptManager {
    }
 
    public void action(MapleClient c, byte mode, byte type, int selection) {
-      Invocable iv = scripts.get(c);
+      ScriptEngine iv = scripts.get(c);
       if (iv != null) {
          try {
             c.setClickedNPC();
-            iv.invokeFunction("action", mode, type, selection);
+            ((Invocable) iv).invokeFunction("action", mode, type, selection);
          } catch (ScriptException | NoSuchMethodException t) {
             if (getCM(c) != null) {
                FilePrinter.printError(FilePrinter.NPC + getCM(c).getNpc() + ".txt", t);

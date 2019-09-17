@@ -69,6 +69,7 @@ import server.quest.requirements.MonsterBookCountRequirement;
 import server.quest.requirements.NpcRequirement;
 import server.quest.requirements.PetRequirement;
 import server.quest.requirements.QuestRequirement;
+import server.quest.requirements.ScriptRequirement;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
@@ -547,6 +548,8 @@ public class MapleQuest {
             ret = new BuffExceptRequirement(this, data);
             break;
          case SCRIPT:
+            ret = new ScriptRequirement(this, data);
+            break;
          case NORMAL_AUTO_START:
          case START:
          case END:
@@ -624,6 +627,17 @@ public class MapleQuest {
          return ((NpcRequirement) mqr).get();
       } else {
          return -1;
+      }
+   }
+
+   public boolean hasScriptRequirement(boolean complete) {
+      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !complete ? startReqs : completeReqs;
+      MapleQuestRequirement mqr = reqs.get(MapleQuestRequirementType.SCRIPT);
+
+      if (mqr != null) {
+         return ((ScriptRequirement) mqr).get();
+      } else {
+         return false;
       }
    }
 

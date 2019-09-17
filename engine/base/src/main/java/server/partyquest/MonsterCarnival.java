@@ -51,8 +51,7 @@ public class MonsterCarnival {
          final int bluePortal = map.isPurpleCPQMap() ? 1 : 0;
 
          p1.getMembers().stream()
-               .map(member -> cs.getPlayerStorage().getCharacterById(member.getId()))
-               .flatMap(Optional::stream)
+               .map(MaplePartyCharacter::getPlayer)
                .forEach(character -> {
                   character.setMonsterCarnival(this);
                   character.setTeam(0);
@@ -65,8 +64,7 @@ public class MonsterCarnival {
                   team1 = character;
                });
          p2.getMembers().stream()
-               .map(member -> cs.getPlayerStorage().getCharacterById(member.getId()))
-               .flatMap(Optional::stream)
+               .map(MaplePartyCharacter::getPlayer)
                .forEach(character -> {
                   character.setMonsterCarnival(this);
                   character.setTeam(1);
@@ -228,8 +226,7 @@ public class MonsterCarnival {
 
    private void disposeParty(MapleCharacter partyLeader, boolean warpOut, Channel cs, MapleMap out) {
       partyLeader.getParty().getMembers().stream()
-            .map(member -> cs.getPlayerStorage().getCharacterById(member.getId()))
-            .flatMap(Optional::stream)
+            .map(MaplePartyCharacter::getPlayer)
             .forEach(character -> {
                character.resetCP();
                character.setTeam(-1);
@@ -252,8 +249,7 @@ public class MonsterCarnival {
       Channel cs = map.getChannelServer();
 
       leader.getParty().getMembers().stream()
-            .map(member -> cs.getPlayerStorage().getCharacterById(member.getId()))
-            .flatMap(Optional::stream)
+            .map(MaplePartyCharacter::getPlayer)
             .forEach(character -> {
                character.gainFestivalPoints(totalCP);
                character.setMonsterCarnival(null);
@@ -269,7 +265,6 @@ public class MonsterCarnival {
 
    private void finish(int winningTeam) {
       try {
-         Channel cs = map.getChannelServer();
          if (winningTeam == 0) {
             finishForParty(leader1, this.redTotalCP, 2, 200);
             finishForParty(leader2, this.blueTotalCP, 3, 300);
@@ -319,8 +314,7 @@ public class MonsterCarnival {
 
    private void completeForParty(Channel channel, MapleCharacter leader, boolean win) {
       leader.getParty().getMembers().stream()
-            .map(member -> channel.getPlayerStorage().getCharacterById(member.getId()))
-            .flatMap(Optional::stream)
+            .map(MaplePartyCharacter::getPlayer)
             .forEach(character -> {
                if (win) {
                   character.getClient().announce(MaplePacketCreator.showEffect("quest/carnival/win"));

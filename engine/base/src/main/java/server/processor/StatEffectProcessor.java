@@ -744,6 +744,7 @@ public class StatEffectProcessor {
                break;
             case ILMage.SEAL:
             case FPMage.SEAL:
+            case BlazeWizard.SEAL:
                monsterStatus.put(MonsterStatus.SEAL, 1);
                break;
             case Hermit.SHADOW_WEB: // shadow web

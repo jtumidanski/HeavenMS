@@ -85,10 +85,10 @@ class NPC9010022 {
                   cm.warp(980030000, 3)
                   break
                case 5:
-                  cm.warp(926010000)
+                  cm.warp(926010000, 4)
                   break
                case 6:
-                  cm.warp(910320000)
+                  cm.warp(910320000, 2)
                   break
             }
             cm.dispose()

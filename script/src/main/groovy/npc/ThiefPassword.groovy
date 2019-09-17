@@ -39,7 +39,7 @@ class NPCThiefPassword {
       } else if (status == 1) {
          if (cm.getText() == "Open Sesame") {
             if (cm.isQuestCompleted(3925)) {
-               cm.warp(260010402)
+               cm.warp(260010402, 1)
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Although you said the right answer, the door will not budge.")
             }

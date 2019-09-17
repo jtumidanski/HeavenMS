@@ -24,7 +24,7 @@ class NPC9120200 {
          cm.dispose()
       } else {
          if (mode == 0) {
-            cm.sendOk("If you want to return to #m801000000#, then talk to me")
+            cm.sendOk("If you want to return to #m801000000#, then talk to me.")
             cm.dispose()
          } else if (mode == 1) {
             status++

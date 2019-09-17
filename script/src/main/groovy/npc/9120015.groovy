@@ -35,7 +35,7 @@ class NPC9120015 {
                cm.dispose()
             }
          } else {
-            cm.warp(801040000)
+            cm.warp(801040000, "in00")
             cm.dispose()
          }
       }

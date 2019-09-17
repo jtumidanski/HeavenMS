@@ -670,8 +670,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          mapExit = cs.getMapFactory().getMap(980000000);
 
          c.getPlayer().getParty().getMembers().stream()
-               .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-               .flatMap(Optional::stream)
+               .map(MaplePartyCharacter::getPlayer)
                .forEach(character -> {
                   character.setChallenged(false);
                   character.changeMap(map, map.getPortal(0));
@@ -691,8 +690,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    public void cancelCPQLobby() {
       c.getPlayer().getParty().getMembers().parallelStream()
-            .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-            .flatMap(Optional::stream)
+            .map(MaplePartyCharacter::getPlayer)
             .forEach(MapleCharacter::clearCpqTimer);
    }
 
@@ -713,12 +711,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          final MapleMap lobbyMap = getPlayer().getMap();
          if (challenger != null) {
             if (challenger.getParty() == null) {
-               throw new RuntimeException("Nao existe oponente!");
+               throw new RuntimeException("No opponent found!");
             }
 
             challenger.getParty().getMembers().parallelStream()
-                  .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-                  .flatMap(Optional::stream)
+                  .map(MaplePartyCharacter::getPlayer)
                   .forEach(character -> {
                      character.changeMap(lobbyMap, lobbyMap.getPortal(0));
                      TimerManager tMan = TimerManager.getInstance();
@@ -741,13 +738,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             public void run() {
                try {
                   getPlayer().getParty().getMembers().stream()
-                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-                        .flatMap(Optional::stream)
+                        .map(MaplePartyCharacter::getPlayer)
                         .forEach(character -> character.setMonsterCarnival(null));
 
                   challenger.getParty().getMembers().stream()
-                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-                        .flatMap(Optional::stream)
+                        .map(MaplePartyCharacter::getPlayer)
                         .forEach(character -> character.setMonsterCarnival(null));
                } catch (NullPointerException npe) {
                   warpoutCPQLobby(lobbyMap);
@@ -769,12 +764,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          final MapleMap lobbyMap = getPlayer().getMap();
          if (challenger != null) {
             if (challenger.getParty() == null) {
-               throw new RuntimeException("Não existe oponente!");
+               throw new RuntimeException("No opponent found!");
             }
 
             challenger.getParty().getMembers().stream()
-                  .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-                  .flatMap(Optional::stream)
+                  .map(MaplePartyCharacter::getPlayer)
                   .forEach(character -> {
                      character.changeMap(lobbyMap, lobbyMap.getPortal(0));
                      mapClock(10);
@@ -787,12 +781,10 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             public void run() {
                try {
                   getPlayer().getParty().getMembers().stream()
-                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-                        .flatMap(Optional::stream)
+                        .map(MaplePartyCharacter::getPlayer)
                         .forEach(character -> character.setMonsterCarnival(null));
                   challenger.getParty().getMembers().stream()
-                        .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-                        .flatMap(Optional::stream)
+                        .map(MaplePartyCharacter::getPlayer)
                         .forEach(character -> character.setMonsterCarnival(null));
                } catch (NullPointerException npe) {
                   warpoutCPQLobby(lobbyMap);
@@ -858,8 +850,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          map = cs.getMapFactory().getMap(980031000 + 1000 * field);
 
          c.getPlayer().getParty().getMembers().stream()
-               .map(member -> c.getChannelServer().getPlayerStorage().getCharacterById(member.getId()))
-               .flatMap(Optional::stream)
+               .map(MaplePartyCharacter::getPlayer)
                .forEach(character -> {
                   character.setChallenged(false);
                   character.changeMap(map, map.getPortal(0));

@@ -21,73 +21,48 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package scripting.portal;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.script.Compilable;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 
 import client.MapleClient;
+import scripting.AbstractScriptManager;
 import server.maps.MaplePortal;
 import tools.FilePrinter;
 
-public class PortalScriptManager {
+public class PortalScriptManager extends AbstractScriptManager {
 
    private static PortalScriptManager instance = new PortalScriptManager();
-   private Map<String, PortalScript> scripts = new HashMap<>();
-   private ScriptEngineFactory sef;
+   private Map<String, ScriptEngine> scripts = new HashMap<>();
 
    private PortalScriptManager() {
-      ScriptEngineManager sem = new ScriptEngineManager();
-      sef = sem.getEngineByName("groovy").getFactory();
    }
 
    public static PortalScriptManager getInstance() {
       return instance;
    }
 
-   private PortalScript getPortalScript(String scriptName) {
-      if (scripts.containsKey(scriptName)) {
-         return scripts.get(scriptName);
+   private ScriptEngine getPortalScript(String scriptName) {
+      String scriptPath = "script/src/main/groovy/portal/" + scriptName + ".groovy";
+      ScriptEngine iv = scripts.get(scriptPath);
+      if (iv != null) {
+         return iv;
       }
-      File scriptFile = new File("script/src/main/groovy/portal/" + scriptName + ".groovy");
-      if (!scriptFile.exists()) {
-         scripts.put(scriptName, null);
+
+      iv = getScriptEngine(scriptPath);
+      if (iv == null) {
          return null;
       }
-      FileReader fr = null;
-      ScriptEngine portal = sef.getScriptEngine();
-      try {
-         fr = new FileReader(scriptFile);
-         ((Compilable) portal).compile(fr).eval();
-      } catch (ScriptException | IOException | UndeclaredThrowableException e) {
-         FilePrinter.printError(FilePrinter.PORTAL + scriptName + ".txt", e);
-      } finally {
-         if (fr != null) {
-            try {
-               fr.close();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-         }
-      }
-      PortalScript script = ((Invocable) portal).getInterface(PortalScript.class);
-      scripts.put(scriptName, script);
-      return script;
+      scripts.put(scriptPath, iv);
+      return iv;
    }
 
    public boolean executePortalScript(MaplePortal portal, MapleClient c) {
       try {
-         PortalScript script = getPortalScript(portal.getScriptName());
-         if (script != null) {
-            return script.enter(new PortalPlayerInteraction(c, portal));
+         ScriptEngine iv = getPortalScript(portal.getScriptName());
+         if (iv != null) {
+            return (boolean) ((Invocable) iv).invokeFunction("enter", new PortalPlayerInteraction(c, portal));
          }
       } catch (Exception ute) {
          FilePrinter.printError(FilePrinter.PORTAL + portal.getScriptName() + ".txt", ute);

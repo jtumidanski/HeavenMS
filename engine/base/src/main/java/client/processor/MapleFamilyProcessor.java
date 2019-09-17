@@ -56,7 +56,11 @@ public class MapleFamilyProcessor {
                world = characterData.get().getWorld();
             }
 
-            MapleFamily family = Server.getInstance().getWorld(world).getFamily(familyData.getFamilyId());
+            World wserv = Server.getInstance().getWorld(world);
+            if (wserv == null) {
+               return;
+            }
+            MapleFamily family = wserv.getFamily(familyData.getFamilyId());
             if (family == null) {
                family = new MapleFamily(familyData.getFamilyId(), world);
                Server.getInstance().getWorld(world).addFamily(familyData.getFamilyId(), family);

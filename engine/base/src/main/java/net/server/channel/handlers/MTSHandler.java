@@ -286,16 +286,17 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
 
             String date = buildDate();
             if (!i.getInventoryType().equals(MapleInventoryType.EQUIP)) {
-               MtsItemAdministrator.getInstance().createItem(connection, 1, (int) invType.getType(), i.getItemId(),
-                     postedQuantity, c.getPlayer().getId(), price, i.getOwner(), c.getPlayer().getName(), date);
+               MtsItemAdministrator.getInstance().createItem(connection, 1, invType.getType(), i.getItemId(),
+                     postedQuantity, i.getExpiration(), i.getGiftFrom(), c.getPlayer().getId(), price, i.getOwner(), c.getPlayer().getName(), date);
             } else {
                Equip equip = (Equip) i;
-               MtsItemAdministrator.getInstance().createEquip(connection, 1, (int) invType.getType(),
-                     equip.getItemId(), postedQuantity, c.getPlayer().getId(), price, equip.getUpgradeSlots(),
+               MtsItemAdministrator.getInstance().createEquip(connection, 1, invType.getType(),
+                     equip.getItemId(), postedQuantity, equip.getExpiration(), equip.getGiftFrom(), c.getPlayer().getId(), price, equip.getUpgradeSlots(),
                      equip.getLevel(), equip.getStr(), equip.getDex(), equip.getInt(), equip.getLuk(), equip.getHp(),
                      equip.getMp(), equip.getWatk(), equip.getMatk(), equip.getWdef(), equip.getMdef(), equip.getAcc(),
                      equip.getAvoid(), equip.getHands(), equip.getSpeed(), equip.getJump(), 0, equip.getOwner(),
-                     c.getPlayer().getName(), date, equip.getVicious(), equip.getFlag());
+                     c.getPlayer().getName(), date, equip.getVicious(), equip.getFlag(), equip.getItemExp(),
+                     equip.getItemLevel(), equip.getRingId());
             }
             MapleInventoryManipulator.removeFromSlot(c, invType, slot, postedQuantity, false);
 

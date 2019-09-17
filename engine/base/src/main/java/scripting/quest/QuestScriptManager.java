@@ -41,10 +41,19 @@ public class QuestScriptManager extends AbstractScriptManager {
 
    private static QuestScriptManager instance = new QuestScriptManager();
    private Map<MapleClient, QuestActionManager> qms = new HashMap<>();
-   private Map<MapleClient, Invocable> scripts = new HashMap<>();
+   private Map<MapleClient, ScriptEngine> scripts = new HashMap<>();
 
    public static QuestScriptManager getInstance() {
       return instance;
+   }
+
+   private ScriptEngine getQuestScriptEngine(MapleClient c, short questid) {
+      ScriptEngine iv = getScriptEngine("quest/" + questid + ".groovy", c);
+      if (iv == null && GameConstants.isMedalQuest(questid)) {
+         iv = getScriptEngine("quest/medalQuest.groovy", c);   // start generic medal quest
+      }
+
+      return iv;
    }
 
    public void start(MapleClient c, short questid, int npc) {
@@ -60,20 +69,20 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            ScriptEngine iv = getScriptEngine("quest/" + questid, c);
-            if (iv == null) {
-               if (GameConstants.isMedalQuest(questid)) {   // start generic medal quest
-                  iv = getScriptEngine("quest/medalQuest", c);
-               } else {
-                  FilePrinter.printError(FilePrinter.QUEST_UNCODED, "START Quest " + questid + " is uncoded.");
-               }
-            }
-            if (iv == null || QuestScriptManager.getInstance() == null) {
+            if (!quest.hasScriptRequirement(false)) {
                qm.dispose();
                return;
             }
+
+            ScriptEngine iv = getQuestScriptEngine(c, questid);
+            if (iv == null) {
+               FilePrinter.printError(FilePrinter.QUEST_UNCODED, "START Quest " + questid + " is uncoded.");
+               qm.dispose();
+               return;
+            }
+
             iv.put("qm", qm);
-            scripts.put(c, (Invocable) iv);
+            scripts.put(c, iv);
             c.setClickedNPC();
             ((Invocable) iv).invokeFunction("start", (byte) 1, (byte) 0, 0);
          }
@@ -87,11 +96,11 @@ public class QuestScriptManager extends AbstractScriptManager {
    }
 
    public void start(MapleClient c, byte mode, byte type, int selection) {
-      Invocable iv = scripts.get(c);
+      ScriptEngine iv = scripts.get(c);
       if (iv != null) {
          try {
             c.setClickedNPC();
-            iv.invokeFunction("start", mode, type, selection);
+            ((Invocable) iv).invokeFunction("start", mode, type, selection);
          } catch (final Throwable ute) {
             FilePrinter.printError(FilePrinter.QUEST + getQM(c).getQuest() + ".txt", ute);
             dispose(c);
@@ -112,18 +121,20 @@ public class QuestScriptManager extends AbstractScriptManager {
          }
          if (c.canClickNPC()) {
             qms.put(c, qm);
-            ScriptEngine iv = getScriptEngine("quest/" + questid, c);
-            if (iv == null) {
-               if (GameConstants.isMedalQuest(questid)) {   // start generic medal quest
-                  iv = getScriptEngine("quest/medalQuest", c);
-               } else {
-                  FilePrinter.printError(FilePrinter.QUEST_UNCODED, "END Quest " + questid + " is uncoded.");
-                  qm.dispose();
-                  return;
-               }
+            if (!quest.hasScriptRequirement(true)) {
+               qm.dispose();
+               return;
             }
+
+            ScriptEngine iv = getQuestScriptEngine(c, questid);
+            if (iv == null) {
+               FilePrinter.printError(FilePrinter.QUEST_UNCODED, "END Quest" + questid + " is uncoded.");
+               qm.dispose();
+               return;
+            }
+
             iv.put("qm", qm);
-            scripts.put(c, (Invocable) iv);
+            scripts.put(c, iv);
             c.setClickedNPC();
             ((Invocable) iv).invokeFunction("end", (byte) 1, (byte) 0, 0);
          }
@@ -137,11 +148,11 @@ public class QuestScriptManager extends AbstractScriptManager {
    }
 
    public void end(MapleClient c, byte mode, byte type, int selection) {
-      Invocable iv = scripts.get(c);
+      ScriptEngine iv = scripts.get(c);
       if (iv != null) {
          try {
             c.setClickedNPC();
-            iv.invokeFunction("end", mode, type, selection);
+            ((Invocable) iv).invokeFunction("end", mode, type, selection);
          } catch (final Throwable ute) {
             FilePrinter.printError(FilePrinter.QUEST + getQM(c).getQuest() + ".txt", ute);
             dispose(c);

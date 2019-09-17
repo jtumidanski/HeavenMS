@@ -76,7 +76,7 @@ class EventGuardianNex {
    // Warp player in etc..
    def playerEntry(EventInstanceManager eim, MapleCharacter player) {
       MapleMap cave = eim.getMapInstance(eventMap + 10 * eim.getIntProperty("nex"))
-      player.changeMap(cave)
+      player.changeMap(cave, 1)
    }
 
    // Do something with the player that is about to unregister right before unregistering he/she.

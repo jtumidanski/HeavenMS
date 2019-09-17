@@ -75,8 +75,8 @@ import constants.skills.Shadower;
 import constants.skills.Sniper;
 import constants.skills.Spearman;
 import constants.skills.SuperGM;
-import constants.skills.Swordsman;
 import constants.skills.ThunderBreaker;
+import constants.skills.Warrior;
 import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import provider.MapleData;
@@ -85,7 +85,6 @@ import provider.MapleDataFileEntry;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import server.MapleStatEffect;
 import server.life.Element;
 import server.processor.StatEffectProcessor;
 
@@ -149,10 +148,11 @@ public class SkillFactory {
 
    /**
     * Executes a function if the user has a skill that meets the conditional.
-    * @param character the character
-    * @param skillId the skill identifier
+    *
+    * @param character   the character
+    * @param skillId     the skill identifier
     * @param conditional the condition to execute the function
-    * @param function the function to execute
+    * @param function    the function to execute
     */
    public static void executeIfSkillMeetsConditional(MapleCharacter character, int skillId,
                                                      BiFunction<Skill, Integer, Boolean> conditional,
@@ -272,7 +272,7 @@ public class SkillFactory {
             case Beginner.MONSTER_RIDER:
             case Beginner.ECHO_OF_HERO:
             case Beginner.MAP_CHAIR:
-            case Swordsman.IRON_BODY:
+            case Warrior.IRON_BODY:
             case Fighter.AXE_BOOSTER:
             case Fighter.POWER_GUARD:
             case Fighter.RAGE:
@@ -479,8 +479,9 @@ public class SkillFactory {
       }
       if (data.getChildByPath(skill.toString()) != null) {
          for (MapleData skilldata : data.getChildByPath(skill.toString()).getChildren()) {
-            if (skilldata.getName().equals("name"))
+            if (skilldata.getName().equals("name")) {
                return MapleDataTool.getString(skilldata, null);
+            }
          }
       }
 

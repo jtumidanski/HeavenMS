@@ -99,10 +99,10 @@ class NPC2133001 {
                      cm.gainItem(4001169, (short) -20)
                      cm.getEventInstance().warpEventTeam(930000500)
                   } else {
-                     cm.warp(930000800)
+                     cm.warp(930000800, 0)
                   }
                } else {
-                  cm.warp(930000800)
+                  cm.warp(930000800, 0)
                }
             }
 

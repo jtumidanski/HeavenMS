@@ -40,7 +40,7 @@ class NPC9060000 {
          if (completed) {
             cm.getEventInstance().clearPQ()
          } else {
-            cm.warp(923010100)
+            cm.warp(923010100, 0)
          }
 
          cm.dispose()

@@ -22,29 +22,23 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package scripting.map;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import javax.script.Compilable;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
+import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import scripting.AbstractScriptManager;
 import tools.FilePrinter;
 
-public class MapScriptManager {
+public class MapScriptManager extends AbstractScriptManager {
 
    private static MapScriptManager instance = new MapScriptManager();
-   private Map<String, Invocable> scripts = new HashMap<>();
-   private ScriptEngineFactory sef;
+   private Map<String, ScriptEngine> scripts = new HashMap<>();
+
    private MapScriptManager() {
-      ScriptEngineManager sem = new ScriptEngineManager();
-      sef = sem.getEngineByName("javascript").getFactory();
    }
 
    public static MapScriptManager getInstance() {
@@ -60,46 +54,38 @@ public class MapScriptManager {
       return scriptFile.exists();
    }
 
-   public void runMapScript(MapleClient c, String scriptName, boolean firstUser) {
-      if (scripts.containsKey(scriptName)) {
+   public boolean runMapScript(MapleClient c, String scriptName, boolean firstUser) {
+      if (firstUser) {
+         MapleCharacter character = c.getPlayer();
+         int mapId = character.getMapId();
+         if (character.hasEntered(scriptName, mapId)) {
+            return false;
+         } else {
+            character.enteredScript(scriptName, mapId);
+         }
+      }
+
+      ScriptEngine iv = scripts.get(scriptName);
+      if (iv != null) {
          try {
-            scripts.get(scriptName).invokeFunction("start", new MapScriptMethods(c));
+            ((Invocable) iv).invokeFunction("start", new MapScriptMethods(c));
+            return true;
          } catch (final ScriptException | NoSuchMethodException e) {
             e.printStackTrace();
          }
-         return;
       }
-      String type = firstUser ? "onFirstUserEnter/" : "onUserEnter/";
 
-      File scriptFile = new File("script/src/main/groovy/map/" + type + scriptName + ".js");
-      if (!scriptExists(scriptName, firstUser)) {
-         return;
-      }
-      FileReader fr = null;
-      ScriptEngine se = sef.getScriptEngine();
       try {
-         fr = new FileReader(scriptFile);
-
-         // java 8 support here thanks to Arufonsu
-         if (ServerConstants.JAVA_8) {
-            se.eval("load('nashorn:mozilla_compat.js');" + System.lineSeparator());
+         iv = getScriptEngine("script/src/main/groovy/map/" + scriptName + ".groovy");
+         if (iv == null) {
+            return false;
          }
-
-         ((Compilable) se).compile(fr).eval();
-
-         final Invocable script = ((Invocable) se);
-         scripts.put(scriptName, script);
-         script.invokeFunction("start", new MapScriptMethods(c));
+         scripts.put(scriptName, iv);
+         ((Invocable) iv).invokeFunction("start", new MapScriptMethods(c));
+         return true;
       } catch (final Exception ute) {
-         FilePrinter.printError(FilePrinter.MAP_SCRIPT + type + scriptName + ".txt", ute);
-      } finally {
-         if (fr != null) {
-            try {
-               fr.close();
-            } catch (IOException e) {
-               e.printStackTrace();
-            }
-         }
+         FilePrinter.printError(FilePrinter.MAP_SCRIPT + scriptName + ".txt", ute);
       }
+      return false;
    }
 }

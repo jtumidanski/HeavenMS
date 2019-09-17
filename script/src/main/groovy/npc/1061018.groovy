@@ -44,7 +44,7 @@ class NPC1061018 {
             }
          } else if (status == 1) {
             if (cm.getEventInstance().isEventCleared()) {
-               cm.warp(cm.getMapId() == 105100300 ? 105100301 : 105100401)
+               cm.warp(cm.getMapId() == 105100300 ? 105100301 : 105100401, 0)
             } else {
                cm.warp(105100100)
             }

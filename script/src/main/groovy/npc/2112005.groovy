@@ -81,7 +81,7 @@ class NPC2112005 {
                   cm.sendYesNo("We must keep fighting to save Romeo, please keep your pace. If you are not feeling so well to continue, your companions and I will understand... So, are you going to retreat?")
                }
             } else {
-               cm.warp(926110700)
+               cm.warp(926110700, 0)
                cm.dispose()
             }
          } else {
@@ -99,9 +99,9 @@ class NPC2112005 {
                   cm.gainItem(4001160, (short) 1)
 
                   if (eim.getIntProperty("normalClear") == 1) {
-                     cm.warp(926110600)
+                     cm.warp(926110600, 0)
                   } else {
-                     cm.warp(926110500)
+                     cm.warp(926110500, 0)
                   }
                } else {
                   cm.sendOk("Make sure you have a space on your ETC inventory.")
@@ -109,7 +109,7 @@ class NPC2112005 {
 
                cm.dispose()
             } else {
-               cm.warp(926110600)
+               cm.warp(926110600, 0)
                cm.dispose()
             }
          }

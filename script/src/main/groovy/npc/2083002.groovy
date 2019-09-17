@@ -26,7 +26,7 @@ class NPC2083002 {
          if (cm.getMapId() > 240050400) {
             cm.warp(240050600)
          } else {
-            cm.warp(240040700)
+            cm.warp(240040700, "out00")
          }
 
          cm.dispose()

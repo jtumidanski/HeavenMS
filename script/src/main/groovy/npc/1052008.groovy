@@ -24,7 +24,7 @@ class NPC1052008 {
          int prize = prizes[prizeIndex]
          cm.gainItem(prize, (short) 1)
       }
-      cm.warp(103000100)
+      cm.warp(103000100, 0)
       cm.dispose()
    }
 

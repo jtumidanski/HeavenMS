@@ -311,6 +311,10 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       listener.onHpmpPoolUpdate();
    }
 
+   private void dispatchStatUpdated() {
+      listener.onStatUpdate();
+   }
+
    private void dispatchStatPoolUpdateAnnounced() {
       listener.onAnnounceStatPoolUpdate();
    }
@@ -325,6 +329,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
       try {
          statUpdates.clear();
          boolean poolUpdate = false;
+         boolean statUpdate = false;
 
          if (hpMpPool != null) {
             short newHp = (short) (hpMpPool >> 48);
@@ -396,7 +401,7 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
                statUpdates.put(MapleStat.AVAILABLEAP, remainingAp);
             }
 
-            poolUpdate = true;  // recalc stats
+            statUpdate = true;
          }
 
          if (newSp != null) {
@@ -410,6 +415,10 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
          if (!statUpdates.isEmpty()) {
             if (poolUpdate) {
                dispatchHpmpPoolUpdated();
+            }
+
+            if (statUpdate) {
+               dispatchStatUpdated();
             }
 
             if (!silent) {

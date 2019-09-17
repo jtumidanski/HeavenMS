@@ -65,8 +65,12 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
       }
 
-      int charge = (attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG) ? attack.charge() : -1;
-      byte[] packet = MaplePacketCreator.magicAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), charge, attack.speed(), attack.direction(), attack.display());
+      byte[] packet;
+      if ((attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG)) {
+         packet = MaplePacketCreator.magicAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.charge(), attack.speed(), attack.direction(), attack.display());
+      } else {
+         packet = MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display());
+      }
 
       chr.getMap().broadcastMessage(chr, packet, false, true);
       MapleStatEffect effect = getAttackEffect(attack, chr, null);

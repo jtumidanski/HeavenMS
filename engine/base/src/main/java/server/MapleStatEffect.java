@@ -503,6 +503,8 @@ public class MapleStatEffect {
             MapleMonster monster = (MapleMonster) mo;
             if (isDispel()) {
                monster.debuffMob(skill_.getId());
+            } else if (isSeal() && monster.isBoss()) {
+               //do nothing, seal shouldn't work on bosses
             } else {
                if (makeChanceResult()) {
                   monster.applyStatus(applyfrom, new MonsterStatusEffect(getMonsterStati(), skill_, null, false), isPoison(), getDuration());
@@ -961,6 +963,10 @@ public class MapleStatEffect {
 
    private boolean isCrash() {
       return skill && (sourceid == DragonKnight.POWER_CRASH || sourceid == Crusader.ARMOR_CRASH || sourceid == WhiteKnight.MAGIC_CRASH);
+   }
+
+   private boolean isSeal() {
+      return skill && (sourceid == ILMage.SEAL || sourceid == FPMage.SEAL || sourceid == BlazeWizard.SEAL);
    }
 
    private boolean isDispel() {

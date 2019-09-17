@@ -29,6 +29,8 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
+import server.life.MapleMonster;
+import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
 import tools.Pair;
 
@@ -52,6 +54,22 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
 
          final List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.HOMING_BEACON, 0));
          chr.announce(MaplePacketCreator.giveBuff(1, beaconid, stat));
+      }
+
+      for (MapleMapObject mo : chr.getMap().getMonsters()) {    // thanks BHB, IxianMace, Jefe for noticing several issues regarding mob statuses (such as freeze)
+         MapleMonster m = (MapleMonster) mo;
+         if (m.getSpawnEffect() == 0 || m.getHp() < m.getMaxHp()) {     // avoid effect-spawning mobs
+            if (m.getController() == chr) {
+               client.announce(MaplePacketCreator.stopControllingMonster(m.getObjectId()));
+               m.sendDestroyData(client);
+               m.aggroRedirectController();
+            } else {
+               m.sendDestroyData(client);
+            }
+
+            m.aggroSwitchController(chr, false);
+            m.sendSpawnData(client);
+         }
       }
    }
 }

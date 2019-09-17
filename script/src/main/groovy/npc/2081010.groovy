@@ -32,7 +32,7 @@ class NPC2081010 {
       if (status == 0) {
          cm.sendYesNo("Do you want to exit the area? If you quit, you will need to start this task from the scratch.")
       } else if (status == 1) {
-         cm.warp(exitMap)
+         cm.warp(exitMap, "st00")
          cm.dispose()
       }
    }

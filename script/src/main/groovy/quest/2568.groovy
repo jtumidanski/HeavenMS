@@ -23,7 +23,7 @@ class Quest2568 {
 
          } else {
             qm.forceStartQuest()
-            qm.warp(912060200)
+            qm.warp(912060200, 0)
          }
          qm.dispose()
       }

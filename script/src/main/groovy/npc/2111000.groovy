@@ -17,7 +17,7 @@ class NPC2111000 {
 
    def start() {
       if (cm.isQuestStarted(3310) && !cm.haveItem(4031709, 1)) {
-         cm.warp(926120100)
+         cm.warp(926120100, "out00")
       } else {
          cm.sendNext("Alchemy....and Alchemist.....both of them are important. But more importantly, it is the Magatia that tolerate everything. The honor of Magatia should be protected by me.")
       }

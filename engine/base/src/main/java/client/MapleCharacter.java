@@ -101,6 +101,7 @@ import client.processor.CharacterProcessor;
 import client.processor.MapleFamilyProcessor;
 import client.processor.MapleJobProcessor;
 import client.processor.PartyProcessor;
+import client.processor.PetAutopotProcessor;
 import client.processor.SkillProcessor;
 import constants.ExpTable;
 import constants.GameConstants;
@@ -110,6 +111,7 @@ import constants.skills.Aran;
 import constants.skills.Bishop;
 import constants.skills.BlazeWizard;
 import constants.skills.Bowmaster;
+import constants.skills.Brawler;
 import constants.skills.Buccaneer;
 import constants.skills.Corsair;
 import constants.skills.Crusader;
@@ -126,8 +128,8 @@ import constants.skills.NightLord;
 import constants.skills.Paladin;
 import constants.skills.Priest;
 import constants.skills.Shadower;
-import constants.skills.Swordsman;
 import constants.skills.ThunderBreaker;
+import constants.skills.Warrior;
 import net.server.PlayerBuffValueHolder;
 import net.server.PlayerCoolDownValueHolder;
 import net.server.Server;
@@ -399,6 +401,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                setMp(localmaxmp);
                statUpdates.put(MapleStat.MP, mp);
             }
+         }
+
+         @Override
+         public void onStatUpdate() {
+            recalcLocalStats();
          }
 
          @Override
@@ -1543,6 +1550,24 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       PartyProcessor.getInstance().updatePartyTownDoors(party, this, partyLeaver, partyMembers);
+   }
+
+   public void collectDiseases() {
+      for (MapleCharacter chr : map.getAllPlayers()) {
+         int cid = chr.getId();
+
+         for (Entry<MapleDisease, Pair<Long, MobSkill>> di : chr.getAllDiseases().entrySet()) {
+            MapleDisease disease = di.getKey();
+            MobSkill skill = di.getValue().getRight();
+            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
+
+            if (disease != MapleDisease.SLOW) {
+               this.announce(MaplePacketCreator.giveForeignDebuff(cid, debuff, skill));
+            } else {
+               this.announce(MaplePacketCreator.giveForeignSlowDebuff(cid, debuff, skill));
+            }
+         }
+      }
    }
 
    private Integer getVisitedMapIndex(MapleMap map) {
@@ -5306,10 +5331,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean hasEntered(String script, int mapId) {
-      if (entered.containsKey(mapId)) {
-         return entered.get(mapId).equals(script);
-      }
-      return false;
+      String e = entered.get(mapId);
+      return script.equals(e);
    }
 
    public void hasGivenFame(MapleCharacter to) {
@@ -5739,7 +5762,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          addHp += Randomizer.rand(12, 16);
          addMp += Randomizer.rand(10, 12);
       } else if (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.DAWNWARRIOR1)) {
-         improvingMaxHPSkillId = isCygnus() ? DawnWarrior.MAX_HP_INCREASE : Swordsman.IMPROVED_MAX_HP_INCREASE;
+         improvingMaxHPSkillId = isCygnus() ? DawnWarrior.MAX_HP_INCREASE : Warrior.IMPROVED_MAXHP;
          if (job.isA(MapleJob.CRUSADER)) {
             improvingMaxMPSkillId = 1210000;
          } else if (job.isA(MapleJob.DAWNWARRIOR2)) {
@@ -5758,7 +5781,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          addHp += 30000;
          addMp += 30000;
       } else if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
-         improvingMaxHPSkillId = isCygnus() ? ThunderBreaker.IMPROVE_MAX_HP : 5100000;
+         improvingMaxHPSkillId = isCygnus() ? ThunderBreaker.IMPROVE_MAX_HP : Brawler.IMPROVE_MAX_HP;
          addHp += Randomizer.rand(22, 28);
          addMp += Randomizer.rand(18, 23);
       } else if (job.isA(MapleJob.ARAN1)) {
@@ -5770,7 +5793,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       Optional<Skill> improvingMaxHP = SkillFactory.getSkill(improvingMaxHPSkillId);
       if (improvingMaxHP.isPresent()) {
          int improvingMaxHPLevel = getSkillLevel(improvingMaxHP.get());
-         if (improvingMaxHPLevel > 0 && (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.PIRATE) || job.isA(MapleJob.DAWNWARRIOR1))) {
+         if (improvingMaxHPLevel > 0 && (job.isA(MapleJob.WARRIOR) || job.isA(MapleJob.PIRATE) || job.isA(MapleJob.DAWNWARRIOR1) || job.isA(MapleJob.THUNDERBREAKER1))) {
             addHp += improvingMaxHP.get().getEffect(improvingMaxHPLevel).getX();
          }
       }
@@ -6594,7 +6617,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             client.announce(MaplePacketCreator.updatePlayerStats(hpmpupdate, true, this));
          }
 
-         if (oldmaxhp != localmaxhp) {
+         if (oldmaxhp != localmaxhp) {   // thanks Wh1SK3Y for pointing out a deadlock occuring related to party members HP
             updatePartyMemberHP();
          }
       } finally {
@@ -7178,11 +7201,35 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          updateHpMp(nextHp, nextMp);
-         return true;
       } finally {
          statWlock.unlock();
          effLock.unlock();
       }
+
+      // autopot on HPMP deplete... thanks shavit for finding out D. Roar doesn't trigger autopot request
+      if (hpchange < 0) {
+         MapleKeyBinding autohpPot = this.getKeymap().get(91);
+         if (autohpPot != null) {
+            int autohpItemid = autohpPot.getAction();
+            Item autohpItem = this.getInventory(MapleInventoryType.USE).findById(autohpItemid);
+            if (autohpItem != null) {
+               PetAutopotProcessor.getInstance().runAutopotAction(client, autohpItem.getPosition(), autohpItemid);
+            }
+         }
+      }
+
+      if (mpchange < 0) {
+         MapleKeyBinding autompPot = this.getKeymap().get(92);
+         if (autompPot != null) {
+            int autompItemid = autompPot.getAction();
+            Item autompItem = this.getInventory(MapleInventoryType.USE).findById(autompItemid);
+            if (autompItem != null) {
+               PetAutopotProcessor.getInstance().runAutopotAction(client, autompItem.getPosition(), autompItemid);
+            }
+         }
+      }
+
+      return true;
    }
 
    public void setMiniGamePoints(MapleCharacter visitor, int winnerslot, boolean omok) {

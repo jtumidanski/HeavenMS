@@ -41,7 +41,7 @@ class NPC2112004 {
             if (status == 0) {
                cm.sendYesNo("We must keep fighting to save Juliet, please keep your pace. If you are not feeling so well to continue, your companions and I will understand... So, are you going to retreat?")
             } else if (status == 1) {
-               cm.warp(926100700)
+               cm.warp(926100700, 0)
                cm.dispose()
             }
          } else {

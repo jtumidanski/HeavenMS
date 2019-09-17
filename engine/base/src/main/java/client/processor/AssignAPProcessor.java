@@ -42,6 +42,7 @@ import constants.skills.BlazeWizard;
 import constants.skills.Brawler;
 import constants.skills.DawnWarrior;
 import constants.skills.Magician;
+import constants.skills.ThunderBreaker;
 import constants.skills.Warrior;
 import server.ThreadManager;
 import tools.MaplePacketCreator;
@@ -746,7 +747,7 @@ public class AssignAPProcessor {
          }
       } else if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
          if (!usedAPReset) {
-            MaxHP += SkillFactory.applyIfHasSkill(player, Brawler.IMPROVE_MAX_HP, (skill, skillLevel) -> skill.getEffect(skillLevel).getY(), 0);
+            MaxHP += SkillFactory.applyIfHasSkill(player, job.isA(MapleJob.PIRATE) ? Brawler.IMPROVE_MAX_HP : ThunderBreaker.IMPROVE_MAX_HP, (skill, skillLevel) -> skill.getEffect(skillLevel).getY(), 0);
          }
 
          if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {

@@ -217,6 +217,8 @@ class EventBalrogBattle {
             eim.clearPQ()
 
             eim.dispatchUpdateQuestMobCount(bossMobId, entryMap)
+            eim.dispatchUpdateQuestMobCount(9101003, entryMap)
+            // thanks Atoot for noticing quest not getting updated after boss kill
             mob.getMap().broadcastBalrogVictory(eim.getLeader().getName())
          } else {
             if (count == 1) {

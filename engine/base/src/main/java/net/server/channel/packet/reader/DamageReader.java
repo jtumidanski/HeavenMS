@@ -141,13 +141,13 @@ public class DamageReader implements PacketReader<AttackPacket> {
       long calcDmgMax;
 
       if (magic && ret.skill() != 0) {
-         calcDmgMax = (chr.getTotalMagic() * chr.getTotalMagic() / 1000 + chr.getTotalMagic()) / 30 + chr.getTotalInt() / 200;
+         calcDmgMax = (long) (Math.ceil((chr.getTotalMagic() * Math.ceil(chr.getTotalMagic() / 1000.0) + chr.getTotalMagic()) / 30.0) + Math.ceil(chr.getTotalInt() / 200.0));
       } else if (ret.skill() == 4001344 || ret.skill() == NightWalker.LUCKY_SEVEN || ret.skill() == NightLord.TRIPLE_THROW) {
-         calcDmgMax = (chr.getTotalLuk() * 5) * chr.getTotalWatk() / 100;
+         calcDmgMax = (long) ((chr.getTotalLuk() * 5) * Math.ceil(chr.getTotalWatk() / 100.0));
       } else if (ret.skill() == DragonKnight.DRAGON_ROAR) {
-         calcDmgMax = (chr.getTotalStr() * 4 + chr.getTotalDex()) * chr.getTotalWatk() / 100;
+         calcDmgMax = (long) ((chr.getTotalStr() * 4 + chr.getTotalDex()) * Math.ceil(chr.getTotalWatk() / 100.0));
       } else if (ret.skill() == NightLord.VENOMOUS_STAR || ret.skill() == Shadower.VENOMOUS_STAB) {
-         calcDmgMax = (int) (18.5 * (chr.getTotalStr() + chr.getTotalLuk()) + chr.getTotalDex() * 2) / 100 * chr.calculateMaxBaseDamage(chr.getTotalWatk());
+         calcDmgMax = (long) (Math.ceil((18.5 * (chr.getTotalStr() + chr.getTotalLuk()) + chr.getTotalDex() * 2) / 100.0) * chr.calculateMaxBaseDamage(chr.getTotalWatk()));
       } else {
          calcDmgMax = chr.calculateMaxBaseDamage(chr.getTotalWatk());
       }

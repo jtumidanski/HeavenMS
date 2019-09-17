@@ -39,16 +39,24 @@ public class MapleDoorProcessor {
       target.removeMapObject(areaDoor);
       town.removeMapObject(townDoor);
 
-      target.getCharacters().forEach(character -> areaDoor.sendDestroyData(character.getClient()));
-      town.getCharacters().forEach(character -> townDoor.sendDestroyData(character.getClient()));
-
+      target.getCharacters().forEach(character -> {
+         areaDoor.sendDestroyData(character.getClient());
+         character.removeVisibleMapObject(areaDoor);
+      });
+      town.getCharacters().forEach(character -> {
+         townDoor.sendDestroyData(character.getClient());
+         character.removeVisibleMapObject(townDoor);
+      });
 
       owner.removePartyDoor(false);
 
       if (destroyDoor.getTownPortal().getId() == 0x80) {
          town.getCharacters().stream()
                .filter(character -> character.getMainTownDoor() != null)
-               .forEach(character -> townDoor.sendSpawnData(character.getClient()));
+               .forEach(character -> {
+                  townDoor.sendSpawnData(character.getClient());
+                  character.addVisibleMapObject(townDoor);
+               });
       }
    }
 }
