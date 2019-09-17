@@ -359,15 +359,12 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.ADMIN_CHAT, new AdminChatHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_PET, new MovePetHandler());
       packetProcessor.registerHandler(RecvOpcode.ALLIANCE_OPERATION, new AllianceOperationHandler());
-
+      packetProcessor.registerHandler(RecvOpcode.MAKER_SKILL, new MakerSkillHandler());
+      packetProcessor.registerHandler(RecvOpcode.ADMIN_COMMAND, new AdminCommandHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_LIFE, new MoveLifeHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_DRAGON, new MoveDragonHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.MAKER_SKILL, new MakerSkillHandler());
-
-      packetProcessor.registerHandler(RecvOpcode.ADMIN_COMMAND, new AdminCommandHandler());
 
       packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
 

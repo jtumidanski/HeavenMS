@@ -21,31 +21,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.server.channel.handlers;
 
-import java.awt.Point;
-
 import client.MapleCharacter;
 import client.MapleClient;
+import net.server.PacketReader;
+import net.server.channel.packet.movement.MoveDragonPacket;
+import net.server.channel.packet.reader.MoveDragonReader;
 import server.maps.MapleDragon;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 
-public class MoveDragonHandler extends AbstractMovementPacketHandler {
+public class MoveDragonHandler extends AbstractMoveHandler<MoveDragonPacket> {
    @Override
-   public void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      final MapleCharacter chr = c.getPlayer();
-      final Point startPos = new Point(slea.readShort(), slea.readShort());
-      long movementDataStart = slea.getPosition();
+   public Class<? extends PacketReader<MoveDragonPacket>> getReaderClass() {
+      return MoveDragonReader.class;
+   }
+
+   @Override
+   public void handlePacket(MoveDragonPacket packet, MapleClient client) {
+      final MapleCharacter chr = client.getPlayer();
       final MapleDragon dragon = chr.getDragon();
       if (dragon != null) {
-         updatePosition(slea, dragon, 0);
-         long movementDataLength = slea.getPosition() - movementDataStart; //how many bytes were read by updatePosition
-         if (movementDataLength > 0) {
-            slea.seek(movementDataStart);
+         processMovementList(packet.movementDataList(), dragon);
+         if (packet.hasMovement()) {
             if (chr.isHidden()) {
-               chr.getMap().broadcastGMMessage(chr, MaplePacketCreator.moveDragon(dragon, startPos, slea, movementDataLength));
+               chr.getMap().broadcastGMMessage(chr, MaplePacketCreator.moveDragon(dragon, packet.startPosition(), packet.movementList()));
             } else {
-               chr.getMap().broadcastMessage(chr, MaplePacketCreator.moveDragon(dragon, startPos, slea, movementDataLength), dragon.getPosition());
+               chr.getMap().broadcastMessage(chr, MaplePacketCreator.moveDragon(dragon, packet.startPosition(), packet.movementList()), dragon.getPosition());
             }
          }
       }

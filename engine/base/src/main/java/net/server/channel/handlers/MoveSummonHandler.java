@@ -21,35 +21,36 @@
 */
 package net.server.channel.handlers;
 
-import java.awt.Point;
 import java.util.Collection;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import net.server.PacketReader;
+import net.server.channel.packet.movement.MoveSummonPacket;
+import net.server.channel.packet.reader.MoveSummonReader;
 import server.maps.MapleSummon;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MoveSummonHandler extends AbstractMovementPacketHandler {
+public final class MoveSummonHandler extends AbstractMoveHandler<MoveSummonPacket> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      int oid = slea.readInt();
-      Point startPos = new Point(slea.readShort(), slea.readShort());
-      MapleCharacter player = c.getPlayer();
+   public Class<? extends PacketReader<MoveSummonPacket>> getReaderClass() {
+      return MoveSummonReader.class;
+   }
+
+   @Override
+   public void handlePacket(MoveSummonPacket packet, MapleClient client) {
+      MapleCharacter player = client.getPlayer();
       Collection<MapleSummon> summons = player.getSummonsValues();
       MapleSummon summon = null;
       for (MapleSummon sum : summons) {
-         if (sum.getObjectId() == oid) {
+         if (sum.getObjectId() == packet.objectId()) {
             summon = sum;
             break;
          }
       }
       if (summon != null) {
-         long movementDataStart = slea.getPosition();
-         updatePosition(slea, summon, 0);
-         long movementDataLength = slea.getPosition() - movementDataStart; //how many bytes were read by updatePosition
-         slea.seek(movementDataStart);
-         player.getMap().broadcastMessage(player, MaplePacketCreator.moveSummon(player.getId(), oid, startPos, slea, movementDataLength), summon.getPosition());
+         processMovementList(packet.movementDataList(), summon);
+         player.getMap().broadcastMessage(player, MaplePacketCreator.moveSummon(player.getId(), packet.objectId(), packet.startPosition(), packet.movementList()), summon.getPosition());
       }
    }
 }

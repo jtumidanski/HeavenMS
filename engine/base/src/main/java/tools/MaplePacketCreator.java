@@ -2260,6 +2260,14 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
+   private static void rebroadcastMovementList(LittleEndianWriter lew, List<Byte> movementDataList) {
+      //movement command length is sent by client, probably not a big issue? (could be calculated on server)
+      //if multiple write/reads are slow, could use a (cached?) byte[] buffer
+      for (int i = 0; i < movementDataList.size(); i++) {
+         lew.write(movementDataList.get(i));
+      }
+   }
+
    private static void rebroadcastMovementList(LittleEndianWriter lew, SeekableLittleEndianAccessor slea, long movementDataLength) {
       //movement command length is sent by client, probably not a big issue? (could be calculated on server)
       //if multiple write/reads are slow, could use a (cached?) byte[] buffer
@@ -2275,6 +2283,16 @@ public class MaplePacketCreator {
       }
    }
 
+   public static byte[] movePlayer(int cid, List<Byte> movementList) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MOVE_PLAYER.getValue());
+      mplew.writeInt(cid);
+      mplew.writeInt(0);
+      rebroadcastMovementList(mplew, movementList);
+      return mplew.getPacket();
+   }
+
+   @Deprecated
    public static byte[] movePlayer(int cid, SeekableLittleEndianAccessor movementSlea, long movementDataLength) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.MOVE_PLAYER.getValue());
@@ -2284,6 +2302,17 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
+   public static byte[] moveSummon(int cid, int oid, Point startPos, List<Byte> movementDataList) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MOVE_SUMMON.getValue());
+      mplew.writeInt(cid);
+      mplew.writeInt(oid);
+      mplew.writePos(startPos);
+      rebroadcastMovementList(mplew, movementDataList);
+      return mplew.getPacket();
+   }
+
+   @Deprecated
    public static byte[] moveSummon(int cid, int oid, Point startPos, SeekableLittleEndianAccessor movementSlea, long movementDataLength) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.MOVE_SUMMON.getValue());
@@ -2294,6 +2323,22 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
+   public static byte[] moveMonster(int oid, boolean skillPossible, int skill, int skillId, int skillLevel, int pOption, Point startPos, List<Byte> movementDataList) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MOVE_MONSTER.getValue());
+      mplew.writeInt(oid);
+      mplew.write(0);
+      mplew.writeBool(skillPossible);
+      mplew.write(skill);
+      mplew.write(skillId);
+      mplew.write(skillLevel);
+      mplew.writeShort(pOption);
+      mplew.writePos(startPos);
+      rebroadcastMovementList(mplew, movementDataList);
+      return mplew.getPacket();
+   }
+
+   @Deprecated
    public static byte[] moveMonster(int oid, boolean skillPossible, int skill, int skillId, int skillLevel, int pOption, Point startPos, SeekableLittleEndianAccessor movementSlea, long movementDataLength) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.MOVE_MONSTER.getValue());
@@ -8205,6 +8250,16 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
+   public static byte[] moveDragon(MapleDragon dragon, Point startPos, List<Byte> movementList) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MOVE_DRAGON.getValue());
+      mplew.writeInt(dragon.getOwner().getId());
+      mplew.writePos(startPos);
+      rebroadcastMovementList(mplew, movementList);
+      return mplew.getPacket();
+   }
+
+   @Deprecated
    public static byte[] moveDragon(MapleDragon dragon, Point startPos, SeekableLittleEndianAccessor movementSlea, long movementDataLength) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.MOVE_DRAGON.getValue());

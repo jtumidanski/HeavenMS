@@ -9,6 +9,7 @@ import net.server.PacketReader;
 import net.server.channel.packet.reader.AcceptFamilyReader;
 import net.server.channel.packet.reader.AcceptToSReader;
 import net.server.channel.packet.reader.AdminChatReader;
+import net.server.channel.packet.reader.AdminCommandReader;
 import net.server.channel.packet.reader.AfterLoginReader;
 import net.server.channel.packet.reader.AllianceRegisterOperationReader;
 import net.server.channel.packet.reader.AssignAPReader;
@@ -60,6 +61,7 @@ import net.server.channel.packet.reader.ItemPickupReader;
 import net.server.channel.packet.reader.KeymapChangeReader;
 import net.server.channel.packet.reader.LoginPasswordReader;
 import net.server.channel.packet.reader.MTSReader;
+import net.server.channel.packet.reader.MakerActionReader;
 import net.server.channel.packet.reader.MesoDropReader;
 import net.server.channel.packet.reader.MessengerReader;
 import net.server.channel.packet.reader.MobBanishPlayerReader;
@@ -68,6 +70,10 @@ import net.server.channel.packet.reader.MobDamageMobReader;
 import net.server.channel.packet.reader.MonsterBombReader;
 import net.server.channel.packet.reader.MonsterBookCoverReader;
 import net.server.channel.packet.reader.MonsterCarnivalReader;
+import net.server.channel.packet.reader.MoveDragonReader;
+import net.server.channel.packet.reader.MoveLifeReader;
+import net.server.channel.packet.reader.MovePlayerReader;
+import net.server.channel.packet.reader.MoveSummonReader;
 import net.server.channel.packet.reader.MultiChatReader;
 import net.server.channel.packet.reader.NPCAnimationReader;
 import net.server.channel.packet.reader.NPCMoreTalkReader;
@@ -275,6 +281,12 @@ public class PacketReaderFactory {
       readers.put(PetMovementReader.class, new PetMovementReader());
       readers.put(ExistingAllianceOperationReader.class, new ExistingAllianceOperationReader());
       readers.put(AllianceRegisterOperationReader.class, new AllianceRegisterOperationReader());
+      readers.put(MakerActionReader.class, new MakerActionReader());
+      readers.put(AdminCommandReader.class, new AdminCommandReader());
+      readers.put(MoveLifeReader.class, new MoveLifeReader());
+      readers.put(MovePlayerReader.class, new MovePlayerReader());
+      readers.put(MoveSummonReader.class, new MoveSummonReader());
+      readers.put(MoveDragonReader.class, new MoveDragonReader());
    }
 
    public <T extends MaplePacket> PacketReader<T> get(Class<? extends PacketReader<T>> readerClass) {

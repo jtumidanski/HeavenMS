@@ -22,23 +22,28 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
+import net.server.PacketReader;
+import net.server.channel.packet.movement.MovePlayerPacket;
+import net.server.channel.packet.reader.MovePlayerReader;
 import tools.MaplePacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 
-public final class MovePlayerHandler extends AbstractMovementPacketHandler {
+public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacket> {
    @Override
-   public final void handlePacket(SeekableLittleEndianAccessor slea, MapleClient c) {
-      slea.skip(9);
-      long movementDataStart = slea.getPosition();
-      updatePosition(slea, c.getPlayer(), 0);
-      long movementDataLength = slea.getPosition() - movementDataStart; //how many bytes were read by updatePosition
-      if (movementDataLength > 0) {
-         slea.seek(movementDataStart);
-         c.getPlayer().getMap().movePlayer(c.getPlayer(), c.getPlayer().getPosition());
-         if (c.getPlayer().isHidden()) {
-            c.getPlayer().getMap().broadcastGMMessage(c.getPlayer(), MaplePacketCreator.movePlayer(c.getPlayer().getId(), slea, movementDataLength), false);
+   public Class<? extends PacketReader<MovePlayerPacket>> getReaderClass() {
+      return MovePlayerReader.class;
+   }
+
+   @Override
+   public void handlePacket(MovePlayerPacket packet, MapleClient client) {
+      processMovementList(packet.movementDataList(), client.getPlayer());
+
+      if (packet.hasMovement()) {
+         client.getPlayer().getMap().movePlayer(client.getPlayer(), client.getPlayer().getPosition());
+         if (client.getPlayer().isHidden()) {
+            client.getPlayer().getMap().broadcastGMMessage(client.getPlayer(), MaplePacketCreator.movePlayer(client.getPlayer().getId(), packet.movementList()), false);
          } else {
-            c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.movePlayer(c.getPlayer().getId(), slea, movementDataLength), false);
+            client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.movePlayer(client.getPlayer().getId(), packet.movementList()), false);
          }
       }
    }

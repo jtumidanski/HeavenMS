@@ -48,7 +48,7 @@ class NPC9000040 {
             int levelLimit = !cm.getPlayer().isCygnus() ? 160 : 110
             String selStr = "The medal ranking system is currently unavailable... Therefore, I am providing the #bEquipment Merge#k service! "
 
-            if (!ServerConstants.USE_STARTER_MERGE && (cm.getPlayer().getLevel() < levelLimit || MakerProcessor.getMakerSkillLevel(cm.getPlayer()) < 3)) {
+            if (!ServerConstants.USE_STARTER_MERGE && (cm.getPlayer().getLevel() < levelLimit || MakerProcessor.getInstance().getMakerSkillLevel(cm.getPlayer()) < 3)) {
                selStr += "However, you must have #rMaker level 3#k and at least #rlevel 110#k (Cygnus Knight), #rlevel 160#k (other classes) and a fund of #r" + cm.numberWithCommas(mergeFee) + " mesos#k to use the service."
                cm.sendOk(selStr)
                cm.dispose()
