@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
+import client.MapleFamily;
 import client.MapleJob;
 import client.MapleKeyBinding;
 import client.MapleMount;
@@ -49,6 +50,7 @@ import client.database.administrator.SkillMacroAdministrator;
 import client.database.administrator.TeleportRockLocationAdministrator;
 import client.database.administrator.WishListAdministrator;
 import client.database.data.CharacterData;
+import client.database.data.CharacterGuildFamilyData;
 import client.database.data.CharacterIdNameAccountId;
 import client.database.provider.AccountProvider;
 import client.database.provider.AreaInfoProvider;
@@ -69,6 +71,7 @@ import client.database.provider.SavedLocationProvider;
 import client.database.provider.SkillMacroProvider;
 import client.database.provider.SkillProvider;
 import client.database.provider.TeleportRockProvider;
+import client.database.provider.WorldTransferProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
@@ -693,4 +696,25 @@ public class CharacterProcessor {
       return true;
    }
 
+   public Optional<Byte> canDeleteCharacter(int characterId) {
+      return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> {
+         Optional<CharacterGuildFamilyData> guildFamilyData = CharacterProvider.getInstance().getGuildFamilyInformation(connection, characterId);
+         if (guildFamilyData.isEmpty()) {
+            return Optional.of((byte) 0x09);
+         }
+         if (guildFamilyData.get().getGuildId() != 0 && guildFamilyData.get().getGuildRank() <= 1) {
+            return Optional.of((byte) 0x16);
+         } else if (guildFamilyData.get().getFamilyId() != -1) {
+            MapleFamily family = Server.getInstance().getWorld(guildFamilyData.get().getWorld()).getFamily(guildFamilyData.get().getFamilyId());
+            if (family != null && family.getTotalMembers() > 1) {
+               return Optional.of((byte) 0x1D);
+            }
+         }
+         int pendingWorldTransfers = WorldTransferProvider.getInstance().countOutstandingWorldTransfers(connection, characterId);
+         if (pendingWorldTransfers > 0) {
+            return Optional.of((byte) 0x1A);
+         }
+         return Optional.empty();
+      });
+   }
 }

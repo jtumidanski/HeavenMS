@@ -6265,7 +6265,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             break;
          }
       }
-      if (possesed > 0) {
+      if (possesed > 0 && !GameConstants.isDojo(getMapId())) {
          MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "You have used a safety charm, so your EXP points have not been decreased.");
          MapleInventoryManipulator.removeById(client, ItemConstants.getInventoryType(charmID[i]), charmID[i], 1, true, false);
       } else if (getJob() != MapleJob.BEGINNER) { //Hmm...

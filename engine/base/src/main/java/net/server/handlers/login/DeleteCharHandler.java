@@ -21,7 +21,10 @@
  */
 package net.server.handlers.login;
 
+import java.util.Optional;
+
 import client.MapleClient;
+import client.processor.CharacterProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.DeleteCharacterReader;
 import net.server.login.packet.DeleteCharacterPacket;
@@ -37,11 +40,18 @@ public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharact
    @Override
    public void handlePacket(DeleteCharacterPacket packet, MapleClient client) {
       if (client.checkPic(packet.pic())) {
+         //check for family, guild leader, pending marriage, world transfer
+         Optional<Byte> state = CharacterProcessor.getInstance().canDeleteCharacter(packet.characterId());
+         if (state.isPresent()) {
+            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), state.get()));
+            return;
+         }
+
          if (client.deleteCharacter(packet.characterId(), client.getAccID())) {
             FilePrinter.print(FilePrinter.DELETED_CHAR + client.getAccountName() + ".txt", client.getAccountName() + " deleted CID: " + packet.characterId());
             client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0));
          } else {
-            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x14));
+            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x09));
          }
       } else {
          client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x14));

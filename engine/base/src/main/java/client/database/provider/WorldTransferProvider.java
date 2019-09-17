@@ -36,4 +36,9 @@ public class WorldTransferProvider extends AbstractQueryExecutor {
             rs.getInt("to")
       ));
    }
+
+   public int countOutstandingWorldTransfers(Connection connection, int characterId) {
+      String sql = "SELECT COUNT(*) as rowcount FROM worldtransfers WHERE `characterid` = ? AND completionTime IS NULL";
+      return getNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("rowcount")).orElse(0);
+   }
 }

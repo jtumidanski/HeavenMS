@@ -22,6 +22,7 @@
 package net.server.guild;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+
+import javax.swing.text.html.Option;
 
 import client.MapleCharacter;
 import client.database.administrator.CharacterAdministrator;
@@ -249,6 +252,18 @@ public class MapleGuild {
             });
    }
 
+   public void broadcastInfoChanged() {
+      PlayerStorage ps = Server.getInstance().getWorld(world).getPlayerStorage();
+
+      for (MapleGuildCharacter mgc : getMembers()) {
+         Optional<MapleCharacter> chr = ps.getCharacterById(mgc.getId());
+         if (chr.isEmpty() || !chr.get().isLoggedinWorld()) continue;
+
+         byte[] packet = MaplePacketCreator.showGuildInfo(chr.get());
+         chr.get().announce(packet);
+      }
+   }
+
    public void broadcast(final byte[] packet) {
       broadcast(packet, -1, BCOp.NONE);
    }
@@ -454,6 +469,14 @@ public class MapleGuild {
       }
 
       membersLock.lock();
+      members.sort(new Comparator<MapleGuildCharacter>() {
+         @Override
+         public int compare(MapleGuildCharacter t, MapleGuildCharacter o) {
+            if(t.getGuildRank() <= 1 && o.getGuildRank() > 1) return -1;
+            else if(t.getGuildRank() > 1 && o.getGuildRank() <= 1) return 1;
+            else return 0;
+         }
+      });
       try {
          this.broadcast(MaplePacketCreator.changeRank(mgc));
       } finally {

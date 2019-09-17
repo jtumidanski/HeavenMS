@@ -8,6 +8,7 @@ import client.database.AbstractQueryExecutor;
 import client.database.data.CharNameAndIdData;
 import client.database.data.CharacterData;
 import client.database.data.CharacterGuildData;
+import client.database.data.CharacterGuildFamilyData;
 import client.database.data.CharacterIdNameAccountId;
 import client.database.data.CharacterRankData;
 import client.database.utility.CharNameAndIdTransformer;
@@ -196,5 +197,15 @@ public class CharacterProvider extends AbstractQueryExecutor {
    public int getMesosForCharacter(Connection connection, int characterId) {
       String sql = "SELECT meso FROM characters WHERE id = ?";
       return getNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("meso")).orElse(0);
+   }
+
+   public Optional<CharacterGuildFamilyData> getGuildFamilyInformation(Connection connection, int characterId) {
+      String sql = "SELECT `world`, `guildid`, `guildrank`, `familyId` FROM characters WHERE id = ?";
+      return getNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new CharacterGuildFamilyData(
+            rs.getInt("world"),
+            rs.getInt("guildid"),
+            rs.getInt("guildrank"),
+            rs.getInt("familyId")
+      ));
    }
 }
