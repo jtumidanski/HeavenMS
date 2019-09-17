@@ -24,11 +24,9 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import constants.ItemConstants;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.FaceExpressionPacket;
 import net.server.channel.packet.reader.FaceExpressionReader;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class FaceExpressionHandler extends AbstractPacketHandler<FaceExpressionPacket> {
    @Override

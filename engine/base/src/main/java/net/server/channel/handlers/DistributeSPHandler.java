@@ -23,11 +23,9 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.processor.AssignSPProcessor;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.DistributeSPPacket;
 import net.server.channel.packet.reader.DistributeSPReader;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class DistributeSPHandler extends AbstractPacketHandler<DistributeSPPacket> {
    @Override

@@ -365,8 +365,6 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.MOVE_PLAYER, new MovePlayerHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_DRAGON, new MoveDragonHandler());
-
       packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
-
    }
 }

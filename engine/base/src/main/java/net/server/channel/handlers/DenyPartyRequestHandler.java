@@ -23,7 +23,6 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.party.DenyPartyRequestPacket;
 import net.server.channel.packet.reader.DenyPartyRequestReader;
@@ -31,7 +30,6 @@ import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPartyRequestPacket> {
    @Override

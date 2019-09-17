@@ -23,12 +23,10 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.autoban.AutobanFactory;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.ChangeChannelPacket;
 import net.server.channel.packet.reader.ChangeChannelReader;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze

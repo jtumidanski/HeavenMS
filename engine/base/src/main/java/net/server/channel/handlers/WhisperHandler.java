@@ -28,7 +28,6 @@ import client.MapleClient;
 import client.autoban.AutobanFactory;
 import client.database.provider.CharacterProvider;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.WhisperPacket;
 import net.server.channel.packet.reader.WhisperReader;
@@ -37,7 +36,6 @@ import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Matze

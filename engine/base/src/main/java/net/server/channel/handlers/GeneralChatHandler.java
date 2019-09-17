@@ -26,7 +26,6 @@ import client.MapleClient;
 import client.autoban.AutobanFactory;
 import client.command.CommandsExecutor;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GeneralChatPacket;
 import net.server.channel.packet.reader.GeneralChatReader;
@@ -35,7 +34,6 @@ import tools.LogHelper;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatPacket> {
    @Override

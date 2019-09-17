@@ -3,12 +3,10 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleQuestStatus;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.RaiseUIStatePacket;
 import net.server.channel.packet.reader.RaiseUIStateReader;
 import server.quest.MapleQuest;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author Xari

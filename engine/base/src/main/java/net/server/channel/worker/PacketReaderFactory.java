@@ -112,6 +112,7 @@ import net.server.channel.packet.reader.SkillEffectReader;
 import net.server.channel.packet.reader.SkillMacroReader;
 import net.server.channel.packet.reader.SnowballReader;
 import net.server.channel.packet.reader.SpawnPetReader;
+import net.server.channel.packet.reader.SpecialMoveReader;
 import net.server.channel.packet.reader.SpouseChatReader;
 import net.server.channel.packet.reader.StorageReader;
 import net.server.channel.packet.reader.SummonDamageReader;
@@ -287,6 +288,7 @@ public class PacketReaderFactory {
       readers.put(MovePlayerReader.class, new MovePlayerReader());
       readers.put(MoveSummonReader.class, new MoveSummonReader());
       readers.put(MoveDragonReader.class, new MoveDragonReader());
+      readers.put(SpecialMoveReader.class, new SpecialMoveReader());
    }
 
    public <T extends MaplePacket> PacketReader<T> get(Class<? extends PacketReader<T>> readerClass) {

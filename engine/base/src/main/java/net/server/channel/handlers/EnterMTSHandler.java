@@ -29,7 +29,6 @@ import client.MapleClient;
 import client.database.provider.MtsItemProvider;
 import client.processor.BuybackProcessor;
 import constants.ServerConstants;
-import net.AbstractMaplePacketHandler;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;
@@ -41,7 +40,6 @@ import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 
 public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
