@@ -214,13 +214,13 @@ public class MapleClient {
    public List<MapleCharacter> loadCharacters(int serverId) {
       List<MapleCharacter> chars = new ArrayList<>(15);
       for (CharNameAndIdData cni : loadCharactersInternal(serverId)) {
-         chars.add(CharacterProcessor.getInstance().loadCharFromDB(cni.getId(), this, false));
+         chars.add(CharacterProcessor.getInstance().loadCharFromDB(cni.id(), this, false));
       }
       return chars;
    }
 
    public List<String> loadCharacterNames(int worldId) {
-      return loadCharactersInternal(worldId).stream().map(CharNameAndIdData::getName).collect(Collectors.toList());
+      return loadCharactersInternal(worldId).stream().map(CharNameAndIdData::name).collect(Collectors.toList());
    }
 
    private List<CharNameAndIdData> loadCharactersInternal(int worldId) {
@@ -376,22 +376,22 @@ public class MapleClient {
       if (accountData.isEmpty()) {
          accId = -2;
       } else {
-         accId = accountData.get().getId();
+         accId = accountData.get().id();
          if (accId <= 0) {
             FilePrinter.printError(FilePrinter.LOGIN_EXCEPTION, "Tried to login with accid " + accId);
             return 15;
          }
 
          gmLevel = 0;
-         pin = accountData.get().getPin();
-         pic = accountData.get().getPic();
-         gender = accountData.get().getGender();
-         characterSlots = accountData.get().getCharacterSlots();
-         lang = accountData.get().getLanguage();
-         String passwordHash = accountData.get().getPassword();
-         byte tos = accountData.get().getTos();
+         pin = accountData.get().pin();
+         pic = accountData.get().pic();
+         gender = accountData.get().gender();
+         characterSlots = accountData.get().characterSlots();
+         lang = accountData.get().language();
+         String passwordHash = accountData.get().password();
+         byte tos = accountData.get().tos();
 
-         if (accountData.get().isBanned()) {
+         if (accountData.get().banned()) {
             return 3;
          }
 
@@ -516,11 +516,11 @@ public class MapleClient {
       }
 
       birthday = Calendar.getInstance();
-      birthday.setTime(loginData.get().getBirthday());
+      birthday.setTime(loginData.get().birthday());
 
-      int state = loginData.get().getLoggedIn();
+      int state = loginData.get().loggedIn();
       if (state == LOGIN_SERVER_TRANSITION) {
-         if (loginData.get().getLastLogin().getTime() + 30000 < Server.getInstance().getCurrentTime()) {
+         if (loginData.get().lastLogin().getTime() + 30000 < Server.getInstance().getCurrentTime()) {
             int accountId = accId;
             state = LOGIN_NOTLOGGEDIN;
             updateLoginState(LOGIN_NOTLOGGEDIN);   // ACCID = 0, issue found thanks to Tochi & K u ssss o & Thora & Omo Oppa

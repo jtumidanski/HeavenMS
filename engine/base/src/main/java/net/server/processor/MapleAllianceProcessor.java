@@ -133,16 +133,16 @@ public class MapleAllianceProcessor {
 
    private void setData(int id, MapleAlliance alliance, AllianceData data) {
       alliance.setAllianceId(id);
-      alliance.setCapacity(data.getCapacity());
-      alliance.setName(data.getName());
-      alliance.setNotice(data.getNotice());
+      alliance.setCapacity(data.capacity());
+      alliance.setName(data.name());
+      alliance.setNotice(data.notice());
 
       String[] ranks = new String[5];
-      ranks[0] = data.getRank1();
-      ranks[1] = data.getRank2();
-      ranks[2] = data.getRank3();
-      ranks[3] = data.getRank4();
-      ranks[4] = data.getRank5();
+      ranks[0] = data.rank1();
+      ranks[1] = data.rank2();
+      ranks[2] = data.rank3();
+      ranks[3] = data.rank4();
+      ranks[4] = data.rank5();
       alliance.setRankTitle(ranks);
    }
 

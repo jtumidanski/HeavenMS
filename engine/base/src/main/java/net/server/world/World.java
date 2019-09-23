@@ -48,9 +48,9 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import client.BuddyList;
-import client.BuddyList.BuddyAddResult;
-import client.BuddyList.BuddyOperation;
-import client.BuddylistEntry;
+import client.BuddyListAddResult;
+import client.BuddyListEntry;
+import client.BuddyListOperation;
 import client.MapleCharacter;
 import client.MapleFamily;
 import client.database.administrator.CharacterAdministrator;
@@ -264,7 +264,7 @@ public class World {
          marriageData = DatabaseConnection.getInstance().withConnectionResult(connection -> MarriageProvider.getInstance().getBySpouses(connection, id, id).orElseThrow());
       }
 
-      return marriageData.map(data -> new Pair<>(data.getId(), new Pair<>(data.getSpouse1(), data.getSpouse2()))).orElse(null);
+      return marriageData.map(data -> new Pair<>(data.id(), new Pair<>(data.spouse1(), data.spouse2()))).orElse(null);
    }
 
    private static int addRelationshipToDb(int groomId, int brideId) {
@@ -1224,36 +1224,36 @@ public class World {
       }
    }
 
-   public BuddyAddResult requestBuddyAdd(String addName, int channelFrom, int cidFrom, String nameFrom) {
+   public BuddyListAddResult requestBuddyAdd(String addName, int channelFrom, int cidFrom, String nameFrom) {
       return getPlayerStorage().getCharacterByName(addName)
             .map(addChar -> {
                BuddyList buddylist = addChar.getBuddylist();
                if (buddylist.isFull()) {
-                  return BuddyAddResult.BUDDYLIST_FULL;
+                  return BuddyListAddResult.FULL;
                }
                if (!buddylist.contains(cidFrom)) {
                   BuddyListProcessor.getInstance().addBuddyRequest(addChar, cidFrom, nameFrom, channelFrom);
                } else if (buddylist.containsVisible(cidFrom)) {
-                  return BuddyAddResult.ALREADY_ON_LIST;
+                  return BuddyListAddResult.ALREADY_ON_LIST;
                }
-               return BuddyAddResult.OK;
+               return BuddyListAddResult.OK;
             })
-            .orElse(BuddyAddResult.OK);
+            .orElse(BuddyListAddResult.OK);
    }
 
-   public void buddyChanged(int cid, int cidFrom, String name, int channel, BuddyOperation operation) {
+   public void buddyChanged(int cid, int cidFrom, String name, int channel, BuddyListOperation operation) {
       getPlayerStorage().getCharacterById(cid).ifPresent(addChar -> {
          BuddyList buddylist = addChar.getBuddylist();
          switch (operation) {
             case ADDED:
                if (buddylist.contains(cidFrom)) {
-                  buddylist.put(new BuddylistEntry(name, "Default Group", cidFrom, channel, true));
+                  buddylist.put(new BuddyListEntry(name, "Default Group", cidFrom, channel, true));
                   addChar.getClient().announce(MaplePacketCreator.updateBuddyChannel(cidFrom, (byte) (channel - 1)));
                }
                break;
             case DELETED:
                if (buddylist.contains(cidFrom)) {
-                  buddylist.put(new BuddylistEntry(name, "Default Group", cidFrom, (byte) -1, buddylist.get(cidFrom).isVisible()));
+                  buddylist.put(new BuddyListEntry(name, "Default Group", cidFrom, (byte) -1, buddylist.get(cidFrom).visible()));
                   addChar.getClient().announce(MaplePacketCreator.updateBuddyChannel(cidFrom, (byte) -1));
                }
                break;
@@ -1273,18 +1273,18 @@ public class World {
       PlayerStorage playerStorage = getPlayerStorage();
       for (int buddy : buddies) {
          playerStorage.getCharacterById(buddy).ifPresent(character -> {
-            BuddylistEntry ble = character.getBuddylist().get(characterId);
-            if (ble != null && ble.isVisible()) {
+            BuddyListEntry ble = character.getBuddylist().get(characterId);
+            if (ble != null && ble.visible()) {
                int mcChannel;
                if (offline) {
-                  ble.setChannel((byte) -1);
+                  ble.channel_$eq((byte) -1);
                   mcChannel = -1;
                } else {
-                  ble.setChannel(channel);
+                  ble.channel_$eq(channel);
                   mcChannel = (byte) (channel - 1);
                }
                character.getBuddylist().put(ble);
-               character.getClient().announce(MaplePacketCreator.updateBuddyChannel(ble.getCharacterId(), mcChannel));
+               character.getClient().announce(MaplePacketCreator.updateBuddyChannel(ble.characterId(), mcChannel));
             }
          });
       }

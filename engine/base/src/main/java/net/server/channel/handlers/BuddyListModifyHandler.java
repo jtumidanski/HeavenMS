@@ -21,14 +21,12 @@
 */
 package net.server.channel.handlers;
 
-import static client.BuddyList.BuddyOperation.ADDED;
-
 import java.util.Optional;
 
 import client.BuddyList;
-import client.BuddyList.BuddyAddResult;
-import client.BuddyList.BuddyOperation;
-import client.BuddylistEntry;
+import client.BuddyListAddResult;
+import client.BuddyListEntry;
+import client.BuddyListOperation;
 import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.MapleClient;
@@ -57,7 +55,7 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
    private void nextPendingRequest(MapleClient c) {
       CharacterNameAndId pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
       if (pendingBuddyRequest != null) {
-         c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.getId(), c.getPlayer().getId(), pendingBuddyRequest.getName()));
+         c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
       }
    }
 
@@ -86,9 +84,9 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
                .or(() -> Optional.ofNullable(getCharacterNameFromDatabase(otherCid)));
 
          if (otherName.isPresent()) {
-            buddylist.put(new BuddylistEntry(otherName.get(), "Default Group", otherCid, channel, true));
+            buddylist.put(new BuddyListEntry(otherName.get(), "Default Group", otherCid, channel, true));
             c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
-            notifyRemoteChannel(c, channel, otherCid, ADDED);
+            notifyRemoteChannel(c, channel, otherCid, BuddyListOperation.ADDED);
          }
       }
       nextPendingRequest(c);
@@ -98,9 +96,9 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
       if (group.length() > 16 || addName.length() < 4 || addName.length() > 13) {
          return; //hax.
       }
-      BuddylistEntry ble = buddylist.get(addName);
-      if (ble != null && !ble.isVisible() && group.equals(ble.getGroup())) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You already have \"" + ble.getName() + "\" on your Buddylist");
+      BuddyListEntry ble = buddylist.get(addName);
+      if (ble != null && !ble.visible() && group.equals(ble.group())) {
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You already have \"" + ble.name() + "\" on your Buddylist");
       } else if (buddylist.isFull() && ble == null) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Your buddylist is already full");
       } else if (ble == null) {
@@ -110,47 +108,47 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
          Optional<MapleCharacter> otherChar = c.getChannelServer().getPlayerStorage().getCharacterByName(addName);
          if (otherChar.isPresent()) {
             channel = c.getChannel();
-            charWithId = new CharNameAndIdData(otherChar.get().getName(), otherChar.get().getId(), otherChar.get().getBuddylist().getCapacity());
+            charWithId = new CharNameAndIdData(otherChar.get().getName(), otherChar.get().getId(), otherChar.get().getBuddylist().capacity());
          } else {
             channel = world.find(addName);
             charWithId = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName)).orElseThrow();
          }
 
          if (charWithId != null) {
-            BuddyAddResult buddyAddResult = null;
+            BuddyListAddResult buddyAddResult = null;
             if (channel != -1) {
                buddyAddResult = world.requestBuddyAdd(addName, c.getChannel(), player.getId(), player.getName());
             } else {
-               long count = DatabaseConnection.getInstance().withConnectionResult(connection -> BuddyProvider.getInstance().getBuddyCount(connection, charWithId.getId())).orElse(0L);
-               if (count >= charWithId.getBuddyCapacity()) {
-                  buddyAddResult = BuddyAddResult.BUDDYLIST_FULL;
+               long count = DatabaseConnection.getInstance().withConnectionResult(connection -> BuddyProvider.getInstance().getBuddyCount(connection, charWithId.id())).orElse(0L);
+               if (count >= charWithId.buddyCapacity()) {
+                  buddyAddResult = BuddyListAddResult.FULL;
                }
 
-               boolean alreadyOnList = DatabaseConnection.getInstance().withConnectionResult(connection -> BuddyProvider.getInstance().buddyIsPending(connection, charWithId.getId(), player.getId())).orElse(false);
+               boolean alreadyOnList = DatabaseConnection.getInstance().withConnectionResult(connection -> BuddyProvider.getInstance().buddyIsPending(connection, charWithId.id(), player.getId())).orElse(false);
                if (alreadyOnList) {
-                  buddyAddResult = BuddyAddResult.ALREADY_ON_LIST;
+                  buddyAddResult = BuddyListAddResult.ALREADY_ON_LIST;
                }
             }
-            if (buddyAddResult == BuddyAddResult.BUDDYLIST_FULL) {
+            if (buddyAddResult == BuddyListAddResult.FULL) {
                MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "\"" + addName + "\"'s Buddylist is full");
             } else {
                int displayChannel;
                displayChannel = -1;
-               int otherCid = charWithId.getId();
-               if (buddyAddResult == BuddyAddResult.ALREADY_ON_LIST && channel != -1) {
+               int otherCid = charWithId.id();
+               if (buddyAddResult == BuddyListAddResult.ALREADY_ON_LIST && channel != -1) {
                   displayChannel = channel;
-                  notifyRemoteChannel(c, channel, otherCid, ADDED);
-               } else if (buddyAddResult != BuddyAddResult.ALREADY_ON_LIST && channel == -1) {
-                  DatabaseConnection.getInstance().withConnection(connection -> BuddyAdministrator.getInstance().addBuddy(connection, charWithId.getId(), player.getId()));
+                  notifyRemoteChannel(c, channel, otherCid, BuddyListOperation.ADDED);
+               } else if (buddyAddResult != BuddyListAddResult.ALREADY_ON_LIST && channel == -1) {
+                  DatabaseConnection.getInstance().withConnection(connection -> BuddyAdministrator.getInstance().addBuddy(connection, charWithId.id(), player.getId()));
                }
-               buddylist.put(new BuddylistEntry(charWithId.getName(), group, otherCid, displayChannel, true));
+               buddylist.put(new BuddyListEntry(charWithId.name(), group, otherCid, displayChannel, true));
                c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
             }
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
          }
       } else {
-         ble.changeGroup(group);
+         ble.group_$eq(group);
          c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
       }
    }
@@ -159,7 +157,7 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
       return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getNameForId(connection, otherCid)).orElse(null);
    }
 
-   private void notifyRemoteChannel(MapleClient c, int remoteChannel, int otherCid, BuddyOperation operation) {
+   private void notifyRemoteChannel(MapleClient c, int remoteChannel, int otherCid, BuddyListOperation operation) {
       MapleCharacter player = c.getPlayer();
       if (remoteChannel != -1) {
          c.getWorldServer().buddyChanged(otherCid, player.getId(), player.getName(), c.getChannel(), operation);

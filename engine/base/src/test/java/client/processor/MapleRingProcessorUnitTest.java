@@ -11,7 +11,7 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import client.MapleRing;
+import client.Ring;
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.RingAdministrator;
 import client.inventory.manipulator.MapleCashIdGenerator;
@@ -71,7 +71,7 @@ public class MapleRingProcessorUnitTest extends DatabaseTestBase {
       int partnerId = 3;
       int itemId = 4;
       String partnerName = "partner";
-      MapleRing mapleRing = new MapleRing(ringId1, ringId2, partnerId, itemId, partnerName);
+      Ring mapleRing = new Ring(ringId1, ringId2, partnerId, itemId, partnerName);
 
       //Do
       mapleRingProcessor.removeRing(mapleRing);

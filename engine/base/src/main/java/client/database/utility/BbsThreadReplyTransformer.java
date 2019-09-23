@@ -9,11 +9,11 @@ public class BbsThreadReplyTransformer implements SqlTransformer<BbsThreadReplyD
    @Override
    public BbsThreadReplyData transform(ResultSet resultSet) throws SQLException {
       return new BbsThreadReplyData(
+            resultSet.getInt("threadId"),
             resultSet.getInt("replyid"),
             resultSet.getInt("postercid"),
             resultSet.getLong("timestamp"),
-            resultSet.getString("content"),
-            resultSet.getInt("threadId")
+            resultSet.getString("content")
       );
    }
 }

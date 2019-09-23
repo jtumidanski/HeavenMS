@@ -1559,7 +1559,7 @@ public class MapleItemInformationProvider {
    }
 
    private void loadCardIdData() {
-      DatabaseConnection.getInstance().withConnection(connection -> MonsterCardProvider.getInstance().getMonsterCardData(connection).forEach(data -> monsterBookID.put(data.getCardId(), data.getMobId())));
+      DatabaseConnection.getInstance().withConnection(connection -> MonsterCardProvider.getInstance().getMonsterCardData(connection).forEach(data -> monsterBookID.put(data.cardId(), data.mobId())));
    }
 
    public int getCardMobId(int id) {
@@ -2012,7 +2012,7 @@ public class MapleItemInformationProvider {
          return null;
       }
 
-      statUpgd = DatabaseConnection.getInstance().withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.getStat(), data.getValue())).get()).orElse(null);
+      statUpgd = DatabaseConnection.getInstance().withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.stat(), data.value())).get()).orElse(null);
       statUpgradeMakerCache.put(itemId, statUpgd);
       return statUpgd;
    }
@@ -2045,15 +2045,15 @@ public class MapleItemInformationProvider {
 
             Optional<MakerCreateData> makerCreateData = MakerCreateProvider.getInstance().getMakerCreateDataForItem(connection, toCreate);
             if (makerCreateData.isPresent()) {
-               reqLevel = makerCreateData.get().getRequiredLevel();
-               reqMakerLevel = makerCreateData.get().getRequiredMakerLevel();
-               cost = makerCreateData.get().getRequiredMeso();
-               toGive = makerCreateData.get().getQuantity();
+               reqLevel = makerCreateData.get().requiredLevel();
+               reqMakerLevel = makerCreateData.get().requiredMakerLevel();
+               cost = makerCreateData.get().requiredMeso();
+               toGive = makerCreateData.get().quantity();
             }
             MakerItemCreateEntry result = new MakerItemCreateEntry(cost, reqLevel, reqMakerLevel);
             result.addGainItem(toCreate, toGive);
 
-            MakerRecipeProvider.getInstance().getRecipeForItem(connection, toCreate).forEach(data -> result.addReqItem(data.getRequiredItem(), data.getCount()));
+            MakerRecipeProvider.getInstance().getRecipeForItem(connection, toCreate).forEach(data -> result.addReqItem(data.requiredItem(), data.count()));
             makerItemCache.put(toCreate, new MakerItemCreateEntry(result));
             return result;
          }).orElseThrow();
@@ -2085,7 +2085,7 @@ public class MapleItemInformationProvider {
    public List<Pair<Integer, Integer>> getMakerDisassembledItems(Integer itemId) {
       return DatabaseConnection.getInstance().withConnectionResult(connection ->
             MakerRecipeProvider.getInstance().getMakerDisassembledItems(connection, itemId).stream()
-                  .map(data -> new Pair<>(data.getRequiredItem(), data.getCount()))
+                  .map(data -> new Pair<>(data.requiredItem(), data.count()))
                   .collect(Collectors.toList()))
             .get();
    }
@@ -2097,7 +2097,7 @@ public class MapleItemInformationProvider {
             return -1;
          }
 
-         float val = (float) (makerCreateData.get().getRequiredMeso() * 0.13636363636364);
+         float val = (float) (makerCreateData.get().requiredMeso() * 0.13636363636364);
          return (int) (val / 1000) * 1000;
       }).orElse(-1);
    }

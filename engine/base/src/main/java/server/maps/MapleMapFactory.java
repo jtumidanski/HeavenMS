@@ -85,11 +85,11 @@ public class MapleMapFactory {
    private static void loadLifeFromDb(MapleMap map) {
       DatabaseConnection.getInstance().withConnection(connection ->
             PlayerLifeProvider.getInstance().getForMapAndWorld(connection, map.getId(), map.getWorld())
-                  .forEach(playerLifeData -> loadLifeRaw(map, playerLifeData.getLifeId(), playerLifeData.getType(),
-                        playerLifeData.getCy(),
-                        playerLifeData.getF(), playerLifeData.getFh(), playerLifeData.getRx0(), playerLifeData.getRx1(),
-                        playerLifeData.getX(), playerLifeData.getY(), playerLifeData.getHide(),
-                        playerLifeData.getMobTime(), playerLifeData.getTeam())
+                  .forEach(playerLifeData -> loadLifeRaw(map, playerLifeData.lifeId(), playerLifeData.theType(),
+                        playerLifeData.cy(),
+                        playerLifeData.f(), playerLifeData.fh(), playerLifeData.rx0(), playerLifeData.rx1(),
+                        playerLifeData.x(), playerLifeData.y(), playerLifeData.hide(),
+                        playerLifeData.mobTime(), playerLifeData.team())
                   ));
    }
 

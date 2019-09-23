@@ -1,7 +1,7 @@
 package client.processor;
 
 import client.MapleCharacter;
-import client.MapleRing;
+import client.Ring;
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.RingAdministrator;
 import client.database.provider.RingProvider;
@@ -22,22 +22,22 @@ public class MapleRingProcessor {
       return instance;
    }
 
-   public MapleRing loadFromDb(int ringId) {
+   public Ring loadFromDb(int ringId) {
       return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> RingProvider.getInstance().getRingById(connection, ringId)).orElseThrow();
    }
 
-   public void removeRing(final MapleRing ring) {
+   public void removeRing(final Ring ring) {
       if (ring == null) {
          return;
       }
 
       DatabaseConnection.getInstance().withConnection(connection -> {
-         RingAdministrator.getInstance().deleteRing(connection, ring.getRingId(), ring.getPartnerRingId());
+         RingAdministrator.getInstance().deleteRing(connection, ring.ringId(), ring.partnerRingId());
 
-         MapleCashIdGenerator.getInstance().freeCashId(ring.getRingId());
-         MapleCashIdGenerator.getInstance().freeCashId(ring.getPartnerRingId());
+         MapleCashIdGenerator.getInstance().freeCashId(ring.ringId());
+         MapleCashIdGenerator.getInstance().freeCashId(ring.partnerRingId());
 
-         InventoryEquipmentAdministrator.getInstance().updateRing(connection, ring.getRingId(), ring.getPartnerRingId());
+         InventoryEquipmentAdministrator.getInstance().updateRing(connection, ring.ringId(), ring.partnerRingId());
       });
    }
 

@@ -35,19 +35,19 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
-import client.BuddylistEntry;
+import client.BuddyListEntry;
+import client.KeyBinding;
 import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
 import client.MapleFamilyEntitlement;
 import client.MapleFamilyEntry;
-import client.MapleKeyBinding;
 import client.MapleMount;
 import client.MapleQuestStatus;
-import client.MapleRing;
 import client.MapleStat;
 import client.MonsterBook;
+import client.Ring;
 import client.Skill;
 import client.SkillEntry;
 import client.database.data.BbsThreadData;
@@ -229,7 +229,7 @@ public class MaplePacketCreator {
       mplew.writeLong(-1);
       mplew.write(0);
       addCharStats(mplew, chr);
-      mplew.write(chr.getBuddylist().getCapacity());
+      mplew.write(chr.getBuddylist().capacity());
 
       if (chr.getLinkedName() == null) {
          mplew.write(0);
@@ -536,10 +536,10 @@ public class MaplePacketCreator {
             continue;
          }
          mplew.writeInt(skill.getKey().getId());
-         mplew.writeInt(skill.getValue().getSkillLevel());
-         addExpirationTime(mplew, skill.getValue().getExpiration());
+         mplew.writeInt(skill.getValue().skillLevel());
+         addExpirationTime(mplew, skill.getValue().expiration());
          if (skill.getKey().isFourthJob()) {
-            mplew.writeInt(skill.getValue().getMasterLevel());
+            mplew.writeInt(skill.getValue().masterLevel());
          }
       }
       mplew.writeShort(chr.getAllCooldowns().size());
@@ -2128,24 +2128,24 @@ public class MaplePacketCreator {
    }
 
    private static void addRingLook(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr, boolean crush) {
-      List<MapleRing> rings;
+      List<Ring> rings;
       if (crush) {
          rings = chr.getCrushRings();
       } else {
          rings = chr.getFriendshipRings();
       }
       boolean yes = false;
-      for (MapleRing ring : rings) {
-         if (ring.equipped()) {
+      for (Ring ring : rings) {
+         if (ring.isEquipped()) {
             if (!yes) {
                yes = true;
                mplew.write(1);
             }
-            mplew.writeInt(ring.getRingId());
+            mplew.writeInt(ring.ringId());
             mplew.writeInt(0);
-            mplew.writeInt(ring.getPartnerRingId());
+            mplew.writeInt(ring.partnerRingId());
             mplew.writeInt(0);
-            mplew.writeInt(ring.getItemId());
+            mplew.writeInt(ring.itemId());
          }
       }
       if (!yes) {
@@ -2154,9 +2154,9 @@ public class MaplePacketCreator {
    }
 
    private static void addMarriageRingLook(MapleClient target, final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
-      MapleRing ring = chr.getMarriageRing();
+      Ring ring = chr.getMarriageRing();
 
-      if (ring == null || !ring.equipped()) {
+      if (ring == null || !ring.isEquipped()) {
          mplew.write(0);
       } else {
          mplew.write(1);
@@ -2167,10 +2167,10 @@ public class MaplePacketCreator {
             mplew.writeInt(0);
          } else {
             mplew.writeInt(chr.getId());
-            mplew.writeInt(ring.getPartnerChrId());
+            mplew.writeInt(ring.partnerId());
          }
 
-         mplew.writeInt(ring.getItemId());
+         mplew.writeInt(ring.itemId());
       }
    }
 
@@ -3604,15 +3604,15 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] getKeymap(Map<Integer, MapleKeyBinding> keybindings) {
+   public static byte[] getKeymap(Map<Integer, KeyBinding> keybindings) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.KEYMAP.getValue());
       mplew.write(0);
       for (int x = 0; x < 90; x++) {
-         MapleKeyBinding binding = keybindings.get(x);
+         KeyBinding binding = keybindings.get(x);
          if (binding != null) {
-            mplew.write(binding.getType());
-            mplew.writeInt(binding.getAction());
+            mplew.write(binding.theType());
+            mplew.writeInt(binding.action());
          } else {
             mplew.write(0);
             mplew.writeInt(0);
@@ -4242,18 +4242,18 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] updateBuddylist(Collection<BuddylistEntry> buddylist) {
+   public static byte[] updateBuddylist(Collection<BuddyListEntry> buddylist) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.BUDDYLIST.getValue());
       mplew.write(7);
       mplew.write(buddylist.size());
-      for (BuddylistEntry buddy : buddylist) {
-         if (buddy.isVisible()) {
-            mplew.writeInt(buddy.getCharacterId()); // cid
-            mplew.writeAsciiString(getRightPaddedStr(buddy.getName(), '\0', 13));
+      for (BuddyListEntry buddy : buddylist) {
+         if (buddy.visible()) {
+            mplew.writeInt(buddy.characterId()); // cid
+            mplew.writeAsciiString(getRightPaddedStr(buddy.name(), '\0', 13));
             mplew.write(0); // opposite status
-            mplew.writeInt(buddy.getChannel() - 1);
-            mplew.writeAsciiString(getRightPaddedStr(buddy.getGroup(), '\0', 13));
+            mplew.writeInt(buddy.channel() - 1);
+            mplew.writeAsciiString(getRightPaddedStr(buddy.group(), '\0', 13));
             mplew.writeInt(0);//mapid?
          }
       }
@@ -4676,12 +4676,12 @@ public class MaplePacketCreator {
    }
 
    public static void addThread(final MaplePacketLittleEndianWriter mplew, BbsThreadData threadData) {
-      mplew.writeInt(threadData.getThreadId());
-      mplew.writeInt(threadData.getPosterCharacterId());
-      mplew.writeMapleAsciiString(threadData.getName());
-      mplew.writeLong(getTime(threadData.getTimestamp()));
-      mplew.writeInt(threadData.getIcon());
-      mplew.writeInt(threadData.getReplyCount());
+      mplew.writeInt(threadData.threadId());
+      mplew.writeInt(threadData.posterCharacterId());
+      mplew.writeMapleAsciiString(threadData.name());
+      mplew.writeLong(getTime(threadData.timestamp()));
+      mplew.writeInt(threadData.icon());
+      mplew.writeInt(threadData.replyCount());
    }
 
    public static byte[] BBSThreadList(List<BbsThreadData> threadData, int start) {
@@ -4698,7 +4698,7 @@ public class MaplePacketCreator {
       int threadCount = threadData.size();
 
       BbsThreadData firstThread = threadData.get(0);
-      if (firstThread.getThreadId() == 0) { //has a notice
+      if (firstThread.threadId() == 0) { //has a notice
          mplew.write(1);
          addThread(mplew, firstThread);
          threadCount--; //one thread didn't count (because it's a notice)
@@ -4721,23 +4721,23 @@ public class MaplePacketCreator {
       mplew.writeShort(SendOpcode.GUILD_BBS_PACKET.getValue());
       mplew.write(0x07);
       mplew.writeInt(localthreadid);
-      mplew.writeInt(threadData.getPosterCharacterId());
-      mplew.writeLong(getTime(threadData.getTimestamp()));
-      mplew.writeMapleAsciiString(threadData.getName());
-      mplew.writeMapleAsciiString(threadData.getStartPost());
-      mplew.writeInt(threadData.getIcon());
+      mplew.writeInt(threadData.posterCharacterId());
+      mplew.writeLong(getTime(threadData.timestamp()));
+      mplew.writeMapleAsciiString(threadData.name());
+      mplew.writeMapleAsciiString(threadData.startPost());
+      mplew.writeInt(threadData.icon());
       if (threadData.getReplyData() != null) {
-         int replyCount = threadData.getReplyCount();
+         int replyCount = threadData.replyCount();
          mplew.writeInt(replyCount);
          if (replyCount != threadData.getReplyData().size()) {
-            throw new RuntimeException(String.valueOf(threadData.getThreadId()));
+            throw new RuntimeException(String.valueOf(threadData.threadId()));
          }
 
          threadData.getReplyData().forEach(replyData -> {
-            mplew.writeInt(replyData.getReplyId());
-            mplew.writeInt(replyData.getPosterCharacterId());
-            mplew.writeLong(getTime(replyData.getTimestamp()));
-            mplew.writeMapleAsciiString(replyData.getContent());
+            mplew.writeInt(replyData.replyId());
+            mplew.writeInt(replyData.posterCharacterId());
+            mplew.writeLong(getTime(replyData.timestamp()));
+            mplew.writeMapleAsciiString(replyData.content());
          });
       } else {
          mplew.writeInt(0);
@@ -4757,12 +4757,12 @@ public class MaplePacketCreator {
       mplew.writeInt(rs.size()); //number of entries
 
       for (GuildData guildData : rs) {
-         mplew.writeMapleAsciiString(guildData.getName());
-         mplew.writeInt(guildData.getGp());
-         mplew.writeInt(guildData.getLogo());
-         mplew.writeInt(guildData.getLogoColor());
-         mplew.writeInt(guildData.getLogoBackground());
-         mplew.writeInt(guildData.getLogoBackgroundColor());
+         mplew.writeMapleAsciiString(guildData.name());
+         mplew.writeInt(guildData.gp());
+         mplew.writeInt(guildData.logo());
+         mplew.writeInt(guildData.logoColor());
+         mplew.writeInt(guildData.logoBackground());
+         mplew.writeInt(guildData.logoBackgroundColor());
       }
       return mplew.getPacket();
    }
@@ -4778,8 +4778,8 @@ public class MaplePacketCreator {
       }
       mplew.writeInt(worldRanking.size());
       for (GlobalUserRank wr : worldRanking) {
-         mplew.writeMapleAsciiString(wr.getName());
-         mplew.writeInt(wr.getLevel());
+         mplew.writeMapleAsciiString(wr.name());
+         mplew.writeInt(wr.level());
          mplew.writeInt(0);
          mplew.writeInt(0);
          mplew.writeInt(0);
@@ -6057,11 +6057,11 @@ public class MaplePacketCreator {
       mplew.write(3);
       mplew.write(count);
       notes.forEach(note -> {
-         mplew.writeInt(note.getId());
-         mplew.writeMapleAsciiString(note.getFrom() + " "); //Stupid nexon forgot space lol
-         mplew.writeMapleAsciiString(note.getMessage());
-         mplew.writeLong(getTime(note.getTimestamp()));
-         mplew.write(note.getFame()); //FAME :D
+         mplew.writeInt(note.id());
+         mplew.writeMapleAsciiString(note.from() + " "); //Stupid nexon forgot space lol
+         mplew.writeMapleAsciiString(note.message());
+         mplew.writeLong(getTime(note.timestamp()));
+         mplew.write(note.fame()); //FAME :D
       });
       return mplew.getPacket();
    }
@@ -7637,27 +7637,27 @@ public class MaplePacketCreator {
 
    private static void addRingInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
       mplew.writeShort(chr.getCrushRings().size());
-      for (MapleRing ring : chr.getCrushRings()) {
-         mplew.writeInt(ring.getPartnerChrId());
-         mplew.writeAsciiString(getRightPaddedStr(ring.getPartnerName(), '\0', 13));
-         mplew.writeInt(ring.getRingId());
+      for (Ring ring : chr.getCrushRings()) {
+         mplew.writeInt(ring.partnerId());
+         mplew.writeAsciiString(getRightPaddedStr(ring.partnerName(), '\0', 13));
+         mplew.writeInt(ring.ringId());
          mplew.writeInt(0);
-         mplew.writeInt(ring.getPartnerRingId());
+         mplew.writeInt(ring.partnerRingId());
          mplew.writeInt(0);
       }
       mplew.writeShort(chr.getFriendshipRings().size());
-      for (MapleRing ring : chr.getFriendshipRings()) {
-         mplew.writeInt(ring.getPartnerChrId());
-         mplew.writeAsciiString(getRightPaddedStr(ring.getPartnerName(), '\0', 13));
-         mplew.writeInt(ring.getRingId());
+      for (Ring ring : chr.getFriendshipRings()) {
+         mplew.writeInt(ring.partnerId());
+         mplew.writeAsciiString(getRightPaddedStr(ring.partnerName(), '\0', 13));
+         mplew.writeInt(ring.ringId());
          mplew.writeInt(0);
-         mplew.writeInt(ring.getPartnerRingId());
+         mplew.writeInt(ring.partnerRingId());
          mplew.writeInt(0);
-         mplew.writeInt(ring.getItemId());
+         mplew.writeInt(ring.itemId());
       }
 
       if (chr.getPartnerId() > 0) {
-         MapleRing marriageRing = chr.getMarriageRing();
+         Ring marriageRing = chr.getMarriageRing();
 
          mplew.writeShort(1);
          mplew.writeInt(chr.getRelationshipId());
@@ -7665,8 +7665,8 @@ public class MaplePacketCreator {
          mplew.writeInt(chr.getGender() == 0 ? chr.getPartnerId() : chr.getId());
          mplew.writeShort((marriageRing != null) ? 3 : 1);
          if (marriageRing != null) {
-            mplew.writeInt(marriageRing.getItemId());
-            mplew.writeInt(marriageRing.getItemId());
+            mplew.writeInt(marriageRing.itemId());
+            mplew.writeInt(marriageRing.itemId());
          } else {
             mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
             mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)

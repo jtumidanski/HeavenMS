@@ -22,7 +22,6 @@
 package net.server.guild;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,8 +29,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
-
-import javax.swing.text.html.Option;
 
 import client.MapleCharacter;
 import client.database.administrator.CharacterAdministrator;
@@ -72,24 +69,24 @@ public class MapleGuild {
          }
 
          guildData.ifPresent(data -> {
-            name = data.getName();
-            gp = data.getGp();
-            logo = data.getLogo();
-            logoColor = data.getLogoColor();
-            logoBG = data.getLogoBackground();
-            logoBGColor = data.getLogoBackgroundColor();
-            capacity = data.getCapacity();
-            rankTitles = data.getRankTitles();
-            leader = data.getLeaderId();
-            notice = data.getNotice();
-            signature = data.getSignature();
-            allianceId = data.getAllianceId();
+            name = data.name();
+            gp = data.gp();
+            logo = data.logo();
+            logoColor = data.logoColor();
+            logoBG = data.logoBackground();
+            logoBGColor = data.logoBackgroundColor();
+            capacity = data.capacity();
+            rankTitles = data.rankTitles();
+            leader = data.leaderId();
+            notice = data.notice();
+            signature = data.signature();
+            allianceId = data.allianceId();
          });
 
          CharacterProvider.getInstance().getGuildCharacterData(connection, guildid)
-               .forEach(data -> members.add(new MapleGuildCharacter(null, data.getId(), data.getLevel(),
-                     data.getName(), (byte) -1, world, data.getJob(), data.getGuildRank(), guildid, false,
-                     data.getAllianceRank())));
+               .forEach(data -> members.add(new MapleGuildCharacter(null, data.id(), data.level(),
+                     data.name(), (byte) -1, world, data.job(), data.guildRank(), guildid, false,
+                     data.allianceRank())));
       });
    }
 
@@ -257,7 +254,9 @@ public class MapleGuild {
 
       for (MapleGuildCharacter mgc : getMembers()) {
          Optional<MapleCharacter> chr = ps.getCharacterById(mgc.getId());
-         if (chr.isEmpty() || !chr.get().isLoggedinWorld()) continue;
+         if (chr.isEmpty() || !chr.get().isLoggedinWorld()) {
+            continue;
+         }
 
          byte[] packet = MaplePacketCreator.showGuildInfo(chr.get());
          chr.get().announce(packet);

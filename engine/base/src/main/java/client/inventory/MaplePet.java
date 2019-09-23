@@ -61,12 +61,12 @@ public class MaplePet extends Item {
    public static MaplePet loadFromDb(int itemid, short position, int petid) {
       MaplePet ret = new MaplePet(itemid, position, petid);
       DatabaseConnection.getInstance().withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petid)).ifPresent(petData -> {
-         ret.setName(petData.getName());
-         ret.setCloseness(petData.getCloseness());
-         ret.setLevel(petData.getLevel());
-         ret.setFullness(petData.getFullness());
-         ret.setSummoned(petData.isSummoned());
-         ret.setPetFlag(petData.getFlag());
+         ret.setName(petData.name());
+         ret.setCloseness(petData.closeness());
+         ret.setLevel(petData.level());
+         ret.setFullness(petData.fullness());
+         ret.setSummoned(petData.summoned());
+         ret.setPetFlag(petData.flag());
       });
 
       return ret;

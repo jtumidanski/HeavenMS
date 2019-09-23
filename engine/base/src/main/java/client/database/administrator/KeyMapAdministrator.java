@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
 
-import client.MapleKeyBinding;
+import client.KeyBinding;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
 
@@ -37,13 +37,13 @@ public class KeyMapAdministrator extends AbstractQueryExecutor implements Delete
       });
    }
 
-   public void create(Connection connection, int characterId, Set<Map.Entry<Integer, MapleKeyBinding>> bindings) {
+   public void create(Connection connection, int characterId, Set<Map.Entry<Integer, KeyBinding>> bindings) {
       String sql = "INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)";
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, characterId);
          ps.setInt(2, data.getKey());
-         ps.setInt(3, data.getValue().getType());
-         ps.setInt(4, data.getValue().getAction());
+         ps.setInt(3, data.getValue().theType());
+         ps.setInt(4, data.getValue().action());
       }, bindings);
    }
 }

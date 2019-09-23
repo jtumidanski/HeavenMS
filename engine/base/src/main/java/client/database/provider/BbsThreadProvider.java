@@ -30,7 +30,7 @@ public class BbsThreadProvider extends AbstractQueryExecutor {
       }, rs -> {
          if (rs != null && rs.next()) {
             BbsThreadData threadData = transformer.transform(rs);
-            BbsThreadReplyProvider.getInstance().getByThreadId(connection, !localThread ? threadId : threadData.getThreadId())
+            BbsThreadReplyProvider.getInstance().getByThreadId(connection, !localThread ? threadId : threadData.threadId())
                   .forEach(threadData::addReply);
             return Optional.of(threadData);
          }

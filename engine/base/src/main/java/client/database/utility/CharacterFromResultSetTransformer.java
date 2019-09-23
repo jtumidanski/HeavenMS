@@ -3,80 +3,79 @@ package client.database.utility;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import client.database.GameType;
 import client.database.data.CharacterData;
 import client.database.data.GameData;
 
 public class CharacterFromResultSetTransformer implements SqlTransformer<CharacterData, ResultSet> {
    @Override
    public CharacterData transform(ResultSet resultSet) throws SQLException {
-      CharacterData mapleCharacter = new CharacterData();
-
-      mapleCharacter.setAccountId(resultSet.getInt("accountid"));
-      mapleCharacter.setId(resultSet.getInt("id"));
-      mapleCharacter.setName(resultSet.getString("name"));
-      mapleCharacter.setGender(resultSet.getInt("gender"));
-      mapleCharacter.setSkinColor(resultSet.getInt("skincolor"));
-      mapleCharacter.setFace(resultSet.getInt("face"));
-      mapleCharacter.setHair(resultSet.getInt("hair"));
-      mapleCharacter.setLevel(resultSet.getInt("level"));
-      mapleCharacter.setJob(resultSet.getInt("job"));
-      mapleCharacter.setStr(resultSet.getInt("str"));
-      mapleCharacter.setDex(resultSet.getInt("dex"));
-      mapleCharacter.setIntelligence(resultSet.getInt("int"));
-      mapleCharacter.setLuk(resultSet.getInt("luk"));
-      mapleCharacter.setHp(resultSet.getInt("hp"));
-      mapleCharacter.setMaxhp(resultSet.getInt("maxhp"));
-      mapleCharacter.setMp(resultSet.getInt("mp"));
-      mapleCharacter.setMaxmp(resultSet.getInt("maxmp"));
-      mapleCharacter.setAp(resultSet.getInt("ap"));
-      mapleCharacter.setSp(resultSet.getString("sp").split(","));
-      mapleCharacter.setExp(resultSet.getInt("exp"));
-      mapleCharacter.setFame(resultSet.getInt("fame"));
-      mapleCharacter.setGachaponExp(resultSet.getInt("gachaexp"));
-      mapleCharacter.setMap(resultSet.getInt("map"));
-      mapleCharacter.setSpawnPoint(resultSet.getInt("spawnpoint"));
-      mapleCharacter.setGm(resultSet.getInt("gm"));
-      mapleCharacter.setWorld(resultSet.getByte("world"));
-      mapleCharacter.setRank(resultSet.getInt("rank"));
-      mapleCharacter.setRankMove(resultSet.getInt("rankMove"));
-      mapleCharacter.setJobRank(resultSet.getInt("jobRank"));
-      mapleCharacter.setJobRankMove(resultSet.getInt("jobRankMove"));
-      mapleCharacter.setQuestFame(resultSet.getInt("fquest"));
-      mapleCharacter.setHpMpUsed(resultSet.getInt("hpMpUsed"));
-      mapleCharacter.setHasMerchant(resultSet.getInt("HasMerchant") == 1);
-      mapleCharacter.setMeso(resultSet.getInt("meso"));
-      mapleCharacter.setMerchantMeso(resultSet.getInt("MerchantMesos"));
-      mapleCharacter.setFinishedDojoTutorial(resultSet.getInt("finishedDojoTutorial") == 1);
-      mapleCharacter.setVanquisherKills(resultSet.getInt("vanquisherKills"));
-      mapleCharacter.setOmok(new GameData(GameData.Type.OMOK, resultSet.getInt("omokwins"), resultSet.getInt("omoklosses"), resultSet.getInt("omokties")));
-      mapleCharacter.setMatchCard(new GameData(GameData.Type.MATCH, resultSet.getInt("matchcardwins"), resultSet.getInt("matchcardlosses"), resultSet.getInt("matchcardties")));
-      mapleCharacter.setJailExpire(resultSet.getLong("jailexpire"));
-      mapleCharacter.setMountExp(resultSet.getInt("mountexp"));
-      mapleCharacter.setMountLevel(resultSet.getInt("mountlevel"));
-      mapleCharacter.setMountTiredness(resultSet.getInt("mounttiredness"));
-      mapleCharacter.setGuildId(resultSet.getInt("guildid"));
-      mapleCharacter.setGuildRank(resultSet.getInt("guildrank"));
-      mapleCharacter.setAllianceRank(resultSet.getInt("allianceRank"));
-      mapleCharacter.setFamilyId(resultSet.getInt("familyId"));
-      mapleCharacter.setMonsterBookCover(resultSet.getInt("monsterbookcover"));
-      mapleCharacter.setVanquisherStage(resultSet.getInt("vanquisherStage"));
-      mapleCharacter.setAriantPoints(resultSet.getInt("ariantPoints"));
-      mapleCharacter.setDojoPoints(resultSet.getInt("dojoPoints"));
-      mapleCharacter.setLastDojoStage(resultSet.getInt("lastDojoStage"));
-      mapleCharacter.setDataString(resultSet.getString("dataString"));
-      mapleCharacter.setBuddyCapacity(resultSet.getInt("buddyCapacity"));
-      mapleCharacter.setLastExpGainTime(resultSet.getTimestamp("lastExpGainTime"));
-      mapleCharacter.setPartyInvite(resultSet.getBoolean("partySearch"));
-      mapleCharacter.setEquipSlotLimit(resultSet.getByte("equipslots"));
-      mapleCharacter.setUseSlotLimit(resultSet.getByte("useslots"));
-      mapleCharacter.setSetupSlotLimit(resultSet.getByte("setupslots"));
-      mapleCharacter.setEtcSlotLimit(resultSet.getByte("etcslots"));
-      mapleCharacter.setPartnerId(resultSet.getInt("partnerId"));
-      mapleCharacter.setMarriageItemId(resultSet.getInt("marriageItemId"));
-      mapleCharacter.setPartyId(resultSet.getInt("party"));
-      mapleCharacter.setMessengerId(resultSet.getInt("messengerid"));
-      mapleCharacter.setMessengerPosition(resultSet.getInt("messengerposition"));
-
+      CharacterData mapleCharacter = new CharacterData(
+            resultSet.getInt("accountid"),
+            resultSet.getInt("id"),
+            resultSet.getString("name"),
+            resultSet.getInt("gender"),
+            resultSet.getInt("skincolor"),
+            resultSet.getInt("face"),
+            resultSet.getInt("hair"),
+            resultSet.getInt("level"),
+            resultSet.getInt("job"),
+            resultSet.getInt("str"),
+            resultSet.getInt("dex"),
+            resultSet.getInt("int"),
+            resultSet.getInt("luk"),
+            resultSet.getInt("hp"),
+            resultSet.getInt("maxhp"),
+            resultSet.getInt("mp"),
+            resultSet.getInt("maxmp"),
+            resultSet.getInt("ap"),
+            resultSet.getString("sp").split(","),
+            resultSet.getInt("exp"),
+            resultSet.getInt("fame"),
+            resultSet.getInt("gachaexp"),
+            resultSet.getInt("map"),
+            resultSet.getInt("spawnpoint"),
+            resultSet.getInt("gm"),
+            resultSet.getByte("world"),
+            resultSet.getInt("rank"),
+            resultSet.getInt("rankMove"),
+            resultSet.getInt("jobRank"),
+            resultSet.getInt("jobRankMove"),
+            resultSet.getInt("fquest"),
+            resultSet.getInt("hpMpUsed"),
+            resultSet.getInt("HasMerchant") == 1,
+            resultSet.getInt("meso"),
+            resultSet.getInt("MerchantMesos"),
+            resultSet.getInt("finishedDojoTutorial") == 1,
+            resultSet.getInt("vanquisherKills"),
+            resultSet.getInt("vanquisherStage"),
+            new GameData(GameType.OMOK, resultSet.getInt("omokwins"), resultSet.getInt("omoklosses"), resultSet.getInt("omokties")),
+            new GameData(GameType.MATCH, resultSet.getInt("matchcardwins"), resultSet.getInt("matchcardlosses"), resultSet.getInt("matchcardties")),
+            resultSet.getLong("jailexpire"),
+            resultSet.getInt("mountexp"),
+            resultSet.getInt("mountlevel"),
+            resultSet.getInt("mounttiredness"),
+            resultSet.getInt("guildid"),
+            resultSet.getInt("guildrank"),
+            resultSet.getInt("allianceRank"),
+            resultSet.getInt("familyId"),
+            resultSet.getInt("monsterbookcover"),
+            resultSet.getInt("ariantPoints"),
+            resultSet.getInt("dojoPoints"),
+            resultSet.getInt("lastDojoStage"),
+            resultSet.getString("dataString"),
+            resultSet.getInt("buddyCapacity"),
+            resultSet.getTimestamp("lastExpGainTime"),
+            resultSet.getBoolean("partySearch"),
+            resultSet.getByte("equipslots"),
+            resultSet.getByte("useslots"),
+            resultSet.getByte("setupslots"),
+            resultSet.getByte("etcslots"),
+            resultSet.getInt("partnerId"),
+            resultSet.getInt("marriageItemId"),
+            resultSet.getInt("party"),
+            resultSet.getInt("messengerid"),
+            resultSet.getInt("messengerposition"));
       return mapleCharacter;
    }
 }

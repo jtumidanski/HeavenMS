@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import client.BuddyList;
-import client.BuddylistEntry;
+import client.BuddyListEntry;
 import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.database.administrator.BuddyAdministrator;
@@ -40,7 +40,7 @@ public class BuddyListProcessor {
    }
 
    public void addBuddyRequest(MapleCharacter character, int cidFrom, String nameFrom, int channelFrom) {
-      character.getBuddylist().put(new BuddylistEntry(nameFrom, "Default Group", cidFrom, channelFrom, false));
+      character.getBuddylist().put(new BuddyListEntry(nameFrom, "Default Group", cidFrom, channelFrom, false));
       if (character.getBuddylist().hasPendingRequest()) {
          character.getClient().announce(MaplePacketCreator.requestBuddylistAdd(cidFrom, character.getId(), nameFrom));
       } else {

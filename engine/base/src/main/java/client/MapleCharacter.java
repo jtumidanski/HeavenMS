@@ -133,9 +133,9 @@ import constants.skills.Warrior;
 import net.server.PlayerBuffValueHolder;
 import net.server.PlayerCoolDownValueHolder;
 import net.server.Server;
+import net.server.SkillMacro;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import net.server.SkillMacro;
 import net.server.coordinator.MapleInviteCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
@@ -294,10 +294,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private Map<MapleDisease, Long> diseaseExpires = new LinkedHashMap<>();
    private Map<Integer, Map<MapleBuffStat, MapleBuffStatValueHolder>> buffEffects = new LinkedHashMap<>(); // non-overriding buffs thanks to Ronan
    private Map<Integer, Long> buffExpires = new LinkedHashMap<>();
-   private Map<Integer, MapleKeyBinding> keymap = new LinkedHashMap<>();
+   private Map<Integer, KeyBinding> keymap = new LinkedHashMap<>();
    private Map<Integer, MapleSummon> summons = new LinkedHashMap<>();
-   private Map<Integer, MapleCoolDownValueHolder> coolDowns = new LinkedHashMap<>();
-   private EnumMap<MapleDisease, Pair<MapleDiseaseValueHolder, MobSkill>> diseases = new EnumMap<>(MapleDisease.class);
+   private Map<Integer, CoolDownValueHolder> coolDowns = new LinkedHashMap<>();
+   private EnumMap<MapleDisease, Pair<DiseaseValueHolder, MobSkill>> diseases = new EnumMap<>(MapleDisease.class);
    private MapleDoor pdoor = null;
    private Map<MapleQuest, Long> questExpirations = new LinkedHashMap<>();
    private MapleCharacterScheduler scheduler;
@@ -324,11 +324,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private PartyQuest partyQuest = null;
    private List<Pair<DelayedQuestUpdate, Object[]>> npcUpdateQuests = new LinkedList<>();
    private MapleDragon dragon = null;
-   private MapleRing marriageRing;
+   private Ring marriageRing;
    private int marriageItemid = -1;
    private int partnerId = -1;
-   private List<MapleRing> crushRings = new ArrayList<>();
-   private List<MapleRing> friendshipRings = new ArrayList<>();
+   private List<Ring> crushRings = new ArrayList<>();
+   private List<Ring> friendshipRings = new ArrayList<>();
    private boolean loggedIn = false;
    private boolean useCS;  //chaos scroll upon crafting item.
    private long npcCd;
@@ -693,31 +693,31 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       effLock.lock();
       chrLock.lock();
       try {
-         this.coolDowns.put(skillId, new MapleCoolDownValueHolder(skillId, startTime, length));
+         this.coolDowns.put(skillId, new CoolDownValueHolder(skillId, startTime, length));
       } finally {
          chrLock.unlock();
          effLock.unlock();
       }
    }
 
-   public void addCrushRing(MapleRing r) {
+   public void addCrushRing(Ring r) {
       crushRings.add(r);
    }
 
-   public MapleRing getRingById(int id) {
-      for (MapleRing ring : getCrushRings()) {
-         if (ring.getRingId() == id) {
+   public Ring getRingById(int id) {
+      for (Ring ring : getCrushRings()) {
+         if (ring.ringId() == id) {
             return ring;
          }
       }
-      for (MapleRing ring : getFriendshipRings()) {
-         if (ring.getRingId() == id) {
+      for (Ring ring : getFriendshipRings()) {
+         if (ring.ringId() == id) {
             return ring;
          }
       }
 
       if (marriageRing != null) {
-         if (marriageRing.getRingId() == id) {
+         if (marriageRing.ringId() == id) {
             return marriageRing;
          }
       }
@@ -774,11 +774,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return pts;
    }
 
-   public void addFriendshipRing(MapleRing r) {
+   public void addFriendshipRing(Ring r) {
       friendshipRings.add(r);
    }
 
-   public void addMarriageRing(MapleRing r) {
+   public void addMarriageRing(Ring r) {
       marriageRing = r;
    }
 
@@ -1277,8 +1277,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void changeKeybinding(int key, MapleKeyBinding keybinding) {
-      if (keybinding.getType() != 0) {
+   public void changeKeybinding(int key, KeyBinding keybinding) {
+      if (keybinding.theType() != 0) {
          keymap.put(key, keybinding);
       } else {
          keymap.remove(key);
@@ -2089,11 +2089,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void nextPendingRequest(MapleClient c) {
       CharacterNameAndId pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
       if (pendingBuddyRequest != null) {
-         c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.getId(), c.getPlayer().getId(), pendingBuddyRequest.getName()));
+         c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
       }
    }
 
-   private void notifyRemoteChannel(MapleClient c, int remoteChannel, int otherCid, BuddyList.BuddyOperation operation) {
+   private void notifyRemoteChannel(MapleClient c, int remoteChannel, int otherCid, BuddyListOperation operation) {
       MapleCharacter player = c.getPlayer();
       if (remoteChannel != -1) {
          c.getWorldServer().buddyChanged(otherCid, player.getId(), player.getName(), c.getChannel(), operation);
@@ -2104,7 +2104,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       BuddyList bl = getBuddylist();
 
       if (bl.containsVisible(otherCid)) {
-         notifyRemoteChannel(client, getWorldServer().find(otherCid), otherCid, BuddyList.BuddyOperation.DELETED);
+         notifyRemoteChannel(client, getWorldServer().find(otherCid), otherCid, BuddyListOperation.DELETED);
       }
       bl.remove(otherCid);
       client.announce(MaplePacketCreator.updateBuddylist(getBuddylist().getBuddies()));
@@ -2269,10 +2269,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          Map<MapleDisease, Pair<Long, MobSkill>> ret = new LinkedHashMap<>();
 
          for (Entry<MapleDisease, Long> de : diseaseExpires.entrySet()) {
-            Pair<MapleDiseaseValueHolder, MobSkill> dee = diseases.get(de.getKey());
-            MapleDiseaseValueHolder mdvh = dee.getLeft();
+            Pair<DiseaseValueHolder, MobSkill> dee = diseases.get(de.getKey());
+            DiseaseValueHolder mdvh = dee.getLeft();
 
-            ret.put(de.getKey(), new Pair<>(mdvh.length - (curtime - mdvh.startTime), dee.getRight()));
+            ret.put(de.getKey(), new Pair<>(mdvh.length() - (curtime - mdvh.startTime()), dee.getRight()));
          }
 
          return ret;
@@ -2290,7 +2290,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             long expTime = curTime + di.getValue().getLeft();
 
             diseaseExpires.put(di.getKey(), expTime);
-            diseases.put(di.getKey(), new Pair<>(new MapleDiseaseValueHolder(curTime, di.getValue().getLeft()), di.getValue().getRight()));
+            diseases.put(di.getKey(), new Pair<>(new DiseaseValueHolder(curTime, di.getValue().getLeft()), di.getValue().getRight()));
          }
       } finally {
          chrLock.unlock();
@@ -2298,7 +2298,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void announceDiseases() {
-      Set<Entry<MapleDisease, Pair<MapleDiseaseValueHolder, MobSkill>>> chrDiseases;
+      Set<Entry<MapleDisease, Pair<DiseaseValueHolder, MobSkill>>> chrDiseases;
 
       chrLock.lock();
       try {
@@ -2312,7 +2312,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          chrLock.unlock();
       }
 
-      for (Entry<MapleDisease, Pair<MapleDiseaseValueHolder, MobSkill>> di : chrDiseases) {
+      for (Entry<MapleDisease, Pair<DiseaseValueHolder, MobSkill>> di : chrDiseases) {
          MapleDisease disease = di.getKey();
          MobSkill skill = di.getValue().getRight();
          final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
@@ -2337,7 +2337,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          try {
             long curTime = Server.getInstance().getCurrentTime();
             diseaseExpires.put(disease, curTime + skill.getDuration());
-            diseases.put(disease, new Pair<>(new MapleDiseaseValueHolder(curTime, skill.getDuration()), skill));
+            diseases.put(disease, new Pair<>(new DiseaseValueHolder(curTime, skill.getDuration()), skill));
          } finally {
             chrLock.unlock();
          }
@@ -2512,7 +2512,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void skillCooldownTask() {
       scheduler.addIfNotExists(MapleCharacterScheduler.Type.SKILL_COOLDOWN, () -> {
-         Set<Entry<Integer, MapleCoolDownValueHolder>> es;
+         Set<Entry<Integer, CoolDownValueHolder>> es;
 
          effLock.lock();
          chrLock.lock();
@@ -2524,11 +2524,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          long curTime = Server.getInstance().getCurrentTime();
-         for (Entry<Integer, MapleCoolDownValueHolder> bel : es) {
-            MapleCoolDownValueHolder mcdvh = bel.getValue();
-            if (curTime >= mcdvh.startTime + mcdvh.length) {
-               removeCooldown(mcdvh.skillId);
-               client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId, 0));
+         for (Entry<Integer, CoolDownValueHolder> bel : es) {
+            CoolDownValueHolder mcdvh = bel.getValue();
+            if (curTime >= mcdvh.startTime() + mcdvh.length()) {
+               removeCooldown(mcdvh.skillId());
+               client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId(), 0));
             }
          }
       }, 1500);
@@ -2546,7 +2546,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          Set<Skill> keys = getSkills().keySet();
          for (Skill key : keys) {
             SkillEntry skill = getSkills().get(key);
-            if (skill.getExpiration() != -1 && skill.getExpiration() < currenttime) {
+            if (skill.expiration() != -1 && skill.expiration() < currenttime) {
                changeSkillLevel(key, (byte) -1, 0, -1);
             }
          }
@@ -2820,8 +2820,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       effLock.lock();
       chrLock.lock();
       try {
-         for (MapleCoolDownValueHolder mcdvh : coolDowns.values()) {
-            ret.add(new PlayerCoolDownValueHolder(mcdvh.skillId, mcdvh.startTime, mcdvh.length));
+         for (CoolDownValueHolder mcdvh : coolDowns.values()) {
+            ret.add(new PlayerCoolDownValueHolder(mcdvh.skillId(), mcdvh.startTime(), mcdvh.length()));
          }
       } finally {
          chrLock.unlock();
@@ -3907,7 +3907,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public List<MapleRing> getCrushRings() {
+   public List<Ring> getCrushRings() {
       Collections.sort(crushRings);
       return crushRings;
    }
@@ -4297,7 +4297,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       usedStorage = true;
    }
 
-   public List<MapleRing> getFriendshipRings() {
+   public List<Ring> getFriendshipRings() {
       Collections.sort(friendshipRings);
       return friendshipRings;
    }
@@ -4443,7 +4443,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return job.getId() / 1000;
    }
 
-   public Map<Integer, MapleKeyBinding> getKeymap() {
+   public Map<Integer, KeyBinding> getKeymap() {
       return keymap;
    }
 
@@ -4485,7 +4485,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.mapid = mapId;
    }
 
-   public MapleRing getMarriageRing() {
+   public Ring getMarriageRing() {
       return partnerId > 0 ? marriageRing : null;
    }
 
@@ -4493,7 +4493,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (skills.get(skill) == null) {
          return 0;
       }
-      return skills.get(skill).getMasterLevel();
+      return skills.get(skill).masterLevel();
    }
 
    public int getTotalStr() {
@@ -4634,20 +4634,20 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (isOmok) {
          switch (type) {
             case WIN:
-               return omok.getWins();
+               return omok.wins();
             case LOSS:
-               return omok.getLosses();
+               return omok.losses();
             default:
-               return omok.getTies();
+               return omok.ties();
          }
       } else {
          switch (type) {
             case WIN:
-               return matchCard.getWins();
+               return matchCard.wins();
             case LOSS:
-               return matchCard.getLosses();
+               return matchCard.losses();
             default:
-               return matchCard.getTies();
+               return matchCard.ties();
          }
       }
    }
@@ -5091,14 +5091,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (ret == null) {
          return 0;
       }
-      return ret.getSkillLevel();
+      return ret.skillLevel();
    }
 
    public byte getSkillLevel(Skill skill) {
       if (skills.get(skill) == null) {
          return 0;
       }
-      return skills.get(skill).getSkillLevel();
+      return skills.get(skill).skillLevel();
    }
 
    public long getSkillExpiration(int skillId) {
@@ -5111,14 +5111,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (ret == null) {
          return -1;
       }
-      return ret.getExpiration();
+      return ret.expiration();
    }
 
    public long getSkillExpiration(Skill skill) {
       if (skills.get(skill) == null) {
          return -1;
       }
-      return skills.get(skill).getExpiration();
+      return skills.get(skill).expiration();
    }
 
    public MapleSkinColor getSkinColor() {
@@ -5551,7 +5551,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       for (Entry<Skill, SkillEntry> s : this.getSkills().entrySet()) {
          Skill skill = s.getKey();
          if (GameConstants.isInJobTree(skill.getId(), jobId) && !skill.isBeginnerSkill()) {
-            spUsed += s.getValue().getSkillLevel();
+            spUsed += s.getValue().skillLevel();
          }
       }
 
@@ -6136,11 +6136,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public void addPlayerRing(MapleRing ring) {
-      int ringItemId = ring.getItemId();
+   public void addPlayerRing(Ring ring) {
+      int ringItemId = ring.itemId();
       if (ItemConstants.isWeddingRing(ringItemId)) {
          this.addMarriageRing(ring);
-      } else if (ring.getItemId() > 1112012) {
+      } else if (ring.itemId() > 1112012) {
          this.addFriendshipRing(ring);
       } else {
          this.addCrushRing(ring);
@@ -6644,12 +6644,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       effLock.lock();
       chrLock.lock();
       try {
-         ArrayList<MapleCoolDownValueHolder> list = new ArrayList<>(coolDowns.values());
-         for (MapleCoolDownValueHolder mcvh : list) {
-            if (mcvh.skillId != id) {
-               coolDowns.remove(mcvh.skillId);
+         ArrayList<CoolDownValueHolder> list = new ArrayList<>(coolDowns.values());
+         for (CoolDownValueHolder mcvh : list) {
+            if (mcvh.skillId() != id) {
+               coolDowns.remove(mcvh.skillId());
                if (packet) {
-                  client.announce(MaplePacketCreator.skillCooldown(mcvh.skillId, 0));
+                  client.announce(MaplePacketCreator.skillCooldown(mcvh.skillId(), 0));
                }
             }
          }
@@ -6991,10 +6991,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          CharacterAdministrator.getInstance().update(con, id, level, fame, str, dex, luk, int_, Math.abs(exp.get()),
                Math.abs(gachaexp.get()), hp, mp, maxhp, maxmp, sp.substring(0, sp.length() - 1), remainingAp, gmLevel,
                skinColor.getId(), gender, job.getId(), hair, face, mapId, meso.get(), hpMpApUsed, spawnPoint,
-               partyId, buddylist.getCapacity(), messengerId, messengerPosition, mountLevel, mountExp, mountTiredness,
+               partyId, buddylist.capacity(), messengerId, messengerPosition, mountLevel, mountExp, mountTiredness,
                getSlots(1), getSlots(2), getSlots(3), getSlots(4), bookCover, vanquisherStage,
-               dojoPoints, dojoStage, finishedDojoTutorial ? 1 : 0, vanquisherKills, matchCard.getWins(), matchCard.getLosses(),
-               matchCard.getTies(), omok.getWins(), omok.getLosses(), omok.getTies(), dataString, questFame, jailExpiration, partnerId,
+               dojoPoints, dojoStage, finishedDojoTutorial ? 1 : 0, vanquisherKills, matchCard.wins(), matchCard.losses(),
+               matchCard.ties(), omok.wins(), omok.losses(), omok.ties(), dataString, questFame, jailExpiration, partnerId,
                marriageItemid, lastExpGainTime, ariantPoints, canRecvPartySearchInvite);
          monsterbook.saveCards(getId());
       } finally {
@@ -7040,7 +7040,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void setBuddyCapacity(int capacity) {
-      buddylist.setCapacity(capacity);
+      buddylist.capacity_$eq(capacity);
       client.announce(MaplePacketCreator.updateBuddyCapacity(capacity));
    }
 
@@ -7208,9 +7208,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       // autopot on HPMP deplete... thanks shavit for finding out D. Roar doesn't trigger autopot request
       if (hpchange < 0) {
-         MapleKeyBinding autohpPot = this.getKeymap().get(91);
+         KeyBinding autohpPot = this.getKeymap().get(91);
          if (autohpPot != null) {
-            int autohpItemid = autohpPot.getAction();
+            int autohpItemid = autohpPot.action();
             Item autohpItem = this.getInventory(MapleInventoryType.USE).findById(autohpItemid);
             if (autohpItem != null) {
                PetAutopotProcessor.getInstance().runAutopotAction(client, autohpItem.getPosition(), autohpItemid);
@@ -7219,9 +7219,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (mpchange < 0) {
-         MapleKeyBinding autompPot = this.getKeymap().get(92);
+         KeyBinding autompPot = this.getKeymap().get(92);
          if (autompPot != null) {
-            int autompItemid = autompPot.getAction();
+            int autompItemid = autompPot.action();
             Item autompItem = this.getInventory(MapleInventoryType.USE).findById(autompItemid);
             if (autompItem != null) {
                PetAutopotProcessor.getInstance().runAutopotAction(client, autompItem.getPosition(), autompItemid);
@@ -8348,8 +8348,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       DatabaseConnection.getInstance().withConnection(connection ->
             NameChangeProvider.getInstance().getPendingNameChangeForCharacter(connection, getId()).ifPresent(result -> {
-               CharacterAdministrator.getInstance().performNameChange(connection, result.getCharacterId(), result.getOldName(), result.getNewName(), result.getId());
-               FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + getName() + "\" to \"" + result.getNewName() + "\" at " + Calendar.getInstance().getTime().toString());
+               CharacterAdministrator.getInstance().performNameChange(connection, result.characterId(), result.oldName(), result.newName(), result.id());
+               FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + getName() + "\" to \"" + result.newName() + "\" at " + Calendar.getInstance().getTime().toString());
             }));
    }
 

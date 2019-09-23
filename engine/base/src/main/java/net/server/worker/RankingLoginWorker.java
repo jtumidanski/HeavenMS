@@ -51,11 +51,11 @@ public class RankingLoginWorker implements Runnable {
       for (CharacterRankData characterRankData : rankData) {
          int rankMove = 0;
          rank++;
-         if (characterRankData.getLastLogin() < lastUpdate || characterRankData.getLoggedIn() > 0) {
-            rankMove = characterRankData.getMove();
+         if (characterRankData.lastLogin() < lastUpdate || characterRankData.loggedIn() > 0) {
+            rankMove = characterRankData.move();
          }
-         rankMove += characterRankData.getRank() - rank;
-         consumer.apply(characterRankData.getCharacterId(), rank, rankMove);
+         rankMove += characterRankData.rank() - rank;
+         consumer.apply(characterRankData.characterId(), rank, rankMove);
       }
    }
 

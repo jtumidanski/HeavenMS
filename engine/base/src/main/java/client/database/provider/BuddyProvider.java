@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
-import client.BuddylistEntry;
+import client.BuddyListEntry;
 import client.CharacterNameAndId;
 import client.database.AbstractQueryExecutor;
 
@@ -26,10 +26,10 @@ public class BuddyProvider extends AbstractQueryExecutor {
       return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("buddyid"));
    }
 
-   public List<BuddylistEntry> getInfoForBuddies(Connection connection, int characterId) {
+   public List<BuddyListEntry> getInfoForBuddies(Connection connection, int characterId) {
       String sql = "SELECT b.buddyid, b.pending, b.group, c.name as buddyname FROM buddies as b, characters as c WHERE c.id = b.buddyid AND b.characterid = ? AND pending != 1";
       return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
-            rs -> new BuddylistEntry(rs.getString("buddyname"), rs.getString("group"), rs.getInt("buddyid"), (byte) -1, true));
+            rs -> new BuddyListEntry(rs.getString("buddyname"), rs.getString("group"), rs.getInt("buddyid"), (byte) -1, true));
    }
 
    public List<CharacterNameAndId> getInfoForPendingBuddies(Connection connection, int characterId) {

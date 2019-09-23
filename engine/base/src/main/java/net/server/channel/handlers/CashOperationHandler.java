@@ -26,7 +26,7 @@ import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleRing;
+import client.Ring;
 import client.database.data.CharacterIdNameAccountId;
 import client.inventory.Equip;
 import client.inventory.Item;
@@ -176,16 +176,16 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       } else if (recipient == null) {
          c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xA9));
          return;
-      } else if (recipient.getAccountId() == c.getAccID()) {
+      } else if (recipient.accountId() == c.getAccID()) {
          c.announce(MaplePacketCreator.showCashShopMessage((byte) 0xA8));
          return;
       }
-      cs.gift(recipient.getId(), chr.getName(), message, cItem.getSN());
-      c.announce(MaplePacketCreator.showGiftSucceed(recipient.getName(), cItem));
+      cs.gift(recipient.id(), chr.getName(), message, cItem.getSN());
+      c.announce(MaplePacketCreator.showGiftSucceed(recipient.name(), cItem));
       cs.gainCash(4, cItem, chr.getWorld());
       c.announce(MaplePacketCreator.showCash(chr));
-      NoteProcessor.getInstance().sendNote(recipient.getName(), chr.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
-      c.getChannelServer().getPlayerStorage().getCharacterByName(recipient.getName()).ifPresent(MapleCharacter::showNote);
+      NoteProcessor.getInstance().sendNote(recipient.name(), chr.getName(), chr.getName() + " has sent you a gift! Go check out the Cash Shop.", (byte) 0); //fame or not
+      c.getChannelServer().getPlayerStorage().getCharacterByName(recipient.name()).ifPresent(MapleCharacter::showNote);
    }
 
    private void modifyWishList(MapleClient c, MapleCharacter chr, CashShop cs, int[] sns) {
@@ -303,7 +303,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          if (item instanceof Equip) {
             Equip equip = (Equip) item;
             if (equip.getRingId() >= 0) {
-               MapleRing ring = MapleRingProcessor.getInstance().loadFromDb(equip.getRingId());
+               Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.getRingId());
                chr.addPlayerRing(ring);
             }
          }

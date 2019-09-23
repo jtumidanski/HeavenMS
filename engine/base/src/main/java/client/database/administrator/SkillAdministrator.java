@@ -41,9 +41,9 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, characterId);
          ps.setInt(2, data.getKey().getId());
-         ps.setInt(3, data.getValue().getSkillLevel());
-         ps.setInt(4, data.getValue().getMasterLevel());
-         ps.setLong(5, data.getValue().getExpiration());
+         ps.setInt(3, data.getValue().skillLevel());
+         ps.setInt(4, data.getValue().masterLevel());
+         ps.setLong(5, data.getValue().expiration());
       }, skills);
    }
 
@@ -52,9 +52,9 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, characterId);
          ps.setInt(2, data.getKey().getId());
-         ps.setInt(3, data.getValue().getSkillLevel());
-         ps.setInt(4, data.getValue().getMasterLevel());
-         ps.setLong(5, data.getValue().getExpiration());
+         ps.setInt(3, data.getValue().skillLevel());
+         ps.setInt(4, data.getValue().masterLevel());
+         ps.setLong(5, data.getValue().expiration());
       }, skills);
    }
 }

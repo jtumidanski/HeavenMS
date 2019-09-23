@@ -253,7 +253,7 @@ public class Server {
       for (CharacterData characterData : characterDataList) {
          characterCount++;
 
-         int cworld = characterData.getWorld();
+         int cworld = characterData.world();
          if (cworld >= wlen) {
             continue;
          }
@@ -265,7 +265,7 @@ public class Server {
             chars = new LinkedList<>();
          }
 
-         chars.add(CharacterProcessor.getInstance().loadCharacterEntryFromDB(characterData, accPlayerEquips.get(characterData.getId())));
+         chars.add(CharacterProcessor.getInstance().loadCharacterEntryFromDB(characterData, accPlayerEquips.get(characterData.id())));
       }
 
       wchars.add(curWorld, chars);
@@ -353,9 +353,9 @@ public class Server {
 
    private void loadPlayerNpcMapStepFromDb() {
       DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcFieldProvider.getInstance().get(connection).forEach(fieldData -> {
-         World world = getWorld(fieldData.getWorldId());
+         World world = getWorld(fieldData.worldId());
          if (world != null) {
-            world.setPlayerNpcMapData(fieldData.getMapId(), fieldData.getStep(), fieldData.getPodium());
+            world.setPlayerNpcMapData(fieldData.mapId(), fieldData.step(), fieldData.podium());
          }
       }));
    }
@@ -647,7 +647,7 @@ public class Server {
    }
 
    private void loadCouponRates(Connection c) {
-      NxCouponProvider.getInstance().getCoupons(c).forEach(coupon -> couponRates.put(coupon.getCouponId(), coupon.getRate()));
+      NxCouponProvider.getInstance().getCoupons(c).forEach(coupon -> couponRates.put(coupon.couponId(), coupon.rate()));
    }
 
    public List<Integer> getActiveCoupons() {
@@ -686,7 +686,7 @@ public class Server {
       synchronized (activeCoupons) {
          activeCoupons.clear();
          DatabaseConnection.getInstance().withConnectionResult(connection -> NxCouponProvider.getInstance().getActiveCoupons(connection))
-               .ifPresent(result -> result.forEach(coupon -> activeCoupons.add(coupon.getCouponId())));
+               .ifPresent(result -> result.forEach(coupon -> activeCoupons.add(coupon.couponId())));
       }
    }
 
@@ -1462,8 +1462,8 @@ public class Server {
       List<Pair<String, String>> changedNames = new LinkedList<>(); //logging only
       DatabaseConnection.getInstance().withConnection(connection ->
             NameChangeProvider.getInstance().getPendingNameChanges(connection).forEach(result -> {
-               CharacterAdministrator.getInstance().performNameChange(connection, result.getCharacterId(), result.getOldName(), result.getNewName(), result.getId());
-               changedNames.add(new Pair<>(result.getOldName(), result.getNewName()));
+               CharacterAdministrator.getInstance().performNameChange(connection, result.characterId(), result.oldName(), result.newName(), result.id());
+               changedNames.add(new Pair<>(result.oldName(), result.newName()));
             }));
       for (Pair<String, String> namePair : changedNames) {
          FilePrinter.print(FilePrinter.CHANGE_CHARACTER_NAME, "Name change applied : from \"" + namePair.getLeft() + "\" to \"" + namePair.getRight() + "\" at " + Calendar.getInstance().getTime().toString());
@@ -1474,14 +1474,14 @@ public class Server {
       List<Pair<Integer, Pair<Integer, Integer>>> worldTransfers = new LinkedList<>(); //logging only <charid, <oldWorld, newWorld>>
       DatabaseConnection.getInstance().withConnection(connection ->
             WorldTransferProvider.getInstance().getPendingTransfers(connection).forEach(result -> {
-               String reason = CharacterProcessor.getInstance().checkWorldTransferEligibility(connection, result.getCharacterId(), result.getFrom(), result.getTo());
+               String reason = CharacterProcessor.getInstance().checkWorldTransferEligibility(connection, result.characterId(), result.from(), result.to());
                if (reason != null) {
-                  WorldTransferAdministrator.getInstance().cancelById(connection, result.getId());
-                  FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer cancelled : Character ID " + result.getCharacterId() + " at " + Calendar.getInstance().getTime().toString() + ", Reason : " + reason);
+                  WorldTransferAdministrator.getInstance().cancelById(connection, result.id());
+                  FilePrinter.print(FilePrinter.WORLD_TRANSFER, "World transfer cancelled : Character ID " + result.characterId() + " at " + Calendar.getInstance().getTime().toString() + ", Reason : " + reason);
                } else {
-                  CharacterAdministrator.getInstance().performWorldTransfer(connection, result.getCharacterId(), result.getFrom(), result.getTo(), result.getId());
+                  CharacterAdministrator.getInstance().performWorldTransfer(connection, result.characterId(), result.from(), result.to(), result.id());
 
-                  worldTransfers.add(new Pair<>(result.getCharacterId(), new Pair<>(result.getFrom(), result.getTo())));
+                  worldTransfers.add(new Pair<>(result.characterId(), new Pair<>(result.from(), result.to())));
                }
             }));
       //log

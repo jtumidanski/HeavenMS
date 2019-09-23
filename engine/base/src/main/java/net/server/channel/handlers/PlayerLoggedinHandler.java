@@ -34,14 +34,14 @@ import java.util.Set;
 import org.apache.mina.core.session.IoSession;
 
 import client.BuddyList;
-import client.BuddylistEntry;
+import client.BuddyListEntry;
 import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
-import client.MapleKeyBinding;
+import client.KeyBinding;
 import client.MapleMount;
 import client.SkillFactory;
 import client.database.administrator.DueyPackageAdministrator;
@@ -266,11 +266,11 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             player.sendMacros();
 
             // pot bindings being passed through other characters on the account detected thanks to Croosade dev team
-            MapleKeyBinding autohpPot = player.getKeymap().get(91);
-            player.announce(MaplePacketCreator.sendAutoHpPot(autohpPot != null ? autohpPot.getAction() : 0));
+            KeyBinding autohpPot = player.getKeymap().get(91);
+            player.announce(MaplePacketCreator.sendAutoHpPot(autohpPot != null ? autohpPot.action() : 0));
 
-            MapleKeyBinding autompPot = player.getKeymap().get(92);
-            player.announce(MaplePacketCreator.sendAutoMpPot(autompPot != null ? autompPot.getAction() : 0));
+            KeyBinding autompPot = player.getKeymap().get(92);
+            player.announce(MaplePacketCreator.sendAutoMpPot(autompPot != null ? autompPot.action() : 0));
 
             player.getMap().addPlayer(player);
             player.visitMap(player.getMap());
@@ -279,8 +279,8 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             int[] buddyIds = bl.getBuddyIds();
             world.loggedOn(player.getName(), player.getId(), client.getChannel(), buddyIds);
             for (CharacterIdChannelPair onlineBuddy : world.multiBuddyFind(player.getId(), buddyIds)) {
-               BuddylistEntry ble = bl.get(onlineBuddy.getCharacterId());
-               ble.setChannel(onlineBuddy.getChannel());
+               BuddyListEntry ble = bl.get(onlineBuddy.getCharacterId());
+               ble.channel_$eq(onlineBuddy.getChannel());
                bl.put(ble);
             }
             client.announce(MaplePacketCreator.updateBuddylist(bl.getBuddies()));
@@ -328,7 +328,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
             CharacterNameAndId pendingBuddyRequest = client.getPlayer().getBuddylist().pollPendingRequest();
             if (pendingBuddyRequest != null) {
-               client.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.getId(), client.getPlayer().getId(), pendingBuddyRequest.getName()));
+               client.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.id(), client.getPlayer().getId(), pendingBuddyRequest.name()));
             }
 
             client.announce(MaplePacketCreator.updateGender(player));

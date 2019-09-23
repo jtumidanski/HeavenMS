@@ -129,7 +129,7 @@ public class FredrickProcessor {
    private static void removeFredrickReminders(List<CharacterWorldData> expiredCids) {
       DatabaseConnection.getInstance().withConnection(connection ->
             expiredCids.stream()
-                  .map(pair -> CharacterProcessor.getInstance().getNameById(pair.getCharacterId()))
+                  .map(pair -> CharacterProcessor.getInstance().getNameById(pair.characterId()))
                   .filter(Objects::nonNull)
                   .forEach(name -> NoteAdministrator.getInstance().deleteWhereNamesLike(connection, "FREDRICK", name)));
    }
@@ -141,11 +141,11 @@ public class FredrickProcessor {
          long curTime = System.currentTimeMillis();
 
          FredStorageProvider.getInstance().get(connection).forEach(fredStorageData -> {
-            int dayNotes = Math.min(dailyReminders.length - 1, fredStorageData.getDayNotes());
+            int dayNotes = Math.min(dailyReminders.length - 1, fredStorageData.dayNotes());
 
-            int elapsedDays = timestampElapsedDays(fredStorageData.getTimestamp(), curTime);
+            int elapsedDays = timestampElapsedDays(fredStorageData.timestamp(), curTime);
             if (elapsedDays > 100) {
-               expiredCharacterIds.add(new CharacterWorldData(fredStorageData.getCharacterId(), fredStorageData.getWorldId()));
+               expiredCharacterIds.add(new CharacterWorldData(fredStorageData.characterId(), fredStorageData.worldId()));
             } else {
                int notifyDay = dailyReminders[dayNotes];
 
@@ -154,9 +154,9 @@ public class FredrickProcessor {
                      dayNotes++;
                      notifyDay = dailyReminders[dayNotes];
                   } while (elapsedDays >= notifyDay);
-                  int inactivityDays = timestampElapsedDays(fredStorageData.getLastLogoutTime(), curTime);
+                  int inactivityDays = timestampElapsedDays(fredStorageData.lastLogoutTime(), curTime);
                   if (inactivityDays < 7 || dayNotes >= dailyReminders.length - 1) {  // don't spam inactive players
-                     characterIdsToNotify.add(new CharacterNameNote(fredStorageData.getCharacterId(), fredStorageData.getName(), dayNotes));
+                     characterIdsToNotify.add(new CharacterNameNote(fredStorageData.characterId(), fredStorageData.name(), dayNotes));
                   }
                }
             }
@@ -164,27 +164,27 @@ public class FredrickProcessor {
 
          if (!expiredCharacterIds.isEmpty()) {
             InventoryItemAdministrator.getInstance().deleteByCharacterAndTypeBatch(connection,
-                  expiredCharacterIds.stream().map(pair -> new Pair<>(ItemFactory.MERCHANT.getValue(), pair.getCharacterId())).collect(Collectors.toList()));
+                  expiredCharacterIds.stream().map(pair -> new Pair<>(ItemFactory.MERCHANT.getValue(), pair.characterId())).collect(Collectors.toList()));
 
-            CharacterAdministrator.getInstance().setMerchantMesosBatch(connection, expiredCharacterIds.stream().map(pair -> new Pair<>(pair.getCharacterId(), 0)).collect(Collectors.toList()));
+            CharacterAdministrator.getInstance().setMerchantMesosBatch(connection, expiredCharacterIds.stream().map(pair -> new Pair<>(pair.characterId(), 0)).collect(Collectors.toList()));
 
             expiredCharacterIds.forEach(pair -> {
-               World world = Server.getInstance().getWorld(pair.getWorldId());
+               World world = Server.getInstance().getWorld(pair.worldId());
                if (world != null) {
-                  world.getPlayerStorage().getCharacterById(pair.getCharacterId()).ifPresent(character -> character.setMerchantMeso(0));
+                  world.getPlayerStorage().getCharacterById(pair.characterId()).ifPresent(character -> character.setMerchantMeso(0));
                }
             });
 
             removeFredrickReminders(expiredCharacterIds);
-            FredStorageAdministrator.getInstance().deleteForCharacterBatch(connection, expiredCharacterIds.stream().map(CharacterWorldData::getCharacterId).collect(Collectors.toList()));
+            FredStorageAdministrator.getInstance().deleteForCharacterBatch(connection, expiredCharacterIds.stream().map(CharacterWorldData::characterId).collect(Collectors.toList()));
          }
 
          if (!characterIdsToNotify.isEmpty()) {
             FredStorageAdministrator.getInstance().updateNotesBatch(connection,
-                  characterIdsToNotify.stream().map(pair -> new Pair<>(pair.getNote(), pair.getCharacterId())).collect(Collectors.toList()));
+                  characterIdsToNotify.stream().map(pair -> new Pair<>(pair.note(), pair.characterId())).collect(Collectors.toList()));
             characterIdsToNotify.forEach(pair -> {
-               String msg = fredrickReminderMessage(pair.getNote() - 1);
-               NoteProcessor.getInstance().sendNote(pair.getCharacterName(), "FREDRICK", msg, (byte) 0);
+               String msg = fredrickReminderMessage(pair.note() - 1);
+               NoteProcessor.getInstance().sendNote(pair.characterName(), "FREDRICK", msg, (byte) 0);
             });
          }
       });

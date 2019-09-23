@@ -116,7 +116,7 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
          if (threadData.isEmpty()) {
             return;
          }
-         int threadId = threadData.get().getThreadId();
+         int threadId = threadData.get().threadId();
          BbsThreadReplyAdministrator.getInstance().create(connection, threadId, c.getPlayer().getId(), text);
          BbsThreadAdministrator.getInstance().incrementReplyCount(connection, threadId);
       });
@@ -161,11 +161,11 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
          if (threadData.isEmpty()) {
             return;
          }
-         if (threadData.get().getPosterCharacterId() != mc.getId() && mc.getGuildRank() > 2) {
+         if (threadData.get().posterCharacterId() != mc.getId() && mc.getGuildRank() > 2) {
             return;
          }
 
-         int threadId = threadData.get().getThreadId();
+         int threadId = threadData.get().threadId();
 
          BbsThreadReplyAdministrator.getInstance().deleteByThreadId(connection, threadId);
          BbsThreadAdministrator.getInstance().deleteById(connection, threadId);
@@ -183,11 +183,11 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
          if (threadReplyData.isEmpty()) {
             return;
          }
-         if (threadReplyData.get().getPosterCharacterId() != mc.getId() && mc.getGuildRank() > 2) {
+         if (threadReplyData.get().posterCharacterId() != mc.getId() && mc.getGuildRank() > 2) {
             return;
          }
 
-         int threadId = threadReplyData.get().getThreadId();
+         int threadId = threadReplyData.get().threadId();
          BbsThreadReplyAdministrator.getInstance().deleteById(connection, replyId);
          BbsThreadAdministrator.getInstance().decrementReplyCount(connection, threadId);
          displayThread(client, threadId, false);
@@ -205,6 +205,6 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
       }
 
       DatabaseConnection.getInstance().withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
-            .ifPresent(threadData -> client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.getThreadId(), threadData))));
+            .ifPresent(threadData -> client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.threadId(), threadData))));
    }
 }

@@ -64,10 +64,10 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
       Map<Integer, Integer> couponPoints = new HashMap<>(5);
 
       NxCodeItemProvider.getInstance().get(con, codeid).forEach(item -> {
-         if (item.getType() < 5) {
-            couponPoints.merge(item.getType(), item.getQuantity(), Integer::sum);
+         if (item.theType() < 5) {
+            couponPoints.merge(item.theType(), item.quantity(), Integer::sum);
          } else {
-            couponItems.merge(item.getItemId(), item.getQuantity(), Integer::sum);
+            couponItems.merge(item.itemId(), item.quantity(), Integer::sum);
          }
       });
 
@@ -115,17 +115,17 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
             return retVal;
          }
 
-         if (nxCode.get().getRetriever() != null) {
+         if (nxCode.get().retriever() != null) {
             retVal = new Pair<>(-2, new ArrayList<>());
             return retVal;
          }
 
-         if (nxCode.get().getExpiration() < Server.getInstance().getCurrentTime()) {
+         if (nxCode.get().expiration() < Server.getInstance().getCurrentTime()) {
             retVal = new Pair<>(-3, new ArrayList<>());
             return retVal;
          }
 
-         int codeid = nxCode.get().getId();
+         int codeid = nxCode.get().id();
 
          List<NxCodeItemData> ret = getNXCodeItems(chr, connection, codeid);
          if (ret == null) {
@@ -181,8 +181,8 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
                int mesos = 0;
 
                for (NxCodeItemData codeItemData : codeRes.getRight()) {
-                  type = codeItemData.getType();
-                  int quantity = codeItemData.getQuantity();
+                  type = codeItemData.theType();
+                  int quantity = codeItemData.quantity();
 
                   CashShop cs = client.getPlayer().getCashShop();
                   switch (type) {
@@ -210,7 +210,7 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
                         break;
 
                      default:
-                        int item = codeItemData.getItemId();
+                        int item = codeItemData.itemId();
 
                         short qty;
                         if (quantity > Short.MAX_VALUE) {

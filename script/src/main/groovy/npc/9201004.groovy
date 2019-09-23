@@ -1,7 +1,7 @@
 package npc
 
 import client.MapleCharacter
-import client.MapleRing
+import client.Ring
 import net.server.channel.handlers.RingActionHandler
 import scripting.npc.NPCConversationManager
 
@@ -19,7 +19,7 @@ class NPC9201004 {
 
    int[] rings = [1112806, 1112803, 1112807, 1112809]
    int divorceFee = 500000
-   MapleRing ringObj
+   Ring ringObj
 
    def getWeddingRingItemId(MapleCharacter player) {
       for (int i = 0; i < rings.length; i++) {
@@ -113,15 +113,15 @@ class NPC9201004 {
                cm.sendOk("You don't have the required amount of #r" + divorceFee + " mesos#k for the divorce fee.")
                cm.dispose()
                return
-            } else if (ringObj.equipped()) {
+            } else if (ringObj.isEquipped()) {
                cm.sendOk("Please unequip your ring before trying to divorce.")
                cm.dispose()
                return
             }
 
             cm.gainMeso(-divorceFee)
-            RingActionHandler.breakMarriageRing(cm.getPlayer(), ringObj.getItemId())
-            cm.gainItem(ringObj.getItemId(), (short) -1)
+            RingActionHandler.breakMarriageRing(cm.getPlayer(), ringObj.itemId())
+            cm.gainItem(ringObj.itemId(), (short) -1)
 
             cm.sendOk("You have divorced from your partner.")
             cm.dispose()

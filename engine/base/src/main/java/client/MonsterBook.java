@@ -152,12 +152,12 @@ public final class MonsterBook {
       try {
          List<MonsterBookData> monsterBookData = DatabaseConnection.getInstance().withConnectionResult(connection -> MonsterBookProvider.getInstance().getDataForCharacter(connection, charid)).orElse(new ArrayList<>());
          for (MonsterBookData bookData : monsterBookData) {
-            if (bookData.getCardId() / 1000 >= 2388) {
+            if (bookData.cardId() / 1000 >= 2388) {
                specialCard++;
             } else {
                normalCard++;
             }
-            cards.put(bookData.getCardId(), bookData.getLevel());
+            cards.put(bookData.cardId(), bookData.level());
          }
       } finally {
          lock.unlock();

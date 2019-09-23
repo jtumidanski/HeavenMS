@@ -42,51 +42,51 @@ public class MapleFamilyProcessor {
       List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<Pair<Pair<Integer, Integer>, MapleFamilyEntry>>(200); // <<world, seniorid> familyEntry>
       DatabaseConnection.getInstance().withConnection(connection -> {
          FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
-            int cid = familyData.getCharacterId();
+            int cid = familyData.characterId();
             String name = null;
             int level = -1;
             int jobID = -1;
             int world = -1;
 
-            Optional<CharacterData> characterData = CharacterProvider.getInstance().getById(connection, familyData.getCharacterId());
+            Optional<CharacterData> characterData = CharacterProvider.getInstance().getById(connection, familyData.characterId());
             if (characterData.isPresent()) {
-               name = characterData.get().getName();
-               level = characterData.get().getLevel();
-               jobID = characterData.get().getJob();
-               world = characterData.get().getWorld();
+               name = characterData.get().name();
+               level = characterData.get().level();
+               jobID = characterData.get().job();
+               world = characterData.get().world();
             }
 
             World wserv = Server.getInstance().getWorld(world);
             if (wserv == null) {
                return;
             }
-            MapleFamily family = wserv.getFamily(familyData.getFamilyId());
+            MapleFamily family = wserv.getFamily(familyData.familyId());
             if (family == null) {
-               family = new MapleFamily(familyData.getFamilyId(), world);
-               Server.getInstance().getWorld(world).addFamily(familyData.getFamilyId(), family);
+               family = new MapleFamily(familyData.familyId(), world);
+               Server.getInstance().getWorld(world).addFamily(familyData.familyId(), family);
             }
 
             MapleFamilyEntry familyEntry = new MapleFamilyEntry(family, cid, name, level, MapleJob.getById(jobID));
             family.addEntry(familyEntry);
-            if (familyData.getSeniorId() <= 0) {
+            if (familyData.seniorId() <= 0) {
                family.setLeader(familyEntry);
-               setMessage(family, familyData.getPrecepts(), false);
+               setMessage(family, familyData.precepts(), false);
             }
 
-            MapleFamilyEntry senior = family.getEntryByID(familyData.getSeniorId());
+            MapleFamilyEntry senior = family.getEntryByID(familyData.seniorId());
             if (senior != null) {
-               familyEntry.setSenior(family.getEntryByID(familyData.getSeniorId()), false);
+               familyEntry.setSenior(family.getEntryByID(familyData.seniorId()), false);
             } else {
-               if (familyData.getSeniorId() > 0) {
-                  unmatchedJuniors.add(new Pair<>(new Pair<>(world, familyData.getSeniorId()), familyEntry));
+               if (familyData.seniorId() > 0) {
+                  unmatchedJuniors.add(new Pair<>(new Pair<>(world, familyData.seniorId()), familyEntry));
                }
             }
-            familyEntry.setReputation(familyData.getReputation());
-            familyEntry.setTodaysRep(familyData.getTodaysReputation());
-            familyEntry.setTotalReputation(familyData.getTotalReputation());
-            familyEntry.setRepsToSenior(familyData.getReputationToSenior());
+            familyEntry.setReputation(familyData.reputation());
+            familyEntry.setTodaysRep(familyData.todaysReputation());
+            familyEntry.setTotalReputation(familyData.totalReputation());
+            familyEntry.setRepsToSenior(familyData.reputationToSenior());
 
-            FamilyEntitlementProvider.getInstance().getIdsByCharacter(connection, familyData.getCharacterId()).forEach(familyEntry::setEntitlementUsed);
+            FamilyEntitlementProvider.getInstance().getIdsByCharacter(connection, familyData.characterId()).forEach(familyEntry::setEntitlementUsed);
          });
       });
 

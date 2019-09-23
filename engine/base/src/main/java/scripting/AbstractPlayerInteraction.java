@@ -922,7 +922,7 @@ public class AbstractPlayerInteraction {
          SkillEntry skillEntry = getPlayer().getSkills().get(skill);
          if (skillEntry != null) {
             if (!force && level > -1) {
-               getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.getSkillLevel(), level), Math.max(skillEntry.getMasterLevel(), masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.getExpiration(), expiration));
+               getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.skillLevel(), level), Math.max(skillEntry.masterLevel(), masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.expiration(), expiration));
                return;
             }
          } else if (GameConstants.isAranSkills(skillid)) {

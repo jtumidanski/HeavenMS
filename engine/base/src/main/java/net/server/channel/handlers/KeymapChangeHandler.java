@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleKeyBinding;
+import client.KeyBinding;
 import client.Skill;
 import client.SkillFactory;
 import client.inventory.MapleInventoryType;
@@ -55,13 +55,13 @@ public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapC
                client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
-            client.getPlayer().changeKeybinding(91, new MapleKeyBinding(7, ((AutoHPKeymapChangePacket) packet).itemId()));
+            client.getPlayer().changeKeybinding(91, new KeyBinding(7, ((AutoHPKeymapChangePacket) packet).itemId()));
          } else if (packet instanceof AutoMPKeymapChangePacket) {
             if (((AutoMPKeymapChangePacket) packet).itemId() != 0 && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoMPKeymapChangePacket) packet).itemId()) == null) {
                client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
-            client.getPlayer().changeKeybinding(92, new MapleKeyBinding(7, ((AutoMPKeymapChangePacket) packet).itemId()));
+            client.getPlayer().changeKeybinding(92, new KeyBinding(7, ((AutoMPKeymapChangePacket) packet).itemId()));
          }
       }
    }
@@ -85,6 +85,6 @@ public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapC
             }
          }
       }
-      character.changeKeybinding(keyTypeAction.key(), new MapleKeyBinding(keyTypeAction.theType(), keyTypeAction.action()));
+      character.changeKeybinding(keyTypeAction.key(), new KeyBinding(keyTypeAction.theType(), keyTypeAction.action()));
    }
 }

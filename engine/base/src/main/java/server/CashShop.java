@@ -32,14 +32,14 @@ import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 
 import client.database.administrator.AccountAdministrator;
-import client.database.provider.AccountProvider;
 import client.database.administrator.GiftAdministrator;
-import client.database.provider.GiftProvider;
-import client.database.provider.SpecialCashItemProvider;
 import client.database.administrator.WishListAdministrator;
-import client.database.provider.WishListProvider;
 import client.database.data.AccountCashShopData;
 import client.database.data.GiftData;
+import client.database.provider.AccountProvider;
+import client.database.provider.GiftProvider;
+import client.database.provider.SpecialCashItemProvider;
+import client.database.provider.WishListProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
@@ -87,9 +87,9 @@ public class CashShop {
 
       DatabaseConnection.getInstance().withConnection(connection -> {
          AccountCashShopData cashShopData = AccountProvider.getInstance().getAccountCashShopData(connection, accountId);
-         this.nxCredit = cashShopData.getNxCredit();
-         this.maplePoint = cashShopData.getMaplePoint();
-         this.nxPrepaid = cashShopData.getNxPrepaid();
+         this.nxCredit = cashShopData.nxCredit();
+         this.maplePoint = cashShopData.maplePoint();
+         this.nxPrepaid = cashShopData.nxPrepaid();
 
          for (Pair<Item, MapleInventoryType> item : factory.loadItems(accountId, false)) {
             inventory.add(item.getLeft());
@@ -224,21 +224,21 @@ public class CashShop {
 
    private void loadGift(List<Pair<Item, String>> gifts, GiftData gift) {
       notes++;
-      CashItem cItem = CashItemFactory.getItem(gift.getSn());
+      CashItem cItem = CashItemFactory.getItem(gift.sn());
       Item item = cItem.toItem();
       Equip equip = null;
-      item.setGiftFrom(gift.getFrom());
+      item.setGiftFrom(gift.from());
       if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
          equip = (Equip) item;
-         equip.setRingId(gift.getRingId());
-         gifts.add(new Pair<>(equip, gift.getMessage()));
+         equip.setRingId(gift.ringId());
+         gifts.add(new Pair<>(equip, gift.message()));
       } else {
-         gifts.add(new Pair<>(item, gift.getMessage()));
+         gifts.add(new Pair<>(item, gift.message()));
       }
 
       if (CashItemFactory.isPackage(cItem.getItemId())) { //Packages never contains a ring
          for (Item packageItem : CashItemFactory.getPackage(cItem.getItemId())) {
-            packageItem.setGiftFrom(gift.getFrom());
+            packageItem.setGiftFrom(gift.from());
             addToInventory(packageItem);
          }
       } else {

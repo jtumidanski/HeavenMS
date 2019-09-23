@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
-import client.MapleRing;
+import client.Ring;
 import client.database.AbstractQueryExecutor;
 import client.database.utility.RingTransformer;
 
@@ -21,7 +21,7 @@ public class RingProvider extends AbstractQueryExecutor {
    private RingProvider() {
    }
 
-   public Optional<MapleRing> getRingById(Connection connection, int ringId) {
+   public Optional<Ring> getRingById(Connection connection, int ringId) {
       String sql = "SELECT * FROM rings WHERE id = ?";
       RingTransformer transformer = new RingTransformer();
       return getNew(connection, sql, ps -> ps.setInt(1, ringId), transformer::transform);

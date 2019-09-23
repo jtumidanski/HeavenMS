@@ -189,7 +189,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
    }
 
    private static void resetRingId(MapleCharacter player) {
-      int ringitemid = player.getMarriageRing().getItemId();
+      int ringitemid = player.getMarriageRing().itemId();
 
       Item it = player.getInventory(MapleInventoryType.EQUIP).findById(ringitemid);
       if (it == null) {

@@ -3,7 +3,7 @@ package client.database.administrator;
 import java.sql.Connection;
 import java.util.Collection;
 
-import client.BuddylistEntry;
+import client.BuddyListEntry;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
 
@@ -44,12 +44,12 @@ public class BuddyAdministrator extends AbstractQueryExecutor implements DeleteF
       });
    }
 
-   public void addBuddies(Connection connection, int characterId, Collection<BuddylistEntry> buddies) {
+   public void addBuddies(Connection connection, int characterId, Collection<BuddyListEntry> buddies) {
       String sql = "INSERT INTO buddies (characterid, `buddyid`, `pending`, `group`) VALUES (?, ?, 0, ?)";
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, characterId);
-         ps.setInt(2, data.getCharacterId());
-         ps.setString(3, data.getGroup());
+         ps.setInt(2, data.characterId());
+         ps.setString(3, data.group());
       }, buddies);
    }
 

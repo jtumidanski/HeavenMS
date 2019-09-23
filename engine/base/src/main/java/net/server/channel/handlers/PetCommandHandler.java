@@ -53,8 +53,8 @@ public final class PetCommandHandler extends AbstractPacketHandler<PetCommandPac
          return;
       }
 
-      if (Randomizer.nextInt(100) < petCommand.getProbability()) {
-         pet.gainClosenessFullness(chr, petCommand.getIncrease(), 0, packet.command());
+      if (Randomizer.nextInt(100) < petCommand.probability()) {
+         pet.gainClosenessFullness(chr, petCommand.increase(), 0, packet.command());
          chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, false, packet.command(), false));
       } else {
          chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, true, packet.command(), false));

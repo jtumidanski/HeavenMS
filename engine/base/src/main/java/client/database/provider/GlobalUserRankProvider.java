@@ -41,11 +41,11 @@ public class GlobalUserRankProvider extends AbstractQueryExecutor {
       List<WorldRankData> rankSystem = new ArrayList<>();
       int currentWorld = -1;
       for (CharacterData characterData : characterDataList) {
-         if (currentWorld < characterData.getWorld()) {
-            currentWorld = characterData.getWorld();
-            rankSystem.add(new WorldRankData(characterData.getWorld()));
+         if (currentWorld < characterData.world()) {
+            currentWorld = characterData.world();
+            rankSystem.add(new WorldRankData(characterData.world()));
          }
-         rankSystem.get(characterData.getWorld()).addUserRank(new GlobalUserRank(characterData.getName(), characterData.getLevel()));
+         rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level()));
       }
       return rankSystem;
    }
@@ -59,7 +59,7 @@ public class GlobalUserRankProvider extends AbstractQueryExecutor {
       rankSystem.add(new WorldRankData(0));
 
       for (CharacterData characterData : characterDataList) {
-         rankSystem.get(characterData.getWorld()).addUserRank(new GlobalUserRank(characterData.getName(), characterData.getLevel()));
+         rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level()));
       }
       return rankSystem;
    }

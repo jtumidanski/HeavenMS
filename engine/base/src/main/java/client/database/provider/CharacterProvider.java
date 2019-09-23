@@ -178,12 +178,9 @@ public class CharacterProvider extends AbstractQueryExecutor {
       return getNew(connection, sql, ps -> {
          ps.setInt(1, accountId);
          ps.setInt(2, characterId);
-      }, rs -> {
-         CharacterData characterData = new CharacterData();
-         characterData.setName(rs.getString("name"));
-         characterData.setLevel(rs.getInt("level"));
-         return characterData;
-      });
+      }, rs -> new CharacterData(
+            rs.getString("name"),
+            rs.getInt("level")));
    }
 
    public int getCharactersInWorld(Connection connection, int accountId, int worldId) {
