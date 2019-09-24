@@ -1846,7 +1846,7 @@ public class World {
       hmsAvailable.sort(new Comparator<>() {
          @Override
          public int compare(Pair<MaplePlayerShopItem, AbstractMapleMapObject> p1, Pair<MaplePlayerShopItem, AbstractMapleMapObject> p2) {
-            return p1.getLeft().getPrice() - p2.getLeft().getPrice();
+            return p1.getLeft().price() - p2.getLeft().price();
          }
       });
 

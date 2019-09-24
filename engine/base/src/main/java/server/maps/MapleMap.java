@@ -68,6 +68,7 @@ import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.Channel;
 import net.server.coordinator.MapleMonsterAggroCoordinator;
 import net.server.world.World;
+import scala.Option;
 import scripting.event.EventInstanceManager;
 import scripting.map.MapScriptManager;
 import server.MapleItemInformationProvider;
@@ -79,7 +80,6 @@ import server.events.gm.MapleOla;
 import server.events.gm.MapleOxQuiz;
 import server.events.gm.MapleSnowball;
 import server.life.MapleLifeFactory;
-import server.life.MapleLifeFactory.selfDestruction;
 import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MapleNPC;
@@ -87,6 +87,7 @@ import server.life.MaplePlayerNPC;
 import server.life.MonsterDropEntry;
 import server.life.MonsterGlobalDropEntry;
 import server.life.MonsterListener;
+import server.life.SelfDestruction;
 import server.life.SpawnPoint;
 import server.partyquest.GuardianSpawnPoint;
 import server.partyquest.MapleCarnivalFactory;
@@ -485,15 +486,15 @@ public class MapleMap {
       if (fh == null) {
          return null;
       }
-      int dropY = fh.getY1();
-      if (!fh.isWall() && fh.getY1() != fh.getY2()) {
-         double s1 = Math.abs(fh.getY2() - fh.getY1());
-         double s2 = Math.abs(fh.getX2() - fh.getX1());
-         double s5 = Math.cos(Math.atan(s2 / s1)) * (Math.abs(initial.x - fh.getX1()) / Math.cos(Math.atan(s1 / s2)));
-         if (fh.getY2() < fh.getY1()) {
-            dropY = fh.getY1() - (int) s5;
+      int dropY = fh.firstY();
+      if (!fh.isWall() && fh.firstY() != fh.secondY()) {
+         double s1 = Math.abs(fh.secondY() - fh.firstY());
+         double s2 = Math.abs(fh.secondX() - fh.firstX());
+         double s5 = Math.cos(Math.atan(s2 / s1)) * (Math.abs(initial.x - fh.firstX()) / Math.cos(Math.atan(s1 / s2)));
+         if (fh.secondY() < fh.firstY()) {
+            dropY = fh.firstY() - (int) s5;
          } else {
-            dropY = fh.getY1() + (int) s5;
+            dropY = fh.firstY() + (int) s5;
          }
       }
       return new Point(initial.x, dropY);
@@ -594,8 +595,8 @@ public class MapleMap {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       for (final MonsterDropEntry de : dropEntry) {
-         float cardRate = chr.getCardRate(de.itemId);
-         int dropChance = (int) Math.min((float) de.chance * chRate * cardRate, Integer.MAX_VALUE);
+         float cardRate = chr.getCardRate(de.itemId());
+         int dropChance = (int) Math.min((float) de.chance() * chRate * cardRate, Integer.MAX_VALUE);
 
          if (Randomizer.nextInt(999999) < dropChance) {
             if (droptype == 3) {
@@ -603,8 +604,8 @@ public class MapleMap {
             } else {
                pos.x = mobpos + ((d % 2 == 0) ? (25 * ((d + 1) / 2)) : -(25 * (d / 2)));
             }
-            if (de.itemId == 0) { // meso
-               int mesos = Randomizer.nextInt(de.Maximum - de.Minimum) + de.Minimum;
+            if (de.itemId() == 0) { // meso
+               int mesos = Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum();
 
                if (mesos > 0) {
                   if (chr.getBuffedValue(MapleBuffStat.MESOUP) != null) {
@@ -618,12 +619,12 @@ public class MapleMap {
                   spawnMesoDrop(mesos, calcDropPos(pos, mob.getPosition()), mob, chr, false, droptype);
                }
             } else {
-               if (ItemConstants.getInventoryType(de.itemId) == MapleInventoryType.EQUIP) {
-                  idrop = ii.randomizeStats((Equip) ii.getEquipById(de.itemId));
+               if (ItemConstants.getInventoryType(de.itemId()) == MapleInventoryType.EQUIP) {
+                  idrop = ii.randomizeStats((Equip) ii.getEquipById(de.itemId()));
                } else {
-                  idrop = new Item(de.itemId, (short) 0, (short) (de.Maximum != 1 ? Randomizer.nextInt(de.Maximum - de.Minimum) + de.Minimum : 1));
+                  idrop = new Item(de.itemId(), (short) 0, (short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1));
                }
-               spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questid);
+               spawnDrop(idrop, calcDropPos(pos, mob.getPosition()), mob, chr, droptype, de.questId());
             }
             d++;
          }
@@ -665,7 +666,7 @@ public class MapleMap {
          return;
       }
 
-      final byte droptype = (byte) (mob.getStats().isExplosiveReward() ? 3 : mob.getStats().isFfaLoot() ? 2 : chr.getParty() != null ? 1 : 0);
+      final byte droptype = (byte) (mob.getStats().isExplosiveReward() ? 3 : mob.getStats().isFFALoot() ? 2 : chr.getParty() != null ? 1 : 0);
       final int mobpos = mob.getPosition().x;
       int chRate = !mob.isBoss() ? chr.getDropRate() : chr.getBossDropRate();
       byte d = 1;
@@ -1219,10 +1220,10 @@ public class MapleMap {
       if (monster.isAlive()) {
          boolean killed = monster.damage(chr, damage, false);
 
-         selfDestruction selfDestr = monster.getStats().selfDestruction();
-         if (selfDestr != null && selfDestr.getHp() > -1) {// should work ;p
-            if (monster.getHp() <= selfDestr.getHp()) {
-               killMonster(monster, chr, true, selfDestr.getAction());
+         Option<SelfDestruction> selfDestr = monster.getStats().selfDestruction();
+         if (selfDestr.isDefined() && selfDestr.get().hp() > -1) {// should work ;p
+            if (monster.getHp() <= selfDestr.get().hp()) {
+               killMonster(monster, chr, true, selfDestr.get().action());
                return true;
             }
          }
@@ -1285,7 +1286,7 @@ public class MapleMap {
       } else {
          if (removeKilledMonsterObject(monster)) {
             try {
-               if (monster.getStats().getLevel() >= chr.getLevel() + 30 && !chr.isGM()) {
+               if (monster.getStats().level() >= chr.getLevel() + 30 && !chr.isGM()) {
                   AutobanFactory.GENERAL.alert(chr, " for killing a " + monster.getName() + " which is over 30 levels higher.");
                }
 
@@ -1737,11 +1738,11 @@ public class MapleMap {
    }
 
    private void applyRemoveAfter(final MapleMonster monster) {
-      final selfDestruction selfDestruction = monster.getStats().selfDestruction();
-      if (monster.getStats().removeAfter() > 0 || selfDestruction != null && selfDestruction.getHp() < 0) {
+      final Option<SelfDestruction> selfDestruction = monster.getStats().selfDestruction();
+      if (monster.getStats().removeAfter() > 0 || selfDestruction.isDefined() && selfDestruction.get().hp() < 0) {
          Runnable removeAfterAction;
 
-         if (selfDestruction == null) {
+         if (selfDestruction.isEmpty()) {
             removeAfterAction = new Runnable() {
                @Override
                public void run() {
@@ -1754,11 +1755,11 @@ public class MapleMap {
             removeAfterAction = new Runnable() {
                @Override
                public void run() {
-                  killMonster(monster, null, false, selfDestruction.getAction());
+                  killMonster(monster, null, false, selfDestruction.get().action());
                }
             };
 
-            registerMapSchedule(removeAfterAction, selfDestruction.removeAfter() * 1000);
+            registerMapSchedule(removeAfterAction, selfDestruction.get().removeAfter() * 1000);
          }
 
          monster.pushRemoveAfterAction(removeAfterAction);

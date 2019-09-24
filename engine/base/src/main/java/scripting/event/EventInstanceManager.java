@@ -883,7 +883,7 @@ public class EventInstanceManager {
          npc.setCy(pos.y);
          npc.setRx0(pos.x + 50);
          npc.setRx1(pos.x - 50);
-         npc.setFh(map.getFootholds().findBelow(pos).getId());
+         npc.setFh(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
          map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
       }

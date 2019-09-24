@@ -346,7 +346,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            toSteal.add(mi.retrieveDrop(monster.getId()).get(i));
 
                            map.dropItemsFromMonster(toSteal, player, monster);
-                           monster.addStolen(toSteal.get(0).itemId);
+                           monster.addStolen(toSteal.get(0).itemId());
                         }
                      }
                   }
@@ -472,7 +472,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      int skillLevel = player.getSkillLevel(mortalBlow);
                      if (skillLevel > 0) {
                         MapleStatEffect mortal = mortalBlow.getEffect(skillLevel);
-                        if (monster.getHp() <= (monster.getStats().getHp() * mortal.getX()) / 100) {
+                        if (monster.getHp() <= (monster.getStats().hp() * mortal.getX()) / 100) {
                            if (Randomizer.rand(1, 100) <= mortal.getY()) {
                               map.damageMonster(player, monster, Integer.MAX_VALUE);  // thanks Conrad for noticing reduced EXP gain from skill kill
                            }

@@ -2469,19 +2469,19 @@ public class MaplePacketCreator {
       mplew.writeInt(sid);
       mplew.writeShort(items.size()); // item count
       for (MapleShopItem item : items) {
-         mplew.writeInt(item.getItemId());
-         mplew.writeInt(item.getPrice());
-         mplew.writeInt(item.getPrice() == 0 ? item.getPitch() : 0); //Perfect Pitch
+         mplew.writeInt(item.itemId());
+         mplew.writeInt(item.price());
+         mplew.writeInt(item.price() == 0 ? item.pitch() : 0); //Perfect Pitch
          mplew.writeInt(0); //Can be used x minutes after purchase
          mplew.writeInt(0); //Hmm
-         if (!ItemConstants.isRechargeable(item.getItemId())) {
+         if (!ItemConstants.isRechargeable(item.itemId())) {
             mplew.writeShort(1); // stacksize o.o
-            mplew.writeShort(item.getBuyable());
+            mplew.writeShort(item.buyable());
          } else {
             mplew.writeShort(0);
             mplew.writeInt(0);
-            mplew.writeShort(doubleToShortBits(ii.getUnitPrice(item.getItemId())));
-            mplew.writeShort(ii.getSlotMax(c, item.getItemId()));
+            mplew.writeShort(doubleToShortBits(ii.getUnitPrice(item.itemId())));
+            mplew.writeShort(ii.getSlotMax(c, item.itemId()));
          }
       }
       return mplew.getPacket();
@@ -2521,27 +2521,27 @@ public class MaplePacketCreator {
       //mplew.write(0); v104 :)
       int addMovement = -1;
       for (ModifyInventory mod : mods) {
-         mplew.write(mod.getMode());
-         mplew.write(mod.getInventoryType());
-         mplew.writeShort(mod.getMode() == 2 ? mod.getOldPosition() : mod.getPosition());
-         switch (mod.getMode()) {
+         mplew.write(mod.mode());
+         mplew.write(mod.inventoryType());
+         mplew.writeShort(mod.mode() == 2 ? mod.oldPos() : mod.position());
+         switch (mod.mode()) {
             case 0: {//add item
-               addItemInfo(mplew, mod.getItem(), true);
+               addItemInfo(mplew, mod.item(), true);
                break;
             }
             case 1: {//update quantity
-               mplew.writeShort(mod.getQuantity());
+               mplew.writeShort(mod.quantity());
                break;
             }
             case 2: {//move
-               mplew.writeShort(mod.getPosition());
-               if (mod.getPosition() < 0 || mod.getOldPosition() < 0) {
-                  addMovement = mod.getOldPosition() < 0 ? 1 : 2;
+               mplew.writeShort(mod.position());
+               if (mod.position() < 0 || mod.oldPos() < 0) {
+                  addMovement = mod.oldPos() < 0 ? 1 : 2;
                }
                break;
             }
             case 3: {//remove
-               if (mod.getPosition() < 0) {
+               if (mod.position() < 0) {
                   addMovement = 2;
                }
                break;
@@ -3289,10 +3289,10 @@ public class MaplePacketCreator {
       mplew.write(PlayerInteractionHandler.Action.UPDATE_MERCHANT.getCode());
       mplew.write(shop.getItems().size());
       for (MaplePlayerShopItem item : shop.getItems()) {
-         mplew.writeShort(item.getBundles());
-         mplew.writeShort(item.getItem().quantity());
-         mplew.writeInt(item.getPrice());
-         addItemInfo(mplew, item.getItem(), true);
+         mplew.writeShort(item.bundles());
+         mplew.writeShort(item.item().quantity());
+         mplew.writeInt(item.price());
+         addItemInfo(mplew, item.item(), true);
       }
       return mplew.getPacket();
    }
@@ -3352,10 +3352,10 @@ public class MaplePacketCreator {
       mplew.write(0x10);  //TODO SLOTS, which is 16 for most stores...slotMax
       mplew.write(items.size());
       for (MaplePlayerShopItem item : items) {
-         mplew.writeShort(item.getBundles());
-         mplew.writeShort(item.getItem().quantity());
-         mplew.writeInt(item.getPrice());
-         addItemInfo(mplew, item.getItem(), true);
+         mplew.writeShort(item.bundles());
+         mplew.writeShort(item.item().quantity());
+         mplew.writeInt(item.price());
+         addItemInfo(mplew, item.item(), true);
       }
       return mplew.getPacket();
    }
@@ -5662,9 +5662,9 @@ public class MaplePacketCreator {
             mplew.writeMapleAsciiString(owner.getName());
             mplew.writeInt(owner.getMapId());
             mplew.writeMapleAsciiString(ps.getDescription());
-            mplew.writeInt(item.getBundles());
-            mplew.writeInt(item.getItem().quantity());
-            mplew.writeInt(item.getPrice());
+            mplew.writeInt(item.bundles());
+            mplew.writeInt(item.item().quantity());
+            mplew.writeInt(item.price());
             mplew.writeInt(owner.getId());
             mplew.write(owner.getClient().getChannel() - 1);
          } else {
@@ -5673,16 +5673,16 @@ public class MaplePacketCreator {
             mplew.writeMapleAsciiString(hm.getOwner());
             mplew.writeInt(hm.getMapId());
             mplew.writeMapleAsciiString(hm.getDescription());
-            mplew.writeInt(item.getBundles());
-            mplew.writeInt(item.getItem().quantity());
-            mplew.writeInt(item.getPrice());
+            mplew.writeInt(item.bundles());
+            mplew.writeInt(item.item().quantity());
+            mplew.writeInt(item.price());
             mplew.writeInt(hm.getOwnerId());
             mplew.write(hm.getChannel() - 1);
          }
 
          mplew.write(itemType);
          if (itemType == MapleInventoryType.EQUIP.getType()) {
-            addItemInfo(mplew, item.getItem(), true);
+            addItemInfo(mplew, item.item(), true);
          }
       }
       return mplew.getPacket();
@@ -5762,10 +5762,10 @@ public class MaplePacketCreator {
          List<MapleSoldItem> sold = hm.getSold();
          mplew.write(sold.size());
          for (MapleSoldItem s : sold) {
-            mplew.writeInt(s.getItemId());
-            mplew.writeShort(s.getQuantity());
-            mplew.writeInt(s.getMesos());
-            mplew.writeMapleAsciiString(s.getBuyer());
+            mplew.writeInt(s.itemId());
+            mplew.writeShort(s.quantity());
+            mplew.writeInt(s.mesos());
+            mplew.writeMapleAsciiString(s.buyer());
          }
          mplew.writeInt(chr.getMerchantMeso());//:D?
       }
@@ -5777,10 +5777,10 @@ public class MaplePacketCreator {
          mplew.write(0);//Hmm??
       } else {
          for (MaplePlayerShopItem item : hm.getItems()) {
-            mplew.writeShort(item.getBundles());
-            mplew.writeShort(item.getItem().quantity());
-            mplew.writeInt(item.getPrice());
-            addItemInfo(mplew, item.getItem(), true);
+            mplew.writeShort(item.bundles());
+            mplew.writeShort(item.item().quantity());
+            mplew.writeInt(item.price());
+            addItemInfo(mplew, item.item(), true);
          }
       }
       return mplew.getPacket();
@@ -5793,10 +5793,10 @@ public class MaplePacketCreator {
       mplew.writeInt(hm.isOwner(chr) ? chr.getMerchantMeso() : chr.getMeso());
       mplew.write(hm.getItems().size());
       for (MaplePlayerShopItem item : hm.getItems()) {
-         mplew.writeShort(item.getBundles());
-         mplew.writeShort(item.getItem().quantity());
-         mplew.writeInt(item.getPrice());
-         addItemInfo(mplew, item.getItem(), true);
+         mplew.writeShort(item.bundles());
+         mplew.writeShort(item.item().quantity());
+         mplew.writeInt(item.price());
+         addItemInfo(mplew, item.item(), true);
       }
       return mplew.getPacket();
    }
@@ -6015,14 +6015,14 @@ public class MaplePacketCreator {
       mplew.write(1);
       mplew.write(1);
       for (MTSItemInfo item : items) {
-         addItemInfo(mplew, item.getItem(), true);
-         mplew.writeInt(item.getID()); //id
-         mplew.writeInt(item.getTaxes()); //this + below = price
-         mplew.writeInt(item.getPrice()); //price
+         addItemInfo(mplew, item.item(), true);
+         mplew.writeInt(item.id()); //id
+         mplew.writeInt(item.taxes()); //this + below = price
+         mplew.writeInt(item.price()); //price
          mplew.writeInt(0);
-         mplew.writeLong(getTime(item.getEndingDate()));
-         mplew.writeMapleAsciiString(item.getSeller()); //account name (what was nexon thinking?)
-         mplew.writeMapleAsciiString(item.getSeller()); //char name
+         mplew.writeLong(getTime(item.endingDate()));
+         mplew.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
+         mplew.writeMapleAsciiString(item.seller()); //char name
          for (int j = 0; j < 28; j++) {
             mplew.write(0);
          }
@@ -6244,14 +6244,14 @@ public class MaplePacketCreator {
       mplew.writeInt(items.size());
       if (!items.isEmpty()) {
          for (MTSItemInfo item : items) {
-            addItemInfo(mplew, item.getItem(), true);
-            mplew.writeInt(item.getID()); //id
-            mplew.writeInt(item.getTaxes()); //this + below = price
-            mplew.writeInt(item.getPrice()); //price
+            addItemInfo(mplew, item.item(), true);
+            mplew.writeInt(item.id()); //id
+            mplew.writeInt(item.taxes()); //this + below = price
+            mplew.writeInt(item.price()); //price
             mplew.writeInt(0);
-            mplew.writeLong(getTime(item.getEndingDate()));
-            mplew.writeMapleAsciiString(item.getSeller()); //account name (what was nexon thinking?)
-            mplew.writeMapleAsciiString(item.getSeller()); //char name
+            mplew.writeLong(getTime(item.endingDate()));
+            mplew.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
+            mplew.writeMapleAsciiString(item.seller()); //char name
             for (int i = 0; i < 28; i++) {
                mplew.write(0);
             }
@@ -6269,14 +6269,14 @@ public class MaplePacketCreator {
       mplew.writeInt(items.size());
       if (!items.isEmpty()) {
          for (MTSItemInfo item : items) {
-            addItemInfo(mplew, item.getItem(), true);
-            mplew.writeInt(item.getID()); //id
-            mplew.writeInt(item.getTaxes()); //taxes
-            mplew.writeInt(item.getPrice()); //price
+            addItemInfo(mplew, item.item(), true);
+            mplew.writeInt(item.id()); //id
+            mplew.writeInt(item.taxes()); //taxes
+            mplew.writeInt(item.price()); //price
             mplew.writeInt(0);
-            mplew.writeLong(getTime(item.getEndingDate()));
-            mplew.writeMapleAsciiString(item.getSeller()); //account name (what was nexon thinking?)
-            mplew.writeMapleAsciiString(item.getSeller()); //char name
+            mplew.writeLong(getTime(item.endingDate()));
+            mplew.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
+            mplew.writeMapleAsciiString(item.seller()); //char name
             for (int i = 0; i < 28; i++) {
                mplew.write(0);
             }
@@ -7406,16 +7406,16 @@ public class MaplePacketCreator {
          mplew.write(0);
          mplew.write(packages.size());
          for (DueyPackage dp : packages) {
-            mplew.writeInt(dp.getPackageId());
-            mplew.writeAsciiString(dp.getSender());
-            for (int i = dp.getSender().length(); i < 13; i++) {
+            mplew.writeInt(dp.packageId());
+            mplew.writeAsciiString(dp.sender());
+            for (int i = dp.sender().length(); i < 13; i++) {
                mplew.write(0);
             }
 
-            mplew.writeInt(dp.getMesos());
+            mplew.writeInt(dp.mesos());
             mplew.writeLong(getTime(dp.sentTimeInMilliseconds()));
 
-            String msg = dp.getMessage();
+            String msg = dp.message();
             if (msg != null) {
                mplew.writeInt(1);
                mplew.writeAsciiString(msg);
@@ -7428,9 +7428,9 @@ public class MaplePacketCreator {
             }
 
             mplew.write(0);
-            if (dp.getItem() != null) {
+            if (dp.item() != null) {
                mplew.write(1);
-               addItemInfo(mplew, dp.getItem(), true);
+               addItemInfo(mplew, dp.item().get(), true);
             } else {
                mplew.write(0);
             }

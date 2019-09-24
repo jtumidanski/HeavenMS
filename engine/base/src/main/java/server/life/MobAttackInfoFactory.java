@@ -64,12 +64,7 @@ public class MobAttackInfoFactory {
                int disease = MapleDataTool.getInt("disease", attackData, 0);
                int level = MapleDataTool.getInt("level", attackData, 0);
                int mpCon = MapleDataTool.getInt("conMP", attackData, 0);
-               ret = new MobAttackInfo(mob.getId(), attack);
-               ret.setDeadlyAttack(deadlyAttack != null);
-               ret.setMpBurn(mpBurn);
-               ret.setDiseaseSkill(disease);
-               ret.setDiseaseLevel(level);
-               ret.setMpCon(mpCon);
+               ret = new MobAttackInfo(mob.getId(), attack, deadlyAttack != null, mpBurn, disease, level, mpCon);
             }
             mobAttacks.put(mob.getId() + "" + attack, ret);
          }

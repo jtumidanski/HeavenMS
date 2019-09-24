@@ -46,7 +46,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.TakeDamagePacket;
 import net.server.channel.packet.reader.TakeDamageReader;
 import server.MapleStatEffect;
-import server.life.MapleLifeFactory.loseItem;
+import server.life.LoseItem;
 import server.life.MapleMonster;
 import server.life.MobAttackInfo;
 import server.life.MobAttackInfoFactory;
@@ -95,7 +95,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   return;
                }
 
-               List<loseItem> loseItems;
+               List<LoseItem> loseItems;
                if (damage > 0) {
                   loseItems = attacker.getStats().loseItem();
                   if (loseItems != null) {
@@ -104,12 +104,12 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                         final int playerpos = chr.getPosition().x;
                         byte d = 1;
                         Point pos = new Point(0, chr.getPosition().y);
-                        for (loseItem loseItem : loseItems) {
-                           type = ItemConstants.getInventoryType(loseItem.getId());
+                        for (LoseItem loseItem : loseItems) {
+                           type = ItemConstants.getInventoryType(loseItem.id());
 
                            int dropCount = 0;
-                           for (byte b = 0; b < loseItem.getX(); b++) {
-                              if (Randomizer.nextInt(100) < loseItem.getChance()) {
+                           for (byte b = 0; b < loseItem.x(); b++) {
+                              if (Randomizer.nextInt(100) < loseItem.chance()) {
                                  dropCount += 1;
                               }
                            }
@@ -120,19 +120,19 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                               MapleInventory inv = chr.getInventory(type);
                               inv.lockInventory();
                               try {
-                                 qty = Math.min(chr.countItem(loseItem.getId()), dropCount);
-                                 MapleInventoryManipulator.removeById(client, type, loseItem.getId(), qty, false, false);
+                                 qty = Math.min(chr.countItem(loseItem.id()), dropCount);
+                                 MapleInventoryManipulator.removeById(client, type, loseItem.id(), qty, false, false);
                               } finally {
                                  inv.unlockInventory();
                               }
 
-                              if (loseItem.getId() == 4031868) {
+                              if (loseItem.id() == 4031868) {
                                  chr.updateAriantScore();
                               }
 
                               for (byte b = 0; b < qty; b++) {
                                  pos.x = playerpos + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
-                                 map.spawnItemDrop(chr, chr, new Item(loseItem.getId(), (short) 0, (short) 1), map.calcDropPos(pos, chr.getPosition()), true, true);
+                                 map.spawnItemDrop(chr, chr, new Item(loseItem.id(), (short) 0, (short) 1), map.calcDropPos(pos, chr.getPosition()), true, true);
                                  d++;
                               }
                            }
@@ -156,17 +156,17 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       if (damagefrom != -1 && damagefrom != -2 && attacker != null) {
          MobAttackInfo attackInfo = MobAttackInfoFactory.getMobAttackInfo(attacker, damagefrom);
          if (attackInfo != null) {
-            if (attackInfo.isDeadlyAttack()) {
+            if (attackInfo.deadlyAttack()) {
                mpattack = chr.getMp() - 1;
                is_deadly = true;
             }
-            mpattack += attackInfo.getMpBurn();
-            MobSkill mobSkill = MobSkillFactory.getMobSkill(attackInfo.getDiseaseSkill(), attackInfo.getDiseaseLevel());
+            mpattack += attackInfo.mpBurn();
+            MobSkill mobSkill = MobSkillFactory.getMobSkill(attackInfo.diseaseSkill(), attackInfo.diseaseLevel());
             if (mobSkill != null && damage > 0) {
                mobSkill.applyEffect(chr, attacker, false, banishPlayers);
             }
 
-            attacker.setMp(attacker.getMp() - attackInfo.getMpCon());
+            attacker.setMp(attacker.getMp() - attackInfo.mpCon());
             if (chr.getBuffedValue(MapleBuffStat.MANA_REFLECTION) != null && damage > 0 && !attacker.isBoss()) {
                int jobid = chr.getJob().getId();
                if (jobid == 212 || jobid == 222 || jobid == 232) {
@@ -296,7 +296,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       }
 
       for (MapleCharacter player : banishPlayers) {  // chill, if this list ever gets non-empty an attacker does exist, trust me :)
-         player.changeMapBanish(attacker.getBanish().getMap(), attacker.getBanish().getPortal(), attacker.getBanish().getMsg());
+         player.changeMapBanish(attacker.getBanish().map(), attacker.getBanish().portal(), attacker.getBanish().msg());
       }
    }
 }

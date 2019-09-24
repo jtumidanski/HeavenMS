@@ -72,7 +72,7 @@ public class PlayerNpcAdministrator extends AbstractQueryExecutor {
          ps.setInt(9, map.getId());
          ps.setInt(10, scriptId);
          ps.setInt(11, 1);    // default direction
-         ps.setInt(12, map.getFootholds().findBelow(position).getId());
+         ps.setInt(12, map.getFootholds().findBelow(position).id());
          ps.setInt(13, position.x + 50);
          ps.setInt(14, position.x - 50);
          ps.setInt(15, worldRank);

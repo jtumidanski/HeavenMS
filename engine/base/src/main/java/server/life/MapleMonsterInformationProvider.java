@@ -105,10 +105,10 @@ public class MapleMonsterInformationProvider {
          multiDrops = new LinkedList<>();
 
          for (MonsterDropEntry mde : list) {
-            if (ItemConstants.isEquipment(mde.itemId) && mde.Maximum > 1) {
+            if (ItemConstants.isEquipment(mde.itemId()) && mde.maximum() > 1) {
                multiDrops.add(mde);
 
-               int rnd = Randomizer.rand(mde.Minimum, mde.Maximum);
+               int rnd = Randomizer.rand(mde.minimum(), mde.maximum());
                for (int i = 0; i < rnd - 1; i++) {
                   extra.add(mde);   // this passes copies of the equips' MDE with min/max quantity > 1, but idc on equips they are unused anyways
                }
@@ -122,7 +122,7 @@ public class MapleMonsterInformationProvider {
          }
       } else {
          for (MonsterDropEntry mde : multiDrops) {
-            int rnd = Randomizer.rand(mde.Minimum, mde.Maximum);
+            int rnd = Randomizer.rand(mde.minimum(), mde.maximum());
             for (int i = 0; i < rnd - 1; i++) {
                extra.add(mde);
             }
@@ -157,8 +157,8 @@ public class MapleMonsterInformationProvider {
 
       int accProp = 0;
       for (MonsterDropEntry mde : dropList) {
-         if (!ii.isQuestItem(mde.itemId) && !ii.isPartyQuestItem(mde.itemId)) {
-            accProp += mde.chance;
+         if (!ii.isQuestItem(mde.itemId()) && !ii.isPartyQuestItem(mde.itemId())) {
+            accProp += mde.chance();
          }
 
          ret.add(accProp);

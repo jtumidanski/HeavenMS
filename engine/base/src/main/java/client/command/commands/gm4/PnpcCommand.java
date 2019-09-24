@@ -64,7 +64,7 @@ public class PnpcCommand extends Command {
       Point checkpos = player.getMap().getGroundBelow(player.getPosition());
       int xpos = checkpos.x;
       int ypos = checkpos.y;
-      int fh = player.getMap().getFootholds().findBelow(checkpos).getId();
+      int fh = player.getMap().getFootholds().findBelow(checkpos).id();
 
       if (npc != null && !npc.getName().equals("MISSINGNO")) {
 

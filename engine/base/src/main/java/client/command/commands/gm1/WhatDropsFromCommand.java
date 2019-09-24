@@ -58,11 +58,11 @@ public class WhatDropsFromCommand extends Command {
             String mobName = data.getRight();
             output.append(mobName).append(" drops the following items:\r\n\r\n");
             for (MonsterDropEntry drop : MapleMonsterInformationProvider.getInstance().retrieveDrop(mobId)) {
-                  if (drop.chance == 0 || drop.itemId == 0) {
+                  if (drop.chance() == 0 || drop.itemId() == 0) {
                      continue;
                   }
-                  float chance = Math.max(1000000 / drop.chance / (!MapleMonsterInformationProvider.getInstance().isBoss(mobId) ? player.getDropRate() : player.getBossDropRate()), 1);
-                  output.append("- #v").append(drop.itemId).append("# (1/").append((int) chance).append(")\r\n");
+                  float chance = Math.max(1000000 / drop.chance() / (!MapleMonsterInformationProvider.getInstance().isBoss(mobId) ? player.getDropRate() : player.getBossDropRate()), 1);
+                  output.append("- #v").append(drop.itemId()).append("# (1/").append((int) chance).append(")\r\n");
             }
             output.append("\r\n");
          }

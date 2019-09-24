@@ -602,7 +602,7 @@ public class AbstractPlayerInteraction {
                Point pos = getPlayer().getPosition();
                pos.y -= 12;
                evolved.pos_$eq(pos);
-               evolved.fh_$eq(getPlayer().getMap().getFootholds().findBelow(evolved.pos()).getId());
+               evolved.fh_$eq(getPlayer().getMap().getFootholds().findBelow(evolved.pos()).id());
                evolved.stance_$eq(0);
                evolved.summoned_$eq(true);
 
@@ -958,7 +958,7 @@ public class AbstractPlayerInteraction {
          npc.setCy(pos.y);
          npc.setRx0(pos.x + 50);
          npc.setRx1(pos.x - 50);
-         npc.setFh(map.getFootholds().findBelow(pos).getId());
+         npc.setFh(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
          map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
       }

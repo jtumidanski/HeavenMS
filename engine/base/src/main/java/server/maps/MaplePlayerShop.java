@@ -243,10 +243,10 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    public void takeItemBack(int slot, MapleCharacter chr) {
       synchronized (items) {
          MaplePlayerShopItem shopItem = items.get(slot);
-         if (shopItem.isExist()) {
-            if (shopItem.getBundles() > 0) {
-               Item iitem = shopItem.getItem().copy();
-               iitem.quantity_$eq((short) (shopItem.getItem().quantity() * shopItem.getBundles()));
+         if (shopItem.doesExist()) {
+            if (shopItem.bundles() > 0) {
+               Item iitem = shopItem.item().copy();
+               iitem.quantity_$eq((short) (shopItem.item().quantity() * shopItem.bundles()));
 
                if (!MapleInventory.checkSpot(chr, iitem)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
@@ -274,10 +274,10 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       synchronized (items) {
          if (isVisitor(c.getPlayer())) {
             MaplePlayerShopItem pItem = items.get(item);
-            Item newItem = pItem.getItem().copy();
+            Item newItem = pItem.item().copy();
 
-            newItem.quantity_$eq((short) ((pItem.getItem().quantity() * quantity)));
-            if (quantity < 1 || !pItem.isExist() || pItem.getBundles() < quantity) {
+            newItem.quantity_$eq((short) ((pItem.item().quantity() * quantity)));
+            if (quantity < 1 || !pItem.doesExist() || pItem.bundles() < quantity) {
                c.announce(MaplePacketCreator.enableActions());
                return false;
             } else if (newItem.inventoryType().equals(MapleInventoryType.EQUIP) && newItem.quantity() > 1) {
@@ -289,7 +289,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
             visitorLock.lock();
             try {
-               int price = (int) Math.min((float) pItem.getPrice() * quantity, Integer.MAX_VALUE);
+               int price = (int) Math.min((float) pItem.price() * quantity, Integer.MAX_VALUE);
 
                if (c.getPlayer().getMeso() >= price) {
                   if (canBuy(c, newItem)) {
@@ -303,16 +303,16 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                      price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
                      owner.gainMeso(price, true);
 
-                     SoldItem soldItem = new SoldItem(c.getPlayer().getName(), pItem.getItem().id(), quantity, price);
+                     SoldItem soldItem = new SoldItem(c.getPlayer().getName(), pItem.item().id(), quantity, price);
                      owner.announce(MaplePacketCreator.getPlayerShopOwnerUpdate(soldItem, item));
 
                      synchronized (sold) {
                         sold.add(soldItem);
                      }
 
-                     pItem.setBundles((short) (pItem.getBundles() - quantity));
-                     if (pItem.getBundles() < 1) {
-                        pItem.setDoesExist(false);
+                     pItem.bundles_$eq((short) (pItem.bundles() - quantity));
+                     if (pItem.bundles() < 1) {
+                        pItem.doesExist_$eq(false);
                         if (++boughtnumber == items.size()) {
                            owner.setPlayerShop(null);
                            this.setOpen(false);
@@ -493,7 +493,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    public boolean hasItem(int itemid) {
       for (MaplePlayerShopItem mpsi : getItems()) {
-         if (mpsi.getItem().id() == itemid && mpsi.isExist() && mpsi.getBundles() > 0) {
+         if (mpsi.item().id() == itemid && mpsi.doesExist() && mpsi.bundles() > 0) {
             return true;
          }
       }
@@ -573,7 +573,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       }
 
       for (MaplePlayerShopItem mpsi : all) {
-         if (mpsi.getItem().id() == itemid && mpsi.getBundles() > 0 && mpsi.isExist()) {
+         if (mpsi.item().id() == itemid && mpsi.bundles() > 0 && mpsi.doesExist()) {
             list.add(mpsi);
          }
       }

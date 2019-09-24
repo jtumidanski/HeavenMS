@@ -58,7 +58,7 @@ public class PmobCommand extends Command {
       Point checkpos = player.getMap().getGroundBelow(player.getPosition());
       int xpos = checkpos.x;
       int ypos = checkpos.y;
-      int fh = player.getMap().getFootholds().findBelow(checkpos).getId();
+      int fh = player.getMap().getFootholds().findBelow(checkpos).id();
 
       MapleMonster mob = MapleLifeFactory.getMonster(mobId);
       if (mob != null && !mob.getName().equals("MISSINGNO")) {

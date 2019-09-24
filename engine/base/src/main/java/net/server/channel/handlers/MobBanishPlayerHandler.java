@@ -24,7 +24,7 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.MobBanishPlayerPacket;
 import net.server.channel.packet.reader.MobBanishPlayerReader;
-import server.life.MapleLifeFactory.BanishInfo;
+import server.life.BanishInfo;
 import server.life.MapleMonster;
 
 public final class MobBanishPlayerHandler extends AbstractPacketHandler<MobBanishPlayerPacket> {
@@ -41,7 +41,7 @@ public final class MobBanishPlayerHandler extends AbstractPacketHandler<MobBanis
       if (mob != null) {
          BanishInfo banishInfo = mob.getBanish();
          if (banishInfo != null) {
-            chr.changeMapBanish(banishInfo.getMap(), banishInfo.getPortal(), banishInfo.getMsg());
+            chr.changeMapBanish(banishInfo.map(), banishInfo.portal(), banishInfo.msg());
          }
       }
    }

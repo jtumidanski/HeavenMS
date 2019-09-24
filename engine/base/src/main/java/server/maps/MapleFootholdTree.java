@@ -58,22 +58,22 @@ public class MapleFootholdTree {
 
    public void insert(MapleFoothold f) {
       if (depth == 0) {
-         if (f.getX1() > maxDropX) {
-            maxDropX = f.getX1();
+         if (f.firstX() > maxDropX) {
+            maxDropX = f.firstX();
          }
-         if (f.getX1() < minDropX) {
-            minDropX = f.getX1();
+         if (f.firstX() < minDropX) {
+            minDropX = f.firstX();
          }
-         if (f.getX2() > maxDropX) {
-            maxDropX = f.getX2();
+         if (f.secondX() > maxDropX) {
+            maxDropX = f.secondX();
          }
-         if (f.getX2() < minDropX) {
-            minDropX = f.getX2();
+         if (f.secondX() < minDropX) {
+            minDropX = f.secondX();
          }
       }
       if (depth == maxDepth ||
-            (f.getX1() >= p1.x && f.getX2() <= p2.x &&
-                  f.getY1() >= p1.y && f.getY2() <= p2.y)) {
+            (f.firstX() >= p1.x && f.secondX() <= p2.x &&
+                  f.firstY() >= p1.y && f.secondY() <= p2.y)) {
          footholds.add(f);
       } else {
          if (nw == null) {
@@ -82,11 +82,11 @@ public class MapleFootholdTree {
             sw = new MapleFootholdTree(new Point(p1.x, center.y), new Point(center.x, p2.y), depth + 1);
             se = new MapleFootholdTree(center, p2, depth + 1);
          }
-         if (f.getX2() <= center.x && f.getY2() <= center.y) {
+         if (f.secondX() <= center.x && f.secondY() <= center.y) {
             nw.insert(f);
-         } else if (f.getX1() > center.x && f.getY2() <= center.y) {
+         } else if (f.firstX() > center.x && f.secondY() <= center.y) {
             ne.insert(f);
-         } else if (f.getX2() <= center.x && f.getY1() > center.y) {
+         } else if (f.secondX() <= center.x && f.firstY() > center.y) {
             sw.insert(f);
          } else {
             se.insert(f);
@@ -117,8 +117,8 @@ public class MapleFootholdTree {
    private MapleFoothold findWallR(Point p1, Point p2) {
       MapleFoothold ret;
       for (MapleFoothold f : footholds) {
-         if (f.isWall() && f.getX1() >= p1.x && f.getX1() <= p2.x &&
-               f.getY1() >= p1.y && f.getY2() <= p1.y) {
+         if (f.isWall() && f.firstX() >= p1.x && f.firstX() <= p2.x &&
+               f.firstY() >= p1.y && f.secondY() <= p1.y) {
             return f;
          }
       }
@@ -160,30 +160,30 @@ public class MapleFootholdTree {
       List<MapleFoothold> relevants = getRelevants(p);
       List<MapleFoothold> xMatches = new LinkedList<>();
       for (MapleFoothold fh : relevants) {
-         if (fh.getX1() <= p.x && fh.getX2() >= p.x) {
+         if (fh.firstX() <= p.x && fh.secondX() >= p.x) {
             xMatches.add(fh);
          }
       }
       Collections.sort(xMatches);
       for (MapleFoothold fh : xMatches) {
-         if (!fh.isWall() && fh.getY1() != fh.getY2()) {
+         if (!fh.isWall() && fh.firstY() != fh.secondY()) {
             int calcY;
-            double s1 = Math.abs(fh.getY2() - fh.getY1());
-            double s2 = Math.abs(fh.getX2() - fh.getX1());
-            double s4 = Math.abs(p.x - fh.getX1());
+            double s1 = Math.abs(fh.secondY() - fh.firstY());
+            double s2 = Math.abs(fh.secondX() - fh.firstX());
+            double s4 = Math.abs(p.x - fh.firstX());
             double alpha = Math.atan(s2 / s1);
             double beta = Math.atan(s1 / s2);
             double s5 = Math.cos(alpha) * (s4 / Math.cos(beta));
-            if (fh.getY2() < fh.getY1()) {
-               calcY = fh.getY1() - (int) s5;
+            if (fh.secondY() < fh.firstY()) {
+               calcY = fh.firstY() - (int) s5;
             } else {
-               calcY = fh.getY1() + (int) s5;
+               calcY = fh.firstY() + (int) s5;
             }
             if (calcY >= p.y) {
                return fh;
             }
          } else if (!fh.isWall()) {
-            if (fh.getY1() >= p.y) {
+            if (fh.firstY() >= p.y) {
                return fh;
             }
          }

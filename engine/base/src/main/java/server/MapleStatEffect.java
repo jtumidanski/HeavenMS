@@ -150,7 +150,7 @@ public class MapleStatEffect {
          return false;
       }
 
-      return !cardStats.party || partyHunting;
+      return !cardStats.inParty() || partyHunting;
    }
 
    public boolean isActive(MapleCharacter applyto) {
@@ -159,15 +159,15 @@ public class MapleStatEffect {
 
    public int getCardRate(int mapid, int itemid) {
       if (cardStats != null) {
-         if (cardStats.itemCode == Integer.MAX_VALUE) {
-            return cardStats.prob;
-         } else if (cardStats.itemCode < 1000) {
-            if (itemid / 10000 == cardStats.itemCode) {
-               return cardStats.prob;
+         if (cardStats.itemCode() == Integer.MAX_VALUE) {
+            return cardStats.probability();
+         } else if (cardStats.itemCode() < 1000) {
+            if (itemid / 10000 == cardStats.itemCode()) {
+               return cardStats.probability();
             }
          } else {
-            if (itemid == cardStats.itemCode) {
-               return cardStats.prob;
+            if (itemid == cardStats.itemCode()) {
+               return cardStats.probability();
             }
          }
       }

@@ -86,7 +86,7 @@ public class SpawnPetProcessor {
                Point pos = chr.getPosition();
                pos.y -= 12;
                pet.pos_$eq(pos);
-               pet.fh_$eq(chr.getMap().getFootholds().findBelow(pet.pos()).getId());
+               pet.fh_$eq(chr.getMap().getFootholds().findBelow(pet.pos()).id());
                pet.stance_$eq(0);
                pet.summoned_$eq(true);
                PetProcessor.getInstance().saveToDb(pet);

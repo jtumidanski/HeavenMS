@@ -460,7 +460,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       RX0 = newPos.x + 50;
       RX1 = newPos.x - 50;
       CY = newPos.y;
-      FH = map.getFootholds().findBelow(newPos).getId();
+      FH = map.getFootholds().findBelow(newPos).id();
 
       DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcAdministrator.getInstance().updatePosition(connection, newPos.x, CY, FH, RX0, RX1, getObjectId()));
    }

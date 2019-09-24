@@ -183,17 +183,17 @@ public class MapleMapFactory {
                int x2 = MapleDataTool.getInt(footHold.getChildByPath("x2"));
                int y2 = MapleDataTool.getInt(footHold.getChildByPath("y2"));
                MapleFoothold fh = new MapleFoothold(new Point(x1, y1), new Point(x2, y2), Integer.parseInt(footHold.getName()));
-               if (fh.getX1() < lBound.x) {
-                  lBound.x = fh.getX1();
+               if (fh.firstX() < lBound.x) {
+                  lBound.x = fh.firstX();
                }
-               if (fh.getX2() > uBound.x) {
-                  uBound.x = fh.getX2();
+               if (fh.secondX() > uBound.x) {
+                  uBound.x = fh.secondX();
                }
-               if (fh.getY1() < lBound.y) {
-                  lBound.y = fh.getY1();
+               if (fh.firstY() < lBound.y) {
+                  lBound.y = fh.firstY();
                }
-               if (fh.getY2() > uBound.y) {
-                  uBound.y = fh.getY2();
+               if (fh.secondY() > uBound.y) {
+                  uBound.y = fh.secondY();
                }
                allFootholds.add(fh);
             }

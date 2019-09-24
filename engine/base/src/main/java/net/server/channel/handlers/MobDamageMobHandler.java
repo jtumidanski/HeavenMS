@@ -52,18 +52,18 @@ public final class MobDamageMobHandler extends AbstractPacketHandler<MobDamageMo
       double maxDamage;
       if (magic) {
          int atkRate = calcModifier(attacker, MonsterStatus.MAGIC_ATTACK_UP, MonsterStatus.MATK);
-         attackerAtk = (attacker.getStats().getMADamage() * atkRate) / 100;
+         attackerAtk = (attacker.getStats().maDamage() * atkRate) / 100;
 
          int defRate = calcModifier(damaged, MonsterStatus.MAGIC_DEFENSE_UP, MonsterStatus.MDEF);
-         damagedDef = (damaged.getStats().getMDDamage() * defRate) / 100;
+         damagedDef = (damaged.getStats().mdDamage() * defRate) / 100;
 
          maxDamage = ((attackerAtk * (1.15 + (0.025 * attackerLevel))) - (0.75 * damagedDef)) * (Math.log(Math.abs(damagedDef - attackerAtk)) / Math.log(12));
       } else {
          int atkRate = calcModifier(attacker, MonsterStatus.WEAPON_ATTACK_UP, MonsterStatus.WATK);
-         attackerAtk = (attacker.getStats().getPADamage() * atkRate) / 100;
+         attackerAtk = (attacker.getStats().paDamage() * atkRate) / 100;
 
          int defRate = calcModifier(damaged, MonsterStatus.WEAPON_DEFENSE_UP, MonsterStatus.WDEF);
-         damagedDef = (damaged.getStats().getPDDamage() * defRate) / 100;
+         damagedDef = (damaged.getStats().pdDamage() * defRate) / 100;
 
          maxDamage = ((attackerAtk * (1.15 + (0.025 * attackerLevel))) - (0.75 * damagedDef)) * (Math.log(Math.abs(damagedDef - attackerAtk)) / Math.log(17));
       }

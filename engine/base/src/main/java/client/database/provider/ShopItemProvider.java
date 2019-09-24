@@ -31,8 +31,8 @@ public class ShopItemProvider extends AbstractQueryExecutor {
             if (ItemConstants.isRechargeable(rs.getInt("itemid"))) {
                MapleShopItem starItem = new MapleShopItem((short) 1, rs.getInt("itemid"), rs.getInt("price"), rs.getInt("pitch"));
                shopItemData.add(starItem);
-               if (rechargeableItems.contains(starItem.getItemId())) {
-                  recharges.remove(Integer.valueOf(starItem.getItemId()));
+               if (rechargeableItems.contains(starItem.itemId())) {
+                  recharges.remove(Integer.valueOf(starItem.itemId()));
                }
             } else {
                shopItemData.add(new MapleShopItem((short) 1000, rs.getInt("itemid"), rs.getInt("price"), rs.getInt("pitch")));

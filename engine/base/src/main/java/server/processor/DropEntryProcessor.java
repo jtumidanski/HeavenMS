@@ -22,10 +22,10 @@ public class DropEntryProcessor {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       for (MonsterDropEntry mde : from) {
-         if (!ii.isQuestItem(mde.itemId)) {
+         if (!ii.isQuestItem(mde.itemId())) {
             item.add(mde);
          } else {
-            if (chr.needQuestItem(mde.questid, mde.itemId)) {
+            if (chr.needQuestItem(mde.questId(), mde.itemId())) {
                visibleQuest.add(mde);
             } else {
                otherQuest.add(mde);

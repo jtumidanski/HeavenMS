@@ -32,8 +32,8 @@ public class SavedLocationAdministrator extends AbstractQueryExecutor implements
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, characterId);
          ps.setString(2, data.getLeft());
-         ps.setInt(3, data.getRight().getMapId());
-         ps.setInt(4, data.getRight().getPortal());
+         ps.setInt(3, data.getRight().mapId());
+         ps.setInt(4, data.getRight().portal());
       }, savedLocations);
    }
 }

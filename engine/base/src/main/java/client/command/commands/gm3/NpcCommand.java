@@ -48,7 +48,7 @@ public class NpcCommand extends Command {
          npc.setCy(player.getPosition().y);
          npc.setRx0(player.getPosition().x + 50);
          npc.setRx1(player.getPosition().x - 50);
-         npc.setFh(player.getMap().getFootholds().findBelow(c.getPlayer().getPosition()).getId());
+         npc.setFh(player.getMap().getFootholds().findBelow(c.getPlayer().getPosition()).id());
          player.getMap().addMapObject(npc);
          player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
       }

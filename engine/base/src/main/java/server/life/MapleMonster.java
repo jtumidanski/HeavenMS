@@ -69,7 +69,6 @@ import net.server.world.MaplePartyCharacter;
 import scripting.event.EventInstanceManager;
 import server.MapleStatEffect;
 import server.TimerManager;
-import server.life.MapleLifeFactory.BanishInfo;
 import server.loot.MapleLootManager;
 import server.maps.MapleMap;
 import server.maps.MapleMapObjectType;
@@ -182,8 +181,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    private void initWithStats(MapleMonsterStats baseStats) {
       setStance(5);
       this.stats = baseStats.copy();
-      hp.set(stats.getHp());
-      mp = stats.getMp();
+      hp.set(stats.hp());
+      mp = stats.mp();
 
       maxHpPlusHeal.set(hp.get());
    }
@@ -283,12 +282,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public synchronized void setStartingHp(int hp) {
-      stats.setHp(hp);    // refactored mob stats after non-static HP pool suggestion thanks to twigs
+      stats.hp_$eq(hp);    // refactored mob stats after non-static HP pool suggestion thanks to twigs
       this.hp.set(hp);
    }
 
    public int getMaxHp() {
-      return stats.getHp();
+      return stats.hp();
    }
 
    public int getMp() {
@@ -303,19 +302,19 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public int getMaxMp() {
-      return stats.getMp();
+      return stats.mp();
    }
 
    public int getExp() {
-      return stats.getExp();
+      return stats.exp();
    }
 
    public int getLevel() {
-      return stats.getLevel();
+      return stats.level();
    }
 
    public int getCP() {
-      return stats.getCP();
+      return stats.cp();
    }
 
    public int getTeam() {
@@ -343,7 +342,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public void setBoss(boolean boss) {
-      this.stats.setBoss(boss);
+      this.stats.isBoss_$eq(boss);
    }
 
    public int getAnimationTime(String name) {
@@ -351,15 +350,15 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private List<Integer> getRevives() {
-      return stats.getRevives();
+      return stats.revives();
    }
 
    private byte getTagColor() {
-      return stats.getTagColor();
+      return stats.tagColor();
    }
 
    private byte getTagBgColor() {
-      return stats.getTagBgColor();
+      return stats.tagBackgroundColor();
    }
 
    public void setHpZero() {     // force HP = 0
@@ -1097,7 +1096,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    @Override
    public boolean isFacingLeft() {
-      int fixedStance = stats.getFixedStance();    // thanks DimDiDima for noticing inconsistency on some AOE mobskills
+      int fixedStance = stats.fixedStance();    // thanks DimDiDima for noticing inconsistency on some AOE mobskills
       if (fixedStance != 0) {
          return Math.abs(fixedStance) % 2 == 1;
       }
@@ -1669,11 +1668,11 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public int getBuffToGive() {
-      return this.stats.getBuffToGive();
+      return this.stats.buffToGive();
    }
 
    public String getName() {
-      return stats.getName();
+      return stats.name();
    }
 
    public void addStolen(int itemId) {
@@ -1723,15 +1722,15 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public BanishInfo getBanish() {
-      return stats.getBanishInfo();
+      return stats.banish().get();
    }
 
    public int getDropPeriodTime() {
-      return stats.getDropPeriod();
+      return stats.dropPeriod();
    }
 
    public int getPADamage() {
-      return stats.getPADamage();
+      return stats.paDamage();
    }
 
    public Map<MonsterStatus, MonsterStatusEffect> getStati() {
@@ -1760,15 +1759,15 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    public final int getMobMaxHp() {
       if (ostats != null) {
-         return ostats.hp;
+         return ostats.hp();
       }
-      return stats.getHp();
+      return stats.hp();
    }
 
    public final void setOverrideStats(final OverrideMonsterStats ostats) {
       this.ostats = new ChangeableStats(stats, ostats);
-      this.hp.set(ostats.getHp());
-      this.mp = ostats.getMp();
+      this.hp.set(ostats.hp());
+      this.mp = ostats.mp();
    }
 
    public final void changeLevel(final int newLevel) {
@@ -1776,12 +1775,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public final void changeLevel(final int newLevel, boolean pqMob) {
-      if (!stats.isChangeable()) {
+      if (!stats.changeable()) {
          return;
       }
       this.ostats = new ChangeableStats(stats, newLevel, pqMob);
-      this.hp.set(ostats.getHp());
-      this.mp = ostats.getMp();
+      this.hp.set(ostats.hp());
+      this.mp = ostats.mp();
    }
 
    private float getDifficultyRate(final int difficulty) {

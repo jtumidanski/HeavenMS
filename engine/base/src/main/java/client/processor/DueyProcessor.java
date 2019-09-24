@@ -254,9 +254,9 @@ public class DueyProcessor {
                return;
             }
 
-            Item dpItem = dp.getItem();
-            if (dpItem != null) {
-               if (!c.getPlayer().canHoldMeso(dp.getMesos())) {
+            if (dp.item().isDefined()) {
+               Item dpItem = dp.item().get();
+               if (!c.getPlayer().canHoldMeso(dp.mesos())) {
                   c.announce(MaplePacketCreator.sendDueyMSG(Actions.TOCLIENT_RECV_UNKNOWN_ERROR.getCode()));
                   return;
                }
@@ -275,7 +275,7 @@ public class DueyProcessor {
                }
             }
 
-            c.getPlayer().gainMeso(dp.getMesos(), false);
+            c.getPlayer().gainMeso(dp.mesos(), false);
 
             dueyRemovePackage(c, packageId, false);
          } finally {

@@ -61,8 +61,8 @@ public class MapleLifeFactory {
          MapleMonsterInformationProvider mi = MapleMonsterInformationProvider.getInstance();
 
          for (MobAttackInfoHolder attackInfo : attackInfos) {
-            mi.setMobAttackInfo(mid, attackInfo.attackPos, attackInfo.mpCon, attackInfo.coolTime);
-            mi.setMobAttackAnimationTime(mid, attackInfo.attackPos, attackInfo.animationTime);
+            mi.setMobAttackInfo(mid, attackInfo.attackPos(), attackInfo.mpCon(), attackInfo.coolTime());
+            mi.setMobAttackAnimationTime(mid, attackInfo.attackPos(), attackInfo.animationTime());
          }
       }
    }
@@ -90,40 +90,41 @@ public class MapleLifeFactory {
          attackInfos.addAll(linkStats.getRight());
       }
 
-      stats.setHp(MapleDataTool.getIntConvert("maxHP", monsterInfoData));
-      stats.setFriendly(MapleDataTool.getIntConvert("damagedByMob", monsterInfoData, stats.isFriendly() ? 1 : 0) == 1);
-      stats.setPADamage(MapleDataTool.getIntConvert("PADamage", monsterInfoData));
-      stats.setPDDamage(MapleDataTool.getIntConvert("PDDamage", monsterInfoData));
-      stats.setMADamage(MapleDataTool.getIntConvert("MADamage", monsterInfoData));
-      stats.setMDDamage(MapleDataTool.getIntConvert("MDDamage", monsterInfoData));
-      stats.setMp(MapleDataTool.getIntConvert("maxMP", monsterInfoData, stats.getMp()));
-      stats.setExp(MapleDataTool.getIntConvert("exp", monsterInfoData, stats.getExp()));
-      stats.setLevel(MapleDataTool.getIntConvert("level", monsterInfoData));
-      stats.setRemoveAfter(MapleDataTool.getIntConvert("removeAfter", monsterInfoData, stats.removeAfter()));
-      stats.setBoss(MapleDataTool.getIntConvert("boss", monsterInfoData, stats.isBoss() ? 1 : 0) > 0);
-      stats.setExplosiveReward(MapleDataTool.getIntConvert("explosiveReward", monsterInfoData, stats.isExplosiveReward() ? 1 : 0) > 0);
-      stats.setFfaLoot(MapleDataTool.getIntConvert("publicReward", monsterInfoData, stats.isFfaLoot() ? 1 : 0) > 0);
-      stats.setUndead(MapleDataTool.getIntConvert("undead", monsterInfoData, stats.isUndead() ? 1 : 0) > 0);
-      stats.setName(MapleDataTool.getString(mid + "/name", mobStringData, "MISSINGNO"));
-      stats.setBuffToGive(MapleDataTool.getIntConvert("buff", monsterInfoData, stats.getBuffToGive()));
-      stats.setCP(MapleDataTool.getIntConvert("getCP", monsterInfoData, stats.getCP()));
-      stats.setRemoveOnMiss(MapleDataTool.getIntConvert("removeOnMiss", monsterInfoData, stats.removeOnMiss() ? 1 : 0) > 0);
+      stats.init(
+            MapleDataTool.getIntConvert("maxHP", monsterInfoData),
+            MapleDataTool.getIntConvert("damagedByMob", monsterInfoData, stats.isFriendly() ? 1 : 0) == 1,
+            MapleDataTool.getIntConvert("PADamage", monsterInfoData),
+            MapleDataTool.getIntConvert("PDDamage", monsterInfoData),
+            MapleDataTool.getIntConvert("MADamage", monsterInfoData),
+            MapleDataTool.getIntConvert("MDDamage", monsterInfoData),
+            MapleDataTool.getIntConvert("maxMP", monsterInfoData, stats.mp()),
+            MapleDataTool.getIntConvert("exp", monsterInfoData, stats.exp()),
+            MapleDataTool.getIntConvert("level", monsterInfoData),
+            MapleDataTool.getIntConvert("removeAfter", monsterInfoData, stats.removeAfter()),
+            MapleDataTool.getIntConvert("boss", monsterInfoData, stats.isBoss() ? 1 : 0) > 0,
+            MapleDataTool.getIntConvert("explosiveReward", monsterInfoData, stats.isExplosiveReward() ? 1 : 0) > 0,
+            MapleDataTool.getIntConvert("publicReward", monsterInfoData, stats.isFFALoot() ? 1 : 0) > 0,
+            MapleDataTool.getIntConvert("undead", monsterInfoData, stats.isUndead() ? 1 : 0) > 0,
+            MapleDataTool.getString(mid + "/name", mobStringData, "MISSINGNO"),
+            MapleDataTool.getIntConvert("buff", monsterInfoData, stats.buffToGive()),
+            MapleDataTool.getIntConvert("getCP", monsterInfoData, stats.cp()),
+            MapleDataTool.getIntConvert("removeOnMiss", monsterInfoData, stats.removeOnMiss() ? 1 : 0) > 0);
 
       MapleData special = monsterInfoData.getChildByPath("coolDamage");
       if (special != null) {
          int coolDmg = MapleDataTool.getIntConvert("coolDamage", monsterInfoData);
          int coolProb = MapleDataTool.getIntConvert("coolDamageProb", monsterInfoData, 0);
-         stats.setCool(new Pair<>(coolDmg, coolProb));
+         stats.cool_$eq(new Pair<>(coolDmg, coolProb));
       }
       special = monsterInfoData.getChildByPath("loseItem");
       if (special != null) {
          for (MapleData liData : special.getChildren()) {
-            stats.addLoseItem(new loseItem(MapleDataTool.getInt(liData.getChildByPath("id")), (byte) MapleDataTool.getInt(liData.getChildByPath("prop")), (byte) MapleDataTool.getInt(liData.getChildByPath("x"))));
+            stats.addLoseItem(new LoseItem(MapleDataTool.getInt(liData.getChildByPath("id")), (byte) MapleDataTool.getInt(liData.getChildByPath("prop")), (byte) MapleDataTool.getInt(liData.getChildByPath("x"))));
          }
       }
       special = monsterInfoData.getChildByPath("selfDestruction");
       if (special != null) {
-         stats.setSelfDestruction(new selfDestruction((byte) MapleDataTool.getInt(special.getChildByPath("action")), MapleDataTool.getIntConvert("removeAfter", special, -1), MapleDataTool.getIntConvert("hp", special, -1)));
+         stats.selfDestruction_$eq(new SelfDestruction((byte) MapleDataTool.getInt(special.getChildByPath("action")), MapleDataTool.getIntConvert("removeAfter", special, -1), MapleDataTool.getIntConvert("hp", special, -1)));
       }
       MapleData firstAttackData = monsterInfoData.getChildByPath("firstAttack");
       int firstAttack = 0;
@@ -134,11 +135,11 @@ public class MapleLifeFactory {
             firstAttack = MapleDataTool.getInt(firstAttackData);
          }
       }
-      stats.setFirstAttack(firstAttack > 0);
-      stats.setDropPeriod(MapleDataTool.getIntConvert("dropItemPeriod", monsterInfoData, stats.getDropPeriod() / 10000) * 10000);
+      stats.isFirstAttack_$eq(firstAttack > 0);
+      stats.dropPeriod_$eq(MapleDataTool.getIntConvert("dropItemPeriod", monsterInfoData, stats.dropPeriod() / 10000) * 10000);
 
-      stats.setTagColor(MapleDataTool.getIntConvert("hpTagColor", monsterInfoData, 0));
-      stats.setTagBgColor(MapleDataTool.getIntConvert("hpTagBgcolor", monsterInfoData, 0));
+      stats.tagColor_$eq((byte) MapleDataTool.getIntConvert("hpTagColor", monsterInfoData, 0));
+      stats.tagBackgroundColor_$eq((byte) MapleDataTool.getIntConvert("hpTagBgcolor", monsterInfoData, 0));
 
       for (MapleData idata : monsterData) {
          if (!idata.getName().equals("info")) {
@@ -155,7 +156,7 @@ public class MapleLifeFactory {
          for (MapleData data_ : reviveInfo) {
             revives.add(MapleDataTool.getInt(data_));
          }
-         stats.setRevives(revives);
+         stats.revives_$eq(revives);
       }
       decodeElementalString(stats, MapleDataTool.getString("elemAttr", monsterInfoData, ""));
 
@@ -201,14 +202,14 @@ public class MapleLifeFactory {
 
       MapleData banishData = monsterInfoData.getChildByPath("ban");
       if (banishData != null) {
-         stats.setBanishInfo(new BanishInfo(MapleDataTool.getString("banMsg", banishData), MapleDataTool.getInt("banMap/0/field", banishData, -1), MapleDataTool.getString("banMap/0/portal", banishData, "sp")));
+         stats.banish_$eq(new BanishInfo(MapleDataTool.getString("banMsg", banishData), MapleDataTool.getInt("banMap/0/field", banishData, -1), MapleDataTool.getString("banMap/0/portal", banishData, "sp")));
       }
 
       int noFlip = MapleDataTool.getInt("noFlip", monsterInfoData, 0);
       if (noFlip > 0) {
          Point origin = MapleDataTool.getPoint("stand/0/origin", monsterData, null);
          if (origin != null) {
-            stats.setFixedStance(origin.getX() < 1 ? 5 : 4);    // fixed left/right
+            stats.fixedStance_$eq(origin.getX() < 1 ? 5 : 4);    // fixed left/right
          }
       }
 
@@ -245,7 +246,7 @@ public class MapleLifeFactory {
             MapleData monsterInfoData = monsterData.getChildByPath("info");
             return MapleDataTool.getIntConvert("level", monsterInfoData);
          } else {
-            return stats.getLevel();
+            return stats.level();
          }
       } catch (NullPointerException npe) {
          System.out.println("[SEVERE] MOB " + mid + " failed to load. Issue: " + npe.getMessage() + "\n\n");
@@ -267,92 +268,5 @@ public class MapleLifeFactory {
 
    public static String getNPCDefaultTalk(int nid) {
       return MapleDataTool.getString(nid + "/d0", npcStringData, "(...)");
-   }
-
-   private static class MobAttackInfoHolder {
-      protected int attackPos;
-      protected int mpCon;
-      protected int coolTime;
-      protected int animationTime;
-
-      protected MobAttackInfoHolder(int attackPos, int mpCon, int coolTime, int animationTime) {
-         this.attackPos = attackPos;
-         this.mpCon = mpCon;
-         this.coolTime = coolTime;
-         this.animationTime = animationTime;
-      }
-   }
-
-   public static class BanishInfo {
-
-      private int map;
-      private String portal, msg;
-
-      public BanishInfo(String msg, int map, String portal) {
-         this.msg = msg;
-         this.map = map;
-         this.portal = portal;
-      }
-
-      public int getMap() {
-         return map;
-      }
-
-      public String getPortal() {
-         return portal;
-      }
-
-      public String getMsg() {
-         return msg;
-      }
-   }
-
-   public static class loseItem {
-
-      private int id;
-      private byte chance, x;
-
-      private loseItem(int id, byte chance, byte x) {
-         this.id = id;
-         this.chance = chance;
-         this.x = x;
-      }
-
-      public int getId() {
-         return id;
-      }
-
-      public byte getChance() {
-         return chance;
-      }
-
-      public byte getX() {
-         return x;
-      }
-   }
-
-   public static class selfDestruction {
-
-      private byte action;
-      private int removeAfter;
-      private int hp;
-
-      private selfDestruction(byte action, int removeAfter, int hp) {
-         this.action = action;
-         this.removeAfter = removeAfter;
-         this.hp = hp;
-      }
-
-      public int getHp() {
-         return hp;
-      }
-
-      public byte getAction() {
-         return action;
-      }
-
-      public int removeAfter() {
-         return removeAfter;
-      }
    }
 }

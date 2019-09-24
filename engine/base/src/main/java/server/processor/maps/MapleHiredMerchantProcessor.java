@@ -32,8 +32,8 @@ public class MapleHiredMerchantProcessor {
    }
 
    private Pair<Item, MapleInventoryType> getItemMapleInventoryTypePair(MaplePlayerShopItem item) {
-      Item it = item.getItem().copy();
-      it.quantity_$eq((short) (it.quantity() * item.getBundles()));
+      Item it = item.item().copy();
+      it.quantity_$eq((short) (it.quantity() * item.bundles()));
       return new Pair<>(it, it.inventoryType());
    }
 }

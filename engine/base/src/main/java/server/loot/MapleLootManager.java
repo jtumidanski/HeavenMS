@@ -36,18 +36,18 @@ public class MapleLootManager {
 
    private static boolean isRelevantDrop(MonsterDropEntry dropEntry, List<MapleCharacter> players, List<MapleLootInventory> playersInv) {
       int qStartAmount = 0, qCompleteAmount = 0;
-      MapleQuest quest = MapleQuest.getInstance(dropEntry.questid);
+      MapleQuest quest = MapleQuest.getInstance(dropEntry.questId());
       if (quest != null) {
-         qStartAmount = quest.getStartItemAmountNeeded(dropEntry.itemId);
-         qCompleteAmount = quest.getCompleteItemAmountNeeded(dropEntry.itemId);
+         qStartAmount = quest.getStartItemAmountNeeded(dropEntry.itemId());
+         qCompleteAmount = quest.getCompleteItemAmountNeeded(dropEntry.itemId());
       }
 
       //boolean restricted = MapleItemInformationProvider.getInstance().isPickupRestricted(dropEntry.itemId);
       for (int i = 0; i < players.size(); i++) {
          MapleLootInventory chrInv = playersInv.get(i);
 
-         if (dropEntry.questid > 0) {
-            int qItemAmount, chrQuestStatus = players.get(i).getQuestStatus(dropEntry.questid);
+         if (dropEntry.questId() > 0) {
+            int qItemAmount, chrQuestStatus = players.get(i).getQuestStatus(dropEntry.questId());
             if (chrQuestStatus == 0) {
                qItemAmount = qStartAmount;
             } else if (chrQuestStatus != 1) {
@@ -60,7 +60,7 @@ public class MapleLootManager {
                continue;
             }
 
-            int qItemStatus = chrInv.hasItem(dropEntry.itemId, qItemAmount);
+            int qItemStatus = chrInv.hasItem(dropEntry.itemId(), qItemAmount);
             if (qItemStatus == 2) {
                continue;
             } /*else if (restricted && qItemStatus == 1) {

@@ -4471,7 +4471,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (map.getFootholds().findBelow(pos) == null) {
          return 0;
       } else {
-         return map.getFootholds().findBelow(pos).getY1();
+         return map.getFootholds().findBelow(pos).firstY();
       }
    }
 
@@ -4855,12 +4855,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          getWorldServer().unregisterPlayerShop(mps);
 
          for (MaplePlayerShopItem shopItem : mps.getItems()) {
-            if (shopItem.getBundles() >= 2) {
-               Item iItem = shopItem.getItem().copy();
-               iItem.quantity_$eq((short) (shopItem.getBundles() * iItem.quantity()));
+            if (shopItem.bundles() >= 2) {
+               Item iItem = shopItem.item().copy();
+               iItem.quantity_$eq((short) (shopItem.bundles() * iItem.quantity()));
                MapleInventoryManipulator.addFromDrop(this.getClient(), iItem, false);
-            } else if (shopItem.isExist()) {
-               MapleInventoryManipulator.addFromDrop(this.getClient(), shopItem.getItem(), true);
+            } else if (shopItem.doesExist()) {
+               MapleInventoryManipulator.addFromDrop(this.getClient(), shopItem.item(), true);
             }
          }
          mps.closeShop();
@@ -5052,7 +5052,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (sl == null) {
          return -1;
       }
-      return sl.getMapId();
+      return sl.mapId();
    }
 
    public int getSavedLocation(String type) {

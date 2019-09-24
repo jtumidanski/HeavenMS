@@ -168,7 +168,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
 
       if (banishPlayers != null) {
          for (MapleCharacter chr : banishPlayers) {
-            chr.changeMapBanish(monster.getBanish().getMap(), monster.getBanish().getPortal(), monster.getBanish().getMsg());
+            chr.changeMapBanish(monster.getBanish().map(), monster.getBanish().portal(), monster.getBanish().msg());
          }
       }
    }
