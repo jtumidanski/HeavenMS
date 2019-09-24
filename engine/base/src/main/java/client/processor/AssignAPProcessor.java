@@ -49,7 +49,6 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 /**
  * @author RonanLana - synchronization of AP transaction modules
@@ -89,23 +88,23 @@ public class AssignAPProcessor {
 
             for (Item item : equippedC) {   //selecting the biggest AP value of each stat from each equipped item.
                nEquip = (Equip) item;
-               if (nEquip.getStr() > 0) {
-                  eqpStrList.add(nEquip.getStr());
+               if (nEquip.str() > 0) {
+                  eqpStrList.add((short) nEquip.str());
                }
-               str += nEquip.getStr();
+               str += nEquip.str();
 
-               if (nEquip.getDex() > 0) {
-                  eqpDexList.add(nEquip.getDex());
+               if (nEquip.dex() > 0) {
+                  eqpDexList.add((short) nEquip.dex());
                }
-               dex += nEquip.getDex();
+               dex += nEquip.dex();
 
-               if (nEquip.getLuk() > 0) {
-                  eqpLukList.add(nEquip.getLuk());
+               if (nEquip.luk() > 0) {
+                  eqpLukList.add((short) nEquip.luk());
                }
-               luk += nEquip.getLuk();
+               luk += nEquip.luk();
 
                //if(nEquip.getInt() > 0) eqpIntList.add(nEquip.getInt()); //not needed...
-               int_ += nEquip.getInt();
+               int_ += nEquip._int();
             }
 
             statUpdate[0] = chr.getStr();

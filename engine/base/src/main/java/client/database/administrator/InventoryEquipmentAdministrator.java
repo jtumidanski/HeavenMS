@@ -21,7 +21,7 @@ public class InventoryEquipmentAdministrator extends AbstractQueryExecutor {
    public void create(Connection connection, int inventoryItemId, int upgradeSlots, int level, int strength,
                       int dexterity, int intelligence, int luck, int hp, int mp, int weaponAttack, int magicAttack,
                       int weaponDefense, int magicDefense, int accuracy, int avoidability, int hands, int speed,
-                      int jump, int locked, int vicious, int itemLevel, int itemExp, int ringId) {
+                      int jump, int locked, int vicious, int itemLevel, float itemExp, int ringId) {
       String sql = "INSERT INTO `inventoryequipment` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       execute(connection, sql, ps -> {
          ps.setInt(1, inventoryItemId);
@@ -45,7 +45,7 @@ public class InventoryEquipmentAdministrator extends AbstractQueryExecutor {
          ps.setInt(19, locked);
          ps.setInt(20, vicious);
          ps.setInt(21, itemLevel);
-         ps.setInt(22, itemExp);
+         ps.setFloat(22, itemExp);
          ps.setInt(23, ringId);
       });
    }

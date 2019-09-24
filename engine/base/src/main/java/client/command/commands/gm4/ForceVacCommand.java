@@ -31,6 +31,7 @@ import client.MapleClient;
 import client.command.Command;
 import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.PetProcessor;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
@@ -58,12 +59,12 @@ public class ForceVacCommand extends Command {
             } else if (mapItem.getItemId() == 4031865 || mapItem.getItemId() == 4031866) {
                // Add NX to account, show effect and make item disappear
                player.getCashShop().gainCash(1, mapItem.getItemId() == 4031865 ? 100 : 250);
-            } else if (mapItem.getItem().getItemId() >= 5000000 && mapItem.getItem().getItemId() <= 5000100) {
-               int petId = MaplePet.createPet(mapItem.getItem().getItemId());
+            } else if (mapItem.getItem().id() >= 5000000 && mapItem.getItem().id() <= 5000100) {
+               int petId = PetProcessor.getInstance().createPet(mapItem.getItem().id());
                if (petId == -1) {
                   continue;
                }
-               MapleInventoryManipulator.addById(c, mapItem.getItem().getItemId(), mapItem.getItem().getQuantity(), null, petId);
+               MapleInventoryManipulator.addById(c, mapItem.getItem().id(), mapItem.getItem().quantity(), null, petId);
             } else if (MapleInventoryManipulator.addFromDrop(c, mapItem.getItem(), true)) {
                if (mapItem.getItemId() == 4031868) {
                   player.updateAriantScore();

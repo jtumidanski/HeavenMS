@@ -68,7 +68,7 @@ public class MtsItemAdministrator extends AbstractQueryExecutor implements Delet
                            int luck, int hp, int mp, int weaponAttack, int magicAttack, int weaponDefense,
                            int magicDefense, int accuracy, int avoidability, int hands, int speed, int jump,
                            int locked, String owner, String characterName, String date, int vicious, int flag,
-                           int itemExp, byte itemLevel, int ringId) {
+                           float itemExp, byte itemLevel, int ringId) {
       String sql = "INSERT INTO mts_items (tab, type, itemid, quantity, seller, price, upgradeslots, level, str, dex, `int`, luk, hp, mp, watk, matk, wdef, mdef, acc, avoid, hands, speed, jump, locked, owner, sellername, sell_ends, vicious, flag, itemexp, itemlevel, ringid) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
       execute(connection, sql, ps -> {
          baseInsertParam(tab, type, itemId, quantity, expiration, giftFrom, characterId, price, ps);
@@ -95,7 +95,7 @@ public class MtsItemAdministrator extends AbstractQueryExecutor implements Delet
          ps.setString(29, date);
          ps.setInt(30, vicious);
          ps.setInt(31, flag);
-         ps.setInt(32, itemExp);
+         ps.setFloat(32, itemExp);
          ps.setByte(33, itemLevel);    // thanks Jefe for noticing missing itemlevel labels
          ps.setInt(34, ringId);
       });

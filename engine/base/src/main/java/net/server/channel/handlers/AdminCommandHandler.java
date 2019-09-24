@@ -122,7 +122,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       MapleInventory in = c.getPlayer().getInventory(MapleInventoryType.getByType(inventoryType));
       for (short i = 1; i <= in.getSlotLimit(); i++) { //TODO What is the point of this loop?
          if (in.getItem(i) != null) {
-            MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.getByType(inventoryType), i, in.getItem(i).getQuantity(), false);
+            MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.getByType(inventoryType), i, in.getItem(i).quantity(), false);
          }
          return;
       }

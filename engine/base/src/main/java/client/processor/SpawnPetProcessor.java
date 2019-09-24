@@ -25,6 +25,7 @@ import java.io.File;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.SkillFactory;
+import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
@@ -45,10 +46,13 @@ public class SpawnPetProcessor {
       if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();
-            MaplePet pet = chr.getInventory(MapleInventoryType.CASH).getItem(slot).getPet();
-            if (pet == null) return;
+            Item item = chr.getInventory(MapleInventoryType.CASH).getItem(slot);
+            if (item.pet().isEmpty()) {
+               return;
+            }
 
-            int petid = pet.getItemId();
+            MaplePet pet = item.pet().get();
+            int petid = pet.id();
             if (petid == 5000028 || petid == 5000047) //Handles Dragon AND Robos
             {
                if (chr.haveItem(petid + 1)) {
@@ -57,14 +61,14 @@ public class SpawnPetProcessor {
                   return;
                } else {
                   int evolveid = MapleDataTool.getInt("info/evol1", dataRoot.getData("Pet/" + petid + ".img"));
-                  int petId = MaplePet.createPet(evolveid);
+                  int petId = PetProcessor.getInstance().createPet(evolveid);
                   if (petId == -1) {
                      return;
                   }
-                  long expiration = chr.getInventory(MapleInventoryType.CASH).getItem(slot).getExpiration();
+                  long expiration = chr.getInventory(MapleInventoryType.CASH).getItem(slot).expiration();
                   MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, petid, (short) 1, false, false);
                   MapleInventoryManipulator.addById(c, evolveid, (short) 1, null, petId, expiration);
-                  MaplePet.deleteFromDb(chr, petid);
+                  PetProcessor.getInstance().deleteFromDb(chr, petid);
                   c.announce(MaplePacketCreator.enableActions());
                   return;
                }
@@ -81,11 +85,11 @@ public class SpawnPetProcessor {
                }
                Point pos = chr.getPosition();
                pos.y -= 12;
-               pet.setPos(pos);
-               pet.setFh(chr.getMap().getFootholds().findBelow(pet.getPos()).getId());
-               pet.setStance(0);
-               pet.setSummoned(true);
-               pet.saveToDb();
+               pet.pos_$eq(pos);
+               pet.fh_$eq(chr.getMap().getFootholds().findBelow(pet.pos()).getId());
+               pet.stance_$eq(0);
+               pet.summoned_$eq(true);
+               PetProcessor.getInstance().saveToDb(pet);
                chr.addPet(pet);
                chr.getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showPet(c.getPlayer(), pet, false, false), true);
                c.announce(MaplePacketCreator.petStatUpdate(c.getPlayer()));

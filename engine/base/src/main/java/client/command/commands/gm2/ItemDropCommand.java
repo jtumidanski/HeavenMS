@@ -26,9 +26,12 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import client.inventory.BetterItemFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
+import client.processor.ItemProcessor;
+import client.processor.PetProcessor;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
@@ -68,20 +71,20 @@ public class ItemDropCommand extends Command {
             quantity = 1;
             long days = Math.max(1, Integer.parseInt(params[1]));
             long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
-            int petid = MaplePet.createPet(itemId);
+            int petid = PetProcessor.getInstance().createPet(itemId);
 
-            Item toDrop = new Item(itemId, (short) 0, quantity, petid);
-            toDrop.setExpiration(expiration);
+            Item toDrop = BetterItemFactory.getInstance().create(itemId, (short) 0, quantity, petid);
+            toDrop.expiration_(expiration);
 
-            toDrop.setOwner("");
+            toDrop.owner_$eq("");
             if (player.gmLevel() < 3) {
-               short f = toDrop.getFlag();
+               short f = toDrop.flag();
                f |= ItemConstants.ACCOUNT_SHARING;
                f |= ItemConstants.UNTRADEABLE;
                f |= ItemConstants.SANDBOX;
 
-               toDrop.setFlag(f);
-               toDrop.setOwner("TRIAL-MODE");
+               ItemProcessor.getInstance().setFlag(toDrop, f);
+               toDrop.owner_$eq("TRIAL-MODE");
             }
 
             c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
@@ -100,15 +103,15 @@ public class ItemDropCommand extends Command {
          toDrop = new Item(itemId, (short) 0, quantity);
       }
 
-      toDrop.setOwner(player.getName());
+      toDrop.owner_$eq(player.getName());
       if (player.gmLevel() < 3) {
-         short f = toDrop.getFlag();
+         short f = toDrop.flag();
          f |= ItemConstants.ACCOUNT_SHARING;
          f |= ItemConstants.UNTRADEABLE;
          f |= ItemConstants.SANDBOX;
 
-         toDrop.setFlag(f);
-         toDrop.setOwner("TRIAL-MODE");
+         ItemProcessor.getInstance().setFlag(toDrop, f);
+         toDrop.owner_$eq("TRIAL-MODE");
       }
 
       c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);

@@ -49,7 +49,7 @@ class PairedQuicksort {
 
       intersect.add(0);
       for (int ind = 1; ind < A.size(); ind++) {
-         if (A.get(ind - 1).getItemId() != A.get(ind).getItemId()) {
+         if (A.get(ind - 1).id() != A.get(ind).id()) {
             intersect.add(ind);
          }
       }
@@ -69,8 +69,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.getItemId() > A.get(i).getItemId()) i++;
-         while (x.getItemId() < A.get(j).getItemId()) j--;
+         while (x.id() > A.get(i).id()) i++;
+         while (x.id() < A.get(j).id()) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -91,8 +91,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (ii.getName(x.getItemId()).compareTo(ii.getName(A.get(i).getItemId())) > 0) i++;
-         while (ii.getName(x.getItemId()).compareTo(ii.getName(A.get(j).getItemId())) < 0) j--;
+         while (ii.getName(x.id()).compareTo(ii.getName(A.get(i).id())) > 0) i++;
+         while (ii.getName(x.id()).compareTo(ii.getName(A.get(j).id())) < 0) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -113,8 +113,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.getQuantity() > A.get(i).getQuantity()) i++;
-         while (x.getQuantity() < A.get(j).getQuantity()) j--;
+         while (x.quantity() > A.get(i).quantity()) i++;
+         while (x.quantity() < A.get(j).quantity()) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -139,8 +139,8 @@ class PairedQuicksort {
          eqpI = (Equip) A.get(i);
          eqpJ = (Equip) A.get(j);
 
-         while (x.getLevel() > eqpI.getLevel()) i++;
-         while (x.getLevel() < eqpJ.getLevel()) j--;
+         while (x.level() > eqpI.level()) i++;
+         while (x.level() < eqpJ.level()) j--;
 
          if (i <= j) {
             w = (Equip) A.get(i);
@@ -193,12 +193,12 @@ public class MapleStorageInventory {
    }
 
    private static boolean isEquipOrCash(Item item) {
-      int type = item.getItemId() / 1000000;
+      int type = item.id() / 1000000;
       return type == 1 || type == 5;
    }
 
    private static boolean isSameOwner(Item source, Item target) {
-      return source.getOwner().equals(target.getOwner());
+      return source.owner().equals(target.owner());
    }
 
    private byte getSlotLimit() {
@@ -215,7 +215,7 @@ public class MapleStorageInventory {
          return -1;
       }
       addSlot(slotId, item);
-      item.setPosition(slotId);
+      item.position_(slotId);
       return slotId;
    }
 
@@ -226,18 +226,18 @@ public class MapleStorageInventory {
          return;
       }
       if (target == null) {
-         source.setPosition(dSlot);
+         source.position_(dSlot);
          inventory.put(dSlot, source);
          inventory.remove(sSlot);
-      } else if (target.getItemId() == source.getItemId() && !ItemConstants.isRechargeable(source.getItemId()) && !MapleItemInformationProvider.getInstance().isPickupRestricted(source.getItemId()) && isSameOwner(source, target)) {
+      } else if (target.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && !MapleItemInformationProvider.getInstance().isPickupRestricted(source.id()) && isSameOwner(source, target)) {
          if (isEquipOrCash(source)) {
             swap(target, source);
-         } else if (source.getQuantity() + target.getQuantity() > slotMax) {
-            short rest = (short) ((source.getQuantity() + target.getQuantity()) - slotMax);
-            source.setQuantity(rest);
-            target.setQuantity(slotMax);
+         } else if (source.quantity() + target.quantity() > slotMax) {
+            short rest = (short) ((source.quantity() + target.quantity()) - slotMax);
+            source.quantity_$eq(rest);
+            target.quantity_$eq(slotMax);
          } else {
-            target.setQuantity((short) (source.getQuantity() + target.getQuantity()));
+            target.quantity_$eq((short) (source.quantity() + target.quantity()));
             inventory.remove(sSlot);
          }
       } else {
@@ -257,18 +257,18 @@ public class MapleStorageInventory {
       if (source == null) {
          return;
       }
-      short slotMax = MapleItemInformationProvider.getInstance().getSlotMax(c, source.getItemId());
+      short slotMax = MapleItemInformationProvider.getInstance().getSlotMax(c, source.id());
       this.move(src, dst, slotMax);
    }
 
    private void swap(Item source, Item target) {
-      inventory.remove(source.getPosition());
-      inventory.remove(target.getPosition());
-      short swapPos = source.getPosition();
-      source.setPosition(target.getPosition());
-      target.setPosition(swapPos);
-      inventory.put(source.getPosition(), source);
-      inventory.put(target.getPosition(), target);
+      inventory.remove(source.position());
+      inventory.remove(target.position());
+      short swapPos = source.position();
+      source.position_(target.position());
+      target.position_(swapPos);
+      inventory.put(source.position(), source);
+      inventory.put(target.position(), target);
    }
 
    private Item getItem(short slot) {
@@ -312,8 +312,8 @@ public class MapleStorageInventory {
             srcItem = this.getItem(src);
             if (srcItem == null) continue;
 
-            if (dstItem.getItemId() != srcItem.getItemId()) continue;
-            if (dstItem.getQuantity() == ii.getSlotMax(c, this.getItem(dst).getItemId())) break;
+            if (dstItem.id() != srcItem.id()) continue;
+            if (dstItem.quantity() == ii.getSlotMax(c, this.getItem(dst).id())) break;
 
             moveItem(src, dst);
          }
@@ -354,7 +354,7 @@ public class MapleStorageInventory {
       }
 
       for (Item item : itemarray) {
-         this.removeSlot(item.getPosition());
+         this.removeSlot(item.position());
       }
 
       int invTypeCriteria = 1;

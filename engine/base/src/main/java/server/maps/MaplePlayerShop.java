@@ -74,7 +74,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    }
 
    private static boolean canBuy(MapleClient c, Item newItem) {
-      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+      return MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
    }
 
    public static byte[] shopErrorMessage(int error, int type) {
@@ -246,7 +246,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          if (shopItem.isExist()) {
             if (shopItem.getBundles() > 0) {
                Item iitem = shopItem.getItem().copy();
-               iitem.setQuantity((short) (shopItem.getItem().getQuantity() * shopItem.getBundles()));
+               iitem.quantity_$eq((short) (shopItem.getItem().quantity() * shopItem.getBundles()));
 
                if (!MapleInventory.checkSpot(chr, iitem)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
@@ -276,11 +276,11 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
             MaplePlayerShopItem pItem = items.get(item);
             Item newItem = pItem.getItem().copy();
 
-            newItem.setQuantity((short) ((pItem.getItem().getQuantity() * quantity)));
+            newItem.quantity_$eq((short) ((pItem.getItem().quantity() * quantity)));
             if (quantity < 1 || !pItem.isExist() || pItem.getBundles() < quantity) {
                c.announce(MaplePacketCreator.enableActions());
                return false;
-            } else if (newItem.getInventoryType().equals(MapleInventoryType.EQUIP) && newItem.getQuantity() > 1) {
+            } else if (newItem.inventoryType().equals(MapleInventoryType.EQUIP) && newItem.quantity() > 1) {
                c.announce(MaplePacketCreator.enableActions());
                return false;
             }
@@ -303,7 +303,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                      price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
                      owner.gainMeso(price, true);
 
-                     SoldItem soldItem = new SoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), quantity, price);
+                     SoldItem soldItem = new SoldItem(c.getPlayer().getName(), pItem.getItem().id(), quantity, price);
                      owner.announce(MaplePacketCreator.getPlayerShopOwnerUpdate(soldItem, item));
 
                      synchronized (sold) {
@@ -493,7 +493,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    public boolean hasItem(int itemid) {
       for (MaplePlayerShopItem mpsi : getItems()) {
-         if (mpsi.getItem().getItemId() == itemid && mpsi.isExist() && mpsi.getBundles() > 0) {
+         if (mpsi.getItem().id() == itemid && mpsi.isExist() && mpsi.getBundles() > 0) {
             return true;
          }
       }
@@ -573,7 +573,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       }
 
       for (MaplePlayerShopItem mpsi : all) {
-         if (mpsi.getItem().getItemId() == itemid && mpsi.getBundles() > 0 && mpsi.isExist()) {
+         if (mpsi.getItem().id() == itemid && mpsi.getBundles() > 0 && mpsi.isExist()) {
             list.add(mpsi);
          }
       }

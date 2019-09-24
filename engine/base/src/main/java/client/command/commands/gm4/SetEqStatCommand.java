@@ -29,6 +29,7 @@ import client.command.Command;
 import client.inventory.Equip;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
+import client.processor.ItemProcessor;
 import constants.ItemConstants;
 
 public class SetEqStatCommand extends Command {
@@ -53,24 +54,24 @@ public class SetEqStatCommand extends Command {
             Equip eq = (Equip) equip.getItem(i);
             if (eq == null) continue;
 
-            eq.setWdef(newStat);
-            eq.setAcc(newStat);
-            eq.setAvoid(newStat);
-            eq.setJump(newSpdJmp);
-            eq.setMatk(newStat);
-            eq.setMdef(newStat);
-            eq.setHp(newStat);
-            eq.setMp(newStat);
-            eq.setSpeed(newSpdJmp);
-            eq.setWatk(newStat);
-            eq.setDex(newStat);
-            eq.setInt(newStat);
-            eq.setStr(newStat);
-            eq.setLuk(newStat);
+            eq.wdef_$eq(newStat);
+            eq.acc_$eq(newStat);
+            eq.avoid_$eq(newStat);
+            eq.jump_$eq(newSpdJmp);
+            eq.matk_$eq(newStat);
+            eq.mdef_$eq(newStat);
+            eq.hp_$eq(newStat);
+            eq.mp_$eq(newStat);
+            eq.speed_$eq(newSpdJmp);
+            eq.watk_$eq(newStat);
+            eq.dex_$eq(newStat);
+            eq._int_$eq(newStat);
+            eq.str_$eq(newStat);
+            eq.luk_$eq(newStat);
 
-            short flag = eq.getFlag();
+            short flag = eq.flag();
             flag |= ItemConstants.UNTRADEABLE;
-            eq.setFlag(flag);
+            ItemProcessor.getInstance().setFlag(eq, flag);
 
             player.forceUpdateItem(eq);
          } catch (Exception e) {

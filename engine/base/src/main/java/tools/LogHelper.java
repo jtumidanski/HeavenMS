@@ -20,14 +20,14 @@ public class LogHelper {
       //Trade 1 to trade 2
       log.append(trade1.getExchangeMesos()).append(" mesos from ").append(name1).append(" to ").append(name2).append(" \r\n");
       for (Item item : trade1.getItems()) {
-         String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId()) + "(" + item.getItemId() + ")";
-         log.append(item.getQuantity()).append(" ").append(itemName).append(" from ").append(name1).append(" to ").append(name2).append(" \r\n");
+         String itemName = MapleItemInformationProvider.getInstance().getName(item.id()) + "(" + item.id() + ")";
+         log.append(item.quantity()).append(" ").append(itemName).append(" from ").append(name1).append(" to ").append(name2).append(" \r\n");
       }
       //Trade 2 to trade 1
       log.append(trade2.getExchangeMesos()).append(" mesos from ").append(name2).append(" to ").append(name1).append(" \r\n");
       for (Item item : trade2.getItems()) {
-         String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId()) + "(" + item.getItemId() + ")";
-         log.append(item.getQuantity()).append(" ").append(itemName).append(" from ").append(name2).append(" to ").append(name1).append(" \r\n");
+         String itemName = MapleItemInformationProvider.getInstance().getName(item.id()) + "(" + item.id() + ")";
+         log.append(item.quantity()).append(" ").append(itemName).append(" from ").append(name2).append(" to ").append(name1).append(" \r\n");
       }
       log.append("\r\n\r\n");
       FilePrinter.print(FilePrinter.LOG_TRADE, log.toString());

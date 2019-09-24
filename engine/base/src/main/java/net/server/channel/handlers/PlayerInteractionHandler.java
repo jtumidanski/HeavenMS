@@ -32,6 +32,7 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
+import client.processor.ItemProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
@@ -380,12 +381,12 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MapleInventoryType ivType = MapleInventoryType.getByType(slotType);
       Item ivItem = chr.getInventory(ivType).getItem(slot);
 
-      if (ivItem == null || ivItem.isUntradeable()) {
+      if (ivItem == null || ItemProcessor.getInstance().isUntradeable(ivItem)) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Could not perform shop operation with that item.");
          c.announce(MaplePacketCreator.enableActions());
          return;
-      } else if (MapleItemInformationProvider.getInstance().isUnmerchable(ivItem.getItemId())) {
-         if (ItemConstants.isPet(ivItem.getItemId())) {
+      } else if (MapleItemInformationProvider.getInstance().isUnmerchable(ivItem.id())) {
+         if (ItemConstants.isPet(ivItem.id())) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Pets are not allowed to be sold on the Player Store.");
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Cash items are not allowed to be sold on the Player Store.");
@@ -395,10 +396,10 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      if (ItemConstants.isRechargeable(ivItem.getItemId())) {
+      if (ItemConstants.isRechargeable(ivItem.id())) {
          perBundle = 1;
          bundles = 1;
-      } else if (ivItem.getQuantity() < (bundles * perBundle)) {     // thanks GabrielSin for finding a dupe here
+      } else if (ivItem.quantity() < (bundles * perBundle)) {     // thanks GabrielSin for finding a dupe here
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Could not perform shop operation with that item.");
          c.announce(MaplePacketCreator.enableActions());
          return;
@@ -411,8 +412,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
 
       Item sellItem = ivItem.copy();
-      if (!ItemConstants.isRechargeable(ivItem.getItemId())) {
-         sellItem.setQuantity(perBundle);
+      if (!ItemConstants.isRechargeable(ivItem.id())) {
+         sellItem.quantity_$eq(perBundle);
       }
 
       MaplePlayerShopItem shopItem = new MaplePlayerShopItem(sellItem, bundles, price);
@@ -424,8 +425,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             return;
          }
 
-         if (ItemConstants.isRechargeable(ivItem.getItemId())) {
-            MapleInventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.getQuantity(), true);
+         if (ItemConstants.isRechargeable(ivItem.id())) {
+            MapleInventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.quantity(), true);
          } else {
             MapleInventoryManipulator.removeFromSlot(c, ivType, slot, (short) (bundles * perBundle), true);
          }
@@ -442,8 +443,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             return;
          }
 
-         if (ItemConstants.isRechargeable(ivItem.getItemId())) {
-            MapleInventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.getQuantity(), true);
+         if (ItemConstants.isRechargeable(ivItem.id())) {
+            MapleInventoryManipulator.removeFromSlot(c, ivType, slot, ivItem.quantity(), true);
          } else {
             MapleInventoryManipulator.removeFromSlot(c, ivType, slot, (short) (bundles * perBundle), true);
          }
@@ -481,8 +482,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      if (ii.isUnmerchable(item.getItemId())) {
-         if (ItemConstants.isPet(item.getItemId())) {
+      if (ii.isUnmerchable(item.id())) {
+         if (ItemConstants.isPet(item.id())) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Pets are not allowed to be traded.");
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Cash items are not allowed to be traded.");
@@ -492,7 +493,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      if (quantity < 1 || quantity > item.getQuantity()) {
+      if (quantity < 1 || quantity > item.quantity()) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You don't have enough quantity of the item.");
          c.announce(MaplePacketCreator.enableActions());
          return;
@@ -500,8 +501,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
       MapleTrade trade = chr.getTrade();
       if (trade != null) {
-         if ((quantity <= item.getQuantity() && quantity >= 0) || ItemConstants.isRechargeable(item.getItemId())) {
-            if (ii.isDropRestricted(item.getItemId())) { // ensure that undroppable items do not make it to the trade window
+         if ((quantity <= item.quantity() && quantity >= 0) || ItemConstants.isRechargeable(item.id())) {
+            if (ii.isDropRestricted(item.id())) { // ensure that undroppable items do not make it to the trade window
                if (!MapleKarmaManipulator.hasKarmaFlag(item)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "That item is untradeable.");
                   c.announce(MaplePacketCreator.enableActions());
@@ -513,22 +514,22 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             inv.lockInventory();
             try {
                Item checkItem = chr.getInventory(ivType).getItem(pos);
-               if (checkItem != item || checkItem.getPosition() != item.getPosition()) {
+               if (checkItem != item || checkItem.position() != item.position()) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Invalid item description.");
                   c.announce(MaplePacketCreator.enableActions());
                   return;
                }
 
                Item tradeItem = item.copy();
-               if (ItemConstants.isRechargeable(item.getItemId())) {
-                  quantity = item.getQuantity();
+               if (ItemConstants.isRechargeable(item.id())) {
+                  quantity = item.quantity();
                }
 
-               tradeItem.setQuantity(quantity);
-               tradeItem.setPosition(targetSlot);
+               tradeItem.quantity_$eq(quantity);
+               tradeItem.position_(targetSlot);
 
                if (trade.addItem(tradeItem)) {
-                  MapleInventoryManipulator.removeFromSlot(c, ivType, item.getPosition(), quantity, true);
+                  MapleInventoryManipulator.removeFromSlot(c, ivType, item.position(), quantity, true);
 
                   trade.getChr().announce(MaplePacketCreator.getTradeItemAdd((byte) 0, tradeItem));
                   if (trade.getPartner() != null) {
@@ -536,7 +537,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
                   }
                }
             } catch (Exception e) {
-               FilePrinter.printError(FilePrinter.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.getItemId()) + " qty. " + item.getQuantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
+               FilePrinter.printError(FilePrinter.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.id()) + " qty. " + item.quantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
             } finally {
                inv.unlockInventory();
             }

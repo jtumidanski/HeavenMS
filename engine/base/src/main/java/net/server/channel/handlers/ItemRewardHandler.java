@@ -52,7 +52,7 @@ public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPac
    @Override
    public void handlePacket(ItemRewardPacket packet, MapleClient client) {
       Item it = client.getPlayer().getInventory(MapleInventoryType.USE).getItem(packet.slot());   // null check here thanks to Thora
-      if (it == null || it.getItemId() != packet.itemId() || client.getPlayer().getInventory(MapleInventoryType.USE).countById(packet.itemId()) < 1) {
+      if (it == null || it.id() != packet.itemId() || client.getPlayer().getInventory(MapleInventoryType.USE).countById(packet.itemId()) < 1) {
          return;
       }
 
@@ -67,7 +67,7 @@ public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPac
             if (ItemConstants.getInventoryType(reward.itemid) == MapleInventoryType.EQUIP) {
                final Item item = ii.getEquipById(reward.itemid);
                if (reward.period != -1) {
-                  item.setExpiration(currentServerTime() + (reward.period * 60 * 60 * 10));
+                  item.expiration_(currentServerTime() + (reward.period * 60 * 60 * 10));
                }
                MapleInventoryManipulator.addFromDrop(client, item, false);
             } else {

@@ -7,8 +7,10 @@ import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.utility.EquipFromResultSetTransformer;
+import client.inventory.BetterItemFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import client.processor.ItemProcessor;
 import tools.Pair;
 
 public class InventoryItemProvider extends AbstractQueryExecutor {
@@ -64,12 +66,12 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
          if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
             return new Pair<>(equipTransformer.transform(resultSet), inventoryType);
          } else {
-            Item item = new Item(resultSet.getInt("itemid"), (byte) resultSet.getInt("position"),
+            Item item = BetterItemFactory.getInstance().create(resultSet.getInt("itemid"), (byte) resultSet.getInt("position"),
                   (short) resultSet.getInt("quantity"), resultSet.getInt("petid"));
-            item.setOwner(resultSet.getString("owner"));
-            item.setExpiration(resultSet.getLong("expiration"));
-            item.setGiftFrom(resultSet.getString("giftFrom"));
-            item.setFlag((short) resultSet.getInt("flag"));
+            item.owner_$eq(resultSet.getString("owner"));
+            item.expiration_(resultSet.getLong("expiration"));
+            item.giftFrom_$eq(resultSet.getString("giftFrom"));
+            ItemProcessor.getInstance().setFlag(item, (short) resultSet.getInt("flag"));
             return new Pair<>(item, inventoryType);
          }
       }

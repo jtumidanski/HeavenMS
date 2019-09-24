@@ -37,12 +37,12 @@ public class MapleLootInventory {
       for (MapleInventoryType values : MapleInventoryType.values()) {
 
          for (Item it : from.getInventory(values).list()) {
-            Integer itemQty = items.get(it.getItemId());
+            Integer itemQty = items.get(it.id());
 
             if (itemQty == null) {
-               items.put(it.getItemId(), (int) it.getQuantity());
+               items.put(it.id(), (int) it.quantity());
             } else {
-               items.put(it.getItemId(), itemQty + it.getQuantity());
+               items.put(it.id(), itemQty + it.quantity());
             }
          }
       }

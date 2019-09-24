@@ -116,7 +116,7 @@ public class MapleStorage {
 
       List<Item> list = getItems();
       for (Item item : list) {
-         itemsWithType.add(new Pair<>(item, item.getInventoryType()));
+         itemsWithType.add(new Pair<>(item, item.inventoryType()));
       }
 
       ItemFactory.STORAGE.saveItems(itemsWithType, id, con);
@@ -136,7 +136,7 @@ public class MapleStorage {
       try {
          boolean ret = items.remove(item);
 
-         MapleInventoryType type = item.getInventoryType();
+         MapleInventoryType type = item.inventoryType();
          typeItems.put(type, new ArrayList<>(filterItems(type)));
 
          return ret;
@@ -154,7 +154,7 @@ public class MapleStorage {
 
          items.add(item);
 
-         MapleInventoryType type = item.getInventoryType();
+         MapleInventoryType type = item.inventoryType();
          typeItems.put(type, new ArrayList<>(filterItems(type)));
 
          return true;
@@ -177,7 +177,7 @@ public class MapleStorage {
       List<Item> ret = new LinkedList<>();
 
       for (Item item : storageItems) {
-         if (item.getInventoryType() == type) {
+         if (item.inventoryType() == type) {
             ret.add(item);
          }
       }
@@ -213,9 +213,9 @@ public class MapleStorage {
          items.sort(new Comparator<>() {
             @Override
             public int compare(Item o1, Item o2) {
-               if (o1.getInventoryType().getType() < o2.getInventoryType().getType()) {
+               if (o1.inventoryType().getType() < o2.inventoryType().getType()) {
                   return -1;
-               } else if (o1.getInventoryType() == o2.getInventoryType()) {
+               } else if (o1.inventoryType() == o2.inventoryType()) {
                   return 0;
                }
                return 1;

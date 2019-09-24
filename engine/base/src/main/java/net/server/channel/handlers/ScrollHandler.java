@@ -31,11 +31,11 @@ import client.MapleClient;
 import client.Skill;
 import client.SkillFactory;
 import client.inventory.Equip;
-import client.inventory.Equip.ScrollResult;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.ModifyInventory;
+import client.inventory.ScrollResult;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ItemConstants;
 import net.server.AbstractPacketHandler;
@@ -56,7 +56,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
 
    private static void announceCannotScroll(MapleClient c, boolean legendarySpirit) {
       if (legendarySpirit) {
-         c.announce(MaplePacketCreator.getScrollEffect(c.getPlayer().getId(), Equip.ScrollResult.FAIL, false, false));
+         c.announce(MaplePacketCreator.getScrollEffect(c.getPlayer().getId(), ScrollResult.FAIL, false, false));
       } else {
          c.announce(MaplePacketCreator.getInventoryFull());
       }
@@ -91,25 +91,25 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                toScroll = (Equip) chr.getInventory(MapleInventoryType.EQUIP).getItem(packet.destination());
             }
 
-            byte oldLevel = toScroll.getLevel();
-            byte oldSlots = toScroll.getUpgradeSlots();
+            byte oldLevel = toScroll.level();
+            byte oldSlots = (byte) toScroll.slots();
             MapleInventory useInventory = chr.getInventory(MapleInventoryType.USE);
             Item scroll = useInventory.getItem(packet.slot());
             Item wscroll = null;
 
-            if (ItemConstants.isCleanSlate(scroll.getItemId())) {
-               Map<String, Integer> eqStats = ii.getEquipStats(toScroll.getItemId());  // clean slate issue found thanks to Masterrulax
+            if (ItemConstants.isCleanSlate(scroll.id())) {
+               Map<String, Integer> eqStats = ii.getEquipStats(toScroll.id());  // clean slate issue found thanks to Masterrulax
                if (eqStats == null || eqStats.get("tuc") == 0) {
                   announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
-            } else if (!ItemConstants.isModifierScroll(scroll.getItemId()) && toScroll.getUpgradeSlots() < 1) {
+            } else if (!ItemConstants.isModifierScroll(scroll.id()) && toScroll.slots() < 1) {
                announceCannotScroll(client, hasLegendarySpirit);   // thanks onechord for noticing zero upgrade slots freezing Legendary Scroll UI
                return;
             }
 
-            List<Integer> scrollReqs = ii.getScrollReqs(scroll.getItemId());
-            if (scrollReqs.size() > 0 && !scrollReqs.contains(toScroll.getItemId())) {
+            List<Integer> scrollReqs = ii.getScrollReqs(scroll.id());
+            if (scrollReqs.size() > 0 && !scrollReqs.contains(toScroll.id())) {
                announceCannotScroll(client, hasLegendarySpirit);
                return;
             }
@@ -120,50 +120,50 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                }
             }
 
-            if (!ItemConstants.isChaosScroll(scroll.getItemId()) && !ItemConstants.isCleanSlate(scroll.getItemId())) {
-               if (!canScroll(scroll.getItemId(), toScroll.getItemId())) {
+            if (!ItemConstants.isChaosScroll(scroll.id()) && !ItemConstants.isCleanSlate(scroll.id())) {
+               if (!canScroll(scroll.id(), toScroll.id())) {
                   announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
             }
 
-            if (ItemConstants.isCleanSlate(scroll.getItemId()) && !ii.canUseCleanSlate(toScroll)) {
+            if (ItemConstants.isCleanSlate(scroll.id()) && !ii.canUseCleanSlate(toScroll)) {
                announceCannotScroll(client, hasLegendarySpirit);
                return;
             }
 
-            Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, scroll.getItemId(), isWhiteScroll, 0, chr.isGM());
-            ScrollResult scrollSuccess = Equip.ScrollResult.FAIL; // fail
+            Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, scroll.id(), isWhiteScroll, 0, chr.isGM());
+            ScrollResult scrollSuccess = ScrollResult.FAIL; // fail
             if (scrolled == null) {
-               scrollSuccess = Equip.ScrollResult.CURSE;
-            } else if (scrolled.getLevel() > oldLevel || (ItemConstants.isCleanSlate(scroll.getItemId()) && scrolled.getUpgradeSlots() == oldSlots + 1) || ItemConstants.isFlagModifier(scroll.getItemId(), scrolled.getFlag())) {
-               scrollSuccess = Equip.ScrollResult.SUCCESS;
+               scrollSuccess = ScrollResult.CURSE;
+            } else if (scrolled.level() > oldLevel || (ItemConstants.isCleanSlate(scroll.id()) && scrolled.slots() == oldSlots + 1) || ItemConstants.isFlagModifier(scroll.id(), scrolled.flag())) {
+               scrollSuccess = ScrollResult.SUCCESS;
             }
 
             useInventory.lockInventory();
             try {
-               if (scroll.getQuantity() < 1) {
+               if (scroll.quantity() < 1) {
                   announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
 
-               if (isWhiteScroll && !ItemConstants.isCleanSlate(scroll.getItemId())) {
-                  if (wscroll.getQuantity() < 1) {
+               if (isWhiteScroll && !ItemConstants.isCleanSlate(scroll.id())) {
+                  if (wscroll.quantity() < 1) {
                      announceCannotScroll(client, hasLegendarySpirit);
                      return;
                   }
 
-                  MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, wscroll.getPosition(), (short) 1, false, false);
+                  MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, wscroll.position(), (short) 1, false, false);
                }
 
-               MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, scroll.getPosition(), (short) 1, false);
+               MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, scroll.position(), (short) 1, false);
             } finally {
                useInventory.unlockInventory();
             }
 
             final List<ModifyInventory> mods = new ArrayList<>();
-            if (scrollSuccess == Equip.ScrollResult.CURSE) {
-               if (!ItemConstants.isWeddingRing(toScroll.getItemId())) {
+            if (scrollSuccess == ScrollResult.CURSE) {
+               if (!ItemConstants.isWeddingRing(toScroll.id())) {
                   mods.add(new ModifyInventory(3, toScroll));
                   if (packet.destination() < 0) {
                      MapleInventory inv = chr.getInventory(MapleInventoryType.EQUIPPED);
@@ -171,7 +171,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                      inv.lockInventory();
                      try {
                         chr.unequippedItem(toScroll);
-                        inv.removeItem(toScroll.getPosition());
+                        inv.removeItem(toScroll.position());
                      } finally {
                         inv.unlockInventory();
                      }
@@ -180,14 +180,14 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
 
                      inv.lockInventory();
                      try {
-                        inv.removeItem(toScroll.getPosition());
+                        inv.removeItem(toScroll.position());
                      } finally {
                         inv.unlockInventory();
                      }
                   }
                } else {
                   scrolled = toScroll;
-                  scrollSuccess = Equip.ScrollResult.FAIL;
+                  scrollSuccess = ScrollResult.FAIL;
 
                   mods.add(new ModifyInventory(3, scrolled));
                   mods.add(new ModifyInventory(0, scrolled));
@@ -198,7 +198,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
             }
             client.announce(MaplePacketCreator.modifyInventory(true, mods));
             chr.getMap().broadcastMessage(MaplePacketCreator.getScrollEffect(chr.getId(), scrollSuccess, hasLegendarySpirit, isWhiteScroll));
-            if (packet.destination() < 0 && (scrollSuccess == Equip.ScrollResult.SUCCESS || scrollSuccess == Equip.ScrollResult.CURSE)) {
+            if (packet.destination() < 0 && (scrollSuccess == ScrollResult.SUCCESS || scrollSuccess == ScrollResult.CURSE)) {
                chr.equipChanged();
             }
          } finally {

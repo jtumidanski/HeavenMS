@@ -33,6 +33,7 @@ import client.MapleClient;
 import client.MapleQuestStatus;
 import client.SkillEntry;
 import client.SkillFactory;
+import client.inventory.BetterItemFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -41,6 +42,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.PetProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
@@ -556,7 +558,7 @@ public class AbstractPlayerInteraction {
             chr.getClient().getWorldServer().registerPetHunger(chr, chr.getPetIndex(evolved));
             */
 
-      MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.CASH, target.getPosition(), (short) 1, false);
+      MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.CASH, target.position(), (short) 1, false);
 
       return evolved;
    }
@@ -592,24 +594,24 @@ public class AbstractPlayerInteraction {
 
       if (quantity >= 0) {
          if (ItemConstants.isPet(id)) {
-            petId = MaplePet.createPet(id);
+            petId = PetProcessor.getInstance().createPet(id);
 
             if (from != null) {
-               evolved = MaplePet.loadFromDb(id, (short) 0, petId);
+               evolved = PetProcessor.getInstance().loadFromDb(id, (short) 0, petId);
 
                Point pos = getPlayer().getPosition();
                pos.y -= 12;
-               evolved.setPos(pos);
-               evolved.setFh(getPlayer().getMap().getFootholds().findBelow(evolved.getPos()).getId());
-               evolved.setStance(0);
-               evolved.setSummoned(true);
+               evolved.pos_$eq(pos);
+               evolved.fh_$eq(getPlayer().getMap().getFootholds().findBelow(evolved.pos()).getId());
+               evolved.stance_$eq(0);
+               evolved.summoned_$eq(true);
 
-               evolved.setName(from.getName().compareTo(MapleItemInformationProvider.getInstance().getName(from.getItemId())) != 0 ? from.getName() : MapleItemInformationProvider.getInstance().getName(id));
-               evolved.setCloseness(from.getCloseness());
-               evolved.setFullness(from.getFullness());
-               evolved.setLevel(from.getLevel());
-               evolved.setExpiration(System.currentTimeMillis() + expires);
-               evolved.saveToDb();
+               evolved.name_$eq(from.name().compareTo(MapleItemInformationProvider.getInstance().getName(from.id())) != 0 ? from.name() : MapleItemInformationProvider.getInstance().getName(id));
+               evolved.closeness_$eq(from.closeness());
+               evolved.fullness_$eq(from.fullness());
+               evolved.level_$eq(from.level());
+               evolved.expiration_(System.currentTimeMillis() + expires);
+               PetProcessor.getInstance().saveToDb(evolved);
             }
 
             //MapleInventoryManipulator.addById(c, id, (short) 1, null, petId, expires == -1 ? -1 : System.currentTimeMillis() + expires);
@@ -622,24 +624,24 @@ public class AbstractPlayerInteraction {
 
             if (item != null) {
                Equip it = (Equip) item;
-               if (ItemConstants.isAccessory(item.getItemId()) && it.getUpgradeSlots() <= 0) {
-                  it.setUpgradeSlots(3);
+               if (ItemConstants.isAccessory(item.id()) && it.slots() <= 0) {
+                  it.slots_$eq(3);
                }
 
                if (ServerConstants.USE_ENHANCED_CRAFTING && c.getPlayer().getCS()) {
                   Equip eqp = (Equip) item;
                   if (!(c.getPlayer().isGM() && ServerConstants.USE_PERFECT_GM_SCROLL)) {
-                     eqp.setUpgradeSlots((byte) (eqp.getUpgradeSlots() + 1));
+                     eqp.slots_$eq((byte) (eqp.slots() + 1));
                   }
                   item = MapleItemInformationProvider.getInstance().scrollEquipWithId(item, 2049100, true, 2049100, c.getPlayer().isGM());
                }
             }
          } else {
-            item = new Item(id, (short) 0, quantity, petId);
+            item = BetterItemFactory.getInstance().create(id, (short) 0, quantity, petId);
          }
 
          if (expires >= 0) {
-            item.setExpiration(System.currentTimeMillis() + expires);
+            item.expiration_(System.currentTimeMillis() + expires);
          }
 
          if (!MapleInventoryManipulator.checkSpace(c, id, quantity, "")) {
@@ -935,16 +937,16 @@ public class AbstractPlayerInteraction {
 
    public void removeEquipFromSlot(short slot) {
       Item tempItem = c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).getItem(slot);
-      MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, tempItem.getQuantity(), false, false);
+      MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, tempItem.quantity(), false, false);
    }
 
    public void gainAndEquip(int itemid, short slot) {
       final Item old = c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).getItem(slot);
       if (old != null) {
-         MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, old.getQuantity(), false, false);
+         MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, old.quantity(), false, false);
       }
       final Item newItem = MapleItemInformationProvider.getInstance().getEquipById(itemid);
-      newItem.setPosition(slot);
+      newItem.position_(slot);
       c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).addItemFromDB(newItem);
       c.announce(MaplePacketCreator.modifyInventory(false, Collections.singletonList(new ModifyInventory(0, newItem))));
    }
@@ -1121,10 +1123,9 @@ public class AbstractPlayerInteraction {
 
       long curTime = System.currentTimeMillis();
       for (Item it : getPlayer().getInventory(MapleInventoryType.CASH).list()) {
-         if (ItemConstants.isPet(it.getItemId()) && it.getExpiration() < curTime) {
-            MaplePet pet = it.getPet();
-            if (pet != null) {
-               list.add(pet);
+         if (ItemConstants.isPet(it.id()) && it.expiration() < curTime) {
+            if (it.pet().isDefined()) {
+               list.add(it.pet().get());
             }
          }
       }

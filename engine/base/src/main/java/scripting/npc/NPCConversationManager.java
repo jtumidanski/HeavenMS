@@ -40,6 +40,7 @@ import client.SkillFactory;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MaplePet;
+import client.processor.PetProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.LanguageConstants;
@@ -367,7 +368,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    public void gainCloseness(int closeness) {
       for (MaplePet pet : getPlayer().getPets()) {
          if (pet != null) {
-            pet.gainClosenessFullness(getPlayer(), closeness, 0, 0);
+            PetProcessor.getInstance().gainClosenessFullness(pet, getPlayer(), closeness, 0, 0);
          }
       }
    }

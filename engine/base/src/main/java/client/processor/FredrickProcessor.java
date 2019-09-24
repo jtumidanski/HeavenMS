@@ -67,7 +67,7 @@ public class FredrickProcessor {
       if (!MapleInventory.checkSpotsAndOwnership(chr, items)) {
          List<Integer> itemids = new LinkedList<>();
          for (Pair<Item, MapleInventoryType> it : items) {
-            itemids.add(it.getLeft().getItemId());
+            itemids.add(it.getLeft().id());
          }
 
          if (chr.canHoldUniques(itemids)) {
@@ -222,8 +222,8 @@ public class FredrickProcessor {
                for (Pair<Item, MapleInventoryType> it : items) {
                   Item item = it.getLeft();
                   MapleInventoryManipulator.addFromDrop(chr.getClient(), item, false);
-                  String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId());
-                  FilePrinter.print(FilePrinter.FREDRICK + chr.getName() + ".txt", chr.getName() + " gained " + item.getQuantity() + " " + itemName + " (" + item.getItemId() + ")");
+                  String itemName = MapleItemInformationProvider.getInstance().getName(item.id());
+                  FilePrinter.print(FilePrinter.FREDRICK + chr.getName() + ".txt", chr.getName() + " gained " + item.quantity() + " " + itemName + " (" + item.id() + ")");
                }
 
                chr.announce(MaplePacketCreator.fredrickMessage((byte) 0x1E));

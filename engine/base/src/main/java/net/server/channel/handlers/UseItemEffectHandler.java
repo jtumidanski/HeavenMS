@@ -44,7 +44,7 @@ public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEff
       } else {
          toUse = client.getPlayer().getInventory(MapleInventoryType.CASH).findById(itemId);
       }
-      if (toUse == null || toUse.getQuantity() < 1) {
+      if (toUse == null || toUse.quantity() < 1) {
          if (itemId != 0) {
             return;
          }

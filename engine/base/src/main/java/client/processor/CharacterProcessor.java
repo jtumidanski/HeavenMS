@@ -392,14 +392,13 @@ public class CharacterProcessor {
    private void loadInventory(int characterId, boolean channelserver, MapleCharacter mapleCharacter) {
       short sandboxCheck = 0x0;
       for (Pair<Item, MapleInventoryType> item : ItemFactory.INVENTORY.loadItems(characterId, !channelserver)) {
-         sandboxCheck |= item.getLeft().getFlag();
+         sandboxCheck |= item.getLeft().flag();
 
          mapleCharacter.getInventory(item.getRight()).addItemFromDB(item.getLeft());
          Item itemz = item.getLeft();
-         if (itemz.getPetId() > -1) {
-            MaplePet pet = itemz.getPet();
-            if (pet != null && pet.isSummoned()) {
-               mapleCharacter.addPet(pet);
+         if (itemz.petId() > -1) {
+            if (itemz.pet().isDefined() && itemz.pet().get().summoned()) {
+               mapleCharacter.addPet(itemz.pet().get());
             }
             continue;
          }
@@ -407,8 +406,8 @@ public class CharacterProcessor {
          MapleInventoryType mit = item.getRight();
          if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
             Equip equip = (Equip) item.getLeft();
-            if (equip.getRingId() > -1) {
-               Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.getRingId());
+            if (equip.ringId() > -1) {
+               Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.ringId());
                if (item.getRight().equals(MapleInventoryType.EQUIPPED)) {
                   ring.equip();
                }
@@ -501,7 +500,7 @@ public class CharacterProcessor {
 
             MapleMount mapleMount;
             if (mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18) != null) {
-               mapleMount = new MapleMount(mapleCharacter, mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).getItemId(), mountid);
+               mapleMount = new MapleMount(mapleCharacter, mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id(), mountid);
             } else {
                mapleMount = new MapleMount(mapleCharacter, 0, mountid);
             }

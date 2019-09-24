@@ -86,8 +86,8 @@ public class PlayerNpcAdministrator extends AbstractQueryExecutor {
       String sql = "INSERT INTO playernpcs_equip (npcid, equipid, equippos) VALUES (?, ?, ?)";
       batch(connection, sql, (ps, data) -> {
          ps.setInt(1, npcId);
-         ps.setInt(2, data.getItemId());
-         ps.setInt(3, data.getPosition());
+         ps.setInt(2, data.id());
+         ps.setInt(3, data.position());
       }, items);
    }
 

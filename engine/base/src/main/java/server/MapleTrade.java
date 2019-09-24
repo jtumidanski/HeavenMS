@@ -379,7 +379,7 @@ public class MapleTrade {
             return false;
          }
          for (Item it : items) {
-            if (it.getPosition() == item.getPosition()) {
+            if (it.position() == item.position()) {
                return false;
             }
          }
@@ -427,7 +427,7 @@ public class MapleTrade {
    private boolean fitsInInventory() {
       List<Pair<Item, MapleInventoryType>> tradeItems = new LinkedList<>();
       for (Item item : exchangeItems) {
-         tradeItems.add(new Pair<>(item, item.getInventoryType()));
+         tradeItems.add(new Pair<>(item, item.inventoryType()));
       }
 
       return MapleInventory.checkSpotsAndOwnership(chr, tradeItems);
@@ -436,7 +436,7 @@ public class MapleTrade {
    private boolean fitsUniquesInInventory() {
       List<Integer> exchangeItemids = new LinkedList<>();
       for (Item item : exchangeItems) {
-         exchangeItemids.add(item.getItemId());
+         exchangeItemids.add(item.id());
       }
 
       return chr.canHoldUniques(exchangeItemids);

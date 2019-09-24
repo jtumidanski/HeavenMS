@@ -276,17 +276,17 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       if (item == null) {
          c.enableCSActions();
          return;
-      } else if (c.getPlayer().getPetIndex(item.getPetId()) > -1) {
+      } else if (c.getPlayer().getPetIndex(item.petId()) > -1) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot put the pet you currently equip into the Cash Shop inventory.");
          c.enableCSActions();
          return;
-      } else if (ItemConstants.isWeddingRing(item.getItemId()) || ItemConstants.isWeddingToken(item.getItemId())) {
+      } else if (ItemConstants.isWeddingRing(item.id()) || ItemConstants.isWeddingToken(item.id())) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot put relationship items into the Cash Shop inventory.");
          c.enableCSActions();
          return;
       }
       cs.addToInventory(item);
-      mi.removeSlot(item.getPosition());
+      mi.removeSlot(item.position());
       c.announce(MaplePacketCreator.putIntoCashInventory(item, c.getAccID()));
    }
 
@@ -296,14 +296,14 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       }
-      if (chr.getInventory(item.getInventoryType()).addItem(item) != -1) {
+      if (chr.getInventory(item.inventoryType()).addItem(item) != -1) {
          cs.removeFromInventory(item);
          c.announce(MaplePacketCreator.takeFromCashInventory(item));
 
          if (item instanceof Equip) {
             Equip equip = (Equip) item;
-            if (equip.getRingId() >= 0) {
-               Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.getRingId());
+            if (equip.ringId() >= 0) {
+               Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.ringId());
                chr.addPlayerRing(ring);
             }
          }
@@ -454,10 +454,10 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             if (itemRing.toItem() instanceof Equip) {
                Equip eqp = (Equip) itemRing.toItem();
                Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(itemRing.getItemId(), chr, partner);
-               eqp.setRingId(rings.getLeft());
+               eqp.ringId_$eq(rings.getLeft());
                cs.addToInventory(eqp);
                c.announce(MaplePacketCreator.showBoughtCashRing(eqp, partner.getName(), c.getAccID()));
-               cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
+               cs.gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
                cs.gainCash(payment, -itemRing.getPrice());
                chr.addFriendshipRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
@@ -478,10 +478,10 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             if (itemRing.toItem() instanceof Equip) {
                Equip eqp = (Equip) itemRing.toItem();
                Pair<Integer, Integer> rings = MapleRingProcessor.getInstance().createRing(itemRing.getItemId(), chr, partner);
-               eqp.setRingId(rings.getLeft());
+               eqp.ringId_$eq(rings.getLeft());
                cs.addToInventory(eqp);
                c.announce(MaplePacketCreator.showBoughtCashItem(eqp, c.getAccID()));
-               cs.gift(partner.getId(), chr.getName(), text, eqp.getSN(), rings.getRight());
+               cs.gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
                cs.gainCash(toCharge, itemRing, chr.getWorld());
                chr.addCrushRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);

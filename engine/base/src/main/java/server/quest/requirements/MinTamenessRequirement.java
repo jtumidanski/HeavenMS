@@ -56,8 +56,8 @@ public class MinTamenessRequirement extends MapleQuestRequirement {
       for (MaplePet pet : chr.getPets()) {
          if (pet == null) continue;
 
-         if (pet.getCloseness() > curCloseness)
-            curCloseness = pet.getCloseness();
+         if (pet.closeness() > curCloseness)
+            curCloseness = pet.closeness();
       }
 
       return curCloseness >= minTameness;

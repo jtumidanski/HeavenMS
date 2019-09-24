@@ -85,7 +85,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                pos = ((MakerDisassemblingPacket) packet).position();
 
                Item it = client.getPlayer().getInventory(MapleInventoryType.EQUIP).getItem((short) pos);
-               if (it != null && it.getItemId() == toCreate) {
+               if (it != null && it.id() == toCreate) {
                   toDisassemble = toCreate;
 
                   Pair<Integer, List<Pair<Integer, Integer>>> p = generateDisassemblyInfo(toDisassemble);
@@ -366,13 +366,13 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
       }
 
       Equip eqp = (Equip) item;
-      if (ItemConstants.isAccessory(item.getItemId()) && eqp.getUpgradeSlots() <= 0) {
-         eqp.setUpgradeSlots(3);
+      if (ItemConstants.isAccessory(item.id()) && eqp.slots() <= 0) {
+         eqp.slots_$eq(3);
       }
 
       if (ServerConstants.USE_ENHANCED_CRAFTING) {
          if (!(c.getPlayer().isGM() && ServerConstants.USE_PERFECT_GM_SCROLL)) {
-            eqp.setUpgradeSlots((byte) (eqp.getUpgradeSlots() + 1));
+            eqp.slots_$eq((byte) (eqp.slots() + 1));
          }
          item = MapleItemInformationProvider.getInstance().scrollEquipWithId(eqp, 2049100, true, 2049100, c.getPlayer().isGM());
       }

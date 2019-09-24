@@ -213,7 +213,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          if (shopItem.isExist()) {
             if (shopItem.getBundles() > 0) {
                Item iitem = shopItem.getItem().copy();
-               iitem.setQuantity((short) (shopItem.getItem().getQuantity() * shopItem.getBundles()));
+               iitem.quantity_$eq((short) (shopItem.getItem().quantity() * shopItem.getBundles()));
 
                if (!MapleInventory.checkSpot(chr, iitem)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
@@ -237,8 +237,8 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
    private int getQuantityLeft(int itemid) {
       synchronized (items) {
          return items.stream()
-               .filter(shopItem -> shopItem.getItem().getItemId() == itemid)
-               .mapToInt(shopItem -> (shopItem.getBundles() * shopItem.getItem().getQuantity()))
+               .filter(shopItem -> shopItem.getItem().id() == itemid)
+               .mapToInt(shopItem -> (shopItem.getBundles() * shopItem.getItem().quantity()))
                .sum();
       }
    }
@@ -248,11 +248,11 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          MaplePlayerShopItem pItem = items.get(item);
          Item newItem = pItem.getItem().copy();
 
-         newItem.setQuantity((short) ((pItem.getItem().getQuantity() * quantity)));
+         newItem.quantity_$eq((short) ((pItem.getItem().quantity() * quantity)));
          if (quantity < 1 || !pItem.isExist() || pItem.getBundles() < quantity) {
             c.announce(MaplePacketCreator.enableActions());
             return;
-         } else if (newItem.getInventoryType().equals(MapleInventoryType.EQUIP) && newItem.getQuantity() > 1) {
+         } else if (newItem.inventoryType().equals(MapleInventoryType.EQUIP) && newItem.quantity() > 1) {
             c.announce(MaplePacketCreator.enableActions());
             return;
          }
@@ -266,7 +266,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
 
                synchronized (sold) {
-                  sold.add(new MapleSoldItem(c.getPlayer().getName(), pItem.getItem().getItemId(), newItem.getQuantity(), price));
+                  sold.add(new MapleSoldItem(c.getPlayer().getName(), pItem.getItem().id(), newItem.quantity(), price));
                }
 
                pItem.setBundles((short) (pItem.getBundles() - quantity));
@@ -275,7 +275,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                }
 
                if (ServerConstants.USE_ANNOUNCE_SHOPITEMSOLD) {   // idea thanks to Vcoc
-                  announceItemSold(newItem, price, getQuantityLeft(pItem.getItem().getItemId()));
+                  announceItemSold(newItem, price, getQuantityLeft(pItem.getItem().id()));
                }
 
                Optional<MapleCharacter> owner = Server.getInstance().getWorld(world).getPlayerStorage().getCharacterByName(ownerName);
@@ -308,8 +308,8 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
    }
 
    private void announceItemSold(Item item, int mesos, int inStore) {
-      String qtyStr = (item.getQuantity() > 1) ? " x " + item.getQuantity() : "";
-      String itemName = MapleItemInformationProvider.getInstance().getName(item.getItemId());
+      String qtyStr = (item.quantity() > 1) ? " x " + item.quantity() : "";
+      String itemName = MapleItemInformationProvider.getInstance().getName(item.id());
       Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId)
             .filter(MapleCharacter::isLoggedinWorld)
             .ifPresent(character ->  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, "[Hired Merchant] Item '" + itemName + "'" + qtyStr + " has been sold for " + mesos + " mesos. (" + inStore + " left)"));
@@ -370,12 +370,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          List<MaplePlayerShopItem> copyItems = getItems();
          if (MapleHiredMerchantProcessor.getInstance().check(c.getPlayer(), copyItems) && !timeout) {
             copyItems.stream().filter(MaplePlayerShopItem::isExist).forEach(shopItem -> {
-               if (shopItem.getItem().getInventoryType().equals(MapleInventoryType.EQUIP)) {
+               if (shopItem.getItem().inventoryType().equals(MapleInventoryType.EQUIP)) {
                   MapleInventoryManipulator.addFromDrop(c, shopItem.getItem(), false);
                } else {
                   Item item = shopItem.getItem();
-                  short quantity = (short) (shopItem.getBundles() * item.getQuantity());
-                  MapleInventoryManipulator.addById(c, item.getItemId(), quantity, item.getOwner(), -1, item.getFlag(), item.getExpiration());
+                  short quantity = (short) (shopItem.getBundles() * item.quantity());
+                  MapleInventoryManipulator.addById(c, item.id(), quantity, item.owner(), -1, item.flag(), item.expiration());
                }
             });
 
@@ -468,7 +468,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
    public boolean hasItem(int itemid) {
       for (MaplePlayerShopItem mpsi : getItems()) {
-         if (mpsi.getItem().getItemId() == itemid && mpsi.isExist() && mpsi.getBundles() > 0) {
+         if (mpsi.getItem().id() == itemid && mpsi.isExist() && mpsi.getBundles() > 0) {
             return true;
          }
       }
@@ -555,7 +555,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       }
 
       return all.stream()
-            .filter(shopItem -> shopItem.getItem().getItemId() == itemId && shopItem.getBundles() > 0 && shopItem.isExist())
+            .filter(shopItem -> shopItem.getItem().id() == itemId && shopItem.getBundles() > 0 && shopItem.isExist())
             .collect(Collectors.toList());
    }
 
@@ -568,12 +568,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          short newBundle = shopItem.getBundles();
 
          if (shutdown) { //is "shutdown" really necessary?
-            newItem.setQuantity(shopItem.getItem().getQuantity());
+            newItem.quantity_$eq(shopItem.getItem().quantity());
          } else {
-            newItem.setQuantity(shopItem.getItem().getQuantity());
+            newItem.quantity_$eq(shopItem.getItem().quantity());
          }
          if (newBundle > 0) {
-            itemsWithType.add(new Pair<>(newItem, newItem.getInventoryType()));
+            itemsWithType.add(new Pair<>(newItem, newItem.inventoryType()));
             bundles.add(newBundle);
          }
       });

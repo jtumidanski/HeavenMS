@@ -54,7 +54,7 @@ public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket> {
 
       int petIndex = chr.getPetIndex(packet.petIndex());
       MaplePet pet = chr.getPet(petIndex);
-      if (pet == null || !pet.isSummoned()) {
+      if (pet == null || !pet.summoned()) {
          c.announce(MaplePacketCreator.enableActions());
          return;
       }
@@ -83,7 +83,7 @@ public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket> {
 
             if (chr.isEquippedPetItemIgnore()) {
                final Set<Integer> petIgnore = chr.getExcludedItems();
-               if (!petIgnore.isEmpty() && petIgnore.contains(mapitem.getItem().getItemId())) {
+               if (!petIgnore.isEmpty() && petIgnore.contains(mapitem.getItem().id())) {
                   c.announce(MaplePacketCreator.enableActions());
                   return;
                }

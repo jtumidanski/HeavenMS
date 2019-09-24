@@ -101,7 +101,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
          }
       } else {
          Item weapon = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -11);
-         MapleWeaponType type = MapleItemInformationProvider.getInstance().getWeaponType(weapon.getItemId());
+         MapleWeaponType type = MapleItemInformationProvider.getInstance().getWeaponType(weapon.id());
          if (type == MapleWeaponType.NOT_A_WEAPON) {
             return;
          }
@@ -138,13 +138,13 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
          for (short i = 1; i <= inv.getSlotLimit(); i++) {
             Item item = inv.getItem(i);
             if (item != null) {
-               int id = item.getItemId();
-               slot = item.getPosition();
+               int id = item.id();
+               slot = item.position();
 
                boolean bow = ItemConstants.isArrowForBow(id);
                boolean cbow = ItemConstants.isArrowForCrossBow(id);
-               if (item.getQuantity() >= bulletCount) { //Fixes the bug where you can't use your last arrow.
-                  if (type == MapleWeaponType.CLAW && ItemConstants.isThrowingStar(id) && weapon.getItemId() != 1472063) {
+               if (item.quantity() >= bulletCount) { //Fixes the bug where you can't use your last arrow.
+                  if (type == MapleWeaponType.CLAW && ItemConstants.isThrowingStar(id) && weapon.id() != 1472063) {
                      if (((id == 2070007 || id == 2070018) && chr.getLevel() < 70) || (id == 2070016 && chr.getLevel() < 50)) {
                      } else {
                         projectile = id;
@@ -160,7 +160,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                         projectile = id;
                         break;
                      }
-                  } else if ((type == MapleWeaponType.BOW && bow) || (type == MapleWeaponType.CROSSBOW && cbow) || (weapon.getItemId() == 1472063 && (bow || cbow))) {
+                  } else if ((type == MapleWeaponType.BOW && bow) || (type == MapleWeaponType.CROSSBOW && cbow) || (weapon.id() == 1472063 && (bow || cbow))) {
                      projectile = id;
                      break;
                   }
@@ -192,8 +192,8 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                for (int i = 1; i <= cash.getSlotLimit(); i++) { // impose order...
                   Item item = cash.getItem((short) i);
                   if (item != null) {
-                     if (item.getItemId() / 1000 == 5021) {
-                        visProjectile = item.getItemId();
+                     if (item.id() / 1000 == 5021) {
+                        visProjectile = item.id();
                         break;
                      }
                   }

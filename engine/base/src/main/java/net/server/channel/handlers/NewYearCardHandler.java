@@ -71,7 +71,7 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
       }
 
       Item it = player.getInventory(ItemConstants.getInventoryType(itemid)).getItem(slot);
-      return (it != null && it.getItemId() == itemid) ? 0 : 0x12;
+      return (it != null && it.id() == itemid) ? 0 : 0x12;
    }
 
    private void cardAccepted(MapleClient c, MapleCharacter player, int cardId) {

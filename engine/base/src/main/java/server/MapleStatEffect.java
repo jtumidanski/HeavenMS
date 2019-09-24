@@ -315,7 +315,7 @@ public class MapleStatEffect {
             for (int i = 1; i <= use.getSlotLimit(); i++) { // impose order...
                Item item = use.getItem((short) i);
                if (item != null) {
-                  if (ItemConstants.isThrowingStar(item.getItemId()) && item.getQuantity() >= 200) {
+                  if (ItemConstants.isThrowingStar(item.id()) && item.quantity() >= 200) {
                      projectile = item;
                      break;
                   }
@@ -324,7 +324,7 @@ public class MapleStatEffect {
             if (projectile == null) {
                return false;
             } else {
-               MapleInventoryManipulator.removeFromSlot(applyto.getClient(), MapleInventoryType.USE, projectile.getPosition(), (short) 200, false, true);
+               MapleInventoryManipulator.removeFromSlot(applyto.getClient(), MapleInventoryType.USE, projectile.position(), (short) 200, false, true);
             }
          } finally {
             use.unlockInventory();
@@ -600,7 +600,7 @@ public class MapleStatEffect {
          int ridingMountId = 0;
          Item mount = applyfrom.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18);
          if (mount != null) {
-            ridingMountId = mount.getItemId();
+            ridingMountId = mount.id();
          }
 
          if (sourceid == Corsair.BATTLE_SHIP) {

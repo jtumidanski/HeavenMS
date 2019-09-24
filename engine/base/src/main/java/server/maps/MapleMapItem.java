@@ -90,7 +90,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
 
    public final int getItemId() {
       if (meso > 0) return meso;
-      return item.getItemId();
+      return item.id();
    }
 
    public final MapleMapObject getDropper() {

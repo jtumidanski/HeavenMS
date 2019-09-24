@@ -49,7 +49,7 @@ public final class ScriptedItemHandler extends AbstractPacketHandler<ScriptedIte
       }
 
       Item item = client.getPlayer().getInventory(ItemConstants.getInventoryType(packet.itemId())).getItem(packet.itemSlot());
-      if (item == null || item.getItemId() != packet.itemId() || item.getQuantity() < 1) {
+      if (item == null || item.id() != packet.itemId() || item.quantity() < 1) {
          return;
       }
 

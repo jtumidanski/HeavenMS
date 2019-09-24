@@ -95,7 +95,7 @@ public class DueyProcessor {
    }
 
    private static boolean insertPackageItem(int packageId, Item item) {
-      Pair<Item, MapleInventoryType> dueyItem = new Pair<>(item, MapleInventoryType.getByType(item.getItemType()));
+      Pair<Item, MapleInventoryType> dueyItem = new Pair<>(item, MapleInventoryType.getByType(item.itemType()));
       DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.DUEY.saveItems(Collections.singletonList(dueyItem), packageId, connection));
       return true;
    }
@@ -111,13 +111,13 @@ public class DueyProcessor {
          inv.lockInventory();
          try {
             item = inv.getItem(itemPos);
-            if (item != null && item.getQuantity() >= amount) {
-               if (item.isUntradeable() || ii.isUnmerchable(item.getItemId())) {
+            if (item != null && item.quantity() >= amount) {
+               if (ItemProcessor.getInstance().isUntradeable(item) || ii.isUnmerchable(item.id())) {
                   return -1;
                }
 
-               if (ItemConstants.isRechargeable(item.getItemId())) {
-                  MapleInventoryManipulator.removeFromSlot(c, invType, itemPos, item.getQuantity(), true);
+               if (ItemConstants.isRechargeable(item.id())) {
+                  MapleInventoryManipulator.removeFromSlot(c, invType, itemPos, item.quantity(), true);
                } else {
                   MapleInventoryManipulator.removeFromSlot(c, invType, itemPos, amount, true, false);
                }
@@ -131,7 +131,7 @@ public class DueyProcessor {
          }
 
          MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
-         item.setQuantity(amount);
+         item.quantity_$eq(amount);
 
          if (!insertPackageItem(packageId, item)) {
             return 1;
@@ -261,8 +261,8 @@ public class DueyProcessor {
                   return;
                }
 
-               if (!MapleInventoryManipulator.checkSpace(c, dpItem.getItemId(), dpItem.getQuantity(), dpItem.getOwner())) {
-                  int itemid = dpItem.getItemId();
+               if (!MapleInventoryManipulator.checkSpace(c, dpItem.id(), dpItem.quantity(), dpItem.owner())) {
+                  int itemid = dpItem.id();
                   if (MapleItemInformationProvider.getInstance().isPickupRestricted(itemid) && c.getPlayer().getInventory(ItemConstants.getInventoryType(itemid)).findById(itemid) != null) {
                      c.announce(MaplePacketCreator.sendDueyMSG(Actions.TOCLIENT_RECV_RECEIVER_WITH_UNIQUE.getCode()));
                   } else {

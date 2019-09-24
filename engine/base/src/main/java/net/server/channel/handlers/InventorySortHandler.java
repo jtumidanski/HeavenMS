@@ -56,7 +56,7 @@ class PairedQuicksort {
       if (A.size() > 0) {
          MapleQuicksort(0, A.size() - 1, A, primarySort);
 
-         if (A.get(0).getInventoryType().equals(MapleInventoryType.USE)) {   // thanks KDA & Vcoc for suggesting stronger projectiles coming before weaker ones
+         if (A.get(0).inventoryType().equals(MapleInventoryType.USE)) {   // thanks KDA & Vcoc for suggesting stronger projectiles coming before weaker ones
             reverseSortSublist(A, BinarySearchElement(A, 206));  // arrows
             reverseSortSublist(A, BinarySearchElement(A, 207));  // stars
             reverseSortSublist(A, BinarySearchElement(A, 233));  // bullets
@@ -65,7 +65,7 @@ class PairedQuicksort {
 
       intersect.add(0);
       for (int ind = 1; ind < A.size(); ind++) {
-         if (A.get(ind - 1).getItemId() != A.get(ind).getItemId()) {
+         if (A.get(ind - 1).id() != A.get(ind).id()) {
             intersect.add(ind);
          }
       }
@@ -79,7 +79,7 @@ class PairedQuicksort {
    }
 
    private static int getItemSubtype(Item it) {
-      return it.getItemId() / 10000;
+      return it.id() / 10000;
    }
 
    private void PartitionByItemId(int Esq, int Dir, ArrayList<Item> A) {
@@ -90,8 +90,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.getItemId() > A.get(i).getItemId()) i++;
-         while (x.getItemId() < A.get(j).getItemId()) j--;
+         while (x.id() > A.get(i).id()) i++;
+         while (x.id() < A.get(j).id()) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -112,8 +112,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.getItemId() < A.get(i).getItemId()) i++;
-         while (x.getItemId() > A.get(j).getItemId()) j--;
+         while (x.id() < A.get(i).id()) i++;
+         while (x.id() > A.get(j).id()) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -134,8 +134,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (ii.getName(x.getItemId()).compareTo(ii.getName(A.get(i).getItemId())) > 0) i++;
-         while (ii.getName(x.getItemId()).compareTo(ii.getName(A.get(j).getItemId())) < 0) j--;
+         while (ii.getName(x.id()).compareTo(ii.getName(A.get(i).id())) > 0) i++;
+         while (ii.getName(x.id()).compareTo(ii.getName(A.get(j).id())) < 0) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -156,8 +156,8 @@ class PairedQuicksort {
 
       x = A.get((i + j) / 2);
       do {
-         while (x.getQuantity() > A.get(i).getQuantity()) i++;
-         while (x.getQuantity() < A.get(j).getQuantity()) j--;
+         while (x.quantity() > A.get(i).quantity()) i++;
+         while (x.quantity() < A.get(j).quantity()) j--;
 
          if (i <= j) {
             w = A.get(i);
@@ -180,8 +180,8 @@ class PairedQuicksort {
 
       do {
 
-         while (x.getLevel() > ((Equip) A.get(i)).getLevel()) i++;
-         while (x.getLevel() < ((Equip) A.get(j)).getLevel()) j--;
+         while (x.level() > ((Equip) A.get(i)).level()) i++;
+         while (x.level() < ((Equip) A.get(j)).level()) j--;
 
          if (i <= j) {
             w = (Equip) A.get(i);
@@ -299,7 +299,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
          }
 
          for (Item item : itemarray) {
-            inventory.removeSlot(item.getPosition());
+            inventory.removeSlot(item.position());
             mods.add(new ModifyInventory(3, item));
          }
 

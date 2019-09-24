@@ -1041,7 +1041,7 @@ public class MapleMap {
          public void sendPackets(MapleClient c) {
             MapleCharacter chr = c.getPlayer();
 
-            if (chr.needQuestItem(questid, idrop.getItemId())) {
+            if (chr.needQuestItem(questid, idrop.id())) {
                mdrop.lockItem();
                try {
                   c.announce(MaplePacketCreator.dropItemFromMapObject(chr, mdrop, dropper.getPosition(), dropPos, (byte) 1));
@@ -2135,7 +2135,7 @@ public class MapleMap {
          final MapleReactor react = (MapleReactor) o;
 
          if (react.getReactorType() == 100) {
-            if (react.getReactItem(react.getEventState()).getLeft() == item.getItemId() && react.getReactItem(react.getEventState()).getRight() == item.getQuantity()) {
+            if (react.getReactItem(react.getEventState()).getLeft() == item.id() && react.getReactItem(react.getEventState()).getRight() == item.quantity()) {
 
                if (react.getArea().contains(drop.getPosition())) {
                   registerMapSchedule(new ActivateItemReactor(drop, react, c), 5000);
@@ -2166,7 +2166,7 @@ public class MapleMap {
                if (!drop.isPickedUp()) {
                   final Item item = drop.getItem();
 
-                  if (item != null && reactItem == item.getItemId() && reactQty == item.getQuantity()) {
+                  if (item != null && reactItem == item.id() && reactQty == item.quantity()) {
                      if (reactArea.contains(drop.getPosition())) {
                         MapleClient owner = drop.getOwnerClient();
                         if (owner != null) {
@@ -2398,7 +2398,7 @@ public class MapleMap {
       Arrays.stream(chr.getPets())
             .filter(Objects::nonNull)
             .forEach(pet -> {
-               pet.setPos(getGroundBelow(chr.getPosition()));
+               pet.pos_$eq(getGroundBelow(chr.getPosition()));
                chr.announce(MaplePacketCreator.showPet(chr, pet, false, false));
             });
       chr.commitExcludedItems();  // thanks OishiiKawaiiDesu for noticing pet item ignore registry erasing upon changing maps

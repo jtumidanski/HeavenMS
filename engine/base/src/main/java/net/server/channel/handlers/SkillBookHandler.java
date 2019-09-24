@@ -59,10 +59,10 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
          try {
             MapleInventory inv = player.getInventory(MapleInventoryType.USE);
             Item toUse = inv.getItem(packet.slot());
-            if (toUse == null || toUse.getItemId() != packet.itemId()) {
+            if (toUse == null || toUse.id() != packet.itemId()) {
                return;
             }
-            Map<String, Integer> skillData = MapleItemInformationProvider.getInstance().getSkillStats(toUse.getItemId(), player.getJob().getId());
+            Map<String, Integer> skillData = MapleItemInformationProvider.getInstance().getSkillStats(toUse.id(), player.getJob().getId());
             if (skillData == null) {
                return;
             }
@@ -109,7 +109,7 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
       inv.lockInventory();
       try {
          Item used = inv.getItem(slot);
-         if (used != toUse || toUse.getQuantity() < 1) {
+         if (used != toUse || toUse.quantity() < 1) {
             return false;
          }
 

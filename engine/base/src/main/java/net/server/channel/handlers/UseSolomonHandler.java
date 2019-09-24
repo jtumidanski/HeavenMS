@@ -57,7 +57,7 @@ public final class UseSolomonHandler extends AbstractPacketHandler<UseSolomonPac
                }
 
                long gachaexp = ii.getExpById(packet.itemId());
-               if (slotItem.getItemId() != packet.itemId() || slotItem.getQuantity() <= 0 || chr.getLevel() > ii.getMaxLevelById(packet.itemId())) {
+               if (slotItem.id() != packet.itemId() || slotItem.quantity() <= 0 || chr.getLevel() > ii.getMaxLevelById(packet.itemId())) {
                   return;
                }
                if (gachaexp + chr.getGachaExp() > Integer.MAX_VALUE) {

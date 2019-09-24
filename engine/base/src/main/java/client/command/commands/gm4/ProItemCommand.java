@@ -30,6 +30,7 @@ import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.ItemProcessor;
 import constants.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.MessageBroadcaster;
@@ -41,24 +42,24 @@ public class ProItemCommand extends Command {
    }
 
    private static void hardsetItemStats(Equip equip, short stat, short spdjmp) {
-      equip.setStr(stat);
-      equip.setDex(stat);
-      equip.setInt(stat);
-      equip.setLuk(stat);
-      equip.setMatk(stat);
-      equip.setWatk(stat);
-      equip.setAcc(stat);
-      equip.setAvoid(stat);
-      equip.setJump(spdjmp);
-      equip.setSpeed(spdjmp);
-      equip.setWdef(stat);
-      equip.setMdef(stat);
-      equip.setHp(stat);
-      equip.setMp(stat);
+      equip.str_$eq(stat);
+      equip.dex_$eq(stat);
+      equip._int_$eq(stat);
+      equip.luk_$eq(stat);
+      equip.matk_$eq(stat);
+      equip.watk_$eq(stat);
+      equip.acc_$eq(stat);
+      equip.avoid_$eq(stat);
+      equip.jump_$eq(spdjmp);
+      equip.speed_$eq(spdjmp);
+      equip.wdef_$eq(stat);
+      equip.mdef_$eq(stat);
+      equip.hp_$eq(stat);
+      equip.mp_$eq(stat);
 
-      short flag = equip.getFlag();
+      short flag = equip.flag();
       flag |= ItemConstants.UNTRADEABLE;
-      equip.setFlag(flag);
+      ItemProcessor.getInstance().setFlag(equip, flag);
    }
 
    @Override
@@ -83,7 +84,7 @@ public class ProItemCommand extends Command {
       MapleInventoryType type = ItemConstants.getInventoryType(itemid);
       if (type.equals(MapleInventoryType.EQUIP)) {
          Item it = ii.getEquipById(itemid);
-         it.setOwner(player.getName());
+         it.owner_$eq(player.getName());
 
          hardsetItemStats((Equip) it, stat, spdjmp);
          MapleInventoryManipulator.addFromDrop(c, it);

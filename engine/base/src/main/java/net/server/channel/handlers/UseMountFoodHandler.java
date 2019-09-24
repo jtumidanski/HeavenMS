@@ -57,7 +57,7 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
             useInv.lockInventory();
             try {
                Item item = useInv.getItem(packet.position());
-               if (item != null && item.getItemId() == packet.itemId() && mount != null) {
+               if (item != null && item.id() == packet.itemId() && mount != null) {
                   int curTiredness = mount.getTiredness();
                   int healedTiredness = Math.min(curTiredness, 30);
 

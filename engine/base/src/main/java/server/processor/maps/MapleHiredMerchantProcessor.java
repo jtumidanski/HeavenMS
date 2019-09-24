@@ -23,7 +23,7 @@ public class MapleHiredMerchantProcessor {
    }
 
    public boolean canBuy(MapleClient c, Item newItem) {    // thanks xiaokelvin (Conrad) for noticing a leaked test code here
-      return MapleInventoryManipulator.checkSpace(c, newItem.getItemId(), newItem.getQuantity(), newItem.getOwner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
+      return MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
    }
 
    public boolean check(MapleCharacter chr, List<MaplePlayerShopItem> items) {
@@ -33,7 +33,7 @@ public class MapleHiredMerchantProcessor {
 
    private Pair<Item, MapleInventoryType> getItemMapleInventoryTypePair(MaplePlayerShopItem item) {
       Item it = item.getItem().copy();
-      it.setQuantity((short) (it.getQuantity() * item.getBundles()));
-      return new Pair<>(it, it.getInventoryType());
+      it.quantity_$eq((short) (it.quantity() * item.getBundles()));
+      return new Pair<>(it, it.inventoryType());
    }
 }

@@ -43,17 +43,17 @@ public class RechargeCommand extends Command {
       MapleCharacter player = c.getPlayer();
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       for (Item torecharge : c.getPlayer().getInventory(MapleInventoryType.USE).list()) {
-         if (ItemConstants.isThrowingStar(torecharge.getItemId())) {
-            torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+         if (ItemConstants.isThrowingStar(torecharge.id())) {
+            torecharge.quantity_$eq(ii.getSlotMax(c, torecharge.id()));
             c.getPlayer().forceUpdateItem(torecharge);
-         } else if (ItemConstants.isArrow(torecharge.getItemId())) {
-            torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+         } else if (ItemConstants.isArrow(torecharge.id())) {
+            torecharge.quantity_$eq(ii.getSlotMax(c, torecharge.id()));
             c.getPlayer().forceUpdateItem(torecharge);
-         } else if (ItemConstants.isBullet(torecharge.getItemId())) {
-            torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+         } else if (ItemConstants.isBullet(torecharge.id())) {
+            torecharge.quantity_$eq(ii.getSlotMax(c, torecharge.id()));
             c.getPlayer().forceUpdateItem(torecharge);
-         } else if (ItemConstants.isConsumable(torecharge.getItemId())) {
-            torecharge.setQuantity(ii.getSlotMax(c, torecharge.getItemId()));
+         } else if (ItemConstants.isConsumable(torecharge.id())) {
+            torecharge.quantity_$eq(ii.getSlotMax(c, torecharge.id()));
             c.getPlayer().forceUpdateItem(torecharge);
          }
       }

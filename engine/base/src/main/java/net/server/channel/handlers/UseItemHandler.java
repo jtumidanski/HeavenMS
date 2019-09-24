@@ -64,7 +64,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       Item toUse = chr.getInventory(MapleInventoryType.USE).getItem(packet.slot());
-      if (toUse != null && toUse.getQuantity() > 0 && toUse.getItemId() == packet.itemId()) {
+      if (toUse != null && toUse.quantity() > 0 && toUse.id() == packet.itemId()) {
          if (packet.itemId() == 2022178 || packet.itemId() == 2050004) {
             chr.dispelDebuffs();
             remove(client, packet.slot());
@@ -88,7 +88,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
             int banSp = chr.getMap().findClosestPlayerSpawnpoint(chr.getPosition()).getId();
             long banTime = currentServerTime();
 
-            if (ii.getItemEffect(toUse.getItemId()).applyTo(chr)) {
+            if (ii.getItemEffect(toUse.id()).applyTo(chr)) {
                if (ServerConstants.USE_BANISHABLE_TOWN_SCROLL) {
                   chr.setBanishPlayerData(banMap, banSp, banTime);
                }
@@ -97,7 +97,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
             }
             return;
          } else if (ItemConstants.isAntibanishScroll(packet.itemId())) {
-            if (ii.getItemEffect(toUse.getItemId()).applyTo(chr)) {
+            if (ii.getItemEffect(toUse.id()).applyTo(chr)) {
                remove(client, packet.slot());
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot recover from a banish state at the moment.");
@@ -107,10 +107,10 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
 
          remove(client, packet.slot());
 
-         if (toUse.getItemId() != 2022153) {
-            ii.getItemEffect(toUse.getItemId()).applyTo(chr);
+         if (toUse.id() != 2022153) {
+            ii.getItemEffect(toUse.id()).applyTo(chr);
          } else {
-            MapleStatEffect mse = ii.getItemEffect(toUse.getItemId());
+            MapleStatEffect mse = ii.getItemEffect(toUse.id());
             for (MapleCharacter player : chr.getMap().getCharacters()) {
                mse.applyTo(player);
             }

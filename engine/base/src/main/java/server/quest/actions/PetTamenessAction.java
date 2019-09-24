@@ -22,6 +22,7 @@ package server.quest.actions;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MaplePet;
+import client.processor.PetProcessor;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
@@ -54,7 +55,7 @@ public class PetTamenessAction extends MapleQuestAction {
 
       c.lockClient();
       try {
-         pet.gainClosenessFullness(chr, tameness, 0, 0);
+         PetProcessor.getInstance().gainClosenessFullness(pet, chr, tameness, 0, 0);
       } finally {
          c.unlockClient();
       }

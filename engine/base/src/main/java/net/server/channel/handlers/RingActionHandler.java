@@ -198,7 +198,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
 
       if (it != null) {
          Equip eqp = (Equip) it;
-         eqp.setRingId(-1);
+         eqp.ringId_$eq(-1);
       }
    }
 
@@ -260,14 +260,14 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
 
       Item ringObj = ii.getEquipById(marriageRingId);
       Equip ringEqp = (Equip) ringObj;
-      ringEqp.setRingId(rings.getLeft());
+      ringEqp.ringId_$eq(rings.getLeft());
       player.addMarriageRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
       MapleInventoryManipulator.addFromDrop(player.getClient(), ringEqp, false, -1);
       player.broadcastMarriageMessage();
 
       ringObj = ii.getEquipById(marriageRingId);
       ringEqp = (Equip) ringObj;
-      ringEqp.setRingId(rings.getRight());
+      ringEqp.ringId_$eq(rings.getRight());
       partner.addMarriageRing(MapleRingProcessor.getInstance().loadFromDb(rings.getRight()));
       MapleInventoryManipulator.addFromDrop(partner.getClient(), ringEqp, false, -1);
       partner.broadcastMarriageMessage();
@@ -345,7 +345,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
    private boolean openWeddingInvitation(MapleClient c, byte slot, int invitationId) {
       if (invitationId == 4031406 || invitationId == 4031407) {
          Item item = c.getPlayer().getInventory(MapleInventoryType.ETC).getItem(slot);
-         if (item == null || item.getItemId() != invitationId) {
+         if (item == null || item.id() != invitationId) {
             c.announce(MaplePacketCreator.enableActions());
             return true;
          }
@@ -363,7 +363,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
    private boolean inviteToWedding(MapleClient c, String name, int marriageId, byte slot) {
       int itemId;
       try {
-         itemId = c.getPlayer().getInventory(MapleInventoryType.ETC).getItem(slot).getItemId();
+         itemId = c.getPlayer().getInventory(MapleInventoryType.ETC).getItem(slot).id();
       } catch (NullPointerException npe) {
          c.announce(MaplePacketCreator.enableActions());
          return true;
@@ -405,7 +405,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
                   }
 
                   Item weddingTicket = new Item(newItemId, (short) 0, (short) 1);
-                  weddingTicket.setExpiration(expiration);
+                  weddingTicket.expiration_(expiration);
 
                   DueyProcessor.dueyCreatePackage(weddingTicket, 0, groom, guest);
                }

@@ -40,11 +40,13 @@ import client.database.provider.AccountProvider;
 import client.database.provider.GiftProvider;
 import client.database.provider.SpecialCashItemProvider;
 import client.database.provider.WishListProvider;
+import client.inventory.BetterItemFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
+import client.processor.PetProcessor;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import net.server.Server;
@@ -160,14 +162,14 @@ public class CashShop {
       boolean isRing;
       Equip equip = null;
       for (Item item : getInventory()) {
-         if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
+         if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
             equip = (Equip) item;
-            isRing = equip.getRingId() > -1;
+            isRing = equip.ringId() > -1;
          } else {
             isRing = false;
          }
 
-         if ((item.getPetId() > -1 ? item.getPetId() : isRing ? equip.getRingId() : item.getCashId()) == cashId) {
+         if ((item.petId() > -1 ? item.petId() : isRing ? equip.ringId() : item.cashId()) == cashId) {
             return item;
          }
       }
@@ -227,10 +229,10 @@ public class CashShop {
       CashItem cItem = CashItemFactory.getItem(gift.sn());
       Item item = cItem.toItem();
       Equip equip = null;
-      item.setGiftFrom(gift.from());
-      if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
+      item.giftFrom_$eq(gift.from());
+      if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
          equip = (Equip) item;
-         equip.setRingId(gift.ringId());
+         equip.ringId_$eq(gift.ringId());
          gifts.add(new Pair<>(equip, gift.message()));
       } else {
          gifts.add(new Pair<>(item, gift.message()));
@@ -238,7 +240,7 @@ public class CashShop {
 
       if (CashItemFactory.isPackage(cItem.getItemId())) { //Packages never contains a ring
          for (Item packageItem : CashItemFactory.getPackage(cItem.getItemId())) {
-            packageItem.setGiftFrom(gift.from());
+            packageItem.giftFrom_$eq(gift.from());
             addToInventory(packageItem);
          }
       } else {
@@ -261,7 +263,7 @@ public class CashShop {
 
       List<Item> inv = getInventory();
       for (Item item : inv) {
-         itemsWithType.add(new Pair<>(item, item.getInventoryType()));
+         itemsWithType.add(new Pair<>(item, item.inventoryType()));
       }
 
       factory.saveItems(itemsWithType, accountId, con);
@@ -274,7 +276,7 @@ public class CashShop {
       lock.lock();
       try {
          for (Item it : inventory) {
-            if (it.getItemId() == itemid) {
+            if (it.id() == itemid) {
                return it;
             }
          }
@@ -292,12 +294,12 @@ public class CashShop {
          CashItem cItem = CashItemFactory.getRandomCashItem();
 
          if (cItem != null) {
-            if (css.getQuantity() > 1) {
+            if (css.quantity() > 1) {
                     /* if(NOT ENOUGH SPACE) { looks like we're not dealing with cash inventory limit whatsoever, k then
                         return null;
                     } */
 
-               css.setQuantity((short) (css.getQuantity() - 1));
+               css.quantity_$eq((short) (css.quantity() - 1));
             } else {
                removeFromInventory(css);
             }
@@ -355,34 +357,34 @@ public class CashShop {
 
          int petid = -1;
          if (ItemConstants.isPet(itemId)) {
-            petid = MaplePet.createPet(itemId);
+            petid = PetProcessor.getInstance().createPet(itemId);
          }
 
          if (ItemConstants.getInventoryType(itemId).equals(MapleInventoryType.EQUIP)) {
             item = MapleItemInformationProvider.getInstance().getEquipById(itemId);
          } else {
-            item = new Item(itemId, (byte) 0, count, petid);
+            item = BetterItemFactory.getInstance().create(itemId, (byte) 0, count, petid);
          }
 
          if (ItemConstants.EXPIRING_ITEMS) {
             if (period == 1) {
                if (itemId == 5211048 || itemId == 5360042) { // 4 Hour 2X coupons, the period is 1, but we don't want them to last a day.
-                  item.setExpiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 4));
+                  item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 4));
                             /*
                             } else if(itemId == 5211047 || itemId == 5360014) { // 3 Hour 2X coupons, unused as of now
                                     item.setExpiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 3));
                             */
                } else if (itemId == 5211060) { // 2 Hour 3X coupons.
-                  item.setExpiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 2));
+                  item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 2));
                } else {
-                  item.setExpiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24));
+                  item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24));
                }
             } else {
-               item.setExpiration(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24 * period));
+               item.expiration_(Server.getInstance().getCurrentTime() + (1000 * 60 * 60 * 24 * period));
             }
          }
 
-         item.setSN(sn);
+         item.sn_$eq(sn);
          return item;
       }
    }

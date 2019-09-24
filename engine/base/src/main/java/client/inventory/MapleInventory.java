@@ -63,7 +63,7 @@ public class MapleInventory implements Iterable<Item> {
    }
 
    private static boolean isSameOwner(Item source, Item target) {
-      return source.getOwner().equals(target.getOwner());
+      return source.owner().equals(target.owner());
    }
 
    public static boolean checkSpot(MapleCharacter chr, Item item) {    // thanks Vcoc for noticing pshops not checking item stacks when taking item back
@@ -73,7 +73,7 @@ public class MapleInventory implements Iterable<Item> {
    public static boolean checkSpot(MapleCharacter chr, List<Item> items) {
       List<Pair<Item, MapleInventoryType>> listItems = new LinkedList<>();
       for (Item item : items) {
-         listItems.add(new Pair<>(item, item.getInventoryType()));
+         listItems.add(new Pair<>(item, item.inventoryType()));
       }
 
       return checkSpotsAndOwnership(chr, listItems);
@@ -98,20 +98,20 @@ public class MapleInventory implements Iterable<Item> {
       Map<Integer, Byte> rcvTypes = new LinkedHashMap<>();
 
       for (Pair<Item, MapleInventoryType> item : items) {
-         Integer itemId = item.left.getItemId();
+         Integer itemId = item.left.id();
          List<Integer> qty = rcvItems.get(itemId);
 
          if (qty == null) {
             List<Integer> itemQtyList = new LinkedList<>();
-            itemQtyList.add((int) item.left.getQuantity());
+            itemQtyList.add((int) item.left.quantity());
 
             rcvItems.put(itemId, itemQtyList);
             rcvTypes.put(itemId, item.right.getType());
          } else {
             if (!ItemConstants.isRechargeable(itemId)) {
-               qty.set(0, qty.get(0) + item.left.getQuantity());
+               qty.set(0, qty.get(0) + item.left.quantity());
             } else {
-               qty.add((int) item.left.getQuantity());
+               qty.add((int) item.left.quantity());
             }
          }
       }
@@ -126,7 +126,9 @@ public class MapleInventory implements Iterable<Item> {
             int result = MapleInventoryManipulator.checkSpaceProgressively(c, it.getKey(), itValue, "", usedSlots, useProofInv);
             boolean hasSpace = ((result % 2) != 0);
 
-            if (!hasSpace) return false;
+            if (!hasSpace) {
+               return false;
+            }
             typesSlotsUsed.set(itemType, (result >> 1));
          }
       }
@@ -171,22 +173,22 @@ public class MapleInventory implements Iterable<Item> {
       Map<Long, String> rcvOwners = new LinkedHashMap<>();
 
       for (Pair<Item, MapleInventoryType> item : items) {
-         Long itemHash = hashKey(item.left.getItemId(), item.left.getOwner());
+         Long itemHash = hashKey(item.left.id(), item.left.owner());
          List<Integer> qty = rcvItems.get(itemHash);
 
          if (qty == null) {
             List<Integer> itemQtyList = new LinkedList<>();
-            itemQtyList.add((int) item.left.getQuantity());
+            itemQtyList.add((int) item.left.quantity());
 
             rcvItems.put(itemHash, itemQtyList);
             rcvTypes.put(itemHash, item.right.getType());
-            rcvOwners.put(itemHash, item.left.getOwner());
+            rcvOwners.put(itemHash, item.left.owner());
          } else {
             // thanks BHB88 for pointing out an issue with rechargeable items being stacked on inventory check
-            if (!ItemConstants.isRechargeable(item.left.getItemId())) {
-               qty.set(0, qty.get(0) + item.left.getQuantity());
+            if (!ItemConstants.isRechargeable(item.left.id())) {
+               qty.set(0, qty.get(0) + item.left.quantity());
             } else {
-               qty.add((int) item.left.getQuantity());
+               qty.add((int) item.left.quantity());
             }
          }
       }
@@ -205,7 +207,9 @@ public class MapleInventory implements Iterable<Item> {
             boolean hasSpace = ((result % 2) != 0);
             //System.out.print(" -> hasSpace: " + hasSpace + " RESULT : " + result + "\n");
 
-            if (!hasSpace) return false;
+            if (!hasSpace) {
+               return false;
+            }
             typesSlotsUsed.set(itemType, (result >> 1));
          }
       }
@@ -236,8 +240,8 @@ public class MapleInventory implements Iterable<Item> {
          if (newLimit < slotLimit) {
             List<Short> toRemove = new LinkedList<>();
             for (Item it : list()) {
-               if (it.getPosition() > newLimit) {
-                  toRemove.add(it.getPosition());
+               if (it.position() > newLimit) {
+                  toRemove.add(it.position());
                }
             }
 
@@ -261,7 +265,7 @@ public class MapleInventory implements Iterable<Item> {
 
    public Item findById(int itemId) {
       for (Item item : list()) {
-         if (item.getItemId() == itemId) {
+         if (item.id() == itemId) {
             return item;
          }
       }
@@ -271,9 +275,9 @@ public class MapleInventory implements Iterable<Item> {
    public Item findByName(String name) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       for (Item item : list()) {
-         String itemName = ii.getName(item.getItemId());
+         String itemName = ii.getName(item.id());
          if (itemName == null) {
-            FilePrinter.printError(FilePrinter.EXCEPTION, "[CRITICAL] Item " + item.getItemId() + " has no name.");
+            FilePrinter.printError(FilePrinter.EXCEPTION, "[CRITICAL] Item " + item.id() + " has no name.");
             continue;
          }
 
@@ -287,8 +291,8 @@ public class MapleInventory implements Iterable<Item> {
    public int countById(int itemId) {
       int qty = 0;
       for (Item item : list()) {
-         if (item.getItemId() == itemId) {
-            qty += item.getQuantity();
+         if (item.id() == itemId) {
+            qty += item.quantity();
          }
       }
       return qty;
@@ -297,8 +301,8 @@ public class MapleInventory implements Iterable<Item> {
    public int countNotOwnedById(int itemId) {
       int qty = 0;
       for (Item item : list()) {
-         if (item.getItemId() == itemId && item.getOwner().equals("")) {
-            qty += item.getQuantity();
+         if (item.id() == itemId && item.owner().equals("")) {
+            qty += item.quantity();
          }
       }
       return qty;
@@ -310,11 +314,13 @@ public class MapleInventory implements Iterable<Item> {
 
       if (!ItemConstants.isRechargeable(itemId)) {
          for (Item item : itemList) {
-            required -= item.getQuantity();
+            required -= item.quantity();
 
             if (required >= 0) {
                openSlot++;
-               if (required == 0) return openSlot;
+               if (required == 0) {
+                  return openSlot;
+               }
             } else {
                return openSlot;
             }
@@ -325,7 +331,9 @@ public class MapleInventory implements Iterable<Item> {
 
             if (required >= 0) {
                openSlot++;
-               if (required == 0) return openSlot;
+               if (required == 0) {
+                  return openSlot;
+               }
             } else {
                return openSlot;
             }
@@ -338,7 +346,7 @@ public class MapleInventory implements Iterable<Item> {
    public List<Item> listById(int itemId) {
       List<Item> ret = new ArrayList<>();
       for (Item item : list()) {
-         if (item.getItemId() == itemId) {
+         if (item.id() == itemId) {
             ret.add(item);
          }
       }
@@ -347,7 +355,7 @@ public class MapleInventory implements Iterable<Item> {
          ret.sort(new Comparator<>() {
             @Override
             public int compare(Item i1, Item i2) {
-               return i1.getPosition() - i2.getPosition();
+               return i1.position() - i2.position();
             }
          });
       }
@@ -358,7 +366,7 @@ public class MapleInventory implements Iterable<Item> {
    public List<Item> linkedListById(int itemId) {
       List<Item> ret = new LinkedList<>();
       for (Item item : list()) {
-         if (item.getItemId() == itemId) {
+         if (item.id() == itemId) {
             ret.add(item);
          }
       }
@@ -367,7 +375,7 @@ public class MapleInventory implements Iterable<Item> {
          ret.sort(new Comparator<>() {
             @Override
             public int compare(Item i1, Item i2) {
-               return i1.getPosition() - i2.getPosition();
+               return i1.position() - i2.position();
             }
          });
       }
@@ -380,15 +388,15 @@ public class MapleInventory implements Iterable<Item> {
       if (slotId == -1) {
          return -1;
       }
-      item.setPosition(slotId);
+      item.position_(slotId);
       return slotId;
    }
 
    public void addItemFromDB(Item item) {
-      if (item.getPosition() < 0 && !type.equals(MapleInventoryType.EQUIPPED)) {
+      if (item.position() < 0 && !type.equals(MapleInventoryType.EQUIPPED)) {
          return;
       }
-      addSlotFromDB(item.getPosition(), item);
+      addSlotFromDB(item.position(), item);
    }
 
    public void move(short sSlot, short dSlot, short slotMax) {
@@ -400,18 +408,18 @@ public class MapleInventory implements Iterable<Item> {
             return;
          }
          if (target == null) {
-            source.setPosition(dSlot);
+            source.position_(dSlot);
             inventory.put(dSlot, source);
             inventory.remove(sSlot);
-         } else if (target.getItemId() == source.getItemId() && !ItemConstants.isRechargeable(source.getItemId()) && isSameOwner(source, target)) {
+         } else if (target.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && isSameOwner(source, target)) {
             if (type.getType() == MapleInventoryType.EQUIP.getType() || type.getType() == MapleInventoryType.CASH.getType()) {
                swap(target, source);
-            } else if (source.getQuantity() + target.getQuantity() > slotMax) {
-               short rest = (short) ((source.getQuantity() + target.getQuantity()) - slotMax);
-               source.setQuantity(rest);
-               target.setQuantity(slotMax);
+            } else if (source.quantity() + target.quantity() > slotMax) {
+               short rest = (short) ((source.quantity() + target.quantity()) - slotMax);
+               source.quantity_$eq(rest);
+               target.quantity_$eq(slotMax);
             } else {
-               target.setQuantity((short) (source.getQuantity() + target.getQuantity()));
+               target.quantity_$eq((short) (source.quantity() + target.quantity()));
                inventory.remove(sSlot);
             }
          } else {
@@ -423,13 +431,13 @@ public class MapleInventory implements Iterable<Item> {
    }
 
    private void swap(Item source, Item target) {
-      inventory.remove(source.getPosition());
-      inventory.remove(target.getPosition());
-      short swapPos = source.getPosition();
-      source.setPosition(target.getPosition());
-      target.setPosition(swapPos);
-      inventory.put(source.getPosition(), source);
-      inventory.put(target.getPosition(), target);
+      inventory.remove(source.position());
+      inventory.remove(target.position());
+      short swapPos = source.position();
+      source.position_(target.position());
+      target.position_(swapPos);
+      inventory.put(source.position(), source);
+      inventory.put(target.position(), target);
    }
 
    public Item getItem(short slot) {
@@ -450,11 +458,11 @@ public class MapleInventory implements Iterable<Item> {
       if (item == null) {// TODO is it ok not to throw an exception here?
          return;
       }
-      item.setQuantity((short) (item.getQuantity() - quantity));
-      if (item.getQuantity() < 0) {
-         item.setQuantity((short) 0);
+      item.quantity_$eq((short) (item.quantity() - quantity));
+      if (item.quantity() < 0) {
+         item.quantity_$eq((short) 0);
       }
-      if (item.getQuantity() == 0 && !allowZero) {
+      if (item.quantity() == 0 && !allowZero) {
          removeSlot(slot);
       }
    }
@@ -477,7 +485,7 @@ public class MapleInventory implements Iterable<Item> {
          lock.unlock();
       }
 
-      if (ItemConstants.isRateCoupon(item.getItemId())) {
+      if (ItemConstants.isRateCoupon(item.id())) {
          ThreadManager.getInstance().newTask(new Runnable() {    // deadlocks with coupons rates found thanks to GabrielSin & Masterrulax
             @Override
             public void run() {
@@ -497,7 +505,7 @@ public class MapleInventory implements Iterable<Item> {
          lock.unlock();
       }
 
-      if (ItemConstants.isRateCoupon(item.getItemId())) {
+      if (ItemConstants.isRateCoupon(item.id())) {
          ThreadManager.getInstance().newTask(new Runnable() {
             @Override
             public void run() {
@@ -516,7 +524,7 @@ public class MapleInventory implements Iterable<Item> {
          lock.unlock();
       }
 
-      if (item != null && ItemConstants.isRateCoupon(item.getItemId())) {
+      if (item != null && ItemConstants.isRateCoupon(item.id())) {
          ThreadManager.getInstance().newTask(new Runnable() {
             @Override
             public void run() {
@@ -609,12 +617,13 @@ public class MapleInventory implements Iterable<Item> {
       boolean isRing = false;
       Equip equip = null;
       for (Item item : list()) {
-         if (item.getInventoryType().equals(MapleInventoryType.EQUIP)) {
+         if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
             equip = (Equip) item;
-            isRing = equip.getRingId() > -1;
+            isRing = equip.ringId() > -1;
          }
-         if ((item.getPetId() > -1 ? item.getPetId() : isRing ? equip.getRingId() : item.getCashId()) == cashId)
+         if ((item.petId() > -1 ? item.petId() : isRing ? equip.ringId() : item.cashId()) == cashId) {
             return item;
+         }
       }
 
       return null;

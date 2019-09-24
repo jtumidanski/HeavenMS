@@ -26,6 +26,7 @@ import client.MapleClient;
 import client.inventory.MaplePet;
 import client.inventory.PetCommand;
 import client.inventory.PetDataFactory;
+import client.processor.PetProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetCommandPacket;
 import net.server.channel.packet.reader.PetCommandReader;
@@ -48,13 +49,13 @@ public final class PetCommandHandler extends AbstractPacketHandler<PetCommandPac
       } else {
          pet = chr.getPet(petIndex);
       }
-      PetCommand petCommand = PetDataFactory.getPetCommand(pet.getItemId(), packet.command());
+      PetCommand petCommand = PetDataFactory.getPetCommand(pet.id(), packet.command());
       if (petCommand == null) {
          return;
       }
 
       if (Randomizer.nextInt(100) < petCommand.probability()) {
-         pet.gainClosenessFullness(chr, petCommand.increase(), 0, packet.command());
+         PetProcessor.getInstance().gainClosenessFullness(pet, chr, petCommand.increase(), 0, packet.command());
          chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, false, packet.command(), false));
       } else {
          chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, true, packet.command(), false));

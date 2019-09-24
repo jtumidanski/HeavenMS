@@ -17,6 +17,7 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
+import client.processor.ItemProcessor;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
@@ -127,8 +128,8 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
                      try {
                         Item item = chrInv.getItem((byte) slot);
                         if (item != null) {
-                           if (!item.isUntradeable()) {
-                              if (itemid == item.getItemId() && quantity <= item.getQuantity()) {
+                           if (!ItemProcessor.getInstance().isUntradeable(item)) {
+                              if (itemid == item.id() && quantity <= item.quantity()) {
                                  Item newItem = item.copy();
 
                                  marriage.addGiftItem(groomWishlist, newItem);

@@ -25,11 +25,11 @@ public class ModifyInventory {
    }
 
    public final int getInventoryType() {
-      return item.getInventoryType().type;
+      return item.inventoryType().type;
    }
 
    public final short getPosition() {
-      return item.getPosition();
+      return item.position();
    }
 
    public final short getOldPosition() {
@@ -37,7 +37,7 @@ public class ModifyInventory {
    }
 
    public final short getQuantity() {
-      return item.getQuantity();
+      return item.quantity();
    }
 
    public final Item getItem() {

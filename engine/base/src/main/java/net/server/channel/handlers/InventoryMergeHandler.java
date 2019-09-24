@@ -83,10 +83,10 @@ public final class InventoryMergeHandler extends AbstractPacketHandler<Inventory
                   continue;
                }
 
-               if (dstItem.getItemId() != srcItem.getItemId()) {
+               if (dstItem.id() != srcItem.id()) {
                   continue;
                }
-               if (dstItem.getQuantity() == ii.getSlotMax(client, inventory.getItem(dst).getItemId())) {
+               if (dstItem.quantity() == ii.getSlotMax(client, inventory.getItem(dst).id())) {
                   break;
                }
 

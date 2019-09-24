@@ -156,14 +156,14 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          inv.lockInventory();    // thanks imbee for pointing a dupe within storage
          try {
             item = inv.getItem(slot);
-            if (item != null && item.getItemId() == itemId && (item.getQuantity() >= quantity || ItemConstants.isRechargeable(itemId))) {
+            if (item != null && item.id() == itemId && (item.quantity() >= quantity || ItemConstants.isRechargeable(itemId))) {
                if (ItemConstants.isWeddingRing(itemId) || ItemConstants.isWeddingToken(itemId)) {
                   c.announce(MaplePacketCreator.enableActions());
                   return;
                }
 
                if (ItemConstants.isRechargeable(itemId)) {
-                  quantity = item.getQuantity();
+                  quantity = item.quantity();
                }
 
                MapleInventoryManipulator.removeFromSlot(c, invType, slot, quantity, false);
@@ -180,11 +180,11 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          chr.gainMeso(-storeFee, false, true, false);
 
          MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
-         item.setQuantity(quantity);
+         item.quantity_$eq(quantity);
          storage.store(item);    // inside a critical section, "!(storage.isFull())" is still in effect...
          chr.setUsedStorage();
-         String itemName = ii.getName(item.getItemId());
-         FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " stored " + item.getQuantity() + " " + itemName + " (" + item.getItemId() + ")");
+         String itemName = ii.getName(item.id());
+         FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " stored " + item.quantity() + " " + itemName + " (" + item.id() + ")");
          storage.sendStored(c, ItemConstants.getInventoryType(itemId));
       }
    }
@@ -199,7 +199,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       slot = storage.getSlot(MapleInventoryType.getByType(type), slot);
       Item item = storage.getItem(slot);
       if (item != null) {
-         if (ii.isPickupRestricted(item.getItemId()) && chr.haveItemWithId(item.getItemId(), true)) {
+         if (ii.isPickupRestricted(item.id()) && chr.haveItemWithId(item.id(), true)) {
             c.announce(MaplePacketCreator.getStorageError((byte) 0x0C));
             return;
          }
@@ -212,17 +212,17 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
             chr.gainMeso(-takeoutFee, false);
          }
 
-         if (MapleInventoryManipulator.checkSpace(c, item.getItemId(), item.getQuantity(), item.getOwner())) {
+         if (MapleInventoryManipulator.checkSpace(c, item.id(), item.quantity(), item.owner())) {
             if (storage.takeOut(item)) {
                chr.setUsedStorage();
 
                MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);
                MapleInventoryManipulator.addFromDrop(c, item, false);
 
-               String itemName = ii.getName(item.getItemId());
-               FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " took out " + item.getQuantity() + " " + itemName + " (" + item.getItemId() + ")");
+               String itemName = ii.getName(item.id());
+               FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " took out " + item.quantity() + " " + itemName + " (" + item.id() + ")");
 
-               storage.sendTakenOut(c, item.getInventoryType());
+               storage.sendTakenOut(c, item.inventoryType());
             } else {
                c.announce(MaplePacketCreator.enableActions());
             }

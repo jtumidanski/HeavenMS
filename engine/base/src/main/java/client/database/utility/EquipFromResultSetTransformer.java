@@ -4,37 +4,41 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import client.inventory.Equip;
+import client.processor.ItemProcessor;
+import server.MapleItemInformationProvider;
 
 public class EquipFromResultSetTransformer implements SqlTransformer<Equip, ResultSet> {
    @Override
    public Equip transform(ResultSet resultSet) throws SQLException {
-      Equip equip = new Equip(resultSet.getInt("itemid"), (short) resultSet.getInt("position"));
-      equip.setOwner(resultSet.getString("owner"));
-      equip.setQuantity((short) resultSet.getInt("quantity"));
-      equip.setAcc((short) resultSet.getInt("acc"));
-      equip.setAvoid((short) resultSet.getInt("avoid"));
-      equip.setDex((short) resultSet.getInt("dex"));
-      equip.setHands((short) resultSet.getInt("hands"));
-      equip.setHp((short) resultSet.getInt("hp"));
-      equip.setInt((short) resultSet.getInt("int"));
-      equip.setJump((short) resultSet.getInt("jump"));
-      equip.setVicious((short) resultSet.getInt("vicious"));
-      equip.setFlag((short) resultSet.getInt("flag"));
-      equip.setLuk((short) resultSet.getInt("luk"));
-      equip.setMatk((short) resultSet.getInt("matk"));
-      equip.setMdef((short) resultSet.getInt("mdef"));
-      equip.setMp((short) resultSet.getInt("mp"));
-      equip.setSpeed((short) resultSet.getInt("speed"));
-      equip.setStr((short) resultSet.getInt("str"));
-      equip.setWatk((short) resultSet.getInt("watk"));
-      equip.setWdef((short) resultSet.getInt("wdef"));
-      equip.setUpgradeSlots((byte) resultSet.getInt("upgradeslots"));
-      equip.setLevel(resultSet.getByte("level"));
-      equip.setItemExp(resultSet.getInt("itemexp"));
-      equip.setItemLevel(resultSet.getByte("itemlevel"));
-      equip.setExpiration(resultSet.getLong("expiration"));
-      equip.setGiftFrom(resultSet.getString("giftFrom"));
-      equip.setRingId(resultSet.getInt("ringid"));
+      int id = resultSet.getInt("itemid");
+      boolean isElemental = (MapleItemInformationProvider.getInstance().getEquipLevel(id, false) > 1);
+      Equip equip = new Equip(id, (short) resultSet.getInt("position"), isElemental);
+      equip.owner_$eq(resultSet.getString("owner"));
+      equip.quantity_$eq((short) resultSet.getInt("quantity"));
+      equip.acc_$eq((short) resultSet.getInt("acc"));
+      equip.avoid_$eq((short) resultSet.getInt("avoid"));
+      equip.dex_$eq((short) resultSet.getInt("dex"));
+      equip.hands_$eq((short) resultSet.getInt("hands"));
+      equip.hp_$eq((short) resultSet.getInt("hp"));
+      equip._int_$eq((short) resultSet.getInt("int"));
+      equip.jump_$eq((short) resultSet.getInt("jump"));
+      equip.vicious_$eq((short) resultSet.getInt("vicious"));
+      ItemProcessor.getInstance().setFlag(equip, (short) resultSet.getInt("flag"));
+      equip.luk_$eq((short) resultSet.getInt("luk"));
+      equip.matk_$eq((short) resultSet.getInt("matk"));
+      equip.mdef_$eq((short) resultSet.getInt("mdef"));
+      equip.mp_$eq((short) resultSet.getInt("mp"));
+      equip.speed_$eq((short) resultSet.getInt("speed"));
+      equip.str_$eq((short) resultSet.getInt("str"));
+      equip.watk_$eq((short) resultSet.getInt("watk"));
+      equip.wdef_$eq((short) resultSet.getInt("wdef"));
+      equip.slots_$eq((byte) resultSet.getInt("upgradeslots"));
+      equip.level_$eq(resultSet.getByte("level"));
+      equip.itemExp_$eq(resultSet.getInt("itemexp"));
+      equip.itemLevel_$eq(resultSet.getByte("itemlevel"));
+      equip.expiration_(resultSet.getLong("expiration"));
+      equip.giftFrom_$eq(resultSet.getString("giftFrom"));
+      equip.ringId_$eq(resultSet.getInt("ringid"));
       return equip;
    }
 }

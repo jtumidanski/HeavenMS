@@ -38,8 +38,8 @@ public class MapleInventoryProof extends MapleInventory {
          this.setSlotLimit(inv.getSlotLimit());
 
          for (Item it : inv.list()) {
-            Item item = new Item(it.getItemId(), it.getPosition(), it.getQuantity());
-            inventory.put(item.getPosition(), item);
+            Item item = new Item(it.id(), it.position(), it.quantity());
+            inventory.put(item.position(), item);
          }
       } finally {
          lock.unlock();

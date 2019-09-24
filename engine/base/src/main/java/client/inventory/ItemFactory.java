@@ -28,8 +28,8 @@ import java.util.stream.Collectors;
 
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
-import client.database.provider.InventoryItemProvider;
 import client.database.administrator.InventoryMerchantAdministrator;
+import client.database.provider.InventoryItemProvider;
 import client.database.provider.InventoryMerchantProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -125,8 +125,8 @@ public enum ItemFactory {
                Item item = pair.getLeft();
                MapleInventoryType mit = pair.getRight();
                int genKey = InventoryItemAdministrator.getInstance().create(con, value, account ? -1 : id, account ? id : -1,
-                     item.getItemId(), mit.getType(), item.getPosition(), item.getQuantity(), item.getOwner(),
-                     item.getPetId(), item.getFlag(), item.getExpiration(), item.getGiftFrom());
+                     item.id(), mit.getType(), item.position(), item.quantity(), item.owner(),
+                     item.petId(), item.flag(), item.expiration(), item.giftFrom());
 
                if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
                   saveEquipItem(con, (Equip) item, genKey);
@@ -147,13 +147,13 @@ public enum ItemFactory {
             results = InventoryItemProvider.getInstance().getItemsByCharacterAndType(connection, id, value, login);
          }
          return results.stream().map(original -> {
-            short bundles = InventoryMerchantProvider.getInstance().getBundleForItem(connection, original.getLeft().getItemId());
+            short bundles = InventoryMerchantProvider.getInstance().getBundleForItem(connection, original.getLeft().id());
             MapleInventoryType inventoryType = original.getRight();
             if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
                return original;
             } else {
                if (bundles > 0) {
-                  original.getLeft().setQuantity((short) (bundles * original.getLeft().getQuantity()));
+                  original.getLeft().quantity_$eq((short) (bundles * original.getLeft().quantity()));
                   return original;
                }
             }
@@ -184,8 +184,8 @@ public enum ItemFactory {
                i++;
 
                int genKey = InventoryItemAdministrator.getInstance().create(con, value, account ? -1 : id,
-                     account ? id : -1, item.getItemId(), mit.getType(), item.getPosition(), item.getQuantity(),
-                     item.getOwner(), item.getPetId(), item.getFlag(), item.getExpiration(), item.getGiftFrom());
+                     account ? id : -1, item.id(), mit.getType(), item.position(), item.quantity(),
+                     item.owner(), item.petId(), item.flag(), item.expiration(), item.giftFrom());
                InventoryMerchantAdministrator.getInstance().create(con, genKey, id, bundles);
 
                if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
@@ -199,11 +199,11 @@ public enum ItemFactory {
    }
 
    private void saveEquipItem(Connection con, Equip item, int genKey) {
-      InventoryEquipmentAdministrator.getInstance().create(con, genKey, item.getUpgradeSlots(),
-            item.getLevel(), item.getStr(), item.getDex(), item.getInt(), item.getLuk(),
-            item.getHp(), item.getMp(), item.getWatk(), item.getMatk(), item.getWdef(),
-            item.getMdef(), item.getAcc(), item.getAvoid(), item.getHands(), item.getSpeed(),
-            item.getJump(), 0, item.getVicious(), item.getItemLevel(), item.getItemExp(),
-            item.getRingId());
+      InventoryEquipmentAdministrator.getInstance().create(con, genKey, item.slots(),
+            item.level(), item.str(), item.dex(), item._int(), item.luk(),
+            item.hp(), item.mp(), item.watk(), item.matk(), item.wdef(),
+            item.mdef(), item.acc(), item.avoid(), item.hands(), item.speed(),
+            item.jump(), 0, item.vicious(), item.itemLevel(), item.itemExp(),
+            item.ringId());
    }
 }

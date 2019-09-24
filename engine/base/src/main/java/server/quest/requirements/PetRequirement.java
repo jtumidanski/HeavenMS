@@ -57,7 +57,7 @@ public class PetRequirement extends MapleQuestRequirement {
       for (MaplePet pet : chr.getPets()) {
          if (pet == null) continue;   // thanks Arufonsu for showing a NPE occurring here
 
-         if (petIDs.contains(pet.getItemId()))
+         if (petIDs.contains(pet.id()))
             return true;
       }
 

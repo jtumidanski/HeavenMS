@@ -36,18 +36,20 @@ import client.creator.veteran.PirateCreator;
 import client.creator.veteran.ThiefCreator;
 import client.creator.veteran.WarriorCreator;
 import client.inventory.Equip;
-import client.inventory.Equip.ScrollResult;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
+import client.inventory.ScrollResult;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.AssignAPProcessor;
 import client.processor.AssignSPProcessor;
 import client.processor.DueyProcessor;
+import client.processor.ItemProcessor;
 import client.processor.NoteProcessor;
+import client.processor.PetProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
@@ -64,21 +66,21 @@ import net.server.channel.packet.cash.use.UseDueyPacket;
 import net.server.channel.packet.cash.use.UseExtendExpirationPacket;
 import net.server.channel.packet.cash.use.UseHammerPacket;
 import net.server.channel.packet.cash.use.UseIncubatorPacket;
+import net.server.channel.packet.cash.use.UseItemBagPacket;
 import net.server.channel.packet.cash.use.UseItemMegaphonePacket;
 import net.server.channel.packet.cash.use.UseItemTagPacket;
 import net.server.channel.packet.cash.use.UseJukeboxPacket;
-import net.server.channel.packet.cash.use.UseScissorsKarmaPacket;
 import net.server.channel.packet.cash.use.UseKitePacket;
 import net.server.channel.packet.cash.use.UseMapEffectPacket;
 import net.server.channel.packet.cash.use.UseMapleTvPacket;
 import net.server.channel.packet.cash.use.UseMegaphonePacket;
-import net.server.channel.packet.cash.use.UseItemBagPacket;
 import net.server.channel.packet.cash.use.UseMiuMiuPacket;
 import net.server.channel.packet.cash.use.UseNameChangePacket;
 import net.server.channel.packet.cash.use.UseNotePacket;
 import net.server.channel.packet.cash.use.UseOwlSearchPacket;
 import net.server.channel.packet.cash.use.UsePetConsumePacket;
 import net.server.channel.packet.cash.use.UsePetNameChangePacket;
+import net.server.channel.packet.cash.use.UseScissorsKarmaPacket;
 import net.server.channel.packet.cash.use.UseSealingLockPacket;
 import net.server.channel.packet.cash.use.UseSpResetPacket;
 import net.server.channel.packet.cash.use.UseSuperMegaphonePacket;
@@ -111,10 +113,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       cashInv.lockInventory();
       try {
          Item it = cashInv.getItem(position);
-         if (it == null || it.getItemId() != itemId) {
+         if (it == null || it.id() != itemId) {
             it = cashInv.findById(itemId);
             if (it != null) {
-               position = it.getPosition();
+               position = it.position();
             }
          }
       } finally {
@@ -164,7 +166,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
       MapleInventory cashInv = player.getInventory(MapleInventoryType.CASH);
       Item toUse = cashInv.getItem(position);
-      if (toUse == null || toUse.getItemId() != itemId) {
+      if (toUse == null || toUse.id() != itemId) {
          toUse = cashInv.findById(itemId);
 
          if (toUse == null) {
@@ -172,10 +174,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             return;
          }
 
-         position = toUse.getPosition();
+         position = toUse.position();
       }
 
-      if (toUse.getQuantity() < 1) {
+      if (toUse.quantity() < 1) {
          client.announce(MaplePacketCreator.enableActions());
          return;
       }
@@ -266,7 +268,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       String medal = "";
       Item medalItem = player.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -49);
       if (medalItem != null) {
-         medal = "<" + ii.getName(medalItem.getItemId()) + "> ";
+         medal = "<" + ii.getName(medalItem.id()) + "> ";
       }
       return medal;
    }
@@ -294,7 +296,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       Equip toScroll = (Equip) eitem;
-      if (toScroll.getUpgradeSlots() < 1) {
+      if (toScroll.slots() < 1) {
          c.announce(MaplePacketCreator.getInventoryFull());
          return;
       }
@@ -306,11 +308,11 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
       player.toggleBlockCashShop();
 
-      final int currentLevel = toScroll.getLevel();
+      final int currentLevel = toScroll.level();
       c.announce(MaplePacketCreator.sendVegaScroll(MaplePacketOpCodes.VegaScroll.FORTY));
 
-      final Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, uitem.getItemId(), false, itemId, player.isGM());
-      c.announce(MaplePacketCreator.sendVegaScroll(scrolled.getLevel() > currentLevel ? MaplePacketOpCodes.VegaScroll.FORTY_ONE : MaplePacketOpCodes.VegaScroll.FORTY_THREE));
+      final Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, uitem.id(), false, itemId, player.isGM());
+      c.announce(MaplePacketCreator.sendVegaScroll(scrolled.level() > currentLevel ? MaplePacketOpCodes.VegaScroll.FORTY_ONE : MaplePacketOpCodes.VegaScroll.FORTY_THREE));
 
       MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, uSlot, (short) 1, false);
       remove(c, position, itemId);
@@ -330,7 +332,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             mods.add(new ModifyInventory(0, scrolled));
             client.announce(MaplePacketCreator.modifyInventory(true, mods));
 
-            ScrollResult scrollResult = scrolled.getLevel() > currentLevel ? ScrollResult.SUCCESS : ScrollResult.FAIL;
+            ScrollResult scrollResult = scrolled.level() > currentLevel ? ScrollResult.SUCCESS : ScrollResult.FAIL;
             player.getMap().broadcastMessage(MaplePacketCreator.getScrollEffect(player.getId(), scrollResult, false, false));
             if (eSlot < 0 && (scrollResult == ScrollResult.SUCCESS)) {
                player.equipChanged();
@@ -343,21 +345,21 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
    private void hammer(MapleClient c, MapleCharacter player, short position, int itemId, short itemSlot) {
       final Equip equip = (Equip) player.getInventory(MapleInventoryType.EQUIP).getItem(itemSlot);
-      if (equip.getVicious() >= 2 || player.getInventory(MapleInventoryType.CASH).findById(5570000) == null) {
+      if (equip.vicious() >= 2 || player.getInventory(MapleInventoryType.CASH).findById(5570000) == null) {
          return;
       }
-      equip.setVicious(equip.getVicious() + 1);
-      equip.setUpgradeSlots(equip.getUpgradeSlots() + 1);
+      equip.vicious_$eq(equip.vicious() + 1);
+      equip.slots_$eq(equip.slots() + 1);
       remove(c, position, itemId);
       c.announce(MaplePacketCreator.enableActions());
-      c.announce(MaplePacketCreator.sendHammerData(equip.getVicious()));
+      c.announce(MaplePacketCreator.sendHammerData(equip.vicious()));
       player.forceUpdateItem(equip);
    }
 
    private void scissorsOfKarma(MapleClient c, MapleCharacter player, MapleItemInformationProvider ii, short position, int itemId, byte inventoryType, short slot) {
       MapleInventoryType type = MapleInventoryType.getByType(inventoryType);
       Item item = player.getInventory(type).getItem(slot);
-      if (item == null || item.getQuantity() <= 0 || MapleKarmaManipulator.hasKarmaFlag(item) || !ii.isKarmaAble(item.getItemId())) {
+      if (item == null || item.quantity() <= 0 || MapleKarmaManipulator.hasKarmaFlag(item) || !ii.isKarmaAble(item.id())) {
          c.announce(MaplePacketCreator.enableActions());
          return;
       }
@@ -472,10 +474,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       for (byte i = 0; i < 3; i++) {
          MaplePet pet = player.getPet(i);
          if (pet != null) {
-            Pair<Integer, Boolean> p = pet.canConsume(itemId);
+            Pair<Integer, Boolean> p = PetProcessor.getInstance().canConsume(pet, itemId);
 
             if (p.getRight()) {
-               pet.gainClosenessFullness(player, p.getLeft(), 100, 1);
+               PetProcessor.getInstance().gainClosenessFullness(pet, player, p.getLeft(), 100, 1);
                remove(c, position, itemId);
                break;
             }
@@ -512,10 +514,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          c.announce(MaplePacketCreator.enableActions());
          return;
       }
-      pet.setName(newName);
-      pet.saveToDb();
+      pet.name_$eq(newName);
+      PetProcessor.getInstance().saveToDb(pet);
 
-      Item item = player.getInventory(MapleInventoryType.CASH).getItem(pet.getPosition());
+      Item item = player.getInventory(MapleInventoryType.CASH).getItem(pet.position());
       if (item != null) {
          player.forceUpdateItem(item);
       }
@@ -625,7 +627,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          return;
       }
       Item eq = player.getInventory(MapleInventoryType.EQUIPPED).getItem((short) equipSlot);
-      eq.setOwner(player.getName());
+      eq.owner_$eq(player.getName());
       player.forceUpdateItem(eq);
       remove(c, position, itemId);
    }
@@ -637,12 +639,12 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       if (eq == null) { //Check if the type is EQUIPMENT?
          return;
       }
-      short flag = eq.getFlag();
+      short flag = eq.flag();
       flag |= ItemConstants.LOCK;
-      if (eq.getExpiration() > -1) {
+      if (eq.expiration() > -1) {
          return; //No perma items pls
       }
-      eq.setFlag(flag);
+      ItemProcessor.getInstance().setFlag(eq, flag);
 
       long period = 0;
       if (UseableCashItems.ItemAugmenters.ITEM_GUARD_7.is(itemId)) {
@@ -656,7 +658,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       if (period > 0) {
-         eq.setExpiration(currentServerTime() + (period * 60 * 60 * 24 * 1000));
+         eq.expiration_(currentServerTime() + (period * 60 * 60 * 24 * 1000));
       }
 
       remove(c, position, itemId);

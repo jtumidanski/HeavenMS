@@ -211,14 +211,14 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
    private void transferItem(MapleClient c, int id) {
       DatabaseConnection.getInstance().withConnection(connection -> MtsItemProvider.getInstance().getTransferItem(connection, c.getPlayer().getId(), id)
             .ifPresent(item -> {
-               item.setPosition(c.getPlayer().getInventory(ItemConstants.getInventoryType(item.getItemId())).getNextFreeSlot());
+               item.position_(c.getPlayer().getInventory(ItemConstants.getInventoryType(item.id())).getNextFreeSlot());
                MtsItemAdministrator.getInstance().deleteTransferItem(connection, id, c.getPlayer().getId());
 
                MapleInventoryManipulator.addFromDrop(c, item, false);
                c.enableCSActions();
                c.announce(getCart(c.getPlayer().getId()));
                c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
-               c.announce(MaplePacketCreator.MTSConfirmTransfer(item.getQuantity(), item.getPosition()));
+               c.announce(MaplePacketCreator.MTSConfirmTransfer(item.quantity(), item.position()));
                c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
             }));
    }
@@ -285,18 +285,18 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
             }
 
             String date = buildDate();
-            if (!i.getInventoryType().equals(MapleInventoryType.EQUIP)) {
-               MtsItemAdministrator.getInstance().createItem(connection, 1, invType.getType(), i.getItemId(),
-                     postedQuantity, i.getExpiration(), i.getGiftFrom(), c.getPlayer().getId(), price, i.getOwner(), c.getPlayer().getName(), date);
+            if (!i.inventoryType().equals(MapleInventoryType.EQUIP)) {
+               MtsItemAdministrator.getInstance().createItem(connection, 1, invType.getType(), i.id(),
+                     postedQuantity, i.expiration(), i.giftFrom(), c.getPlayer().getId(), price, i.owner(), c.getPlayer().getName(), date);
             } else {
                Equip equip = (Equip) i;
                MtsItemAdministrator.getInstance().createEquip(connection, 1, invType.getType(),
-                     equip.getItemId(), postedQuantity, equip.getExpiration(), equip.getGiftFrom(), c.getPlayer().getId(), price, equip.getUpgradeSlots(),
-                     equip.getLevel(), equip.getStr(), equip.getDex(), equip.getInt(), equip.getLuk(), equip.getHp(),
-                     equip.getMp(), equip.getWatk(), equip.getMatk(), equip.getWdef(), equip.getMdef(), equip.getAcc(),
-                     equip.getAvoid(), equip.getHands(), equip.getSpeed(), equip.getJump(), 0, equip.getOwner(),
-                     c.getPlayer().getName(), date, equip.getVicious(), equip.getFlag(), equip.getItemExp(),
-                     equip.getItemLevel(), equip.getRingId());
+                     equip.id(), postedQuantity, equip.expiration(), equip.giftFrom(), c.getPlayer().getId(), price, equip.slots(),
+                     equip.level(), equip.str(), equip.dex(), equip._int(), equip.luk(), equip.hp(),
+                     equip.mp(), equip.watk(), equip.matk(), equip.wdef(), equip.mdef(), equip.acc(),
+                     equip.avoid(), equip.hands(), equip.speed(), equip.jump(), 0, equip.owner(),
+                     c.getPlayer().getName(), date, equip.vicious(), equip.flag(), equip.itemExp(),
+                     equip.itemLevel(), equip.ringId());
             }
             MapleInventoryManipulator.removeFromSlot(c, invType, slot, postedQuantity, false);
 

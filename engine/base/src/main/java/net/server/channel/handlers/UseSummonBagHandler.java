@@ -55,7 +55,7 @@ public final class UseSummonBagHandler extends AbstractPacketHandler<UseItemPack
    public void handlePacket(UseItemPacket packet, MapleClient c) {
       //[4A 00][6C 4C F2 02][02 00][63 0B 20 00]
       Item toUse = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(packet.slot());
-      if (toUse != null && toUse.getQuantity() > 0 && toUse.getItemId() == packet.itemId()) {
+      if (toUse != null && toUse.quantity() > 0 && toUse.id() == packet.itemId()) {
          MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, packet.slot(), (short) 1, false);
          int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(packet.itemId());
          for (int[] toSpawnChild : toSpawn) {

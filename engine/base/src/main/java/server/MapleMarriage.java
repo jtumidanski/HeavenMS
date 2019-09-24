@@ -78,7 +78,7 @@ public class MapleMarriage extends EventInstanceManager {
    public static void saveGiftItemsToDb(MapleClient c, List<Item> giftItems, int cid) {
       List<Pair<Item, MapleInventoryType>> items = new LinkedList<>();
       for (Item it : giftItems) {
-         items.add(new Pair<>(it, it.getInventoryType()));
+         items.add(new Pair<>(it, it.inventoryType()));
       }
 
       if (c.tryAcquireClient()) {

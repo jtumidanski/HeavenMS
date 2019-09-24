@@ -124,7 +124,7 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
 
          int maxBaseDmg;  // thanks Conrad, Atoot for detecting some summons legitimately hitting over the calculated limit
          if (weapon_item != null) {
-            maxBaseDmg = player.calculateMaxBaseDamage(watk, MapleItemInformationProvider.getInstance().getWeaponType(weapon_item.getItemId()));
+            maxBaseDmg = player.calculateMaxBaseDamage(watk, MapleItemInformationProvider.getInstance().getWeaponType(weapon_item.id()));
          } else {
             maxBaseDmg = player.calculateMaxBaseDamage(watk, MapleWeaponType.SWORD1H);
          }

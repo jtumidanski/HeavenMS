@@ -49,9 +49,9 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
          while (!toUseList.isEmpty()) {
             Item it = toUseList.remove(0);
 
-            if (it.getQuantity() > 0) {
+            if (it.quantity() > 0) {
                toUse = it;
-               slot = it.getPosition();
+               slot = it.position();
 
                return true;
             }
@@ -82,7 +82,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
          try {
             toUse = useInv.getItem(slot);
             if (toUse != null) {
-               if (toUse.getItemId() != itemId) {
+               if (toUse.id() != itemId) {
                   c.announce(MaplePacketCreator.enableActions());
                   return;
                }
@@ -90,14 +90,14 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
                toUseList = null;
 
                // from now on, toUse becomes the "cursor" for the current pot being used
-               if (toUse.getQuantity() <= 0) {
+               if (toUse.quantity() <= 0) {
                   if (!cursorOnNextAvailablePot(chr)) {
                      c.announce(MaplePacketCreator.enableActions());
                      return;
                   }
                }
 
-               stat = MapleItemInformationProvider.getInstance().getItemEffect(toUse.getItemId());
+               stat = MapleItemInformationProvider.getInstance().getItemEffect(toUse.id());
                hasHpGain = stat.getHp() > 0 || stat.getHpRate() > 0.0;
                hasMpGain = stat.getMp() > 0 || stat.getMpRate() > 0.0;
 
@@ -130,7 +130,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
                }
 
                while (true) {
-                  short qtyToUse = (short) Math.min(qtyCount, toUse.getQuantity());
+                  short qtyToUse = (short) Math.min(qtyCount, toUse.quantity());
                   MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, qtyToUse, false);
 
                   curHp += (incHp * qtyToUse);
@@ -139,7 +139,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
                   useCount += qtyToUse;
                   qtyCount -= qtyToUse;
 
-                  if (toUse.getQuantity() == 0 && qtyCount > 0) {
+                  if (toUse.quantity() == 0 && qtyCount > 0) {
                      // depleted out the current slot, fetch for more
 
                      if (!cursorOnNextAvailablePot(chr)) {

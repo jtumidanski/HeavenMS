@@ -39,7 +39,7 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
             MapleInventory inv = client.getPlayer().getInventory(MapleInventoryType.getByType(packet.inventoryType()));
             inv.lockInventory();
             try {
-               consId = inv.getItem(packet.slot()).getItemId();
+               consId = inv.getItem(packet.slot()).id();
                if (!consumables.containsKey(consId) || !client.getPlayer().haveItem(consId)) {
                   return;
                }

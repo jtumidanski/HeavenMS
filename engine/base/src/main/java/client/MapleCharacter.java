@@ -82,10 +82,8 @@ import client.database.provider.NameChangeProvider;
 import client.database.provider.NoteProvider;
 import client.database.provider.WorldTransferProvider;
 import client.inventory.Equip;
-import client.inventory.Equip.StatUpgrade;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
-import client.inventory.ItemProcessor;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryProof;
 import client.inventory.MapleInventoryType;
@@ -93,15 +91,18 @@ import client.inventory.MaplePet;
 import client.inventory.MapleWeaponType;
 import client.inventory.ModifyInventory;
 import client.inventory.PetDataFactory;
+import client.inventory.StatUpgrade;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.newyear.NewYearCardRecord;
 import client.processor.BuffStatProcessor;
 import client.processor.ChairProcessor;
 import client.processor.CharacterProcessor;
+import client.processor.ItemProcessor;
 import client.processor.MapleFamilyProcessor;
 import client.processor.MapleJobProcessor;
 import client.processor.PartyProcessor;
 import client.processor.PetAutopotProcessor;
+import client.processor.PetProcessor;
 import client.processor.SkillProcessor;
 import constants.ExpTable;
 import constants.GameConstants;
@@ -839,7 +840,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       int maxbasedamage;
       Item weapon_item = getInventory(MapleInventoryType.EQUIPPED).getItem((short) -11);
       if (weapon_item != null) {
-         maxbasedamage = calculateMaxBaseDamage(watk, ii.getWeaponType(weapon_item.getItemId()));
+         maxbasedamage = calculateMaxBaseDamage(watk, ii.getWeaponType(weapon_item.id()));
       } else {
          if (job.isA(MapleJob.PIRATE) || job.isA(MapleJob.THUNDERBREAKER1)) {
             double weapMulti = 3;
@@ -927,7 +928,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       String medal = "";
       final Item medalItem = getInventory(MapleInventoryType.EQUIPPED).getItem((short) -49);
       if (medalItem != null) {
-         medal = "<" + ii.getName(medalItem.getItemId()) + "> ";
+         medal = "<" + ii.getName(medalItem.id()) + "> ";
       }
       return medal;
    }
@@ -1008,8 +1009,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          try {
             for (Item item : new ArrayList<>(inv.list())) {
                if (MapleInventoryManipulator.isSandboxItem(item)) {
-                  MapleInventoryManipulator.removeFromSlot(client, invType, item.getPosition(), item.getQuantity(), false);
-                  MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "[" + ii.getName(item.getItemId()) + "] has passed its trial conditions and will be removed from your inventory.");
+                  MapleInventoryManipulator.removeFromSlot(client, invType, item.position(), item.quantity(), false);
+                  MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "[" + ii.getName(item.id()) + "] has passed its trial conditions and will be removed from your inventory.");
                }
             }
          } finally {
@@ -1349,7 +1350,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void changeMapBanish(int mapid, String portal, String msg) {
       if (ServerConstants.USE_SPIKES_AVOID_BANISH) {
          for (Item it : this.getInventory(MapleInventoryType.EQUIPPED).list()) {
-            if ((it.getFlag() & ItemConstants.SPIKES) == ItemConstants.SPIKES) {
+            if ((it.flag() & ItemConstants.SPIKES) == ItemConstants.SPIKES) {
                return;
             }
          }
@@ -1480,7 +1481,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       for (Item it : this.getInventory(MapleInventoryType.EQUIPPED).list()) {
-         if ((it.getFlag() & ItemConstants.COLD) == ItemConstants.COLD && ((returnMapid == 211000000 && thisMapid != 200082300) || returnMapid == 193000000)) {
+         if ((it.flag() & ItemConstants.COLD) == ItemConstants.COLD && ((returnMapid == 211000000 && thisMapid != 200082300) || returnMapid == 193000000)) {
             return true;        //protection from cold
          }
       }
@@ -1926,7 +1927,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
             Item mItem = mapitem.getItem();
             boolean hasSpaceInventory;
-            if (mapitem.getItemId() == 4031865 || mapitem.getItemId() == 4031866 || mapitem.getMeso() > 0 || ii.isConsumeOnPickup(mapitem.getItemId()) || (hasSpaceInventory = MapleInventoryManipulator.checkSpace(client, mapitem.getItemId(), mItem.getQuantity(), mItem.getOwner()))) {
+            if (mapitem.getItemId() == 4031865 || mapitem.getItemId() == 4031866 || mapitem.getMeso() > 0 || ii.isConsumeOnPickup(mapitem.getItemId()) || (hasSpaceInventory = MapleInventoryManipulator.checkSpace(client, mapitem.getItemId(), mItem.quantity(), mItem.owner()))) {
                int mapId = this.getMapId();
 
                if ((mapId > 209000000 && mapId < 209000016) || (mapId >= 990000500 && mapId <= 990000502)) {//happyville trees and guild PQ
@@ -1984,8 +1985,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                   } else {
                      this.gainMeso(mapitem.getMeso(), true, true, false);
                   }
-               } else if (mItem.getItemId() / 10000 == 243) {
-                  ScriptedItem info = ii.getScriptedItemInfo(mItem.getItemId());
+               } else if (mItem.id() / 10000 == 243) {
+                  ScriptedItem info = ii.getScriptedItemInfo(mItem.id());
                   if (info != null && info.runOnPickup()) {
                      itemScript = info;
                   } else {
@@ -2000,9 +2001,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                   this.getCashShop().gainCash(1, nxGain);
 
                   showHint("You have earned #e#b" + nxGain + " NX#k#n. (" + this.getCashShop().getCash(1) + " NX)", 300);
-               } else if (applyConsumeOnPickup(mItem.getItemId())) {
+               } else if (applyConsumeOnPickup(mItem.id())) {
                } else if (MapleInventoryManipulator.addFromDrop(client, mItem, true)) {
-                  if (mItem.getItemId() == 4031868) {
+                  if (mItem.id() == 4031868) {
                      updateAriantScore();
                   }
                } else {
@@ -2554,27 +2555,27 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          List<Item> toberemove = new ArrayList<>();
          for (MapleInventory inv : inventory) {
             for (Item item : inv.list()) {
-               expiration = item.getExpiration();
+               expiration = item.expiration();
 
-               if (expiration != -1 && (expiration < currenttime) && ((item.getFlag() & ItemConstants.LOCK) == ItemConstants.LOCK)) {
-                  short lock = item.getFlag();
+               if (expiration != -1 && (expiration < currenttime) && ((item.flag() & ItemConstants.LOCK) == ItemConstants.LOCK)) {
+                  short lock = item.flag();
                   lock &= ~(ItemConstants.LOCK);
-                  item.setFlag(lock); //Probably need a check, else people can make expiring items into permanent items...
-                  item.setExpiration(-1);
+                  ItemProcessor.getInstance().setFlag(item, lock); //Probably need a check, else people can make expiring items into permanent items...
+                  item.expiration_(-1);
                   forceUpdateItem(item);   //TEST :3
                } else if (expiration != -1 && expiration < currenttime) {
-                  if (!ItemConstants.isPet(item.getItemId())) {
-                     client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
+                  if (!ItemConstants.isPet(item.id())) {
+                     client.announce(MaplePacketCreator.itemExpired(item.id()));
                      toberemove.add(item);
-                     if (ItemConstants.isRateCoupon(item.getItemId())) {
+                     if (ItemConstants.isRateCoupon(item.id())) {
                         deletedCoupon = true;
                      }
                   } else {
-                     if (ItemConstants.isExpirablePet(item.getItemId())) {
-                        client.announce(MaplePacketCreator.itemExpired(item.getItemId()));
+                     if (ItemConstants.isExpirablePet(item.id())) {
+                        client.announce(MaplePacketCreator.itemExpired(item.id()));
                         toberemove.add(item);
                      } else {
-                        item.setExpiration(-1);
+                        item.expiration_(-1);
                         forceUpdateItem(item);
                      }
                   }
@@ -2583,13 +2584,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
             if (!toberemove.isEmpty()) {
                for (Item item : toberemove) {
-                  MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.getPosition(), item.getQuantity(), true);
+                  MapleInventoryManipulator.removeFromSlot(client, inv.getType(), item.position(), item.quantity(), true);
                }
 
                MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
                for (Item item : toberemove) {
                   List<Integer> toadd = new ArrayList<>();
-                  Pair<Integer, String> replace = ii.getReplaceOnExpire(item.getItemId());
+                  Pair<Integer, String> replace = ii.getReplaceOnExpire(item.id());
                   if (replace.left > 0) {
                      toadd.add(replace.left);
                      if (!replace.right.isEmpty()) {
@@ -4856,7 +4857,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          for (MaplePlayerShopItem shopItem : mps.getItems()) {
             if (shopItem.getBundles() >= 2) {
                Item iItem = shopItem.getItem().copy();
-               iItem.setQuantity((short) (shopItem.getBundles() * iItem.getQuantity()));
+               iItem.quantity_$eq((short) (shopItem.getBundles() * iItem.quantity()));
                MapleInventoryManipulator.addFromDrop(this.getClient(), iItem, false);
             } else if (shopItem.isExist()) {
                MapleInventoryManipulator.addFromDrop(this.getClient(), shopItem.getItem(), true);
@@ -4943,7 +4944,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       try {
          for (byte i = 0; i < 3; i++) {
             if (pets[i] != null) {
-               if (pets[i].getUniqueId() == petId) {
+               if (pets[i].uniqueId() == petId) {
                   return i;
                }
             }
@@ -4959,7 +4960,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       try {
          for (byte i = 0; i < 3; i++) {
             if (pets[i] != null) {
-               if (pets[i].getUniqueId() == pet.getUniqueId()) {
+               if (pets[i].uniqueId() == pet.uniqueId()) {
                   return i;
                }
             }
@@ -6123,14 +6124,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       List<Integer> active = Server.getInstance().getActiveCoupons();
 
       for (Item it : cashItems) {
-         if (ItemConstants.isRateCoupon(it.getItemId()) && active.contains(it.getItemId())) {
-            Integer count = activeCoupons.get(it.getItemId());
+         if (ItemConstants.isRateCoupon(it.id()) && active.contains(it.id())) {
+            Integer count = activeCoupons.get(it.id());
 
             if (count != null) {
-               activeCoupons.put(it.getItemId(), count + 1);
+               activeCoupons.put(it.id(), count + 1);
             } else {
-               activeCoupons.put(it.getItemId(), 1);
-               activeCouponRates.put(it.getItemId(), coupons.get(it.getItemId()));
+               activeCoupons.put(it.id(), 1);
+               activeCouponRates.put(it.id(), coupons.get(it.id()));
             }
          }
       }
@@ -6415,14 +6416,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          for (Item item : getInventory(MapleInventoryType.EQUIPPED)) {
             Equip equip = (Equip) item;
-            equipmaxhp += equip.getHp();
-            equipmaxmp += equip.getMp();
-            equipdex += equip.getDex();
-            equipint_ += equip.getInt();
-            equipstr += equip.getStr();
-            equipluk += equip.getLuk();
-            equipmagic += equip.getMatk() + equip.getInt();
-            equipwatk += equip.getWatk();
+            equipmaxhp += equip.hp();
+            equipmaxmp += equip.mp();
+            equipdex += equip.dex();
+            equipint_ += equip._int();
+            equipstr += equip.str();
+            equipluk += equip.luk();
+            equipmagic += equip.matk() + equip._int();
+            equipwatk += equip.watk();
             //equipspeed += equip.getSpeed();
             //equipjump += equip.getJump();
          }
@@ -6528,7 +6529,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (job.isA(MapleJob.THIEF) || job.isA(MapleJob.BOWMAN) || job.isA(MapleJob.PIRATE) || job.isA(MapleJob.NIGHTWALKER1) || job.isA(MapleJob.WINDARCHER1)) {
             Item weapon_item = getInventory(MapleInventoryType.EQUIPPED).getItem((short) -11);
             if (weapon_item != null) {
-               MapleWeaponType weapon = ii.getWeaponType(weapon_item.getItemId());
+               MapleWeaponType weapon = ii.getWeaponType(weapon_item.id());
                boolean bow = weapon == MapleWeaponType.BOW;
                boolean crossbow = weapon == MapleWeaponType.CROSSBOW;
                boolean claw = weapon == MapleWeaponType.CLAW;
@@ -6539,10 +6540,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                   for (short i = 1; i <= inv.getSlotLimit(); i++) {
                      Item item = inv.getItem(i);
                      if (item != null) {
-                        if ((claw && ItemConstants.isThrowingStar(item.getItemId())) || (gun && ItemConstants.isBullet(item.getItemId())) || (bow && ItemConstants.isArrowForBow(item.getItemId())) || (crossbow && ItemConstants.isArrowForCrossBow(item.getItemId()))) {
-                           if (item.getQuantity() > 0) {
+                        if ((claw && ItemConstants.isThrowingStar(item.id())) || (gun && ItemConstants.isBullet(item.id())) || (bow && ItemConstants.isArrowForBow(item.id())) || (crossbow && ItemConstants.isArrowForCrossBow(item.id()))) {
+                           if (item.quantity() > 0) {
                               // Finally there!
-                              localwatk += ii.getWatkForProjectile(item.getItemId());
+                              localwatk += ii.getWatkForProjectile(item.id());
                               break;
                            }
                         }
@@ -6676,7 +6677,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int slot = -1;
          for (int i = 0; i < 3; i++) {
             if (pets[i] != null) {
-               if (pets[i].getUniqueId() == pet.getUniqueId()) {
+               if (pets[i].uniqueId() == pet.uniqueId()) {
                   pets[i] = null;
                   slot = i;
                   break;
@@ -6942,7 +6943,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       } finally {
          petLock.unlock();
       }
-      petList.forEach(MaplePet::saveToDb);
+      petList.forEach(pet -> PetProcessor.getInstance().saveToDb(pet));
    }
 
    private void updateCharacter(Connection con) {
@@ -7213,7 +7214,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             int autohpItemid = autohpPot.action();
             Item autohpItem = this.getInventory(MapleInventoryType.USE).findById(autohpItemid);
             if (autohpItem != null) {
-               PetAutopotProcessor.getInstance().runAutopotAction(client, autohpItem.getPosition(), autohpItemid);
+               PetAutopotProcessor.getInstance().runAutopotAction(client, autohpItem.position(), autohpItemid);
             }
          }
       }
@@ -7224,7 +7225,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             int autompItemid = autompPot.action();
             Item autompItem = this.getInventory(MapleInventoryType.USE).findById(autompItemid);
             if (autompItem != null) {
-               PetAutopotProcessor.getInstance().runAutopotAction(client, autompItem.getPosition(), autompItemid);
+               PetAutopotProcessor.getInstance().runAutopotAction(client, autompItem.position(), autompItemid);
             }
          }
       }
@@ -7312,7 +7313,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             return (-1);
          }
 
-         return (sellAllItemsFromPosition(ii, type, it.getPosition()));
+         return (sellAllItemsFromPosition(ii, type, it.position()));
       } finally {
          inv.unlockInventory();
       }
@@ -7328,7 +7329,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             if (inv.getItem(i) == null) {
                continue;
             }
-            mesoGain += standaloneSell(getClient(), ii, type, i, inv.getItem(i).getQuantity());
+            mesoGain += standaloneSell(getClient(), ii, type, i, inv.getItem(i).quantity());
          }
       } finally {
          inv.unlockInventory();
@@ -7350,9 +7351,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             return (0);
          }
 
-         int itemid = item.getItemId();
+         int itemid = item.id();
          if (ItemConstants.isRechargeable(itemid)) {
-            quantity = item.getQuantity();
+            quantity = item.quantity();
          } else if (ItemConstants.isWeddingToken(itemid) || ItemConstants.isWeddingRing(itemid)) {
             return (0);
          }
@@ -7360,7 +7361,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (quantity < 0) {
             return (0);
          }
-         short iQuant = item.getQuantity();
+         short iQuant = item.quantity();
          if (iQuant == 0xFFFF) {
             iQuant = 1;
          }
@@ -7384,7 +7385,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       List<Equip> list = new LinkedList<>();
 
       for (Item item : getInventory(MapleInventoryType.EQUIPPED)) {
-         if (ii.isUpgradeable(item.getItemId())) {
+         if (ii.isUpgradeable(item.id())) {
             list.add((Equip) item);
          }
       }
@@ -7404,7 +7405,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          Map<StatUpgrade, Float> statups = new LinkedHashMap<>();
-         mergeAllItemsFromPosition(statups, it.getPosition());
+         mergeAllItemsFromPosition(statups, it.position());
 
          List<Pair<Equip, Map<StatUpgrade, Short>>> upgradeableEquipped = new LinkedList<>();
          Map<Equip, List<Pair<StatUpgrade, Integer>>> equipUpgrades = new LinkedHashMap<>();
@@ -7453,7 +7454,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                Equip eqp = eqpUpg.getKey();
                ItemProcessor.getInstance().setMergeFlag(eqp);
 
-               String showStr = " '" + MapleItemInformationProvider.getInstance().getName(eqp.getItemId()) + "': ";
+               String showStr = " '" + MapleItemInformationProvider.getInstance().getName(eqp.id()) + "': ";
                String upgdStr = eqp.gainStats(eqpStatups).getLeft();
 
                this.forceUpdateItem(eqp);
@@ -7483,7 +7484,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private void standaloneMerge(Map<StatUpgrade, Float> statups, MapleClient c, MapleInventoryType type, short slot, Item item) {
       short quantity;
-      if (item == null || (quantity = item.getQuantity()) < 1 || ii.isCash(item.getItemId()) || !ii.isUpgradeable(item.getItemId()) || ItemProcessor.getInstance().hasMergeFlag(item)) {
+      if (item == null || (quantity = item.quantity()) < 1 || ii.isCash(item.id()) || !ii.isUpgradeable(item.id()) || ItemProcessor.getInstance().hasMergeFlag(item)) {
          return;
       }
 
@@ -7559,7 +7560,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          String medal = "";
          Item medalItem = mapOwner.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -49);
          if (medalItem != null) {
-            medal = "<" + ii.getName(medalItem.getItemId()) + "> ";
+            medal = "<" + ii.getName(medalItem.id()) + "> ";
          }
 
          List<String> strLines = new LinkedList<>();
@@ -7616,16 +7617,16 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return;
       }
 
-      int newFullness = pet.getFullness() - PetDataFactory.getHunger(pet.getItemId());
+      int newFullness = pet.fullness() - PetDataFactory.getHunger(pet.id());
       if (newFullness <= 5) {
-         pet.setFullness(15);
-         pet.saveToDb();
+         pet.fullness_$eq(15);
+         PetProcessor.getInstance().saveToDb(pet);
          unequipPet(pet, true);
          MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your pet grew hungry! Treat it some pet food to keep it healthy!");
       } else {
-         pet.setFullness(newFullness);
-         pet.saveToDb();
-         Item petz = getInventory(MapleInventoryType.CASH).getItem(pet.getPosition());
+         pet.fullness_$eq(newFullness);
+         PetProcessor.getInstance().saveToDb(pet);
+         Item petz = getInventory(MapleInventoryType.CASH).getItem(pet.position());
          if (petz != null) {
             forceUpdateItem(petz);
          }
@@ -7667,8 +7668,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       MaplePet chrPet = this.getPet(petIdx);
 
       if (chrPet != null) {
-         chrPet.setSummoned(false);
-         chrPet.saveToDb();
+         chrPet.summoned_$eq(false);
+         PetProcessor.getInstance().saveToDb(chrPet);
       }
 
       this.getClient().getWorldServer().unregisterPetHunger(this, petIdx);
@@ -8103,7 +8104,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void equippedItem(Equip equip) {
-      int itemid = equip.getItemId();
+      int itemid = equip.id();
 
       if (itemid == 1122017) {
          this.equipPendantOfSpirit();
@@ -8117,7 +8118,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void unequippedItem(Equip equip) {
-      int itemid = equip.getItemId();
+      int itemid = equip.id();
 
       if (itemid == 1122017) {
          this.unequipPendantOfSpirit();
@@ -8164,15 +8165,15 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return fullList;
       }
       return fullList.stream()
-            .filter(item -> !ii.isCash(item.getItemId()))
+            .filter(item -> !ii.isCash(item.id()))
             .collect(Collectors.toCollection(LinkedHashSet::new));
    }
 
    public void increaseEquipExp(int expGain) {
       getUpgradeableEquipList().stream()
             .map(item -> (Equip) item)
-            .filter(equip -> ii.getName(equip.getItemId()) != null)
-            .forEach(equip -> equip.gainItemExp(client, expGain));
+            .filter(equip -> ii.getName(equip.id()) != null)
+            .forEach(equip -> ItemProcessor.getInstance().gainItemExp(equip, client, expGain));
    }
 
    public void showAllEquipFeatures() {
@@ -8180,8 +8181,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       getInventory(MapleInventoryType.EQUIPPED).list().stream()
             .map(item -> (Equip) item)
-            .filter(equip -> ii.getName(equip.getItemId()) != null)
-            .forEach(equip -> showMsg.append(equip.showEquipFeatures(client)));
+            .filter(equip -> ii.getName(equip.id()) != null)
+            .forEach(equip -> showMsg.append(ItemProcessor.getInstance().showEquipFeatures(equip)));
 
       if (showMsg.length() > 0) {
          this.showHint("#ePLAYER EQUIPMENTS:#n\r\n\r\n" + showMsg, 400);
