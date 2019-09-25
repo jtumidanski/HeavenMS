@@ -3,6 +3,7 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import tools.MaplePacketCreator
+import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -42,7 +43,7 @@ class NPC2012032 {
          }
 
          if (status == 0) {
-            cm.getMap().broadcastMessage(MaplePacketCreator.playSound("orbis/" + harpSounds[cm.getNpc() - 2012027]))
+            MasterBroadcaster.getInstance().sendToAllInMap(cm.getMap(), { character -> MaplePacketCreator.playSound("orbis/" + harpSounds[cm.getNpc() - 2012027]) })
 
             if (cm.isQuestStarted(3114)) {
                int idx = cm.getQuestProgress(3114, 7777)

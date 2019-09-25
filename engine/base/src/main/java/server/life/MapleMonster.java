@@ -75,6 +75,7 @@ import server.maps.MapleMapObjectType;
 import server.maps.MapleSummon;
 import tools.IntervalBuilder;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
@@ -532,7 +533,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       setMp(mp2Heal);
 
       if (hp > 0) {
-         getMap().broadcastMessage(MaplePacketCreator.healMonster(getObjectId(), hp, getHp(), getMaxHp()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.healMonster(getObjectId(), hp, getHp(), getMaxHp()));
       }
 
       maxHpPlusHeal.addAndGet(hpHealed);
@@ -784,8 +785,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       if (toSpawn != null) {
          final MapleMap reviveMap = map;
          if (toSpawn.contains(9300216) && reviveMap.getId() > 925000000 && reviveMap.getId() < 926000000) {
-            reviveMap.broadcastMessage(MaplePacketCreator.playSound("Dojang/clear"));
-            reviveMap.broadcastMessage(MaplePacketCreator.showEffect("dojang/end/clear"));
+            MasterBroadcaster.getInstance().sendToAllInMap(reviveMap, character -> MaplePacketCreator.playSound("Dojang/clear"));
+            MasterBroadcaster.getInstance().sendToAllInMap(reviveMap, character -> MaplePacketCreator.showEffect("dojang/end/clear"));
          }
          Pair<Integer, String> timeMob = reviveMap.getTimeMob();
          if (timeMob != null) {
@@ -1137,7 +1138,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private void broadcastMonsterStatusMessage(byte[] packet) {
-      map.broadcastMessage(packet, getPosition());
+      MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> packet, getPosition());
 
       MapleCharacter chrController = getActiveController();
       if (chrController != null && !chrController.isMapObjectVisible(MapleMonster.this)) {
@@ -1386,7 +1387,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
       setPosition(newPoint);
 
-      map.broadcastMessage(MaplePacketCreator.moveMonster(this.getObjectId(), false, -1, 0, 0, 0, getPosition(), getIdleMovementBytes()));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.moveMonster(this.getObjectId(), false, -1, 0, 0, 0, getPosition(), getIdleMovementBytes()));
       map.moveMonster(this, this.getPosition());
 
       aggroUpdateController();
@@ -2252,11 +2253,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                unlockMonster();
             }
 
+            int finalDamage = damage;
             if (type == 1) {
-               map.broadcastMessage(MaplePacketCreator.damageMonster(getObjectId(), damage), getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(getObjectId(), finalDamage), getPosition());
             } else if (type == 2) {
                if (damage < dealDamage) {    // ninja ambush (type 2) is already displaying DOT to the caster
-                  map.broadcastMessage(MaplePacketCreator.damageMonster(getObjectId(), damage), getPosition());
+                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(getObjectId(), finalDamage), getPosition());
                }
             }
          }

@@ -468,24 +468,6 @@ public class MapleFamilyEntry {
       return result;
    }
 
-   @Deprecated
-   public void announceToSenior(byte[] packet, boolean includeSuperSenior) {
-      MapleFamilyEntry senior = getSenior();
-      if (senior != null) {
-         MapleCharacter seniorChr = senior.getChr();
-         if (seniorChr != null) {
-            seniorChr.announce(packet);
-         }
-         senior = senior.getSenior();
-         if (includeSuperSenior && senior != null) {
-            seniorChr = senior.getChr();
-            if (seniorChr != null) {
-               seniorChr.announce(packet);
-            }
-         }
-      }
-   }
-
    public void updateSeniorFamilyInfo(boolean includeSuperSenior) {
       MapleFamilyEntry senior = getSenior();
       if (senior != null) {

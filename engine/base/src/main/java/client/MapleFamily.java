@@ -125,22 +125,6 @@ public class MapleFamily {
       return members.get(cid);
    }
 
-   public void broadcast(byte[] packet) {
-      broadcast(packet, -1);
-   }
-
-   public void broadcast(byte[] packet, int ignoreID) {
-      for (MapleFamilyEntry entry : members.values()) {
-         MapleCharacter chr = entry.getChr();
-         if (chr != null) {
-            if (chr.getId() == ignoreID) {
-               continue;
-            }
-            chr.getClient().announce(packet);
-         }
-      }
-   }
-
    public void resetDailyReps() {
       for (MapleFamilyEntry entry : members.values()) {
          entry.setTodaysRep(0);

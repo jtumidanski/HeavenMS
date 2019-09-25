@@ -56,6 +56,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Randomizer;
 
 public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePacket> {
@@ -183,9 +184,10 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                            bouncedamage = attacker.getMaxHp() / 5;
                         }
                         map.damageMonster(chr, attacker, bouncedamage);
-                        map.broadcastMessage(chr, MaplePacketCreator.damageMonster(oid, bouncedamage), true);
+                        int finalBouncedamage = bouncedamage;
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(oid, finalBouncedamage), true, chr);
                         chr.getClient().announce(MaplePacketCreator.showOwnBuffEffect(id, 5));
-                        map.broadcastMessage(chr, MaplePacketCreator.showBuffeffect(chr.getId(), id, 5), false);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showBuffeffect(chr.getId(), id, 5), false, chr);
                      }
                   }
                }
@@ -217,7 +219,8 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   bouncedamage = Math.min(bouncedamage, attacker.getMaxHp() / 10);
                   damage -= bouncedamage;
                   map.damageMonster(chr, attacker, bouncedamage);
-                  map.broadcastMessage(chr, MaplePacketCreator.damageMonster(oid, bouncedamage), false, true);
+                  int finalBouncedamage = bouncedamage;
+                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(oid, finalBouncedamage), false, chr, true);
                   attacker.aggroMonsterDamage(chr, bouncedamage);
                }
                MapleStatEffect bPressure = chr.getBuffEffect(MapleBuffStat.COMBO_BARRIER);
@@ -286,7 +289,9 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          }
       }
       if (!chr.isHidden()) {
-         map.broadcastMessage(chr, MaplePacketCreator.damagePlayer(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
+         int finalDamage = damage;
+         int finalFake = fake;
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damagePlayer(damagefrom, monsteridfrom, chr.getId(), finalDamage, finalFake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
       } else {
          map.broadcastGMMessage(chr, MaplePacketCreator.damagePlayer(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
       }

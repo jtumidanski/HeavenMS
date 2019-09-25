@@ -26,6 +26,7 @@ package client.command.commands.gm2;
 import client.MapleClient;
 import client.command.Command;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public class UnBugCommand extends Command {
    {
@@ -34,6 +35,6 @@ public class UnBugCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      c.getPlayer().getMap().broadcastMessage(MaplePacketCreator.enableActions());
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), character -> MaplePacketCreator.enableActions());
    }
 }

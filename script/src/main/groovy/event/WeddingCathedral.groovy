@@ -8,6 +8,7 @@ import scripting.event.EventManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
+import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 import tools.packets.Wedding
@@ -136,9 +137,9 @@ class EventWeddingCathedral {
    static def sendWeddingAction(EventInstanceManager eim, type) {
       MapleCharacter chr = eim.getLeader()
       if (chr.getGender() == 0) {
-         chr.getMap().broadcastMessage(Wedding.OnWeddingProgress(type == 2, eim.getIntProperty("groomId"), eim.getIntProperty("brideId"), (byte) (type + 1)))
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), { character -> Wedding.OnWeddingProgress(type == 2, eim.getIntProperty("groomId"), eim.getIntProperty("brideId"), (byte) (type + 1)) })
       } else {
-         chr.getMap().broadcastMessage(Wedding.OnWeddingProgress(type == 2, eim.getIntProperty("brideId"), eim.getIntProperty("groomId"), (byte) (type + 1)))
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), { character -> Wedding.OnWeddingProgress(type == 2, eim.getIntProperty("brideId"), eim.getIntProperty("groomId"), (byte) (type + 1)) })
       }
    }
 
@@ -147,12 +148,12 @@ class EventWeddingCathedral {
    }
 
    def showStartMsg(EventInstanceManager eim) {
-      eim.getMapInstance(entryMap + 10).broadcastMessage(Wedding.OnWeddingProgress(false, 0, 0, (byte) 0))
+      MasterBroadcaster.getInstance().sendToAllInMap(eim.getMapInstance(entryMap + 10), { character -> Wedding.OnWeddingProgress(false, 0, 0, (byte) 0) })
       eim.schedule("hidePriestMsg", forceHideMsgTime * 1000)
    }
 
    def showBlessMsg(EventInstanceManager eim) {
-      eim.getMapInstance(entryMap + 10).broadcastMessage(Wedding.OnWeddingProgress(false, 0, 0, (byte) 1))
+      MasterBroadcaster.getInstance().sendToAllInMap(eim.getMapInstance(entryMap + 10), { character -> Wedding.OnWeddingProgress(false, 0, 0, (byte) 1) })
       eim.setIntProperty("guestBlessings", 1)
       eim.schedule("hidePriestMsg", forceHideMsgTime * 1000)
    }

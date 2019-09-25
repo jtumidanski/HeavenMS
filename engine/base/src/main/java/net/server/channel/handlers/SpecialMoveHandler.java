@@ -42,6 +42,7 @@ import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -90,7 +91,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
          for (int i = 0; i < num; i++) {
             int mobOid = ((MonsterMagnetPacket) packet).monsterData()[i].monsterId();
             byte success = ((MonsterMagnetPacket) packet).monsterData()[i].success();
-            chr.getMap().broadcastMessage(chr, MaplePacketCreator.catchMonster(mobOid, success), false);
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character ->MaplePacketCreator.catchMonster(mobOid, success), false, chr);
             MapleMonster monster = chr.getMap().getMonsterByOid(mobOid);
             if (monster != null) {
                if (!monster.isBoss()) {
@@ -104,7 +105,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
             }
          }
          byte direction = ((MonsterMagnetPacket) packet).direction();   // thanks MedicOP for pointing some 3rd-party related issues with Magnet
-         chr.getMap().broadcastMessage(chr, MaplePacketCreator.showBuffeffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), 1, direction), false);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character ->MaplePacketCreator.showBuffeffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), 1, direction), false, chr);
          client.announce(MaplePacketCreator.enableActions());
          return;
       } else if (packet.skillId() == Brawler.MP_RECOVERY) {// MP Recovery
@@ -115,7 +116,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
             chr.addMP(gain);
          });
       } else if (packet.skillId() == SuperGM.HEAL_PLUS_DISPEL) {
-         chr.getMap().broadcastMessage(chr, MaplePacketCreator.showBuffeffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId())), false);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character ->MaplePacketCreator.showBuffeffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId())), false, chr);
       }
 
       Point pos = packet.position();

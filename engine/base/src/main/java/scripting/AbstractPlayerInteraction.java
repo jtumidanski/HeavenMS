@@ -70,6 +70,7 @@ import server.partyquest.PartyQuest;
 import server.partyquest.Pyramid;
 import server.quest.MapleQuest;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
@@ -672,7 +673,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void changeMusic(String songName) {
-      getPlayer().getMap().broadcastMessage(MaplePacketCreator.musicChange(songName));
+      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.musicChange(songName));
    }
 
    public void mapEffect(String path) {
@@ -902,7 +903,7 @@ public class AbstractPlayerInteraction {
       getMap(mapid).killAllMonsters();
       for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
          getMap(mapid).removeMapObject(i);
-         getMap(mapid).broadcastMessage(MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, c.getPlayer().getId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, c.getPlayer().getId()));
       }
    }
 
@@ -960,7 +961,7 @@ public class AbstractPlayerInteraction {
          npc.setRx1(pos.x - 50);
          npc.setFh(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
-         map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.spawnNPC(npc));
       }
    }
 
@@ -1056,11 +1057,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void playSound(String sound) {
-      getPlayer().getMap().broadcastMessage(MaplePacketCreator.environmentChange(sound, 4));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.environmentChange(sound, 4));
    }
 
    public void environmentChange(String env, int mode) {
-      getPlayer().getMap().broadcastMessage(MaplePacketCreator.environmentChange(env, mode));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.environmentChange(env, mode));
    }
 
    public String numberWithCommas(int number) {

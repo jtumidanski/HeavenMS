@@ -33,6 +33,7 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -91,7 +92,7 @@ public class SpawnPetProcessor {
                pet.summoned_$eq(true);
                PetProcessor.getInstance().saveToDb(pet);
                chr.addPet(pet);
-               chr.getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showPet(c.getPlayer(), pet, false, false), true);
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.showPet(c.getPlayer(), pet, false, false), true, chr);
                c.announce(MaplePacketCreator.petStatUpdate(c.getPlayer()));
                c.announce(MaplePacketCreator.enableActions());
 

@@ -32,12 +32,13 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
 import client.database.administrator.MonsterBookAdministrator;
-import client.database.provider.MonsterBookProvider;
 import client.database.data.MonsterBookData;
+import client.database.provider.MonsterBookProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class MonsterBook {
    private static final Semaphore semaphore = new Semaphore(10);
@@ -58,7 +59,7 @@ public final class MonsterBook {
    }
 
    public void addCard(final MapleClient c, final int cardid) {
-      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showForeignCardEffect(c.getPlayer().getId()), false);
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), character -> MaplePacketCreator.showForeignCardEffect(c.getPlayer().getId()), false, c.getPlayer());
 
       Integer qty;
       lock.lock();

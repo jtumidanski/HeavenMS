@@ -26,6 +26,7 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author Xterminator
@@ -39,6 +40,6 @@ public final class CloseChalkboardHandler extends AbstractPacketHandler<NoOpPack
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
       client.getPlayer().setChalkboard(null);
-      client.getPlayer().getMap().broadcastMessage(MaplePacketCreator.useChalkboard(client.getPlayer(), true));
+      MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.useChalkboard(client.getPlayer(), true));
    }
 }

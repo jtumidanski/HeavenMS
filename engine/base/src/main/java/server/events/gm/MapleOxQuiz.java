@@ -32,6 +32,7 @@ import provider.MapleDataTool;
 import server.TimerManager;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Randomizer;
 import tools.ServerNoticeType;
@@ -74,11 +75,11 @@ public final class MapleOxQuiz {
          }
       }
       final int number = gm;
-      map.broadcastMessage(MaplePacketCreator.showOXQuiz(round, question, true));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showOXQuiz(round, question, true));
       TimerManager.getInstance().schedule(new Runnable() {
          @Override
          public void run() {
-            map.broadcastMessage(MaplePacketCreator.showOXQuiz(round, question, true));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showOXQuiz(round, question, true));
             List<MapleCharacter> chars = new ArrayList<>(map.getCharacters());
 
             for (MapleCharacter chr : chars) {

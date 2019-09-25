@@ -43,6 +43,7 @@ import net.server.channel.packet.ScrollPacket;
 import net.server.channel.packet.reader.ScrollReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author Matze
@@ -197,7 +198,10 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                mods.add(new ModifyInventory(0, scrolled));
             }
             client.announce(MaplePacketCreator.modifyInventory(true, mods));
-            chr.getMap().broadcastMessage(MaplePacketCreator.getScrollEffect(chr.getId(), scrollSuccess, hasLegendarySpirit, isWhiteScroll));
+            ScrollResult finalScrollSuccess = scrollSuccess;
+            boolean finalHasLegendarySpirit = hasLegendarySpirit;
+            boolean finalIsWhiteScroll = isWhiteScroll;
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.getScrollEffect(chr.getId(), finalScrollSuccess, finalHasLegendarySpirit, finalIsWhiteScroll));
             if (packet.destination() < 0 && (scrollSuccess == ScrollResult.SUCCESS || scrollSuccess == ScrollResult.CURSE)) {
                chr.equipChanged();
             }

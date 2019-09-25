@@ -35,6 +35,7 @@ import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.coordinator.MapleInviteCoordinator.MapleInviteResult;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author Jay Estrella
@@ -113,7 +114,7 @@ public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamil
                   chr.getFamilyEntry().join(inviterEntry);
                }
             }
-            client.getPlayer().getFamily().broadcast(MaplePacketCreator.sendFamilyJoinResponse(true, client.getPlayer().getName()), client.getPlayer().getId());
+            MasterBroadcaster.getInstance().sendToFamily(client.getPlayer().getFamily(), character -> MaplePacketCreator.sendFamilyJoinResponse(true, client.getPlayer().getName()), false, client.getPlayer());
             client.announce(MaplePacketCreator.getSeniorMessage(inviter.getName()));
             client.announce(MaplePacketCreator.getFamilyInfo(chr.getFamilyEntry()));
             chr.getFamilyEntry().updateSeniorFamilyInfo(true);

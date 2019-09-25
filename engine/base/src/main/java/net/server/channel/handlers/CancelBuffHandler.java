@@ -35,6 +35,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.CancelBuffPacket;
 import net.server.channel.packet.reader.CancelBuffReader;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class CancelBuffHandler extends AbstractPacketHandler<CancelBuffPacket> {
    @Override
@@ -54,7 +55,7 @@ public final class CancelBuffHandler extends AbstractPacketHandler<CancelBuffPac
          case WindArcher.HURRICANE:
          case Evan.FIRE_BREATH:
          case Evan.ICE_BREATH:
-            client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.skillCancel(client.getPlayer(), packet.sourceId()), false);
+            MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.skillCancel(client.getPlayer(), packet.sourceId()), false, client.getPlayer());
             break;
          default:
             SkillFactory.getSkill(packet.sourceId()).ifPresent(skill -> client.getPlayer().cancelEffect(skill.getEffect(1), false, -1));

@@ -45,6 +45,7 @@ import server.MapleItemInformationProvider;
 import server.maps.MapleMap;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author Matze
@@ -803,7 +804,7 @@ public class MapleInventoryManipulator {
       if (itemId == chr.getItemEffect()) {
          if (quantityNow <= 0) {
             chr.setItemEffect(0);
-            map.broadcastMessage(MaplePacketCreator.itemEffect(chr.getId(), 0));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.itemEffect(chr.getId(), 0));
          }
       } else if (itemId == 5370000 || itemId == 5370001) {
          if (source.quantity() <= 0) {

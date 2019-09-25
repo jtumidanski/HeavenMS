@@ -35,6 +35,7 @@ import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
@@ -72,7 +73,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
          packet = MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display());
       }
 
-      chr.getMap().broadcastMessage(chr, packet, false, true);
+      MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> packet, false, chr, true);
       MapleStatEffect effect = getAttackEffect(attack, chr, null);
 
       SkillFactory.getSkill(attack.skill()).ifPresent(skill -> {

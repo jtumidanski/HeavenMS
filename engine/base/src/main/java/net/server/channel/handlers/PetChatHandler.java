@@ -30,6 +30,7 @@ import net.server.channel.packet.reader.PetChatReader;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket> {
    @Override
@@ -49,7 +50,7 @@ public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket> {
          client.disconnect(true, false);
          return;
       }
-      client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.petChat(client.getPlayer().getId(), pet, packet.act(), packet.text()), true);
+      MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.petChat(client.getPlayer().getId(), pet, packet.act(), packet.text()), true, client.getPlayer());
       if (ServerConstants.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Pet", packet.text());
       }

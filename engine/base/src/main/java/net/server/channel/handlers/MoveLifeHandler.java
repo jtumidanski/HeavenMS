@@ -39,6 +39,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
 
@@ -161,7 +162,8 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
          if (ServerConstants.USE_DEBUG_SHOW_RCVD_MVLIFE) {
             System.out.println((isSkill ? "SKILL " : (isAttack ? "ATTCK " : " ")) + "castPos: " + castPos + " rawAct: " + rawActivity + " opt: " + pOption + " skillID: " + useSkillId + " skillLV: " + useSkillLevel + " " + "allowSkill: " + nextMovementCouldBeSkill + " mobMp: " + mobMp);
          }
-         map.broadcastMessage(player, MaplePacketCreator.moveMonster(packet.objectId(), nextMovementCouldBeSkill, rawActivity, useSkillId, useSkillLevel, pOption, startPos, packet.movementList()), serverStartPos);
+         byte[] movePacket = MaplePacketCreator.moveMonster(packet.objectId(), nextMovementCouldBeSkill, rawActivity, useSkillId, useSkillLevel, pOption, startPos, packet.movementList());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> movePacket, player, serverStartPos);
          //updatePosition(res, monster, -2); //does this need to be done after the packet is broadcast?
          map.moveMonster(monster, monster.getPosition());
       }

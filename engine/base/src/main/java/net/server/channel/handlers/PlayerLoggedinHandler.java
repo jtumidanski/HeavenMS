@@ -36,12 +36,12 @@ import org.apache.mina.core.session.IoSession;
 import client.BuddyList;
 import client.BuddyListEntry;
 import client.CharacterNameAndId;
+import client.KeyBinding;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleDisease;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
-import client.KeyBinding;
 import client.MapleMount;
 import client.SkillFactory;
 import client.database.administrator.DueyPackageAdministrator;
@@ -75,6 +75,7 @@ import server.life.MobSkill;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 import tools.packets.Wedding;
 
@@ -294,7 +295,8 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                      familyEntry.setCharacter(player);
                      player.setFamilyEntry(familyEntry);
                      client.announce(MaplePacketCreator.getFamilyInfo(familyEntry));
-                     familyEntry.announceToSenior(MaplePacketCreator.sendFamilyLoginNotice(player.getName(), true), true);
+                     byte[] familyLoginNotice = MaplePacketCreator.sendFamilyLoginNotice(player.getName(), true);
+                     MasterBroadcaster.getInstance().sendToSenior(familyEntry.getSenior(), character -> familyLoginNotice, true);
                   } else {
                      FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Player " + player.getName() + "'s family doesn't have an entry for them. (" + f.getID() + ")");
                   }

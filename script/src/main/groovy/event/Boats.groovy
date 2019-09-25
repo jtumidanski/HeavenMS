@@ -9,6 +9,7 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -120,8 +121,9 @@ class EventBoats {
          em.setProperty("haveBalrog", "true")
          Boat_to_Orbis.broadcastEnemyShip(true)
          Boat_to_Ellinia.broadcastEnemyShip(true)
-         Boat_to_Orbis.broadcastMessage(MaplePacketCreator.musicChange("Bgm04/ArabPirate"))
-         Boat_to_Ellinia.broadcastMessage(MaplePacketCreator.musicChange("Bgm04/ArabPirate"))
+
+         MasterBroadcaster.getInstance().sendToAllInMap(Boat_to_Orbis, { character -> MaplePacketCreator.musicChange("Bgm04/ArabPirate") })
+         MasterBroadcaster.getInstance().sendToAllInMap(Boat_to_Ellinia, { character -> MaplePacketCreator.musicChange("Bgm04/ArabPirate") })
 
          em.schedule("invasion", invasionDelay)
       }

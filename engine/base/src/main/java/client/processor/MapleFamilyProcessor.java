@@ -34,10 +34,6 @@ public class MapleFamilyProcessor {
    private MapleFamilyProcessor() {
    }
 
-   public void broadcast(byte[] packet) {
-      // family currently not developed
-   }
-
    public void loadAllFamilies() {
       List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<Pair<Pair<Integer, Integer>, MapleFamilyEntry>>(200); // <<world, seniorid> familyEntry>
       DatabaseConnection.getInstance().withConnection(connection -> {
@@ -180,12 +176,14 @@ public class MapleFamilyProcessor {
    }
 
    public void giveReputationToCharactersSenior(MapleFamilyEntry familyEntry, int level, String name) {
-      if(familyEntry != null) {
+      if (familyEntry != null) {
          familyEntry.giveReputationToSenior(ServerConstants.FAMILY_REP_PER_LEVELUP, true);
          MapleFamilyEntry senior = familyEntry.getSenior();
-         if(senior != null) { //only send the message to direct senior
+         if (senior != null) { //only send the message to direct senior
             MapleCharacter seniorChr = senior.getChr();
-            if(seniorChr != null) seniorChr.announce(MaplePacketCreator.levelUpMessage(1, level, name));
+            if (seniorChr != null) {
+               seniorChr.announce(MaplePacketCreator.levelUpMessage(1, level, name));
+            }
          }
       }
    }

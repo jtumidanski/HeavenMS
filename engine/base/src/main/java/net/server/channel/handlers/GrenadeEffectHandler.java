@@ -30,6 +30,7 @@ import net.server.channel.packet.GrenadeEffectPacket;
 import net.server.channel.packet.reader.GrenadeEffectReader;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /*
  * @author GabrielSin
@@ -49,7 +50,7 @@ public class GrenadeEffectHandler extends AbstractPacketHandler<GrenadeEffectPac
          case Gunslinger.GRENADE:
             int skillLevel = chr.getSkillLevel(packet.skillId());
             if (skillLevel > 0) {
-               chr.getMap().broadcastMessage(chr, MaplePacketCreator.throwGrenade(chr.getId(), position, packet.keyDown(), packet.skillId(), skillLevel), position);
+               MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> MaplePacketCreator.throwGrenade(chr.getId(), position, packet.keyDown(), packet.skillId(), skillLevel), chr, position);
             }
             break;
          default:

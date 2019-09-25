@@ -106,6 +106,7 @@ import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
@@ -196,7 +197,7 @@ public class MapleStatEffect {
                      mob.setMp(mob.getMp() - absorbMp);
                      applyto.addMP(absorbMp);
                      applyto.announce(MaplePacketCreator.showOwnBuffEffect(sourceid, 1));
-                     applyto.getMap().broadcastMessage(applyto, MaplePacketCreator.showBuffeffect(applyto.getId(), sourceid, 1), false);
+                     MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), character -> MaplePacketCreator.showBuffeffect(applyto.getId(), sourceid, 1), false, applyto);
                   }
                }
                break;
@@ -487,7 +488,7 @@ public class MapleStatEffect {
          for (MapleCharacter affected : affectedp) {
             applyTo(applyfrom, affected, false, null, useMaxRange, affectedc);
             affected.announce(MaplePacketCreator.showOwnBuffEffect(sourceid, 2));
-            affected.getMap().broadcastMessage(affected, MaplePacketCreator.showBuffeffect(affected.getId(), sourceid, 2), false);
+            MasterBroadcaster.getInstance().sendToAllInMap(affected.getMap(), character -> MaplePacketCreator.showBuffeffect(affected.getId(), sourceid, 2), false, affected);
          }
       }
 
@@ -634,7 +635,7 @@ public class MapleStatEffect {
       }
       if (primary) {
          localDuration = alchemistModifyVal(applyfrom, localDuration, false);
-         applyto.getMap().broadcastMessage(applyto, MaplePacketCreator.showBuffeffect(applyto.getId(), sourceid, 1, (byte) 3), false);
+         MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), character -> MaplePacketCreator.showBuffeffect(applyto.getId(), sourceid, 1, (byte) 3), false, applyto);
       }
       if (localstatups.size() > 0) {
          byte[] buff = null;
@@ -703,7 +704,8 @@ public class MapleStatEffect {
          applyto.registerEffect(this, starttime, starttime + localDuration, false);
 
          if (mbuff != null) {
-            applyto.getMap().broadcastMessage(applyto, mbuff, false);
+            byte[] finalMbuff = mbuff;
+            MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), character -> finalMbuff, false, applyto);
          }
          if (sourceid == Corsair.BATTLE_SHIP) {
             applyto.announceBattleshipHp();

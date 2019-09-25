@@ -28,6 +28,7 @@ import client.MapleCharacter;
 import server.TimerManager;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author kevintjuh93
@@ -122,7 +123,7 @@ public class MapleSnowball {
                }, 10000);
             } else
                this.snowmanhp -= damage;
-            map.broadcastMessage(MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
          }
 
       if (this.hits == 0) {
@@ -135,10 +136,10 @@ public class MapleSnowball {
             map.getSnowball(team == 0 ? 1 : 0).message(3);
 
          this.hits = 3;
-         map.broadcastMessage(MaplePacketCreator.rollSnowBall(false, 0, map.getSnowball(0), map.getSnowball(1)));
-         map.broadcastMessage(MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.rollSnowBall(false, 0, map.getSnowball(0), map.getSnowball(1)));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
       }
-      map.broadcastMessage(MaplePacketCreator.hitSnowBall(what, damage));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitSnowBall(what, damage));
    }
 
    public void message(int message) {

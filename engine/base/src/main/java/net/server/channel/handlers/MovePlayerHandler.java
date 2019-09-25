@@ -26,6 +26,7 @@ import net.server.PacketReader;
 import net.server.channel.packet.movement.MovePlayerPacket;
 import net.server.channel.packet.reader.MovePlayerReader;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacket> {
    @Override
@@ -42,7 +43,7 @@ public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacke
          if (client.getPlayer().isHidden()) {
             client.getPlayer().getMap().broadcastGMMessage(client.getPlayer(), MaplePacketCreator.movePlayer(client.getPlayer().getId(), packet.movementList()), false);
          } else {
-            client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.movePlayer(client.getPlayer().getId(), packet.movementList()), false);
+            MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.movePlayer(client.getPlayer().getId(), packet.movementList()), false, client.getPlayer());
          }
       }
    }

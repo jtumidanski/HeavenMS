@@ -43,6 +43,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SkillEffectPacket;
 import net.server.channel.packet.reader.SkillEffectReader;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectPacket> {
    @Override
@@ -71,7 +72,7 @@ public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectP
          case Hero.MONSTER_MAGNET:
          case Evan.FIRE_BREATH:
          case Evan.ICE_BREATH:
-            client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.skillEffect(client.getPlayer(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false);
+            MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.skillEffect(client.getPlayer(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false, client.getPlayer());
             return;
          default:
             System.out.println(client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");

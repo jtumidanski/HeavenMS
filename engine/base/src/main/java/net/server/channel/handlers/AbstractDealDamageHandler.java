@@ -87,6 +87,7 @@ import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.Randomizer;
@@ -130,12 +131,12 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
          TimerManager.getInstance().schedule(new Runnable() {
             @Override
             public void run() {
-               map.broadcastMessage(MaplePacketCreator.damageMonster(monster.getObjectId(), damage), monster.getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(monster.getObjectId(), damage), monster.getPosition());
                map.damageMonster(attacker, monster, damage);
             }
          }, animationTime);
       } else {
-         map.broadcastMessage(MaplePacketCreator.damageMonster(monster.getObjectId(), damage), monster.getPosition());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(monster.getObjectId(), damage), monster.getPosition());
          map.damageMonster(attacker, monster, damage);
       }
    }
@@ -551,7 +552,8 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   }
                } else {
                   if (attack.skill() == Aran.BODY_PRESSURE) {
-                     map.broadcastMessage(MaplePacketCreator.damageMonster(monster.getObjectId(), totDamageToOneMonster));
+                     int finalTotDamageToOneMonster = totDamageToOneMonster;
+                     MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(monster.getObjectId(), finalTotDamageToOneMonster));
                   }
 
                   map.damageMonster(player, monster, totDamageToOneMonster);
@@ -563,7 +565,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.getX());
-                        map.broadcastMessage(player, MaplePacketCreator.damagePlayer(0, monster.getId(), player.getId(), toUse.getX(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damagePlayer(0, monster.getId(), player.getId(), toUse.getX(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
                      }
                   }
                }
@@ -574,7 +576,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.getY());
-                        map.broadcastMessage(player, MaplePacketCreator.damagePlayer(0, monster.getId(), player.getId(), toUse.getY(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damagePlayer(0, monster.getId(), player.getId(), toUse.getY(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
                      }
                   }
                }

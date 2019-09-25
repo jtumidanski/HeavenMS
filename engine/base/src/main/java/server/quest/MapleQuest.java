@@ -71,6 +71,7 @@ import server.quest.requirements.PetRequirement;
 import server.quest.requirements.QuestRequirement;
 import server.quest.requirements.ScriptRequirement;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 import tools.StringUtil;
@@ -130,7 +131,9 @@ public class MapleQuest {
             autoComplete = MapleDataTool.getInt("autoComplete", reqInfo, 0) == 1;
 
             int medalid = MapleDataTool.getInt("viewMedalItem", reqInfo, 0);
-            if (medalid != 0) medals.put(this.id, medalid);
+            if (medalid != 0) {
+               medals.put(this.id, medalid);
+            }
          } else {
             System.out.println("no data " + id);
          }
@@ -151,8 +154,9 @@ public class MapleQuest {
             }
 
             MapleQuestRequirement req = this.getRequirement(type, startReq);
-            if (req == null)
+            if (req == null) {
                continue;
+            }
 
             startReqs.put(type, req);
          }
@@ -164,8 +168,9 @@ public class MapleQuest {
             MapleQuestRequirementType type = MapleQuestRequirementType.getByWZName(completeReq.getName());
             MapleQuestRequirement req = this.getRequirement(type, completeReq);
 
-            if (req == null)
+            if (req == null) {
                continue;
+            }
 
             if (type.equals(MapleQuestRequirementType.INFO_NUMBER)) {
                infoNumber = (short) MapleDataTool.getInt(completeReq, 0);
@@ -187,8 +192,9 @@ public class MapleQuest {
             MapleQuestActionType questActionType = MapleQuestActionType.getByWZName(startAct.getName());
             MapleQuestAction act = this.getAction(questActionType, startAct);
 
-            if (act == null)
+            if (act == null) {
                continue;
+            }
 
             startActs.put(questActionType, act);
          }
@@ -199,8 +205,9 @@ public class MapleQuest {
             MapleQuestActionType questActionType = MapleQuestActionType.getByWZName(completeAct.getName());
             MapleQuestAction act = this.getAction(questActionType, completeAct);
 
-            if (act == null)
+            if (act == null) {
                continue;
+            }
 
             completeActs.put(questActionType, act);
          }
@@ -271,8 +278,9 @@ public class MapleQuest {
       if (leftTime / (60 * 1000) > 0) {
          mode++;     //counts minutes
 
-         if (leftTime / (60 * 60 * 1000) > 0)
+         if (leftTime / (60 * 60 * 1000) > 0) {
             mode++;     //counts hours
+         }
       }
 
       switch (mode) {
@@ -293,7 +301,9 @@ public class MapleQuest {
    }
 
    public boolean isSameDayRepeatable() {
-      if (!repeatable) return false;
+      if (!repeatable) {
+         return false;
+      }
 
       IntervalRequirement ir = (IntervalRequirement) startReqs.get(MapleQuestRequirementType.INTERVAL);
       return ir.getInterval() < ServerConstants.QUEST_POINT_REPEATABLE_INTERVAL * 60 * 60 * 1000;
@@ -426,7 +436,7 @@ public class MapleQuest {
       c.updateQuest(newStatus);
 
       c.announce(MaplePacketCreator.showSpecialEffect(9)); // Quest completion
-      c.getMap().broadcastMessage(c, MaplePacketCreator.showForeignEffect(c.getId(), 9), false); //use 9 instead of 12 for both
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), character -> MaplePacketCreator.showForeignEffect(c.getId(), 9), false, c); //use 9 instead of 12 for both
       return true;
    }
 
@@ -440,8 +450,9 @@ public class MapleQuest {
 
    public int getStartItemAmountNeeded(int itemid) {
       MapleQuestRequirement req = startReqs.get(MapleQuestRequirementType.ITEM);
-      if (req == null)
+      if (req == null) {
          return 0;
+      }
 
       ItemRequirement ireq = (ItemRequirement) req;
       return ireq.getItemAmountNeeded(itemid);
@@ -449,8 +460,9 @@ public class MapleQuest {
 
    public int getCompleteItemAmountNeeded(int itemid) {
       MapleQuestRequirement req = completeReqs.get(MapleQuestRequirementType.ITEM);
-      if (req == null)
+      if (req == null) {
          return 0;
+      }
 
       ItemRequirement ireq = (ItemRequirement) req;
       return ireq.getItemAmountNeeded(itemid);
@@ -458,8 +470,9 @@ public class MapleQuest {
 
    public int getMobAmountNeeded(int mid) {
       MapleQuestRequirement req = completeReqs.get(MapleQuestRequirementType.MOB);
-      if (req == null)
+      if (req == null) {
          return 0;
+      }
 
       MobRequirement mreq = (MobRequirement) req;
 

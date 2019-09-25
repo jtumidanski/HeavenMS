@@ -45,26 +45,26 @@ public class MessageBroadcaster {
 
    private void sendWorldNotice(int worldId, Function<MapleCharacter, Boolean> filter, Function<MapleCharacter, byte[]> packetCreator) {
       if (filter != null) {
-         send(Server.getInstance().getWorld(worldId).getPlayerStorage().getAllCharacters().stream().filter(filter::apply).collect(Collectors.toList()), packetCreator);
+         MasterBroadcaster.getInstance().send(Server.getInstance().getWorld(worldId).getPlayerStorage().getAllCharacters().stream().filter(filter::apply).collect(Collectors.toList()), packetCreator);
       } else {
-         send(Server.getInstance().getWorld(worldId).getPlayerStorage().getAllCharacters(), packetCreator);
+         MasterBroadcaster.getInstance().send(Server.getInstance().getWorld(worldId).getPlayerStorage().getAllCharacters(), packetCreator);
       }
    }
 
    public void sendMapServerNotice(MapleMap map, ServerNoticeType noticeType, String message) {
-      sendMapNotice(map, null, character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, null, character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
    }
 
    public void sendMapServerNotice(MapleMap map, ServerNoticeType noticeType, Function<MapleCharacter, Boolean> filter, String message) {
-      sendMapNotice(map, filter, character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, filter, character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
    }
 
    public void sendChannelServerNotice(int worldId, int channelId, ServerNoticeType noticeType, String message) {
-      send(Server.getInstance().getChannel(worldId, channelId).getPlayerStorage().getAllCharacters(), character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+      MasterBroadcaster.getInstance().send(Server.getInstance().getChannel(worldId, channelId).getPlayerStorage().getAllCharacters(), character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
    }
 
    public void sendGuildServerNotice(MapleGuild guild, ServerNoticeType noticeType, String message) {
-      send(guild.getMembers().stream().map(MapleGuildCharacter::getCharacter).collect(Collectors.toList()), character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+      MasterBroadcaster.getInstance().send(guild.getMembers().stream().map(MapleGuildCharacter::getCharacter).collect(Collectors.toList()), character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
    }
 
    public void sendAllianceServerNotice(MapleAlliance alliance, ServerNoticeType noticeType, String message) {
@@ -76,11 +76,11 @@ public class MessageBroadcaster {
    }
 
    public void sendServerNotice(Collection<MapleCharacter> recipients, ServerNoticeType noticeType, String message) {
-      send(recipients, character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+      MasterBroadcaster.getInstance().send(recipients, character -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
    }
 
    public void sendServerNotice(MapleCharacter character, ServerNoticeType noticeType, String message) {
-      send(Collections.singletonList(character), recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+      MasterBroadcaster.getInstance().send(Collections.singletonList(character), recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
    }
 
    public void sendServerNoticeToAcquaintances(MapleCharacter originator, ServerNoticeType noticeType, String message) {
@@ -91,11 +91,11 @@ public class MessageBroadcaster {
                .flatMap(Optional::stream)
                .filter(MapleCharacter::isLoggedinWorld)
                .collect(Collectors.toList());
-         send(buddies, recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+         MasterBroadcaster.getInstance().send(buddies, recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
       }
       {
          Collection<MapleCharacter> familyMembers = originator.getFamily().getMembers().stream().map(MapleFamilyEntry::getChr).collect(Collectors.toList());
-         send(familyMembers, recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+         MasterBroadcaster.getInstance().send(familyMembers, recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
       }
       {
          List<MapleCharacter> guildMembers = originator.getGuild()
@@ -103,20 +103,8 @@ public class MessageBroadcaster {
                      .map(MapleGuildCharacter::getCharacter)
                      .collect(Collectors.toList()))
                .orElse(Collections.emptyList());
-         send(guildMembers, recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
+         MasterBroadcaster.getInstance().send(guildMembers, recipient -> MaplePacketCreator.serverNotice(noticeType.getValue(), message));
       }
 
-   }
-
-   private void sendMapNotice(MapleMap map, Function<MapleCharacter, Boolean> filter, Function<MapleCharacter, byte[]> packetCreator) {
-      if (filter == null) {
-         send(map.getCharacters(), packetCreator);
-      } else {
-         send(map.getCharacters().stream().filter(filter::apply).collect(Collectors.toList()), packetCreator);
-      }
-   }
-
-   private void send(Collection<MapleCharacter> recipients, Function<MapleCharacter, byte[]> packetCreator) {
-      recipients.parallelStream().forEach(character -> character.announce(packetCreator.apply(character)));
    }
 }

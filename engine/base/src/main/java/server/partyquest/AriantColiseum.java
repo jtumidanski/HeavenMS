@@ -33,6 +33,7 @@ import server.expeditions.MapleExpedition;
 import server.expeditions.MapleExpeditionType;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author Ronan
@@ -211,7 +212,7 @@ public class AriantColiseum {
       eventClear = true;
 
       if (map != null) {
-         map.broadcastMessage(MaplePacketCreator.showAriantScoreBoard());
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showAriantScoreBoard());
          map.killAllMonsters();
 
          distributeAriantPoints();

@@ -23,14 +23,6 @@ public class BuddyListProcessor {
    private BuddyListProcessor() {
    }
 
-   public void broadcast(byte[] packet, BuddyList buddyList, PlayerStorage playerStorage) {
-      Arrays.stream(buddyList.getBuddyIds())
-            .mapToObj(playerStorage::getCharacterById)
-            .flatMap(Optional::stream)
-            .filter(MapleCharacter::isLoggedinWorld)
-            .forEach(character -> character.announce(packet));
-   }
-
    public void loadFromDb(int characterId, BuddyList buddyList) {
       DatabaseConnection.getInstance().withConnection(connection -> {
          BuddyProvider.getInstance().getInfoForBuddies(connection, characterId).forEach(buddyList::put);

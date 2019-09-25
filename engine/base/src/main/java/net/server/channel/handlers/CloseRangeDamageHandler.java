@@ -54,6 +54,7 @@ import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
@@ -92,7 +93,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
       }
 
-      chr.getMap().broadcastMessage(chr, MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, true);
+      MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr, true);
       int numFinisherOrbs = 0;
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);
       if (GameConstants.isFinisherSkill(attack.skill())) {
@@ -140,7 +141,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
                   chr.setBuffedValue(MapleBuffStat.COMBO, newOrbCount);
                   duration -= (int) (currentServerTime() - chr.getBuffedStarttime(MapleBuffStat.COMBO));
                   c.announce(MaplePacketCreator.giveBuff(comboId, duration, stat));
-                  chr.getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(chr.getId(), stat), false);
+                  MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.giveForeignBuff(chr.getId(), stat), false, chr);
                }
             }
          } else if (chr.getJob().isA(MapleJob.MARAUDER)) {

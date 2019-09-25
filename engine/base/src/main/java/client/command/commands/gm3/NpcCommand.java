@@ -29,6 +29,7 @@ import client.command.Command;
 import server.life.MapleLifeFactory;
 import server.life.MapleNPC;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public class NpcCommand extends Command {
    {
@@ -50,7 +51,7 @@ public class NpcCommand extends Command {
          npc.setRx1(player.getPosition().x - 50);
          npc.setFh(player.getMap().getFootholds().findBelow(c.getPlayer().getPosition()).id());
          player.getMap().addMapObject(npc);
-         player.getMap().broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+         MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.spawnNPC(npc));
       }
    }
 }

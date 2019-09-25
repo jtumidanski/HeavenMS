@@ -32,6 +32,7 @@ import net.server.channel.packet.reader.GeneralChatReader;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -64,12 +65,12 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
          }
 
          if (!chr.isHidden()) {
-            chr.getMap().broadcastMessage(MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "General", packet.message());
             }
          } else {
-            chr.getMap().broadcastGMMessage(MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
+            MasterBroadcaster.getInstance().sendToAllGMInMap(chr.getMap(), character -> MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "GM General", packet.message());
             }

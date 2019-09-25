@@ -38,6 +38,7 @@ import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.partyquest.MonsterCarnival;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
@@ -177,7 +178,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                   }
                }
                client.getPlayer().gainCP(-neededCP);
-               client.getPlayer().getMap().broadcastMessage(MaplePacketCreator.playerSummoned(client.getPlayer().getName(), tab, num));
+               MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.playerSummoned(client.getPlayer().getName(), tab, num));
             } catch (Exception e) {
                e.printStackTrace();
             }

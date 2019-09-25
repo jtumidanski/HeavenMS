@@ -102,6 +102,7 @@ import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 import tools.packets.Fishing;
 
@@ -753,17 +754,8 @@ public class World {
 
    public void changeEmblem(int gid, List<Integer> affectedPlayers, MapleGuildSummary mgs) {
       updateGuildSummary(gid, mgs);
-      sendPacket(affectedPlayers, MaplePacketCreator.guildEmblemChange(gid, mgs.getLogoBG(), mgs.getLogoBGColor(), mgs.getLogo(), mgs.getLogoColor()), -1);
+      MasterBroadcaster.getInstance().sendToWorld(this, affectedPlayers, character -> MaplePacketCreator.guildEmblemChange(gid, mgs.getLogoBG(), mgs.getLogoBGColor(), mgs.getLogo(), mgs.getLogoColor()), true, -1);
       setGuildAndRank(affectedPlayers, -1, -1, -1);   //respawn player
-   }
-
-   public void sendPacket(List<Integer> targetIds, final byte[] packet, int exception) {
-      for (int i : targetIds) {
-         if (i == exception) {
-            continue;
-         }
-         getPlayerStorage().getCharacterById(i).ifPresent(character -> character.getClient().announce(packet));
-      }
    }
 
    public boolean isGuildQueued(int guildId) {

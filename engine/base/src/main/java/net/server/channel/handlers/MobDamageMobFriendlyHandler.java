@@ -29,6 +29,7 @@ import scripting.event.EventInstanceManager;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Randomizer;
 import tools.ServerNoticeType;
@@ -86,7 +87,8 @@ public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<Mob
          map.removeMapObject(monster);
       }
 
-      map.broadcastMessage(MaplePacketCreator.MobDamageMobFriendly(monster, damage, remainingHp), monster.getPosition());
+      int finalRemainingHp = remainingHp;
+      MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.MobDamageMobFriendly(monster, damage, finalRemainingHp), monster.getPosition());
       client.announce(MaplePacketCreator.enableActions());
    }
 }

@@ -45,6 +45,7 @@ import net.server.channel.Channel;
 import net.server.processor.MapleAllianceProcessor;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 
 public class MapleGuild {
@@ -286,7 +287,7 @@ public class MapleGuild {
                      } else if (bcop == BCOp.EMBLEMCHANGE) {
                         Server.getInstance().getWorld(world).changeEmblem(this.id, notifications.get(b), new MapleGuildSummary(this));
                      } else {
-                        Server.getInstance().getWorld(world).sendPacket(notifications.get(b), packet, exceptionId);
+                        MasterBroadcaster.getInstance().sendToWorld(Server.getInstance().getWorld(world), notifications.get(b), character -> packet, false, exceptionId);
                      }
                   }
                }

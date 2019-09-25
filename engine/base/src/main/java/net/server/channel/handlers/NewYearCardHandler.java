@@ -33,6 +33,7 @@ import net.server.channel.packet.newyear.CardHasBeenSentPacket;
 import net.server.channel.packet.reader.NewYearCardReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -91,10 +92,10 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
                player.addNewYearRecord(newYear);
                player.announce(MaplePacketCreator.onNewYearCardRes(player, newYear, 6, 0));    // successfully rcvd
 
-               player.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(player, newYear, 0xD, 0));
+               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.onNewYearCardRes(player, newYear, 0xD, 0));
 
                c.getWorldServer().getPlayerStorage().getCharacterById(newYear.getSenderId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(sender -> {
-                  sender.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(sender, newYear, 0xD, 0));
+                  MasterBroadcaster.getInstance().sendToAllInMap(sender.getMap(), character -> MaplePacketCreator.onNewYearCardRes(sender, newYear, 0xD, 0));
                   MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, "[New Year] Your addressee successfully received the New Year card.");
                });
             } else {

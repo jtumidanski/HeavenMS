@@ -66,6 +66,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 
 /**
@@ -883,7 +884,7 @@ public class EventInstanceManager {
          npc.setRx1(pos.x - 50);
          npc.setFh(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
-         map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.spawnNPC(npc));
       }
    }
 
@@ -1237,8 +1238,8 @@ public class EventInstanceManager {
 
    public final void showWrongEffect(int mapId) {
       MapleMap map = getMapInstance(mapId);
-      map.broadcastMessage(MaplePacketCreator.showEffect("quest/party/wrong_kor"));
-      map.broadcastMessage(MaplePacketCreator.playSound("Party1/Failed"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showEffect("quest/party/wrong_kor"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.playSound("Party1/Failed"));
    }
 
    public final void showClearEffect() {
@@ -1264,10 +1265,10 @@ public class EventInstanceManager {
 
    public final void showClearEffect(boolean hasGate, int mapId, String mapObj, int newState) {
       MapleMap map = getMapInstance(mapId);
-      map.broadcastMessage(MaplePacketCreator.showEffect("quest/party/clear"));
-      map.broadcastMessage(MaplePacketCreator.playSound("Party1/Clear"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showEffect("quest/party/clear"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.playSound("Party1/Clear"));
       if (hasGate) {
-         map.broadcastMessage(MaplePacketCreator.environmentChange(mapObj, newState));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.environmentChange(mapObj, newState));
          wL.lock();
          try {
             openedGates.put(map.getId(), new Pair<>(mapObj, newState));

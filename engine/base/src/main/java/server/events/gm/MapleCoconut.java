@@ -30,6 +30,7 @@ import client.MapleCharacter;
 import server.TimerManager;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author kevintjuh93
@@ -54,9 +55,9 @@ public class MapleCoconut extends MapleEvent {
       for (int i = 0; i < 506; i++) {
          coconuts.add(new MapleCoconuts(i));
       }
-      map.broadcastMessage(MaplePacketCreator.hitCoconut(true, 0, 0));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitCoconut(true, 0, 0));
       setCoconutsHittable(true);
-      map.broadcastMessage(MaplePacketCreator.getClock(300));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(300));
 
       TimerManager.getInstance().schedule(new Runnable() {
          @Override
@@ -93,7 +94,7 @@ public class MapleCoconut extends MapleEvent {
    }
 
    public void bonusTime() {
-      map.broadcastMessage(MaplePacketCreator.getClock(120));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(120));
       TimerManager.getInstance().schedule(new Runnable() {
          @Override
          public void run() {

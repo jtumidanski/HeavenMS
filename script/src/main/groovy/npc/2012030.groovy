@@ -3,6 +3,7 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import tools.MaplePacketCreator
+import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -35,21 +36,22 @@ class NPC2012030 {
             cm.dispose()
             return
          }
-         if (mode == 1)
+         if (mode == 1) {
             status++
-         else
+         } else {
             status--
+         }
 
-         if(status == 0) {
-            cm.getMap().broadcastMessage(MaplePacketCreator.playSound("orbis/" + harpSounds[cm.getNpc() - 2012027]))
+         if (status == 0) {
+            MasterBroadcaster.getInstance().sendToAllInMap(cm.getMap(), { character -> MaplePacketCreator.playSound("orbis/" + harpSounds[cm.getNpc() - 2012027]) })
 
-            if(cm.isQuestStarted(3114)) {
+            if (cm.isQuestStarted(3114)) {
                int idx = cm.getQuestProgress(3114, 7777)
 
-               if(idx != -1) {
+               if (idx != -1) {
                   String nextNote = harpSong[idx]
 
-                  if(harpNote != nextNote) {
+                  if (harpNote != nextNote) {
                      cm.setQuestProgress(3114, 7777, 0)
 
                      cm.getPlayer().announce(MaplePacketCreator.showEffect("quest/party/wrong_kor"))
@@ -59,10 +61,10 @@ class NPC2012030 {
                   } else {
                      nextNote = harpSong[idx + 1]
 
-                     if(nextNote == '|') {
+                     if (nextNote == '|') {
                         idx++
 
-                        if(idx == 45) {     // finished lullaby
+                        if (idx == 45) {     // finished lullaby
                            MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Twinkle, twinkle, little star, how I wonder what you are.")
                            cm.setQuestProgress(3114, 7777, -1)
 
@@ -72,11 +74,11 @@ class NPC2012030 {
                            cm.dispose()
                            return
                         } else {
-                           if(idx == 14) {
+                           if (idx == 14) {
                               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Twinkle, twinkle, little star, how I wonder what you are!")
-                           } else if(idx == 22) {
+                           } else if (idx == 22) {
                               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Up above the world so high,")
-                           } else if(idx == 30) {
+                           } else if (idx == 30) {
                               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "like a diamond in the sky.")
                            }
                         }

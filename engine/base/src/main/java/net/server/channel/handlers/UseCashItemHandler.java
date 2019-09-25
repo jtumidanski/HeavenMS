@@ -103,6 +103,7 @@ import server.maps.MaplePlayerShopItem;
 import server.maps.MapleTVEffect;
 import server.processor.MapleShopProcessor;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
@@ -334,7 +335,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             client.announce(MaplePacketCreator.modifyInventory(true, mods));
 
             ScrollResult scrollResult = scrolled.level() > currentLevel ? ScrollResult.SUCCESS : ScrollResult.FAIL;
-            player.getMap().broadcastMessage(MaplePacketCreator.getScrollEffect(player.getId(), scrollResult, false, false));
+            MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.getScrollEffect(player.getId(), scrollResult, false, false));
             if (eSlot < 0 && (scrollResult == ScrollResult.SUCCESS)) {
                player.equipChanged();
             }
@@ -463,7 +464,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       player.setChalkboard(message);
-      player.getMap().broadcastMessage(MaplePacketCreator.useChalkboard(player, false));
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.useChalkboard(player, false));
       player.getClient().announce(MaplePacketCreator.enableActions());
    }
 
@@ -523,7 +524,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          player.forceUpdateItem(item);
       }
 
-      player.getMap().broadcastMessage(player, MaplePacketCreator.changePetName(player, newName, 1), true);
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.changePetName(player, newName, 1), true, player);
       c.announce(MaplePacketCreator.enableActions());
       remove(c, position, itemId);
    }
@@ -539,7 +540,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void jukebox(MapleClient c, MapleCharacter player, short position, int itemId) {
-      player.getMap().broadcastMessage(MaplePacketCreator.musicChange("Jukebox/Congratulation"));
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.musicChange("Jukebox/Congratulation"));
       remove(c, position, itemId);
    }
 

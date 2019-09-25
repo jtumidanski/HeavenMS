@@ -35,6 +35,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 /**
  * @author RonanLana
@@ -155,8 +156,8 @@ public class MaplePlayerNPCPositioner {
 
             for (MaplePlayerNPC pn : playerNpcs) {
                m.removeMapObject(pn);
-               m.broadcastMessage(MaplePacketCreator.removeNPCController(pn.getObjectId()));
-               m.broadcastMessage(MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removeNPCController(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
             }
          }
 
@@ -167,8 +168,8 @@ public class MaplePlayerNPCPositioner {
 
             for (MaplePlayerNPC pn : playerNpcs) {
                m.addPlayerNPCMapObject(pn);
-               m.broadcastMessage(MaplePacketCreator.spawnPlayerNPC(pn));
-               m.broadcastMessage(MaplePacketCreator.getPlayerNPC(pn));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.spawnPlayerNPC(pn));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.getPlayerNPC(pn));
             }
          }
 

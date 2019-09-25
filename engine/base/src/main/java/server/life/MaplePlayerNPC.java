@@ -52,6 +52,7 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 
 /**
@@ -286,8 +287,8 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
             MapleMap m = channel.getMapFactory().getMap(mapid);
 
             m.addPlayerNPCMapObject(pn);
-            m.broadcastMessage(MaplePacketCreator.spawnPlayerNPC(pn));
-            m.broadcastMessage(MaplePacketCreator.getPlayerNPC(pn));
+            MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.spawnPlayerNPC(pn));
+            MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.getPlayerNPC(pn));
          }
 
          return true;
@@ -325,8 +326,8 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
                MapleMap m = channel.getMapFactory().getMap(mapid);
                m.removeMapObject(pn);
 
-               m.broadcastMessage(MaplePacketCreator.removeNPCController(pn.getObjectId()));
-               m.broadcastMessage(MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removeNPCController(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
             }
          }
       }
@@ -360,8 +361,8 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
                      for (MapleMapObject pnpcObj : m.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
                         MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
                         m.removeMapObject(pnpcObj);
-                        m.broadcastMessage(MaplePacketCreator.removeNPCController(pn.getObjectId()));
-                        m.broadcastMessage(MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
+                        MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removeNPCController(pn.getObjectId()));
+                        MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
                      }
                   }
                });

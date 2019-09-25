@@ -84,6 +84,7 @@ import server.processor.MapleShopProcessor;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 import tools.packets.Wedding;
@@ -310,7 +311,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    @Override
    public void showEffect(String effect) {
-      getPlayer().getMap().broadcastMessage(MaplePacketCreator.environmentChange(effect, 3));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.environmentChange(effect, 3));
    }
 
    public void setHair(int hair) {
@@ -865,7 +866,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void mapClock(int time) {
-      getPlayer().getMap().broadcastMessage(MaplePacketCreator.getClock(time));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.getClock(time));
    }
 
    private boolean sendCPQChallenge(String cpqType, int leaderid) {

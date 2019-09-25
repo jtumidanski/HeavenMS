@@ -12,6 +12,7 @@ import constants.ExpTable;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Pair;
 
 public class PetProcessor {
@@ -81,7 +82,7 @@ public class PetProcessor {
             while (newCloseness >= ExpTable.getClosenessNeededForLevel(pet.level())) {
                pet.level_$eq((byte) (pet.level() + 1));
                owner.getClient().announce(MaplePacketCreator.showOwnPetLevelUp(slot));
-               owner.getMap().broadcastMessage(MaplePacketCreator.showPetLevelUp(owner, slot));
+               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.showPetLevelUp(owner, slot));
             }
          }
 
@@ -100,7 +101,7 @@ public class PetProcessor {
          enjoyed = false;
       }
 
-      owner.getMap().broadcastMessage(MaplePacketCreator.petFoodResponse(owner.getId(), slot, enjoyed, false));
+      MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.petFoodResponse(owner.getId(), slot, enjoyed, false));
       PetProcessor.getInstance().saveToDb(pet);
 
       Item petz = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());

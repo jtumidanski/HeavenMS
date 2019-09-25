@@ -27,6 +27,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetMovementPacket;
 import net.server.channel.packet.reader.PetMovementReader;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class MovePetHandler extends AbstractPacketHandler<PetMovementPacket> {
    @Override
@@ -45,6 +46,6 @@ public final class MovePetHandler extends AbstractPacketHandler<PetMovementPacke
          return;
       }
       player.getPet(slot).updatePosition(packet.commands());
-      player.getMap().broadcastMessage(player, MaplePacketCreator.movePet(player.getId(), packet.petId(), slot, packet.commands()), false);
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.movePet(player.getId(), packet.petId(), slot, packet.commands()), false, player);
    }
 }

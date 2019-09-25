@@ -31,6 +31,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetCommandPacket;
 import net.server.channel.packet.reader.PetCommandReader;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.Randomizer;
 
 public final class PetCommandHandler extends AbstractPacketHandler<PetCommandPacket> {
@@ -56,9 +57,9 @@ public final class PetCommandHandler extends AbstractPacketHandler<PetCommandPac
 
       if (Randomizer.nextInt(100) < petCommand.probability()) {
          PetProcessor.getInstance().gainClosenessFullness(pet, chr, petCommand.increase(), 0, packet.command());
-         chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, false, packet.command(), false));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.commandResponse(chr.getId(), petIndex, false, packet.command(), false));
       } else {
-         chr.getMap().broadcastMessage(MaplePacketCreator.commandResponse(chr.getId(), petIndex, true, packet.command(), false));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.commandResponse(chr.getId(), petIndex, true, packet.command(), false));
       }
    }
 }

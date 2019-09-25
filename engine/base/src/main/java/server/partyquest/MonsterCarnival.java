@@ -13,6 +13,7 @@ import server.TimerManager;
 import server.maps.MapleMap;
 import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -307,7 +308,7 @@ public class MonsterCarnival {
       }
       startTime = System.currentTimeMillis() + 3 * 60 * 1000;
 
-      map.broadcastMessage(MaplePacketCreator.getClock(3 * 60));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(3 * 60));
 
       timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeExpand() * 1000);
       effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeExpand() * 1000 - 10 * 1000); // thanks Vcoc for noticing a time set issue here

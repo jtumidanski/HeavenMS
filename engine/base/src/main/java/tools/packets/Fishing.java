@@ -27,6 +27,7 @@ import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -121,7 +122,7 @@ public class Fishing {
       }
 
       chr.announce(MaplePacketCreator.showInfo(fishingEffect));
-      chr.getMap().broadcastMessage(chr, MaplePacketCreator.showForeignInfo(chr.getId(), fishingEffect), false);
+      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.showForeignInfo(chr.getId(), fishingEffect), false, chr);
    }
 
    public static int getRandomItem() {

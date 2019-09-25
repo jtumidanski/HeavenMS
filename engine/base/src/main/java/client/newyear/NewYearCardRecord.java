@@ -31,6 +31,7 @@ import net.server.Server;
 import server.TimerManager;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -150,11 +151,11 @@ public class NewYearCardRecord {
                chr.removeNewYearRecord(nyc);
                deleteNewYearCard(nyc.id);
 
-               chr.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(chr, nyc, 0xE, 0));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.onNewYearCardRes(chr, nyc, 0xE, 0));
 
                chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getReceiverId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(other -> {
                   other.removeNewYearRecord(nyc);
-                  other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
+                  MasterBroadcaster.getInstance().sendToAllInMap(other.getMap(), character -> MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
                   MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
                });
             }
@@ -166,13 +167,13 @@ public class NewYearCardRecord {
                chr.removeNewYearRecord(nyc);
                deleteNewYearCard(nyc.id);
 
-               chr.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(chr, nyc, 0xE, 0));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.onNewYearCardRes(chr, nyc, 0xE, 0));
 
                chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.getSenderId())
                      .filter(MapleCharacter::isLoggedinWorld)
                      .ifPresent(other -> {
                         other.removeNewYearRecord(nyc);
-                        other.getMap().broadcastMessage(MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
+                        MasterBroadcaster.getInstance().sendToAllInMap(other.getMap(), character -> MaplePacketCreator.onNewYearCardRes(other, nyc, 0xE, 0));
                         MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
                      });
             }

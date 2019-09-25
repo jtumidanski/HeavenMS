@@ -45,6 +45,7 @@ import server.MakerItemFactory;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
@@ -236,7 +237,8 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                   }
 
                   client.announce(MaplePacketCreator.showMakerEffect(makerSucceeded));
-                  client.getPlayer().getMap().broadcastMessage(client.getPlayer(), MaplePacketCreator.showForeignMakerEffect(client.getPlayer().getId(), makerSucceeded), false);
+                  boolean finalMakerSucceeded = makerSucceeded;
+                  MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.showForeignMakerEffect(client.getPlayer().getId(), finalMakerSucceeded), false, client.getPlayer());
 
                   if (toCreate == 4260003 && type == 3 && client.getPlayer().getQuestStatus(6033) == 1) {
                      client.getAbstractPlayerInteraction().setQuestProgress(6033, 1);

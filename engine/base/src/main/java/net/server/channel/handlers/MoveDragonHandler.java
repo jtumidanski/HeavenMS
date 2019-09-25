@@ -28,6 +28,7 @@ import net.server.channel.packet.movement.MoveDragonPacket;
 import net.server.channel.packet.reader.MoveDragonReader;
 import server.maps.MapleDragon;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 
 public class MoveDragonHandler extends AbstractMoveHandler<MoveDragonPacket> {
@@ -46,7 +47,7 @@ public class MoveDragonHandler extends AbstractMoveHandler<MoveDragonPacket> {
             if (chr.isHidden()) {
                chr.getMap().broadcastGMMessage(chr, MaplePacketCreator.moveDragon(dragon, packet.startPosition(), packet.movementList()));
             } else {
-               chr.getMap().broadcastMessage(chr, MaplePacketCreator.moveDragon(dragon, packet.startPosition(), packet.movementList()), dragon.getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> MaplePacketCreator.moveDragon(dragon, packet.startPosition(), packet.movementList()), chr, dragon.getPosition());
             }
          }
       }

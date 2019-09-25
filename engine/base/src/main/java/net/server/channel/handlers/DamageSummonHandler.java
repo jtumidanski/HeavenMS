@@ -30,6 +30,7 @@ import net.server.channel.packet.reader.DamageSummonReader;
 import server.maps.MapleMapObject;
 import server.maps.MapleSummon;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummonPacket> {
    @Override
@@ -49,7 +50,7 @@ public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummo
          if (summon.getHP() <= 0) {
             player.cancelEffectFromBuffStat(MapleBuffStat.PUPPET);
          }
-         player.getMap().broadcastMessage(player, MaplePacketCreator.damageSummon(player.getId(), packet.objectId(), packet.damage(), packet.monsterIdFrom()), summon.getPosition());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), character -> MaplePacketCreator.damageSummon(player.getId(), packet.objectId(), packet.damage(), packet.monsterIdFrom()), player, summon.getPosition());
       }
    }
 }

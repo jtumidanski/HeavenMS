@@ -35,6 +35,7 @@ import server.life.MapleNPC;
 import server.maps.MapleMap;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -82,7 +83,8 @@ public class PnpcCommand extends Command {
 
             MapleMap map = ch.getMapFactory().getMap(mapId);
             map.addMapObject(npc);
-            map.broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+            MapleNPC finalNpc = npc;
+            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.spawnNPC(finalNpc));
          }
 
          player.yellowMessage("Pnpc created.");

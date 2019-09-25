@@ -98,6 +98,7 @@ import server.processor.maps.MapleMapObjectTypeProcessor;
 import server.processor.maps.MapleMapProcessor;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.PointUtil;
@@ -324,7 +325,7 @@ public class MapleMap {
                mr.lockReactor();
                try {
                   mr.resetReactorActions(1);
-                  broadcastMessage(MaplePacketCreator.triggerReactor((MapleReactor) o, 1));
+                  MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.triggerReactor((MapleReactor) o, 1));
                } finally {
                   mr.unlockReactor();
                }
@@ -955,7 +956,7 @@ public class MapleMap {
    }
 
    public void pickItemDrop(byte[] pickupPacket, MapleMapItem mdrop) { // mdrop must be already locked and not-pickedup checked by now
-      broadcastMessage(pickupPacket, mdrop.getPosition());
+      MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> pickupPacket, mdrop.getPosition());
 
       droppedItemCount.decrementAndGet();
       this.removeMapObject(mdrop);
@@ -1280,7 +1281,7 @@ public class MapleMap {
       if (chr == null) {
          if (removeKilledMonsterObject(monster)) {
             monster.dispatchMonsterKilled(false);
-            broadcastMessage(MaplePacketCreator.killMonster(monster.getObjectId(), animation), monster.getPosition());
+            MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> MaplePacketCreator.killMonster(monster.getObjectId(), animation), monster.getPosition());
             monster.aggroSwitchController(null, false);
          }
       } else {
@@ -1310,7 +1311,7 @@ public class MapleMap {
                         .forEach(character -> {
                            MapleStatEffect statEffect = mii.getItemEffect(buff);
                            character.getClient().announce(MaplePacketCreator.showOwnBuffEffect(buff, 1));
-                           broadcastMessage(character, MaplePacketCreator.showBuffeffect(character.getId(), buff, 1), false);
+                           MasterBroadcaster.getInstance().sendToAllInMap(this, chara -> MaplePacketCreator.showBuffeffect(character.getId(), buff, 1), false, character);
                            statEffect.applyTo(character);
                         });
                }
@@ -1360,7 +1361,7 @@ public class MapleMap {
                e.printStackTrace();
             } finally {     // thanks resinate for pointing out a memory leak possibly from an exception thrown
                monster.dispatchMonsterKilled(true);
-               broadcastMessage(MaplePacketCreator.killMonster(monster.getObjectId(), animation), monster.getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> MaplePacketCreator.killMonster(monster.getObjectId(), animation), monster.getPosition());
             }
          }
       }
@@ -1469,7 +1470,7 @@ public class MapleMap {
          try {
             r.resetReactorActions(0);
             r.setAlive(true);
-            broadcastMessage(MaplePacketCreator.triggerReactor(r, 0));
+            MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.triggerReactor(r, 0));
          } finally {
             r.unlockReactor();
          }
@@ -1591,8 +1592,8 @@ public class MapleMap {
       try {
          for (MapleMapObject obj : npcs) {
             if (((MapleNPC) obj).getId() == npcid) {
-               broadcastMessage(MaplePacketCreator.removeNPCController(obj.getObjectId()));
-               broadcastMessage(MaplePacketCreator.removeNPC(obj.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeNPCController(obj.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeNPC(obj.getObjectId()));
 
                this.mapobjects.remove(obj.getObjectId());
             }
@@ -1919,7 +1920,7 @@ public class MapleMap {
 
    public void makeMonsterReal(final MapleMonster monster) {
       monster.setFake(false);
-      broadcastMessage(MaplePacketCreator.makeMonsterReal(monster));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.makeMonsterReal(monster));
 
       monster.aggroUpdateController();
    }
@@ -1975,7 +1976,7 @@ public class MapleMap {
 
    public void spawnMist(final MapleMist mist, final int duration, boolean poison, boolean fake, boolean recovery) {
       addMapObject(mist);
-      broadcastMessage(fake ? mist.makeFakeSpawnData(30) : mist.makeSpawnData());
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> fake ? mist.makeFakeSpawnData(30) : mist.makeSpawnData());
       TimerManager tMan = TimerManager.getInstance();
       final ScheduledFuture<?> poisonSchedule;
       if (poison) {
@@ -2023,7 +2024,7 @@ public class MapleMap {
             if (poisonSchedule != null) {
                poisonSchedule.cancel(false);
             }
-            broadcastMessage(mist.makeDestroyData());
+            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> mist.makeDestroyData());
          }
       };
 
@@ -2032,13 +2033,13 @@ public class MapleMap {
 
    public void spawnKite(final MapleKite kite) {
       addMapObject(kite);
-      broadcastMessage(kite.makeSpawnData());
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> kite.makeSpawnData());
 
       Runnable expireKite = new Runnable() {
          @Override
          public void run() {
             removeMapObject(kite);
-            broadcastMessage(kite.makeDestroyData());
+            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> kite.makeDestroyData());
          }
       };
 
@@ -2184,7 +2185,7 @@ public class MapleMap {
    }
 
    public void changeEnvironment(String mapObj, int newState) {
-      broadcastMessage(MaplePacketCreator.environmentChange(mapObj, newState));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.environmentChange(mapObj, newState));
    }
 
    public void startMapEffect(String msg, int itemId) {
@@ -2196,12 +2197,12 @@ public class MapleMap {
          return;
       }
       mapEffect = new MapleMapEffect(msg, itemId);
-      broadcastMessage(mapEffect.makeStartData());
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> mapEffect.makeStartData());
 
       Runnable r = new Runnable() {
          @Override
          public void run() {
-            broadcastMessage(mapEffect.makeDestroyData());
+            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> mapEffect.makeDestroyData());
             mapEffect = null;
          }
       };
@@ -2612,9 +2613,9 @@ public class MapleMap {
 
       removeMapObject(chr.getObjectId());
       if (!chr.isHidden()) {
-         broadcastMessage(MaplePacketCreator.removePlayerFromMap(chr.getId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removePlayerFromMap(chr.getId()));
       } else {
-         broadcastGMMessage(MaplePacketCreator.removePlayerFromMap(chr.getId()));
+         MasterBroadcaster.getInstance().sendToAllGMInMap(this, character -> MaplePacketCreator.removePlayerFromMap(chr.getId()));
       }
 
       chr.leaveMap();
@@ -2634,79 +2635,6 @@ public class MapleMap {
          } else {
             this.broadcastMessage(chr, MaplePacketCreator.removeDragon(chr.getId()));
          }
-      }
-   }
-
-   @Deprecated
-   public void broadcastMessage(final byte[] packet) {
-      broadcastMessage(null, packet, Double.POSITIVE_INFINITY, null);
-   }
-
-   @Deprecated
-   public void broadcastGMMessage(final byte[] packet) {
-      broadcastGMMessage(null, packet, Double.POSITIVE_INFINITY, null);
-   }
-
-   /**
-    * Nonranged. Repeat to source according to parameter.
-    *
-    * @param source
-    * @param packet
-    * @param repeatToSource
-    */
-   public void broadcastMessage(MapleCharacter source, final byte[] packet, boolean repeatToSource) {
-      broadcastMessage(repeatToSource ? null : source, packet, Double.POSITIVE_INFINITY, source.getPosition());
-   }
-
-   /**
-    * Ranged and repeat according to parameters.
-    *
-    * @param source
-    * @param packet
-    * @param repeatToSource
-    * @param ranged
-    */
-   public void broadcastMessage(MapleCharacter source, final byte[] packet, boolean repeatToSource, boolean ranged) {
-      broadcastMessage(repeatToSource ? null : source, packet, ranged ? MapleMapProcessor.getInstance().getRangedDistance() : Double.POSITIVE_INFINITY, source.getPosition());
-   }
-
-   /**
-    * Always ranged from Point.
-    *
-    * @param packet
-    * @param rangedFrom
-    */
-   public void broadcastMessage(final byte[] packet, Point rangedFrom) {
-      broadcastMessage(null, packet, MapleMapProcessor.getInstance().getRangedDistance(), rangedFrom);
-   }
-
-   /**
-    * Always ranged from point. Does not repeat to source.
-    *
-    * @param source
-    * @param packet
-    * @param rangedFrom
-    */
-   public void broadcastMessage(MapleCharacter source, final byte[] packet, Point rangedFrom) {
-      broadcastMessage(source, packet, MapleMapProcessor.getInstance().getRangedDistance(), rangedFrom);
-   }
-
-   private void broadcastMessage(MapleCharacter source, final byte[] packet, double rangeSq, Point rangedFrom) {
-      chrRLock.lock();
-      try {
-         for (MapleCharacter chr : characters) {
-            if (chr != source) {
-               if (rangeSq < Double.POSITIVE_INFINITY) {
-                  if (rangedFrom.distanceSq(chr.getPosition()) <= rangeSq) {
-                     chr.getClient().announce(packet);
-                  }
-               } else {
-                  chr.getClient().announce(packet);
-               }
-            }
-         }
-      } finally {
-         chrRLock.unlock();
       }
    }
 
@@ -3064,7 +2992,7 @@ public class MapleMap {
    }
 
    public final void moveEnvironment(final String ms, final int type) {
-      broadcastMessage(MaplePacketCreator.environmentMove(ms, type));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.environmentMove(ms, type));
 
       objectWLock.lock();
       try {
@@ -3500,7 +3428,7 @@ public class MapleMap {
    private void clearDrop(MapleMapObject i, int characterId) {
       droppedItemCount.decrementAndGet();
       removeMapObject(i);
-      this.broadcastMessage(MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, characterId));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, characterId));
    }
 
    public int getFieldLimit() {
@@ -3654,7 +3582,7 @@ public class MapleMap {
                   npc.setHide(!npc.isHidden());
                   if (!npc.isHidden()) //Should only be hidden upon changing maps
                   {
-                     broadcastMessage(MaplePacketCreator.spawnNPC(npc));
+                     MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.spawnNPC(npc));
                   }
                }
             }
@@ -3703,12 +3631,12 @@ public class MapleMap {
    }
 
    public void broadcastShip(final boolean state) {
-      broadcastMessage(MaplePacketCreator.boatPacket(state));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.boatPacket(state));
       this.setDocked(state);
    }
 
    public void broadcastEnemyShip(final boolean state) {
-      broadcastMessage(MaplePacketCreator.crogBoatPacket(state));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.crogBoatPacket(state));
       this.setDocked(state);
    }
 
@@ -4230,7 +4158,7 @@ public class MapleMap {
                      unregisterItemDrop(mapitem);
 
                      reactor.setShouldCollect(false);
-                     MapleMap.this.broadcastMessage(MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), 0, 0), mapitem.getPosition());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(MapleMap.this, character -> MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), 0, 0), mapitem.getPosition());
 
                      droppedItemCount.decrementAndGet();
                      MapleMap.this.removeMapObject(mapitem);
@@ -4247,7 +4175,7 @@ public class MapleMap {
                               try {
                                  reactor.resetReactorActions(0);
                                  reactor.setAlive(true);
-                                 broadcastMessage(MaplePacketCreator.triggerReactor(reactor, 0));
+                                 MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> MaplePacketCreator.triggerReactor(reactor, 0));
                               } finally {
                                  reactor.unlockReactor();
                               }

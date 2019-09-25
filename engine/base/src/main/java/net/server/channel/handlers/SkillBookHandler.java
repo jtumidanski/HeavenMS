@@ -35,6 +35,7 @@ import net.server.channel.packet.SkillBookPacket;
 import net.server.channel.packet.reader.SkillBookReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.MasterBroadcaster;
 
 public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacket> {
    @Override
@@ -69,7 +70,7 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
 
             skillId = skillData.get("skillid");
             if (skillId == 0) {
-               player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, false, false));
+               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.skillBookResult(player, skillId, 0, false, false));
             } else {
                SkillFactory.getSkill(skillId).ifPresentOrElse(skill -> {
                   boolean meetsPrerequisiteLevel = (player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0);
@@ -87,8 +88,9 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
                         success = false;
                      }
                   }
-                  player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, bookCanBeUsed, success));
-               }, () -> player.getMap().broadcastMessage(MaplePacketCreator.skillBookResult(player, skillId, 0, false, false)));
+                  boolean finalSuccess = success;
+                  MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.skillBookResult(player, skillId, 0, bookCanBeUsed, finalSuccess));
+               }, () -> MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.skillBookResult(player, skillId, 0, false, false)));
             }
          } finally {
             client.releaseClient();
