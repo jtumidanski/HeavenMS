@@ -21,7 +21,9 @@
 */
 package server.maps;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericSeekableLittleEndianAccessor;
@@ -67,7 +69,16 @@ public abstract class AbstractAnimatedMapleMapObject extends AbstractMapleMapObj
       return Math.abs(stance) % 2 == 1;
    }
 
-   public SeekableLittleEndianAccessor getIdleMovement() {
+   public List<Byte> getIdleMovementBytes() {
+      byte[] movementData = adjustIdleMovementData();
+      List<Byte> result = new ArrayList<>();
+      for (byte bit : movementData) {
+         result.add(bit);
+      }
+      return result;
+   }
+
+   private byte[] adjustIdleMovementData() {
       byte[] movementData = Arrays.copyOf(idleMovementPacketData, idleMovementPacketData.length);
       //seems wasteful to create a whole packet writer when only a few values are changed
       int x = getPosition().x;
@@ -77,6 +88,6 @@ public abstract class AbstractAnimatedMapleMapObject extends AbstractMapleMapObj
       movementData[4] = (byte) (y & 0xFF); //y
       movementData[5] = (byte) (y >> 8 & 0xFF);
       movementData[12] = (byte) (getStance() & 0xFF);
-      return new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(movementData));
+      return movementData;
    }
 }

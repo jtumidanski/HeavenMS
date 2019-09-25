@@ -1292,7 +1292,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void broadcastStance() {
-      map.broadcastMessage(this, MaplePacketCreator.movePlayer(id, this.getIdleMovement(), getIdleMovementDataLength()), false);
+      map.broadcastMessage(this, MaplePacketCreator.movePlayer(id, this.getIdleMovementBytes()), false);
    }
 
    public MapleMap getWarpMap(int map) {

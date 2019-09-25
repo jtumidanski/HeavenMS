@@ -81,6 +81,7 @@ class MapleMonsterStats() {
 
   def level: Int = _level
 
+  //noinspection MutatorLikeMethodIsParameterless
   def removeAfter: Int = _removeAfter
 
   def isFFALoot: Boolean = _isFFALoot
@@ -111,6 +112,7 @@ class MapleMonsterStats() {
 
   def selfDestruction_=(selfDestruction: SelfDestruction): Unit = _selfDestruction = Option.apply(selfDestruction)
 
+  //noinspection MutatorLikeMethodIsParameterless
   def removeOnMiss: Boolean = _removeOnMiss
 
   def isFriendly: Boolean = _isFriendly
