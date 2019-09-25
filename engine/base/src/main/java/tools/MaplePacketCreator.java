@@ -70,6 +70,7 @@ import constants.ExpTable;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
+import constants.ShopTransactionOperation;
 import constants.skills.Buccaneer;
 import constants.skills.Corsair;
 import constants.skills.ThunderBreaker;
@@ -2442,21 +2443,10 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   /* 00 = /
-    * 01 = You don't have enough in stock
-    * 02 = You do not have enough mesos
-    * 03 = Please check if your inventory is full or not
-    * 05 = You don't have enough in stock
-    * 06 = Due to an error, the trade did not happen
-    * 07 = Due to an error, the trade did not happen
-    * 08 = /
-    * 0D = You need more items
-    * 0E = CRASH; LENGTH NEEDS TO BE LONGER :O
-    */
-   public static byte[] shopTransaction(byte code) {
+   public static byte[] shopTransaction(ShopTransactionOperation code) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
       mplew.writeShort(SendOpcode.CONFIRM_SHOP_TRANSACTION.getValue());
-      mplew.write(code);
+      mplew.write(code.getValue());
       return mplew.getPacket();
    }
 

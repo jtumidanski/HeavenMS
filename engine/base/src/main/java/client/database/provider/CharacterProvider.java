@@ -71,14 +71,14 @@ public class CharacterProvider extends AbstractQueryExecutor {
    public Optional<CharacterGuildData> getGuildDataForCharacter(Connection connection, int characterId, int accountId) {
       String sql = "SELECT id, guildid, guildrank, name, allianceRank, level, job FROM characters WHERE id = ? AND accountid = ?";
       CharacterGuildTransformer transformer = new CharacterGuildTransformer();
-      return get(connection, sql, ps -> {
+      return getNew(connection, sql, ps -> {
          ps.setInt(1, characterId);
          ps.setInt(2, accountId);
       }, rs -> {
-         if (rs != null && rs.next() && rs.getInt("guildid") > 0) {
-            return Optional.of(transformer.transform(rs));
+         if (rs.getInt("guildid") > 0) {
+            return transformer.transform(rs);
          }
-         return Optional.empty();
+         return null;
       });
    }
 
@@ -91,8 +91,8 @@ public class CharacterProvider extends AbstractQueryExecutor {
 
    public Optional<Pair<Integer, Integer>> getIdAndAccountIdForName(Connection connection, String name) {
       String sql = "SELECT id, accountid FROM characters WHERE name = ?";
-      return get(connection, sql, ps -> ps.setString(1, name),
-            rs -> Optional.of(new Pair<>(rs.getInt(2), rs.getInt(1))));
+      return getNew(connection, sql, ps -> ps.setString(1, name),
+            rs -> new Pair<>(rs.getInt(2), rs.getInt(1)));
    }
 
    public Integer getAccountIdForName(Connection connection, String name) {

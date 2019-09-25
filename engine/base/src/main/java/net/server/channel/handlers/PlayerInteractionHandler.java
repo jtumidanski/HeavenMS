@@ -75,6 +75,7 @@ import net.server.channel.packet.interaction.VisitPlayerInteractionPacket;
 import net.server.channel.packet.reader.PlayerInteractionReader;
 import server.MapleItemInformationProvider;
 import server.MapleTrade;
+import server.MapleTradeResult;
 import server.maps.FieldLimit;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMapObject;
@@ -723,7 +724,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
    private void exitAction(MapleCharacter chr) {
       if (chr.getTrade() != null) {
-         MapleTrade.cancelTrade(chr, MapleTrade.TradeResult.PARTNER_CANCEL);
+         MapleTrade.cancelTrade(chr, MapleTradeResult.PARTNER_CANCEL);
       } else {
          chr.closePlayerShop();
          chr.closeMiniGame(false);

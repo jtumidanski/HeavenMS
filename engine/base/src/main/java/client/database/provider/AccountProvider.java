@@ -46,36 +46,25 @@ public class AccountProvider extends AbstractQueryExecutor {
 
    public AccountLoginData getLoginData(Connection connection, int accountId) {
       String sql = "SELECT loggedin, lastlogin, birthday FROM accounts WHERE id = ?";
-      Optional<AccountLoginData> result = get(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new AccountLoginData(rs.getInt("loggedin"), rs.getTimestamp("lastlogin"), rs.getDate("birthday")));
-         }
-         return Optional.empty();
-      });
+      Optional<AccountLoginData> result = getNew(connection, sql, ps -> ps.setInt(1, accountId),
+            rs -> new AccountLoginData(rs.getInt("loggedin"), rs.getTimestamp("lastlogin"), rs.getDate("birthday")));
       return result.orElse(null);
    }
 
    public Calendar getTempBanCalendar(Connection connection, int accountId) {
       String sql = "SELECT `tempban` FROM accounts WHERE id = ?";
-      Optional<Calendar> result = get(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
-         if (rs != null && rs.next()) {
-            Calendar tempBan = Calendar.getInstance();
-            tempBan.setTimeInMillis(rs.getTimestamp("tempban").getTime());
-            return Optional.of(tempBan);
-         }
-         return Optional.empty();
+      Optional<Calendar> result = getNew(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
+         Calendar tempBan = Calendar.getInstance();
+         tempBan.setTimeInMillis(rs.getTimestamp("tempban").getTime());
+         return tempBan;
       });
       return result.orElse(null);
    }
 
    public Set<String> getMacs(Connection connection, int accountId) {
       String sql = "SELECT macs FROM accounts WHERE id = ?";
-      Optional<Set<String>> result = get(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(Arrays.stream(rs.getString("macs").split(", ")).filter(mac -> !mac.equals("")).collect(Collectors.toSet()));
-         }
-         return Optional.empty();
-      });
+      Optional<Set<String>> result = getNew(connection, sql, ps -> ps.setInt(1, accountId),
+            rs -> Arrays.stream(rs.getString("macs").split(", ")).filter(mac -> !mac.equals("")).collect(Collectors.toSet()));
       return result.orElse(null);
    }
 
@@ -99,25 +88,17 @@ public class AccountProvider extends AbstractQueryExecutor {
 
    public AccountCashShopData getAccountCashShopData(Connection connection, int accountId) {
       String sql = "SELECT `nxCredit`, `maplePoint`, `nxPrepaid` FROM `accounts` WHERE `id` = ?";
-      Optional<AccountCashShopData> result = get(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new AccountCashShopData(rs.getInt("nxCredit"), rs.getInt("maplePoint"), rs.getInt("nxPrepaid")));
-         }
-         return Optional.empty();
-      });
+      Optional<AccountCashShopData> result = getNew(connection, sql, ps -> ps.setInt(1, accountId),
+            rs -> new AccountCashShopData(rs.getInt("nxCredit"), rs.getInt("maplePoint"), rs.getInt("nxPrepaid")));
       return result.orElse(null);
    }
 
    public Optional<AccountData> getAccountDataByName(Connection connection, String name) {
       String sql = "SELECT id, password, gender, banned, pin, pic, characterslots, tos, language FROM accounts WHERE name = ?";
-      return get(connection, sql, ps -> ps.setString(1, name), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new AccountData(rs.getInt("id"), name, rs.getString("password"), rs.getByte("gender"),
+      return getNew(connection, sql, ps -> ps.setString(1, name),
+            rs -> new AccountData(rs.getInt("id"), name, rs.getString("password"), rs.getByte("gender"),
                   rs.getByte("banned") == 1, rs.getString("pin"), rs.getString("pic"), rs.getByte("characterslots"),
                   rs.getByte("tos"), rs.getInt("language")));
-         }
-         return Optional.empty();
-      });
    }
 
    public long getAccountCount(Connection connection) {
@@ -128,14 +109,10 @@ public class AccountProvider extends AbstractQueryExecutor {
 
    public Optional<AccountData> getAccountDataById(Connection connection, int accountId) {
       String sql = "SELECT name, password, gender, banned, pin, pic, characterslots, tos, language FROM accounts WHERE id = ?";
-      return get(connection, sql, ps -> ps.setInt(1, accountId), rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.of(new AccountData(accountId, rs.getString("name"), rs.getString("password"), rs.getByte("gender"),
+      return getNew(connection, sql, ps -> ps.setInt(1, accountId),
+            rs -> new AccountData(accountId, rs.getString("name"), rs.getString("password"), rs.getByte("gender"),
                   rs.getByte("banned") == 1, rs.getString("pin"), rs.getString("pic"), rs.getByte("characterslots"),
                   rs.getByte("tos"), rs.getInt("language")));
-         }
-         return Optional.empty();
-      });
    }
 
    public List<Integer> getAllAccountIds(Connection connection) {

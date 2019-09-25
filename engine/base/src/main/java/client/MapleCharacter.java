@@ -160,6 +160,7 @@ import server.MapleShop;
 import server.MapleStatEffect;
 import server.MapleStorage;
 import server.MapleTrade;
+import server.MapleTradeResult;
 import server.ThreadManager;
 import server.TimerManager;
 import server.events.MapleEvents;
@@ -1635,7 +1636,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       this.unregisterChairBuff();
       this.clearBanishPlayerData();
-      MapleTrade.cancelTrade(this, MapleTrade.TradeResult.UNSUCCESSFUL_ANOTHER_MAP);
+      MapleTrade.cancelTrade(this, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
       this.closePlayerInteractions();
 
       MapleParty e = null;
@@ -4841,7 +4842,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void closeTrade() {
-      MapleTrade.cancelTrade(this, MapleTrade.TradeResult.PARTNER_CANCEL);
+      MapleTrade.cancelTrade(this, MapleTradeResult.PARTNER_CANCEL);
    }
 
    public void closePlayerShop() {

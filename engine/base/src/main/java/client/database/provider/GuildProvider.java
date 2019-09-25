@@ -34,29 +34,26 @@ public class GuildProvider extends AbstractQueryExecutor {
 
    public Optional<GuildData> getGuildDataById(Connection connection, int guildId) {
       String sql = "SELECT * FROM guilds WHERE guildid = ?";
-      return get(connection, sql, ps -> ps.setInt(1, guildId), rs -> {
-         if (rs != null && rs.next()) {
-            String[] rankTitles = new String[5];
-            for (int i = 1; i <= 5; i++) {
-               rankTitles[i - 1] = rs.getString("rank" + i + "title");
-            }
-
-            return Optional.of(new GuildData(
-                  rs.getString("name"),
-                  rs.getInt("GP"),
-                  rs.getInt("logo"),
-                  rs.getInt("logoColor"),
-                  rs.getInt("logoBG"),
-                  rs.getInt("logoBGColor"),
-                  rs.getInt("capacity"),
-                  rankTitles,
-                  rs.getInt("leader"),
-                  rs.getString("notice"),
-                  rs.getInt("signature"),
-                  rs.getInt("allianceId")
-            ));
+      return getNew(connection, sql, ps -> ps.setInt(1, guildId), rs -> {
+         String[] rankTitles = new String[5];
+         for (int i = 1; i <= 5; i++) {
+            rankTitles[i - 1] = rs.getString("rank" + i + "title");
          }
-         return Optional.empty();
+
+         return new GuildData(
+               rs.getString("name"),
+               rs.getInt("GP"),
+               rs.getInt("logo"),
+               rs.getInt("logoColor"),
+               rs.getInt("logoBG"),
+               rs.getInt("logoBGColor"),
+               rs.getInt("capacity"),
+               rankTitles,
+               rs.getInt("leader"),
+               rs.getString("notice"),
+               rs.getInt("signature"),
+               rs.getInt("allianceId")
+         );
       });
    }
 

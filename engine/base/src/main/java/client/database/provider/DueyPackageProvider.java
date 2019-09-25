@@ -30,8 +30,8 @@ public class DueyPackageProvider extends AbstractQueryExecutor {
 
    public Optional<Pair<String, Integer>> get(Connection connection, int characterId) {
       String sql = "SELECT SenderName, Type FROM dueypackages WHERE ReceiverId = ? AND Checked = 1 ORDER BY Type DESC";
-      return get(connection, sql, ps -> ps.setInt(1, characterId),
-            rs -> Optional.of(new Pair<>(rs.getString("SenderName"), rs.getInt("Type"))));
+      return getNew(connection, sql, ps -> ps.setInt(1, characterId),
+            rs -> new Pair<>(rs.getString("SenderName"), rs.getInt("Type")));
    }
 
    public List<DueyPackage> getPackagesForReceiver(Connection connection, int characterId) {

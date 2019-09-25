@@ -90,12 +90,12 @@ public class MapleTrade {
          partner.fetchExchangedItems();
 
          if (!local.fitsMeso()) {
-            cancelTrade(local.getChr(), TradeResult.UNSUCCESSFUL);
+            cancelTrade(local.getChr(), MapleTradeResult.UNSUCCESSFUL);
             MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "There is not enough meso inventory space to complete the trade.");
             MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "Partner does not have enough meso inventory space to complete the trade.");
             return;
          } else if (!partner.fitsMeso()) {
-            cancelTrade(partner.getChr(), TradeResult.UNSUCCESSFUL);
+            cancelTrade(partner.getChr(), MapleTradeResult.UNSUCCESSFUL);
             MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "Partner does not have enough meso inventory space to complete the trade.");
             MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "There is not enough meso inventory space to complete the trade.");
             return;
@@ -103,21 +103,21 @@ public class MapleTrade {
 
          if (!local.fitsInInventory()) {
             if (local.fitsUniquesInInventory()) {
-               cancelTrade(local.getChr(), TradeResult.UNSUCCESSFUL);
+               cancelTrade(local.getChr(), MapleTradeResult.UNSUCCESSFUL);
                MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "There is not enough inventory space to complete the trade.");
                MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "Partner does not have enough inventory space to complete the trade.");
             } else {
-               cancelTrade(local.getChr(), TradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
+               cancelTrade(local.getChr(), MapleTradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
                MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "Partner cannot hold more than one one-of-a-kind item at a time.");
             }
             return;
          } else if (!partner.fitsInInventory()) {
             if (partner.fitsUniquesInInventory()) {
-               cancelTrade(partner.getChr(), TradeResult.UNSUCCESSFUL);
+               cancelTrade(partner.getChr(), MapleTradeResult.UNSUCCESSFUL);
                MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "Partner does not have enough inventory space to complete the trade.");
                MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.PINK_TEXT, "There is not enough inventory space to complete the trade.");
             } else {
-               cancelTrade(partner.getChr(), TradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
+               cancelTrade(partner.getChr(), MapleTradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
                MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "Partner cannot hold more than one one-of-a-kind item at a time.");
             }
             return;
@@ -125,7 +125,7 @@ public class MapleTrade {
 
          if (local.getChr().getLevel() < 15) {
             if (local.getChr().getMesosTraded() + local.exchangeMeso > 1000000) {
-               cancelTrade(local.getChr(), TradeResult.NO_RESPONSE);
+               cancelTrade(local.getChr(), MapleTradeResult.NO_RESPONSE);
                MessageBroadcaster.getInstance().sendServerNotice(local.getChr(), ServerNoticeType.POP_UP, "Characters under level 15 may not trade more than 1 million mesos per day.");
                return;
             } else {
@@ -133,7 +133,7 @@ public class MapleTrade {
             }
          } else if (partner.getChr().getLevel() < 15) {
             if (partner.getChr().getMesosTraded() + partner.exchangeMeso > 1000000) {
-               cancelTrade(partner.getChr(), TradeResult.NO_RESPONSE);
+               cancelTrade(partner.getChr(), MapleTradeResult.NO_RESPONSE);
                MessageBroadcaster.getInstance().sendServerNotice(partner.getChr(), ServerNoticeType.POP_UP, "Characters under level 15 may not trade more than 1 million mesos per day.");
                return;
             } else {
@@ -170,11 +170,11 @@ public class MapleTrade {
    private static byte[] tradeResultsPair(byte result) {
       byte selfResult, partnerResult;
 
-      if (result == TradeResult.PARTNER_CANCEL.getValue()) {
+      if (result == MapleTradeResult.PARTNER_CANCEL.getValue()) {
          partnerResult = result;
-         selfResult = TradeResult.NO_RESPONSE.getValue();
-      } else if (result == TradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT.getValue()) {
-         partnerResult = TradeResult.UNSUCCESSFUL.getValue();
+         selfResult = MapleTradeResult.NO_RESPONSE.getValue();
+      } else if (result == MapleTradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT.getValue()) {
+         partnerResult = MapleTradeResult.UNSUCCESSFUL.getValue();
          selfResult = result;
       } else {
          partnerResult = result;
@@ -184,7 +184,7 @@ public class MapleTrade {
       return new byte[]{selfResult, partnerResult};
    }
 
-   public static void cancelTrade(MapleCharacter chr, TradeResult result) {
+   public static void cancelTrade(MapleCharacter chr, MapleTradeResult result) {
       MapleTrade trade = chr.getTrade();
       if (trade == null) {
          return;
@@ -235,12 +235,12 @@ public class MapleTrade {
             c2.getClient().announce(MaplePacketCreator.tradeInvite(c1));
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "The other player is already trading with someone else.");
-            cancelTrade(c1, TradeResult.NO_RESPONSE);
+            cancelTrade(c1, MapleTradeResult.NO_RESPONSE);
             MapleInviteCoordinator.answerInvite(InviteType.TRADE, c2.getId(), c1.getId(), false);
          }
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "The other player is already managing someone else's trade invitation.");
-         cancelTrade(c1, TradeResult.NO_RESPONSE);
+         cancelTrade(c1, MapleTradeResult.NO_RESPONSE);
       }
    }
 
@@ -259,7 +259,7 @@ public class MapleTrade {
          }
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "This trade invitation already rescinded.");
-         cancelTrade(c1, TradeResult.NO_RESPONSE);
+         cancelTrade(c1, MapleTradeResult.NO_RESPONSE);
       }
    }
 
@@ -272,11 +272,11 @@ public class MapleTrade {
                MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.PINK_TEXT, c.getName() + " has declined your trade request.");
             }
 
-            other.getTrade().cancel(TradeResult.PARTNER_CANCEL.getValue());
+            other.getTrade().cancel(MapleTradeResult.PARTNER_CANCEL.getValue());
             other.setTrade(null);
 
          }
-         trade.cancel(TradeResult.NO_RESPONSE.getValue());
+         trade.cancel(MapleTradeResult.NO_RESPONSE.getValue());
          c.setTrade(null);
       }
    }
@@ -312,9 +312,9 @@ public class MapleTrade {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Transaction completed. You received " + GameConstants.numberWithCommas(exchangeMeso) + " mesos.");
          }
 
-         result = TradeResult.NO_RESPONSE.getValue();
+         result = MapleTradeResult.NO_RESPONSE.getValue();
       } else {
-         result = TradeResult.SUCCESSFUL.getValue();
+         result = MapleTradeResult.SUCCESSFUL.getValue();
       }
 
       exchangeMeso = 0;
@@ -501,25 +501,5 @@ public class MapleTrade {
 
    public void setFullTrade(boolean fullTrade) {
       this.fullTrade = fullTrade;
-   }
-
-   public enum TradeResult {
-      NO_RESPONSE(1),
-      PARTNER_CANCEL(2),
-      SUCCESSFUL(7),
-      UNSUCCESSFUL(8),
-      UNSUCCESSFUL_UNIQUE_ITEM_LIMIT(9),
-      UNSUCCESSFUL_ANOTHER_MAP(12),
-      UNSUCCESSFUL_DAMAGED_FILES(13);
-
-      private final int res;
-
-      TradeResult(int res) {
-         this.res = res;
-      }
-
-      private byte getValue() {
-         return (byte) res;
-      }
    }
 }

@@ -24,17 +24,14 @@ public class BbsThreadProvider extends AbstractQueryExecutor {
    public Optional<BbsThreadData> getByThreadAndGuildId(Connection connection, int threadId, int guildId, boolean localThread) {
       String sql = "SELECT * FROM bbs_threads WHERE guildid = ? AND " + (localThread ? "local" : "") + "threadid = ?";
       BbsThreadTransformer transformer = new BbsThreadTransformer();
-      return get(connection, sql, ps -> {
+      return getNew(connection, sql, ps -> {
          ps.setInt(1, guildId);
          ps.setInt(2, threadId);
       }, rs -> {
-         if (rs != null && rs.next()) {
             BbsThreadData threadData = transformer.transform(rs);
             BbsThreadReplyProvider.getInstance().getByThreadId(connection, !localThread ? threadId : threadData.threadId())
                   .forEach(threadData::addReply);
-            return Optional.of(threadData);
-         }
-         return Optional.empty();
+            return threadData;
       });
    }
 

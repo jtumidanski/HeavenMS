@@ -33,6 +33,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ChangeMapPacket;
 import net.server.channel.packet.reader.ChangeMapReader;
 import server.MapleTrade;
+import server.MapleTradeResult;
 import server.maps.MapleMap;
 import server.maps.MaplePortal;
 import tools.FilePrinter;
@@ -57,7 +58,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
          return;
       }
       if (chr.getTrade() != null) {
-         MapleTrade.cancelTrade(chr, MapleTrade.TradeResult.UNSUCCESSFUL_ANOTHER_MAP);
+         MapleTrade.cancelTrade(chr, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
       }
       if (packet.cashShop()) { //Cash Shop :)
          if (!chr.getCashShop().isOpened()) {

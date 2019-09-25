@@ -14,12 +14,7 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, int columnIndex) {
-      return get(connection, sql, setParams, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.ofNullable((T) rs.getObject(columnIndex));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, setParams, resultSet -> (T) resultSet.getObject(columnIndex));
    }
 
    protected <T> Optional<T> getSingle(Connection connection, String sql, String columnLabel) {
@@ -27,12 +22,7 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, String columnLabel) {
-      return get(connection, sql, setParams, rs -> {
-         if (rs != null && rs.next()) {
-            return Optional.ofNullable((T) rs.getObject(columnLabel));
-         }
-         return Optional.empty();
-      });
+      return getNew(connection, sql, setParams, resultSet -> (T) resultSet.getObject(columnLabel));
    }
 
    protected void execute(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams) {
@@ -80,46 +70,34 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T> Optional<T> getNew(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult) {
-      return get(connection, sql, setParams, rs -> {
+      return getInternal(connection, sql, setParams, rs -> {
          if (rs != null && rs.next()) {
-            return Optional.of(getResult.apply(rs));
+            try {
+               return Optional.of(getResult.apply(rs));
+            } catch (NullPointerException exception) {
+               return Optional.empty();
+            }
          }
          return Optional.empty();
-      });
+      }, Optional.empty());
    }
 
    protected <T> Optional<T> getNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
       return getNew(connection, sql, null, getResult);
    }
 
-   @Deprecated
-   protected <T> Optional<T> get(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, Optional<T>> getResult) {
-      return getInternal(connection, sql, setParams, getResult, Optional.empty());
-   }
-
-   @Deprecated
-   protected <T> Optional<T> get(Connection connection, String sql, SQLFunction<ResultSet, Optional<T>> getResult) {
-      return get(connection, sql, null, getResult);
-   }
-
-   @Deprecated
    protected <T> List<T> getList(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, List<T>> getResult) {
       return getInternal(connection, sql, setParams, getResult, new ArrayList<>());
    }
 
-   @Deprecated
-   protected <T> List<T> getList(Connection connection, String sql, SQLFunction<ResultSet, List<T>> getResult) {
-      return getList(connection, sql, null, getResult);
-   }
-
    protected <T> List<T> getListNew(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult) {
-      return getList(connection, sql, setParams, rs -> {
+      return getInternal(connection, sql, setParams, rs -> {
          List<T> result = new ArrayList<>();
          while (rs != null && rs.next()) {
             result.add(getResult.apply(rs));
          }
          return result;
-      });
+      }, new ArrayList<>());
    }
 
    protected <T> List<T> getListNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
