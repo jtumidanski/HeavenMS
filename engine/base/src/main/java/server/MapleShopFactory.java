@@ -24,6 +24,8 @@ package server;
 import java.util.HashMap;
 import java.util.Map;
 
+import server.processor.MapleShopProcessor;
+
 /**
  * @author Matze
  */
@@ -38,10 +40,10 @@ public class MapleShopFactory {
    }
 
    private MapleShop loadShop(int id, boolean isShopId) {
-      MapleShop ret = MapleShop.createFromDB(id, isShopId);
+      MapleShop ret = MapleShopProcessor.getInstance().createFromDB(id, isShopId);
       if (ret != null) {
-         shops.put(ret.getId(), ret);
-         npcShops.put(ret.getNpcId(), ret);
+         shops.put(ret.id(), ret);
+         npcShops.put(ret.npcId(), ret);
       } else if (isShopId) {
          shops.put(id, null);
       } else {

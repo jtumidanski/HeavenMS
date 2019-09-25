@@ -3,6 +3,7 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import server.MapleShopFactory
+import server.processor.MapleShopProcessor
 
 /*
 
@@ -14,7 +15,7 @@ class NPC11000 {
    int sel = -1
 
    def start() {
-      MapleShopFactory.getInstance().getShop(11000).sendShop(cm.getClient())
+      MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShop(11000), cm.getClient());
       cm.dispose()
    }
 

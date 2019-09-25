@@ -24,6 +24,7 @@ package server.life;
 import client.MapleClient;
 import server.MapleShopFactory;
 import server.maps.MapleMapObjectType;
+import server.processor.MapleShopProcessor;
 import tools.MaplePacketCreator;
 
 public class MapleNPC extends AbstractLoadedMapleLife {
@@ -39,7 +40,7 @@ public class MapleNPC extends AbstractLoadedMapleLife {
    }
 
    public void sendShop(MapleClient c) {
-      MapleShopFactory.getInstance().getShopForNPC(getId()).sendShop(c);
+      MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShopForNPC(getId()), c);
    }
 
    @Override

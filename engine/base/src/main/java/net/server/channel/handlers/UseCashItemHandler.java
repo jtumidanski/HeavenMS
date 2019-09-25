@@ -101,6 +101,7 @@ import server.maps.MapleKite;
 import server.maps.MapleMap;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MapleTVEffect;
+import server.processor.MapleShopProcessor;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.Pair;
@@ -384,7 +385,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       if (player.getShop() == null) {
          MapleShop shop = MapleShopFactory.getInstance().getShop(1338);
          if (shop != null) {
-            shop.sendShop(c);
+            MapleShopProcessor.getInstance().sendShop(shop, c);
             remove(c, position, itemId);
          }
       } else {

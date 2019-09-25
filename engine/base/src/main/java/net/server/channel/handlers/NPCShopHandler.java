@@ -27,6 +27,7 @@ import constants.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.NPCShopPacket;
 import net.server.channel.packet.reader.NPCShopReader;
+import server.processor.MapleShopProcessor;
 import tools.FilePrinter;
 
 /**
@@ -47,11 +48,11 @@ public final class NPCShopHandler extends AbstractPacketHandler<NPCShopPacket> {
             client.disconnect(true, false);
             return;
          }
-         client.getPlayer().getShop().buy(client, packet.slot(), packet.itemId(), packet.quantity());
+         MapleShopProcessor.getInstance().buy(client.getPlayer().getShop(), client, packet.slot(), packet.itemId(), packet.quantity());
       } else if (packet.mode() == 1) { // sell ;)
-         client.getPlayer().getShop().sell(client, ItemConstants.getInventoryType(packet.itemId()), packet.slot(), packet.quantity());
+         MapleShopProcessor.getInstance().sell(client, ItemConstants.getInventoryType(packet.itemId()), packet.slot(), packet.quantity());
       } else if (packet.mode() == 2) { // recharge ;)
-         client.getPlayer().getShop().recharge(client, packet.slot());
+         MapleShopProcessor.getInstance().recharge(client, packet.slot());
       } else if (packet.mode() == 3) { // leaving :(
          client.getPlayer().setShop(null);
       }

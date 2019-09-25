@@ -80,6 +80,7 @@ import server.partyquest.AriantColiseum;
 import server.partyquest.MonsterCarnival;
 import server.partyquest.Pyramid;
 import server.partyquest.Pyramid.PyramidMode;
+import server.processor.MapleShopProcessor;
 import tools.FilePrinter;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
@@ -405,10 +406,10 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       MapleShop shop = MapleShopFactory.getInstance().getShop(id);
 
       if (shop != null) {
-         shop.sendShop(c);
+         MapleShopProcessor.getInstance().sendShop(shop, c);
       } else {    // check for missing shopids thanks to resinate
          FilePrinter.printError(FilePrinter.NPC_UNCODED, "Shop ID: " + id + " is missing from database.");
-         MapleShopFactory.getInstance().getShop(11000).sendShop(c);
+         MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShop(11000), c);
       }
    }
 

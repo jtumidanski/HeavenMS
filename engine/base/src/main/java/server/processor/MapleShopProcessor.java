@@ -1,29 +1,7 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
+package server.processor;
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-package server;
-
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -35,13 +13,16 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
 import constants.ItemConstants;
+import scala.Option;
+import server.MapleItemInformationProvider;
+import server.MapleShop;
+import server.MapleShopItem;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 
-/**
- * @author Matze
- */
-public class MapleShop {
+public class MapleShopProcessor {
+   private static MapleShopProcessor instance;
+
    private static final Set<Integer> rechargeableItems = new LinkedHashSet<>();
 
    static {
@@ -57,38 +38,36 @@ public class MapleShop {
       }
    }
 
-   private int id;
-   private int npcId;
-   private List<MapleShopItem> items;
-   private int tokenvalue = 1000000000;
-   private int token = 4000313;
-
-   public MapleShop(int id, int npcId) {
-      this.id = id;
-      this.npcId = npcId;
-      items = new ArrayList<>();
+   public static MapleShopProcessor getInstance() {
+      if (instance == null) {
+         instance = new MapleShopProcessor();
+      }
+      return instance;
    }
 
-   private static boolean canSell(Item item, short quantity) {
+   private MapleShopProcessor() {
+   }
+
+   private boolean canSell(Item item, short quantity) {
       if (item == null) { //Basic check
          return false;
       }
 
-      short iQuant = item.quantity();
-      if (iQuant == 0xFFFF) {
-         iQuant = 1;
-      } else if (iQuant < 0) {
+      short itemQuantity = item.quantity();
+      if (itemQuantity == 0xFFFF) {
+         itemQuantity = 1;
+      } else if (itemQuantity < 0) {
          return false;
       }
 
       if (!ItemConstants.isRechargeable(item.id())) {
-         return iQuant != 0 && quantity <= iQuant;
+         return itemQuantity != 0 && quantity <= itemQuantity;
       }
 
       return true;
    }
 
-   private static short getSellingQuantity(Item item, short quantity) {
+   private short getSellingQuantity(Item item, short quantity) {
       if (ItemConstants.isRechargeable(item.id())) {
          quantity = item.quantity();
          if (quantity == 0xFFFF) {
@@ -99,7 +78,7 @@ public class MapleShop {
       return quantity;
    }
 
-   public static MapleShop createFromDB(int id, boolean isShopId) {
+   public MapleShop createFromDB(int id, boolean isShopId) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<MapleShop> ret;
          if (isShopId) {
@@ -109,34 +88,30 @@ public class MapleShop {
          }
          if (ret.isPresent()) {
             MapleShop shop = ret.get();
-            List<MapleShopItem> items = ShopItemProvider.getInstance().getItemsForShop(connection, shop.getId(), rechargeableItems);
-            for (MapleShopItem item : items) {
-               shop.addItem(item);
-            }
+            MapleShopItem[] result = ShopItemProvider.getInstance().getItemsForShop(connection, shop.id(), rechargeableItems).toArray(MapleShopItem[]::new);
+            shop.setItems(result);
          }
          return ret.orElse(null);
       }).orElse(null);
    }
 
-   private void addItem(MapleShopItem item) {
-      items.add(item);
+   public void sendShop(MapleShop shop, MapleClient c) {
+      c.getPlayer().setShop(shop);
+      c.announce(MaplePacketCreator.getNPCShop(c, shop.npcId(), Arrays.asList(shop.items())));
    }
 
-   public void sendShop(MapleClient c) {
-      c.getPlayer().setShop(this);
-      c.announce(MaplePacketCreator.getNPCShop(c, getNpcId(), items));
-   }
-
-   public void buy(MapleClient c, short slot, int itemId, short quantity) {
-      MapleShopItem item = findBySlot(slot);
-      if (item != null) {
-         if (item.itemId() != itemId) {
-            System.out.println("Wrong slot number in shop " + id);
+   public void buy(MapleShop shop, MapleClient c, short slot, int itemId, short quantity) {
+      Option<MapleShopItem> itemResult = shop.findBySlot(slot);
+      if (itemResult.isDefined()) {
+         if (itemResult.get().itemId() != itemId) {
+            System.out.println("Wrong slot number in shop " + shop.id());
             return;
          }
       } else {
          return;
       }
+
+      MapleShopItem item = itemResult.get();
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       if (item.price() > 0) {
          int amount = (int) Math.min((float) item.price() * quantity, Integer.MAX_VALUE);
@@ -178,9 +153,9 @@ public class MapleShop {
             }
          }
 
-      } else if (c.getPlayer().getInventory(MapleInventoryType.CASH).countById(token) != 0) {
-         int amount = c.getPlayer().getInventory(MapleInventoryType.CASH).countById(token);
-         int value = amount * tokenvalue;
+      } else if (c.getPlayer().getInventory(MapleInventoryType.CASH).countById(shop.token()) != 0) {
+         int amount = c.getPlayer().getInventory(MapleInventoryType.CASH).countById(shop.token());
+         int value = amount * shop.tokenValue();
          int cost = item.price() * quantity;
          if (c.getPlayer().getMeso() + value >= cost) {
             int cardreduce = value - cost;
@@ -247,17 +222,5 @@ public class MapleShop {
             c.announce(MaplePacketCreator.shopTransaction((byte) 0x2));
          }
       }
-   }
-
-   private MapleShopItem findBySlot(short slot) {
-      return items.get(slot);
-   }
-
-   public int getNpcId() {
-      return npcId;
-   }
-
-   public int getId() {
-      return id;
    }
 }
