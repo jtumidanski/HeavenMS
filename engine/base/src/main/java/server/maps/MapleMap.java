@@ -3919,7 +3919,6 @@ public class MapleMap {
          for (SpawnPoint sp : monsterSpawn) {
             for (Point pt : takenSpawns) {
                if ((sp.getPosition().x == pt.x && sp.getPosition().y == pt.y) || (sp.getTeam() != team && !this.isBlueCPQMap())) {
-                  continue;
                } else {
                   takenSpawns.add(pt);
                   return sp.getPosition();

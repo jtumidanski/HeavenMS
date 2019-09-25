@@ -32,7 +32,6 @@ import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
 import tools.Pair;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override

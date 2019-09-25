@@ -36,7 +36,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.mina.core.session.IoSession;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import client.database.administrator.HwidAccountAdministrator;
 import client.database.provider.HwidAccountProvider;

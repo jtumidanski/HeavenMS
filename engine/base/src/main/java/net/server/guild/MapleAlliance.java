@@ -31,8 +31,6 @@ import client.database.administrator.AllianceGuildAdministrator;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
-import tools.MessageBroadcaster;
-import tools.ServerNoticeType;
 
 /**
  * @author XoticStory

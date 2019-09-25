@@ -77,7 +77,6 @@ import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleCashIdGenerator;
 import client.newyear.NewYearCardRecord;
 import constants.GameConstants;

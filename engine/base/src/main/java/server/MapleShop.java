@@ -32,7 +32,6 @@ import client.database.provider.ShopItemProvider;
 import client.database.provider.ShopProvider;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
 import constants.ItemConstants;

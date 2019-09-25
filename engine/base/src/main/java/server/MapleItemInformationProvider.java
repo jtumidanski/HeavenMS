@@ -581,7 +581,7 @@ public class MapleItemInformationProvider {
          try {
             fEntry = getRoundedUnitPrice(MapleDataTool.getDouble(pData), 5);
          } catch (Exception e) {
-            fEntry = (double) MapleDataTool.getInt(pData);
+            fEntry = MapleDataTool.getInt(pData);
          }
       }
 

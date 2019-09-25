@@ -27,7 +27,6 @@ import client.MapleCharacter;
 import constants.LanguageConstants;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
-import net.server.guild.MapleAlliance;
 import net.server.world.MaplePartyCharacter;
 import scripting.npc.NPCConversationManager;
 import scripting.npc.NPCScriptManager;

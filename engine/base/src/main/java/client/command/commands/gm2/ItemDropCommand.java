@@ -29,7 +29,6 @@ import client.command.Command;
 import client.inventory.BetterItemFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
 import client.processor.ItemProcessor;
 import client.processor.PetProcessor;
 import constants.ItemConstants;

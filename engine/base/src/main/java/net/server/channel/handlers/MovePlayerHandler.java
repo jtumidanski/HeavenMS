@@ -26,7 +26,6 @@ import net.server.PacketReader;
 import net.server.channel.packet.movement.MovePlayerPacket;
 import net.server.channel.packet.reader.MovePlayerReader;
 import tools.MaplePacketCreator;
-import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacket> {
    @Override

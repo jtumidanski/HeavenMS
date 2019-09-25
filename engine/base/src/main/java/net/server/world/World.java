@@ -651,7 +651,7 @@ public class World {
 
    public Collection<MapleFamily> getFamilies() {
       synchronized (families) {
-         return Collections.unmodifiableCollection((Collection<MapleFamily>) families.values());
+         return Collections.unmodifiableCollection(families.values());
       }
    }
 

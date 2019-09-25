@@ -29,7 +29,6 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import client.inventory.MaplePet;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
 import server.maps.MapleMapItem;

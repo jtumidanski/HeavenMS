@@ -20,7 +20,7 @@ class AttackPacket(var numAttacked: Int, var numDamage: Int, var numAttackedAndD
     allDamage += (key -> damage)
   }
 
-  def getDamage(): java.util.Map[Integer, java.util.List[Integer]] = {
-    allDamage.asJava;
+  def getDamage: java.util.Map[Integer, java.util.List[Integer]] = {
+    allDamage.asJava
   }
 }

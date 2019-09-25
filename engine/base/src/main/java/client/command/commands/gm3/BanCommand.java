@@ -28,7 +28,6 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import client.database.administrator.IpBanAdministrator;
-import net.server.Server;
 import server.TimerManager;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;

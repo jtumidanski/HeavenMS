@@ -2065,7 +2065,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          SkillFactory.getSkill(Corsair.BATTLE_SHIP).ifPresent(skill -> {
                   int coolDown = skill.getEffect(getSkillLevel(skill)).getCooldown();
                   announce(MaplePacketCreator.skillCooldown(Corsair.BATTLE_SHIP, coolDown));
-                  addCooldown(Corsair.BATTLE_SHIP, Server.getInstance().getCurrentTime(), (long) (coolDown * 1000));
+                  addCooldown(Corsair.BATTLE_SHIP, Server.getInstance().getCurrentTime(), coolDown * 1000);
                   removeCooldown(5221999);
                   cancelEffectFromBuffStat(MapleBuffStat.MONSTER_RIDING);
                }
@@ -2670,7 +2670,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       int equip = (int) Math.min((long) (gain / 10) * pendantExp, Integer.MAX_VALUE);
 
-      gainExpInternal((long) gain, equip, party, show, inChat, white);
+      gainExpInternal(gain, equip, party, show, inChat, white);
    }
 
    public void loseExp(int loss, boolean show, boolean inChat) {
@@ -4555,7 +4555,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          elapsedDays = 100;
       }
 
-      long netMeso = (long) merchantmeso; // negative mesos issues found thanks to Flash, Vcoc
+      long netMeso = merchantmeso; // negative mesos issues found thanks to Flash, Vcoc
       netMeso = (netMeso * (100 - elapsedDays)) / 100;
       return (int) netMeso;
    }

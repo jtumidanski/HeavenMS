@@ -12,7 +12,6 @@ import java.util.Stack;
 
 import client.MapleBuffStat;
 import client.MapleBuffStatValueHolder;
-import client.MapleCharacter;
 import server.MapleStatEffect;
 import tools.Pair;
 

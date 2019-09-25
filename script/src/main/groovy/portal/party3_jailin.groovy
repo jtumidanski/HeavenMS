@@ -7,8 +7,6 @@ import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-boolean leverSequenceExit = false
-
 def enterLeverSequence(PortalPlayerInteraction pi) {
    MapleMap map = pi.getMap()
 

@@ -73,7 +73,6 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
                         useEntitlement(entry, type);
                      } else {
                         client.announce(MaplePacketCreator.sendFamilyMessage(75, 0)); // wrong message, but close enough. (client should check this first anyway)
-                        return;
                      }
                   } else {
                      if (!FieldLimit.CANNOTMIGRATE.check(targetMap.getFieldLimit()) && !FieldLimit.CANNOTVIPROCK.check(ownMap.getFieldLimit())
@@ -88,7 +87,6 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
                         useEntitlement(entry, type);
                      } else {
                         client.announce(MaplePacketCreator.sendFamilyMessage(75, 0));
-                        return;
                      }
                   }
                }

@@ -48,7 +48,7 @@ class NPC1002003 {
                cm.sendNext("Hey... are you sure you have #b240,000 mesos#k? If so, then check and see if you have extended your buddy list to the max. Even if you pay up, the most you can have on your buddy list is #b50#k.")
                cm.dispose()
             } else {
-               def newCapacity = capacity + 5
+               int newCapacity = capacity + 5
                cm.gainMeso(-240000)
                cm.getPlayer().setBuddyCapacity(newCapacity)
                cm.sendOk("Alright! Your buddy list will have 5 extra slots by now. Check and see for it yourself. And if you still need more room on your buddy list, you know who to find. Of course, it isn't going to be for free ... well, so long ...")

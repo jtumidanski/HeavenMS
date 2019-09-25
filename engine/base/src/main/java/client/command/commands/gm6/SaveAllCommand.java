@@ -28,7 +28,6 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import net.server.world.World;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 

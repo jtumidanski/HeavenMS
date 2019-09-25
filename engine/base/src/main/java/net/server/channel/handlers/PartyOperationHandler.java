@@ -144,6 +144,5 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
 
    private void create(MapleCharacter player) {
       MaplePartyProcessor.getInstance().createParty(player, false);
-      return;
    }
 }

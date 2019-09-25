@@ -45,7 +45,6 @@ import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
-import client.inventory.MaplePet;
 import client.processor.PetProcessor;
 import constants.ItemConstants;
 import constants.ServerConstants;

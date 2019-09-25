@@ -29,7 +29,6 @@ import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
 import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MaplePartyProcessor;
-import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;

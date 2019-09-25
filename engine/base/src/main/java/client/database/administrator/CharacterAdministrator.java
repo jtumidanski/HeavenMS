@@ -1,15 +1,11 @@
 package client.database.administrator;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
 import client.database.AbstractQueryExecutor;
 import client.database.provider.CharacterProvider;
-import tools.FilePrinter;
 import tools.Pair;
 
 public class CharacterAdministrator extends AbstractQueryExecutor {

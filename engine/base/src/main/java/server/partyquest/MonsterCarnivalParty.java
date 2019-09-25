@@ -88,6 +88,7 @@ public class MonsterCarnivalParty {
       for (MapleCharacter chr : members) {
          if (chr.getMap() != map) {
             status = false;
+            break;
          }
       }
       return status;

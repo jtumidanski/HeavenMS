@@ -422,7 +422,6 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             break;
          } catch (NullPointerException npe) {
             npe.printStackTrace();
-            continue;
          }
       }
    }
@@ -536,7 +535,6 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       for (byte b = 0; b < 5; b++) {//They cannot warp to the next map before the timer ends (:
          map = mapManager.getMap(mapid + b);
          if (map.getCharacters().size() > 0) {
-            continue;
          } else {
             break;
          }

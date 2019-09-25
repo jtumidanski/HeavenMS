@@ -1,6 +1,5 @@
 package server.partyquest;
 
-import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
@@ -114,11 +113,13 @@ public class MonsterCarnival {
       for (MaplePartyCharacter mpc : leader1.getParty().getMembers()) {
          if (mpc.getId() == charid) {
             team = 0;
+            break;
          }
       }
       for (MaplePartyCharacter mpc : leader2.getParty().getMembers()) {
          if (mpc.getId() == charid) {
             team = 1;
+            break;
          }
       }
       for (MapleCharacter chrMap : map.getAllPlayers()) {

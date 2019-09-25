@@ -28,7 +28,6 @@ import java.util.Iterator;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import server.MapleItemInformationProvider;
 import server.life.MapleMonsterInformationProvider;
 import server.life.MonsterDropEntry;
 import tools.MessageBroadcaster;

@@ -78,8 +78,8 @@ class NPC9201014 {
                               cm.gainItem(2210005, (short) 5)
                            } else if (rand == 3) {
                               cm.gainItem(2210003, (short) 5)
-                           };
-                           cm.gainItem(4031424, (short) -1);
+                           }
+                           cm.gainItem(4031424, (short) -1)
                            cm.dispose()
                         } else {
                            cm.sendOk("You don't have a free USE slot right now.")
@@ -111,9 +111,9 @@ class NPC9201014 {
                      cm.gainItem(2022273, (short) 10)
                   } else if (selection == 3) {
                      cm.gainItem(2022179, (short) 3)
-                  };
-                  cm.gainItem(4031423, (short) -1);
-                  cm.dispose();
+                  }
+                  cm.gainItem(4031423, (short) -1)
+                  cm.dispose()
                } else {
                   cm.sendOk("You don't have a free USE slot right now.")
                   cm.dispose()

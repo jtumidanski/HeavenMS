@@ -71,7 +71,6 @@ import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import net.server.AbstractPacketHandler;
 import net.server.MaplePacket;
-import net.server.PacketReader;
 import net.server.channel.packet.AttackPacket;
 import scripting.AbstractPlayerInteraction;
 import server.MapleStatEffect;
@@ -319,7 +318,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            TimerManager.getInstance().schedule(new Runnable() {
                               @Override
                               public void run() {
-                                 map.spawnMesoDrop(Math.min((int) Math.max(((double) eachdf / (double) 20000) * (double) maxmeso, (double) 1), maxmeso), new Point((int) (monster.getPosition().getX() + Randomizer.nextInt(100) - 50), (int) (monster.getPosition().getY())), monster, player, true, (byte) 2);
+                                 map.spawnMesoDrop(Math.min((int) Math.max(((double) eachdf / (double) 20000) * (double) maxmeso, 1), maxmeso), new Point((int) (monster.getPosition().getX() + Randomizer.nextInt(100) - 50), (int) (monster.getPosition().getY())), monster, player, true, (byte) 2);
                               }
                            }, delay);
                            delay += 100;
