@@ -41,6 +41,11 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
+import tools.packet.mtsoperation.MTSTransferInventory;
+import tools.packet.mtsoperation.MTSWantedListingOver;
+import tools.packet.mtsoperation.SendMTS;
+import tools.packet.mtsoperation.ShowMTSCash;
 import tools.packet.stat.EnableActions;
 
 
@@ -121,17 +126,17 @@ public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
          }
          chr.getCashShop().open(true);// xD
          client.enableCSActions();
-         client.announce(MaplePacketCreator.MTSWantedListingOver(0, 0));
-         client.announce(MaplePacketCreator.showMTSCash(client.getPlayer()));
+         PacketCreator.announce(client, new MTSWantedListingOver(0, 0));
+         PacketCreator.announce(client, new ShowMTSCash(client.getPlayer().getCashShop().getCash(2), client.getPlayer().getCashShop().getCash(4)));
 
          DatabaseConnection.getInstance().withConnection(connection -> {
             List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getByTab(connection, 1, 16));
             long countForTab = MtsItemProvider.getInstance().countByTab(connection, 1);
             int pages = (int) Math.ceil(countForTab / 16);
 
-            client.announce(MaplePacketCreator.sendMTS(items, 1, 0, 0, pages));
-            client.announce(MaplePacketCreator.transferInventory(getTransfer(chr.getId())));
-            client.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(chr.getId())));
+            PacketCreator.announce(client, new SendMTS(items, 1, 0, 0, pages));
+            PacketCreator.announce(client, new MTSTransferInventory(getTransfer(chr.getId())));
+            PacketCreator.announce(client, new GetNotYetSoldMTSInventory(getNotYetSold(chr.getId())));
          });
       }
    }

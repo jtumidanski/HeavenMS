@@ -64,6 +64,14 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
+import tools.packet.mtsoperation.MTSConfirmBuy;
+import tools.packet.mtsoperation.MTSConfirmSell;
+import tools.packet.mtsoperation.MTSConfirmTransfer;
+import tools.packet.mtsoperation.MTSFailBuy;
+import tools.packet.mtsoperation.MTSTransferInventory;
+import tools.packet.mtsoperation.SendMTS;
+import tools.packet.mtsoperation.ShowMTSCash;
 import tools.packet.stat.EnableActions;
 
 //TODO this needs a lot more work.
@@ -89,7 +97,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
          if (count % 16 > 0) {
             pages++;
          }
-         return MaplePacketCreator.sendMTS(items, tab, type, page, (int) pages); // resniff
+         return PacketCreator.create(new SendMTS(items, tab, type, page, (int) pages));
       }).orElseThrow();
    }
 
@@ -139,7 +147,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
             System.out.println("Unhandled OP(MTS): " + op + " Packet: " + packet.toString());
          }
       } else {
-         c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
+         PacketCreator.announce(c, new ShowMTSCash(c.getPlayer().getCashShop().getCash(2), c.getPlayer().getCashShop().getCash(4)));
       }
    }
 
@@ -172,15 +180,15 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
                   c.getPlayer().getCashShop().gainCash(4, -price);
                   c.enableCSActions();
                   c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
-                  c.announce(MaplePacketCreator.MTSConfirmBuy());
-                  c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
-                  c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-                  c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+                  PacketCreator.announce(c, new MTSConfirmBuy());
+                  PacketCreator.announce(c, new ShowMTSCash(c.getPlayer().getCashShop().getCash(2), c.getPlayer().getCashShop().getCash(4)));
+                  PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+                  PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
                   PacketCreator.announce(c, new EnableActions());
                } else {
-                  c.announce(MaplePacketCreator.MTSFailBuy());
+                  PacketCreator.announce(c, new MTSFailBuy());
                }
-            }, () -> c.announce(MaplePacketCreator.MTSFailBuy())));
+            }, () -> PacketCreator.announce(c, new MTSFailBuy())));
    }
 
    private void deleteFromCart(MapleClient c, int id) {
@@ -188,8 +196,8 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
 
       c.announce(getCart(c.getPlayer().getId()));
       c.enableCSActions();
-      c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-      c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+      PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+      PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
    }
 
    private void addToCart(MapleClient c, int id) {
@@ -205,8 +213,8 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
          c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
          c.enableCSActions();
          PacketCreator.announce(c, new EnableActions());
-         c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-         c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+         PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+         PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
       });
    }
 
@@ -220,8 +228,8 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
                c.enableCSActions();
                c.announce(getCart(c.getPlayer().getId()));
                c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
-               c.announce(MaplePacketCreator.MTSConfirmTransfer(item.quantity(), item.position()));
-               c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
+               PacketCreator.announce(c, new MTSConfirmTransfer(item.quantity(), item.position()));
+               PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
             }));
    }
 
@@ -233,8 +241,8 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
 
       c.enableCSActions();
       c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
-      c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
-      c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
+      PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
+      PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
    }
 
    private void search(MapleClient c, int tab, int type, int ci, String search) {
@@ -245,9 +253,9 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
       c.enableCSActions();
       PacketCreator.announce(c, new EnableActions());
       c.announce(getMTSSearch(tab, type, ci, search, c.getPlayer().getCurrentPage()));
-      c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
-      c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-      c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+      PacketCreator.announce(c, new ShowMTSCash(c.getPlayer().getCashShop().getCash(2), c.getPlayer().getCashShop().getCash(4)));
+      PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+      PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
    }
 
    private void changePage(MapleClient c, int tab, int type, int page) {
@@ -263,8 +271,8 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
       c.getPlayer().changeTab(tab);
       c.getPlayer().changeType(type);
       c.enableCSActions();
-      c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-      c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+      PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+      PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
    }
 
    private void putItemUpForSale(MapleClient c, short quantity, int price, int itemId, short slot) {
@@ -281,8 +289,8 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
             if (itemForSaleCount > 10) { //They have more than 10 items up for sale already!
                MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You already have 10 items up for auction!");
                c.announce(getMTS(1, 0, 0));
-               c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-               c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+               PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+               PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
                return;
             }
 
@@ -303,11 +311,11 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
             MapleInventoryManipulator.removeFromSlot(c, invType, slot, postedQuantity, false);
 
             c.getPlayer().gainMeso(-5000, false);
-            c.announce(MaplePacketCreator.MTSConfirmSell());
+            PacketCreator.announce(c, new MTSConfirmSell());
             c.announce(getMTS(1, 0, 0));
             c.enableCSActions();
-            c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-            c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+            PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+            PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
          });
       }
    }
@@ -374,14 +382,14 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
                   c.getPlayer().getCashShop().gainCash(4, -price);
                   c.announce(getCart(c.getPlayer().getId()));
                   c.enableCSActions();
-                  c.announce(MaplePacketCreator.MTSConfirmBuy());
-                  c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
-                  c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
-                  c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
+                  PacketCreator.announce(c, new MTSConfirmBuy());
+                  PacketCreator.announce(c, new ShowMTSCash(c.getPlayer().getCashShop().getCash(2), c.getPlayer().getCashShop().getCash(4)));
+                  PacketCreator.announce(c, new MTSTransferInventory(getTransfer(c.getPlayer().getId())));
+                  PacketCreator.announce(c, new GetNotYetSoldMTSInventory(getNotYetSold(c.getPlayer().getId())));
                } else {
-                  c.announce(MaplePacketCreator.MTSFailBuy());
+                  PacketCreator.announce(c, new MTSFailBuy());
                }
-            }, () -> c.announce(MaplePacketCreator.MTSFailBuy())));
+            }, () -> PacketCreator.announce(c, new MTSFailBuy())));
    }
 
    private void awardSellerCash(int seller, int price) {
@@ -405,7 +413,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
             pages += 1;
          }
 
-         return MaplePacketCreator.sendMTS(items, 4, 0, 0, (int) pages);
+         return PacketCreator.create(new SendMTS(items, 4, 0, 0, (int) pages));
       }).orElseThrow();
    }
 
@@ -424,7 +432,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
             pages++;
          }
 
-         return MaplePacketCreator.sendMTS(items, tab, type, page, (int) pages);
+         return PacketCreator.create(new SendMTS(items, tab, type, page, (int) pages));
       }).orElseThrow();
    }
 }

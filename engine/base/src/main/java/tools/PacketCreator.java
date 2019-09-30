@@ -19,6 +19,7 @@ import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
+import tools.packet.factory.MTSOperationPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
@@ -121,6 +122,9 @@ public class PacketCreator {
             return Optional.of(ForeignEffectPacketFactory.getInstance());
          case UPDATE_QUEST_INFO:
             return Optional.of(QuestInfoPacketFactory.getInstance());
+         case MTS_OPERATION:
+         case MTS_OPERATION2:
+            return Optional.of(MTSOperationPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();
