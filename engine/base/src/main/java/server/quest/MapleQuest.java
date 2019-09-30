@@ -77,6 +77,7 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.packet.foreigneffect.ShowForeignEffect;
+import tools.packet.quest.info.RemoveQuestTimeLimit;
 
 /**
  * @author Matze
@@ -388,7 +389,7 @@ public class MapleQuest {
          return;
       }
       if (timeLimit > 0) {
-         c.announce(MaplePacketCreator.removeQuestTimeLimit(id));
+         PacketCreator.announce(c, new RemoveQuestTimeLimit(id));
       }
       MapleQuestStatus newStatus = new MapleQuestStatus(this, MapleQuestStatus.Status.NOT_STARTED);
       newStatus.setForfeited(c.getQuest(this).getForfeited() + 1);
@@ -428,7 +429,7 @@ public class MapleQuest {
 
    public boolean forceComplete(MapleCharacter c, int npc) {
       if (timeLimit > 0) {
-         c.announce(MaplePacketCreator.removeQuestTimeLimit(id));
+         PacketCreator.announce(c, new RemoveQuestTimeLimit(id));
       }
 
       MapleQuestStatus newStatus = new MapleQuestStatus(this, MapleQuestStatus.Status.COMPLETED, npc);

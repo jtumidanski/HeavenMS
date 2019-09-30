@@ -26,6 +26,7 @@ import tools.packet.factory.PicPacketFactory;
 import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
 import tools.packet.factory.PlayerInteractionPacketFactory;
+import tools.packet.factory.QuestInfoPacketFactory;
 import tools.packet.factory.RecommendedWorldMessagePacketFactory;
 import tools.packet.factory.RelogResponsePacketFactory;
 import tools.packet.factory.SelectWorldPacketFactory;
@@ -118,6 +119,8 @@ public class PacketCreator {
             return Optional.of(NPCTalkPacketFactory.getInstance());
          case SHOW_FOREIGN_EFFECT:
             return Optional.of(ForeignEffectPacketFactory.getInstance());
+         case UPDATE_QUEST_INFO:
+            return Optional.of(QuestInfoPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

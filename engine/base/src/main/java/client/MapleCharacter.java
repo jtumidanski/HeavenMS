@@ -214,6 +214,9 @@ import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.inventory.SlotLimitUpdate;
 import tools.packet.partyoperation.UpdateParty;
+import tools.packet.quest.info.AddQuestTimeLimit;
+import tools.packet.quest.info.QuestExpire;
+import tools.packet.quest.info.UpdateQuestInfo;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
 import tools.packet.stat.UpdatePlayerStats;
@@ -7738,7 +7741,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (qs.getQuest().getInfoNumber() > 0) {
          announceUpdateQuest(DelayedQuestUpdate.UPDATE, qs, true);
       }
-      announce(MaplePacketCreator.updateQuestInfo(qs.getQuest().getId(), qs.getNpc()));
+      PacketCreator.announce(this, new UpdateQuestInfo(qs.getQuest().getId(), qs.getNpc()));
    }
 
    public void awardQuestPoint(int awardedPoints) {
@@ -7815,7 +7818,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (quest.getQuest().getInfoNumber() > 0) {
             announceUpdateQuest(DelayedQuestUpdate.UPDATE, quest, true);
          }
-         announce(MaplePacketCreator.updateQuestInfo(quest.getQuest().getId(), quest.getNpc()));
+         PacketCreator.announce(this, new UpdateQuestInfo(quest.getQuest().getId(), quest.getNpc()));
       } else if (quest.getStatus().equals(MapleQuestStatus.Status.COMPLETED)) {
          MapleQuest mquest = quest.getQuest();
          short questid = mquest.getId();
@@ -7841,7 +7844,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return;
       }
 
-      announce(MaplePacketCreator.questExpire(quest.getId()));
+      PacketCreator.announce(this, new QuestExpire(quest.getId()));
       MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
       newStatus.setForfeited(getQuest(quest).getForfeited() + 1);
       updateQuest(newStatus);
@@ -7920,7 +7923,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void questTimeLimit(final MapleQuest quest, int seconds) {
       registerQuestExpire(quest, seconds * 1000);
-      announce(MaplePacketCreator.addQuestTimeLimit(quest.getId(), seconds * 1000));
+      PacketCreator.announce(this, new AddQuestTimeLimit(quest.getId(), seconds * 1000));
    }
 
    public void questTimeLimit2(final MapleQuest quest, long expires) {
