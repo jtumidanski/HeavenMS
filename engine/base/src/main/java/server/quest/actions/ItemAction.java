@@ -40,9 +40,11 @@ import server.quest.MapleQuestActionType;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.showitemgaininchat.ShowItemGainInChat;
 
 /**
  * @author Tyler (Twdtwd)
@@ -149,12 +151,12 @@ public class ItemAction extends MapleQuestAction {
          }
 
          MapleInventoryManipulator.removeById(chr.getClient(), type, iPair.getLeft(), quantity, true, false);
-         chr.announce(MaplePacketCreator.getShowItemGain(iPair.getLeft(), iPair.getRight().shortValue(), true));
+         PacketCreator.announce(chr, new ShowItemGainInChat(iPair.getLeft(), iPair.getRight().shortValue()));
       }
 
       for (Pair<Integer, Integer> iPair : giveItem) {
          MapleInventoryManipulator.addById(chr.getClient(), iPair.getLeft(), iPair.getRight().shortValue(), "", -1);
-         chr.announce(MaplePacketCreator.getShowItemGain(iPair.getLeft(), iPair.getRight().shortValue(), true));
+         PacketCreator.announce(chr, new ShowItemGainInChat(iPair.getLeft(), iPair.getRight().shortValue()));
       }
    }
 

@@ -41,6 +41,7 @@ import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowForeignCardEffect;
+import tools.packet.showitemgaininchat.ShowGainCard;
 
 public final class MonsterBook {
    private static final Semaphore semaphore = new Semaphore(10);
@@ -90,7 +91,7 @@ public final class MonsterBook {
          calculateLevel();   // current leveling system only accounts unique cards...
 
          c.announce(MaplePacketCreator.addCard(false, cardid, qty + 1));
-         c.announce(MaplePacketCreator.showGainCard());
+         PacketCreator.announce(c, new ShowGainCard());
       } else {
          c.announce(MaplePacketCreator.addCard(true, cardid, 5));
       }

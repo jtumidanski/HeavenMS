@@ -40,6 +40,7 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
+import tools.packet.statusinfo.ShowInventoryFull;
 
 /**
  * @author Jay Estrella
@@ -62,7 +63,7 @@ public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPac
       Pair<Integer, List<RewardItem>> rewards = ii.getItemReward(packet.itemId());
       for (RewardItem reward : rewards.getRight()) {
          if (!MapleInventoryManipulator.checkSpace(client, reward.itemid, reward.quantity, "")) {
-            client.announce(MaplePacketCreator.getShowInventoryFull());
+            PacketCreator.announce(client, new ShowInventoryFull());
             break;
          }
          if (Randomizer.nextInt(rewards.getLeft()) < reward.prob) {//Is it even possible to get an item with prob 1?

@@ -19,6 +19,7 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowForeignEffect;
+import tools.packet.showitemgaininchat.ShowSpecialEffect;
 
 public class ItemProcessor {
    private static ItemProcessor instance;
@@ -250,7 +251,7 @@ public class ItemProcessor {
       showLevelupMessage(showStr, c); // thanks to Polaris dev team !
       MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, lvupStr);
 
-      c.announce(MaplePacketCreator.showEquipmentLevelUp());
+      PacketCreator.announce(c, new ShowSpecialEffect(15));
       c.getPlayer().getMap().broadcastMessage(c.getPlayer(), PacketCreator.create(new ShowForeignEffect(c.getPlayer().getId(), 15)));
       c.getPlayer().forceUpdateItem(equip);
    }

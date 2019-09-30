@@ -27,6 +27,8 @@ import scripting.AbstractPlayerInteraction;
 import server.maps.MaplePortal;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.showitemgaininchat.ShowSpecialEffect;
 
 public class PortalPlayerInteraction extends AbstractPlayerInteraction {
 
@@ -56,6 +58,6 @@ public class PortalPlayerInteraction extends AbstractPlayerInteraction {
    }
 
    public void playPortalSound() {
-      c.announce(MaplePacketCreator.playPortalSound());
+      PacketCreator.announce(c, new ShowSpecialEffect(7));
    }
 }

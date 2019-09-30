@@ -112,6 +112,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowBuffEffect;
+import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -199,7 +200,7 @@ public class MapleStatEffect {
                   if (absorbMp > 0) {
                      mob.setMp(mob.getMp() - absorbMp);
                      applyto.addMP(absorbMp);
-                     applyto.announce(MaplePacketCreator.showOwnBuffEffect(sourceid, 1));
+                     PacketCreator.announce(applyto, new ShowOwnBuffEffect(sourceid, 1));
                      MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), character -> PacketCreator.create(new ShowBuffEffect(applyto.getId(), sourceid, 1, (byte) 3)), false, applyto);
                   }
                }
@@ -490,7 +491,7 @@ public class MapleStatEffect {
          affectedc += affectedp.size();   // used for heal
          for (MapleCharacter affected : affectedp) {
             applyTo(applyfrom, affected, false, null, useMaxRange, affectedc);
-            affected.announce(MaplePacketCreator.showOwnBuffEffect(sourceid, 2));
+            PacketCreator.announce(affected, new ShowOwnBuffEffect(sourceid, 2));
             MasterBroadcaster.getInstance().sendToAllInMap(affected.getMap(), character -> PacketCreator.create(new ShowBuffEffect(affected.getId(), sourceid, 2, (byte) 3)), false, affected);
          }
       }

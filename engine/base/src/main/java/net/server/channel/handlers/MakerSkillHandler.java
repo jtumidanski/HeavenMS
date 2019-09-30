@@ -51,6 +51,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowForeignMakerEffect;
+import tools.packet.showitemgaininchat.ShowMakerEffect;
 
 /**
  * @author Jay Estrella, Ronan
@@ -238,7 +239,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                      client.announce(MaplePacketCreator.makerResult(makerSucceeded, recipe.getGainItems().get(0).getLeft(), recipe.getGainItems().get(0).getRight(), recipe.getCost(), recipe.getReqItems(), stimulantid, new LinkedList<>(reagentids.keySet())));
                   }
 
-                  client.announce(MaplePacketCreator.showMakerEffect(makerSucceeded));
+                  PacketCreator.announce(client, new ShowMakerEffect(makerSucceeded));
                   boolean finalMakerSucceeded = makerSucceeded;
                   MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(),
                         character -> PacketCreator.create(new ShowForeignMakerEffect(client.getPlayer().getId(), finalMakerSucceeded)), false, client.getPlayer());

@@ -26,12 +26,12 @@ import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowForeignInfo;
+import tools.packet.showitemgaininchat.ShowInfo;
 
 /**
  * @author FateJiki (RaGeZONE)
@@ -123,7 +123,7 @@ public class Fishing {
          MessageBroadcaster.getInstance().sendMapServerNotice(chr.getMap(), ServerNoticeType.LIGHT_BLUE, chr.getName() + " found " + rewardStr);
       }
 
-      chr.announce(MaplePacketCreator.showInfo(fishingEffect));
+      PacketCreator.announce(chr, new ShowInfo(fishingEffect));
       MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowForeignInfo(chr.getId(), fishingEffect)), false, chr);
    }
 

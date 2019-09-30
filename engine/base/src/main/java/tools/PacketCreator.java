@@ -18,6 +18,7 @@ import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
+import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
@@ -35,6 +36,7 @@ import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
 import tools.packet.factory.ServerStatusPacketFactory;
 import tools.packet.factory.StatUpdatePacketFactory;
+import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 
@@ -125,6 +127,10 @@ public class PacketCreator {
          case MTS_OPERATION:
          case MTS_OPERATION2:
             return Optional.of(MTSOperationPacketFactory.getInstance());
+         case SHOW_STATUS_INFO:
+            return Optional.of(StatusInfoPacketFactory.getInstance());
+         case SHOW_ITEM_GAIN_INCHAT:
+            return Optional.of(ItemGainInChatPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

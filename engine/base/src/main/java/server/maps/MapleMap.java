@@ -106,6 +106,7 @@ import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowBuffEffect;
+import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 
 public class MapleMap {
 
@@ -1312,7 +1313,7 @@ public class MapleMap {
                         .filter(AbstractMapleCharacterObject::isAlive)
                         .forEach(character -> {
                            MapleStatEffect statEffect = mii.getItemEffect(buff);
-                           character.getClient().announce(MaplePacketCreator.showOwnBuffEffect(buff, 1));
+                           PacketCreator.announce(character, new ShowOwnBuffEffect(buff, 1));
                            MasterBroadcaster.getInstance().sendToAllInMap(this, chara -> PacketCreator.create(new ShowBuffEffect(character.getId(), buff, 1, (byte) 3)), false, character);
                            statEffect.applyTo(character);
                         });

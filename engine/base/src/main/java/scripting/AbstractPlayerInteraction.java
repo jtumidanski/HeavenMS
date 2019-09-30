@@ -77,7 +77,12 @@ import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.npctalk.GetNPCTalk;
+import tools.packet.showitemgaininchat.ShowInfo;
+import tools.packet.showitemgaininchat.ShowIntro;
+import tools.packet.showitemgaininchat.ShowItemGainInChat;
 import tools.packet.stat.EnableActions;
+import tools.packet.statusinfo.GetItemMessage;
+import tools.packet.statusinfo.ShowInfoText;
 
 public class AbstractPlayerInteraction {
 
@@ -666,7 +671,7 @@ public class AbstractPlayerInteraction {
          MapleInventoryManipulator.removeById(c, ItemConstants.getInventoryType(id), id, -quantity, true, false);
       }
       if (showMessage) {
-         c.announce(MaplePacketCreator.getShowItemGain(id, quantity, true));
+         PacketCreator.announce(c, new ShowItemGainInChat(id, quantity));
       }
 
       return item;
@@ -714,11 +719,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void showIntro(String path) {
-      c.announce(MaplePacketCreator.showIntro(path));
+      PacketCreator.announce(c, new ShowIntro(path));
    }
 
    public void showInfo(String path) {
-      c.announce(MaplePacketCreator.showInfo(path));
+      PacketCreator.announce(c, new ShowInfo(path));
       PacketCreator.announce(c, new EnableActions());
    }
 
@@ -763,7 +768,7 @@ public class AbstractPlayerInteraction {
          } else {
             MapleInventoryManipulator.removeById(cl, ItemConstants.getInventoryType(id), id, -quantity, true, false);
          }
-         cl.announce(MaplePacketCreator.getShowItemGain(id, quantity, true));
+         PacketCreator.announce(cl, new ShowItemGainInChat(id, quantity));
       }
    }
 
@@ -856,7 +861,7 @@ public class AbstractPlayerInteraction {
          int possesed = iv.countById(id);
          if (possesed > 0) {
             MapleInventoryManipulator.removeById(c, ItemConstants.getInventoryType(id), id, possesed, true, false);
-            chr.announce(MaplePacketCreator.getShowItemGain(id, (short) -possesed, true));
+            PacketCreator.announce(chr, new ShowItemGainInChat(id, (short) -possesed));
          }
       }
    }
@@ -870,13 +875,13 @@ public class AbstractPlayerInteraction {
       int possessed = cl.getPlayer().getInventory(invType).countById(id);
       if (possessed > 0) {
          MapleInventoryManipulator.removeById(cl, ItemConstants.getInventoryType(id), id, possessed, true, false);
-         cl.announce(MaplePacketCreator.getShowItemGain(id, (short) -possessed, true));
+         PacketCreator.announce(cl, new ShowItemGainInChat(id, (short) -possessed));
       }
 
       if (invType == MapleInventoryType.EQUIP) {
          if (cl.getPlayer().getInventory(MapleInventoryType.EQUIPPED).countById(id) > 0) {
             MapleInventoryManipulator.removeById(cl, MapleInventoryType.EQUIPPED, id, 1, true, false);
-            cl.announce(MaplePacketCreator.getShowItemGain(id, (short) -1, true));
+            PacketCreator.announce(cl, new ShowItemGainInChat(id, (short) -1));
          }
       }
    }
@@ -913,7 +918,7 @@ public class AbstractPlayerInteraction {
 
    public void useItem(int id) {
       MapleItemInformationProvider.getInstance().getItemEffect(id).applyTo(c.getPlayer());
-      c.announce(MaplePacketCreator.getItemMessage(id));//Useful shet :3
+      PacketCreator.announce(c, new GetItemMessage(id));
    }
 
    public void cancelItem(final int id) {
@@ -933,7 +938,7 @@ public class AbstractPlayerInteraction {
                return;
             }
          } else if (GameConstants.isAranSkills(skillid)) {
-            c.announce(MaplePacketCreator.showInfo("Effect/BasicEff.img/AranGetSkill"));
+            PacketCreator.announce(c, new ShowInfo("Effect/BasicEff.img/AranGetSkill"));
          }
 
          getPlayer().changeSkillLevel(skill, level, masterLevel, expiration);
@@ -992,7 +997,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void displayGuide(int num) {
-      c.announce(MaplePacketCreator.showInfo("UI/tutorial.img/" + num));
+      PacketCreator.announce(c, new ShowInfo("UI/tutorial.img/" + num));
    }
 
    public void goDojoUp() {
@@ -1043,7 +1048,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void showInfoText(String msg) {
-      c.announce(MaplePacketCreator.showInfoText(msg));
+      PacketCreator.announce(c, new ShowInfoText(msg));
    }
 
    public void openUI(byte ui) {

@@ -40,6 +40,7 @@ import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.ChangeChannel;
+import tools.packet.showitemgaininchat.ShowWheelsLeft;
 import tools.packet.stat.EnableActions;
 
 public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacket> {
@@ -93,7 +94,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
                      // thanks lucasziron for showing revivePlayer() also being triggered by Wheel
 
                      MapleInventoryManipulator.removeById(client, MapleInventoryType.CASH, 5510000, 1, true, false);
-                     chr.announce(MaplePacketCreator.showWheelsLeft(chr.getItemQuantity(5510000, false)));
+                     PacketCreator.announce(chr, new ShowWheelsLeft(chr.getItemQuantity(5510000, false)));
 
                      chr.updateHp(50);
                      chr.changeMap(map, map.findClosestPlayerSpawnpoint(chr.getPosition()));

@@ -8,12 +8,12 @@ import scripting.AbstractPlayerInteraction
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
-import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.PacketCreator
 import tools.ServerNoticeType
 import tools.packet.foreigneffect.ShowForeignEffect
+import tools.packet.showitemgaininchat.ShowSpecialEffect
 
 /*
 	NPC Name: 		
@@ -315,15 +315,15 @@ class NPC9201002 {
 
                   if (ServerConstants.WEDDING_BLESSER_SHOWFX) {
                      MapleCharacter target = cm.getPlayer()
-                     target.announce(MaplePacketCreator.showSpecialEffect(9))
+                     PacketCreator.announce(target, new ShowSpecialEffect(9))
                      MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> PacketCreator.create(new ShowForeignEffect(target.getId(), 9)) }, false, target)
                   } else {
                      MapleCharacter target = eim.getPlayerById(eim.getIntProperty("groomId"))
-                     target.announce(MaplePacketCreator.showSpecialEffect(9))
+                     PacketCreator.announce(target, new ShowSpecialEffect(9))
                      MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> PacketCreator.create(new ShowForeignEffect(target.getId(), 9)) }, false, target)
 
                      target = eim.getPlayerById(eim.getIntProperty("brideId"))
-                     target.announce(MaplePacketCreator.showSpecialEffect(9))
+                     PacketCreator.announce(target, new ShowSpecialEffect(9))
                      MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> PacketCreator.create(new ShowForeignEffect(target.getId(), 9)) }, false, target)
                   }
 

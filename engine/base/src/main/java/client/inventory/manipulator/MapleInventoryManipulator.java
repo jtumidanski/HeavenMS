@@ -50,6 +50,8 @@ import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.statusinfo.ShowInventoryFull;
+import tools.packet.statusinfo.ShowItemUnavailable;
 
 /**
  * @author Matze
@@ -130,7 +132,7 @@ public class MapleInventoryManipulator {
                   short newSlot = inv.addItem(nItem);
                   if (newSlot == -1) {
                      PacketCreator.announce(c, new InventoryFull());
-                     c.announce(MaplePacketCreator.getShowInventoryFull());
+                     PacketCreator.announce(c, new ShowInventoryFull());
                      return false;
                   }
                   if (owner != null) {
@@ -155,7 +157,7 @@ public class MapleInventoryManipulator {
             short newSlot = inv.addItem(nItem);
             if (newSlot == -1) {
                PacketCreator.announce(c, new InventoryFull());
-               c.announce(MaplePacketCreator.getShowInventoryFull());
+               PacketCreator.announce(c, new ShowInventoryFull());
                return false;
             }
             PacketCreator.announce(c, new ModifyInventoryPacket(true, Collections.singletonList(new ModifyInventory(0, nItem))));
@@ -173,7 +175,7 @@ public class MapleInventoryManipulator {
          short newSlot = inv.addItem(nEquip);
          if (newSlot == -1) {
             PacketCreator.announce(c, new InventoryFull());
-            c.announce(MaplePacketCreator.getShowInventoryFull());
+            PacketCreator.announce(c, new ShowInventoryFull());
             return false;
          }
          PacketCreator.announce(c, new ModifyInventoryPacket(true, Collections.singletonList(new ModifyInventory(0, nEquip))));
@@ -221,7 +223,7 @@ public class MapleInventoryManipulator {
 
       if (ii.isPickupRestricted(item.id()) && chr.haveItemWithId(item.id(), true)) {
          PacketCreator.announce(c, new InventoryFull());
-         c.announce(MaplePacketCreator.showItemUnavailable());
+         PacketCreator.announce(c, new ShowItemUnavailable());
          return false;
       }
       short quantity = item.quantity();
@@ -258,7 +260,7 @@ public class MapleInventoryManipulator {
                short newSlot = inv.addItem(nItem);
                if (newSlot == -1) {
                   PacketCreator.announce(c, new InventoryFull());
-                  c.announce(MaplePacketCreator.getShowInventoryFull());
+                  PacketCreator.announce(c, new ShowInventoryFull());
                   item.quantity_$eq((short) (quantity + newQ));
                   return false;
                }
@@ -277,7 +279,7 @@ public class MapleInventoryManipulator {
             short newSlot = inv.addItem(nItem);
             if (newSlot == -1) {
                PacketCreator.announce(c, new InventoryFull());
-               c.announce(MaplePacketCreator.getShowInventoryFull());
+               PacketCreator.announce(c, new ShowInventoryFull());
                return false;
             }
             nItem.position_(newSlot);
@@ -292,7 +294,7 @@ public class MapleInventoryManipulator {
          short newSlot = inv.addItem(item);
          if (newSlot == -1) {
             PacketCreator.announce(c, new InventoryFull());
-            c.announce(MaplePacketCreator.getShowInventoryFull());
+            PacketCreator.announce(c, new ShowInventoryFull());
             return false;
          }
          item.position_(newSlot);
@@ -303,7 +305,7 @@ public class MapleInventoryManipulator {
       } else {
          FilePrinter.printError(FilePrinter.ITEM, "Tried to pickup Equip id " + item.id() + " containing more than 1 quantity --> " + quantity);
          PacketCreator.announce(c, new InventoryFull());
-         c.announce(MaplePacketCreator.showItemUnavailable());
+         PacketCreator.announce(c, new ShowItemUnavailable());
          return false;
       }
       if (show) {
@@ -569,7 +571,7 @@ public class MapleInventoryManipulator {
          if (top != null && ItemConstants.isOverall(top.id())) {
             if (eqpInv.isFull()) {
                PacketCreator.announce(c, new InventoryFull());
-               c.announce(MaplePacketCreator.getShowInventoryFull());
+               PacketCreator.announce(c, new ShowInventoryFull());
                return;
             }
             unequip(c, (byte) -5, eqpInv.getNextFreeSlot());
@@ -579,7 +581,7 @@ public class MapleInventoryManipulator {
          if (bottom != null && ItemConstants.isOverall(source.id())) {
             if (eqpInv.isFull()) {
                PacketCreator.announce(c, new InventoryFull());
-               c.announce(MaplePacketCreator.getShowInventoryFull());
+               PacketCreator.announce(c, new ShowInventoryFull());
                return;
             }
             unequip(c, (byte) -6, eqpInv.getNextFreeSlot());
@@ -589,7 +591,7 @@ public class MapleInventoryManipulator {
          if (weapon != null && ii.isTwoHanded(weapon.id())) {
             if (eqpInv.isFull()) {
                PacketCreator.announce(c, new InventoryFull());
-               c.announce(MaplePacketCreator.getShowInventoryFull());
+               PacketCreator.announce(c, new ShowInventoryFull());
                return;
             }
             unequip(c, (byte) -11, eqpInv.getNextFreeSlot());
@@ -599,7 +601,7 @@ public class MapleInventoryManipulator {
          if (shield != null && ii.isTwoHanded(source.id())) {
             if (eqpInv.isFull()) {
                PacketCreator.announce(c, new InventoryFull());
-               c.announce(MaplePacketCreator.getShowInventoryFull());
+               PacketCreator.announce(c, new ShowInventoryFull());
                return;
             }
             unequip(c, (byte) -10, eqpInv.getNextFreeSlot());

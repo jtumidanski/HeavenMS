@@ -78,6 +78,7 @@ import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.quest.info.RemoveQuestTimeLimit;
+import tools.packet.showitemgaininchat.ShowSpecialEffect;
 
 /**
  * @author Matze
@@ -438,7 +439,7 @@ public class MapleQuest {
       newStatus.setCompletionTime(System.currentTimeMillis());
       c.updateQuest(newStatus);
 
-      c.announce(MaplePacketCreator.showSpecialEffect(9)); // Quest completion
+      PacketCreator.announce(c, new ShowSpecialEffect(9));
       MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), character -> PacketCreator.create(new ShowForeignEffect(c.getId(), 9)), false, c); //use 9 instead of 12 for both
       return true;
    }

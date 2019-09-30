@@ -46,7 +46,9 @@ import net.server.processor.MapleAllianceProcessor;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.statusinfo.GetGuildPointMessage;
 
 public class MapleGuild {
 
@@ -600,7 +602,7 @@ public class MapleGuild {
       this.gp += amount;
       this.writeToDB(false);
       this.guildMessage(MaplePacketCreator.updateGP(this.id, this.gp));
-      this.guildMessage(MaplePacketCreator.getGPMessage(amount));
+      this.guildMessage(PacketCreator.create(new GetGuildPointMessage(amount)));
    }
 
    public void removeGP(int amount) {

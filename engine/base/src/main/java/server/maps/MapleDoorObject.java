@@ -30,6 +30,7 @@ import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.partyoperation.PartyPortal;
+import tools.packet.showitemgaininchat.ShowSpecialEffect;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -88,7 +89,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    public void warp(final MapleCharacter chr) {
       MapleParty party = chr.getParty();
       if (chr.getId() == ownerId || (party != null && party.getMemberById(ownerId) != null)) {
-         chr.announce(MaplePacketCreator.playPortalSound());
+         PacketCreator.announce(chr, new ShowSpecialEffect(7));
          if (!inTown() && party == null) {
             chr.changeMap(to, getLinkedPortalId());
          } else {
