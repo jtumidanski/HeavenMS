@@ -34,7 +34,9 @@ import tools.LogHelper;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatPacket> {
    @Override
@@ -46,7 +48,7 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
    public void handlePacket(GeneralChatPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
       if (chr.getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       if (packet.message().length() > Byte.MAX_VALUE && !chr.isGM()) {

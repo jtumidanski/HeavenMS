@@ -25,8 +25,10 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import server.CashShop;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.cashshop.gachapon.CashShopGachaponFailed;
+import tools.packet.cashshop.gachapon.CashShopGachaponSuccess;
 
 /**
  * @author RonanLana
@@ -46,9 +48,9 @@ public class CashShopSurpriseHandler extends AbstractPacketHandler<NoOpPacket> {
 
          if (cssResult != null) {
             Item cssItem = cssResult.getLeft(), cssBox = cssResult.getRight();
-            client.announce(MaplePacketCreator.onCashGachaponOpenSuccess(client.getAccID(), cssBox.sn(), cssBox.quantity(), cssItem, cssItem.id(), cssItem.quantity(), true));
+            PacketCreator.announce(client, new CashShopGachaponSuccess(client.getAccID(), cssBox.sn(), cssBox.quantity(), cssItem, cssItem.id(), cssItem.quantity(), true));
          } else {
-            client.announce(MaplePacketCreator.onCashItemGachaponOpenFailed());
+            PacketCreator.announce(client, new CashShopGachaponFailed());
          }
       }
    }

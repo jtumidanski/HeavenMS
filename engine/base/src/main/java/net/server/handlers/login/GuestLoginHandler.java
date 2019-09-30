@@ -22,8 +22,10 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
+import net.opcodes.SendOpcode;
 import net.server.login.packet.LoginPasswordPacket;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.GuestTOS;
 
 /*
  * @author David
@@ -31,8 +33,7 @@ import tools.MaplePacketCreator;
 public final class GuestLoginHandler extends LoginPasswordHandler {
    @Override
    public void handlePacket(LoginPasswordPacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.sendGuestTOS());
-      //System.out.println(slea.toString());
+      PacketCreator.announce(client, new GuestTOS());
       super.handlePacket(packet, client);
    }
 }

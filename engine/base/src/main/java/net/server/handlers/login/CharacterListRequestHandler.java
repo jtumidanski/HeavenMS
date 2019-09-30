@@ -27,7 +27,10 @@ import net.server.Server;
 import net.server.channel.packet.reader.CharacterListRequestReader;
 import net.server.login.packet.CharacterListRequestPacket;
 import net.server.world.World;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.CharacterList;
+import tools.packet.serverlist.GetServerStatus;
+import tools.packet.serverlist.ServerStatus;
 
 public final class CharacterListRequestHandler extends AbstractPacketHandler<CharacterListRequestPacket> {
    @Override
@@ -39,17 +42,17 @@ public final class CharacterListRequestHandler extends AbstractPacketHandler<Cha
    public void handlePacket(CharacterListRequestPacket packet, MapleClient client) {
       World world = Server.getInstance().getWorld(packet.world());
       if (world == null || world.isWorldCapacityFull()) {
-         client.announce(MaplePacketCreator.getServerStatus(2));
+         PacketCreator.announce(client, new GetServerStatus(ServerStatus.FULL));
          return;
       }
 
       if (world.getChannel(packet.channel()) == null) {
-         client.announce(MaplePacketCreator.getServerStatus(2));
+         PacketCreator.announce(client, new GetServerStatus(ServerStatus.FULL));
          return;
       }
 
       client.setWorld(packet.world());
       client.setChannel(packet.channel());
-      client.sendCharList(packet.world());
+      PacketCreator.announce(client, new CharacterList(client, packet.world(), 0));
    }
 }

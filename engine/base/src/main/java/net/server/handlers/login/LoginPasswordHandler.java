@@ -39,7 +39,12 @@ import net.server.login.packet.LoginPasswordPacket;
 import tools.BCrypt;
 import tools.DatabaseConnection;
 import tools.HexTool;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.login.LoginFailedReason;
+import tools.packet.login.AuthSuccess;
+import tools.packet.login.LoginFailed;
+import tools.packet.login.PermanentBan;
+import tools.packet.login.TemporaryBan;
 
 public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPacket> {
    @Override
@@ -54,18 +59,20 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
          if (ServerConstants.USE_IP_VALIDATION) {    // thanks Alex (CanIGetaPR) for suggesting IP validation as a server flag
             if (remoteHost.startsWith("127.")) {
                if (!ServerConstants.LOCALSERVER) { // thanks Mills for noting HOST can also have a field named "localhost"
-                  client.announce(MaplePacketCreator.getLoginFailed(13));  // cannot login as localhost if it's not a local server
+                  // cannot login as localhost if it's not a local server
+                  PacketCreator.announce(client, new LoginFailed(LoginFailedReason.UNABLE_TO_LOG_ON_AS_MASTER_AT_IP));
                   return false;
                }
             } else {
                if (ServerConstants.LOCALSERVER) {
-                  client.announce(MaplePacketCreator.getLoginFailed(13));  // cannot login as non-localhost if it's a local server
+                  // cannot login as non-localhost if it's a local server
+                  PacketCreator.announce(client, new LoginFailed(LoginFailedReason.UNABLE_TO_LOG_ON_AS_MASTER_AT_IP));
                   return false;
                }
             }
          }
       } else {
-         client.announce(MaplePacketCreator.getLoginFailed(14));          // thanks Alchemist for noting remoteHost could be null
+         PacketCreator.announce(client, new LoginFailed(LoginFailedReason.WRONG_GATEWAY));
          return false;
       }
       return true;
@@ -96,27 +103,28 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
       }
 
       if (client.hasBannedIP() || client.hasBannedMac()) {
-         client.announce(MaplePacketCreator.getLoginFailed(3));
+         PacketCreator.announce(client, new LoginFailed(LoginFailedReason.DELETED_OR_BLOCKED));
          return;
       }
       Calendar tempban = client.getTempBanCalendarFromDB();
       if (tempban != null) {
          if (tempban.getTimeInMillis() > Calendar.getInstance().getTimeInMillis()) {
-            client.announce(MaplePacketCreator.getTempBan(tempban.getTimeInMillis(), client.getGReason()));
+            PacketCreator.announce(client, new TemporaryBan(tempban.getTimeInMillis(), client.getGReason()));
             return;
          }
       }
       if (loginStatus == 3) {
-         client.announce(MaplePacketCreator.getPermBan(client.getGReason()));//crashes but idc :D
+         PacketCreator.announce(client, new PermanentBan(client.getGReason()));
          return;
       } else if (loginStatus != 0) {
-         client.announce(MaplePacketCreator.getLoginFailed(loginStatus));
+         LoginFailedReason reason = LoginFailedReason.fromValue(loginStatus);
+         PacketCreator.announce(client, new LoginFailed(reason));
          return;
       }
       if (client.finishLogin() == 0) {
          login(client);
       } else {
-         client.announce(MaplePacketCreator.getLoginFailed(7));
+         PacketCreator.announce(client, new LoginFailed(LoginFailedReason.ALREADY_LOGGED_IN));
       }
    }
 
@@ -131,7 +139,7 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
    }
 
    private void login(MapleClient client) {
-      client.announce(MaplePacketCreator.getAuthSuccess(client));//why the fk did I do client.getAccountName()?
+      PacketCreator.announce(client, new AuthSuccess(client));
       Server.getInstance().registerLoginState(client);
    }
 

@@ -34,9 +34,10 @@ import net.server.world.MaplePartyCharacter;
 import scripting.AbstractScriptManager;
 import server.MapleItemInformationProvider.ScriptedItem;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -154,7 +155,7 @@ public class NPCScriptManager extends AbstractScriptManager {
                }
             }
          } else {
-            c.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(c, new EnableActions());
          }
          return true;
       } catch (final Exception ute) {

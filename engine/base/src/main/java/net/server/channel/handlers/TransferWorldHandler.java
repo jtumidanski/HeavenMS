@@ -33,6 +33,10 @@ import net.server.channel.packet.TransferWorldPacket;
 import net.server.channel.packet.reader.TransferWorldReader;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
+import tools.packet.cashshop.operation.ShowCashShopMessage;
+import tools.packet.cashshop.CashShopMessage;
 
 /**
  * @author Ronan
@@ -46,8 +50,8 @@ public final class TransferWorldHandler extends AbstractPacketHandler<TransferWo
    @Override
    public void handlePacket(TransferWorldPacket packet, MapleClient client) {
       if (!CashOperationHandler.checkBirthday(client, packet.birthday())) {
-         client.announce(MaplePacketCreator.showCashShopMessage((byte) 0xC4));
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new ShowCashShopMessage(CashShopMessage.CHECK_BIRTHDAY_CODE));
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 

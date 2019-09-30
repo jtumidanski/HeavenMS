@@ -38,6 +38,9 @@ import net.server.channel.packet.InventorySortPacket;
 import net.server.channel.packet.reader.InventorySortReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
+import tools.packet.inventory.ModifyInventoryPacket;
 
 /**
  * @author BubblesDev
@@ -276,7 +279,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
       chr.getAutobanManager().setTimestamp(3, Server.getInstance().getCurrentTimestamp(), 4);
 
       if (!ServerConstants.USE_ITEM_SORT) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 
@@ -316,8 +319,8 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
          inventory.unlockInventory();
       }
 
-      client.announce(MaplePacketCreator.modifyInventory(true, mods));
+      PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
       client.announce(MaplePacketCreator.finishedSort2(packet.inventoryType()));
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

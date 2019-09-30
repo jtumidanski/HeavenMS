@@ -27,7 +27,9 @@ import net.server.channel.packet.UseMapleLifePacket;
 import net.server.channel.packet.reader.UseMapleLifeReader;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author RonanLana
@@ -46,7 +48,7 @@ public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacke
       if (timeNow - player.getLastUsedCashItem() < 3000) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a moment before trying again.");
          client.announce(MaplePacketCreator.sendMapleLifeError(3));
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       player.setLastUsedCashItem(timeNow);
@@ -56,6 +58,6 @@ public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacke
       } else {
          client.announce(MaplePacketCreator.sendMapleLifeNameError());
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

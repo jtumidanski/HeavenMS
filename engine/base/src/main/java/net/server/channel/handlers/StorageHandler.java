@@ -44,7 +44,9 @@ import server.MapleStorage;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -60,7 +62,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       MapleCharacter chr = client.getPlayer();
       if (chr.getLevel() < 15) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You may only use the storage once you have reached level 15.");
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;
@@ -102,13 +104,13 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          if (meso < 0 && (storageMesos - meso) < 0) {
             meso = Integer.MIN_VALUE + storageMesos;
             if (meso < playerMesos) {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
                return;
             }
          } else if (meso > 0 && (playerMesos + meso) < 0) {
             meso = Integer.MAX_VALUE - playerMesos;
             if (meso > storageMesos) {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
                return;
             }
          }
@@ -118,7 +120,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          FilePrinter.print(FilePrinter.STORAGE + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + (meso > 0 ? " took out " : " stored ") + Math.abs(meso) + " mesos");
          storage.sendMeso(c);
       } else {
-         c.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(c, new EnableActions());
       }
    }
 
@@ -126,7 +128,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       if (ServerConstants.USE_STORAGE_ITEM_SORT) {
          storage.arrangeItems(c);
       }
-      c.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(c, new EnableActions());
    }
 
    private void store(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, short slot, int itemId, short quantity) {
@@ -139,7 +141,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          return;
       }
       if (quantity < 1) {
-         c.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(c, new EnableActions());
          return;
       }
       if (storage.isFull()) {
@@ -158,7 +160,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
             item = inv.getItem(slot);
             if (item != null && item.id() == itemId && (item.quantity() >= quantity || ItemConstants.isRechargeable(itemId))) {
                if (ItemConstants.isWeddingRing(itemId) || ItemConstants.isWeddingToken(itemId)) {
-                  c.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                   return;
                }
 
@@ -168,7 +170,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
 
                MapleInventoryManipulator.removeFromSlot(c, invType, slot, quantity, false);
             } else {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
                return;
             }
 
@@ -224,7 +226,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
 
                storage.sendTakenOut(c, item.inventoryType());
             } else {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
             }
          } else {
             c.announce(MaplePacketCreator.getStorageError((byte) 0x0A));

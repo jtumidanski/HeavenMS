@@ -39,7 +39,9 @@ import server.maps.MapleMiniDungeonInfo;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 
 public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
@@ -54,38 +56,38 @@ public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
 
       if (!chr.isAlive() && ServerConstants.USE_BUYBACK_SYSTEM) {
          BuybackProcessor.processBuyback(client);
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       } else {
          if (!ServerConstants.USE_MTS) {
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
 
          if (chr.getEventInstance() != null) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Entering Cash Shop or MTS are disabled when registered on an event.");
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
 
          if (MapleMiniDungeonInfo.isDungeonMap(chr.getMapId())) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
 
          if (FieldLimit.CANNOTMIGRATE.check(chr.getMap().getFieldLimit())) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't do it here in this map.");
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
 
          if (!chr.isAlive()) {
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
          if (chr.getLevel() < 10) {
             client.announce(MaplePacketCreator.blockedMessage2(5));
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
 

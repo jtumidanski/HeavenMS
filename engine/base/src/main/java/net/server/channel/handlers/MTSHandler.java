@@ -62,7 +62,9 @@ import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 //TODO this needs a lot more work.
 public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
@@ -174,7 +176,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
                   c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
                   c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
                   c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
-                  c.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                } else {
                   c.announce(MaplePacketCreator.MTSFailBuy());
                }
@@ -202,7 +204,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
 
          c.announce(getMTS(c.getPlayer().getCurrentTab(), c.getPlayer().getCurrentType(), c.getPlayer().getCurrentPage()));
          c.enableCSActions();
-         c.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(c, new EnableActions());
          c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));
          c.announce(MaplePacketCreator.notYetSoldInv(getNotYetSold(c.getPlayer().getId())));
       });
@@ -241,7 +243,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
       c.getPlayer().changeType(type);
       c.getPlayer().changeCI(ci);
       c.enableCSActions();
-      c.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(c, new EnableActions());
       c.announce(getMTSSearch(tab, type, ci, search, c.getPlayer().getCurrentPage()));
       c.announce(MaplePacketCreator.showMTSCash(c.getPlayer()));
       c.announce(MaplePacketCreator.transferInventory(getTransfer(c.getPlayer().getId())));

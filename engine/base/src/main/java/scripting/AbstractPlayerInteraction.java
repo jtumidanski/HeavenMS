@@ -72,8 +72,11 @@ import server.quest.MapleQuest;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
+import tools.packet.inventory.ModifyInventoryPacket;
 
 public class AbstractPlayerInteraction {
 
@@ -715,7 +718,7 @@ public class AbstractPlayerInteraction {
 
    public void showInfo(String path) {
       c.announce(MaplePacketCreator.showInfo(path));
-      c.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(c, new EnableActions());
    }
 
    public MapleGuild getGuild() {
@@ -887,7 +890,7 @@ public class AbstractPlayerInteraction {
 
    public void showInstruction(String msg, int width, int height) {
       c.announce(MaplePacketCreator.sendHint(msg, width, height));
-      c.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(c, new EnableActions());
    }
 
    public void disableMinimap() {
@@ -949,7 +952,7 @@ public class AbstractPlayerInteraction {
       final Item newItem = MapleItemInformationProvider.getInstance().getEquipById(itemid);
       newItem.position_(slot);
       c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).addItemFromDB(newItem);
-      c.announce(MaplePacketCreator.modifyInventory(false, Collections.singletonList(new ModifyInventory(0, newItem))));
+      PacketCreator.announce(c, new ModifyInventoryPacket(false, Collections.singletonList(new ModifyInventory(0, newItem))));
    }
 
    public void spawnNpc(int npcId, Point pos, MapleMap map) {
@@ -1006,7 +1009,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void enableActions() {
-      c.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(c, new EnableActions());
    }
 
    public void showEffect(String effect) {
@@ -1027,7 +1030,7 @@ public class AbstractPlayerInteraction {
 
    public void updateAreaInfo(Short area, String info) {
       c.getPlayer().updateAreaInfo(area, info);
-      c.announce(MaplePacketCreator.enableActions());//idk, nexon does the same :P
+      PacketCreator.announce(c, new EnableActions());//idk, nexon does the same :P
    }
 
    public boolean containsAreaInfo(short area, String info) {

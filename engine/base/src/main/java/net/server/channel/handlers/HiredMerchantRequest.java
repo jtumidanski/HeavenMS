@@ -37,7 +37,10 @@ import server.maps.MaplePlayerShop;
 import server.maps.MaplePortal;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.MiniRoomError;
+import tools.packet.playerinteraction.GetMiniRoomError;
 
 /**
  * @author XoticStory
@@ -58,11 +61,11 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
 
                MaplePlayerShop shop = mc.getPlayerShop();
                if (shop != null && shop.isOwner(mc)) {
-                  chr.announce(MaplePacketCreator.getMiniRoomError(13));
+                  PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.CANT_ESTABLISH_MINI_ROOM));
                   return;
                }
             } else {
-               chr.announce(MaplePacketCreator.getMiniRoomError(13));
+               PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.CANT_ESTABLISH_MINI_ROOM));
                return;
             }
          }
@@ -70,7 +73,7 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
          Point cpos = chr.getPosition();
          MaplePortal portal = chr.getMap().findClosestTeleportPortal(cpos);
          if (portal != null && portal.getPosition().distance(cpos) < 120.0) {
-            chr.announce(MaplePacketCreator.getMiniRoomError(10));
+            PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.NOT_NEAR_PORTAL));
             return;
          }
       } catch (Exception e) {

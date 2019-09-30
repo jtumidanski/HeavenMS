@@ -44,7 +44,9 @@ import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialMovePacket> {
    @Override
@@ -106,7 +108,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
          }
          byte direction = ((MonsterMagnetPacket) packet).direction();   // thanks MedicOP for pointing some 3rd-party related issues with Magnet
          MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character ->MaplePacketCreator.showBuffeffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), 1, direction), false, chr);
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       } else if (packet.skillId() == Brawler.MP_RECOVERY) {// MP Recovery
          SkillFactory.getSkill(packet.skillId()).ifPresent(s -> {
@@ -141,10 +143,10 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
                }
             }
 
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
          }
       } else {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 }

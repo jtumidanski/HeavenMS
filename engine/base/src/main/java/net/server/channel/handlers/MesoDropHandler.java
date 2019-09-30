@@ -26,7 +26,8 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.MesoDropPacket;
 import net.server.channel.packet.reader.MesoDropReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -37,7 +38,7 @@ public final class MesoDropHandler extends AbstractPacketHandler<MesoDropPacket>
    public boolean successfulProcess(MapleClient client) {
       MapleCharacter player = client.getPlayer();
       if (!player.isAlive()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;
@@ -56,14 +57,14 @@ public final class MesoDropHandler extends AbstractPacketHandler<MesoDropPacket>
             if (packet.meso() <= player.getMeso() && packet.meso() > 9 && packet.meso() < 50001) {
                player.gainMeso(-packet.meso(), false, true, false);
             } else {
-               client.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(client, new EnableActions());
                return;
             }
          } finally {
             client.releaseClient();
          }
       } else {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 

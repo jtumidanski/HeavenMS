@@ -2,9 +2,12 @@ package net.server.handlers.login;
 
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
-import net.server.login.packet.AcceptToSPacket;
 import net.server.channel.packet.reader.AcceptToSReader;
-import tools.MaplePacketCreator;
+import net.server.login.packet.AcceptToSPacket;
+import tools.PacketCreator;
+import tools.packet.login.LoginFailedReason;
+import tools.packet.login.AuthSuccess;
+import tools.packet.login.LoginFailed;
 
 /**
  * @author kevintjuh93
@@ -23,9 +26,9 @@ public final class AcceptToSHandler extends AbstractPacketHandler<AcceptToSPacke
          return;
       }
       if (client.finishLogin() == 0) {
-         client.announce(MaplePacketCreator.getAuthSuccess(client));
+         PacketCreator.announce(client, new AuthSuccess(client));
       } else {
-         client.announce(MaplePacketCreator.getLoginFailed(9));//shouldn't happen XD
+         PacketCreator.announce(client, new LoginFailed(LoginFailedReason.SYSTEM_ERROR_3));
       }
    }
 

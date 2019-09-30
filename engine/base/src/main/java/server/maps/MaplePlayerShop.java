@@ -44,9 +44,18 @@ import server.MapleTrade;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.playerinteraction.GetPlayerShop;
+import tools.packet.playerinteraction.PlayerShopChat;
+import tools.packet.playerinteraction.PlayerShopErrorMessage;
+import tools.packet.playerinteraction.PlayerShopItemUpdate;
+import tools.packet.playerinteraction.PlayerShopNewVisitor;
+import tools.packet.playerinteraction.PlayerShopOwnerUpdate;
+import tools.packet.playerinteraction.PlayerShopRemoveVisitor;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -59,7 +68,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    private MapleCharacter[] visitors = new MapleCharacter[3];
    private List<MaplePlayerShopItem> items = new ArrayList<>();
-   private List<SoldItem> sold = new LinkedList<>();
+   private List<MaplePlayerShopSoldItem> sold = new LinkedList<>();
    private String description;
    private int boughtnumber = 0;
    private List<String> bannedList = new ArrayList<>();
@@ -146,7 +155,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
             visitors[i] = visitor;
             visitor.setSlot(i);
 
-            byte[] newVisitorPacket = MaplePacketCreator.getPlayerShopNewVisitor(visitor, i + 1);
+            byte[] newVisitorPacket = PacketCreator.create(new PlayerShopNewVisitor(visitor, i + 1));
             MasterBroadcaster.getInstance().sendToShop(this, character -> newVisitorPacket);
             MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(this));
             break;
@@ -168,7 +177,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                visitors[i] = null;
                visitor.setSlot(-1);
 
-               byte[] removeVisitorPacket = MaplePacketCreator.getPlayerShopRemoveVisitor(i + 1);
+               byte[] removeVisitorPacket = PacketCreator.create(new PlayerShopRemoveVisitor(i + 1));
                MasterBroadcaster.getInstance().sendToShop(this, character -> removeVisitorPacket);
                MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(this));
                return;
@@ -192,7 +201,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
                   for (int j = i; j < 2; j++) {
                      if (visitors[j] != null) {
-                        owner.announce(MaplePacketCreator.getPlayerShopRemoveVisitor(j + 1));
+                        PacketCreator.announce(owner, new PlayerShopRemoveVisitor(j + 1));
                      }
                      visitors[j] = visitors[j + 1];
                      if (visitors[j] != null) {
@@ -202,7 +211,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                   visitors[2] = null;
                   for (int j = i; j < 2; j++) {
                      if (visitors[j] != null) {
-                        owner.announce(MaplePacketCreator.getPlayerShopNewVisitor(visitors[j], j + 1));
+                        PacketCreator.announce(owner, new PlayerShopNewVisitor(visitors[j], j + 1));
                      }
                   }
 
@@ -253,7 +262,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
                if (!MapleInventory.checkSpot(chr, iitem)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
-                  chr.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(chr, new EnableActions());
                   return;
                }
 
@@ -261,7 +270,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
             }
 
             removeFromSlot(slot);
-            chr.announce(MaplePacketCreator.getPlayerShopItemUpdate(this));
+            PacketCreator.announce(chr, new PlayerShopItemUpdate(this));
          }
       }
    }
@@ -281,10 +290,10 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
             newItem.quantity_$eq((short) ((pItem.item().quantity() * quantity)));
             if (quantity < 1 || !pItem.doesExist() || pItem.bundles() < quantity) {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
                return false;
             } else if (newItem.inventoryType().equals(MapleInventoryType.EQUIP) && newItem.quantity() > 1) {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
                return false;
             }
 
@@ -298,7 +307,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                   if (canBuy(c, newItem)) {
                      if (!owner.canHoldMeso(price)) {
                         MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, "Transaction failed since the shop owner can't hold any more mesos.");
-                        c.announce(MaplePacketCreator.enableActions());
+                        PacketCreator.announce(c, new EnableActions());
                         return false;
                      }
 
@@ -306,8 +315,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                      price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
                      owner.gainMeso(price, true);
 
-                     SoldItem soldItem = new SoldItem(c.getPlayer().getName(), pItem.item().id(), quantity, price);
-                     owner.announce(MaplePacketCreator.getPlayerShopOwnerUpdate(soldItem, item));
+                     MaplePlayerShopSoldItem soldItem = new MaplePlayerShopSoldItem(c.getPlayer().getName(), pItem.item().id(), quantity, price);
+                     PacketCreator.announce(owner, new PlayerShopOwnerUpdate(soldItem, item));
 
                      synchronized (sold) {
                         sold.add(soldItem);
@@ -325,12 +334,12 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                      }
                   } else {
                      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please clear a slot before buying this item.");
-                     c.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos to purchase this item.");
-                  c.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                   return false;
                }
 
@@ -347,8 +356,8 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    public void broadcastRestoreToVisitors() {
       visitorLock.lock();
       try {
-         MasterBroadcaster.getInstance().sendToShoppers(this, (character, index) -> MaplePacketCreator.getPlayerShopRemoveVisitor(index + 1));
-         MasterBroadcaster.getInstance().sendToShoppers(this, character -> MaplePacketCreator.getPlayerShop(this, false));
+         MasterBroadcaster.getInstance().sendToShoppers(this, (character, index) -> PacketCreator.create(new PlayerShopRemoveVisitor(index + 1)));
+         MasterBroadcaster.getInstance().sendToShoppers(this, character -> PacketCreator.create(new GetPlayerShop(this, false)));
          recoverChatLog();
       } finally {
          visitorLock.unlock();
@@ -363,7 +372,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          try {
             for (int i = 0; i < 3; i++) {
                if (visitors[i] != null) {
-                  visitors[i].getClient().announce(MaplePacketCreator.shopErrorMessage(10, 1));
+                  PacketCreator.announce(visitors[i], new PlayerShopErrorMessage(10, 1));
                   visitorList.add(visitors[i]);
                }
             }
@@ -406,7 +415,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          }
          chatSlot.put(c.getPlayer().getId(), s);
       }
-      MasterBroadcaster.getInstance().sendToShop(this, character -> MaplePacketCreator.getPlayerShopChat(c.getPlayer(), chat, s));
+      MasterBroadcaster.getInstance().sendToShop(this, character -> PacketCreator.create(new PlayerShopChat(c.getPlayer().getName(), chat, s)));
    }
 
    private void recoverChatLog() {
@@ -414,7 +423,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          for (Pair<MapleCharacter, String> it : chatLog) {
             MapleCharacter chr = it.getLeft();
             Byte pos = chatSlot.get(chr.getId());
-            MasterBroadcaster.getInstance().sendToShoppers(this, character -> MaplePacketCreator.getPlayerShopChat(chr, it.getRight(), pos));
+            MasterBroadcaster.getInstance().sendToShoppers(this, character -> PacketCreator.create(new PlayerShopChat(chr.getName(), it.getRight(), pos)));
          }
       }
    }
@@ -434,7 +443,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    public void sendShop(MapleClient c) {
       visitorLock.lock();
       try {
-         c.announce(MaplePacketCreator.getPlayerShop(this, isOwner(c.getPlayer())));
+         PacketCreator.announce(c, new GetPlayerShop(this, isOwner(c.getPlayer())));
       } finally {
          visitorLock.unlock();
       }
@@ -499,7 +508,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       }
 
       if (target != null) {
-         target.getClient().announce(MaplePacketCreator.shopErrorMessage(5, 1));
+         PacketCreator.announce(target, new PlayerShopErrorMessage(5, 1));
          removeVisitor(target);
       }
    }
@@ -551,7 +560,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       return list;
    }
 
-   public List<SoldItem> getSold() {
+   public List<MaplePlayerShopSoldItem> getSold() {
       synchronized (sold) {
          return Collections.unmodifiableList(sold);
       }
@@ -570,35 +579,5 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    @Override
    public MapleMapObjectType getType() {
       return MapleMapObjectType.SHOP;
-   }
-
-   public class SoldItem {
-
-      int itemid, mesos;
-      short quantity;
-      String buyer;
-
-      public SoldItem(String buyer, int itemid, short quantity, int mesos) {
-         this.buyer = buyer;
-         this.itemid = itemid;
-         this.quantity = quantity;
-         this.mesos = mesos;
-      }
-
-      public String getBuyer() {
-         return buyer;
-      }
-
-      public int getItemId() {
-         return itemid;
-      }
-
-      public short getQuantity() {
-         return quantity;
-      }
-
-      public int getMesos() {
-         return mesos;
-      }
    }
 }

@@ -34,7 +34,8 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.pet.PetFoodPacket;
 import net.server.channel.packet.reader.PetFoodReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
    @Override
@@ -47,13 +48,13 @@ public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
       MapleCharacter chr = client.getPlayer();
       AutobanManager abm = chr.getAutobanManager();
       if (abm.getLastSpam(2) + 500 > currentServerTime()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       abm.spam(2);
       abm.setTimestamp(1, Server.getInstance().getCurrentTimestamp(), 3);
       if (chr.getNoPets() == 0) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       int previousFullness = 100;

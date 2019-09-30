@@ -27,7 +27,8 @@ import client.autoban.AutobanFactory;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author kevintjuh93; modified by Ronan
@@ -51,6 +52,6 @@ public class UseGachaExpHandler extends AbstractPacketHandler<NoOpPacket> {
          }
       }
 
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

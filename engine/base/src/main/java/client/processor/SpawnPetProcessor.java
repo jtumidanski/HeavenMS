@@ -35,7 +35,10 @@ import provider.MapleDataTool;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
+import tools.packet.stat.UpdatePetStats;
 
 /**
  * @author RonanLana - just added locking on OdinMS' SpawnPetHandler method body
@@ -58,7 +61,7 @@ public class SpawnPetProcessor {
             {
                if (chr.haveItem(petid + 1)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You can't hatch your " + (petid == 5000028 ? "Dragon egg" : "Robo egg") + " if you already have a Baby " + (petid == 5000028 ? "Dragon." : "Robo."));
-                  c.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                   return;
                } else {
                   int evolveid = MapleDataTool.getInt("info/evol1", dataRoot.getData("Pet/" + petid + ".img"));
@@ -70,7 +73,7 @@ public class SpawnPetProcessor {
                   MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, petid, (short) 1, false, false);
                   MapleInventoryManipulator.addById(c, evolveid, (short) 1, null, petId, expiration);
                   PetProcessor.getInstance().deleteFromDb(chr, petid);
-                  c.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                   return;
                }
             }
@@ -93,9 +96,8 @@ public class SpawnPetProcessor {
                PetProcessor.getInstance().saveToDb(pet);
                chr.addPet(pet);
                MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.showPet(c.getPlayer(), pet, false, false), true, chr);
-               c.announce(MaplePacketCreator.petStatUpdate(c.getPlayer()));
-               c.announce(MaplePacketCreator.enableActions());
-
+               PacketCreator.announce(c, new UpdatePetStats(c.getPlayer().getPets()));
+               PacketCreator.announce(c, new EnableActions());
                chr.commitExcludedItems();
                chr.getClient().getWorldServer().registerPetHunger(chr, chr.getPetIndex(pet));
             }

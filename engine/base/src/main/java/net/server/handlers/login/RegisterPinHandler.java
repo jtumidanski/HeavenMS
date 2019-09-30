@@ -26,7 +26,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.RegisterPinReader;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.login.packet.RegisterPinPacket;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.pin.PinRegistered;
 
 /*
  * @author Rob
@@ -45,7 +46,7 @@ public final class RegisterPinHandler extends AbstractPacketHandler<RegisterPinP
       } else {
          if (packet.pin() != null) {
             client.setPin(packet.pin());
-            client.announce(MaplePacketCreator.pinRegistered());
+            PacketCreator.announce(client, new PinRegistered());
 
             MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);
             client.updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);

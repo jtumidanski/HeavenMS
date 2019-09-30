@@ -30,8 +30,10 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.ShowAllCharacter;
+import tools.packet.ShowAllCharacterInfo;
 
 public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
@@ -42,7 +44,7 @@ public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> 
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
       if (!client.canRequestCharacterlist()) {   // client breaks if the charlist request pops too soon
-         client.announce(MaplePacketCreator.showAllCharacter(0, 0));
+         PacketCreator.announce(client, new ShowAllCharacter(0, 0));
          return;
       }
 
@@ -67,10 +69,10 @@ public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> 
 
       int charsSize = chrTotal;
       int unk = charsSize + (3 - charsSize % 3); //rowSize?
-      client.announce(MaplePacketCreator.showAllCharacter(charsSize, unk));
+      PacketCreator.announce(client, new ShowAllCharacter(charsSize, unk));
 
       for (Pair<Integer, List<MapleCharacter>> wchars : worldChars) {
-         client.announce(MaplePacketCreator.showAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && client.cannotBypassPic()));
+         PacketCreator.announce(client, new ShowAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && client.cannotBypassPic()));
       }
    }
 }

@@ -51,9 +51,11 @@ import tools.FilePrinter;
 import tools.MapleAESOFB;
 import tools.MapleLogger;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericSeekableLittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.Ping;
 
 public class MapleServerHandler extends IoHandlerAdapter {
    private final static Set<Short> ignoredDebugRecvPackets = new HashSet<>(Arrays.asList((short) 167, (short) 197, (short) 89, (short) 91, (short) 41, (short) 188, (short) 107));
@@ -216,7 +218,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
       if (idleLock.tryLock()) {
          try {
             idleSessions.put(c, Server.getInstance().getCurrentTime());
-            c.announce(MaplePacketCreator.getPing());
+            PacketCreator.announce(c, new Ping());
          } finally {
             idleLock.unlock();
          }
@@ -224,7 +226,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          tempLock.lock();
          try {
             tempIdleSessions.put(c, Server.getInstance().getCurrentTime());
-            c.announce(MaplePacketCreator.getPing());
+            PacketCreator.announce(c, new Ping());
          } finally {
             tempLock.unlock();
          }

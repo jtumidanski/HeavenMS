@@ -44,6 +44,9 @@ import net.server.channel.packet.reader.ScrollReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.inventory.InventoryFull;
+import tools.packet.inventory.ModifyInventoryPacket;
 
 /**
  * @author Matze
@@ -59,7 +62,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
       if (legendarySpirit) {
          c.announce(MaplePacketCreator.getScrollEffect(c.getPlayer().getId(), ScrollResult.FAIL, false, false));
       } else {
-         c.announce(MaplePacketCreator.getInventoryFull());
+         PacketCreator.announce(c, new InventoryFull());
       }
    }
 
@@ -197,7 +200,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                mods.add(new ModifyInventory(3, scrolled));
                mods.add(new ModifyInventory(0, scrolled));
             }
-            client.announce(MaplePacketCreator.modifyInventory(true, mods));
+            PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
             ScrollResult finalScrollSuccess = scrollSuccess;
             boolean finalHasLegendarySpirit = hasLegendarySpirit;
             boolean finalIsWhiteScroll = isWhiteScroll;

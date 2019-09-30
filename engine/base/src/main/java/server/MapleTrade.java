@@ -38,10 +38,17 @@ import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import tools.LogHelper;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.playerinteraction.GetTradeMeso;
+import tools.packet.playerinteraction.GetTradeResult;
+import tools.packet.playerinteraction.GetTradeStart;
+import tools.packet.playerinteraction.TradeChat;
+import tools.packet.playerinteraction.TradeConfirmation;
+import tools.packet.playerinteraction.TradeInvite;
+import tools.packet.playerinteraction.TradePartnerAdd;
 
 /**
  * @author Matze
@@ -231,8 +238,8 @@ public class MapleTrade {
             c2.getTrade().setPartner(c1.getTrade());
             c1.getTrade().setPartner(c2.getTrade());
 
-            c1.getClient().announce(MaplePacketCreator.getTradeStart(c1.getClient(), c1.getTrade(), (byte) 0));
-            c2.getClient().announce(MaplePacketCreator.tradeInvite(c1));
+            PacketCreator.announce(c1, new GetTradeStart(c1, c1.getTrade(), (byte) 0));
+            PacketCreator.announce(c2, new TradeInvite(c1));
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(c1, ServerNoticeType.PINK_TEXT, "The other player is already trading with someone else.");
             cancelTrade(c1, MapleTradeResult.NO_RESPONSE);
@@ -250,8 +257,8 @@ public class MapleTrade {
       InviteResult res = inviteRes.result;
       if (res == InviteResult.ACCEPTED) {
          if (c1.getTrade() != null && c1.getTrade().getPartner() == c2.getTrade() && c2.getTrade() != null && c2.getTrade().getPartner() == c1.getTrade()) {
-            c2.getClient().announce(MaplePacketCreator.getTradePartnerAdd(c1));
-            c1.getClient().announce(MaplePacketCreator.getTradeStart(c1.getClient(), c1.getTrade(), (byte) 1));
+            PacketCreator.announce(c2, new TradePartnerAdd(c1));
+            PacketCreator.announce(c1, new GetTradeStart(c1, c1.getTrade(), (byte) 1));
             c1.getTrade().setFullTrade(true);
             c2.getTrade().setFullTrade(true);
          } else {
@@ -283,7 +290,7 @@ public class MapleTrade {
 
    private void lockTrade() {
       locked.set(true);
-      partner.getChr().getClient().announce(MaplePacketCreator.getTradeConfirmation());
+      PacketCreator.announce(partner.getChr(), new TradeConfirmation());
    }
 
    private void fetchExchangedItems() {
@@ -322,7 +329,7 @@ public class MapleTrade {
          exchangeItems.clear();
       }
 
-      chr.getClient().announce(MaplePacketCreator.getTradeResult(number, result));
+      PacketCreator.announce(chr, new GetTradeResult(number, result));
    }
 
    private void cancel(byte result) {
@@ -343,7 +350,7 @@ public class MapleTrade {
          exchangeItems.clear();
       }
 
-      chr.getClient().announce(MaplePacketCreator.getTradeResult(number, result));
+      PacketCreator.announce(chr, new GetTradeResult(number, result));
    }
 
    private boolean isLocked() {
@@ -365,9 +372,9 @@ public class MapleTrade {
       if (chr.getMeso() >= meso) {
          chr.gainMeso(-meso, false, true, false);
          this.meso += meso;
-         chr.getClient().announce(MaplePacketCreator.getTradeMesoSet((byte) 0, this.meso));
+         PacketCreator.announce(chr, new GetTradeMeso((byte) 0, this.meso));
          if (partner != null) {
-            partner.getChr().getClient().announce(MaplePacketCreator.getTradeMesoSet((byte) 1, this.meso));
+            PacketCreator.announce(partner.getChr(), new GetTradeMeso((byte) 1, this.meso));
          }
       } else {
       }
@@ -391,9 +398,9 @@ public class MapleTrade {
    }
 
    public void chat(String message) {
-      chr.getClient().announce(MaplePacketCreator.getTradeChat(chr, message, true));
+      PacketCreator.announce(chr, new TradeChat(chr.getName(), message, true));
       if (partner != null) {
-         partner.getChr().getClient().announce(MaplePacketCreator.getTradeChat(chr, message, false));
+         PacketCreator.announce(partner.getChr(), new TradeChat(chr.getName(), message, false));
       }
    }
 

@@ -19,18 +19,20 @@
 */
 package client.creator;
 
-import client.processor.CharacterProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleSkinColor;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
+import client.processor.CharacterProcessor;
 import constants.ServerConstants;
 import net.server.Server;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.AddNewCharacter;
 
 /**
  * @author RonanLana
@@ -90,7 +92,7 @@ public abstract class CharacterFactory {
       if (!CharacterProcessor.getInstance().insertNewChar(newchar, recipe)) {
          return -2;
       }
-      c.announce(MaplePacketCreator.addNewCharEntry(newchar));
+      PacketCreator.announce(c, new AddNewCharacter(newchar));
 
       Server.getInstance().createCharacterEntry(newchar);
       Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name));

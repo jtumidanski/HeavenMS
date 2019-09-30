@@ -28,7 +28,9 @@ import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.playerinteraction.GetHiredMerchant;
 
 /*
  * @author Ronan
@@ -95,7 +97,7 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
 
                   if (hm.isOpen()) {   //change map has a delay, must double check
                      if (hm.addVisitor(client.getPlayer())) {
-                        client.announce(MaplePacketCreator.getHiredMerchant(client.getPlayer(), hm, false));
+                        PacketCreator.announce(client, new GetHiredMerchant(client.getPlayer(), hm, false));
                         client.getPlayer().setHiredMerchant(hm);
                      } else {
                         //c.announce(MaplePacketCreator.serverNotice(1, hm.getOwner() + "'s merchant is full. Wait awhile before trying again."));

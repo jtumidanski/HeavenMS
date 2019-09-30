@@ -34,7 +34,8 @@ import constants.GameConstants;
 import constants.skills.Aran;
 import server.ThreadManager;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author RonanLana - synchronization of SP transaction modules
@@ -43,7 +44,7 @@ public class AssignSPProcessor {
 
    public static boolean canSPAssign(MapleClient c, int skillid) {
       if (skillid == Aran.HIDDEN_FULL_DOUBLE || skillid == Aran.HIDDEN_FULL_TRIPLE || skillid == Aran.HIDDEN_OVER_DOUBLE || skillid == Aran.HIDDEN_OVER_TRIPLE) {
-         c.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(c, new EnableActions());
          return false;
       }
 
@@ -98,7 +99,7 @@ public class AssignSPProcessor {
                if (!isBeginnerSkill) {
                   player.gainSp(-1, GameConstants.getSkillBook(skillid / 10000), false);
                } else {
-                  player.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                }
 
                long skillExpiration = player.getSkillExpiration(skill);

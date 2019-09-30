@@ -112,6 +112,7 @@ import server.CashShop.CashItemFactory;
 import server.MapleSkillbookInformationProvider;
 import server.ThreadManager;
 import server.TimerManager;
+import server.WorldRecommendation;
 import server.expeditions.MapleExpeditionBossLog;
 import server.life.MaplePlayerNPCFactory;
 import server.quest.MapleQuest;
@@ -152,7 +153,7 @@ public class Server {
    private IoAcceptor acceptor;
    private List<Map<Integer, String>> channels = new LinkedList<>();
    private List<World> worlds = new ArrayList<>();
-   private List<Pair<Integer, String>> worldRecommendedList = new LinkedList<>();
+   private List<WorldRecommendation> worldRecommendedList = new LinkedList<>();
    private long serverCurrentTime = 0;
 
    private boolean availableDeveloperRoom = false;
@@ -327,7 +328,7 @@ public class Server {
       return online;
    }
 
-   public List<Pair<Integer, String>> worldRecommendedList() {
+   public List<WorldRecommendation> worldRecommendedList() {
       return worldRecommendedList;
    }
 
@@ -544,7 +545,7 @@ public class Server {
                p.getProperty("eventmessage" + i),
                exprate, droprate, bossdroprate, mesorate, questrate, travelrate, fishingrate);
 
-         worldRecommendedList.add(new Pair<>(i, p.getProperty("whyamirecommended" + i)));
+         worldRecommendedList.add(new WorldRecommendation(i, p.getProperty("whyamirecommended" + i)));
          worlds.add(world);
 
          Map<Integer, String> channelInfo = new HashMap<>();

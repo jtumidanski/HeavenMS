@@ -29,6 +29,8 @@ import net.server.channel.packet.reader.DoorReader;
 import server.maps.MapleDoorObject;
 import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -43,7 +45,7 @@ public final class DoorHandler extends AbstractPacketHandler<DoorPacket> {
    public void handlePacket(DoorPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
       if (chr.isChangingMaps() || chr.isBanned()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 
@@ -58,6 +60,6 @@ public final class DoorHandler extends AbstractPacketHandler<DoorPacket> {
       }
 
       client.announce(MaplePacketCreator.blockedMessage(6));
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

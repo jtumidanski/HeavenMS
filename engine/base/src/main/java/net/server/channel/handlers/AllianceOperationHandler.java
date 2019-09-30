@@ -47,8 +47,10 @@ import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author XoticStory, Ronan
@@ -95,12 +97,12 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
             existingAllianceOperations(packet, client, chr, alliance.get().getId(), alliance.get());
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void existingAllianceOperations(AllianceOperationPacket packet, MapleClient client, MapleCharacter chr, int allianceId, MapleAlliance alliance) {
       if (chr.getMGC().getAllianceRank() > 2 || !alliance.getGuilds().contains(chr.getGuildId())) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 
@@ -113,7 +115,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
          sendInvite(client, alliance, chr, ((AllianceInvitePacket) packet).guildName());
       } else if (packet instanceof AllianceAlreadyRegisteredPacket) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Your guild is already registered on a guild alliance.");
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       } else if (packet instanceof AllianceNoticePacket) {
          setAllianceNotice(alliance, ((AllianceNoticePacket) packet).notice());
       } else if (packet instanceof AlliancePlayerRankDataPacket) {

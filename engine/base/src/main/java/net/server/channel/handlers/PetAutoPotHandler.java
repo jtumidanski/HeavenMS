@@ -26,7 +26,8 @@ import client.processor.PetAutopotProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetAutoPotPacket;
 import net.server.channel.packet.reader.PetAutoPotReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Ronan - multi-pot consumption feature
@@ -40,7 +41,7 @@ public final class PetAutoPotHandler extends AbstractPacketHandler<PetAutoPotPac
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (!client.getPlayer().isAlive()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;

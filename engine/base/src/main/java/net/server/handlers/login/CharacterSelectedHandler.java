@@ -29,12 +29,14 @@ import org.apache.mina.core.session.IoSession;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
-import net.server.login.packet.CharacterSelectedPacket;
 import net.server.channel.packet.reader.CharacterSelectedReader;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
+import net.server.login.packet.CharacterSelectedPacket;
 import net.server.world.World;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.AfterLoginError;
+import tools.packet.serverlist.ServerIP;
 
 public final class CharacterSelectedHandler extends AbstractPacketHandler<CharacterSelectedPacket> {
    @Override
@@ -45,7 +47,7 @@ public final class CharacterSelectedHandler extends AbstractPacketHandler<Charac
    @Override
    public void handlePacket(CharacterSelectedPacket packet, MapleClient client) {
       if (!packet.hwid().matches("[0-9A-F]{12}_[0-9A-F]{8}")) {
-         client.announce(MaplePacketCreator.getAfterLoginError(17));
+         PacketCreator.announce(client, new AfterLoginError(17));
          return;
       }
 
@@ -55,7 +57,7 @@ public final class CharacterSelectedHandler extends AbstractPacketHandler<Charac
       IoSession session = client.getSession();
       AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
       if (res != AntiMulticlientResult.SUCCESS) {
-         client.announce(MaplePacketCreator.getAfterLoginError(parseAntiMulticlientError(res)));
+         PacketCreator.announce(client, new AfterLoginError(parseAntiMulticlientError(res)));
          return;
       }
 
@@ -73,13 +75,13 @@ public final class CharacterSelectedHandler extends AbstractPacketHandler<Charac
       client.setWorld(server.getCharacterWorld(packet.characterId()));
       World wserv = client.getWorldServer();
       if (wserv == null || wserv.isWorldCapacityFull()) {
-         client.announce(MaplePacketCreator.getAfterLoginError(10));
+         PacketCreator.announce(client, new AfterLoginError(10));
          return;
       }
 
       String[] socket = server.getInetSocket(client.getWorld(), client.getChannel());
       if (socket == null) {
-         client.announce(MaplePacketCreator.getAfterLoginError(10));
+         PacketCreator.announce(client, new AfterLoginError(10));
          return;
       }
 
@@ -88,7 +90,7 @@ public final class CharacterSelectedHandler extends AbstractPacketHandler<Charac
       server.setCharacteridInTransition(session, packet.characterId());
 
       try {
-         client.announce(MaplePacketCreator.getServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), packet.characterId()));
+         PacketCreator.announce(client, new ServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), packet.characterId()));
       } catch (UnknownHostException | NumberFormatException e) {
          e.printStackTrace();
       }

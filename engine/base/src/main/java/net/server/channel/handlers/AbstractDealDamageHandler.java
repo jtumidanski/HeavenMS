@@ -89,9 +89,11 @@ import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends AbstractPacketHandler<T> {
    // TODO move this
@@ -158,7 +160,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
             theSkill = SkillFactory.getSkill(GameConstants.getHiddenSkill(attack.skill())).orElseThrow(); //returns back the skill id if its not a hidden skill so we are gucci
             attackEffect = getAttackEffect(attack, player, theSkill);
             if (attackEffect == null) {
-               player.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(player, new EnableActions());
                return;
             }
 
@@ -184,7 +186,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      }
                   }
                } else {
-                  player.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(player, new EnableActions());
                }
             }
 

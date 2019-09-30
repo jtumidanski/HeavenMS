@@ -32,20 +32,21 @@ import server.life.MapleNPC;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (!client.getPlayer().isAlive()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
 
       if (currentServerTime() - client.getPlayer().getNpcCooldown() < ServerConstants.BLOCK_NPC_RACE_CONDT) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;
@@ -69,7 +70,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
             DueyProcessor.dueySendTalk(client, false);
          } else {
             if (client.getCM() != null || client.getQM() != null) {
-               client.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(client, new EnableActions());
                return;
             }
             if (npc.getId() >= 9100100 && npc.getId() <= 9100200) {
@@ -82,7 +83,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
                      FilePrinter.printError(FilePrinter.NPC_UNCODED, "NPC " + npc.getName() + "(" + npc.getId() + ") is not coded.");
                      return;
                   } else if (client.getPlayer().getShop() != null) {
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                      return;
                   }
 

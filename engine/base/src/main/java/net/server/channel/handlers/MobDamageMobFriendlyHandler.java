@@ -31,8 +31,10 @@ import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Xotic & BubblesDev
@@ -89,6 +91,6 @@ public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<Mob
 
       int finalRemainingHp = remainingHp;
       MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.MobDamageMobFriendly(monster, damage, finalRemainingHp), monster.getPosition());
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

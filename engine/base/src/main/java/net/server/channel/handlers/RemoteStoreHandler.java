@@ -30,7 +30,9 @@ import net.server.packet.reader.NoOpReader;
 import server.maps.MapleHiredMerchant;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author kevintjuh93 :3
@@ -55,7 +57,7 @@ public class RemoteStoreHandler extends AbstractPacketHandler<NoOpPacket> {
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You don't have a Merchant open.");
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private MapleHiredMerchant getMerchant(MapleClient c) {

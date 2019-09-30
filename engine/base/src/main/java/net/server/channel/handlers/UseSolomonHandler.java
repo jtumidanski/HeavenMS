@@ -31,7 +31,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseSolomonPacket;
 import net.server.channel.packet.reader.UseSolomonReader;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author XoticStory; modified by kevintjuh93, Ronan
@@ -73,6 +74,6 @@ public final class UseSolomonHandler extends AbstractPacketHandler<UseSolomonPac
          }
       }
 
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

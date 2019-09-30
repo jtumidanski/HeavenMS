@@ -36,7 +36,9 @@ import server.life.MapleMonster;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author kevintjuh93
@@ -121,7 +123,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             }
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void useFishNet(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
@@ -135,7 +137,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot use the Fishing Net yet.");
          }
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 
@@ -150,7 +152,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             client.announce(MaplePacketCreator.catchMessage(0));
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void useThirdTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
@@ -164,7 +166,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             client.announce(MaplePacketCreator.catchMessage(0));
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void useSecondTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
@@ -178,7 +180,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             client.announce(MaplePacketCreator.catchMessage(0));
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void useFirstTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
@@ -192,7 +194,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             client.announce(MaplePacketCreator.catchMessage(0));
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void useCliffsMagicCane(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
@@ -206,7 +208,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             client.announce(MaplePacketCreator.catchMessage(0));
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void useElementRock(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
@@ -231,7 +233,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
                client.announce(MaplePacketCreator.catchMessage(0));
             }
          }
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 
@@ -248,7 +250,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
                client.announce(MaplePacketCreator.catchMessage(0));
             }
          }
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 
@@ -259,6 +261,6 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
          MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
          MapleInventoryManipulator.addById(client, 1902000, (short) 1, "", -1);
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

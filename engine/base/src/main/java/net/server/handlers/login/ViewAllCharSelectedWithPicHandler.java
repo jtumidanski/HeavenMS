@@ -13,8 +13,11 @@ import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
 import net.server.login.packet.ViewAllCharactersSelectedWithPicPacket;
 import net.server.world.World;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Randomizer;
+import tools.packet.AfterLoginError;
+import tools.packet.serverlist.ServerIP;
+import tools.packet.WrongPic;
 
 public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<ViewAllCharactersSelectedWithPicPacket> {
    @Override
@@ -25,7 +28,7 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
    @Override
    public void handlePacket(ViewAllCharactersSelectedWithPicPacket packet, MapleClient client) {
       if (!packet.hwid().matches("[0-9A-F]{12}_[0-9A-F]{8}")) {
-         client.announce(MaplePacketCreator.getAfterLoginError(17));
+         PacketCreator.announce(client, new AfterLoginError(17));
          return;
       }
 
@@ -48,7 +51,7 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
       client.setWorld(server.getCharacterWorld(packet.characterId()));
       World wserv = client.getWorldServer();
       if (wserv == null || wserv.isWorldCapacityFull()) {
-         client.announce(MaplePacketCreator.getAfterLoginError(10));
+         PacketCreator.announce(client, new AfterLoginError(10));
          return;
       }
 
@@ -58,13 +61,13 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
       if (client.checkPic(packet.pic())) {
          String[] socket = server.getInetSocket(client.getWorld(), client.getChannel());
          if (socket == null) {
-            client.announce(MaplePacketCreator.getAfterLoginError(10));
+            PacketCreator.announce(client, new AfterLoginError(10));
             return;
          }
 
          AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
          if (res != AntiMulticlientResult.SUCCESS) {
-            client.announce(MaplePacketCreator.getAfterLoginError(parseAntiMulticlientError(res)));
+            PacketCreator.announce(client, new AfterLoginError(parseAntiMulticlientError(res)));
             return;
          }
 
@@ -73,13 +76,12 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
          server.setCharacteridInTransition(session, packet.characterId());
 
          try {
-            client.announce(MaplePacketCreator.getServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), packet.characterId()));
+            PacketCreator.announce(client, new ServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), packet.characterId()));
          } catch (UnknownHostException e) {
             e.printStackTrace();
          }
-
       } else {
-         client.announce(MaplePacketCreator.wrongPic());
+         PacketCreator.announce(client, new WrongPic());
       }
    }
 

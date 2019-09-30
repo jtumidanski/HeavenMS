@@ -31,7 +31,8 @@ import net.server.channel.packet.duey.DueyReceiveItemPacket;
 import net.server.channel.packet.duey.DueyRemovePackagePacket;
 import net.server.channel.packet.duey.DueySendItemPacket;
 import net.server.channel.packet.reader.DueyReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 public final class DueyHandler extends AbstractPacketHandler<BaseDueyPacket> {
    @Override
@@ -42,7 +43,7 @@ public final class DueyHandler extends AbstractPacketHandler<BaseDueyPacket> {
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (!ServerConstants.USE_DUEY) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;

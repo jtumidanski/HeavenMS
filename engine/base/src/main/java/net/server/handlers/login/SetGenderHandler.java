@@ -28,7 +28,8 @@ import net.server.Server;
 import net.server.channel.packet.reader.SetGenderReader;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.login.packet.SetGenderPacket;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.login.AuthSuccess;
 
 /**
  * @author kevintjuh93
@@ -43,8 +44,7 @@ public class SetGenderHandler extends AbstractPacketHandler<SetGenderPacket> {
    public void handlePacket(SetGenderPacket packet, MapleClient client) {
       if (packet.confirmed() == 0x01) {
          client.setGender(packet.gender());
-         client.announce(MaplePacketCreator.getAuthSuccess(client));
-
+         PacketCreator.announce(client, new AuthSuccess(client));
          Server.getInstance().registerLoginState(client);
       } else {
          MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);

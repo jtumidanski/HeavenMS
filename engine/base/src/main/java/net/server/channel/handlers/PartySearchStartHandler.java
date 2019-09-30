@@ -28,9 +28,10 @@ import net.server.channel.packet.party.PartySearchStartPacket;
 import net.server.channel.packet.reader.PartySearchStartReader;
 import net.server.world.MapleParty;
 import net.server.world.World;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author XoticStory
@@ -48,19 +49,19 @@ public class PartySearchStartHandler extends AbstractPacketHandler<PartySearchSt
       MapleCharacter chr = client.getPlayer();
       if (packet.min() > packet.max()) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "The min. value is higher than the max!");
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 
       if (packet.max() - packet.min() > 30) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can only search for party members within a range of 30 levels.");
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 
       if (chr.getLevel() < packet.min() || chr.getLevel() > packet.max()) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "The range of level for search has to include your own level.");
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
 

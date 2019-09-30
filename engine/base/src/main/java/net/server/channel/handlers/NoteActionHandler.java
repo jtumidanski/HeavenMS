@@ -31,7 +31,8 @@ import net.server.channel.packet.ClearNotePacket;
 import net.server.channel.packet.SendNotePacket;
 import net.server.channel.packet.reader.NoteActionReader;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.cashshop.operation.ShowCashInventory;
 
 public final class NoteActionHandler extends AbstractPacketHandler<BaseNoteActionPacket> {
    @Override
@@ -65,7 +66,7 @@ public final class NoteActionHandler extends AbstractPacketHandler<BaseNoteActio
 
    private void sendNote(SendNotePacket packet, MapleClient client) {
       if (client.getPlayer().getCashShop().isOpened()) {
-         client.announce(MaplePacketCreator.showCashInventory(client));
+         PacketCreator.announce(client, new ShowCashInventory(client.getAccID(), client.getPlayer().getCashShop().getInventory(), client.getPlayer().getStorage().getSlots(), client.getCharacterSlots()));
       }
 
       NoteProcessor.getInstance().sendNote(packet.characterName(), client.getPlayer().getName(), packet.message(), (byte) 1);

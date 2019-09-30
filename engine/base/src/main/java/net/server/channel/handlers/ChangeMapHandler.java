@@ -38,6 +38,9 @@ import server.maps.MapleMap;
 import server.maps.MaplePortal;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.ChangeChannel;
+import tools.packet.stat.EnableActions;
 
 public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacket> {
    @Override
@@ -54,7 +57,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
             FilePrinter.printError(FilePrinter.PORTAL_STUCK + chr.getName() + ".txt", "Player " + chr.getName() + " got stuck when changing maps. Timestamp: " + Calendar.getInstance().getTime().toString() + " Last visited mapids: " + chr.getLastVisitedMapids());
          }
 
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       if (chr.getTrade() != null) {
@@ -71,7 +74,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
          client.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
          chr.setSessionTransitionState();
          try {
-            client.announce(MaplePacketCreator.getChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
+            PacketCreator.announce(client, new ChangeChannel(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
          } catch (UnknownHostException ex) {
             ex.printStackTrace();
          }
@@ -147,7 +150,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
 
             if (portal != null && !portal.getPortalStatus()) {
                client.announce(MaplePacketCreator.blockedMessage(1));
-               client.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(client, new EnableActions());
                return;
             }
 
@@ -159,13 +162,13 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
 
             if (portal != null) {
                if (portal.getPosition().distanceSq(chr.getPosition()) > 400000) {
-                  client.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(client, new EnableActions());
                   return;
                }
 
                portal.enterPortal(client);
             } else {
-               client.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(client, new EnableActions());
             }
          } catch (Exception e) {
             e.printStackTrace();

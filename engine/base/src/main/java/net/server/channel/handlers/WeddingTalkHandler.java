@@ -25,7 +25,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.WeddingTalkReader;
 import net.server.channel.packet.wedding.BaseWeddingTalkPacket;
 import scripting.event.EventInstanceManager;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 import tools.packets.Wedding;
 
 /**
@@ -51,6 +52,6 @@ public final class WeddingTalkHandler extends AbstractPacketHandler<BaseWeddingT
          client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
       }
 
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

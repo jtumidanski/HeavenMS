@@ -29,7 +29,9 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.DeleteCharacterReader;
 import net.server.login.packet.DeleteCharacterPacket;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.DeleteCharacter;
+import tools.packet.DeleteCharacterResponse;
 
 public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharacterPacket> {
    @Override
@@ -43,18 +45,18 @@ public final class DeleteCharHandler extends AbstractPacketHandler<DeleteCharact
          //check for family, guild leader, pending marriage, world transfer
          Optional<Byte> state = CharacterProcessor.getInstance().canDeleteCharacter(packet.characterId());
          if (state.isPresent()) {
-            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), state.get()));
+            PacketCreator.announce(client, new DeleteCharacter(packet.characterId(), DeleteCharacterResponse.fromValue(state.get())));
             return;
          }
 
          if (client.deleteCharacter(packet.characterId(), client.getAccID())) {
             FilePrinter.print(FilePrinter.DELETED_CHAR + client.getAccountName() + ".txt", client.getAccountName() + " deleted CID: " + packet.characterId());
-            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0));
+            PacketCreator.announce(client, new DeleteCharacter(packet.characterId(), DeleteCharacterResponse.SUCCESS));
          } else {
-            client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x09));
+            PacketCreator.announce(client, new DeleteCharacter(packet.characterId(), DeleteCharacterResponse.UNKNOWN_ERROR));
          }
       } else {
-         client.announce(MaplePacketCreator.deleteCharResponse(packet.characterId(), 0x14));
+         PacketCreator.announce(client, new DeleteCharacter(packet.characterId(), DeleteCharacterResponse.INCORRECT_PIC));
       }
    }
 }

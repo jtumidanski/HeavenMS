@@ -30,8 +30,9 @@ import net.server.channel.packet.UseItemPacket;
 import net.server.channel.packet.reader.UseItemReader;
 import server.MapleItemInformationProvider;
 import server.life.MapleLifeFactory;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Randomizer;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author AngelSL
@@ -45,25 +46,25 @@ public final class UseSummonBagHandler extends AbstractPacketHandler<UseItemPack
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (!client.getPlayer().isAlive()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;
    }
 
    @Override
-   public void handlePacket(UseItemPacket packet, MapleClient c) {
+   public void handlePacket(UseItemPacket packet, MapleClient client) {
       //[4A 00][6C 4C F2 02][02 00][63 0B 20 00]
-      Item toUse = c.getPlayer().getInventory(MapleInventoryType.USE).getItem(packet.slot());
+      Item toUse = client.getPlayer().getInventory(MapleInventoryType.USE).getItem(packet.slot());
       if (toUse != null && toUse.quantity() > 0 && toUse.id() == packet.itemId()) {
-         MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, packet.slot(), (short) 1, false);
+         MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, packet.slot(), (short) 1, false);
          int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(packet.itemId());
          for (int[] toSpawnChild : toSpawn) {
             if (Randomizer.nextInt(100) < toSpawnChild[1]) {
-               c.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), c.getPlayer().getPosition());
+               client.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), client.getPlayer().getPosition());
             }
          }
       }
-      c.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

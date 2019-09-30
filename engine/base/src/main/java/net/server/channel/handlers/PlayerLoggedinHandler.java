@@ -76,7 +76,9 @@ import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.AfterLoginError;
 import tools.packets.Wedding;
 
 public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLoggedInPacket> {
@@ -215,7 +217,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                      if (state == MapleClient.LOGIN_LOGGEDIN) {
                         client.disconnect(true, false);
                      } else {
-                        client.announce(MaplePacketCreator.getAfterLoginError(7));
+                        PacketCreator.announce(client, new AfterLoginError(7));
                      }
 
                      return;
@@ -227,7 +229,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             } else {
                client.setPlayer(null);
                client.setAccID(0);
-               client.announce(MaplePacketCreator.getAfterLoginError(10));
+               PacketCreator.announce(client, new AfterLoginError(10));
                return;
             }
 
@@ -420,7 +422,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             client.releaseClient();
          }
       } else {
-         client.announce(MaplePacketCreator.getAfterLoginError(10));
+         PacketCreator.announce(client, new AfterLoginError(10));
       }
    }
 

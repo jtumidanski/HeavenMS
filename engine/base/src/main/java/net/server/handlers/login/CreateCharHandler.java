@@ -33,7 +33,9 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.CreateCharacterReader;
 import net.server.login.packet.CreateCharacterPacket;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.DeleteCharacter;
+import tools.packet.DeleteCharacterResponse;
 
 public final class CreateCharHandler extends AbstractPacketHandler<CreateCharacterPacket> {
    @Override
@@ -60,12 +62,12 @@ public final class CreateCharHandler extends AbstractPacketHandler<CreateCharact
       } else if (packet.job() == 2) { // Aran
          status = LegendCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
       } else {
-         client.announce(MaplePacketCreator.deleteCharResponse(0, 9));
+         PacketCreator.announce(client, new DeleteCharacter(0, DeleteCharacterResponse.UNKNOWN_ERROR));
          return;
       }
 
       if (status == -2) {
-         client.announce(MaplePacketCreator.deleteCharResponse(0, 9));
+         PacketCreator.announce(client, new DeleteCharacter(0, DeleteCharacterResponse.UNKNOWN_ERROR));
       }
    }
 

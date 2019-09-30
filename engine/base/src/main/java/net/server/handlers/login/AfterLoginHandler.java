@@ -26,7 +26,9 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.AfterLoginReader;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.login.packet.AfterLoginPacket;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.pin.PinCodePacket;
+import tools.packet.pin.PinOperation;
 
 public final class AfterLoginHandler extends AbstractPacketHandler<AfterLoginPacket> {
    @Override
@@ -38,21 +40,21 @@ public final class AfterLoginHandler extends AbstractPacketHandler<AfterLoginPac
    public void handlePacket(AfterLoginPacket packet, MapleClient client) {
       if (packet.byte1() == 1 && packet.byte2() == 1) {
          if (client.getPin() == null || client.getPin().equals("")) {
-            client.announce(MaplePacketCreator.registerPin());
+            PacketCreator.announce(client, new PinCodePacket(PinOperation.NEW_PIN));
          } else {
-            client.announce(MaplePacketCreator.requestPin());
+            PacketCreator.announce(client, new PinCodePacket(PinOperation.ENTER_PIN));
          }
       } else if (packet.byte1() == 1 && packet.byte2() == 0) {
          if (client.checkPin(packet.pin())) {
-            client.announce(MaplePacketCreator.pinAccepted());
+            PacketCreator.announce(client, new PinCodePacket(PinOperation.ACCEPTED));
          } else {
-            client.announce(MaplePacketCreator.requestPinAfterFailure());
+            PacketCreator.announce(client, new PinCodePacket(PinOperation.INVALID));
          }
       } else if (packet.byte1() == 2 && packet.byte2() == 0) {
          if (client.checkPin(packet.pin())) {
-            client.announce(MaplePacketCreator.registerPin());
+            PacketCreator.announce(client, new PinCodePacket(PinOperation.NEW_PIN));
          } else {
-            client.announce(MaplePacketCreator.requestPinAfterFailure());
+            PacketCreator.announce(client, new PinCodePacket(PinOperation.INVALID));
          }
       } else if (packet.byte1() == 0 && packet.byte2() == 5) {
          MapleSessionCoordinator.getInstance().closeSession(client.getSession(), null);

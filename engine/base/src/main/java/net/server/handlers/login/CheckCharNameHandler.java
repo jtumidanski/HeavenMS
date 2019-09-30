@@ -26,7 +26,8 @@ import client.processor.CharacterProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.CheckCharacterNameReader;
 import net.server.login.packet.CheckCharacterNamePacket;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.CharacterName;
 
 public final class CheckCharNameHandler extends AbstractPacketHandler<CheckCharacterNamePacket> {
    @Override
@@ -36,6 +37,7 @@ public final class CheckCharNameHandler extends AbstractPacketHandler<CheckChara
 
    @Override
    public void handlePacket(CheckCharacterNamePacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.charNameResponse(packet.name(), !CharacterProcessor.getInstance().canCreateChar(packet.name())));
+      boolean nameUsed = !CharacterProcessor.getInstance().canCreateChar(packet.name());
+      PacketCreator.announce(client, new CharacterName(packet.name(), nameUsed));
    }
 }

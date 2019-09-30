@@ -52,7 +52,9 @@ import server.MapleTrade;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author RonanLana - synchronization of Duey modules
@@ -289,7 +291,7 @@ public class DueyProcessor {
          try {
             long timeNow = System.currentTimeMillis();
             if (timeNow - c.getPlayer().getNpcCooldown() < ServerConstants.BLOCK_NPC_RACE_CONDT) {
-               c.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(c, new EnableActions());
                return;
             }
             c.getPlayer().setNpcCooldown(timeNow);

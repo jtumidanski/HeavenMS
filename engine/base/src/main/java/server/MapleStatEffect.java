@@ -108,8 +108,10 @@ import server.processor.StatEffectProcessor;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -245,7 +247,7 @@ public class MapleStatEffect {
       if (primary) {
          if (itemConNo != 0) {
             if (!applyto.getAbstractPlayerInteraction().hasItem(itemCon, itemConNo)) {
-               applyto.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(applyto, new EnableActions());
                return false;
             }
             MapleInventoryManipulator.removeById(applyto.getClient(), ItemConstants.getInventoryType(itemCon), itemCon, itemConNo, false, true);
@@ -271,7 +273,7 @@ public class MapleStatEffect {
          } */
 
       if (!applyto.applyHpMpChange(hpCon, hpchange, mpchange)) {
-         applyto.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(applyto, new EnableActions());
          return false;
       }
 
@@ -340,7 +342,7 @@ public class MapleStatEffect {
                applyto.cancelBuffStats(MapleBuffStat.SUMMON);
             }
 
-            applyto.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(applyto, new EnableActions());
          }
 
          applyBuffEffect(applyfrom, applyto, primary);

@@ -33,13 +33,15 @@ import tools.HexTool;
  * @since Revision 352
  */
 public class MaplePacketLittleEndianWriter extends GenericLittleEndianWriter {
+   public static final int DEFAULT_SIZE = 32;
+
    private ByteArrayOutputStream baos;
 
    /**
     * Constructor - initializes this stream with a default size.
     */
    public MaplePacketLittleEndianWriter() {
-      this(32);
+      this(DEFAULT_SIZE);
    }
 
    /**

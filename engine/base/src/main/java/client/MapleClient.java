@@ -97,7 +97,10 @@ import tools.LogHelper;
 import tools.MapleAESOFB;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.ChangeChannel;
+import tools.packet.stat.EnableActions;
 
 public class MapleClient {
 
@@ -205,10 +208,6 @@ public class MapleClient {
 
    public AbstractPlayerInteraction getAbstractPlayerInteraction() {
       return new AbstractPlayerInteraction(this);
-   }
-
-   public void sendCharList(int server) {
-      this.announce(MaplePacketCreator.getCharList(this, server, 0));
    }
 
    public List<MapleCharacter> loadCharacters(int serverId) {
@@ -1012,7 +1011,7 @@ public class MapleClient {
 
    public void announceHint(String msg, int length) {
       announce(MaplePacketCreator.sendHint(msg, length, 10));
-      announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(this, new EnableActions());
    }
 
    public void changeChannel(int channel) {
@@ -1022,18 +1021,18 @@ public class MapleClient {
          return;
       }
       if (!player.isAlive() || FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
-         announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(this, new EnableActions());
          return;
       } else if (MapleMiniDungeonInfo.isDungeonMap(player.getMapId())) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
-         announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(this, new EnableActions());
          return;
       }
 
       String[] socket = Server.getInstance().getInetSocket(getWorld(), channel);
       if (socket == null) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Channel " + channel + " is currently disabled. Try another channel.");
-         announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(this, new EnableActions());
          return;
       }
 
@@ -1065,7 +1064,7 @@ public class MapleClient {
       player.getClient().updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
       player.setSessionTransitionState();
       try {
-         announce(MaplePacketCreator.getChannelChange(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
+         PacketCreator.announce(this, new ChangeChannel(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
       } catch (IOException e) {
          e.printStackTrace();
       }

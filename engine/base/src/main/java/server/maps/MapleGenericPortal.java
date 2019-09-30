@@ -30,9 +30,10 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import scripting.portal.PortalScriptManager;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 public class MapleGenericPortal implements MaplePortal {
 
@@ -158,7 +159,7 @@ public class MapleGenericPortal implements MaplePortal {
          }
       }
       if (!changed) {
-         c.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(c, new EnableActions());
       }
    }
 

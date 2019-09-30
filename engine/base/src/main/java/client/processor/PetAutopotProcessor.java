@@ -12,7 +12,8 @@ import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 public class PetAutopotProcessor extends AbstractQueryExecutor {
    private static PetAutopotProcessor instance;
@@ -70,7 +71,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
          MapleClient c = this.c;
          MapleCharacter chr = c.getPlayer();
          if (!chr.isAlive()) {
-            c.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(c, new EnableActions());
             return;
          }
 
@@ -83,7 +84,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
             toUse = useInv.getItem(slot);
             if (toUse != null) {
                if (toUse.id() != itemId) {
-                  c.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(c, new EnableActions());
                   return;
                }
 
@@ -92,7 +93,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
                // from now on, toUse becomes the "cursor" for the current pot being used
                if (toUse.quantity() <= 0) {
                   if (!cursorOnNextAvailablePot(chr)) {
-                     c.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(c, new EnableActions());
                      return;
                   }
                }
@@ -158,7 +159,7 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
             stat.applyTo(chr);
          }
 
-         chr.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(chr, new EnableActions());
       }
    }
 

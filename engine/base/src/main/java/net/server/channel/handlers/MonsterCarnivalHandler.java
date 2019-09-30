@@ -40,8 +40,10 @@ import server.partyquest.MonsterCarnival;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 
 /**
@@ -66,7 +68,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                   final List<Pair<Integer, Integer>> mobs = client.getPlayer().getMap().getMobsToSpawn();
                   if (num >= mobs.size() || client.getPlayer().getCP() < mobs.get(num).right) {
                      client.announce(MaplePacketCreator.CPQMessage((byte) 1));
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                      return;
                   }
 
@@ -75,7 +77,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                   if (mcpq != null) {
                      if (!mcpq.canSummonR() && client.getPlayer().getTeam() == 0 || !mcpq.canSummonB() && client.getPlayer().getTeam() == 1) {
                         client.announce(MaplePacketCreator.CPQMessage((byte) 2));
-                        client.announce(MaplePacketCreator.enableActions());
+                        PacketCreator.announce(client, new EnableActions());
                         return;
                      }
 
@@ -90,7 +92,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
 
                      client.getPlayer().getMap().addMonsterSpawn(mob, 1, client.getPlayer().getTeam());
                      client.getPlayer().getMap().addAllMonsterSpawn(mob, 1, client.getPlayer().getTeam());
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                   }
 
                   neededCP = mobs.get(num).right;
@@ -98,13 +100,13 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                   final List<Integer> skillid = client.getPlayer().getMap().getSkillIds();
                   if (num >= skillid.size()) {
                      MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "An unexpected error has occurred.");
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                      return;
                   }
                   final MCSkill skill = MapleCarnivalFactory.getInstance().getSkill(skillid.get(num)); //ugh wtf
                   if (skill == null || client.getPlayer().getCP() < skill.cpLoss) {
                      client.announce(MaplePacketCreator.CPQMessage((byte) 1));
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                      return;
                   }
                   final MapleDisease dis = skill.getDisease();
@@ -139,12 +141,12 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      }
                   }
                   neededCP = skill.cpLoss;
-                  client.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(client, new EnableActions());
                } else if (tab == 2) { //protectors
                   final MCSkill skill = MapleCarnivalFactory.getInstance().getGuardian(num);
                   if (skill == null || client.getPlayer().getCP() < skill.cpLoss) {
                      client.announce(MaplePacketCreator.CPQMessage((byte) 1));
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                      return;
                   }
 
@@ -152,7 +154,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                   if (mcpq != null) {
                      if (!mcpq.canGuardianR() && client.getPlayer().getTeam() == 0 || !mcpq.canGuardianB() && client.getPlayer().getTeam() == 1) {
                         client.announce(MaplePacketCreator.CPQMessage((byte) 2));
-                        client.announce(MaplePacketCreator.enableActions());
+                        PacketCreator.announce(client, new EnableActions());
                         return;
                      }
 
@@ -170,7 +172,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                            default:
                               client.announce(MaplePacketCreator.CPQMessage((byte) 3));
                         }
-                        client.announce(MaplePacketCreator.enableActions());
+                        PacketCreator.announce(client, new EnableActions());
                         return;
                      } else {
                         neededCP = skill.cpLoss;

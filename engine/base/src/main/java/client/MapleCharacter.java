@@ -199,11 +199,18 @@ import tools.MaplePacketCreator;
 import tools.MapleStringUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
+import tools.packet.stat.EnableActions;
+import tools.packet.inventory.InventoryFull;
+import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.inventory.SlotLimitUpdate;
+import tools.packet.stat.UpdatePetStats;
+import tools.packet.stat.UpdatePlayerStats;
 import tools.packets.Wedding;
 
 public class MapleCharacter extends AbstractMapleCharacterObject {
@@ -417,8 +424,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             for (Map.Entry<MapleStat, Integer> s : statUpdates.entrySet()) {
                statup.add(new Pair<>(s.getKey(), s.getValue()));
             }
-
-            announce(MaplePacketCreator.updatePlayerStats(statup, true, MapleCharacter.this));
+            PacketCreator.announce(client, new UpdatePlayerStats(statup, true, MapleCharacter.this));
          }
       });
 
@@ -957,7 +963,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             getMap().broadcastGMMessage(this, MaplePacketCreator.giveForeignBuff(id, ldsstat), false);
             this.releaseControlledMonsters();
          }
-         announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 
@@ -1237,7 +1243,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          statup.add(new Pair<>(MapleStat.AVAILABLEAP, remainingAp));
          statup.add(new Pair<>(MapleStat.AVAILABLESP, remainingSp[GameConstants.getSkillBook(job.getId())]));
          statup.add(new Pair<>(MapleStat.JOB, job.getId()));
-         client.announce(MaplePacketCreator.updatePlayerStats(statup, true, this));
+         PacketCreator.announce(client, new UpdatePlayerStats(statup, true, this));
       } finally {
          statWlock.unlock();
          effLock.unlock();
@@ -1906,7 +1912,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (ob instanceof MapleMapItem) {
          MapleMapItem mapitem = (MapleMapItem) ob;
          if (System.currentTimeMillis() - mapitem.getDropTime() < 400 || !mapitem.canBePickedBy(this)) {
-            client.announce(MaplePacketCreator.enableActions());
+            PacketCreator.announce(client, new EnableActions());
             return;
          }
 
@@ -1920,7 +1926,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          try {
             if (mapitem.isPickedUp()) {
                client.announce(MaplePacketCreator.showItemUnavailable());
-               client.announce(MaplePacketCreator.enableActions());
+               PacketCreator.announce(client, new EnableActions());
                return;
             }
 
@@ -1958,21 +1964,21 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                      } else if (MapleInventoryManipulator.addFromDrop(client, mItem, true)) {
                         this.getMap().pickItemDrop(pickupPacket, mapitem);
                      } else {
-                        client.announce(MaplePacketCreator.enableActions());
+                        PacketCreator.announce(client, new EnableActions());
                         return;
                      }
                   } else {
                      client.announce(MaplePacketCreator.showItemUnavailable());
-                     client.announce(MaplePacketCreator.enableActions());
+                     PacketCreator.announce(client, new EnableActions());
                      return;
                   }
-                  client.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(client, new EnableActions());
                   return;
                }
 
                if (!this.needQuestItem(mapitem.getQuest(), mapitem.getItemId())) {
                   client.announce(MaplePacketCreator.showItemUnavailable());
-                  client.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(client, new EnableActions());
                   return;
                }
 
@@ -1993,7 +1999,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                      itemScript = info;
                   } else {
                      if (!MapleInventoryManipulator.addFromDrop(client, mItem, true)) {
-                        client.announce(MaplePacketCreator.enableActions());
+                        PacketCreator.announce(client, new EnableActions());
                         return;
                      }
                   }
@@ -2009,13 +2015,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                      updateAriantScore();
                   }
                } else {
-                  client.announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(client, new EnableActions());
                   return;
                }
 
                this.getMap().pickItemDrop(pickupPacket, mapitem);
             } else if (!hasSpaceInventory) {
-               client.announce(MaplePacketCreator.getInventoryFull());
+               PacketCreator.announce(client, new InventoryFull());
                client.announce(MaplePacketCreator.getShowInventoryFull());
             }
          } finally {
@@ -2027,7 +2033,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             ism.runItemScript(client, itemScript);
          }
       }
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    public int countItem(int itemid) {
@@ -2618,7 +2624,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       final List<ModifyInventory> mods = new LinkedList<>();
       mods.add(new ModifyInventory(3, item));
       mods.add(new ModifyInventory(0, item));
-      client.announce(MaplePacketCreator.modifyInventory(true, mods));
+      PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
    }
 
    public void gainGachaExp() {
@@ -2805,7 +2811,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             client.announce(MaplePacketCreator.getShowMesoGain(gain, inChat));
          }
       } else {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 
@@ -5699,7 +5705,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          statup.add(new Pair<>(MapleStat.STR, str));
          statup.add(new Pair<>(MapleStat.DEX, dex));
 
-         client.announce(MaplePacketCreator.updatePlayerStats(statup, true, this));
+         PacketCreator.announce(client, new UpdatePlayerStats(statup, true, this));
       } finally {
          statWlock.unlock();
          effLock.unlock();
@@ -6327,7 +6333,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       unsitChairInternal();
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 
    private void unsitChairInternal() {
@@ -6357,7 +6363,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                      setChair(itemId);
                      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.showChair(this.getId(), itemId), false, this);
                   }
-                  announce(MaplePacketCreator.enableActions());
+                  PacketCreator.announce(client, new EnableActions());
                } else if (itemId >= 0) {    // sit on map chair
                   if (chair.get() < 0) {
                      setChair(itemId);
@@ -6618,7 +6624,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          enforceMaxHpMp();
 
          if (!hpmpupdate.isEmpty()) {
-            client.announce(MaplePacketCreator.updatePlayerStats(hpmpupdate, true, this));
+            PacketCreator.announce(client, new UpdatePlayerStats(hpmpupdate, true, this));
          }
 
          if (oldmaxhp != localmaxhp) {   // thanks Wh1SK3Y for pointing out a deadlock occuring related to party members HP
@@ -7295,7 +7301,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          this.saveCharToDB();
          if (update) {
-            client.announce(MaplePacketCreator.updateInventorySlotLimit(type, slots));
+            PacketCreator.announce(client, new SlotLimitUpdate(type, slots));
          }
 
          return true;
@@ -7681,8 +7687,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       removePet(pet, shift_left);
       commitExcludedItems();
 
-      client.announce(MaplePacketCreator.petStatUpdate(this));
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new UpdatePetStats(getPets()));
+      PacketCreator.announce(client, new EnableActions());
    }
 
    public void updateMacros(int position, SkillMacro updateMacro) {
@@ -7926,7 +7932,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void updateSingleStat(MapleStat stat, int newval, boolean itemReaction) {
-      announce(MaplePacketCreator.updatePlayerStats(Collections.singletonList(new Pair<>(stat, newval)), itemReaction, this));
+      PacketCreator.announce(client, new UpdatePlayerStats(Collections.singletonList(new Pair<>(stat, newval)), itemReaction, this));
    }
 
    public void announce(final byte[] packet) {
@@ -8015,7 +8021,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void blockPortal(String scriptName) {
       if (!blockedPortals.contains(scriptName) && scriptName != null) {
          blockedPortals.add(scriptName);
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
       }
    }
 

@@ -28,6 +28,8 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Ronan
@@ -93,7 +95,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
          }
       } else {
          chr.getClient().announce(MaplePacketCreator.blockedMessage(6));
-         chr.getClient().announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(chr, new EnableActions());
       }
    }
 

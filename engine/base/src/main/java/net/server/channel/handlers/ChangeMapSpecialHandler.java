@@ -28,7 +28,8 @@ import net.server.channel.packet.reader.ChangeMapSpecialReader;
 import server.MapleTrade;
 import server.MapleTradeResult;
 import server.maps.MaplePortal;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 public final class ChangeMapSpecialHandler extends AbstractPacketHandler<ChangeMapSpecialPacket> {
    @Override
@@ -40,11 +41,11 @@ public final class ChangeMapSpecialHandler extends AbstractPacketHandler<ChangeM
    public void handlePacket(ChangeMapSpecialPacket packet, MapleClient client) {
       MaplePortal portal = client.getPlayer().getMap().getPortal(packet.startWarp());
       if (portal == null || client.getPlayer().portalDelay() > currentServerTime() || client.getPlayer().getBlockedPortals().contains(portal.getScriptName())) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       if (client.getPlayer().isChangingMaps() || client.getPlayer().isBanned()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return;
       }
       if (client.getPlayer().getTrade() != null) {

@@ -25,9 +25,10 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import scripting.event.EventInstanceManager;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 import tools.packets.Wedding;
 
 /**
@@ -48,6 +49,6 @@ public final class WeddingTalkMoreHandler extends AbstractPacketHandler<NoOpPack
       }
 
       client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

@@ -27,7 +27,9 @@ import net.server.Server;
 import net.server.channel.packet.reader.ServerStatusRequestReader;
 import net.server.login.packet.ServerStatusRequestPacket;
 import net.server.world.World;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.serverlist.GetServerStatus;
+import tools.packet.serverlist.ServerStatus;
 
 public final class ServerStatusRequestHandler extends AbstractPacketHandler<ServerStatusRequestPacket> {
    @Override
@@ -40,9 +42,9 @@ public final class ServerStatusRequestHandler extends AbstractPacketHandler<Serv
       World world = Server.getInstance().getWorld(packet.world());
       if (world != null) {
          int status = world.getWorldCapacityStatus();
-         client.announce(MaplePacketCreator.getServerStatus(status));
+         PacketCreator.announce(client, new GetServerStatus(status));
       } else {
-         client.announce(MaplePacketCreator.getServerStatus(2));
+         PacketCreator.announce(client, new GetServerStatus(ServerStatus.FULL));
       }
    }
 }

@@ -36,6 +36,8 @@ import net.server.channel.packet.reader.SkillBookReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacket> {
    @Override
@@ -46,7 +48,7 @@ public final class SkillBookHandler extends AbstractPacketHandler<SkillBookPacke
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (!client.getPlayer().isAlive()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;

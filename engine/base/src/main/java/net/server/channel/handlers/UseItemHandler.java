@@ -34,9 +34,10 @@ import net.server.channel.packet.UseItemPacket;
 import net.server.channel.packet.reader.UseItemReader;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -52,7 +53,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
       MapleCharacter chr = client.getPlayer();
 
       if (!chr.isAlive()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;
@@ -118,8 +119,8 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
       }
    }
 
-   private void remove(MapleClient c, short slot) {
-      MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, slot, (short) 1, false);
-      c.announce(MaplePacketCreator.enableActions());
+   private void remove(MapleClient client, short slot) {
+      MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, slot, (short) 1, false);
+      PacketCreator.announce(client, new EnableActions());
    }
 }

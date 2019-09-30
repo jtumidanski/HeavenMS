@@ -25,7 +25,8 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.RelogResponse;
 
 public final class RelogRequestHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
@@ -35,7 +36,7 @@ public final class RelogRequestHandler extends AbstractPacketHandler<NoOpPacket>
 
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.getRelogResponse());
+      PacketCreator.announce(client, new RelogResponse());
    }
 
    @Override

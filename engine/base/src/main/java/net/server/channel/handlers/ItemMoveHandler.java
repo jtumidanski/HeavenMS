@@ -27,7 +27,8 @@ import client.inventory.manipulator.MapleInventoryManipulator;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ItemMovePacket;
 import net.server.channel.packet.reader.ItemMoveReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Matze
@@ -36,7 +37,7 @@ public final class ItemMoveHandler extends AbstractPacketHandler<ItemMovePacket>
    @Override
    public boolean successfulProcess(MapleClient client) {
       if (client.getPlayer().getAutobanManager().getLastSpam(6) + 300 > currentServerTime()) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;

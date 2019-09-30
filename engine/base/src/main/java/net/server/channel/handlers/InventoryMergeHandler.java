@@ -34,6 +34,8 @@ import net.server.channel.packet.InventoryMergePacket;
 import net.server.channel.packet.reader.InventoryMergeReader;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 public final class InventoryMergeHandler extends AbstractPacketHandler<InventoryMergePacket> {
    @Override
@@ -42,7 +44,7 @@ public final class InventoryMergeHandler extends AbstractPacketHandler<Inventory
       chr.getAutobanManager().setTimestamp(2, Server.getInstance().getCurrentTimestamp(), 4);
 
       if (!ServerConstants.USE_ITEM_SORT) {
-         client.announce(MaplePacketCreator.enableActions());
+         PacketCreator.announce(client, new EnableActions());
          return false;
       }
       return true;
@@ -124,6 +126,6 @@ public final class InventoryMergeHandler extends AbstractPacketHandler<Inventory
       }
 
       client.announce(MaplePacketCreator.finishedSort(inventoryType.getType()));
-      client.announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(client, new EnableActions());
    }
 }

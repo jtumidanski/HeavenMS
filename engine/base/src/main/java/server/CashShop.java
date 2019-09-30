@@ -57,6 +57,7 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.DatabaseConnection;
 import tools.Pair;
+import tools.packet.Gift;
 
 /*
  * @author Flav
@@ -214,8 +215,8 @@ public class CashShop {
       DatabaseConnection.getInstance().withConnection(connection -> GiftAdministrator.getInstance().createGift(connection, recipient, from, message, sn, ringid));
    }
 
-   public List<Pair<Item, String>> loadGifts() {
-      List<Pair<Item, String>> gifts = new ArrayList<>();
+   public List<Gift> loadGifts() {
+      List<Gift> gifts = new ArrayList<>();
       DatabaseConnection.getInstance().withConnection(connection -> {
          GiftProvider.getInstance().getGiftsForCharacter(connection, characterId).forEach(gift -> loadGift(gifts, gift));
          GiftAdministrator.getInstance().deleteAllGiftsForCharacter(connection, characterId);
@@ -223,7 +224,7 @@ public class CashShop {
       return gifts;
    }
 
-   private void loadGift(List<Pair<Item, String>> gifts, GiftData gift) {
+   private void loadGift(List<Gift> gifts, GiftData gift) {
       notes++;
       CashItem cItem = CashItemFactory.getItem(gift.sn());
       Item item = cItem.toItem();
@@ -232,9 +233,9 @@ public class CashShop {
       if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
          equip = (Equip) item;
          equip.ringId_$eq(gift.ringId());
-         gifts.add(new Pair<>(equip, gift.message()));
+         gifts.add(new Gift(equip, gift.message()));
       } else {
-         gifts.add(new Pair<>(item, gift.message()));
+         gifts.add(new Gift(item, gift.message()));
       }
 
       if (CashItemFactory.isPackage(cItem.getItemId())) { //Packages never contains a ring

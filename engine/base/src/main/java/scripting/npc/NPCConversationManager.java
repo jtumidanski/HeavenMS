@@ -86,7 +86,9 @@ import tools.LogHelper;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.stat.EnableActions;
 import tools.packets.Wedding;
 
 /**
@@ -154,7 +156,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    public void dispose() {
       NPCScriptManager.getInstance().dispose(this);
-      getClient().announce(MaplePacketCreator.enableActions());
+      PacketCreator.announce(getClient(), new EnableActions());
    }
 
    public void sendNext(String text) {
