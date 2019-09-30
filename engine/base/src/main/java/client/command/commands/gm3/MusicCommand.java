@@ -29,6 +29,8 @@ import client.command.Command;
 import constants.GameConstants;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.npctalk.GetNPCTalk;
 
 public class MusicCommand extends Command {
    {
@@ -54,7 +56,7 @@ public class MusicCommand extends Command {
          sendMsg += "Syntax: #r!music <song>#k\r\n\r\n";
          sendMsg += getSongList();
 
-         c.announce(MaplePacketCreator.getNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
+         PacketCreator.announce(c, new GetNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
          return;
       }
 
@@ -71,6 +73,6 @@ public class MusicCommand extends Command {
       sendMsg += "Song not found, please enter a song below.\r\n\r\n";
       sendMsg += getSongList();
 
-      c.announce(MaplePacketCreator.getNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
+      PacketCreator.announce(c, new GetNPCTalk(1052015, (byte) 0, sendMsg, "00 00", (byte) 0));
    }
 }

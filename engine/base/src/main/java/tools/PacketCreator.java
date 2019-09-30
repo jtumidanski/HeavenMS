@@ -18,6 +18,7 @@ import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
+import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
 import tools.packet.factory.PicPacketFactory;
@@ -112,6 +113,8 @@ public class PacketCreator {
             return Optional.of(PartyOperationPacketFactory.getInstance());
          case STORAGE:
             return Optional.of(StoragePacketFactory.getInstance());
+         case NPC_TALK:
+            return Optional.of(NPCTalkPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

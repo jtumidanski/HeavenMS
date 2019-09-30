@@ -75,8 +75,9 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.packet.stat.EnableActions;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.npctalk.GetNPCTalk;
+import tools.packet.stat.EnableActions;
 
 public class AbstractPlayerInteraction {
 
@@ -1191,7 +1192,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void npcTalk(int npcid, String message) {
-      c.announce(MaplePacketCreator.getNPCTalk(npcid, (byte) 0, message, "00 00", (byte) 0));
+      PacketCreator.announce(c, new GetNPCTalk(npcid, (byte) 0, message, "00 00", (byte) 0));
    }
 
    public long getCurrentTime() {

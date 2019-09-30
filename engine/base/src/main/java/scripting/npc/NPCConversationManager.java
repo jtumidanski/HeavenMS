@@ -91,6 +91,11 @@ import tools.ServerNoticeType;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.UpdateAllianceInfo;
+import tools.packet.npctalk.GetDimensionalMirror;
+import tools.packet.npctalk.GetNPCTalk;
+import tools.packet.npctalk.GetNPCTalkNum;
+import tools.packet.npctalk.GetNPCTalkStyle;
+import tools.packet.npctalk.GetNPCTalkText;
 import tools.packet.stat.EnableActions;
 import tools.packets.Wedding;
 
@@ -163,19 +168,19 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void sendNext(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "00 01", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 01", (byte) 0));
    }
 
    public void sendPrev(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "01 00", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 00", (byte) 0));
    }
 
    public void sendNextPrev(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "01 01", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 01", (byte) 0));
    }
 
    public void sendOk(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "00 00", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 00", (byte) 0));
    }
 
    public void sendDefault() {
@@ -183,48 +188,48 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void sendYesNo(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 1, text, "", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text, "", (byte) 0));
    }
 
    public void sendAcceptDecline(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0x0C, text, "", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text, "", (byte) 0));
    }
 
    public void sendSimple(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 4, text, "", (byte) 0));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text, "", (byte) 0));
    }
 
    public void sendNext(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "00 01", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 01", speaker));
    }
 
    public void sendPrev(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "01 00", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 00", speaker));
    }
 
    public void sendNextPrev(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "01 01", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 01", speaker));
    }
 
    public void sendOk(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0, text, "00 00", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 00", speaker));
    }
 
    public void sendYesNo(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 1, text, "", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text, "", speaker));
    }
 
    public void sendAcceptDecline(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 0x0C, text, "", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text, "", speaker));
    }
 
    public void sendSimple(String text, byte speaker) {
-      getClient().announce(MaplePacketCreator.getNPCTalk(npc, (byte) 4, text, "", speaker));
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text, "", speaker));
    }
 
    public void sendStyle(String text, int[] styles) {
       if (styles.length > 0) {
-         getClient().announce(MaplePacketCreator.getNPCTalkStyle(npc, text, styles));
+         PacketCreator.announce(getClient(), new GetNPCTalkStyle(npc, text, styles));
       } else {    // thanks Conrad for noticing empty styles crashing players
          sendOk("Sorry, there are no options of cosmetics available for you here at the moment.");
          dispose();
@@ -232,11 +237,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void sendGetNumber(String text, int def, int min, int max) {
-      getClient().announce(MaplePacketCreator.getNPCTalkNum(npc, text, def, min, max));
+      PacketCreator.announce(getClient(), new GetNPCTalkNum(npc, text, def, min, max));
    }
 
    public void sendGetText(String text) {
-      getClient().announce(MaplePacketCreator.getNPCTalkText(npc, text, ""));
+      PacketCreator.announce(getClient(), new GetNPCTalkText(npc, text, ""));
    }
 
    /*
@@ -249,7 +254,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
     * 6 = Kerning Subway
     */
    public void sendDimensionalMirror(String text) {
-      getClient().announce(MaplePacketCreator.getDimensionalMirror(text));
+      PacketCreator.announce(getClient(), new GetDimensionalMirror(text));
    }
 
    public void setGetText(String text) {
