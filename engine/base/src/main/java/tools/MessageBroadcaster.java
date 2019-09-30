@@ -68,7 +68,7 @@ public class MessageBroadcaster {
    }
 
    public void sendAllianceServerNotice(MapleAlliance alliance, ServerNoticeType noticeType, String message) {
-      alliance.getGuilds().parallelStream()
+      alliance.guilds().parallelStream()
             .map(guildId -> Server.getInstance().getGuild(guildId))
             .filter(Optional::isPresent)
             .map(Optional::get)

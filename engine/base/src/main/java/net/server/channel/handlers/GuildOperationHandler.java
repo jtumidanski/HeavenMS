@@ -46,12 +46,15 @@ import net.server.channel.packet.reader.GuildOperationReader;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildResponse;
+import net.server.processor.MapleAllianceProcessor;
 import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.World;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.alliance.GetGuildAlliances;
 
 public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuildOperationPacket> {
    @Override
@@ -150,8 +153,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       Server.getInstance().setGuildEmblem(mapleCharacter.getGuildId(), packet.background(), packet.backgroundColor(), packet.logo(), packet.logoColor());
 
       mapleCharacter.getAlliance().ifPresent(alliance -> {
-         byte[] packetData = MaplePacketCreator.getGuildAlliances(alliance, client.getWorld());
-         Server.getInstance().allianceMessage(alliance.getId(), packetData, -1, -1);
+         byte[] packetData = PacketCreator.create(new GetGuildAlliances(alliance, client.getWorld()));
+         Server.getInstance().allianceMessage(alliance.id(), packetData, -1, -1);
       });
 
       mapleCharacter.gainMeso(-ServerConstants.CHANGE_EMBLEM_COST, true, false, true);
@@ -189,7 +192,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
-         Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> alliance.updateAlliancePackets(mapleCharacter));
+         Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> MapleAllianceProcessor.getInstance().updateAlliancePackets(alliance, mapleCharacter));
       }
    }
 
@@ -206,7 +209,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
-         Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> alliance.updateAlliancePackets(mapleCharacter));
+         Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> MapleAllianceProcessor.getInstance().updateAlliancePackets(alliance, mapleCharacter));
       }
 
       mapleCharacter.getMGC().setGuildId(0);
@@ -245,7 +248,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
-         Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> alliance.updateAlliancePackets(mapleCharacter));
+         Server.getInstance().getAlliance(allianceId).ifPresent(alliance -> MapleAllianceProcessor.getInstance().updateAlliancePackets(alliance, mapleCharacter));
       }
 
       mapleCharacter.saveGuildStatus(); // update database

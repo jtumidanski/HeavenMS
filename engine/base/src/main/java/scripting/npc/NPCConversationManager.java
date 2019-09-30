@@ -88,6 +88,9 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.alliance.AllianceNotice;
+import tools.packet.alliance.GetGuildAlliances;
+import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.stat.EnableActions;
 import tools.packets.Wedding;
 
@@ -453,9 +456,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       Server.getInstance().getAlliance(allianceId)
             .ifPresent(alliance -> {
                alliance.increaseCapacity(1);
-               Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.getGuildAlliances(alliance, c.getWorld()), -1, -1);
-               Server.getInstance().allianceMessage(allianceId, MaplePacketCreator.allianceNotice(allianceId, alliance.getNotice()), -1, -1);
-               c.announce(MaplePacketCreator.updateAllianceInfo(alliance, c.getWorld()));  // thanks Vcoc for finding an alliance update to leader issue
+               Server.getInstance().allianceMessage(allianceId, PacketCreator.create(new GetGuildAlliances(alliance, c.getWorld())), -1, -1);
+               Server.getInstance().allianceMessage(allianceId, PacketCreator.create(new AllianceNotice(allianceId, alliance.notice())), -1, -1);
+               PacketCreator.announce(c, new UpdateAllianceInfo(alliance, c.getWorld()));
             });
    }
 
@@ -476,7 +479,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             .getGuild()
             .map(MapleGuild::getAllianceId)
             .flatMap(allianceId -> Server.getInstance().getAlliance(allianceId))
-            .map(MapleAlliance::getCapacity)
+            .map(MapleAlliance::capacity)
             .orElse(0);
    }
 

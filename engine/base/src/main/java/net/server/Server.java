@@ -947,7 +947,7 @@ public class Server {
       synchronized (alliances) {
          MapleAlliance alliance = alliances.get(id);
          if (alliance != null) {
-            for (Integer gid : alliance.getGuilds()) {
+            for (Integer gid : alliance.guilds()) {
                guilds.get(gid).setAllianceId(0);
             }
             alliances.remove(id);
@@ -958,7 +958,7 @@ public class Server {
    public void allianceMessage(int id, final byte[] packet, int exception, int guildex) {
       MapleAlliance alliance = alliances.get(id);
       if (alliance != null) {
-         for (Integer gid : alliance.getGuilds()) {
+         for (Integer gid : alliance.guilds()) {
             if (guildex == gid) {
                continue;
             }
@@ -993,7 +993,7 @@ public class Server {
    public boolean setAllianceRanks(int aId, String[] ranks) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.setRankTitle(ranks);
+         alliance.rankTitles_$eq(ranks);
          return true;
       }
       return false;
@@ -1002,7 +1002,7 @@ public class Server {
    public boolean setAllianceNotice(int aId, String notice) {
       MapleAlliance alliance = alliances.get(aId);
       if (alliance != null) {
-         alliance.setNotice(notice);
+         alliance.notice_$eq(notice);
          return true;
       }
       return false;

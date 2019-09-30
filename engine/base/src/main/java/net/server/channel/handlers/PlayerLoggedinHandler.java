@@ -79,6 +79,9 @@ import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.AfterLoginError;
+import tools.packet.alliance.AllianceMemberOnline;
+import tools.packet.alliance.AllianceNotice;
+import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.parcel.DueyParcelNotification;
 import tools.packets.Wedding;
 
@@ -468,11 +471,11 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
          server.getAlliance(allianceId)
                .or(() -> loadAlliance(server, player, allianceId))
                .ifPresent(alliance -> {
-                  client.announce(MaplePacketCreator.updateAllianceInfo(alliance, client.getWorld()));
-                  client.announce(MaplePacketCreator.allianceNotice(alliance.getId(), alliance.getNotice()));
+                  PacketCreator.announce(client, new UpdateAllianceInfo(alliance, client.getWorld()));
+                  PacketCreator.announce(client, new AllianceNotice(alliance.id(), alliance.notice()));
 
                   if (newcomer) {
-                     server.allianceMessage(allianceId, MaplePacketCreator.allianceMemberOnline(player, true), player.getId(), -1);
+                     server.allianceMessage(allianceId, PacketCreator.create(new AllianceMemberOnline(allianceId, player.getGuildId(), player.getId(), true)), player.getId(), -1);
                   }
                });
       }

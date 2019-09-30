@@ -43,6 +43,6 @@ public final class DenyAllianceRequestHandler extends AbstractPacketHandler<Deny
             .map(MapleCharacter::getAlliance)
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .ifPresent(alliance -> MapleAllianceProcessor.getInstance().answerInvitation(client.getPlayer().getId(), packet.guildName(), alliance.getId(), false));
+            .ifPresent(alliance -> MapleAllianceProcessor.getInstance().answerInvitation(client.getPlayer().getId(), packet.guildName(), alliance.id(), false));
    }
 }

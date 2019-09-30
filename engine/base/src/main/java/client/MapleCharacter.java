@@ -205,10 +205,11 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
-import tools.packet.stat.EnableActions;
+import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.inventory.SlotLimitUpdate;
+import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
 import tools.packet.stat.UpdatePlayerStats;
 import tools.packets.Wedding;
@@ -5276,7 +5277,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          //Server.getInstance().getGuild(guildid, world, mgc).gainGP(40);
          getGuild()
                .map(MapleGuild::getAllianceId)
-               .ifPresent(id -> Server.getInstance().allianceMessage(id, MaplePacketCreator.updateAllianceJobLevel(this), getId(), -1));
+               .ifPresent(id -> Server.getInstance().allianceMessage(id, PacketCreator.create(new UpdateAllianceJobLevel(id, this.getGuildId(), getId(), getLevel(), getJob().getId())), getId(), -1));
       } catch (Exception e) {
          e.printStackTrace();
       }
