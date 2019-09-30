@@ -17,6 +17,7 @@ import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
+import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PicPacketFactory;
 import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
@@ -100,6 +101,8 @@ public class PacketCreator {
             return Optional.of(CashShopGachaponPacketFactoryPacketFactory.getInstance());
          case PLAYER_INTERACTION:
             return Optional.of(PlayerInteractionPacketFactory.getInstance());
+         case PARCEL:
+            return Optional.of(ParcelPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

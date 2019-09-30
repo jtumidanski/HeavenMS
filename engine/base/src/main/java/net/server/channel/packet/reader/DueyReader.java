@@ -1,5 +1,6 @@
 package net.server.channel.packet.reader;
 
+import client.DueyAction;
 import client.processor.DueyProcessor;
 import net.server.PacketReader;
 import net.server.channel.packet.duey.BaseDueyPacket;
@@ -13,13 +14,13 @@ public class DueyReader implements PacketReader<BaseDueyPacket> {
    @Override
    public BaseDueyPacket read(SeekableLittleEndianAccessor accessor) {
       byte operation = accessor.readByte();
-      if (operation == DueyProcessor.Actions.TOSERVER_RECV_ITEM.getCode()) {
+      if (operation == DueyAction.TOSERVER_RECV_ITEM.getValue()) {
          return readReceiveItem(operation);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_SEND_ITEM.getCode()) {
+      } else if (operation == DueyAction.TOSERVER_SEND_ITEM.getValue()) {
          return readSendItem(accessor, operation);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_REMOVE_PACKAGE.getCode()) {
+      } else if (operation == DueyAction.TOSERVER_REMOVE_PACKAGE.getValue()) {
          return readRemovePackage(accessor, operation);
-      } else if (operation == DueyProcessor.Actions.TOSERVER_CLAIM_PACKAGE.getCode()) {
+      } else if (operation == DueyAction.TOSERVER_CLAIM_PACKAGE.getValue()) {
          return readClaimPackage(accessor, operation);
       }
       return new BaseDueyPacket(operation);

@@ -79,6 +79,7 @@ import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.AfterLoginError;
+import tools.packet.parcel.DueyParcelNotification;
 import tools.packets.Wedding;
 
 public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLoggedInPacket> {
@@ -94,7 +95,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             DueyPackageProvider.getInstance().getPackageTypeForCharacter(connection, player.getId())
                   .ifPresent(type -> {
                      DueyPackageAdministrator.getInstance().uncheck(connection, player.getId());
-                     c.announce(MaplePacketCreator.sendDueyParcelNotification(type == 1));
+                     PacketCreator.announce(c, new DueyParcelNotification(type == 1));
                   }));
    }
 
