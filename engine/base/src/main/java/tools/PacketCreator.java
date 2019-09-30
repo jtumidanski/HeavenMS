@@ -31,6 +31,7 @@ import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
 import tools.packet.factory.ServerStatusPacketFactory;
 import tools.packet.factory.StatUpdatePacketFactory;
+import tools.packet.factory.StoragePacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 
 public class PacketCreator {
@@ -109,6 +110,8 @@ public class PacketCreator {
             return Optional.of(AllianceOperationPacketFactory.getInstance());
          case PARTY_OPERATION:
             return Optional.of(PartyOperationPacketFactory.getInstance());
+         case STORAGE:
+            return Optional.of(StoragePacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

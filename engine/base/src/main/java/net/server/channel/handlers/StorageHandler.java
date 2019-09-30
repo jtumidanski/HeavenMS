@@ -42,11 +42,11 @@ import net.server.channel.packet.storage.TakeoutPacket;
 import server.MapleItemInformationProvider;
 import server.MapleStorage;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
+import tools.packet.storage.StorageError;
 
 /**
  * @author Matze
@@ -145,13 +145,13 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
          return;
       }
       if (storage.isFull()) {
-         c.announce(MaplePacketCreator.getStorageError((byte) 0x11));
+         PacketCreator.announce(c, new StorageError((byte) 0x11));
          return;
       }
 
       int storeFee = storage.getStoreFee();
       if (chr.getMeso() < storeFee) {
-         c.announce(MaplePacketCreator.getStorageError((byte) 0x0B));
+         PacketCreator.announce(c, new StorageError((byte) 0x0B));
       } else {
          Item item;
 
@@ -202,13 +202,13 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       Item item = storage.getItem(slot);
       if (item != null) {
          if (ii.isPickupRestricted(item.id()) && chr.haveItemWithId(item.id(), true)) {
-            c.announce(MaplePacketCreator.getStorageError((byte) 0x0C));
+            PacketCreator.announce(c, new StorageError((byte) 0x0C));
             return;
          }
 
          int takeoutFee = storage.getTakeOutFee();
          if (chr.getMeso() < takeoutFee) {
-            c.announce(MaplePacketCreator.getStorageError((byte) 0x0B));
+            PacketCreator.announce(c, new StorageError((byte) 0x0B));
             return;
          } else {
             chr.gainMeso(-takeoutFee, false);
@@ -229,7 +229,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
                PacketCreator.announce(c, new EnableActions());
             }
          } else {
-            c.announce(MaplePacketCreator.getStorageError((byte) 0x0A));
+            PacketCreator.announce(c, new StorageError((byte) 0x0A));
          }
       }
    }

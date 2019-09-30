@@ -43,12 +43,16 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
+import tools.packet.storage.ArrangeStorage;
+import tools.packet.storage.GetStorage;
+import tools.packet.storage.MesoStorage;
+import tools.packet.storage.StoreInStorage;
+import tools.packet.storage.TakeOutOfStorage;
 
 /**
  * @author Matze
@@ -230,7 +234,7 @@ public class MapleStorage {
          }
 
          currentNpcid = npcId;
-         c.announce(MaplePacketCreator.getStorage(npcId, slots, storageItems, meso));
+         PacketCreator.announce(c, new GetStorage(npcId, slots, storageItems, meso));
       } finally {
          lock.unlock();
       }
@@ -239,7 +243,7 @@ public class MapleStorage {
    public void sendStored(MapleClient c, MapleInventoryType type) {
       lock.lock();
       try {
-         c.announce(MaplePacketCreator.storeStorage(slots, type, typeItems.get(type)));
+         PacketCreator.announce(c, new StoreInStorage(slots, type, typeItems.get(type)));
       } finally {
          lock.unlock();
       }
@@ -248,7 +252,7 @@ public class MapleStorage {
    public void sendTakenOut(MapleClient c, MapleInventoryType type) {
       lock.lock();
       try {
-         c.announce(MaplePacketCreator.takeOutStorage(slots, type, typeItems.get(type)));
+         PacketCreator.announce(c, new TakeOutOfStorage(slots, type, typeItems.get(type)));
       } finally {
          lock.unlock();
       }
@@ -265,7 +269,7 @@ public class MapleStorage {
             typeItems.put(type, new ArrayList<>(items));
          }
 
-         c.announce(MaplePacketCreator.arrangeStorage(slots, items));
+         PacketCreator.announce(c, new ArrangeStorage(slots, items));
       } finally {
          lock.unlock();
       }
@@ -283,7 +287,7 @@ public class MapleStorage {
    }
 
    public void sendMeso(MapleClient c) {
-      c.announce(MaplePacketCreator.mesoStorage(slots, meso));
+      PacketCreator.announce(c, new MesoStorage(slots, meso));
    }
 
    public int getStoreFee() {  // thanks to GabrielSin
