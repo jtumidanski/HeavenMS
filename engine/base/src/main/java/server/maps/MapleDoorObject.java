@@ -29,6 +29,7 @@ import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.world.MapleParty;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.partyoperation.PartyPortal;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -108,7 +109,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
       MapleCharacter chr = client.getPlayer();
       if (this.getFrom().getId() == chr.getMapId()) {
          if (chr.getParty() != null && (this.getOwnerId() == chr.getId() || chr.getParty().getMemberById(this.getOwnerId()) != null)) {
-            chr.announce(MaplePacketCreator.partyPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
+            PacketCreator.announce(client, new PartyPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
          }
 
          chr.announce(MaplePacketCreator.spawnPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
@@ -124,7 +125,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
       if (from.getId() == chr.getMapId()) {
          MapleParty party = chr.getParty();
          if (party != null && (ownerId == chr.getId() || party.getMemberById(ownerId) != null)) {
-            client.announce(MaplePacketCreator.partyPortal(999999999, 999999999, new Point(-1, -1)));
+            PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
          }
          client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
       }
@@ -132,7 +133,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
 
    public void sendDestroyData(MapleClient client, boolean partyUpdate) {
       if (client != null && from.getId() == client.getPlayer().getMapId()) {
-         client.announce(MaplePacketCreator.partyPortal(999999999, 999999999, new Point(-1, -1)));
+         PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
          client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
       }
    }

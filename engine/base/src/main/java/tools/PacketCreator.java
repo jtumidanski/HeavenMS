@@ -8,6 +8,7 @@ import net.opcodes.SendOpcode;
 import tools.packet.PacketInput;
 import tools.packet.factory.AddNewCharacterPacketFactory;
 import tools.packet.factory.AfterLoginErrorPacketFactory;
+import tools.packet.factory.AllianceOperationPacketFactory;
 import tools.packet.factory.CashShopGachaponPacketFactoryPacketFactory;
 import tools.packet.factory.CashShopOperationPacketFactory;
 import tools.packet.factory.ChangeChannelPacketFactory;
@@ -18,6 +19,7 @@ import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
+import tools.packet.factory.PartyOperationPacketFactory;
 import tools.packet.factory.PicPacketFactory;
 import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
@@ -103,6 +105,10 @@ public class PacketCreator {
             return Optional.of(PlayerInteractionPacketFactory.getInstance());
          case PARCEL:
             return Optional.of(ParcelPacketFactory.getInstance());
+         case ALLIANCE_OPERATION:
+            return Optional.of(AllianceOperationPacketFactory.getInstance());
+         case PARTY_OPERATION:
+            return Optional.of(PartyOperationPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

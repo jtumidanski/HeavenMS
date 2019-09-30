@@ -209,6 +209,7 @@ import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.inventory.SlotLimitUpdate;
+import tools.packet.partyoperation.UpdateParty;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
 import tools.packet.stat.UpdatePlayerStats;
@@ -1665,7 +1666,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          try {
             if (party != null) {
                mpc.setMapId(to.getId());
-               client.announce(MaplePacketCreator.updateParty(client.getChannel(), party, PartyOperation.SILENT_UPDATE, null));
+               PacketCreator.announce(client, new UpdateParty(client.getChannel(), party, PartyOperation.SILENT_UPDATE, null));
                updatePartyMemberHPInternal();
             }
          } finally {

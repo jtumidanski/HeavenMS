@@ -44,9 +44,12 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
-import tools.MaplePacketCreator;
+import scala.Option;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.partyoperation.PartyInvite;
+import tools.packet.partyoperation.PartyStatusMessage;
 
 public final class PartyOperationHandler extends AbstractPacketHandler<BasePartyOperationPacket> {
    @Override
@@ -87,7 +90,7 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
    private void invite(MapleClient client, MapleCharacter player, World world, MapleParty party, String name) {
       Optional<MapleCharacter> invitedOptional = world.getPlayerStorage().getCharacterByName(name);
       if (invitedOptional.isEmpty()) {
-         client.announce(MaplePacketCreator.partyStatusMessage(19));
+         PacketCreator.announce(player, new PartyStatusMessage(19));
       } else {
          MapleCharacter invited = invitedOptional.get();
          if (invited.getLevel() < 10 && (!ServerConstants.USE_PARTY_FOR_STARTERS || player.getLevel() >= 10)) { //min requirement is level 10
@@ -109,15 +112,15 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
             }
             if (party.getMembers().size() < 6) {
                if (MapleInviteCoordinator.createInvite(InviteType.PARTY, player, party.getId(), invited.getId())) {
-                  invited.getClient().announce(MaplePacketCreator.partyInvite(player));
+                  PacketCreator.announce(invited, new PartyInvite(party.getId(), player.getName()));
                } else {
-                  client.announce(MaplePacketCreator.partyStatusMessage(22, invited.getName()));
+                  PacketCreator.announce(client, new PartyStatusMessage(22, Option.apply(invited.getName())));
                }
             } else {
-               client.announce(MaplePacketCreator.partyStatusMessage(17));
+               PacketCreator.announce(player, new PartyStatusMessage(17));
             }
          } else {
-            client.announce(MaplePacketCreator.partyStatusMessage(16));
+            PacketCreator.announce(player, new PartyStatusMessage(16));
          }
       }
    }

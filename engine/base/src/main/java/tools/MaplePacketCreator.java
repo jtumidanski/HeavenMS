@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -74,44 +73,33 @@ import net.opcodes.SendOpcode;
 import net.server.PlayerCoolDownValueHolder;
 import net.server.Server;
 import net.server.SkillMacro;
-import net.server.channel.handlers.PlayerInteractionHandler;
 import net.server.channel.handlers.SummonDamageHandler.SummonAttackEntry;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
 import net.server.guild.MapleGuildSummary;
-import net.server.world.MapleParty;
-import net.server.world.MaplePartyCharacter;
-import net.server.world.PartyOperation;
 import net.server.world.World;
 import server.CashShop.CashItemFactory;
 import server.CashShop.SpecialCashItem;
-import server.DueyPackage;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;
 import server.MaplePacketOpCodes;
 import server.MapleShopItem;
-import server.MapleTrade;
 import server.events.gm.MapleSnowball;
 import server.life.MapleMonster;
 import server.life.MapleNPC;
 import server.life.MaplePlayerNPC;
 import server.life.MobSkill;
 import server.maps.AbstractMapleMapObject;
-import server.maps.MapleDoor;
-import server.maps.MapleDoorObject;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMiniGame;
-import server.maps.MapleMiniGame.MiniGameResult;
 import server.maps.MapleMist;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
-import server.maps.MaplePlayerShopSoldItem;
 import server.maps.MapleReactor;
-import server.maps.MapleSoldItem;
 import server.maps.MapleSummon;
 import server.movement.LifeMovementFragment;
 import tools.data.output.LittleEndianWriter;
@@ -3073,213 +3061,6 @@ public class MaplePacketCreator {
       mplew.write(5);
       mplew.writeMapleAsciiString(charnameFrom);
       mplew.write(mode);
-      return mplew.getPacket();
-   }
-
-   public static byte[] partyCreated(MapleParty party, int partycharid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(8);
-      mplew.writeInt(party.getId());
-
-      Map<Integer, MapleDoor> partyDoors = party.getDoors();
-      if (partyDoors.size() > 0) {
-         MapleDoor door = partyDoors.get(partycharid);
-
-         if (door != null) {
-            MapleDoorObject mdo = door.getAreaDoor();
-            mplew.writeInt(mdo.getTo().getId());
-            mplew.writeInt(mdo.getFrom().getId());
-            mplew.writeInt(mdo.getPosition().x);
-            mplew.writeInt(mdo.getPosition().y);
-         } else {
-            mplew.writeInt(999999999);
-            mplew.writeInt(999999999);
-            mplew.writeInt(0);
-            mplew.writeInt(0);
-         }
-      } else {
-         mplew.writeInt(999999999);
-         mplew.writeInt(999999999);
-         mplew.writeInt(0);
-         mplew.writeInt(0);
-      }
-      return mplew.getPacket();
-   }
-
-   public static byte[] partyInvite(MapleCharacter from) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(4);
-      mplew.writeInt(from.getParty().getId());
-      mplew.writeMapleAsciiString(from.getName());
-      mplew.write(0);
-      return mplew.getPacket();
-   }
-
-   public static byte[] partySearchInvite(MapleCharacter from) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(4);
-      mplew.writeInt(from.getParty().getId());
-      mplew.writeMapleAsciiString("PS: " + from.getName());
-      mplew.write(0);
-      return mplew.getPacket();
-   }
-
-   /**
-    * 10: A beginner can't create a party. 1/5/6/11/14/19: Your request for a
-    * party didn't work due to an unexpected error. 12: Quit as leader of the
-    * party. 13: You have yet to join a party.
-    * 16: Already have joined a party. 17: The party you're trying to join is
-    * already in full capacity. 19: Unable to find the requested character in
-    * this channel. 25: Cannot kick another user in this map. 28/29: Leadership
-    * can only be given to a party member in the vicinity. 30: Change leadership
-    * only on same channel.
-    *
-    * @param message
-    * @return
-    */
-   public static byte[] partyStatusMessage(int message) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(message);
-      return mplew.getPacket();
-   }
-
-   /**
-    * 21: Player is blocking any party invitations, 22: Player is taking care of
-    * another invitation, 23: Player have denied request to the party.
-    *
-    * @param message
-    * @param charname
-    * @return
-    */
-   public static byte[] partyStatusMessage(int message, String charname) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(message);
-      mplew.writeMapleAsciiString(charname);
-      return mplew.getPacket();
-   }
-
-   private static void addPartyStatus(int forchannel, MapleParty party, LittleEndianWriter lew, boolean leaving) {
-      List<MaplePartyCharacter> partymembers = new ArrayList<>(party.getMembers());
-      while (partymembers.size() < 6) {
-         partymembers.add(new MaplePartyCharacter());
-      }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeInt(partychar.getId());
-      }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeAsciiString(getRightPaddedStr(partychar.getName(), '\0', 13));
-      }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeInt(partychar.getJobId());
-      }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeInt(partychar.getLevel());
-      }
-      for (MaplePartyCharacter partychar : partymembers) {
-         if (partychar.isOnline()) {
-            lew.writeInt(partychar.getChannel() - 1);
-         } else {
-            lew.writeInt(-2);
-         }
-      }
-      lew.writeInt(party.getLeader().getId());
-      for (MaplePartyCharacter partychar : partymembers) {
-         if (partychar.getChannel() == forchannel) {
-            lew.writeInt(partychar.getMapId());
-         } else {
-            lew.writeInt(0);
-         }
-      }
-
-      Map<Integer, MapleDoor> partyDoors = party.getDoors();
-      for (MaplePartyCharacter partychar : partymembers) {
-         if (partychar.getChannel() == forchannel && !leaving) {
-            if (partyDoors.size() > 0) {
-               MapleDoor door = partyDoors.get(partychar.getId());
-               if (door != null) {
-                  MapleDoorObject mdo = door.getTownDoor();
-                  lew.writeInt(mdo.getTown().getId());
-                  lew.writeInt(mdo.getArea().getId());
-                  lew.writeInt(mdo.getPosition().x);
-                  lew.writeInt(mdo.getPosition().y);
-               } else {
-                  lew.writeInt(999999999);
-                  lew.writeInt(999999999);
-                  lew.writeInt(0);
-                  lew.writeInt(0);
-               }
-            } else {
-               lew.writeInt(999999999);
-               lew.writeInt(999999999);
-               lew.writeInt(0);
-               lew.writeInt(0);
-            }
-         } else {
-            lew.writeInt(999999999);
-            lew.writeInt(999999999);
-            lew.writeInt(0);
-            lew.writeInt(0);
-         }
-      }
-   }
-
-   public static byte[] updateParty(int forChannel, MapleParty party, PartyOperation op, MaplePartyCharacter target) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      switch (op) {
-         case DISBAND:
-         case EXPEL:
-         case LEAVE:
-            mplew.write(0x0C);
-            mplew.writeInt(party.getId());
-            mplew.writeInt(target.getId());
-            if (op == PartyOperation.DISBAND) {
-               mplew.write(0);
-               mplew.writeInt(party.getId());
-            } else {
-               mplew.write(1);
-               if (op == PartyOperation.EXPEL) {
-                  mplew.write(1);
-               } else {
-                  mplew.write(0);
-               }
-               mplew.writeMapleAsciiString(target.getName());
-               addPartyStatus(forChannel, party, mplew, false);
-            }
-            break;
-         case JOIN:
-            mplew.write(0xF);
-            mplew.writeInt(party.getId());
-            mplew.writeMapleAsciiString(target.getName());
-            addPartyStatus(forChannel, party, mplew, false);
-            break;
-         case SILENT_UPDATE:
-         case LOG_ONOFF:
-            mplew.write(0x7);
-            mplew.writeInt(party.getId());
-            addPartyStatus(forChannel, party, mplew, false);
-            break;
-         case CHANGE_LEADER:
-            mplew.write(0x1B);
-            mplew.writeInt(target.getId());
-            mplew.write(0);
-            break;
-      }
-      return mplew.getPacket();
-   }
-
-   public static byte[] partyPortal(int townId, int targetId, Point position) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.writeShort(0x23);
-      mplew.writeInt(townId);
-      mplew.writeInt(targetId);
-      mplew.writePos(position);
       return mplew.getPacket();
    }
 

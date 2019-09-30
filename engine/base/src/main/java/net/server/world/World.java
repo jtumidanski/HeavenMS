@@ -103,7 +103,9 @@ import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.partyoperation.UpdateParty;
 import tools.packets.Fishing;
 
 /**
@@ -969,14 +971,14 @@ public class World {
                character.setParty(party);
                character.setMPC(partychar);
             }
-            character.announce(MaplePacketCreator.updateParty(character.getClient().getChannel(), party, operation, target));
+            PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
          });
       }
       switch (operation) {
          case LEAVE:
          case EXPEL:
             getPlayerStorage().getCharacterById(target.getId()).ifPresent(character -> {
-               character.announce(MaplePacketCreator.updateParty(character.getClient().getChannel(), party, operation, target));
+               PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
                character.setParty(null);
                character.setMPC(null);
             });

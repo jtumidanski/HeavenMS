@@ -44,10 +44,11 @@ import net.server.world.MapleParty;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.partyoperation.PartySearchInvite;
 
 /**
  * @author Ronan
@@ -200,7 +201,9 @@ public class MaplePartySearchCoordinator {
    }
 
    public void registerPartyLeader(MapleCharacter leader, int minLevel, int maxLevel, int jobs) {
-      if (searchLeaders.containsKey(leader.getId())) return;
+      if (searchLeaders.containsKey(leader.getId())) {
+         return;
+      }
 
       searchSettings.put(leader.getId(), new LeaderSearchMetadata(minLevel, maxLevel, jobs));
       searchLeaders.put(leader.getId(), leader);
@@ -208,7 +211,9 @@ public class MaplePartySearchCoordinator {
    }
 
    private void registerPartyLeader(MapleCharacter leader, LeaderSearchMetadata settings) {
-      if (searchLeaders.containsKey(leader.getId())) return;
+      if (searchLeaders.containsKey(leader.getId())) {
+         return;
+      }
 
       searchSettings.put(leader.getId(), settings);
       searchLeaders.put(leader.getId(), leader);
@@ -256,7 +261,7 @@ public class MaplePartySearchCoordinator {
 
       if (MapleInviteCoordinator.createInvite(InviteType.PARTY, leader, partyid, chr.getId())) {
          chr.disablePartySearchInvite(leader.getId());
-         chr.announce(MaplePacketCreator.partySearchInvite(leader));
+         PacketCreator.announce(chr, new PartySearchInvite(leader.getPartyId(), leader.getName()));
          return true;
       } else {
          return false;
@@ -357,8 +362,9 @@ public class MaplePartySearchCoordinator {
          if (party != null && party.getMembers().size() < 6) {
             addQueueLeader(leader);
          } else {
-            if (leader.isLoggedinWorld())
+            if (leader.isLoggedinWorld()) {
                MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session has finished as your party reached full capacity.");
+            }
             searchLeaders.remove(leader.getId());
             searchSettings.remove(leader.getId());
          }
@@ -372,8 +378,9 @@ public class MaplePartySearchCoordinator {
          if (leader.isLoggedinWorld()) {
             if (settings != null) {
                recycledLeaders.add(new Pair<>(leader, settings));
-               if (ServerConstants.USE_DEBUG && leader.isGM())
+               if (ServerConstants.USE_DEBUG && leader.isGM()) {
                   MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session is now on waiting queue for up to 7 minutes, to get it working right away please stop your Party Search and retry again later.");
+               }
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session expired, please stop your Party Search and retry again later.");
             }
