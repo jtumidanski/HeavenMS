@@ -39,6 +39,8 @@ import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowForeignCardEffect;
 
 public final class MonsterBook {
    private static final Semaphore semaphore = new Semaphore(10);
@@ -59,7 +61,7 @@ public final class MonsterBook {
    }
 
    public void addCard(final MapleClient c, final int cardid) {
-      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), character -> MaplePacketCreator.showForeignCardEffect(c.getPlayer().getId()), false, c.getPlayer());
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), character -> PacketCreator.create(new ShowForeignCardEffect(c.getPlayer().getId())), false, c.getPlayer());
 
       Integer qty;
       lock.lock();

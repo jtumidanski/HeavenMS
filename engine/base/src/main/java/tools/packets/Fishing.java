@@ -29,7 +29,9 @@ import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.foreigneffect.ShowForeignInfo;
 
 /**
  * @author FateJiki (RaGeZONE)
@@ -122,7 +124,7 @@ public class Fishing {
       }
 
       chr.announce(MaplePacketCreator.showInfo(fishingEffect));
-      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.showForeignInfo(chr.getId(), fishingEffect), false, chr);
+      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowForeignInfo(chr.getId(), fishingEffect)), false, chr);
    }
 
    public static int getRandomItem() {

@@ -30,8 +30,9 @@ import net.server.Server;
 import net.server.channel.packet.HealOvertimePacket;
 import net.server.channel.packet.reader.HealOvertimeReader;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowRecovery;
 
 public final class HealOvertimeHandler extends AbstractPacketHandler<HealOvertimePacket> {
    @Override
@@ -65,7 +66,7 @@ public final class HealOvertimeHandler extends AbstractPacketHandler<HealOvertim
          }
 
          chr.addHP(packet.healHP());
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.showHpHealed(chr.getId(), packet.healHP()), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowRecovery(chr.getId(), (byte) packet.healHP())), false, chr);
          abm.spam(0, timestamp);
       }
 

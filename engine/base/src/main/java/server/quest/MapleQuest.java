@@ -73,8 +73,10 @@ import server.quest.requirements.ScriptRequirement;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.packet.foreigneffect.ShowForeignEffect;
 
 /**
  * @author Matze
@@ -436,7 +438,7 @@ public class MapleQuest {
       c.updateQuest(newStatus);
 
       c.announce(MaplePacketCreator.showSpecialEffect(9)); // Quest completion
-      MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), character -> MaplePacketCreator.showForeignEffect(c.getId(), 9), false, c); //use 9 instead of 12 for both
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), character -> PacketCreator.create(new ShowForeignEffect(c.getId(), 9)), false, c); //use 9 instead of 12 for both
       return true;
    }
 

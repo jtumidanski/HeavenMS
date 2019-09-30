@@ -24,6 +24,8 @@ import client.MapleClient;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowForeignBuybackEffect;
 
 /**
  * @author RonanLana
@@ -77,7 +79,7 @@ public class BuybackProcessor {
          MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.earnTitleMessage(chr.getName() + " just bought back into the game!"));
 
          chr.announce(MaplePacketCreator.showBuybackEffect());
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showForeignBuybackEffect(chr.getId()), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> PacketCreator.create(new ShowForeignBuybackEffect(chr.getId())), false, chr);
       }
    }
 }

@@ -57,7 +57,9 @@ import server.maps.MapleMapObject;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Randomizer;
+import tools.packet.foreigneffect.ShowBuffEffect;
 
 public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePacket> {
    @Override
@@ -187,7 +189,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                         int finalBouncedamage = bouncedamage;
                         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(oid, finalBouncedamage), true, chr);
                         chr.getClient().announce(MaplePacketCreator.showOwnBuffEffect(id, 5));
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showBuffeffect(chr.getId(), id, 5), false, chr);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> PacketCreator.create(new ShowBuffEffect(chr.getId(), id, 5, (byte) 3)), false, chr);
                      }
                   }
                }

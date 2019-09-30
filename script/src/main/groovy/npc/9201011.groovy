@@ -9,7 +9,9 @@ import scripting.npc.NPCConversationManager
 import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
+import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.packet.foreigneffect.ShowForeignEffect
 
 /*
 	NPC Name: 		
@@ -189,15 +191,15 @@ class NPC9201011 {
                if (ServerConstants.WEDDING_BLESSER_SHOWFX) {
                   MapleCharacter target = cm.getPlayer()
                   target.announce(MaplePacketCreator.showSpecialEffect(9))
-                  MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> MaplePacketCreator.showForeignEffect(target.getId(), 9) }, false, target)
+                  MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> PacketCreator.create(new ShowForeignEffect(target.getId(), 9)) }, false, target)
                } else {
                   MapleCharacter target = eim.getPlayerById(eim.getIntProperty("groomId"))
                   target.announce(MaplePacketCreator.showSpecialEffect(9))
-                  MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> MaplePacketCreator.showForeignEffect(target.getId(), 9) }, false, target)
+                  MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> PacketCreator.create(new ShowForeignEffect(target.getId(), 9)) }, false, target)
 
                   target = eim.getPlayerById(eim.getIntProperty("brideId"))
                   target.announce(MaplePacketCreator.showSpecialEffect(9))
-                  MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> MaplePacketCreator.showForeignEffect(target.getId(), 9) }, false, target)
+                  MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), { character -> PacketCreator.create(new ShowForeignEffect(target.getId(), 9)) }, false, target)
                }
 
                cm.sendOk("Way to go, my friend! Your LOVE has been added to theirs, now in one bigger heart-shaped sentiment that will remain lively in our hearts forever! Who-hoo~!")

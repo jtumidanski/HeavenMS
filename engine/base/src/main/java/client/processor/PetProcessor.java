@@ -13,7 +13,9 @@ import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.foreigneffect.ShowPetLevelUp;
 
 public class PetProcessor {
    private static PetProcessor instance;
@@ -82,7 +84,7 @@ public class PetProcessor {
             while (newCloseness >= ExpTable.getClosenessNeededForLevel(pet.level())) {
                pet.level_$eq((byte) (pet.level() + 1));
                owner.getClient().announce(MaplePacketCreator.showOwnPetLevelUp(slot));
-               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.showPetLevelUp(owner, slot));
+               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> PacketCreator.create(new ShowPetLevelUp(owner.getId(), slot)));
             }
          }
 

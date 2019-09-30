@@ -15,6 +15,7 @@ import tools.packet.factory.ChangeChannelPacketFactory;
 import tools.packet.factory.CharacterListPacketFactory;
 import tools.packet.factory.CharacterNameResponsePacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
+import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
@@ -115,6 +116,8 @@ public class PacketCreator {
             return Optional.of(StoragePacketFactory.getInstance());
          case NPC_TALK:
             return Optional.of(NPCTalkPacketFactory.getInstance());
+         case SHOW_FOREIGN_EFFECT:
+            return Optional.of(ForeignEffectPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

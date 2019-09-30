@@ -14,9 +14,11 @@ import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.foreigneffect.ShowForeignEffect;
 
 public class ItemProcessor {
    private static ItemProcessor instance;
@@ -249,7 +251,7 @@ public class ItemProcessor {
       MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, lvupStr);
 
       c.announce(MaplePacketCreator.showEquipmentLevelUp());
-      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), MaplePacketCreator.showForeignEffect(c.getPlayer().getId(), 15));
+      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), PacketCreator.create(new ShowForeignEffect(c.getPlayer().getId(), 15)));
       c.getPlayer().forceUpdateItem(equip);
    }
 

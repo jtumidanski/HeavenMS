@@ -100,10 +100,12 @@ import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.foreigneffect.ShowBuffEffect;
 
 public class MapleMap {
 
@@ -1311,7 +1313,7 @@ public class MapleMap {
                         .forEach(character -> {
                            MapleStatEffect statEffect = mii.getItemEffect(buff);
                            character.getClient().announce(MaplePacketCreator.showOwnBuffEffect(buff, 1));
-                           MasterBroadcaster.getInstance().sendToAllInMap(this, chara -> MaplePacketCreator.showBuffeffect(character.getId(), buff, 1), false, character);
+                           MasterBroadcaster.getInstance().sendToAllInMap(this, chara -> PacketCreator.create(new ShowBuffEffect(character.getId(), buff, 1, (byte) 3)), false, character);
                            statEffect.applyTo(character);
                         });
                }
