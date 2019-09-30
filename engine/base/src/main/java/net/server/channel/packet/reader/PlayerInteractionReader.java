@@ -37,73 +37,74 @@ import net.server.channel.packet.interaction.StartPlayerInteractionPacket;
 import net.server.channel.packet.interaction.TakeItemBackPlayerInteractionPacket;
 import net.server.channel.packet.interaction.UnReadyPlayerInteractionPacket;
 import net.server.channel.packet.interaction.VisitPlayerInteractionPacket;
+import server.channel.PlayerInteractionAction;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class PlayerInteractionReader implements PacketReader<BasePlayerInteractionPacket> {
    @Override
    public BasePlayerInteractionPacket read(SeekableLittleEndianAccessor accessor) {
       byte mode = accessor.readByte();
-      if (mode == PlayerInteractionHandler.Action.CREATE.getCode()) {
+      if (mode == PlayerInteractionAction.CREATE.getValue()) {
          return readCreate(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.INVITE.getCode()) {
+      } else if (mode == PlayerInteractionAction.INVITE.getValue()) {
          return readInvite(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.DECLINE.getCode()) {
+      } else if (mode == PlayerInteractionAction.DECLINE.getValue()) {
          return readDecline(mode);
-      } else if (mode == PlayerInteractionHandler.Action.VISIT.getCode()) {
+      } else if (mode == PlayerInteractionAction.VISIT.getValue()) {
          return readVisit(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.CHAT.getCode()) {
+      } else if (mode == PlayerInteractionAction.CHAT.getValue()) {
          return readChat(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.OPEN_STORE.getCode()) {
+      } else if (mode == PlayerInteractionAction.OPEN_STORE.getValue()) {
          return readOpenStore(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.OPEN_CASH.getCode()) {
+      } else if (mode == PlayerInteractionAction.OPEN_CASH.getValue()) {
          return readOpenCash(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.READY.getCode()) {
+      } else if (mode == PlayerInteractionAction.READY.getValue()) {
          return readReady(mode);
-      } else if (mode == PlayerInteractionHandler.Action.UN_READY.getCode()) {
+      } else if (mode == PlayerInteractionAction.UN_READY.getValue()) {
          return readUnReady(mode);
-      } else if (mode == PlayerInteractionHandler.Action.START.getCode()) {
+      } else if (mode == PlayerInteractionAction.START.getValue()) {
          return readStart(mode);
-      } else if (mode == PlayerInteractionHandler.Action.GIVE_UP.getCode()) {
+      } else if (mode == PlayerInteractionAction.GIVE_UP.getValue()) {
          return readGiveUp(mode);
-      } else if (mode == PlayerInteractionHandler.Action.REQUEST_TIE.getCode()) {
+      } else if (mode == PlayerInteractionAction.REQUEST_TIE.getValue()) {
          return readRequestTie(mode);
-      } else if (mode == PlayerInteractionHandler.Action.ANSWER_TIE.getCode()) {
+      } else if (mode == PlayerInteractionAction.ANSWER_TIE.getValue()) {
          return readAnswerTie(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.SKIP.getCode()) {
+      } else if (mode == PlayerInteractionAction.SKIP.getValue()) {
          return readSkip(mode);
-      } else if (mode == PlayerInteractionHandler.Action.MOVE_OMOK.getCode()) {
+      } else if (mode == PlayerInteractionAction.MOVE_OMOK.getValue()) {
          return readOmokMove(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.SELECT_CARD.getCode()) {
+      } else if (mode == PlayerInteractionAction.SELECT_CARD.getValue()) {
          return readSelectCard(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.SET_MESO.getCode()) {
+      } else if (mode == PlayerInteractionAction.SET_MESO.getValue()) {
          return readSetMeso(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.SET_ITEMS.getCode()) {
+      } else if (mode == PlayerInteractionAction.SET_ITEMS.getValue()) {
          return readSetItems(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.CONFIRM.getCode()) {
+      } else if (mode == PlayerInteractionAction.CONFIRM.getValue()) {
          return readConfirm(mode);
-      } else if (mode == PlayerInteractionHandler.Action.ADD_ITEM.getCode() || mode == PlayerInteractionHandler.Action.PUT_ITEM.getCode()) {
+      } else if (mode == PlayerInteractionAction.ADD_ITEM.getValue() || mode == PlayerInteractionAction.PUT_ITEM.getValue()) {
          return readAddItem(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.REMOVE_ITEM.getCode()) {
+      } else if (mode == PlayerInteractionAction.REMOVE_ITEM.getValue()) {
          return readRemoveItem(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.MERCHANT_MESO.getCode()) {
+      } else if (mode == PlayerInteractionAction.MERCHANT_MESO.getValue()) {
          return readMerchantMeso(mode);
-      } else if (mode == PlayerInteractionHandler.Action.MERCHANT_ORGANIZE.getCode()) {
+      } else if (mode == PlayerInteractionAction.MERCHANT_ORGANIZE.getValue()) {
          return readMerchantOrganize(mode);
-      } else if (mode == PlayerInteractionHandler.Action.BUY.getCode() || mode == PlayerInteractionHandler.Action.MERCHANT_BUY.getCode()) {
+      } else if (mode == PlayerInteractionAction.BUY.getValue() || mode == PlayerInteractionAction.MERCHANT_BUY.getValue()) {
          return readBuy(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.TAKE_ITEM_BACK.getCode()) {
+      } else if (mode == PlayerInteractionAction.TAKE_ITEM_BACK.getValue()) {
          return readTakeItemBack(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.CLOSE_MERCHANT.getCode()) {
+      } else if (mode == PlayerInteractionAction.CLOSE_MERCHANT.getValue()) {
          return readCloseMerchant(mode);
-      } else if (mode == PlayerInteractionHandler.Action.MAINTENANCE_OFF.getCode()) {
+      } else if (mode == PlayerInteractionAction.MAINTENANCE_OFF.getValue()) {
          return readMaintenanceOff(mode);
-      } else if (mode == PlayerInteractionHandler.Action.BAN_PLAYER.getCode()) {
+      } else if (mode == PlayerInteractionAction.BAN_PLAYER.getValue()) {
          return readBanPlayer(accessor, mode);
-      } else if (mode == PlayerInteractionHandler.Action.EXPEL.getCode()) {
+      } else if (mode == PlayerInteractionAction.EXPEL.getValue()) {
          return readExpel(mode);
-      } else if (mode == PlayerInteractionHandler.Action.EXIT_AFTER_GAME.getCode()) {
+      } else if (mode == PlayerInteractionAction.EXIT_AFTER_GAME.getValue()) {
          return readExitAfterGame(mode);
-      } else if (mode == PlayerInteractionHandler.Action.CANCEL_EXIT_AFTER_GAME.getCode()) {
+      } else if (mode == PlayerInteractionAction.CANCEL_EXIT_AFTER_GAME.getValue()) {
          return readCancelExitAfterGame(mode);
       }
 
