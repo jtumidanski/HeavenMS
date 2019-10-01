@@ -114,9 +114,9 @@ public class MapleMiniGame extends AbstractMapleMapObject {
       MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.removeMinigameBox(owner));
 
       if (forceClose) {
-         MasterBroadcaster.getInstance().sendToGameOwner(this, character -> PacketCreator.create(new MiniGameClose(false, 4)));
+         MasterBroadcaster.getInstance().sendToGameOwner(this, new MiniGameClose(false, 4));
       }
-      MasterBroadcaster.getInstance().sendToGameVisitor(this, character -> PacketCreator.create(new MiniGameClose(true, 3)));
+      MasterBroadcaster.getInstance().sendToGameVisitor(this, new MiniGameClose(true, 3));
 
       if (visitor != null) {
          visitor.setMiniGame(null);
@@ -229,7 +229,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
          visitorforfeits++;
       }
 
-      MasterBroadcaster.getInstance().sendToGamers(this, character -> PacketCreator.create(new MiniGameOwnerWin(this, forfeit)));
+      MasterBroadcaster.getInstance().sendToGamers(this, new MiniGameOwnerWin(this, forfeit));
 
       minigameMatchFinished();
    }
@@ -249,7 +249,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
          ownerforfeits++;
       }
 
-      MasterBroadcaster.getInstance().sendToGamers(this, character -> PacketCreator.create(new MiniGameVisitorWin(this, forfeit)));
+      MasterBroadcaster.getInstance().sendToGamers(this, new MiniGameVisitorWin(this, forfeit));
 
       minigameMatchFinished();
    }
@@ -269,7 +269,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
          nextavailabletie = timeNow + 5 * 60 * 1000;
       }
 
-      MasterBroadcaster.getInstance().sendToGamers(this, character -> PacketCreator.create(new MiniGameTie(this)));
+      MasterBroadcaster.getInstance().sendToGamers(this, new MiniGameTie(this));
 
       minigameMatchFinished();
    }
@@ -381,7 +381,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
    }
 
    public void chat(MapleClient c, String chat) {
-      MasterBroadcaster.getInstance().sendToGamers(this, character -> PacketCreator.create(new PlayerShopChat(c.getPlayer().getName(), chat, (byte) (isOwner(c.getPlayer()) ? 0 : 1))));
+      MasterBroadcaster.getInstance().sendToGamers(this, new PlayerShopChat(c.getPlayer().getName(), chat, (byte) (isOwner(c.getPlayer()) ? 0 : 1)));
    }
 
    public void sendOmok(MapleClient c, int type) {
@@ -404,7 +404,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
       int slot = move2 * 15 + move1 + 1;
       if (piece[slot] == 0) {
          piece[slot] = type;
-         MasterBroadcaster.getInstance().sendToGamers(this, character -> PacketCreator.create(new MiniGameMoveOmok(move1, move2, type)));
+         MasterBroadcaster.getInstance().sendToGamers(this, new MiniGameMoveOmok(move1, move2, type));
          for (int y = 0; y < 15; y++) {
             for (int x = 0; x < 11; x++) {
                if (searchCombo(x, y, type)) {

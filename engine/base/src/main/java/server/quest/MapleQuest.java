@@ -440,7 +440,7 @@ public class MapleQuest {
       c.updateQuest(newStatus);
 
       PacketCreator.announce(c, new ShowSpecialEffect(9));
-      MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), character -> PacketCreator.create(new ShowForeignEffect(c.getId(), 9)), false, c); //use 9 instead of 12 for both
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), new ShowForeignEffect(c.getId(), 9), false, c); //use 9 instead of 12 for both
       return true;
    }
 

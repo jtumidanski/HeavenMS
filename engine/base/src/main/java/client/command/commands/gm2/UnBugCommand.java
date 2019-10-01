@@ -36,6 +36,6 @@ public class UnBugCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), character -> PacketCreator.create(new EnableActions()));
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), new EnableActions());
    }
 }

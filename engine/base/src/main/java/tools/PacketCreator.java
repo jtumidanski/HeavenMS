@@ -22,6 +22,7 @@ import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
+import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
@@ -134,6 +135,13 @@ public class PacketCreator {
             return Optional.of(ItemGainInChatPacketFactory.getInstance());
          case GUILD_OPERATION:
             return Optional.of(GuildOperationPacketFactory.getInstance());
+         case MONSTER_CARNIVAL_START:
+         case MONSTER_CARNIVAL_DIED:
+         case MONSTER_CARNIVAL_SUMMON:
+         case MONSTER_CARNIVAL_MESSAGE:
+         case MONSTER_CARNIVAL_OBTAINED_CP:
+         case MONSTER_CARNIVAL_PARTY_CP:
+            return Optional.of(MonsterCarnivalPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

@@ -1,8 +1,8 @@
 package reactor
 
 import scripting.reactor.ReactorActionManager
+import server.maps.MapleMap
 import tools.MasterBroadcaster
-import tools.PacketCreator
 import tools.packet.statusinfo.ShowBunny
 
 class Reactor9101000 {
@@ -10,8 +10,9 @@ class Reactor9101000 {
 
    def act() {
       rm.spawnMonster(9300061, 1, 0, 0) // (0, 0) is temp position
-      rm.getClient().getPlayer().getMap().startMapEffect("Protect the Moon Bunny that's pounding the mill, and gather up 10 Moon Bunny's Rice Cakes!", 5120016, 7000)
-      MasterBroadcaster.getInstance().sendToAllInMap(rm.getClient().getPlayer().getMap(), { character -> PacketCreator.create(new ShowBunny()) })
+      MapleMap map = rm.getClient().getPlayer().getMap()
+      map.startMapEffect("Protect the Moon Bunny that's pounding the mill, and gather up 10 Moon Bunny's Rice Cakes!", 5120016, 7000)
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowBunny())
 
       //TODO
 //      rm.getClient().getPlayer().getMap().broadcastMessage(MaplePacketCreator.showHPQMoon());

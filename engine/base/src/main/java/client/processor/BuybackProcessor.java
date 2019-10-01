@@ -80,7 +80,7 @@ public class BuybackProcessor {
          MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.earnTitleMessage(chr.getName() + " just bought back into the game!"));
 
          PacketCreator.announce(chr, new ShowBuybackEffect());
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> PacketCreator.create(new ShowForeignBuybackEffect(chr.getId())), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowForeignBuybackEffect(chr.getId()), false, chr);
       }
    }
 }

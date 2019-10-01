@@ -201,7 +201,7 @@ public class MapleStatEffect {
                      mob.setMp(mob.getMp() - absorbMp);
                      applyto.addMP(absorbMp);
                      PacketCreator.announce(applyto, new ShowOwnBuffEffect(sourceid, 1));
-                     MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), character -> PacketCreator.create(new ShowBuffEffect(applyto.getId(), sourceid, 1, (byte) 3)), false, applyto);
+                     MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), new ShowBuffEffect(applyto.getId(), sourceid, 1, (byte) 3), false, applyto);
                   }
                }
                break;
@@ -492,7 +492,7 @@ public class MapleStatEffect {
          for (MapleCharacter affected : affectedp) {
             applyTo(applyfrom, affected, false, null, useMaxRange, affectedc);
             PacketCreator.announce(affected, new ShowOwnBuffEffect(sourceid, 2));
-            MasterBroadcaster.getInstance().sendToAllInMap(affected.getMap(), character -> PacketCreator.create(new ShowBuffEffect(affected.getId(), sourceid, 2, (byte) 3)), false, affected);
+            MasterBroadcaster.getInstance().sendToAllInMap(affected.getMap(), new ShowBuffEffect(affected.getId(), sourceid, 2, (byte) 3), false, affected);
          }
       }
 
@@ -639,7 +639,7 @@ public class MapleStatEffect {
       }
       if (primary) {
          localDuration = alchemistModifyVal(applyfrom, localDuration, false);
-         MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), character -> PacketCreator.create(new ShowBuffEffect(applyto.getId(), sourceid, 1, (byte) 3)), false, applyto);
+         MasterBroadcaster.getInstance().sendToAllInMap(applyto.getMap(), new ShowBuffEffect(applyto.getId(), sourceid, 1, (byte) 3), false, applyto);
       }
       if (localstatups.size() > 0) {
          byte[] buff = null;

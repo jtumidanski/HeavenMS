@@ -357,7 +357,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
       visitorLock.lock();
       try {
          MasterBroadcaster.getInstance().sendToShoppers(this, (character, index) -> PacketCreator.create(new PlayerShopRemoveVisitor(index + 1)));
-         MasterBroadcaster.getInstance().sendToShoppers(this, character -> PacketCreator.create(new GetPlayerShop(this, false)));
+         MasterBroadcaster.getInstance().sendToShoppers(this, new GetPlayerShop(this, false));
          recoverChatLog();
       } finally {
          visitorLock.unlock();
@@ -415,7 +415,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          }
          chatSlot.put(c.getPlayer().getId(), s);
       }
-      MasterBroadcaster.getInstance().sendToShop(this, character -> PacketCreator.create(new PlayerShopChat(c.getPlayer().getName(), chat, s)));
+      MasterBroadcaster.getInstance().sendToShop(this, new PlayerShopChat(c.getPlayer().getName(), chat, s));
    }
 
    private void recoverChatLog() {
@@ -423,7 +423,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
          for (Pair<MapleCharacter, String> it : chatLog) {
             MapleCharacter chr = it.getLeft();
             Byte pos = chatSlot.get(chr.getId());
-            MasterBroadcaster.getInstance().sendToShoppers(this, character -> PacketCreator.create(new PlayerShopChat(chr.getName(), it.getRight(), pos)));
+            MasterBroadcaster.getInstance().sendToShoppers(this, new PlayerShopChat(chr.getName(), it.getRight(), pos));
          }
       }
    }

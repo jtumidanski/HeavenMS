@@ -92,6 +92,7 @@ import server.life.SpawnPoint;
 import server.partyquest.GuardianSpawnPoint;
 import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
+import server.partyquest.MonsterCarnival;
 import server.processor.DropEntryProcessor;
 import server.processor.maps.MapleMapObjectProcessor;
 import server.processor.maps.MapleMapObjectTypeProcessor;
@@ -106,6 +107,7 @@ import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowBuffEffect;
+import tools.packet.monster.carnival.MonsterCarnivalStart;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 
 public class MapleMap {
@@ -1314,7 +1316,7 @@ public class MapleMap {
                         .forEach(character -> {
                            MapleStatEffect statEffect = mii.getItemEffect(buff);
                            PacketCreator.announce(character, new ShowOwnBuffEffect(buff, 1));
-                           MasterBroadcaster.getInstance().sendToAllInMap(this, chara -> PacketCreator.create(new ShowBuffEffect(character.getId(), buff, 1, (byte) 3)), false, character);
+                           MasterBroadcaster.getInstance().sendToAllInMap(this, new ShowBuffEffect(character.getId(), buff, 1, (byte) 3), false, character);
                            statEffect.applyTo(character);
                         });
                }
@@ -2421,7 +2423,11 @@ public class MapleMap {
                team = 1;
                oposition = 0;
             }
-            chr.getClient().announce(MaplePacketCreator.startMonsterCarnival(chr, team, oposition));
+
+            MonsterCarnival monsterCarnival = chr.getMonsterCarnival();
+            PacketCreator.announce(chr, new MonsterCarnivalStart(team, chr.getCP(), chr.getTotalCP(),
+                  monsterCarnival.getCP(team), monsterCarnival.getTotalCP(team), monsterCarnival.getCP(oposition),
+                  monsterCarnival.getTotalCP(oposition)));
          }
       }
 

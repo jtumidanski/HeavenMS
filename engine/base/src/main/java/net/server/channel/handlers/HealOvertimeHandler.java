@@ -66,7 +66,7 @@ public final class HealOvertimeHandler extends AbstractPacketHandler<HealOvertim
          }
 
          chr.addHP(packet.healHP());
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowRecovery(chr.getId(), (byte) packet.healHP())), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowRecovery(chr.getId(), (byte) packet.healHP()), false, chr);
          abm.spam(0, timestamp);
       }
 

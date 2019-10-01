@@ -124,7 +124,7 @@ public class Fishing {
       }
 
       PacketCreator.announce(chr, new ShowInfo(fishingEffect));
-      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowForeignInfo(chr.getId(), fishingEffect)), false, chr);
+      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowForeignInfo(chr.getId(), fishingEffect), false, chr);
    }
 
    public static int getRandomItem() {

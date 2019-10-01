@@ -242,7 +242,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                   PacketCreator.announce(client, new ShowMakerEffect(makerSucceeded));
                   boolean finalMakerSucceeded = makerSucceeded;
                   MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(),
-                        character -> PacketCreator.create(new ShowForeignMakerEffect(client.getPlayer().getId(), finalMakerSucceeded)), false, client.getPlayer());
+                        new ShowForeignMakerEffect(client.getPlayer().getId(), finalMakerSucceeded), false, client.getPlayer());
 
                   if (toCreate == 4260003 && type == 3 && client.getPlayer().getQuestStatus(6033) == 1) {
                      client.getAbstractPlayerInteraction().setQuestProgress(6033, 1);

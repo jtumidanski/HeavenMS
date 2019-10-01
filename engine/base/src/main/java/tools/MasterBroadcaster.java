@@ -20,6 +20,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
 import server.processor.maps.MapleMapProcessor;
+import tools.packet.PacketInput;
 
 public class MasterBroadcaster {
    private static MasterBroadcaster instance;
@@ -44,6 +45,10 @@ public class MasterBroadcaster {
       sendToAllInMap(map, null, packetCreator);
    }
 
+   public void sendToAllInMap(MapleMap map, PacketInput packetInput) {
+      sendToAllInMap(map, null, character -> PacketCreator.create(packetInput));
+   }
+
    /**
     * Sends a packet to everyone in the map, conditionally excluding the source of the packet.
     *
@@ -54,6 +59,10 @@ public class MasterBroadcaster {
     */
    public void sendToAllInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source) {
       sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), packetCreator);
+   }
+
+   public void sendToAllInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source) {
+      sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), character -> PacketCreator.create(packetInput));
    }
 
    /**
@@ -188,31 +197,32 @@ public class MasterBroadcaster {
    /**
     * Sends a packet to both the game participants
     *
-    * @param game          the game
-    * @param packetCreator the packet
+    * @param game        the game
+    * @param packetInput the packet
     */
-   public void sendToGamers(MapleMiniGame game, Function<MapleCharacter, byte[]> packetCreator) {
-      sendToGamers(game, packetCreator, true, true);
+   public void sendToGamers(MapleMiniGame game, PacketInput packetInput) {
+      sendToGamers(game, character -> PacketCreator.create(packetInput), true, true);
    }
+
 
    /**
     * Sends a packet to the game owner
     *
-    * @param game          the game
-    * @param packetCreator the packet
+    * @param game        the game
+    * @param packetInput the packet
     */
-   public void sendToGameOwner(MapleMiniGame game, Function<MapleCharacter, byte[]> packetCreator) {
-      sendToGamers(game, packetCreator, true, false);
+   public void sendToGameOwner(MapleMiniGame game, PacketInput packetInput) {
+      sendToGamers(game, character -> PacketCreator.create(packetInput), true, false);
    }
 
    /**
     * Sends a packet to the game visitor
     *
-    * @param game          the game
-    * @param packetCreator the packet
+    * @param game        the game
+    * @param packetInput the packet
     */
-   public void sendToGameVisitor(MapleMiniGame game, Function<MapleCharacter, byte[]> packetCreator) {
-      sendToGamers(game, packetCreator, false, true);
+   public void sendToGameVisitor(MapleMiniGame game, PacketInput packetInput) {
+      sendToGamers(game, character -> PacketCreator.create(packetInput), false, true);
    }
 
    /**
@@ -247,14 +257,18 @@ public class MasterBroadcaster {
       send(recipients, packetCreator);
    }
 
+   public void sendToShop(MaplePlayerShop shop, PacketInput packetInput) {
+      sendToShop(shop, character -> PacketCreator.create(packetInput));
+   }
+
    /**
     * Sends a packet to everyone shopping in a shop.
     *
-    * @param shop          the shop
-    * @param packetCreator the packet
+    * @param shop        the shop
+    * @param packetInput the packet
     */
-   public void sendToShoppers(MaplePlayerShop shop, Function<MapleCharacter, byte[]> packetCreator) {
-      send(Arrays.stream(shop.getVisitors()).filter(Objects::nonNull).collect(Collectors.toList()), packetCreator);
+   public void sendToShoppers(MaplePlayerShop shop, PacketInput packetInput) {
+      send(Arrays.stream(shop.getVisitors()).filter(Objects::nonNull).collect(Collectors.toList()), character -> PacketCreator.create(packetInput));
    }
 
    /**

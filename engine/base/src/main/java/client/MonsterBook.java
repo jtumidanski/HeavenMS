@@ -62,7 +62,7 @@ public final class MonsterBook {
    }
 
    public void addCard(final MapleClient c, final int cardid) {
-      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), character -> PacketCreator.create(new ShowForeignCardEffect(c.getPlayer().getId())), false, c.getPlayer());
+      MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), new ShowForeignCardEffect(c.getPlayer().getId()), false, c.getPlayer());
 
       Integer qty;
       lock.lock();

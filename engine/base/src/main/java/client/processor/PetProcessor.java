@@ -85,7 +85,7 @@ public class PetProcessor {
             while (newCloseness >= ExpTable.getClosenessNeededForLevel(pet.level())) {
                pet.level_$eq((byte) (pet.level() + 1));
                PacketCreator.announce(owner, new ShowOwnPetLevelUp(slot));
-               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> PacketCreator.create(new ShowPetLevelUp(owner.getId(), slot)));
+               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new ShowPetLevelUp(owner.getId(), slot));
             }
          }
 

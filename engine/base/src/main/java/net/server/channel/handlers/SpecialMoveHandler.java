@@ -109,7 +109,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
             }
          }
          byte direction = ((MonsterMagnetPacket) packet).direction();   // thanks MedicOP for pointing some 3rd-party related issues with Magnet
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowBuffEffectWithLevel(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), 1, direction)), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowBuffEffectWithLevel(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), 1, direction), false, chr);
          PacketCreator.announce(client, new EnableActions());
          return;
       } else if (packet.skillId() == Brawler.MP_RECOVERY) {// MP Recovery
@@ -120,7 +120,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
             chr.addMP(gain);
          });
       } else if (packet.skillId() == SuperGM.HEAL_PLUS_DISPEL) {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ShowBuffEffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), (byte) 3)), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowBuffEffect(chr.getId(), packet.skillId(), chr.getSkillLevel(packet.skillId()), (byte) 3), false, chr);
       }
 
       Point pos = packet.position();

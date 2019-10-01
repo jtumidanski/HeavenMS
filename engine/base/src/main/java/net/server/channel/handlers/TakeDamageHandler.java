@@ -190,7 +190,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                         int finalBouncedamage = bouncedamage;
                         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(oid, finalBouncedamage), true, chr);
                         PacketCreator.announce(chr, new ShowOwnBuffEffect(id, 5));
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> PacketCreator.create(new ShowBuffEffect(chr.getId(), id, 5, (byte) 3)), false, chr);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowBuffEffect(chr.getId(), id, 5, (byte) 3), false, chr);
                      }
                   }
                }
