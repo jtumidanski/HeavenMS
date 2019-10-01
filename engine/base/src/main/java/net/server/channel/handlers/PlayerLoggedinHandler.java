@@ -82,6 +82,7 @@ import tools.packet.AfterLoginError;
 import tools.packet.alliance.AllianceMemberOnline;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.UpdateAllianceInfo;
+import tools.packet.guild.ShowGuildInfo;
 import tools.packet.parcel.DueyParcelNotification;
 import tools.packets.Wedding;
 
@@ -456,7 +457,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
          guild.getMGC(player.getId()).setCharacter(player);
          player.setMGC(guild.getMGC(player.getId()));
          server.setGuildMemberOnline(player, true, client.getChannel());
-         client.announce(MaplePacketCreator.showGuildInfo(player));
+         PacketCreator.announce(client, new ShowGuildInfo(player));
          loggingInAllianceOperations(client, server, player, newcomer);
       }, () -> {
          player.deleteGuild(player.getGuildId());

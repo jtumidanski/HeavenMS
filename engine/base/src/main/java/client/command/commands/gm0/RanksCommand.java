@@ -28,7 +28,8 @@ import client.MapleClient;
 import client.command.Command;
 import client.database.data.WorldRankData;
 import net.server.Server;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.guild.ShowPlayerRanks;
 
 public class RanksCommand extends Command {
    {
@@ -40,6 +41,6 @@ public class RanksCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       WorldRankData worldRanking = Server.getInstance().getWorldPlayerRanking(player.getWorld());
-      player.announce(MaplePacketCreator.showPlayerRanks(9010000, worldRanking.getUserRanks()));
+      PacketCreator.announce(player, new ShowPlayerRanks(9010000, worldRanking.getUserRanks()));
    }
 }

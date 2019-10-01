@@ -55,6 +55,8 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.alliance.GetGuildAlliances;
+import tools.packet.guild.ShowGuildInfo;
+import tools.packet.guild.UpdateGuildPoints;
 
 public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuildOperationPacket> {
    @Override
@@ -202,10 +204,10 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      client.announce(MaplePacketCreator.updateGP(mapleCharacter.getGuildId(), 0));
+      PacketCreator.announce(client, new UpdateGuildPoints(mapleCharacter.getGuildId(), 0));
       Server.getInstance().leaveGuild(mapleCharacter.getMGC());
 
-      client.announce(MaplePacketCreator.showGuildInfo(null));
+      PacketCreator.announce(client, new ShowGuildInfo(null));
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
@@ -244,7 +246,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      client.announce(MaplePacketCreator.showGuildInfo(mapleCharacter));
+      PacketCreator.announce(client, new ShowGuildInfo(mapleCharacter));
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {

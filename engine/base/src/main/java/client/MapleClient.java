@@ -100,6 +100,8 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.ChangeChannel;
+import tools.packet.PacketInput;
+import tools.packet.guild.ShowGuildInfo;
 import tools.packet.stat.EnableActions;
 
 public class MapleClient {
@@ -660,7 +662,7 @@ public class MapleClient {
                      }
                      player.getGuild().ifPresent(guild -> {
                         Server.getInstance().setGuildMemberOnline(player, false, player.getClient().getChannel());
-                        player.getClient().announce(MaplePacketCreator.showGuildInfo(player));
+                        PacketCreator.announce(player, new ShowGuildInfo(player));
 
                      });
                      if (bl != null) {

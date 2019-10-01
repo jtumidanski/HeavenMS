@@ -48,6 +48,17 @@ import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.guild.GuildCapacityChange;
+import tools.packet.guild.GuildDisband;
+import tools.packet.guild.GuildMemberChangeRank;
+import tools.packet.guild.GuildMemberLeft;
+import tools.packet.guild.GuildMemberLevelJobUpdate;
+import tools.packet.guild.GuildMemberOnline;
+import tools.packet.guild.GuildNotice;
+import tools.packet.guild.GuildRankTitleChange;
+import tools.packet.guild.NewGuildMember;
+import tools.packet.guild.ShowGuildInfo;
+import tools.packet.guild.UpdateGuildPoints;
 import tools.packet.statusinfo.GetGuildPointMessage;
 
 public class MapleGuild {
@@ -143,7 +154,7 @@ public class MapleGuild {
             GuildAdministrator.getInstance().deleteGuild(connection, this.id);
             membersLock.lock();
             try {
-               this.broadcast(MaplePacketCreator.guildDisband(this.id));
+               this.broadcast(PacketCreator.create(new GuildDisband(this.id)));
             } finally {
                membersLock.unlock();
             }
@@ -261,7 +272,7 @@ public class MapleGuild {
             continue;
          }
 
-         byte[] packet = MaplePacketCreator.showGuildInfo(chr.get());
+         byte[] packet = PacketCreator.create(new ShowGuildInfo(chr.get()));
          chr.get().announce(packet);
       }
    }
@@ -357,7 +368,7 @@ public class MapleGuild {
             }
          }
          if (bBroadcast) {
-            this.broadcast(MaplePacketCreator.guildMemberOnline(id, cid, online), cid);
+            this.broadcast(PacketCreator.create(new GuildMemberOnline(id, cid, online)), cid);
          }
          bDirty = true;
       } finally {
@@ -393,7 +404,7 @@ public class MapleGuild {
             }
          }
 
-         this.broadcast(MaplePacketCreator.newGuildMember(mgc));
+         this.broadcast(PacketCreator.create(new NewGuildMember(mgc.getGuildId(), mgc.getId(), mgc.getName(), mgc.getJobId(), mgc.getLevel(), mgc.getGuildRank(), mgc.isOnline())));
          return 1;
       } finally {
          membersLock.unlock();
@@ -403,7 +414,7 @@ public class MapleGuild {
    public void leaveGuild(MapleGuildCharacter mgc) {
       membersLock.lock();
       try {
-         this.broadcast(MaplePacketCreator.memberLeft(mgc, false));
+         this.broadcast(PacketCreator.create(new GuildMemberLeft(mgc.getGuildId(), mgc.getId(), mgc.getName(), false)));
          members.remove(mgc);
          bDirty = true;
       } finally {
@@ -418,7 +429,7 @@ public class MapleGuild {
          while (itr.hasNext()) {
             MapleGuildCharacter mgc = itr.next();
             if (mgc.getId() == cid && initiator.getGuildRank() < mgc.getGuildRank()) {
-               this.broadcast(MaplePacketCreator.memberLeft(mgc, true));
+               this.broadcast(PacketCreator.create(new GuildMemberLeft(mgc.getGuildId(), mgc.getId(), mgc.getName(), true)));
                itr.remove();
                bDirty = true;
                try {
@@ -472,7 +483,7 @@ public class MapleGuild {
 
       membersLock.lock();
       try {
-         this.broadcast(MaplePacketCreator.changeRank(mgc));
+         this.broadcast(PacketCreator.create(new GuildMemberChangeRank(mgc.getGuildId(), mgc.getId(), mgc.getGuildRank())));
       } finally {
          membersLock.unlock();
       }
@@ -484,7 +495,7 @@ public class MapleGuild {
 
       membersLock.lock();
       try {
-         this.broadcast(MaplePacketCreator.guildNotice(this.id, notice));
+         this.broadcast(PacketCreator.create(new GuildNotice(this.id, notice)));
       } finally {
          membersLock.unlock();
       }
@@ -497,7 +508,7 @@ public class MapleGuild {
             if (mgc.equals(member)) {
                member.setJobId(mgc.getJobId());
                member.setLevel(mgc.getLevel());
-               this.broadcast(MaplePacketCreator.guildMemberLevelJobUpdate(mgc));
+               this.broadcast(PacketCreator.create(new GuildMemberLevelJobUpdate(mgc.getGuildId(), mgc.getId(), mgc.getLevel(), mgc.getJobId())));
                break;
             }
          }
@@ -528,7 +539,7 @@ public class MapleGuild {
 
       membersLock.lock();
       try {
-         this.broadcast(MaplePacketCreator.rankTitleChange(this.id, ranks));
+         this.broadcast(PacketCreator.create(new GuildRankTitleChange(this.id, ranks)));
       } finally {
          membersLock.unlock();
       }
@@ -590,7 +601,7 @@ public class MapleGuild {
 
       membersLock.lock();
       try {
-         this.broadcast(MaplePacketCreator.guildCapacityChange(this.id, this.capacity));
+         this.broadcast(PacketCreator.create(new GuildCapacityChange(this.id, this.capacity)));
       } finally {
          membersLock.unlock();
       }
@@ -601,14 +612,14 @@ public class MapleGuild {
    public void gainGP(int amount) {
       this.gp += amount;
       this.writeToDB(false);
-      this.guildMessage(MaplePacketCreator.updateGP(this.id, this.gp));
+      this.guildMessage(PacketCreator.create(new UpdateGuildPoints(this.id, this.gp)));
       this.guildMessage(PacketCreator.create(new GetGuildPointMessage(amount)));
    }
 
    public void removeGP(int amount) {
       this.gp -= amount;
       this.writeToDB(false);
-      this.guildMessage(MaplePacketCreator.updateGP(this.id, this.gp));
+      this.guildMessage(PacketCreator.create(new UpdateGuildPoints(this.id, this.gp)));
    }
 
    public int getAllianceId() {

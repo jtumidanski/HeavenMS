@@ -17,6 +17,7 @@ import tools.packet.factory.CharacterNameResponsePacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
+import tools.packet.factory.GuildOperationPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
@@ -131,6 +132,8 @@ public class PacketCreator {
             return Optional.of(StatusInfoPacketFactory.getInstance());
          case SHOW_ITEM_GAIN_INCHAT:
             return Optional.of(ItemGainInChatPacketFactory.getInstance());
+         case GUILD_OPERATION:
+            return Optional.of(GuildOperationPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

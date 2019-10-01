@@ -105,6 +105,7 @@ import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.guild.GuildEmblemChange;
 import tools.packet.partyoperation.UpdateParty;
 import tools.packets.Fishing;
 
@@ -756,7 +757,8 @@ public class World {
 
    public void changeEmblem(int gid, List<Integer> affectedPlayers, MapleGuildSummary mgs) {
       updateGuildSummary(gid, mgs);
-      MasterBroadcaster.getInstance().sendToWorld(this, affectedPlayers, character -> MaplePacketCreator.guildEmblemChange(gid, mgs.getLogoBG(), mgs.getLogoBGColor(), mgs.getLogo(), mgs.getLogoColor()), true, -1);
+      MasterBroadcaster.getInstance().sendToWorld(this, affectedPlayers, character ->
+            PacketCreator.create(new GuildEmblemChange(gid, mgs.getLogoBG(), mgs.getLogoBGColor(), mgs.getLogo(), mgs.getLogoColor())), true, -1);
       setGuildAndRank(affectedPlayers, -1, -1, -1);   //respawn player
    }
 

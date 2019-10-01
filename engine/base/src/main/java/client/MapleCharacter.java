@@ -210,6 +210,7 @@ import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.foreigneffect.ShowRecovery;
+import tools.packet.guild.GenericGuildMessage;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.inventory.SlotLimitUpdate;
@@ -2838,7 +2839,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void genericGuildMessage(int code) {
-      this.client.announce(MaplePacketCreator.genericGuildMessage((byte) code));
+      PacketCreator.announce(client, new GenericGuildMessage((byte) code));
    }
 
    public int getAccountID() {

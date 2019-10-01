@@ -14,7 +14,9 @@ import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleMatchCheckerCoordinator;
 import net.server.guild.MapleGuildResponse;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.guild.GuildInvite;
+import tools.packet.guild.ShowGuildRanks;
 
 public class MapleGuildProcessor {
    private static MapleGuildProcessor ourInstance = new MapleGuildProcessor();
@@ -51,7 +53,7 @@ public class MapleGuildProcessor {
 
       MapleCharacter sender = c.getPlayer();
       if (MapleInviteCoordinator.createInvite(MapleInviteCoordinator.InviteType.GUILD, sender, sender.getGuildId(), mc.get().getId())) {
-         mc.get().getClient().announce(MaplePacketCreator.guildInvite(sender.getGuildId(), sender.getName()));
+         PacketCreator.announce(mc.get(), new GuildInvite(sender.getGuildId(), sender.getName()));
          return null;
       } else {
          return MapleGuildResponse.MANAGING_INVITE;
@@ -96,7 +98,7 @@ public class MapleGuildProcessor {
    }
 
    public void displayGuildRanks(MapleClient c, int npcid) {
-      DatabaseConnection.getInstance().withConnection(connection -> c.announce(MaplePacketCreator.showGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection))));
+      DatabaseConnection.getInstance().withConnection(connection -> c.announce(PacketCreator.create(new ShowGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection)))));
    }
 
    public int getIncreaseGuildCost(int size) {
