@@ -5,6 +5,8 @@ import java.awt.Point;
 import client.MapleCharacter;
 import client.MapleClient;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.spawn.SpawnKite;
 
 public class MapleKite extends AbstractMapleMapObject {
 
@@ -52,7 +54,7 @@ public class MapleKite extends AbstractMapleMapObject {
    }
 
    public final byte[] makeSpawnData() {
-      return MaplePacketCreator.spawnKite(getObjectId(), itemid, owner.getName(), text, pos, ft);
+      return PacketCreator.create(new SpawnKite(getObjectId(), itemid, owner.getName(), text, pos, ft));
    }
 
    public final byte[] makeDestroyData() {

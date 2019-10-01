@@ -80,6 +80,8 @@ import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.showitemgaininchat.ShowInfo;
 import tools.packet.showitemgaininchat.ShowIntro;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
+import tools.packet.spawn.SpawnGuide;
+import tools.packet.spawn.SpawnNPC;
 import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.GetItemMessage;
 import tools.packet.statusinfo.ShowInfoText;
@@ -970,7 +972,7 @@ public class AbstractPlayerInteraction {
          npc.setRx1(pos.x - 50);
          npc.setFh(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.spawnNPC(npc));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
       }
    }
 
@@ -989,11 +991,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void spawnGuide() {
-      c.announce(MaplePacketCreator.spawnGuide(true));
+      PacketCreator.announce(c, new SpawnGuide(true));
    }
 
    public void removeGuide() {
-      c.announce(MaplePacketCreator.spawnGuide(false));
+      PacketCreator.announce(c, new SpawnGuide(false));
    }
 
    public void displayGuide(int num) {

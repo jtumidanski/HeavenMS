@@ -77,9 +77,15 @@ import tools.IntervalBuilder;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.spawn.ControlMonster;
+import tools.packet.spawn.SpawnFakeMonster;
+import tools.packet.spawn.SpawnMonster;
+import tools.packet.spawn.SpawnSummon;
+import tools.packet.spawn.StopMonsterControl;
 
 public class MapleMonster extends AbstractLoadedMapleLife {
 
@@ -165,7 +171,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private static void aggroMonsterControl(MapleClient c, MapleMonster mob, boolean immediateAggro) {
-      c.announce(MaplePacketCreator.controlMonster(mob, false, immediateAggro));
+      PacketCreator.announce(c, new ControlMonster(mob, false, immediateAggro));
 
       // thanks BHB for noticing puppets disrupting mobstatuses for bowmans
       mob.announceMonsterStatus(c);
@@ -1068,9 +1074,9 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          return;
       }
       if (fake) {
-         client.announce(MaplePacketCreator.spawnFakeMonster(this, 0));
+         PacketCreator.announce(client, new SpawnFakeMonster(this, 0));
       } else {
-         client.announce(MaplePacketCreator.spawnMonster(this, false));
+         PacketCreator.announce(client, new SpawnMonster(this, false));
       }
 
       announceMonsterStatus(client);
@@ -1901,7 +1907,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
 
       if (chrController != null) { // this can/should only happen when a hidden gm attacks the monster
-         chrController.announce(MaplePacketCreator.stopControllingMonster(this.getObjectId()));
+         PacketCreator.announce(chrController, new StopMonsterControl(this.getObjectId()));
          chrController.stopControllingMonster(this);
       }
 
@@ -2116,7 +2122,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
 
       for (MapleMonster mob : puppetControlled) {
-         chrController.announce(MaplePacketCreator.stopControllingMonster(mob.getObjectId()));
+         PacketCreator.announce(chrController, new StopMonsterControl(mob.getObjectId()));
       }
       chrController.announce(MaplePacketCreator.removeSummon(puppet, false));
 
@@ -2124,7 +2130,9 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       for (MapleMonster mob : puppetControlled) {
          aggroMonsterControl(c, mob, mob.isControllerKnowsAboutAggro());
       }
-      chrController.announce(MaplePacketCreator.spawnSummon(puppet, false));
+      PacketCreator.announce(chrController, new SpawnSummon(puppet.getOwner().getId(), puppet.getObjectId(),
+            puppet.getSkill(), puppet.getSkillLevel(), puppet.getPosition(), puppet.getStance(),
+            puppet.getMovementType().getValue(), puppet.isPuppet(), false));
    }
 
    public void aggroUpdatePuppetVisibility() {
@@ -2155,8 +2163,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
                if (controllerHasPuppet) {
                   controllerHasPuppet = false;
-
-                  chrController.announce(MaplePacketCreator.stopControllingMonster(MapleMonster.this.getObjectId()));
+                  PacketCreator.announce(chrController, new StopMonsterControl(MapleMonster.this.getObjectId()));
                   aggroMonsterControl(chrController.getClient(), MapleMonster.this, MapleMonster.this.isControllerHasAggro());
                }
             } finally {

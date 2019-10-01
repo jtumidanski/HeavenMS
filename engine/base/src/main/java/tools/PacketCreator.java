@@ -39,6 +39,7 @@ import tools.packet.factory.SelectWorldPacketFactory;
 import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
 import tools.packet.factory.ServerStatusPacketFactory;
+import tools.packet.factory.SpawnPacketFactory;
 import tools.packet.factory.StatUpdatePacketFactory;
 import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
@@ -160,6 +161,22 @@ public class PacketCreator {
          case FAMILY_JOIN_ACCEPTED:
          case FAMILY_REP_GAIN:
             return Optional.of(FamilyPacketFactory.getInstance());
+         case SPAWN_PORTAL:
+         case SPAWN_DOOR:
+         case REMOVE_DOOR:
+         case SPAWN_SPECIAL_MAPOBJECT:
+         case SPAWN_NPC:
+         case SPAWN_NPC_REQUEST_CONTROLLER:
+         case SPAWN_MONSTER_CONTROL:
+         case SPAWN_MONSTER:
+         case SPAWN_PLAYER:
+         case SPAWN_KITE:
+         case SPAWN_MIST:
+         case SPAWN_PET:
+         case SPAWN_HIRED_MERCHANT:
+         case SPAWN_GUIDE:
+         case SPAWN_DRAGON:
+            return Optional.of(SpawnPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

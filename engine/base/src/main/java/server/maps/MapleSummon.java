@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.SkillFactory;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.spawn.SpawnSummon;
 
 /**
  * @author Jan
@@ -43,7 +45,9 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
 
       SkillFactory.getSkill(skillId).ifPresent(skill -> {
          this.skillLevel = owner.getSkillLevel(skill);
-         if (skillLevel == 0) throw new RuntimeException();
+         if (skillLevel == 0) {
+            throw new RuntimeException();
+         }
 
          this.movementType = movementType;
          setPosition(pos);
@@ -52,7 +56,9 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
 
    @Override
    public void sendSpawnData(MapleClient client) {
-      client.announce(MaplePacketCreator.spawnSummon(this, false));
+      PacketCreator.announce(client, new SpawnSummon(getOwner().getId(), getObjectId(),
+            getSkill(), getSkillLevel(), getPosition(), getStance(),
+            getMovementType().getValue(), isPuppet(), false));
    }
 
    @Override

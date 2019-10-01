@@ -224,6 +224,9 @@ import tools.packet.quest.info.UpdateQuestInfo;
 import tools.packet.showitemgaininchat.ShowOwnBerserk;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.showitemgaininchat.ShowOwnRecovery;
+import tools.packet.spawn.ShowPet;
+import tools.packet.spawn.SpawnPlayer;
+import tools.packet.spawn.SpawnSummon;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
 import tools.packet.stat.UpdatePlayerStats;
@@ -977,7 +980,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             getMap().broadcastSpawnPlayerMapObjectMessage(this, this, false);
 
             for (MapleSummon ms : this.getSummonsValues()) {
-               getMap().broadcastNONGMMessage(this, MaplePacketCreator.spawnSummon(ms, false), false);
+               getMap().broadcastNONGMMessage(this,
+                     PacketCreator.create(
+                           new SpawnSummon(ms.getOwner().getId(), ms.getObjectId(), ms.getSkill(), ms.getSkillLevel(),
+                                 ms.getPosition(), ms.getStance(), ms.getMovementType().getValue(), ms.isPuppet(), false)
+                     ), false);
             }
          } else {
             this.hidden = true;
@@ -7708,7 +7715,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       this.getClient().getWorldServer().unregisterPetHunger(this, petIdx);
-      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.showPet(this, pet, true, hunger), true, this);
+      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowPet(this, pet, true, hunger), true, this);
 
       removePet(pet, shift_left);
       commitExcludedItems();
@@ -7987,7 +7994,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    @Override
    public void sendSpawnData(MapleClient client) {
       if (!this.isHidden() || client.getPlayer().gmLevel() > 1) {
-         client.announce(MaplePacketCreator.spawnPlayerMapObject(client, this, false));
+         PacketCreator.announce(client, new SpawnPlayer(client, this, false));
 
          if (buffEffects.containsKey(ChairProcessor.getInstance().getJobMapChair(job))) { // mustn't effLock, chrLock this function
             client.announce(MaplePacketCreator.giveForeignChairSkillEffect(id));

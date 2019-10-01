@@ -68,6 +68,7 @@ import tools.packet.playerinteraction.MerchantOwnerLeave;
 import tools.packet.playerinteraction.MerchantVisitorAdd;
 import tools.packet.playerinteraction.MerchantVisitorLeave;
 import tools.packet.playerinteraction.UpdateHiredMerchant;
+import tools.packet.spawn.SpawnHiredMerchant;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -648,7 +649,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
 
    @Override
    public void sendSpawnData(MapleClient client) {
-      client.announce(MaplePacketCreator.spawnHiredMerchantBox(this));
+      PacketCreator.announce(client, new SpawnHiredMerchant(this));
    }
 
 }

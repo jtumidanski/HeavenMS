@@ -31,6 +31,9 @@ import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.partyoperation.PartyPortal;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
+import tools.packet.spawn.RemoveDoor;
+import tools.packet.spawn.SpawnDoor;
+import tools.packet.spawn.SpawnPortal;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -113,9 +116,9 @@ public class MapleDoorObject extends AbstractMapleMapObject {
             PacketCreator.announce(client, new PartyPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
          }
 
-         chr.announce(MaplePacketCreator.spawnPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
+         PacketCreator.announce(chr, new SpawnPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
          if (!this.inTown()) {
-            chr.announce(MaplePacketCreator.spawnDoor(this.getOwnerId(), this.getPosition(), launched));
+            PacketCreator.announce(chr, new SpawnDoor(this.getOwnerId(), this.getPosition(), launched));
          }
       }
    }
@@ -128,14 +131,14 @@ public class MapleDoorObject extends AbstractMapleMapObject {
          if (party != null && (ownerId == chr.getId() || party.getMemberById(ownerId) != null)) {
             PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
          }
-         client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
+         PacketCreator.announce(client, new RemoveDoor(ownerId, inTown()));
       }
    }
 
    public void sendDestroyData(MapleClient client, boolean partyUpdate) {
       if (client != null && from.getId() == client.getPlayer().getMapId()) {
          PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
-         client.announce(MaplePacketCreator.removeDoor(ownerId, inTown()));
+         PacketCreator.announce(client, new RemoveDoor(ownerId, inTown()));
       }
    }
 

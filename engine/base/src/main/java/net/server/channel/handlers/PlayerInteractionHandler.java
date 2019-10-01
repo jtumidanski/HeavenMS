@@ -109,6 +109,7 @@ import tools.packet.playerinteraction.MiniGameClose;
 import tools.packet.playerinteraction.PlayerShopItemUpdate;
 import tools.packet.playerinteraction.TradeItemAdd;
 import tools.packet.playerinteraction.UpdateHiredMerchant;
+import tools.packet.spawn.SpawnHiredMerchant;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -702,7 +703,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          merchant.setOpen(true);
          chr.getMap().addMapObject(merchant);
          chr.setHiredMerchant(null);
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.spawnHiredMerchantBox(merchant));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new SpawnHiredMerchant(merchant));
       }
    }
 
@@ -739,7 +740,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          merchant.setOpen(true);
          chr.getMap().addMapObject(merchant);
          chr.setHiredMerchant(null);
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.spawnHiredMerchantBox(merchant));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new SpawnHiredMerchant(merchant));
       }
    }
 

@@ -34,6 +34,8 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.spawn.RemoveNPCController;
+import tools.packet.spawn.SpawnPlayerNPC;
 
 /**
  * @author RonanLana
@@ -103,7 +105,7 @@ public class MaplePlayerNPCPodium {
 
             for (MaplePlayerNPC pn : playerNpcs) {
                m.removeMapObject(pn);
-               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removeNPCController(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
                MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
             }
          }
@@ -115,7 +117,7 @@ public class MaplePlayerNPCPodium {
 
             for (MaplePlayerNPC pn : playerNpcs) {
                m.addPlayerNPCMapObject(pn);
-               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.spawnPlayerNPC(pn));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new SpawnPlayerNPC(pn));
                MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.getPlayerNPC(pn));
             }
          }

@@ -54,7 +54,6 @@ import net.server.world.MaplePartyCharacter;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.worker.EventScriptScheduler;
 import server.MapleItemInformationProvider;
-import server.maps.MaplePortal;
 import server.MapleStatEffect;
 import server.ThreadManager;
 import server.TimerManager;
@@ -64,10 +63,12 @@ import server.life.MapleMonster;
 import server.life.MapleNPC;
 import server.maps.MapleMap;
 import server.maps.MapleMapManager;
+import server.maps.MaplePortal;
 import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.Pair;
+import tools.packet.spawn.SpawnNPC;
 
 /**
  * @author Matze
@@ -178,7 +179,9 @@ public class EventInstanceManager {
    }
 
    public void giveEventPlayersExp(int gain, int mapId) {
-      if (gain == 0) return;
+      if (gain == 0) {
+         return;
+      }
 
       List<MapleCharacter> players = getPlayerList();
 
@@ -188,7 +191,9 @@ public class EventInstanceManager {
          }
       } else {
          for (MapleCharacter mc : players) {
-            if (mc.getMapId() == mapId) mc.gainExp(gain * mc.getExpRate(), true, true);
+            if (mc.getMapId() == mapId) {
+               mc.gainExp(gain * mc.getExpRate(), true, true);
+            }
          }
       }
    }
@@ -198,7 +203,9 @@ public class EventInstanceManager {
    }
 
    public void giveEventPlayersMeso(int gain, int mapId) {
-      if (gain == 0) return;
+      if (gain == 0) {
+         return;
+      }
 
       List<MapleCharacter> players = getPlayerList();
 
@@ -208,7 +215,9 @@ public class EventInstanceManager {
          }
       } else {
          for (MapleCharacter mc : players) {
-            if (mc.getMapId() == mapId) mc.gainMeso(gain * mc.getMesoRate());
+            if (mc.getMapId() == mapId) {
+               mc.gainMeso(gain * mc.getMesoRate());
+            }
          }
       }
 
@@ -610,7 +619,9 @@ public class EventInstanceManager {
    }
 
    public synchronized void dispose(boolean shutdown) {    // should not trigger any event script method after disposed
-      if (disposed) return;
+      if (disposed) {
+         return;
+      }
 
       try {
          invokeScriptFunction("dispose", EventInstanceManager.this);
@@ -645,7 +656,9 @@ public class EventInstanceManager {
 
       sL.lock();
       try {
-         if (!eventCleared) em.disposeInstance(name);
+         if (!eventCleared) {
+            em.disposeInstance(name);
+         }
       } finally {
          sL.unlock();
       }
@@ -884,7 +897,7 @@ public class EventInstanceManager {
          npc.setRx1(pos.x - 50);
          npc.setFh(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.spawnNPC(npc));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
       }
    }
 
@@ -934,12 +947,16 @@ public class EventInstanceManager {
    }
 
    public Integer getClearStageExp(int stage) {    //stage counts from ONE.
-      if (stage > onMapClearExp.size()) return 0;
+      if (stage > onMapClearExp.size()) {
+         return 0;
+      }
       return onMapClearExp.get(stage - 1);
    }
 
    public Integer getClearStageMeso(int stage) {   //stage counts from ONE.
-      if (stage > onMapClearMeso.size()) return 0;
+      if (stage > onMapClearMeso.size()) {
+         return 0;
+      }
       return onMapClearMeso.get(stage - 1);
    }
 
@@ -985,7 +1002,9 @@ public class EventInstanceManager {
    public final void setEventRewards(int eventLevel, List<Object> rwds, List<Object> qtys, int expGiven) {
       // fixed EXP will be rewarded at the same time the random item is given
 
-      if (eventLevel <= 0 || eventLevel > ServerConstants.MAX_EVENT_LEVELS) return;
+      if (eventLevel <= 0 || eventLevel > ServerConstants.MAX_EVENT_LEVELS) {
+         return;
+      }
       eventLevel--;    //event level starts from 1
 
       List<Integer> rewardIds = convertToIntegerArray(rwds);
@@ -1003,7 +1022,9 @@ public class EventInstanceManager {
    }
 
    private byte getRewardListRequirements(int level) {
-      if (level >= collectionSet.size()) return 0;
+      if (level >= collectionSet.size()) {
+         return 0;
+      }
 
       byte rewardTypes = 0;
       List<Integer> list = collectionSet.get(level);
@@ -1020,8 +1041,9 @@ public class EventInstanceManager {
 
       //iterating over all valid inventory types
       for (byte type = 1; type <= 5; type++) {
-         if ((listReq >> type) % 2 == 1 && !player.hasEmptySlot(type))
+         if ((listReq >> type) % 2 == 1 && !player.hasEmptySlot(type)) {
             return false;
+         }
       }
 
       return true;
@@ -1039,7 +1061,9 @@ public class EventInstanceManager {
       rL.lock();
       try {
          eventLevel--;       //event level starts counting from 1
-         if (eventLevel >= collectionSet.size()) return true;
+         if (eventLevel >= collectionSet.size()) {
+            return true;
+         }
 
          rewardsSet = collectionSet.get(eventLevel);
          rewardsQty = collectionQty.get(eventLevel);
@@ -1049,20 +1073,28 @@ public class EventInstanceManager {
          rL.unlock();
       }
 
-      if (rewardExp == null) rewardExp = 0;
+      if (rewardExp == null) {
+         rewardExp = 0;
+      }
 
       if (rewardsSet == null || rewardsSet.isEmpty()) {
-         if (rewardExp > 0) player.gainExp(rewardExp);
+         if (rewardExp > 0) {
+            player.gainExp(rewardExp);
+         }
          return true;
       }
 
-      if (!hasRewardSlot(player, eventLevel)) return false;
+      if (!hasRewardSlot(player, eventLevel)) {
+         return false;
+      }
 
       AbstractPlayerInteraction api = player.getAbstractPlayerInteraction();
       int rnd = (int) Math.floor(Math.random() * rewardsSet.size());
 
       api.gainItem(rewardsSet.get(rnd), rewardsQty.get(rnd).shortValue());
-      if (rewardExp > 0) player.gainExp(rewardExp);
+      if (rewardExp > 0) {
+         player.gainExp(rewardExp);
+      }
       return true;
    }
 
@@ -1118,16 +1150,22 @@ public class EventInstanceManager {
 
    private boolean isEventTeamLeaderOn() {
       for (MapleCharacter chr : getPlayers()) {
-         if (chr.getId() == getLeaderId()) return true;
+         if (chr.getId() == getLeaderId()) {
+            return true;
+         }
       }
 
       return false;
    }
 
    public final boolean checkEventTeamLacking(boolean leavingEventMap, int minPlayers) {
-      if (eventCleared && getPlayerCount() > 1) return false;
+      if (eventCleared && getPlayerCount() > 1) {
+         return false;
+      }
 
-      if (!eventCleared && leavingEventMap && !isEventTeamLeaderOn()) return true;
+      if (!eventCleared && leavingEventMap && !isEventTeamLeaderOn()) {
+         return true;
+      }
       return getPlayerCount() < minPlayers;
    }
 
@@ -1145,7 +1183,9 @@ public class EventInstanceManager {
       if (eventCleared) {
          return leavingEventMap && getPlayerCount() <= 1;
       } else {
-         if (leavingEventMap && getLeaderId() == quitter.getId()) return true;
+         if (leavingEventMap && getLeaderId() == quitter.getId()) {
+            return true;
+         }
          return getPlayerCount() <= minPlayers;
       }
 
@@ -1154,7 +1194,9 @@ public class EventInstanceManager {
    public final boolean isEventTeamTogether() {
       rL.lock();
       try {
-         if (chars.size() <= 1) return true;
+         if (chars.size() <= 1) {
+            return true;
+         }
 
          Iterator<MapleCharacter> iterator = chars.values().iterator();
          MapleCharacter mc = iterator.next();
@@ -1162,7 +1204,9 @@ public class EventInstanceManager {
 
          for (; iterator.hasNext(); ) {
             mc = iterator.next();
-            if (mc.getMapId() != mapId) return false;
+            if (mc.getMapId() != mapId) {
+               return false;
+            }
          }
 
          return true;
@@ -1175,8 +1219,9 @@ public class EventInstanceManager {
       List<MapleCharacter> players = getPlayerList();
 
       for (MapleCharacter chr : players) {
-         if (chr.getMapId() == warpFrom)
+         if (chr.getMapId() == warpFrom) {
             chr.changeMap(warpTo);
+         }
       }
    }
 
@@ -1192,8 +1237,9 @@ public class EventInstanceManager {
       List<MapleCharacter> players = getPlayerList();
 
       for (MapleCharacter chr : players) {
-         if (chr.getMapId() == warpFrom)
+         if (chr.getMapId() == warpFrom) {
             chr.changeMap(warpTo, toSp);
+         }
       }
    }
 
@@ -1248,7 +1294,9 @@ public class EventInstanceManager {
 
    public final void showClearEffect(boolean hasGate) {
       MapleCharacter leader = getLeader();
-      if (leader != null) showClearEffect(hasGate, leader.getMapId());
+      if (leader != null) {
+         showClearEffect(hasGate, leader.getMapId());
+      }
    }
 
    public final void showClearEffect(int mapId) {
@@ -1377,7 +1425,9 @@ public class EventInstanceManager {
    }
 
    public boolean activatedAllReactorsOnMap(MapleMap map, int minReactorId, int maxReactorId) {
-      if (map == null) return true;
+      if (map == null) {
+         return true;
+      }
 
       for (MapleReactor mr : map.getReactorsByIdRange(minReactorId, maxReactorId)) {
          if (mr.getReactorType() != -1) {

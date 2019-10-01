@@ -109,6 +109,15 @@ import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.monster.carnival.MonsterCarnivalStart;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
+import tools.packet.spawn.MakeMonsterReal;
+import tools.packet.spawn.RemoveNPCController;
+import tools.packet.spawn.ShowPet;
+import tools.packet.spawn.SpawnDragon;
+import tools.packet.spawn.SpawnFakeMonster;
+import tools.packet.spawn.SpawnMonster;
+import tools.packet.spawn.SpawnNPC;
+import tools.packet.spawn.SpawnPlayer;
+import tools.packet.spawn.SpawnSummon;
 
 public class MapleMap {
 
@@ -1597,7 +1606,7 @@ public class MapleMap {
       try {
          for (MapleMapObject obj : npcs) {
             if (((MapleNPC) obj).getId() == npcid) {
-               MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeNPCController(obj.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(this, new RemoveNPCController(obj.getObjectId()));
                MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeNPC(obj.getObjectId()));
 
                this.mapobjects.remove(obj.getObjectId());
@@ -1728,7 +1737,7 @@ public class MapleMap {
       spawnAndAddRangedMapObject(monster, new DelayedPacketCreation() {
          @Override
          public void sendPackets(MapleClient c) {
-            c.announce(MaplePacketCreator.spawnMonster(monster, false));
+            PacketCreator.announce(c, new SpawnMonster(monster, false));
          }
       });
 
@@ -1828,7 +1837,7 @@ public class MapleMap {
       spawnAndAddRangedMapObject(monster, new DelayedPacketCreation() {
          @Override
          public void sendPackets(MapleClient c) {
-            c.announce(MaplePacketCreator.spawnMonster(monster, true));
+            PacketCreator.announce(c, new SpawnMonster(monster, true));
          }
       }, null);
 
@@ -1894,7 +1903,7 @@ public class MapleMap {
       spawnAndAddRangedMapObject(monster, new DelayedPacketCreation() {
          @Override
          public void sendPackets(MapleClient c) {
-            c.announce(MaplePacketCreator.spawnMonster(monster, true, effect));
+            PacketCreator.announce(c, new SpawnMonster(monster, true, effect));
          }
       });
 
@@ -1912,12 +1921,7 @@ public class MapleMap {
    public void spawnFakeMonster(final MapleMonster monster) {
       monster.setMap(this);
       monster.setFake(true);
-      spawnAndAddRangedMapObject(monster, new DelayedPacketCreation() {
-         @Override
-         public void sendPackets(MapleClient c) {
-            c.announce(MaplePacketCreator.spawnFakeMonster(monster, 0));
-         }
-      });
+      spawnAndAddRangedMapObject(monster, c -> PacketCreator.announce(c, new SpawnFakeMonster(monster, 0)));
 
       spawnedMonstersOnMap.incrementAndGet();
       addSelfDestructive(monster);
@@ -1925,19 +1929,14 @@ public class MapleMap {
 
    public void makeMonsterReal(final MapleMonster monster) {
       monster.setFake(false);
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.makeMonsterReal(monster));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, new MakeMonsterReal(monster));
 
       monster.aggroUpdateController();
    }
 
    public void spawnReactor(final MapleReactor reactor) {
       reactor.setMap(this);
-      spawnAndAddRangedMapObject(reactor, new DelayedPacketCreation() {
-         @Override
-         public void sendPackets(MapleClient c) {
-            c.announce(reactor.makeSpawnData());
-         }
-      });
+      spawnAndAddRangedMapObject(reactor, c -> c.announce(reactor.makeSpawnData()));
    }
 
    public void spawnDoor(final MapleDoorObject door) {
@@ -1973,7 +1972,9 @@ public class MapleMap {
          @Override
          public void sendPackets(MapleClient c) {
             if (summon != null) {
-               c.announce(MaplePacketCreator.spawnSummon(summon, true));
+               PacketCreator.announce(c, new SpawnSummon(summon.getOwner().getId(), summon.getObjectId(),
+                     summon.getSkill(), summon.getSkillLevel(), summon.getPosition(), summon.getStance(),
+                     summon.getMovementType().getValue(), summon.isPuppet(), true));
             }
          }
       }, null);
@@ -2406,7 +2407,7 @@ public class MapleMap {
             .filter(Objects::nonNull)
             .forEach(pet -> {
                pet.pos_$eq(getGroundBelow(chr.getPosition()));
-               chr.announce(MaplePacketCreator.showPet(chr, pet, false, false));
+               PacketCreator.announce(chr, new ShowPet(chr, pet, false, false));
             });
       chr.commitExcludedItems();  // thanks OishiiKawaiiDesu for noticing pet item ignore registry erasing upon changing maps
 
@@ -2479,9 +2480,9 @@ public class MapleMap {
          dragon.setPosition(chr.getPosition());
          this.addMapObject(dragon);
          if (chr.isHidden()) {
-            this.broadcastGMMessage(chr, MaplePacketCreator.spawnDragon(dragon));
+            this.broadcastGMMessage(chr, PacketCreator.create(new SpawnDragon(dragon)));
          } else {
-            this.broadcastMessage(chr, MaplePacketCreator.spawnDragon(dragon));
+            this.broadcastMessage(chr, PacketCreator.create(new SpawnDragon(dragon)));
          }
       }
 
@@ -2716,14 +2717,14 @@ public class MapleMap {
             for (MapleCharacter chr : characters) {
                if (chr.isGM()) {
                   if (chr != source) {
-                     chr.announce(MaplePacketCreator.spawnPlayerMapObject(chr.getClient(), player, enteringField));
+                     PacketCreator.announce(chr, new SpawnPlayer(chr.getClient(), player, enteringField));
                   }
                }
             }
          } else {
             for (MapleCharacter chr : characters) {
                if (chr != source) {
-                  chr.announce(MaplePacketCreator.spawnPlayerMapObject(chr.getClient(), player, enteringField));
+                  PacketCreator.announce(chr, new SpawnPlayer(chr.getClient(), player, enteringField));
                }
             }
          }
@@ -3591,7 +3592,7 @@ public class MapleMap {
                   npc.setHide(!npc.isHidden());
                   if (!npc.isHidden()) //Should only be hidden upon changing maps
                   {
-                     MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.spawnNPC(npc));
+                     MasterBroadcaster.getInstance().sendToAllInMap(this, new SpawnNPC(npc));
                   }
                }
             }

@@ -24,6 +24,8 @@ package server.maps;
 import client.MapleCharacter;
 import client.MapleClient;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.spawn.SpawnDragon;
 
 
 public class MapleDragon extends AbstractAnimatedMapleMapObject {
@@ -45,7 +47,7 @@ public class MapleDragon extends AbstractAnimatedMapleMapObject {
 
    @Override
    public void sendSpawnData(MapleClient client) {
-      client.announce(MaplePacketCreator.spawnDragon(this));
+      PacketCreator.announce(client, new SpawnDragon(this));
    }
 
    @Override

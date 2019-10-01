@@ -2,12 +2,14 @@ package tools.packet.factory;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.function.Function;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.Ring;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -17,6 +19,7 @@ import constants.ExpTable;
 import constants.GameConstants;
 import constants.ItemConstants;
 import server.MapleItemInformationProvider;
+import server.maps.MapleMiniGame;
 import tools.PacketFactory;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -276,6 +279,63 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
       mplew.writeLong(getTime(-2));
       mplew.writeInt(-1);
+   }
 
+   protected void addAnnounceBox(final MaplePacketLittleEndianWriter mplew, MapleMiniGame game, int ammount, int joinable) {
+      mplew.write(game.getGameType().getValue());
+      mplew.writeInt(game.getObjectId()); // gameid/shopid
+      mplew.writeMapleAsciiString(game.getDescription()); // desc
+      mplew.writeBool(!game.getPassword().isEmpty());    // password here, thanks GabrielSin!
+      mplew.write(game.getPieceType());
+      mplew.write(ammount);
+      mplew.write(2);         //player capacity
+      mplew.write(joinable);
+   }
+
+   protected void addRingLook(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr, boolean crush) {
+      List<Ring> rings;
+      if (crush) {
+         rings = chr.getCrushRings();
+      } else {
+         rings = chr.getFriendshipRings();
+      }
+      boolean yes = false;
+      for (Ring ring : rings) {
+         if (ring.isEquipped()) {
+            if (!yes) {
+               yes = true;
+               mplew.write(1);
+            }
+            mplew.writeInt(ring.ringId());
+            mplew.writeInt(0);
+            mplew.writeInt(ring.partnerRingId());
+            mplew.writeInt(0);
+            mplew.writeInt(ring.itemId());
+         }
+      }
+      if (!yes) {
+         mplew.write(0);
+      }
+   }
+
+   protected void addMarriageRingLook(MapleClient target, final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      Ring ring = chr.getMarriageRing();
+
+      if (ring == null || !ring.isEquipped()) {
+         mplew.write(0);
+      } else {
+         mplew.write(1);
+
+         MapleCharacter targetChr = target.getPlayer();
+         if (targetChr != null && targetChr.getPartnerId() == chr.getId()) {
+            mplew.writeInt(0);
+            mplew.writeInt(0);
+         } else {
+            mplew.writeInt(chr.getId());
+            mplew.writeInt(ring.partnerId());
+         }
+
+         mplew.writeInt(ring.itemId());
+      }
    }
 }

@@ -37,6 +37,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.spawn.ShowPet;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
 
@@ -95,7 +96,7 @@ public class SpawnPetProcessor {
                pet.summoned_$eq(true);
                PetProcessor.getInstance().saveToDb(pet);
                chr.addPet(pet);
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.showPet(c.getPlayer(), pet, false, false), true, chr);
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowPet(c.getPlayer(), pet, false, false), true, chr);
                PacketCreator.announce(c, new UpdatePetStats(c.getPlayer().getPets()));
                PacketCreator.announce(c, new EnableActions());
                chr.commitExcludedItems();
