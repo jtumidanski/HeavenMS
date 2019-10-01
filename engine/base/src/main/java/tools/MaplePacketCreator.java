@@ -1295,30 +1295,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   /**
-    * Guild Name & Mark update packet, thanks to Arnah (Vertisy)
-    *
-    * @param guildName The Guild name, blank for nothing.
-    */
-   public static byte[] guildNameChanged(int chrid, String guildName) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.GUILD_NAME_CHANGED.getValue());
-      mplew.writeInt(chrid);
-      mplew.writeMapleAsciiString(guildName);
-      return mplew.getPacket();
-   }
-
-   public static byte[] guildMarkChanged(int chrid, MapleGuild guild) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.GUILD_MARK_CHANGED.getValue());
-      mplew.writeInt(chrid);
-      mplew.writeShort(guild.getLogoBG());
-      mplew.write(guild.getLogoBGColor());
-      mplew.writeShort(guild.getLogo());
-      mplew.write(guild.getLogoColor());
-      return mplew.getPacket();
-   }
-
    private static void writeForeignBuffs(MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
       mplew.writeInt(0);
       mplew.writeShort(0); //v83
@@ -4172,22 +4148,6 @@ public class MaplePacketCreator {
       mplew.writeInt(isOnline ? ((chr.isAwayFromWorld() || chr.getCashShop().isOpened()) ? -1 : chr.getClient().getChannel() - 1) : 0);
       mplew.writeInt(isOnline ? (int) (chr.getLoggedInTime() / 60000) : 0); //time online in minutes
       mplew.writeMapleAsciiString(entry.getName()); //name
-   }
-
-   public static byte[] addCard(boolean full, int cardid, int level) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.MONSTER_BOOK_SET_CARD.getValue());
-      mplew.write(full ? 0 : 1);
-      mplew.writeInt(cardid);
-      mplew.writeInt(level);
-      return mplew.getPacket();
-   }
-
-   public static byte[] changeCover(int cardid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.MONSTER_BOOK_SET_COVER.getValue());
-      mplew.writeInt(cardid);
-      return mplew.getPacket();
    }
 
    public static byte[] aranGodlyStats() {

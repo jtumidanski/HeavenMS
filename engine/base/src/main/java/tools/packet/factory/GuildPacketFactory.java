@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import java.util.Collection;
-import java.util.List;
 
 import client.MapleCharacter;
 import client.database.data.GlobalUserRank;
@@ -18,10 +17,12 @@ import tools.packet.guild.GuildCapacityChange;
 import tools.packet.guild.GuildDisband;
 import tools.packet.guild.GuildEmblemChange;
 import tools.packet.guild.GuildInvite;
+import tools.packet.guild.GuildMarkChanged;
 import tools.packet.guild.GuildMemberChangeRank;
 import tools.packet.guild.GuildMemberLeft;
 import tools.packet.guild.GuildMemberLevelJobUpdate;
 import tools.packet.guild.GuildMemberOnline;
+import tools.packet.guild.GuildNameChange;
 import tools.packet.guild.GuildNotice;
 import tools.packet.guild.GuildQuestWaitingNotice;
 import tools.packet.guild.GuildRankTitleChange;
@@ -32,17 +33,17 @@ import tools.packet.guild.ShowGuildRanks;
 import tools.packet.guild.ShowPlayerRanks;
 import tools.packet.guild.UpdateGuildPoints;
 
-public class GuildOperationPacketFactory extends AbstractPacketFactory {
-   private static GuildOperationPacketFactory instance;
+public class GuildPacketFactory extends AbstractPacketFactory {
+   private static GuildPacketFactory instance;
 
-   public static GuildOperationPacketFactory getInstance() {
+   public static GuildPacketFactory getInstance() {
       if (instance == null) {
-         instance = new GuildOperationPacketFactory();
+         instance = new GuildPacketFactory();
       }
       return instance;
    }
 
-   private GuildOperationPacketFactory() {
+   private GuildPacketFactory() {
    }
 
    @Override
@@ -82,9 +83,13 @@ public class GuildOperationPacketFactory extends AbstractPacketFactory {
       } else if (packetInput instanceof ShowPlayerRanks) {
          return create(this::showPlayerRanks, packetInput);
       } else if (packetInput instanceof UpdateGuildPoints) {
-          return create(this::updateGP, packetInput);
+         return create(this::updateGP, packetInput);
       } else if (packetInput instanceof ShowGuildInfo) {
          return create(this::showGuildInfo, packetInput);
+      } else if (packetInput instanceof GuildNameChange) {
+         return create(this::guildNameChanged, packetInput);
+      } else if (packetInput instanceof GuildMarkChanged) {
+         return create(this::guildMarkChanged, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -357,6 +362,28 @@ public class GuildOperationPacketFactory extends AbstractPacketFactory {
          //failed to read from DB - don't show a guild
          mplew.write(0);
       });
+      return mplew.getPacket();
+   }
+
+   /**
+    * Guild Name & Mark update packet, thanks to Arnah (Vertisy)
+    */
+   protected byte[] guildNameChanged(GuildNameChange packet) {
+      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.GUILD_NAME_CHANGED.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeMapleAsciiString(packet.guildName());
+      return mplew.getPacket();
+   }
+
+   protected byte[] guildMarkChanged(GuildMarkChanged packet) {
+      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.GUILD_MARK_CHANGED.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeShort(packet.logoBackground());
+      mplew.write(packet.logoBackgroundColor());
+      mplew.writeShort(packet.logo());
+      mplew.write(packet.logoColor());
       return mplew.getPacket();
    }
 }

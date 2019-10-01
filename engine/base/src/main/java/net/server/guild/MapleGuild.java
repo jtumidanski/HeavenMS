@@ -50,10 +50,12 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.guild.GuildCapacityChange;
 import tools.packet.guild.GuildDisband;
+import tools.packet.guild.GuildMarkChanged;
 import tools.packet.guild.GuildMemberChangeRank;
 import tools.packet.guild.GuildMemberLeft;
 import tools.packet.guild.GuildMemberLevelJobUpdate;
 import tools.packet.guild.GuildMemberOnline;
+import tools.packet.guild.GuildNameChange;
 import tools.packet.guild.GuildNotice;
 import tools.packet.guild.GuildRankTitleChange;
 import tools.packet.guild.NewGuildMember;
@@ -246,7 +248,7 @@ public class MapleGuild {
             .flatMap(Optional::stream)
             .filter(MapleCharacter::isLoggedinWorld)
             .forEach(character -> {
-               byte[] packet = MaplePacketCreator.guildNameChanged(character.getId(), this.getName());
+               byte[] packet = PacketCreator.create(new GuildNameChange(character.getId(), this.getName()));
                character.getMap().broadcastMessage(character, packet);
             });
    }
@@ -258,7 +260,7 @@ public class MapleGuild {
             .flatMap(Optional::stream)
             .filter(MapleCharacter::isLoggedinWorld)
             .forEach(character -> {
-               byte[] packet = MaplePacketCreator.guildMarkChanged(character.getId(), this);
+               byte[] packet = PacketCreator.create(new GuildMarkChanged(character.getId(), getLogoBG(), getLogoBGColor(), getLogo(), getLogoColor()));
                character.getMap().broadcastMessage(character, packet);
             });
    }

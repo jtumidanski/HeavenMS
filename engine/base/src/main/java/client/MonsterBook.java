@@ -37,10 +37,10 @@ import client.database.provider.MonsterBookProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowForeignCardEffect;
+import tools.packet.monster.book.SetCard;
 import tools.packet.showitemgaininchat.ShowGainCard;
 
 public final class MonsterBook {
@@ -89,11 +89,10 @@ public final class MonsterBook {
 
       if (qty < 5) {
          calculateLevel();   // current leveling system only accounts unique cards...
-
-         c.announce(MaplePacketCreator.addCard(false, cardid, qty + 1));
+         PacketCreator.announce(c, new SetCard(false, cardid, qty + 1));
          PacketCreator.announce(c, new ShowGainCard());
       } else {
-         c.announce(MaplePacketCreator.addCard(true, cardid, 5));
+         PacketCreator.announce(c, new SetCard(true, cardid, 5));
       }
    }
 

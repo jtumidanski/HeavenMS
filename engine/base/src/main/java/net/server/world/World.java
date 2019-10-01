@@ -106,6 +106,8 @@ import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.guild.GuildEmblemChange;
+import tools.packet.guild.GuildMarkChanged;
+import tools.packet.guild.GuildNameChange;
 import tools.packet.partyoperation.UpdateParty;
 import tools.packets.Fishing;
 
@@ -747,9 +749,9 @@ public class World {
          if (bDifferentGuild) {
             if (character.isLoggedinWorld()) {
                Server.getInstance().getGuild(guildid).ifPresentOrElse(guild -> {
-                  character.getMap().broadcastMessage(character, MaplePacketCreator.guildNameChanged(cid, guild.getName()));
-                  character.getMap().broadcastMessage(character, MaplePacketCreator.guildMarkChanged(cid, guild));
-               }, () -> character.getMap().broadcastMessage(character, MaplePacketCreator.guildNameChanged(cid, "")));
+                  character.getMap().broadcastMessage(character, PacketCreator.create(new GuildNameChange(cid, guild.getName())));
+                  character.getMap().broadcastMessage(character, PacketCreator.create(new GuildMarkChanged(cid, guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor())));
+               }, () -> character.getMap().broadcastMessage(character, PacketCreator.create(new GuildNameChange(cid, ""))));
             }
          }
       });

@@ -17,11 +17,12 @@ import tools.packet.factory.CharacterNameResponsePacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
-import tools.packet.factory.GuildOperationPacketFactory;
+import tools.packet.factory.GuildPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
 import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
+import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
@@ -134,7 +135,9 @@ public class PacketCreator {
          case SHOW_ITEM_GAIN_INCHAT:
             return Optional.of(ItemGainInChatPacketFactory.getInstance());
          case GUILD_OPERATION:
-            return Optional.of(GuildOperationPacketFactory.getInstance());
+         case GUILD_NAME_CHANGED:
+         case GUILD_MARK_CHANGED:
+            return Optional.of(GuildPacketFactory.getInstance());
          case MONSTER_CARNIVAL_START:
          case MONSTER_CARNIVAL_DIED:
          case MONSTER_CARNIVAL_SUMMON:
@@ -142,6 +145,9 @@ public class PacketCreator {
          case MONSTER_CARNIVAL_OBTAINED_CP:
          case MONSTER_CARNIVAL_PARTY_CP:
             return Optional.of(MonsterCarnivalPacketFactory.getInstance());
+         case MONSTER_BOOK_SET_CARD:
+         case MONSTER_BOOK_SET_COVER:
+            return Optional.of(MonsterBookPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();
