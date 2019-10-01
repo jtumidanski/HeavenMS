@@ -108,6 +108,10 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.monster.carnival.MonsterCarnivalStart;
+import tools.packet.remove.RemoveDragon;
+import tools.packet.remove.RemoveItem;
+import tools.packet.remove.RemoveNPC;
+import tools.packet.remove.RemovePlayer;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.spawn.MakeMonsterReal;
 import tools.packet.spawn.RemoveNPCController;
@@ -991,7 +995,7 @@ public class MapleMap {
 
                mdrop.setPartyOwnerId(partyid);
 
-               byte[] removePacket = MaplePacketCreator.silentRemoveItemFromMap(mdrop.getObjectId());
+               byte[] removePacket = PacketCreator.create(new RemoveItem(mdrop.getObjectId()));
                byte[] updatePacket = MaplePacketCreator.updateMapItemObject(mdrop, partyLeaver == null);
 
                for (MapleCharacter mc : partyMembers) {
@@ -1031,7 +1035,7 @@ public class MapleMap {
                continue;
             }
 
-            byte[] removePacket = MaplePacketCreator.silentRemoveItemFromMap(mdrop.getObjectId());
+            byte[] removePacket = PacketCreator.create(new RemoveItem(mdrop.getObjectId()));
             byte[] updatePacket = MaplePacketCreator.updateMapItemObject(mdrop, true);
 
             if (newcomer != null) {
@@ -1607,7 +1611,7 @@ public class MapleMap {
          for (MapleMapObject obj : npcs) {
             if (((MapleNPC) obj).getId() == npcid) {
                MasterBroadcaster.getInstance().sendToAllInMap(this, new RemoveNPCController(obj.getObjectId()));
-               MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeNPC(obj.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(this, new RemoveNPC(obj.getObjectId()));
 
                this.mapobjects.remove(obj.getObjectId());
             }
@@ -2623,9 +2627,9 @@ public class MapleMap {
 
       removeMapObject(chr.getObjectId());
       if (!chr.isHidden()) {
-         MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removePlayerFromMap(chr.getId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new RemovePlayer(chr.getId())));
       } else {
-         MasterBroadcaster.getInstance().sendToAllGMInMap(this, character -> MaplePacketCreator.removePlayerFromMap(chr.getId()));
+         MasterBroadcaster.getInstance().sendToAllGMInMap(this, character -> PacketCreator.create(new RemovePlayer(chr.getId())));
       }
 
       chr.leaveMap();
@@ -2641,9 +2645,9 @@ public class MapleMap {
       if (chr.getDragon() != null) {
          removeMapObject(chr.getDragon());
          if (chr.isHidden()) {
-            this.broadcastGMMessage(chr, MaplePacketCreator.removeDragon(chr.getId()));
+            this.broadcastGMMessage(chr, PacketCreator.create(new RemoveDragon(chr.getId())));
          } else {
-            this.broadcastMessage(chr, MaplePacketCreator.removeDragon(chr.getId()));
+            this.broadcastMessage(chr, PacketCreator.create(new RemoveDragon(chr.getId())));
          }
       }
    }
@@ -3125,7 +3129,7 @@ public class MapleMap {
                return true;
             }
 
-            MapleMap.this.pickItemDrop(MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), 0, 0), mapitem);
+            MapleMap.this.pickItemDrop(PacketCreator.create(new RemoveItem(mapitem.getObjectId(), 0, 0)), mapitem);
             return true;
          } finally {
             mapitem.unlockItem();
@@ -3438,7 +3442,7 @@ public class MapleMap {
    private void clearDrop(MapleMapObject i, int characterId) {
       droppedItemCount.decrementAndGet();
       removeMapObject(i);
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, characterId));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new RemoveItem(i.getObjectId(), 0, characterId)));
    }
 
    public int getFieldLimit() {
@@ -4168,7 +4172,7 @@ public class MapleMap {
                      unregisterItemDrop(mapitem);
 
                      reactor.setShouldCollect(false);
-                     MasterBroadcaster.getInstance().sendToAllInMapRange(MapleMap.this, character -> MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), 0, 0), mapitem.getPosition());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(MapleMap.this, character -> PacketCreator.create(new RemoveItem(mapitem.getObjectId(), 0, 0)), mapitem.getPosition());
 
                      droppedItemCount.decrementAndGet();
                      MapleMap.this.removeMapObject(mapitem);

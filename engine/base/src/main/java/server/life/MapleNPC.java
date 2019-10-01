@@ -27,6 +27,7 @@ import server.maps.MapleMapObjectType;
 import server.processor.MapleShopProcessor;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.remove.RemoveNPC;
 import tools.packet.spawn.RemoveNPCController;
 import tools.packet.spawn.SpawnNPC;
 import tools.packet.spawn.SpawnNPCRequestController;
@@ -56,7 +57,7 @@ public class MapleNPC extends AbstractLoadedMapleLife {
    @Override
    public void sendDestroyData(MapleClient client) {
       PacketCreator.announce(client, new RemoveNPCController(getObjectId()));
-      client.announce(MaplePacketCreator.removeNPC(getObjectId()));
+      PacketCreator.announce(client, new RemoveNPC(getObjectId()));
    }
 
    @Override

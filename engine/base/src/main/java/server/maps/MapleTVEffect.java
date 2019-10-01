@@ -27,6 +27,8 @@ import client.MapleCharacter;
 import net.server.Server;
 import server.TimerManager;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.remove.RemoveTV;
 
 /*
  * MapleTVEffect
@@ -66,7 +68,7 @@ public class MapleTVEffect {
             }
          }, delay);
       } else {
-         server.broadcastMessage(userWorld, MaplePacketCreator.removeTV());
+         server.broadcastMessage(userWorld, PacketCreator.create(new RemoveTV()));
       }
    }
 }

@@ -37,8 +37,8 @@ import constants.skills.Shadower;
 import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.life.MobSkill;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.remove.RemoveMist;
 import tools.packet.spawn.SpawnMist;
 
 /**
@@ -136,7 +136,7 @@ public class MapleMist extends AbstractMapleMapObject {
    }
 
    public final byte[] makeDestroyData() {
-      return MaplePacketCreator.removeMist(getObjectId());
+      return PacketCreator.create(new RemoveMist(getObjectId()));
    }
 
    public final byte[] makeSpawnData() {

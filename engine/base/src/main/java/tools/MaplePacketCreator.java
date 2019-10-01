@@ -569,17 +569,6 @@ public class MaplePacketCreator {
    }
 
    /**
-    * Removes TV
-    *
-    * @return The Remove TV Packet
-    */
-   public static byte[] removeTV() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
-      mplew.writeShort(SendOpcode.REMOVE_TV.getValue());
-      return mplew.getPacket();
-   }
-
-   /**
     * Sends MapleTV
     *
     * @param chr      The character shown in TV
@@ -672,30 +661,6 @@ public class MaplePacketCreator {
       mplew.writeInt(spawnPosition.y);
       mplew.writeLong(getTime(Server.getInstance().getCurrentTime()));
       mplew.skip(18);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Gets a packet to remove a special map object.
-    *
-    * @param summon
-    * @param animated Animated removal?
-    * @return The packet removing the object.
-    */
-   public static byte[] removeSummon(MapleSummon summon, boolean animated) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.REMOVE_SPECIAL_MAPOBJECT.getValue());
-      mplew.writeInt(summon.getOwner().getId());
-      mplew.writeInt(summon.getObjectId());
-      mplew.write(animated ? 4 : 1); // ?
-      return mplew.getPacket();
-   }
-
-   public static byte[] removeKite(int objectid, int animationType) {    // thanks to Arnah (Vertisy)
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_KITE.getValue());
-      mplew.write(animationType); // 0 is 10/10, 1 just vanishes
-      mplew.writeInt(objectid);
       return mplew.getPacket();
    }
 
@@ -1346,13 +1311,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] removePlayerFromMap(int cid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_PLAYER_FROM_MAP.getValue());
-      mplew.writeInt(cid);
-      return mplew.getPacket();
-   }
-
    public static byte[] catchMessage(int message) { // not done, I guess
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.BRIDLE_MOB_CATCH_FAIL.getValue());
@@ -1389,49 +1347,6 @@ public class MaplePacketCreator {
       MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.WITCH_TOWER_SCORE_UPDATE.getValue());
       mplew.write(score);
-      return mplew.getPacket();
-   }
-
-   public static byte[] silentRemoveItemFromMap(int oid) {
-      return removeItemFromMap(oid, 1, 0);
-   }
-
-   /**
-    * animation: 0 - expire<br/> 1 - without animation<br/> 2 - pickup<br/> 4 -
-    * explode<br/> cid is ignored for 0 and 1
-    *
-    * @param oid
-    * @param animation
-    * @param cid
-    * @return
-    */
-   public static byte[] removeItemFromMap(int oid, int animation, int cid) {
-      return removeItemFromMap(oid, animation, cid, false, 0);
-   }
-
-   /**
-    * animation: 0 - expire<br/> 1 - without animation<br/> 2 - pickup<br/> 4 -
-    * explode<br/> cid is ignored for 0 and 1.<br /><br />Flagging pet as true
-    * will make a pet pick up the item.
-    *
-    * @param oid
-    * @param animation
-    * @param cid
-    * @param pet
-    * @param slot
-    * @return
-    */
-   public static byte[] removeItemFromMap(int oid, int animation, int cid, boolean pet, int slot) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_ITEM_FROM_MAP.getValue());
-      mplew.write(animation); // expire
-      mplew.writeInt(oid);
-      if (animation >= 2) {
-         mplew.writeInt(cid);
-         if (pet) {
-            mplew.write(slot);
-         }
-      }
       return mplew.getPacket();
    }
 
@@ -2129,13 +2044,6 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.STOP_CLOCK.getValue());
       mplew.write(0);
-      return mplew.getPacket();
-   }
-
-   public static byte[] removeMist(int oid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_MIST.getValue());
-      mplew.writeInt(oid);
       return mplew.getPacket();
    }
 
@@ -3375,14 +3283,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] removeNPC(int oid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_NPC.getValue());
-      mplew.writeInt(oid);
-
-      return mplew.getPacket();
-   }
-
    /**
     * Sends a report response
     * <p>
@@ -4004,18 +3904,6 @@ public class MaplePacketCreator {
       mplew.writeInt(dragon.getOwner().getId());
       mplew.writePos(startPos);
       rebroadcastMovementList(mplew, movementList);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends a request to remove Mir<br>
-    *
-    * @return The packet
-    */
-   public static byte[] removeDragon(int chrid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_DRAGON.getValue());
-      mplew.writeInt(chrid);
       return mplew.getPacket();
    }
 

@@ -77,6 +77,7 @@ import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.npctalk.GetNPCTalk;
+import tools.packet.remove.RemoveItem;
 import tools.packet.showitemgaininchat.ShowInfo;
 import tools.packet.showitemgaininchat.ShowIntro;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
@@ -914,7 +915,7 @@ public class AbstractPlayerInteraction {
       getMap(mapid).killAllMonsters();
       for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
          getMap(mapid).removeMapObject(i);
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.removeItemFromMap(i.getObjectId(), 0, c.getPlayer().getId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveItem(i.getObjectId(), 0, c.getPlayer().getId()));
       }
    }
 

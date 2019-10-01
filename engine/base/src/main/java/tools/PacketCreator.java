@@ -35,6 +35,7 @@ import tools.packet.factory.PlayerInteractionPacketFactory;
 import tools.packet.factory.QuestInfoPacketFactory;
 import tools.packet.factory.RecommendedWorldMessagePacketFactory;
 import tools.packet.factory.RelogResponsePacketFactory;
+import tools.packet.factory.RemovePacketFactory;
 import tools.packet.factory.SelectWorldPacketFactory;
 import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
@@ -177,6 +178,15 @@ public class PacketCreator {
          case SPAWN_GUIDE:
          case SPAWN_DRAGON:
             return Optional.of(SpawnPacketFactory.getInstance());
+         case REMOVE_TV:
+         case REMOVE_SPECIAL_MAPOBJECT:
+         case REMOVE_KITE:
+         case REMOVE_PLAYER_FROM_MAP:
+         case REMOVE_ITEM_FROM_MAP:
+         case REMOVE_MIST:
+         case REMOVE_NPC:
+         case REMOVE_DRAGON:
+            return Optional.of(RemovePacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

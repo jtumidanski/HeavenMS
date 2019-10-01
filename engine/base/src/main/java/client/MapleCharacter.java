@@ -221,6 +221,10 @@ import tools.packet.partyoperation.UpdateParty;
 import tools.packet.quest.info.AddQuestTimeLimit;
 import tools.packet.quest.info.QuestExpire;
 import tools.packet.quest.info.UpdateQuestInfo;
+import tools.packet.remove.RemoveDragon;
+import tools.packet.remove.RemoveItem;
+import tools.packet.remove.RemovePlayer;
+import tools.packet.remove.RemoveSummon;
 import tools.packet.showitemgaininchat.ShowOwnBerserk;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.showitemgaininchat.ShowOwnRecovery;
@@ -990,7 +994,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             this.hidden = true;
             announce(MaplePacketCreator.getGMEffect(0x10, (byte) 1));
             if (!login) {
-               getMap().broadcastNONGMMessage(this, MaplePacketCreator.removePlayerFromMap(getId()), false);
+               getMap().broadcastNONGMMessage(this, PacketCreator.create(new RemovePlayer(getId())), false);
             }
             List<Pair<MapleBuffStat, Integer>> ldsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
             getMap().broadcastGMMessage(this, MaplePacketCreator.giveForeignBuff(id, ldsstat), false);
@@ -1286,7 +1290,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       silentPartyUpdate();
 
       if (dragon != null) {
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.removeDragon(dragon.getObjectId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveDragon(dragon.getObjectId()));
          dragon = null;
       }
 
@@ -1964,7 +1968,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             boolean isPet = petIndex > -1;
-            final byte[] pickupPacket = MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex);
+            final byte[] pickupPacket = PacketCreator.create(new RemoveItem(mapitem.getObjectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex));
 
             Item mItem = mapitem.getItem();
             boolean hasSpaceInventory;
@@ -3255,7 +3259,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                   MapleSummon summon = summons.get(summonId);
                   if (summon != null) {
-                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> MaplePacketCreator.removeSummon(summon, true), summon.getPosition());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> PacketCreator.create(new RemoveSummon(summon, true)), summon.getPosition());
                      getMap().removeMapObject(summon);
                      removeVisibleMapObject(summon);
 
@@ -7988,7 +7992,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    @Override
    public void sendDestroyData(MapleClient client) {
-      client.announce(MaplePacketCreator.removePlayerFromMap(this.getObjectId()));
+      PacketCreator.announce(client, new RemovePlayer(this.getObjectId()));
    }
 
    @Override

@@ -93,6 +93,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.remove.RemoveItem;
 import tools.packet.stat.EnableActions;
 
 public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends AbstractPacketHandler<T> {
@@ -230,7 +231,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                               if (mapitem.isPickedUp()) {
                                  return;
                               }
-                              map.pickItemDrop(MaplePacketCreator.removeItemFromMap(mapitem.getObjectId(), 4, 0), mapitem);
+                              map.pickItemDrop(PacketCreator.create(new RemoveItem(mapitem.getObjectId(), 4, 0)), mapitem);
                            } finally {
                               mapitem.unlockItem();
                            }

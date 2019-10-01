@@ -6,6 +6,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.remove.RemoveKite;
 import tools.packet.spawn.SpawnKite;
 
 public class MapleKite extends AbstractMapleMapObject {
@@ -58,6 +59,6 @@ public class MapleKite extends AbstractMapleMapObject {
    }
 
    public final byte[] makeDestroyData() {
-      return MaplePacketCreator.removeKite(getObjectId(), 0);
+      return PacketCreator.create(new RemoveKite(getObjectId(), 0));
    }
 }

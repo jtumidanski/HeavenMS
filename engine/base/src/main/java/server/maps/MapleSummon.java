@@ -28,6 +28,7 @@ import client.MapleClient;
 import client.SkillFactory;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.remove.RemoveSummon;
 import tools.packet.spawn.SpawnSummon;
 
 /**
@@ -63,7 +64,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
 
    @Override
    public void sendDestroyData(MapleClient client) {
-      client.announce(MaplePacketCreator.removeSummon(this, true));
+      PacketCreator.announce(client, new RemoveSummon(this, true));
    }
 
    public MapleCharacter getOwner() {

@@ -29,6 +29,8 @@ import client.inventory.Item;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.remove.RemoveItem;
 
 public class MapleMapItem extends AbstractMapleMapObject {
    protected MapleClient ownerClient;
@@ -212,6 +214,6 @@ public class MapleMapItem extends AbstractMapleMapObject {
 
    @Override
    public void sendDestroyData(final MapleClient client) {
-      client.announce(MaplePacketCreator.removeItemFromMap(getObjectId(), 1, 0));
+      PacketCreator.announce(client, new RemoveItem(getObjectId(), 1, 0));
    }
 }

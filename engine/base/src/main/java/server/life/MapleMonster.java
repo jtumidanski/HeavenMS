@@ -81,6 +81,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.remove.RemoveSummon;
 import tools.packet.spawn.ControlMonster;
 import tools.packet.spawn.SpawnFakeMonster;
 import tools.packet.spawn.SpawnMonster;
@@ -2124,7 +2125,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       for (MapleMonster mob : puppetControlled) {
          PacketCreator.announce(chrController, new StopMonsterControl(mob.getObjectId()));
       }
-      chrController.announce(MaplePacketCreator.removeSummon(puppet, false));
+      PacketCreator.announce(chrController, new RemoveSummon(puppet, false));
 
       MapleClient c = chrController.getClient();
       for (MapleMonster mob : puppetControlled) {
