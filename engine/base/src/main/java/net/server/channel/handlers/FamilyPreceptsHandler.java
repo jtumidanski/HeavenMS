@@ -7,6 +7,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilyPreceptsPacket;
 import net.server.channel.packet.reader.FamilyPreceptsReader;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.family.GetFamilyInfo;
 
 public class FamilyPreceptsHandler extends AbstractPacketHandler<FamilyPreceptsPacket> {
    @Override
@@ -29,7 +31,7 @@ public class FamilyPreceptsHandler extends AbstractPacketHandler<FamilyPreceptsP
       }
       MapleFamilyProcessor.getInstance().setMessage(family, packet.newPrecepts(), true);
       //family.broadcastFamilyInfoUpdate(); //probably don't need to broadcast for this?
-      client.announce(MaplePacketCreator.getFamilyInfo(client.getPlayer().getFamilyEntry()));
+      PacketCreator.announce(client, new GetFamilyInfo(client.getPlayer().getFamilyEntry()));
    }
 
 }

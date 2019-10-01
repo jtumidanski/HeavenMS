@@ -15,6 +15,7 @@ import tools.packet.factory.ChangeChannelPacketFactory;
 import tools.packet.factory.CharacterListPacketFactory;
 import tools.packet.factory.CharacterNameResponsePacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
+import tools.packet.factory.FamilyPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.GuildPacketFactory;
@@ -148,6 +149,17 @@ public class PacketCreator {
          case MONSTER_BOOK_SET_CARD:
          case MONSTER_BOOK_SET_COVER:
             return Optional.of(MonsterBookPacketFactory.getInstance());
+         case FAMILY_PRIVILEGE_LIST:
+         case FAMILY_RESULT:
+         case FAMILY_INFO_RESULT:
+         case FAMILY_CHART_RESULT:
+         case FAMILY_JOIN_REQUEST:
+         case FAMILY_SUMMON_REQUEST:
+         case FAMILY_NOTIFY_LOGIN_OR_LOGOUT:
+         case FAMILY_JOIN_REQUEST_RESULT:
+         case FAMILY_JOIN_ACCEPTED:
+         case FAMILY_REP_GAIN:
+            return Optional.of(FamilyPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

@@ -33,8 +33,10 @@ import client.processor.MapleFamilyProcessor;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.family.FamilyGainReputation;
+import tools.packet.family.GetFamilyInfo;
 
 /**
  * @author Ubaware
@@ -297,7 +299,7 @@ public class MapleFamilyEntry {
       }
       MapleCharacter chr = getChr();
       if (chr != null) {
-         chr.announce(MaplePacketCreator.sendGainRep(gain, from != null ? from.getName() : ""));
+         PacketCreator.announce(chr, new FamilyGainReputation(gain, from != null ? from.getName() : ""));
       }
    }
 
@@ -473,13 +475,13 @@ public class MapleFamilyEntry {
       if (senior != null) {
          MapleCharacter seniorChr = senior.getChr();
          if (seniorChr != null) {
-            seniorChr.announce(MaplePacketCreator.getFamilyInfo(senior));
+            PacketCreator.announce(seniorChr, new GetFamilyInfo(senior));
          }
          senior = senior.getSenior();
          if (includeSuperSenior && senior != null) {
             seniorChr = senior.getChr();
             if (seniorChr != null) {
-               seniorChr.announce(MaplePacketCreator.getFamilyInfo(senior));
+               PacketCreator.announce(seniorChr, new GetFamilyInfo(senior));
             }
          }
       }

@@ -31,7 +31,10 @@ import net.server.channel.packet.family.FamilySeparatePacket;
 import net.server.channel.packet.reader.FamilySeparateReader;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.family.FamilyMessage;
+import tools.packet.family.GetFamilyInfo;
 
 public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparatePacket> {
    @Override
@@ -74,7 +77,7 @@ public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparateP
       int cost = 2500 * levelDiff;
       cost += levelDiff * levelDiff;
       if (client.getPlayer().getMeso() < cost) {
-         client.announce(MaplePacketCreator.sendFamilyMessage(isSenior ? 81 : 80, cost));
+         PacketCreator.announce(client, new FamilyMessage(isSenior ? 81 : 80, cost));
          return;
       }
       client.getPlayer().gainMeso(-cost);
@@ -87,9 +90,9 @@ public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparateP
       Collection<MapleCharacter> recipients = forkOn.getSeniors(true);
       MessageBroadcaster.getInstance().sendServerNotice(recipients, ServerNoticeType.PINK_TEXT, forkOn.getName() + " has left the family.");
       forkOn.fork();
-      client.announce(MaplePacketCreator.getFamilyInfo(forkOn)); //pedigree info will be requested by the client if the window is open
+      PacketCreator.announce(client, new GetFamilyInfo(forkOn)); //pedigree info will be requested by the client if the window is open
       forkOn.updateSeniorFamilyInfo(true);
-      client.announce(MaplePacketCreator.sendFamilyMessage(1, 0));
+      PacketCreator.announce(client, new FamilyMessage(1, 0));
    }
 
 

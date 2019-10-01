@@ -15,7 +15,9 @@ import net.server.coordinator.MapleInviteCoordinator.MapleInviteResult;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.family.GetFamilyInfo;
 
 public class FamilySummonResponseHandler extends AbstractPacketHandler<FamilySummonResponsePacket> {
    @Override
@@ -45,7 +47,7 @@ public class FamilySummonResponseHandler extends AbstractPacketHandler<FamilySum
       } else {
          inviterEntry.refundEntitlement(MapleFamilyEntitlement.SUMMON_FAMILY);
          inviterEntry.gainReputation(MapleFamilyEntitlement.SUMMON_FAMILY.getRepCost(), false); //refund rep cost if declined
-         inviter.announce(MaplePacketCreator.getFamilyInfo(inviterEntry));
+         PacketCreator.announce(inviter, new GetFamilyInfo(inviterEntry));
          MessageBroadcaster.getInstance().sendServerNotice(inviter, ServerNoticeType.PINK_TEXT, client.getPlayer().getName() + " has denied the summon request.");
       }
    }

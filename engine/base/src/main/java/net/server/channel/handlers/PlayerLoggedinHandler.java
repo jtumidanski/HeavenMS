@@ -82,6 +82,9 @@ import tools.packet.AfterLoginError;
 import tools.packet.alliance.AllianceMemberOnline;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.UpdateAllianceInfo;
+import tools.packet.family.FamilyLogonNotice;
+import tools.packet.family.GetFamilyInfo;
+import tools.packet.family.LoadFamily;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.parcel.DueyParcelNotification;
 import tools.packets.Wedding;
@@ -293,7 +296,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
             client.announce(MaplePacketCreator.updateBuddylist(bl.getBuddies()));
 
-            client.announce(MaplePacketCreator.loadFamily(player));
+            PacketCreator.announce(client, new LoadFamily());
             if (player.getFamilyId() > 0) {
                MapleFamily f = world.getFamily(player.getFamilyId());
                if (f != null) {
@@ -301,18 +304,18 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                   if (familyEntry != null) {
                      familyEntry.setCharacter(player);
                      player.setFamilyEntry(familyEntry);
-                     client.announce(MaplePacketCreator.getFamilyInfo(familyEntry));
-                     byte[] familyLoginNotice = MaplePacketCreator.sendFamilyLoginNotice(player.getName(), true);
+                     PacketCreator.announce(client, new GetFamilyInfo(familyEntry));
+                     byte[] familyLoginNotice = PacketCreator.create(new FamilyLogonNotice(player.getName(), true));
                      MasterBroadcaster.getInstance().sendToSenior(familyEntry.getSenior(), character -> familyLoginNotice, true);
                   } else {
                      FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Player " + player.getName() + "'s family doesn't have an entry for them. (" + f.getID() + ")");
                   }
                } else {
                   FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Player " + player.getName() + " has an invalid family ID. (" + player.getFamilyId() + ")");
-                  client.announce(MaplePacketCreator.getFamilyInfo(null));
+                  PacketCreator.announce(client, new GetFamilyInfo(null));
                }
             } else {
-               client.announce(MaplePacketCreator.getFamilyInfo(null));
+               PacketCreator.announce(client, new GetFamilyInfo(null));
             }
             if (player.getGuildId() > 0) {
                loggingInGuildOperations(client, server, player, newcomer);

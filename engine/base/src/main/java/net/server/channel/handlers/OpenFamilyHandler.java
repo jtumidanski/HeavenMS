@@ -26,6 +26,8 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.family.GetFamilyInfo;
 
 /**
  * @author Ubaware
@@ -44,7 +46,7 @@ public final class OpenFamilyHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-      client.announce(MaplePacketCreator.getFamilyInfo(chr.getFamilyEntry()));
+      PacketCreator.announce(client, new GetFamilyInfo(chr.getFamilyEntry()));
    }
 }
 

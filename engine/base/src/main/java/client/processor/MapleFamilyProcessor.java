@@ -22,7 +22,9 @@ import net.server.world.World;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.family.GetFamilyInfo;
 
 public class MapleFamilyProcessor {
    private static MapleFamilyProcessor ourInstance = new MapleFamilyProcessor();
@@ -109,7 +111,7 @@ public class MapleFamilyProcessor {
       for (MapleFamilyEntry entry : mapleFamily.getMembers()) {
          MapleCharacter chr = entry.getChr();
          if (chr != null) {
-            chr.getClient().announce(MaplePacketCreator.getFamilyInfo(entry));
+            PacketCreator.announce(chr, new GetFamilyInfo(entry));
          }
       }
    }

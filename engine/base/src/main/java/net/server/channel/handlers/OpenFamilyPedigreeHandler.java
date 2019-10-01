@@ -24,7 +24,8 @@ import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.OpenFamilyPedigreePacket;
 import net.server.channel.packet.reader.OpenFamilyPedigreeReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.family.ShowPedigree;
 
 /**
  * @author Ubaware
@@ -44,7 +45,7 @@ public final class OpenFamilyPedigreeHandler extends AbstractPacketHandler<OpenF
    public void handlePacket(OpenFamilyPedigreePacket packet, MapleClient client) {
       client.getChannelServer().getPlayerStorage().getCharacterByName(packet.characterName()).ifPresent(target -> {
          if (target.getFamily() != null) {
-            client.announce(MaplePacketCreator.showPedigree(target.getFamilyEntry()));
+            PacketCreator.announce(client, new ShowPedigree(target.getFamilyEntry()));
          }
       });
    }
