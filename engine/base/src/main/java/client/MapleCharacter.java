@@ -219,6 +219,7 @@ import tools.packet.inventory.SlotLimitUpdate;
 import tools.packet.monster.carnival.MonsterCarnivalPartyPoints;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerDied;
 import tools.packet.monster.carnival.MonsterCarnivalPointObtained;
+import tools.packet.movement.MovePlayer;
 import tools.packet.partyoperation.UpdateParty;
 import tools.packet.quest.info.AddQuestTimeLimit;
 import tools.packet.quest.info.QuestExpire;
@@ -1339,7 +1340,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void broadcastStance() {
-      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.movePlayer(id, this.getIdleMovementBytes()), false, this);
+      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new MovePlayer(id, this.getIdleMovementBytes()), false, this);
    }
 
    public MapleMap getWarpMap(int map) {

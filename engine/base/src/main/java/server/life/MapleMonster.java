@@ -84,6 +84,7 @@ import tools.ServerNoticeType;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowBossHP;
 import tools.packet.field.effect.ShowEffect;
+import tools.packet.movement.MoveMonster;
 import tools.packet.remove.RemoveSummon;
 import tools.packet.spawn.ControlMonster;
 import tools.packet.spawn.SpawnFakeMonster;
@@ -1397,7 +1398,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
       setPosition(newPoint);
 
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.moveMonster(this.getObjectId(), false, -1, 0, 0, 0, getPosition(), getIdleMovementBytes()));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new MoveMonster(this.getObjectId(), false, -1, 0, 0, 0, getPosition(), getIdleMovementBytes()));
       map.moveMonster(this, this.getPosition());
 
       aggroUpdateController();

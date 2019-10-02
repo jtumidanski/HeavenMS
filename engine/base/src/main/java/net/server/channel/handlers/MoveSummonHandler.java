@@ -31,6 +31,8 @@ import net.server.channel.packet.reader.MoveSummonReader;
 import server.maps.MapleSummon;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.movement.MoveSummon;
 
 public final class MoveSummonHandler extends AbstractMoveHandler<MoveSummonPacket> {
    @Override
@@ -51,7 +53,8 @@ public final class MoveSummonHandler extends AbstractMoveHandler<MoveSummonPacke
       }
       if (summon != null) {
          processMovementList(packet.movementDataList(), summon);
-         MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), character -> MaplePacketCreator.moveSummon(player.getId(), packet.objectId(), packet.startPosition(), packet.movementList()), player, summon.getPosition());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(),
+               character -> PacketCreator.create(new MoveSummon(player.getId(), packet.objectId(), packet.startPosition(), packet.movementList())), player, summon.getPosition());
       }
    }
 }

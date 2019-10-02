@@ -77,7 +77,6 @@ import server.life.MobSkill;
 import server.maps.AbstractMapleMapObject;
 import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
-import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
@@ -86,6 +85,7 @@ import server.maps.MapleReactor;
 import server.movement.LifeMovementFragment;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.movement.MoveMonsterResponse;
 import tools.packet.statusinfo.ShowItemGain;
 
 /**
@@ -467,43 +467,6 @@ public class MaplePacketCreator {
    }
 
    /**
-    * Gets a response to a move monster packet.
-    *
-    * @param objectid  The ObjectID of the monster being moved.
-    * @param moveid    The movement ID.
-    * @param currentMp The current MP of the monster.
-    * @param useSkills Can the monster use skills?
-    * @return The move response packet.
-    */
-   public static byte[] moveMonsterResponse(int objectid, short moveid, int currentMp, boolean useSkills) {
-      return moveMonsterResponse(objectid, moveid, currentMp, useSkills, 0, 0);
-   }
-
-   /**
-    * Gets a response to a move monster packet.
-    *
-    * @param objectid   The ObjectID of the monster being moved.
-    * @param moveid     The movement ID.
-    * @param currentMp  The current MP of the monster.
-    * @param useSkills  Can the monster use skills?
-    * @param skillId    The skill ID for the monster to use.
-    * @param skillLevel The level of the skill to use.
-    * @return The move response packet.
-    */
-
-   public static byte[] moveMonsterResponse(int objectid, short moveid, int currentMp, boolean useSkills, int skillId, int skillLevel) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(13);
-      mplew.writeShort(SendOpcode.MOVE_MONSTER_RESPONSE.getValue());
-      mplew.writeInt(objectid);
-      mplew.writeShort(moveid);
-      mplew.writeBool(useSkills);
-      mplew.writeShort(currentMp);
-      mplew.write(skillId);
-      mplew.write(skillLevel);
-      return mplew.getPacket();
-   }
-
-   /**
     * Gets a general chat packet.
     *
     * @param cidfrom The character ID who sent the chat.
@@ -797,47 +760,6 @@ public class MaplePacketCreator {
       for (int i = 0; i < movementDataList.size(); i++) {
          lew.write(movementDataList.get(i));
       }
-   }
-
-   private static void serializeMovementList(LittleEndianWriter lew, List<LifeMovementFragment> moves) {
-      lew.write(moves.size());
-      for (LifeMovementFragment move : moves) {
-         move.serialize(lew);
-      }
-   }
-
-   public static byte[] movePlayer(int cid, List<Byte> movementList) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_PLAYER.getValue());
-      mplew.writeInt(cid);
-      mplew.writeInt(0);
-      rebroadcastMovementList(mplew, movementList);
-      return mplew.getPacket();
-   }
-
-   public static byte[] moveSummon(int cid, int oid, Point startPos, List<Byte> movementDataList) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_SUMMON.getValue());
-      mplew.writeInt(cid);
-      mplew.writeInt(oid);
-      mplew.writePos(startPos);
-      rebroadcastMovementList(mplew, movementDataList);
-      return mplew.getPacket();
-   }
-
-   public static byte[] moveMonster(int oid, boolean skillPossible, int skill, int skillId, int skillLevel, int pOption, Point startPos, List<Byte> movementDataList) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_MONSTER.getValue());
-      mplew.writeInt(oid);
-      mplew.write(0);
-      mplew.writeBool(skillPossible);
-      mplew.write(skill);
-      mplew.write(skillId);
-      mplew.write(skillLevel);
-      mplew.writeShort(pOption);
-      mplew.writePos(startPos);
-      rebroadcastMovementList(mplew, movementDataList);
-      return mplew.getPacket();
    }
 
    public static byte[] summonAttack(int cid, int summonOid, byte direction, List<SummonAttackEntry> allDamage) {
@@ -2117,16 +2039,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] movePet(int cid, int pid, byte slot, List<LifeMovementFragment> moves) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_PET.getValue());
-      mplew.writeInt(cid);
-      mplew.write(slot);
-      mplew.writeInt(pid);
-      serializeMovementList(mplew, moves);
-      return mplew.getPacket();
-   }
-
    public static byte[] petChat(int cid, byte index, int act, String text) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.PET_CHAT.getValue());
@@ -3320,15 +3232,6 @@ public class MaplePacketCreator {
       mplew.writeShort(SendOpcode.PYRAMID_SCORE.getValue());
       mplew.write(score);
       mplew.writeInt(exp);
-      return mplew.getPacket();
-   }
-
-   public static byte[] moveDragon(MapleDragon dragon, Point startPos, List<Byte> movementList) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_DRAGON.getValue());
-      mplew.writeInt(dragon.getOwner().getId());
-      mplew.writePos(startPos);
-      rebroadcastMovementList(mplew, movementList);
       return mplew.getPacket();
    }
 

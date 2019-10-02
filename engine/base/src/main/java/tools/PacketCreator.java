@@ -27,6 +27,7 @@ import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
 import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
+import tools.packet.factory.MovementPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
@@ -204,6 +205,12 @@ public class PacketCreator {
          case SET_ITC:
          case SET_CASH_SHOP:
             return Optional.of(SpecialShopPacketFactory.getInstance());
+         case MOVE_MONSTER_RESPONSE:
+         case MOVE_PLAYER:
+         case MOVE_SUMMON:
+         case MOVE_MONSTER:
+         case MOVE_DRAGON:
+            return Optional.of(MovementPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();
