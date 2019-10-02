@@ -85,6 +85,7 @@ import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.family.FamilyLogonNotice;
 import tools.packet.family.GetFamilyInfo;
 import tools.packet.family.LoadFamily;
+import tools.packet.field.set.GetCharacterInfo;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.parcel.DueyParcelNotification;
 import tools.packets.Wedding;
@@ -267,7 +268,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                player.silentApplyDiseases(diseases);
             }
 
-            client.announce(MaplePacketCreator.getCharInfo(player));
+            PacketCreator.announce(client, new GetCharacterInfo(player));
             if (!player.isHidden()) {
                if (player.isGM() && ServerConstants.USE_AUTOHIDE_GM) {
                   player.toggleHide(true);

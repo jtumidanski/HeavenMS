@@ -41,6 +41,7 @@ import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.SetITC;
 import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
 import tools.packet.mtsoperation.MTSTransferInventory;
 import tools.packet.mtsoperation.MTSWantedListingOver;
@@ -119,11 +120,7 @@ public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
 
          client.getChannelServer().removePlayer(chr);
          chr.getMap().removePlayer(client.getPlayer());
-         try {
-            client.announce(MaplePacketCreator.openCashShop(client, true));
-         } catch (Exception ex) {
-            ex.printStackTrace();
-         }
+         PacketCreator.announce(client, new SetITC(client));
          chr.getCashShop().open(true);// xD
          client.enableCSActions();
          PacketCreator.announce(client, new MTSWantedListingOver(0, 0));

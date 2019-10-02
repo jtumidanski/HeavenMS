@@ -149,6 +149,7 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
+import scala.Option;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.EventInstanceManager;
 import scripting.item.ItemScriptManager;
@@ -206,6 +207,7 @@ import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
 import tools.packet.alliance.UpdateAllianceJobLevel;
+import tools.packet.field.set.WarpToMap;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.foreigneffect.ShowForeignEffect;
@@ -1444,7 +1446,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       eventChangedMap(target.getId());    // player can be dropped from an event here, hence the new warping target.
       MapleMap to = getWarpMap(target.getId());
-      changeMapInternal(to, pto.getPosition(), MaplePacketCreator.getWarpToMap(to, pto.getId(), this));
+      changeMapInternal(to, pto.getPosition(), PacketCreator.create(new WarpToMap(getClient().getChannel(), to.getId(), pto.getId(), getHp())));
       canWarpMap = false;
 
       canWarpCounter--;
@@ -1460,7 +1462,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       eventChangedMap(target.getId());
       MapleMap to = getWarpMap(target.getId());
-      changeMapInternal(to, pos, MaplePacketCreator.getWarpToMap(to, 0x80, pos, this));
+      changeMapInternal(to, pos, PacketCreator.create(new WarpToMap(getClient().getChannel(), to.getId(), 0x80, getHp(), Option.apply(pos))));
       canWarpMap = false;
 
       canWarpCounter--;
@@ -1491,7 +1493,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          mapEim.registerPlayer(this, false);
       }
 
-      changeMapInternal(target, pto.getPosition(), MaplePacketCreator.getWarpToMap(target, pto.getId(), this));
+      changeMapInternal(target, pto.getPosition(), PacketCreator.create(new WarpToMap(getClient().getChannel(), target.getId(), pto.getId(), getHp())));
       canWarpMap = false;
 
       canWarpCounter--;

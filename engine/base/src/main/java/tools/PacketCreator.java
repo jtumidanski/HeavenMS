@@ -42,7 +42,9 @@ import tools.packet.factory.SelectWorldPacketFactory;
 import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
 import tools.packet.factory.ServerStatusPacketFactory;
+import tools.packet.factory.SetFieldPacketFactory;
 import tools.packet.factory.SpawnPacketFactory;
+import tools.packet.factory.SpecialShopPacketFactory;
 import tools.packet.factory.StatUpdatePacketFactory;
 import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
@@ -197,6 +199,11 @@ public class PacketCreator {
          case COCONUT_SCORE:
          case COCONUT_HIT:
             return Optional.of(EventPacketFactory.getInstance());
+         case SET_FIELD:
+            return Optional.of(SetFieldPacketFactory.getInstance());
+         case SET_ITC:
+         case SET_CASH_SHOP:
+            return Optional.of(SpecialShopPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

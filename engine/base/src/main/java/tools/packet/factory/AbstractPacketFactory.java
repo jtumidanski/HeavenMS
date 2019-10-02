@@ -1,23 +1,31 @@
 package tools.packet.factory;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleQuestStatus;
 import client.Ring;
+import client.Skill;
+import client.SkillEntry;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
+import client.newyear.NewYearCardRecord;
+import client.processor.CharacterProcessor;
 import constants.ExpTable;
 import constants.GameConstants;
 import constants.ItemConstants;
+import net.server.PlayerCoolDownValueHolder;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
 import tools.PacketFactory;
@@ -187,6 +195,9 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       mplew.writeLong(getTime(time)); // offset expiration time issue found thanks to Thora
    }
 
+   protected void addItemInfo(final MaplePacketLittleEndianWriter mplew, Item item) {
+      addItemInfo(mplew, item, false);
+   }
 
    protected void addItemInfo(final MaplePacketLittleEndianWriter mplew, Item item, boolean zeroPosition) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -336,6 +347,233 @@ public abstract class AbstractPacketFactory implements PacketFactory {
          }
 
          mplew.writeInt(ring.itemId());
+      }
+   }
+
+   protected void addCharacterInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      mplew.writeLong(-1);
+      mplew.write(0);
+      addCharStats(mplew, chr);
+      mplew.write(chr.getBuddylist().capacity());
+
+      if (chr.getLinkedName() == null) {
+         mplew.write(0);
+      } else {
+         mplew.write(1);
+         mplew.writeMapleAsciiString(chr.getLinkedName());
+      }
+
+      mplew.writeInt(chr.getMeso());
+      addInventoryInfo(mplew, chr);
+      addSkillInfo(mplew, chr);
+      addQuestInfo(mplew, chr);
+      addMiniGameInfo(mplew, chr);
+      addRingInfo(mplew, chr);
+      addTeleportInfo(mplew, chr);
+      addMonsterBookInfo(mplew, chr);
+      addNewYearInfo(mplew, chr);
+      addAreaInfo(mplew, chr);//assuming it stayed here xd
+      mplew.writeShort(0);
+   }
+
+   protected void addInventoryInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      for (byte i = 1; i <= 5; i++) {
+         mplew.write(chr.getInventory(MapleInventoryType.getByType(i)).getSlotLimit());
+      }
+      mplew.writeLong(getTime(-2));
+      MapleInventory iv = chr.getInventory(MapleInventoryType.EQUIPPED);
+      Collection<Item> equippedC = iv.list();
+      List<Item> equipped = new ArrayList<>(equippedC.size());
+      List<Item> equippedCash = new ArrayList<>(equippedC.size());
+      for (Item item : equippedC) {
+         if (item.position() <= -100) {
+            equippedCash.add(item);
+         } else {
+            equipped.add(item);
+         }
+      }
+      for (Item item : equipped) {    // equipped doesn't actually need sorting, thanks Pllsz
+         addItemInfo(mplew, item);
+      }
+      mplew.writeShort(0); // start of equip cash
+      for (Item item : equippedCash) {
+         addItemInfo(mplew, item);
+      }
+      mplew.writeShort(0); // start of equip inventory
+      for (Item item : chr.getInventory(MapleInventoryType.EQUIP).list()) {
+         addItemInfo(mplew, item);
+      }
+      mplew.writeInt(0);
+      for (Item item : chr.getInventory(MapleInventoryType.USE).list()) {
+         addItemInfo(mplew, item);
+      }
+      mplew.write(0);
+      for (Item item : chr.getInventory(MapleInventoryType.SETUP).list()) {
+         addItemInfo(mplew, item);
+      }
+      mplew.write(0);
+      for (Item item : chr.getInventory(MapleInventoryType.ETC).list()) {
+         addItemInfo(mplew, item);
+      }
+      mplew.write(0);
+      for (Item item : chr.getInventory(MapleInventoryType.CASH).list()) {
+         addItemInfo(mplew, item);
+      }
+   }
+
+   protected void addSkillInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      mplew.write(0); // start of skills
+      Map<Skill, SkillEntry> skills = chr.getSkills();
+      int skillsSize = skills.size();
+      // We don't want to include any hidden skill in this, so subtract them from the size list and ignore them.
+      for (Map.Entry<Skill, SkillEntry> skill : skills.entrySet()) {
+         if (GameConstants.isHiddenSkills(skill.getKey().getId())) {
+            skillsSize--;
+         }
+      }
+      mplew.writeShort(skillsSize);
+      for (Map.Entry<Skill, SkillEntry> skill : skills.entrySet()) {
+         if (GameConstants.isHiddenSkills(skill.getKey().getId())) {
+            continue;
+         }
+         mplew.writeInt(skill.getKey().getId());
+         mplew.writeInt(skill.getValue().skillLevel());
+         addExpirationTime(mplew, skill.getValue().expiration());
+         if (skill.getKey().isFourthJob()) {
+            mplew.writeInt(skill.getValue().masterLevel());
+         }
+      }
+      mplew.writeShort(chr.getAllCooldowns().size());
+      for (PlayerCoolDownValueHolder cooling : chr.getAllCooldowns()) {
+         mplew.writeInt(cooling.skillId);
+         int timeLeft = (int) (cooling.length + cooling.startTime - System.currentTimeMillis());
+         mplew.writeShort(timeLeft / 1000);
+      }
+   }
+
+   protected void addQuestInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      mplew.writeShort(chr.getStartedQuestsSize());
+      for (MapleQuestStatus q : chr.getStartedQuests()) {
+         mplew.writeShort(q.getQuest().getId());
+         mplew.writeMapleAsciiString(q.getQuestData());
+         if (q.getQuest().getInfoNumber() > 0) {
+            mplew.writeShort(q.getQuest().getInfoNumber());
+            mplew.writeMapleAsciiString(q.getQuestData());
+         }
+      }
+      List<MapleQuestStatus> completed = chr.getCompletedQuests();
+      mplew.writeShort(completed.size());
+      for (MapleQuestStatus q : completed) {
+         mplew.writeShort(q.getQuest().getId());
+         mplew.writeLong(getTime(q.getCompletionTime()));
+      }
+   }
+
+   protected void addMiniGameInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      mplew.writeShort(0);
+                /*for (int m = size; m > 0; m--) {//nexon does this :P
+                 mplew.writeInt(0);
+                 mplew.writeInt(0);
+                 mplew.writeInt(0);
+                 mplew.writeInt(0);
+                 mplew.writeInt(0);
+                 }*/
+   }
+
+   protected void addRingInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      mplew.writeShort(chr.getCrushRings().size());
+      for (Ring ring : chr.getCrushRings()) {
+         mplew.writeInt(ring.partnerId());
+         mplew.writeAsciiString(StringUtil.getRightPaddedStr(ring.partnerName(), '\0', 13));
+         mplew.writeInt(ring.ringId());
+         mplew.writeInt(0);
+         mplew.writeInt(ring.partnerRingId());
+         mplew.writeInt(0);
+      }
+      mplew.writeShort(chr.getFriendshipRings().size());
+      for (Ring ring : chr.getFriendshipRings()) {
+         mplew.writeInt(ring.partnerId());
+         mplew.writeAsciiString(StringUtil.getRightPaddedStr(ring.partnerName(), '\0', 13));
+         mplew.writeInt(ring.ringId());
+         mplew.writeInt(0);
+         mplew.writeInt(ring.partnerRingId());
+         mplew.writeInt(0);
+         mplew.writeInt(ring.itemId());
+      }
+
+      if (chr.getPartnerId() > 0) {
+         Ring marriageRing = chr.getMarriageRing();
+
+         mplew.writeShort(1);
+         mplew.writeInt(chr.getRelationshipId());
+         mplew.writeInt(chr.getGender() == 0 ? chr.getId() : chr.getPartnerId());
+         mplew.writeInt(chr.getGender() == 0 ? chr.getPartnerId() : chr.getId());
+         mplew.writeShort((marriageRing != null) ? 3 : 1);
+         if (marriageRing != null) {
+            mplew.writeInt(marriageRing.itemId());
+            mplew.writeInt(marriageRing.itemId());
+         } else {
+            mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
+            mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
+         }
+         mplew.writeAsciiString(StringUtil.getRightPaddedStr(chr.getGender() == 0 ? chr.getName() : CharacterProcessor.getInstance().getNameById(chr.getPartnerId()), '\0', 13));
+         mplew.writeAsciiString(StringUtil.getRightPaddedStr(chr.getGender() == 0 ? CharacterProcessor.getInstance().getNameById(chr.getPartnerId()) : chr.getName(), '\0', 13));
+      } else {
+         mplew.writeShort(0);
+      }
+   }
+
+   protected void addTeleportInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      final List<Integer> tele = chr.getTrockMaps();
+      final List<Integer> viptele = chr.getVipTrockMaps();
+      for (int i = 0; i < 5; i++) {
+         mplew.writeInt(tele.get(i));
+      }
+      for (int i = 0; i < 10; i++) {
+         mplew.writeInt(viptele.get(i));
+      }
+   }
+
+   protected void addMonsterBookInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      mplew.writeInt(chr.getMonsterBookCover()); // cover
+      mplew.write(0);
+      Map<Integer, Integer> cards = chr.getMonsterBook().getCards();
+      mplew.writeShort(cards.size());
+      for (Map.Entry<Integer, Integer> all : cards.entrySet()) {
+         mplew.writeShort(all.getKey() % 10000); // Id
+         mplew.write(all.getValue()); // Level
+      }
+   }
+
+   protected void addNewYearInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      Set<NewYearCardRecord> received = chr.getReceivedNewYearRecords();
+
+      mplew.writeShort(received.size());
+      for (NewYearCardRecord nyc : received) {
+         encodeNewYearCard(nyc, mplew);
+      }
+   }
+
+   protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter mplew) {
+      mplew.writeInt(newyear.getId());
+      mplew.writeInt(newyear.getSenderId());
+      mplew.writeMapleAsciiString(newyear.getSenderName());
+      mplew.writeBool(newyear.isSenderCardDiscarded());
+      mplew.writeLong(newyear.getDateSent());
+      mplew.writeInt(newyear.getReceiverId());
+      mplew.writeMapleAsciiString(newyear.getReceiverName());
+      mplew.writeBool(newyear.isReceiverCardDiscarded());
+      mplew.writeBool(newyear.isReceiverCardReceived());
+      mplew.writeLong(newyear.getDateReceived());
+      mplew.writeMapleAsciiString(newyear.getMessage());
+   }
+
+   protected void addAreaInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+      Map<Short, String> areaInfos = chr.getAreaInfos();
+      mplew.writeShort(areaInfos.size());
+      for (Short area : areaInfos.keySet()) {
+         mplew.writeShort(area);
+         mplew.writeMapleAsciiString(areaInfos.get(area));
       }
    }
 }
