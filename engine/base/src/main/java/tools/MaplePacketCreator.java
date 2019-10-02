@@ -94,6 +94,7 @@ import server.maps.MapleSummon;
 import server.movement.LifeMovementFragment;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.statusinfo.ShowItemGain;
 
 /**
@@ -1837,48 +1838,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] showBossHP(int oid, int currHP, int maxHP, byte tagColor, byte tagBgColor) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(5);
-      mplew.writeInt(oid);
-      mplew.writeInt(currHP);
-      mplew.writeInt(maxHP);
-      mplew.write(tagColor);
-      mplew.write(tagBgColor);
-      return mplew.getPacket();
-   }
-
-   private static Pair<Integer, Integer> normalizedCustomMaxHP(long currHP, long maxHP) {
-      int sendHP, sendMaxHP;
-
-      if (maxHP <= Integer.MAX_VALUE) {
-         sendHP = (int) currHP;
-         sendMaxHP = (int) maxHP;
-      } else {
-         float f = ((float) currHP) / maxHP;
-
-         sendHP = (int) (Integer.MAX_VALUE * f);
-         sendMaxHP = Integer.MAX_VALUE;
-      }
-
-      return new Pair<>(sendHP, sendMaxHP);
-   }
-
-   public static byte[] customShowBossHP(byte call, int oid, long currHP, long maxHP, byte tagColor, byte tagBgColor) {
-      Pair<Integer, Integer> customHP = normalizedCustomMaxHP(currHP, maxHP);
-
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(call);
-      mplew.writeInt(oid);
-      mplew.writeInt(customHP.left);
-      mplew.writeInt(customHP.right);
-      mplew.write(tagColor);
-      mplew.write(tagBgColor);
-      return mplew.getPacket();
-   }
-
    public static byte[] giveFameResponse(int mode, String charname, int newfame) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
@@ -2207,26 +2166,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] musicChange(String song) {
-      return environmentChange(song, 6);
-   }
-
-   public static byte[] showEffect(String effect) {
-      return environmentChange(effect, 3);
-   }
-
-   public static byte[] playSound(String sound) {
-      return environmentChange(sound, 4);
-   }
-
-   public static byte[] environmentChange(String env, int mode) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(mode);
-      mplew.writeMapleAsciiString(env);
-      return mplew.getPacket();
-   }
-
    public static byte[] environmentMove(String env, int mode) {
       MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
 
@@ -2272,22 +2211,6 @@ public class MaplePacketCreator {
       mplew.writeShort(SendOpcode.BLOW_WEATHER.getValue());
       mplew.write(0);
       mplew.writeInt(0);
-      return mplew.getPacket();
-   }
-
-   public static byte[] mapEffect(String path) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(3);
-      mplew.writeMapleAsciiString(path);
-      return mplew.getPacket();
-   }
-
-   public static byte[] mapSound(String path) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(4);
-      mplew.writeMapleAsciiString(path);
       return mplew.getPacket();
    }
 
@@ -3457,14 +3380,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] sendDojoAnimation(byte firstByte, String animation) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(firstByte);
-      mplew.writeMapleAsciiString(animation);
-      return mplew.getPacket();
-   }
-
    /**
     * Gets a "block" packet (ie. the cash shop is unavailable, etc)
     * <p>
@@ -3560,20 +3475,6 @@ public class MaplePacketCreator {
       mplew.writeInt(job); //Why fking int?
       mplew.writeMapleAsciiString("> " + charname); //To fix the stupid packet lol
 
-      return mplew.getPacket();
-   }
-
-   /**
-    * @param type  - (0:Light&Long 1:Heavy&Short)
-    * @param delay - seconds
-    * @return
-    */
-   public static byte[] trembleEffect(int type, int delay) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(1);
-      mplew.write(type);
-      mplew.writeInt(delay);
       return mplew.getPacket();
    }
 

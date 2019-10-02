@@ -1,8 +1,8 @@
 package npc
 
-
 import scripting.npc.NPCConversationManager
-import tools.MaplePacketCreator
+import tools.PacketCreator
+import tools.packet.field.effect.MusicChange
 
 /*
 	NPC Name: 		
@@ -25,7 +25,7 @@ class NPC9977777 {
    String[] tabs = ["PQs", "Skills", "Quests", "Player Social Network", "Cash & Items", "Monsters, Maps & Reactors", "PQ potentials", "Player potentials", "Server potentials", "Commands", "Custom NPCs", "Localhost edits", "Project"]
 
    def start() {
-      cm.getPlayer().announce(MaplePacketCreator.musicChange(anthemSong))
+      PacketCreator.announce(cm.getPlayer(), new MusicChange(anthemSong))
       status = -1
       writeAllFeatures()
       action((byte) 1, (byte) 0, 0)
@@ -33,11 +33,11 @@ class NPC9977777 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode == -1) {
-         cm.getPlayer().announce(MaplePacketCreator.musicChange(ambientSong))
+         PacketCreator.announce(cm.getPlayer(), new MusicChange(ambientSong))
          cm.dispose()
       } else {
          if (mode == 0 && type > 0) {
-            cm.getPlayer().announce(MaplePacketCreator.musicChange(ambientSong))
+            PacketCreator.announce(cm.getPlayer(), new MusicChange(ambientSong))
             cm.dispose()
             return
          }
@@ -72,7 +72,7 @@ class NPC9977777 {
 
             cm.sendPrev(sendStr)
          } else {
-            cm.getPlayer().announce(MaplePacketCreator.musicChange(ambientSong))
+            PacketCreator.announce(cm.getPlayer(), new MusicChange(ambientSong))
             cm.dispose()
          }
       }

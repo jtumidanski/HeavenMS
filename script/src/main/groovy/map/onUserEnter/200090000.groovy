@@ -1,9 +1,10 @@
 package map.onUserEnter
 
-
 import scripting.map.MapScriptMethods
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.PacketCreator
+import tools.packet.field.effect.MusicChange
 
 class Map200090000 {
    int mapId = 200090000
@@ -12,7 +13,7 @@ class Map200090000 {
       MapleMap map = ms.getClient().getChannelServer().getMapFactory().getMap(mapId)
 
       if (map.getDocked()) {
-         ms.getClient().announce(MaplePacketCreator.musicChange("Bgm04/ArabPirate"))
+         PacketCreator.announce(ms.getClient(), new MusicChange("Bgm04/ArabPirate"))
          ms.getClient().announce(MaplePacketCreator.crogBoatPacket(true))
       }
 

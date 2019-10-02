@@ -75,6 +75,11 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.field.effect.EnvironmentChange;
+import tools.packet.field.effect.MapEffect;
+import tools.packet.field.effect.MapSound;
+import tools.packet.field.effect.MusicChange;
+import tools.packet.field.effect.ShowEffect;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.remove.RemoveItem;
@@ -685,15 +690,15 @@ public class AbstractPlayerInteraction {
    }
 
    public void changeMusic(String songName) {
-      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.musicChange(songName));
+      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new MusicChange(songName));
    }
 
    public void mapEffect(String path) {
-      c.announce(MaplePacketCreator.mapEffect(path));
+      PacketCreator.announce(c, new MapEffect(path));
    }
 
    public void mapSound(String path) {
-      c.announce(MaplePacketCreator.mapSound(path));
+      PacketCreator.announce(c, new MapSound(path));
    }
 
    public void displayAranIntro() {
@@ -1022,7 +1027,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void showEffect(String effect) {
-      c.announce(MaplePacketCreator.showEffect(effect));
+      PacketCreator.announce(c, new ShowEffect(effect));
    }
 
    public void dojoEnergy() {
@@ -1069,11 +1074,11 @@ public class AbstractPlayerInteraction {
    }
 
    public void playSound(String sound) {
-      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.environmentChange(sound, 4));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), new EnvironmentChange(sound, 4));
    }
 
    public void environmentChange(String env, int mode) {
-      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.environmentChange(env, mode));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), new EnvironmentChange(env, mode));
    }
 
    public String numberWithCommas(int number) {

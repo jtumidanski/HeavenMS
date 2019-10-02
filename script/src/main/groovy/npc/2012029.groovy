@@ -5,7 +5,10 @@ import scripting.npc.NPCConversationManager
 import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
+import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.packet.field.effect.PlaySound
+import tools.packet.field.effect.ShowEffect
 
 /*
 	NPC Name: 		
@@ -43,7 +46,7 @@ class NPC2012029 {
          }
 
          if (status == 0) {
-            MasterBroadcaster.getInstance().sendToAllInMap(cm.getMap(), { character -> MaplePacketCreator.playSound("orbis/" + harpSounds[cm.getNpc() - 2012027]) })
+            MasterBroadcaster.getInstance().sendToAllInMap(cm.getMap(), new PlaySound("orbis/" + harpSounds[cm.getNpc() - 2012027]))
 
             if (cm.isQuestStarted(3114)) {
                int idx = cm.getQuestProgress(3114, 7777)
@@ -54,8 +57,8 @@ class NPC2012029 {
                   if (harpNote != nextNote) {
                      cm.setQuestProgress(3114, 7777, 0)
 
-                     cm.getPlayer().announce(MaplePacketCreator.showEffect("quest/party/wrong_kor"))
-                     cm.getPlayer().announce(MaplePacketCreator.playSound("Party1/Failed"))
+                     PacketCreator.announce(cm.getPlayer(), new ShowEffect("quest/party/wrong_kor"))
+                     PacketCreator.announce(cm.getPlayer(), new PlaySound("Party1/Failed"))
 
                      MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "You've missed the note... Start over again.")
                   } else {
@@ -68,8 +71,8 @@ class NPC2012029 {
                            MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Twinkle, twinkle, little star, how I wonder what you are.")
                            cm.setQuestProgress(3114, 7777, -1)
 
-                           cm.getPlayer().announce(MaplePacketCreator.showEffect("quest/party/clear"))
-                           cm.getPlayer().announce(MaplePacketCreator.playSound("Party1/Clear"))
+                           PacketCreator.announce(cm.getPlayer(), new ShowEffect("quest/party/clear"))
+                           PacketCreator.announce(cm.getPlayer(), new PlaySound("Party1/Clear"))
 
                            cm.dispose()
                            return

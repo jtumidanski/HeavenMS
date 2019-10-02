@@ -106,6 +106,7 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.monster.carnival.MonsterCarnivalStart;
 import tools.packet.remove.RemoveDragon;
@@ -2195,7 +2196,7 @@ public class MapleMap {
    }
 
    public void changeEnvironment(String mapObj, int newState) {
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.environmentChange(mapObj, newState));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, new EnvironmentChange(mapObj, newState));
    }
 
    public void startMapEffect(String msg, int itemId) {

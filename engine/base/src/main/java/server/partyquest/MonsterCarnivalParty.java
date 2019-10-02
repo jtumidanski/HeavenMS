@@ -6,6 +6,8 @@ import java.util.List;
 import client.MapleCharacter;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.field.effect.ShowEffect;
 
 /**
  * @author Rob
@@ -113,7 +115,7 @@ public class MonsterCarnivalParty {
       final String effect = winner ? "quest/carnival/win" : "quest/carnival/lose";
 
       for (final MapleCharacter chr : members) {
-         chr.announce(MaplePacketCreator.showEffect(effect));
+         PacketCreator.announce(chr, new ShowEffect(effect));
       }
    }
 

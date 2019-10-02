@@ -25,6 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.remove.RemoveDragon;
 import tools.packet.spawn.SpawnDragon;
 
 
@@ -57,7 +58,7 @@ public class MapleDragon extends AbstractAnimatedMapleMapObject {
 
    @Override
    public void sendDestroyData(MapleClient c) {
-      c.announce(MaplePacketCreator.removeDragon(owner.getId()));
+      PacketCreator.announce(c, new RemoveDragon(owner.getId()));
    }
 
    public MapleCharacter getOwner() {

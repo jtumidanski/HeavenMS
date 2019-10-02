@@ -9,7 +9,9 @@ import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
 import tools.MessageBroadcaster
+import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.packet.field.effect.ShowEffect
 
 import java.awt.*
 import java.util.List
@@ -131,7 +133,7 @@ class EventRescueGaga {
       MapleMap map = eim.getMapInstance(entryMap)
       player.changeMap(map, map.getPortal(0))
 
-      player.announce(MaplePacketCreator.showEffect("event/space/start"))
+      PacketCreator.announce(player, new ShowEffect("event/space/start"))
       player.startMapEffect("Please rescue Gaga within the time limit.", 5120027)
    }
 

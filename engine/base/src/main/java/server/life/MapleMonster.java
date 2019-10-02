@@ -81,6 +81,9 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.field.effect.PlaySound;
+import tools.packet.field.effect.ShowBossHP;
+import tools.packet.field.effect.ShowEffect;
 import tools.packet.remove.RemoveSummon;
 import tools.packet.spawn.ControlMonster;
 import tools.packet.spawn.SpawnFakeMonster;
@@ -792,8 +795,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       if (toSpawn != null) {
          final MapleMap reviveMap = map;
          if (toSpawn.contains(9300216) && reviveMap.getId() > 925000000 && reviveMap.getId() < 926000000) {
-            MasterBroadcaster.getInstance().sendToAllInMap(reviveMap, character -> MaplePacketCreator.playSound("Dojang/clear"));
-            MasterBroadcaster.getInstance().sendToAllInMap(reviveMap, character -> MaplePacketCreator.showEffect("dojang/end/clear"));
+            MasterBroadcaster.getInstance().sendToAllInMap(reviveMap, new PlaySound("Dojang/clear"));
+            MasterBroadcaster.getInstance().sendToAllInMap(reviveMap, new ShowEffect("dojang/end/clear"));
          }
          Pair<Integer, String> timeMob = reviveMap.getTimeMob();
          if (timeMob != null) {
@@ -1049,7 +1052,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    public byte[] makeBossHPBarPacket() {
-      return MaplePacketCreator.showBossHP(getId(), getHp(), getMaxHp(), getTagColor(), getTagBgColor());
+      return PacketCreator.create(new ShowBossHP(getId(), getHp(), getMaxHp(), getTagColor(), getTagBgColor()));
    }
 
    public boolean hasBossHPBar() {

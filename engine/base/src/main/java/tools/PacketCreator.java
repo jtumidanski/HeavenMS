@@ -16,6 +16,7 @@ import tools.packet.factory.CharacterListPacketFactory;
 import tools.packet.factory.CharacterNameResponsePacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.FamilyPacketFactory;
+import tools.packet.factory.FieldEffectPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.GuildPacketFactory;
@@ -187,6 +188,8 @@ public class PacketCreator {
          case REMOVE_NPC:
          case REMOVE_DRAGON:
             return Optional.of(RemovePacketFactory.getInstance());
+         case FIELD_EFFECT:
+            return Optional.of(FieldEffectPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

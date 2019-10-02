@@ -25,6 +25,7 @@ import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
+import tools.packet.field.effect.PlaySound;
 import tools.packet.foreigneffect.ShowForeignBuybackEffect;
 import tools.packet.showitemgaininchat.ShowBuybackEffect;
 
@@ -76,7 +77,7 @@ public class BuybackProcessor {
          chr.broadcastStance(chr.isFacingLeft() ? 5 : 4);
 
          MapleMap map = chr.getMap();
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.playSound("Buyback/" + jobString));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new PlaySound("Buyback/" + jobString));
          MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.earnTitleMessage(chr.getName() + " just bought back into the game!"));
 
          PacketCreator.announce(chr, new ShowBuybackEffect());

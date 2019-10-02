@@ -8,10 +8,10 @@ import scripting.event.EventManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.packet.field.effect.MusicChange
 
 import java.awt.*
 
@@ -122,8 +122,8 @@ class EventBoats {
          Boat_to_Orbis.broadcastEnemyShip(true)
          Boat_to_Ellinia.broadcastEnemyShip(true)
 
-         MasterBroadcaster.getInstance().sendToAllInMap(Boat_to_Orbis, { character -> MaplePacketCreator.musicChange("Bgm04/ArabPirate") })
-         MasterBroadcaster.getInstance().sendToAllInMap(Boat_to_Ellinia, { character -> MaplePacketCreator.musicChange("Bgm04/ArabPirate") })
+         MasterBroadcaster.getInstance().sendToAllInMap(Boat_to_Orbis, new MusicChange("Bgm04/ArabPirate"))
+         MasterBroadcaster.getInstance().sendToAllInMap(Boat_to_Ellinia, new MusicChange("Bgm04/ArabPirate"))
 
          em.schedule("invasion", invasionDelay)
       }

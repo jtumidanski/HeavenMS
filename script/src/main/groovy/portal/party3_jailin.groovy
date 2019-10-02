@@ -1,12 +1,12 @@
 package portal
 
-
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.packet.field.effect.PlaySound
+import tools.packet.field.effect.ShowEffect
 
 def enterLeverSequence(PortalPlayerInteraction pi) {
    MapleMap map = pi.getMap()
@@ -39,15 +39,15 @@ def enterLeverSequence(PortalPlayerInteraction pi) {
       }
 
       if (countMiss > 0) {
-         MasterBroadcaster.getInstance().sendToAllInMap(map, { character -> MaplePacketCreator.showEffect("quest/party/wrong_kor") })
-         MasterBroadcaster.getInstance().sendToAllInMap(map, { character -> MaplePacketCreator.playSound("Party1/Failed") })
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowEffect("quest/party/wrong_kor"))
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new PlaySound("Party1/Failed"))
 
          MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The right combination of levers is needed to pass. " + countMiss + " lever(s) are misplaced.")
          return false
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMap(map, { character -> MaplePacketCreator.showEffect("quest/party/clear") })
-      MasterBroadcaster.getInstance().sendToAllInMap(map, { character -> MaplePacketCreator.playSound("Party1/Clear") })
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowEffect("quest/party/clear"))
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new PlaySound("Party1/Clear"))
       pi.getEventInstance().setProperty("jail" + jailn, "0")
    }
 

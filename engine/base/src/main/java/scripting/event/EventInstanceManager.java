@@ -67,7 +67,11 @@ import server.maps.MaplePortal;
 import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.field.effect.EnvironmentChange;
+import tools.packet.field.effect.PlaySound;
+import tools.packet.field.effect.ShowEffect;
 import tools.packet.spawn.SpawnNPC;
 
 /**
@@ -1284,8 +1288,8 @@ public class EventInstanceManager {
 
    public final void showWrongEffect(int mapId) {
       MapleMap map = getMapInstance(mapId);
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showEffect("quest/party/wrong_kor"));
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.playSound("Party1/Failed"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowEffect("quest/party/wrong_kor"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new PlaySound("Party1/Failed"));
    }
 
    public final void showClearEffect() {
@@ -1313,10 +1317,10 @@ public class EventInstanceManager {
 
    public final void showClearEffect(boolean hasGate, int mapId, String mapObj, int newState) {
       MapleMap map = getMapInstance(mapId);
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showEffect("quest/party/clear"));
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.playSound("Party1/Clear"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowEffect("quest/party/clear"));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new PlaySound("Party1/Clear"));
       if (hasGate) {
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.environmentChange(mapObj, newState));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new EnvironmentChange(mapObj, newState));
          wL.lock();
          try {
             openedGates.put(map.getId(), new Pair<>(mapObj, newState));
@@ -1339,7 +1343,7 @@ public class EventInstanceManager {
       }
 
       if (gateData != null) {
-         chr.announce(MaplePacketCreator.environmentChange(gateData.getLeft(), gateData.getRight()));
+         PacketCreator.announce(chr, new EnvironmentChange(gateData.getLeft(), gateData.getRight()));
       }
    }
 

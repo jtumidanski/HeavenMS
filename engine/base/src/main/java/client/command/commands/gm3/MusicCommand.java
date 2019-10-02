@@ -27,9 +27,9 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import constants.GameConstants;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
+import tools.packet.field.effect.MusicChange;
 import tools.packet.npctalk.GetNPCTalk;
 
 public class MusicCommand extends Command {
@@ -63,7 +63,7 @@ public class MusicCommand extends Command {
       String song = player.getLastCommandMessage();
       for (String s : GameConstants.GAME_SONGS) {
          if (s.equalsIgnoreCase(song)) {    // thanks Masterrulax for finding an issue here
-            MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.musicChange(s));
+            MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new MusicChange(s));
             player.yellowMessage("Now playing song " + s + ".");
             return;
          }

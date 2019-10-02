@@ -15,7 +15,10 @@ import server.maps.MapleReactor;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.field.effect.PlaySound;
+import tools.packet.field.effect.ShowEffect;
 
 /**
  * @author Drago/Dragohe4rt
@@ -319,12 +322,12 @@ public class MonsterCarnival {
             .map(MaplePartyCharacter::getPlayer)
             .forEach(character -> {
                if (win) {
-                  character.getClient().announce(MaplePacketCreator.showEffect("quest/carnival/win"));
-                  character.getClient().announce(MaplePacketCreator.playSound("MobCarnival/Win"));
+                  PacketCreator.announce(character, new ShowEffect("quest/carnival/win"));
+                  PacketCreator.announce(character, new PlaySound("MobCarnival/Win"));
                   character.dispelDebuffs();
                } else {
-                  character.getClient().announce(MaplePacketCreator.showEffect("quest/carnival/lose"));
-                  character.getClient().announce(MaplePacketCreator.playSound("MobCarnival/Lose"));
+                  PacketCreator.announce(character, new ShowEffect("quest/carnival/lose"));
+                  PacketCreator.announce(character, new PlaySound("MobCarnival/Lose"));
                   character.dispelDebuffs();
                }
             });

@@ -91,6 +91,7 @@ import tools.ServerNoticeType;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.UpdateAllianceInfo;
+import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.npctalk.GetDimensionalMirror;
 import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.npctalk.GetNPCTalkNum;
@@ -321,7 +322,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    @Override
    public void showEffect(String effect) {
-      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.environmentChange(effect, 3));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), new EnvironmentChange(effect, 3));
    }
 
    public void setHair(int hair) {

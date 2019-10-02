@@ -108,9 +108,10 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.packet.stat.EnableActions;
+import tools.packet.field.effect.MusicChange;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.stat.EnableActions;
 
 public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseCashItemPacket> {
 
@@ -544,7 +545,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void jukebox(MapleClient c, MapleCharacter player, short position, int itemId) {
-      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.musicChange("Jukebox/Congratulation"));
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new MusicChange("Jukebox/Congratulation"));
       remove(c, position, itemId);
    }
 

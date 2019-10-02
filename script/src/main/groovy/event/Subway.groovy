@@ -11,6 +11,7 @@ import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.packet.field.effect.PlaySound
 
 class EventSubway {
    EventManager em
@@ -66,8 +67,8 @@ class EventSubway {
 
    def takeoff() {
       //sound src: https://www.soundjay.com/transportation/metro-door-close-01.mp3
-      MasterBroadcaster.getInstance().sendToAllInMap(KC_docked, { character -> MaplePacketCreator.playSound("subway/whistle") })
-      MasterBroadcaster.getInstance().sendToAllInMap(NLC_docked, { character -> MaplePacketCreator.playSound("subway/whistle") })
+      MasterBroadcaster.getInstance().sendToAllInMap(KC_docked, new PlaySound("subway/whistle"))
+      MasterBroadcaster.getInstance().sendToAllInMap(NLC_docked, new PlaySound("subway/whistle"))
 
       em.setProperty("docked", "false")
       KC_Waiting.warpEveryone(Subway_to_NLC.getId())
@@ -80,8 +81,8 @@ class EventSubway {
       Subway_to_NLC.warpEveryone(NLC_docked.getId(), 0)
       scheduleNew()
 
-      MasterBroadcaster.getInstance().sendToAllInMap(KC_docked, { character -> MaplePacketCreator.playSound("subway/whistle") })
-      MasterBroadcaster.getInstance().sendToAllInMap(NLC_docked, { character -> MaplePacketCreator.playSound("subway/whistle") })
+      MasterBroadcaster.getInstance().sendToAllInMap(KC_docked, new PlaySound("subway/whistle"))
+      MasterBroadcaster.getInstance().sendToAllInMap(NLC_docked, new PlaySound("subway/whistle"))
    }
 
    def setLobbyRange() {
