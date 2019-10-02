@@ -29,6 +29,10 @@ import server.TimerManager;
 import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.event.HitSnowBall;
+import tools.packet.event.RollSnowBall;
+import tools.packet.event.SnowBallMessage;
 
 /**
  * @author kevintjuh93
@@ -48,17 +52,22 @@ public class MapleSnowball {
       this.team = team;
 
       for (MapleCharacter chr : map.getCharacters()) {
-         if (chr.getTeam() == team)
+         if (chr.getTeam() == team) {
             characters.add(chr);
+         }
       }
    }
 
    public void startEvent() {
-      if (hittable) return;
+      if (hittable) {
+         return;
+      }
 
       for (MapleCharacter chr : characters) {
          if (chr != null) {
-            chr.announce(MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
+            MapleSnowball firstSnowBall = map.getSnowball(0);
+            MapleSnowball secondSnowBall = map.getSnowball(1);
+            PacketCreator.announce(chr, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
             chr.announce(MaplePacketCreator.getClock(600));
          }
       }
@@ -68,14 +77,18 @@ public class MapleSnowball {
          public void run() {
             if (map.getSnowball(team).getPosition() > map.getSnowball(team == 0 ? 1 : 0).getPosition()) {
                for (MapleCharacter chr : characters) {
-                  if (chr != null)
-                     chr.announce(MaplePacketCreator.rollSnowBall(false, 3, map.getSnowball(0), map.getSnowball(0)));
+                  if (chr != null) {
+                     MapleSnowball firstSnowBall = map.getSnowball(0);
+                     PacketCreator.announce(chr, new RollSnowBall(false, 3, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition()));
+                  }
                }
                winner = true;
             } else if (map.getSnowball(team == 0 ? 1 : 0).getPosition() > map.getSnowball(team).getPosition()) {
                for (MapleCharacter chr : characters) {
-                  if (chr != null)
-                     chr.announce(MaplePacketCreator.rollSnowBall(false, 4, map.getSnowball(0), map.getSnowball(0)));
+                  if (chr != null) {
+                     MapleSnowball firstSnowBall = map.getSnowball(0);
+                     PacketCreator.announce(chr, new RollSnowBall(false, 4, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition()));
+                  }
                }
                winner = true;
             } //Else
@@ -106,10 +119,10 @@ public class MapleSnowball {
    }
 
    public void hit(int what, int damage) {
-      if (what < 2)
-         if (damage > 0)
+      if (what < 2) {
+         if (damage > 0) {
             this.hits--;
-         else {
+         } else {
             if (this.snowmanhp - damage < 0) {
                this.snowmanhp = 0;
 
@@ -121,31 +134,39 @@ public class MapleSnowball {
                      message(5);
                   }
                }, 10000);
-            } else
+            } else {
                this.snowmanhp -= damage;
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
+            }
+            MapleSnowball firstSnowBall = map.getSnowball(0);
+            MapleSnowball secondSnowBall = map.getSnowball(1);
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
          }
+      }
 
       if (this.hits == 0) {
          this.position += 1;
-         if (this.position == 45)
+         if (this.position == 45) {
             map.getSnowball(team == 0 ? 1 : 0).message(1);
-         else if (this.position == 290)
+         } else if (this.position == 290) {
             map.getSnowball(team == 0 ? 1 : 0).message(2);
-         else if (this.position == 560)
+         } else if (this.position == 560) {
             map.getSnowball(team == 0 ? 1 : 0).message(3);
+         }
 
          this.hits = 3;
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.rollSnowBall(false, 0, map.getSnowball(0), map.getSnowball(1)));
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.rollSnowBall(false, 1, map.getSnowball(0), map.getSnowball(1)));
+         MapleSnowball firstSnowBall = map.getSnowball(0);
+         MapleSnowball secondSnowBall = map.getSnowball(1);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, 0, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
       }
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitSnowBall(what, damage));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new HitSnowBall(what, damage));
    }
 
    public void message(int message) {
       for (MapleCharacter chr : characters) {
-         if (chr != null)
-            chr.announce(MaplePacketCreator.snowballMessage(team, message));
+         if (chr != null) {
+            PacketCreator.announce(chr, new SnowBallMessage(team, message));
+         }
       }
    }
 
@@ -154,10 +175,11 @@ public class MapleSnowball {
 
          @Override
          public void run() {
-            if (winner)
+            if (winner) {
                map.warpOutByTeam(team, 109050000);
-            else
+            } else {
                map.warpOutByTeam(team, 109050001);
+            }
 
             map.setSnowball(team, null);
          }

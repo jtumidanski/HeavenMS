@@ -29,10 +29,11 @@ import net.server.channel.packet.reader.CoconutReader;
 import server.events.gm.MapleCoconut;
 import server.events.gm.MapleCoconuts;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.packet.event.CoconutHit;
+import tools.packet.event.CoconutScore;
 
 /**
  * @author kevintjuh93
@@ -61,16 +62,16 @@ public final class CoconutHandler extends AbstractPacketHandler<CoconutPacket> {
          if (Math.random() < 0.01 && event.getStopped() > 0) {
             nut.setHittable(false);
             event.stopCoconut();
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitCoconut(false, packet.id(), 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutHit(false, packet.id(), 1));
             return;
          }
          nut.setHittable(false); // for sure :)
          nut.resetHits(); // For next event (without restarts)
          if (Math.random() < 0.05 && event.getBombings() > 0) {
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitCoconut(false, packet.id(), 2));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutHit(false, packet.id(), 2));
             event.bombCoconut();
          } else if (event.getFalling() > 0) {
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitCoconut(false, packet.id(), 3));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutHit(false, packet.id(), 3));
             event.fallCoconut();
             if (client.getPlayer().getTeam() == 0) {
                event.addMapleScore();
@@ -79,11 +80,11 @@ public final class CoconutHandler extends AbstractPacketHandler<CoconutPacket> {
                event.addStoryScore();
                MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, client.getPlayer().getName() + " of Team Story knocks down a coconut.");
             }
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.coconutScore(event.getMapleScore(), event.getStoryScore()));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutScore(event.getMapleScore(), event.getStoryScore()));
          }
       } else {
          nut.hit();
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitCoconut(false, packet.id(), 1));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutHit(false, packet.id(), 1));
       }
    }
 }  

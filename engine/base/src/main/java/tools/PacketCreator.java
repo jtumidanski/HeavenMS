@@ -15,6 +15,7 @@ import tools.packet.factory.ChangeChannelPacketFactory;
 import tools.packet.factory.CharacterListPacketFactory;
 import tools.packet.factory.CharacterNameResponsePacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
+import tools.packet.factory.EventPacketFactory;
 import tools.packet.factory.FamilyPacketFactory;
 import tools.packet.factory.FieldEffectPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
@@ -190,6 +191,12 @@ public class PacketCreator {
             return Optional.of(RemovePacketFactory.getInstance());
          case FIELD_EFFECT:
             return Optional.of(FieldEffectPacketFactory.getInstance());
+         case SNOWBALL_STATE:
+         case HIT_SNOWBALL:
+         case SNOWBALL_MESSAGE:
+         case COCONUT_SCORE:
+         case COCONUT_HIT:
+            return Optional.of(EventPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

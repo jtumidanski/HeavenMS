@@ -32,6 +32,7 @@ import server.maps.MapleMap;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
+import tools.packet.event.CoconutHit;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
 
@@ -58,7 +59,7 @@ public class MapleCoconut extends MapleEvent {
       for (int i = 0; i < 506; i++) {
          coconuts.add(new MapleCoconuts(i));
       }
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.hitCoconut(true, 0, 0));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutHit(true, 0, 0));
       setCoconutsHittable(true);
       MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(300));
 

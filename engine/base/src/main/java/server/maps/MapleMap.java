@@ -106,6 +106,8 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.event.CoconutScore;
+import tools.packet.event.RollSnowBall;
 import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.monster.carnival.MonsterCarnivalStart;
@@ -2466,7 +2468,7 @@ public class MapleMap {
          chr.getClient().announce(MaplePacketCreator.showForcedEquip(-1));
       }
       if (specialEquip()) {
-         chr.getClient().announce(MaplePacketCreator.coconutScore(0, 0));
+         PacketCreator.announce(chr, new CoconutScore(0, 0));
          chr.getClient().announce(MaplePacketCreator.showForcedEquip(chr.getTeam()));
       }
       objectWLock.lock();
@@ -2517,7 +2519,7 @@ public class MapleMap {
       }
 
       if (mapid == 109060000) {
-         chr.announce(MaplePacketCreator.rollSnowBall(true, 0, null, null));
+         PacketCreator.announce(chr, new RollSnowBall(true, 0));
       }
 
       if (hasClock()) {
