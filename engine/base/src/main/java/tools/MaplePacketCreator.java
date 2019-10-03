@@ -75,17 +75,14 @@ import server.life.MapleMonster;
 import server.life.MaplePlayerNPC;
 import server.life.MobSkill;
 import server.maps.AbstractMapleMapObject;
-import server.maps.MapleDragon;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMapItem;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MapleReactor;
-import server.movement.LifeMovementFragment;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.movement.MoveMonsterResponse;
 import tools.packet.statusinfo.ShowItemGain;
 
 /**
@@ -2829,72 +2826,6 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.VICIOUS_HAMMER.getValue());
       mplew.write(0x3D);
-      mplew.writeInt(0);
-      return mplew.getPacket();
-   }
-
-   // MAKER_RESULT packets thanks to Arnah (Vertisy)
-   public static byte[] makerResult(boolean success, int itemMade, int itemCount, int mesos, List<Pair<Integer, Integer>> itemsLost, int catalystID, List<Integer> INCBuffGems) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(success ? 0 : 1); // 0 = success, 1 = fail
-      mplew.writeInt(1); // 1 or 2 doesn't matter, same methods
-      mplew.writeBool(!success);
-      if (success) {
-         mplew.writeInt(itemMade);
-         mplew.writeInt(itemCount);
-      }
-      mplew.writeInt(itemsLost.size()); // Loop
-      for (Pair<Integer, Integer> item : itemsLost) {
-         mplew.writeInt(item.getLeft());
-         mplew.writeInt(item.getRight());
-      }
-      mplew.writeInt(INCBuffGems.size());
-      for (Integer gem : INCBuffGems) {
-         mplew.writeInt(gem);
-      }
-      if (catalystID != -1) {
-         mplew.write(1); // stimulator
-         mplew.writeInt(catalystID);
-      } else {
-         mplew.write(0);
-      }
-
-      mplew.writeInt(mesos);
-      return mplew.getPacket();
-   }
-
-   public static byte[] makerResultCrystal(int itemIdGained, int itemIdLost) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(0); // Always successful!
-      mplew.writeInt(3); // Monster Crystal
-      mplew.writeInt(itemIdGained);
-      mplew.writeInt(itemIdLost);
-      return mplew.getPacket();
-   }
-
-   public static byte[] makerResultDesynth(int itemId, int mesos, List<Pair<Integer, Integer>> itemsGained) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(0); // Always successful!
-      mplew.writeInt(4); // Mode Desynth
-      mplew.writeInt(itemId); // Item desynthed
-      mplew.writeInt(itemsGained.size()); // Loop of items gained, (int, int)
-      for (Pair<Integer, Integer> item : itemsGained) {
-         mplew.writeInt(item.getLeft());
-         mplew.writeInt(item.getRight());
-      }
-      mplew.writeInt(mesos); // Mesos spent.
-      return mplew.getPacket();
-   }
-
-   public static byte[] makerEnableActions() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(0); // Always successful!
-      mplew.writeInt(0); // Monster Crystal
-      mplew.writeInt(0);
       mplew.writeInt(0);
       return mplew.getPacket();
    }

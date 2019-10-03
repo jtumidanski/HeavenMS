@@ -44,13 +44,16 @@ import net.server.channel.packet.reader.MakerActionReader;
 import server.MakerItemFactory;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowForeignMakerEffect;
+import tools.packet.maker.MakerCrystalResult;
+import tools.packet.maker.MakerEnableActions;
+import tools.packet.maker.MakerResult;
+import tools.packet.maker.MakerResultDesynth;
 import tools.packet.showitemgaininchat.ShowMakerEffect;
 
 /**
@@ -80,7 +83,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                toCreate = MapleItemInformationProvider.getInstance().getMakerCrystalFromLeftover(toCreate);
                if (toCreate == -1) {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, MapleItemInformationProvider.getInstance().getName(fromLeftover) + " is unavailable for Monster Crystal conversion.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   return;
                }
 
@@ -97,12 +100,12 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                      recipe = MakerItemFactory.generateDisassemblyCrystalEntry(toDisassemble, p.getLeft(), p.getRight());
                   } else {
                      MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, MapleItemInformationProvider.getInstance().getName(toCreate) + " is unavailable for Monster Crystal disassembly.");
-                     client.announce(MaplePacketCreator.makerEnableActions());
+                     PacketCreator.announce(client, new MakerEnableActions());
                      return;
                   }
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "An unknown error occurred when trying to apply that item for disassembly.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   return;
                }
             } else {
@@ -149,7 +152,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                   if (!reagentids.isEmpty()) {
                      if (!removeOddMakerReagents(toCreate, reagentids)) {
                         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You can only use WATK and MATK Strengthening Gems on weapon items.");
-                        client.announce(MaplePacketCreator.makerEnableActions());
+                        PacketCreator.announce(client, new MakerEnableActions());
                         return;
                      }
                   }
@@ -164,32 +167,32 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                case -1:// non-available for Maker itemid has been tried to forge
                   FilePrinter.printError(FilePrinter.EXPLOITS, "Player " + client.getPlayer().getName() + " tried to craft itemid " + toCreate + " using the Maker skill.");
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "The requested item could not be crafted on this operation.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   break;
 
                case 1: // no items
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have all required items in your inventory to make " + MapleItemInformationProvider.getInstance().getName(toCreate) + ".");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   break;
 
                case 2: // no meso
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos (" + GameConstants.numberWithCommas(recipe.getCost()) + ") to complete this operation.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   break;
 
                case 3: // no req level
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough level to complete this operation.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   break;
 
                case 4: // no req skill level
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough Maker level to complete this operation.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   break;
 
                case 5: // inventory full
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full.");
-                  client.announce(MaplePacketCreator.makerEnableActions());
+                  PacketCreator.announce(client, new MakerEnableActions());
                   break;
 
                default:
@@ -232,11 +235,11 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
 
                   // thanks inhyuk for noticing missing MAKER_RESULT packets
                   if (type == 3) {
-                     client.announce(MaplePacketCreator.makerResultCrystal(recipe.getGainItems().get(0).getLeft(), recipe.getReqItems().get(0).getLeft()));
+                     PacketCreator.announce(client, new MakerCrystalResult(recipe.getGainItems().get(0).getLeft(), recipe.getReqItems().get(0).getLeft()));
                   } else if (type == 4) {
-                     client.announce(MaplePacketCreator.makerResultDesynth(recipe.getReqItems().get(0).getLeft(), recipe.getCost(), recipe.getGainItems()));
+                     PacketCreator.announce(client, new MakerResultDesynth(recipe.getReqItems().get(0).getLeft(), recipe.getCost(), recipe.getGainItems()));
                   } else {
-                     client.announce(MaplePacketCreator.makerResult(makerSucceeded, recipe.getGainItems().get(0).getLeft(), recipe.getGainItems().get(0).getRight(), recipe.getCost(), recipe.getReqItems(), stimulantid, new LinkedList<>(reagentids.keySet())));
+                     PacketCreator.announce(client, new MakerResult(makerSucceeded, recipe.getGainItems().get(0).getLeft(), recipe.getGainItems().get(0).getRight(), recipe.getCost(), recipe.getReqItems(), stimulantid, new LinkedList<>(reagentids.keySet())));
                   }
 
                   PacketCreator.announce(client, new ShowMakerEffect(makerSucceeded));
