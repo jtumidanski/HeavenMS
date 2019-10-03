@@ -207,6 +207,9 @@ import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
 import tools.packet.alliance.UpdateAllianceJobLevel;
+import tools.packet.buddy.RequestAddBuddy;
+import tools.packet.buddy.UpdateBuddyCapacity;
+import tools.packet.buddy.UpdateBuddyList;
 import tools.packet.field.set.WarpToMap;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
@@ -224,6 +227,7 @@ import tools.packet.monster.carnival.MonsterCarnivalPlayerDied;
 import tools.packet.monster.carnival.MonsterCarnivalPointObtained;
 import tools.packet.movement.MovePlayer;
 import tools.packet.partyoperation.UpdateParty;
+import tools.packet.pet.PetExceptionList;
 import tools.packet.quest.info.AddQuestTimeLimit;
 import tools.packet.quest.info.QuestExpire;
 import tools.packet.quest.info.UpdateQuestInfo;
@@ -250,7 +254,7 @@ import tools.packet.statusinfo.ShowMesoGain;
 import tools.packet.statusinfo.ShowQuestForfeit;
 import tools.packet.statusinfo.UpdateAreaInfo;
 import tools.packet.statusinfo.UpdateQuest;
-import tools.packets.Wedding;
+import tools.packet.wedding.WeddingPartnerTransfer;
 
 public class MapleCharacter extends AbstractMapleCharacterObject {
    private static final MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
@@ -1669,7 +1673,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (partnerId > 0) {
          getWorldServer().getPlayerStorage().getCharacterById(partnerId)
                .filter(character -> !character.isAwayFromWorld())
-               .ifPresent(character -> character.announce(Wedding.OnNotifyWeddingPartnerTransfer(id, mapId)));
+               .ifPresent(character -> PacketCreator.announce(character, new WeddingPartnerTransfer(id, mapId)));
       }
    }
 
@@ -2141,7 +2145,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void nextPendingRequest(MapleClient c) {
       CharacterNameAndId pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
       if (pendingBuddyRequest != null) {
-         c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
+         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
       }
    }
 
@@ -2159,7 +2163,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          notifyRemoteChannel(client, getWorldServer().find(otherCid), otherCid, BuddyListOperation.DELETED);
       }
       bl.remove(otherCid);
-      client.announce(MaplePacketCreator.updateBuddylist(getBuddylist().getBuddies()));
+      PacketCreator.announce(client, new UpdateBuddyList(getBuddylist().getBuddies()));
       nextPendingRequest(client);
    }
 
@@ -4156,7 +4160,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          Set<Integer> exclItems = pe.getValue();
          if (!exclItems.isEmpty()) {
-            client.announce(MaplePacketCreator.loadExceptionList(this.getId(), pe.getKey(), petIndex, new ArrayList<>(exclItems)));
+            PacketCreator.announce(client, new PetExceptionList(this.getId(), pe.getKey(), petIndex, new ArrayList<>(exclItems)));
 
             chrLock.lock();
             try {
@@ -4178,7 +4182,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          Set<Integer> exclItems = pe.getValue();
          if (!exclItems.isEmpty()) {
-            c.announce(MaplePacketCreator.loadExceptionList(this.getId(), pe.getKey(), petIndex, new ArrayList<>(exclItems)));
+            PacketCreator.announce(c, new PetExceptionList(this.getId(), pe.getKey(), petIndex, new ArrayList<>(exclItems)));
          }
       }
    }
@@ -7094,7 +7098,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void setBuddyCapacity(int capacity) {
       buddylist.capacity_$eq(capacity);
-      client.announce(MaplePacketCreator.updateBuddyCapacity(capacity));
+      PacketCreator.announce(client, new UpdateBuddyCapacity(capacity));
    }
 
    public void setBuffedValue(MapleBuffStat effect, int value) {

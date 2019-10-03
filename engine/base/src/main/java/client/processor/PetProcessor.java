@@ -11,11 +11,11 @@ import client.inventory.manipulator.MapleCashIdGenerator;
 import constants.ExpTable;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.foreigneffect.ShowPetLevelUp;
+import tools.packet.pet.PetFoodResponse;
 import tools.packet.showitemgaininchat.ShowOwnPetLevelUp;
 
 public class PetProcessor {
@@ -104,7 +104,7 @@ public class PetProcessor {
          enjoyed = false;
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.petFoodResponse(owner.getId(), slot, enjoyed, false));
+      MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new PetFoodResponse(owner.getId(), slot, enjoyed, false));
       PetProcessor.getInstance().saveToDb(pet);
 
       Item petz = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());

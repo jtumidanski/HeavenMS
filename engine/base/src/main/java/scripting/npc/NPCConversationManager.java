@@ -99,7 +99,8 @@ import tools.packet.npctalk.GetNPCTalkNum;
 import tools.packet.npctalk.GetNPCTalkStyle;
 import tools.packet.npctalk.GetNPCTalkText;
 import tools.packet.stat.EnableActions;
-import tools.packets.Wedding;
+import tools.packet.wedding.SendWishList;
+import tools.packet.wedding.WeddingGiftResult;
 
 /**
  * @author Matze
@@ -1009,17 +1010,17 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          MapleCharacter chr = marriage.getPlayerById(cid);
          if (chr != null) {
             if (chr.getId() == player.getId()) {
-               player.announce(Wedding.OnWeddingGiftResult((byte) 0xA, marriage.getWishlistItems(groom), marriage.getGiftItems(player.getClient(), groom)));
+               PacketCreator.announce(player, new WeddingGiftResult((byte) 0xA, marriage.getWishlistItems(groom), marriage.getGiftItems(player.getClient(), groom)));
             } else {
                marriage.setIntProperty("wishlistSelection", groom ? 0 : 1);
-               player.announce(Wedding.OnWeddingGiftResult((byte) 0x09, marriage.getWishlistItems(groom), marriage.getGiftItems(player.getClient(), groom)));
+               PacketCreator.announce(player, new WeddingGiftResult((byte) 0x09, marriage.getWishlistItems(groom), marriage.getGiftItems(player.getClient(), groom)));
             }
          }
       }
    }
 
    public void sendMarriageGifts(List<Item> gifts) {
-      this.getPlayer().announce(Wedding.OnWeddingGiftResult((byte) 0xA, Collections.singletonList(""), gifts));
+      PacketCreator.announce(getPlayer(), new WeddingGiftResult((byte) 0xA, Collections.singletonList(""), gifts));
    }
 
    public boolean createMarriageWishlist() {
@@ -1035,7 +1036,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
             }
 
             if (marriage.getProperty(wlKey).contentEquals("")) {
-               getClient().announce(Wedding.sendWishList());
+               PacketCreator.announce(getClient(), new SendWishList());
                return true;
             }
          }

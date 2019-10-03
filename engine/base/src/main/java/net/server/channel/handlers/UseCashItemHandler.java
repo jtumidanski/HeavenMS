@@ -115,6 +115,7 @@ import tools.packet.message.ClearAvatarMegaphone;
 import tools.packet.message.GetAvatarMegaphone;
 import tools.packet.message.ItemMegaphone;
 import tools.packet.message.MultiMegaphone;
+import tools.packet.pet.PetNameChange;
 import tools.packet.stat.EnableActions;
 
 public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseCashItemPacket> {
@@ -533,7 +534,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          player.forceUpdateItem(item);
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.changePetName(player, newName, 1), true, player);
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new PetNameChange(player.getId(), newName, 1), true, player);
       PacketCreator.announce(c, new EnableActions());
       remove(c, position, itemId);
    }

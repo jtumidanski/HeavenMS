@@ -82,13 +82,15 @@ import tools.packet.AfterLoginError;
 import tools.packet.alliance.AllianceMemberOnline;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.UpdateAllianceInfo;
+import tools.packet.buddy.RequestAddBuddy;
+import tools.packet.buddy.UpdateBuddyList;
 import tools.packet.family.FamilyLogonNotice;
 import tools.packet.family.GetFamilyInfo;
 import tools.packet.family.LoadFamily;
 import tools.packet.field.set.GetCharacterInfo;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.parcel.DueyParcelNotification;
-import tools.packets.Wedding;
+import tools.packet.wedding.WeddingPartnerTransfer;
 
 public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLoggedInPacket> {
    private static Set<Integer> attemptingLoginAccounts = new HashSet<>();
@@ -295,7 +297,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                ble.channel_$eq(onlineBuddy.getChannel());
                bl.put(ble);
             }
-            client.announce(MaplePacketCreator.updateBuddylist(bl.getBuddies()));
+            PacketCreator.announce(client, new UpdateBuddyList(bl.getBuddies()));
 
             PacketCreator.announce(client, new LoadFamily());
             if (player.getFamilyId() > 0) {
@@ -337,11 +339,11 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                eqpInv.unlockInventory();
             }
 
-            client.announce(MaplePacketCreator.updateBuddylist(player.getBuddylist().getBuddies()));
+            PacketCreator.announce(client, new UpdateBuddyList(player.getBuddylist().getBuddies()));
 
             CharacterNameAndId pendingBuddyRequest = client.getPlayer().getBuddylist().pollPendingRequest();
             if (pendingBuddyRequest != null) {
-               client.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.id(), client.getPlayer().getId(), pendingBuddyRequest.name()));
+               PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.id(), client.getPlayer().getId(), pendingBuddyRequest.name()));
             }
 
             client.announce(MaplePacketCreator.updateGender(player));
@@ -438,8 +440,8 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
    private void loggingInPartnerOperations(World world, MapleCharacter player) {
       int partnerId = player.getPartnerId();
       world.getPlayerStorage().getCharacterById(partnerId).filter(partner -> !partner.isAwayFromWorld()).ifPresent(partner -> {
-         player.announce(Wedding.OnNotifyWeddingPartnerTransfer(partnerId, partner.getMapId()));
-         partner.announce(Wedding.OnNotifyWeddingPartnerTransfer(player.getId(), player.getMapId()));
+         PacketCreator.announce(player, new WeddingPartnerTransfer(partnerId, partner.getMapId()));
+         PacketCreator.announce(partner, new WeddingPartnerTransfer(player.getId(), player.getMapId()));
       });
    }
 

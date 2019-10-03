@@ -106,6 +106,7 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.CharacterLook;
 import tools.packet.event.CoconutScore;
 import tools.packet.event.RollSnowBall;
 import tools.packet.field.effect.EnvironmentChange;
@@ -2745,7 +2746,7 @@ public class MapleMap {
       try {
          characters.stream()
                .filter(character -> character != source)
-               .forEach(character -> character.announce(MaplePacketCreator.updateCharLook(character.getClient(), player)));
+               .forEach(character -> PacketCreator.announce(character, new CharacterLook(character.getClient(), player)));
       } finally {
          chrRLock.unlock();
       }

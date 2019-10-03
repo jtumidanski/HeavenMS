@@ -44,7 +44,10 @@ import net.server.world.World;
 import tools.DatabaseConnection;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.buddy.RequestAddBuddy;
+import tools.packet.buddy.UpdateBuddyList;
 
 public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacket> {
    @Override
@@ -55,7 +58,7 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
    private void nextPendingRequest(MapleClient c) {
       CharacterNameAndId pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
       if (pendingBuddyRequest != null) {
-         c.announce(MaplePacketCreator.requestBuddylistAdd(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
+         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
       }
    }
 
@@ -85,7 +88,7 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
 
          if (otherName.isPresent()) {
             buddylist.put(new BuddyListEntry(otherName.get(), "Default Group", otherCid, channel, true));
-            c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
+            PacketCreator.announce(c, new UpdateBuddyList(buddylist.getBuddies()));
             notifyRemoteChannel(c, channel, otherCid, BuddyListOperation.ADDED);
          }
       }
@@ -142,14 +145,14 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
                   DatabaseConnection.getInstance().withConnection(connection -> BuddyAdministrator.getInstance().addBuddy(connection, charWithId.id(), player.getId()));
                }
                buddylist.put(new BuddyListEntry(charWithId.name(), group, otherCid, displayChannel, true));
-               c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
+               PacketCreator.announce(c, new UpdateBuddyList(buddylist.getBuddies()));
             }
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
          }
       } else {
          ble.group_$eq(group);
-         c.announce(MaplePacketCreator.updateBuddylist(buddylist.getBuddies()));
+         PacketCreator.announce(c, new UpdateBuddyList(buddylist.getBuddies()));
       }
    }
 

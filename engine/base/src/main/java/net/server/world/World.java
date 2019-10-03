@@ -101,16 +101,23 @@ import server.maps.MapleMiniDungeonInfo;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.buddy.UpdateBuddyChannel;
 import tools.packet.guild.GuildEmblemChange;
 import tools.packet.guild.GuildMarkChanged;
 import tools.packet.guild.GuildNameChange;
 import tools.packet.message.MultiChat;
 import tools.packet.message.ServerMessage;
 import tools.packet.message.Whisper;
+import tools.packet.messenger.MessengerAddCharacter;
+import tools.packet.messenger.MessengerChat;
+import tools.packet.messenger.MessengerInvite;
+import tools.packet.messenger.MessengerJoin;
+import tools.packet.messenger.MessengerNote;
+import tools.packet.messenger.MessengerRemoveCharacter;
+import tools.packet.messenger.MessengerUpdateCharacter;
 import tools.packet.partyoperation.UpdateParty;
 import tools.packets.Fishing;
 
@@ -1117,15 +1124,15 @@ public class World {
          getPlayerStorage().getCharacterByName(targetName).ifPresent(target -> target.getMessenger()
                .ifPresentOrElse(messenger -> {
                   getChannel(fromchannel).getPlayerStorage().getCharacterByName(sender).ifPresent(from -> {
-                     from.getClient().announce(MaplePacketCreator.messengerChat(sender + " : " + target + " is already using Maple Messenger"));
+                     PacketCreator.announce(from, new MessengerChat(sender + " : " + target + " is already using Maple Messenger"));
                   });
                }, () -> {
                   getChannel(fromchannel).getPlayerStorage().getCharacterByName(sender).ifPresent(from -> {
                      if (MapleInviteCoordinator.createInvite(InviteType.MESSENGER, from, messengerid, target.getId())) {
-                        target.getClient().announce(MaplePacketCreator.messengerInvite(sender, messengerid));
-                        from.getClient().announce(MaplePacketCreator.messengerNote(targetName, 4, 1));
+                        PacketCreator.announce(target, new MessengerInvite(sender, messengerid));
+                        PacketCreator.announce(from, new MessengerNote(targetName, 4, 1));
                      } else {
-                        from.announce(MaplePacketCreator.messengerChat(sender + " : " + target + " is already managing a Maple Messenger invitation"));
+                        PacketCreator.announce(from, new MessengerChat(sender + " : " + target + " is already managing a Maple Messenger invitation"));
                      }
                   });
                }));
@@ -1137,11 +1144,11 @@ public class World {
          getPlayerStorage().getCharacterByName(messengerchar.getName()).ifPresent(character -> {
             if (!messengerchar.getName().equals(namefrom)) {
                getChannel(fromchannel).getPlayerStorage().getCharacterByName(namefrom).ifPresent(from -> {
-                  character.getClient().announce(MaplePacketCreator.addMessengerPlayer(namefrom, from, position, (byte) (fromchannel - 1)));
-                  from.getClient().announce(MaplePacketCreator.addMessengerPlayer(character.getName(), character, messengerchar.getPosition(), (byte) (messengerchar.getChannel() - 1)));
+                  PacketCreator.announce(character, new MessengerAddCharacter(namefrom, from, position, (byte) (fromchannel - 1)));
+                  PacketCreator.announce(from, new MessengerAddCharacter(character.getName(), character, messengerchar.getPosition(), (byte) (messengerchar.getChannel() - 1)));
                });
             } else {
-               character.getClient().announce(MaplePacketCreator.joinMessenger(messengerchar.getPosition()));
+               PacketCreator.announce(character, new MessengerJoin(messengerchar.getPosition()));
             }
          });
       }
@@ -1150,7 +1157,7 @@ public class World {
    public void removeMessengerPlayer(MapleMessenger messenger, int position) {
       for (MapleMessengerCharacter messengerchar : messenger.getMembers()) {
          getPlayerStorage().getCharacterByName(messengerchar.getName())
-               .ifPresent(character -> character.getClient().announce(MaplePacketCreator.removeMessengerPlayer(position)));
+               .ifPresent(character -> PacketCreator.announce(character, new MessengerRemoveCharacter(position)));
       }
    }
 
@@ -1158,7 +1165,7 @@ public class World {
       for (MapleMessengerCharacter messengerchar : messenger.getMembers()) {
          if (!(messengerchar.getName().equals(namefrom))) {
             getPlayerStorage().getCharacterByName(messengerchar.getName())
-                  .ifPresent(character -> character.getClient().announce(MaplePacketCreator.messengerChat(chattext)));
+                  .ifPresent(character -> PacketCreator.announce(character, new MessengerChat(chattext)));
          }
       }
    }
@@ -1168,7 +1175,7 @@ public class World {
          getPlayerStorage().getCharacterByName(sender).ifPresent(character -> character.getMessenger()
                .ifPresent(messenger -> {
                   if (MapleInviteCoordinator.answerInvite(InviteType.MESSENGER, player.getId(), messenger.getId(), false).result == InviteResult.DENIED) {
-                     character.getClient().announce(MaplePacketCreator.messengerNote(player.getName(), 5, 0));
+                     PacketCreator.announce(character, new MessengerNote(player.getName(), 5, 0));
                   }
                }));
       }
@@ -1187,7 +1194,7 @@ public class World {
          if (!(messengerchar.getName().equals(namefrom))) {
             ch.getPlayerStorage().getCharacterByName(messengerchar.getName())
                   .ifPresent(character -> getChannel(fromchannel).getPlayerStorage().getCharacterByName(namefrom)
-                        .ifPresent(from -> character.getClient().announce(MaplePacketCreator.updateMessengerPlayer(namefrom, from, position, (byte) (fromchannel - 1)))));
+                        .ifPresent(from -> PacketCreator.announce(character, new MessengerUpdateCharacter(namefrom, from, position, (byte) (fromchannel - 1)))));
          }
       }
    }
@@ -1249,13 +1256,13 @@ public class World {
             case ADDED:
                if (buddylist.contains(cidFrom)) {
                   buddylist.put(new BuddyListEntry(name, "Default Group", cidFrom, channel, true));
-                  addChar.getClient().announce(MaplePacketCreator.updateBuddyChannel(cidFrom, (byte) (channel - 1)));
+                  PacketCreator.announce(addChar, new UpdateBuddyChannel(cidFrom, (byte) (channel - 1)));
                }
                break;
             case DELETED:
                if (buddylist.contains(cidFrom)) {
                   buddylist.put(new BuddyListEntry(name, "Default Group", cidFrom, (byte) -1, buddylist.get(cidFrom).visible()));
-                  addChar.getClient().announce(MaplePacketCreator.updateBuddyChannel(cidFrom, (byte) -1));
+                  PacketCreator.announce(addChar, new UpdateBuddyChannel(cidFrom, (byte) -1));
                }
                break;
          }
@@ -1285,7 +1292,7 @@ public class World {
                   mcChannel = (byte) (channel - 1);
                }
                character.getBuddylist().put(ble);
-               character.getClient().announce(MaplePacketCreator.updateBuddyChannel(ble.characterId(), mcChannel));
+               PacketCreator.announce(character, new UpdateBuddyChannel(ble.characterId(), mcChannel));
             }
          });
       }

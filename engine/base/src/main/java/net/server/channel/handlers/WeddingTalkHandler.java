@@ -27,7 +27,7 @@ import net.server.channel.packet.wedding.BaseWeddingTalkPacket;
 import scripting.event.EventInstanceManager;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
-import tools.packets.Wedding;
+import tools.packet.wedding.WeddingProgress;
 
 /**
  * @author Ronan
@@ -44,12 +44,12 @@ public final class WeddingTalkHandler extends AbstractPacketHandler<BaseWeddingT
          EventInstanceManager eim = client.getPlayer().getEventInstance();
 
          if (eim != null && !(client.getPlayer().getId() == eim.getIntProperty("groomId") || client.getPlayer().getId() == eim.getIntProperty("brideId"))) {
-            client.announce(Wedding.OnWeddingProgress(false, 0, 0, (byte) 2));
+            PacketCreator.announce(client, new WeddingProgress(false, 0, 0, (byte) 2));
          } else {
-            client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
+            PacketCreator.announce(client, new WeddingProgress(true, 0, 0, (byte) 3));
          }
       } else {
-         client.announce(Wedding.OnWeddingProgress(true, 0, 0, (byte) 3));
+         PacketCreator.announce(client, new WeddingProgress(true, 0, 0, (byte) 3));
       }
 
       PacketCreator.announce(client, new EnableActions());

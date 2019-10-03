@@ -9,11 +9,13 @@ import tools.packet.PacketInput;
 import tools.packet.factory.AddNewCharacterPacketFactory;
 import tools.packet.factory.AfterLoginErrorPacketFactory;
 import tools.packet.factory.AllianceOperationPacketFactory;
+import tools.packet.factory.BuddyPacketFactory;
 import tools.packet.factory.CashShopGachaponPacketFactoryPacketFactory;
 import tools.packet.factory.CashShopOperationPacketFactory;
 import tools.packet.factory.ChangeChannelPacketFactory;
 import tools.packet.factory.CharacterListPacketFactory;
 import tools.packet.factory.CharacterNameResponsePacketFactory;
+import tools.packet.factory.CharacterPacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.EventPacketFactory;
 import tools.packet.factory.FamilyPacketFactory;
@@ -27,12 +29,14 @@ import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
 import tools.packet.factory.MakerResultPacketFactory;
 import tools.packet.factory.MessagePacketFactory;
+import tools.packet.factory.MessengerPacketFactory;
 import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.MovementPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
+import tools.packet.factory.PetPacketFactory;
 import tools.packet.factory.PicPacketFactory;
 import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
@@ -53,6 +57,7 @@ import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
 import tools.packet.factory.TVPacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
+import tools.packet.factory.WeddingPacketFactory;
 
 public class PacketCreator {
    private PacketCreator() {
@@ -227,6 +232,24 @@ public class PacketCreator {
          case FAME_RESPONSE:
          case MULTICHAT:
             return Optional.of(MessagePacketFactory.getInstance());
+         case BUDDYLIST:
+            return Optional.of(BuddyPacketFactory.getInstance());
+         case MESSENGER:
+            return Optional.of(MessengerPacketFactory.getInstance());
+         case PET_CHAT:
+         case PET_COMMAND:
+         case PET_NAMECHANGE:
+            return Optional.of(PetPacketFactory.getInstance());
+         case UPDATE_CHAR_LOOK:
+            return Optional.of(CharacterPacketFactory.getInstance());
+         case MARRIAGE_REQUEST:
+         case WEDDING_PHOTO:
+         case MARRIAGE_RESULT:
+         case NOTIFY_MARRIED_PARTNER_MAP_TRANSFER:
+         case WEDDING_CEREMONY_END:
+         case WEDDING_PROGRESS:
+         case WEDDING_GIFT_RESULT:
+            return Optional.of(WeddingPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

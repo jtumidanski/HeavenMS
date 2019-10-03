@@ -1,17 +1,14 @@
 package client.processor;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 import client.BuddyList;
 import client.BuddyListEntry;
 import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.database.administrator.BuddyAdministrator;
 import client.database.provider.BuddyProvider;
-import net.server.PlayerStorage;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.buddy.RequestAddBuddy;
 
 public class BuddyListProcessor {
    private static BuddyListProcessor ourInstance = new BuddyListProcessor();
@@ -34,7 +31,7 @@ public class BuddyListProcessor {
    public void addBuddyRequest(MapleCharacter character, int cidFrom, String nameFrom, int channelFrom) {
       character.getBuddylist().put(new BuddyListEntry(nameFrom, "Default Group", cidFrom, channelFrom, false));
       if (character.getBuddylist().hasPendingRequest()) {
-         character.getClient().announce(MaplePacketCreator.requestBuddylistAdd(cidFrom, character.getId(), nameFrom));
+         PacketCreator.announce(character, new RequestAddBuddy(cidFrom, character.getId(), nameFrom));
       } else {
          character.getBuddylist().addRequest(new CharacterNameAndId(cidFrom, nameFrom));
       }

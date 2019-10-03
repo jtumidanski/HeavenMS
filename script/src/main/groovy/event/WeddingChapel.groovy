@@ -11,7 +11,7 @@ import server.maps.MapleMap
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
-import tools.packets.Wedding
+import tools.packet.wedding.WeddingProgress
 
 import java.awt.*
 import java.util.List
@@ -140,9 +140,9 @@ class EventWeddingChapel {
    static def sendWeddingAction(EventInstanceManager eim, byte type) {
       MapleCharacter chr = eim.getLeader()
       if (chr.getGender() == 0) {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), { character -> Wedding.OnWeddingProgress(type == ((byte) 2), eim.getIntProperty("groomId"), eim.getIntProperty("brideId"), (byte) (type + 1)) })
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new WeddingProgress(type == ((byte) 2), eim.getIntProperty("groomId"), eim.getIntProperty("brideId"), (byte) (type + 1)))
       } else {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), { character -> Wedding.OnWeddingProgress(type == ((byte) 2), eim.getIntProperty("brideId"), eim.getIntProperty("groomId"), (byte) (type + 1)) })
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new WeddingProgress(type == ((byte) 2), eim.getIntProperty("brideId"), eim.getIntProperty("groomId"), (byte) (type + 1)))
       }
    }
 
@@ -151,12 +151,12 @@ class EventWeddingChapel {
    }
 
    def showStartMsg(EventInstanceManager eim) {
-      MasterBroadcaster.getInstance().sendToAllInMap(eim.getMapInstance(entryMap + 10), { character -> Wedding.OnWeddingProgress(false, 0, 0, (byte) 0) })
+      MasterBroadcaster.getInstance().sendToAllInMap(eim.getMapInstance(entryMap + 10), new WeddingProgress(false, 0, 0, (byte) 0))
       eim.schedule("hidePriestMsg", forceHideMsgTime * 1000)
    }
 
    def showBlessMsg(EventInstanceManager eim) {
-      MasterBroadcaster.getInstance().sendToAllInMap(eim.getMapInstance(entryMap + 10), { character -> Wedding.OnWeddingProgress(false, 0, 0, (byte) 1) })
+      MasterBroadcaster.getInstance().sendToAllInMap(eim.getMapInstance(entryMap + 10), new WeddingProgress(false, 0, 0, (byte) 1))
       eim.setIntProperty("guestBlessings", 1)
       eim.schedule("hidePriestMsg", forceHideMsgTime * 1000)
    }
