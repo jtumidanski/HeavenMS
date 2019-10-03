@@ -26,8 +26,9 @@ import java.util.List;
 import client.MapleCharacter;
 import net.server.Server;
 import server.TimerManager;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.EnableTV;
+import tools.packet.SendTV;
 import tools.packet.remove.RemoveTV;
 
 /*
@@ -53,20 +54,15 @@ public class MapleTVEffect {
       Server server = Server.getInstance();
       ACTIVE[userWorld] = activity;
       if (activity) {
-         server.broadcastMessage(userWorld, MaplePacketCreator.enableTV());
-         server.broadcastMessage(userWorld, MaplePacketCreator.sendTV(user, message, type <= 2 ? type : type - 3, partner));
+         server.broadcastMessage(userWorld, PacketCreator.create(new EnableTV()));
+         server.broadcastMessage(userWorld, PacketCreator.create(new SendTV(user, message, type <= 2 ? type : type - 3, partner)));
          int delay = 15000;
          if (type == 4) {
             delay = 30000;
          } else if (type == 5) {
             delay = 60000;
          }
-         TimerManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-               broadcastTV(false, userWorld, null, null, -1, null);
-            }
-         }, delay);
+         TimerManager.getInstance().schedule(() -> broadcastTV(false, userWorld, null, null, -1, null), delay);
       } else {
          server.broadcastMessage(userWorld, PacketCreator.create(new RemoveTV()));
       }

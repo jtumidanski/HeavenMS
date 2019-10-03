@@ -216,6 +216,9 @@ import tools.packet.guild.GenericGuildMessage;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.inventory.SlotLimitUpdate;
+import tools.packet.message.GetAvatarMegaphone;
+import tools.packet.message.GiveFameResponse;
+import tools.packet.message.ReceiveFame;
 import tools.packet.monster.carnival.MonsterCarnivalPartyPoints;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerDied;
 import tools.packet.monster.carnival.MonsterCarnivalPointObtained;
@@ -2805,8 +2808,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          updateSingleStat(MapleStat.FAME, thisFame);
 
          if (fromPlayer != null) {
-            fromPlayer.announce(MaplePacketCreator.giveFameResponse(mode, getName(), thisFame));
-            announce(MaplePacketCreator.receiveFame(mode, fromPlayer.getName()));
+            PacketCreator.announce(fromPlayer, new GiveFameResponse(mode, getName(), thisFame));
+            PacketCreator.announce(this, new ReceiveFame(mode, fromPlayer.getName()));
          } else {
             PacketCreator.announce(this, new ShowFameGain(delta));
          }
@@ -7618,7 +7621,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          strLines.add("");
          strLines.add(this.getClient().getChannelServer().getServerMessage().isEmpty() ? 0 : 1, "Get off my lawn!!");
 
-         this.announce(MaplePacketCreator.getAvatarMega(mapOwner, medal, this.getClient().getChannel(), 5390006, strLines, true));
+         PacketCreator.announce(this, new GetAvatarMegaphone(mapOwner, medal, this.getClient().getChannel(), 5390006, strLines, true));
       }
    }
 

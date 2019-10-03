@@ -298,186 +298,9 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] enableTV() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.ENABLE_TV.getValue());
-      mplew.writeInt(0);
-      mplew.write(0);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends MapleTV
-    *
-    * @param chr      The character shown in TV
-    * @param messages The message sent with the TV
-    * @param type     The type of TV
-    * @param partner  The partner shown with chr
-    * @return the SEND_TV packet
-    */
-   public static byte[] sendTV(MapleCharacter chr, List<String> messages, int type, MapleCharacter partner) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SEND_TV.getValue());
-      mplew.write(partner != null ? 3 : 1);
-      mplew.write(type); //Heart = 2  Star = 1  Normal = 0
-      addCharLook(mplew, chr, false);
-      mplew.writeMapleAsciiString(chr.getName());
-      if (partner != null) {
-         mplew.writeMapleAsciiString(partner.getName());
-      } else {
-         mplew.writeShort(0);
-      }
-      for (int i = 0; i < messages.size(); i++) {
-         if (i == 4 && messages.get(4).length() > 15) {
-            mplew.writeMapleAsciiString(messages.get(4).substring(0, 15));
-         } else {
-            mplew.writeMapleAsciiString(messages.get(i));
-         }
-      }
-      mplew.writeInt(1337); // time limit shit lol 'Your thing still start in blah blah seconds'
-      if (partner != null) {
-         addCharLook(mplew, partner, false);
-      }
-      return mplew.getPacket();
-   }
-
    public static byte[] sendCannotSpawnKite() {
       MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.CANNOT_SPAWN_KITE.getValue());
-      return mplew.getPacket();
-   }
-
-   /**
-    * Gets a server message packet.
-    *
-    * @param message The message to convey.
-    * @return The server message packet.
-    */
-   public static byte[] serverMessage(String message) {
-      return serverMessage(4, (byte) 0, message, true, false, 0);
-   }
-
-   /**
-    * Gets a server notice packet.
-    * <p>
-    * Possible values for <code>type</code>:<br> 0: [Notice]<br> 1: Popup<br>
-    * 2: Megaphone<br> 3: Super Megaphone<br> 4: Scrolling message at top<br>
-    * 5: Pink Text<br> 6: Lightblue Text
-    *
-    * @param type    The type of the notice.
-    * @param message The message to convey.
-    * @return The server notice packet.
-    */
-   public static byte[] serverNotice(int type, String message) {
-      return serverMessage(type, (byte) 0, message, false, false, 0);
-   }
-
-   public static byte[] serverNotice(int type, int channel, String message, boolean smegaEar) {
-      return serverMessage(type, channel, message, false, smegaEar, 0);
-   }
-
-   /**
-    * Gets a server message packet.
-    * <p>
-    * Possible values for <code>type</code>:<br> 0: [Notice]<br> 1: Popup<br>
-    * 2: Megaphone<br> 3: Super Megaphone<br> 4: Scrolling message at top<br>
-    * 5: Pink Text<br> 6: Lightblue Text<br> 7: BroadCasting NPC
-    *
-    * @param type          The type of the notice.
-    * @param channel       The channel this notice was sent on.
-    * @param message       The message to convey.
-    * @param servermessage Is this a scrolling ticker?
-    * @return The server notice packet.
-    */
-   private static byte[] serverMessage(int type, int channel, String message, boolean servermessage, boolean megaEar, int npc) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(type);
-      if (servermessage) {
-         mplew.write(1);
-      }
-      mplew.writeMapleAsciiString(message);
-      if (type == 3) {
-         mplew.write(channel - 1); // channel
-         mplew.writeBool(megaEar);
-      } else if (type == 6) {
-         mplew.writeInt(0);
-      } else if (type == 7) { // npc
-         mplew.writeInt(npc);
-      }
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends a Avatar Super Megaphone packet.
-    *
-    * @param chr     The character name.
-    * @param medal   The medal text.
-    * @param channel Which channel.
-    * @param itemId  Which item used.
-    * @param message The message sent.
-    * @param ear     Whether or not the ear is shown for whisper.
-    * @return
-    */
-   public static byte[] getAvatarMega(MapleCharacter chr, String medal, int channel, int itemId, List<String> message, boolean ear) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_AVATAR_MEGAPHONE.getValue());
-      mplew.writeInt(itemId);
-      mplew.writeMapleAsciiString(medal + chr.getName());
-      for (String s : message) {
-         mplew.writeMapleAsciiString(s);
-      }
-      mplew.writeInt(channel - 1); // channel
-      mplew.writeBool(ear);
-      addCharLook(mplew, chr, true);
-      return mplew.getPacket();
-   }
-
-   /*
-    * Sends a packet to remove the tiger megaphone
-    * @return
-    */
-   public static byte[] byeAvatarMega() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLEAR_AVATAR_MEGAPHONE.getValue());
-      mplew.write(1);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends the Gachapon green message when a user uses a gachapon ticket.
-    *
-    * @param item
-    * @param town
-    * @param player
-    * @return
-    */
-   public static byte[] gachaponMessage(Item item, String town, MapleCharacter player) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(0x0B);
-      mplew.writeMapleAsciiString(player.getName() + " : got a(n)");
-      mplew.writeInt(0); //random?
-      mplew.writeMapleAsciiString(town);
-      addItemInfo(mplew, item, true);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Gets a general chat packet.
-    *
-    * @param cidfrom The character ID who sent the chat.
-    * @param text    The text of the chat.
-    * @param show
-    * @return The general chat packet.
-    */
-   public static byte[] getChatText(int cidfrom, String text, boolean gm, int show) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CHATTEXT.getValue());
-      mplew.writeInt(cidfrom);
-      mplew.writeBool(gm);
-      mplew.writeMapleAsciiString(text);
-      mplew.write(show);
       return mplew.getPacket();
    }
 
@@ -1399,30 +1222,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] getWhisper(String sender, int channel, String text) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(0x12);
-      mplew.writeMapleAsciiString(sender);
-      mplew.writeShort(channel - 1); // I guess this is the channel
-      mplew.writeMapleAsciiString(text);
-      return mplew.getPacket();
-   }
-
-   /**
-    * @param target name of the target character
-    * @param reply  error code: 0x0 = cannot find char, 0x1 = success
-    * @return the MaplePacket
-    */
-   public static byte[] getWhisperReply(String target, byte reply) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(0x0A); // whisper?
-      mplew.writeMapleAsciiString(target);
-      mplew.write(reply);
-      return mplew.getPacket();
-   }
-
    /**
     * @param oid
     * @param remhppercentage
@@ -1436,67 +1235,12 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] giveFameResponse(int mode, String charname, int newfame) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
-      mplew.write(0);
-      mplew.writeMapleAsciiString(charname);
-      mplew.write(mode);
-      mplew.writeShort(newfame);
-      mplew.writeShort(0);
-      return mplew.getPacket();
-   }
-
-   /**
-    * status can be: <br> 0: ok, use giveFameResponse<br> 1: the username is
-    * incorrectly entered<br> 2: users under level 15 are unable to toggle with
-    * fame.<br> 3: can't raise or drop fame anymore today.<br> 4: can't raise
-    * or drop fame for this character for this month anymore.<br> 5: received
-    * fame, use receiveFame()<br> 6: level of fame neither has been raised nor
-    * dropped due to an unexpected error
-    *
-    * @param status
-    * @return
-    */
-   public static byte[] giveFameErrorResponse(int status) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
-      mplew.write(status);
-      return mplew.getPacket();
-   }
-
-   public static byte[] receiveFame(int mode, String charnameFrom) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
-      mplew.write(5);
-      mplew.writeMapleAsciiString(charnameFrom);
-      mplew.write(mode);
-      return mplew.getPacket();
-   }
-
    public static byte[] updatePartyMemberHP(int cid, int curhp, int maxhp) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.UPDATE_PARTYMEMBER_HP.getValue());
       mplew.writeInt(cid);
       mplew.writeInt(curhp);
       mplew.writeInt(maxhp);
-      return mplew.getPacket();
-   }
-
-   /**
-    * mode: 0 buddychat; 1 partychat; 2 guildchat
-    *
-    * @param name
-    * @param chattext
-    * @param mode
-    * @return
-    */
-   public static byte[] multiChat(String name, String chattext, int mode) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MULTICHAT.getValue());
-      mplew.write(mode);
-      mplew.writeMapleAsciiString(name);
-      mplew.writeMapleAsciiString(chattext);
       return mplew.getPacket();
    }
 
@@ -2647,44 +2391,6 @@ public class MaplePacketCreator {
       return showCash(mc);
    }
 
-   /**
-    * @param target
-    * @param mapid
-    * @param MTSmapCSchannel 0: MTS 1: Map 2: CS 3: Different Channel
-    * @return
-    */
-   public static byte[] getFindReply(String target, int mapid, int MTSmapCSchannel) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(9);
-      mplew.writeMapleAsciiString(target);
-      mplew.write(MTSmapCSchannel); // 0: mts 1: map 2: cs
-      mplew.writeInt(mapid); // -1 if mts, cs
-      if (MTSmapCSchannel == 1) {
-         mplew.write(new byte[8]);
-      }
-      return mplew.getPacket();
-   }
-
-   /**
-    * @param target
-    * @param mapid
-    * @param MTSmapCSchannel 0: MTS 1: Map 2: CS 3: Different Channel
-    * @return
-    */
-   public static byte[] getBuddyFindReply(String target, int mapid, int MTSmapCSchannel) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(72);
-      mplew.writeMapleAsciiString(target);
-      mplew.write(MTSmapCSchannel); // 0: mts 1: map 2: cs
-      mplew.writeInt(mapid); // -1 if mts, cs
-      if (MTSmapCSchannel == 1) {
-         mplew.write(new byte[8]);
-      }
-      return mplew.getPacket();
-   }
-
    public static byte[] sendAutoHpPot(int itemId) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.AUTO_HP_POT.getValue());
@@ -2778,22 +2484,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] itemMegaphone(String msg, boolean whisper, int channel, Item item) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(8);
-      mplew.writeMapleAsciiString(msg);
-      mplew.write(channel - 1);
-      mplew.write(whisper ? 1 : 0);
-      if (item == null) {
-         mplew.write(0);
-      } else {
-         mplew.write(item.position());
-         addItemInfo(mplew, item, true);
-      }
-      return mplew.getPacket();
-   }
-
    /**
     * Sends a report response
     * <p>
@@ -2827,27 +2517,6 @@ public class MaplePacketCreator {
       mplew.writeShort(SendOpcode.VICIOUS_HAMMER.getValue());
       mplew.write(0x3D);
       mplew.writeInt(0);
-      return mplew.getPacket();
-   }
-
-   public static byte[] getMultiMegaphone(String[] messages, int channel, boolean showEar) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(0x0A);
-      if (messages[0] != null) {
-         mplew.writeMapleAsciiString(messages[0]);
-      }
-      mplew.write(messages.length);
-      for (int i = 1; i < messages.length; i++) {
-         if (messages[i] != null) {
-            mplew.writeMapleAsciiString(messages[i]);
-         }
-      }
-      for (int i = 0; i < 10; i++) {
-         mplew.write(channel - 1);
-      }
-      mplew.write(showEar ? 1 : 0);
-      mplew.write(1);
       return mplew.getPacket();
    }
 

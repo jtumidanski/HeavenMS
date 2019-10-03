@@ -26,6 +26,7 @@ import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
 import tools.packet.factory.MakerResultPacketFactory;
+import tools.packet.factory.MessagePacketFactory;
 import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.MovementPacketFactory;
@@ -50,6 +51,7 @@ import tools.packet.factory.SpecialShopPacketFactory;
 import tools.packet.factory.StatUpdatePacketFactory;
 import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
+import tools.packet.factory.TVPacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 
 public class PacketCreator {
@@ -214,6 +216,17 @@ public class PacketCreator {
             return Optional.of(MovementPacketFactory.getInstance());
          case MAKER_RESULT:
             return Optional.of(MakerResultPacketFactory.getInstance());
+         case ENABLE_TV:
+         case SEND_TV:
+            return Optional.of(TVPacketFactory.getInstance());
+         case SERVERMESSAGE:
+         case SET_AVATAR_MEGAPHONE:
+         case CLEAR_AVATAR_MEGAPHONE:
+         case CHATTEXT:
+         case WHISPER:
+         case FAME_RESPONSE:
+         case MULTICHAT:
+            return Optional.of(MessagePacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

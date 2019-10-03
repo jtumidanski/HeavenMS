@@ -102,6 +102,7 @@ import tools.ServerNoticeType;
 import tools.packet.ChangeChannel;
 import tools.packet.PacketInput;
 import tools.packet.guild.ShowGuildInfo;
+import tools.packet.message.ServerMessage;
 import tools.packet.stat.EnableActions;
 
 public class MapleClient {
@@ -973,12 +974,12 @@ public class MapleClient {
 
    private void announceDisableServerMessage() {
       if (!this.getWorldServer().registerDisabledServerMessage(player.getId())) {
-         announce(MaplePacketCreator.serverMessage(""));
+         PacketCreator.announce(this, new ServerMessage(""));
       }
    }
 
    public void announceServerMessage() {
-      announce(MaplePacketCreator.serverMessage(this.getChannelServer().getServerMessage()));
+      PacketCreator.announce(this, new ServerMessage(getChannelServer().getServerMessage()));
    }
 
    public synchronized void announceBossHpBar(MapleMonster monster, final int mobHash, final byte[] packet) {

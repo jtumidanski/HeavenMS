@@ -85,8 +85,10 @@ import server.maps.MapleMiniDungeonInfo;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.message.ServerMessage;
 
 public final class Channel {
 
@@ -376,7 +378,7 @@ public final class Channel {
 
    public void addPlayer(MapleCharacter chr) {
       players.addPlayer(chr);
-      chr.announce(MaplePacketCreator.serverMessage(serverMessage));
+      PacketCreator.announce(chr, new ServerMessage(serverMessage));
    }
 
    public String getServerMessage() {
@@ -385,7 +387,7 @@ public final class Channel {
 
    public void setServerMessage(String message) {
       this.serverMessage = message;
-      broadcastPacket(MaplePacketCreator.serverMessage(message));
+      broadcastPacket(PacketCreator.create(new ServerMessage(message)));
       getWorldServer().resetDisabledServerMessages();
    }
 

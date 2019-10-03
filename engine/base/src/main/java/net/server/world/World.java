@@ -108,6 +108,9 @@ import tools.Pair;
 import tools.packet.guild.GuildEmblemChange;
 import tools.packet.guild.GuildMarkChanged;
 import tools.packet.guild.GuildNameChange;
+import tools.packet.message.MultiChat;
+import tools.packet.message.ServerMessage;
+import tools.packet.message.Whisper;
 import tools.packet.partyoperation.UpdateParty;
 import tools.packets.Fishing;
 
@@ -1071,7 +1074,7 @@ public class World {
       for (MaplePartyCharacter partychar : party.getMembers()) {
          if (!(partychar.getName().equals(namefrom))) {
             getPlayerStorage().getCharacterByName(partychar.getName())
-                  .ifPresent(character -> character.getClient().announce(MaplePacketCreator.multiChat(namefrom, chattext, 1)));
+                  .ifPresent(character -> PacketCreator.announce(character, new MultiChat(namefrom, chattext, 1)));
          }
       }
    }
@@ -1080,7 +1083,7 @@ public class World {
       for (int characterId : recipientCharacterIds) {
          getPlayerStorage().getCharacterById(characterId).ifPresent(character -> {
             if (character.getBuddylist().containsVisible(cidFrom)) {
-               character.getClient().announce(MaplePacketCreator.multiChat(nameFrom, chattext, 0));
+               PacketCreator.announce(character, new MultiChat(nameFrom, chattext, 0));
             }
 
          });
@@ -1218,7 +1221,7 @@ public class World {
 
    public void whisper(String sender, String target, int channel, String message) {
       if (isConnected(target)) {
-         getPlayerStorage().getCharacterByName(target).ifPresent(character -> character.getClient().announce(MaplePacketCreator.getWhisper(sender, channel, message)));
+         getPlayerStorage().getCharacterByName(target).ifPresent(character -> PacketCreator.announce(character, new Whisper(sender, channel, message)));
       }
    }
 
@@ -1751,7 +1754,7 @@ public class World {
          for (Integer chrid : toRemove) {
             players.getCharacterById(chrid)
                   .filter(MapleCharacter::isLoggedinWorld)
-                  .ifPresent(character -> character.announce(MaplePacketCreator.serverMessage(character.getClient().getChannelServer().getServerMessage())));
+                  .ifPresent(character -> PacketCreator.announce(character, new ServerMessage(character.getClient().getChannelServer().getServerMessage())));
          }
       }
    }

@@ -111,6 +111,10 @@ import tools.ServerNoticeType;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.message.ClearAvatarMegaphone;
+import tools.packet.message.GetAvatarMegaphone;
+import tools.packet.message.ItemMegaphone;
+import tools.packet.message.MultiMegaphone;
 import tools.packet.stat.EnableActions;
 
 public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseCashItemPacket> {
@@ -456,8 +460,8 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
    private void avatarMega(MapleClient c, MapleCharacter player, short position, int itemId, String medal, String[] messages, Boolean ear) {
       final int world = c.getWorld();
-      Server.getInstance().broadcastMessage(world, MaplePacketCreator.getAvatarMega(player, medal, c.getChannel(), itemId, Arrays.asList(messages), ear));
-      TimerManager.getInstance().schedule(() -> Server.getInstance().broadcastMessage(world, MaplePacketCreator.byeAvatarMega()), 1000 * 10);
+      Server.getInstance().broadcastMessage(world, PacketCreator.create(new GetAvatarMegaphone(player, medal, c.getChannel(), itemId, Arrays.asList(messages), ear)));
+      TimerManager.getInstance().schedule(() -> Server.getInstance().broadcastMessage(world, PacketCreator.create(new ClearAvatarMegaphone())), 1000 * 10);
       remove(c, position, itemId);
    }
 
@@ -612,7 +616,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             return;
          }
       }
-      Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.itemMegaphone(msg, whisper, c.getChannel(), item));
+      Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.create(new ItemMegaphone(msg, whisper, c.getChannel(), item)));
 
       remove(c, position, itemId);
    }
@@ -625,7 +629,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       for (int i = 0; i < lines; i++) {
          msg2[i] = medal + player.getName() + " : " + message[i];
       }
-      Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.getMultiMegaphone(msg2, c.getChannel(), whisper));
+      Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.create(new MultiMegaphone(msg2, c.getChannel(), whisper)));
       remove(c, position, itemId);
    }
 

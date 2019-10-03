@@ -92,6 +92,7 @@ import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.field.effect.EnvironmentChange;
+import tools.packet.message.GachaponMessage;
 import tools.packet.npctalk.GetDimensionalMirror;
 import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.npctalk.GetNPCTalkNum;
@@ -453,7 +454,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       LogHelper.logGacha(getPlayer(), item.getId(), map);
 
       if (item.getTier() > 0) { //Uncommon and Rare
-         Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.gachaponMessage(itemGained, map, getPlayer()));
+         Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.create(new GachaponMessage(itemGained, map, getPlayer().getName())));
       }
    }
 

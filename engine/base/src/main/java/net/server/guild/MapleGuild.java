@@ -61,6 +61,7 @@ import tools.packet.guild.GuildRankTitleChange;
 import tools.packet.guild.NewGuildMember;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.guild.UpdateGuildPoints;
+import tools.packet.message.MultiChat;
 import tools.packet.statusinfo.GetGuildPointMessage;
 
 public class MapleGuild {
@@ -381,7 +382,7 @@ public class MapleGuild {
    public void guildChat(String name, int cid, String message) {
       membersLock.lock();
       try {
-         this.broadcast(MaplePacketCreator.multiChat(name, message, 2), cid);
+         this.broadcast(PacketCreator.create(new MultiChat(name, message, 2)), cid);
       } finally {
          membersLock.unlock();
       }

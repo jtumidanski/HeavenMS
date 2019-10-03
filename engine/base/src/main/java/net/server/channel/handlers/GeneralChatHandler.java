@@ -31,11 +31,11 @@ import net.server.channel.packet.GeneralChatPacket;
 import net.server.channel.packet.reader.GeneralChatReader;
 import tools.FilePrinter;
 import tools.LogHelper;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.message.ChatText;
 import tools.packet.stat.EnableActions;
 
 public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatPacket> {
@@ -67,12 +67,12 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
          }
 
          if (!chr.isHidden()) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show())));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "General", packet.message());
             }
          } else {
-            MasterBroadcaster.getInstance().sendToAllGMInMap(chr.getMap(), character -> MaplePacketCreator.getChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
+            MasterBroadcaster.getInstance().sendToAllGMInMap(chr.getMap(), character -> PacketCreator.create(new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show())));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "GM General", packet.message());
             }
