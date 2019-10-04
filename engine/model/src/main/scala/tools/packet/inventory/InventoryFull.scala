@@ -7,6 +7,7 @@ import net.opcodes.SendOpcode
 import tools.packet.PacketInput
 
 class InventoryFull() extends PacketInput {
+  //noinspection MutatorLikeMethodIsParameterless
   def updateTick: Boolean = true
 
   def modifications: java.util.List[ModifyInventory] = Collections.emptyList()

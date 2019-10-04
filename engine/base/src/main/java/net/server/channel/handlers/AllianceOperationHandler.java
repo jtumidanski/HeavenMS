@@ -45,7 +45,6 @@ import net.server.channel.packet.reader.ExistingAllianceOperationReader;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

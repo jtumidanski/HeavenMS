@@ -2,7 +2,6 @@ package tools.packet.factory;
 
 import client.BuddyListEntry;
 import net.opcodes.SendOpcode;
-import net.server.channel.packet.buddy.AddBuddyPacket;
 import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;

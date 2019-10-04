@@ -30,7 +30,6 @@ import net.server.coordinator.MapleInviteCoordinator;
 import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import scala.Option;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.partyoperation.PartyStatusMessage;
 

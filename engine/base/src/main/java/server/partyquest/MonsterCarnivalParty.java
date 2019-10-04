@@ -5,7 +5,6 @@ import java.util.List;
 
 import client.MapleCharacter;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.field.effect.ShowEffect;
 

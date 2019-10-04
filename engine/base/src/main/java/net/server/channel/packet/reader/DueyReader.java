@@ -1,7 +1,6 @@
 package net.server.channel.packet.reader;
 
 import client.DueyAction;
-import client.processor.DueyProcessor;
 import net.server.PacketReader;
 import net.server.channel.packet.duey.BaseDueyPacket;
 import net.server.channel.packet.duey.DueyClaimPackagePacket;

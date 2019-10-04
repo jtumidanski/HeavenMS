@@ -70,7 +70,6 @@ import server.quest.requirements.NpcRequirement;
 import server.quest.requirements.PetRequirement;
 import server.quest.requirements.QuestRequirement;
 import server.quest.requirements.ScriptRequirement;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

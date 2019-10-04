@@ -44,7 +44,6 @@ import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.Channel;
 import net.server.processor.MapleAllianceProcessor;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -440,7 +439,7 @@ public class MapleGuild {
                      Server.getInstance().getWorld(mgc.getWorld()).setGuildAndRank(cid, 0, 5);
                   } else {
                      DatabaseConnection.getInstance().withConnection(
-                           connection -> NoteAdministrator.getInstance().sendNote(connection, mgc.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.valueOf("0")));
+                           connection -> NoteAdministrator.getInstance().sendNote(connection, mgc.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.parseByte("0")));
                      Server.getInstance().getWorld(mgc.getWorld()).setOfflineGuildStatus((short) 0, (byte) 5, cid);
                   }
                } catch (Exception re) {

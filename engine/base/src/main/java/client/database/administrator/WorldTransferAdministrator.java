@@ -29,9 +29,7 @@ public class WorldTransferAdministrator extends AbstractQueryExecutor {
 
    public void cancelPendingForCharacter(Connection connection, int characterId) {
       String sql = "DELETE FROM worldtransfers WHERE characterid=? AND completionTime IS NULL";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-      });
+      execute(connection, sql, ps -> ps.setInt(1, characterId));
    }
 
    public void markComplete(Connection connection, int transferId) {

@@ -1123,9 +1123,7 @@ public class World {
       if (isConnected(targetName)) {
          getPlayerStorage().getCharacterByName(targetName).ifPresent(target -> target.getMessenger()
                .ifPresentOrElse(messenger -> {
-                  getChannel(fromchannel).getPlayerStorage().getCharacterByName(sender).ifPresent(from -> {
-                     PacketCreator.announce(from, new MessengerChat(sender + " : " + target + " is already using Maple Messenger"));
-                  });
+                  getChannel(fromchannel).getPlayerStorage().getCharacterByName(sender).ifPresent(from -> PacketCreator.announce(from, new MessengerChat(sender + " : " + target + " is already using Maple Messenger")));
                }, () -> {
                   getChannel(fromchannel).getPlayerStorage().getCharacterByName(sender).ifPresent(from -> {
                      if (MapleInviteCoordinator.createInvite(InviteType.MESSENGER, from, messengerid, target.getId())) {

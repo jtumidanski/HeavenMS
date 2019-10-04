@@ -4,7 +4,6 @@ import java.awt.Point;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.remove.RemoveKite;
 import tools.packet.spawn.SpawnKite;

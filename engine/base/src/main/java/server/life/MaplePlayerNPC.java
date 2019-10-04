@@ -55,7 +55,6 @@ import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
-import tools.packet.PacketInput;
 import tools.packet.spawn.RemoveNPCController;
 import tools.packet.spawn.SpawnPlayerNPC;
 

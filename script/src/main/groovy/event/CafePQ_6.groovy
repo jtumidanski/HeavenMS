@@ -211,7 +211,7 @@ class EventCafePQ_6 {
       Item itemObj = new Item(4001007, (short) 0, (short) 1)
       MapleCharacter dropper = eim.getPlayers().get(0)
 
-      itemObj.setQuantity((short) getDroppedQuantity(mob))
+      itemObj.quantity_$eq((short) getDroppedQuantity(mob))
       mapObj.spawnItemDrop(mob, dropper, itemObj, mob.getPosition(), true, false)
    }
 

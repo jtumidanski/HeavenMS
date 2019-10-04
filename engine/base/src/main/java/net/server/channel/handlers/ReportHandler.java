@@ -89,8 +89,6 @@ public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket>
       Calendar calendar = Calendar.getInstance();
       Timestamp currentTimestamp = new java.sql.Timestamp(calendar.getTime().getTime());
 
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         ReportAdministrator.getInstance().create(connection, currentTimestamp.toGMTString(), reporterid, victimid, reason, chatlog, description);
-      });
+      DatabaseConnection.getInstance().withConnection(connection -> ReportAdministrator.getInstance().create(connection, currentTimestamp.toGMTString(), reporterid, victimid, reason, chatlog, description));
    }
 }

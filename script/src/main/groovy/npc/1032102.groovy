@@ -47,10 +47,10 @@ class NPC1032102 {
             } else if (cm.getPlayer().getPet(0) == null) {
                cm.sendOk("Make sure your pet is equipped on slot 1.")
                cm.dispose()
-            } else if (cm.getPlayer().getPet(0).getItemId() < 5000029 || cm.getPlayer().getPet(0).getItemId() > 5000033 || !cm.haveItem(5380000, 1)) {
+            } else if (cm.getPlayer().getPet(0).id() < 5000029 || cm.getPlayer().getPet(0).id() > 5000033 || !cm.haveItem(5380000, 1)) {
                cm.sendOk("You do not meet the requirements. You need #i5380000##t5380000#, as well as either one of #d#i5000029##t5000029##k, #g#i5000030##t5000030##k, #r#i5000031##t5000031##k, #b#i5000032##t5000032##k, or #e#i5000033##t5000033##n equipped on slot 1. Please come back when you do.")
                cm.dispose()
-            } else if (cm.getPlayer().getPet(0).getLevel() < 15) {
+            } else if (cm.getPlayer().getPet(0).level() < 15) {
                cm.sendOk("Your pet must be level 15 or above to evolve.")
                cm.dispose()
             } else if (cm.haveItem(5000029, 2) || cm.haveItem(5000030, 2) || cm.haveItem(5000031, 2) || cm.haveItem(5000032, 2) || cm.haveItem(5000033, 2)) {
@@ -59,7 +59,7 @@ class NPC1032102 {
                int i
 
                for (i = 0; i < 3; i++) {
-                  if (cm.getPlayer().getPet(i) != null && cm.getPlayer().getPet(i).getItemId() == 5000029) {
+                  if (cm.getPlayer().getPet(i) != null && cm.getPlayer().getPet(i).id() == 5000029) {
                      break
                   }
                }
@@ -69,7 +69,7 @@ class NPC1032102 {
                   return
                }
 
-               int id = cm.getPlayer().getPet(i).getItemId()
+               int id = cm.getPlayer().getPet(i).id()
                //var name = cm.getPlayer().getPet(i).getName();
                //var level = cm.getPlayer().getPet(i).getLevel();
                //var closeness = cm.getPlayer().getPet(i).getCloseness();

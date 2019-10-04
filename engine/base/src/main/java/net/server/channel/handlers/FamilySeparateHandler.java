@@ -29,7 +29,6 @@ import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilySeparatePacket;
 import net.server.channel.packet.reader.FamilySeparateReader;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

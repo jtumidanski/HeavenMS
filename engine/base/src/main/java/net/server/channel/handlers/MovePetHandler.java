@@ -26,7 +26,6 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetMovementPacket;
 import net.server.channel.packet.reader.PetMovementReader;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.packet.movement.MovePet;
 

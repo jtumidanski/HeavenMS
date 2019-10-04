@@ -509,15 +509,15 @@ class NPC2042000 {
       Iterator<Item> iter = cm.getPlayer().getInventory(MapleInventoryType.ETC).iterator()
       while (iter.hasNext()) {
          Item it = iter.next()
-         String itemid = it.getItemId().toString()
+         String itemid = it.id().toString()
 
          if (isRefineTarget(refineType, itemid)) {
             Object ic = itemCount[itemid]
 
             if (ic != null) {
-               itemCount[itemid] += it.getQuantity()
+               itemCount[itemid] += it.quantity()
             } else {
-               itemCount[itemid] = it.getQuantity()
+               itemCount[itemid] = it.quantity()
             }
          }
       }
@@ -564,11 +564,11 @@ class NPC2042000 {
       Iterator<Item> iter = cm.getPlayer().getInventory(MapleInventoryType.ETC).iterator()
       while (iter.hasNext()) {
          Item it = iter.next()
-         int itemid = it.getItemId()
+         int itemid = it.id()
          int rockRefine = getRockRefineTarget(itemid)
          if (rockRefine >= 0) {
             int rockItem = ((itemid % 100) | 0)
-            int itemqty = it.getQuantity()
+            int itemqty = it.quantity()
 
             minItems[rockRefine][rockItem] += itemqty
          }

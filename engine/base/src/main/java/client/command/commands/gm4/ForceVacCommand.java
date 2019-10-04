@@ -34,7 +34,6 @@ import client.processor.PetProcessor;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.remove.RemoveItem;
 

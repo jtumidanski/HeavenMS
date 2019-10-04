@@ -29,7 +29,6 @@ import net.server.PacketReader;
 import net.server.channel.packet.movement.MoveSummonPacket;
 import net.server.channel.packet.reader.MoveSummonReader;
 import server.maps.MapleSummon;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.movement.MoveSummon;

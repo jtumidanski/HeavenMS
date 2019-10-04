@@ -537,7 +537,7 @@ public final class Channel {
    }
 
    public boolean isConnected(String name) {
-      return getPlayerStorage().getCharacterByName(name) != null;
+      return getPlayerStorage().getCharacterByName(name).isPresent();
    }
 
    public boolean finishedShutdown() {

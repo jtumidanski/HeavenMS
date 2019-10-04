@@ -61,7 +61,7 @@ class NPCwaterOfLife {
             while (dIter.hasNext()) {
                MaplePet dPet = dIter.next()
 
-               listStr += "#b#L" + i + "# " + dPet.getName() + " #k - Lv " + dPet.getLevel() + " Closeness " + dPet.getCloseness()
+               listStr += "#b#L" + i + "# " + dPet.name() + " #k - Lv " + dPet.level() + " Closeness " + dPet.closeness()
                listStr += "#l\r\n"
 
                i++
@@ -74,8 +74,8 @@ class NPCwaterOfLife {
             if (sPet != null) {
                cm.sendNext("Your doll has now reawaken as your pet! However, my magic isn't perfect, so I can't promise an eternal life for your pet... Please take care of that pet before the Water of Life dries. Well then, good bye...")
 
-               Item it = cm.getPlayer().getInventory(MapleInventoryType.CASH).getItem(sPet.getPosition())
-               it.setExpiration(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 90))
+               Item it = cm.getPlayer().getInventory(MapleInventoryType.CASH).getItem(sPet.position())
+               it.expiration_(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 90))
                cm.getPlayer().forceUpdateItem(it)
 
                cm.gainItem(5180000, (short) -1)

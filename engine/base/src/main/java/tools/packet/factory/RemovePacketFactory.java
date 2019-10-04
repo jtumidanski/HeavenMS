@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import server.maps.MapleSummon;
 import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
@@ -14,7 +13,6 @@ import tools.packet.remove.RemoveNPC;
 import tools.packet.remove.RemovePlayer;
 import tools.packet.remove.RemoveSummon;
 import tools.packet.remove.RemoveTV;
-import tools.packet.spawn.RemoveDoor;
 
 public class RemovePacketFactory extends AbstractPacketFactory {
    private static RemovePacketFactory instance;

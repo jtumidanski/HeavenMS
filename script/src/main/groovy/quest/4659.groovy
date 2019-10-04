@@ -40,7 +40,7 @@ class Quest4659 {
             int i
 
             for (i = 0; i < 3; i++) {
-               if (qm.getPlayer().getPet(i) != null && qm.getPlayer().getPet(i).getItemId() == 5000048) {
+               if (qm.getPlayer().getPet(i) != null && qm.getPlayer().getPet(i).id() == 5000048) {
                   pet = qm.getPlayer().getPet(i)
                   break
                }
@@ -51,7 +51,7 @@ class Quest4659 {
                return
             }
 
-            int closeness = pet.getCloseness()
+            int closeness = pet.closeness()
             if (closeness < 1642) {
                qm.sendOk("It looks like your pet is not grown enough to be evolved yet. Train it a bit more, util it reaches #blevel 15#k.")
                qm.dispose()

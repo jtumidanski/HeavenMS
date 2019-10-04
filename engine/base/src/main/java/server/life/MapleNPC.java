@@ -25,7 +25,6 @@ import client.MapleClient;
 import server.MapleShopFactory;
 import server.maps.MapleMapObjectType;
 import server.processor.MapleShopProcessor;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.remove.RemoveNPC;
 import tools.packet.spawn.RemoveNPCController;

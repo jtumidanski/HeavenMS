@@ -1,7 +1,5 @@
 package tools.packet.factory;
 
-import java.util.List;
-
 import net.opcodes.SendOpcode;
 import server.DueyPackage;
 import tools.FilePrinter;

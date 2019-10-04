@@ -21,9 +21,7 @@ package client;
 
 import java.sql.Connection;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import client.database.administrator.CharacterAdministrator;
@@ -381,7 +379,7 @@ public class MapleFamilyEntry {
    }
 
    public List<MapleFamilyEntry> getJuniors() {
-      return Collections.unmodifiableList(Arrays.asList(juniors));
+      return List.of(juniors);
    }
 
    public MapleFamilyEntry getOtherJunior(MapleFamilyEntry junior) {

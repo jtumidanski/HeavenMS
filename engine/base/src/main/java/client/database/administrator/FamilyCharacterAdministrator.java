@@ -64,8 +64,6 @@ public class FamilyCharacterAdministrator extends AbstractQueryExecutor {
 
    public void resetReputationOlderThan(Connection connection, long resetTime) {
       String sql = "UPDATE family_character SET todaysrep = 0, reptosenior = 0 WHERE lastresettime <= ?";
-      execute(connection, sql, ps -> {
-         ps.setLong(1, resetTime);
-      });
+      execute(connection, sql, ps -> ps.setLong(1, resetTime));
    }
 }

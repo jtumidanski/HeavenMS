@@ -58,7 +58,7 @@ import tools.packet.stat.UpdatePlayerStats;
  */
 public class AssignAPProcessor {
 
-   public static void APAutoAssignAction(MapleClient c, byte job, int types[], int gains[]) {
+   public static void APAutoAssignAction(MapleClient c, byte job, int[] types, int[] gains) {
       MapleCharacter chr = c.getPlayer();
       if (chr.getRemainingAp() < 1) {
          return;

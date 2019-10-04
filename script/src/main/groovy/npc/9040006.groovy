@@ -175,7 +175,7 @@ class NPC9040006 {
       Iterator<MapleMapItem> iter = mapItems.iterator()
       while (iter.hasNext()) {
          MapleMapItem item = iter.next()
-         int id = item.getItem().getItemId()
+         int id = item.getItem().id()
          if (!(id < 4001027 || id > 4001030)) {
             rawItems << item
          }
@@ -195,7 +195,7 @@ class NPC9040006 {
 
       for (int j = 0; j < rawItems.length; j++) {
          MapleMapItem item = rawItems[j]
-         int id = item.getItem().getItemId()
+         int id = item.getItem().id()
 
          //check item location
          for (int i = 0; i < 4; i++) {

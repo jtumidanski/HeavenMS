@@ -100,7 +100,6 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.ChangeChannel;
-import tools.packet.PacketInput;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.message.ServerMessage;
 import tools.packet.stat.EnableActions;

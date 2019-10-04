@@ -42,7 +42,6 @@ import net.server.channel.packet.buddy.DeleteBuddyPacket;
 import net.server.channel.packet.reader.BuddyReader;
 import net.server.world.World;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

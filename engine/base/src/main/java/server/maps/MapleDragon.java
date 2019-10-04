@@ -23,7 +23,6 @@ package server.maps;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.remove.RemoveDragon;
 import tools.packet.spawn.SpawnDragon;

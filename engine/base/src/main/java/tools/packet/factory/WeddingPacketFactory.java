@@ -1,7 +1,5 @@
 package tools.packet.factory;
 
-import java.util.List;
-
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.processor.CharacterProcessor;

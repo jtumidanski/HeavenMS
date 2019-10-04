@@ -60,7 +60,6 @@ import net.server.channel.packet.reader.MTSReader;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

@@ -26,7 +26,6 @@ package client.command.commands.gm2;
 import client.MapleClient;
 import client.command.Command;
 import tools.MasterBroadcaster;
-import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
 
 public class UnBugCommand extends Command {

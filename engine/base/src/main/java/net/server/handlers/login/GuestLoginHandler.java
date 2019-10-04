@@ -22,7 +22,6 @@
 package net.server.handlers.login;
 
 import client.MapleClient;
-import net.opcodes.SendOpcode;
 import net.server.login.packet.LoginPasswordPacket;
 import tools.PacketCreator;
 import tools.packet.GuestTOS;

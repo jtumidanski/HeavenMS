@@ -12,7 +12,6 @@ import constants.ExpTable;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;

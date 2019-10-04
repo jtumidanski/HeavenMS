@@ -15,7 +15,7 @@ class NPC11000 {
    int sel = -1
 
    def start() {
-      MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShop(11000), cm.getClient());
+      MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShop(11000), cm.getClient())
       cm.dispose()
    }
 

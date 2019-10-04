@@ -6,7 +6,6 @@ import client.processor.MapleFamilyProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilyPreceptsPacket;
 import net.server.channel.packet.reader.FamilyPreceptsReader;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.family.GetFamilyInfo;
 

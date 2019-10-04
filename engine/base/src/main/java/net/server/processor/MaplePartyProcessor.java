@@ -14,7 +14,6 @@ import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import server.maps.MapleMap;
 import server.partyquest.MonsterCarnival;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

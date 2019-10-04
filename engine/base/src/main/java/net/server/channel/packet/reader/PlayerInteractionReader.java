@@ -1,7 +1,6 @@
 package net.server.channel.packet.reader;
 
 import net.server.PacketReader;
-import net.server.channel.handlers.PlayerInteractionHandler;
 import net.server.channel.packet.ChatPlayerInteraction;
 import net.server.channel.packet.interaction.AddItemPlayerInteractionPacket;
 import net.server.channel.packet.interaction.AnswerTiePlayerInteractionPacket;

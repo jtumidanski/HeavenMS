@@ -49,7 +49,7 @@ public final class PacketProcessor {
    }
 
    public MaplePacketHandler getHandler(short packetId) {
-      return handlers.get(Integer.valueOf(packetId));
+      return handlers.get((int) packetId);
    }
 
    public void registerHandler(RecvOpcode code, MaplePacketHandler handler) {

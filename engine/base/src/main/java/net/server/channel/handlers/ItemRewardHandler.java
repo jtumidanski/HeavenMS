@@ -33,7 +33,6 @@ import net.server.channel.packet.ItemRewardPacket;
 import net.server.channel.packet.reader.ItemRewardReader;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.RewardItem;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;

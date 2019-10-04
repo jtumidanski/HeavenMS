@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
-import java.awt.Point;
 import java.util.List;
 
 import net.opcodes.SendOpcode;
-import server.maps.MapleDragon;
 import server.movement.LifeMovementFragment;
 import tools.FilePrinter;
 import tools.data.output.LittleEndianWriter;

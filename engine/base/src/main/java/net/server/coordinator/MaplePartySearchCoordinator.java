@@ -81,7 +81,7 @@ public class MaplePartySearchCoordinator {
       MapleData data = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "Etc.wz")).getData("MapNeighbors.img");
       if (data != null) {
          for (MapleData mapdata : data.getChildren()) {
-            int mapid = Integer.valueOf(mapdata.getName());
+            int mapid = Integer.parseInt(mapdata.getName());
 
             Set<Integer> neighborMaps = new HashSet<>();
             mapLinks.put(mapid, neighborMaps);

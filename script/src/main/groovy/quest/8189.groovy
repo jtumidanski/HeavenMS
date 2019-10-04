@@ -32,18 +32,18 @@ class Quest8189 {
             qm.sendNextPrev("Then here we go...! #rHYAHH!#k")
          } else if (status == 2) {
             int pet
-            if (qm.getPlayer().getPet(0).getItemId() >= 5000029 && qm.getPlayer().getPet(0).getItemId() <= 5000033) {
+            if (qm.getPlayer().getPet(0).id() >= 5000029 && qm.getPlayer().getPet(0).id() <= 5000033) {
                pet = 0
-            } else if (qm.getPlayer().getPet(1).getItemId() >= 5000029 && qm.getPlayer().getPet(1).getItemId() <= 5000033) {
+            } else if (qm.getPlayer().getPet(1).id() >= 5000029 && qm.getPlayer().getPet(1).id() <= 5000033) {
                pet = 1
-            } else if (qm.getPlayer().getPet(2).getItemId() >= 5000029 && qm.getPlayer().getPet(2).getItemId() <= 5000033) {
+            } else if (qm.getPlayer().getPet(2).id() >= 5000029 && qm.getPlayer().getPet(2).id() <= 5000033) {
                pet = 2
             } else {
                qm.sendOk("Something wrong, try again.")
                qm.dispose()
                return
             }
-            int id = qm.getPlayer().getPet(pet).getItemId()
+            int id = qm.getPlayer().getPet(pet).id()
             if (id < 5000029 || id > 5000033) {
                qm.sendOk("Something wrong, try again.")
                qm.dispose()

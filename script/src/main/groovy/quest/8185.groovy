@@ -46,7 +46,7 @@ class Quest8185 {
 
             int i
             for (i = 0; i < 3; i++) {
-               if (qm.getPlayer().getPet(i) != null && qm.getPlayer().getPet(i).getItemId() == 5000029) {
+               if (qm.getPlayer().getPet(i) != null && qm.getPlayer().getPet(i).id() == 5000029) {
 //                  MaplePet pet = qm.getPlayer().getPet(i)
                   break
                }

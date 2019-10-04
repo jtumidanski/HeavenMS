@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import client.MapleCharacter;
 import net.opcodes.SendOpcode;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
@@ -12,7 +11,6 @@ import tools.packet.character.box.AddOmokBox;
 import tools.packet.character.box.RemoveMiniGameBox;
 import tools.packet.character.box.RemovePlayerShop;
 import tools.packet.character.box.UpdatePlayerShopBox;
-import tools.packet.factory.AbstractPacketFactory;
 
 public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    private static UpdateCharacterBoxPacketFactory instance;

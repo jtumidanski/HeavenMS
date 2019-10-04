@@ -1,9 +1,6 @@
 package tools.packet.factory;
 
-import java.util.List;
-
 import client.MapleCharacter;
-import client.MapleClient;
 import client.inventory.MapleInventoryType;
 import constants.ItemConstants;
 import net.opcodes.SendOpcode;

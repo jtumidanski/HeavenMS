@@ -31,7 +31,6 @@ import net.server.channel.packet.HealOvertimePacket;
 import net.server.channel.packet.reader.HealOvertimeReader;
 import server.maps.MapleMap;
 import tools.MasterBroadcaster;
-import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowRecovery;
 
 public final class HealOvertimeHandler extends AbstractPacketHandler<HealOvertimePacket> {

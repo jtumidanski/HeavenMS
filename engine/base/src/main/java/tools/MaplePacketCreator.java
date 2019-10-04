@@ -69,8 +69,6 @@ import server.life.MaplePlayerNPC;
 import server.life.MobSkill;
 import server.maps.MapleHiredMerchant;
 import server.maps.MapleMapItem;
-import server.maps.MapleMiniGame;
-import server.maps.MaplePlayerShop;
 import server.maps.MapleReactor;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;

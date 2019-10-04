@@ -37,56 +37,54 @@ public class MapleFamilyProcessor {
    }
 
    public void loadAllFamilies() {
-      List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<Pair<Pair<Integer, Integer>, MapleFamilyEntry>>(200); // <<world, seniorid> familyEntry>
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
-            int cid = familyData.characterId();
-            String name = null;
-            int level = -1;
-            int jobID = -1;
-            int world = -1;
+      List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<>(200); // <<world, seniorid> familyEntry>
+      DatabaseConnection.getInstance().withConnection(connection -> FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
+         int cid = familyData.characterId();
+         String name = null;
+         int level = -1;
+         int jobID = -1;
+         int world = -1;
 
-            Optional<CharacterData> characterData = CharacterProvider.getInstance().getById(connection, familyData.characterId());
-            if (characterData.isPresent()) {
-               name = characterData.get().name();
-               level = characterData.get().level();
-               jobID = characterData.get().job();
-               world = characterData.get().world();
-            }
+         Optional<CharacterData> characterData = CharacterProvider.getInstance().getById(connection, familyData.characterId());
+         if (characterData.isPresent()) {
+            name = characterData.get().name();
+            level = characterData.get().level();
+            jobID = characterData.get().job();
+            world = characterData.get().world();
+         }
 
-            World wserv = Server.getInstance().getWorld(world);
-            if (wserv == null) {
-               return;
-            }
-            MapleFamily family = wserv.getFamily(familyData.familyId());
-            if (family == null) {
-               family = new MapleFamily(familyData.familyId(), world);
-               Server.getInstance().getWorld(world).addFamily(familyData.familyId(), family);
-            }
+         World wserv = Server.getInstance().getWorld(world);
+         if (wserv == null) {
+            return;
+         }
+         MapleFamily family = wserv.getFamily(familyData.familyId());
+         if (family == null) {
+            family = new MapleFamily(familyData.familyId(), world);
+            Server.getInstance().getWorld(world).addFamily(familyData.familyId(), family);
+         }
 
-            MapleFamilyEntry familyEntry = new MapleFamilyEntry(family, cid, name, level, MapleJob.getById(jobID));
-            family.addEntry(familyEntry);
-            if (familyData.seniorId() <= 0) {
-               family.setLeader(familyEntry);
-               setMessage(family, familyData.precepts(), false);
-            }
+         MapleFamilyEntry familyEntry = new MapleFamilyEntry(family, cid, name, level, MapleJob.getById(jobID));
+         family.addEntry(familyEntry);
+         if (familyData.seniorId() <= 0) {
+            family.setLeader(familyEntry);
+            setMessage(family, familyData.precepts(), false);
+         }
 
-            MapleFamilyEntry senior = family.getEntryByID(familyData.seniorId());
-            if (senior != null) {
-               familyEntry.setSenior(family.getEntryByID(familyData.seniorId()), false);
-            } else {
-               if (familyData.seniorId() > 0) {
-                  unmatchedJuniors.add(new Pair<>(new Pair<>(world, familyData.seniorId()), familyEntry));
-               }
+         MapleFamilyEntry senior = family.getEntryByID(familyData.seniorId());
+         if (senior != null) {
+            familyEntry.setSenior(family.getEntryByID(familyData.seniorId()), false);
+         } else {
+            if (familyData.seniorId() > 0) {
+               unmatchedJuniors.add(new Pair<>(new Pair<>(world, familyData.seniorId()), familyEntry));
             }
-            familyEntry.setReputation(familyData.reputation());
-            familyEntry.setTodaysRep(familyData.todaysReputation());
-            familyEntry.setTotalReputation(familyData.totalReputation());
-            familyEntry.setRepsToSenior(familyData.reputationToSenior());
+         }
+         familyEntry.setReputation(familyData.reputation());
+         familyEntry.setTodaysRep(familyData.todaysReputation());
+         familyEntry.setTotalReputation(familyData.totalReputation());
+         familyEntry.setRepsToSenior(familyData.reputationToSenior());
 
-            FamilyEntitlementProvider.getInstance().getIdsByCharacter(connection, familyData.characterId()).forEach(familyEntry::setEntitlementUsed);
-         });
-      });
+         FamilyEntitlementProvider.getInstance().getIdsByCharacter(connection, familyData.characterId()).forEach(familyEntry::setEntitlementUsed);
+      }));
 
       for (Pair<Pair<Integer, Integer>, MapleFamilyEntry> unmatchedJunior : unmatchedJuniors) {
          int world = unmatchedJunior.getLeft().getLeft();

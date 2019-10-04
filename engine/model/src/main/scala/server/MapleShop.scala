@@ -7,7 +7,7 @@ class MapleShop(private var _id: Int, private var _npcId: Int) {
 
   private var _items: Array[MapleShopItem] = new Array[MapleShopItem](0)
 
-  def setItems(items: Array[MapleShopItem]) = _items = items
+  def setItems(items: Array[MapleShopItem]):Unit = _items = items
 
   def items: Array[MapleShopItem] = _items
 

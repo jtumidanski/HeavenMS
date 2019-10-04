@@ -50,7 +50,6 @@ import net.server.processor.MapleAllianceProcessor;
 import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.World;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
