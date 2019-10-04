@@ -36,7 +36,10 @@ import net.server.channel.worker.PacketReaderFactory;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.attack.CloseRangeAttack;
+import tools.packet.attack.MagicAttack;
 
 public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -68,9 +71,9 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
 
       byte[] packet;
       if ((attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG)) {
-         packet = MaplePacketCreator.magicAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.charge(), attack.speed(), attack.direction(), attack.display());
+         packet = PacketCreator.create(new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.charge(), attack.speed(), attack.direction(), attack.display()));
       } else {
-         packet = MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display());
+         packet = PacketCreator.create(new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()));
       }
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> packet, false, chr, true);

@@ -111,6 +111,8 @@ import tools.ServerNoticeType;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.item.enhance.SendHammer;
+import tools.packet.item.enhance.SendVegaScroll;
 import tools.packet.message.ClearAvatarMegaphone;
 import tools.packet.message.GetAvatarMegaphone;
 import tools.packet.message.ItemMegaphone;
@@ -322,10 +324,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       player.toggleBlockCashShop();
 
       final int currentLevel = toScroll.level();
-      c.announce(MaplePacketCreator.sendVegaScroll(MaplePacketOpCodes.VegaScroll.FORTY));
+      PacketCreator.announce(c, new SendVegaScroll(MaplePacketOpCodes.VegaScroll.FORTY));
 
       final Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, uitem.id(), false, itemId, player.isGM());
-      c.announce(MaplePacketCreator.sendVegaScroll(scrolled.level() > currentLevel ? MaplePacketOpCodes.VegaScroll.FORTY_ONE : MaplePacketOpCodes.VegaScroll.FORTY_THREE));
+      PacketCreator.announce(c, new SendVegaScroll(scrolled.level() > currentLevel ? MaplePacketOpCodes.VegaScroll.FORTY_ONE : MaplePacketOpCodes.VegaScroll.FORTY_THREE));
 
       MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, uSlot, (short) 1, false);
       remove(c, position, itemId);
@@ -365,7 +367,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       equip.slots_$eq(equip.slots() + 1);
       remove(c, position, itemId);
       PacketCreator.announce(c, new EnableActions());
-      c.announce(MaplePacketCreator.sendHammerData(equip.vicious()));
+      PacketCreator.announce(c, new SendHammer(equip.vicious()));
       player.forceUpdateItem(equip);
    }
 

@@ -9,6 +9,7 @@ import tools.packet.PacketInput;
 import tools.packet.factory.AddNewCharacterPacketFactory;
 import tools.packet.factory.AfterLoginErrorPacketFactory;
 import tools.packet.factory.AllianceOperationPacketFactory;
+import tools.packet.factory.AttackPacketFactory;
 import tools.packet.factory.BuddyPacketFactory;
 import tools.packet.factory.CashShopGachaponPacketFactoryPacketFactory;
 import tools.packet.factory.CashShopOperationPacketFactory;
@@ -23,8 +24,10 @@ import tools.packet.factory.FieldEffectPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.FredrickPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
+import tools.packet.factory.GuildBBSPacketFactory;
 import tools.packet.factory.GuildPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
+import tools.packet.factory.ItemEnhancePacketFactory;
 import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
 import tools.packet.factory.MTSOperationPacketFactory;
@@ -35,6 +38,7 @@ import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.MovementPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
+import tools.packet.factory.NewYearCardPacketFactory;
 import tools.packet.factory.OwlOfMinervaPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
@@ -44,6 +48,7 @@ import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
 import tools.packet.factory.PlayerInteractionPacketFactory;
 import tools.packet.factory.QuestInfoPacketFactory;
+import tools.packet.factory.ReactorPacketFactory;
 import tools.packet.factory.RecommendedWorldMessagePacketFactory;
 import tools.packet.factory.RelogResponsePacketFactory;
 import tools.packet.factory.RemovePacketFactory;
@@ -244,6 +249,7 @@ public class PacketCreator {
          case PET_NAMECHANGE:
             return Optional.of(PetPacketFactory.getInstance());
          case UPDATE_CHAR_LOOK:
+         case CHAR_INFO:
             return Optional.of(CharacterPacketFactory.getInstance());
          case MARRIAGE_REQUEST:
          case WEDDING_PHOTO:
@@ -261,6 +267,23 @@ public class PacketCreator {
             return Optional.of(OwlOfMinervaPacketFactory.getInstance());
          case UPDATE_CHAR_BOX:
             return Optional.of(UpdateCharacterBoxPacketFactory.getInstance());
+         case NEW_YEAR_CARD_RES:
+            return Optional.of(NewYearCardPacketFactory.getInstance());
+         case GUILD_BBS_PACKET:
+            return Optional.of(GuildBBSPacketFactory.getInstance());
+         case REACTOR_SPAWN:
+         case REACTOR_HIT:
+         case REACTOR_DESTROY:
+            return Optional.of(ReactorPacketFactory.getInstance());
+         case CLOSE_RANGE_ATTACK:
+         case RANGED_ATTACK:
+         case MAGIC_ATTACK:
+         case SUMMON_ATTACK:
+         case THROW_GRENADE:
+            return Optional.of(AttackPacketFactory.getInstance());
+         case VEGA_SCROLL:
+         case VICIOUS_HAMMER:
+            return Optional.of(ItemEnhancePacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

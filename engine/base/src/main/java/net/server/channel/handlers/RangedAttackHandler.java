@@ -46,8 +46,10 @@ import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
 import tools.Randomizer;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.attack.RangedAttack;
 
 public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -79,17 +81,17 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
       }
 
       if (attack.skill() == Buccaneer.ENERGY_ORB || attack.skill() == ThunderBreaker.SPARK || attack.skill() == Shadower.TAUNT || attack.skill() == NightLord.TAUNT) {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.rangedAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), 0, attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), 0, attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr);
          applyAttack(attack, chr, 1);
       } else if (attack.skill() == ThunderBreaker.SHARK_WAVE && chr.getSkillLevel(ThunderBreaker.SHARK_WAVE) > 0) {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.rangedAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), 0, attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), 0, attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr);
          applyAttack(attack, chr, 1);
 
          for (int i = 0; i < attack.numAttacked(); i++) {
             chr.handleEnergyChargeGain();
          }
       } else if (attack.skill() == Aran.COMBO_SMASH || attack.skill() == Aran.COMBO_FENRIR || attack.skill() == Aran.COMBO_TEMPEST) {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.rangedAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), 0, attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), 0, attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr);
          if (attack.skill() == Aran.COMBO_SMASH && chr.getCombo() >= 30) {
             chr.setCombo((short) 0);
             applyAttack(attack, chr, 1);
@@ -209,10 +211,10 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                case 3221001: // Pierce
                case 5221004: // Rapid Fire
                case 13111002: // KoC Hurricane
-                  packet = MaplePacketCreator.rangedAttack(chr, attack.skill(), attack.skillLevel(), attack.rangedDirection(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display());
+                  packet = PacketCreator.create(new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.rangedDirection(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display()));
                   break;
                default:
-                  packet = MaplePacketCreator.rangedAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display());
+                  packet = PacketCreator.create(new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display()));
                   break;
             }
             MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> packet, false, chr, true);

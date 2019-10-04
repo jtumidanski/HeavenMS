@@ -28,7 +28,7 @@ import net.server.channel.packet.reader.CharacterListRequestReader;
 import net.server.login.packet.CharacterListRequestPacket;
 import net.server.world.World;
 import tools.PacketCreator;
-import tools.packet.CharacterList;
+import tools.packet.character.CharacterList;
 import tools.packet.serverlist.GetServerStatus;
 import tools.packet.serverlist.ServerStatus;
 

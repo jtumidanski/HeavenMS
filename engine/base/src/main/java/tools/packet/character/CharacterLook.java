@@ -1,8 +1,9 @@
-package tools.packet;
+package tools.packet.character;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import net.opcodes.SendOpcode;
+import tools.packet.PacketInput;
 
 public class CharacterLook implements PacketInput {
    private MapleClient target;

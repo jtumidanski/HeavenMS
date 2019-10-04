@@ -25,7 +25,8 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.item.enhance.SendHammerMessage;
 
 /**
  * @author Jay Estrella
@@ -38,6 +39,6 @@ public final class UseHammerHandler extends AbstractPacketHandler<NoOpPacket> {
 
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.sendHammerMessage());
+      PacketCreator.announce(client, new SendHammerMessage());
    }
 }

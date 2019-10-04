@@ -43,7 +43,9 @@ import net.server.channel.packet.bbs.NewBBSThreadPacket;
 import net.server.channel.packet.bbs.ReplyToThreadPacket;
 import net.server.channel.packet.reader.BBSOperationReader;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.guild.bbs.GetThreadList;
+import tools.packet.guild.bbs.ShowThread;
 
 public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOperationPacket> {
    @Override
@@ -102,7 +104,7 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
    private void listBBSThreads(MapleClient c, int start) {
       DatabaseConnection.getInstance().withConnection(connection -> {
          List<BbsThreadData> threadData = BbsThreadProvider.getInstance().getThreadsForGuild(connection, c.getPlayer().getGuildId());
-         c.announce(MaplePacketCreator.BBSThreadList(threadData, start));
+         PacketCreator.announce(c, new GetThreadList(threadData, start));
       });
    }
 
@@ -205,6 +207,6 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
       }
 
       DatabaseConnection.getInstance().withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
-            .ifPresent(threadData -> client.announce(MaplePacketCreator.showThread(bIsThreadIdLocal ? threadid : threadData.threadId(), threadData))));
+            .ifPresent(threadData -> PacketCreator.announce(client, new ShowThread(bIsThreadIdLocal ? threadid : threadData.threadId(), threadData))));
    }
 }

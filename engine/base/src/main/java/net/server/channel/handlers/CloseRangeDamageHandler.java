@@ -56,9 +56,11 @@ import server.MapleStatEffect;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.attack.CloseRangeAttack;
 
 public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -93,7 +95,9 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> MaplePacketCreator.closeRangeAttack(chr, attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()), false, chr, true);
+      MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(),
+            character -> PacketCreator.create(new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display())),
+            false, chr, true);
       int numFinisherOrbs = 0;
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);
       if (GameConstants.isFinisherSkill(attack.skill())) {

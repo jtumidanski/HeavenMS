@@ -43,8 +43,9 @@ import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleSummon;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.attack.SummonAttack;
 
 public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonDamagePacket> {
    @Override
@@ -81,7 +82,7 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
          allDamage.add(new SummonAttackEntry(packet.monsterObjectId()[x], packet.damage()[x]));
       }
 
-      byte[] attackPacket = MaplePacketCreator.summonAttack(player.getId(), summon.getObjectId(), packet.direction(), allDamage);
+      byte[] attackPacket = PacketCreator.create(new SummonAttack(player.getId(), summon.getObjectId(), packet.direction(), allDamage));
       MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), character -> attackPacket, player, summon.getPosition());
 
       if (player.getMap().isOwnershipRestricted(player)) {
@@ -91,8 +92,8 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
       boolean magic = summonEffect.getWatk() == 0;
       int maxDmg = calcMaxDamage(summonEffect, player, magic);    // thanks Darter (YungMoozi) for reporting unchecked max dmg
       for (SummonAttackEntry attackEntry : allDamage) {
-         int damage = attackEntry.getDamage();
-         MapleMonster target = player.getMap().getMonsterByOid(attackEntry.getMonsterOid());
+         int damage = attackEntry.damage();
+         MapleMonster target = player.getMap().getMonsterByOid(attackEntry.monsterObjectId());
          if (target != null) {
             if (damage > maxDmg) {
                AutobanFactory.DAMAGE_HACK.alert(client.getPlayer(), "Possible packet editing summon damage exploit.");
@@ -137,25 +138,5 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
       }
 
       return (int) maxDamage;
-   }
-
-   public final class SummonAttackEntry {
-
-      private int monsterOid;
-      private int damage;
-
-      public SummonAttackEntry(int monsterOid, int damage) {
-         this.monsterOid = monsterOid;
-         this.damage = damage;
-      }
-
-      public int getMonsterOid() {
-         return monsterOid;
-      }
-
-      public int getDamage() {
-         return damage;
-      }
-
    }
 }

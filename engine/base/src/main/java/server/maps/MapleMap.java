@@ -106,12 +106,13 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
-import tools.packet.CharacterLook;
+import tools.packet.character.CharacterLook;
 import tools.packet.event.CoconutScore;
 import tools.packet.event.RollSnowBall;
 import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.monster.carnival.MonsterCarnivalStart;
+import tools.packet.reactor.TriggerReactor;
 import tools.packet.remove.RemoveDragon;
 import tools.packet.remove.RemoveItem;
 import tools.packet.remove.RemoveNPC;
@@ -347,7 +348,7 @@ public class MapleMap {
                mr.lockReactor();
                try {
                   mr.resetReactorActions(1);
-                  MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.triggerReactor((MapleReactor) o, 1));
+                  MasterBroadcaster.getInstance().sendToAllInMap(this, new TriggerReactor((MapleReactor) o, 1));
                } finally {
                   mr.unlockReactor();
                }
@@ -1492,7 +1493,7 @@ public class MapleMap {
          try {
             r.resetReactorActions(0);
             r.setAlive(true);
-            MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.triggerReactor(r, 0));
+            MasterBroadcaster.getInstance().sendToAllInMap(this, new TriggerReactor(r, 0));
          } finally {
             r.unlockReactor();
          }
@@ -4193,7 +4194,7 @@ public class MapleMap {
                               try {
                                  reactor.resetReactorActions(0);
                                  reactor.setAlive(true);
-                                 MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> MaplePacketCreator.triggerReactor(reactor, 0));
+                                 MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, new TriggerReactor(reactor, 0));
                               } finally {
                                  reactor.unlockReactor();
                               }

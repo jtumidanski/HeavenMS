@@ -7,7 +7,7 @@ import constants.ServerConstants;
 import net.opcodes.SendOpcode;
 import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.CharacterList;
+import tools.packet.character.CharacterList;
 import tools.packet.PacketInput;
 
 public class CharacterListPacketFactory extends AbstractPacketFactory {

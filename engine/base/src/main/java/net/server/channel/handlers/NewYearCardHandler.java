@@ -32,10 +32,11 @@ import net.server.channel.packet.newyear.CardAcceptedPacket;
 import net.server.channel.packet.newyear.CardHasBeenSentPacket;
 import net.server.channel.packet.reader.NewYearCardReader;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.NewYearCardResolution;
 
 /**
  * @author Ronan
@@ -90,16 +91,16 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
                }
 
                player.addNewYearRecord(newYear);
-               player.announce(MaplePacketCreator.onNewYearCardRes(player, newYear, 6, 0));    // successfully rcvd
+               PacketCreator.announce(player, new NewYearCardResolution(player, newYear, 6, 0));    // successfully rcvd
 
-               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.onNewYearCardRes(player, newYear, 0xD, 0));
+               MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new NewYearCardResolution(player, newYear, 0xD, 0));
 
                c.getWorldServer().getPlayerStorage().getCharacterById(newYear.getSenderId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(sender -> {
-                  MasterBroadcaster.getInstance().sendToAllInMap(sender.getMap(), character -> MaplePacketCreator.onNewYearCardRes(sender, newYear, 0xD, 0));
+                  MasterBroadcaster.getInstance().sendToAllInMap(sender.getMap(), new NewYearCardResolution(sender, newYear, 0xD, 0));
                   MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, "[New Year] Your addressee successfully received the New Year card.");
                });
             } else {
-               player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
+               PacketCreator.announce(player, new NewYearCardResolution(player, -1, 5, 0x10));  // inventory full
             }
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "[New Year] The sender of the New Year card already dropped it. Nothing to receive.");
@@ -130,21 +131,21 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
 
                      Server.getInstance().setNewYearCard(newyear);
                      newyear.startNewYearCardTask();
-                     player.announce(MaplePacketCreator.onNewYearCardRes(player, newyear, 4, 0));    // successfully sent
+                     PacketCreator.announce(player, new NewYearCardResolution(player, newyear, 4, 0));    // successfully sent
                   } else {
-                     player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0xF));   // cannot send to yourself
+                     PacketCreator.announce(player, new NewYearCardResolution(player, -1, 5, 0xF));   // cannot send to yourself
                   }
                } else {
-                  player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x13));  // cannot find such character
+                  PacketCreator.announce(player, new NewYearCardResolution(player, -1, 5, 0x13));  // cannot find such character
                }
             } else {
-               player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x10));  // inventory full
+               PacketCreator.announce(player, new NewYearCardResolution(player, -1, 5, 0x10));  // inventory full
             }
          } else {
-            player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, status));  // item and inventory errors
+            PacketCreator.announce(player, new NewYearCardResolution(player, -1, 5, status));  // item and inventory errors
          }
       } else {
-         player.announce(MaplePacketCreator.onNewYearCardRes(player, -1, 5, 0x11));  // have no card to send
+         PacketCreator.announce(player, new NewYearCardResolution(player, -1, 5, 0x11));  // have no card to send
       }
    }
 }

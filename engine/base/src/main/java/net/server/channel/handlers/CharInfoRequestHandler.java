@@ -27,7 +27,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.CharacterInfoRequestPacket;
 import net.server.channel.packet.reader.CharacterInfoRequestReader;
 import server.maps.MapleMapObject;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.character.GetCharacterInfo;
 
 public final class CharInfoRequestHandler extends AbstractPacketHandler<CharacterInfoRequestPacket> {
    @Override
@@ -45,7 +46,7 @@ public final class CharInfoRequestHandler extends AbstractPacketHandler<Characte
             if (client.getPlayer().getId() != player.getId()) {
                player.exportExcludedItems(client);
             }
-            client.announce(MaplePacketCreator.charInfo(player));
+            PacketCreator.announce(client, new GetCharacterInfo(player));
          }
       }
    }
