@@ -51,10 +51,11 @@ import server.MapleItemInformationProvider;
 import server.maps.MapleHiredMerchant;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.fredrick.FredrickMessage;
 
 /**
  * @author RonanLana - synchronization of Fredrick modules & operation results
@@ -206,7 +207,7 @@ public class FredrickProcessor {
 
             byte response = canRetrieveFromFredrick(chr, items);
             if (response != 0) {
-               chr.announce(MaplePacketCreator.fredrickMessage(response));
+               PacketCreator.announce(chr, new FredrickMessage(response));
                return;
             }
 
@@ -226,7 +227,7 @@ public class FredrickProcessor {
                   FilePrinter.print(FilePrinter.FREDRICK + chr.getName() + ".txt", chr.getName() + " gained " + item.quantity() + " " + itemName + " (" + item.id() + ")");
                }
 
-               chr.announce(MaplePacketCreator.fredrickMessage((byte) 0x1E));
+               PacketCreator.announce(chr, new FredrickMessage((byte) 0x1E));
                removeFredrickLog(chr.getId());
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "An unknown error has occurred.");

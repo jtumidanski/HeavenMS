@@ -92,6 +92,7 @@ import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.field.effect.EnvironmentChange;
+import tools.packet.fredrick.GetFredrickInfo;
 import tools.packet.message.GachaponMessage;
 import tools.packet.npctalk.GetDimensionalMirror;
 import tools.packet.npctalk.GetNPCTalk;
@@ -503,7 +504,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void showFredrick() {
-      c.announce(MaplePacketCreator.getFredrick(getPlayer()));
+      PacketCreator.announce(c, new GetFredrickInfo(getPlayer().getId(), getPlayer().getMerchantNetMeso()));
    }
 
    public int partyMembersInMap() {

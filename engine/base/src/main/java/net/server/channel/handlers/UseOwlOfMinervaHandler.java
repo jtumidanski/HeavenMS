@@ -29,8 +29,9 @@ import constants.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.owl.GetOwlOpen;
 
 /**
  * @author Ronan
@@ -64,6 +65,6 @@ public final class UseOwlOfMinervaHandler extends AbstractPacketHandler<NoOpPack
          }
       }
 
-      client.announce(MaplePacketCreator.getOwlOpen(owlLeaderboards));
+      PacketCreator.announce(client, new GetOwlOpen(owlLeaderboards));
    }
 }

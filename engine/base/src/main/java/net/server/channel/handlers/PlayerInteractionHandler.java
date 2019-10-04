@@ -93,6 +93,9 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.MiniRoomError;
+import tools.packet.character.box.AddMatchCard;
+import tools.packet.character.box.AddOmokBox;
+import tools.packet.character.box.UpdatePlayerShopBox;
 import tools.packet.playerinteraction.GetHiredMerchant;
 import tools.packet.playerinteraction.GetMatchCardStart;
 import tools.packet.playerinteraction.GetMiniGameDenyTie;
@@ -658,12 +661,12 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       if (game.getGameType().equals(MiniGameType.OMOK)) {
          game.minigameMatchStarted();
          MasterBroadcaster.getInstance().sendToGamers(game, new GetMiniGameStart(game.getLoser()));
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.addOmokBox(game.getOwner(), 2, 1));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new AddOmokBox(game.getOwner(), 2, 1));
       } else if (game.getGameType().equals(MiniGameType.MATCH_CARD)) {
          game.minigameMatchStarted();
          game.shuffleList();
          MasterBroadcaster.getInstance().sendToGamers(game, new GetMatchCardStart(game, game.getLoser()));
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.addMatchCardBox(game.getOwner(), 2, 1));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new AddMatchCard(game.getOwner(), 2, 1));
       }
    }
 
@@ -696,7 +699,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             } // fella does not have a player shop permit...
          }
 
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(shop));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdatePlayerShopBox(shop));
          shop.setOpen(true);
       } else if (merchant != null && merchant.isOwner(chr)) {
          chr.setHasMerchant(true);
@@ -733,7 +736,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             } // fella does not have a player shop permit...
          }
 
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(shop));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdatePlayerShopBox(shop));
          shop.setOpen(true);
       } else if (merchant != null && merchant.isOwner(chr)) {
          chr.setHasMerchant(true);
@@ -919,7 +922,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       game.setGameType(MiniGameType.MATCH_CARD);
       chr.setMiniGame(game);
       chr.getMap().addMapObject(game);
-      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.addMatchCardBox(chr, 1, 0));
+      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new AddMatchCard(chr, 1, 0));
       game.sendMatchCard(c, type);
    }
 
@@ -945,7 +948,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       game.setPieceType(type);
       game.setGameType(MiniGameType.OMOK);
       chr.getMap().addMapObject(game);
-      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.addOmokBox(chr, 1, 0));
+      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new AddOmokBox(chr, 1, 0));
       game.sendOmok(c, type);
    }
 

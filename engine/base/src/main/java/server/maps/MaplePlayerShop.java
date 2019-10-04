@@ -41,13 +41,14 @@ import net.opcodes.SendOpcode;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleTrade;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.character.box.RemovePlayerShop;
+import tools.packet.character.box.UpdatePlayerShopBox;
 import tools.packet.playerinteraction.GetPlayerShop;
 import tools.packet.playerinteraction.PlayerShopChat;
 import tools.packet.playerinteraction.PlayerShopErrorMessage;
@@ -157,7 +158,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
             byte[] newVisitorPacket = PacketCreator.create(new PlayerShopNewVisitor(visitor, i + 1));
             MasterBroadcaster.getInstance().sendToShop(this, character -> newVisitorPacket);
-            MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(this));
+            MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new UpdatePlayerShopBox(this));
             break;
          }
       }
@@ -179,7 +180,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
                byte[] removeVisitorPacket = PacketCreator.create(new PlayerShopRemoveVisitor(i + 1));
                MasterBroadcaster.getInstance().sendToShop(this, character -> removeVisitorPacket);
-               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(this));
+               MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new UpdatePlayerShopBox(this));
                return;
             }
          }
@@ -216,7 +217,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                   }
 
                   broadcastRestoreToVisitors();
-                  MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(this));
+                  MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new UpdatePlayerShopBox(this));
                   return;
                }
             }
@@ -224,7 +225,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
             visitorLock.unlock();
          }
 
-         MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.updatePlayerShopBox(this));
+         MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new UpdatePlayerShopBox(this));
       }
    }
 
@@ -437,7 +438,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    public void closeShop() {
       clearChatLog();
       removeVisitors();
-      MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), character -> MaplePacketCreator.removePlayerShopBox(this));
+      MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new RemovePlayerShop(this.getOwner().getId()));
    }
 
    public void sendShop(MapleClient c) {
@@ -568,12 +569,12 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    @Override
    public void sendDestroyData(MapleClient client) {
-      client.announce(MaplePacketCreator.removePlayerShopBox(this));
+      PacketCreator.announce(client, new RemovePlayerShop(this.getOwner().getId()));
    }
 
    @Override
    public void sendSpawnData(MapleClient client) {
-      client.announce(MaplePacketCreator.updatePlayerShopBox(this));
+      PacketCreator.announce(client, new UpdatePlayerShopBox(this));
    }
 
    @Override

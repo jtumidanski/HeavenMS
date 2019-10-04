@@ -21,6 +21,7 @@ import tools.packet.factory.EventPacketFactory;
 import tools.packet.factory.FamilyPacketFactory;
 import tools.packet.factory.FieldEffectPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
+import tools.packet.factory.FredrickPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.GuildPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
@@ -34,6 +35,7 @@ import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.MovementPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
+import tools.packet.factory.OwlOfMinervaPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
 import tools.packet.factory.PartyOperationPacketFactory;
 import tools.packet.factory.PetPacketFactory;
@@ -56,6 +58,7 @@ import tools.packet.factory.StatUpdatePacketFactory;
 import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
 import tools.packet.factory.TVPacketFactory;
+import tools.packet.factory.UpdateCharacterBoxPacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 import tools.packet.factory.WeddingPacketFactory;
 
@@ -250,6 +253,14 @@ public class PacketCreator {
          case WEDDING_PROGRESS:
          case WEDDING_GIFT_RESULT:
             return Optional.of(WeddingPacketFactory.getInstance());
+         case FREDRICK_MESSAGE:
+         case FREDRICK:
+            return Optional.of(FredrickPacketFactory.getInstance());
+         case SHOP_LINK_RESULT:
+         case SHOP_SCANNER_RESULT:
+            return Optional.of(OwlOfMinervaPacketFactory.getInstance());
+         case UPDATE_CHAR_BOX:
+            return Optional.of(UpdateCharacterBoxPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

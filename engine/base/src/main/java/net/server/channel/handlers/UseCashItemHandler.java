@@ -115,6 +115,7 @@ import tools.packet.message.ClearAvatarMegaphone;
 import tools.packet.message.GetAvatarMegaphone;
 import tools.packet.message.ItemMegaphone;
 import tools.packet.message.MultiMegaphone;
+import tools.packet.owl.OwlOfMinervaResult;
 import tools.packet.pet.PetNameChange;
 import tools.packet.stat.EnableActions;
 
@@ -510,7 +511,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          remove(c, position, itemId);
       }
 
-      c.announce(MaplePacketCreator.owlOfMinerva(c, searchedItemId, hmsAvailable));
+      PacketCreator.announce(c, new OwlOfMinervaResult(searchedItemId, hmsAvailable));
       PacketCreator.announce(c, new EnableActions());
    }
 

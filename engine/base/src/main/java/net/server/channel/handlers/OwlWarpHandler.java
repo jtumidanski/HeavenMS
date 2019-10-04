@@ -26,10 +26,10 @@ import net.server.channel.packet.OwlWarpPacket;
 import net.server.channel.packet.reader.OwlWarpReader;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.owl.GetOwlMessage;
 import tools.packet.playerinteraction.GetHiredMerchant;
 
 /*
@@ -55,9 +55,9 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
          ps = client.getWorldServer().getPlayerShop(packet.ownerId());
          if (ps == null || ps.getMapId() != packet.mapId() || !ps.hasItem(client.getPlayer().getOwlSearch())) {
             if (hm == null && ps == null) {
-               client.announce(MaplePacketCreator.getOwlMessage(1));
+               PacketCreator.announce(client, new GetOwlMessage(1));
             } else {
-               client.announce(MaplePacketCreator.getOwlMessage(3));
+               PacketCreator.announce(client, new GetOwlMessage(3));
             }
             return;
          }
@@ -70,14 +70,14 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
                   if (ps.isOpen()) {   //change map has a delay, must double check
                      if (!ps.visitShop(client.getPlayer())) {
                         if (!ps.isBanned(client.getPlayer().getName())) {
-                           client.announce(MaplePacketCreator.getOwlMessage(2));
+                           PacketCreator.announce(client, new GetOwlMessage(2));
                         } else {
-                           client.announce(MaplePacketCreator.getOwlMessage(17));
+                           PacketCreator.announce(client, new GetOwlMessage(17));
                         }
                      }
                   } else {
                      //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
-                     client.announce(MaplePacketCreator.getOwlMessage(18));
+                     PacketCreator.announce(client, new GetOwlMessage(18));
                   }
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "That shop is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
@@ -87,7 +87,7 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
             }
          } else {
             //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
-            client.announce(MaplePacketCreator.getOwlMessage(18));
+            PacketCreator.announce(client, new GetOwlMessage(18));
          }
       } else {
          if (hm.isOpen()) {
@@ -101,11 +101,11 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
                         client.getPlayer().setHiredMerchant(hm);
                      } else {
                         //c.announce(MaplePacketCreator.serverNotice(1, hm.getOwner() + "'s merchant is full. Wait awhile before trying again."));
-                        client.announce(MaplePacketCreator.getOwlMessage(2));
+                        PacketCreator.announce(client, new GetOwlMessage(2));
                      }
                   } else {
                      //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
-                     client.announce(MaplePacketCreator.getOwlMessage(18));
+                     PacketCreator.announce(client, new GetOwlMessage(18));
                   }
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "That merchant is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
@@ -115,7 +115,7 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
             }
          } else {
             //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
-            client.announce(MaplePacketCreator.getOwlMessage(18));
+            PacketCreator.announce(client, new GetOwlMessage(18));
          }
       }
    }
