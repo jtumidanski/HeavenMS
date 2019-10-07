@@ -21,10 +21,10 @@ import net.server.Server;
 import net.server.world.World;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.family.GetFamilyInfo;
+import tools.packet.message.NotifyLevelUp;
 
 public class MapleFamilyProcessor {
    private static MapleFamilyProcessor ourInstance = new MapleFamilyProcessor();
@@ -182,7 +182,7 @@ public class MapleFamilyProcessor {
          if (senior != null) { //only send the message to direct senior
             MapleCharacter seniorChr = senior.getChr();
             if (seniorChr != null) {
-               seniorChr.announce(MaplePacketCreator.levelUpMessage(1, level, name));
+               PacketCreator.announce(seniorChr, new NotifyLevelUp(1, level, name));
             }
          }
       }

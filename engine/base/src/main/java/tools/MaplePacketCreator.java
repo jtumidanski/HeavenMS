@@ -652,28 +652,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-        /*
-        public static byte[] sendSpouseChat(MapleCharacter partner, String msg) {
-                final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-                mplew.writeShort(SendOpcode.SPOUSE_CHAT.getValue());
-                mplew.writeMapleAsciiString(partner.getName());
-                mplew.writeMapleAsciiString(msg);
-                return mplew.getPacket();
-        }
-        */
-
-   public static byte[] OnCoupleMessage(String fiance, String text, boolean spouse) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPOUSE_CHAT.getValue());
-      mplew.write(spouse ? 5 : 4); // v2 = CInPacket::Decode1(a1) - 4;
-      if (spouse) { // if ( v2 ) {
-         mplew.writeMapleAsciiString(fiance);
-      }
-      mplew.write(spouse ? 5 : 1);
-      mplew.writeMapleAsciiString(text);
-      return mplew.getPacket();
-   }
-
    public static byte[] showForcedEquip(int team) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.FORCED_MAP_EQUIP.getValue());
@@ -849,15 +827,6 @@ public class MaplePacketCreator {
       mplew.write(0x00);
       mplew.writeInt(oid);
 
-      return mplew.getPacket();
-   }
-
-   public static byte[] sendYellowTip(String tip) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_WEEK_EVENT_MESSAGE.getValue());
-      mplew.write(0xFF);
-      mplew.writeMapleAsciiString(tip);
-      mplew.writeShort(0);
       return mplew.getPacket();
    }
 
@@ -1203,64 +1172,6 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.BLOCKED_SERVER.getValue());
       mplew.write(type);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends a "levelup" packet to the guild or family.
-    * <p>
-    * Possible values for <code>type</code>:<br> 0: <Family> ? has reached Lv.
-    * ?.<br> - The Reps you have received from ? will be reduced in half. 1:
-    * <Family> ? has reached Lv. ?.<br> 2: <Guild> ? has reached Lv. ?.<br>
-    *
-    * @param type The type
-    * @return The "levelup" packet.
-    */
-   public static byte[] levelUpMessage(int type, int level, String charname) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_LEVELUP.getValue());
-      mplew.write(type);
-      mplew.writeInt(level);
-      mplew.writeMapleAsciiString(charname);
-
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends a "married" packet to the guild or family.
-    * <p>
-    * Possible values for <code>type</code>:<br> 0: <Guild ? is now married.
-    * Please congratulate them.<br> 1: <Family ? is now married. Please
-    * congratulate them.<br>
-    *
-    * @param type The type
-    * @return The "married" packet.
-    */
-   public static byte[] marriageMessage(int type, String charname) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_MARRIAGE.getValue());
-      mplew.write(type);  // 0: guild, 1: family
-      mplew.writeMapleAsciiString("> " + charname); //To fix the stupid packet lol
-
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends a "job advance" packet to the guild or family.
-    * <p>
-    * Possible values for <code>type</code>:<br> 0: <Guild ? has advanced to
-    * a(an) ?.<br> 1: <Family ? has advanced to a(an) ?.<br>
-    *
-    * @param type The type
-    * @return The "job advance" packet.
-    */
-   public static byte[] jobMessage(int type, int job, String charname) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_JOB_CHANGE.getValue());
-      mplew.write(type);
-      mplew.writeInt(job); //Why fking int?
-      mplew.writeMapleAsciiString("> " + charname); //To fix the stupid packet lol
-
       return mplew.getPacket();
    }
 

@@ -28,7 +28,9 @@ import net.server.Server;
 import tools.FilePrinter;
 import tools.MapleLogger;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
 import tools.StringUtil;
+import tools.packet.message.YellowTip;
 
 /**
  * @author kevintjuh93
@@ -88,7 +90,7 @@ public enum AutobanFactory {
          if (chr != null && MapleLogger.ignored.contains(chr.getId())) {
             return;
          }
-         Server.getInstance().broadcastGMMessage((chr != null ? chr.getWorld() : 0), MaplePacketCreator.sendYellowTip((chr != null ? StringUtil.makeMapleReadable(chr.getName()) : "") + " caused " + this.name() + " " + reason));
+         Server.getInstance().broadcastGMMessage((chr != null ? chr.getWorld() : 0), PacketCreator.create(new YellowTip((chr != null ? StringUtil.makeMapleReadable(chr.getName()) : "") + " caused " + this.name() + " " + reason)));
       }
       if (ServerConstants.USE_AUTOBAN_LOG) {
          FilePrinter.print(FilePrinter.AUTOBAN_WARNING, (chr != null ? StringUtil.makeMapleReadable(chr.getName()) : "") + " caused " + this.name() + " " + reason);

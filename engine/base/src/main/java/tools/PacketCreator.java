@@ -242,6 +242,10 @@ public class PacketCreator {
          case WHISPER:
          case FAME_RESPONSE:
          case MULTICHAT:
+         case NOTIFY_LEVELUP:
+         case NOTIFY_MARRIAGE:
+         case NOTIFY_JOB_CHANGE:
+         case SPOUSE_CHAT:
             return Optional.of(MessagePacketFactory.getInstance());
          case BUDDYLIST:
             return Optional.of(BuddyPacketFactory.getInstance());

@@ -15,11 +15,16 @@ import tools.packet.message.GiveFameResponse;
 import tools.packet.message.ItemMegaphone;
 import tools.packet.message.MultiChat;
 import tools.packet.message.MultiMegaphone;
+import tools.packet.message.NotifyJobAdvance;
+import tools.packet.message.NotifyLevelUp;
+import tools.packet.message.NotifyMarriage;
 import tools.packet.message.ReceiveFame;
 import tools.packet.message.ServerMessage;
 import tools.packet.message.ServerNotice;
+import tools.packet.message.SpouseMessage;
 import tools.packet.message.Whisper;
 import tools.packet.message.WhisperReply;
+import tools.packet.message.YellowTip;
 
 public class MessagePacketFactory extends AbstractPacketFactory {
    private static MessagePacketFactory instance;
@@ -68,6 +73,16 @@ public class MessagePacketFactory extends AbstractPacketFactory {
          return create(this::itemMegaphone, packetInput);
       } else if (packetInput instanceof MultiMegaphone) {
          return create(this::getMultiMegaphone, packetInput);
+      } else if (packetInput instanceof NotifyLevelUp) {
+         return create(this::levelUpMessage, packetInput);
+      } else if (packetInput instanceof NotifyMarriage) {
+         return create(this::marriageMessage, packetInput);
+      } else if (packetInput instanceof NotifyJobAdvance) {
+         return create(this::jobMessage, packetInput);
+      } else if (packetInput instanceof SpouseMessage) {
+         return create(this::coupleMessage, packetInput);
+      } else if (packetInput instanceof YellowTip) {
+         return create(this::sendYellowTip, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -321,6 +336,76 @@ public class MessagePacketFactory extends AbstractPacketFactory {
       }
       mplew.write(packet.showEar() ? 1 : 0);
       mplew.write(1);
+      return mplew.getPacket();
+   }
+
+   /**
+    * Sends a "levelup" packet to the guild or family.
+    * <p>
+    * Possible values for <code>type</code>:<br> 0: <Family> ? has reached Lv.
+    * ?.<br> - The Reps you have received from ? will be reduced in half. 1:
+    * <Family> ? has reached Lv. ?.<br> 2: <Guild> ? has reached Lv. ?.<br>
+    */
+   protected byte[] levelUpMessage(NotifyLevelUp packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.NOTIFY_LEVELUP.getValue());
+      mplew.write(packet.theType());
+      mplew.writeInt(packet.level());
+      mplew.writeMapleAsciiString(packet.characterName());
+
+      return mplew.getPacket();
+   }
+
+   /**
+    * Sends a "married" packet to the guild or family.
+    * <p>
+    * Possible values for <code>type</code>:<br> 0: <Guild ? is now married.
+    * Please congratulate them.<br> 1: <Family ? is now married. Please
+    * congratulate them.<br>
+    */
+   protected byte[] marriageMessage(NotifyMarriage packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.NOTIFY_MARRIAGE.getValue());
+      mplew.write(packet.theType());  // 0: guild, 1: family
+      mplew.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
+
+      return mplew.getPacket();
+   }
+
+   /**
+    * Sends a "job advance" packet to the guild or family.
+    * <p>
+    * Possible values for <code>type</code>:<br> 0: <Guild ? has advanced to
+    * a(an) ?.<br> 1: <Family ? has advanced to a(an) ?.<br>
+    */
+   protected byte[] jobMessage(NotifyJobAdvance packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.NOTIFY_JOB_CHANGE.getValue());
+      mplew.write(packet.theType());
+      mplew.writeInt(packet.job()); //Why fking int?
+      mplew.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
+
+      return mplew.getPacket();
+   }
+
+   protected byte[] coupleMessage(SpouseMessage packet) {
+      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SPOUSE_CHAT.getValue());
+      mplew.write(packet.spouse() ? 5 : 4); // v2 = CInPacket::Decode1(a1) - 4;
+      if (packet.spouse()) { // if ( v2 ) {
+         mplew.writeMapleAsciiString(packet.fiance());
+      }
+      mplew.write(packet.spouse() ? 5 : 1);
+      mplew.writeMapleAsciiString(packet.text());
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendYellowTip(YellowTip packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SET_WEEK_EVENT_MESSAGE.getValue());
+      mplew.write(0xFF);
+      mplew.writeMapleAsciiString(packet.tip());
+      mplew.writeShort(0);
       return mplew.getPacket();
    }
 }

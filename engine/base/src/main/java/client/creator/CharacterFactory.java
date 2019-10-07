@@ -33,6 +33,7 @@ import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.AddNewCharacter;
+import tools.packet.message.YellowTip;
 
 /**
  * @author RonanLana
@@ -95,7 +96,7 @@ public abstract class CharacterFactory {
       PacketCreator.announce(c, new AddNewCharacter(newchar));
 
       Server.getInstance().createCharacterEntry(newchar);
-      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name));
+      Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name)));
       FilePrinter.print(FilePrinter.CREATED_CHAR + c.getAccountName() + ".txt", c.getAccountName() + " created character with IGN " + name);
 
       return 0;

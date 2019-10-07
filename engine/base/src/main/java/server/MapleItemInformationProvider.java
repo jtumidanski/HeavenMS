@@ -74,10 +74,12 @@ import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.packet.message.YellowTip;
 
 /**
  * @author Matze
@@ -1839,7 +1841,7 @@ public class MapleItemInformationProvider {
       if (!EquipSlot.getFromTextSlot(islot).isAllowed(dst, isCash(id))) {
          equip.wearing_$eq(false);
          String itemName = MapleItemInformationProvider.getInstance().getName(equip.id());
-         Server.getInstance().broadcastGMMessage(chr.getWorld(), MaplePacketCreator.sendYellowTip("[Warning]: " + chr.getName() + " tried to equip " + itemName + " into slot " + dst + "."));
+         Server.getInstance().broadcastGMMessage(chr.getWorld(), PacketCreator.create(new YellowTip("[Warning]: " + chr.getName() + " tried to equip " + itemName + " into slot " + dst + ".")));
          AutobanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to forcibly equip an item.");
          FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to equip " + itemName + " into " + dst + " slot.");
          return false;

@@ -233,7 +233,11 @@ import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.inventory.SlotLimitUpdate;
 import tools.packet.message.GetAvatarMegaphone;
 import tools.packet.message.GiveFameResponse;
+import tools.packet.message.NotifyJobAdvance;
+import tools.packet.message.NotifyLevelUp;
+import tools.packet.message.NotifyMarriage;
 import tools.packet.message.ReceiveFame;
+import tools.packet.message.YellowTip;
 import tools.packet.monster.carnival.MonsterCarnivalPartyPoints;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerDied;
 import tools.packet.monster.carnival.MonsterCarnivalPointObtained;
@@ -1317,12 +1321,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (this.guildid > 0) {
-         getGuild().ifPresent(guild -> guild.broadcast(MaplePacketCreator.jobMessage(0, job.getId(), name), this.getId()));
+         getGuild().ifPresent(guild -> guild.broadcast(PacketCreator.create(new NotifyJobAdvance(0, job.getId(), name)), this.getId()));
       }
 
       MapleFamily family = getFamily();
       if (family != null) {
-         MasterBroadcaster.getInstance().sendToFamily(family, character -> MaplePacketCreator.jobMessage(1, job.getId(), name), false, this);
+         MasterBroadcaster.getInstance().sendToFamily(family, character -> PacketCreator.create(new NotifyJobAdvance(1, job.getId(), name)), false, this);
       }
 
       setMasteries(this.job.getId());
@@ -5775,7 +5779,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       silentPartyUpdate();
 
       if (this.guildid > 0) {
-         getGuild().ifPresent(guild -> guild.broadcast(MaplePacketCreator.levelUpMessage(2, level, name), this.getId()));
+         getGuild().ifPresent(guild -> guild.broadcast(PacketCreator.create(new NotifyLevelUp(2, level, name)), this.getId()));
       }
 
       if (level % 20 == 0) {
@@ -6284,7 +6288,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void yellowMessage(String m) {
-      announce(MaplePacketCreator.sendYellowTip(m));
+      PacketCreator.announce(this, new YellowTip(m));
    }
 
    public void updateQuestMobCount(int id) {
@@ -7082,7 +7086,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void sendPolice(String text) {
       String message = getName() + " received this - " + text;
       if (Server.getInstance().isGmOnline(this.getWorld())) { //Alert and log if a GM is online
-         Server.getInstance().broadcastGMMessage(this.getWorld(), MaplePacketCreator.sendYellowTip(message));
+         Server.getInstance().broadcastGMMessage(this.getWorld(), PacketCreator.create(new YellowTip(message)));
          FilePrinter.print(FilePrinter.AUTOBAN_WARNING, message);
       } else { //Auto DC and log if no GM is online
          client.disconnect(false, false);
@@ -8258,11 +8262,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void broadcastMarriageMessage() {
-      getGuild().ifPresent(guild -> guild.broadcast(MaplePacketCreator.marriageMessage(0, name)));
+      getGuild().ifPresent(guild -> guild.broadcast(PacketCreator.create(new NotifyMarriage(0, name))));
 
       MapleFamily family = this.getFamily();
       if (family != null) {
-         MasterBroadcaster.getInstance().sendToFamily(family, character -> MaplePacketCreator.marriageMessage(1, name), false, this);
+         MasterBroadcaster.getInstance().sendToFamily(family, familyEntry -> PacketCreator.create(new NotifyMarriage(1, name)), false, this);
       }
    }
 

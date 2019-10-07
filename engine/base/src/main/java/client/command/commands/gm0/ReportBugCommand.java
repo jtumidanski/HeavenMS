@@ -30,8 +30,10 @@ import net.server.Server;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.packet.message.YellowTip;
 
 public class ReportBugCommand extends Command {
    {
@@ -47,7 +49,7 @@ public class ReportBugCommand extends Command {
          return;
       }
       String message = player.getLastCommandMessage();
-      Server.getInstance().broadcastGMMessage(c.getWorld(), MaplePacketCreator.sendYellowTip("[Bug]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message));
+      Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[Bug]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message)));
       MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, message);
       FilePrinter.printError(FilePrinter.COMMAND_BUG, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Your bug '" + message + "' was submitted successfully to our developers. Thank you!");

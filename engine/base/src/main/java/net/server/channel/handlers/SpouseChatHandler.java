@@ -30,9 +30,10 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SpouseChatPacket;
 import net.server.channel.packet.reader.SpouseChatReader;
 import tools.LogHelper;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.message.SpouseMessage;
 
 public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPacket> {
    @Override
@@ -47,8 +48,8 @@ public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPac
       if (partnerId > 0) { // yay marriage
          Optional<MapleCharacter> spouse = client.getWorldServer().getPlayerStorage().getCharacterById(partnerId);
          if (spouse.isPresent()) {
-            spouse.get().announce(MaplePacketCreator.OnCoupleMessage(client.getPlayer().getName(), packet.message(), true));
-            client.announce(MaplePacketCreator.OnCoupleMessage(client.getPlayer().getName(), packet.message(), true));
+            PacketCreator.announce(spouse.get(), new SpouseMessage(client.getPlayer().getName(), packet.message(), true));
+            PacketCreator.announce(client, new SpouseMessage(client.getPlayer().getName(), packet.message(), true));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Spouse", packet.message());
             }
