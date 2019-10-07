@@ -63,6 +63,9 @@ public enum MapleDisease {
       }
    }
 
+   public static final MapleDisease[] CPQ_DISEASES = {MapleDisease.SLOW, MapleDisease.SEDUCE, MapleDisease.STUN, MapleDisease.POISON,
+         MapleDisease.SEAL, MapleDisease.DARKNESS, MapleDisease.WEAKEN, MapleDisease.CURSE};
+
    public static MapleDisease getRandom() {
       MapleDisease[] diseases = GameConstants.CPQ_DISEASES;
       return diseases[(int) (Math.random() * diseases.length)];

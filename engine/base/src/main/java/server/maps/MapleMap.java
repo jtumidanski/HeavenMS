@@ -106,6 +106,7 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.buff.GiveForeignBuff;
 import tools.packet.character.CharacterLook;
 import tools.packet.event.CoconutScore;
 import tools.packet.event.RollSnowBall;
@@ -2456,7 +2457,7 @@ public class MapleMap {
          chr.announce(MaplePacketCreator.getGMEffect(0x10, (byte) 1));
 
          List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-         broadcastGMMessage(chr, MaplePacketCreator.giveForeignBuff(chr.getId(), dsstat), false);
+         broadcastGMMessage(chr, PacketCreator.create(new GiveForeignBuff(chr.getId(), dsstat)), false);
       } else {
          broadcastSpawnPlayerMapObjectMessage(chr, chr, true);
       }

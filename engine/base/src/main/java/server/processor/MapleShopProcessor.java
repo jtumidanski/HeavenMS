@@ -19,7 +19,9 @@ import server.MapleItemInformationProvider;
 import server.MapleShop;
 import server.MapleShopItem;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.shop.ConfirmShopTransaction;
+import tools.packet.shop.GetNPCShop;
 
 public class MapleShopProcessor {
    private static MapleShopProcessor instance;
@@ -98,7 +100,7 @@ public class MapleShopProcessor {
 
    public void sendShop(MapleShop shop, MapleClient c) {
       c.getPlayer().setShop(shop);
-      c.announce(MaplePacketCreator.getNPCShop(c, shop.npcId(), Arrays.asList(shop.items())));
+      PacketCreator.announce(c, new GetNPCShop(c, shop.npcId(), Arrays.asList(shop.items())));
    }
 
    public void buy(MapleShop shop, MapleClient c, short slot, int itemId, short quantity) {
@@ -126,13 +128,13 @@ public class MapleShopProcessor {
                   MapleInventoryManipulator.addById(c, itemId, quantity, "", -1);
                   c.getPlayer().gainMeso(-item.price(), false);
                }
-               c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.DEFAULT));
+               PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.DEFAULT));
             } else {
-               c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.INVENTORY_FULL));
+               PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.INVENTORY_FULL));
             }
 
          } else {
-            c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
+            PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
          }
 
       } else if (item.pitch() > 0) {
@@ -148,9 +150,9 @@ public class MapleShopProcessor {
                   MapleInventoryManipulator.addById(c, itemId, quantity, "", -1);
                   MapleInventoryManipulator.removeById(c, MapleInventoryType.ETC, 4310000, amount, false, false);
                }
-               c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.DEFAULT));
+               PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.DEFAULT));
             } else {
-               c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.INVENTORY_FULL));
+               PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.INVENTORY_FULL));
             }
          }
 
@@ -170,11 +172,11 @@ public class MapleShopProcessor {
                }
                c.getPlayer().gainMeso(diff, false);
             } else {
-               c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.INVENTORY_FULL));
+               PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.INVENTORY_FULL));
             }
-            c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.DEFAULT));
+            PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.DEFAULT));
          } else {
-            c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
+            PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
          }
       }
    }
@@ -196,9 +198,9 @@ public class MapleShopProcessor {
          if (recvMesos > 0) {
             c.getPlayer().gainMeso(recvMesos, false);
          }
-         c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.DEFAULT_2));
+         PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.DEFAULT_2));
       } else {
-         c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.NOT_ENOUGH_IN_STOCK_2));
+         PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.NOT_ENOUGH_IN_STOCK_2));
       }
    }
 
@@ -218,9 +220,9 @@ public class MapleShopProcessor {
             item.quantity_$eq(slotMax);
             c.getPlayer().forceUpdateItem(item);
             c.getPlayer().gainMeso(-price, false, true, false);
-            c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.DEFAULT_2));
+            PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.DEFAULT_2));
          } else {
-            c.announce(MaplePacketCreator.shopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
+            PacketCreator.announce(c, new ConfirmShopTransaction(ShopTransactionOperation.NOT_ENOUGH_MESO));
          }
       }
    }

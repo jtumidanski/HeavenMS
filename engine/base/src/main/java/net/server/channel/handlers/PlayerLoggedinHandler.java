@@ -84,6 +84,7 @@ import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyList;
+import tools.packet.buff.GiveDebuff;
 import tools.packet.family.FamilyLogonNotice;
 import tools.packet.family.GetFamilyInfo;
 import tools.packet.family.LoadFamily;
@@ -375,7 +376,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                if (diseases != null) {
                   for (Entry<MapleDisease, Pair<Long, MobSkill>> e : diseases.entrySet()) {
                      final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(e.getKey(), e.getValue().getRight().getX()));
-                     client.announce(MaplePacketCreator.giveDebuff(debuff, e.getValue().getRight()));
+                     PacketCreator.announce(client, new GiveDebuff(debuff, e.getValue().getRight()));
                   }
                }
             } else {

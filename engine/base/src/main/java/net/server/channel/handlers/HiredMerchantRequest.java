@@ -41,6 +41,8 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.MiniRoomError;
 import tools.packet.playerinteraction.GetMiniRoomError;
+import tools.packet.shop.RetrieveFirstMessage;
+import tools.packet.shop.ShowHiredMerchantBox;
 
 /**
  * @author XoticStory
@@ -83,9 +85,9 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
       if (GameConstants.isFreeMarketRoom(chr.getMapId())) {
          if (!chr.hasMerchant()) {
             if (ItemFactory.MERCHANT.loadItems(chr.getId(), false).isEmpty() && chr.getMerchantMeso() == 0) {
-               client.announce(MaplePacketCreator.hiredMerchantBox());
+               PacketCreator.announce(client, new ShowHiredMerchantBox());
             } else {
-               chr.announce(MaplePacketCreator.retrieveFirstMessage());
+               PacketCreator.announce(chr, new RetrieveFirstMessage());
             }
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You already have a store open.");

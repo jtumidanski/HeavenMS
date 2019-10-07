@@ -105,12 +105,16 @@ import server.maps.SummonMovementType;
 import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.processor.StatEffectProcessor;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.buff.GiveBuff;
+import tools.packet.buff.GiveForeignBuff;
+import tools.packet.buff.GiveForeignPirateBuff;
+import tools.packet.buff.GivePirateBuff;
+import tools.packet.buff.ShowMonsterRiding;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.stat.EnableActions;
@@ -565,7 +569,7 @@ public class MapleStatEffect {
 
    public final void applyComboBuff(final MapleCharacter applyto, int combo) {
       final List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ARAN_COMBO, combo));
-      applyto.announce(MaplePacketCreator.giveBuff(sourceid, 99999, stat));
+      PacketCreator.announce(applyto, new GiveBuff(sourceid, 99999, stat));
 
       final long starttime = Server.getInstance().getCurrentTime();
 //	final CancelEffectAction cancelAction = new CancelEffectAction(applyto, this, starttime);
@@ -575,7 +579,7 @@ public class MapleStatEffect {
 
    public final void applyBeaconBuff(final MapleCharacter applyto, int objectid) { // thanks Thora & Hyun for reporting an issue with homing beacon autoflagging mobs when changing maps
       final List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.HOMING_BEACON, objectid));
-      applyto.announce(MaplePacketCreator.giveBuff(1, sourceid, stat));
+      PacketCreator.announce(applyto, new GiveBuff(1, sourceid, stat));
 
       final long starttime = Server.getInstance().getCurrentTime();
       applyto.registerEffect(this, starttime, Long.MAX_VALUE, false);
@@ -587,7 +591,7 @@ public class MapleStatEffect {
 
       long leftDuration = (starttime + localDuration) - Server.getInstance().getCurrentTime();
       if (leftDuration > 0) {
-         target.announce(MaplePacketCreator.giveBuff((skill ? sourceid : -sourceid), (int) leftDuration, activeStats));
+         PacketCreator.announce(target, new GiveBuff((skill ? sourceid : -sourceid), (int) leftDuration, activeStats));
       }
    }
 
@@ -645,20 +649,20 @@ public class MapleStatEffect {
          byte[] buff = null;
          byte[] mbuff = null;
          if (this.isActive(applyto)) {
-            buff = MaplePacketCreator.giveBuff((skill ? sourceid : -sourceid), localDuration, localstatups);
+            buff = PacketCreator.create(new GiveBuff((skill ? sourceid : -sourceid), localDuration, localstatups));
          }
          if (isDash()) {
-            buff = MaplePacketCreator.givePirateBuff(statups, sourceid, seconds);
-            mbuff = MaplePacketCreator.giveForeignPirateBuff(applyto.getId(), sourceid, seconds, localstatups);
+            buff = PacketCreator.create(new GivePirateBuff(statups, sourceid, seconds));
+            mbuff = PacketCreator.create(new GiveForeignPirateBuff(applyto.getId(), sourceid, seconds, localstatups));
          } else if (isInfusion()) {
-            buff = MaplePacketCreator.givePirateBuff(localstatups, sourceid, seconds);
-            mbuff = MaplePacketCreator.giveForeignPirateBuff(applyto.getId(), sourceid, seconds, localstatups);
+            buff = PacketCreator.create(new GivePirateBuff(localstatups, sourceid, seconds));
+            mbuff = PacketCreator.create(new GiveForeignPirateBuff(applyto.getId(), sourceid, seconds, localstatups));
          } else if (isDs()) {
             List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), dsstat);
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), dsstat));
          } else if (isWw()) {
             List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.WIND_WALK, 0));
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), dsstat);
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), dsstat));
          } else if (isCombo()) {
             Integer comboCount = applyto.getBuffedValue(MapleBuffStat.COMBO);
             if (comboCount == null) {
@@ -666,8 +670,8 @@ public class MapleStatEffect {
             }
 
             List<Pair<MapleBuffStat, Integer>> cbstat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, comboCount));
-            buff = MaplePacketCreator.giveBuff((skill ? sourceid : -sourceid), localDuration, cbstat);
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), cbstat);
+            buff = PacketCreator.create(new GiveBuff((skill ? sourceid : -sourceid), localDuration, cbstat));
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), cbstat));
          } else if (isMonsterRiding()) {
             if (sourceid == Corsair.BATTLE_SHIP) {//hp
                if (applyto.getBattleshipHp() <= 0) {
@@ -676,23 +680,23 @@ public class MapleStatEffect {
 
                localstatups = statups;
             }
-            buff = MaplePacketCreator.giveBuff(localsourceid, localDuration, localstatups);
-            mbuff = MaplePacketCreator.showMonsterRiding(applyto.getId(), givemount);
+            buff = PacketCreator.create(new GiveBuff(localsourceid, localDuration, localstatups));
+            mbuff = PacketCreator.create(new ShowMonsterRiding(applyto.getId(), givemount.getItemId(), givemount.getSkillId()));
             localDuration = duration;
          } else if (isShadowPartner()) {
             List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.SHADOWPARTNER, 0));
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), stat);
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), stat));
          } else if (isSoulArrow()) {
             List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.SOULARROW, 0));
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), stat);
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), stat));
          } else if (isEnrage()) {
             applyto.handleOrbconsume();
          } else if (isMorph()) {
             List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.MORPH, getMorph(applyto)));
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), stat);
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), stat));
          } else if (isAriantShield()) {
             List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.AURA, 1));
-            mbuff = MaplePacketCreator.giveForeignBuff(applyto.getId(), stat);
+            mbuff = PacketCreator.create(new GiveForeignBuff(applyto.getId(), stat));
          }
 
          if (buff != null) {

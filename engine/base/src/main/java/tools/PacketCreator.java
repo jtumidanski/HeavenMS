@@ -11,6 +11,7 @@ import tools.packet.factory.AfterLoginErrorPacketFactory;
 import tools.packet.factory.AllianceOperationPacketFactory;
 import tools.packet.factory.AttackPacketFactory;
 import tools.packet.factory.BuddyPacketFactory;
+import tools.packet.factory.CancelBuffPacketFactory;
 import tools.packet.factory.CashShopGachaponPacketFactoryPacketFactory;
 import tools.packet.factory.CashShopOperationPacketFactory;
 import tools.packet.factory.ChangeChannelPacketFactory;
@@ -23,6 +24,7 @@ import tools.packet.factory.FamilyPacketFactory;
 import tools.packet.factory.FieldEffectPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.FredrickPacketFactory;
+import tools.packet.factory.GiveBuffPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.GuildBBSPacketFactory;
 import tools.packet.factory.GuildPacketFactory;
@@ -57,6 +59,7 @@ import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
 import tools.packet.factory.ServerStatusPacketFactory;
 import tools.packet.factory.SetFieldPacketFactory;
+import tools.packet.factory.ShopPacketFactory;
 import tools.packet.factory.SpawnPacketFactory;
 import tools.packet.factory.SpecialShopPacketFactory;
 import tools.packet.factory.StatUpdatePacketFactory;
@@ -284,6 +287,18 @@ public class PacketCreator {
          case VEGA_SCROLL:
          case VICIOUS_HAMMER:
             return Optional.of(ItemEnhancePacketFactory.getInstance());
+         case UPDATE_HIRED_MERCHANT:
+         case OPEN_NPC_SHOP:
+         case CONFIRM_SHOP_TRANSACTION:
+         case ENTRUSTED_SHOP_CHECK_RESULT:
+         case DESTROY_HIRED_MERCHANT:
+            return Optional.of(ShopPacketFactory.getInstance());
+         case GIVE_BUFF:
+         case GIVE_FOREIGN_BUFF:
+            return Optional.of(GiveBuffPacketFactory.getInstance());
+         case CANCEL_BUFF:
+         case CANCEL_FOREIGN_BUFF:
+            return Optional.of(CancelBuffPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

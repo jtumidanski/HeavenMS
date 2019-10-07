@@ -210,6 +210,18 @@ import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
 import tools.packet.buddy.UpdateBuddyList;
+import tools.packet.buff.CancelBuff;
+import tools.packet.buff.CancelDebuff;
+import tools.packet.buff.CancelForeignBuff;
+import tools.packet.buff.CancelForeignChairSkillEffect;
+import tools.packet.buff.CancelForeignDebuff;
+import tools.packet.buff.CancelForeignSlowDebuff;
+import tools.packet.buff.GiveBuff;
+import tools.packet.buff.GiveDebuff;
+import tools.packet.buff.GiveForeignBuff;
+import tools.packet.buff.GiveForeignChairSkillEffect;
+import tools.packet.buff.GiveForeignDebuff;
+import tools.packet.buff.GiveForeignSlowDebuff;
 import tools.packet.field.set.WarpToMap;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
@@ -990,7 +1002,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             this.hidden = false;
             announce(MaplePacketCreator.getGMEffect(0x10, (byte) 0));
             List<MapleBuffStat> dsstat = Collections.singletonList(MapleBuffStat.DARKSIGHT);
-            getMap().broadcastGMMessage(this, MaplePacketCreator.cancelForeignBuff(id, dsstat), false);
+            getMap().broadcastGMMessage(this, PacketCreator.create(new CancelForeignBuff(id, dsstat)), false);
             getMap().broadcastSpawnPlayerMapObjectMessage(this, this, false);
 
             for (MapleSummon ms : this.getSummonsValues()) {
@@ -1007,7 +1019,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                getMap().broadcastNONGMMessage(this, PacketCreator.create(new RemovePlayer(getId())), false);
             }
             List<Pair<MapleBuffStat, Integer>> ldsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-            getMap().broadcastGMMessage(this, MaplePacketCreator.giveForeignBuff(id, ldsstat), false);
+            getMap().broadcastGMMessage(this, PacketCreator.create(new GiveForeignBuff(id, ldsstat)), false);
             this.releaseControlledMonsters();
          }
          PacketCreator.announce(client, new EnableActions());
@@ -1035,9 +1047,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private void cancelPlayerBuffs(List<MapleBuffStat> buffstats) {
       if (client.getChannelServer().getPlayerStorage().getCharacterById(getId()).isPresent()) {
          updateLocalStats();
-         client.announce(MaplePacketCreator.cancelBuff(buffstats));
+         PacketCreator.announce(client, new CancelBuff(buffstats));
          if (buffstats.size() > 0) {
-            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.cancelForeignBuff(getId(), buffstats), false, this);
+            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new CancelForeignBuff(getId(), buffstats), false, this);
          }
       }
    }
@@ -1618,9 +1630,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
 
             if (disease != MapleDisease.SLOW) {
-               this.announce(MaplePacketCreator.giveForeignDebuff(cid, debuff, skill));
+               PacketCreator.announce(this, new GiveForeignDebuff(cid, debuff, skill));
             } else {
-               this.announce(MaplePacketCreator.giveForeignSlowDebuff(cid, debuff, skill));
+               PacketCreator.announce(this, new GiveForeignSlowDebuff(cid, debuff, skill));
             }
          }
       }
@@ -2374,9 +2386,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
 
          if (disease != MapleDisease.SLOW) {
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.giveForeignDebuff(id, debuff, skill));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new GiveForeignDebuff(id, debuff, skill));
          } else {
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.giveForeignSlowDebuff(id, debuff, skill));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new GiveForeignSlowDebuff(id, debuff, skill));
          }
       }
    }
@@ -2403,12 +2415,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
-         client.announce(MaplePacketCreator.giveDebuff(debuff, skill));
+         PacketCreator.announce(client, new GiveDebuff(debuff, skill));
 
          if (disease != MapleDisease.SLOW) {
-            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.giveForeignDebuff(id, debuff, skill), false, this);
+            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new GiveForeignDebuff(id, debuff, skill), false, this);
          } else {
-            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.giveForeignSlowDebuff(id, debuff, skill), false, this);
+            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new GiveForeignSlowDebuff(id, debuff, skill), false, this);
          }
       }
    }
@@ -2416,12 +2428,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void dispelDebuff(MapleDisease debuff) {
       if (hasDisease(debuff)) {
          long mask = debuff.getValue();
-         announce(MaplePacketCreator.cancelDebuff(mask));
+         PacketCreator.announce(this, new CancelDebuff(mask));
 
          if (debuff != MapleDisease.SLOW) {
-            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.cancelForeignDebuff(id, mask), false, this);
+            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new CancelForeignDebuff(id, mask), false, this);
          } else {
-            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.cancelForeignSlowDebuff(id), false, this);
+            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new CancelForeignSlowDebuff(id), false, this);
          }
 
          chrLock.lock();
@@ -3570,8 +3582,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (!inactiveStats.isEmpty()) {
-         client.announce(MaplePacketCreator.cancelBuff(inactiveStats));
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.cancelForeignBuff(getId(), inactiveStats), false, this);
+         PacketCreator.announce(client, new CancelBuff(inactiveStats));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new CancelForeignBuff(getId(), inactiveStats), false, this);
       }
    }
 
@@ -3709,7 +3721,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (this.isRidingBattleship()) {
          List<Pair<MapleBuffStat, Integer>> statups = new ArrayList<>(1);
          statups.add(new Pair<>(MapleBuffStat.MONSTER_RIDING, 0));
-         this.announce(MaplePacketCreator.giveBuff(1932000, 5221006, statups));
+         PacketCreator.announce(this, new GiveBuff(1932000, 5221006, statups));
          this.announceBattleshipHp();
       }
    }
@@ -5347,10 +5359,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
             List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
             setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
-            client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
+            PacketCreator.announce(client, new GiveBuff(energybar, 0, stat));
             PacketCreator.announce(this, new ShowOwnBuffEffect(skill.getId(), 2));
             getMap().broadcastMessage(this, PacketCreator.create(new ShowBuffEffect(id, skill.getId(), 2, (byte) 3)));
-            getMap().broadcastMessage(this, MaplePacketCreator.giveForeignBuff(energybar, stat));
+            getMap().broadcastMessage(this, PacketCreator.create(new GiveForeignBuff(energybar, stat)));
          }
          if (energybar >= 10000 && energybar < 11000) {
             energybar = 15000;
@@ -5359,8 +5371,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                energybar = 0;
                List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
                setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
-               client.announce(MaplePacketCreator.giveBuff(energybar, 0, stat));
-               getMap().broadcastMessage(chr, MaplePacketCreator.giveForeignBuff(energybar, stat));
+               PacketCreator.announce(client, new GiveBuff(energybar, 0, stat));
+               getMap().broadcastMessage(chr, PacketCreator.create(new GiveForeignBuff(energybar, stat)));
             }, statEffect.getDuration());
          }
       });
@@ -5372,8 +5384,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       SkillFactory.getSkill(skillid).ifPresent(combo -> {
          List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, 1));
          setBuffedValue(MapleBuffStat.COMBO, 1);
-         client.announce(MaplePacketCreator.giveBuff(skillid, combo.getEffect(getSkillLevel(combo)).getDuration() + (int) ((getBuffedStarttime(MapleBuffStat.COMBO) - System.currentTimeMillis())), stat));
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.giveForeignBuff(getId(), stat), false, this);
+         PacketCreator.announce(client, new GiveBuff(skillid, combo.getEffect(getSkillLevel(combo)).getDuration() + (int) ((getBuffedStarttime(MapleBuffStat.COMBO) - System.currentTimeMillis())), stat));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new GiveForeignBuff(getId(), stat), false, this);
       });
    }
 
@@ -6392,7 +6404,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          setChair(-1);
          if (unregisterChairBuff()) {
-            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.cancelForeignChairSkillEffect(this.getId()), false, this);
+            MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new CancelForeignChairSkillEffect(this.getId()), false, this);
          }
 
          MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.showChair(this.getId(), 0), false, this);
@@ -6415,7 +6427,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                   if (chair.get() < 0) {
                      setChair(itemId);
                      if (registerChairBuff()) {
-                        MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.giveForeignChairSkillEffect(this.getId()), false, this);
+                        MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new GiveForeignChairSkillEffect(this.getId()), false, this);
                      }
                      announce(MaplePacketCreator.cancelChair(itemId));
                   }
@@ -8011,13 +8023,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          PacketCreator.announce(client, new SpawnPlayer(client, this, false));
 
          if (buffEffects.containsKey(ChairProcessor.getInstance().getJobMapChair(job))) { // mustn't effLock, chrLock this function
-            client.announce(MaplePacketCreator.giveForeignChairSkillEffect(id));
+            PacketCreator.announce(client, new GiveForeignChairSkillEffect(id));
          }
       }
 
       if (this.isHidden()) {
          List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-         getMap().broadcastGMMessage(this, MaplePacketCreator.giveForeignBuff(getId(), dsstat), false);
+         getMap().broadcastGMMessage(this, PacketCreator.create(new GiveForeignBuff(getId(), dsstat)), false);
       }
    }
 

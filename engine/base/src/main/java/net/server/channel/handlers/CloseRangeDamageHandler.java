@@ -61,6 +61,8 @@ import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.attack.CloseRangeAttack;
+import tools.packet.buff.GiveBuff;
+import tools.packet.buff.GiveForeignBuff;
 
 public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -144,8 +146,8 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
                   List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, newOrbCount));
                   chr.setBuffedValue(MapleBuffStat.COMBO, newOrbCount);
                   duration -= (int) (currentServerTime() - chr.getBuffedStarttime(MapleBuffStat.COMBO));
-                  c.announce(MaplePacketCreator.giveBuff(comboId, duration, stat));
-                  MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.giveForeignBuff(chr.getId(), stat), false, chr);
+                  PacketCreator.announce(c, new GiveBuff(comboId, duration, stat));
+                  MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new GiveForeignBuff(chr.getId(), stat), false, chr);
                }
             }
          } else if (chr.getJob().isA(MapleJob.MARAUDER)) {

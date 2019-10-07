@@ -34,6 +34,7 @@ import server.maps.MapleMapObject;
 import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.buff.GiveBuff;
 import tools.packet.spawn.StopMonsterControl;
 
 /**
@@ -55,7 +56,7 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
          chr.cancelBuffStats(MapleBuffStat.HOMING_BEACON);
 
          final List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.HOMING_BEACON, 0));
-         chr.announce(MaplePacketCreator.giveBuff(1, beaconid, stat));
+         PacketCreator.announce(chr, new GiveBuff(1, beaconid, stat));
       }
 
       for (MapleMapObject mo : chr.getMap().getMonsters()) {    // thanks BHB, IxianMace, Jefe for noticing several issues regarding mob statuses (such as freeze)

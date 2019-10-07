@@ -87,7 +87,6 @@ import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MaplePortal;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -112,6 +111,7 @@ import tools.packet.playerinteraction.MiniGameClose;
 import tools.packet.playerinteraction.PlayerShopItemUpdate;
 import tools.packet.playerinteraction.TradeItemAdd;
 import tools.packet.playerinteraction.UpdateHiredMerchant;
+import tools.packet.shop.UpdateHiredMerchantBox;
 import tools.packet.spawn.SpawnHiredMerchant;
 import tools.packet.stat.EnableActions;
 
@@ -285,7 +285,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             } else {
                merchant.clearMessages();
                merchant.setOpen(true);
-               MasterBroadcaster.getInstance().sendToAllInMap(merchant.getMap(), character -> MaplePacketCreator.updateHiredMerchantBox(merchant));
+               MasterBroadcaster.getInstance().sendToAllInMap(merchant.getMap(), new UpdateHiredMerchantBox(merchant.getOwnerId(), merchant.getObjectId(), merchant.getDescription(), merchant.getItemId(), merchant.getShopRoomInfo()));
             }
          }
       }

@@ -28,10 +28,10 @@ import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import server.maps.MapleHiredMerchant;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.shop.RemoteChannelChange;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -51,7 +51,7 @@ public class RemoteStoreHandler extends AbstractPacketHandler<NoOpPacket> {
          if (hm.getChannel() == chr.getClient().getChannel()) {
             hm.visitShop(chr);
          } else {
-            client.announce(MaplePacketCreator.remoteChannelChange((byte) (hm.getChannel() - 1)));
+            PacketCreator.announce(client, new RemoteChannelChange((byte) (hm.getChannel() - 1)));
          }
          return;
       } else {
