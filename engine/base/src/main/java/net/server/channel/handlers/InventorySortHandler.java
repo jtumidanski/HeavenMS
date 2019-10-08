@@ -37,10 +37,10 @@ import net.server.Server;
 import net.server.channel.packet.InventorySortPacket;
 import net.server.channel.packet.reader.InventorySortReader;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
-import tools.packet.stat.EnableActions;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.stat.EnableActions;
+import tools.packet.ui.FinishedSort2;
 
 /**
  * @author BubblesDev
@@ -320,7 +320,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
       }
 
       PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
-      client.announce(MaplePacketCreator.finishedSort2(packet.inventoryType()));
+      PacketCreator.announce(client, new FinishedSort2(packet.inventoryType()));
       PacketCreator.announce(client, new EnableActions());
    }
 }

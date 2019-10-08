@@ -35,6 +35,7 @@ import tools.PacketCreator;
 import tools.packet.event.CoconutHit;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
+import tools.packet.ui.GetClock;
 
 /**
  * @author kevintjuh93
@@ -61,7 +62,7 @@ public class MapleCoconut extends MapleEvent {
       }
       MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutHit(true, 0, 0));
       setCoconutsHittable(true);
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(300));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new GetClock(300));
 
       TimerManager.getInstance().schedule(new Runnable() {
          @Override
@@ -98,7 +99,7 @@ public class MapleCoconut extends MapleEvent {
    }
 
    public void bonusTime() {
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(120));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new GetClock(120));
       TimerManager.getInstance().schedule(new Runnable() {
          @Override
          public void run() {

@@ -29,6 +29,7 @@ import net.server.channel.packet.UseItemEffectPacket;
 import net.server.channel.packet.reader.UseItemEffectReader;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.foreigneffect.ShowItemEffect;
 
 public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEffectPacket> {
    @Override
@@ -51,6 +52,6 @@ public final class UseItemEffectHandler extends AbstractPacketHandler<UseItemEff
          }
       }
       client.getPlayer().setItemEffect(itemId);
-      MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.itemEffect(client.getPlayer().getId(), itemId), false, client.getPlayer());
+      MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new ShowItemEffect(client.getPlayer().getId(), itemId), false, client.getPlayer());
    }
 }

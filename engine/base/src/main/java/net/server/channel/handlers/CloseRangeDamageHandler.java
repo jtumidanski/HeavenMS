@@ -63,6 +63,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveForeignBuff;
+import tools.packet.character.SkillCooldown;
 
 public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -196,7 +197,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
             MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
             if (effect_.getCooldown() > 0) {
                if (!chr.skillIsCooling(attack.skill())) {
-                  c.announce(MaplePacketCreator.skillCooldown(attack.skill(), effect_.getCooldown()));
+                  PacketCreator.announce(c, new SkillCooldown(attack.skill(), effect_.getCooldown()));
                   chr.addCooldown(attack.skill(), currentServerTime(), effect_.getCooldown() * 1000);
                }
             }

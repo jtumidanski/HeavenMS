@@ -8,6 +8,8 @@ import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
+import tools.PacketCreator
+import tools.packet.ui.GetClock
 
 class EventHak {
    EventManager em
@@ -83,7 +85,7 @@ class EventHak {
       onRide = eim.getMapFactory().getMap(birdRide[myRide])
       player.changeMap(onRide, onRide.getPortal(0))
 
-      player.getClient().announce(MaplePacketCreator.getClock((rideTime / 1000).intValue()))
+      PacketCreator.announce(player, new GetClock((rideTime / 1000).intValue()))
       eim.schedule("timeOut", rideTime)
    }
 

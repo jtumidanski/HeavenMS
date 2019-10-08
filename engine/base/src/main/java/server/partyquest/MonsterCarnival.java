@@ -19,6 +19,7 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
+import tools.packet.ui.GetClock;
 
 /**
  * @author Drago/Dragohe4rt
@@ -311,7 +312,7 @@ public class MonsterCarnival {
       }
       startTime = System.currentTimeMillis() + 3 * 60 * 1000;
 
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.getClock(3 * 60));
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new GetClock(3 * 60));
 
       timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeExpand() * 1000);
       effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeExpand() * 1000 - 10 * 1000); // thanks Vcoc for noticing a time set issue here

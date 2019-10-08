@@ -100,6 +100,7 @@ import tools.packet.npctalk.GetNPCTalkNum;
 import tools.packet.npctalk.GetNPCTalkStyle;
 import tools.packet.npctalk.GetNPCTalkText;
 import tools.packet.stat.EnableActions;
+import tools.packet.ui.GetClock;
 import tools.packet.wedding.SendWishList;
 import tools.packet.wedding.WeddingGiftResult;
 
@@ -880,7 +881,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public void mapClock(int time) {
-      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), character -> MaplePacketCreator.getClock(time));
+      MasterBroadcaster.getInstance().sendToAllInMap(getPlayer().getMap(), new GetClock(time));
    }
 
    private boolean sendCPQChallenge(String cpqType, int leaderid) {

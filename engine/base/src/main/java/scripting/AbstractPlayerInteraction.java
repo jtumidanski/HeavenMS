@@ -80,6 +80,7 @@ import tools.packet.field.effect.MapEffect;
 import tools.packet.field.effect.MapSound;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.field.effect.ShowEffect;
+import tools.packet.foreigneffect.ShowHint;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.remove.RemoveItem;
@@ -91,6 +92,10 @@ import tools.packet.spawn.SpawnNPC;
 import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.GetItemMessage;
 import tools.packet.statusinfo.ShowInfoText;
+import tools.packet.ui.DisableMiniMap;
+import tools.packet.ui.DisableUI;
+import tools.packet.ui.LockUI;
+import tools.packet.ui.OpenUI;
 
 public class AbstractPlayerInteraction {
 
@@ -903,12 +908,12 @@ public class AbstractPlayerInteraction {
    }
 
    public void showInstruction(String msg, int width, int height) {
-      c.announce(MaplePacketCreator.sendHint(msg, width, height));
+      PacketCreator.announce(c, new ShowHint(msg, width, height));
       PacketCreator.announce(c, new EnableActions());
    }
 
    public void disableMinimap() {
-      c.announce(MaplePacketCreator.disableMinimap());
+      PacketCreator.announce(c, new DisableMiniMap());
    }
 
    public boolean isAllReactorState(final int reactorId, final int state) {
@@ -1060,17 +1065,17 @@ public class AbstractPlayerInteraction {
    }
 
    public void openUI(byte ui) {
-      c.announce(MaplePacketCreator.openUI(ui));
+      PacketCreator.announce(c, new OpenUI(ui));
    }
 
    public void lockUI() {
-      c.announce(MaplePacketCreator.disableUI(true));
-      c.announce(MaplePacketCreator.lockUI(true));
+      PacketCreator.announce(c, new DisableUI(true));
+      PacketCreator.announce(c, new LockUI(true));
    }
 
    public void unlockUI() {
-      c.announce(MaplePacketCreator.disableUI(false));
-      c.announce(MaplePacketCreator.lockUI(false));
+      PacketCreator.announce(c, new DisableUI(false));
+      PacketCreator.announce(c, new LockUI(false));
    }
 
    public void playSound(String sound) {

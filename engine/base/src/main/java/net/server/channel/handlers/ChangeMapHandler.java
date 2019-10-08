@@ -42,6 +42,8 @@ import tools.PacketCreator;
 import tools.packet.ChangeChannel;
 import tools.packet.showitemgaininchat.ShowWheelsLeft;
 import tools.packet.stat.EnableActions;
+import tools.packet.ui.DisableUI;
+import tools.packet.ui.LockUI;
 
 public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacket> {
    @Override
@@ -120,8 +122,8 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
                         }
                      } else if (divi == 20100) {
                         if (packet.targetId() == 104000000) {
-                           client.announce(MaplePacketCreator.lockUI(false));
-                           client.announce(MaplePacketCreator.disableUI(false));
+                           PacketCreator.announce(client, new LockUI(false));
+                           PacketCreator.announce(client, new DisableUI(false));
                            warp = true;
                         }
                      } else if (divi == 9130401) { // Only allow warp if player is already in Intro map, or else = hack

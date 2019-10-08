@@ -10,7 +10,9 @@ import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MaplePacketCreator
 import tools.MessageBroadcaster
+import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.packet.ui.GetClock
 
 class Event3rdJob_mount {
    EventManager em
@@ -102,7 +104,7 @@ class Event3rdJob_mount {
       player.changeMap(entryMap, 0)
       em.setProperty("noEntry", "true")
 
-      player.getClient().announce(MaplePacketCreator.getClock(eventTime * 60))
+      PacketCreator.announce(player, new GetClock(eventTime * 60))
       eim.startEventTimer(eventTime * 60000)
    }
 

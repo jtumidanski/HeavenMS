@@ -37,6 +37,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
+import org.apache.tools.ant.taskdefs.Get;
+
 import client.MapleCharacter;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
@@ -48,7 +50,10 @@ import server.maps.MapleMap;
 import tools.LogHelper;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.ui.GetClock;
+import tools.packet.ui.StopClock;
 
 /**
  * @author Alan (SharpAceX)
@@ -122,7 +127,7 @@ public class MapleExpedition {
 
    public void beginRegistration() {
       registering = true;
-      leader.announce(MaplePacketCreator.getClock(type.getRegistrationTime() * 60));
+      PacketCreator.announce(leader, new GetClock(type.getRegistrationTime() * 60));
       if (!silent) {
          MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, character -> character != leader, "[Expedition] " + leader.getName() + " has been declared the expedition captain. Please register for the expedition.");
          MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have become the expedition captain. Gather enough people for your team then talk to the NPC to start.");
@@ -150,7 +155,7 @@ public class MapleExpedition {
    }
 
    public void dispose(boolean log) {
-      broadcastExped(MaplePacketCreator.removeClock());
+      broadcastExped(PacketCreator.create(new StopClock()));
 
       if (schedule != null) {
          schedule.cancel(false);
@@ -167,7 +172,7 @@ public class MapleExpedition {
    public void start() {
       finishRegistration();
       registerExpeditionAttempt();
-      broadcastExped(MaplePacketCreator.removeClock());
+      broadcastExped(PacketCreator.create(new StopClock()));
       if (!silent) {
          MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] The expedition has started! Good luck, brave heroes!");
       }
@@ -192,7 +197,7 @@ public class MapleExpedition {
       }
 
       members.put(player.getId(), player.getName());
-      player.announce(MaplePacketCreator.getClock((int) (startTime - System.currentTimeMillis()) / 1000));
+      PacketCreator.announce(player, new GetClock((int) (startTime - System.currentTimeMillis()) / 1000));
       if (!silent) {
          MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + player.getName() + " has joined the expedition!");
       }
@@ -211,7 +216,7 @@ public class MapleExpedition {
       }
 
       members.put(player.getId(), player.getName());
-      player.announce(MaplePacketCreator.getClock((int) (startTime - System.currentTimeMillis()) / 1000));
+      PacketCreator.announce(player, new GetClock((int) (startTime - System.currentTimeMillis()) / 1000));
       if (!silent) {
          MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + player.getName() + " has joined the expedition!");
       }
@@ -234,7 +239,7 @@ public class MapleExpedition {
 
    public boolean removeMember(MapleCharacter chr) {
       if (members.remove(chr.getId()) != null) {
-         chr.announce(MaplePacketCreator.removeClock());
+         PacketCreator.announce(chr, new StopClock());
          if (!silent) {
             MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + chr.getName() + " has left the expedition.");
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have left this expedition.");
@@ -257,7 +262,7 @@ public class MapleExpedition {
 
          startMap.getWorldServer().getPlayerStorage().getCharacterById(cid)
                .filter(MapleCharacter::isLoggedinWorld).ifPresent(character -> {
-            character.announce(MaplePacketCreator.removeClock());
+            PacketCreator.announce(character, new StopClock());
             if (!silent) {
                MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have been banned from this expedition.");
             }

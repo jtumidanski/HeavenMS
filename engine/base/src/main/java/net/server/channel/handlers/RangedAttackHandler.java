@@ -50,6 +50,7 @@ import tools.PacketCreator;
 import tools.Randomizer;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.attack.RangedAttack;
+import tools.packet.character.SkillCooldown;
 
 public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -116,7 +117,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
             effect = getAttackEffect(attack, chr, null);
             bulletCount = effect.getBulletCount();
             if (effect.getCooldown() > 0) {
-               c.announce(MaplePacketCreator.skillCooldown(attack.skill(), effect.getCooldown()));
+               PacketCreator.announce(c, new SkillCooldown(attack.skill(), effect.getCooldown()));
             }
 
             if (attack.skill() == 4111004) {   // shadow meso
@@ -228,7 +229,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                   if (chr.skillIsCooling(attack.skill())) {
                      return;
                   } else {
-                     c.announce(MaplePacketCreator.skillCooldown(attack.skill(), cooldown));
+                     PacketCreator.announce(c, new SkillCooldown(attack.skill(), cooldown));
                      chr.addCooldown(attack.skill(), currentServerTime(), cooldown * 1000);
                   }
                }

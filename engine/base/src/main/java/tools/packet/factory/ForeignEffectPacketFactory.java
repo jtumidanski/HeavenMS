@@ -9,15 +9,19 @@ import tools.packet.PacketInput;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.foreigneffect.ShowBuffEffectWithLevel;
+import tools.packet.foreigneffect.ShowCombo;
 import tools.packet.foreigneffect.ShowForeignBuybackEffect;
 import tools.packet.foreigneffect.ShowForeignCardEffect;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.foreigneffect.ShowForeignInfo;
 import tools.packet.foreigneffect.ShowForeignMakerEffect;
+import tools.packet.foreigneffect.ShowHint;
+import tools.packet.foreigneffect.ShowItemEffect;
 import tools.packet.foreigneffect.ShowPetLevelUp;
 import tools.packet.foreigneffect.ShowRecovery;
 import tools.packet.foreigneffect.ShowScrollEffect;
 import tools.packet.foreigneffect.ShowSkillBookResult;
+import tools.packet.foreigneffect.ShowSkillEffect;
 
 public class ForeignEffectPacketFactory extends AbstractPacketFactory {
    private static ForeignEffectPacketFactory instance;
@@ -58,6 +62,14 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
          return create(this::getScrollEffect, packetInput);
       } else if (packetInput instanceof ShowSkillBookResult) {
          return create(this::skillBookResult, packetInput);
+      } else if (packetInput instanceof ShowCombo) {
+         return create(this::showCombo, packetInput);
+      } else if (packetInput instanceof ShowHint) {
+         return create(this::sendHint, packetInput);
+      } else if (packetInput instanceof ShowSkillEffect) {
+         return create(this::skillEffect, packetInput);
+      } else if (packetInput instanceof ShowItemEffect) {
+         return create(this::itemEffect, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -183,6 +195,60 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
       mplew.writeInt(packet.maxLevel());
       mplew.write(packet.canUse() ? 1 : 0);
       mplew.write(packet.success() ? 1 : 0);
+      return mplew.getPacket();
+   }
+
+   protected byte[] showCombo(ShowCombo packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
+      mplew.writeShort(SendOpcode.SHOW_COMBO.getValue());
+      mplew.writeInt(packet.count());
+      return mplew.getPacket();
+   }
+
+   /**
+    * Sends a player hint.
+    *
+    * @return The player hint packet.
+    */
+   protected byte[] sendHint(ShowHint packet) {
+      int width = packet.width();
+      int height = packet.height();
+
+      if (width < 1) {
+         width = packet.hint().length() * 10;
+         if (width < 40) {
+            width = 40;
+         }
+      }
+      if (height < 5) {
+         height = 5;
+      }
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.PLAYER_HINT.getValue());
+      mplew.writeMapleAsciiString(packet.hint());
+      mplew.writeShort(width);
+      mplew.writeShort(height);
+      mplew.write(1);
+      return mplew.getPacket();
+   }
+
+   protected byte[] skillEffect(ShowSkillEffect packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SKILL_EFFECT.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.skillId());
+      mplew.write(packet.level());
+      mplew.write(packet.flags());
+      mplew.write(packet.speed());
+      mplew.write(packet.direction()); //Mmmk
+      return mplew.getPacket();
+   }
+
+   protected byte[] itemEffect(ShowItemEffect packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SHOW_ITEM_EFFECT.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.itemId());
       return mplew.getPacket();
    }
 }

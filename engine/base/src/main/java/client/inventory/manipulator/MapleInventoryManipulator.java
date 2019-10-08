@@ -47,9 +47,10 @@ import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
-import tools.packet.stat.EnableActions;
+import tools.packet.foreigneffect.ShowItemEffect;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
+import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.ShowInventoryFull;
 import tools.packet.statusinfo.ShowItemUnavailable;
 
@@ -810,7 +811,7 @@ public class MapleInventoryManipulator {
       if (itemId == chr.getItemEffect()) {
          if (quantityNow <= 0) {
             chr.setItemEffect(0);
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.itemEffect(chr.getId(), 0));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowItemEffect(chr.getId(), 0));
          }
       } else if (itemId == 5370000 || itemId == 5370001) {
          if (source.quantity() <= 0) {

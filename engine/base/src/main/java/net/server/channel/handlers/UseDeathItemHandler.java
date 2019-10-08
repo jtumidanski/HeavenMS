@@ -26,6 +26,8 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseDeathItemPacket;
 import net.server.channel.packet.reader.UseDeathItemReader;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowItemEffect;
 
 public final class UseDeathItemHandler extends AbstractPacketHandler<UseDeathItemPacket> {
    @Override
@@ -36,6 +38,6 @@ public final class UseDeathItemHandler extends AbstractPacketHandler<UseDeathIte
    @Override
    public void handlePacket(UseDeathItemPacket packet, MapleClient client) {
       client.getPlayer().setItemEffect(packet.itemId());
-      client.announce(MaplePacketCreator.itemEffect(client.getPlayer().getId(), packet.itemId()));
+      PacketCreator.announce(client, new ShowItemEffect(client.getPlayer().getId(), packet.itemId()));
    }
 }

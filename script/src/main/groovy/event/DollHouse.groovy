@@ -8,7 +8,9 @@ import scripting.event.EventManager
 import server.life.MapleMonster
 import tools.MaplePacketCreator
 import tools.MessageBroadcaster
+import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.packet.ui.GetClock
 
 class EventDollHouse {
    EventManager em
@@ -74,7 +76,7 @@ class EventDollHouse {
       player.changeMap(entryMap, 0)
       em.setProperty("noEntry", "true")
 
-      player.getClient().announce(MaplePacketCreator.getClock(eventTime * 60))
+      PacketCreator.announce(player, new GetClock(eventTime * 60))
       eim.startEventTimer(eventTime * 60000)
    }
 

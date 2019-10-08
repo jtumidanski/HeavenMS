@@ -222,10 +222,14 @@ import tools.packet.buff.GiveForeignBuff;
 import tools.packet.buff.GiveForeignChairSkillEffect;
 import tools.packet.buff.GiveForeignDebuff;
 import tools.packet.buff.GiveForeignSlowDebuff;
+import tools.packet.character.SkillCooldown;
+import tools.packet.character.SummonSkill;
+import tools.packet.character.UpdateSkill;
 import tools.packet.field.obstacle.EnvironmentMoveList;
 import tools.packet.field.set.WarpToMap;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
+import tools.packet.foreigneffect.ShowCombo;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.foreigneffect.ShowRecovery;
 import tools.packet.guild.GenericGuildMessage;
@@ -272,6 +276,9 @@ import tools.packet.statusinfo.ShowMesoGain;
 import tools.packet.statusinfo.ShowQuestForfeit;
 import tools.packet.statusinfo.UpdateAreaInfo;
 import tools.packet.statusinfo.UpdateQuest;
+import tools.packet.ui.GetClock;
+import tools.packet.ui.GetKeyMap;
+import tools.packet.ui.GetMacros;
 import tools.packet.wedding.WeddingPartnerTransfer;
 
 public class MapleCharacter extends AbstractMapleCharacterObject {
@@ -956,7 +963,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
       combocounter = (short) Math.min(30000, count);
       if (count > 0) {
-         announce(MaplePacketCreator.showCombo(combocounter));
+         PacketCreator.announce(this, new ShowCombo(combocounter));
       }
    }
 
@@ -1784,11 +1791,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (newLevel > -1) {
          skills.put(skill, new SkillEntry(newLevel, newMasterlevel, expiration));
          if (!GameConstants.isHiddenSkills(skill.getId())) {
-            this.client.announce(MaplePacketCreator.updateSkill(skill.getId(), newLevel, newMasterlevel, expiration));
+            PacketCreator.announce(client, new UpdateSkill(skill.getId(), newLevel, newMasterlevel, expiration));
          }
       } else {
          skills.remove(skill);
-         this.client.announce(MaplePacketCreator.updateSkill(skill.getId(), newLevel, newMasterlevel, -1)); //Shouldn't use expiration anymore :)
+         PacketCreator.announce(client, new UpdateSkill(skill.getId(), newLevel, newMasterlevel, -1)); //Shouldn't use expiration anymore :)
          DatabaseConnection.getInstance().withConnection(connection -> SkillAdministrator.getInstance().deleteForSkillCharacter(connection, skill.getId(), id));
       }
    }
@@ -2129,7 +2136,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void announceBattleshipHp() {
-      announce(MaplePacketCreator.skillCooldown(5221999, battleShipHp));
+      PacketCreator.announce(this, new SkillCooldown(5221999, battleShipHp));
    }
 
    public void decreaseBattleshipHp(int decrease) {
@@ -2137,7 +2144,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (battleShipHp <= 0) {
          SkillFactory.getSkill(Corsair.BATTLE_SHIP).ifPresent(skill -> {
                   int coolDown = skill.getEffect(getSkillLevel(skill)).getCooldown();
-                  announce(MaplePacketCreator.skillCooldown(Corsair.BATTLE_SHIP, coolDown));
+                  PacketCreator.announce(this, new SkillCooldown(Corsair.BATTLE_SHIP, coolDown));
                   addCooldown(Corsair.BATTLE_SHIP, Server.getInstance().getCurrentTime(), coolDown * 1000);
                   removeCooldown(5221999);
                   cancelEffectFromBuffStat(MapleBuffStat.MONSTER_RIDING);
@@ -2602,7 +2609,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             CoolDownValueHolder mcdvh = bel.getValue();
             if (curTime >= mcdvh.startTime() + mcdvh.length()) {
                removeCooldown(mcdvh.skillId());
-               client.announce(MaplePacketCreator.skillCooldown(mcdvh.skillId(), 0));
+               PacketCreator.announce(client, new SkillCooldown(mcdvh.skillId(), 0));
             }
          }
       }, 1500);
@@ -3893,7 +3900,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          addHP(healEffect.getHp());
          PacketCreator.announce(client, new ShowOwnBuffEffect(beholder, 2));
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.summonSkill(getId(), beholder, 5), true, MapleCharacter.this);
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new SummonSkill(getId(), beholder, 5), true, MapleCharacter.this);
          MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowOwnBuffEffect(beholder, 2), false, MapleCharacter.this);
       }, healInterval, healInterval);
    }
@@ -3908,7 +3915,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          buffEffect.applyTo(MapleCharacter.this);
          PacketCreator.announce(client, new ShowOwnBuffEffect(beholder, 2));
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.summonSkill(getId(), beholder, (int) (Math.random() * 3) + 6), true, MapleCharacter.this);
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new SummonSkill(getId(), beholder, (int) (Math.random() * 3) + 6), true, MapleCharacter.this);
          MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowBuffEffect(getId(), beholder, 2, (byte) 3), false, MapleCharacter.this);
       }, buffInterval, buffInterval);
    }
@@ -6724,7 +6731,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             if (mcvh.skillId() != id) {
                coolDowns.remove(mcvh.skillId());
                if (packet) {
-                  client.announce(MaplePacketCreator.skillCooldown(mcvh.skillId(), 0));
+                  PacketCreator.announce(client, new SkillCooldown(mcvh.skillId(), 0));
                }
             }
          }
@@ -7106,12 +7113,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void sendKeymap() {
-      client.announce(MaplePacketCreator.getKeymap(keymap));
+      PacketCreator.announce(client, new GetKeyMap(keymap));
    }
 
    public void sendMacros() {
       // Always send the macro packet to fix a client side bug when switching characters.
-      client.announce(MaplePacketCreator.getMacros(skillMacros));
+      PacketCreator.announce(client, new GetMacros(skillMacros));
    }
 
    public void setBuddyCapacity(int capacity) {
@@ -7607,7 +7614,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void showDojoClock() {
       if (map.isDojoFightMap()) {
-         client.announce(MaplePacketCreator.getClock((int) (getDojoTimeLeft() / 1000)));
+         PacketCreator.announce(client, new GetClock((int) (getDojoTimeLeft() / 1000)));
       }
    }
 

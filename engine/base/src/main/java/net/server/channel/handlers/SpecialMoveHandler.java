@@ -46,6 +46,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.character.SkillCooldown;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.foreigneffect.ShowBuffEffectWithLevel;
 import tools.packet.monster.CatchMonster;
@@ -87,7 +88,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
                cooldownTime /= 60;
             }
 
-            client.announce(MaplePacketCreator.skillCooldown(packet.skillId(), cooldownTime));
+            PacketCreator.announce(client, new SkillCooldown(packet.skillId(), cooldownTime));
             chr.addCooldown(packet.skillId(), currentServerTime(), cooldownTime * 1000);
          }
       }

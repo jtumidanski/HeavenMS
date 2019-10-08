@@ -19,9 +19,14 @@ import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
 import tools.packet.character.CharacterLook;
-import tools.packet.character.GetCharacterInfo;
 import tools.packet.character.FacialExpression;
+import tools.packet.character.GetCharacterInfo;
+import tools.packet.character.SetAutoHpPot;
+import tools.packet.character.SetAutoMpPot;
+import tools.packet.character.SkillCooldown;
+import tools.packet.character.SummonSkill;
 import tools.packet.character.UpdateGender;
+import tools.packet.character.UpdateSkill;
 
 public class CharacterPacketFactory extends AbstractPacketFactory {
    private static CharacterPacketFactory instance;
@@ -46,6 +51,16 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
          return create(this::facialExpression, packetInput);
       } else if (packetInput instanceof UpdateGender) {
          return create(this::updateGender, packetInput);
+      } else if (packetInput instanceof SetAutoMpPot) {
+         return create(this::sendAutoMpPot, packetInput);
+      } else if (packetInput instanceof SetAutoHpPot) {
+         return create(this::sendAutoHpPot, packetInput);
+      } else if (packetInput instanceof UpdateSkill) {
+         return create(this::updateSkill, packetInput);
+      } else if (packetInput instanceof SummonSkill) {
+         return create(this::summonSkill, packetInput);
+      } else if (packetInput instanceof SkillCooldown) {
+         return create(this::skillCooldown, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -164,6 +179,50 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
       mplew.writeShort(SendOpcode.SET_GENDER.getValue());
       mplew.write(packet.gender());
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendAutoMpPot(SetAutoMpPot packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
+      mplew.writeShort(SendOpcode.AUTO_MP_POT.getValue());
+      mplew.writeInt(packet.itemId());
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendAutoHpPot(SetAutoHpPot packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.AUTO_HP_POT.getValue());
+      mplew.writeInt(packet.itemId());
+      return mplew.getPacket();
+   }
+
+   protected byte[] updateSkill(UpdateSkill packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.UPDATE_SKILLS.getValue());
+      mplew.write(1);
+      mplew.writeShort(1);
+      mplew.writeInt(packet.skillId());
+      mplew.writeInt(packet.level());
+      mplew.writeInt(packet.masterLevel());
+      addExpirationTime(mplew, packet.expiration());
+      mplew.write(4);
+      return mplew.getPacket();
+   }
+
+   protected byte[] summonSkill(SummonSkill packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SUMMON_SKILL.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.summonSkillId());
+      mplew.write(packet.newStance());
+      return mplew.getPacket();
+   }
+
+   protected byte[] skillCooldown(SkillCooldown packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.COOLDOWN.getValue());
+      mplew.writeInt(packet.skillId());
+      mplew.writeShort(packet.time());//Int in v97
       return mplew.getPacket();
    }
 }

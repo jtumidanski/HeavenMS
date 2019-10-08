@@ -95,12 +95,12 @@ import tools.FilePrinter;
 import tools.HexTool;
 import tools.LogHelper;
 import tools.MapleAESOFB;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.ChangeChannel;
 import tools.packet.cashshop.ShowCash;
+import tools.packet.foreigneffect.ShowHint;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.message.ServerMessage;
 import tools.packet.stat.EnableActions;
@@ -1013,7 +1013,7 @@ public class MapleClient {
    }
 
    public void announceHint(String msg, int length) {
-      announce(MaplePacketCreator.sendHint(msg, length, 10));
+      PacketCreator.announce(this, new ShowHint(msg, length, 10));
       PacketCreator.announce(this, new EnableActions());
    }
 

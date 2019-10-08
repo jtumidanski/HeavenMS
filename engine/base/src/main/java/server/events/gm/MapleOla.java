@@ -27,7 +27,9 @@ import client.MapleCharacter;
 import server.TimerManager;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.ui.GetClock;
 
 /**
  * @author kevintjuh93
@@ -52,7 +54,7 @@ public class MapleOla {
 
    public void startOla() { // TODO: Messages
       chr.getMap().startEvent();
-      chr.getClient().announce(MaplePacketCreator.getClock(360));
+      PacketCreator.announce(chr, new GetClock(360));
       this.timeStarted = System.currentTimeMillis();
       this.time = 360000;
 

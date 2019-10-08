@@ -28,7 +28,9 @@ import client.MapleCharacter;
 import server.TimerManager;
 import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.ui.GetClock;
 
 /**
  * @author kevintjuh93
@@ -54,7 +56,7 @@ public class MapleFitness {
 
    public void startFitness() {
       chr.getMap().startEvent();
-      chr.getClient().announce(MaplePacketCreator.getClock(900));
+      PacketCreator.announce(chr, new GetClock(900));
       this.timeStarted = System.currentTimeMillis();
       this.time = 900000;
       checkAndMessage();

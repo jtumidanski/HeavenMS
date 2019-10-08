@@ -73,6 +73,8 @@ import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
 import tools.packet.spawn.SpawnNPC;
+import tools.packet.ui.GetClock;
+import tools.packet.ui.StopClock;
 
 /**
  * @author Matze
@@ -289,7 +291,7 @@ public class EventInstanceManager {
       eventTime = time;
 
       for (MapleCharacter chr : getPlayers()) {
-         chr.announce(MaplePacketCreator.getClock((int) (time / 1000)));
+         PacketCreator.announce(chr, new GetClock((int) (time / 1000)));
       }
 
       event_schedule = TimerManager.getInstance().schedule(new Runnable() {
@@ -332,7 +334,7 @@ public class EventInstanceManager {
 
    private void dismissEventTimer() {
       for (MapleCharacter chr : getPlayers()) {
-         chr.getClient().announce(MaplePacketCreator.removeClock());
+         PacketCreator.announce(chr, new StopClock());
       }
 
       event_schedule = null;

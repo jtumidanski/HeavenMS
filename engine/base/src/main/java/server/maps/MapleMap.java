@@ -111,6 +111,7 @@ import tools.packet.character.CharacterLook;
 import tools.packet.character.box.UseChalkboard;
 import tools.packet.event.CoconutScore;
 import tools.packet.event.RollSnowBall;
+import tools.packet.field.effect.ChangeBackgroundEffect;
 import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.field.obstacle.EnvironmentMove;
 import tools.packet.foreigneffect.ShowBuffEffect;
@@ -131,6 +132,8 @@ import tools.packet.spawn.SpawnMonster;
 import tools.packet.spawn.SpawnNPC;
 import tools.packet.spawn.SpawnPlayer;
 import tools.packet.spawn.SpawnSummon;
+import tools.packet.ui.GetClock;
+import tools.packet.ui.GetClockTime;
 
 public class MapleMap {
 
@@ -2336,7 +2339,7 @@ public class MapleMap {
 
       if (mapid == 200090060) { // To Rien
          int travelTime = getWorldServer().getTransportationTime(1 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(travelTime / 1000));
+         PacketCreator.announce(chr, new GetClock(travelTime / 1000));
          TimerManager.getInstance().schedule(new Runnable() {
 
             @Override
@@ -2348,7 +2351,7 @@ public class MapleMap {
          }, travelTime);
       } else if (mapid == 200090070) { // To Lith Harbor
          int travelTime = getWorldServer().getTransportationTime(1 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(travelTime / 1000));
+         PacketCreator.announce(chr, new GetClock(travelTime / 1000));
          TimerManager.getInstance().schedule(new Runnable() {
 
             @Override
@@ -2360,7 +2363,7 @@ public class MapleMap {
          }, travelTime);
       } else if (mapid == 200090030) { // To Ereve (SkyFerry)
          int travelTime = getWorldServer().getTransportationTime(2 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(travelTime / 1000));
+         PacketCreator.announce(chr, new GetClock(travelTime / 1000));
          TimerManager.getInstance().schedule(new Runnable() {
 
             @Override
@@ -2372,7 +2375,7 @@ public class MapleMap {
          }, travelTime);
       } else if (mapid == 200090031) { // To Victoria Island (SkyFerry)
          int travelTime = getWorldServer().getTransportationTime(2 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(travelTime / 1000));
+         PacketCreator.announce(chr, new GetClock(travelTime / 1000));
          TimerManager.getInstance().schedule(new Runnable() {
 
             @Override
@@ -2384,7 +2387,7 @@ public class MapleMap {
          }, travelTime);
       } else if (mapid == 200090021) { // To Orbis (SkyFerry)
          int travelTime = getWorldServer().getTransportationTime(8 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(travelTime / 1000));
+         PacketCreator.announce(chr, new GetClock(travelTime / 1000));
          TimerManager.getInstance().schedule(new Runnable() {
 
             @Override
@@ -2396,7 +2399,7 @@ public class MapleMap {
          }, travelTime);
       } else if (mapid == 200090020) { // To Ereve From Orbis (SkyFerry)
          int travelTime = getWorldServer().getTransportationTime(8 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(travelTime / 1000));
+         PacketCreator.announce(chr, new GetClock(travelTime / 1000));
          TimerManager.getInstance().schedule(new Runnable() {
 
             @Override
@@ -2413,7 +2416,7 @@ public class MapleMap {
          }
       } else if (GameConstants.isAriantColiseumArena(mapid)) {
          int pqTimer = (10 * 60 * 1000);
-         chr.announce(MaplePacketCreator.getClock(pqTimer / 1000));
+         PacketCreator.announce(chr, new GetClock(pqTimer / 1000));
       }
 
       Arrays.stream(chr.getPets())
@@ -2425,7 +2428,7 @@ public class MapleMap {
       chr.commitExcludedItems();  // thanks OishiiKawaiiDesu for noticing pet item ignore registry erasing upon changing maps
 
       if (chr.getMonsterCarnival() != null) {
-         chr.getClient().announce(MaplePacketCreator.getClock(chr.getMonsterCarnival().getTimeLeftSeconds()));
+         PacketCreator.announce(chr, new GetClock(chr.getMonsterCarnival().getTimeLeftSeconds()));
          if (isCPQMap()) {
             int team = -1;
             int oposition = -1;
@@ -2514,14 +2517,14 @@ public class MapleMap {
          chr.getClient().announce(MaplePacketCreator.aranGodlyStats());
       }
       if (chr.getEventInstance() != null && chr.getEventInstance().isTimerStarted()) {
-         chr.getClient().announce(MaplePacketCreator.getClock((int) (chr.getEventInstance().getTimeLeft() / 1000)));
+         PacketCreator.announce(chr, new GetClock((int) (chr.getEventInstance().getTimeLeft() / 1000)));
       }
       if (chr.getFitness() != null && chr.getFitness().isTimerStarted()) {
-         chr.getClient().announce(MaplePacketCreator.getClock((int) (chr.getFitness().getTimeLeft() / 1000)));
+         PacketCreator.announce(chr, new GetClock((int) (chr.getFitness().getTimeLeft() / 1000)));
       }
 
       if (chr.getOla() != null && chr.getOla().isTimerStarted()) {
-         chr.getClient().announce(MaplePacketCreator.getClock((int) (chr.getOla().getTimeLeft() / 1000)));
+         PacketCreator.announce(chr, new GetClock((int) (chr.getOla().getTimeLeft() / 1000)));
       }
 
       if (mapid == 109060000) {
@@ -2530,7 +2533,7 @@ public class MapleMap {
 
       if (hasClock()) {
          Calendar cal = Calendar.getInstance();
-         chr.getClient().announce((MaplePacketCreator.getClockTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND))));
+         PacketCreator.announce(chr, new GetClockTime(cal.get(Calendar.HOUR_OF_DAY), cal.get(Calendar.MINUTE), cal.get(Calendar.SECOND)));
       }
       if (hasBoat() > 0) {
          if (hasBoat() == 1) {
@@ -3098,7 +3101,7 @@ public class MapleMap {
    public void sendNightEffect(MapleCharacter mc) {
       backgroundTypes.entrySet().stream()
             .filter(entry -> entry.getValue() >= 3)
-            .forEach(entry -> mc.announce(MaplePacketCreator.changeBackgroundEffect(true, entry.getKey(), 0)));
+            .forEach(entry -> PacketCreator.announce(mc, new ChangeBackgroundEffect(true, entry.getKey(), 0)));
    }
 
    public void broadcastNightEffect() {

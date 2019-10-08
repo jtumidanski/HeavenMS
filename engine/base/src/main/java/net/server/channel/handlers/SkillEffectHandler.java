@@ -42,8 +42,8 @@ import constants.skills.WindArcher;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SkillEffectPacket;
 import net.server.channel.packet.reader.SkillEffectReader;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.foreigneffect.ShowSkillEffect;
 
 public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectPacket> {
    @Override
@@ -72,7 +72,7 @@ public final class SkillEffectHandler extends AbstractPacketHandler<SkillEffectP
          case Hero.MONSTER_MAGNET:
          case Evan.FIRE_BREATH:
          case Evan.ICE_BREATH:
-            MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), character -> MaplePacketCreator.skillEffect(client.getPlayer(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false, client.getPlayer());
+            MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new ShowSkillEffect(client.getPlayer().getId(), packet.skillId(), packet.level(), packet.flags(), packet.speed(), packet.aids()), false, client.getPlayer());
             return;
          default:
             System.out.println(client.getPlayer() + " entered SkillEffectHandler without being handled using " + packet.skillId() + ".");

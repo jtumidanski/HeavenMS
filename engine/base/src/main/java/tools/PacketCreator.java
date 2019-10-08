@@ -69,6 +69,7 @@ import tools.packet.factory.StatUpdatePacketFactory;
 import tools.packet.factory.StatusInfoPacketFactory;
 import tools.packet.factory.StoragePacketFactory;
 import tools.packet.factory.TVPacketFactory;
+import tools.packet.factory.UIPacketFactory;
 import tools.packet.factory.UpdateCharacterBoxPacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 import tools.packet.factory.WeddingPacketFactory;
@@ -158,6 +159,10 @@ public class PacketCreator {
          case SHOW_FOREIGN_EFFECT:
          case SHOW_SCROLL_EFFECT:
          case SKILL_LEARN_ITEM_RESULT:
+         case SHOW_COMBO:
+         case PLAYER_HINT:
+         case SKILL_EFFECT:
+         case SHOW_ITEM_EFFECT:
             return Optional.of(ForeignEffectPacketFactory.getInstance());
          case UPDATE_QUEST_INFO:
          case QUEST_CLEAR:
@@ -224,6 +229,7 @@ public class PacketCreator {
          case FIELD_OBSTACLE_ONOFF_LIST:
          case FIELD_OBSTACLE_ALL_RESET:
          case BLOW_WEATHER:
+         case SET_BACK_EFFECT:
             return Optional.of(FieldPacketFactory.getInstance());
          case SNOWBALL_STATE:
          case HIT_SNOWBALL:
@@ -271,6 +277,11 @@ public class PacketCreator {
          case CHAR_INFO:
          case FACIAL_EXPRESSION:
          case SET_GENDER:
+         case AUTO_MP_POT:
+         case AUTO_HP_POT:
+         case UPDATE_SKILLS:
+         case SUMMON_SKILL:
+         case COOLDOWN:
             return Optional.of(CharacterPacketFactory.getInstance());
          case MARRIAGE_REQUEST:
          case WEDDING_PHOTO:
@@ -333,6 +344,17 @@ public class PacketCreator {
          case ARIANT_ARENA_SHOW_RESULT:
          case ARIANT_ARENA_USER_SCORE:
             return Optional.of(AriantPacketFactory.getInstance());
+         case OPEN_UI:
+         case LOCK_UI:
+         case DISABLE_UI:
+         case KEYMAP:
+         case MACRO_SYS_DATA_INIT:
+         case ADMIN_RESULT:
+         case GATHER_ITEM_RESULT:
+         case SORT_ITEM_RESULT:
+         case CLOCK:
+         case STOP_CLOCK:
+            return Optional.of(UIPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

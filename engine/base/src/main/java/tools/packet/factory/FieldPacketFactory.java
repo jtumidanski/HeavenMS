@@ -9,6 +9,7 @@ import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
 import tools.packet.field.effect.BlowWeather;
+import tools.packet.field.effect.ChangeBackgroundEffect;
 import tools.packet.field.effect.CustomShowBossHP;
 import tools.packet.field.effect.DojoAnimation;
 import tools.packet.field.effect.EnvironmentChange;
@@ -57,6 +58,8 @@ public class FieldPacketFactory extends AbstractPacketFactory {
          return create(this::startMapEffect, packetInput);
       } else if (packetInput instanceof RemoveWeather) {
          return create(this::removeMapEffect, packetInput);
+      } else if (packetInput instanceof ChangeBackgroundEffect) {
+         return create(this::changeBackgroundEffect, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -182,6 +185,23 @@ public class FieldPacketFactory extends AbstractPacketFactory {
       mplew.writeShort(SendOpcode.BLOW_WEATHER.getValue());
       mplew.write(0);
       mplew.writeInt(0);
+      return mplew.getPacket();
+   }
+
+   /**
+    * Changes the current background effect to either being rendered or not.
+    * Data is still missing, so this is pretty binary at the moment in how it
+    * behaves.
+    *
+    * @return a packet to change the background effect of a specified layer.
+    */
+   protected byte[] changeBackgroundEffect(ChangeBackgroundEffect packet) {
+      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SET_BACK_EFFECT.getValue());
+      mplew.writeBool(packet.remove());
+      mplew.writeInt(0); // not sure what this int32 does yet
+      mplew.write(packet.layer());
+      mplew.writeInt(packet.transition());
       return mplew.getPacket();
    }
 }

@@ -27,12 +27,12 @@ import java.util.List;
 import client.MapleCharacter;
 import server.TimerManager;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.event.HitSnowBall;
 import tools.packet.event.RollSnowBall;
 import tools.packet.event.SnowBallMessage;
+import tools.packet.ui.GetClock;
 
 /**
  * @author kevintjuh93
@@ -68,7 +68,7 @@ public class MapleSnowball {
             MapleSnowball firstSnowBall = map.getSnowball(0);
             MapleSnowball secondSnowBall = map.getSnowball(1);
             PacketCreator.announce(chr, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
-            chr.announce(MaplePacketCreator.getClock(600));
+            PacketCreator.announce(chr, new GetClock(600));
          }
       }
       hittable = true;

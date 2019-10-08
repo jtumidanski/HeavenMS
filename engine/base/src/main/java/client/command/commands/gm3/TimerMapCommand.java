@@ -27,6 +27,9 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.ui.GetClock;
+import tools.packet.ui.StopClock;
 
 public class TimerMapCommand extends Command {
    {
@@ -43,13 +46,13 @@ public class TimerMapCommand extends Command {
 
       if (params[0].equalsIgnoreCase("remove")) {
          for (MapleCharacter victim : player.getMap().getCharacters()) {
-            victim.announce(MaplePacketCreator.removeClock());
+            PacketCreator.announce(victim, new StopClock());
          }
       } else {
          try {
             int seconds = Integer.parseInt(params[0]);
             for (MapleCharacter victim : player.getMap().getCharacters()) {
-               victim.announce(MaplePacketCreator.getClock(seconds));
+               PacketCreator.announce(victim, new GetClock(seconds));
             }
          } catch (NumberFormatException e) {
             player.yellowMessage("Syntax: !timermap <seconds>|remove");

@@ -85,6 +85,8 @@ import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyList;
 import tools.packet.buff.GiveDebuff;
+import tools.packet.character.SetAutoHpPot;
+import tools.packet.character.SetAutoMpPot;
 import tools.packet.character.UpdateGender;
 import tools.packet.family.FamilyLogonNotice;
 import tools.packet.family.GetFamilyInfo;
@@ -283,10 +285,10 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
             // pot bindings being passed through other characters on the account detected thanks to Croosade dev team
             KeyBinding autohpPot = player.getKeymap().get(91);
-            player.announce(MaplePacketCreator.sendAutoHpPot(autohpPot != null ? autohpPot.action() : 0));
+            PacketCreator.announce(player, new SetAutoHpPot(autohpPot != null ? autohpPot.action() : 0));
 
             KeyBinding autompPot = player.getKeymap().get(92);
-            player.announce(MaplePacketCreator.sendAutoMpPot(autompPot != null ? autompPot.action() : 0));
+            PacketCreator.announce(player, new SetAutoMpPot(autompPot != null ? autompPot.action() : 0));
 
             player.getMap().addPlayer(player);
             player.visitMap(player.getMap());

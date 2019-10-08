@@ -29,7 +29,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 
-import client.KeyBinding;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleMount;
@@ -37,7 +36,6 @@ import client.database.data.NoteData;
 import constants.GameConstants;
 import net.opcodes.SendOpcode;
 import net.server.Server;
-import net.server.SkillMacro;
 import net.server.world.World;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapItem;
@@ -217,61 +215,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] updateSkill(int skillid, int level, int masterlevel, long expiration) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_SKILLS.getValue());
-      mplew.write(1);
-      mplew.writeShort(1);
-      mplew.writeInt(skillid);
-      mplew.writeInt(level);
-      mplew.writeInt(masterlevel);
-      addExpirationTime(mplew, expiration);
-      mplew.write(4);
-      return mplew.getPacket();
-   }
-
-   public static byte[] getKeymap(Map<Integer, KeyBinding> keybindings) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.KEYMAP.getValue());
-      mplew.write(0);
-      for (int x = 0; x < 90; x++) {
-         KeyBinding binding = keybindings.get(x);
-         if (binding != null) {
-            mplew.write(binding.theType());
-            mplew.writeInt(binding.action());
-         } else {
-            mplew.write(0);
-            mplew.writeInt(0);
-         }
-      }
-      return mplew.getPacket();
-   }
-
-   public static byte[] getClock(int time) { // time in seconds
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLOCK.getValue());
-      mplew.write(2); // clock type. if you send 3 here you have to send another byte (which does not matter at all) before the timestamp
-      mplew.writeInt(time);
-      return mplew.getPacket();
-   }
-
-   public static byte[] getClockTime(int hour, int min, int sec) { // Current Time
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLOCK.getValue());
-      mplew.write(1); //Clock-Type
-      mplew.write(hour);
-      mplew.write(min);
-      mplew.write(sec);
-      return mplew.getPacket();
-   }
-
-   public static byte[] removeClock() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STOP_CLOCK.getValue());
-      mplew.write(0);
-      return mplew.getPacket();
-   }
-
    public static byte[] damageSummon(int cid, int oid, int damage, int monsterIdFrom) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.DAMAGE_SUMMON.getValue());
@@ -281,14 +224,6 @@ public class MaplePacketCreator {
       mplew.writeInt(damage);         // damage display doesn't seem to work...
       mplew.writeInt(monsterIdFrom);
       mplew.write(0);
-      return mplew.getPacket();
-   }
-
-   public static byte[] itemEffect(int characterid, int itemid) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_ITEM_EFFECT.getValue());
-      mplew.writeInt(characterid);
-      mplew.writeInt(itemid);
       return mplew.getPacket();
    }
 
@@ -312,18 +247,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] skillEffect(MapleCharacter from, int skillId, int level, byte flags, int speed, byte direction) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SKILL_EFFECT.getValue());
-      mplew.writeInt(from.getId());
-      mplew.writeInt(skillId);
-      mplew.write(level);
-      mplew.write(flags);
-      mplew.write(speed);
-      mplew.write(direction); //Mmmk
-      return mplew.getPacket();
-   }
-
    public static byte[] skillCancel(MapleCharacter from, int skillId) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.CANCEL_SKILL_EFFECT.getValue());
@@ -332,78 +255,11 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   /**
-    * Sends a player hint.
-    *
-    * @param hint   The hint it's going to send.
-    * @param width  How tall the box is going to be.
-    * @param height How long the box is going to be.
-    * @return The player hint packet.
-    */
-   public static byte[] sendHint(String hint, int width, int height) {
-      if (width < 1) {
-         width = hint.length() * 10;
-         if (width < 40) {
-            width = 40;
-         }
-      }
-      if (height < 5) {
-         height = 5;
-      }
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PLAYER_HINT.getValue());
-      mplew.writeMapleAsciiString(hint);
-      mplew.writeShort(width);
-      mplew.writeShort(height);
-      mplew.write(1);
-      return mplew.getPacket();
-   }
-
    public static byte[] showForcedEquip(int team) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.FORCED_MAP_EQUIP.getValue());
       if (team > -1) {
          mplew.write(team);   // 00 = red, 01 = blue
-      }
-      return mplew.getPacket();
-   }
-
-   public static byte[] summonSkill(int cid, int summonSkillId, int newStance) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SUMMON_SKILL.getValue());
-      mplew.writeInt(cid);
-      mplew.writeInt(summonSkillId);
-      mplew.write(newStance);
-      return mplew.getPacket();
-   }
-
-   public static byte[] skillCooldown(int sid, int time) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.COOLDOWN.getValue());
-      mplew.writeInt(sid);
-      mplew.writeShort(time);//Int in v97
-      return mplew.getPacket();
-   }
-
-   public static byte[] getMacros(SkillMacro[] macros) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MACRO_SYS_DATA_INIT.getValue());
-      int count = 0;
-      for (int i = 0; i < 5; i++) {
-         if (macros[i] != null) {
-            count++;
-         }
-      }
-      mplew.write(count);
-      for (int i = 0; i < 5; i++) {
-         SkillMacro macro = macros[i];
-         if (macro != null) {
-            mplew.writeMapleAsciiString(macro.name());
-            mplew.write(macro.shout());
-            mplew.writeInt(macro.skill1());
-            mplew.writeInt(macro.skill2());
-            mplew.writeInt(macro.skill3());
-         }
       }
       return mplew.getPacket();
    }
@@ -634,20 +490,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] sendAutoHpPot(int itemId) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.AUTO_HP_POT.getValue());
-      mplew.writeInt(itemId);
-      return mplew.getPacket();
-   }
-
-   public static byte[] sendAutoMpPot(int itemId) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.AUTO_MP_POT.getValue());
-      mplew.writeInt(itemId);
-      return mplew.getPacket();
-   }
-
    public static byte[] showOXQuiz(int questionSet, int questionId, boolean askQuestion) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
       mplew.writeShort(SendOpcode.OX_QUIZ.getValue());
@@ -668,40 +510,6 @@ public class MaplePacketCreator {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.FORCED_STAT_SET.getValue());
       mplew.write(new byte[]{(byte) 0x1F, (byte) 0x0F, 0, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xFF, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0x78, (byte) 0x8C});
-      return mplew.getPacket();
-   }
-
-   /**
-    * Sends a UI utility. 0x01 - Equipment Inventory. 0x02 - Stat Window. 0x03
-    * - Skill Window. 0x05 - Keyboard Settings. 0x06 - Quest window. 0x09 -
-    * Monsterbook Window. 0x0A - Char Info 0x0B - Guild BBS 0x12 - Monster
-    * Carnival Window 0x16 - Party Search. 0x17 - Item Creation Window. 0x1A -
-    * My Ranking O.O 0x1B - Family Window 0x1C - Family Pedigree 0x1D - GM
-    * Story Board /funny shet 0x1E - Envelop saying you got mail from an admin.
-    * lmfao 0x1F - Medal Window 0x20 - Maple Event (???) 0x21 - Invalid Pointer
-    * Crash
-    *
-    * @param ui
-    * @return
-    */
-   public static byte[] openUI(byte ui) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.OPEN_UI.getValue());
-      mplew.write(ui);
-      return mplew.getPacket();
-   }
-
-   public static byte[] lockUI(boolean enable) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.LOCK_UI.getValue());
-      mplew.write(enable ? 1 : 0);
-      return mplew.getPacket();
-   }
-
-   public static byte[] disableUI(boolean enable) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DISABLE_UI.getValue());
-      mplew.write(enable ? 1 : 0);
       return mplew.getPacket();
    }
 
@@ -745,13 +553,6 @@ public class MaplePacketCreator {
       mplew.writeShort(SendOpcode.ADMIN_RESULT.getValue());
       mplew.write(type);
       mplew.write(mode);
-      return mplew.getPacket();
-   }
-
-   public static byte[] disableMinimap() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ADMIN_RESULT.getValue());
-      mplew.writeShort(0x1C);
       return mplew.getPacket();
    }
 
@@ -811,22 +612,6 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] finishedSort(int inv) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(4);
-      mplew.writeShort(SendOpcode.GATHER_ITEM_RESULT.getValue());
-      mplew.write(0);
-      mplew.write(inv);
-      return mplew.getPacket();
-   }
-
-   public static byte[] finishedSort2(int inv) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(4);
-      mplew.writeShort(SendOpcode.SORT_ITEM_RESULT.getValue());
-      mplew.write(0);
-      mplew.write(inv);
-      return mplew.getPacket();
-   }
-
    public static byte[] leftKnockBack() {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
       mplew.writeShort(SendOpcode.LEFT_KNOCK_BACK.getValue());
@@ -863,37 +648,10 @@ public class MaplePacketCreator {
       return mplew.getPacket();
    }
 
-   public static byte[] showCombo(int count) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.SHOW_COMBO.getValue());
-      mplew.writeInt(count);
-      return mplew.getPacket();
-   }
-
    public static byte[] earnTitleMessage(String msg) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.SCRIPT_PROGRESS_MESSAGE.getValue());
       mplew.writeMapleAsciiString(msg);
-      return mplew.getPacket();
-   }
-
-   /**
-    * Changes the current background effect to either being rendered or not.
-    * Data is still missing, so this is pretty binary at the moment in how it
-    * behaves.
-    *
-    * @param remove     whether or not the remove or add the specified layer.
-    * @param layer      the targeted layer for removal or addition.
-    * @param transition the time it takes to transition the effect.
-    * @return a packet to change the background effect of a specified layer.
-    */
-   public static byte[] changeBackgroundEffect(boolean remove, int layer, int transition) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_BACK_EFFECT.getValue());
-      mplew.writeBool(remove);
-      mplew.writeInt(0); // not sure what this int32 does yet
-      mplew.write(layer);
-      mplew.writeInt(transition);
       return mplew.getPacket();
    }
 

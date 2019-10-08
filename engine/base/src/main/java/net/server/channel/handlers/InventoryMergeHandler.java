@@ -33,9 +33,9 @@ import net.server.Server;
 import net.server.channel.packet.InventoryMergePacket;
 import net.server.channel.packet.reader.InventoryMergeReader;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
+import tools.packet.ui.FinishedSort;
 
 public final class InventoryMergeHandler extends AbstractPacketHandler<InventoryMergePacket> {
    @Override
@@ -125,7 +125,7 @@ public final class InventoryMergeHandler extends AbstractPacketHandler<Inventory
          inventory.unlockInventory();
       }
 
-      client.announce(MaplePacketCreator.finishedSort(inventoryType.getType()));
+      PacketCreator.announce(client, new FinishedSort(inventoryType.getType()));
       PacketCreator.announce(client, new EnableActions());
    }
 }

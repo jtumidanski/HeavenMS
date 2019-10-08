@@ -29,6 +29,9 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.TimerManager;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.ui.GetClock;
+import tools.packet.ui.StopClock;
 
 /**
  * @author Ronan
@@ -52,11 +55,15 @@ public class MapleMiniDungeon {
 
    public boolean registerPlayer(MapleCharacter chr) {
       int time = (int) ((expireTime - System.currentTimeMillis()) / 1000);
-      if (time > 0) chr.getClient().announce(MaplePacketCreator.getClock(time));
+      if (time > 0) {
+         PacketCreator.announce(chr, new GetClock(time));
+      }
 
       lock.lock();
       try {
-         if (timeoutTask == null) return false;
+         if (timeoutTask == null) {
+            return false;
+         }
 
          players.add(chr);
       } finally {
@@ -67,7 +74,7 @@ public class MapleMiniDungeon {
    }
 
    public boolean unregisterPlayer(MapleCharacter chr) {
-      chr.getClient().announce(MaplePacketCreator.removeClock());
+      PacketCreator.announce(chr, new StopClock());
 
       lock.lock();
       try {
