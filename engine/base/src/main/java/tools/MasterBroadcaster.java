@@ -114,6 +114,13 @@ public class MasterBroadcaster {
       }, packetCreator);
    }
 
+   public void sendToAllInMapRange(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, boolean ranged) {
+      sendToAllInMap(map, mapleCharacter -> {
+         double rangeSq = ranged ? MapleMapProcessor.getInstance().getRangedDistance() : Double.POSITIVE_INFINITY;
+         return passRepeatToSource(repeatToSource, source, mapleCharacter) && passRangeCheck(rangeSq, mapleCharacter, source.getPosition());
+      }, character -> PacketCreator.create(packetInput));
+   }
+
    /**
     * Sends a packet to everyone in the map, excluding those out of range of the reference point.
     *
@@ -123,6 +130,17 @@ public class MasterBroadcaster {
     */
    public void sendToAllInMapRange(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, Point referencePoint) {
       sendToAllInMap(map, mapleCharacter -> passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), packetCreator);
+   }
+
+   /**
+    * Sends a packet to everyone in the map, excluding those out of range of the reference point.
+    *
+    * @param map            the map
+    * @param packetInput    the packet
+    * @param referencePoint the reference point
+    */
+   public void sendToAllInMapRange(MapleMap map, PacketInput packetInput, Point referencePoint) {
+      sendToAllInMap(map, mapleCharacter -> passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), character -> PacketCreator.create(packetInput));
    }
 
    /**

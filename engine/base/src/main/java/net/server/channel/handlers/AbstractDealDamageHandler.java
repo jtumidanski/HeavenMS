@@ -93,6 +93,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.monster.DamageMonster;
 import tools.packet.remove.RemoveItem;
 import tools.packet.stat.EnableActions;
 
@@ -134,12 +135,12 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
          TimerManager.getInstance().schedule(new Runnable() {
             @Override
             public void run() {
-               MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(monster.getObjectId(), damage), monster.getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.getObjectId(), damage), monster.getPosition());
                map.damageMonster(attacker, monster, damage);
             }
          }, animationTime);
       } else {
-         MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(monster.getObjectId(), damage), monster.getPosition());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.getObjectId(), damage), monster.getPosition());
          map.damageMonster(attacker, monster, damage);
       }
    }
@@ -556,7 +557,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                } else {
                   if (attack.skill() == Aran.BODY_PRESSURE) {
                      int finalTotDamageToOneMonster = totDamageToOneMonster;
-                     MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(monster.getObjectId(), finalTotDamageToOneMonster));
+                     MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(monster.getObjectId(), finalTotDamageToOneMonster));
                   }
 
                   map.damageMonster(player, monster, totDamageToOneMonster);

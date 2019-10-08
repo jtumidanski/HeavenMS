@@ -17,8 +17,8 @@ import server.partyquest.MonsterCarnival;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.packet.partyoperation.PartyCreated;
-import tools.packet.partyoperation.PartyStatusMessage;
+import tools.packet.party.PartyCreated;
+import tools.packet.party.PartyStatusMessage;
 
 public class MaplePartyProcessor {
    private static MaplePartyProcessor ourInstance = new MaplePartyProcessor();

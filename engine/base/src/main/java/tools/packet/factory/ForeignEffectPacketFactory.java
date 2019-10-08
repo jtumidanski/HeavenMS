@@ -1,5 +1,7 @@
 package tools.packet.factory;
 
+import client.MapleCharacter;
+import client.inventory.ScrollResult;
 import net.opcodes.SendOpcode;
 import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -14,6 +16,8 @@ import tools.packet.foreigneffect.ShowForeignInfo;
 import tools.packet.foreigneffect.ShowForeignMakerEffect;
 import tools.packet.foreigneffect.ShowPetLevelUp;
 import tools.packet.foreigneffect.ShowRecovery;
+import tools.packet.foreigneffect.ShowScrollEffect;
+import tools.packet.foreigneffect.ShowSkillBookResult;
 
 public class ForeignEffectPacketFactory extends AbstractPacketFactory {
    private static ForeignEffectPacketFactory instance;
@@ -50,6 +54,10 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
          return create(this::showForeignEffect, packetInput);
       } else if (packetInput instanceof ShowRecovery) {
          return create(this::showRecovery, packetInput);
+      } else if (packetInput instanceof ShowScrollEffect) {
+         return create(this::getScrollEffect, packetInput);
+      } else if (packetInput instanceof ShowSkillBookResult) {
+         return create(this::skillBookResult, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -152,6 +160,29 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
       mplew.writeInt(packet.characterId());
       mplew.write(0x0A);
       mplew.write(packet.amount());
+      return mplew.getPacket();
+   }
+
+   protected byte[] getScrollEffect(ShowScrollEffect packet) {   // thanks to Rien dev team
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SHOW_SCROLL_EFFECT.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeBool(packet.success() == ScrollResult.SUCCESS);
+      mplew.writeBool(packet.success() == ScrollResult.CURSE);
+      mplew.writeBool(packet.legendarySpirit());
+      mplew.writeBool(packet.whiteScroll());
+      return mplew.getPacket();
+   }
+
+   protected byte[] skillBookResult(ShowSkillBookResult packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SKILL_LEARN_ITEM_RESULT.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.write(1);
+      mplew.writeInt(packet.skillId());
+      mplew.writeInt(packet.maxLevel());
+      mplew.write(packet.canUse() ? 1 : 0);
+      mplew.write(packet.success() ? 1 : 0);
       return mplew.getPacket();
    }
 }

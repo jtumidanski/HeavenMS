@@ -45,7 +45,6 @@ import constants.skills.Magician;
 import constants.skills.ThunderBreaker;
 import constants.skills.Warrior;
 import server.ThreadManager;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
@@ -617,7 +616,7 @@ public class AssignAPProcessor {
                }
                break;
             default:
-               PacketCreator.announce(c, new UpdatePlayerStats(MaplePacketCreator.EMPTY_STATUPDATE, true, player));
+               PacketCreator.announce(c, new UpdatePlayerStats(Collections.emptyList(), true, player));
                return false;
          }
 
@@ -682,7 +681,7 @@ public class AssignAPProcessor {
             }
             break;
          default:
-            PacketCreator.announce(chr, new UpdatePlayerStats(MaplePacketCreator.EMPTY_STATUPDATE, true, chr));
+            PacketCreator.announce(chr, new UpdatePlayerStats(Collections.emptyList(), true, chr));
             return false;
       }
       return true;

@@ -22,7 +22,9 @@
 package server.maps;
 
 import client.MapleClient;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.field.effect.BlowWeather;
+import tools.packet.field.effect.RemoveWeather;
 
 public class MapleMapEffect {
    private String msg;
@@ -35,11 +37,11 @@ public class MapleMapEffect {
    }
 
    public final byte[] makeDestroyData() {
-      return MaplePacketCreator.removeMapEffect();
+      return PacketCreator.create(new RemoveWeather());
    }
 
    public final byte[] makeStartData() {
-      return MaplePacketCreator.startMapEffect(msg, itemId, active);
+      return PacketCreator.create(new BlowWeather(msg, itemId, active));
    }
 
    public void sendStartData(MapleClient client) {

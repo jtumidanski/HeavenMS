@@ -37,6 +37,7 @@ import server.maps.MapleMap;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.monster.DamageMonster;
 
 /**
  * @author Jay Estrella
@@ -111,7 +112,7 @@ public final class MobDamageMobHandler extends AbstractPacketHandler<MobDamageMo
 
          map.damageMonster(chr, damaged, dmg);
          int finalDmg = dmg;
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(packet.to(), finalDmg), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(packet.to(), finalDmg), false, chr);
       }
    }
 }

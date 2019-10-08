@@ -108,10 +108,13 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.buff.GiveForeignBuff;
 import tools.packet.character.CharacterLook;
+import tools.packet.character.box.UseChalkboard;
 import tools.packet.event.CoconutScore;
 import tools.packet.event.RollSnowBall;
 import tools.packet.field.effect.EnvironmentChange;
+import tools.packet.field.obstacle.EnvironmentMove;
 import tools.packet.foreigneffect.ShowBuffEffect;
+import tools.packet.monster.KillMonster;
 import tools.packet.monster.carnival.MonsterCarnivalStart;
 import tools.packet.reactor.TriggerReactor;
 import tools.packet.remove.RemoveDragon;
@@ -1305,7 +1308,7 @@ public class MapleMap {
       if (chr == null) {
          if (removeKilledMonsterObject(monster)) {
             monster.dispatchMonsterKilled(false);
-            MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> MaplePacketCreator.killMonster(monster.getObjectId(), animation), monster.getPosition());
+            MasterBroadcaster.getInstance().sendToAllInMapRange(this, new KillMonster(monster.getObjectId(), animation), monster.getPosition());
             monster.aggroSwitchController(null, false);
          }
       } else {
@@ -1385,7 +1388,7 @@ public class MapleMap {
                e.printStackTrace();
             } finally {     // thanks resinate for pointing out a memory leak possibly from an exception thrown
                monster.dispatchMonsterKilled(true);
-               MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> MaplePacketCreator.killMonster(monster.getObjectId(), animation), monster.getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(this, new KillMonster(monster.getObjectId(), animation), monster.getPosition());
             }
          }
       }
@@ -2446,7 +2449,7 @@ public class MapleMap {
 
       if (chr.getChalkboard() != null) {
          if (!GameConstants.isFreeMarketRoom(mapid)) {
-            chr.announce(MaplePacketCreator.useChalkboard(chr, false)); // update player's chalkboard when changing maps found thanks to Vcoc
+            PacketCreator.announce(chr, new UseChalkboard(chr.getId(), false, chr.getChalkboard()));
          } else {
             chr.setChalkboard(null);
          }
@@ -3012,7 +3015,7 @@ public class MapleMap {
    }
 
    public final void moveEnvironment(final String ms, final int type) {
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> MaplePacketCreator.environmentMove(ms, type));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, new EnvironmentMove(ms, type));
 
       objectWLock.lock();
       try {

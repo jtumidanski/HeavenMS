@@ -34,6 +34,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.SetCashShop;
+import tools.packet.cashshop.ShowCash;
 import tools.packet.stat.EnableActions;
 import tools.packet.cashshop.operation.ShowCashInventory;
 import tools.packet.cashshop.operation.ShowGifts;
@@ -98,7 +99,7 @@ public class EnterCashShopHandler extends AbstractPacketHandler<NoOpPacket> {
          PacketCreator.announce(client, new ShowCashInventory(client.getAccID(), cashShop.getInventory(), mc.getStorage().getSlots(), client.getCharacterSlots()));
          PacketCreator.announce(client, new ShowGifts(cashShop.loadGifts()));
          PacketCreator.announce(client, new ShowWishList(cashShop.getWishList(), false));
-         client.announce(MaplePacketCreator.showCash(mc));
+         PacketCreator.announce(client, new ShowCash(mc.getCashShop().getCash(1), mc.getCashShop().getCash(2), mc.getCashShop().getCash(4)));
 
          client.getChannelServer().removePlayer(mc);
          mc.getMap().removePlayer(mc);

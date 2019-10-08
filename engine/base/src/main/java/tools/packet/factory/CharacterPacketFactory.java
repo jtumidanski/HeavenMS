@@ -20,6 +20,8 @@ import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
 import tools.packet.character.CharacterLook;
 import tools.packet.character.GetCharacterInfo;
+import tools.packet.character.FacialExpression;
+import tools.packet.character.UpdateGender;
 
 public class CharacterPacketFactory extends AbstractPacketFactory {
    private static CharacterPacketFactory instance;
@@ -40,6 +42,10 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
          return create(this::updateCharLook, packetInput);
       } else if (packetInput instanceof GetCharacterInfo) {
          return create(this::charInfo, packetInput);
+      } else if (packetInput instanceof FacialExpression) {
+         return create(this::facialExpression, packetInput);
+      } else if (packetInput instanceof UpdateGender) {
+         return create(this::updateGender, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -144,5 +150,20 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
          mplew.writeMapleAsciiString("");
          mplew.writeMapleAsciiString("");  // does not seem to work
       }
+   }
+
+   protected byte[] facialExpression(FacialExpression packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(10);
+      mplew.writeShort(SendOpcode.FACIAL_EXPRESSION.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.expression());
+      return mplew.getPacket();
+   }
+
+   protected byte[] updateGender(UpdateGender packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
+      mplew.writeShort(SendOpcode.SET_GENDER.getValue());
+      mplew.write(packet.gender());
+      return mplew.getPacket();
    }
 }

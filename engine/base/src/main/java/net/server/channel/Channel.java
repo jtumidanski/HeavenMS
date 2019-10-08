@@ -82,12 +82,12 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MapleMiniDungeon;
 import server.maps.MapleMiniDungeonInfo;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.character.FacialExpression;
 import tools.packet.message.ServerMessage;
 
 public final class Channel {
@@ -1083,7 +1083,7 @@ public final class Channel {
          @Override
          public void run() {
             if (chr.isLoggedinWorld()) {
-               MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.facialExpression(chr, 0), false, chr);
+               MasterBroadcaster.getInstance().sendToAllInMap(map, new FacialExpression(chr.getId(), 0), false, chr);
             }
          }
       };
@@ -1099,7 +1099,7 @@ public final class Channel {
          faceLock[lockid].unlock();
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.facialExpression(chr, emote), false, chr);
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new FacialExpression(chr.getId(), emote), false, chr);
    }
 
    public void unregisterFaceExpression(int mapid, MapleCharacter chr) {

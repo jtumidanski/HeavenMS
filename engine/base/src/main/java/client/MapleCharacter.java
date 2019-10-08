@@ -222,6 +222,7 @@ import tools.packet.buff.GiveForeignBuff;
 import tools.packet.buff.GiveForeignChairSkillEffect;
 import tools.packet.buff.GiveForeignDebuff;
 import tools.packet.buff.GiveForeignSlowDebuff;
+import tools.packet.field.obstacle.EnvironmentMoveList;
 import tools.packet.field.set.WarpToMap;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
@@ -242,7 +243,8 @@ import tools.packet.monster.carnival.MonsterCarnivalPartyPoints;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerDied;
 import tools.packet.monster.carnival.MonsterCarnivalPointObtained;
 import tools.packet.movement.MovePlayer;
-import tools.packet.partyoperation.UpdateParty;
+import tools.packet.party.UpdateParty;
+import tools.packet.party.UpdatePartyMemberHp;
 import tools.packet.pet.PetExceptionList;
 import tools.packet.quest.info.AddQuestTimeLimit;
 import tools.packet.quest.info.QuestExpire;
@@ -1762,7 +1764,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          // if this map has obstacle components moving, make it do so for this client
-         announce(MaplePacketCreator.environmentMoveList(map.getEnvironment().entrySet()));
+         PacketCreator.announce(this, new EnvironmentMoveList(map.getEnvironment().entrySet()));
       }
    }
 
@@ -6705,7 +6707,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       try {
          if (party != null) {
             for (MapleCharacter partychar : this.getPartyMembersOnSameMap()) {
-               announce(MaplePacketCreator.updatePartyMemberHP(partychar.getId(), partychar.getHp(), partychar.getCurrentMaxHp()));
+               PacketCreator.announce(this, new UpdatePartyMemberHp(partychar.getId(), partychar.getHp(), partychar.getCurrentMaxHp()));
             }
          }
       } finally {
@@ -7772,8 +7774,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int currentMaxHp = getCurrentMaxHp();
          int currentHp = getHp();
 
-         getPartyMembersOnSameMap()
-               .forEach(character -> character.announce(MaplePacketCreator.updatePartyMemberHP(getId(), currentHp, currentMaxHp)));
+         getPartyMembersOnSameMap().forEach(character -> PacketCreator.announce(character, new UpdatePartyMemberHp(getId(), currentHp, currentMaxHp)));
       }
    }
 

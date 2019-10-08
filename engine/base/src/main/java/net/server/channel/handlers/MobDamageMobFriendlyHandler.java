@@ -28,12 +28,12 @@ import net.server.channel.packet.reader.MobDamageMobFriendlyReader;
 import scripting.event.EventInstanceManager;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.monster.DamageMonsterFriendly;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -90,7 +90,7 @@ public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<Mob
       }
 
       int finalRemainingHp = remainingHp;
-      MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.MobDamageMobFriendly(monster, damage, finalRemainingHp), monster.getPosition());
+      MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonsterFriendly(monster.getObjectId(), damage, finalRemainingHp, monster.getMaxHp()), monster.getPosition());
       PacketCreator.announce(client, new EnableActions());
    }
 }

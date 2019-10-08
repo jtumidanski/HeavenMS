@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ScheduledFuture;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import constants.GameConstants;
@@ -32,8 +33,11 @@ import server.TimerManager;
 import server.expeditions.MapleExpedition;
 import server.expeditions.MapleExpeditionType;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.PacketCreator;
+import tools.packet.pq.ariant.AriantScore;
+import tools.packet.pq.ariant.ShowAriantScoreboard;
+import tools.packet.pq.ariant.UpdateAriantRanking;
 
 /**
  * @author Ronan
@@ -75,8 +79,9 @@ public class AriantColiseum {
          rewardTier.put(mc, 0);
       }
 
+      List<AriantScore> scores = score.entrySet().stream().map(e -> new AriantScore(e.getKey().getName(), e.getValue())).collect(Collectors.toList());
       for (MapleCharacter mc : players) {
-         mc.announce(MaplePacketCreator.updateAriantPQRanking(score));
+         PacketCreator.announce(mc, new UpdateAriantRanking(scores));
       }
 
       setAriantScoreBoard(TimerManager.getInstance().schedule(this::showArenaResults, pqTimerBoard));
@@ -162,8 +167,9 @@ public class AriantColiseum {
 
    private void broadcastAriantScoreUpdate() {
       if (scoreDirty) {
+         List<AriantScore> scores = score.entrySet().stream().map(e -> new AriantScore(e.getKey().getName(), e.getValue())).collect(Collectors.toList());
          for (MapleCharacter chr : score.keySet()) {
-            chr.announce(MaplePacketCreator.updateAriantPQRanking(score));
+            PacketCreator.announce(chr, new UpdateAriantRanking(scores));
          }
          scoreDirty = false;
       }
@@ -212,7 +218,7 @@ public class AriantColiseum {
       eventClear = true;
 
       if (map != null) {
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.showAriantScoreBoard());
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowAriantScoreboard());
          map.killAllMonsters();
 
          distributeAriantPoints();

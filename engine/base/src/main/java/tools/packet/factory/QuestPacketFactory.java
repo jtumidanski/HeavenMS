@@ -10,19 +10,20 @@ import tools.packet.quest.info.QuestExpire;
 import tools.packet.quest.info.QuestFailure;
 import tools.packet.quest.info.QuestFinish;
 import tools.packet.quest.info.RemoveQuestTimeLimit;
+import tools.packet.quest.ShowQuestComplete;
 import tools.packet.quest.info.UpdateQuestInfo;
 
-public class QuestInfoPacketFactory extends AbstractPacketFactory {
-   private static QuestInfoPacketFactory instance;
+public class QuestPacketFactory extends AbstractPacketFactory {
+   private static QuestPacketFactory instance;
 
-   public static QuestInfoPacketFactory getInstance() {
+   public static QuestPacketFactory getInstance() {
       if (instance == null) {
-         instance = new QuestInfoPacketFactory();
+         instance = new QuestPacketFactory();
       }
       return instance;
    }
 
-   private QuestInfoPacketFactory() {
+   private QuestPacketFactory() {
    }
 
    @Override
@@ -41,6 +42,8 @@ public class QuestInfoPacketFactory extends AbstractPacketFactory {
          return create(this::questFailure, packetInput);
       } else if (packetInput instanceof QuestExpire) {
          return create(this::questExpire, packetInput);
+      } else if (packetInput instanceof ShowQuestComplete) {
+         return create(this::getShowQuestCompletion, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -104,6 +107,13 @@ public class QuestInfoPacketFactory extends AbstractPacketFactory {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
       mplew.write(0x0F);
+      mplew.writeShort(packet.questId());
+      return mplew.getPacket();
+   }
+
+   protected byte[] getShowQuestCompletion(ShowQuestComplete packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.QUEST_CLEAR.getValue());
       mplew.writeShort(packet.questId());
       return mplew.getPacket();
    }

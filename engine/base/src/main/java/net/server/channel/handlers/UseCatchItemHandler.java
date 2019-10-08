@@ -38,6 +38,8 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.monster.CatchMonsterFailure;
+import tools.packet.monster.CatchMonsterWithItem;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -109,14 +111,14 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
 
          if (timeCatch != 0 && (abm.getLastSpam(10) + timeCatch) < currentServerTime()) {
             if (mobHp != 0 && mob.getHp() < ((mob.getMaxHp() / 100) * mobHp)) {
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
                mob.getMap().killMonster(mob, null, false);
                MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
                MapleInventoryManipulator.addById(client, itemGanho, (short) 1, "", -1);
             } else if (mob.getId() != 9500336) {
                if (mobHp != 0) {
                   abm.spam(10);
-                  client.announce(MaplePacketCreator.catchMessage(0));
+                  PacketCreator.announce(client, new CatchMonsterFailure(0));
                }
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot use the Fishing Net yet.");
@@ -130,7 +132,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
       if (mob.getId() == 9500336) {
          if ((abm.getLastSpam(10) + 3000) < currentServerTime()) {
             abm.spam(10);
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 2022323, (short) 1, "", -1);
@@ -144,12 +146,12 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    private void usePurificationMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
       if (mob.getId() == 9300175) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 4001169, (short) 1, "", -1);
          } else {
-            client.announce(MaplePacketCreator.catchMessage(0));
+            PacketCreator.announce(client, new CatchMonsterFailure(0));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -158,12 +160,12 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    private void useThirdTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
       if (mob.getId() == 9300191) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 3)) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 2109003, (short) 1, "", -1);
          } else {
-            client.announce(MaplePacketCreator.catchMessage(0));
+            PacketCreator.announce(client, new CatchMonsterFailure(0));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -172,12 +174,12 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    private void useSecondTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
       if (mob.getId() == 9300189) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 3)) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 2109002, (short) 1, "", -1);
          } else {
-            client.announce(MaplePacketCreator.catchMessage(0));
+            PacketCreator.announce(client, new CatchMonsterFailure(0));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -186,12 +188,12 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    private void useFirstTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
       if (mob.getId() == 9300187) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 3)) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 2109001, (short) 1, "", -1);
          } else {
-            client.announce(MaplePacketCreator.catchMessage(0));
+            PacketCreator.announce(client, new CatchMonsterFailure(0));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -200,12 +202,12 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    private void useCliffsMagicCane(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
       if (mob.getId() == 9500320) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 4031887, (short) 1, "", -1);
          } else {
-            client.announce(MaplePacketCreator.catchMessage(0));
+            PacketCreator.announce(client, new CatchMonsterFailure(0));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -217,12 +219,12 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
                if (chr.canHold(4031868, 1)) {
                   if (Math.random() < 0.5) { // 50% chance
-                     MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+                     MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
                      mob.getMap().killMonster(mob, null, false);
                      MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
                      MapleInventoryManipulator.addById(client, 4031868, (short) 1, "", -1);
                   } else {
-                     MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 0));
+                     MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 0));
                   }
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Make a ETC slot available before using this item.");
@@ -230,7 +232,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
 
                abm.spam(10);
             } else {
-               client.announce(MaplePacketCreator.catchMessage(0));
+               PacketCreator.announce(client, new CatchMonsterFailure(0));
             }
          }
          PacketCreator.announce(client, new EnableActions());
@@ -241,13 +243,13 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
       if (mob.getId() == 9500197) {
          if ((abm.getLastSpam(10) + 1000) < currentServerTime()) {
             if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
                mob.getMap().killMonster(mob, null, false);
                MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
                MapleInventoryManipulator.addById(client, 4031830, (short) 1, "", -1);
             } else {
                abm.spam(10);
-               client.announce(MaplePacketCreator.catchMessage(0));
+               PacketCreator.announce(client, new CatchMonsterFailure(0));
             }
          }
          PacketCreator.announce(client, new EnableActions());
@@ -256,7 +258,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
 
    private void usePheromonePerfume(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
       if (mob.getId() == 9300101) {
-         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(monsterId, itemId, (byte) 1));
+         MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
          mob.getMap().killMonster(mob, null, false);
          MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
          MapleInventoryManipulator.addById(client, 1902000, (short) 1, "", -1);

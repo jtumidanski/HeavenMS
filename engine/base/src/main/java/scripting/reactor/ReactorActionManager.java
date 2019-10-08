@@ -54,6 +54,7 @@ import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.monster.DamageMonster;
 
 /**
  * @author Lerk
@@ -309,7 +310,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
 
          if (chr != null) {
             map.damageMonster(chr, mm, damage);
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(mm.getObjectId(), damage));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(mm.getObjectId(), damage));
          }
       }
    }

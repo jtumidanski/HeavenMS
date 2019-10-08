@@ -100,6 +100,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.ChangeChannel;
+import tools.packet.cashshop.ShowCash;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.message.ServerMessage;
 import tools.packet.stat.EnableActions;
@@ -1126,7 +1127,7 @@ public class MapleClient {
    }
 
    public void enableCSActions() {
-      announce(MaplePacketCreator.enableCSUse(player));
+      PacketCreator.announce(this, new ShowCash(player.getCashShop().getCash(1), player.getCashShop().getCash(2), player.getCashShop().getCash(4)));
    }
 
    public String getNibbleHWID() {

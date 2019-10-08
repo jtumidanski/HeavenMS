@@ -84,6 +84,12 @@ import tools.ServerNoticeType;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowBossHP;
 import tools.packet.field.effect.ShowEffect;
+import tools.packet.monster.ApplyMonsterStatus;
+import tools.packet.monster.CancelMonsterStatus;
+import tools.packet.monster.DamageMonster;
+import tools.packet.monster.HealMonster;
+import tools.packet.monster.KillMonster;
+import tools.packet.monster.ShowMonsterHP;
 import tools.packet.movement.MoveMonster;
 import tools.packet.remove.RemoveSummon;
 import tools.packet.spawn.ControlMonster;
@@ -439,7 +445,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          from.getMap().broadcastBossHpMessage(this, this.hashCode(), makeBossHPBarPacket(), getPosition());
       } else if (!isBoss()) {
          int remainingHP = (int) Math.max(1, hp.get() * 100f / getMaxHp());
-         byte[] packet = MaplePacketCreator.showMonsterHP(getObjectId(), remainingHP);
+         byte[] packet = PacketCreator.create(new ShowMonsterHP(getObjectId(), remainingHP));
          if (from.getParty() != null) {
             for (MaplePartyCharacter mpc : from.getParty().getMembers()) {
                MapleCharacter member = from.getMap().getCharacterById(mpc.getId()); // god bless
@@ -544,7 +550,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       setMp(mp2Heal);
 
       if (hp > 0) {
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.healMonster(getObjectId(), hp, getHp(), getMaxHp()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new HealMonster(getObjectId(), hp, getHp(), getMaxHp()));
       }
 
       maxHpPlusHeal.addAndGet(hpHealed);
@@ -1065,7 +1071,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       try {
          if (stati.size() > 0) {
             for (final MonsterStatusEffect mse : this.stati.values()) {
-               client.announce(MaplePacketCreator.applyMonsterStatus(getObjectId(), mse, null));
+               PacketCreator.announce(client, new ApplyMonsterStatus(getObjectId(), mse, null));
             }
          }
       } finally {
@@ -1093,8 +1099,8 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    @Override
    public void sendDestroyData(MapleClient client) {
-      client.announce(MaplePacketCreator.killMonster(getObjectId(), false));
-      client.announce(MaplePacketCreator.killMonster(getObjectId(), true));
+      PacketCreator.announce(client, new KillMonster(getObjectId(), false));
+      PacketCreator.announce(client, new KillMonster(getObjectId(), true));
    }
 
    @Override
@@ -1159,7 +1165,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    private int broadcastStatusEffect(final MonsterStatusEffect status) {
       int animationTime = status.getSkill().getAnimationTime();
-      byte[] packet = MaplePacketCreator.applyMonsterStatus(getObjectId(), status, null);
+      byte[] packet = PacketCreator.create(new ApplyMonsterStatus(getObjectId(), status, null));
       broadcastMonsterStatusMessage(packet);
 
       return animationTime;
@@ -1236,7 +1242,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          @Override
          public void run() {
             if (isAlive()) {
-               byte[] packet = MaplePacketCreator.cancelMonsterStatus(getObjectId(), status.getStati());
+               byte[] packet = PacketCreator.create(new CancelMonsterStatus(getObjectId(), status.getStati()));
                broadcastMonsterStatusMessage(packet);
             }
 
@@ -1358,7 +1364,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          @Override
          public void run() {
             if (isAlive()) {
-               byte[] packet = MaplePacketCreator.cancelMonsterStatus(getObjectId(), stats);
+               byte[] packet = PacketCreator.create(new CancelMonsterStatus(getObjectId(), stats));
                broadcastMonsterStatusMessage(packet);
 
                statiLock.lock();
@@ -1373,7 +1379,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          }
       };
       final MonsterStatusEffect effect = new MonsterStatusEffect(stats, null, skill, true);
-      byte[] packet = MaplePacketCreator.applyMonsterStatus(getObjectId(), effect, reflection);
+      byte[] packet = PacketCreator.create(new ApplyMonsterStatus(getObjectId(), effect, reflection));
       broadcastMonsterStatusMessage(packet);
 
       statiLock.lock();
@@ -1414,7 +1420,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
 
       if (oldEffect != null) {
-         byte[] packet = MaplePacketCreator.cancelMonsterStatus(getObjectId(), oldEffect.getStati());
+         byte[] packet = PacketCreator.create(new CancelMonsterStatus(getObjectId(), oldEffect.getStati()));
          broadcastMonsterStatusMessage(packet);
       }
    }
@@ -2267,10 +2273,10 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
             int finalDamage = damage;
             if (type == 1) {
-               MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(getObjectId(), finalDamage), getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(getObjectId(), finalDamage), getPosition());
             } else if (type == 2) {
                if (damage < dealDamage) {    // ninja ambush (type 2) is already displaying DOT to the caster
-                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> MaplePacketCreator.damageMonster(getObjectId(), finalDamage), getPosition());
+                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(getObjectId(), finalDamage), getPosition());
                }
             }
          }

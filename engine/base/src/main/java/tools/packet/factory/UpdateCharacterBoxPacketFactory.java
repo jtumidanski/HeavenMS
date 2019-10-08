@@ -1,5 +1,6 @@
 package tools.packet.factory;
 
+import client.MapleCharacter;
 import net.opcodes.SendOpcode;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
@@ -11,6 +12,7 @@ import tools.packet.character.box.AddOmokBox;
 import tools.packet.character.box.RemoveMiniGameBox;
 import tools.packet.character.box.RemovePlayerShop;
 import tools.packet.character.box.UpdatePlayerShopBox;
+import tools.packet.character.box.UseChalkboard;
 
 public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    private static UpdateCharacterBoxPacketFactory instance;
@@ -37,6 +39,8 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
          return create(this::updatePlayerShopBox, packetInput);
       } else if (packetInput instanceof RemovePlayerShop) {
          return create(this::removePlayerShopBox, packetInput);
+      } else if (packetInput instanceof UseChalkboard) {
+         return create(this::useChalkboard, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -103,6 +107,19 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
       mplew.writeShort(SendOpcode.UPDATE_CHAR_BOX.getValue());
       mplew.writeInt(packet.characterId());
       mplew.write(0);
+      return mplew.getPacket();
+   }
+
+   protected byte[] useChalkboard(UseChalkboard packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CHALKBOARD.getValue());
+      mplew.writeInt(packet.characterId());
+      if (packet.close()) {
+         mplew.write(0);
+      } else {
+         mplew.write(1);
+         mplew.writeMapleAsciiString(packet.text());
+      }
       return mplew.getPacket();
    }
 }

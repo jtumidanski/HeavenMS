@@ -85,6 +85,7 @@ import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyList;
 import tools.packet.buff.GiveDebuff;
+import tools.packet.character.UpdateGender;
 import tools.packet.family.FamilyLogonNotice;
 import tools.packet.family.GetFamilyInfo;
 import tools.packet.family.LoadFamily;
@@ -347,7 +348,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.id(), client.getPlayer().getId(), pendingBuddyRequest.name()));
             }
 
-            client.announce(MaplePacketCreator.updateGender(player));
+            PacketCreator.announce(client, new UpdateGender(player.getGender()));
             player.checkMessenger();
             client.announce(MaplePacketCreator.enableReport());
 

@@ -48,7 +48,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.packet.partyoperation.PartySearchInvite;
+import tools.packet.party.PartySearchInvite;
 
 /**
  * @author Ronan

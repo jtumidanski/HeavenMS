@@ -48,8 +48,8 @@ import scala.Option;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.packet.partyoperation.PartyInvite;
-import tools.packet.partyoperation.PartyStatusMessage;
+import tools.packet.party.PartyInvite;
+import tools.packet.party.PartyStatusMessage;
 
 public final class PartyOperationHandler extends AbstractPacketHandler<BasePartyOperationPacket> {
    @Override

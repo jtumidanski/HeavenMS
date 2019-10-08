@@ -42,9 +42,9 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ScrollPacket;
 import net.server.channel.packet.reader.ScrollReader;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowScrollEffect;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 
@@ -60,7 +60,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
 
    private static void announceCannotScroll(MapleClient c, boolean legendarySpirit) {
       if (legendarySpirit) {
-         c.announce(MaplePacketCreator.getScrollEffect(c.getPlayer().getId(), ScrollResult.FAIL, false, false));
+         PacketCreator.announce(c, new ShowScrollEffect(c.getPlayer().getId(), ScrollResult.FAIL, false, false));
       } else {
          PacketCreator.announce(c, new InventoryFull());
       }
@@ -204,7 +204,7 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
             ScrollResult finalScrollSuccess = scrollSuccess;
             boolean finalHasLegendarySpirit = hasLegendarySpirit;
             boolean finalIsWhiteScroll = isWhiteScroll;
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.getScrollEffect(chr.getId(), finalScrollSuccess, finalHasLegendarySpirit, finalIsWhiteScroll));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ShowScrollEffect(chr.getId(), finalScrollSuccess, finalHasLegendarySpirit, finalIsWhiteScroll));
             if (packet.destination() < 0 && (scrollSuccess == ScrollResult.SUCCESS || scrollSuccess == ScrollResult.CURSE)) {
                chr.equipChanged();
             }

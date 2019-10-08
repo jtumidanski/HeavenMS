@@ -31,6 +31,7 @@ import server.maps.MapleMap;
 import tools.FilePrinter;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.monster.DamageMonster;
 
 public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobPacket> {
    @Override
@@ -52,7 +53,7 @@ public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobP
       if (mob != null) {
 
          if (packet.damage() < 0 || packet.damage() > GameConstants.MAX_FIELD_MOB_DAMAGE) {
-            MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damageMonster(packet.mobId(), packet.damage()), true, chr);
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(packet.mobId(), packet.damage()), true, chr);
             FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.getId()) + " with damage " + packet.damage());
             return;
          }

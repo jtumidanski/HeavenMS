@@ -17,24 +17,25 @@ import tools.StringUtil;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
-import tools.packet.partyoperation.PartyCreated;
-import tools.packet.partyoperation.PartyInvite;
-import tools.packet.partyoperation.PartyPortal;
-import tools.packet.partyoperation.PartySearchInvite;
-import tools.packet.partyoperation.PartyStatusMessage;
-import tools.packet.partyoperation.UpdateParty;
+import tools.packet.party.PartyCreated;
+import tools.packet.party.PartyInvite;
+import tools.packet.party.PartyPortal;
+import tools.packet.party.PartySearchInvite;
+import tools.packet.party.PartyStatusMessage;
+import tools.packet.party.UpdateParty;
+import tools.packet.party.UpdatePartyMemberHp;
 
-public class PartyOperationPacketFactory extends AbstractPacketFactory {
-   private static PartyOperationPacketFactory instance;
+public class PartyPacketFactory extends AbstractPacketFactory {
+   private static PartyPacketFactory instance;
 
-   public static PartyOperationPacketFactory getInstance() {
+   public static PartyPacketFactory getInstance() {
       if (instance == null) {
-         instance = new PartyOperationPacketFactory();
+         instance = new PartyPacketFactory();
       }
       return instance;
    }
 
-   private PartyOperationPacketFactory() {
+   private PartyPacketFactory() {
    }
 
    @Override
@@ -51,6 +52,8 @@ public class PartyOperationPacketFactory extends AbstractPacketFactory {
          return create(this::partyPortal, packetInput);
       } else if (packetInput instanceof UpdateParty) {
          return create(this::updateParty, packetInput);
+      } else if (packetInput instanceof UpdatePartyMemberHp) {
+         return create(this::updatePartyMemberHP, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -248,6 +251,15 @@ public class PartyOperationPacketFactory extends AbstractPacketFactory {
             mplew.write(0);
             break;
       }
+      return mplew.getPacket();
+   }
+
+   protected byte[] updatePartyMemberHP(UpdatePartyMemberHp packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.UPDATE_PARTYMEMBER_HP.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.currentHp());
+      mplew.writeInt(packet.maximumHp());
       return mplew.getPacket();
    }
 }

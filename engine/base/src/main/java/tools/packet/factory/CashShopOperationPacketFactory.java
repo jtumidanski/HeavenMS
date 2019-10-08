@@ -4,12 +4,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
+import client.MapleCharacter;
 import client.inventory.Item;
 import net.opcodes.SendOpcode;
 import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.cashshop.CashShopOperationSubOp;
+import tools.packet.cashshop.ShowCash;
 import tools.packet.cashshop.operation.DeleteCashItem;
 import tools.packet.Gift;
 import tools.packet.PacketInput;
@@ -86,6 +88,8 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
          return create(CashShopOperationSubOp.REFUND_CASH_ITEM, this::refundCashItem, packetInput);
       } else if (packetInput instanceof PutIntoCashInventory) {
          return create(CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory, packetInput);
+      } else if (packetInput instanceof ShowCash) {
+         return create(this::showCash, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -217,5 +221,14 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
 
    protected void putIntoCashInventory(MaplePacketLittleEndianWriter writer, PutIntoCashInventory packet) {
       addCashItemInformation(writer, packet.item(), packet.accountId());
+   }
+
+   protected byte[] showCash(ShowCash packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.QUERY_CASH_RESULT.getValue());
+      mplew.writeInt(packet.nxCredit());
+      mplew.writeInt(packet.maplePoint());
+      mplew.writeInt(packet.nxPrepaid());
+      return mplew.getPacket();
    }
 }

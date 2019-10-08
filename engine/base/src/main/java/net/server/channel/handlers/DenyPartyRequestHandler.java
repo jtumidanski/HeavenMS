@@ -31,7 +31,7 @@ import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import scala.Option;
 import tools.PacketCreator;
-import tools.packet.partyoperation.PartyStatusMessage;
+import tools.packet.party.PartyStatusMessage;
 
 public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPartyRequestPacket> {
    @Override

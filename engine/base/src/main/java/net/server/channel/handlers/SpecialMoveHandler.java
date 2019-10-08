@@ -48,6 +48,7 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.foreigneffect.ShowBuffEffectWithLevel;
+import tools.packet.monster.CatchMonster;
 import tools.packet.stat.EnableActions;
 
 public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialMovePacket> {
@@ -95,7 +96,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
          for (int i = 0; i < num; i++) {
             int mobOid = ((MonsterMagnetPacket) packet).monsterData()[i].monsterId();
             byte success = ((MonsterMagnetPacket) packet).monsterData()[i].success();
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.catchMonster(mobOid, success), false, chr);
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonster(mobOid, success), false, chr);
             MapleMonster monster = chr.getMap().getMonsterByOid(mobOid);
             if (monster != null) {
                if (!monster.isBoss()) {

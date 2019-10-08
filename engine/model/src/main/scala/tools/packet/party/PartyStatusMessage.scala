@@ -1,4 +1,4 @@
-package tools.packet.partyoperation
+package tools.packet.party
 
 import net.opcodes.SendOpcode
 import tools.packet.PacketInput

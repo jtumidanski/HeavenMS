@@ -9,6 +9,7 @@ import tools.packet.PacketInput;
 import tools.packet.factory.AddNewCharacterPacketFactory;
 import tools.packet.factory.AfterLoginErrorPacketFactory;
 import tools.packet.factory.AllianceOperationPacketFactory;
+import tools.packet.factory.AriantPacketFactory;
 import tools.packet.factory.AttackPacketFactory;
 import tools.packet.factory.BuddyPacketFactory;
 import tools.packet.factory.CancelBuffPacketFactory;
@@ -21,7 +22,7 @@ import tools.packet.factory.CharacterPacketFactory;
 import tools.packet.factory.DeleteCharacterPacketFactory;
 import tools.packet.factory.EventPacketFactory;
 import tools.packet.factory.FamilyPacketFactory;
-import tools.packet.factory.FieldEffectPacketFactory;
+import tools.packet.factory.FieldPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.FredrickPacketFactory;
 import tools.packet.factory.GiveBuffPacketFactory;
@@ -38,18 +39,20 @@ import tools.packet.factory.MessagePacketFactory;
 import tools.packet.factory.MessengerPacketFactory;
 import tools.packet.factory.MonsterBookPacketFactory;
 import tools.packet.factory.MonsterCarnivalPacketFactory;
+import tools.packet.factory.MonsterPacketFactory;
 import tools.packet.factory.MovementPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
 import tools.packet.factory.NewYearCardPacketFactory;
 import tools.packet.factory.OwlOfMinervaPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
-import tools.packet.factory.PartyOperationPacketFactory;
+import tools.packet.factory.PartyPacketFactory;
 import tools.packet.factory.PetPacketFactory;
 import tools.packet.factory.PicPacketFactory;
 import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
 import tools.packet.factory.PlayerInteractionPacketFactory;
-import tools.packet.factory.QuestInfoPacketFactory;
+import tools.packet.factory.PyramidPacketFactory;
+import tools.packet.factory.QuestPacketFactory;
 import tools.packet.factory.ReactorPacketFactory;
 import tools.packet.factory.RecommendedWorldMessagePacketFactory;
 import tools.packet.factory.RelogResponsePacketFactory;
@@ -135,6 +138,7 @@ public class PacketCreator {
          case STAT_CHANGED:
             return Optional.of(StatUpdatePacketFactory.getInstance());
          case CASHSHOP_OPERATION:
+         case QUERY_CASH_RESULT:
             return Optional.of(CashShopOperationPacketFactory.getInstance());
          case CASHSHOP_CASH_ITEM_GACHAPON_RESULT:
             return Optional.of(CashShopGachaponPacketFactoryPacketFactory.getInstance());
@@ -145,15 +149,19 @@ public class PacketCreator {
          case ALLIANCE_OPERATION:
             return Optional.of(AllianceOperationPacketFactory.getInstance());
          case PARTY_OPERATION:
-            return Optional.of(PartyOperationPacketFactory.getInstance());
+         case UPDATE_PARTYMEMBER_HP:
+            return Optional.of(PartyPacketFactory.getInstance());
          case STORAGE:
             return Optional.of(StoragePacketFactory.getInstance());
          case NPC_TALK:
             return Optional.of(NPCTalkPacketFactory.getInstance());
          case SHOW_FOREIGN_EFFECT:
+         case SHOW_SCROLL_EFFECT:
+         case SKILL_LEARN_ITEM_RESULT:
             return Optional.of(ForeignEffectPacketFactory.getInstance());
          case UPDATE_QUEST_INFO:
-            return Optional.of(QuestInfoPacketFactory.getInstance());
+         case QUEST_CLEAR:
+            return Optional.of(QuestPacketFactory.getInstance());
          case MTS_OPERATION:
          case MTS_OPERATION2:
             return Optional.of(MTSOperationPacketFactory.getInstance());
@@ -212,7 +220,11 @@ public class PacketCreator {
          case REMOVE_DRAGON:
             return Optional.of(RemovePacketFactory.getInstance());
          case FIELD_EFFECT:
-            return Optional.of(FieldEffectPacketFactory.getInstance());
+         case FIELD_OBSTACLE_ONOFF:
+         case FIELD_OBSTACLE_ONOFF_LIST:
+         case FIELD_OBSTACLE_ALL_RESET:
+         case BLOW_WEATHER:
+            return Optional.of(FieldPacketFactory.getInstance());
          case SNOWBALL_STATE:
          case HIT_SNOWBALL:
          case SNOWBALL_MESSAGE:
@@ -257,6 +269,8 @@ public class PacketCreator {
             return Optional.of(PetPacketFactory.getInstance());
          case UPDATE_CHAR_LOOK:
          case CHAR_INFO:
+         case FACIAL_EXPRESSION:
+         case SET_GENDER:
             return Optional.of(CharacterPacketFactory.getInstance());
          case MARRIAGE_REQUEST:
          case WEDDING_PHOTO:
@@ -273,6 +287,7 @@ public class PacketCreator {
          case SHOP_SCANNER_RESULT:
             return Optional.of(OwlOfMinervaPacketFactory.getInstance());
          case UPDATE_CHAR_BOX:
+         case CHALKBOARD:
             return Optional.of(UpdateCharacterBoxPacketFactory.getInstance());
          case NEW_YEAR_CARD_RES:
             return Optional.of(NewYearCardPacketFactory.getInstance());
@@ -303,6 +318,21 @@ public class PacketCreator {
          case CANCEL_BUFF:
          case CANCEL_FOREIGN_BUFF:
             return Optional.of(CancelBuffPacketFactory.getInstance());
+         case PYRAMID_SCORE:
+         case PYRAMID_GAUGE:
+            return Optional.of(PyramidPacketFactory.getInstance());
+         case KILL_MONSTER:
+         case SHOW_MONSTER_HP:
+         case APPLY_MONSTER_STATUS:
+         case CANCEL_MONSTER_STATUS:
+         case DAMAGE_MONSTER:
+         case CATCH_MONSTER:
+         case CATCH_MONSTER_WITH_ITEM:
+         case BRIDLE_MOB_CATCH_FAIL:
+            return Optional.of(MonsterPacketFactory.getInstance());
+         case ARIANT_ARENA_SHOW_RESULT:
+         case ARIANT_ARENA_USER_SCORE:
+            return Optional.of(AriantPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();

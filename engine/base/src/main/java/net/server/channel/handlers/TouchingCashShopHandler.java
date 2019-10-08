@@ -21,11 +21,14 @@
 */
 package net.server.channel.handlers;
 
+import client.MapleCharacter;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.cashshop.ShowCash;
 
 /**
  * @author Terry Han (Acrylic)
@@ -38,6 +41,7 @@ public final class TouchingCashShopHandler extends AbstractPacketHandler<NoOpPac
 
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.showCash(client.getPlayer()));
+      MapleCharacter chr = client.getPlayer();
+      PacketCreator.announce(client, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
    }
 }

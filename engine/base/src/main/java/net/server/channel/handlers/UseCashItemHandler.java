@@ -108,7 +108,9 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.character.box.UseChalkboard;
 import tools.packet.field.effect.MusicChange;
+import tools.packet.foreigneffect.ShowScrollEffect;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.item.enhance.SendHammer;
@@ -348,7 +350,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
 
             ScrollResult scrollResult = scrolled.level() > currentLevel ? ScrollResult.SUCCESS : ScrollResult.FAIL;
-            MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.getScrollEffect(player.getId(), scrollResult, false, false));
+            MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new ShowScrollEffect(player.getId(), scrollResult, false, false));
             if (eSlot < 0 && (scrollResult == ScrollResult.SUCCESS)) {
                player.equipChanged();
             }
@@ -477,7 +479,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       player.setChalkboard(message);
-      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), character -> MaplePacketCreator.useChalkboard(player, false));
+      MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new UseChalkboard(player.getId(), false, player.getChalkboard()));
       PacketCreator.announce(player.getClient(), new EnableActions());
    }
 

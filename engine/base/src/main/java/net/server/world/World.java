@@ -118,7 +118,7 @@ import tools.packet.messenger.MessengerJoin;
 import tools.packet.messenger.MessengerNote;
 import tools.packet.messenger.MessengerRemoveCharacter;
 import tools.packet.messenger.MessengerUpdateCharacter;
-import tools.packet.partyoperation.UpdateParty;
+import tools.packet.party.UpdateParty;
 import tools.packets.Fishing;
 
 /**

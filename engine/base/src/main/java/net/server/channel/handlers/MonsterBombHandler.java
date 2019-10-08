@@ -28,6 +28,7 @@ import net.server.channel.packet.reader.MonsterBombReader;
 import server.life.MapleMonster;
 import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.monster.KillMonster;
 
 public final class MonsterBombHandler extends AbstractPacketHandler<MonsterBombPacket> {
    @Override
@@ -42,7 +43,7 @@ public final class MonsterBombHandler extends AbstractPacketHandler<MonsterBombP
          return;
       }
       if (monster.getId() == 8500003 || monster.getId() == 8500004) {
-         MasterBroadcaster.getInstance().sendToAllInMap(monster.getMap(), character -> MaplePacketCreator.killMonster(monster.getObjectId(), 4));
+         MasterBroadcaster.getInstance().sendToAllInMap(monster.getMap(), new KillMonster(monster.getObjectId(), 4));
          client.getPlayer().getMap().removeMapObject(packet.objectId());
       }
    }
