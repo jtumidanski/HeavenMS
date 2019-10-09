@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import client.MapleCharacter;
 import net.opcodes.SendOpcode;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;

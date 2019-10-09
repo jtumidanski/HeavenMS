@@ -25,7 +25,6 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseDeathItemPacket;
 import net.server.channel.packet.reader.UseDeathItemReader;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowItemEffect;
 

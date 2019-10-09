@@ -26,7 +26,6 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.cashshop.ShowCash;
 

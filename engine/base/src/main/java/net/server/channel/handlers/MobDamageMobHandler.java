@@ -35,7 +35,6 @@ import server.life.MapleMonster;
 import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleMap;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.packet.monster.DamageMonster;
 

@@ -29,7 +29,6 @@ import java.util.List;
 import client.MapleCharacter;
 import server.TimerManager;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.event.CoconutHit;

@@ -6,7 +6,6 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
-import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.PacketCreator
 import tools.ServerNoticeType

@@ -30,10 +30,11 @@ import client.command.Command;
 import client.database.administrator.IpBanAdministrator;
 import server.TimerManager;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.packet.ui.GMEffect;
 
 public class BanCommand extends Command {
    {
@@ -62,7 +63,7 @@ public class BanCommand extends Command {
          target.ban(reason);
          target.yellowMessage("You have been banned by #b" + c.getPlayer().getName() + " #k.");
          target.yellowMessage("Reason: " + reason);
-         c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+         PacketCreator.announce(c, new GMEffect(4, (byte) 0));
          final MapleCharacter rip = target;
          TimerManager.getInstance().schedule(new Runnable() {
             @Override
@@ -72,10 +73,10 @@ public class BanCommand extends Command {
          }, 5000); //5 Seconds
          MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[RIP]: " + ign + " has been banned.");
       } else if (BanProcessor.getInstance().ban(ign, reason, false)) {
-         c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+         PacketCreator.announce(c, new GMEffect(4, (byte) 0));
          MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[RIP]: " + ign + " has been banned.");
       } else {
-         c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
+         PacketCreator.announce(c, new GMEffect(6, (byte) 1));
       }
    }
 }

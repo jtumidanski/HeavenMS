@@ -7,7 +7,6 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType

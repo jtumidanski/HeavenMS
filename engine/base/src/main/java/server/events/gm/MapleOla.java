@@ -25,7 +25,6 @@ import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
 import server.TimerManager;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

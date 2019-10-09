@@ -30,7 +30,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.owl.GetOwlMessage;
-import tools.packet.playerinteraction.GetHiredMerchant;
+import tools.packet.character.interaction.GetHiredMerchant;
 
 /*
  * @author Ronan

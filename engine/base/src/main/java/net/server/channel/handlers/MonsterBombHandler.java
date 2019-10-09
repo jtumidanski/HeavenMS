@@ -26,7 +26,6 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.MonsterBombPacket;
 import net.server.channel.packet.reader.MonsterBombReader;
 import server.life.MapleMonster;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.packet.monster.KillMonster;
 

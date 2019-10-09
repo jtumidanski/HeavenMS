@@ -53,13 +53,13 @@ import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;
 import server.MapleStatEffect;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.GetEnergy;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveForeignBuff;
@@ -95,7 +95,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
       }
       if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_ATK);
-         c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(),
@@ -190,7 +190,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          }
 
          chr.setDojoEnergy(0);
-         c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
       } else if (attack.skill() > 0) {
          SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> {

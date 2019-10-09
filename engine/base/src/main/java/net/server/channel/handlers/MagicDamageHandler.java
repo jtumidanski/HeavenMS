@@ -34,10 +34,10 @@ import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;
 import server.MapleStatEffect;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.GetEnergy;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.attack.MagicAttack;
 import tools.packet.character.SkillCooldown;
@@ -67,7 +67,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
 
       if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
          chr.setDojoEnergy(chr.getDojoEnergy() + +ServerConstants.DOJO_ENERGY_ATK);
-         c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 
       byte[] packet;

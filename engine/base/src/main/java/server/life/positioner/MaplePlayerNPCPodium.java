@@ -32,8 +32,9 @@ import server.life.MaplePlayerNPC;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.character.npc.GetPlayerNPC;
+import tools.packet.character.npc.RemovePlayerNPC;
 import tools.packet.spawn.RemoveNPCController;
 import tools.packet.spawn.SpawnPlayerNPC;
 
@@ -86,7 +87,9 @@ public class MaplePlayerNPCPodium {
 
    private static Point reorganizePlayerNpcs(MapleMap map, int newStep, List<MapleMapObject> mmoList) {
       if (!mmoList.isEmpty()) {
-         if (ServerConstants.USE_DEBUG) System.out.println("Reorganizing pnpc map, step " + newStep);
+         if (ServerConstants.USE_DEBUG) {
+            System.out.println("Reorganizing pnpc map, step " + newStep);
+         }
 
          List<MaplePlayerNPC> playerNpcs = new ArrayList<>(mmoList.size());
          for (MapleMapObject mmo : mmoList) {
@@ -106,7 +109,7 @@ public class MaplePlayerNPCPodium {
             for (MaplePlayerNPC pn : playerNpcs) {
                m.removeMapObject(pn);
                MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.getObjectId()));
             }
          }
 
@@ -118,7 +121,7 @@ public class MaplePlayerNPCPodium {
             for (MaplePlayerNPC pn : playerNpcs) {
                m.addPlayerNPCMapObject(pn);
                MasterBroadcaster.getInstance().sendToAllInMap(m, new SpawnPlayerNPC(pn));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.getPlayerNPC(pn));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new GetPlayerNPC(pn));
             }
          }
 
@@ -136,7 +139,9 @@ public class MaplePlayerNPCPodium {
       int podiumStep = podiumData % (1 << 5), podiumCount = (podiumData / (1 << 5));
 
       if (podiumCount >= 3 * podiumStep) {
-         if (podiumStep >= ServerConstants.PLAYERNPC_AREA_STEPS) return null;
+         if (podiumStep >= ServerConstants.PLAYERNPC_AREA_STEPS) {
+            return null;
+         }
 
          List<MapleMapObject> mmoList = map.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC));
          map.getWorldServer().setPlayerNpcMapPodiumData(map.getId(), encodePodiumData(podiumStep + 1, podiumCount + 1));
@@ -149,7 +154,9 @@ public class MaplePlayerNPCPodium {
 
    public static Point getNextPlayerNpcPosition(MapleMap map) {
       Point pos = getNextPlayerNpcPosition(map, map.getWorldServer().getPlayerNpcMapPodiumData(map.getId()));
-      if (pos == null) return null;
+      if (pos == null) {
+         return null;
+      }
 
       return map.getGroundBelow(pos);
    }

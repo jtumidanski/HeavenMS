@@ -18,7 +18,9 @@ import server.MapleItemInformationProvider;
 import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
+import tools.packet.character.CharacterKnockBack;
 import tools.packet.character.CharacterLook;
+import tools.packet.character.DamageCharacter;
 import tools.packet.character.FacialExpression;
 import tools.packet.character.GetCharacterInfo;
 import tools.packet.character.SetAutoHpPot;
@@ -26,6 +28,7 @@ import tools.packet.character.SetAutoMpPot;
 import tools.packet.character.SkillCooldown;
 import tools.packet.character.SummonSkill;
 import tools.packet.character.UpdateGender;
+import tools.packet.character.UpdateMount;
 import tools.packet.character.UpdateSkill;
 
 public class CharacterPacketFactory extends AbstractPacketFactory {
@@ -61,6 +64,12 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
          return create(this::summonSkill, packetInput);
       } else if (packetInput instanceof SkillCooldown) {
          return create(this::skillCooldown, packetInput);
+      } else if (packetInput instanceof DamageCharacter) {
+         return create(this::damagePlayer, packetInput);
+      } else if (packetInput instanceof UpdateMount) {
+         return create(this::updateMount, packetInput);
+      } else if (packetInput instanceof CharacterKnockBack) {
+         return create(this::leftKnockBack, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -223,6 +232,54 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       mplew.writeShort(SendOpcode.COOLDOWN.getValue());
       mplew.writeInt(packet.skillId());
       mplew.writeShort(packet.time());//Int in v97
+      return mplew.getPacket();
+   }
+
+   protected byte[] damagePlayer(DamageCharacter packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.DAMAGE_PLAYER.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.write(packet.skill());
+      mplew.writeInt(packet.damage());
+      if (packet.skill() != -4) {
+         mplew.writeInt(packet.monsterIdFrom());
+         mplew.write(packet.direction());
+         if (packet.pgmr()) {
+            mplew.write(packet.pgmr_1());
+            mplew.write(packet.is_pg() ? 1 : 0);
+            mplew.writeInt(packet.objectId());
+            mplew.write(6);
+            mplew.writeShort(packet.xPosition());
+            mplew.writeShort(packet.yPosition());
+            mplew.write(0);
+         } else {
+            mplew.writeShort(0);
+         }
+         mplew.writeInt(packet.damage());
+         if (packet.fake() > 0) {
+            mplew.writeInt(packet.fake());
+         }
+      } else {
+         mplew.writeInt(packet.damage());
+      }
+
+      return mplew.getPacket();
+   }
+
+   protected byte[] updateMount(UpdateMount packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.SET_TAMING_MOB_INFO.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.mountLevel());
+      mplew.writeInt(packet.mountExp());
+      mplew.writeInt(packet.mountTiredness());
+      mplew.write(packet.levelUp() ? (byte) 1 : (byte) 0);
+      return mplew.getPacket();
+   }
+
+   protected byte[] leftKnockBack(CharacterKnockBack packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
+      mplew.writeShort(SendOpcode.LEFT_KNOCK_BACK.getValue());
       return mplew.getPacket();
    }
 }

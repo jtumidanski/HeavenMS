@@ -1,8 +1,6 @@
 package npc
 
-
 import scripting.npc.NPCConversationManager
-import tools.MaplePacketCreator
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.PacketCreator

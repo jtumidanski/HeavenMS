@@ -25,7 +25,7 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.CustomPacket;
 import net.server.packet.reader.CustomReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
 
 public class CustomPacketHandler extends AbstractPacketHandler<CustomPacket> {
    @Override
@@ -36,7 +36,7 @@ public class CustomPacketHandler extends AbstractPacketHandler<CustomPacket> {
    @Override
    public void handlePacket(CustomPacket packet, MapleClient client) {
       if (packet.bytes().length > 0 && client.getGMLevel() == 4) {
-         client.announce(MaplePacketCreator.customPacket(packet.bytes()));
+         client.announce(PacketCreator.customPacket(packet.bytes()));
       }
    }
 

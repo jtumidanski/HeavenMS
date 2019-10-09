@@ -28,8 +28,8 @@ import client.MapleCharacter;
 import net.server.world.MapleParty;
 import server.MapleItemInformationProvider;
 import server.TimerManager;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.GetEnergy;
 import tools.packet.pyramid.PyramidGuage;
 import tools.packet.pyramid.PyramidScore;
 
@@ -158,7 +158,7 @@ public class Pyramid extends PartyQuest {
 
    public void broadcastInfo(String info, int amount) {
       for (MapleCharacter chr : getParticipants()) {
-         chr.announce(MaplePacketCreator.getEnergy("massacre_" + info, amount));
+         PacketCreator.announce(chr, new GetEnergy("massacre_" + info, amount));
          PacketCreator.announce(chr, new PyramidGuage(count));
       }
    }
@@ -186,7 +186,7 @@ public class Pyramid extends PartyQuest {
          skill++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          for (MapleCharacter chr : getParticipants()) {
-            chr.announce(MaplePacketCreator.getEnergy("massacre_skill", skill));
+            PacketCreator.announce(chr, new GetEnergy("massacre_skill", skill));
             ii.getItemEffect(2022586).applyTo(chr);
          }
       } else if (buffcount == 2 && total >= 1000) {
@@ -194,7 +194,7 @@ public class Pyramid extends PartyQuest {
          skill++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          for (MapleCharacter chr : getParticipants()) {
-            chr.announce(MaplePacketCreator.getEnergy("massacre_skill", skill));
+            PacketCreator.announce(chr, new GetEnergy("massacre_skill", skill));
             ii.getItemEffect(2022587).applyTo(chr);
          }
       } else if (buffcount == 3 && total >= 1500) {
@@ -205,7 +205,7 @@ public class Pyramid extends PartyQuest {
          skill++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          for (MapleCharacter chr : getParticipants()) {
-            chr.announce(MaplePacketCreator.getEnergy("massacre_skill", skill));
+            PacketCreator.announce(chr, new GetEnergy("massacre_skill", skill));
             ii.getItemEffect(2022588).applyTo(chr);
          }
       } else if (buffcount == 5 && total >= 2500) {

@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.awt.Point;
 
 import net.opcodes.SendOpcode;
-import server.maps.MapleReactor;
 import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;

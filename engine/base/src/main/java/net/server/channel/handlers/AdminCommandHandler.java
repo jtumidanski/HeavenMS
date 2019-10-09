@@ -55,13 +55,13 @@ import server.life.MapleMonster;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.quest.MapleQuest;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.packet.stat.EnableActions;
+import tools.packet.ui.GMEffect;
 
 public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCommandPacket> {
    @Override
@@ -200,8 +200,8 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    private void warnCommand(MapleClient c, String victim, String message) {
       c.getChannelServer().getPlayerStorage().getCharacterByName(victim).ifPresentOrElse(target -> {
          MessageBroadcaster.getInstance().sendServerNotice(target, ServerNoticeType.POP_UP, message);
-         c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 1));
-      }, () -> c.announce(MaplePacketCreator.getGMEffect(0x1E, (byte) 0)));
+         PacketCreator.announce(c, new GMEffect(0x1E, (byte) 1));
+      }, () -> PacketCreator.announce(c, new GMEffect(0x1E, (byte) 0)));
    }
 
    private void blockCommand(MapleClient c, String victim, int type, int duration, String description) {
@@ -218,11 +218,11 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
             target.get().block(type, duration, description);
             target.get().sendPolice(duration, reason, 6000);
          }
-         c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+         PacketCreator.announce(c, new GMEffect(4, (byte) 0));
       } else if (BanProcessor.getInstance().ban(victim, reason, false)) {
-         c.announce(MaplePacketCreator.getGMEffect(4, (byte) 0));
+         PacketCreator.announce(c, new GMEffect(4, (byte) 0));
       } else {
-         c.announce(MaplePacketCreator.getGMEffect(6, (byte) 1));
+         PacketCreator.announce(c, new GMEffect(6, (byte) 1));
       }
    }
 }

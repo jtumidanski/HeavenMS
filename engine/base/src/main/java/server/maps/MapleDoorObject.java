@@ -27,8 +27,8 @@ import client.MapleClient;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.world.MapleParty;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowBlockedMessage;
 import tools.packet.party.PartyPortal;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
 import tools.packet.spawn.RemoveDoor;
@@ -99,7 +99,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
             chr.changeMap(to, getLinkedPortalPosition());
          }
       } else {
-         chr.getClient().announce(MaplePacketCreator.blockedMessage(6));
+         PacketCreator.announce(chr, new ShowBlockedMessage(6));
          PacketCreator.announce(chr, new EnableActions());
       }
    }

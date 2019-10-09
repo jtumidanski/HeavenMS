@@ -4,13 +4,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 
-import client.MapleCharacter;
 import client.inventory.Item;
 import net.opcodes.SendOpcode;
 import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.cashshop.CashShopOperationSubOp;
+import tools.packet.cashshop.SendMapleLife;
+import tools.packet.cashshop.SendMapleLifeError;
+import tools.packet.cashshop.SendMapleNameLifeError;
 import tools.packet.cashshop.ShowCash;
 import tools.packet.cashshop.operation.DeleteCashItem;
 import tools.packet.Gift;
@@ -90,6 +92,12 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
          return create(CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory, packetInput);
       } else if (packetInput instanceof ShowCash) {
          return create(this::showCash, packetInput);
+      } else if (packetInput instanceof SendMapleLife) {
+         return create(this::sendMapleLifeCharacterInfo, packetInput);
+      } else if (packetInput instanceof SendMapleNameLifeError) {
+         return create(this::sendMapleLifeNameError, packetInput);
+      } else if (packetInput instanceof SendMapleLifeError) {
+         return create(this::sendMapleLifeError, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -229,6 +237,30 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
       mplew.writeInt(packet.nxCredit());
       mplew.writeInt(packet.maplePoint());
       mplew.writeInt(packet.nxPrepaid());
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendMapleLifeCharacterInfo(SendMapleLife packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MAPLELIFE_RESULT.getValue());
+      mplew.writeInt(0);
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendMapleLifeNameError(SendMapleNameLifeError packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MAPLELIFE_RESULT.getValue());
+      mplew.writeInt(2);
+      mplew.writeInt(3);
+      mplew.write(0);
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendMapleLifeError(SendMapleLifeError packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MAPLELIFE_ERROR.getValue());
+      mplew.write(0);
+      mplew.writeInt(packet.code());
       return mplew.getPacket();
    }
 }

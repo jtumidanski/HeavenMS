@@ -2,7 +2,8 @@ package npc
 
 import client.inventory.MapleInventoryType
 import scripting.npc.NPCConversationManager
-import tools.MaplePacketCreator
+import tools.PacketCreator
+import tools.packet.rps.OpenRPSNPC
 
 /*
 	NPC Name: 		
@@ -42,7 +43,7 @@ class NPC9000019 {
                return
             }
 
-            cm.getClient().announce(MaplePacketCreator.openRPSNPC())
+            PacketCreator.announce(cm.getClient(), new OpenRPSNPC())
             cm.dispose()
          }
       }

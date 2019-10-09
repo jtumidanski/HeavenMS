@@ -7,8 +7,8 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.PacketCreator
+import tools.packet.foreigneffect.ShowTitleEarned
 import tools.packet.ui.GetClock
 
 class EventKerningTrain {
@@ -88,7 +88,7 @@ class EventKerningTrain {
       player.changeMap(onRide, onRide.getPortal(0))
 
       PacketCreator.announce(player, new GetClock((rideTime / 1000).intValue()))
-      player.getClient().announce(MaplePacketCreator.earnTitleMessage("The next stop is at Kerning " + (myRide == 0 ? "Square" : "Subway") + " Station. The exit is to your left."))
+      PacketCreator.announce(player, new ShowTitleEarned("The next stop is at Kerning " + (myRide == 0 ? "Square" : "Subway") + " Station. The exit is to your left."))
       eim.schedule("timeOut", rideTime)
    }
 

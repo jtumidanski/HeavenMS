@@ -1,18 +1,22 @@
 package tools.packet.factory;
 
 import java.util.Map;
-import java.util.Set;
 
 import net.opcodes.SendOpcode;
 import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
+import tools.packet.field.Boat;
+import tools.packet.field.CrimsonBalrogBoat;
 import tools.packet.field.effect.BlowWeather;
 import tools.packet.field.effect.ChangeBackgroundEffect;
 import tools.packet.field.effect.CustomShowBossHP;
 import tools.packet.field.effect.DojoAnimation;
 import tools.packet.field.effect.EnvironmentChange;
+import tools.packet.field.effect.ForcedEquip;
+import tools.packet.field.effect.ForcedStatReset;
+import tools.packet.field.effect.ForcedStatSet;
 import tools.packet.field.effect.MapEffect;
 import tools.packet.field.effect.MapSound;
 import tools.packet.field.effect.RemoveWeather;
@@ -60,6 +64,16 @@ public class FieldPacketFactory extends AbstractPacketFactory {
          return create(this::removeMapEffect, packetInput);
       } else if (packetInput instanceof ChangeBackgroundEffect) {
          return create(this::changeBackgroundEffect, packetInput);
+      } else if (packetInput instanceof ForcedEquip) {
+         return create(this::showForcedEquip, packetInput);
+      } else if (packetInput instanceof ForcedStatReset) {
+         return create(this::resetForcedStats, packetInput);
+      } else if (packetInput instanceof ForcedStatSet) {
+         return create(this::aranGodlyStats, packetInput);
+      } else if (packetInput instanceof CrimsonBalrogBoat) {
+         return create(this::crogBoatPacket, packetInput);
+      } else if (packetInput instanceof Boat) {
+         return create(this::boatPacket, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -202,6 +216,44 @@ public class FieldPacketFactory extends AbstractPacketFactory {
       mplew.writeInt(0); // not sure what this int32 does yet
       mplew.write(packet.layer());
       mplew.writeInt(packet.transition());
+      return mplew.getPacket();
+   }
+
+   protected byte[] showForcedEquip(ForcedEquip packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.FORCED_MAP_EQUIP.getValue());
+      if (packet.team() > -1) {
+         mplew.write(packet.team());   // 00 = red, 01 = blue
+      }
+      return mplew.getPacket();
+   }
+
+   protected byte[] resetForcedStats(ForcedStatReset packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
+      mplew.writeShort(SendOpcode.FORCED_STAT_RESET.getValue());
+      return mplew.getPacket();
+   }
+
+   protected byte[] aranGodlyStats(ForcedStatSet packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.FORCED_STAT_SET.getValue());
+      mplew.write(new byte[]{(byte) 0x1F, (byte) 0x0F, 0, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xFF, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0x78, (byte) 0x8C});
+      return mplew.getPacket();
+   }
+
+   protected byte[] crogBoatPacket(CrimsonBalrogBoat packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CONTI_MOVE.getValue());
+      mplew.write(10);
+      mplew.write(packet.theType() ? 4 : 5);
+      return mplew.getPacket();
+   }
+
+   protected byte[] boatPacket(Boat packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CONTI_STATE.getValue());
+      mplew.write(packet.theType() ? 1 : 2);
+      mplew.write(0);
       return mplew.getPacket();
    }
 }

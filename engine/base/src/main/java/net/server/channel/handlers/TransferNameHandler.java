@@ -32,11 +32,11 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.TransferNamePacket;
 import net.server.channel.packet.reader.TransferNameReader;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
-import tools.packet.stat.EnableActions;
-import tools.packet.cashshop.operation.ShowCashShopMessage;
 import tools.packet.cashshop.CashShopMessage;
+import tools.packet.cashshop.operation.ShowCashShopMessage;
+import tools.packet.stat.EnableActions;
+import tools.packet.transfer.name.NameChangeError;
 
 /**
  * @author Ronan
@@ -56,16 +56,16 @@ public final class TransferNameHandler extends AbstractPacketHandler<TransferNam
       }
 
       if (!ServerConstants.ALLOW_CASHSHOP_NAME_CHANGE) {
-         client.announce(MaplePacketCreator.sendNameTransferRules(4));
+         PacketCreator.announce(client, new NameChangeError(4));
          return;
       }
 
       MapleCharacter chr = client.getPlayer();
       if (chr.getLevel() < 10) {
-         client.announce(MaplePacketCreator.sendNameTransferRules(4));
+         PacketCreator.announce(client, new NameChangeError(4));
          return;
       } else if (client.getTempBanCalendar() != null && client.getTempBanCalendar().getTimeInMillis() + (30 * 24 * 60 * 60 * 1000) < Calendar.getInstance().getTimeInMillis()) {
-         client.announce(MaplePacketCreator.sendNameTransferRules(2));
+         PacketCreator.announce(client, new NameChangeError(2));
          return;
       }
 
@@ -73,16 +73,16 @@ public final class TransferNameHandler extends AbstractPacketHandler<TransferNam
       Optional<Timestamp> completionTime = DatabaseConnection.getInstance().withConnectionResult(connection -> NameChangeProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()).orElse(null));
 
       if (completionTime.isEmpty()) {
-         client.announce(MaplePacketCreator.sendNameTransferRules(1));
+         PacketCreator.announce(client, new NameChangeError(1));
          return;
       }
 
       if (completionTime.get().getTime() + ServerConstants.NAME_CHANGE_COOLDOWN > System.currentTimeMillis()) {
-         client.announce(MaplePacketCreator.sendNameTransferRules(3));
+         PacketCreator.announce(client, new NameChangeError(3));
          return;
       }
 
-      client.announce(MaplePacketCreator.sendNameTransferRules(0));
+      PacketCreator.announce(client, new NameChangeError(0));
 
    }
 }

@@ -29,9 +29,10 @@ import net.server.channel.packet.BaseTeleportRockMapPacket;
 import net.server.channel.packet.DeleteTeleportRockMapPacket;
 import net.server.channel.packet.reader.TeleportRockMapReader;
 import server.maps.FieldLimit;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.ui.RefreshTeleportRockMapList;
 
 /**
  * @author kevintjuh93
@@ -51,7 +52,7 @@ public final class TrockAddMapHandler extends AbstractPacketHandler<BaseTeleport
          } else {
             chr.deleteFromTrocks(((DeleteTeleportRockMapPacket) packet).mapId());
          }
-         client.announce(MaplePacketCreator.trockRefreshMapList(chr, true, packet.vip()));
+         PacketCreator.announce(client, new RefreshTeleportRockMapList(chr.getVipTrockMaps(), chr.getTrockMaps(), true, packet.vip()));
       } else if (packet instanceof AddTeleportRockMapPacket) {
          if (!FieldLimit.CANNOTVIPROCK.check(chr.getMap().getFieldLimit())) {
             if (packet.vip()) {
@@ -60,7 +61,7 @@ public final class TrockAddMapHandler extends AbstractPacketHandler<BaseTeleport
                chr.addTrockMap();
             }
 
-            client.announce(MaplePacketCreator.trockRefreshMapList(chr, false, packet.vip()));
+            PacketCreator.announce(client, new RefreshTeleportRockMapList(chr.getVipTrockMaps(), chr.getTrockMaps(), false, packet.vip()));
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You may not save this map.");
          }

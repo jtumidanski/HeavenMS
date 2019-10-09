@@ -2,8 +2,8 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.PacketCreator
+import tools.packet.field.CrimsonBalrogBoat
 import tools.packet.field.effect.MusicChange
 
 class Map200090000 {
@@ -14,7 +14,7 @@ class Map200090000 {
 
       if (map.getDocked()) {
          PacketCreator.announce(ms.getClient(), new MusicChange("Bgm04/ArabPirate"))
-         ms.getClient().announce(MaplePacketCreator.crogBoatPacket(true))
+         PacketCreator.announce(ms.getClient(), new CrimsonBalrogBoat(true))
       }
 
       return (true)

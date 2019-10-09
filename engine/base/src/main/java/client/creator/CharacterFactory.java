@@ -30,7 +30,6 @@ import constants.ServerConstants;
 import net.server.Server;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.AddNewCharacter;
 import tools.packet.message.YellowTip;

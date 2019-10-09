@@ -9,7 +9,6 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 

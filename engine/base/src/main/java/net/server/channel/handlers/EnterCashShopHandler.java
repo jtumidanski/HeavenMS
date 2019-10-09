@@ -29,7 +29,6 @@ import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import server.CashShop;
 import server.maps.MapleMiniDungeonInfo;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

@@ -44,7 +44,6 @@ import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMap;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowItemEffect;
@@ -52,6 +51,7 @@ import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.ShowInventoryFull;
+import tools.packet.statusinfo.ShowItemGain;
 import tools.packet.statusinfo.ShowItemUnavailable;
 
 /**
@@ -310,7 +310,7 @@ public class MapleInventoryManipulator {
          return false;
       }
       if (show) {
-         c.announce(MaplePacketCreator.getShowItemGain(item.id(), item.quantity()));
+         PacketCreator.announce(c, new ShowItemGain(item.id(), item.quantity()));
       }
       return true;
    }

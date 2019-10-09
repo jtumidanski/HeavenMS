@@ -25,10 +25,12 @@ import client.processor.CharacterProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseMapleLifePacket;
 import net.server.channel.packet.reader.UseMapleLifeReader;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.cashshop.SendMapleLife;
+import tools.packet.cashshop.SendMapleLifeError;
+import tools.packet.cashshop.SendMapleNameLifeError;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -47,16 +49,16 @@ public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacke
 
       if (timeNow - player.getLastUsedCashItem() < 3000) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a moment before trying again.");
-         client.announce(MaplePacketCreator.sendMapleLifeError(3));
+         PacketCreator.announce(client, new SendMapleLifeError(3));
          PacketCreator.announce(client, new EnableActions());
          return;
       }
       player.setLastUsedCashItem(timeNow);
 
       if (CharacterProcessor.getInstance().canCreateChar(packet.name())) {
-         client.announce(MaplePacketCreator.sendMapleLifeCharacterInfo());
+         PacketCreator.announce(client, new SendMapleLife());
       } else {
-         client.announce(MaplePacketCreator.sendMapleLifeNameError());
+         PacketCreator.announce(client, new SendMapleNameLifeError());
       }
       PacketCreator.announce(client, new EnableActions());
    }

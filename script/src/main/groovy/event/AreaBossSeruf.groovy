@@ -9,7 +9,6 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -54,7 +53,7 @@ class EventAreaBossSeruf {
       int posY = 520
       posX = Math.floor((Math.random() * 2300) - 1500).intValue()
       theSeaweedTower.spawnMonsterOnGroundBelow(seruf, new Point(posX, posY))
-      MessageBroadcaster.getInstance().sendMapServerNotice(theSeaweedTower, ServerNoticeType.LIGHT_BLUE,"A strange shell has appeared from a grove of seaweed")
+      MessageBroadcaster.getInstance().sendMapServerNotice(theSeaweedTower, ServerNoticeType.LIGHT_BLUE, "A strange shell has appeared from a grove of seaweed")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 

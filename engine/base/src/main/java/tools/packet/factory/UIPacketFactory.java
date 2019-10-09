@@ -1,5 +1,7 @@
 package tools.packet.factory;
 
+import java.util.List;
+
 import client.KeyBinding;
 import net.opcodes.SendOpcode;
 import net.server.SkillMacro;
@@ -10,12 +12,17 @@ import tools.packet.ui.DisableMiniMap;
 import tools.packet.ui.DisableUI;
 import tools.packet.ui.FinishedSort;
 import tools.packet.ui.FinishedSort2;
+import tools.packet.ui.GMEffect;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.GetClockTime;
 import tools.packet.ui.GetKeyMap;
 import tools.packet.ui.GetMacros;
 import tools.packet.ui.LockUI;
 import tools.packet.ui.OpenUI;
+import tools.packet.ui.RefreshTeleportRockMapList;
+import tools.packet.ui.ShowBlockedUI;
+import tools.packet.ui.ShowNotes;
+import tools.packet.ui.ShowOXQuiz;
 import tools.packet.ui.StopClock;
 
 public class UIPacketFactory extends AbstractPacketFactory {
@@ -55,6 +62,16 @@ public class UIPacketFactory extends AbstractPacketFactory {
          return create(this::getClockTime, packetInput);
       } else if (packetInput instanceof StopClock) {
          return create(this::removeClock, packetInput);
+      } else if (packetInput instanceof GMEffect) {
+         return create(this::getGMEffect, packetInput);
+      } else if (packetInput instanceof ShowBlockedUI) {
+         return create(this::blockedMessage2, packetInput);
+      } else if (packetInput instanceof ShowNotes) {
+         return create(this::showNotes, packetInput);
+      } else if (packetInput instanceof ShowOXQuiz) {
+         return create(this::showOXQuiz, packetInput);
+      } else if (packetInput instanceof RefreshTeleportRockMapList) {
+         return create(this::trockRefreshMapList, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -176,6 +193,87 @@ public class UIPacketFactory extends AbstractPacketFactory {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.STOP_CLOCK.getValue());
       mplew.write(0);
+      return mplew.getPacket();
+   }
+
+   /**
+    * Gets a gm effect packet (ie. hide, banned, etc.)
+    * <p>
+    * Possible values for <code>type</code>:<br> 0x04: You have successfully
+    * blocked access.<br>
+    * 0x05: The unblocking has been successful.<br> 0x06 with Mode 0: You have
+    * successfully removed the name from the ranks.<br> 0x06 with Mode 1: You
+    * have entered an invalid character name.<br> 0x10: GM Hide, mode
+    * determines whether or not it is on.<br> 0x1E: Mode 0: Failed to send
+    * warning Mode 1: Sent warning<br> 0x13 with Mode 0: + mapid 0x13 with Mode
+    * 1: + ch (FF = Unable to find merchant)
+    */
+   protected byte[] getGMEffect(GMEffect packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.ADMIN_RESULT.getValue());
+      mplew.write(packet.theType());
+      mplew.write(packet.mode());
+      return mplew.getPacket();
+   }
+
+   /**
+    * Gets a "block" packet (ie. the cash shop is unavailable, etc)
+    * <p>
+    * Possible values for <code>type</code>:<br> 1: You cannot move that
+    * channel. Please try again later.<br> 2: You cannot go into the cash shop.
+    * Please try again later.<br> 3: The Item-Trading Shop is currently
+    * unavailable. Please try again later.<br> 4: You cannot go into the trade
+    * shop, due to limitation of user count.<br> 5: You do not meet the minimum
+    * level requirement to access the Trade Shop.<br>
+    */
+   protected byte[] blockedMessage2(ShowBlockedUI packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.BLOCKED_SERVER.getValue());
+      mplew.write(packet.theType());
+      return mplew.getPacket();
+   }
+
+   protected byte[] showNotes(ShowNotes packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MEMO_RESULT.getValue());
+      mplew.write(3);
+      mplew.write(packet.notes().size());
+      packet.notes().forEach(note -> {
+         mplew.writeInt(note.id());
+         mplew.writeMapleAsciiString(note.from() + " "); //Stupid nexon forgot space lol
+         mplew.writeMapleAsciiString(note.message());
+         mplew.writeLong(getTime(note.timestamp()));
+         mplew.write(note.fame()); //FAME :D
+      });
+      return mplew.getPacket();
+   }
+
+   protected byte[] showOXQuiz(ShowOXQuiz packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
+      mplew.writeShort(SendOpcode.OX_QUIZ.getValue());
+      mplew.write(packet.askQuestion() ? 1 : 0);
+      mplew.write(packet.questionSet());
+      mplew.writeShort(packet.questionId());
+      return mplew.getPacket();
+   }
+
+   protected byte[] trockRefreshMapList(RefreshTeleportRockMapList packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.MAP_TRANSFER_RESULT.getValue());
+      mplew.write(packet.delete() ? 2 : 3);
+      if (packet.vip()) {
+         mplew.write(1);
+         List<Integer> map = packet.vips();
+         for (int i = 0; i < 10; i++) {
+            mplew.writeInt(map.get(i));
+         }
+      } else {
+         mplew.write(0);
+         List<Integer> map = packet.regulars();
+         for (int i = 0; i < 5; i++) {
+            mplew.writeInt(map.get(i));
+         }
+      }
       return mplew.getPacket();
    }
 }

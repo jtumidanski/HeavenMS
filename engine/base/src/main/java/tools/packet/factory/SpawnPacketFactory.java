@@ -21,6 +21,7 @@ import tools.FilePrinter;
 import tools.Randomizer;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
+import tools.packet.spawn.CannotSpawnKite;
 import tools.packet.spawn.ControlMonster;
 import tools.packet.spawn.MakeMonsterInvisible;
 import tools.packet.spawn.MakeMonsterReal;
@@ -103,6 +104,8 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
          return create(this::controlMonster, packetInput);
       } else if (packetInput instanceof MakeMonsterInvisible) {
          return create(this::makeMonsterInvisible, packetInput);
+      } else if (packetInput instanceof CannotSpawnKite) {
+         return create(this::sendCannotSpawnKite, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -752,6 +755,12 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       mplew.writeShort(SendOpcode.SPAWN_MONSTER_CONTROL.getValue());
       mplew.write(0);
       mplew.writeInt(packet.getMonster().getObjectId());
+      return mplew.getPacket();
+   }
+
+   protected byte[] sendCannotSpawnKite(CannotSpawnKite packet) {
+      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.CANNOT_SPAWN_KITE.getValue());
       return mplew.getPacket();
    }
 }

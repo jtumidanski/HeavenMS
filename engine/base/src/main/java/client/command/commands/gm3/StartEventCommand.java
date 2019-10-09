@@ -28,9 +28,10 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import server.events.gm.MapleEvent;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.foreigneffect.ShowTitleEarned;
 
 public class StartEventCommand extends Command {
    {
@@ -45,12 +46,12 @@ public class StartEventCommand extends Command {
          players = Integer.parseInt(params[0]);
       }
       c.getChannelServer().setEvent(new MapleEvent(player.getMapId(), players));
-      Server.getInstance().broadcastMessage(c.getWorld(), MaplePacketCreator.earnTitleMessage(
+      Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.create(new ShowTitleEarned(
             "[Event] An event has started on "
                   + player.getMap().getMapName()
                   + " and will allow "
                   + players
-                  + " players to join. Type @joinevent to participate."));
+                  + " players to join. Type @joinevent to participate.")));
       MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE,
             "[Event] An event has started on "
                   + player.getMap().getMapName()

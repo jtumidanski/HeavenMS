@@ -34,9 +34,10 @@ import net.server.channel.packet.report.BaseReportPacket;
 import net.server.channel.packet.report.ReportPacket;
 import net.server.channel.packet.report.ReportWithChatPacket;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
+import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.report.ReportResponse;
 
 /*
  *
@@ -56,11 +57,11 @@ public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket>
                client.getPlayer().decreaseReports();
                client.getPlayer().gainMeso(-300, true);
             } else {
-               client.announce(MaplePacketCreator.reportResponse((byte) 4));
+               PacketCreator.announce(client, new ReportResponse((byte) 4));
                return;
             }
          } else {
-            client.announce(MaplePacketCreator.reportResponse((byte) 2));
+            PacketCreator.announce(client, new ReportResponse((byte) 2));
             return;
          }
          MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, packet.victim() + " was reported for: " + packet.description());
@@ -74,7 +75,7 @@ public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket>
                client.getPlayer().decreaseReports();
                client.getPlayer().gainMeso(-300, true);
             } else {
-               client.announce(MaplePacketCreator.reportResponse((byte) 4));
+               PacketCreator.announce(client, new ReportResponse((byte) 4));
                return;
             }
          }

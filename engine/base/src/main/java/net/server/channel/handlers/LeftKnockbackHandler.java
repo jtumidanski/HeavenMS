@@ -26,8 +26,8 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.character.CharacterKnockBack;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -41,7 +41,7 @@ public class LeftKnockbackHandler extends AbstractPacketHandler<NoOpPacket> {
 
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.leftKnockBack());
+      PacketCreator.announce(client, new CharacterKnockBack());
       PacketCreator.announce(client, new EnableActions());
    }
 }

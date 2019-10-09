@@ -6,7 +6,6 @@ import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType
-import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 

@@ -12,7 +12,9 @@ import net.server.channel.packet.rps.RetryPacket;
 import net.server.channel.packet.rps.StartGamePacket;
 import net.server.channel.packet.rps.TimeOverPacket;
 import server.minigame.MapleRockPaperScissor;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.rps.RPSMesoError;
+import tools.packet.rps.RPSMode;
 
 /**
  * @Author Arnah
@@ -45,25 +47,25 @@ public final class RPSActionHandler extends AbstractPacketHandler<BaseRPSActionP
                if (chr.getMeso() >= 1000) {
                   chr.setRPS(new MapleRockPaperScissor(client, packet.mode()));
                } else {
-                  client.announce(MaplePacketCreator.rpsMesoError(-1));
+                  PacketCreator.announce(client, new RPSMesoError(-1));
                }
             } else if (packet instanceof AnswerPacket) {
                if (rps == null || !rps.answer(client, ((AnswerPacket) packet).answer())) {
-                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));// 13
+                  PacketCreator.announce(client, new RPSMode((byte) 0x0D));// 13
                }
             } else if (packet instanceof TimeOverPacket) {
                if (rps == null || !rps.timeOut(client)) {
-                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
+                  PacketCreator.announce(client, new RPSMode((byte) 0x0D));
                }
             } else if (packet instanceof ContinuePacket) {
                if (rps == null || !rps.nextRound(client)) {
-                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
+                  PacketCreator.announce(client, new RPSMode((byte) 0x0D));
                }
             } else if (packet instanceof LeavePacket) {
                if (rps != null) {
                   rps.dispose(client);
                } else {
-                  client.announce(MaplePacketCreator.rpsMode((byte) 0x0D));
+                  PacketCreator.announce(client, new RPSMode((byte) 0x0D));
                }
             }
          } finally {

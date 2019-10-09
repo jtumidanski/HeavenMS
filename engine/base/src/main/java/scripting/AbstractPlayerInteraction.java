@@ -69,18 +69,22 @@ import server.maps.MapleMapObjectType;
 import server.partyquest.PartyQuest;
 import server.partyquest.Pyramid;
 import server.quest.MapleQuest;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.DojoWarpUp;
+import tools.packet.GetEnergy;
 import tools.packet.field.effect.EnvironmentChange;
 import tools.packet.field.effect.MapEffect;
 import tools.packet.field.effect.MapSound;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.field.effect.ShowEffect;
+import tools.packet.foreigneffect.ShowGuideHint;
+import tools.packet.foreigneffect.ShowGuideTalk;
 import tools.packet.foreigneffect.ShowHint;
+import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.npctalk.GetNPCTalk;
 import tools.packet.remove.RemoveItem;
@@ -1014,7 +1018,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void goDojoUp() {
-      c.announce(MaplePacketCreator.dojoWarpUp());
+      PacketCreator.announce(c, new DojoWarpUp());
    }
 
    public void resetDojoEnergy() {
@@ -1036,15 +1040,15 @@ public class AbstractPlayerInteraction {
    }
 
    public void dojoEnergy() {
-      c.announce(MaplePacketCreator.getEnergy("energy", getPlayer().getDojoEnergy()));
+      PacketCreator.announce(c, new GetEnergy("energy", getPlayer().getDojoEnergy()));
    }
 
    public void talkGuide(String message) {
-      c.announce(MaplePacketCreator.talkGuide(message));
+      PacketCreator.announce(c, new ShowGuideTalk(message));
    }
 
    public void guideHint(int hint) {
-      c.announce(MaplePacketCreator.guideHint(hint));
+      PacketCreator.announce(c, new ShowGuideHint(hint));
    }
 
    public void updateAreaInfo(Short area, String info) {
@@ -1057,7 +1061,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void earnTitle(String msg) {
-      c.announce(MaplePacketCreator.earnTitleMessage(msg));
+      PacketCreator.announce(c, new ShowTitleEarned(msg));
    }
 
    public void showInfoText(String msg) {

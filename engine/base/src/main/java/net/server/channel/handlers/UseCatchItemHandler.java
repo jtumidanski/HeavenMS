@@ -33,7 +33,6 @@ import net.server.channel.packet.UseCatchItemPacket;
 import net.server.channel.packet.reader.UseCatchItemReader;
 import server.MapleItemInformationProvider;
 import server.life.MapleMonster;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

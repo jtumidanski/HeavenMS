@@ -9,7 +9,6 @@ import scripting.event.EventScheduledFuture
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -54,7 +53,7 @@ class EventAreaBossStumpy {
       int posY = 1280
       posX = Math.floor((Math.random() * 800) + 400).intValue()
       eastRockyMountain5.spawnMonsterOnGroundBelow(stumpy, new Point(posX, posY))
-      MessageBroadcaster.getInstance().sendMapServerNotice(eastRockyMountain5, ServerNoticeType.LIGHT_BLUE,"Stumpy has appeared with a stumping sound that rings the Stone Mountain.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(eastRockyMountain5, ServerNoticeType.LIGHT_BLUE, "Stumpy has appeared with a stumping sound that rings the Stone Mountain.")
       em.schedule("start", 3 * 60 * 60 * 1000)
    }
 

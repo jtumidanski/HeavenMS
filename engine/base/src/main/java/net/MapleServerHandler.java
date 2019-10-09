@@ -50,7 +50,6 @@ import server.TimerManager;
 import tools.FilePrinter;
 import tools.MapleAESOFB;
 import tools.MapleLogger;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.data.input.ByteArrayByteStream;
 import tools.data.input.GenericSeekableLittleEndianAccessor;
@@ -143,7 +142,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
       client.setWorld(world);
       client.setChannel(channel);
       client.setSessionId(sessionId.getAndIncrement()); // Generates a reasonable session id.
-      session.write(MaplePacketCreator.getHello(ServerConstants.VERSION, ivSend, ivRecv));
+      session.write(PacketCreator.getHello(ServerConstants.VERSION, ivSend, ivRecv));
       session.setAttribute(MapleClient.CLIENT_KEY, client);
    }
 

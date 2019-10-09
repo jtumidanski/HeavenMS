@@ -32,11 +32,11 @@ import net.server.Server;
 import net.server.channel.packet.TransferWorldPacket;
 import net.server.channel.packet.reader.TransferWorldReader;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
-import tools.packet.stat.EnableActions;
-import tools.packet.cashshop.operation.ShowCashShopMessage;
 import tools.packet.cashshop.CashShopMessage;
+import tools.packet.cashshop.operation.ShowCashShopMessage;
+import tools.packet.stat.EnableActions;
+import tools.packet.transfer.world.WorldTransferError;
 
 /**
  * @author Ronan
@@ -57,27 +57,27 @@ public final class TransferWorldHandler extends AbstractPacketHandler<TransferWo
 
       MapleCharacter chr = client.getPlayer();
       if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER || Server.getInstance().getWorldsSize() <= 1) {
-         client.announce(MaplePacketCreator.sendWorldTransferRules(9, client));
+         PacketCreator.announce(client, new WorldTransferError(9));
          return;
       }
       int worldTransferError = chr.checkWorldTransferEligibility();
       if (worldTransferError != 0) {
-         client.announce(MaplePacketCreator.sendWorldTransferRules(worldTransferError, client));
+         PacketCreator.announce(client, new WorldTransferError(worldTransferError));
          return;
       }
 
       Optional<Timestamp> completionTime = DatabaseConnection.getInstance().withConnectionResult(connection -> WorldTransferProvider.getInstance().getCompletionTimeByCharacterId(connection, chr.getId()));
 
       if (completionTime.isEmpty()) {
-         client.announce(MaplePacketCreator.sendWorldTransferRules(6, client));
+         PacketCreator.announce(client, new WorldTransferError(6));
          return;
       }
 
       if (completionTime.get().getTime() + ServerConstants.WORLD_TRANSFER_COOLDOWN > System.currentTimeMillis()) {
-         client.announce(MaplePacketCreator.sendWorldTransferRules(7, client));
+         PacketCreator.announce(client, new WorldTransferError(7));
          return;
       }
 
-      client.announce(MaplePacketCreator.sendWorldTransferRules(0, client));
+      PacketCreator.announce(client, new WorldTransferError(0));
    }
 }

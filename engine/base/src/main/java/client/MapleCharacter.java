@@ -196,7 +196,6 @@ import server.processor.maps.MapleDoorProcessor;
 import server.quest.MapleQuest;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MapleStringUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
@@ -224,11 +223,14 @@ import tools.packet.buff.GiveForeignDebuff;
 import tools.packet.buff.GiveForeignSlowDebuff;
 import tools.packet.character.SkillCooldown;
 import tools.packet.character.SummonSkill;
+import tools.packet.character.UpdateMount;
 import tools.packet.character.UpdateSkill;
 import tools.packet.field.obstacle.EnvironmentMoveList;
 import tools.packet.field.set.WarpToMap;
+import tools.packet.foreigneffect.CancelChair;
 import tools.packet.foreigneffect.ShowBerserk;
 import tools.packet.foreigneffect.ShowBuffEffect;
+import tools.packet.foreigneffect.ShowChair;
 import tools.packet.foreigneffect.ShowCombo;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.foreigneffect.ShowRecovery;
@@ -257,6 +259,7 @@ import tools.packet.remove.RemoveDragon;
 import tools.packet.remove.RemoveItem;
 import tools.packet.remove.RemovePlayer;
 import tools.packet.remove.RemoveSummon;
+import tools.packet.report.SendPolice;
 import tools.packet.showitemgaininchat.ShowOwnBerserk;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.showitemgaininchat.ShowOwnRecovery;
@@ -276,9 +279,11 @@ import tools.packet.statusinfo.ShowMesoGain;
 import tools.packet.statusinfo.ShowQuestForfeit;
 import tools.packet.statusinfo.UpdateAreaInfo;
 import tools.packet.statusinfo.UpdateQuest;
+import tools.packet.ui.GMEffect;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.GetKeyMap;
 import tools.packet.ui.GetMacros;
+import tools.packet.ui.ShowNotes;
 import tools.packet.wedding.WeddingPartnerTransfer;
 
 public class MapleCharacter extends AbstractMapleCharacterObject {
@@ -345,7 +350,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private MapleMessenger messenger = null;
    private MapleMiniGame miniGame;
    private MapleRockPaperScissor rps;
-   private MapleMount maplemount;
+   private MapleMount mount;
    private MapleParty party;
    private MaplePet[] pets = new MaplePet[3];
    private MaplePlayerShop playerShop = null;
@@ -521,7 +526,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void setMount(MapleMount mapleMount) {
-      maplemount = mapleMount;
+      mount = mapleMount;
    }
 
    public void addSkill(Skill skill, SkillEntry skillEntry) {
@@ -1013,7 +1018,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (isGM() && hide != this.hidden) {
          if (!hide) {
             this.hidden = false;
-            announce(MaplePacketCreator.getGMEffect(0x10, (byte) 0));
+            PacketCreator.announce(this, new GMEffect(0x10, (byte) 0));
             List<MapleBuffStat> dsstat = Collections.singletonList(MapleBuffStat.DARKSIGHT);
             getMap().broadcastGMMessage(this, PacketCreator.create(new CancelForeignBuff(id, dsstat)), false);
             getMap().broadcastSpawnPlayerMapObjectMessage(this, this, false);
@@ -1027,7 +1032,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
          } else {
             this.hidden = true;
-            announce(MaplePacketCreator.getGMEffect(0x10, (byte) 1));
+            PacketCreator.announce(this, new GMEffect(0x10, (byte) 1));
             if (!login) {
                getMap().broadcastNONGMMessage(this, PacketCreator.create(new RemovePlayer(getId())), false);
             }
@@ -4746,7 +4751,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public MapleMount getMount() {
-      return maplemount;
+      return mount;
    }
 
    public Optional<MapleMessenger> getMessenger() {
@@ -6334,7 +6339,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public MapleMount mount(int id, int skillid) {
-      MapleMount mount = maplemount;
+      MapleMount mount = this.mount;
       mount.setItemId(id);
       mount.setSkillId(skillid);
       return mount;
@@ -6420,10 +6425,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new CancelForeignChairSkillEffect(this.getId()), false, this);
          }
 
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.showChair(this.getId(), 0), false, this);
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowChair(this.getId(), 0), false, this);
       }
 
-      announce(MaplePacketCreator.cancelChair(-1));
+      PacketCreator.announce(this, new CancelChair(-1));
    }
 
    public void sitChair(int itemId) {
@@ -6433,7 +6438,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                if (itemId >= 1000000) {    // sit on item chair
                   if (chair.get() < 0) {
                      setChair(itemId);
-                     MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.showChair(this.getId(), itemId), false, this);
+                     MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowChair(this.getId(), itemId), false, this);
                   }
                   PacketCreator.announce(client, new EnableActions());
                } else if (itemId >= 0) {    // sit on map chair
@@ -6442,7 +6447,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                      if (registerChairBuff()) {
                         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new GiveForeignChairSkillEffect(this.getId()), false, this);
                      }
-                     announce(MaplePacketCreator.cancelChair(itemId));
+                     PacketCreator.announce(this, new CancelChair(itemId));
                   }
                } else {    // stand up
                   unsitChairInternal();
@@ -7066,9 +7071,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int messengerId = messenger != null ? messenger.getId() : 0;
          int messengerPosition = messenger != null ? messengerposition : 4;
 
-         int mountLevel = maplemount != null ? maplemount.getLevel() : 1;
-         int mountExp = maplemount != null ? maplemount.getExp() : 0;
-         int mountTiredness = maplemount != null ? maplemount.getTiredness() : 0;
+         int mountLevel = mount != null ? mount.getLevel() : 1;
+         int mountExp = mount != null ? mount.getExp() : 0;
+         int mountTiredness = mount != null ? mount.getTiredness() : 0;
 
          CharacterAdministrator.getInstance().update(con, id, level, fame, str, dex, luk, int_, Math.abs(exp.get()),
                Math.abs(gachaexp.get()), hp, mp, maxhp, maxmp, sp.substring(0, sp.length() - 1), remainingAp, gmLevel,
@@ -7087,7 +7092,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void sendPolice(int greason, String reason, int duration) {
-      announce(MaplePacketCreator.sendPolice(String.format("You have been blocked by the#b %s Police for %s.#k", "HeavenMS", reason)));
+      PacketCreator.announce(this, new SendPolice(String.format("You have been blocked by the#b %s Police for %s.#k", "HeavenMS", reason)));
       this.isbanned = true;
       TimerManager.getInstance().schedule(() -> client.disconnect(false, false), duration);
    }
@@ -7664,7 +7669,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void showNote() {
       DatabaseConnection.getInstance().withConnectionResult(connection -> NoteProvider.getInstance().getFirstNote(connection, name)).ifPresent(notes ->
-            client.announce(MaplePacketCreator.showNotes(notes, notes.size())));
+            PacketCreator.announce(client, new ShowNotes(notes)));
    }
 
    public void silentGiveBuffs(List<Pair<Long, PlayerBuffValueHolder>> buffs) {
@@ -7715,12 +7720,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean runTirednessSchedule() {
-      if (maplemount != null) {
-         int tiredness = maplemount.incrementAndGetTiredness();
+      if (mount != null) {
+         int tiredness = mount.incrementAndGetTiredness();
 
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), character -> MaplePacketCreator.updateMount(this.getId(), maplemount, false));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new UpdateMount(this.getId(), mount.getLevel(), mount.getExp(), mount.getTiredness(), false));
          if (tiredness > 99) {
-            maplemount.setTiredness(99);
+            mount.setTiredness(99);
             this.dispelSkill(this.getJobType() * 10000000 + 1004);
             MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your mount grew tired! Treat it some revitalizer before riding it again!");
             return false;
@@ -8129,7 +8134,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       this.ban(reason);
-      announce(MaplePacketCreator.sendPolice(String.format("You have been blocked by the#b %s Police for HACK reason.#k", "HeavenMS")));
+      PacketCreator.announce(this, new SendPolice(String.format("You have been blocked by the#b %s Police for HACK reason.#k", "HeavenMS")));
       TimerManager.getInstance().schedule(() -> client.disconnect(false, false), 5000);
 
       MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, StringUtil.makeMapleReadable(this.name) + " was autobanned for " + reason);
@@ -8305,9 +8310,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       evtLock.lock();
 
-      if (maplemount != null) {
-         maplemount.empty();
-         maplemount = null;
+      if (mount != null) {
+         mount.empty();
+         mount = null;
       }
       if (remove) {
          partyQuest = null;

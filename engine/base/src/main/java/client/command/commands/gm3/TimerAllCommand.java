@@ -26,7 +26,6 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;

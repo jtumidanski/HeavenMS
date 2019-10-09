@@ -102,12 +102,13 @@ import server.maps.MapleMap;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MapleTVEffect;
 import server.processor.MapleShopProcessor;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.cashshop.SendMapleLifeError;
+import tools.packet.cashshop.SendMapleNameLifeError;
 import tools.packet.character.box.UseChalkboard;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.foreigneffect.ShowScrollEffect;
@@ -121,7 +122,10 @@ import tools.packet.message.ItemMegaphone;
 import tools.packet.message.MultiMegaphone;
 import tools.packet.owl.OwlOfMinervaResult;
 import tools.packet.pet.PetNameChange;
+import tools.packet.spawn.CannotSpawnKite;
 import tools.packet.stat.EnableActions;
+import tools.packet.transfer.name.NameChangeCancel;
+import tools.packet.transfer.world.WorldTransferCancel;
 
 public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseCashItemPacket> {
 
@@ -439,27 +443,27 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       if (createStatus == 0) {
-         c.announce(MaplePacketCreator.sendMapleLifeError(0));   // success!
+         PacketCreator.announce(c, new SendMapleLifeError(0));   // success!
 
          player.showHint("#bSuccess#k on creation of the new character through the Maple Life card.");
          remove(c, position, itemId);
       } else {
          if (createStatus == -1) {    // check name
-            c.announce(MaplePacketCreator.sendMapleLifeNameError());
+            PacketCreator.announce(c, new SendMapleNameLifeError());
          } else {
-            c.announce(MaplePacketCreator.sendMapleLifeError(-1 * createStatus));
+            PacketCreator.announce(c, new SendMapleLifeError(-1 * createStatus));
          }
       }
    }
 
    private void nameChange(MapleClient c, MapleCharacter player, short position, int itemId) {
-      c.announce(MaplePacketCreator.showNameChangeCancel(player.cancelPendingNameChange()));
+      PacketCreator.announce(c, new NameChangeCancel(player.cancelPendingNameChange()));
       remove(c, position, itemId);
       PacketCreator.announce(c, new EnableActions());
    }
 
    private void worldChange(MapleClient c, MapleCharacter player, short position, int itemId) {
-      c.announce(MaplePacketCreator.showWorldTransferCancel(player.cancelPendingWorldTranfer()));
+      PacketCreator.announce(c, new WorldTransferCancel(player.cancelPendingWorldTranfer()));
       remove(c, position, itemId);
       PacketCreator.announce(c, new EnableActions());
    }
@@ -571,7 +575,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          player.getMap().spawnKite(kite);
          remove(c, position, itemId);
       } else {
-         c.announce(MaplePacketCreator.sendCannotSpawnKite());
+         PacketCreator.announce(c, new CannotSpawnKite());
       }
    }
 

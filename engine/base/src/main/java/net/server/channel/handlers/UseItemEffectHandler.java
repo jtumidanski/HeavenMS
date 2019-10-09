@@ -27,7 +27,6 @@ import client.inventory.MapleInventoryType;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseItemEffectPacket;
 import net.server.channel.packet.reader.UseItemEffectReader;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.packet.foreigneffect.ShowItemEffect;
 

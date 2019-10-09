@@ -37,7 +37,6 @@ import server.MTSItemInfo;
 import server.maps.FieldLimit;
 import server.maps.MapleMiniDungeonInfo;
 import tools.DatabaseConnection;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
@@ -48,6 +47,7 @@ import tools.packet.mtsoperation.MTSWantedListingOver;
 import tools.packet.mtsoperation.SendMTS;
 import tools.packet.mtsoperation.ShowMTSCash;
 import tools.packet.stat.EnableActions;
+import tools.packet.ui.ShowBlockedUI;
 
 
 public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
@@ -92,7 +92,7 @@ public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
             return;
          }
          if (chr.getLevel() < 10) {
-            client.announce(MaplePacketCreator.blockedMessage2(5));
+            PacketCreator.announce(client, new ShowBlockedUI(5));
             PacketCreator.announce(client, new EnableActions());
             return;
          }

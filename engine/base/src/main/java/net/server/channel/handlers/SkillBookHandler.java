@@ -34,7 +34,6 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SkillBookPacket;
 import net.server.channel.packet.reader.SkillBookReader;
 import server.MapleItemInformationProvider;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowSkillBookResult;

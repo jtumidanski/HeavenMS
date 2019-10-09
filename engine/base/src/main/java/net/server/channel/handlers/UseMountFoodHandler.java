@@ -32,8 +32,8 @@ import constants.ExpTable;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseMountFoodPacket;
 import net.server.channel.packet.reader.UseMountFoodReader;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.character.UpdateMount;
 
 /**
  * @author PurpleMadness
@@ -84,7 +84,7 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
 
             if (mountLevelup != null) {
                Boolean finalMountLevelup = mountLevelup;
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> MaplePacketCreator.updateMount(chr.getId(), mount, finalMountLevelup));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.getLevel(), mount.getExp(), mount.getTiredness(), finalMountLevelup));
             }
          } finally {
             client.releaseClient();

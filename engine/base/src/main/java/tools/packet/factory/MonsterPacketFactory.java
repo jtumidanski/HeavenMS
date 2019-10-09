@@ -15,6 +15,7 @@ import tools.packet.monster.CatchMonsterFailure;
 import tools.packet.monster.CatchMonsterWithItem;
 import tools.packet.monster.DamageMonster;
 import tools.packet.monster.DamageMonsterFriendly;
+import tools.packet.monster.DamageSummon;
 import tools.packet.monster.HealMonster;
 import tools.packet.monster.KillMonster;
 import tools.packet.monster.ShowMonsterHP;
@@ -54,6 +55,8 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
          return create(this::damageMonsterFriendly, packetInput);
       } else if (packetInput instanceof CatchMonsterFailure) {
          return create(this::catchMessage, packetInput);
+      } else if (packetInput instanceof DamageSummon) {
+         return create(this::damageSummon, packetInput);
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
       return new byte[0];
@@ -212,6 +215,18 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
       mplew.write(packet.message()); // 1 = too strong, 2 = Elemental Rock
       mplew.writeInt(0);//Maybe itemid?
       mplew.writeInt(0);
+      return mplew.getPacket();
+   }
+
+   protected byte[] damageSummon(DamageSummon packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+      mplew.writeShort(SendOpcode.DAMAGE_SUMMON.getValue());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.objectId());
+      mplew.write(12);
+      mplew.writeInt(packet.damage());         // damage display doesn't seem to work...
+      mplew.writeInt(packet.monsterIdFrom());
+      mplew.write(0);
       return mplew.getPacket();
    }
 }

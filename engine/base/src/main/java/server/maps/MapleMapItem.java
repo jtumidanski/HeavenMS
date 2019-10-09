@@ -28,8 +28,8 @@ import client.MapleClient;
 import client.inventory.Item;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.item.drop.DropItemFromMapObject;
 import tools.packet.remove.RemoveItem;
 
 public class MapleMapItem extends AbstractMapleMapObject {
@@ -91,7 +91,9 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public final int getItemId() {
-      if (meso > 0) return meso;
+      if (meso > 0) {
+         return meso;
+      }
       return item.id();
    }
 
@@ -132,7 +134,9 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public final boolean canBePickedBy(MapleCharacter chr) {
-      if (character_ownerid <= 0 || isFFADrop()) return true;
+      if (character_ownerid <= 0 || isFFADrop()) {
+         return true;
+      }
 
       if (party_ownerid == -1) {
          if (chr.getId() == character_ownerid) {
@@ -205,7 +209,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
       if (chr.needQuestItem(questid, getItemId())) {
          this.lockItem();
          try {
-            client.announce(MaplePacketCreator.dropItemFromMapObject(chr, this, null, getPosition(), (byte) 2));
+            PacketCreator.announce(client, new DropItemFromMapObject(chr, this, null, getPosition(), (byte) 2));
          } finally {
             this.unlockItem();
          }

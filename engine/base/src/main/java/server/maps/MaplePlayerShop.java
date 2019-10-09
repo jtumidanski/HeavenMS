@@ -49,13 +49,13 @@ import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.character.box.RemovePlayerShop;
 import tools.packet.character.box.UpdatePlayerShopBox;
-import tools.packet.playerinteraction.GetPlayerShop;
-import tools.packet.playerinteraction.PlayerShopChat;
-import tools.packet.playerinteraction.PlayerShopErrorMessage;
-import tools.packet.playerinteraction.PlayerShopItemUpdate;
-import tools.packet.playerinteraction.PlayerShopNewVisitor;
-import tools.packet.playerinteraction.PlayerShopOwnerUpdate;
-import tools.packet.playerinteraction.PlayerShopRemoveVisitor;
+import tools.packet.character.interaction.GetPlayerShop;
+import tools.packet.character.interaction.PlayerShopChat;
+import tools.packet.character.interaction.PlayerShopErrorMessage;
+import tools.packet.character.interaction.PlayerShopItemUpdate;
+import tools.packet.character.interaction.PlayerShopNewVisitor;
+import tools.packet.character.interaction.PlayerShopOwnerUpdate;
+import tools.packet.character.interaction.PlayerShopRemoveVisitor;
 import tools.packet.stat.EnableActions;
 
 /**

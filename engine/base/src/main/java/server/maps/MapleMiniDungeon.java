@@ -28,7 +28,6 @@ import client.MapleCharacter;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.TimerManager;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;

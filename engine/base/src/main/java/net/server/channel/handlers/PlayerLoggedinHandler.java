@@ -74,11 +74,12 @@ import scripting.event.EventInstanceManager;
 import server.life.MobSkill;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.AfterLoginError;
+import tools.packet.EnableReport;
+import tools.packet.SetNPCScriptable;
 import tools.packet.alliance.AllianceMemberOnline;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.UpdateAllianceInfo;
@@ -88,10 +89,12 @@ import tools.packet.buff.GiveDebuff;
 import tools.packet.character.SetAutoHpPot;
 import tools.packet.character.SetAutoMpPot;
 import tools.packet.character.UpdateGender;
+import tools.packet.character.UpdateMount;
 import tools.packet.family.FamilyLogonNotice;
 import tools.packet.family.GetFamilyInfo;
 import tools.packet.family.LoadFamily;
 import tools.packet.field.set.GetCharacterInfo;
+import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.guild.ShowGuildInfo;
 import tools.packet.parcel.DueyParcelNotification;
 import tools.packet.wedding.WeddingPartnerTransfer;
@@ -352,7 +355,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
             PacketCreator.announce(client, new UpdateGender(player.getGender()));
             player.checkMessenger();
-            client.announce(MaplePacketCreator.enableReport());
+            PacketCreator.announce(client, new EnableReport());
 
             int skillId = 10000000 * player.getJobType() + 12;
             player.changeSkillLevel(SkillFactory.getSkill(skillId).orElseThrow(), (byte) (player.getLinkedLevel() / 10), 20, -1);
@@ -367,13 +370,13 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
                MapleMount mount = player.getMount();   // thanks Ari for noticing a scenario where Silver Mane quest couldn't be started
                if (mount.getItemId() != 0) {
-                  player.announce(MaplePacketCreator.updateMount(player.getId(), mount, false));
+                  PacketCreator.announce(player, new UpdateMount(player.getId(), mount.getLevel(), mount.getExp(), mount.getTiredness(), false));
                }
 
                player.reloadQuestExpirations();
 
                if (player.isGM()) {
-                  Server.getInstance().broadcastGMMessage(client.getWorld(), MaplePacketCreator.earnTitleMessage((player.gmLevel() < 6 ? "GM " : "Admin ") + player.getName() + " has logged in"));
+                  Server.getInstance().broadcastGMMessage(client.getWorld(), PacketCreator.create(new ShowTitleEarned((player.gmLevel() < 6 ? "GM " : "Admin ") + player.getName() + " has logged in")));
                }
 
                if (diseases != null) {
@@ -425,7 +428,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
 
             if (ServerConstants.USE_NPCS_SCRIPTABLE) {
-               client.announce(MaplePacketCreator.setNPCScriptable(ScriptableNPCConstants.SCRIPTABLE_NPCS));
+               PacketCreator.announce(client, new SetNPCScriptable(ScriptableNPCConstants.SCRIPTABLE_NPCS));
             }
 
             if (newcomer) {

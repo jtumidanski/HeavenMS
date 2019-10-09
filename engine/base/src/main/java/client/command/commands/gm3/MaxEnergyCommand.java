@@ -23,10 +23,10 @@
 */
 package client.command.commands.gm3;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.GetEnergy;
 
 public class MaxEnergyCommand extends Command {
    {
@@ -35,8 +35,7 @@ public class MaxEnergyCommand extends Command {
 
    @Override
    public void execute(MapleClient c, String[] params) {
-      MapleCharacter player = c.getPlayer();
       c.getPlayer().setDojoEnergy(10000);
-      c.announce(MaplePacketCreator.getEnergy("energy", 10000));
+      PacketCreator.announce(c, new GetEnergy("energy", 10000));
    }
 }

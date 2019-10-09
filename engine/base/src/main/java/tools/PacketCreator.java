@@ -5,6 +5,7 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import net.opcodes.SendOpcode;
+import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
 import tools.packet.factory.AddNewCharacterPacketFactory;
 import tools.packet.factory.AfterLoginErrorPacketFactory;
@@ -25,11 +26,13 @@ import tools.packet.factory.FamilyPacketFactory;
 import tools.packet.factory.FieldPacketFactory;
 import tools.packet.factory.ForeignEffectPacketFactory;
 import tools.packet.factory.FredrickPacketFactory;
+import tools.packet.factory.GenericPacketFactory;
 import tools.packet.factory.GiveBuffPacketFactory;
 import tools.packet.factory.GuestLoginPacketFactory;
 import tools.packet.factory.GuildBBSPacketFactory;
 import tools.packet.factory.GuildPacketFactory;
 import tools.packet.factory.InventoryPacketFactory;
+import tools.packet.factory.ItemDropPacketFactory;
 import tools.packet.factory.ItemEnhancePacketFactory;
 import tools.packet.factory.ItemGainInChatPacketFactory;
 import tools.packet.factory.LoginStatusPacketFactory;
@@ -42,6 +45,7 @@ import tools.packet.factory.MonsterCarnivalPacketFactory;
 import tools.packet.factory.MonsterPacketFactory;
 import tools.packet.factory.MovementPacketFactory;
 import tools.packet.factory.NPCTalkPacketFactory;
+import tools.packet.factory.NameChangePacketFactory;
 import tools.packet.factory.NewYearCardPacketFactory;
 import tools.packet.factory.OwlOfMinervaPacketFactory;
 import tools.packet.factory.ParcelPacketFactory;
@@ -51,12 +55,15 @@ import tools.packet.factory.PicPacketFactory;
 import tools.packet.factory.PinPacketFactory;
 import tools.packet.factory.PingPacketFactory;
 import tools.packet.factory.PlayerInteractionPacketFactory;
+import tools.packet.factory.PlayerNPCPacketFactory;
 import tools.packet.factory.PyramidPacketFactory;
 import tools.packet.factory.QuestPacketFactory;
+import tools.packet.factory.RPSPacketFactory;
 import tools.packet.factory.ReactorPacketFactory;
 import tools.packet.factory.RecommendedWorldMessagePacketFactory;
 import tools.packet.factory.RelogResponsePacketFactory;
 import tools.packet.factory.RemovePacketFactory;
+import tools.packet.factory.ReportPacketFactory;
 import tools.packet.factory.SelectWorldPacketFactory;
 import tools.packet.factory.ServerIPPacketFactory;
 import tools.packet.factory.ServerListPacketFactory;
@@ -73,6 +80,7 @@ import tools.packet.factory.UIPacketFactory;
 import tools.packet.factory.UpdateCharacterBoxPacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 import tools.packet.factory.WeddingPacketFactory;
+import tools.packet.factory.WorldTransferPacketFactory;
 
 public class PacketCreator {
    private PacketCreator() {
@@ -140,6 +148,7 @@ public class PacketCreator {
             return Optional.of(StatUpdatePacketFactory.getInstance());
          case CASHSHOP_OPERATION:
          case QUERY_CASH_RESULT:
+         case MAPLELIFE_RESULT:
             return Optional.of(CashShopOperationPacketFactory.getInstance());
          case CASHSHOP_CASH_ITEM_GACHAPON_RESULT:
             return Optional.of(CashShopGachaponPacketFactoryPacketFactory.getInstance());
@@ -163,6 +172,12 @@ public class PacketCreator {
          case PLAYER_HINT:
          case SKILL_EFFECT:
          case SHOW_ITEM_EFFECT:
+         case TALK_GUIDE:
+         case SHOW_CHAIR:
+         case CANCEL_CHAIR:
+         case CANCEL_SKILL_EFFECT:
+         case SCRIPT_PROGRESS_MESSAGE:
+         case BLOCKED_MAP:
             return Optional.of(ForeignEffectPacketFactory.getInstance());
          case UPDATE_QUEST_INFO:
          case QUEST_CLEAR:
@@ -214,6 +229,7 @@ public class PacketCreator {
          case SPAWN_HIRED_MERCHANT:
          case SPAWN_GUIDE:
          case SPAWN_DRAGON:
+         case CANNOT_SPAWN_KITE:
             return Optional.of(SpawnPacketFactory.getInstance());
          case REMOVE_TV:
          case REMOVE_SPECIAL_MAPOBJECT:
@@ -230,6 +246,11 @@ public class PacketCreator {
          case FIELD_OBSTACLE_ALL_RESET:
          case BLOW_WEATHER:
          case SET_BACK_EFFECT:
+         case FORCED_MAP_EQUIP:
+         case FORCED_STAT_RESET:
+         case FORCED_STAT_SET:
+         case CONTI_MOVE:
+         case CONTI_STATE:
             return Optional.of(FieldPacketFactory.getInstance());
          case SNOWBALL_STATE:
          case HIT_SNOWBALL:
@@ -282,6 +303,9 @@ public class PacketCreator {
          case UPDATE_SKILLS:
          case SUMMON_SKILL:
          case COOLDOWN:
+         case DAMAGE_PLAYER:
+         case SET_TAMING_MOB_INFO:
+         case LEFT_KNOCK_BACK:
             return Optional.of(CharacterPacketFactory.getInstance());
          case MARRIAGE_REQUEST:
          case WEDDING_PHOTO:
@@ -340,6 +364,7 @@ public class PacketCreator {
          case CATCH_MONSTER:
          case CATCH_MONSTER_WITH_ITEM:
          case BRIDLE_MOB_CATCH_FAIL:
+         case DAMAGE_SUMMON:
             return Optional.of(MonsterPacketFactory.getInstance());
          case ARIANT_ARENA_SHOW_RESULT:
          case ARIANT_ARENA_USER_SCORE:
@@ -354,9 +379,59 @@ public class PacketCreator {
          case SORT_ITEM_RESULT:
          case CLOCK:
          case STOP_CLOCK:
+         case BLOCKED_SERVER:
+         case MEMO_RESULT:
+         case OX_QUIZ:
+         case MAP_TRANSFER_RESULT:
             return Optional.of(UIPacketFactory.getInstance());
+         case SUE_CHARACTER_RESULT:
+         case DATA_CRC_CHECK_FAILED:
+            return Optional.of(ReportPacketFactory.getInstance());
+         case RPS_GAME:
+            return Optional.of(RPSPacketFactory.getInstance());
+         case CASHSHOP_CHECK_NAME_CHANGE_POSSIBLE_RESULT:
+         case CASHSHOP_CHECK_NAME_CHANGE:
+         case CANCEL_NAME_CHANGE_RESULT:
+            return Optional.of(NameChangePacketFactory.getInstance());
+         case CASHSHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT:
+         case CANCEL_TRANSFER_WORLD_RESULT:
+            return Optional.of(WorldTransferPacketFactory.getInstance());
+         case IMITATED_NPC_DATA:
+            return Optional.of(PlayerNPCPacketFactory.getInstance());
+         case DROP_ITEM_FROM_MAPOBJECT:
+            return Optional.of(ItemDropPacketFactory.getInstance());
+         case CLAIM_STATUS_CHANGED:
+         case SESSION_VALUE:
+         case DOJO_WARP_UP:
+            return Optional.of(GenericPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
       return Optional.empty();
+   }
+
+   /**
+    * Sends a hello packet.
+    *
+    * @param mapleVersion The maple client version.
+    * @param sendIv       the IV used by the server for sending
+    * @param recvIv       the IV used by the server for receiving
+    * @return
+    */
+   public static byte[] getHello(short mapleVersion, byte[] sendIv, byte[] recvIv) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(8);
+      mplew.writeShort(0x0E);
+      mplew.writeShort(mapleVersion);
+      mplew.writeShort(1);
+      mplew.write(49);
+      mplew.write(recvIv);
+      mplew.write(sendIv);
+      mplew.write(8);
+      return mplew.getPacket();
+   }
+
+   public static byte[] customPacket(byte[] packet) {
+      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(packet.length);
+      mplew.write(packet);
+      return mplew.getPacket();
    }
 }

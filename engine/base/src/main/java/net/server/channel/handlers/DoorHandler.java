@@ -28,8 +28,8 @@ import net.server.channel.packet.DoorPacket;
 import net.server.channel.packet.reader.DoorReader;
 import server.maps.MapleDoorObject;
 import server.maps.MapleMapObject;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowBlockedMessage;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -59,7 +59,7 @@ public final class DoorHandler extends AbstractPacketHandler<DoorPacket> {
          }
       }
 
-      client.announce(MaplePacketCreator.blockedMessage(6));
+      PacketCreator.announce(client, new ShowBlockedMessage(6));
       PacketCreator.announce(client, new EnableActions());
    }
 }

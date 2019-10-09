@@ -29,7 +29,6 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GrenadeEffectPacket;
 import net.server.channel.packet.reader.GrenadeEffectReader;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.attack.ThrowGrenade;

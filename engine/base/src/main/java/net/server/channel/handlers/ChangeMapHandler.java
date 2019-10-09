@@ -37,9 +37,9 @@ import server.MapleTradeResult;
 import server.maps.MapleMap;
 import server.maps.MaplePortal;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.packet.ChangeChannel;
+import tools.packet.foreigneffect.ShowBlockedMessage;
 import tools.packet.showitemgaininchat.ShowWheelsLeft;
 import tools.packet.stat.EnableActions;
 import tools.packet.ui.DisableUI;
@@ -152,7 +152,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
             }
 
             if (portal != null && !portal.getPortalStatus()) {
-               client.announce(MaplePacketCreator.blockedMessage(1));
+               PacketCreator.announce(client, new ShowBlockedMessage(1));
                PacketCreator.announce(client, new EnableActions());
                return;
             }

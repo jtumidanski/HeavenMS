@@ -41,11 +41,11 @@ import net.server.channel.packet.special.MonsterMagnetPacket;
 import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.processor.StatEffectProcessor;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.packet.GetEnergy;
 import tools.packet.character.SkillCooldown;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.foreigneffect.ShowBuffEffectWithLevel;
@@ -71,7 +71,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
          }
          skillLevel = 1;
          chr.setDojoEnergy(0);
-         client.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         PacketCreator.announce(client, new GetEnergy("energy", chr.getDojoEnergy()));
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
       }
       if (skillLevel == 0 || skillLevel != packet.skillLevel()) {

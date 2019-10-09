@@ -62,7 +62,6 @@ import server.CashShop.CashItem;
 import server.CashShop.CashItemFactory;
 import server.MapleItemInformationProvider;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;

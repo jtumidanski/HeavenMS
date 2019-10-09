@@ -8,7 +8,6 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
 import server.maps.MapleMap
-import tools.MaplePacketCreator
 import tools.MessageBroadcaster
 import tools.PacketCreator
 import tools.ServerNoticeType
@@ -42,7 +41,8 @@ class Event3rdJob_mount {
          int oldHp = eim.getIntProperty("whog_hp")
 
          if (oldHp - hp > 1000) {    // or 800, if using mobHP / eventTime
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "Please protect the pig from the aliens!")  // thanks Vcoc
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "Please protect the pig from the aliens!")
+            // thanks Vcoc
          }
          eim.setIntProperty("whog_hp", hp)
       }

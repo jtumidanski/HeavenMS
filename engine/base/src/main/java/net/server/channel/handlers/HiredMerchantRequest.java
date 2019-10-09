@@ -35,12 +35,11 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePortal;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.MiniRoomError;
-import tools.packet.playerinteraction.GetMiniRoomError;
+import tools.packet.character.interaction.GetMiniRoomError;
 import tools.packet.shop.RetrieveFirstMessage;
 import tools.packet.shop.ShowHiredMerchantBox;
 

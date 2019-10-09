@@ -155,6 +155,10 @@ public class MasterBroadcaster {
       sendToAllInMap(map, mapleCharacter -> passRepeatToSource(false, source, mapleCharacter) && passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), packetCreator);
    }
 
+   public void sendToAllInMapRange(MapleMap map, PacketInput packetInput, MapleCharacter source, Point referencePoint) {
+      sendToAllInMap(map, mapleCharacter -> passRepeatToSource(false, source, mapleCharacter) && passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), character -> PacketCreator.create(packetInput));
+   }
+
    /**
     * Sends a packet to all GMs in the map. Including the source.
     *

@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import java.awt.Point;
 import java.util.List;
 import java.util.Map;
 

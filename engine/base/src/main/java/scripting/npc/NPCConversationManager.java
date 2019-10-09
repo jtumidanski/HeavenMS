@@ -83,7 +83,6 @@ import server.partyquest.Pyramid.PyramidMode;
 import server.processor.MapleShopProcessor;
 import tools.FilePrinter;
 import tools.LogHelper;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

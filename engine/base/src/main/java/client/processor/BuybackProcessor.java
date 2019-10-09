@@ -22,11 +22,11 @@ package client.processor;
 import client.MapleCharacter;
 import client.MapleClient;
 import server.maps.MapleMap;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.foreigneffect.ShowForeignBuybackEffect;
+import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.showitemgaininchat.ShowBuybackEffect;
 
 /**
@@ -78,7 +78,7 @@ public class BuybackProcessor {
 
          MapleMap map = chr.getMap();
          MasterBroadcaster.getInstance().sendToAllInMap(map, new PlaySound("Buyback/" + jobString));
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.earnTitleMessage(chr.getName() + " just bought back into the game!"));
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowTitleEarned(chr.getName() + " just bought back into the game!"));
 
          PacketCreator.announce(chr, new ShowBuybackEffect());
          MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowForeignBuybackEffect(chr.getId()), false, chr);

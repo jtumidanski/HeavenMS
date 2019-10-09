@@ -86,13 +86,13 @@ import server.maps.MapleMap;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.character.DamageCharacter;
 import tools.packet.monster.DamageMonster;
 import tools.packet.remove.RemoveItem;
 import tools.packet.stat.EnableActions;
@@ -569,7 +569,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.getX());
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damagePlayer(0, monster.getId(), player.getId(), toUse.getX(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.getId(), player.getId(), toUse.getX(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
                      }
                   }
                }
@@ -580,7 +580,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.getY());
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damagePlayer(0, monster.getId(), player.getId(), toUse.getY(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.getId(), player.getId(), toUse.getY(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
                      }
                   }
                }

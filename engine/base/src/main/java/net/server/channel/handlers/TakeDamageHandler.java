@@ -55,10 +55,11 @@ import server.life.MobSkillFactory;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
+import tools.packet.GetEnergy;
+import tools.packet.character.DamageCharacter;
 import tools.packet.foreigneffect.ShowBuffEffect;
 import tools.packet.monster.DamageMonster;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
@@ -295,13 +296,13 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       if (!chr.isHidden()) {
          int finalDamage = damage;
          int finalFake = fake;
-         MasterBroadcaster.getInstance().sendToAllInMap(map, character -> MaplePacketCreator.damagePlayer(damagefrom, monsteridfrom, chr.getId(), finalDamage, finalFake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), finalDamage, finalFake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
       } else {
-         map.broadcastGMMessage(chr, MaplePacketCreator.damagePlayer(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
+         map.broadcastGMMessage(chr, PacketCreator.create(new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y)), false);
       }
       if (GameConstants.isDojo(map.getId())) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_DMG);
-         client.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         PacketCreator.announce(client, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 
       for (MapleCharacter player : banishPlayers) {  // chill, if this list ever gets non-empty an attacker does exist, trust me :)

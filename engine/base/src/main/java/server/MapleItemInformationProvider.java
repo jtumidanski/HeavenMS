@@ -72,7 +72,6 @@ import server.life.MapleMonsterInformationProvider;
 import server.processor.StatEffectProcessor;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
-import tools.MaplePacketCreator;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;

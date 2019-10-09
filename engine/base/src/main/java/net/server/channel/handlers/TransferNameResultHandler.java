@@ -25,7 +25,8 @@ import client.processor.CharacterProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.TransferNameResultPacket;
 import net.server.channel.packet.reader.TransferNameResultReader;
-import tools.MaplePacketCreator;
+import tools.PacketCreator;
+import tools.packet.transfer.name.CheckNameChange;
 
 /**
  * @author Ronan
@@ -38,6 +39,6 @@ public final class TransferNameResultHandler extends AbstractPacketHandler<Trans
 
    @Override
    public void handlePacket(TransferNameResultPacket packet, MapleClient client) {
-      client.announce(MaplePacketCreator.sendNameTransferCheck(packet.name(), CharacterProcessor.getInstance().canCreateChar(packet.name())));
+      PacketCreator.announce(client, new CheckNameChange(packet.name(), CharacterProcessor.getInstance().canCreateChar(packet.name())));
    }
 }

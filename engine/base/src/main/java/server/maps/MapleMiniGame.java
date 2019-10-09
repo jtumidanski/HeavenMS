@@ -33,17 +33,17 @@ import tools.PacketCreator;
 import tools.packet.character.box.AddMatchCard;
 import tools.packet.character.box.AddOmokBox;
 import tools.packet.character.box.RemoveMiniGameBox;
-import tools.packet.playerinteraction.GetMatchCard;
-import tools.packet.playerinteraction.GetMiniGame;
-import tools.packet.playerinteraction.MiniGameClose;
-import tools.packet.playerinteraction.MiniGameMoveOmok;
-import tools.packet.playerinteraction.MiniGameNewVisitor;
-import tools.packet.playerinteraction.MiniGameOwnerWin;
-import tools.packet.playerinteraction.MiniGameRemoveVisitor;
-import tools.packet.playerinteraction.MiniGameTie;
-import tools.packet.playerinteraction.MiniGameVisitorWin;
-import tools.packet.playerinteraction.NewMatchCardVisitor;
-import tools.packet.playerinteraction.PlayerShopChat;
+import tools.packet.character.interaction.GetMatchCard;
+import tools.packet.character.interaction.GetMiniGame;
+import tools.packet.character.interaction.MiniGameClose;
+import tools.packet.character.interaction.MiniGameMoveOmok;
+import tools.packet.character.interaction.MiniGameNewVisitor;
+import tools.packet.character.interaction.MiniGameOwnerWin;
+import tools.packet.character.interaction.MiniGameRemoveVisitor;
+import tools.packet.character.interaction.MiniGameTie;
+import tools.packet.character.interaction.MiniGameVisitorWin;
+import tools.packet.character.interaction.NewMatchCardVisitor;
+import tools.packet.character.interaction.PlayerShopChat;
 
 /**
  * @author Matze

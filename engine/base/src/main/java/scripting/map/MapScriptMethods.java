@@ -26,8 +26,8 @@ import client.MapleClient;
 import client.MapleQuestStatus;
 import scripting.AbstractPlayerInteraction;
 import server.quest.MapleQuest;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
+import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.quest.ShowQuestComplete;
 import tools.packet.showitemgaininchat.ShowIntro;
 
@@ -111,11 +111,11 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
          smp.append("You have earned the <").append(questName).append(">").append(rewardstring);
          PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.getId()));
       } else {
-         getPlayer().announce(MaplePacketCreator.earnTitleMessage(status + "/" + infoex + " regions explored."));
+         PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/" + infoex + " regions explored."));
          etm.append("Trying for the ").append(questName).append(" title.");
          smp.append("You made progress on the ").append(questName).append(" title. ").append(status).append("/").append(infoex);
       }
-      getPlayer().announce(MaplePacketCreator.earnTitleMessage(etm.toString()));
+      PacketCreator.announce(getPlayer(), new ShowTitleEarned(etm.toString()));
       showInfoText(smp.toString());
    }
 
@@ -132,8 +132,8 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
       }
       String status = Integer.toString(q.getMedalProgress());
       getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
-      getPlayer().announce(MaplePacketCreator.earnTitleMessage(status + "/5 Completed"));
-      getPlayer().announce(MaplePacketCreator.earnTitleMessage("The One Who's Touched the Sky title in progress."));
+      PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/5 Completed"));
+      PacketCreator.announce(getPlayer(), new ShowTitleEarned("The One Who's Touched the Sky title in progress."));
       if (Integer.toString(q.getMedalProgress()).equals(quest.getInfoEx())) {
          showInfoText("The One Who's Touched the Sky" + rewardstring);
          PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.getId()));

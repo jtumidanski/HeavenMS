@@ -42,13 +42,13 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.packet.playerinteraction.GetTradeMeso;
-import tools.packet.playerinteraction.GetTradeResult;
-import tools.packet.playerinteraction.GetTradeStart;
-import tools.packet.playerinteraction.TradeChat;
-import tools.packet.playerinteraction.TradeConfirmation;
-import tools.packet.playerinteraction.TradeInvite;
-import tools.packet.playerinteraction.TradePartnerAdd;
+import tools.packet.character.interaction.GetTradeMeso;
+import tools.packet.character.interaction.GetTradeResult;
+import tools.packet.character.interaction.GetTradeStart;
+import tools.packet.character.interaction.TradeChat;
+import tools.packet.character.interaction.TradeConfirmation;
+import tools.packet.character.interaction.TradeInvite;
+import tools.packet.character.interaction.TradePartnerAdd;
 
 /**
  * @author Matze

@@ -34,8 +34,9 @@ import server.life.MaplePlayerNPC;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
+import tools.packet.character.npc.GetPlayerNPC;
+import tools.packet.character.npc.RemovePlayerNPC;
 import tools.packet.spawn.RemoveNPCController;
 import tools.packet.spawn.SpawnPlayerNPC;
 
@@ -139,7 +140,9 @@ public class MaplePlayerNPCPositioner {
 
    private static Point reorganizePlayerNpcs(MapleMap map, int newStep, List<MapleMapObject> mmoList) {
       if (!mmoList.isEmpty()) {
-         if (ServerConstants.USE_DEBUG) System.out.println("Reorganizing pnpc map, step " + newStep);
+         if (ServerConstants.USE_DEBUG) {
+            System.out.println("Reorganizing pnpc map, step " + newStep);
+         }
 
          List<MaplePlayerNPC> playerNpcs = new ArrayList<>(mmoList.size());
          for (MapleMapObject mmo : mmoList) {
@@ -159,7 +162,7 @@ public class MaplePlayerNPCPositioner {
             for (MaplePlayerNPC pn : playerNpcs) {
                m.removeMapObject(pn);
                MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.removePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.getObjectId()));
             }
          }
 
@@ -171,7 +174,7 @@ public class MaplePlayerNPCPositioner {
             for (MaplePlayerNPC pn : playerNpcs) {
                m.addPlayerNPCMapObject(pn);
                MasterBroadcaster.getInstance().sendToAllInMap(m, new SpawnPlayerNPC(pn));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, character -> MaplePacketCreator.getPlayerNPC(pn));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new GetPlayerNPC(pn));
             }
          }
 

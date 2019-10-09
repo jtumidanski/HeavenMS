@@ -44,11 +44,11 @@ import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.worker.PacketReaderFactory;
 import server.MapleItemInformationProvider;
 import server.MapleStatEffect;
-import tools.MaplePacketCreator;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.packet.GetEnergy;
 import tools.packet.attack.RangedAttack;
 import tools.packet.character.SkillCooldown;
 
@@ -78,7 +78,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
 
       if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_ATK);
-         c.announce(MaplePacketCreator.getEnergy("energy", chr.getDojoEnergy()));
+         PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 
       if (attack.skill() == Buccaneer.ENERGY_ORB || attack.skill() == ThunderBreaker.SPARK || attack.skill() == Shadower.TAUNT || attack.skill() == NightLord.TAUNT) {

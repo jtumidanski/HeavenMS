@@ -31,7 +31,6 @@ import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import server.life.MapleMonster;
 import server.maps.MapleMapObject;
-import tools.MaplePacketCreator;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.buff.GiveBuff;
