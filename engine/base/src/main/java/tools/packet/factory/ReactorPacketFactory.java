@@ -19,46 +19,37 @@ public class ReactorPacketFactory extends AbstractPacketFactory {
    }
 
    private ReactorPacketFactory() {
-      registry.setHandler(SpawnReactor.class, packet -> this.spawnReactor((SpawnReactor) packet));
-      registry.setHandler(TriggerReactor.class, packet -> this.triggerReactor((TriggerReactor) packet));
-      registry.setHandler(DestroyReactor.class, packet -> this.destroyReactor((DestroyReactor) packet));
+      registry.setHandler(SpawnReactor.class, packet -> create(SendOpcode.REACTOR_SPAWN, this::spawnReactor, packet));
+      registry.setHandler(TriggerReactor.class, packet -> create(SendOpcode.REACTOR_HIT, this::triggerReactor, packet));
+      registry.setHandler(DestroyReactor.class, packet -> create(SendOpcode.REACTOR_DESTROY, this::destroyReactor, packet));
    }
 
    // is there a way to spawn reactors non-animated?
-   protected byte[] spawnReactor(SpawnReactor packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+   protected void spawnReactor(MaplePacketLittleEndianWriter writer, SpawnReactor packet) {
       Point pos = packet.getReactor().getPosition();
-      mplew.writeShort(SendOpcode.REACTOR_SPAWN.getValue());
-      mplew.writeInt(packet.getReactor().getObjectId());
-      mplew.writeInt(packet.getReactor().getId());
-      mplew.write(packet.getReactor().getState());
-      mplew.writePos(pos);
-      mplew.write(0);
-      mplew.writeShort(0);
-      return mplew.getPacket();
+      writer.writeInt(packet.getReactor().getObjectId());
+      writer.writeInt(packet.getReactor().getId());
+      writer.write(packet.getReactor().getState());
+      writer.writePos(pos);
+      writer.write(0);
+      writer.writeShort(0);
    }
 
    // is there a way to trigger reactors without performing the hit animation?
-   protected byte[] triggerReactor(TriggerReactor packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+   protected void triggerReactor(MaplePacketLittleEndianWriter writer, TriggerReactor packet) {
       Point pos = packet.getReactor().getPosition();
-      mplew.writeShort(SendOpcode.REACTOR_HIT.getValue());
-      mplew.writeInt(packet.getReactor().getObjectId());
-      mplew.write(packet.getReactor().getState());
-      mplew.writePos(pos);
-      mplew.write(packet.getStance());
-      mplew.writeShort(0);
-      mplew.write(5); // frame delay, set to 5 since there doesn't appear to be a fixed formula for it
-      return mplew.getPacket();
+      writer.writeInt(packet.getReactor().getObjectId());
+      writer.write(packet.getReactor().getState());
+      writer.writePos(pos);
+      writer.write(packet.getStance());
+      writer.writeShort(0);
+      writer.write(5); // frame delay, set to 5 since there doesn't appear to be a fixed formula for it
    }
 
-   protected byte[] destroyReactor(DestroyReactor packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+   protected void destroyReactor(MaplePacketLittleEndianWriter writer, DestroyReactor packet) {
       Point pos = packet.getReactor().getPosition();
-      mplew.writeShort(SendOpcode.REACTOR_DESTROY.getValue());
-      mplew.writeInt(packet.getReactor().getObjectId());
-      mplew.write(packet.getReactor().getState());
-      mplew.writePos(pos);
-      return mplew.getPacket();
+      writer.writeInt(packet.getReactor().getObjectId());
+      writer.write(packet.getReactor().getState());
+      writer.writePos(pos);
    }
 }

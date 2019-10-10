@@ -15,14 +15,11 @@ public class DeleteCharacterPacketFactory extends AbstractPacketFactory {
    }
 
    private DeleteCharacterPacketFactory() {
-      registry.setHandler(DeleteCharacter.class, packet -> this.deleteCharResponse((DeleteCharacter) packet));
+      registry.setHandler(DeleteCharacter.class, packet -> create(SendOpcode.DELETE_CHAR_RESPONSE, this::deleteCharResponse, packet));
    }
 
-   protected byte[] deleteCharResponse(DeleteCharacter packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DELETE_CHAR_RESPONSE.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.state().getValue());
-      return mplew.getPacket();
+   protected void deleteCharResponse(MaplePacketLittleEndianWriter writer, DeleteCharacter packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.state().getValue());
    }
 }

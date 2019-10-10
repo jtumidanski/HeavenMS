@@ -1,15 +1,12 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.DojoWarpUp;
 import tools.packet.EnableReport;
 import tools.packet.GetEnergy;
-import tools.packet.PacketInput;
 import tools.packet.SetNPCScriptable;
-import tools.packet.factory.AbstractPacketFactory;
 
 public class GenericPacketFactory extends AbstractPacketFactory {
    private static GenericPacketFactory instance;
@@ -22,45 +19,33 @@ public class GenericPacketFactory extends AbstractPacketFactory {
    }
 
    private GenericPacketFactory() {
-      registry.setHandler(EnableReport.class, packet -> this.enableReport((EnableReport) packet));
-      registry.setHandler(GetEnergy.class, packet -> this.getEnergy((GetEnergy) packet));
-      registry.setHandler(DojoWarpUp.class, packet -> this.dojoWarpUp((DojoWarpUp) packet));
-      registry.setHandler(SetNPCScriptable.class, packet -> this.setNPCScriptable((SetNPCScriptable) packet));
+      registry.setHandler(EnableReport.class, packet -> create(SendOpcode.CLAIM_STATUS_CHANGED, this::enableReport, packet, 3));
+      registry.setHandler(GetEnergy.class, packet -> create(SendOpcode.SESSION_VALUE, this::getEnergy, packet));
+      registry.setHandler(DojoWarpUp.class, packet -> create(SendOpcode.DOJO_WARP_UP, this::dojoWarpUp, packet));
+      registry.setHandler(SetNPCScriptable.class, packet -> create(SendOpcode.SET_NPC_SCRIPTABLE, this::setNPCScriptable, packet));
    }
 
-   protected byte[] enableReport(EnableReport packet) { // thanks to snow
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.CLAIM_STATUS_CHANGED.getValue());
-      mplew.write(1);
-      return mplew.getPacket();
+   protected void enableReport(MaplePacketLittleEndianWriter writer, EnableReport packet) { // thanks to snow
+      writer.write(1);
    }
 
-   protected byte[] getEnergy(GetEnergy packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SESSION_VALUE.getValue());
-      mplew.writeMapleAsciiString(packet.info());
-      mplew.writeMapleAsciiString(Integer.toString(packet.amount()));
-      return mplew.getPacket();
+   protected void getEnergy(MaplePacketLittleEndianWriter writer, GetEnergy packet) {
+      writer.writeMapleAsciiString(packet.info());
+      writer.writeMapleAsciiString(Integer.toString(packet.amount()));
    }
 
-   protected byte[] dojoWarpUp(DojoWarpUp packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DOJO_WARP_UP.getValue());
-      mplew.write(0);
-      mplew.write(6);
-      return mplew.getPacket();
+   protected void dojoWarpUp(MaplePacketLittleEndianWriter writer, DojoWarpUp packet) {
+      writer.write(0);
+      writer.write(6);
    }
 
-   protected byte[] setNPCScriptable(SetNPCScriptable packet) {  // thanks to GabrielSin
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_NPC_SCRIPTABLE.getValue());
-      mplew.write(packet.descriptions().size());
+   protected void setNPCScriptable(MaplePacketLittleEndianWriter writer, SetNPCScriptable packet) {  // thanks to GabrielSin
+      writer.write(packet.descriptions().size());
       for (Pair<Integer, String> p : packet.descriptions()) {
-         mplew.writeInt(p.getLeft());
-         mplew.writeMapleAsciiString(p.getRight());
-         mplew.writeInt(0); // start time
-         mplew.writeInt(Integer.MAX_VALUE); // end time
+         writer.writeInt(p.getLeft());
+         writer.writeMapleAsciiString(p.getRight());
+         writer.writeInt(0); // start time
+         writer.writeInt(Integer.MAX_VALUE); // end time
       }
-      return mplew.getPacket();
    }
 }

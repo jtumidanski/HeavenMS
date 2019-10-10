@@ -25,33 +25,32 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
    }
 
    private InventoryPacketFactory() {
-      registry.setHandler(ModifyInventoryPacket.class, packet -> this.modifyInventory((ModifyInventoryPacket) packet));
-      registry.setHandler(InventoryFull.class, packet -> this.modifyInventory(new ModifyInventoryPacket(((InventoryFull) packet).updateTick(), ((InventoryFull) packet).modifications())));
-      registry.setHandler(SlotLimitUpdate.class, packet -> this.updateInventorySlotLimit((SlotLimitUpdate) packet));
+      registry.setHandler(ModifyInventoryPacket.class, packet -> create(SendOpcode.INVENTORY_OPERATION, this::modifyInventory, packet));
+      registry.setHandler(InventoryFull.class, packet -> create(SendOpcode.INVENTORY_OPERATION, this::modifyInventory,
+            new ModifyInventoryPacket(((InventoryFull) packet).updateTick(), ((InventoryFull) packet).modifications())));
+      registry.setHandler(SlotLimitUpdate.class, packet -> create(SendOpcode.INVENTORY_GROW, this::updateInventorySlotLimit, packet));
    }
 
-   protected byte[] modifyInventory(ModifyInventoryPacket packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.INVENTORY_OPERATION.getValue());
-      mplew.writeBool(packet.updateTick());
-      mplew.write(packet.modifications().size());
-      //mplew.write(0); v104 :)
+   protected void modifyInventory(MaplePacketLittleEndianWriter writer, ModifyInventoryPacket packet) {
+      writer.writeBool(packet.updateTick());
+      writer.write(packet.modifications().size());
+      //writer.write(0); v104 :)
       int addMovement = -1;
       for (ModifyInventory mod : packet.modifications()) {
-         mplew.write(mod.mode());
-         mplew.write(mod.inventoryType());
-         mplew.writeShort(mod.mode() == 2 ? mod.oldPos() : mod.position());
+         writer.write(mod.mode());
+         writer.write(mod.inventoryType());
+         writer.writeShort(mod.mode() == 2 ? mod.oldPos() : mod.position());
          switch (mod.mode()) {
             case 0: {//add item
-               addItemInfo(mplew, mod.item(), true);
+               addItemInfo(writer, mod.item(), true);
                break;
             }
             case 1: {//update quantity
-               mplew.writeShort(mod.quantity());
+               writer.writeShort(mod.quantity());
                break;
             }
             case 2: {//move
-               mplew.writeShort(mod.position());
+               writer.writeShort(mod.position());
                if (mod.position() < 0 || mod.oldPos() < 0) {
                   addMovement = mod.oldPos() < 0 ? 1 : 2;
                }
@@ -67,12 +66,11 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
          mod.clear();
       }
       if (addMovement > -1) {
-         mplew.write(addMovement);
+         writer.write(addMovement);
       }
-      return mplew.getPacket();
    }
 
-   protected void addItemInfo(final MaplePacketLittleEndianWriter mplew, Item item, boolean zeroPosition) {
+   protected void addItemInfo(final MaplePacketLittleEndianWriter writer, Item item, boolean zeroPosition) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       boolean isCash = ii.isCash(item.id());
       boolean isPet = item.petId() > -1;
@@ -89,65 +87,65 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
             if (pos < 0) {
                pos *= -1;
             }
-            mplew.writeShort(pos > 100 ? pos - 100 : pos);
+            writer.writeShort(pos > 100 ? pos - 100 : pos);
          } else {
-            mplew.write(pos);
+            writer.write(pos);
          }
       }
-      mplew.write(itemType);
-      mplew.writeInt(item.id());
-      mplew.writeBool(isCash);
+      writer.write(itemType);
+      writer.writeInt(item.id());
+      writer.writeBool(isCash);
       if (isCash) {
-         mplew.writeLong(isPet ? item.petId() : isRing ? equip.ringId() : item.cashId());
+         writer.writeLong(isPet ? item.petId() : isRing ? equip.ringId() : item.cashId());
       }
-      addExpirationTime(mplew, item.expiration());
+      addExpirationTime(writer, item.expiration());
       if (isPet) {
          MaplePet pet = item.pet().get();
-         mplew.writeAsciiString(StringUtil.getRightPaddedStr(pet.name(), '\0', 13));
-         mplew.write(pet.level());
-         mplew.writeShort(pet.closeness());
-         mplew.write(pet.fullness());
-         addExpirationTime(mplew, item.expiration());
-         mplew.writeInt(pet.petFlag());  /* pet flags found by -- lrenex & Spoon */
+         writer.writeAsciiString(StringUtil.getRightPaddedStr(pet.name(), '\0', 13));
+         writer.write(pet.level());
+         writer.writeShort(pet.closeness());
+         writer.write(pet.fullness());
+         addExpirationTime(writer, item.expiration());
+         writer.writeInt(pet.petFlag());  /* pet flags found by -- lrenex & Spoon */
 
-         mplew.write(new byte[]{(byte) 0x50, (byte) 0x46}); //wonder what this is
-         mplew.writeInt(0);
+         writer.write(new byte[]{(byte) 0x50, (byte) 0x46}); //wonder what this is
+         writer.writeInt(0);
          return;
       }
       if (equip == null) {
-         mplew.writeShort(item.quantity());
-         mplew.writeMapleAsciiString(item.owner());
-         mplew.writeShort(item.flag()); // flag
+         writer.writeShort(item.quantity());
+         writer.writeMapleAsciiString(item.owner());
+         writer.writeShort(item.flag()); // flag
 
          if (ItemConstants.isRechargeable(item.id())) {
-            mplew.writeInt(2);
-            mplew.write(new byte[]{(byte) 0x54, 0, 0, (byte) 0x34});
+            writer.writeInt(2);
+            writer.write(new byte[]{(byte) 0x54, 0, 0, (byte) 0x34});
          }
          return;
       }
-      mplew.write(equip.slots()); // upgrade slots
-      mplew.write(equip.level()); // level
-      mplew.writeShort(equip.str()); // str
-      mplew.writeShort(equip.dex()); // dex
-      mplew.writeShort(equip._int()); // int
-      mplew.writeShort(equip.luk()); // luk
-      mplew.writeShort(equip.hp()); // hp
-      mplew.writeShort(equip.mp()); // mp
-      mplew.writeShort(equip.watk()); // watk
-      mplew.writeShort(equip.matk()); // matk
-      mplew.writeShort(equip.wdef()); // wdef
-      mplew.writeShort(equip.mdef()); // mdef
-      mplew.writeShort(equip.acc()); // accuracy
-      mplew.writeShort(equip.avoid()); // avoid
-      mplew.writeShort(equip.hands()); // hands
-      mplew.writeShort(equip.speed()); // speed
-      mplew.writeShort(equip.jump()); // jump
-      mplew.writeMapleAsciiString(equip.owner()); // owner name
-      mplew.writeShort(equip.flag()); //Item Flags
+      writer.write(equip.slots()); // upgrade slots
+      writer.write(equip.level()); // level
+      writer.writeShort(equip.str()); // str
+      writer.writeShort(equip.dex()); // dex
+      writer.writeShort(equip._int()); // int
+      writer.writeShort(equip.luk()); // luk
+      writer.writeShort(equip.hp()); // hp
+      writer.writeShort(equip.mp()); // mp
+      writer.writeShort(equip.watk()); // watk
+      writer.writeShort(equip.matk()); // matk
+      writer.writeShort(equip.wdef()); // wdef
+      writer.writeShort(equip.mdef()); // mdef
+      writer.writeShort(equip.acc()); // accuracy
+      writer.writeShort(equip.avoid()); // avoid
+      writer.writeShort(equip.hands()); // hands
+      writer.writeShort(equip.speed()); // speed
+      writer.writeShort(equip.jump()); // jump
+      writer.writeMapleAsciiString(equip.owner()); // owner name
+      writer.writeShort(equip.flag()); //Item Flags
 
       if (isCash) {
          for (int i = 0; i < 10; i++) {
-            mplew.write(0x40);
+            writer.write(0x40);
          }
       } else {
          int itemLevel = equip.itemLevel();
@@ -155,21 +153,18 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
          long expNibble = (long) (ExpTable.getExpNeededForLevel(ii.getEquipLevelReq(item.id())) * equip.itemExp());
          expNibble /= ExpTable.getEquipExpNeededForLevel(itemLevel);
 
-         mplew.write(0);
-         mplew.write(itemLevel); //Item Level
-         mplew.writeInt((int) expNibble);
-         mplew.writeInt(equip.vicious()); //WTF NEXON ARE YOU SERIOUS?
-         mplew.writeLong(0);
+         writer.write(0);
+         writer.write(itemLevel); //Item Level
+         writer.writeInt((int) expNibble);
+         writer.writeInt(equip.vicious()); //WTF NEXON ARE YOU SERIOUS?
+         writer.writeLong(0);
       }
-      mplew.writeLong(getTime(-2));
-      mplew.writeInt(-1);
+      writer.writeLong(getTime(-2));
+      writer.writeInt(-1);
    }
 
-   protected byte[] updateInventorySlotLimit(SlotLimitUpdate packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.INVENTORY_GROW.getValue());
-      mplew.write(packet.inventoryType());
-      mplew.write(packet.newLimit());
-      return mplew.getPacket();
+   protected void updateInventorySlotLimit(MaplePacketLittleEndianWriter writer, SlotLimitUpdate packet) {
+      writer.write(packet.inventoryType());
+      writer.write(packet.newLimit());
    }
 }

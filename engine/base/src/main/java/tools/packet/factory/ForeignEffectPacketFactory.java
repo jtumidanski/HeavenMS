@@ -38,159 +38,119 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
    }
 
    private ForeignEffectPacketFactory() {
-      registry.setHandler(ShowBuffEffect.class, packet -> this.showBuffEffect((ShowBuffEffect) packet));
-      registry.setHandler(ShowBuffEffectWithLevel.class, packet -> this.showBuffEffectWithLevel((ShowBuffEffectWithLevel) packet));
-      registry.setHandler(ShowBerserk.class, packet -> this.showBerserk((ShowBerserk) packet));
-      registry.setHandler(ShowPetLevelUp.class, packet -> this.showPetLevelUp((ShowPetLevelUp) packet));
-      registry.setHandler(ShowForeignCardEffect.class, packet -> this.showForeignCardEffect((ShowForeignCardEffect) packet));
-      registry.setHandler(ShowForeignInfo.class, packet -> this.showForeignInfo((ShowForeignInfo) packet));
-      registry.setHandler(ShowForeignBuybackEffect.class, packet -> this.showForeignBuybackEffect((ShowForeignBuybackEffect) packet));
-      registry.setHandler(ShowForeignMakerEffect.class, packet -> this.showForeignMakerEffect((ShowForeignMakerEffect) packet));
-      registry.setHandler(ShowForeignEffect.class, packet -> this.showForeignEffect((ShowForeignEffect) packet));
-      registry.setHandler(ShowRecovery.class, packet -> this.showRecovery((ShowRecovery) packet));
-      registry.setHandler(ShowScrollEffect.class, packet -> this.getScrollEffect((ShowScrollEffect) packet));
-      registry.setHandler(ShowSkillBookResult.class, packet -> this.skillBookResult((ShowSkillBookResult) packet));
-      registry.setHandler(ShowCombo.class, packet -> this.showCombo((ShowCombo) packet));
-      registry.setHandler(ShowHint.class, packet -> this.sendHint((ShowHint) packet));
-      registry.setHandler(ShowSkillEffect.class, packet -> this.skillEffect((ShowSkillEffect) packet));
-      registry.setHandler(ShowItemEffect.class, packet -> this.itemEffect((ShowItemEffect) packet));
-      registry.setHandler(ShowGuideHint.class, packet -> this.guideHint((ShowGuideHint) packet));
-      registry.setHandler(ShowGuideTalk.class, packet -> this.talkGuide((ShowGuideTalk) packet));
-      registry.setHandler(ShowChair.class, packet -> this.showChair((ShowChair) packet));
-      registry.setHandler(CancelChair.class, packet -> this.cancelChair((CancelChair) packet));
-      registry.setHandler(CancelSkill.class, packet -> this.skillCancel((CancelSkill) packet));
-      registry.setHandler(ShowTitleEarned.class, packet -> this.earnTitleMessage((ShowTitleEarned) packet));
-      registry.setHandler(ShowBlockedMessage.class, packet -> this.blockedMessage((ShowBlockedMessage) packet));
+      registry.setHandler(ShowBuffEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showBuffEffect, packet));
+      registry.setHandler(ShowBuffEffectWithLevel.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showBuffEffectWithLevel, packet));
+      registry.setHandler(ShowBerserk.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showBerserk, packet));
+      registry.setHandler(ShowPetLevelUp.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showPetLevelUp, packet));
+      registry.setHandler(ShowForeignCardEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignCardEffect, packet, 7));
+      registry.setHandler(ShowForeignInfo.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignInfo, packet));
+      registry.setHandler(ShowForeignBuybackEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignBuybackEffect, packet));
+      registry.setHandler(ShowForeignMakerEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignMakerEffect, packet));
+      registry.setHandler(ShowForeignEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignEffect, packet));
+      registry.setHandler(ShowRecovery.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showRecovery, packet));
+      registry.setHandler(ShowScrollEffect.class, packet -> create(SendOpcode.SHOW_SCROLL_EFFECT, this::getScrollEffect, packet));
+      registry.setHandler(ShowSkillBookResult.class, packet -> create(SendOpcode.SKILL_LEARN_ITEM_RESULT, this::skillBookResult, packet));
+      registry.setHandler(ShowCombo.class, packet -> create(SendOpcode.SHOW_COMBO, this::showCombo, packet, 6));
+      registry.setHandler(ShowHint.class, packet -> create(SendOpcode.PLAYER_HINT, this::sendHint, packet));
+      registry.setHandler(ShowSkillEffect.class, packet -> create(SendOpcode.SKILL_EFFECT, this::skillEffect, packet));
+      registry.setHandler(ShowItemEffect.class, packet -> create(SendOpcode.SHOW_ITEM_EFFECT, this::itemEffect, packet));
+      registry.setHandler(ShowGuideHint.class, packet -> create(SendOpcode.TALK_GUIDE, this::guideHint, packet, 11));
+      registry.setHandler(ShowGuideTalk.class, packet -> create(SendOpcode.TALK_GUIDE, this::talkGuide, packet));
+      registry.setHandler(ShowChair.class, packet -> create(SendOpcode.SHOW_CHAIR, this::showChair, packet));
+      registry.setHandler(CancelChair.class, packet -> create(SendOpcode.CANCEL_CHAIR, this::cancelChair, packet));
+      registry.setHandler(CancelSkill.class, packet -> create(SendOpcode.CANCEL_SKILL_EFFECT, this::skillCancel, packet));
+      registry.setHandler(ShowTitleEarned.class, packet -> create(SendOpcode.SCRIPT_PROGRESS_MESSAGE, this::earnTitleMessage, packet));
+      registry.setHandler(ShowBlockedMessage.class, packet -> create(SendOpcode.BLOCKED_MAP, this::blockedMessage, packet));
    }
 
-   protected byte[] showBuffEffect(ShowBuffEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.effectId()); //buff level
-      mplew.writeInt(packet.skillId());
-      mplew.write(packet.direction());
-      mplew.write(1);
-      mplew.writeLong(0);
-      return mplew.getPacket();
+   protected void showBuffEffect(MaplePacketLittleEndianWriter writer, ShowBuffEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.effectId()); //buff level
+      writer.writeInt(packet.skillId());
+      writer.write(packet.direction());
+      writer.write(1);
+      writer.writeLong(0);
    }
 
-   protected byte[] showBuffEffectWithLevel(ShowBuffEffectWithLevel packet) {   // updated packet structure found thanks to Rien dev team
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.effectId());
-      mplew.writeInt(packet.skillId());
-      mplew.write(0);
-      mplew.write(packet.skillLevel());
-      mplew.write(packet.direction());
-      return mplew.getPacket();
+   protected void showBuffEffectWithLevel(MaplePacketLittleEndianWriter writer, ShowBuffEffectWithLevel packet) {   // updated packet structure found thanks to Rien dev team
+      writer.writeInt(packet.characterId());
+      writer.write(packet.effectId());
+      writer.writeInt(packet.skillId());
+      writer.write(0);
+      writer.write(packet.skillLevel());
+      writer.write(packet.direction());
    }
 
-   protected byte[] showBerserk(ShowBerserk packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(1);
-      mplew.writeInt(1320006);
-      mplew.write(0xA9);
-      mplew.write(packet.skillLevel());
-      mplew.write(packet.berserk() ? 1 : 0);
-      return mplew.getPacket();
+   protected void showBerserk(MaplePacketLittleEndianWriter writer, ShowBerserk packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(1);
+      writer.writeInt(1320006);
+      writer.write(0xA9);
+      writer.write(packet.skillLevel());
+      writer.write(packet.berserk() ? 1 : 0);
    }
 
-   protected byte[] showPetLevelUp(ShowPetLevelUp packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(4);
-      mplew.write(0);
-      mplew.write(packet.index());
-      return mplew.getPacket();
+   protected void showPetLevelUp(MaplePacketLittleEndianWriter writer, ShowPetLevelUp packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(4);
+      writer.write(0);
+      writer.write(packet.index());
    }
 
-   protected byte[] showForeignCardEffect(ShowForeignCardEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(0x0D);
-      return mplew.getPacket();
+   protected void showForeignCardEffect(MaplePacketLittleEndianWriter writer, ShowForeignCardEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(0x0D);
    }
 
-   protected byte[] showForeignInfo(ShowForeignInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(0x17);
-      mplew.writeMapleAsciiString(packet.path());
-      mplew.writeInt(1);
-      return mplew.getPacket();
+   protected void showForeignInfo(MaplePacketLittleEndianWriter writer, ShowForeignInfo packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(0x17);
+      writer.writeMapleAsciiString(packet.path());
+      writer.writeInt(1);
    }
 
-   protected byte[] showForeignBuybackEffect(ShowForeignBuybackEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(11);
-      mplew.writeInt(0);
-
-      return mplew.getPacket();
+   protected void showForeignBuybackEffect(MaplePacketLittleEndianWriter writer, ShowForeignBuybackEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(11);
+      writer.writeInt(0);
    }
 
-   protected byte[] showForeignMakerEffect(ShowForeignMakerEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(16);
-      mplew.writeInt(packet.success() ? 0 : 1);
-      return mplew.getPacket();
+   protected void showForeignMakerEffect(MaplePacketLittleEndianWriter writer, ShowForeignMakerEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(16);
+      writer.writeInt(packet.success() ? 0 : 1);
    }
 
-   protected byte[] showForeignEffect(ShowForeignEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.effect());
-      return mplew.getPacket();
+   protected void showForeignEffect(MaplePacketLittleEndianWriter writer, ShowForeignEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.effect());
    }
 
-   protected byte[] showRecovery(ShowRecovery packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_FOREIGN_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(0x0A);
-      mplew.write(packet.amount());
-      return mplew.getPacket();
+   protected void showRecovery(MaplePacketLittleEndianWriter writer, ShowRecovery packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(0x0A);
+      writer.write(packet.amount());
    }
 
-   protected byte[] getScrollEffect(ShowScrollEffect packet) {   // thanks to Rien dev team
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_SCROLL_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeBool(packet.success() == ScrollResult.SUCCESS);
-      mplew.writeBool(packet.success() == ScrollResult.CURSE);
-      mplew.writeBool(packet.legendarySpirit());
-      mplew.writeBool(packet.whiteScroll());
-      return mplew.getPacket();
+   protected void getScrollEffect(MaplePacketLittleEndianWriter writer, ShowScrollEffect packet) {   // thanks to Rien dev team
+      writer.writeInt(packet.characterId());
+      writer.writeBool(packet.success() == ScrollResult.SUCCESS);
+      writer.writeBool(packet.success() == ScrollResult.CURSE);
+      writer.writeBool(packet.legendarySpirit());
+      writer.writeBool(packet.whiteScroll());
    }
 
-   protected byte[] skillBookResult(ShowSkillBookResult packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SKILL_LEARN_ITEM_RESULT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(1);
-      mplew.writeInt(packet.skillId());
-      mplew.writeInt(packet.maxLevel());
-      mplew.write(packet.canUse() ? 1 : 0);
-      mplew.write(packet.success() ? 1 : 0);
-      return mplew.getPacket();
+   protected void skillBookResult(MaplePacketLittleEndianWriter writer, ShowSkillBookResult packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(1);
+      writer.writeInt(packet.skillId());
+      writer.writeInt(packet.maxLevel());
+      writer.write(packet.canUse() ? 1 : 0);
+      writer.write(packet.success() ? 1 : 0);
    }
 
-   protected byte[] showCombo(ShowCombo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.SHOW_COMBO.getValue());
-      mplew.writeInt(packet.count());
-      return mplew.getPacket();
+   protected void showCombo(MaplePacketLittleEndianWriter writer, ShowCombo packet) {
+      writer.writeInt(packet.count());
    }
 
    /**
@@ -198,7 +158,7 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
     *
     * @return The player hint packet.
     */
-   protected byte[] sendHint(ShowHint packet) {
+   protected void sendHint(MaplePacketLittleEndianWriter writer, ShowHint packet) {
       int width = packet.width();
       int height = packet.height();
 
@@ -211,86 +171,59 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
       if (height < 5) {
          height = 5;
       }
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PLAYER_HINT.getValue());
-      mplew.writeMapleAsciiString(packet.hint());
-      mplew.writeShort(width);
-      mplew.writeShort(height);
-      mplew.write(1);
-      return mplew.getPacket();
+      writer.writeMapleAsciiString(packet.hint());
+      writer.writeShort(width);
+      writer.writeShort(height);
+      writer.write(1);
    }
 
-   protected byte[] skillEffect(ShowSkillEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SKILL_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.skillId());
-      mplew.write(packet.level());
-      mplew.write(packet.flags());
-      mplew.write(packet.speed());
-      mplew.write(packet.direction()); //Mmmk
-      return mplew.getPacket();
+   protected void skillEffect(MaplePacketLittleEndianWriter writer, ShowSkillEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.skillId());
+      writer.write(packet.level());
+      writer.write(packet.flags());
+      writer.write(packet.speed());
+      writer.write(packet.direction()); //Mmmk
    }
 
-   protected byte[] itemEffect(ShowItemEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_ITEM_EFFECT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.itemId());
-      return mplew.getPacket();
+   protected void itemEffect(MaplePacketLittleEndianWriter writer, ShowItemEffect packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.itemId());
    }
 
-   protected byte[] guideHint(ShowGuideHint packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.TALK_GUIDE.getValue());
-      mplew.write(1);
-      mplew.writeInt(packet.hint());
-      mplew.writeInt(7000);
-      return mplew.getPacket();
+   protected void guideHint(MaplePacketLittleEndianWriter writer, ShowGuideHint packet) {
+      writer.write(1);
+      writer.writeInt(packet.hint());
+      writer.writeInt(7000);
    }
 
-   protected byte[] talkGuide(ShowGuideTalk packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.TALK_GUIDE.getValue());
-      mplew.write(0);
-      mplew.writeMapleAsciiString(packet.talk());
-      mplew.write(new byte[]{(byte) 0xC8, 0, 0, 0, (byte) 0xA0, (byte) 0x0F, 0, 0});
-      return mplew.getPacket();
+   protected void talkGuide(MaplePacketLittleEndianWriter writer, ShowGuideTalk packet) {
+      writer.write(0);
+      writer.writeMapleAsciiString(packet.talk());
+      writer.write(new byte[]{(byte) 0xC8, 0, 0, 0, (byte) 0xA0, (byte) 0x0F, 0, 0});
    }
 
-   protected byte[] showChair(ShowChair packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_CHAIR.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.itemId());
-      return mplew.getPacket();
+   protected void showChair(MaplePacketLittleEndianWriter writer, ShowChair packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.itemId());
    }
 
-   protected byte[] cancelChair(CancelChair packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_CHAIR.getValue());
+   protected void cancelChair(MaplePacketLittleEndianWriter writer, CancelChair packet) {
       if (packet.itemId() < 0) {
-         mplew.write(0);
+         writer.write(0);
       } else {
-         mplew.write(1);
-         mplew.writeShort(packet.itemId());
+         writer.write(1);
+         writer.writeShort(packet.itemId());
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] skillCancel(CancelSkill packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_SKILL_EFFECT.getValue());
-      mplew.writeInt(packet.fromCharacterId());
-      mplew.writeInt(packet.skillId());
-      return mplew.getPacket();
+   protected void skillCancel(MaplePacketLittleEndianWriter writer, CancelSkill packet) {
+      writer.writeInt(packet.fromCharacterId());
+      writer.writeInt(packet.skillId());
    }
 
-   protected byte[] earnTitleMessage(ShowTitleEarned packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SCRIPT_PROGRESS_MESSAGE.getValue());
-      mplew.writeMapleAsciiString(packet.message());
-      return mplew.getPacket();
+   protected void earnTitleMessage(MaplePacketLittleEndianWriter writer, ShowTitleEarned packet) {
+      writer.writeMapleAsciiString(packet.message());
    }
 
    /**
@@ -303,10 +236,7 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
     * This map can only be entered by party members.<br> 7: The Cash Shop is
     * currently not available. Stay tuned...<br>
     */
-   protected byte[] blockedMessage(ShowBlockedMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BLOCKED_MAP.getValue());
-      mplew.write(packet.theType());
-      return mplew.getPacket();
+   protected void blockedMessage(MaplePacketLittleEndianWriter writer, ShowBlockedMessage packet) {
+      writer.write(packet.theType());
    }
 }

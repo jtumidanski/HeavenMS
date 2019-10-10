@@ -21,80 +21,59 @@ public class MessengerPacketFactory extends AbstractPacketFactory {
    }
 
    private MessengerPacketFactory() {
-      registry.setHandler(MessengerInvite.class, packet -> this.messengerInvite((MessengerInvite) packet));
-      registry.setHandler(MessengerAddCharacter.class, packet -> this.addMessengerPlayer((MessengerAddCharacter) packet));
-      registry.setHandler(MessengerRemoveCharacter.class, packet -> this.removeMessengerPlayer((MessengerRemoveCharacter) packet));
-      registry.setHandler(MessengerUpdateCharacter.class, packet -> this.updateMessengerPlayer((MessengerUpdateCharacter) packet));
-      registry.setHandler(MessengerJoin.class, packet -> this.joinMessenger((MessengerJoin) packet));
-      registry.setHandler(MessengerChat.class, packet -> this.messengerChat((MessengerChat) packet));
-      registry.setHandler(MessengerNote.class, packet -> this.messengerNote((MessengerNote) packet));
+      registry.setHandler(MessengerInvite.class, packet -> create(SendOpcode.MESSENGER, this::messengerInvite, packet));
+      registry.setHandler(MessengerAddCharacter.class, packet -> create(SendOpcode.MESSENGER, this::addMessengerPlayer, packet));
+      registry.setHandler(MessengerRemoveCharacter.class, packet -> create(SendOpcode.MESSENGER, this::removeMessengerPlayer, packet));
+      registry.setHandler(MessengerUpdateCharacter.class, packet -> create(SendOpcode.MESSENGER, this::updateMessengerPlayer, packet));
+      registry.setHandler(MessengerJoin.class, packet -> create(SendOpcode.MESSENGER, this::joinMessenger, packet));
+      registry.setHandler(MessengerChat.class, packet -> create(SendOpcode.MESSENGER, this::messengerChat, packet));
+      registry.setHandler(MessengerNote.class, packet -> create(SendOpcode.MESSENGER, this::messengerNote, packet));
    }
 
-   protected byte[] messengerInvite(MessengerInvite packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(0x03);
-      mplew.writeMapleAsciiString(packet.characterNameFrom());
-      mplew.write(0);
-      mplew.writeInt(packet.messengerId());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void messengerInvite(MaplePacketLittleEndianWriter writer, MessengerInvite packet) {
+      writer.write(0x03);
+      writer.writeMapleAsciiString(packet.characterNameFrom());
+      writer.write(0);
+      writer.writeInt(packet.messengerId());
+      writer.write(0);
    }
 
-   protected byte[] addMessengerPlayer(MessengerAddCharacter packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(0x00);
-      mplew.write(packet.getPosition());
-      addCharLook(mplew, packet.getCharacter(), true);
-      mplew.writeMapleAsciiString(packet.getCharacterNameFrom());
-      mplew.write(packet.getChannel());
-      mplew.write(0x00);
-      return mplew.getPacket();
+   protected void addMessengerPlayer(MaplePacketLittleEndianWriter writer, MessengerAddCharacter packet) {
+      writer.write(0x00);
+      writer.write(packet.getPosition());
+      addCharLook(writer, packet.getCharacter(), true);
+      writer.writeMapleAsciiString(packet.getCharacterNameFrom());
+      writer.write(packet.getChannel());
+      writer.write(0x00);
    }
 
-   protected byte[] removeMessengerPlayer(MessengerRemoveCharacter packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(0x02);
-      mplew.write(packet.position());
-      return mplew.getPacket();
+   protected void removeMessengerPlayer(MaplePacketLittleEndianWriter writer, MessengerRemoveCharacter packet) {
+      writer.write(0x02);
+      writer.write(packet.position());
    }
 
-   protected byte[] updateMessengerPlayer(MessengerUpdateCharacter packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(0x07);
-      mplew.write(packet.getPosition());
-      addCharLook(mplew, packet.getCharacter(), true);
-      mplew.writeMapleAsciiString(packet.getCharacterNameFrom());
-      mplew.write(packet.getChannel());
-      mplew.write(0x00);
-      return mplew.getPacket();
+   protected void updateMessengerPlayer(MaplePacketLittleEndianWriter writer, MessengerUpdateCharacter packet) {
+      writer.write(0x07);
+      writer.write(packet.getPosition());
+      addCharLook(writer, packet.getCharacter(), true);
+      writer.writeMapleAsciiString(packet.getCharacterNameFrom());
+      writer.write(packet.getChannel());
+      writer.write(0x00);
    }
 
-   protected byte[] joinMessenger(MessengerJoin packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(0x01);
-      mplew.write(packet.position());
-      return mplew.getPacket();
+   protected void joinMessenger(MaplePacketLittleEndianWriter writer, MessengerJoin packet) {
+      writer.write(0x01);
+      writer.write(packet.position());
    }
 
-   protected byte[] messengerChat(MessengerChat packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(0x06);
-      mplew.writeMapleAsciiString(packet.text());
-      return mplew.getPacket();
+   protected void messengerChat(MaplePacketLittleEndianWriter writer, MessengerChat packet) {
+      writer.write(0x06);
+      writer.writeMapleAsciiString(packet.text());
    }
 
-   protected byte[] messengerNote(MessengerNote packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MESSENGER.getValue());
-      mplew.write(packet.mode());
-      mplew.writeMapleAsciiString(packet.text());
-      mplew.write(packet.mode2());
-      return mplew.getPacket();
+   protected void messengerNote(MaplePacketLittleEndianWriter writer, MessengerNote packet) {
+      writer.write(packet.mode());
+      writer.writeMapleAsciiString(packet.text());
+      writer.write(packet.mode2());
    }
 }

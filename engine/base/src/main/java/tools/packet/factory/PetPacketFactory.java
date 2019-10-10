@@ -19,68 +19,53 @@ public class PetPacketFactory extends AbstractPacketFactory {
    }
 
    private PetPacketFactory() {
-      registry.setHandler(PetChat.class, packet -> this.petChat((PetChat) packet));
-      registry.setHandler(PetFoodResponse.class, packet -> this.petFoodResponse((PetFoodResponse) packet));
-      registry.setHandler(PetCommandResponse.class, packet -> this.commandResponse((PetCommandResponse) packet));
-      registry.setHandler(PetNameChange.class, packet -> this.changePetName((PetNameChange) packet));
-      registry.setHandler(PetExceptionList.class, packet -> this.loadExceptionList((PetExceptionList) packet));
+      registry.setHandler(PetChat.class, packet -> create(SendOpcode.PET_CHAT, this::petChat, packet));
+      registry.setHandler(PetFoodResponse.class, packet -> create(SendOpcode.PET_COMMAND, this::petFoodResponse, packet));
+      registry.setHandler(PetCommandResponse.class, packet -> create(SendOpcode.PET_COMMAND, this::commandResponse, packet));
+      registry.setHandler(PetNameChange.class, packet -> create(SendOpcode.PET_NAMECHANGE, this::changePetName, packet));
+      registry.setHandler(PetExceptionList.class, packet -> create(SendOpcode.PET_EXCEPTION_LIST, this::loadExceptionList, packet));
    }
 
-   protected byte[] petChat(PetChat packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PET_CHAT.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.index());
-      mplew.write(0);
-      mplew.write(packet.act());
-      mplew.writeMapleAsciiString(packet.text());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void petChat(MaplePacketLittleEndianWriter writer, PetChat packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.index());
+      writer.write(0);
+      writer.write(packet.act());
+      writer.writeMapleAsciiString(packet.text());
+      writer.write(0);
    }
 
-   protected byte[] petFoodResponse(PetFoodResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PET_COMMAND.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.index());
-      mplew.write(1);
-      mplew.writeBool(packet.success());
-      mplew.writeBool(packet.balloonType());
-      return mplew.getPacket();
+   protected void petFoodResponse(MaplePacketLittleEndianWriter writer, PetFoodResponse packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.index());
+      writer.write(1);
+      writer.writeBool(packet.success());
+      writer.writeBool(packet.balloonType());
    }
 
-   protected byte[] commandResponse(PetCommandResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PET_COMMAND.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.index());
-      mplew.write(0);
-      mplew.write(packet.animation());
-      mplew.writeBool(!packet.talk());
-      mplew.writeBool(packet.balloonType());
-      return mplew.getPacket();
+   protected void commandResponse(MaplePacketLittleEndianWriter writer, PetCommandResponse packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.index());
+      writer.write(0);
+      writer.write(packet.animation());
+      writer.writeBool(!packet.talk());
+      writer.writeBool(packet.balloonType());
    }
 
-   protected byte[] changePetName(PetNameChange packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PET_NAMECHANGE.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(0);
-      mplew.writeMapleAsciiString(packet.newName());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void changePetName(MaplePacketLittleEndianWriter writer, PetNameChange packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(0);
+      writer.writeMapleAsciiString(packet.newName());
+      writer.write(0);
    }
 
-   protected byte[] loadExceptionList(PetExceptionList packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PET_EXCEPTION_LIST.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.petIndex());
-      mplew.writeLong(packet.petId());
-      mplew.write(packet.exclusionList().size());
+   protected void loadExceptionList(MaplePacketLittleEndianWriter writer, PetExceptionList packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.petIndex());
+      writer.writeLong(packet.petId());
+      writer.write(packet.exclusionList().size());
       for (final Integer ids : packet.exclusionList()) {
-         mplew.writeInt(ids);
+         writer.writeInt(ids);
       }
-      return mplew.getPacket();
    }
 }

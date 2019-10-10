@@ -16,24 +16,18 @@ public class PinPacketFactory extends AbstractPacketFactory {
    }
 
    private PinPacketFactory() {
-      registry.setHandler(PinCodePacket.class, packet -> this.pinOperation((PinCodePacket) packet));
-      registry.setHandler(PinRegistered.class, packet -> this.pinRegistered((PinRegistered) packet));
+      registry.setHandler(PinCodePacket.class, packet -> create(SendOpcode.CHECK_PINCODE, this::pinOperation, packet, 3));
+      registry.setHandler(PinRegistered.class, packet -> create(SendOpcode.UPDATE_PINCODE, this::pinRegistered, packet, 3));
    }
 
    /**
     * Gets a packet detailing a PIN operation.
     */
-   protected byte[] pinOperation(PinCodePacket packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.CHECK_PINCODE.getValue());
-      mplew.write(packet.operation().getValue());
-      return mplew.getPacket();
+   protected void pinOperation(MaplePacketLittleEndianWriter writer, PinCodePacket packet) {
+      writer.write(packet.operation().getValue());
    }
 
-   protected byte[] pinRegistered(PinRegistered packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.UPDATE_PINCODE.getValue());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void pinRegistered(MaplePacketLittleEndianWriter writer, PinRegistered packet) {
+      writer.write(0);
    }
 }

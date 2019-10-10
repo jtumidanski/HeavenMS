@@ -15,7 +15,7 @@ public class ServerIPPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerIPPacketFactory() {
-      registry.setHandler(ServerIP.class, packet -> this.getServerIP((ServerIP) packet));
+      registry.setHandler(ServerIP.class, packet -> create(SendOpcode.SERVER_IP, this::getServerIP, packet));
    }
 
    /**
@@ -23,15 +23,12 @@ public class ServerIPPacketFactory extends AbstractPacketFactory {
     *
     * @return The server IP packet.
     */
-   protected byte[] getServerIP(ServerIP packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVER_IP.getValue());
-      mplew.writeShort(0);
+   protected void getServerIP(MaplePacketLittleEndianWriter writer, ServerIP packet) {
+      writer.writeShort(0);
       byte[] addr = packet.inetAddress().getAddress();
-      mplew.write(addr);
-      mplew.writeShort(packet.port());
-      mplew.writeInt(packet.clientId());
-      mplew.write(new byte[]{0, 0, 0, 0, 0});
-      return mplew.getPacket();
+      writer.write(addr);
+      writer.writeShort(packet.port());
+      writer.writeInt(packet.clientId());
+      writer.write(new byte[]{0, 0, 0, 0, 0});
    }
 }

@@ -15,7 +15,7 @@ public class ServerStatusPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerStatusPacketFactory() {
-      registry.setHandler(GetServerStatus.class, packet -> this.getServerStatus((GetServerStatus) packet));
+      registry.setHandler(GetServerStatus.class, packet -> create(SendOpcode.SERVERSTATUS, this::getServerStatus, packet, 4));
    }
 
    /**
@@ -26,10 +26,7 @@ public class ServerStatusPacketFactory extends AbstractPacketFactory {
     *
     * @return The server status packet.
     */
-   protected byte[] getServerStatus(GetServerStatus packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(4);
-      mplew.writeShort(SendOpcode.SERVERSTATUS.getValue());
-      mplew.writeShort(packet.status().getValue());
-      return mplew.getPacket();
+   protected void getServerStatus(MaplePacketLittleEndianWriter writer, GetServerStatus packet) {
+      writer.writeShort(packet.status().getValue());
    }
 }

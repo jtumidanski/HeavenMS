@@ -27,9 +27,9 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
    }
 
    private StatUpdatePacketFactory() {
-      registry.setHandler(UpdatePlayerStats.class, packet -> this.updatePlayerStats((UpdatePlayerStats) packet));
-      registry.setHandler(EnableActions.class, packet -> this.enableActions((EnableActions) packet));
-      registry.setHandler(UpdatePetStats.class, packet -> this.petStatUpdate((UpdatePetStats) packet));
+      registry.setHandler(UpdatePlayerStats.class, packet -> create(SendOpcode.STAT_CHANGED, this::updatePlayerStats, packet));
+      registry.setHandler(EnableActions.class, packet -> create(SendOpcode.STAT_CHANGED, this::enableActions, packet));
+      registry.setHandler(UpdatePetStats.class, packet -> create(SendOpcode.STAT_CHANGED, this::petStatUpdate, packet));
    }
 
    /**
@@ -37,8 +37,8 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
     *
     * @return The empty stat update packet.
     */
-   protected byte[] enableActions(EnableActions packet) {
-      return updatePlayerStats(new UpdatePlayerStats(EMPTY_STATUPDATE, true, null));
+   protected void enableActions(MaplePacketLittleEndianWriter writer, EnableActions packet) {
+      updatePlayerStats(writer, new UpdatePlayerStats(EMPTY_STATUPDATE, true, null));
    }
 
    /**
@@ -46,10 +46,8 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
     *
     * @return The stat update packet.
     */
-   protected byte[] updatePlayerStats(UpdatePlayerStats packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STAT_CHANGED.getValue());
-      mplew.write(packet.isEnableActions() ? 1 : 0);
+   protected void updatePlayerStats(MaplePacketLittleEndianWriter writer, UpdatePlayerStats packet) {
+      writer.write(packet.isEnableActions() ? 1 : 0);
       int updateMask = 0;
       for (Pair<MapleStat, Integer> statupdate : packet.getStatup()) {
          updateMask |= statupdate.getLeft().getValue();
@@ -65,51 +63,46 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
             }
          });
       }
-      mplew.writeInt(updateMask);
+      writer.writeInt(updateMask);
       for (Pair<MapleStat, Integer> statupdate : mystats) {
          if (statupdate.getLeft().getValue() >= 1) {
             if (statupdate.getLeft().getValue() == 0x1) {
-               mplew.write(statupdate.getRight().byteValue());
+               writer.write(statupdate.getRight().byteValue());
             } else if (statupdate.getLeft().getValue() <= 0x4) {
-               mplew.writeInt(statupdate.getRight());
+               writer.writeInt(statupdate.getRight());
             } else if (statupdate.getLeft().getValue() < 0x20) {
-               mplew.write(statupdate.getRight().shortValue());
+               writer.write(statupdate.getRight().shortValue());
             } else if (statupdate.getLeft().getValue() == 0x8000) {
                if (GameConstants.hasSPTable(packet.getMapleCharacter().getJob())) {
-                  addRemainingSkillInfo(mplew, packet.getMapleCharacter());
+                  addRemainingSkillInfo(writer, packet.getMapleCharacter());
                } else {
-                  mplew.writeShort(statupdate.getRight().shortValue());
+                  writer.writeShort(statupdate.getRight().shortValue());
                }
             } else if (statupdate.getLeft().getValue() < 0xFFFF) {
-               mplew.writeShort(statupdate.getRight().shortValue());
+               writer.writeShort(statupdate.getRight().shortValue());
             } else if (statupdate.getLeft().getValue() == 0x20000) {
-               mplew.writeShort(statupdate.getRight().shortValue());
+               writer.writeShort(statupdate.getRight().shortValue());
             } else {
-               mplew.writeInt(statupdate.getRight());
+               writer.writeInt(statupdate.getRight());
             }
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] petStatUpdate(UpdatePetStats packet) {
+   protected void petStatUpdate(MaplePacketLittleEndianWriter writer, UpdatePetStats packet) {
       // this actually does nothing... packet structure and stats needs to be uncovered
-
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STAT_CHANGED.getValue());
       int mask = 0;
       mask |= MapleStat.PET.getValue();
-      mplew.write(0);
-      mplew.writeInt(mask);
+      writer.write(0);
+      writer.writeInt(mask);
       for (int i = 0; i < 3; i++) {
          MaplePet pet = packet.pets()[i];
          if (pet != null) {
-            mplew.writeLong(pet.uniqueId());
+            writer.writeLong(pet.uniqueId());
          } else {
-            mplew.writeLong(0);
+            writer.writeLong(0);
          }
       }
-      mplew.write(0);
-      return mplew.getPacket();
+      writer.write(0);
    }
 }

@@ -16,16 +16,13 @@ public class TVPacketFactory extends AbstractPacketFactory {
    }
 
    private TVPacketFactory() {
-      registry.setHandler(EnableTV.class, packet -> this.enableTV((EnableTV) packet));
-      registry.setHandler(SendTV.class, packet -> this.sendTV((SendTV) packet));
+      registry.setHandler(EnableTV.class, packet -> create(SendOpcode.ENABLE_TV, this::enableTV, packet, 7));
+      registry.setHandler(SendTV.class, packet -> create(SendOpcode.SEND_TV, this::sendTV, packet));
    }
 
-   protected byte[] enableTV(EnableTV packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.ENABLE_TV.getValue());
-      mplew.writeInt(0);
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void enableTV(MaplePacketLittleEndianWriter writer, EnableTV packet) {
+      writer.writeInt(0);
+      writer.write(0);
    }
 
    /**
@@ -33,29 +30,26 @@ public class TVPacketFactory extends AbstractPacketFactory {
     *
     * @return the SEND_TV packet
     */
-   protected byte[] sendTV(SendTV packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SEND_TV.getValue());
-      mplew.write(packet.getPartner() != null ? 3 : 1);
-      mplew.write(packet.getType()); //Heart = 2  Star = 1  Normal = 0
-      addCharLook(mplew, packet.getCharacter(), false);
-      mplew.writeMapleAsciiString(packet.getCharacter().getName());
+   protected void sendTV(MaplePacketLittleEndianWriter writer, SendTV packet) {
+      writer.write(packet.getPartner() != null ? 3 : 1);
+      writer.write(packet.getType()); //Heart = 2  Star = 1  Normal = 0
+      addCharLook(writer, packet.getCharacter(), false);
+      writer.writeMapleAsciiString(packet.getCharacter().getName());
       if (packet.getPartner() != null) {
-         mplew.writeMapleAsciiString(packet.getPartner().getName());
+         writer.writeMapleAsciiString(packet.getPartner().getName());
       } else {
-         mplew.writeShort(0);
+         writer.writeShort(0);
       }
       for (int i = 0; i < packet.getMessages().size(); i++) {
          if (i == 4 && packet.getMessages().get(4).length() > 15) {
-            mplew.writeMapleAsciiString(packet.getMessages().get(4).substring(0, 15));
+            writer.writeMapleAsciiString(packet.getMessages().get(4).substring(0, 15));
          } else {
-            mplew.writeMapleAsciiString(packet.getMessages().get(i));
+            writer.writeMapleAsciiString(packet.getMessages().get(i));
          }
       }
-      mplew.writeInt(1337); // time limit shit lol 'Your thing still start in blah blah seconds'
+      writer.writeInt(1337); // time limit shit lol 'Your thing still start in blah blah seconds'
       if (packet.getPartner() != null) {
-         addCharLook(mplew, packet.getPartner(), false);
+         addCharLook(writer, packet.getPartner(), false);
       }
-      return mplew.getPacket();
    }
 }

@@ -29,17 +29,17 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterPacketFactory() {
-      registry.setHandler(KillMonster.class, packet -> this.killMonster((KillMonster) packet));
-      registry.setHandler(ShowMonsterHP.class, packet -> this.showMonsterHP((ShowMonsterHP) packet));
-      registry.setHandler(ApplyMonsterStatus.class, packet -> this.applyMonsterStatus((ApplyMonsterStatus) packet));
-      registry.setHandler(CancelMonsterStatus.class, packet -> this.cancelMonsterStatus((CancelMonsterStatus) packet));
-      registry.setHandler(DamageMonster.class, packet -> this.damageMonster((DamageMonster) packet));
-      registry.setHandler(HealMonster.class, packet -> this.healMonster((HealMonster) packet));
-      registry.setHandler(CatchMonster.class, packet -> this.catchMonster((CatchMonster) packet));
-      registry.setHandler(CatchMonsterWithItem.class, packet -> this.catchMonsterWithItem((CatchMonsterWithItem) packet));
-      registry.setHandler(DamageMonsterFriendly.class, packet -> this.damageMonsterFriendly((DamageMonsterFriendly) packet));
-      registry.setHandler(CatchMonsterFailure.class, packet -> this.catchMessage((CatchMonsterFailure) packet));
-      registry.setHandler(DamageSummon.class, packet -> this.damageSummon((DamageSummon) packet));
+      registry.setHandler(KillMonster.class, packet -> create(SendOpcode.KILL_MONSTER, this::killMonster, packet));
+      registry.setHandler(ShowMonsterHP.class, packet -> create(SendOpcode.SHOW_MONSTER_HP, this::showMonsterHP, packet));
+      registry.setHandler(ApplyMonsterStatus.class, packet -> create(SendOpcode.APPLY_MONSTER_STATUS, this::applyMonsterStatus, packet));
+      registry.setHandler(CancelMonsterStatus.class, packet -> create(SendOpcode.CANCEL_MONSTER_STATUS, this::cancelMonsterStatus, packet));
+      registry.setHandler(DamageMonster.class, packet -> create(SendOpcode.DAMAGE_MONSTER, this::damageMonster, packet));
+      registry.setHandler(HealMonster.class, packet -> create(SendOpcode.DAMAGE_MONSTER, this::healMonster, packet));
+      registry.setHandler(CatchMonster.class, packet -> create(SendOpcode.CATCH_MONSTER, this::catchMonster, packet));
+      registry.setHandler(CatchMonsterWithItem.class, packet -> create(SendOpcode.CATCH_MONSTER_WITH_ITEM, this::catchMonsterWithItem, packet));
+      registry.setHandler(DamageMonsterFriendly.class, packet -> create(SendOpcode.DAMAGE_MONSTER, this::damageMonsterFriendly, packet));
+      registry.setHandler(CatchMonsterFailure.class, packet -> create(SendOpcode.BRIDLE_MOB_CATCH_FAIL, this::catchMessage, packet));
+      registry.setHandler(DamageSummon.class, packet -> create(SendOpcode.DAMAGE_SUMMON, this::damageSummon, packet));
    }
 
    /**
@@ -47,79 +47,67 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
     *
     * @return The kill monster packet.
     */
-   protected byte[] killMonster(KillMonster packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.KILL_MONSTER.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.write(packet.animation());
-      mplew.write(packet.animation());
-      return mplew.getPacket();
+   protected void killMonster(MaplePacketLittleEndianWriter writer, KillMonster packet) {
+      writer.writeInt(packet.objectId());
+      writer.write(packet.animation());
+      writer.write(packet.animation());
    }
 
-   protected byte[] showMonsterHP(ShowMonsterHP packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_MONSTER_HP.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.write(packet.remainingHpPercentage());
-      return mplew.getPacket();
+   protected void showMonsterHP(MaplePacketLittleEndianWriter writer, ShowMonsterHP packet) {
+      writer.writeInt(packet.objectId());
+      writer.write(packet.remainingHpPercentage());
    }
 
-   protected byte[] applyMonsterStatusOther(int oid, Map<MonsterStatus, Integer> stats, int skill, boolean monsterSkill, int delay, MobSkill mobskill) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.APPLY_MONSTER_STATUS.getValue());
-      mplew.writeInt(oid);
+   protected void applyMonsterStatusOther(MaplePacketLittleEndianWriter writer, int oid, Map<MonsterStatus, Integer> stats, int skill, boolean monsterSkill, int delay, MobSkill mobskill) {
+      writer.writeInt(oid);
       int mask = 0;
       for (MonsterStatus stat : stats.keySet()) {
          mask |= stat.getValue();
       }
-      mplew.writeInt(mask);
+      writer.writeInt(mask);
       for (Integer val : stats.values()) {
-         mplew.writeShort(val);
+         writer.writeShort(val);
          if (monsterSkill) {
-            mplew.writeShort(mobskill.getSkillId());
-            mplew.writeShort(mobskill.getSkillLevel());
+            writer.writeShort(mobskill.getSkillId());
+            writer.writeShort(mobskill.getSkillLevel());
          } else {
-            mplew.writeInt(skill);
+            writer.writeInt(skill);
          }
-         mplew.writeShort(0); // as this looks similar to giveBuff this
+         writer.writeShort(0); // as this looks similar to giveBuff this
       }
-      mplew.writeShort(delay); // delay in ms
-      mplew.write(1); // ?
-      return mplew.getPacket();
+      writer.writeShort(delay); // delay in ms
+      writer.write(1); // ?
    }
 
-   protected byte[] applyMonsterStatus(ApplyMonsterStatus packet) {
+   protected void applyMonsterStatus(MaplePacketLittleEndianWriter writer, ApplyMonsterStatus packet) {
       Map<MonsterStatus, Integer> stati = packet.getStatusEffect().getStati();
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.APPLY_MONSTER_STATUS.getValue());
-      mplew.writeInt(packet.getObjectId());
-      mplew.writeLong(0);
-      writeIntMask(mplew, stati);
+      writer.writeInt(packet.getObjectId());
+      writer.writeLong(0);
+      writeIntMask(writer, stati);
       for (Map.Entry<MonsterStatus, Integer> stat : stati.entrySet()) {
-         mplew.writeShort(stat.getValue());
+         writer.writeShort(stat.getValue());
          if (packet.getStatusEffect().isMonsterSkill()) {
-            mplew.writeShort(packet.getStatusEffect().getMobSkill().getSkillId());
-            mplew.writeShort(packet.getStatusEffect().getMobSkill().getSkillLevel());
+            writer.writeShort(packet.getStatusEffect().getMobSkill().getSkillId());
+            writer.writeShort(packet.getStatusEffect().getMobSkill().getSkillLevel());
          } else {
-            mplew.writeInt(packet.getStatusEffect().getSkill().getId());
+            writer.writeInt(packet.getStatusEffect().getSkill().getId());
          }
-         mplew.writeShort(-1); // might actually be the buffTime but it's not displayed anywhere
+         writer.writeShort(-1); // might actually be the buffTime but it's not displayed anywhere
       }
       int size = stati.size(); // size
       if (packet.getReflection() != null) {
          for (Integer ref : packet.getReflection()) {
-            mplew.writeInt(ref);
+            writer.writeInt(ref);
          }
          if (packet.getReflection().size() > 0) {
             size /= 2; // This gives 2 buffs per reflection but it's really one buff
          }
       }
-      mplew.write(size); // size
-      mplew.writeInt(0);
-      return mplew.getPacket();
+      writer.write(size); // size
+      writer.writeInt(0);
    }
 
-   protected void writeIntMask(final MaplePacketLittleEndianWriter mplew, Map<MonsterStatus, Integer> stats) {
+   protected void writeIntMask(final MaplePacketLittleEndianWriter writer, Map<MonsterStatus, Integer> stats) {
       int firstmask = 0;
       int secondmask = 0;
       for (MonsterStatus stat : stats.keySet()) {
@@ -129,85 +117,65 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
             secondmask |= stat.getValue();
          }
       }
-      mplew.writeInt(firstmask);
-      mplew.writeInt(secondmask);
+      writer.writeInt(firstmask);
+      writer.writeInt(secondmask);
    }
 
-   protected byte[] cancelMonsterStatus(CancelMonsterStatus packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_MONSTER_STATUS.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.writeLong(0);
-      writeIntMask(mplew, packet.stats());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void cancelMonsterStatus(MaplePacketLittleEndianWriter writer, CancelMonsterStatus packet) {
+      writer.writeInt(packet.objectId());
+      writer.writeLong(0);
+      writeIntMask(writer, packet.stats());
+      writer.writeInt(0);
    }
 
-   protected byte[] damageMonster(DamageMonster packet) {
-      return damageMonsterIntern(packet.objectId(), packet.damage(), 0, 0);
+   protected void damageMonster(MaplePacketLittleEndianWriter writer, DamageMonster packet) {
+      damageMonsterIntern(writer, packet.objectId(), packet.damage(), 0, 0);
    }
 
-   protected byte[] healMonster(HealMonster packet) {
-      return damageMonsterIntern(packet.objectId(), -packet.heal(), packet.currentHp(), packet.maximumHp());
+   protected void healMonster(MaplePacketLittleEndianWriter writer, HealMonster packet) {
+      damageMonsterIntern(writer, packet.objectId(), -packet.heal(), packet.currentHp(), packet.maximumHp());
    }
 
-   protected byte[] damageMonsterIntern(int oid, int damage, int curhp, int maxhp) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DAMAGE_MONSTER.getValue());
-      mplew.writeInt(oid);
-      mplew.write(0);
-      mplew.writeInt(damage);
-      mplew.writeInt(curhp);
-      mplew.writeInt(maxhp);
-      return mplew.getPacket();
+   protected void damageMonsterIntern(MaplePacketLittleEndianWriter writer, int oid, int damage, int curhp, int maxhp) {
+      writer.writeInt(oid);
+      writer.write(0);
+      writer.writeInt(damage);
+      writer.writeInt(curhp);
+      writer.writeInt(maxhp);
    }
 
-   protected byte[] catchMonster(CatchMonster packet) {   // updated packet structure found thanks to Rien dev team
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CATCH_MONSTER.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.write(packet.success());
-      return mplew.getPacket();
+   protected void catchMonster(MaplePacketLittleEndianWriter writer, CatchMonster packet) {
+      // updated packet structure found thanks to Rien dev team
+      writer.writeInt(packet.objectId());
+      writer.write(packet.success());
    }
 
-   protected byte[] catchMonsterWithItem(CatchMonsterWithItem packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CATCH_MONSTER_WITH_ITEM.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.writeInt(packet.itemId());
-      mplew.write(packet.success());
-      return mplew.getPacket();
+   protected void catchMonsterWithItem(MaplePacketLittleEndianWriter writer, CatchMonsterWithItem packet) {
+      writer.writeInt(packet.objectId());
+      writer.writeInt(packet.itemId());
+      writer.write(packet.success());
    }
 
-   protected byte[] damageMonsterFriendly(DamageMonsterFriendly packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DAMAGE_MONSTER.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.write(1); // direction ?
-      mplew.writeInt(packet.damage());
-      mplew.writeInt(packet.remainingHp());
-      mplew.writeInt(packet.maximumHp());
-      return mplew.getPacket();
+   protected void damageMonsterFriendly(MaplePacketLittleEndianWriter writer, DamageMonsterFriendly packet) {
+      writer.writeInt(packet.objectId());
+      writer.write(1); // direction ?
+      writer.writeInt(packet.damage());
+      writer.writeInt(packet.remainingHp());
+      writer.writeInt(packet.maximumHp());
    }
 
-   protected byte[] catchMessage(CatchMonsterFailure packet) { // not done, I guess
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BRIDLE_MOB_CATCH_FAIL.getValue());
-      mplew.write(packet.message()); // 1 = too strong, 2 = Elemental Rock
-      mplew.writeInt(0);//Maybe itemid?
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void catchMessage(MaplePacketLittleEndianWriter writer, CatchMonsterFailure packet) { // not done, I guess
+      writer.write(packet.message()); // 1 = too strong, 2 = Elemental Rock
+      writer.writeInt(0);//Maybe itemid?
+      writer.writeInt(0);
    }
 
-   protected byte[] damageSummon(DamageSummon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DAMAGE_SUMMON.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.objectId());
-      mplew.write(12);
-      mplew.writeInt(packet.damage());         // damage display doesn't seem to work...
-      mplew.writeInt(packet.monsterIdFrom());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void damageSummon(MaplePacketLittleEndianWriter writer, DamageSummon packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.objectId());
+      writer.write(12);
+      writer.writeInt(packet.damage());         // damage display doesn't seem to work...
+      writer.writeInt(packet.monsterIdFrom());
+      writer.write(0);
    }
 }

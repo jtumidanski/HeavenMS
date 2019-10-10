@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.transfer.name.CheckNameChange;
 import tools.packet.transfer.name.NameChangeCancel;
 import tools.packet.transfer.name.NameChangeError;
@@ -19,9 +17,9 @@ public class NameChangePacketFactory extends AbstractPacketFactory {
    }
 
    private NameChangePacketFactory() {
-      registry.setHandler(NameChangeError.class, packet -> this.sendNameTransferRules((NameChangeError) packet));
-      registry.setHandler(CheckNameChange.class, packet -> this.sendNameTransferCheck((CheckNameChange) packet));
-      registry.setHandler(NameChangeCancel.class, packet -> this.showNameChangeCancel((NameChangeCancel) packet));
+      registry.setHandler(NameChangeError.class, packet -> create(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE_POSSIBLE_RESULT, this::sendNameTransferRules, packet));
+      registry.setHandler(CheckNameChange.class, packet -> create(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE, this::sendNameTransferCheck, packet));
+      registry.setHandler(NameChangeCancel.class, packet -> create(SendOpcode.CANCEL_NAME_CHANGE_RESULT, this::showNameChangeCancel, packet));
    }
 
    /*  1: name change already submitted
@@ -29,32 +27,23 @@ public class NameChangePacketFactory extends AbstractPacketFactory {
             3: recently banned
             4: unknown error
         */
-   protected byte[] sendNameTransferRules(NameChangeError packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE_POSSIBLE_RESULT.getValue());
-      mplew.writeInt(0);
-      mplew.write(packet.error());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void sendNameTransferRules(MaplePacketLittleEndianWriter writer, NameChangeError packet) {
+      writer.writeInt(0);
+      writer.write(packet.error());
+      writer.writeInt(0);
    }
 
-   protected byte[] sendNameTransferCheck(CheckNameChange packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE.getValue());
+   protected void sendNameTransferCheck(MaplePacketLittleEndianWriter writer, CheckNameChange packet) {
       //Send provided name back to client to add to temporary cache of checked & accepted names
-      mplew.writeMapleAsciiString(packet.availableName());
-      mplew.writeBool(!packet.canUseName());
-      return mplew.getPacket();
+      writer.writeMapleAsciiString(packet.availableName());
+      writer.writeBool(!packet.canUseName());
    }
 
-   protected byte[] showNameChangeCancel(NameChangeCancel packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_NAME_CHANGE_RESULT.getValue());
-      mplew.writeBool(packet.success());
+   protected void showNameChangeCancel(MaplePacketLittleEndianWriter writer, NameChangeCancel packet) {
+      writer.writeBool(packet.success());
       if (!packet.success()) {
-         mplew.write(0);
+         writer.write(0);
       }
-      //mplew.writeMapleAsciiString("Custom message."); //only if ^ != 0
-      return mplew.getPacket();
+      //writer.writeMapleAsciiString("Custom message."); //only if ^ != 0
    }
 }

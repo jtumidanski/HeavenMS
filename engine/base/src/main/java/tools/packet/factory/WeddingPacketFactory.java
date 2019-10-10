@@ -51,29 +51,26 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
    }
 
    private WeddingPacketFactory() {
-      registry.setHandler(MarriageRequest.class, packet -> this.marriageRequest((MarriageRequest) packet));
-      registry.setHandler(TakePhoto.class, packet -> this.takePhoto((TakePhoto) packet));
-      registry.setHandler(MarriageResult.class, packet -> this.marriageResult((MarriageResult) packet));
-      registry.setHandler(MarriageResultError.class, packet -> this.marriageResultError((MarriageResultError) packet));
-      registry.setHandler(WeddingPartnerTransfer.class, packet -> this.weddingPartnerTransfer((WeddingPartnerTransfer) packet));
-      registry.setHandler(WeddingProgress.class, packet -> this.weddingProgress((WeddingProgress) packet));
-      registry.setHandler(WeddingInvitation.class, packet -> this.sendWeddingInvitation((WeddingInvitation) packet));
-      registry.setHandler(SendWishList.class, packet -> this.sendWishList((SendWishList) packet));
-      registry.setHandler(WeddingGiftResult.class, packet -> this.weddingGiftResult((WeddingGiftResult) packet));
+      registry.setHandler(MarriageRequest.class, packet -> create(SendOpcode.MARRIAGE_REQUEST, this::marriageRequest, packet));
+      registry.setHandler(TakePhoto.class, packet -> create(SendOpcode.WEDDING_PHOTO, this::takePhoto, packet));
+      registry.setHandler(MarriageResult.class, packet -> create(SendOpcode.MARRIAGE_RESULT, this::marriageResult, packet));
+      registry.setHandler(MarriageResultError.class, packet -> create(SendOpcode.MARRIAGE_RESULT, this::marriageResultError, packet));
+      registry.setHandler(WeddingPartnerTransfer.class, packet -> create(SendOpcode.NOTIFY_MARRIED_PARTNER_MAP_TRANSFER, this::weddingPartnerTransfer, packet));
+      registry.setHandler(WeddingProgress.class, packet -> create(((WeddingProgress) packet).blessEffect() ? SendOpcode.WEDDING_CEREMONY_END : SendOpcode.WEDDING_PROGRESS, this::weddingProgress, packet));
+      registry.setHandler(WeddingInvitation.class, packet -> create(SendOpcode.MARRIAGE_RESULT, this::sendWeddingInvitation, packet));
+      registry.setHandler(SendWishList.class, packet -> create(SendOpcode.MARRIAGE_REQUEST, this::sendWishList, packet));
+      registry.setHandler(WeddingGiftResult.class, packet -> create(SendOpcode.WEDDING_GIFT_RESULT, this::weddingGiftResult, packet));
    }
 
    /**
     * <name> has requested engagement. Will you accept this proposal?
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] marriageRequest(MarriageRequest packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MARRIAGE_REQUEST.getValue());
-      mplew.write(0); //mode, 0 = engage, 1 = cancel, 2 = answer.. etc
-      mplew.writeMapleAsciiString(packet.name()); // name
-      mplew.writeInt(packet.characterId()); // playerid
-      return mplew.getPacket();
+   protected void marriageRequest(MaplePacketLittleEndianWriter writer, MarriageRequest packet) {
+      writer.write(0); //mode, 0 = engage, 1 = cancel, 2 = answer.. etc
+      writer.writeMapleAsciiString(packet.name()); // name
+      writer.writeInt(packet.characterId()); // playerid
    }
 
    /**
@@ -89,104 +86,90 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
     * <p>
     * - Will no longer continue Wedding Photos, needs a WvsMapGen :(
     *
-    * @return mplew (MaplePacket) Byte array to be converted and read for byte[]->ImageIO
+    * @return writer (MaplePacket) Byte array to be converted and read for byte[]->ImageIO
     */
-   protected byte[] takePhoto(TakePhoto packet) { // OnIFailedAtWeddingPhotos
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WEDDING_PHOTO.getValue()); // v53 header, convert -> v83
-      mplew.writeMapleAsciiString(packet.getReservedGroomName());
-      mplew.writeMapleAsciiString(packet.getReservedBrideName());
-      mplew.writeInt(packet.getField()); // field id?
-      mplew.writeInt(packet.getAttendees().size());
+   protected void takePhoto(MaplePacketLittleEndianWriter writer, TakePhoto packet) { // OnIFailedAtWeddingPhotos
+      writer.writeMapleAsciiString(packet.getReservedGroomName());
+      writer.writeMapleAsciiString(packet.getReservedBrideName());
+      writer.writeInt(packet.getField()); // field id?
+      writer.writeInt(packet.getAttendees().size());
 
       for (MapleCharacter guest : packet.getAttendees()) {
          // Begin Avatar Encoding
-         addCharLook(mplew, guest, false); // CUser::EncodeAvatar
-         mplew.writeInt(30000); // v20 = *(_DWORD *)(v13 + 2192) -- new groom marriage ID??
-         mplew.writeInt(30000); // v20 = *(_DWORD *)(v13 + 2192) -- new bride marriage ID??
-         mplew.writeMapleAsciiString(guest.getName());
+         addCharLook(writer, guest, false); // CUser::EncodeAvatar
+         writer.writeInt(30000); // v20 = *(_DWORD *)(v13 + 2192) -- new groom marriage ID??
+         writer.writeInt(30000); // v20 = *(_DWORD *)(v13 + 2192) -- new bride marriage ID??
+         writer.writeMapleAsciiString(guest.getName());
 
          guest.getGuild().ifPresentOrElse(guild -> {
-            mplew.writeMapleAsciiString(guild.getName());
-            mplew.writeShort(guild.getLogoBG());
-            mplew.write(guild.getLogoBGColor());
-            mplew.writeShort(guild.getLogo());
-            mplew.write(guild.getLogoColor());
+            writer.writeMapleAsciiString(guild.getName());
+            writer.writeShort(guild.getLogoBG());
+            writer.write(guild.getLogoBGColor());
+            writer.writeShort(guild.getLogo());
+            writer.write(guild.getLogoColor());
          }, () -> {
-            mplew.writeMapleAsciiString("");
-            mplew.writeShort(0);
-            mplew.write(0);
-            mplew.writeShort(0);
-            mplew.write(0);
+            writer.writeMapleAsciiString("");
+            writer.writeShort(0);
+            writer.write(0);
+            writer.writeShort(0);
+            writer.write(0);
          });
-         mplew.writeShort(guest.getPosition().x); // v18 = *(_DWORD *)(v13 + 3204);
-         mplew.writeShort(guest.getPosition().y); // v20 = *(_DWORD *)(v13 + 3208);
+         writer.writeShort(guest.getPosition().x); // v18 = *(_DWORD *)(v13 + 3204);
+         writer.writeShort(guest.getPosition().y); // v20 = *(_DWORD *)(v13 + 3208);
          // Begin Screenshot Encoding
-         mplew.write(1); // // if ( *(_DWORD *)(v13 + 288) ) { COutPacket::Encode1(&thisa, v20);
+         writer.write(1); // // if ( *(_DWORD *)(v13 + 288) ) { COutPacket::Encode1(&thisa, v20);
          // CPet::EncodeScreenShotPacket(*(CPet **)(v13 + 288), &thisa);
-         mplew.writeInt(1); // dwTemplateID
-         mplew.writeMapleAsciiString(guest.getName()); // m_sName
-         mplew.writeShort(guest.getPosition().x); // m_ptCurPos.x
-         mplew.writeShort(guest.getPosition().y); // m_ptCurPos.y
-         mplew.write(guest.getStance()); // guest.m_bMoveAction
+         writer.writeInt(1); // dwTemplateID
+         writer.writeMapleAsciiString(guest.getName()); // m_sName
+         writer.writeShort(guest.getPosition().x); // m_ptCurPos.x
+         writer.writeShort(guest.getPosition().y); // m_ptCurPos.y
+         writer.write(guest.getStance()); // guest.m_bMoveAction
       }
-
-      return mplew.getPacket();
    }
 
    /**
     * Enable spouse chat and their engagement ring without @relog
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] marriageResult(MarriageResult packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MARRIAGE_RESULT.getValue());
-      mplew.write(11);
-      mplew.writeInt(packet.getMarriageId());
-      mplew.writeInt(packet.getCharacter().getGender() == 0 ? packet.getCharacter().getId() : packet.getCharacter().getPartnerId());
-      mplew.writeInt(packet.getCharacter().getGender() == 0 ? packet.getCharacter().getPartnerId() : packet.getCharacter().getId());
-      mplew.writeShort(packet.isWedding() ? 3 : 1);
+   protected void marriageResult(MaplePacketLittleEndianWriter writer, MarriageResult packet) {
+      writer.write(11);
+      writer.writeInt(packet.getMarriageId());
+      writer.writeInt(packet.getCharacter().getGender() == 0 ? packet.getCharacter().getId() : packet.getCharacter().getPartnerId());
+      writer.writeInt(packet.getCharacter().getGender() == 0 ? packet.getCharacter().getPartnerId() : packet.getCharacter().getId());
+      writer.writeShort(packet.isWedding() ? 3 : 1);
       if (packet.isWedding()) {
-         mplew.writeInt(packet.getCharacter().getMarriageItemId());
-         mplew.writeInt(packet.getCharacter().getMarriageItemId());
+         writer.writeInt(packet.getCharacter().getMarriageItemId());
+         writer.writeInt(packet.getCharacter().getMarriageItemId());
       } else {
-         mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
-         mplew.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
+         writer.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
+         writer.writeInt(1112803); // Engagement Ring's Outcome (doesn't matter for engagement)
       }
-      mplew.writeAsciiString(StringUtil.getRightPaddedStr(packet.getCharacter().getGender() == 0 ? packet.getCharacter().getName() : CharacterProcessor.getInstance().getNameById(packet.getCharacter().getPartnerId()), '\0', 13));
-      mplew.writeAsciiString(StringUtil.getRightPaddedStr(packet.getCharacter().getGender() == 0 ? CharacterProcessor.getInstance().getNameById(packet.getCharacter().getPartnerId()) : packet.getCharacter().getName(), '\0', 13));
-
-      return mplew.getPacket();
+      writer.writeAsciiString(StringUtil.getRightPaddedStr(packet.getCharacter().getGender() == 0 ? packet.getCharacter().getName() : CharacterProcessor.getInstance().getNameById(packet.getCharacter().getPartnerId()), '\0', 13));
+      writer.writeAsciiString(StringUtil.getRightPaddedStr(packet.getCharacter().getGender() == 0 ? CharacterProcessor.getInstance().getNameById(packet.getCharacter().getPartnerId()) : packet.getCharacter().getName(), '\0', 13));
    }
 
    /**
     * To exit the Engagement Window (Waiting for her response...), we send a GMS-like pop-up.
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] marriageResultError(MarriageResultError packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MARRIAGE_RESULT.getValue());
-      mplew.write(packet.message());
+   protected void marriageResultError(MaplePacketLittleEndianWriter writer, MarriageResultError packet) {
+      writer.write(packet.message());
       if (packet.message() == 36) {
-         mplew.write(1);
-         mplew.writeMapleAsciiString("You are now engaged.");
+         writer.write(1);
+         writer.writeMapleAsciiString("You are now engaged.");
       }
-      return mplew.getPacket();
    }
 
    /**
     * The World Map includes 'loverPos' in which this packet controls
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] weddingPartnerTransfer(WeddingPartnerTransfer packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_MARRIED_PARTNER_MAP_TRANSFER.getValue());
-      mplew.writeInt(packet.mapId());
-      mplew.writeInt(packet.partnerId());
-      return mplew.getPacket();
+   protected void weddingPartnerTransfer(MaplePacketLittleEndianWriter writer, WeddingPartnerTransfer packet) {
+      writer.writeInt(packet.mapId());
+      writer.writeInt(packet.partnerId());
    }
 
    /**
@@ -194,59 +177,48 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
     * CField_Wedding::OnWeddingProgress - Stages
     * CField_Wedding::OnWeddingCeremonyEnd - Wedding Ceremony Effect
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] weddingProgress(WeddingProgress packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(packet.blessEffect() ? SendOpcode.WEDDING_CEREMONY_END.getValue() : SendOpcode.WEDDING_PROGRESS.getValue());
+   protected void weddingProgress(MaplePacketLittleEndianWriter writer, WeddingProgress packet) {
       if (!packet.blessEffect()) { // in order for ceremony packet to send, byte step = 2 must be sent first
-         mplew.write(packet.step());
+         writer.write(packet.step());
       }
-      mplew.writeInt(packet.groomId());
-      mplew.writeInt(packet.brideId());
-      return mplew.getPacket();
+      writer.writeInt(packet.groomId());
+      writer.writeInt(packet.brideId());
    }
 
    /**
     * When we open a Wedding Invitation, we display the Bride & Groom
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] sendWeddingInvitation(WeddingInvitation packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MARRIAGE_RESULT.getValue());
-      mplew.write(15);
-      mplew.writeMapleAsciiString(packet.groom());
-      mplew.writeMapleAsciiString(packet.bride());
-      mplew.writeShort(1); // 0 = Cathedral Normal?, 1 = Cathedral Premium?, 2 = Chapel Normal?
-      return mplew.getPacket();
+   protected void sendWeddingInvitation(MaplePacketLittleEndianWriter writer, WeddingInvitation packet) {
+      writer.write(15);
+      writer.writeMapleAsciiString(packet.groom());
+      writer.writeMapleAsciiString(packet.bride());
+      writer.writeShort(1); // 0 = Cathedral Normal?, 1 = Cathedral Premium?, 2 = Chapel Normal?
    }
 
-   protected byte[] sendWishList(SendWishList packet) { // fuck my life
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MARRIAGE_REQUEST.getValue());
-      mplew.write(9);
-      return mplew.getPacket();
+   protected void sendWishList(MaplePacketLittleEndianWriter writer, SendWishList packet) { // fuck my life
+      writer.write(9);
    }
 
    /**
     * Handles all of WeddingWishlist packets
     *
-    * @return mplew
+    * @return writer
     */
-   protected byte[] weddingGiftResult(WeddingGiftResult packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WEDDING_GIFT_RESULT.getValue());
-      mplew.write(packet.mode());
+   protected void weddingGiftResult(MaplePacketLittleEndianWriter writer, WeddingGiftResult packet) {
+      writer.write(packet.mode());
       switch (packet.mode()) {
          case 0xC: // 12 : You cannot give more than one present for each wishlist
          case 0xE: // 14 : Failed to send the gift.
             break;
 
          case 0x09: { // Load Wedding Registry
-            mplew.write(packet.itemNames().size());
+            writer.write(packet.itemNames().size());
             for (String names : packet.itemNames()) {
-               mplew.writeMapleAsciiString(names);
+               writer.writeMapleAsciiString(names);
             }
             break;
          }
@@ -255,15 +227,15 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
          case 0xB: { // Add Item to Wedding Registry
             // 11 : You have sent a gift | | 13 : Failed to send the gift. |
             if (packet.mode() == 0xB) {
-               mplew.write(packet.itemNames().size());
+               writer.write(packet.itemNames().size());
                for (String names : packet.itemNames()) {
-                  mplew.writeMapleAsciiString(names);
+                  writer.writeMapleAsciiString(names);
                }
             }
-            mplew.writeLong(32);
-            mplew.write(packet.items().size());
+            writer.writeLong(32);
+            writer.write(packet.items().size());
             for (Item item : packet.items()) {
-               addItemInfo(mplew, item, true);
+               addItemInfo(writer, item, true);
             }
             break;
          }
@@ -272,6 +244,5 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             break;
          }
       }
-      return mplew.getPacket();
    }
 }

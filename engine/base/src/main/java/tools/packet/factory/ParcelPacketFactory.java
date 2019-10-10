@@ -19,78 +19,65 @@ public class ParcelPacketFactory extends AbstractPacketFactory {
    }
 
    private ParcelPacketFactory() {
-      registry.setHandler(RemoveDueyItem.class, packet -> this.removeItemFromDuey((RemoveDueyItem) packet));
-      registry.setHandler(DueyParcelReceived.class, packet -> this.sendDueyParcelReceived((DueyParcelReceived) packet));
-      registry.setHandler(DueyParcelNotification.class, packet -> this.sendDueyParcelNotification((DueyParcelNotification) packet));
-      registry.setHandler(SendDuey.class, packet -> this.sendDuey((SendDuey) packet));
+      registry.setHandler(RemoveDueyItem.class, packet -> create(SendOpcode.PARCEL, this::removeItemFromDuey, packet));
+      registry.setHandler(DueyParcelReceived.class, packet -> create(SendOpcode.PARCEL, this::sendDueyParcelReceived, packet));
+      registry.setHandler(DueyParcelNotification.class, packet -> create(SendOpcode.PARCEL, this::sendDueyParcelNotification, packet));
+      registry.setHandler(SendDuey.class, packet -> create(SendOpcode.PARCEL, this::sendDuey, packet));
    }
 
-   protected byte[] removeItemFromDuey(RemoveDueyItem packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARCEL.getValue());
-      mplew.write(0x17);
-      mplew.writeInt(packet.packageId());
-      mplew.write(packet.remove() ? 3 : 4);
-      return mplew.getPacket();
+   protected void removeItemFromDuey(MaplePacketLittleEndianWriter writer, RemoveDueyItem packet) {
+      writer.write(0x17);
+      writer.writeInt(packet.packageId());
+      writer.write(packet.remove() ? 3 : 4);
    }
 
-   protected byte[] sendDueyParcelReceived(DueyParcelReceived packet) {    // thanks inhyuk
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARCEL.getValue());
-      mplew.write(0x19);
-      mplew.writeMapleAsciiString(packet.from());
-      mplew.writeBool(packet.quick());
-      return mplew.getPacket();
+   protected void sendDueyParcelReceived(MaplePacketLittleEndianWriter writer, DueyParcelReceived packet) {    // thanks inhyuk
+      writer.write(0x19);
+      writer.writeMapleAsciiString(packet.from());
+      writer.writeBool(packet.quick());
    }
 
-   protected byte[] sendDueyParcelNotification(DueyParcelNotification packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARCEL.getValue());
-      mplew.write(0x1B);
-      mplew.writeBool(packet.quick());  // 0 : package received, 1 : quick delivery package
-      return mplew.getPacket();
+   protected void sendDueyParcelNotification(MaplePacketLittleEndianWriter writer, DueyParcelNotification packet) {
+      writer.write(0x1B);
+      writer.writeBool(packet.quick());  // 0 : package received, 1 : quick delivery package
    }
 
-   protected byte[] sendDuey(SendDuey packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARCEL.getValue());
-      mplew.write(packet.operation().getValue());
+   protected void sendDuey(MaplePacketLittleEndianWriter writer, SendDuey packet) {
+      writer.write(packet.operation().getValue());
       if (packet.operation().getValue() == 8) {
-         mplew.write(0);
-         mplew.write(packet.packages().get().size());
+         writer.write(0);
+         writer.write(packet.packages().get().size());
          for (DueyPackage dp : packet.packages().get()) {
-            mplew.writeInt(dp.packageId());
-            mplew.writeAsciiString(dp.sender());
+            writer.writeInt(dp.packageId());
+            writer.writeAsciiString(dp.sender());
             for (int i = dp.sender().length(); i < 13; i++) {
-               mplew.write(0);
+               writer.write(0);
             }
 
-            mplew.writeInt(dp.mesos());
-            mplew.writeLong(getTime(dp.sentTimeInMilliseconds()));
+            writer.writeInt(dp.mesos());
+            writer.writeLong(getTime(dp.sentTimeInMilliseconds()));
 
             String msg = dp.message();
             if (msg != null) {
-               mplew.writeInt(1);
-               mplew.writeAsciiString(msg);
+               writer.writeInt(1);
+               writer.writeAsciiString(msg);
                for (int i = msg.length(); i < 200; i++) {
-                  mplew.write(0);
+                  writer.write(0);
                }
             } else {
-               mplew.writeInt(0);
-               mplew.skip(200);
+               writer.writeInt(0);
+               writer.skip(200);
             }
 
-            mplew.write(0);
+            writer.write(0);
             if (dp.item() != null) {
-               mplew.write(1);
-               addItemInfo(mplew, dp.item().get(), true);
+               writer.write(1);
+               addItemInfo(writer, dp.item().get(), true);
             } else {
-               mplew.write(0);
+               writer.write(0);
             }
          }
-         mplew.write(0);
+         writer.write(0);
       }
-
-      return mplew.getPacket();
    }
 }

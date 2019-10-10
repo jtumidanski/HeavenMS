@@ -20,61 +20,43 @@ public class CancelBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    private CancelBuffPacketFactory() {
-      registry.setHandler(CancelForeignDebuff.class, packet -> this.cancelForeignDebuff((CancelForeignDebuff) packet));
-      registry.setHandler(CancelForeignBuff.class, packet -> this.cancelForeignBuff((CancelForeignBuff) packet));
-      registry.setHandler(CancelBuff.class, packet -> this.cancelBuff((CancelBuff) packet));
-      registry.setHandler(CancelDebuff.class, packet -> this.cancelDebuff((CancelDebuff) packet));
-      registry.setHandler(CancelForeignSlowDebuff.class, packet -> this.cancelForeignSlowDebuff((CancelForeignSlowDebuff) packet));
-      registry.setHandler(CancelForeignChairSkillEffect.class, packet -> this.cancelForeignChairSkillEffect((CancelForeignChairSkillEffect) packet));
+      registry.setHandler(CancelForeignDebuff.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignDebuff, packet));
+      registry.setHandler(CancelForeignBuff.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignBuff, packet));
+      registry.setHandler(CancelBuff.class, packet -> create(SendOpcode.CANCEL_BUFF, this::cancelBuff, packet));
+      registry.setHandler(CancelDebuff.class, packet -> create(SendOpcode.CANCEL_BUFF, this::cancelDebuff, packet, 19));
+      registry.setHandler(CancelForeignSlowDebuff.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignSlowDebuff, packet));
+      registry.setHandler(CancelForeignChairSkillEffect.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignChairSkillEffect, packet, 19));
    }
 
-   protected byte[] cancelForeignDebuff(CancelForeignDebuff packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_FOREIGN_BUFF.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeLong(0);
-      mplew.writeLong(packet.mask());
-      return mplew.getPacket();
+   protected void cancelForeignDebuff(MaplePacketLittleEndianWriter writer, CancelForeignDebuff packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeLong(0);
+      writer.writeLong(packet.mask());
    }
 
-   protected byte[] cancelForeignBuff(CancelForeignBuff packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_FOREIGN_BUFF.getValue());
-      mplew.writeInt(packet.characterId());
-      writeLongMaskFromList(mplew, packet.statups());
-      return mplew.getPacket();
+   protected void cancelForeignBuff(MaplePacketLittleEndianWriter writer, CancelForeignBuff packet) {
+      writer.writeInt(packet.characterId());
+      writeLongMaskFromList(writer, packet.statups());
    }
 
-   protected byte[] cancelBuff(CancelBuff packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_BUFF.getValue());
-      writeLongMaskFromList(mplew, packet.statups());
-      mplew.write(1);//?
-      return mplew.getPacket();
+   protected void cancelBuff(MaplePacketLittleEndianWriter writer, CancelBuff packet) {
+      writeLongMaskFromList(writer, packet.statups());
+      writer.write(1);//?
    }
 
-   protected byte[] cancelDebuff(CancelDebuff packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(19);
-      mplew.writeShort(SendOpcode.CANCEL_BUFF.getValue());
-      mplew.writeLong(0);
-      mplew.writeLong(packet.mask());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void cancelDebuff(MaplePacketLittleEndianWriter writer, CancelDebuff packet) {
+      writer.writeLong(0);
+      writer.writeLong(packet.mask());
+      writer.write(0);
    }
 
-   protected byte[] cancelForeignSlowDebuff(CancelForeignSlowDebuff packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_FOREIGN_BUFF.getValue());
-      mplew.writeInt(packet.characterId());
-      writeLongMaskSlowD(mplew);
-      return mplew.getPacket();
+   protected void cancelForeignSlowDebuff(MaplePacketLittleEndianWriter writer, CancelForeignSlowDebuff packet) {
+      writer.writeInt(packet.characterId());
+      writeLongMaskSlowD(writer);
    }
 
-   protected byte[] cancelForeignChairSkillEffect(CancelForeignChairSkillEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(19);
-      mplew.writeShort(SendOpcode.CANCEL_FOREIGN_BUFF.getValue());
-      mplew.writeInt(packet.characterId());
-      writeLongMaskChair(mplew);
-      return mplew.getPacket();
+   protected void cancelForeignChairSkillEffect(MaplePacketLittleEndianWriter writer, CancelForeignChairSkillEffect packet) {
+      writer.writeInt(packet.characterId());
+      writeLongMaskChair(writer);
    }
 }

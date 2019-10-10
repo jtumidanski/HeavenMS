@@ -16,17 +16,14 @@ public class RecommendedWorldMessagePacketFactory extends AbstractPacketFactory 
    }
 
    private RecommendedWorldMessagePacketFactory() {
-      registry.setHandler(RecommendedWorldMessage.class, packet -> this.sendRecommended((RecommendedWorldMessage) packet));
+      registry.setHandler(RecommendedWorldMessage.class, packet -> create(SendOpcode.RECOMMENDED_WORLD_MESSAGE, this::sendRecommended, packet));
    }
 
-   protected byte[] sendRecommended(RecommendedWorldMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.RECOMMENDED_WORLD_MESSAGE.getValue());
-      mplew.write(packet.worlds().size());//size
+   protected void sendRecommended(MaplePacketLittleEndianWriter writer, RecommendedWorldMessage packet) {
+      writer.write(packet.worlds().size());//size
       for (WorldRecommendation world : packet.worlds()) {
-         mplew.writeInt(world.worldId());
-         mplew.writeMapleAsciiString(world.reason());
+         writer.writeInt(world.worldId());
+         writer.writeMapleAsciiString(world.reason());
       }
-      return mplew.getPacket();
    }
 }

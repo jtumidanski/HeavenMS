@@ -21,10 +21,10 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
    }
 
    private LoginStatusPacketFactory() {
-      registry.setHandler(LoginFailed.class, packet -> this.getLoginFailed((LoginFailed) packet));
-      registry.setHandler(PermanentBan.class, packet -> this.getPermBan((PermanentBan) packet));
-      registry.setHandler(TemporaryBan.class, packet -> this.getTempBan((TemporaryBan) packet));
-      registry.setHandler(AuthSuccess.class, packet -> this.getAuthSuccess((AuthSuccess) packet));
+      registry.setHandler(LoginFailed.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getLoginFailed, packet, 8));
+      registry.setHandler(PermanentBan.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getPermBan, packet));
+      registry.setHandler(TemporaryBan.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getTempBan, packet, 17));
+      registry.setHandler(AuthSuccess.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getAuthSuccess, packet));
    }
 
    /**
@@ -32,35 +32,26 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
     *
     * @return The login failed packet.
     */
-   protected byte[] getLoginFailed(LoginFailed packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(8);
-      mplew.writeShort(SendOpcode.LOGIN_STATUS.getValue());
-      mplew.write(packet.reason().getValue());
-      mplew.write(0);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getLoginFailed(MaplePacketLittleEndianWriter writer, LoginFailed packet) {
+      writer.write(packet.reason().getValue());
+      writer.write(0);
+      writer.writeInt(0);
    }
 
-   protected byte[] getPermBan(PermanentBan packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.LOGIN_STATUS.getValue());
-      mplew.write(2); // Account is banned
-      mplew.write(0);
-      mplew.writeInt(0);
-      mplew.write(0);
-      mplew.writeLong(getTime(-1));
-      return mplew.getPacket();
+   protected void getPermBan(MaplePacketLittleEndianWriter writer, PermanentBan packet) {
+      writer.write(2); // Account is banned
+      writer.write(0);
+      writer.writeInt(0);
+      writer.write(0);
+      writer.writeLong(getTime(-1));
    }
 
-   protected byte[] getTempBan(TemporaryBan packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(17);
-      mplew.writeShort(SendOpcode.LOGIN_STATUS.getValue());
-      mplew.write(2);
-      mplew.write(0);
-      mplew.writeInt(0);
-      mplew.write(packet.reason());
-      mplew.writeLong(getTime(packet.timestampUntil())); // Tempban date is handled as a 64-bit long, number of 100NS intervals since 1/1/1601. Lulz.
-      return mplew.getPacket();
+   protected void getTempBan(MaplePacketLittleEndianWriter writer, TemporaryBan packet) {
+      writer.write(2);
+      writer.write(0);
+      writer.writeInt(0);
+      writer.write(packet.reason());
+      writer.writeLong(getTime(packet.timestampUntil())); // Tempban date is handled as a 64-bit long, number of 100NS intervals since 1/1/1601. Lulz.
    }
 
    /**
@@ -68,35 +59,25 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
     *
     * @return the successful authentication packet
     */
-   protected byte[] getAuthSuccess(AuthSuccess packet) {
+   protected void getAuthSuccess(MaplePacketLittleEndianWriter writer, AuthSuccess packet) {
       MapleClient client = packet.getClient();
       Server.getInstance().loadAccountCharacters(client);    // locks the login session until data is recovered from the cache or the DB.
       Server.getInstance().loadAccountStorages(client);
-
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.LOGIN_STATUS.getValue());
-      mplew.writeInt(0);
-      mplew.writeShort(0);
-      mplew.writeInt(client.getAccID());
-      mplew.write(client.getGender());
-
+      writer.writeInt(0);
+      writer.writeShort(0);
+      writer.writeInt(client.getAccID());
+      writer.write(client.getGender());
       boolean canFly = Server.getInstance().canFly(client.getAccID());
-      mplew.writeBool((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
-      mplew.write(((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
-      mplew.write(0); // Country Code.
-
-      mplew.writeMapleAsciiString(client.getAccountName());
-      mplew.write(0);
-
-      mplew.write(0); // IsQuietBan
-      mplew.writeLong(0);//IsQuietBanTimeStamp
-      mplew.writeLong(0); //CreationTimeStamp
-
-      mplew.writeInt(1); // 1: Remove the "Select the world you want to play in"
-
-      mplew.write(ServerConstants.ENABLE_PIN && client.cannotBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-      mplew.write(ServerConstants.ENABLE_PIC && client.cannotBypassPic() ? (client.getPic() == null || client.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
-
-      return mplew.getPacket();
+      writer.writeBool((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
+      writer.write(((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
+      writer.write(0); // Country Code.
+      writer.writeMapleAsciiString(client.getAccountName());
+      writer.write(0);
+      writer.write(0); // IsQuietBan
+      writer.writeLong(0);//IsQuietBanTimeStamp
+      writer.writeLong(0); //CreationTimeStamp
+      writer.writeInt(1); // 1: Remove the "Select the world you want to play in"
+      writer.write(ServerConstants.ENABLE_PIN && client.cannotBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+      writer.write(ServerConstants.ENABLE_PIC && client.cannotBypassPic() ? (client.getPic() == null || client.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
    }
 }

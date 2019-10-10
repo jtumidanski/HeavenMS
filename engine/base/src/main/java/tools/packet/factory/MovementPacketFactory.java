@@ -24,12 +24,12 @@ public class MovementPacketFactory extends AbstractPacketFactory {
    }
 
    private MovementPacketFactory() {
-      registry.setHandler(MoveMonsterResponse.class, packet -> this.moveMonsterResponse((MoveMonsterResponse) packet));
-      registry.setHandler(MovePlayer.class, packet -> this.movePlayer((MovePlayer) packet));
-      registry.setHandler(MoveSummon.class, packet -> this.moveSummon((MoveSummon) packet));
-      registry.setHandler(MoveMonster.class, packet -> this.moveMonster((MoveMonster) packet));
-      registry.setHandler(MovePet.class, packet -> this.movePet((MovePet) packet));
-      registry.setHandler(MoveDragon.class, packet -> this.moveDragon((MoveDragon) packet));
+      registry.setHandler(MoveMonsterResponse.class, packet -> create(SendOpcode.MOVE_MONSTER_RESPONSE, this::moveMonsterResponse, packet, 13));
+      registry.setHandler(MovePlayer.class, packet -> create(SendOpcode.MOVE_PLAYER, this::movePlayer, packet));
+      registry.setHandler(MoveSummon.class, packet -> create(SendOpcode.MOVE_SUMMON, this::moveSummon, packet));
+      registry.setHandler(MoveMonster.class, packet -> create(SendOpcode.MOVE_MONSTER, this::moveMonster, packet));
+      registry.setHandler(MovePet.class, packet -> create(SendOpcode.MOVE_PET, this::movePet, packet));
+      registry.setHandler(MoveDragon.class, packet -> create(SendOpcode.MOVE_DRAGON, this::moveDragon, packet));
    }
 
    /**
@@ -37,16 +37,13 @@ public class MovementPacketFactory extends AbstractPacketFactory {
     *
     * @return The move response packet.
     */
-   protected byte[] moveMonsterResponse(MoveMonsterResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(13);
-      mplew.writeShort(SendOpcode.MOVE_MONSTER_RESPONSE.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.writeShort(packet.moveId());
-      mplew.writeBool(packet.useSkills());
-      mplew.writeShort(packet.currentMp());
-      mplew.write(packet.skillId());
-      mplew.write(packet.skillLevel());
-      return mplew.getPacket();
+   protected void moveMonsterResponse(MaplePacketLittleEndianWriter writer, MoveMonsterResponse packet) {
+      writer.writeInt(packet.objectId());
+      writer.writeShort(packet.moveId());
+      writer.writeBool(packet.useSkills());
+      writer.writeShort(packet.currentMp());
+      writer.write(packet.skillId());
+      writer.write(packet.skillLevel());
    }
 
    protected void rebroadcastMovementList(LittleEndianWriter lew, List<Byte> movementDataList) {
@@ -57,48 +54,36 @@ public class MovementPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected byte[] movePlayer(MovePlayer packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_PLAYER.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(0);
-      rebroadcastMovementList(mplew, packet.movementList());
-      return mplew.getPacket();
+   protected void movePlayer(MaplePacketLittleEndianWriter writer, MovePlayer packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(0);
+      rebroadcastMovementList(writer, packet.movementList());
    }
 
-   protected byte[] moveSummon(MoveSummon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_SUMMON.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.objectId());
-      mplew.writePos(packet.startPosition());
-      rebroadcastMovementList(mplew, packet.movementList());
-      return mplew.getPacket();
+   protected void moveSummon(MaplePacketLittleEndianWriter writer, MoveSummon packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.objectId());
+      writer.writePos(packet.startPosition());
+      rebroadcastMovementList(writer, packet.movementList());
    }
 
-   protected byte[] moveMonster(MoveMonster packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_MONSTER.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.write(0);
-      mplew.writeBool(packet.skillPossible());
-      mplew.write(packet.skill());
-      mplew.write(packet.skillId());
-      mplew.write(packet.skillLevel());
-      mplew.writeShort(packet.option());
-      mplew.writePos(packet.startPosition());
-      rebroadcastMovementList(mplew, packet.movementList());
-      return mplew.getPacket();
+   protected void moveMonster(MaplePacketLittleEndianWriter writer, MoveMonster packet) {
+      writer.writeInt(packet.objectId());
+      writer.write(0);
+      writer.writeBool(packet.skillPossible());
+      writer.write(packet.skill());
+      writer.write(packet.skillId());
+      writer.write(packet.skillLevel());
+      writer.writeShort(packet.option());
+      writer.writePos(packet.startPosition());
+      rebroadcastMovementList(writer, packet.movementList());
    }
 
-   protected byte[] movePet(MovePet packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_PET.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.slot());
-      mplew.writeInt(packet.petId());
-      serializeMovementList(mplew, packet.movementList());
-      return mplew.getPacket();
+   protected void movePet(MaplePacketLittleEndianWriter writer, MovePet packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(packet.slot());
+      writer.writeInt(packet.petId());
+      serializeMovementList(writer, packet.movementList());
    }
 
    protected void serializeMovementList(LittleEndianWriter lew, List<LifeMovementFragment> moves) {
@@ -108,12 +93,9 @@ public class MovementPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected byte[] moveDragon(MoveDragon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MOVE_DRAGON.getValue());
-      mplew.writeInt(packet.ownerId());
-      mplew.writePos(packet.startPosition());
-      rebroadcastMovementList(mplew, packet.movementList());
-      return mplew.getPacket();
+   protected void moveDragon(MaplePacketLittleEndianWriter writer, MoveDragon packet) {
+      writer.writeInt(packet.ownerId());
+      writer.writePos(packet.startPosition());
+      rebroadcastMovementList(writer, packet.movementList());
    }
 }

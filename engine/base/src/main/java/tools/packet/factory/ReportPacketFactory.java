@@ -16,8 +16,8 @@ public class ReportPacketFactory extends AbstractPacketFactory {
    }
 
    private ReportPacketFactory() {
-      registry.setHandler(ReportResponse.class, packet -> this.reportResponse((ReportResponse) packet));
-      registry.setHandler(SendPolice.class, packet -> this.sendPolice((SendPolice) packet));
+      registry.setHandler(ReportResponse.class, packet -> create(SendOpcode.SUE_CHARACTER_RESULT, this::reportResponse, packet));
+      registry.setHandler(SendPolice.class, packet -> create(SendOpcode.DATA_CRC_CHECK_FAILED, this::sendPolice, packet));
    }
 
    /**
@@ -29,17 +29,11 @@ public class ReportPacketFactory extends AbstractPacketFactory {
     * a user.<br> 4: Your request did not go through for unknown reasons.
     * Please try again later.<br>
     */
-   protected byte[] reportResponse(ReportResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SUE_CHARACTER_RESULT.getValue());
-      mplew.write(packet.mode());
-      return mplew.getPacket();
+   protected void reportResponse(MaplePacketLittleEndianWriter writer, ReportResponse packet) {
+      writer.write(packet.mode());
    }
 
-   protected byte[] sendPolice(SendPolice packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DATA_CRC_CHECK_FAILED.getValue());
-      mplew.writeMapleAsciiString(packet.text());
-      return mplew.getPacket();
+   protected void sendPolice(MaplePacketLittleEndianWriter writer, SendPolice packet) {
+      writer.writeMapleAsciiString(packet.text());
    }
 }

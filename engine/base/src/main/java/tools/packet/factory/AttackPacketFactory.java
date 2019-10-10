@@ -24,42 +24,33 @@ public class AttackPacketFactory extends AbstractPacketFactory {
    }
 
    private AttackPacketFactory() {
-      registry.setHandler(CloseRangeAttack.class, packet -> this.closeRangeAttack((CloseRangeAttack) packet));
-      registry.setHandler(RangedAttack.class, packet -> this.rangedAttack((RangedAttack) packet));
-      registry.setHandler(MagicAttack.class, packet -> this.magicAttack((MagicAttack) packet));
-      registry.setHandler(SummonAttack.class, packet -> this.summonAttack((SummonAttack) packet));
-      registry.setHandler(ThrowGrenade.class, packet -> this.throwGrenade((ThrowGrenade) packet));
+      registry.setHandler(CloseRangeAttack.class, packet -> create(SendOpcode.CLOSE_RANGE_ATTACK, this::closeRangeAttack, packet));
+      registry.setHandler(RangedAttack.class, packet -> create(SendOpcode.RANGED_ATTACK, this::rangedAttack, packet));
+      registry.setHandler(MagicAttack.class, packet -> create(SendOpcode.MAGIC_ATTACK, this::magicAttack, packet));
+      registry.setHandler(SummonAttack.class, packet -> create(SendOpcode.SUMMON_ATTACK, this::summonAttack, packet));
+      registry.setHandler(ThrowGrenade.class, packet -> create(SendOpcode.THROW_GRENADE, this::throwGrenade, packet));
    }
 
-   protected byte[] closeRangeAttack(CloseRangeAttack packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLOSE_RANGE_ATTACK.getValue());
-      addAttackBody(mplew, packet.characterId(), packet.skill(), packet.skillLevel(), packet.stance(),
+   protected void closeRangeAttack(MaplePacketLittleEndianWriter writer, CloseRangeAttack packet) {
+      addAttackBody(writer, packet.characterId(), packet.skill(), packet.skillLevel(), packet.stance(),
             packet.numAttackedAndDamage(), 0, packet.damage(), packet.speed(), packet.direction(),
             packet.display());
-      return mplew.getPacket();
    }
 
-   protected byte[] rangedAttack(RangedAttack packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.RANGED_ATTACK.getValue());
-      addAttackBody(mplew, packet.characterId(), packet.skill(), packet.skillLevel(), packet.stance(),
+   protected void rangedAttack(MaplePacketLittleEndianWriter writer, RangedAttack packet) {
+      addAttackBody(writer, packet.characterId(), packet.skill(), packet.skillLevel(), packet.stance(),
             packet.numAttackedAndDamage(), packet.projectile(), packet.damage(), packet.speed(), packet.direction(),
             packet.display());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+      writer.writeInt(0);
    }
 
-   protected byte[] magicAttack(MagicAttack packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAGIC_ATTACK.getValue());
-      addAttackBody(mplew, packet.characterId(), packet.skill(), packet.skillLevel(), packet.stance(),
+   protected void magicAttack(MaplePacketLittleEndianWriter writer, MagicAttack packet) {
+      addAttackBody(writer, packet.characterId(), packet.skill(), packet.skillLevel(), packet.stance(),
             packet.numAttackedAndDamage(), 0, packet.damage(), packet.speed(), packet.direction(),
             packet.display());
       if (packet.charge() != -1) {
-         mplew.writeInt(packet.charge());
+         writer.writeInt(packet.charge());
       }
-      return mplew.getPacket();
    }
 
    protected void addAttackBody(LittleEndianWriter lew, int characterId, int skill, int skilllevel, int stance,
@@ -93,52 +84,45 @@ public class AttackPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected byte[] summonAttack(SummonAttack packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+   protected void summonAttack(MaplePacketLittleEndianWriter writer, SummonAttack packet) {
       //b2 00 29 f7 00 00 9a a3 04 00 c8 04 01 94 a3 04 00 06 ff 2b 00
-      mplew.writeShort(SendOpcode.SUMMON_ATTACK.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.summonObjectId());
-      mplew.write(0);     // char level
-      mplew.write(packet.direction());
-      mplew.write(packet.damage().size());
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.summonObjectId());
+      writer.write(0);     // char level
+      writer.write(packet.direction());
+      writer.write(packet.damage().size());
       for (SummonAttackEntry attackEntry : packet.damage()) {
-         mplew.writeInt(attackEntry.monsterObjectId()); // oid
-         mplew.write(6); // who knows
-         mplew.writeInt(attackEntry.damage()); // damage
+         writer.writeInt(attackEntry.monsterObjectId()); // oid
+         writer.write(6); // who knows
+         writer.writeInt(attackEntry.damage()); // damage
       }
-
-      return mplew.getPacket();
    }
 
         /*
         public static byte[] summonAttack(int cid, int summonSkillId, byte direction, List<SummonAttackEntry> allDamage) {
-                final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
+                final MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
                 //b2 00 29 f7 00 00 9a a3 04 00 c8 04 01 94 a3 04 00 06 ff 2b 00
-                mplew.writeShort(SendOpcode.SUMMON_ATTACK.getValue());
-                mplew.writeInt(cid);
-                mplew.writeInt(summonSkillId);
-                mplew.write(direction);
-                mplew.write(4);
-                mplew.write(allDamage.size());
+                writer.writeShort(SendOpcode.SUMMON_ATTACK.getValue());
+                writer.writeInt(cid);
+                writer.writeInt(summonSkillId);
+                writer.write(direction);
+                writer.write(4);
+                writer.write(allDamage.size());
                 for (SummonAttackEntry attackEntry : allDamage) {
-                        mplew.writeInt(attackEntry.getMonsterOid()); // oid
-                        mplew.write(6); // who knows
-                        mplew.writeInt(attackEntry.getDamage()); // damage
+                        writer.writeInt(attackEntry.getMonsterOid()); // oid
+                        writer.write(6); // who knows
+                        writer.writeInt(attackEntry.getDamage()); // damage
                 }
-                return mplew.getPacket();
+                return writer.getPacket();
         }
         */
 
-   protected byte[] throwGrenade(ThrowGrenade packet) { // packets found thanks to GabrielSin
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.THROW_GRENADE.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.position().x);
-      mplew.writeInt(packet.position().y);
-      mplew.writeInt(packet.keyDown());
-      mplew.writeInt(packet.skillId());
-      mplew.writeInt(packet.skillLevel());
-      return mplew.getPacket();
+   protected void throwGrenade(MaplePacketLittleEndianWriter writer, ThrowGrenade packet) { // packets found thanks to GabrielSin
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.position().x);
+      writer.writeInt(packet.position().y);
+      writer.writeInt(packet.keyDown());
+      writer.writeInt(packet.skillId());
+      writer.writeInt(packet.skillLevel());
    }
 }

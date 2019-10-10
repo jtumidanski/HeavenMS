@@ -15,13 +15,10 @@ public class AfterLoginErrorPacketFactory extends AbstractPacketFactory {
    }
 
    private AfterLoginErrorPacketFactory() {
-      registry.setHandler(AfterLoginError.class, packet -> this.getAfterLoginError((AfterLoginError) packet));
+      registry.setHandler(AfterLoginError.class, packet -> create(SendOpcode.SELECT_CHARACTER_BY_VAC, this::getAfterLoginError, packet, 8));
    }
 
-   protected byte[] getAfterLoginError(AfterLoginError packet) {//same as above o.o
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(8);
-      mplew.writeShort(SendOpcode.SELECT_CHARACTER_BY_VAC.getValue());
-      mplew.writeShort(packet.reason());//using other types than stated above = CRASH
-      return mplew.getPacket();
+   protected void getAfterLoginError(MaplePacketLittleEndianWriter writer, AfterLoginError packet) {//same as above o.o
+      writer.writeShort(packet.reason());//using other types than stated above = CRASH
    }
 }

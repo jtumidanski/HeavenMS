@@ -17,78 +17,72 @@ public class GuildBBSPacketFactory extends AbstractPacketFactory {
    }
 
    private GuildBBSPacketFactory() {
-      registry.setHandler(ShowThread.class, packet -> this.showThread((ShowThread) packet));
-      registry.setHandler(GetThreadList.class, packet -> this.getThreadList((GetThreadList) packet));
+      registry.setHandler(ShowThread.class, packet -> create(SendOpcode.GUILD_BBS_PACKET, this::showThread, packet));
+      registry.setHandler(GetThreadList.class, packet -> create(SendOpcode.GUILD_BBS_PACKET, this::getThreadList, packet));
    }
 
-   protected byte[] showThread(ShowThread packet) throws RuntimeException {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.GUILD_BBS_PACKET.getValue());
-      mplew.write(0x07);
-      mplew.writeInt(packet.localThreadId());
-      mplew.writeInt(packet.threadData().posterCharacterId());
-      mplew.writeLong(getTime(packet.threadData().timestamp()));
-      mplew.writeMapleAsciiString(packet.threadData().name());
-      mplew.writeMapleAsciiString(packet.threadData().startPost());
-      mplew.writeInt(packet.threadData().icon());
+   protected void showThread(MaplePacketLittleEndianWriter writer, ShowThread packet) throws RuntimeException {
+      writer.write(0x07);
+      writer.writeInt(packet.localThreadId());
+      writer.writeInt(packet.threadData().posterCharacterId());
+      writer.writeLong(getTime(packet.threadData().timestamp()));
+      writer.writeMapleAsciiString(packet.threadData().name());
+      writer.writeMapleAsciiString(packet.threadData().startPost());
+      writer.writeInt(packet.threadData().icon());
       if (packet.threadData().getReplyData() != null) {
          int replyCount = packet.threadData().replyCount();
-         mplew.writeInt(replyCount);
+         writer.writeInt(replyCount);
          if (replyCount != packet.threadData().getReplyData().size()) {
             throw new RuntimeException(String.valueOf(packet.threadData().threadId()));
          }
 
          packet.threadData().getReplyData().forEach(replyData -> {
-            mplew.writeInt(replyData.replyId());
-            mplew.writeInt(replyData.posterCharacterId());
-            mplew.writeLong(getTime(replyData.timestamp()));
-            mplew.writeMapleAsciiString(replyData.content());
+            writer.writeInt(replyData.replyId());
+            writer.writeInt(replyData.posterCharacterId());
+            writer.writeLong(getTime(replyData.timestamp()));
+            writer.writeMapleAsciiString(replyData.content());
          });
       } else {
-         mplew.writeInt(0);
+         writer.writeInt(0);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getThreadList(GetThreadList packet) {
+   protected void getThreadList(MaplePacketLittleEndianWriter writer, GetThreadList packet) {
       int start = packet.start();
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.GUILD_BBS_PACKET.getValue());
-      mplew.write(0x06);
+      writer.write(0x06);
       if (packet.threadData().size() == 0) {
-         mplew.write(0);
-         mplew.writeInt(0);
-         mplew.writeInt(0);
-         return mplew.getPacket();
+         writer.write(0);
+         writer.writeInt(0);
+         writer.writeInt(0);
+         return;
       }
 
       int threadCount = packet.threadData().size();
 
       BbsThreadData firstThread = packet.threadData().get(0);
       if (firstThread.threadId() == 0) { //has a notice
-         mplew.write(1);
-         addThread(mplew, firstThread);
+         writer.write(1);
+         addThread(writer, firstThread);
          threadCount--; //one thread didn't count (because it's a notice)
       } else {
-         mplew.write(0);
+         writer.write(0);
       }
       if (start >= packet.threadData().size()) { //seek to the thread before where we start
          start = 0; //uh, we're trying to start at a place past possible
       }
-      mplew.writeInt(threadCount);
-      mplew.writeInt(Math.min(10, threadCount - start));
+      writer.writeInt(threadCount);
+      writer.writeInt(Math.min(10, threadCount - start));
       for (int i = start; i < Math.min(10, threadCount - start); i++) {
-         addThread(mplew, packet.threadData().get(i));
+         addThread(writer, packet.threadData().get(i));
       }
-      return mplew.getPacket();
    }
 
-   protected void addThread(final MaplePacketLittleEndianWriter mplew, BbsThreadData threadData) {
-      mplew.writeInt(threadData.threadId());
-      mplew.writeInt(threadData.posterCharacterId());
-      mplew.writeMapleAsciiString(threadData.name());
-      mplew.writeLong(getTime(threadData.timestamp()));
-      mplew.writeInt(threadData.icon());
-      mplew.writeInt(threadData.replyCount());
+   protected void addThread(final MaplePacketLittleEndianWriter writer, BbsThreadData threadData) {
+      writer.writeInt(threadData.threadId());
+      writer.writeInt(threadData.posterCharacterId());
+      writer.writeMapleAsciiString(threadData.name());
+      writer.writeLong(getTime(threadData.timestamp()));
+      writer.writeInt(threadData.icon());
+      writer.writeInt(threadData.replyCount());
    }
 }

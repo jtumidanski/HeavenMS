@@ -22,36 +22,27 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    }
 
    private UpdateCharacterBoxPacketFactory() {
-      registry.setHandler(AddOmokBox.class, packet -> this.addOmokBox((AddOmokBox) packet));
-      registry.setHandler(AddMatchCard.class, packet -> this.addMatchCardBox((AddMatchCard) packet));
-      registry.setHandler(RemoveMiniGameBox.class, packet -> this.removeMinigameBox((RemoveMiniGameBox) packet));
-      registry.setHandler(UpdatePlayerShopBox.class, packet -> this.updatePlayerShopBox((UpdatePlayerShopBox) packet));
-      registry.setHandler(RemovePlayerShop.class, packet -> this.removePlayerShopBox((RemovePlayerShop) packet));
-      registry.setHandler(UseChalkboard.class, packet -> this.useChalkboard((UseChalkboard) packet));
+      registry.setHandler(AddOmokBox.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::addOmokBox, packet));
+      registry.setHandler(AddMatchCard.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::addMatchCardBox, packet));
+      registry.setHandler(RemoveMiniGameBox.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::removeMinigameBox, packet, 7));
+      registry.setHandler(UpdatePlayerShopBox.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::updatePlayerShopBox, packet));
+      registry.setHandler(RemovePlayerShop.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::removePlayerShopBox, packet, 7));
+      registry.setHandler(UseChalkboard.class, packet -> create(SendOpcode.CHALKBOARD, this::useChalkboard, packet));
    }
 
-   protected byte[] addOmokBox(AddOmokBox packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_CHAR_BOX.getValue());
-      mplew.writeInt(packet.getCharacter().getId());
-      addAnnounceBox(mplew, packet.getCharacter().getMiniGame(), packet.getAmount(), packet.getType());
-      return mplew.getPacket();
+   protected void addOmokBox(MaplePacketLittleEndianWriter writer, AddOmokBox packet) {
+      writer.writeInt(packet.getCharacter().getId());
+      addAnnounceBox(writer, packet.getCharacter().getMiniGame(), packet.getAmount(), packet.getType());
    }
 
-   protected byte[] addMatchCardBox(AddMatchCard packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_CHAR_BOX.getValue());
-      mplew.writeInt(packet.getCharacter().getId());
-      addAnnounceBox(mplew, packet.getCharacter().getMiniGame(), packet.getAmount(), packet.getType());
-      return mplew.getPacket();
+   protected void addMatchCardBox(MaplePacketLittleEndianWriter writer, AddMatchCard packet) {
+      writer.writeInt(packet.getCharacter().getId());
+      addAnnounceBox(writer, packet.getCharacter().getMiniGame(), packet.getAmount(), packet.getType());
    }
 
-   protected byte[] removeMinigameBox(RemoveMiniGameBox packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.UPDATE_CHAR_BOX.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void removeMinigameBox(MaplePacketLittleEndianWriter writer, RemoveMiniGameBox packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(0);
    }
 
    protected void addAnnounceBox(final MaplePacketLittleEndianWriter writer, MapleMiniGame game, int amount, int joinable) {
@@ -65,13 +56,9 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
       writer.write(joinable);
    }
 
-   protected byte[] updatePlayerShopBox(UpdatePlayerShopBox packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_CHAR_BOX.getValue());
-      mplew.writeInt(packet.getPlayerShop().getOwner().getId());
-
-      updatePlayerShopBoxInfo(mplew, packet.getPlayerShop());
-      return mplew.getPacket();
+   protected void updatePlayerShopBox(MaplePacketLittleEndianWriter writer, UpdatePlayerShopBox packet) {
+      writer.writeInt(packet.getPlayerShop().getOwner().getId());
+      updatePlayerShopBoxInfo(writer, packet.getPlayerShop());
    }
 
    protected void updatePlayerShopBoxInfo(final MaplePacketLittleEndianWriter writer, MaplePlayerShop shop) {
@@ -86,24 +73,18 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
       writer.write(0);
    }
 
-   protected byte[] removePlayerShopBox(RemovePlayerShop packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.UPDATE_CHAR_BOX.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void removePlayerShopBox(MaplePacketLittleEndianWriter writer, RemovePlayerShop packet) {
+      writer.writeInt(packet.characterId());
+      writer.write(0);
    }
 
-   protected byte[] useChalkboard(UseChalkboard packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CHALKBOARD.getValue());
-      mplew.writeInt(packet.characterId());
+   protected void useChalkboard(MaplePacketLittleEndianWriter writer, UseChalkboard packet) {
+      writer.writeInt(packet.characterId());
       if (packet.close()) {
-         mplew.write(0);
+         writer.write(0);
       } else {
-         mplew.write(1);
-         mplew.writeMapleAsciiString(packet.text());
+         writer.write(1);
+         writer.writeMapleAsciiString(packet.text());
       }
-      return mplew.getPacket();
    }
 }

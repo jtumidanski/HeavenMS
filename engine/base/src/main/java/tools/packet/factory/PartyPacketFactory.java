@@ -34,20 +34,18 @@ public class PartyPacketFactory extends AbstractPacketFactory {
    }
 
    private PartyPacketFactory() {
-      registry.setHandler(PartyCreated.class, packet -> this.partyCreated((PartyCreated) packet));
-      registry.setHandler(PartyInvite.class, packet -> this.partyInvite((PartyInvite) packet));
-      registry.setHandler(PartySearchInvite.class, packet -> this.partySearchInvite((PartySearchInvite) packet));
-      registry.setHandler(PartyStatusMessage.class, packet -> this.partyStatusMessage((PartyStatusMessage) packet));
-      registry.setHandler(PartyPortal.class, packet -> this.partyPortal((PartyPortal) packet));
-      registry.setHandler(UpdateParty.class, packet -> this.updateParty((UpdateParty) packet));
-      registry.setHandler(UpdatePartyMemberHp.class, packet -> this.updatePartyMemberHP((UpdatePartyMemberHp) packet));
+      registry.setHandler(PartyCreated.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyCreated, packet));
+      registry.setHandler(PartyInvite.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyInvite, packet));
+      registry.setHandler(PartySearchInvite.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partySearchInvite, packet));
+      registry.setHandler(PartyStatusMessage.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyStatusMessage, packet));
+      registry.setHandler(PartyPortal.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyPortal, packet));
+      registry.setHandler(UpdateParty.class, packet -> create(SendOpcode.PARTY_OPERATION, this::updateParty, packet));
+      registry.setHandler(UpdatePartyMemberHp.class, packet -> create(SendOpcode.UPDATE_PARTYMEMBER_HP, this::updatePartyMemberHP, packet));
    }
 
-   protected byte[] partyCreated(PartyCreated packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(8);
-      mplew.writeInt(packet.getParty().getId());
+   protected void partyCreated(MaplePacketLittleEndianWriter writer, PartyCreated packet) {
+      writer.write(8);
+      writer.writeInt(packet.getParty().getId());
 
       Map<Integer, MapleDoor> partyDoors = packet.getParty().getDoors();
       if (partyDoors.size() > 0) {
@@ -55,43 +53,36 @@ public class PartyPacketFactory extends AbstractPacketFactory {
 
          if (door != null) {
             MapleDoorObject mdo = door.getAreaDoor();
-            mplew.writeInt(mdo.getTo().getId());
-            mplew.writeInt(mdo.getFrom().getId());
-            mplew.writeInt(mdo.getPosition().x);
-            mplew.writeInt(mdo.getPosition().y);
+            writer.writeInt(mdo.getTo().getId());
+            writer.writeInt(mdo.getFrom().getId());
+            writer.writeInt(mdo.getPosition().x);
+            writer.writeInt(mdo.getPosition().y);
          } else {
-            mplew.writeInt(999999999);
-            mplew.writeInt(999999999);
-            mplew.writeInt(0);
-            mplew.writeInt(0);
+            writer.writeInt(999999999);
+            writer.writeInt(999999999);
+            writer.writeInt(0);
+            writer.writeInt(0);
          }
       } else {
-         mplew.writeInt(999999999);
-         mplew.writeInt(999999999);
-         mplew.writeInt(0);
-         mplew.writeInt(0);
+         writer.writeInt(999999999);
+         writer.writeInt(999999999);
+         writer.writeInt(0);
+         writer.writeInt(0);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] partyInvite(PartyInvite packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(4);
-      mplew.writeInt(packet.partyId());
-      mplew.writeMapleAsciiString(packet.fromCharacterName());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void partyInvite(MaplePacketLittleEndianWriter writer, PartyInvite packet) {
+      writer.write(4);
+      writer.writeInt(packet.partyId());
+      writer.writeMapleAsciiString(packet.fromCharacterName());
+      writer.write(0);
    }
 
-   protected byte[] partySearchInvite(PartySearchInvite packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(4);
-      mplew.writeInt(packet.partyId());
-      mplew.writeMapleAsciiString("PS: " + packet.fromCharacterName());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void partySearchInvite(MaplePacketLittleEndianWriter writer, PartySearchInvite packet) {
+      writer.write(4);
+      writer.writeInt(packet.partyId());
+      writer.writeMapleAsciiString("PS: " + packet.fromCharacterName());
+      writer.write(0);
    }
 
    /**
@@ -108,24 +99,18 @@ public class PartyPacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] partyStatusMessage(PartyStatusMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.write(packet.message());
+   protected void partyStatusMessage(MaplePacketLittleEndianWriter writer, PartyStatusMessage packet) {
+      writer.write(packet.message());
       if (packet.fromCharacterName().isDefined()) {
-         mplew.writeMapleAsciiString(packet.fromCharacterName().get());
+         writer.writeMapleAsciiString(packet.fromCharacterName().get());
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] partyPortal(PartyPortal packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
-      mplew.writeShort(0x23);
-      mplew.writeInt(packet.townId());
-      mplew.writeInt(packet.targetId());
-      mplew.writePos(packet.position());
-      return mplew.getPacket();
+   protected void partyPortal(MaplePacketLittleEndianWriter writer, PartyPortal packet) {
+      writer.writeShort(0x23);
+      writer.writeInt(packet.townId());
+      writer.writeInt(packet.targetId());
+      writer.writePos(packet.position());
    }
 
    protected void addPartyStatus(int forChannel, MapleParty party, LittleEndianWriter lew, boolean leaving) {
@@ -193,57 +178,51 @@ public class PartyPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected byte[] updateParty(UpdateParty packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.PARTY_OPERATION.getValue());
+   protected void updateParty(MaplePacketLittleEndianWriter writer, UpdateParty packet) {
       switch (packet.getOperation()) {
          case DISBAND:
          case EXPEL:
          case LEAVE:
-            mplew.write(0x0C);
-            mplew.writeInt(packet.getParty().getId());
-            mplew.writeInt(packet.getTarget().getId());
+            writer.write(0x0C);
+            writer.writeInt(packet.getParty().getId());
+            writer.writeInt(packet.getTarget().getId());
             if (packet.getOperation() == DISBAND) {
-               mplew.write(0);
-               mplew.writeInt(packet.getParty().getId());
+               writer.write(0);
+               writer.writeInt(packet.getParty().getId());
             } else {
-               mplew.write(1);
+               writer.write(1);
                if (packet.getOperation() == EXPEL) {
-                  mplew.write(1);
+                  writer.write(1);
                } else {
-                  mplew.write(0);
+                  writer.write(0);
                }
-               mplew.writeMapleAsciiString(packet.getTarget().getName());
-               addPartyStatus(packet.getForChannel(), packet.getParty(), mplew, false);
+               writer.writeMapleAsciiString(packet.getTarget().getName());
+               addPartyStatus(packet.getForChannel(), packet.getParty(), writer, false);
             }
             break;
          case JOIN:
-            mplew.write(0xF);
-            mplew.writeInt(packet.getParty().getId());
-            mplew.writeMapleAsciiString(packet.getTarget().getName());
-            addPartyStatus(packet.getForChannel(), packet.getParty(), mplew, false);
+            writer.write(0xF);
+            writer.writeInt(packet.getParty().getId());
+            writer.writeMapleAsciiString(packet.getTarget().getName());
+            addPartyStatus(packet.getForChannel(), packet.getParty(), writer, false);
             break;
          case SILENT_UPDATE:
          case LOG_ONOFF:
-            mplew.write(0x7);
-            mplew.writeInt(packet.getParty().getId());
-            addPartyStatus(packet.getForChannel(), packet.getParty(), mplew, false);
+            writer.write(0x7);
+            writer.writeInt(packet.getParty().getId());
+            addPartyStatus(packet.getForChannel(), packet.getParty(), writer, false);
             break;
          case CHANGE_LEADER:
-            mplew.write(0x1B);
-            mplew.writeInt(packet.getTarget().getId());
-            mplew.write(0);
+            writer.write(0x1B);
+            writer.writeInt(packet.getTarget().getId());
+            writer.write(0);
             break;
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] updatePartyMemberHP(UpdatePartyMemberHp packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_PARTYMEMBER_HP.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.currentHp());
-      mplew.writeInt(packet.maximumHp());
-      return mplew.getPacket();
+   protected void updatePartyMemberHP(MaplePacketLittleEndianWriter writer, UpdatePartyMemberHp packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.currentHp());
+      writer.writeInt(packet.maximumHp());
    }
 }

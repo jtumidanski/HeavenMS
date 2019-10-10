@@ -21,30 +21,27 @@ public class StoragePacketFactory extends AbstractPacketFactory {
    }
 
    private StoragePacketFactory() {
-      registry.setHandler(GetStorage.class, packet -> this.getStorage((GetStorage) packet));
-      registry.setHandler(StorageError.class, packet -> this.getStorageError((StorageError) packet));
-      registry.setHandler(MesoStorage.class, packet -> this.mesoStorage((MesoStorage) packet));
-      registry.setHandler(StoreInStorage.class, packet -> this.storeStorage((StoreInStorage) packet));
-      registry.setHandler(TakeOutOfStorage.class, packet -> this.takeOutStorage((TakeOutOfStorage) packet));
-      registry.setHandler(ArrangeStorage.class, packet -> this.arrangeStorage((ArrangeStorage) packet));
+      registry.setHandler(GetStorage.class, packet -> create(SendOpcode.STORAGE, this::getStorage, packet));
+      registry.setHandler(StorageError.class, packet -> create(SendOpcode.STORAGE, this::getStorageError, packet));
+      registry.setHandler(MesoStorage.class, packet -> create(SendOpcode.STORAGE, this::mesoStorage, packet));
+      registry.setHandler(StoreInStorage.class, packet -> create(SendOpcode.STORAGE, this::storeStorage, packet));
+      registry.setHandler(TakeOutOfStorage.class, packet -> create(SendOpcode.STORAGE, this::takeOutStorage, packet));
+      registry.setHandler(ArrangeStorage.class, packet -> create(SendOpcode.STORAGE, this::arrangeStorage, packet));
    }
 
-   protected byte[] getStorage(GetStorage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STORAGE.getValue());
-      mplew.write(0x16);
-      mplew.writeInt(packet.npcId());
-      mplew.write(packet.slots());
-      mplew.writeShort(0x7E);
-      mplew.writeShort(0);
-      mplew.writeInt(0);
-      mplew.writeInt(packet.meso());
-      mplew.writeShort(0);
-      mplew.write((byte) packet.items().size());
-      packet.items().forEach(item -> addItemInfo(mplew, item, true));
-      mplew.writeShort(0);
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void getStorage(MaplePacketLittleEndianWriter writer, GetStorage packet) {
+      writer.write(0x16);
+      writer.writeInt(packet.npcId());
+      writer.write(packet.slots());
+      writer.writeShort(0x7E);
+      writer.writeShort(0);
+      writer.writeInt(0);
+      writer.writeInt(packet.meso());
+      writer.writeShort(0);
+      writer.write((byte) packet.items().size());
+      packet.items().forEach(item -> addItemInfo(writer, item, true));
+      writer.writeShort(0);
+      writer.write(0);
    }
 
    /*
@@ -52,67 +49,52 @@ public class StoragePacketFactory extends AbstractPacketFactory {
     * 0x0B = You do not have enough mesos
     * 0x0C = One-Of-A-Kind error
     */
-   protected byte[] getStorageError(StorageError packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STORAGE.getValue());
-      mplew.write(packet.theType());
-      return mplew.getPacket();
+   protected void getStorageError(MaplePacketLittleEndianWriter writer, StorageError packet) {
+      writer.write(packet.theType());
    }
 
-   protected byte[] mesoStorage(MesoStorage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STORAGE.getValue());
-      mplew.write(0x13);
-      mplew.write(packet.slots());
-      mplew.writeShort(2);
-      mplew.writeShort(0);
-      mplew.writeInt(0);
-      mplew.writeInt(packet.meso());
-      return mplew.getPacket();
+   protected void mesoStorage(MaplePacketLittleEndianWriter writer, MesoStorage packet) {
+      writer.write(0x13);
+      writer.write(packet.slots());
+      writer.writeShort(2);
+      writer.writeShort(0);
+      writer.writeInt(0);
+      writer.writeInt(packet.meso());
    }
 
-   protected byte[] storeStorage(StoreInStorage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STORAGE.getValue());
-      mplew.write(0xD);
-      mplew.write(packet.slots());
-      mplew.writeShort(packet.inventoryType().getBitfieldEncoding());
-      mplew.writeShort(0);
-      mplew.writeInt(0);
-      mplew.write(packet.items().size());
+   protected void storeStorage(MaplePacketLittleEndianWriter writer, StoreInStorage packet) {
+      writer.write(0xD);
+      writer.write(packet.slots());
+      writer.writeShort(packet.inventoryType().getBitfieldEncoding());
+      writer.writeShort(0);
+      writer.writeInt(0);
+      writer.write(packet.items().size());
       for (Item item : packet.items()) {
-         addItemInfo(mplew, item, true);
+         addItemInfo(writer, item, true);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] takeOutStorage(TakeOutOfStorage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STORAGE.getValue());
-      mplew.write(0x9);
-      mplew.write(packet.slots());
-      mplew.writeShort(packet.inventoryType().getBitfieldEncoding());
-      mplew.writeShort(0);
-      mplew.writeInt(0);
-      mplew.write(packet.items().size());
+   protected void takeOutStorage(MaplePacketLittleEndianWriter writer, TakeOutOfStorage packet) {
+      writer.write(0x9);
+      writer.write(packet.slots());
+      writer.writeShort(packet.inventoryType().getBitfieldEncoding());
+      writer.writeShort(0);
+      writer.writeInt(0);
+      writer.write(packet.items().size());
       for (Item item : packet.items()) {
-         addItemInfo(mplew, item, true);
+         addItemInfo(writer, item, true);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] arrangeStorage(ArrangeStorage packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STORAGE.getValue());
-      mplew.write(0xF);
-      mplew.write(packet.slots());
-      mplew.write(124);
-      mplew.skip(10);
-      mplew.write(packet.items().size());
+   protected void arrangeStorage(MaplePacketLittleEndianWriter writer, ArrangeStorage packet) {
+      writer.write(0xF);
+      writer.write(packet.slots());
+      writer.write(124);
+      writer.skip(10);
+      writer.write(packet.items().size());
       for (Item item : packet.items()) {
-         addItemInfo(mplew, item, true);
+         addItemInfo(writer, item, true);
       }
-      mplew.write(0);
-      return mplew.getPacket();
+      writer.write(0);
    }
 }

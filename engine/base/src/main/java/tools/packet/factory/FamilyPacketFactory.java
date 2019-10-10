@@ -30,31 +30,28 @@ public class FamilyPacketFactory extends AbstractPacketFactory {
    }
 
    private FamilyPacketFactory() {
-      registry.setHandler(LoadFamily.class, packet -> this.loadFamily((LoadFamily) packet));
-      registry.setHandler(FamilyMessage.class, packet -> this.sendFamilyMessage((FamilyMessage) packet));
-      registry.setHandler(GetFamilyInfo.class, packet -> this.getFamilyInfo((GetFamilyInfo) packet));
-      registry.setHandler(ShowPedigree.class, packet -> this.showPedigree((ShowPedigree) packet));
-      registry.setHandler(SendFamilyInvite.class, packet -> this.sendFamilyInvite((SendFamilyInvite) packet));
-      registry.setHandler(FamilySummonRequest.class, packet -> this.sendFamilySummonRequest((FamilySummonRequest) packet));
-      registry.setHandler(FamilyLogonNotice.class, packet -> this.sendFamilyLoginNotice((FamilyLogonNotice) packet));
-      registry.setHandler(FamilyJoinResponse.class, packet -> this.sendFamilyJoinResponse((FamilyJoinResponse) packet));
-      registry.setHandler(SeniorMessage.class, packet -> this.getSeniorMessage((SeniorMessage) packet));
-      registry.setHandler(FamilyGainReputation.class, packet -> this.sendGainRep((FamilyGainReputation) packet));
+      registry.setHandler(LoadFamily.class, packet -> create(SendOpcode.FAMILY_PRIVILEGE_LIST, this::loadFamily, packet));
+      registry.setHandler(FamilyMessage.class, packet -> create(SendOpcode.FAMILY_RESULT, this::sendFamilyMessage, packet, 6));
+      registry.setHandler(GetFamilyInfo.class, packet -> create(SendOpcode.FAMILY_INFO_RESULT, this::getFamilyInfo, packet));
+      registry.setHandler(ShowPedigree.class, packet -> create(SendOpcode.FAMILY_CHART_RESULT, this::showPedigree, packet));
+      registry.setHandler(SendFamilyInvite.class, packet -> create(SendOpcode.FAMILY_JOIN_REQUEST, this::sendFamilyInvite, packet));
+      registry.setHandler(FamilySummonRequest.class, packet -> create(SendOpcode.FAMILY_SUMMON_REQUEST, this::sendFamilySummonRequest, packet));
+      registry.setHandler(FamilyLogonNotice.class, packet -> create(SendOpcode.FAMILY_NOTIFY_LOGIN_OR_LOGOUT, this::sendFamilyLoginNotice, packet));
+      registry.setHandler(FamilyJoinResponse.class, packet -> create(SendOpcode.FAMILY_JOIN_REQUEST_RESULT, this::sendFamilyJoinResponse, packet));
+      registry.setHandler(SeniorMessage.class, packet -> create(SendOpcode.FAMILY_JOIN_ACCEPTED, this::getSeniorMessage, packet));
+      registry.setHandler(FamilyGainReputation.class, packet -> create(SendOpcode.FAMILY_REP_GAIN, this::sendGainRep, packet));
    }
 
-   protected byte[] loadFamily(LoadFamily packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_PRIVILEGE_LIST.getValue());
-      mplew.writeInt(MapleFamilyEntitlement.values().length);
+   protected void loadFamily(MaplePacketLittleEndianWriter writer, LoadFamily packet) {
+      writer.writeInt(MapleFamilyEntitlement.values().length);
       for (int i = 0; i < MapleFamilyEntitlement.values().length; i++) {
          MapleFamilyEntitlement entitlement = MapleFamilyEntitlement.values()[i];
-         mplew.write(i <= 1 ? 1 : 2); //type
-         mplew.writeInt(entitlement.getRepCost());
-         mplew.writeInt(entitlement.getUsageLimit());
-         mplew.writeMapleAsciiString(entitlement.getName());
-         mplew.writeMapleAsciiString(entitlement.getDescription());
+         writer.write(i <= 1 ? 1 : 2); //type
+         writer.writeInt(entitlement.getRepCost());
+         writer.writeInt(entitlement.getUsageLimit());
+         writer.writeMapleAsciiString(entitlement.getName());
+         writer.writeMapleAsciiString(entitlement.getDescription());
       }
-      return mplew.getPacket();
    }
 
    /**
@@ -91,57 +88,47 @@ public class FamilyPacketFactory extends AbstractPacketFactory {
     *
     * @return Family Result packet
     */
-   protected byte[] sendFamilyMessage(FamilyMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.FAMILY_RESULT.getValue());
-      mplew.writeInt(packet.theType());
-      mplew.writeInt(packet.mesos());
-      return mplew.getPacket();
+   protected void sendFamilyMessage(MaplePacketLittleEndianWriter writer, FamilyMessage packet) {
+      writer.writeInt(packet.theType());
+      writer.writeInt(packet.mesos());
    }
 
-   protected byte[] getFamilyInfo(GetFamilyInfo packet) {
+   protected void getFamilyInfo(MaplePacketLittleEndianWriter writer, GetFamilyInfo packet) {
       if (packet.getFamilyEntry() == null) {
-         return getEmptyFamilyInfo();
+         getEmptyFamilyInfo(writer);
+         return;
       }
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_INFO_RESULT.getValue());
-      mplew.writeInt(packet.getFamilyEntry().getReputation()); // cur rep left
-      mplew.writeInt(packet.getFamilyEntry().getTotalReputation()); // tot rep left
-      mplew.writeInt(packet.getFamilyEntry().getTodaysRep()); // todays rep
-      mplew.writeShort(packet.getFamilyEntry().getJuniorCount()); // juniors added
-      mplew.writeShort(2); // juniors allowed
-      mplew.writeShort(0); //Unknown
-      mplew.writeInt(packet.getFamilyEntry().getFamily().getLeader().getChrId()); // Leader ID (Allows setting message)
-      mplew.writeMapleAsciiString(packet.getFamilyEntry().getFamily().getName());
-      mplew.writeMapleAsciiString(packet.getFamilyEntry().getFamily().getMessage()); //family message
-      mplew.writeInt(MapleFamilyEntitlement.values().length); //Entitlement info count
+      writer.writeInt(packet.getFamilyEntry().getReputation()); // cur rep left
+      writer.writeInt(packet.getFamilyEntry().getTotalReputation()); // tot rep left
+      writer.writeInt(packet.getFamilyEntry().getTodaysRep()); // todays rep
+      writer.writeShort(packet.getFamilyEntry().getJuniorCount()); // juniors added
+      writer.writeShort(2); // juniors allowed
+      writer.writeShort(0); //Unknown
+      writer.writeInt(packet.getFamilyEntry().getFamily().getLeader().getChrId()); // Leader ID (Allows setting message)
+      writer.writeMapleAsciiString(packet.getFamilyEntry().getFamily().getName());
+      writer.writeMapleAsciiString(packet.getFamilyEntry().getFamily().getMessage()); //family message
+      writer.writeInt(MapleFamilyEntitlement.values().length); //Entitlement info count
       for (MapleFamilyEntitlement entitlement : MapleFamilyEntitlement.values()) {
-         mplew.writeInt(entitlement.ordinal()); //ID
-         mplew.writeInt(packet.getFamilyEntry().isEntitlementUsed(entitlement) ? 1 : 0); //Used count
+         writer.writeInt(entitlement.ordinal()); //ID
+         writer.writeInt(packet.getFamilyEntry().isEntitlementUsed(entitlement) ? 1 : 0); //Used count
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getEmptyFamilyInfo() {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_INFO_RESULT.getValue());
-      mplew.writeInt(0); // cur rep left
-      mplew.writeInt(0); // tot rep left
-      mplew.writeInt(0); // todays rep
-      mplew.writeShort(0); // juniors added
-      mplew.writeShort(2); // juniors allowed
-      mplew.writeShort(0); //Unknown
-      mplew.writeInt(0); // Leader ID (Allows setting message)
-      mplew.writeMapleAsciiString("");
-      mplew.writeMapleAsciiString(""); //family message
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getEmptyFamilyInfo(MaplePacketLittleEndianWriter writer) {
+      writer.writeInt(0); // cur rep left
+      writer.writeInt(0); // tot rep left
+      writer.writeInt(0); // todays rep
+      writer.writeShort(0); // juniors added
+      writer.writeShort(2); // juniors allowed
+      writer.writeShort(0); //Unknown
+      writer.writeInt(0); // Leader ID (Allows setting message)
+      writer.writeMapleAsciiString("");
+      writer.writeMapleAsciiString(""); //family message
+      writer.writeInt(0);
    }
 
-   protected byte[] showPedigree(ShowPedigree packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_CHART_RESULT.getValue());
-      mplew.writeInt(packet.getFamilyEntry().getChrId()); //ID of viewed player's pedigree, can't be leader?
+   protected void showPedigree(MaplePacketLittleEndianWriter writer, ShowPedigree packet) {
+      writer.writeInt(packet.getFamilyEntry().getChrId()); //ID of viewed player's pedigree, can't be leader?
       List<MapleFamilyEntry> superJuniors = new ArrayList<>(4);
       boolean hasOtherJunior = false;
       int entryCount = 2; //2 guaranteed, leader and self
@@ -171,114 +158,95 @@ public class FamilyPacketFactory extends AbstractPacketFactory {
       if (missingEntries) {
          entryCount++;
       }
-      mplew.writeInt(entryCount); //player count
-      addPedigreeEntry(mplew, packet.getFamilyEntry().getFamily().getLeader());
+      writer.writeInt(entryCount); //player count
+      addPedigreeEntry(writer, packet.getFamilyEntry().getFamily().getLeader());
       if (packet.getFamilyEntry().getSenior() != null) {
          if (packet.getFamilyEntry().getSenior().getSenior() != null) {
-            addPedigreeEntry(mplew, packet.getFamilyEntry().getSenior().getSenior());
+            addPedigreeEntry(writer, packet.getFamilyEntry().getSenior().getSenior());
          }
-         addPedigreeEntry(mplew, packet.getFamilyEntry().getSenior());
+         addPedigreeEntry(writer, packet.getFamilyEntry().getSenior());
       }
-      addPedigreeEntry(mplew, packet.getFamilyEntry());
+      addPedigreeEntry(writer, packet.getFamilyEntry());
       if (hasOtherJunior) { //must be sent after own entry
          MapleFamilyEntry otherJunior = packet.getFamilyEntry().getSenior().getOtherJunior(packet.getFamilyEntry());
          if (otherJunior != null) {
-            addPedigreeEntry(mplew, otherJunior);
+            addPedigreeEntry(writer, otherJunior);
          }
       }
       if (missingEntries) {
-         addPedigreeEntry(mplew, packet.getFamilyEntry());
+         addPedigreeEntry(writer, packet.getFamilyEntry());
       }
       for (MapleFamilyEntry junior : packet.getFamilyEntry().getJuniors()) {
          if (junior == null) {
             continue;
          }
-         addPedigreeEntry(mplew, junior);
+         addPedigreeEntry(writer, junior);
          for (MapleFamilyEntry superJunior : junior.getJuniors()) {
             if (superJunior != null) {
-               addPedigreeEntry(mplew, superJunior);
+               addPedigreeEntry(writer, superJunior);
             }
          }
       }
-      mplew.writeInt(2 + superJuniors.size()); //member info count
+      writer.writeInt(2 + superJuniors.size()); //member info count
       // 0 = total seniors, -1 = total members, otherwise junior count of ID
-      mplew.writeInt(-1);
-      mplew.writeInt(packet.getFamilyEntry().getFamily().getTotalMembers());
-      mplew.writeInt(0);
-      mplew.writeInt(packet.getFamilyEntry().getTotalSeniors()); //client subtracts provided seniors
+      writer.writeInt(-1);
+      writer.writeInt(packet.getFamilyEntry().getFamily().getTotalMembers());
+      writer.writeInt(0);
+      writer.writeInt(packet.getFamilyEntry().getTotalSeniors()); //client subtracts provided seniors
       for (MapleFamilyEntry superJunior : superJuniors) {
-         mplew.writeInt(superJunior.getChrId());
-         mplew.writeInt(superJunior.getTotalJuniors());
+         writer.writeInt(superJunior.getChrId());
+         writer.writeInt(superJunior.getTotalJuniors());
       }
-      mplew.writeInt(0); //another loop count (entitlements used)
-      //mplew.writeInt(1); //entitlement index
-      //mplew.writeInt(2); //times used
-      mplew.writeShort(packet.getFamilyEntry().getJuniorCount() >= 2 ? 0 : 2); //0 disables Add button (only if viewing own pedigree)
-      return mplew.getPacket();
+      writer.writeInt(0); //another loop count (entitlements used)
+      //writer.writeInt(1); //entitlement index
+      //writer.writeInt(2); //times used
+      writer.writeShort(packet.getFamilyEntry().getJuniorCount() >= 2 ? 0 : 2); //0 disables Add button (only if viewing own pedigree)
    }
 
-   protected void addPedigreeEntry(MaplePacketLittleEndianWriter mplew, MapleFamilyEntry entry) {
+   protected void addPedigreeEntry(MaplePacketLittleEndianWriter writer, MapleFamilyEntry entry) {
       MapleCharacter chr = entry.getChr();
       boolean isOnline = chr != null;
-      mplew.writeInt(entry.getChrId()); //ID
-      mplew.writeInt(entry.getSenior() != null ? entry.getSenior().getChrId() : 0); //parent ID
-      mplew.writeShort(entry.getJob().getId()); //job id
-      mplew.write(entry.getLevel()); //level
-      mplew.writeBool(isOnline); //isOnline
-      mplew.writeInt(entry.getReputation()); //current rep
-      mplew.writeInt(entry.getTotalReputation()); //total rep
-      mplew.writeInt(entry.getRepsToSenior()); //reps recorded to senior
-      mplew.writeInt(entry.getTodaysRep());
-      mplew.writeInt(isOnline ? ((chr.isAwayFromWorld() || chr.getCashShop().isOpened()) ? -1 : chr.getClient().getChannel() - 1) : 0);
-      mplew.writeInt(isOnline ? (int) (chr.getLoggedInTime() / 60000) : 0); //time online in minutes
-      mplew.writeMapleAsciiString(entry.getName()); //name
+      writer.writeInt(entry.getChrId()); //ID
+      writer.writeInt(entry.getSenior() != null ? entry.getSenior().getChrId() : 0); //parent ID
+      writer.writeShort(entry.getJob().getId()); //job id
+      writer.write(entry.getLevel()); //level
+      writer.writeBool(isOnline); //isOnline
+      writer.writeInt(entry.getReputation()); //current rep
+      writer.writeInt(entry.getTotalReputation()); //total rep
+      writer.writeInt(entry.getRepsToSenior()); //reps recorded to senior
+      writer.writeInt(entry.getTodaysRep());
+      writer.writeInt(isOnline ? ((chr.isAwayFromWorld() || chr.getCashShop().isOpened()) ? -1 : chr.getClient().getChannel() - 1) : 0);
+      writer.writeInt(isOnline ? (int) (chr.getLoggedInTime() / 60000) : 0); //time online in minutes
+      writer.writeMapleAsciiString(entry.getName()); //name
    }
 
-   protected byte[] sendFamilyInvite(SendFamilyInvite packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_JOIN_REQUEST.getValue());
-      mplew.writeInt(packet.characterId());
-      mplew.writeMapleAsciiString(packet.inviter());
-      return mplew.getPacket();
+   protected void sendFamilyInvite(MaplePacketLittleEndianWriter writer, SendFamilyInvite packet) {
+      writer.writeInt(packet.characterId());
+      writer.writeMapleAsciiString(packet.inviter());
    }
 
-   protected byte[] sendFamilySummonRequest(FamilySummonRequest packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_SUMMON_REQUEST.getValue());
-      mplew.writeMapleAsciiString(packet.characterNameFrom());
-      mplew.writeMapleAsciiString(packet.familyName());
-      return mplew.getPacket();
+   protected void sendFamilySummonRequest(MaplePacketLittleEndianWriter writer, FamilySummonRequest packet) {
+      writer.writeMapleAsciiString(packet.characterNameFrom());
+      writer.writeMapleAsciiString(packet.familyName());
    }
 
-   protected byte[] sendFamilyLoginNotice(FamilyLogonNotice packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_NOTIFY_LOGIN_OR_LOGOUT.getValue());
-      mplew.writeBool(packet.loggedIn());
-      mplew.writeMapleAsciiString(packet.characterName());
-      return mplew.getPacket();
+   protected void sendFamilyLoginNotice(MaplePacketLittleEndianWriter writer, FamilyLogonNotice packet) {
+      writer.writeBool(packet.loggedIn());
+      writer.writeMapleAsciiString(packet.characterName());
    }
 
-   protected byte[] sendFamilyJoinResponse(FamilyJoinResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_JOIN_REQUEST_RESULT.getValue());
-      mplew.write(packet.accepted() ? 1 : 0);
-      mplew.writeMapleAsciiString(packet.characterNameAdded());
-      return mplew.getPacket();
+   protected void sendFamilyJoinResponse(MaplePacketLittleEndianWriter writer, FamilyJoinResponse packet) {
+      writer.write(packet.accepted() ? 1 : 0);
+      writer.writeMapleAsciiString(packet.characterNameAdded());
    }
 
-   protected byte[] getSeniorMessage(SeniorMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_JOIN_ACCEPTED.getValue());
-      mplew.writeMapleAsciiString(packet.characterName());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getSeniorMessage(MaplePacketLittleEndianWriter writer, SeniorMessage packet) {
+      writer.writeMapleAsciiString(packet.characterName());
+      writer.writeInt(0);
    }
 
-   protected byte[] sendGainRep(FamilyGainReputation packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAMILY_REP_GAIN.getValue());
-      mplew.writeInt(packet.gain());
-      mplew.writeMapleAsciiString(packet.characterNameFrom());
-      return mplew.getPacket();
+   protected void sendGainRep(MaplePacketLittleEndianWriter writer, FamilyGainReputation packet) {
+      writer.writeInt(packet.gain());
+      writer.writeMapleAsciiString(packet.characterNameFrom());
    }
 }

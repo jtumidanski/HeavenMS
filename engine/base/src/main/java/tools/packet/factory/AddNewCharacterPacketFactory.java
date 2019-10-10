@@ -15,14 +15,11 @@ public class AddNewCharacterPacketFactory extends AbstractPacketFactory {
    }
 
    private AddNewCharacterPacketFactory() {
-      registry.setHandler(AddNewCharacter.class, packet -> this.addNewCharEntry((AddNewCharacter) packet));
+      registry.setHandler(AddNewCharacter.class, packet -> create(SendOpcode.ADD_NEW_CHAR_ENTRY, this::addNewCharEntry, packet));
    }
 
-   protected byte[] addNewCharEntry(AddNewCharacter packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ADD_NEW_CHAR_ENTRY.getValue());
-      mplew.write(0);
-      addCharEntry(mplew, packet.getMapleCharacter(), false);
-      return mplew.getPacket();
+   protected void addNewCharEntry(MaplePacketLittleEndianWriter writer, AddNewCharacter packet) {
+      writer.write(0);
+      addCharEntry(writer, packet.getMapleCharacter(), false);
    }
 }

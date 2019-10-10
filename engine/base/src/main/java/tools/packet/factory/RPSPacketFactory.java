@@ -18,43 +18,31 @@ public class RPSPacketFactory extends AbstractPacketFactory {
    }
 
    private RPSPacketFactory() {
-      registry.setHandler(OpenRPSNPC.class, packet -> this.openRPSNPC((OpenRPSNPC) packet));
-      registry.setHandler(RPSMesoError.class, packet -> this.rpsMesoError((RPSMesoError) packet));
-      registry.setHandler(RPSSelection.class, packet -> this.rpsSelection((RPSSelection) packet));
-      registry.setHandler(RPSMode.class, packet -> this.rpsMode((RPSMode) packet));
+      registry.setHandler(OpenRPSNPC.class, packet -> create(SendOpcode.RPS_GAME, this::openRPSNPC, packet));
+      registry.setHandler(RPSMesoError.class, packet -> create(SendOpcode.RPS_GAME, this::rpsMesoError, packet));
+      registry.setHandler(RPSSelection.class, packet -> create(SendOpcode.RPS_GAME, this::rpsSelection, packet));
+      registry.setHandler(RPSMode.class, packet -> create(SendOpcode.RPS_GAME, this::rpsMode, packet));
    }
 
-   protected byte[] openRPSNPC(OpenRPSNPC packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.RPS_GAME.getValue());
-      mplew.write(8);// open npc
-      mplew.writeInt(9000019);
-      return mplew.getPacket();
+   protected void openRPSNPC(MaplePacketLittleEndianWriter writer, OpenRPSNPC packet) {
+      writer.write(8);// open npc
+      writer.writeInt(9000019);
    }
 
-   protected byte[] rpsMesoError(RPSMesoError packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.RPS_GAME.getValue());
-      mplew.write(0x06);
+   protected void rpsMesoError(MaplePacketLittleEndianWriter writer, RPSMesoError packet) {
+      writer.write(0x06);
       if (packet.mesos() != -1) {
-         mplew.writeInt(packet.mesos());
+         writer.writeInt(packet.mesos());
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] rpsSelection(RPSSelection packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.RPS_GAME.getValue());
-      mplew.write(0x0B);// 11l
-      mplew.write(packet.selection());
-      mplew.write(packet.answer());
-      return mplew.getPacket();
+   protected void rpsSelection(MaplePacketLittleEndianWriter writer, RPSSelection packet) {
+      writer.write(0x0B);// 11l
+      writer.write(packet.selection());
+      writer.write(packet.answer());
    }
 
-   protected byte[] rpsMode(RPSMode packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.RPS_GAME.getValue());
-      mplew.write(packet.mode());
-      return mplew.getPacket();
+   protected void rpsMode(MaplePacketLittleEndianWriter writer, RPSMode packet) {
+      writer.write(packet.mode());
    }
 }

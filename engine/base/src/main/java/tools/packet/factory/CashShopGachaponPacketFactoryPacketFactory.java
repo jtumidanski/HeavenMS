@@ -26,12 +26,9 @@ public class CashShopGachaponPacketFactoryPacketFactory extends AbstractCashShop
    }
 
    protected <T extends PacketInput> byte[] create(CashShopGachaponSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {
-      return create((Function<T, byte[]>) castInput -> {
-         final MaplePacketLittleEndianWriter writer = newWriter(size);
-         writer.writeShort(SendOpcode.CASHSHOP_CASH_ITEM_GACHAPON_RESULT.getValue());
+      return create(SendOpcode.CASHSHOP_GACHAPON_STAMP_RESULT, (BiConsumer<MaplePacketLittleEndianWriter, T>) (writer, castInput) -> {
          writer.write(subOp.getValue());
          decorator.accept(writer, castInput);
-         return writer.getPacket();
       }, packetInput);
    }
 

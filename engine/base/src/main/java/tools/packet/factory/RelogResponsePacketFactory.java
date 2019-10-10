@@ -15,7 +15,7 @@ public class RelogResponsePacketFactory extends AbstractPacketFactory {
    }
 
    private RelogResponsePacketFactory() {
-      registry.setHandler(RelogResponse.class, packet -> this.getRelogResponse((RelogResponse) packet));
+      registry.setHandler(RelogResponse.class, packet -> create(SendOpcode.RELOG_RESPONSE, this::getRelogResponse, packet, 3));
    }
 
    /**
@@ -23,10 +23,7 @@ public class RelogResponsePacketFactory extends AbstractPacketFactory {
     *
     * @return The relog response packet.
     */
-   protected byte[] getRelogResponse(RelogResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.RELOG_RESPONSE.getValue());
-      mplew.write(1);//1 O.O Must be more types ):
-      return mplew.getPacket();
+   protected void getRelogResponse(MaplePacketLittleEndianWriter writer, RelogResponse packet) {
+      writer.write(1);//1 O.O Must be more types ):
    }
 }

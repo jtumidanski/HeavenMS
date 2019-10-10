@@ -53,29 +53,29 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    private SpawnPacketFactory() {
-      registry.setHandler(SpawnPortal.class, packet -> this.spawnPortal((SpawnPortal) packet));
-      registry.setHandler(SpawnDoor.class, packet -> this.spawnDoor((SpawnDoor) packet));
-      registry.setHandler(RemoveDoor.class, packet -> this.removeDoor((RemoveDoor) packet));
-      registry.setHandler(SpawnSummon.class, packet -> this.spawnSummon((SpawnSummon) packet));
-      registry.setHandler(SpawnNPC.class, packet -> this.spawnNPC((SpawnNPC) packet));
-      registry.setHandler(SpawnNPCRequestController.class, packet -> this.spawnNPCRequestController((SpawnNPCRequestController) packet));
-      registry.setHandler(RemoveMonsterInvisibility.class, packet -> this.removeMonsterInvisibility((RemoveMonsterInvisibility) packet));
-      registry.setHandler(SpawnFakeMonster.class, packet -> this.spawnFakeMonster((SpawnFakeMonster) packet));
-      registry.setHandler(MakeMonsterReal.class, packet -> this.makeMonsterReal((MakeMonsterReal) packet));
-      registry.setHandler(StopMonsterControl.class, packet -> this.stopControllingMonster((StopMonsterControl) packet));
-      registry.setHandler(SpawnPlayer.class, packet -> this.spawnPlayerMapObject((SpawnPlayer) packet));
-      registry.setHandler(SpawnKite.class, packet -> this.spawnKite((SpawnKite) packet));
-      registry.setHandler(SpawnMist.class, packet -> this.spawnMist((SpawnMist) packet));
-      registry.setHandler(ShowPet.class, packet -> this.showPet((ShowPet) packet));
-      registry.setHandler(SpawnHiredMerchant.class, packet -> this.spawnHiredMerchantBox((SpawnHiredMerchant) packet));
-      registry.setHandler(SpawnPlayerNPC.class, packet -> this.spawnPlayerNPC((SpawnPlayerNPC) packet));
-      registry.setHandler(RemoveNPCController.class, packet -> this.removeNPCController((RemoveNPCController) packet));
-      registry.setHandler(SpawnGuide.class, packet -> this.spawnGuide((SpawnGuide) packet));
-      registry.setHandler(SpawnDragon.class, packet -> this.spawnDragon((SpawnDragon) packet));
-      registry.setHandler(SpawnMonster.class, packet -> this.spawnMonster((SpawnMonster) packet));
-      registry.setHandler(ControlMonster.class, packet -> this.controlMonster((ControlMonster) packet));
-      registry.setHandler(MakeMonsterInvisible.class, packet -> this.makeMonsterInvisible((MakeMonsterInvisible) packet));
-      registry.setHandler(CannotSpawnKite.class, packet -> this.sendCannotSpawnKite((CannotSpawnKite) packet));
+      registry.setHandler(SpawnPortal.class, packet -> create(SendOpcode.SPAWN_PORTAL, this::spawnPortal, packet, 14));
+      registry.setHandler(SpawnDoor.class, packet -> create(SendOpcode.SPAWN_DOOR, this::spawnDoor, packet, 11));
+      registry.setHandler(RemoveDoor.class, packet -> create(((RemoveDoor) packet).town() ? SendOpcode.SPAWN_PORTAL : SendOpcode.REMOVE_DOOR, this::removeDoor, packet, 10));
+      registry.setHandler(SpawnSummon.class, packet -> create(SendOpcode.SPAWN_SPECIAL_MAPOBJECT, this::spawnSummon, packet, 25));
+      registry.setHandler(SpawnNPC.class, packet -> create(SendOpcode.SPAWN_NPC, this::spawnNPC, packet, 24));
+      registry.setHandler(SpawnNPCRequestController.class, packet -> create(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER, this::spawnNPCRequestController, packet, 23));
+      registry.setHandler(RemoveMonsterInvisibility.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::removeMonsterInvisibility, packet));
+      registry.setHandler(SpawnFakeMonster.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::spawnFakeMonster, packet));
+      registry.setHandler(MakeMonsterReal.class, packet -> create(SendOpcode.SPAWN_MONSTER, this::makeMonsterReal, packet));
+      registry.setHandler(StopMonsterControl.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::stopControllingMonster, packet, 7));
+      registry.setHandler(SpawnPlayer.class, packet -> create(SendOpcode.SPAWN_PLAYER, this::spawnPlayerMapObject, packet));
+      registry.setHandler(SpawnKite.class, packet -> create(SendOpcode.SPAWN_KITE, this::spawnKite, packet));
+      registry.setHandler(SpawnMist.class, packet -> create(SendOpcode.SPAWN_MIST, this::spawnMist, packet));
+      registry.setHandler(ShowPet.class, packet -> create(SendOpcode.SPAWN_PET, this::showPet, packet));
+      registry.setHandler(SpawnHiredMerchant.class, packet -> create(SendOpcode.SPAWN_HIRED_MERCHANT, this::spawnHiredMerchantBox, packet));
+      registry.setHandler(SpawnPlayerNPC.class, packet -> create(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER, this::spawnPlayerNPC, packet));
+      registry.setHandler(RemoveNPCController.class, packet -> create(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER, this::removeNPCController, packet));
+      registry.setHandler(SpawnGuide.class, packet -> create(SendOpcode.SPAWN_GUIDE, this::spawnGuide, packet, 3));
+      registry.setHandler(SpawnDragon.class, packet -> create(SendOpcode.SPAWN_DRAGON, this::spawnDragon, packet));
+      registry.setHandler(SpawnMonster.class, packet -> create(SendOpcode.SPAWN_MONSTER, this::spawnMonster, packet));
+      registry.setHandler(ControlMonster.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::controlMonster, packet));
+      registry.setHandler(MakeMonsterInvisible.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::makeMonsterInvisible, packet));
+      registry.setHandler(CannotSpawnKite.class, packet -> create(SendOpcode.CANNOT_SPAWN_KITE, this::sendCannotSpawnKite, packet));
    }
 
    /**
@@ -83,13 +83,10 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The portal spawn packet.
     */
-   protected byte[] spawnPortal(SpawnPortal packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(14);
-      mplew.writeShort(SendOpcode.SPAWN_PORTAL.getValue());
-      mplew.writeInt(packet.townId());
-      mplew.writeInt(packet.targetId());
-      mplew.writePos(packet.position());
-      return mplew.getPacket();
+   protected void spawnPortal(MaplePacketLittleEndianWriter writer, SpawnPortal packet) {
+      writer.writeInt(packet.townId());
+      writer.writeInt(packet.targetId());
+      writer.writePos(packet.position());
    }
 
    /**
@@ -97,13 +94,10 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The remove door packet.
     */
-   protected byte[] spawnDoor(SpawnDoor packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.SPAWN_DOOR.getValue());
-      mplew.writeBool(packet.launched());
-      mplew.writeInt(packet.ownerId());
-      mplew.writePos(packet.position());
-      return mplew.getPacket();
+   protected void spawnDoor(MaplePacketLittleEndianWriter writer, SpawnDoor packet) {
+      writer.writeBool(packet.launched());
+      writer.writeInt(packet.ownerId());
+      writer.writePos(packet.position());
    }
 
 
@@ -112,18 +106,14 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The remove door packet.
     */
-   protected byte[] removeDoor(RemoveDoor packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(10);
+   protected void removeDoor(MaplePacketLittleEndianWriter writer, RemoveDoor packet) {
       if (packet.town()) {
-         mplew.writeShort(SendOpcode.SPAWN_PORTAL.getValue());
-         mplew.writeInt(999999999);
-         mplew.writeInt(999999999);
+         writer.writeInt(999999999);
+         writer.writeInt(999999999);
       } else {
-         mplew.writeShort(SendOpcode.REMOVE_DOOR.getValue());
-         mplew.write(0);
-         mplew.writeInt(packet.ownerId());
+         writer.write(0);
+         writer.writeInt(packet.ownerId());
       }
-      return mplew.getPacket();
    }
 
    /**
@@ -131,60 +121,51 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The spawn packet for the map object.
     */
-   protected byte[] spawnSummon(SpawnSummon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(25);
-      mplew.writeShort(SendOpcode.SPAWN_SPECIAL_MAPOBJECT.getValue());
-      mplew.writeInt(packet.ownerId());
-      mplew.writeInt(packet.objectId());
-      mplew.writeInt(packet.skillId());
-      mplew.write(0x0A); //v83
-      mplew.write(packet.skillLevel());
-      mplew.writePos(packet.position());
-      mplew.write(packet.stance());    //bMoveAction & foothold, found thanks to Rien dev team
-      mplew.writeShort(0);
-      mplew.write(packet.movementType()); // 0 = don't move, 1 = follow (4th mage summons?), 2/4 = only tele follow, 3 = bird follow
-      mplew.write(packet.puppet() ? 0 : 1); // 0 and the summon can't attack - but puppets don't attack with 1 either ^.-
-      mplew.write(packet.animated() ? 0 : 1);
-      return mplew.getPacket();
+   protected void spawnSummon(MaplePacketLittleEndianWriter writer, SpawnSummon packet) {
+      writer.writeInt(packet.ownerId());
+      writer.writeInt(packet.objectId());
+      writer.writeInt(packet.skillId());
+      writer.write(0x0A); //v83
+      writer.write(packet.skillLevel());
+      writer.writePos(packet.position());
+      writer.write(packet.stance());    //bMoveAction & foothold, found thanks to Rien dev team
+      writer.writeShort(0);
+      writer.write(packet.movementType()); // 0 = don't move, 1 = follow (4th mage summons?), 2/4 = only tele follow, 3 = bird follow
+      writer.write(packet.puppet() ? 0 : 1); // 0 and the summon can't attack - but puppets don't attack with 1 either ^.-
+      writer.write(packet.animated() ? 0 : 1);
    }
 
-   protected byte[] spawnNPC(SpawnNPC packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(24);
-      mplew.writeShort(SendOpcode.SPAWN_NPC.getValue());
-      mplew.writeInt(packet.getNpc().getObjectId());
-      mplew.writeInt(packet.getNpc().getId());
-      mplew.writeShort(packet.getNpc().getPosition().x);
-      mplew.writeShort(packet.getNpc().getCy());
+   protected void spawnNPC(MaplePacketLittleEndianWriter writer, SpawnNPC packet) {
+      writer.writeInt(packet.getNpc().getObjectId());
+      writer.writeInt(packet.getNpc().getId());
+      writer.writeShort(packet.getNpc().getPosition().x);
+      writer.writeShort(packet.getNpc().getCy());
       if (packet.getNpc().getF() == 1) {
-         mplew.write(0);
+         writer.write(0);
       } else {
-         mplew.write(1);
+         writer.write(1);
       }
-      mplew.writeShort(packet.getNpc().getFh());
-      mplew.writeShort(packet.getNpc().getRx0());
-      mplew.writeShort(packet.getNpc().getRx1());
-      mplew.write(1);
-      return mplew.getPacket();
+      writer.writeShort(packet.getNpc().getFh());
+      writer.writeShort(packet.getNpc().getRx0());
+      writer.writeShort(packet.getNpc().getRx1());
+      writer.write(1);
    }
 
-   protected byte[] spawnNPCRequestController(SpawnNPCRequestController packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(23);
-      mplew.writeShort(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER.getValue());
-      mplew.write(1);
-      mplew.writeInt(packet.getNpc().getObjectId());
-      mplew.writeInt(packet.getNpc().getId());
-      mplew.writeShort(packet.getNpc().getPosition().x);
-      mplew.writeShort(packet.getNpc().getCy());
+   protected void spawnNPCRequestController(MaplePacketLittleEndianWriter writer, SpawnNPCRequestController packet) {
+      writer.write(1);
+      writer.writeInt(packet.getNpc().getObjectId());
+      writer.writeInt(packet.getNpc().getId());
+      writer.writeShort(packet.getNpc().getPosition().x);
+      writer.writeShort(packet.getNpc().getCy());
       if (packet.getNpc().getF() == 1) {
-         mplew.write(0);
+         writer.write(0);
       } else {
-         mplew.write(1);
+         writer.write(1);
       }
-      mplew.writeShort(packet.getNpc().getFh());
-      mplew.writeShort(packet.getNpc().getRx0());
-      mplew.writeShort(packet.getNpc().getRx1());
-      mplew.writeBool(packet.isMiniMap());
-      return mplew.getPacket();
+      writer.writeShort(packet.getNpc().getFh());
+      writer.writeShort(packet.getNpc().getRx0());
+      writer.writeShort(packet.getNpc().getRx1());
+      writer.writeBool(packet.isMiniMap());
    }
 
    /**
@@ -192,12 +173,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] removeMonsterInvisibility(RemoveMonsterInvisibility packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER_CONTROL.getValue());
-      mplew.write(1);
-      mplew.writeInt(packet.getMonster().getObjectId());
-      return mplew.getPacket();
+   protected void removeMonsterInvisibility(MaplePacketLittleEndianWriter writer, RemoveMonsterInvisibility packet) {
+      writer.write(1);
+      writer.writeInt(packet.getMonster().getObjectId());
    }
 
    /**
@@ -205,29 +183,26 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The packet to spawn the mob as non-targettable.
     */
-   protected byte[] spawnFakeMonster(SpawnFakeMonster packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER_CONTROL.getValue());
-      mplew.write(1);
-      mplew.writeInt(packet.getMonster().getObjectId());
-      mplew.write(5);
-      mplew.writeInt(packet.getMonster().getId());
-      mplew.skip(15);
-      mplew.write(0x88);
-      mplew.skip(6);
-      mplew.writePos(packet.getMonster().getPosition());
-      mplew.write(packet.getMonster().getStance());
-      mplew.writeShort(0);//life.getStartFh()
-      mplew.writeShort(packet.getMonster().getFh());
+   protected void spawnFakeMonster(MaplePacketLittleEndianWriter writer, SpawnFakeMonster packet) {
+      writer.write(1);
+      writer.writeInt(packet.getMonster().getObjectId());
+      writer.write(5);
+      writer.writeInt(packet.getMonster().getId());
+      writer.skip(15);
+      writer.write(0x88);
+      writer.skip(6);
+      writer.writePos(packet.getMonster().getPosition());
+      writer.write(packet.getMonster().getStance());
+      writer.writeShort(0);//life.getStartFh()
+      writer.writeShort(packet.getMonster().getFh());
       if (packet.getEffectId() > 0) {
-         mplew.write(packet.getEffectId());
-         mplew.write(0);
-         mplew.writeShort(0);
+         writer.write(packet.getEffectId());
+         writer.write(0);
+         writer.writeShort(0);
       }
-      mplew.writeShort(-2);
-      mplew.write(packet.getMonster().getTeam());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+      writer.writeShort(-2);
+      writer.write(packet.getMonster().getTeam());
+      writer.writeInt(0);
    }
 
    /**
@@ -235,22 +210,19 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The packet to make the mob targettable.
     */
-   protected byte[] makeMonsterReal(MakeMonsterReal packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER.getValue());
-      mplew.writeInt(packet.getMonster().getObjectId());
-      mplew.write(5);
-      mplew.writeInt(packet.getMonster().getId());
-      mplew.skip(15);
-      mplew.write(0x88);
-      mplew.skip(6);
-      mplew.writePos(packet.getMonster().getPosition());
-      mplew.write(packet.getMonster().getStance());
-      mplew.writeShort(0);//life.getStartFh()
-      mplew.writeShort(packet.getMonster().getFh());
-      mplew.writeShort(-1);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void makeMonsterReal(MaplePacketLittleEndianWriter writer, MakeMonsterReal packet) {
+      writer.writeInt(packet.getMonster().getObjectId());
+      writer.write(5);
+      writer.writeInt(packet.getMonster().getId());
+      writer.skip(15);
+      writer.write(0x88);
+      writer.skip(6);
+      writer.writePos(packet.getMonster().getPosition());
+      writer.write(packet.getMonster().getStance());
+      writer.writeShort(0);//life.getStartFh()
+      writer.writeShort(packet.getMonster().getFh());
+      writer.writeShort(-1);
+      writer.writeInt(0);
    }
 
    /**
@@ -258,12 +230,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The stop control monster packet.
     */
-   protected byte[] stopControllingMonster(StopMonsterControl packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER_CONTROL.getValue());
-      mplew.write(0);
-      mplew.writeInt(packet.monsterId());
-      return mplew.getPacket();
+   protected void stopControllingMonster(MaplePacketLittleEndianWriter writer, StopMonsterControl packet) {
+      writer.write(0);
+      writer.writeInt(packet.monsterId());
    }
 
    /**
@@ -271,122 +240,119 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The spawn player packet.
     */
-   protected byte[] spawnPlayerMapObject(SpawnPlayer packet) {
+   protected void spawnPlayerMapObject(MaplePacketLittleEndianWriter writer, SpawnPlayer packet) {
       MapleCharacter chr = packet.getCharacter();
       MapleClient target = packet.getTarget();
       boolean enteringField = packet.isEnteringField();
 
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_PLAYER.getValue());
-      mplew.writeInt(chr.getId());
-      mplew.write(chr.getLevel()); //v83
-      mplew.writeMapleAsciiString(chr.getName());
+      writer.writeInt(chr.getId());
+      writer.write(chr.getLevel()); //v83
+      writer.writeMapleAsciiString(chr.getName());
       if (chr.getGuildId() < 1) {
-         mplew.writeMapleAsciiString("");
-         mplew.write(new byte[6]);
+         writer.writeMapleAsciiString("");
+         writer.write(new byte[6]);
       } else {
          MapleGuildSummary gs = chr.getClient().getWorldServer().getGuildSummary(chr.getGuildId(), chr.getWorld());
          if (gs != null) {
-            mplew.writeMapleAsciiString(gs.getName());
-            mplew.writeShort(gs.getLogoBG());
-            mplew.write(gs.getLogoBGColor());
-            mplew.writeShort(gs.getLogo());
-            mplew.write(gs.getLogoColor());
+            writer.writeMapleAsciiString(gs.getName());
+            writer.writeShort(gs.getLogoBG());
+            writer.write(gs.getLogoBGColor());
+            writer.writeShort(gs.getLogo());
+            writer.write(gs.getLogoColor());
          } else {
-            mplew.writeMapleAsciiString("");
-            mplew.write(new byte[6]);
+            writer.writeMapleAsciiString("");
+            writer.write(new byte[6]);
          }
       }
 
-      writeForeignBuffs(mplew, chr);
+      writeForeignBuffs(writer, chr);
 
-      mplew.writeShort(chr.getJob().getId());
+      writer.writeShort(chr.getJob().getId());
 
-                /* replace "mplew.writeShort(chr.getJob().getId())" with this snippet for 3rd person FJ animation on all classes
+                /* replace "writer.writeShort(chr.getJob().getId())" with this snippet for 3rd person FJ animation on all classes
                 if (chr.getJob().isA(MapleJob.HERMIT) || chr.getJob().isA(MapleJob.DAWNWARRIOR2) || chr.getJob().isA(MapleJob.NIGHTWALKER2)) {
-			mplew.writeShort(chr.getJob().getId());
+			writer.writeShort(chr.getJob().getId());
                 } else {
-			mplew.writeShort(412);
+			writer.writeShort(412);
                 }*/
 
-      addCharLook(mplew, chr, false);
-      mplew.writeInt(chr.getInventory(MapleInventoryType.CASH).countById(5110000));
-      mplew.writeInt(chr.getItemEffect());
-      mplew.writeInt(ItemConstants.getInventoryType(chr.getChair()) == MapleInventoryType.SETUP ? chr.getChair() : 0);
+      addCharLook(writer, chr, false);
+      writer.writeInt(chr.getInventory(MapleInventoryType.CASH).countById(5110000));
+      writer.writeInt(chr.getItemEffect());
+      writer.writeInt(ItemConstants.getInventoryType(chr.getChair()) == MapleInventoryType.SETUP ? chr.getChair() : 0);
 
       if (enteringField) {
          Point spawnPos = new Point(chr.getPosition());
          spawnPos.y -= 42;
-         mplew.writePos(spawnPos);
-         mplew.write(6);
+         writer.writePos(spawnPos);
+         writer.write(6);
       } else {
-         mplew.writePos(chr.getPosition());
-         mplew.write(chr.getStance());
+         writer.writePos(chr.getPosition());
+         writer.write(chr.getStance());
       }
 
-      mplew.writeShort(0);//chr.getFh()
-      mplew.write(0);
+      writer.writeShort(0);//chr.getFh()
+      writer.write(0);
       MaplePet[] pet = chr.getPets();
       for (int i = 0; i < 3; i++) {
          if (pet[i] != null) {
-            addPetInfo(mplew, pet[i], false);
+            addPetInfo(writer, pet[i], false);
          }
       }
-      mplew.write(0); //end of pets
+      writer.write(0); //end of pets
       if (chr.getMount() == null) {
-         mplew.writeInt(1); // mob level
-         mplew.writeLong(0); // mob exp + tiredness
+         writer.writeInt(1); // mob level
+         writer.writeLong(0); // mob exp + tiredness
       } else {
-         mplew.writeInt(chr.getMount().getLevel());
-         mplew.writeInt(chr.getMount().getExp());
-         mplew.writeInt(chr.getMount().getTiredness());
+         writer.writeInt(chr.getMount().getLevel());
+         writer.writeInt(chr.getMount().getExp());
+         writer.writeInt(chr.getMount().getTiredness());
       }
 
       MaplePlayerShop mps = chr.getPlayerShop();
       if (mps != null && mps.isOwner(chr)) {
          if (mps.hasFreeSlot()) {
-            addAnnounceBox(mplew, mps, mps.getVisitors().length);
+            addAnnounceBox(writer, mps, mps.getVisitors().length);
          } else {
-            addAnnounceBox(mplew, mps, 1);
+            addAnnounceBox(writer, mps, 1);
          }
       } else {
          MapleMiniGame miniGame = chr.getMiniGame();
          if (miniGame != null && miniGame.isOwner(chr)) {
             if (miniGame.hasFreeSlot()) {
-               addAnnounceBox(mplew, miniGame, 1, 0);
+               addAnnounceBox(writer, miniGame, 1, 0);
             } else {
-               addAnnounceBox(mplew, miniGame, 2, miniGame.isMatchInProgress() ? 1 : 0);
+               addAnnounceBox(writer, miniGame, 2, miniGame.isMatchInProgress() ? 1 : 0);
             }
          } else {
-            mplew.write(0);
+            writer.write(0);
          }
       }
 
       if (chr.getChalkboard() != null) {
-         mplew.write(1);
-         mplew.writeMapleAsciiString(chr.getChalkboard());
+         writer.write(1);
+         writer.writeMapleAsciiString(chr.getChalkboard());
       } else {
-         mplew.write(0);
+         writer.write(0);
       }
-      addRingLook(mplew, chr, true);  // crush
-      addRingLook(mplew, chr, false); // friendship
-      addMarriageRingLook(target, mplew, chr);
-      encodeNewYearCardInfo(mplew, chr);  // new year seems to crash sometimes...
-      mplew.write(0);
-      mplew.write(0);
-      mplew.write(chr.getTeam());//only needed in specific fields
-      return mplew.getPacket();
+      addRingLook(writer, chr, true);  // crush
+      addRingLook(writer, chr, false); // friendship
+      addMarriageRingLook(target, writer, chr);
+      encodeNewYearCardInfo(writer, chr);  // new year seems to crash sometimes...
+      writer.write(0);
+      writer.write(0);
+      writer.write(chr.getTeam());//only needed in specific fields
    }
 
-   protected void writeForeignBuffs(MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
-      mplew.writeInt(0);
-      mplew.writeShort(0); //v83
-      mplew.write(0xFC);
-      mplew.write(1);
+   protected void writeForeignBuffs(MaplePacketLittleEndianWriter writer, MapleCharacter chr) {
+      writer.writeInt(0);
+      writer.writeShort(0); //v83
+      writer.write(0xFC);
+      writer.write(1);
       if (chr.getBuffedValue(MapleBuffStat.MORPH) != null) {
-         mplew.writeInt(2);
+         writer.writeInt(2);
       } else {
-         mplew.writeInt(0);
+         writer.writeInt(0);
       }
       long buffmask = 0;
       Integer buffvalue = null;
@@ -410,205 +376,179 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
          buffmask |= MapleBuffStat.ENERGY_CHARGE.getValue();
          buffvalue = chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE);
       }//AREN'T THESE
-      mplew.writeInt((int) ((buffmask >> 32) & 0xffffffffL));
+      writer.writeInt((int) ((buffmask >> 32) & 0xffffffffL));
       if (buffvalue != null) {
          if (chr.getBuffedValue(MapleBuffStat.MORPH) != null) { //TEST
-            mplew.writeShort(buffvalue);
+            writer.writeShort(buffvalue);
          } else {
-            mplew.write(buffvalue.byteValue());
+            writer.write(buffvalue.byteValue());
          }
       }
-      mplew.writeInt((int) (buffmask & 0xffffffffL));
+      writer.writeInt((int) (buffmask & 0xffffffffL));
       int CHAR_MAGIC_SPAWN = Randomizer.nextInt();
-      mplew.skip(6);
-      mplew.writeInt(CHAR_MAGIC_SPAWN);
-      mplew.skip(11);
-      mplew.writeInt(CHAR_MAGIC_SPAWN);//v74
-      mplew.skip(11);
-      mplew.writeInt(CHAR_MAGIC_SPAWN);
-      mplew.writeShort(0);
-      mplew.write(0);
+      writer.skip(6);
+      writer.writeInt(CHAR_MAGIC_SPAWN);
+      writer.skip(11);
+      writer.writeInt(CHAR_MAGIC_SPAWN);//v74
+      writer.skip(11);
+      writer.writeInt(CHAR_MAGIC_SPAWN);
+      writer.writeShort(0);
+      writer.write(0);
 
       Integer bv = chr.getBuffedValue(MapleBuffStat.MONSTER_RIDING);
       if (bv != null) {
          MapleMount mount = chr.getMount();
          if (mount != null) {
-            mplew.writeInt(mount.getItemId());
-            mplew.writeInt(mount.getSkillId());
+            writer.writeInt(mount.getItemId());
+            writer.writeInt(mount.getSkillId());
          } else {
-            mplew.writeLong(0);
+            writer.writeLong(0);
          }
       } else {
-         mplew.writeLong(0);
+         writer.writeLong(0);
       }
 
-      mplew.writeInt(CHAR_MAGIC_SPAWN);
-      mplew.skip(9);
-      mplew.writeInt(CHAR_MAGIC_SPAWN);
-      mplew.writeShort(0);
-      mplew.writeInt(0); // actually not 0, why is it 0 then?
-      mplew.skip(10);
-      mplew.writeInt(CHAR_MAGIC_SPAWN);
-      mplew.skip(13);
-      mplew.writeInt(CHAR_MAGIC_SPAWN);
-      mplew.writeShort(0);
-      mplew.write(0);
+      writer.writeInt(CHAR_MAGIC_SPAWN);
+      writer.skip(9);
+      writer.writeInt(CHAR_MAGIC_SPAWN);
+      writer.writeShort(0);
+      writer.writeInt(0); // actually not 0, why is it 0 then?
+      writer.skip(10);
+      writer.writeInt(CHAR_MAGIC_SPAWN);
+      writer.skip(13);
+      writer.writeInt(CHAR_MAGIC_SPAWN);
+      writer.writeShort(0);
+      writer.write(0);
    }
 
-   protected void addPetInfo(final MaplePacketLittleEndianWriter mplew, MaplePet pet, boolean showpet) {
-      mplew.write(1);
+   protected void addPetInfo(final MaplePacketLittleEndianWriter writer, MaplePet pet, boolean showpet) {
+      writer.write(1);
       if (showpet) {
-         mplew.write(0);
+         writer.write(0);
       }
 
-      mplew.writeInt(pet.id());
-      mplew.writeMapleAsciiString(pet.name());
-      mplew.writeLong(pet.uniqueId());
-      mplew.writePos(pet.pos());
-      mplew.write(pet.stance());
-      mplew.writeInt(pet.fh());
+      writer.writeInt(pet.id());
+      writer.writeMapleAsciiString(pet.name());
+      writer.writeLong(pet.uniqueId());
+      writer.writePos(pet.pos());
+      writer.write(pet.stance());
+      writer.writeInt(pet.fh());
    }
 
    /**
     * Adds a announcement box to an existing MaplePacketLittleEndianWriter.
     *
-    * @param mplew The MaplePacketLittleEndianWriter to add an announcement box to.
-    * @param shop  The shop to announce.
+    * @param writer The MaplePacketLittleEndianWriter to add an announcement box to.
+    * @param shop   The shop to announce.
     */
-   protected void addAnnounceBox(final MaplePacketLittleEndianWriter mplew, MaplePlayerShop shop, int availability) {
-      mplew.write(4);
-      mplew.writeInt(shop.getObjectId());
-      mplew.writeMapleAsciiString(shop.getDescription());
-      mplew.write(0);
-      mplew.write(0);
-      mplew.write(1);
-      mplew.write(availability);
-      mplew.write(0);
+   protected void addAnnounceBox(final MaplePacketLittleEndianWriter writer, MaplePlayerShop shop, int availability) {
+      writer.write(4);
+      writer.writeInt(shop.getObjectId());
+      writer.writeMapleAsciiString(shop.getDescription());
+      writer.write(0);
+      writer.write(0);
+      writer.write(1);
+      writer.write(availability);
+      writer.write(0);
    }
 
-   protected void encodeNewYearCardInfo(MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
+   protected void encodeNewYearCardInfo(MaplePacketLittleEndianWriter writer, MapleCharacter chr) {
       Set<NewYearCardRecord> newyears = chr.getReceivedNewYearRecords();
       if (!newyears.isEmpty()) {
-         mplew.write(1);
+         writer.write(1);
 
-         mplew.writeInt(newyears.size());
+         writer.writeInt(newyears.size());
          for (NewYearCardRecord nyc : newyears) {
-            mplew.writeInt(nyc.getId());
+            writer.writeInt(nyc.getId());
          }
       } else {
-         mplew.write(0);
+         writer.write(0);
       }
    }
 
-   protected byte[] spawnKite(SpawnKite packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_KITE.getValue());
-      mplew.writeInt(packet.objectId());
-      mplew.writeInt(packet.itemId());
-      mplew.writeMapleAsciiString(packet.message());
-      mplew.writeMapleAsciiString(packet.name());
-      mplew.writeShort(packet.position().x);
-      mplew.writeShort(packet.ft());
-      return mplew.getPacket();
+   protected void spawnKite(MaplePacketLittleEndianWriter writer, SpawnKite packet) {
+      writer.writeInt(packet.objectId());
+      writer.writeInt(packet.itemId());
+      writer.writeMapleAsciiString(packet.message());
+      writer.writeMapleAsciiString(packet.name());
+      writer.writeShort(packet.position().x);
+      writer.writeShort(packet.ft());
    }
 
-   protected byte[] spawnMist(SpawnMist packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MIST.getValue());
-      mplew.writeInt(packet.getObjectId());
-      mplew.writeInt(packet.getMist().isMobMist() ? 0 : packet.getMist().isPoisonMist() ? 1 : packet.getMist().isRecoveryMist() ? 4 : 2); // mob mist = 0, player poison = 1, smokescreen = 2, unknown = 3, recovery = 4
-      mplew.writeInt(packet.getOwnerId());
-      mplew.writeInt(packet.getSkillId());
-      mplew.write(packet.getLevel());
-      mplew.writeShort(packet.getMist().getSkillDelay()); // Skill delay
-      mplew.writeInt(packet.getMist().getBox().x);
-      mplew.writeInt(packet.getMist().getBox().y);
-      mplew.writeInt(packet.getMist().getBox().x + packet.getMist().getBox().width);
-      mplew.writeInt(packet.getMist().getBox().y + packet.getMist().getBox().height);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void spawnMist(MaplePacketLittleEndianWriter writer, SpawnMist packet) {
+      writer.writeInt(packet.getObjectId());
+      writer.writeInt(packet.getMist().isMobMist() ? 0 : packet.getMist().isPoisonMist() ? 1 : packet.getMist().isRecoveryMist() ? 4 : 2); // mob mist = 0, player poison = 1, smokescreen = 2, unknown = 3, recovery = 4
+      writer.writeInt(packet.getOwnerId());
+      writer.writeInt(packet.getSkillId());
+      writer.write(packet.getLevel());
+      writer.writeShort(packet.getMist().getSkillDelay()); // Skill delay
+      writer.writeInt(packet.getMist().getBox().x);
+      writer.writeInt(packet.getMist().getBox().y);
+      writer.writeInt(packet.getMist().getBox().x + packet.getMist().getBox().width);
+      writer.writeInt(packet.getMist().getBox().y + packet.getMist().getBox().height);
+      writer.writeInt(0);
    }
 
-   protected byte[] showPet(ShowPet packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_PET.getValue());
-      mplew.writeInt(packet.getCharacter().getId());
-      mplew.write(packet.getCharacter().getPetIndex(packet.getPet()));
+   protected void showPet(MaplePacketLittleEndianWriter writer, ShowPet packet) {
+      writer.writeInt(packet.getCharacter().getId());
+      writer.write(packet.getCharacter().getPetIndex(packet.getPet()));
       if (packet.isRemove()) {
-         mplew.write(0);
-         mplew.write(packet.isHunger() ? 1 : 0);
+         writer.write(0);
+         writer.write(packet.isHunger() ? 1 : 0);
       } else {
-         addPetInfo(mplew, packet.getPet(), true);
+         addPetInfo(writer, packet.getPet(), true);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] spawnHiredMerchantBox(SpawnHiredMerchant packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_HIRED_MERCHANT.getValue());
-      mplew.writeInt(packet.getHiredMerchant().getOwnerId());
-      mplew.writeInt(packet.getHiredMerchant().getItemId());
-      mplew.writeShort((short) packet.getHiredMerchant().getPosition().getX());
-      mplew.writeShort((short) packet.getHiredMerchant().getPosition().getY());
-      mplew.writeShort(0);
-      mplew.writeMapleAsciiString(packet.getHiredMerchant().getOwner());
-      mplew.write(0x05);
-      mplew.writeInt(packet.getHiredMerchant().getObjectId());
-      mplew.writeMapleAsciiString(packet.getHiredMerchant().getDescription());
-      mplew.write(packet.getHiredMerchant().getItemId() % 100);
-      mplew.write(new byte[]{1, 4});
-      return mplew.getPacket();
+   protected void spawnHiredMerchantBox(MaplePacketLittleEndianWriter writer, SpawnHiredMerchant packet) {
+      writer.writeInt(packet.getHiredMerchant().getOwnerId());
+      writer.writeInt(packet.getHiredMerchant().getItemId());
+      writer.writeShort((short) packet.getHiredMerchant().getPosition().getX());
+      writer.writeShort((short) packet.getHiredMerchant().getPosition().getY());
+      writer.writeShort(0);
+      writer.writeMapleAsciiString(packet.getHiredMerchant().getOwner());
+      writer.write(0x05);
+      writer.writeInt(packet.getHiredMerchant().getObjectId());
+      writer.writeMapleAsciiString(packet.getHiredMerchant().getDescription());
+      writer.write(packet.getHiredMerchant().getItemId() % 100);
+      writer.write(new byte[]{1, 4});
    }
 
-   protected byte[] spawnPlayerNPC(SpawnPlayerNPC packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER.getValue());
-      mplew.write(1);
-      mplew.writeInt(packet.getPlayerNPC().getObjectId());
-      mplew.writeInt(packet.getPlayerNPC().getScriptId());
-      mplew.writeShort(packet.getPlayerNPC().getPosition().x);
-      mplew.writeShort(packet.getPlayerNPC().getCY());
-      mplew.write(packet.getPlayerNPC().getDirection());
-      mplew.writeShort(packet.getPlayerNPC().getFH());
-      mplew.writeShort(packet.getPlayerNPC().getRX0());
-      mplew.writeShort(packet.getPlayerNPC().getRX1());
-      mplew.write(1);
-      return mplew.getPacket();
+   protected void spawnPlayerNPC(MaplePacketLittleEndianWriter writer, SpawnPlayerNPC packet) {
+      writer.write(1);
+      writer.writeInt(packet.getPlayerNPC().getObjectId());
+      writer.writeInt(packet.getPlayerNPC().getScriptId());
+      writer.writeShort(packet.getPlayerNPC().getPosition().x);
+      writer.writeShort(packet.getPlayerNPC().getCY());
+      writer.write(packet.getPlayerNPC().getDirection());
+      writer.writeShort(packet.getPlayerNPC().getFH());
+      writer.writeShort(packet.getPlayerNPC().getRX0());
+      writer.writeShort(packet.getPlayerNPC().getRX1());
+      writer.write(1);
    }
 
-   protected byte[] removeNPCController(RemoveNPCController packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-
-      mplew.writeShort(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER.getValue());
-      mplew.write(0);
-      mplew.writeInt(packet.objectId());
-
-      return mplew.getPacket();
+   protected void removeNPCController(MaplePacketLittleEndianWriter writer, RemoveNPCController packet) {
+      writer.write(0);
+      writer.writeInt(packet.objectId());
    }
 
-   protected byte[] spawnGuide(SpawnGuide packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.SPAWN_GUIDE.getValue());
+   protected void spawnGuide(MaplePacketLittleEndianWriter writer, SpawnGuide packet) {
       if (packet.spawn()) {
-         mplew.write(1);
+         writer.write(1);
       } else {
-         mplew.write(0);
+         writer.write(0);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] spawnDragon(SpawnDragon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_DRAGON.getValue());
-      mplew.writeInt(packet.getDragon().getOwner().getId());//objectid = owner id
-      mplew.writeShort(packet.getDragon().getPosition().x);
-      mplew.writeShort(0);
-      mplew.writeShort(packet.getDragon().getPosition().y);
-      mplew.writeShort(0);
-      mplew.write(packet.getDragon().getStance());
-      mplew.write(0);
-      mplew.writeShort(packet.getDragon().getOwner().getJob().getId());
-      return mplew.getPacket();
+   protected void spawnDragon(MaplePacketLittleEndianWriter writer, SpawnDragon packet) {
+      writer.writeInt(packet.getDragon().getOwner().getId());//objectid = owner id
+      writer.writeShort(packet.getDragon().getPosition().x);
+      writer.writeShort(0);
+      writer.writeShort(packet.getDragon().getPosition().y);
+      writer.writeShort(0);
+      writer.write(packet.getDragon().getStance());
+      writer.write(0);
+      writer.writeShort(packet.getDragon().getOwner().getJob().getId());
    }
 
    /**
@@ -616,20 +556,18 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The spawn/control packet.
     */
-   protected byte[] spawnMonster(SpawnMonster packet) {
+   protected void spawnMonster(MaplePacketLittleEndianWriter writer, SpawnMonster packet) {
       MapleMonster life = packet.getMonster();
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER.getValue());
-      mplew.writeInt(life.getObjectId());
-      mplew.write(life.getController() == null ? 5 : 1);
-      mplew.writeInt(life.getId());
-      mplew.skip(15);
-      mplew.write(0x88);
-      mplew.skip(6);
-      mplew.writePos(life.getPosition());
-      mplew.write(life.getStance());
-      mplew.writeShort(0); //Origin FH //life.getStartFh()
-      mplew.writeShort(life.getFh());
+      writer.writeInt(life.getObjectId());
+      writer.write(life.getController() == null ? 5 : 1);
+      writer.writeInt(life.getId());
+      writer.skip(15);
+      writer.write(0x88);
+      writer.skip(6);
+      writer.writePos(life.getPosition());
+      writer.write(life.getStance());
+      writer.writeShort(0); //Origin FH //life.getStartFh()
+      writer.writeShort(life.getFh());
 
       /*
        * -4: Fake -3: Appear after linked mob is dead -2: Fade in 1: Smoke 3:
@@ -642,30 +580,29 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       if (life.getParentMobOid() != 0) {
          MapleMonster parentMob = life.getMap().getMonsterByOid(life.getParentMobOid());
          if (parentMob != null && parentMob.isAlive()) {
-            mplew.write(packet.getEffect() != 0 ? packet.getEffect() : -3);
-            mplew.writeInt(life.getParentMobOid());
+            writer.write(packet.getEffect() != 0 ? packet.getEffect() : -3);
+            writer.writeInt(life.getParentMobOid());
          } else {
-            encodeParentlessMobSpawnEffect(mplew, packet.isNewSpawn(), packet.getEffect());
+            encodeParentlessMobSpawnEffect(writer, packet.isNewSpawn(), packet.getEffect());
          }
       } else {
-         encodeParentlessMobSpawnEffect(mplew, packet.isNewSpawn(), packet.getEffect());
+         encodeParentlessMobSpawnEffect(writer, packet.isNewSpawn(), packet.getEffect());
       }
 
-      mplew.write(life.getTeam());
-      mplew.writeInt(0); // getItemEffect
-      return mplew.getPacket();
+      writer.write(life.getTeam());
+      writer.writeInt(0); // getItemEffect
    }
 
-   protected void encodeParentlessMobSpawnEffect(MaplePacketLittleEndianWriter mplew, boolean newSpawn, int effect) {
+   protected void encodeParentlessMobSpawnEffect(MaplePacketLittleEndianWriter writer, boolean newSpawn, int effect) {
       if (effect > 0) {
-         mplew.write(effect);
-         mplew.write(0);
-         mplew.writeShort(0);
+         writer.write(effect);
+         writer.write(0);
+         writer.writeShort(0);
          if (effect == 15) {
-            mplew.write(0);
+            writer.write(0);
          }
       }
-      mplew.write(newSpawn ? -2 : -1);
+      writer.write(newSpawn ? -2 : -1);
    }
 
    /**
@@ -673,20 +610,18 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     *
     * @return The spawn/control packet.
     */
-   protected byte[] controlMonster(ControlMonster packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER_CONTROL.getValue());
-      mplew.write(packet.isAggro() ? 2 : 1);
-      mplew.writeInt(packet.getMonster().getObjectId());
-      mplew.write(packet.getMonster().getController() == null ? 5 : 1);
-      mplew.writeInt(packet.getMonster().getId());
-      mplew.skip(15);
-      mplew.write(0x88);
-      mplew.skip(6);
-      mplew.writePos(packet.getMonster().getPosition());
-      mplew.write(packet.getMonster().getStance());
-      mplew.writeShort(0); //Origin FH //life.getStartFh()
-      mplew.writeShort(packet.getMonster().getFh());
+   protected void controlMonster(MaplePacketLittleEndianWriter writer, ControlMonster packet) {
+      writer.write(packet.isAggro() ? 2 : 1);
+      writer.writeInt(packet.getMonster().getObjectId());
+      writer.write(packet.getMonster().getController() == null ? 5 : 1);
+      writer.writeInt(packet.getMonster().getId());
+      writer.skip(15);
+      writer.write(0x88);
+      writer.skip(6);
+      writer.writePos(packet.getMonster().getPosition());
+      writer.write(packet.getMonster().getStance());
+      writer.writeShort(0); //Origin FH //life.getStartFh()
+      writer.writeShort(packet.getMonster().getFh());
 
 
       /*
@@ -700,34 +635,27 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       if (packet.getMonster().getParentMobOid() != 0) {
          MapleMonster parentMob = packet.getMonster().getMap().getMonsterByOid(packet.getMonster().getParentMobOid());
          if (parentMob != null && parentMob.isAlive()) {
-            mplew.write(-3);
-            mplew.writeInt(packet.getMonster().getParentMobOid());
+            writer.write(-3);
+            writer.writeInt(packet.getMonster().getParentMobOid());
          } else {
-            encodeParentlessMobSpawnEffect(mplew, packet.isNewSpawn(), 0);
+            encodeParentlessMobSpawnEffect(writer, packet.isNewSpawn(), 0);
          }
       } else {
-         encodeParentlessMobSpawnEffect(mplew, packet.isNewSpawn(), 0);
+         encodeParentlessMobSpawnEffect(writer, packet.isNewSpawn(), 0);
       }
 
-      mplew.write(packet.getMonster().getTeam());
-      mplew.writeInt(0); // getItemEffect
-      return mplew.getPacket();
+      writer.write(packet.getMonster().getTeam());
+      writer.writeInt(0); // getItemEffect
    }
 
    /**
     * Makes a monster invisible for Ariant PQ.
     */
-   protected byte[] makeMonsterInvisible(MakeMonsterInvisible packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPAWN_MONSTER_CONTROL.getValue());
-      mplew.write(0);
-      mplew.writeInt(packet.getMonster().getObjectId());
-      return mplew.getPacket();
+   protected void makeMonsterInvisible(MaplePacketLittleEndianWriter writer, MakeMonsterInvisible packet) {
+      writer.write(0);
+      writer.writeInt(packet.getMonster().getObjectId());
    }
 
-   protected byte[] sendCannotSpawnKite(CannotSpawnKite packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANNOT_SPAWN_KITE.getValue());
-      return mplew.getPacket();
+   protected void sendCannotSpawnKite(MaplePacketLittleEndianWriter writer, CannotSpawnKite packet) {
    }
 }

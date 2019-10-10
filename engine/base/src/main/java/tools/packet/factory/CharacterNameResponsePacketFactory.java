@@ -15,14 +15,11 @@ public class CharacterNameResponsePacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterNameResponsePacketFactory() {
-      registry.setHandler(CharacterName.class, packet -> this.charNameResponse((CharacterName) packet));
+      registry.setHandler(CharacterName.class, packet -> create(SendOpcode.CHAR_NAME_RESPONSE, this::charNameResponse, packet));
    }
 
-   protected byte[] charNameResponse(CharacterName packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CHAR_NAME_RESPONSE.getValue());
-      mplew.writeMapleAsciiString(packet.characterName());
-      mplew.write(packet.nameUsed() ? 1 : 0);
-      return mplew.getPacket();
+   protected void charNameResponse(MaplePacketLittleEndianWriter writer, CharacterName packet) {
+      writer.writeMapleAsciiString(packet.characterName());
+      writer.write(packet.nameUsed() ? 1 : 0);
    }
 }

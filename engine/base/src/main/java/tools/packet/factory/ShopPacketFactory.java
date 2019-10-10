@@ -24,25 +24,22 @@ public class ShopPacketFactory extends AbstractPacketFactory {
    }
 
    private ShopPacketFactory() {
-      registry.setHandler(UpdateHiredMerchantBox.class, packet -> this.updateHiredMerchantBox((UpdateHiredMerchantBox) packet));
-      registry.setHandler(GetNPCShop.class, packet -> this.getNPCShop((GetNPCShop) packet));
-      registry.setHandler(ConfirmShopTransaction.class, packet -> this.shopTransaction((ConfirmShopTransaction) packet));
-      registry.setHandler(ShowHiredMerchantBox.class, packet -> this.hiredMerchantBox((ShowHiredMerchantBox) packet));
-      registry.setHandler(RetrieveFirstMessage.class, packet -> this.retrieveFirstMessage((RetrieveFirstMessage) packet));
-      registry.setHandler(RemoteChannelChange.class, packet -> this.remoteChannelChange((RemoteChannelChange) packet));
-      registry.setHandler(DestroyHiredMerchantBox.class, packet -> this.removeHiredMerchantBox((DestroyHiredMerchantBox) packet));
+      registry.setHandler(UpdateHiredMerchantBox.class, packet -> create(SendOpcode.UPDATE_HIRED_MERCHANT, this::updateHiredMerchantBox, packet));
+      registry.setHandler(GetNPCShop.class, packet -> create(SendOpcode.OPEN_NPC_SHOP, this::getNPCShop, packet));
+      registry.setHandler(ConfirmShopTransaction.class, packet -> create(SendOpcode.CONFIRM_SHOP_TRANSACTION, this::shopTransaction, packet, 3));
+      registry.setHandler(ShowHiredMerchantBox.class, packet -> create(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT, this::hiredMerchantBox, packet));
+      registry.setHandler(RetrieveFirstMessage.class, packet -> create(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT, this::retrieveFirstMessage, packet));
+      registry.setHandler(RemoteChannelChange.class, packet -> create(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT, this::remoteChannelChange, packet));
+      registry.setHandler(DestroyHiredMerchantBox.class, packet -> create(SendOpcode.DESTROY_HIRED_MERCHANT, this::removeHiredMerchantBox, packet));
    }
 
-   protected byte[] updateHiredMerchantBox(UpdateHiredMerchantBox packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_HIRED_MERCHANT.getValue());
-      mplew.writeInt(packet.ownerId());
-      mplew.write(5);
-      mplew.writeInt(packet.objectId());
-      mplew.writeMapleAsciiString(packet.description());
-      mplew.write(packet.itemId() % 100);
-      mplew.write(packet.roomInto());    // visitor capacity here, thanks GabrielSin!
-      return mplew.getPacket();
+   protected void updateHiredMerchantBox(MaplePacketLittleEndianWriter writer, UpdateHiredMerchantBox packet) {
+      writer.writeInt(packet.ownerId());
+      writer.write(5);
+      writer.writeInt(packet.objectId());
+      writer.writeMapleAsciiString(packet.description());
+      writer.write(packet.itemId() % 100);
+      writer.write(packet.roomInto());    // visitor capacity here, thanks GabrielSin!
    }
 
    // someone thought it was a good idea to handle floating point representation through packets ROFL
@@ -50,65 +47,47 @@ public class ShopPacketFactory extends AbstractPacketFactory {
       return (int) (Double.doubleToLongBits(d) >> 48);
    }
 
-   protected byte[] getNPCShop(GetNPCShop packet) {
+   protected void getNPCShop(MaplePacketLittleEndianWriter writer, GetNPCShop packet) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.OPEN_NPC_SHOP.getValue());
-      mplew.writeInt(packet.getShopId());
-      mplew.writeShort(packet.getShopItems().size()); // item count
+      writer.writeInt(packet.getShopId());
+      writer.writeShort(packet.getShopItems().size()); // item count
       for (MapleShopItem item : packet.getShopItems()) {
-         mplew.writeInt(item.itemId());
-         mplew.writeInt(item.price());
-         mplew.writeInt(item.price() == 0 ? item.pitch() : 0); //Perfect Pitch
-         mplew.writeInt(0); //Can be used x minutes after purchase
-         mplew.writeInt(0); //Hmm
+         writer.writeInt(item.itemId());
+         writer.writeInt(item.price());
+         writer.writeInt(item.price() == 0 ? item.pitch() : 0); //Perfect Pitch
+         writer.writeInt(0); //Can be used x minutes after purchase
+         writer.writeInt(0); //Hmm
          if (!ItemConstants.isRechargeable(item.itemId())) {
-            mplew.writeShort(1); // stacksize o.o
-            mplew.writeShort(item.buyable());
+            writer.writeShort(1); // stacksize o.o
+            writer.writeShort(item.buyable());
          } else {
-            mplew.writeShort(0);
-            mplew.writeInt(0);
-            mplew.writeShort(doubleToShortBits(ii.getUnitPrice(item.itemId())));
-            mplew.writeShort(ii.getSlotMax(packet.getClient(), item.itemId()));
+            writer.writeShort(0);
+            writer.writeInt(0);
+            writer.writeShort(doubleToShortBits(ii.getUnitPrice(item.itemId())));
+            writer.writeShort(ii.getSlotMax(packet.getClient(), item.itemId()));
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] shopTransaction(ConfirmShopTransaction packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.CONFIRM_SHOP_TRANSACTION.getValue());
-      mplew.write(packet.operation().getValue());
-      return mplew.getPacket();
+   protected void shopTransaction(MaplePacketLittleEndianWriter writer, ConfirmShopTransaction packet) {
+      writer.write(packet.operation().getValue());
    }
 
-   protected byte[] hiredMerchantBox(ShowHiredMerchantBox packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT.getValue()); // header.
-      mplew.write(0x07);
-      return mplew.getPacket();
+   protected void hiredMerchantBox(MaplePacketLittleEndianWriter writer, ShowHiredMerchantBox packet) {
+      writer.write(0x07);
    }
 
-   protected byte[] retrieveFirstMessage(RetrieveFirstMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT.getValue()); // header.
-      mplew.write(0x09);
-      return mplew.getPacket();
+   protected void retrieveFirstMessage(MaplePacketLittleEndianWriter writer, RetrieveFirstMessage packet) {
+      writer.write(0x09);
    }
 
-   protected byte[] remoteChannelChange(RemoteChannelChange packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT.getValue()); // header.
-      mplew.write(0x10);
-      mplew.writeInt(0);//No idea yet
-      mplew.write(packet.channelId());
-      return mplew.getPacket();
+   protected void remoteChannelChange(MaplePacketLittleEndianWriter writer, RemoteChannelChange packet) {
+      writer.write(0x10);
+      writer.writeInt(0);//No idea yet
+      writer.write(packet.channelId());
    }
 
-   protected byte[] removeHiredMerchantBox(DestroyHiredMerchantBox packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DESTROY_HIRED_MERCHANT.getValue());
-      mplew.writeInt(packet.ownerId());
-      return mplew.getPacket();
+   protected void removeHiredMerchantBox(MaplePacketLittleEndianWriter writer, DestroyHiredMerchantBox packet) {
+      writer.writeInt(packet.ownerId());
    }
 }

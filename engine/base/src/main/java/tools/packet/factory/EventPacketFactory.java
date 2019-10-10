@@ -19,36 +19,30 @@ public class EventPacketFactory extends AbstractPacketFactory {
    }
 
    private EventPacketFactory() {
-      registry.setHandler(RollSnowBall.class, packet -> this.rollSnowBall((RollSnowBall) packet));
-      registry.setHandler(HitSnowBall.class, packet -> this.hitSnowBall((HitSnowBall) packet));
-      registry.setHandler(SnowBallMessage.class, packet -> this.snowballMessage((SnowBallMessage) packet));
-      registry.setHandler(CoconutScore.class, packet -> this.coconutScore((CoconutScore) packet));
-      registry.setHandler(CoconutHit.class, packet -> this.hitCoconut((CoconutHit) packet));
+      registry.setHandler(RollSnowBall.class, packet -> create(SendOpcode.SNOWBALL_STATE, this::rollSnowBall, packet));
+      registry.setHandler(HitSnowBall.class, packet -> create(SendOpcode.HIT_SNOWBALL, this::hitSnowBall, packet, 7));
+      registry.setHandler(SnowBallMessage.class, packet -> create(SendOpcode.SNOWBALL_MESSAGE, this::snowballMessage, packet, 7));
+      registry.setHandler(CoconutScore.class, packet -> create(SendOpcode.COCONUT_SCORE, this::coconutScore, packet, 6));
+      registry.setHandler(CoconutHit.class, packet -> create(SendOpcode.COCONUT_HIT, this::hitCoconut, packet, 7));
    }
 
-   protected byte[] rollSnowBall(RollSnowBall packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SNOWBALL_STATE.getValue());
+   protected void rollSnowBall(MaplePacketLittleEndianWriter writer, RollSnowBall packet) {
       if (packet.enterMap()) {
-         mplew.skip(21);
+         writer.skip(21);
       } else {
-         mplew.write(packet.state());// 0 = move, 1 = roll, 2 is down disappear, 3 is up disappear
-         mplew.writeInt(packet.firstSnowmanHP() / 75);
-         mplew.writeInt(packet.secondSnowmanHP() / 75);
-         mplew.writeShort(packet.firstSnowBallPosition());//distance snowball down, 84 03 = max
-         mplew.write(-1);
-         mplew.writeShort(packet.secondSnowBallPosition());//distance snowball up, 84 03 = max
-         mplew.write(-1);
+         writer.write(packet.state());// 0 = move, 1 = roll, 2 is down disappear, 3 is up disappear
+         writer.writeInt(packet.firstSnowmanHP() / 75);
+         writer.writeInt(packet.secondSnowmanHP() / 75);
+         writer.writeShort(packet.firstSnowBallPosition());//distance snowball down, 84 03 = max
+         writer.write(-1);
+         writer.writeShort(packet.secondSnowBallPosition());//distance snowball up, 84 03 = max
+         writer.write(-1);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] hitSnowBall(HitSnowBall packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.HIT_SNOWBALL.getValue());
-      mplew.write(packet.what());
-      mplew.writeInt(packet.damage());
-      return mplew.getPacket();
+   protected void hitSnowBall(MaplePacketLittleEndianWriter writer, HitSnowBall packet) {
+      writer.write(packet.what());
+      writer.writeInt(packet.damage());
    }
 
    /**
@@ -60,34 +54,25 @@ public class EventPacketFactory extends AbstractPacketFactory {
     * attacking the snowman, stopping the progress<br> 5: ... Team is moving
     * again<br>
     */
-   protected byte[] snowballMessage(SnowBallMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.SNOWBALL_MESSAGE.getValue());
-      mplew.write(packet.team());// 0 is down, 1 is up
-      mplew.writeInt(packet.message());
-      return mplew.getPacket();
+   protected void snowballMessage(MaplePacketLittleEndianWriter writer, SnowBallMessage packet) {
+      writer.write(packet.team());// 0 is down, 1 is up
+      writer.writeInt(packet.message());
    }
 
-   protected byte[] coconutScore(CoconutScore packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.COCONUT_SCORE.getValue());
-      mplew.writeShort(packet.firstTeam());
-      mplew.writeShort(packet.secondTeam());
-      return mplew.getPacket();
+   protected void coconutScore(MaplePacketLittleEndianWriter writer, CoconutScore packet) {
+      writer.writeShort(packet.firstTeam());
+      writer.writeShort(packet.secondTeam());
    }
 
-   protected byte[] hitCoconut(CoconutHit packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.COCONUT_HIT.getValue());
+   protected void hitCoconut(MaplePacketLittleEndianWriter writer, CoconutHit packet) {
       if (packet.spawn()) {
-         mplew.writeShort(-1);
-         mplew.writeShort(5000);
-         mplew.write(0);
+         writer.writeShort(-1);
+         writer.writeShort(5000);
+         writer.write(0);
       } else {
-         mplew.writeShort(packet.id());
-         mplew.writeShort(1000);//delay till you can attack again!
-         mplew.write(packet.theType()); // What action to do for the coconut.
+         writer.writeShort(packet.id());
+         writer.writeShort(1000);//delay till you can attack again!
+         writer.write(packet.theType()); // What action to do for the coconut.
       }
-      return mplew.getPacket();
    }
 }

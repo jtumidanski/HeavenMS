@@ -5,9 +5,7 @@ import java.util.List;
 import client.MapleCharacter;
 import constants.ServerConstants;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.character.CharacterList;
 
 public class CharacterListPacketFactory extends AbstractPacketFactory {
@@ -21,7 +19,7 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterListPacketFactory() {
-      registry.setHandler(CharacterList.class, packet -> this.getCharList((CharacterList) packet));
+      registry.setHandler(CharacterList.class, packet -> create(SendOpcode.CHARLIST, this::getCharList, packet));
    }
 
    /**
@@ -29,18 +27,15 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
     *
     * @return The character list packet.
     */
-   protected byte[] getCharList(CharacterList packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CHARLIST.getValue());
-      mplew.write(packet.getStatus());
+   protected void getCharList(MaplePacketLittleEndianWriter writer, CharacterList packet) {
+      writer.write(packet.getStatus());
       List<MapleCharacter> chars = packet.getClient().loadCharacters(packet.getServerId());
-      mplew.write((byte) chars.size());
+      writer.write((byte) chars.size());
       for (MapleCharacter chr : chars) {
-         addCharEntry(mplew, chr, false);
+         addCharEntry(writer, chr, false);
       }
 
-      mplew.write(ServerConstants.ENABLE_PIC && packet.getClient().cannotBypassPic() ? (packet.getClient().getPic() == null || packet.getClient().getPic().equals("") ? 0 : 1) : 2);
-      mplew.writeInt(ServerConstants.COLLECTIVE_CHARSLOT ? chars.size() + packet.getClient().getAvailableCharacterSlots() : packet.getClient().getCharacterSlots());
-      return mplew.getPacket();
+      writer.write(ServerConstants.ENABLE_PIC && packet.getClient().cannotBypassPic() ? (packet.getClient().getPic() == null || packet.getClient().getPic().equals("") ? 0 : 1) : 2);
+      writer.writeInt(ServerConstants.COLLECTIVE_CHARSLOT ? chars.size() + packet.getClient().getAvailableCharacterSlots() : packet.getClient().getCharacterSlots());
    }
 }

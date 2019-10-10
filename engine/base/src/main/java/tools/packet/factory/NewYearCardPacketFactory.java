@@ -16,20 +16,18 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
    }
 
    private NewYearCardPacketFactory() {
-      registry.setHandler(NewYearCardResolution.class, packet -> this.onNewYearCardRes((NewYearCardResolution) packet));
+      registry.setHandler(NewYearCardResolution.class, packet -> create(SendOpcode.NEW_YEAR_CARD_RES, this::onNewYearCardRes, packet));
    }
 
-   protected byte[] onNewYearCardRes(NewYearCardResolution packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NEW_YEAR_CARD_RES.getValue());
-      mplew.write(packet.getMode());
+   protected void onNewYearCardRes(MaplePacketLittleEndianWriter writer, NewYearCardResolution packet) {
+      writer.write(packet.getMode());
       switch (packet.getMode()) {
          case 4: // Successfully sent a New Year Card\r\n to %s.
          case 6: // Successfully received a New Year Card.
-            encodeNewYearCard(packet.getNewYearCardRecord(), mplew);
+            encodeNewYearCard(packet.getNewYearCardRecord(), writer);
             break;
          case 8: // Successfully deleted a New Year Card.
-            mplew.writeInt(packet.getNewYearCardRecord().getId());
+            writer.writeInt(packet.getNewYearCardRecord().getId());
             break;
          case 5: // Nexon's stupid and makes 4 modes do the same operation..
          case 7:
@@ -43,45 +41,44 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
             // 0x15: An error occured during DB operation.
             // 0x16: An unknown error occured !
             // 0xF: You cannot send a card to yourself !
-            mplew.write(packet.getMessage());
+            writer.write(packet.getMessage());
             break;
          case 0xA:   // GetUnreceivedList_Done
             int nSN = 1;
-            mplew.writeInt(nSN);
+            writer.writeInt(nSN);
             if ((nSN - 1) <= 98 && nSN > 0) {//lol nexon are you kidding
                for (int i = 0; i < nSN; i++) {
-                  mplew.writeInt(packet.getNewYearCardRecord().getId());
-                  mplew.writeInt(packet.getNewYearCardRecord().getSenderId());
-                  mplew.writeMapleAsciiString(packet.getNewYearCardRecord().getSenderName());
+                  writer.writeInt(packet.getNewYearCardRecord().getId());
+                  writer.writeInt(packet.getNewYearCardRecord().getSenderId());
+                  writer.writeMapleAsciiString(packet.getNewYearCardRecord().getSenderName());
                }
             }
             break;
          case 0xC:   // NotiArrived
-            mplew.writeInt(packet.getNewYearCardRecord().getId());
-            mplew.writeMapleAsciiString(packet.getNewYearCardRecord().getSenderName());
+            writer.writeInt(packet.getNewYearCardRecord().getId());
+            writer.writeMapleAsciiString(packet.getNewYearCardRecord().getSenderName());
             break;
          case 0xD:   // BroadCast_AddCardInfo
-            mplew.writeInt(packet.getNewYearCardRecord().getId());
-            mplew.writeInt(packet.getCharacter().getId());
+            writer.writeInt(packet.getNewYearCardRecord().getId());
+            writer.writeInt(packet.getCharacter().getId());
             break;
          case 0xE:   // BroadCast_RemoveCardInfo
-            mplew.writeInt(packet.getNewYearCardRecord().getId());
+            writer.writeInt(packet.getNewYearCardRecord().getId());
             break;
       }
-      return mplew.getPacket();
    }
 
-   protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter mplew) {
-      mplew.writeInt(newyear.getId());
-      mplew.writeInt(newyear.getSenderId());
-      mplew.writeMapleAsciiString(newyear.getSenderName());
-      mplew.writeBool(newyear.isSenderCardDiscarded());
-      mplew.writeLong(newyear.getDateSent());
-      mplew.writeInt(newyear.getReceiverId());
-      mplew.writeMapleAsciiString(newyear.getReceiverName());
-      mplew.writeBool(newyear.isReceiverCardDiscarded());
-      mplew.writeBool(newyear.isReceiverCardReceived());
-      mplew.writeLong(newyear.getDateReceived());
-      mplew.writeMapleAsciiString(newyear.getMessage());
+   protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter writer) {
+      writer.writeInt(newyear.getId());
+      writer.writeInt(newyear.getSenderId());
+      writer.writeMapleAsciiString(newyear.getSenderName());
+      writer.writeBool(newyear.isSenderCardDiscarded());
+      writer.writeLong(newyear.getDateSent());
+      writer.writeInt(newyear.getReceiverId());
+      writer.writeMapleAsciiString(newyear.getReceiverName());
+      writer.writeBool(newyear.isReceiverCardDiscarded());
+      writer.writeBool(newyear.isReceiverCardReceived());
+      writer.writeLong(newyear.getDateReceived());
+      writer.writeMapleAsciiString(newyear.getMessage());
    }
 }

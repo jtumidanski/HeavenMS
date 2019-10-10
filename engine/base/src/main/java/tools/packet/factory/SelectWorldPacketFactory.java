@@ -15,13 +15,10 @@ public class SelectWorldPacketFactory extends AbstractPacketFactory {
    }
 
    private SelectWorldPacketFactory() {
-      registry.setHandler(SelectWorld.class, packet -> this.selectWorld((SelectWorld) packet));
+      registry.setHandler(SelectWorld.class, packet -> create(SendOpcode.LAST_CONNECTED_WORLD, this::selectWorld, packet));
    }
 
-   protected byte[] selectWorld(SelectWorld packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.LAST_CONNECTED_WORLD.getValue());
-      mplew.writeInt(packet.worldId());//According to GMS, it should be the world that contains the most characters (most active)
-      return mplew.getPacket();
+   protected void selectWorld(MaplePacketLittleEndianWriter writer, SelectWorld packet) {
+      writer.writeInt(packet.worldId());//According to GMS, it should be the world that contains the most characters (most active)
    }
 }

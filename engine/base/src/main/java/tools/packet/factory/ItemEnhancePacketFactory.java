@@ -17,32 +17,23 @@ public class ItemEnhancePacketFactory extends AbstractPacketFactory {
    }
 
    private ItemEnhancePacketFactory() {
-      registry.setHandler(SendVegaScroll.class, packet -> this.sendVegaScroll((SendVegaScroll) packet));
-      registry.setHandler(SendHammer.class, packet -> this.sendHammerData((SendHammer) packet));
-      registry.setHandler(SendHammerMessage.class, packet -> this.sendHammerMessage((SendHammerMessage) packet));
+      registry.setHandler(SendVegaScroll.class, packet -> create(SendOpcode.VEGA_SCROLL, this::sendVegaScroll, packet, 3));
+      registry.setHandler(SendHammer.class, packet -> create(SendOpcode.VICIOUS_HAMMER, this::sendHammerData, packet));
+      registry.setHandler(SendHammerMessage.class, packet -> create(SendOpcode.VICIOUS_HAMMER, this::sendHammerMessage, packet));
    }
 
-   protected byte[] sendVegaScroll(SendVegaScroll packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.VEGA_SCROLL.getValue());
-      mplew.write(packet.operation().getValue());
-      return mplew.getPacket();
+   protected void sendVegaScroll(MaplePacketLittleEndianWriter writer, SendVegaScroll packet) {
+      writer.write(packet.operation().getValue());
    }
 
-   protected byte[] sendHammerData(SendHammer packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.VICIOUS_HAMMER.getValue());
-      mplew.write(0x39);
-      mplew.writeInt(0);
-      mplew.writeInt(packet.used());
-      return mplew.getPacket();
+   protected void sendHammerData(MaplePacketLittleEndianWriter writer, SendHammer packet) {
+      writer.write(0x39);
+      writer.writeInt(0);
+      writer.writeInt(packet.used());
    }
 
-   protected byte[] sendHammerMessage(SendHammerMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.VICIOUS_HAMMER.getValue());
-      mplew.write(0x3D);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void sendHammerMessage(MaplePacketLittleEndianWriter writer, SendHammerMessage packet) {
+      writer.write(0x3D);
+      writer.writeInt(0);
    }
 }

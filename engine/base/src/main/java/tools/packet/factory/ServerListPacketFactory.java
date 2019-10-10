@@ -17,8 +17,8 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerListPacketFactory() {
-      registry.setHandler(ServerList.class, packet -> this.getServerList((ServerList) packet));
-      registry.setHandler(ServerListEnd.class, packet -> this.getEndOfServerList((ServerListEnd) packet));
+      registry.setHandler(ServerList.class, packet -> create(SendOpcode.SERVERLIST, this::getServerList, packet));
+      registry.setHandler(ServerListEnd.class, packet -> create(SendOpcode.SERVERLIST, this::getEndOfServerList, packet, 3));
    }
 
    /**
@@ -26,30 +26,27 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
     *
     * @return The server info packet.
     */
-   protected byte[] getServerList(ServerList packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERLIST.getValue());
-      mplew.write(packet.serverId());
-      mplew.writeMapleAsciiString(packet.serverName());
-      mplew.write(packet.flag());
-      mplew.writeMapleAsciiString(packet.eventMsg());
-      mplew.write(100); // rate modifier, don't ask O.O!
-      mplew.write(0); // event xp * 2.6 O.O!
-      mplew.write(100); // rate modifier, don't ask O.O!
-      mplew.write(0); // drop rate * 2.6
-      mplew.write(0);
-      mplew.write(packet.channelLoad().size());
+   protected void getServerList(MaplePacketLittleEndianWriter writer, ServerList packet) {
+      writer.write(packet.serverId());
+      writer.writeMapleAsciiString(packet.serverName());
+      writer.write(packet.flag());
+      writer.writeMapleAsciiString(packet.eventMsg());
+      writer.write(100); // rate modifier, don't ask O.O!
+      writer.write(0); // event xp * 2.6 O.O!
+      writer.write(100); // rate modifier, don't ask O.O!
+      writer.write(0); // drop rate * 2.6
+      writer.write(0);
+      writer.write(packet.channelLoad().size());
       for (ChannelLoad ch : packet.channelLoad()) {
-         mplew.writeMapleAsciiString(packet.serverName() + "-" + ch.id());
-         mplew.writeInt(ch.capacity());
+         writer.writeMapleAsciiString(packet.serverName() + "-" + ch.id());
+         writer.writeInt(ch.capacity());
 
          // thanks GabrielSin for this channel packet structure part
-         mplew.write(1);// nWorldID
-         mplew.write(ch.id() - 1);// nChannelID
-         mplew.writeBool(false);// bAdultChannel
+         writer.write(1);// nWorldID
+         writer.write(ch.id() - 1);// nChannelID
+         writer.writeBool(false);// bAdultChannel
       }
-      mplew.writeShort(0);
-      return mplew.getPacket();
+      writer.writeShort(0);
    }
 
    /**
@@ -57,10 +54,7 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
     *
     * @return The end of server list packet.
     */
-   protected byte[] getEndOfServerList(ServerListEnd packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.SERVERLIST.getValue());
-      mplew.write(0xFF);
-      return mplew.getPacket();
+   protected void getEndOfServerList(MaplePacketLittleEndianWriter writer, ServerListEnd packet) {
+      writer.write(0xFF);
    }
 }

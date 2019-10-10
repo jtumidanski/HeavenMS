@@ -15,7 +15,7 @@ public class ChangeChannelPacketFactory extends AbstractPacketFactory {
    }
 
    private ChangeChannelPacketFactory() {
-      registry.setHandler(ChangeChannel.class, packet -> this.getChannelChange((ChangeChannel) packet));
+      registry.setHandler(ChangeChannel.class, packet -> create(SendOpcode.CHANGE_CHANNEL, this::getChannelChange, packet));
    }
 
    /**
@@ -23,13 +23,10 @@ public class ChangeChannelPacketFactory extends AbstractPacketFactory {
     *
     * @return The server IP packet.
     */
-   protected byte[] getChannelChange(ChangeChannel packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CHANGE_CHANNEL.getValue());
-      mplew.write(1);
+   protected void getChannelChange(MaplePacketLittleEndianWriter writer, ChangeChannel packet) {
+      writer.write(1);
       byte[] addr = packet.inetAddress().getAddress();
-      mplew.write(addr);
-      mplew.writeShort(packet.port());
-      return mplew.getPacket();
+      writer.write(addr);
+      writer.writeShort(packet.port());
    }
 }

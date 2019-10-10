@@ -15,13 +15,10 @@ public class PicPacketFactory extends AbstractPacketFactory {
    }
 
    private PicPacketFactory() {
-      registry.setHandler(WrongPic.class, packet -> this.wrongPic((WrongPic) packet));
+      registry.setHandler(WrongPic.class, packet -> create(SendOpcode.CHECK_SPW_RESULT, this::wrongPic, packet, 3));
    }
 
-   protected byte[] wrongPic(WrongPic packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.CHECK_SPW_RESULT.getValue());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void wrongPic(MaplePacketLittleEndianWriter writer, WrongPic packet) {
+      writer.write(0);
    }
 }

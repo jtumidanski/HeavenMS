@@ -32,201 +32,168 @@ public class AllianceOperationPacketFactory extends AbstractPacketFactory {
    }
 
    private AllianceOperationPacketFactory() {
-      registry.setHandler(GetAllianceInfo.class, packet -> this.getAllianceInfo((GetAllianceInfo) packet));
-      registry.setHandler(UpdateAllianceInfo.class, packet -> this.updateAllianceInfo((UpdateAllianceInfo) packet));
-      registry.setHandler(GetGuildAlliances.class, packet -> this.getGuildAlliances((GetGuildAlliances) packet));
-      registry.setHandler(AddGuildToAlliance.class, packet -> this.addGuildToAlliance((AddGuildToAlliance) packet));
-      registry.setHandler(AllianceMemberOnline.class, packet -> this.allianceMemberOnline((AllianceMemberOnline) packet));
-      registry.setHandler(AllianceNotice.class, packet -> this.allianceNotice((AllianceNotice) packet));
-      registry.setHandler(ChangeAllianceRankTitles.class, packet -> this.changeAllianceRankTitle((ChangeAllianceRankTitles) packet));
-      registry.setHandler(UpdateAllianceJobLevel.class, packet -> this.updateAllianceJobLevel((UpdateAllianceJobLevel) packet));
-      registry.setHandler(RemoveGuildFromAlliance.class, packet -> this.removeGuildFromAlliance((RemoveGuildFromAlliance) packet));
-      registry.setHandler(DisbandAlliance.class, packet -> this.disbandAlliance((DisbandAlliance) packet));
-      registry.setHandler(AllianceInvite.class, packet -> this.allianceInvite((AllianceInvite) packet));
+      registry.setHandler(GetAllianceInfo.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::getAllianceInfo, packet));
+      registry.setHandler(UpdateAllianceInfo.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::updateAllianceInfo, packet));
+      registry.setHandler(GetGuildAlliances.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::getGuildAlliances, packet));
+      registry.setHandler(AddGuildToAlliance.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::addGuildToAlliance, packet));
+      registry.setHandler(AllianceMemberOnline.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::allianceMemberOnline, packet));
+      registry.setHandler(AllianceNotice.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::allianceNotice, packet));
+      registry.setHandler(ChangeAllianceRankTitles.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::changeAllianceRankTitle, packet));
+      registry.setHandler(UpdateAllianceJobLevel.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::updateAllianceJobLevel, packet));
+      registry.setHandler(RemoveGuildFromAlliance.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::removeGuildFromAlliance, packet));
+      registry.setHandler(DisbandAlliance.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::disbandAlliance, packet));
+      registry.setHandler(AllianceInvite.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::allianceInvite, packet));
    }
 
-   protected byte[] getAllianceInfo(GetAllianceInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x0C);
-      mplew.write(1);
-      mplew.writeInt(packet.alliance().id());
-      mplew.writeMapleAsciiString(packet.alliance().name());
+   protected void getAllianceInfo(MaplePacketLittleEndianWriter writer, GetAllianceInfo packet) {
+      writer.write(0x0C);
+      writer.write(1);
+      writer.writeInt(packet.alliance().id());
+      writer.writeMapleAsciiString(packet.alliance().name());
       for (int i = 1; i <= 5; i++) {
-         mplew.writeMapleAsciiString(packet.alliance().rankTitle(i));
+         writer.writeMapleAsciiString(packet.alliance().rankTitle(i));
       }
-      mplew.write(packet.alliance().guilds().size());
-      mplew.writeInt(packet.alliance().capacity()); // probably capacity
+      writer.write(packet.alliance().guilds().size());
+      writer.writeInt(packet.alliance().capacity()); // probably capacity
       for (Integer guild : packet.alliance().guilds()) {
-         mplew.writeInt(guild);
+         writer.writeInt(guild);
       }
-      mplew.writeMapleAsciiString(packet.alliance().notice());
-      return mplew.getPacket();
+      writer.writeMapleAsciiString(packet.alliance().notice());
    }
 
-   protected byte[] updateAllianceInfo(UpdateAllianceInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x0F);
-      mplew.writeInt(packet.alliance().id());
-      mplew.writeMapleAsciiString(packet.alliance().name());
+   protected void updateAllianceInfo(MaplePacketLittleEndianWriter writer, UpdateAllianceInfo packet) {
+      writer.write(0x0F);
+      writer.writeInt(packet.alliance().id());
+      writer.writeMapleAsciiString(packet.alliance().name());
       for (int i = 1; i <= 5; i++) {
-         mplew.writeMapleAsciiString(packet.alliance().rankTitle(i));
+         writer.writeMapleAsciiString(packet.alliance().rankTitle(i));
       }
-      mplew.write(packet.alliance().guilds().size());
+      writer.write(packet.alliance().guilds().size());
       for (Integer guild : packet.alliance().guilds()) {
-         mplew.writeInt(guild);
+         writer.writeInt(guild);
       }
-      mplew.writeInt(packet.alliance().capacity()); // probably capacity
-      mplew.writeShort(0);
+      writer.writeInt(packet.alliance().capacity()); // probably capacity
+      writer.writeShort(0);
       packet.alliance().guilds().stream()
             .map(guildId -> Server.getInstance().getGuild(guildId, packet.worldId()))
             .flatMap(Optional::stream)
-            .forEach(guild -> getGuildInfo(mplew, guild));
-      return mplew.getPacket();
+            .forEach(guild -> getGuildInfo(writer, guild));
    }
 
-   private void getGuildInfo(final MaplePacketLittleEndianWriter mplew, MapleGuild guild) {
-      mplew.writeInt(guild.getId());
-      mplew.writeMapleAsciiString(guild.getName());
+   protected void getGuildInfo(final MaplePacketLittleEndianWriter writer, MapleGuild guild) {
+      writer.writeInt(guild.getId());
+      writer.writeMapleAsciiString(guild.getName());
       for (int i = 1; i <= 5; i++) {
-         mplew.writeMapleAsciiString(guild.getRankTitle(i));
+         writer.writeMapleAsciiString(guild.getRankTitle(i));
       }
       Collection<MapleGuildCharacter> members = guild.getMembers();
-      mplew.write(members.size());
+      writer.write(members.size());
       for (MapleGuildCharacter mgc : members) {
-         mplew.writeInt(mgc.getId());
+         writer.writeInt(mgc.getId());
       }
       for (MapleGuildCharacter mgc : members) {
-         mplew.writeAsciiString(StringUtil.getRightPaddedStr(mgc.getName(), '\0', 13));
-         mplew.writeInt(mgc.getJobId());
-         mplew.writeInt(mgc.getLevel());
-         mplew.writeInt(mgc.getGuildRank());
-         mplew.writeInt(mgc.isOnline() ? 1 : 0);
-         mplew.writeInt(guild.getSignature());
-         mplew.writeInt(mgc.getAllianceRank());
+         writer.writeAsciiString(StringUtil.getRightPaddedStr(mgc.getName(), '\0', 13));
+         writer.writeInt(mgc.getJobId());
+         writer.writeInt(mgc.getLevel());
+         writer.writeInt(mgc.getGuildRank());
+         writer.writeInt(mgc.isOnline() ? 1 : 0);
+         writer.writeInt(guild.getSignature());
+         writer.writeInt(mgc.getAllianceRank());
       }
-      mplew.writeInt(guild.getCapacity());
-      mplew.writeShort(guild.getLogoBG());
-      mplew.write(guild.getLogoBGColor());
-      mplew.writeShort(guild.getLogo());
-      mplew.write(guild.getLogoColor());
-      mplew.writeMapleAsciiString(guild.getNotice());
-      mplew.writeInt(guild.getGP());
-      mplew.writeInt(guild.getAllianceId());
+      writer.writeInt(guild.getCapacity());
+      writer.writeShort(guild.getLogoBG());
+      writer.write(guild.getLogoBGColor());
+      writer.writeShort(guild.getLogo());
+      writer.write(guild.getLogoColor());
+      writer.writeMapleAsciiString(guild.getNotice());
+      writer.writeInt(guild.getGP());
+      writer.writeInt(guild.getAllianceId());
    }
 
-   protected byte[] getGuildAlliances(GetGuildAlliances packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x0D);
-      mplew.writeInt(packet.alliance().guilds().size());
+   protected void getGuildAlliances(MaplePacketLittleEndianWriter writer, GetGuildAlliances packet) {
+      writer.write(0x0D);
+      writer.writeInt(packet.alliance().guilds().size());
       packet.alliance().guilds().stream()
             .map(guildId -> Server.getInstance().getGuild(guildId, packet.worldId()))
             .flatMap(Optional::stream)
-            .forEach(guild -> getGuildInfo(mplew, guild));
-      return mplew.getPacket();
+            .forEach(guild -> getGuildInfo(writer, guild));
    }
 
-   protected byte[] addGuildToAlliance(AddGuildToAlliance packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x12);
-      mplew.writeInt(packet.alliance().id());
-      mplew.writeMapleAsciiString(packet.alliance().name());
+   protected void addGuildToAlliance(MaplePacketLittleEndianWriter writer, AddGuildToAlliance packet) {
+      writer.write(0x12);
+      writer.writeInt(packet.alliance().id());
+      writer.writeMapleAsciiString(packet.alliance().name());
       for (int i = 1; i <= 5; i++) {
-         mplew.writeMapleAsciiString(packet.alliance().rankTitle(i));
+         writer.writeMapleAsciiString(packet.alliance().rankTitle(i));
       }
-      mplew.write(packet.alliance().guilds().size());
+      writer.write(packet.alliance().guilds().size());
       for (Integer guild : packet.alliance().guilds()) {
-         mplew.writeInt(guild);
+         writer.writeInt(guild);
       }
-      mplew.writeInt(packet.alliance().capacity());
-      mplew.writeMapleAsciiString(packet.alliance().notice());
-      mplew.writeInt(packet.newGuildId());
-      Server.getInstance().getGuild(packet.newGuildId(), packet.worldId(), null).ifPresent(guild -> getGuildInfo(mplew, guild));
-      return mplew.getPacket();
+      writer.writeInt(packet.alliance().capacity());
+      writer.writeMapleAsciiString(packet.alliance().notice());
+      writer.writeInt(packet.newGuildId());
+      Server.getInstance().getGuild(packet.newGuildId(), packet.worldId(), null).ifPresent(guild -> getGuildInfo(writer, guild));
    }
 
-   protected byte[] allianceMemberOnline(AllianceMemberOnline packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x0E);
-      mplew.writeInt(packet.allianceId());
-      mplew.writeInt(packet.guildId());
-      mplew.writeInt(packet.characterId());
-      mplew.write(packet.online() ? 1 : 0);
-      return mplew.getPacket();
+   protected void allianceMemberOnline(MaplePacketLittleEndianWriter writer, AllianceMemberOnline packet) {
+      writer.write(0x0E);
+      writer.writeInt(packet.allianceId());
+      writer.writeInt(packet.guildId());
+      writer.writeInt(packet.characterId());
+      writer.write(packet.online() ? 1 : 0);
    }
 
-   protected byte[] allianceNotice(AllianceNotice packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x1C);
-      mplew.writeInt(packet.id());
-      mplew.writeMapleAsciiString(packet.notice());
-      return mplew.getPacket();
+   protected void allianceNotice(MaplePacketLittleEndianWriter writer, AllianceNotice packet) {
+      writer.write(0x1C);
+      writer.writeInt(packet.id());
+      writer.writeMapleAsciiString(packet.notice());
    }
 
-   protected byte[] changeAllianceRankTitle(ChangeAllianceRankTitles packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x1A);
-      mplew.writeInt(packet.allianceId());
+   protected void changeAllianceRankTitle(MaplePacketLittleEndianWriter writer, ChangeAllianceRankTitles packet) {
+      writer.write(0x1A);
+      writer.writeInt(packet.allianceId());
       for (int i = 0; i < 5; i++) {
-         mplew.writeMapleAsciiString(packet.ranks()[i]);
+         writer.writeMapleAsciiString(packet.ranks()[i]);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] updateAllianceJobLevel(UpdateAllianceJobLevel packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x18);
-      mplew.writeInt(packet.allianceId());
-      mplew.writeInt(packet.guildId());
-      mplew.writeInt(packet.characterId());
-      mplew.writeInt(packet.level());
-      mplew.writeInt(packet.jobId());
-      return mplew.getPacket();
+   protected void updateAllianceJobLevel(MaplePacketLittleEndianWriter writer, UpdateAllianceJobLevel packet) {
+      writer.write(0x18);
+      writer.writeInt(packet.allianceId());
+      writer.writeInt(packet.guildId());
+      writer.writeInt(packet.characterId());
+      writer.writeInt(packet.level());
+      writer.writeInt(packet.jobId());
    }
 
-   protected byte[] removeGuildFromAlliance(RemoveGuildFromAlliance packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x10);
-      mplew.writeInt(packet.alliance().id());
-      mplew.writeMapleAsciiString(packet.alliance().name());
+   protected void removeGuildFromAlliance(MaplePacketLittleEndianWriter writer, RemoveGuildFromAlliance packet) {
+      writer.write(0x10);
+      writer.writeInt(packet.alliance().id());
+      writer.writeMapleAsciiString(packet.alliance().name());
       for (int i = 1; i <= 5; i++) {
-         mplew.writeMapleAsciiString(packet.alliance().rankTitle(i));
+         writer.writeMapleAsciiString(packet.alliance().rankTitle(i));
       }
-      mplew.write(packet.alliance().guilds().size());
+      writer.write(packet.alliance().guilds().size());
       for (Integer guild : packet.alliance().guilds()) {
-         mplew.writeInt(guild);
+         writer.writeInt(guild);
       }
-      mplew.writeInt(packet.alliance().capacity());
-      mplew.writeMapleAsciiString(packet.alliance().notice());
-      mplew.writeInt(packet.expelledGuildId());
-      Server.getInstance().getGuild(packet.expelledGuildId(), packet.worldId(), null).ifPresent(guild -> getGuildInfo(mplew, guild));
-      mplew.write(0x01);
-      return mplew.getPacket();
+      writer.writeInt(packet.alliance().capacity());
+      writer.writeMapleAsciiString(packet.alliance().notice());
+      writer.writeInt(packet.expelledGuildId());
+      Server.getInstance().getGuild(packet.expelledGuildId(), packet.worldId(), null).ifPresent(guild -> getGuildInfo(writer, guild));
+      writer.write(0x01);
    }
 
-   protected byte[] disbandAlliance(DisbandAlliance packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x1D);
-      mplew.writeInt(packet.allianceId());
-      return mplew.getPacket();
+   protected void disbandAlliance(MaplePacketLittleEndianWriter writer, DisbandAlliance packet) {
+      writer.write(0x1D);
+      writer.writeInt(packet.allianceId());
    }
 
-   protected byte[] allianceInvite(AllianceInvite packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      mplew.write(0x03);
-      mplew.writeInt(packet.allianceId());
-      mplew.writeMapleAsciiString(packet.characterName());
-      mplew.writeShort(0);
-      return mplew.getPacket();
+   protected void allianceInvite(MaplePacketLittleEndianWriter writer, AllianceInvite packet) {
+      writer.write(0x03);
+      writer.writeInt(packet.allianceId());
+      writer.writeMapleAsciiString(packet.characterName());
+      writer.writeShort(0);
    }
 }

@@ -16,23 +16,17 @@ public class MonsterBookPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterBookPacketFactory() {
-      registry.setHandler(SetCard.class, packet -> this.addCard((SetCard) packet));
-      registry.setHandler(ChangeCover.class, packet -> this.changeCover((ChangeCover) packet));
+      registry.setHandler(SetCard.class, packet -> create(SendOpcode.MONSTER_BOOK_SET_CARD, this::addCard, packet, 11));
+      registry.setHandler(ChangeCover.class, packet -> create(SendOpcode.MONSTER_BOOK_SET_COVER, this::changeCover, packet, 6));
    }
 
-   protected byte[] addCard(SetCard packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.MONSTER_BOOK_SET_CARD.getValue());
-      mplew.write(packet.full() ? 0 : 1);
-      mplew.writeInt(packet.cardId());
-      mplew.writeInt(packet.level());
-      return mplew.getPacket();
+   protected void addCard(MaplePacketLittleEndianWriter writer, SetCard packet) {
+      writer.write(packet.full() ? 0 : 1);
+      writer.writeInt(packet.cardId());
+      writer.writeInt(packet.level());
    }
 
-   protected byte[] changeCover(ChangeCover packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.MONSTER_BOOK_SET_COVER.getValue());
-      mplew.writeInt(packet.cardId());
-      return mplew.getPacket();
+   protected void changeCover(MaplePacketLittleEndianWriter writer, ChangeCover packet) {
+      writer.writeInt(packet.cardId());
    }
 }

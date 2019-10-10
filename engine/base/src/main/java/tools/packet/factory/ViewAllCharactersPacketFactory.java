@@ -17,29 +17,23 @@ public class ViewAllCharactersPacketFactory extends AbstractPacketFactory {
    }
 
    private ViewAllCharactersPacketFactory() {
-      registry.setHandler(ShowAllCharacter.class, packet -> this.showAllCharacter((ShowAllCharacter) packet));
-      registry.setHandler(ShowAllCharacterInfo.class, packet -> this.showAllCharacterInfo((ShowAllCharacterInfo) packet));
+      registry.setHandler(ShowAllCharacter.class, packet -> create(SendOpcode.VIEW_ALL_CHAR, this::showAllCharacter, packet, 11));
+      registry.setHandler(ShowAllCharacterInfo.class, packet -> create(SendOpcode.VIEW_ALL_CHAR, this::showAllCharacterInfo, packet));
    }
 
-   protected byte[] showAllCharacter(ShowAllCharacter packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.VIEW_ALL_CHAR.getValue());
-      mplew.write(packet.chars() > 0 ? 1 : 5); // 2: already connected to server, 3 : unk error (view-all-characters), 5 : cannot find any
-      mplew.writeInt(packet.chars());
-      mplew.writeInt(packet.unk());
-      return mplew.getPacket();
+   protected void showAllCharacter(MaplePacketLittleEndianWriter writer, ShowAllCharacter packet) {
+      writer.write(packet.chars() > 0 ? 1 : 5); // 2: already connected to server, 3 : unk error (view-all-characters), 5 : cannot find any
+      writer.writeInt(packet.chars());
+      writer.writeInt(packet.unk());
    }
 
-   protected byte[] showAllCharacterInfo(ShowAllCharacterInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.VIEW_ALL_CHAR.getValue());
-      mplew.write(0);
-      mplew.write(packet.getWorldId());
-      mplew.write(packet.getCharacterList().size());
+   protected void showAllCharacterInfo(MaplePacketLittleEndianWriter writer, ShowAllCharacterInfo packet) {
+      writer.write(0);
+      writer.write(packet.getWorldId());
+      writer.write(packet.getCharacterList().size());
       for (MapleCharacter chr : packet.getCharacterList()) {
-         addCharEntry(mplew, chr, true);
+         addCharEntry(writer, chr, true);
       }
-      mplew.write(packet.isUsePic() ? 1 : 2);
-      return mplew.getPacket();
+      writer.write(packet.isUsePic() ? 1 : 2);
    }
 }

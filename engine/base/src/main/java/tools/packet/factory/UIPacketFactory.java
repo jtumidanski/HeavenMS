@@ -34,22 +34,22 @@ public class UIPacketFactory extends AbstractPacketFactory {
    }
 
    private UIPacketFactory() {
-      registry.setHandler(OpenUI.class, packet -> this.openUI((OpenUI) packet));
-      registry.setHandler(LockUI.class, packet -> this.lockUI((LockUI) packet));
-      registry.setHandler(DisableUI.class, packet -> this.disableUI((DisableUI) packet));
-      registry.setHandler(GetKeyMap.class, packet -> this.getKeymap((GetKeyMap) packet));
-      registry.setHandler(GetMacros.class, packet -> this.getMacros((GetMacros) packet));
-      registry.setHandler(DisableMiniMap.class, packet -> this.disableMinimap((DisableMiniMap) packet));
-      registry.setHandler(FinishedSort.class, packet -> this.finishedSort((FinishedSort) packet));
-      registry.setHandler(FinishedSort2.class, packet -> this.finishedSort2((FinishedSort2) packet));
-      registry.setHandler(GetClock.class, packet -> this.getClock((GetClock) packet));
-      registry.setHandler(GetClockTime.class, packet -> this.getClockTime((GetClockTime) packet));
-      registry.setHandler(StopClock.class, packet -> this.removeClock((StopClock) packet));
-      registry.setHandler(GMEffect.class, packet -> this.getGMEffect((GMEffect) packet));
-      registry.setHandler(ShowBlockedUI.class, packet -> this.blockedMessage2((ShowBlockedUI) packet));
-      registry.setHandler(ShowNotes.class, packet -> this.showNotes((ShowNotes) packet));
-      registry.setHandler(ShowOXQuiz.class, packet -> this.showOXQuiz((ShowOXQuiz) packet));
-      registry.setHandler(RefreshTeleportRockMapList.class, packet -> this.trockRefreshMapList((RefreshTeleportRockMapList) packet));
+      registry.setHandler(OpenUI.class, packet -> create(SendOpcode.OPEN_UI, this::openUI, packet, 3));
+      registry.setHandler(LockUI.class, packet -> create(SendOpcode.LOCK_UI, this::lockUI, packet, 3));
+      registry.setHandler(DisableUI.class, packet -> create(SendOpcode.DISABLE_UI, this::disableUI, packet));
+      registry.setHandler(GetKeyMap.class, packet -> create(SendOpcode.KEYMAP, this::getKeymap, packet));
+      registry.setHandler(GetMacros.class, packet -> create(SendOpcode.MACRO_SYS_DATA_INIT, this::getMacros, packet));
+      registry.setHandler(DisableMiniMap.class, packet -> create(SendOpcode.ADMIN_RESULT, this::disableMinimap, packet));
+      registry.setHandler(FinishedSort.class, packet -> create(SendOpcode.GATHER_ITEM_RESULT, this::finishedSort, packet, 4));
+      registry.setHandler(FinishedSort2.class, packet -> create(SendOpcode.SORT_ITEM_RESULT, this::finishedSort2, packet, 4));
+      registry.setHandler(GetClock.class, packet -> create(SendOpcode.CLOCK, this::getClock, packet));
+      registry.setHandler(GetClockTime.class, packet -> create(SendOpcode.CLOCK, this::getClockTime, packet));
+      registry.setHandler(StopClock.class, packet -> create(SendOpcode.STOP_CLOCK, this::removeClock, packet));
+      registry.setHandler(GMEffect.class, packet -> create(SendOpcode.ADMIN_RESULT, this::getGMEffect, packet));
+      registry.setHandler(ShowBlockedUI.class, packet -> create(SendOpcode.BLOCKED_SERVER, this::blockedMessage2, packet));
+      registry.setHandler(ShowNotes.class, packet -> create(SendOpcode.MEMO_RESULT, this::showNotes, packet));
+      registry.setHandler(ShowOXQuiz.class, packet -> create(SendOpcode.OX_QUIZ, this::showOXQuiz, packet, 6));
+      registry.setHandler(RefreshTeleportRockMapList.class, packet -> create(SendOpcode.MAP_TRANSFER_RESULT, this::trockRefreshMapList, packet));
    }
 
    /**
@@ -62,113 +62,80 @@ public class UIPacketFactory extends AbstractPacketFactory {
     * lmfao 0x1F - Medal Window 0x20 - Maple Event (???) 0x21 - Invalid Pointer
     * Crash
     */
-   protected byte[] openUI(OpenUI packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.OPEN_UI.getValue());
-      mplew.write(packet.ui());
-      return mplew.getPacket();
+   protected void openUI(MaplePacketLittleEndianWriter writer, OpenUI packet) {
+      writer.write(packet.ui());
    }
 
-   protected byte[] lockUI(LockUI packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.LOCK_UI.getValue());
-      mplew.write(packet.enable() ? 1 : 0);
-      return mplew.getPacket();
+   protected void lockUI(MaplePacketLittleEndianWriter writer, LockUI packet) {
+      writer.write(packet.enable() ? 1 : 0);
    }
 
-   protected byte[] disableUI(DisableUI packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.DISABLE_UI.getValue());
-      mplew.write(packet.enable() ? 1 : 0);
-      return mplew.getPacket();
+   protected void disableUI(MaplePacketLittleEndianWriter writer, DisableUI packet) {
+      writer.write(packet.enable() ? 1 : 0);
    }
 
-   protected byte[] getKeymap(GetKeyMap packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.KEYMAP.getValue());
-      mplew.write(0);
+   protected void getKeymap(MaplePacketLittleEndianWriter writer, GetKeyMap packet) {
+      writer.write(0);
       for (int x = 0; x < 90; x++) {
          KeyBinding binding = packet.bindings().get(x);
          if (binding != null) {
-            mplew.write(binding.theType());
-            mplew.writeInt(binding.action());
+            writer.write(binding.theType());
+            writer.writeInt(binding.action());
          } else {
-            mplew.write(0);
-            mplew.writeInt(0);
+            writer.write(0);
+            writer.writeInt(0);
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getMacros(GetMacros packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MACRO_SYS_DATA_INIT.getValue());
+   protected void getMacros(MaplePacketLittleEndianWriter writer, GetMacros packet) {
       int count = 0;
       for (int i = 0; i < 5; i++) {
          if (packet.macros()[i] != null) {
             count++;
          }
       }
-      mplew.write(count);
+      writer.write(count);
       for (int i = 0; i < 5; i++) {
          SkillMacro macro = packet.macros()[i];
          if (macro != null) {
-            mplew.writeMapleAsciiString(macro.name());
-            mplew.write(macro.shout());
-            mplew.writeInt(macro.skill1());
-            mplew.writeInt(macro.skill2());
-            mplew.writeInt(macro.skill3());
+            writer.writeMapleAsciiString(macro.name());
+            writer.write(macro.shout());
+            writer.writeInt(macro.skill1());
+            writer.writeInt(macro.skill2());
+            writer.writeInt(macro.skill3());
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] disableMinimap(DisableMiniMap packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ADMIN_RESULT.getValue());
-      mplew.writeShort(0x1C);
-      return mplew.getPacket();
+   protected void disableMinimap(MaplePacketLittleEndianWriter writer, DisableMiniMap packet) {
+      writer.writeShort(0x1C);
    }
 
-   protected byte[] finishedSort(FinishedSort packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(4);
-      mplew.writeShort(SendOpcode.GATHER_ITEM_RESULT.getValue());
-      mplew.write(0);
-      mplew.write(packet.inventory());
-      return mplew.getPacket();
+   protected void finishedSort(MaplePacketLittleEndianWriter writer, FinishedSort packet) {
+      writer.write(0);
+      writer.write(packet.inventory());
    }
 
-   protected byte[] finishedSort2(FinishedSort2 packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(4);
-      mplew.writeShort(SendOpcode.SORT_ITEM_RESULT.getValue());
-      mplew.write(0);
-      mplew.write(packet.inventory());
-      return mplew.getPacket();
+   protected void finishedSort2(MaplePacketLittleEndianWriter writer, FinishedSort2 packet) {
+      writer.write(0);
+      writer.write(packet.inventory());
    }
 
-   protected byte[] getClock(GetClock packet) { // time in seconds
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLOCK.getValue());
-      mplew.write(2); // clock type. if you send 3 here you have to send another byte (which does not matter at all) before the timestamp
-      mplew.writeInt(packet.time());
-      return mplew.getPacket();
+   protected void getClock(MaplePacketLittleEndianWriter writer, GetClock packet) { // time in seconds
+      writer.write(2); // clock type. if you send 3 here you have to send another byte (which does not matter at all) before the timestamp
+      writer.writeInt(packet.time());
    }
 
-   protected byte[] getClockTime(GetClockTime packet) { // Current Time
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLOCK.getValue());
-      mplew.write(1); //Clock-Type
-      mplew.write(packet.hour());
-      mplew.write(packet.minute());
-      mplew.write(packet.second());
-      return mplew.getPacket();
+   protected void getClockTime(MaplePacketLittleEndianWriter writer, GetClockTime packet) { // Current Time
+      writer.write(1); //Clock-Type
+      writer.write(packet.hour());
+      writer.write(packet.minute());
+      writer.write(packet.second());
    }
 
-   protected byte[] removeClock(StopClock packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.STOP_CLOCK.getValue());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void removeClock(MaplePacketLittleEndianWriter writer, StopClock packet) {
+      writer.write(0);
    }
 
    /**
@@ -183,12 +150,9 @@ public class UIPacketFactory extends AbstractPacketFactory {
     * warning Mode 1: Sent warning<br> 0x13 with Mode 0: + mapid 0x13 with Mode
     * 1: + ch (FF = Unable to find merchant)
     */
-   protected byte[] getGMEffect(GMEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ADMIN_RESULT.getValue());
-      mplew.write(packet.theType());
-      mplew.write(packet.mode());
-      return mplew.getPacket();
+   protected void getGMEffect(MaplePacketLittleEndianWriter writer, GMEffect packet) {
+      writer.write(packet.theType());
+      writer.write(packet.mode());
    }
 
    /**
@@ -201,54 +165,42 @@ public class UIPacketFactory extends AbstractPacketFactory {
     * shop, due to limitation of user count.<br> 5: You do not meet the minimum
     * level requirement to access the Trade Shop.<br>
     */
-   protected byte[] blockedMessage2(ShowBlockedUI packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BLOCKED_SERVER.getValue());
-      mplew.write(packet.theType());
-      return mplew.getPacket();
+   protected void blockedMessage2(MaplePacketLittleEndianWriter writer, ShowBlockedUI packet) {
+      writer.write(packet.theType());
    }
 
-   protected byte[] showNotes(ShowNotes packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MEMO_RESULT.getValue());
-      mplew.write(3);
-      mplew.write(packet.notes().size());
+   protected void showNotes(MaplePacketLittleEndianWriter writer, ShowNotes packet) {
+      writer.write(3);
+      writer.write(packet.notes().size());
       packet.notes().forEach(note -> {
-         mplew.writeInt(note.id());
-         mplew.writeMapleAsciiString(note.from() + " "); //Stupid nexon forgot space lol
-         mplew.writeMapleAsciiString(note.message());
-         mplew.writeLong(getTime(note.timestamp()));
-         mplew.write(note.fame()); //FAME :D
+         writer.writeInt(note.id());
+         writer.writeMapleAsciiString(note.from() + " "); //Stupid nexon forgot space lol
+         writer.writeMapleAsciiString(note.message());
+         writer.writeLong(getTime(note.timestamp()));
+         writer.write(note.fame()); //FAME :D
       });
-      return mplew.getPacket();
    }
 
-   protected byte[] showOXQuiz(ShowOXQuiz packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(6);
-      mplew.writeShort(SendOpcode.OX_QUIZ.getValue());
-      mplew.write(packet.askQuestion() ? 1 : 0);
-      mplew.write(packet.questionSet());
-      mplew.writeShort(packet.questionId());
-      return mplew.getPacket();
+   protected void showOXQuiz(MaplePacketLittleEndianWriter writer, ShowOXQuiz packet) {
+      writer.write(packet.askQuestion() ? 1 : 0);
+      writer.write(packet.questionSet());
+      writer.writeShort(packet.questionId());
    }
 
-   protected byte[] trockRefreshMapList(RefreshTeleportRockMapList packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAP_TRANSFER_RESULT.getValue());
-      mplew.write(packet.delete() ? 2 : 3);
+   protected void trockRefreshMapList(MaplePacketLittleEndianWriter writer, RefreshTeleportRockMapList packet) {
+      writer.write(packet.delete() ? 2 : 3);
       if (packet.vip()) {
-         mplew.write(1);
+         writer.write(1);
          List<Integer> map = packet.vips();
          for (int i = 0; i < 10; i++) {
-            mplew.writeInt(map.get(i));
+            writer.writeInt(map.get(i));
          }
       } else {
-         mplew.write(0);
+         writer.write(0);
          List<Integer> map = packet.regulars();
          for (int i = 0; i < 5; i++) {
-            mplew.writeInt(map.get(i));
+            writer.writeInt(map.get(i));
          }
       }
-      return mplew.getPacket();
    }
 }

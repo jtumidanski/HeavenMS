@@ -15,7 +15,7 @@ public class PingPacketFactory extends AbstractPacketFactory {
    }
 
    private PingPacketFactory() {
-      registry.setHandler(Ping.class, packet -> this.getPing((Ping) packet));
+      registry.setHandler(Ping.class, packet -> create(SendOpcode.PING, this::getPing, packet, 2));
    }
 
    /**
@@ -23,9 +23,6 @@ public class PingPacketFactory extends AbstractPacketFactory {
     *
     * @return The packet.
     */
-   protected byte[] getPing(Ping packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
-      mplew.writeShort(SendOpcode.PING.getValue());
-      return mplew.getPacket();
+   protected void getPing(MaplePacketLittleEndianWriter writer, Ping packet) {
    }
 }

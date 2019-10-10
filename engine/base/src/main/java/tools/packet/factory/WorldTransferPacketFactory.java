@@ -21,8 +21,8 @@ public class WorldTransferPacketFactory extends AbstractPacketFactory {
    }
 
    private WorldTransferPacketFactory() {
-      registry.setHandler(WorldTransferError.class, packet -> this.sendWorldTransferRules((WorldTransferError) packet));
-      registry.setHandler(WorldTransferCancel.class, packet -> this.showWorldTransferCancel((WorldTransferCancel) packet));
+      registry.setHandler(WorldTransferError.class, packet -> create(SendOpcode.CASHSHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT, this::sendWorldTransferRules, packet));
+      registry.setHandler(WorldTransferCancel.class, packet -> create(SendOpcode.CANCEL_TRANSFER_WORLD_RESULT, this::showWorldTransferCancel, packet));
    }
 
    /*  1: cannot find char info,
@@ -35,31 +35,25 @@ public class WorldTransferPacketFactory extends AbstractPacketFactory {
             8: must quit family,
             9: unknown error
         */
-   protected byte[] sendWorldTransferRules(WorldTransferError packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CASHSHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT.getValue());
-      mplew.writeInt(0); //ignored
-      mplew.write(packet.error());
-      mplew.writeInt(0);
-      mplew.writeBool(packet.error() == 0); //0 = ?, otherwise list servers
+   protected void sendWorldTransferRules(MaplePacketLittleEndianWriter writer, WorldTransferError packet) {
+      writer.writeInt(0); //ignored
+      writer.write(packet.error());
+      writer.writeInt(0);
+      writer.writeBool(packet.error() == 0); //0 = ?, otherwise list servers
       if (packet.error() == 0) {
          List<World> worlds = Server.getInstance().getWorlds();
-         mplew.writeInt(worlds.size());
+         writer.writeInt(worlds.size());
          for (World world : worlds) {
-            mplew.writeMapleAsciiString(GameConstants.WORLD_NAMES[world.getId()]);
+            writer.writeMapleAsciiString(GameConstants.WORLD_NAMES[world.getId()]);
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] showWorldTransferCancel(WorldTransferCancel packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CANCEL_TRANSFER_WORLD_RESULT.getValue());
-      mplew.writeBool(packet.success());
+   protected void showWorldTransferCancel(MaplePacketLittleEndianWriter writer, WorldTransferCancel packet) {
+      writer.writeBool(packet.success());
       if (!packet.success()) {
-         mplew.write(0);
+         writer.write(0);
       }
-      //mplew.writeMapleAsciiString("Custom message."); //only if ^ != 0
-      return mplew.getPacket();
+      //writer.writeMapleAsciiString("Custom message."); //only if ^ != 0
    }
 }

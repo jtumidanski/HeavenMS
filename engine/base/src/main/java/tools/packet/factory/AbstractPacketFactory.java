@@ -2,13 +2,13 @@ package tools.packet.factory;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import client.MapleCharacter;
@@ -27,6 +27,7 @@ import client.processor.CharacterProcessor;
 import constants.ExpTable;
 import constants.GameConstants;
 import constants.ItemConstants;
+import net.opcodes.SendOpcode;
 import net.server.PlayerCoolDownValueHolder;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
@@ -59,8 +60,21 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       client.announce(create(packetInput));
    }
 
-   public <T extends PacketInput> byte[] create(Function<T, byte[]> creator, PacketInput packetInput) {
+   protected <T extends PacketInput> byte[] create(Function<T, byte[]> creator, PacketInput packetInput) {
       return creator.apply((T) packetInput);
+   }
+
+   protected <T extends PacketInput> byte[] create(SendOpcode mainOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {
+      return create((Function<T, byte[]>) castInput -> {
+         final MaplePacketLittleEndianWriter writer = newWriter(size);
+         writer.writeShort(mainOp.getValue());
+         decorator.accept(writer, castInput);
+         return writer.getPacket();
+      }, packetInput);
+   }
+
+   protected <T extends PacketInput> byte[] create(SendOpcode mainOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput) {
+      return create(mainOp, decorator, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
    }
 
    protected MaplePacketLittleEndianWriter newWriter(int size) {

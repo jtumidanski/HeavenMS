@@ -20,41 +20,38 @@ public class SpecialShopPacketFactory extends AbstractPacketFactory {
    }
 
    private SpecialShopPacketFactory() {
-      registry.setHandler(SetITC.class, packet -> this.setMTS((SetITC) packet));
-      registry.setHandler(SetCashShop.class, packet -> this.setCashShop((SetCashShop) packet));
+      registry.setHandler(SetITC.class, packet -> create(SendOpcode.SET_ITC, this::setMTS, packet));
+      registry.setHandler(SetCashShop.class, packet -> create(SendOpcode.SET_CASH_SHOP, this::setCashShop, packet));
    }
 
-   protected byte[] setMTS(SetITC packet) {
-      return openCashShop(packet.getClient(), true);
+   protected void setMTS(MaplePacketLittleEndianWriter writer, SetITC packet) {
+      openCashShop(writer, packet.getClient(), true);
    }
 
-   protected byte[] setCashShop(SetCashShop packet) {
-      return openCashShop(packet.getClient(), false);
+   protected void setCashShop(MaplePacketLittleEndianWriter writer, SetCashShop packet) {
+      openCashShop(writer, packet.getClient(), false);
    }
 
-   protected byte[] openCashShop(MapleClient c, boolean mts) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(mts ? SendOpcode.SET_ITC.getValue() : SendOpcode.SET_CASH_SHOP.getValue());
-
-      addCharacterInfo(mplew, c.getPlayer());
+   protected void openCashShop(MaplePacketLittleEndianWriter writer, MapleClient c, boolean mts) {
+      addCharacterInfo(writer, c.getPlayer());
 
       if (!mts) {
-         mplew.write(1);
+         writer.write(1);
       }
 
-      mplew.writeMapleAsciiString(c.getAccountName());
+      writer.writeMapleAsciiString(c.getAccountName());
       if (mts) {
-         mplew.write(new byte[]{(byte) 0x88, 19, 0, 0, 7, 0, 0, 0, (byte) 0xF4, 1, 0, 0, (byte) 0x18, 0, 0, 0, (byte) 0xA8, 0, 0, 0, (byte) 0x70, (byte) 0xAA, (byte) 0xA7, (byte) 0xC5, (byte) 0x4E, (byte) 0xC1, (byte) 0xCA, 1});
+         writer.write(new byte[]{(byte) 0x88, 19, 0, 0, 7, 0, 0, 0, (byte) 0xF4, 1, 0, 0, (byte) 0x18, 0, 0, 0, (byte) 0xA8, 0, 0, 0, (byte) 0x70, (byte) 0xAA, (byte) 0xA7, (byte) 0xC5, (byte) 0x4E, (byte) 0xC1, (byte) 0xCA, 1});
       } else {
-         mplew.writeInt(0);
+         writer.writeInt(0);
          List<CashShop.SpecialCashItem> lsci = CashShop.CashItemFactory.getSpecialCashItems();
-         mplew.writeShort(lsci.size());//Guess what
+         writer.writeShort(lsci.size());//Guess what
          for (CashShop.SpecialCashItem sci : lsci) {
-            mplew.writeInt(sci.getSN());
-            mplew.writeInt(sci.getModifier());
-            mplew.write(sci.getInfo());
+            writer.writeInt(sci.getSN());
+            writer.writeInt(sci.getModifier());
+            writer.write(sci.getInfo());
          }
-         mplew.skip(121);
+         writer.skip(121);
 
          List<List<Integer>> mostSellers = c.getWorldServer().getMostSellerCashItems();
          for (int i = 1; i <= 8; i++) {
@@ -62,19 +59,18 @@ public class SpecialShopPacketFactory extends AbstractPacketFactory {
 
             for (int j = 0; j < 2; j++) {
                for (Integer snid : mostSellersTab) {
-                  mplew.writeInt(i);
-                  mplew.writeInt(j);
-                  mplew.writeInt(snid);
+                  writer.writeInt(i);
+                  writer.writeInt(j);
+                  writer.writeInt(snid);
                }
             }
          }
 
-         mplew.writeInt(0);
-         mplew.writeShort(0);
-         mplew.write(0);
-         mplew.writeInt(75);
+         writer.writeInt(0);
+         writer.writeShort(0);
+         writer.write(0);
+         writer.writeInt(75);
       }
-      return mplew.getPacket();
    }
 
 }

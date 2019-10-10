@@ -22,82 +22,58 @@ public class QuestPacketFactory extends AbstractPacketFactory {
    }
 
    private QuestPacketFactory() {
-      registry.setHandler(UpdateQuestInfo.class, packet -> this.updateQuestInfo((UpdateQuestInfo) packet));
-      registry.setHandler(AddQuestTimeLimit.class, packet -> this.addQuestTimeLimit((AddQuestTimeLimit) packet));
-      registry.setHandler(RemoveQuestTimeLimit.class, packet -> this.removeQuestTimeLimit((RemoveQuestTimeLimit) packet));
-      registry.setHandler(QuestFinish.class, packet -> this.updateQuestFinish((QuestFinish) packet));
-      registry.setHandler(QuestError.class, packet -> this.questError((QuestError) packet));
-      registry.setHandler(QuestFailure.class, packet -> this.questFailure((QuestFailure) packet));
-      registry.setHandler(QuestExpire.class, packet -> this.questExpire((QuestExpire) packet));
-      registry.setHandler(ShowQuestComplete.class, packet -> this.getShowQuestCompletion((ShowQuestComplete) packet));
+      registry.setHandler(UpdateQuestInfo.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::updateQuestInfo, packet));
+      registry.setHandler(AddQuestTimeLimit.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::addQuestTimeLimit, packet));
+      registry.setHandler(RemoveQuestTimeLimit.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::removeQuestTimeLimit, packet));
+      registry.setHandler(QuestFinish.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::updateQuestFinish, packet));
+      registry.setHandler(QuestError.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::questError, packet));
+      registry.setHandler(QuestFailure.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::questFailure, packet));
+      registry.setHandler(QuestExpire.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::questExpire, packet));
+      registry.setHandler(ShowQuestComplete.class, packet -> create(SendOpcode.QUEST_CLEAR, this::getShowQuestCompletion, packet));
    }
 
-   protected byte[] updateQuestInfo(UpdateQuestInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
-      mplew.write(8); //0x0A in v95
-      mplew.writeShort(packet.questId());
-      mplew.writeInt(packet.npcId());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void updateQuestInfo(MaplePacketLittleEndianWriter writer, UpdateQuestInfo packet) {
+      writer.write(8); //0x0A in v95
+      writer.writeShort(packet.questId());
+      writer.writeInt(packet.npcId());
+      writer.writeInt(0);
    }
 
-   protected byte[] addQuestTimeLimit(AddQuestTimeLimit packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
-      mplew.write(6);
-      mplew.writeShort(1);//Size but meh, when will there be 2 at the same time? And it won't even replace the old one :)
-      mplew.writeShort(packet.questId());
-      mplew.writeInt(packet.time());
-      return mplew.getPacket();
+   protected void addQuestTimeLimit(MaplePacketLittleEndianWriter writer, AddQuestTimeLimit packet) {
+      writer.write(6);
+      writer.writeShort(1);//Size but meh, when will there be 2 at the same time? And it won't even replace the old one :)
+      writer.writeShort(packet.questId());
+      writer.writeInt(packet.time());
    }
 
-   protected byte[] removeQuestTimeLimit(RemoveQuestTimeLimit packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
-      mplew.write(7);
-      mplew.writeShort(1);//Position
-      mplew.writeShort(packet.questId());
-      return mplew.getPacket();
+   protected void removeQuestTimeLimit(MaplePacketLittleEndianWriter writer, RemoveQuestTimeLimit packet) {
+      writer.write(7);
+      writer.writeShort(1);//Position
+      writer.writeShort(packet.questId());
    }
 
-   protected byte[] updateQuestFinish(QuestFinish packet) { //Check
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue()); //0xF2 in v95
-      mplew.write(8);//0x0A in v95
-      mplew.writeShort(packet.questId());
-      mplew.writeInt(packet.npcId());
-      mplew.writeShort(packet.nextQuestId());
-      return mplew.getPacket();
+   protected void updateQuestFinish(MaplePacketLittleEndianWriter writer, QuestFinish packet) { //Check
+      writer.write(8);//0x0A in v95
+      writer.writeShort(packet.questId());
+      writer.writeInt(packet.npcId());
+      writer.writeShort(packet.nextQuestId());
    }
 
-   protected byte[] questError(QuestError packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
-      mplew.write(0x0A);
-      mplew.writeShort(packet.questId());
-      return mplew.getPacket();
+   protected void questError(MaplePacketLittleEndianWriter writer, QuestError packet) {
+      writer.write(0x0A);
+      writer.writeShort(packet.questId());
    }
 
-   protected byte[] questFailure(QuestFailure packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
-      mplew.write(packet.theType());//0x0B = No meso, 0x0D = Worn by character, 0x0E = Not having the item ?
-      return mplew.getPacket();
+   protected void questFailure(MaplePacketLittleEndianWriter writer, QuestFailure packet) {
+      writer.write(packet.theType());//0x0B = No meso, 0x0D = Worn by character, 0x0E = Not having the item ?
    }
 
-   protected byte[] questExpire(QuestExpire packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.UPDATE_QUEST_INFO.getValue());
-      mplew.write(0x0F);
-      mplew.writeShort(packet.questId());
-      return mplew.getPacket();
+   protected void questExpire(MaplePacketLittleEndianWriter writer, QuestExpire packet) {
+      writer.write(0x0F);
+      writer.writeShort(packet.questId());
    }
 
-   protected byte[] getShowQuestCompletion(ShowQuestComplete packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.QUEST_CLEAR.getValue());
-      mplew.writeShort(packet.questId());
-      return mplew.getPacket();
+   protected void getShowQuestCompletion(MaplePacketLittleEndianWriter writer, ShowQuestComplete packet) {
+      writer.writeShort(packet.questId());
    }
 }

@@ -35,27 +35,27 @@ public class MessagePacketFactory extends AbstractPacketFactory {
    }
 
    private MessagePacketFactory() {
-      registry.setHandler(ServerNotice.class, packet -> this.serverNotice((ServerNotice) packet));
-      registry.setHandler(ServerMessage.class, packet -> this.serverMessage((ServerMessage) packet));
-      registry.setHandler(GetAvatarMegaphone.class, packet -> this.getAvatarMega((GetAvatarMegaphone) packet));
-      registry.setHandler(ClearAvatarMegaphone.class, packet -> this.byeAvatarMega((ClearAvatarMegaphone) packet));
-      registry.setHandler(GachaponMessage.class, packet -> this.gachaponMessage((GachaponMessage) packet));
-      registry.setHandler(ChatText.class, packet -> this.getChatText((ChatText) packet));
-      registry.setHandler(Whisper.class, packet -> this.getWhisper((Whisper) packet));
-      registry.setHandler(WhisperReply.class, packet -> this.getWhisperReply((WhisperReply) packet));
-      registry.setHandler(GiveFameResponse.class, packet -> this.giveFameResponse((GiveFameResponse) packet));
-      registry.setHandler(GiveFameErrorResponse.class, packet -> this.giveFameErrorResponse((GiveFameErrorResponse) packet));
-      registry.setHandler(ReceiveFame.class, packet -> this.receiveFame((ReceiveFame) packet));
-      registry.setHandler(MultiChat.class, packet -> this.multiChat((MultiChat) packet));
-      registry.setHandler(FindReply.class, packet -> this.getFindReply((FindReply) packet));
-      registry.setHandler(BuddyFindReply.class, packet -> this.getBuddyFindReply((BuddyFindReply) packet));
-      registry.setHandler(ItemMegaphone.class, packet -> this.itemMegaphone((ItemMegaphone) packet));
-      registry.setHandler(MultiMegaphone.class, packet -> this.getMultiMegaphone((MultiMegaphone) packet));
-      registry.setHandler(NotifyLevelUp.class, packet -> this.levelUpMessage((NotifyLevelUp) packet));
-      registry.setHandler(NotifyMarriage.class, packet -> this.marriageMessage((NotifyMarriage) packet));
-      registry.setHandler(NotifyJobAdvance.class, packet -> this.jobMessage((NotifyJobAdvance) packet));
-      registry.setHandler(SpouseMessage.class, packet -> this.coupleMessage((SpouseMessage) packet));
-      registry.setHandler(YellowTip.class, packet -> this.sendYellowTip((YellowTip) packet));
+      registry.setHandler(ServerNotice.class, packet -> create(SendOpcode.SERVERMESSAGE, this::serverNotice, packet));
+      registry.setHandler(ServerMessage.class, packet -> create(SendOpcode.SERVERMESSAGE, this::serverMessage, packet));
+      registry.setHandler(GetAvatarMegaphone.class, packet -> create(SendOpcode.SET_AVATAR_MEGAPHONE, this::getAvatarMega, packet));
+      registry.setHandler(ClearAvatarMegaphone.class, packet -> create(SendOpcode.CLEAR_AVATAR_MEGAPHONE, this::byeAvatarMega, packet));
+      registry.setHandler(GachaponMessage.class, packet -> create(SendOpcode.SERVERMESSAGE, this::gachaponMessage, packet));
+      registry.setHandler(ChatText.class, packet -> create(SendOpcode.CHATTEXT, this::getChatText, packet));
+      registry.setHandler(Whisper.class, packet -> create(SendOpcode.WHISPER, this::getWhisper, packet));
+      registry.setHandler(WhisperReply.class, packet -> create(SendOpcode.WHISPER, this::getWhisperReply, packet));
+      registry.setHandler(GiveFameResponse.class, packet -> create(SendOpcode.FAME_RESPONSE, this::giveFameResponse, packet));
+      registry.setHandler(GiveFameErrorResponse.class, packet -> create(SendOpcode.FAME_RESPONSE, this::giveFameErrorResponse, packet));
+      registry.setHandler(ReceiveFame.class, packet -> create(SendOpcode.FAME_RESPONSE, this::receiveFame, packet));
+      registry.setHandler(MultiChat.class, packet -> create(SendOpcode.MULTICHAT, this::multiChat, packet));
+      registry.setHandler(FindReply.class, packet -> create(SendOpcode.WHISPER, this::getFindReply, packet));
+      registry.setHandler(BuddyFindReply.class, packet -> create(SendOpcode.WHISPER, this::getBuddyFindReply, packet));
+      registry.setHandler(ItemMegaphone.class, packet -> create(SendOpcode.SERVERMESSAGE, this::itemMegaphone, packet));
+      registry.setHandler(MultiMegaphone.class, packet -> create(SendOpcode.SERVERMESSAGE, this::getMultiMegaphone, packet));
+      registry.setHandler(NotifyLevelUp.class, packet -> create(SendOpcode.NOTIFY_LEVELUP, this::levelUpMessage, packet));
+      registry.setHandler(NotifyMarriage.class, packet -> create(SendOpcode.NOTIFY_MARRIAGE, this::marriageMessage, packet));
+      registry.setHandler(NotifyJobAdvance.class, packet -> create(SendOpcode.NOTIFY_JOB_CHANGE, this::jobMessage, packet));
+      registry.setHandler(SpouseMessage.class, packet -> create(SendOpcode.SPOUSE_CHAT, this::coupleMessage, packet));
+      registry.setHandler(YellowTip.class, packet -> create(SendOpcode.SET_WEEK_EVENT_MESSAGE, this::sendYellowTip, packet));
    }
 
    /**
@@ -67,8 +67,8 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return The server notice packet.
     */
-   protected byte[] serverNotice(ServerNotice packet) {
-      return serverMessageInternal(packet.theType(), packet.channel(), packet.message(), false, packet.smegaEar(), 0);
+   protected void serverNotice(MaplePacketLittleEndianWriter writer, ServerNotice packet) {
+      serverMessageInternal(writer, packet.theType(), packet.channel(), packet.message(), false, packet.smegaEar(), 0);
    }
 
    /**
@@ -76,8 +76,8 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return The server message packet.
     */
-   protected byte[] serverMessage(ServerMessage packet) {
-      return serverMessageInternal(4, (byte) 0, packet.message(), true, false, 0);
+   protected void serverMessage(MaplePacketLittleEndianWriter writer, ServerMessage packet) {
+      serverMessageInternal(writer, 4, (byte) 0, packet.message(), true, false, 0);
    }
 
    /**
@@ -93,23 +93,20 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * @param servermessage Is this a scrolling ticker?
     * @return The server notice packet.
     */
-   protected byte[] serverMessageInternal(int type, int channel, String message, boolean servermessage, boolean megaEar, int npc) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(type);
+   protected void serverMessageInternal(MaplePacketLittleEndianWriter writer, int type, int channel, String message, boolean servermessage, boolean megaEar, int npc) {
+      writer.write(type);
       if (servermessage) {
-         mplew.write(1);
+         writer.write(1);
       }
-      mplew.writeMapleAsciiString(message);
+      writer.writeMapleAsciiString(message);
       if (type == 3) {
-         mplew.write(channel - 1); // channel
-         mplew.writeBool(megaEar);
+         writer.write(channel - 1); // channel
+         writer.writeBool(megaEar);
       } else if (type == 6) {
-         mplew.writeInt(0);
+         writer.writeInt(0);
       } else if (type == 7) { // npc
-         mplew.writeInt(npc);
+         writer.writeInt(npc);
       }
-      return mplew.getPacket();
    }
 
    /**
@@ -117,29 +114,23 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] getAvatarMega(GetAvatarMegaphone packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_AVATAR_MEGAPHONE.getValue());
-      mplew.writeInt(packet.getItemId());
-      mplew.writeMapleAsciiString(packet.getMedal() + packet.getCharacter().getName());
+   protected void getAvatarMega(MaplePacketLittleEndianWriter writer, GetAvatarMegaphone packet) {
+      writer.writeInt(packet.getItemId());
+      writer.writeMapleAsciiString(packet.getMedal() + packet.getCharacter().getName());
       for (String s : packet.getMessages()) {
-         mplew.writeMapleAsciiString(s);
+         writer.writeMapleAsciiString(s);
       }
-      mplew.writeInt(packet.getChannel() - 1); // channel
-      mplew.writeBool(packet.isEar());
-      addCharLook(mplew, packet.getCharacter(), true);
-      return mplew.getPacket();
+      writer.writeInt(packet.getChannel() - 1); // channel
+      writer.writeBool(packet.isEar());
+      addCharLook(writer, packet.getCharacter(), true);
    }
 
    /*
     * Sends a packet to remove the tiger megaphone
     * @return
     */
-   protected byte[] byeAvatarMega(ClearAvatarMegaphone packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CLEAR_AVATAR_MEGAPHONE.getValue());
-      mplew.write(1);
-      return mplew.getPacket();
+   protected void byeAvatarMega(MaplePacketLittleEndianWriter writer, ClearAvatarMegaphone packet) {
+      writer.write(1);
    }
 
    /**
@@ -147,15 +138,12 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] gachaponMessage(GachaponMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(0x0B);
-      mplew.writeMapleAsciiString(packet.characterName() + " : got a(n)");
-      mplew.writeInt(0); //random?
-      mplew.writeMapleAsciiString(packet.town());
-      addItemInfo(mplew, packet.item(), true);
-      return mplew.getPacket();
+   protected void gachaponMessage(MaplePacketLittleEndianWriter writer, GachaponMessage packet) {
+      writer.write(0x0B);
+      writer.writeMapleAsciiString(packet.characterName() + " : got a(n)");
+      writer.writeInt(0); //random?
+      writer.writeMapleAsciiString(packet.town());
+      addItemInfo(writer, packet.item(), true);
    }
 
    /**
@@ -163,47 +151,35 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return The general chat packet.
     */
-   protected byte[] getChatText(ChatText packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CHATTEXT.getValue());
-      mplew.writeInt(packet.characterIdFrom());
-      mplew.writeBool(packet.gm());
-      mplew.writeMapleAsciiString(packet.text());
-      mplew.write(packet.show());
-      return mplew.getPacket();
+   protected void getChatText(MaplePacketLittleEndianWriter writer, ChatText packet) {
+      writer.writeInt(packet.characterIdFrom());
+      writer.writeBool(packet.gm());
+      writer.writeMapleAsciiString(packet.text());
+      writer.write(packet.show());
    }
 
-   protected byte[] getWhisper(Whisper packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(0x12);
-      mplew.writeMapleAsciiString(packet.sender());
-      mplew.writeShort(packet.channel() - 1); // I guess this is the channel
-      mplew.writeMapleAsciiString(packet.text());
-      return mplew.getPacket();
+   protected void getWhisper(MaplePacketLittleEndianWriter writer, Whisper packet) {
+      writer.write(0x12);
+      writer.writeMapleAsciiString(packet.sender());
+      writer.writeShort(packet.channel() - 1); // I guess this is the channel
+      writer.writeMapleAsciiString(packet.text());
    }
 
    /**
     * @return the MaplePacket
     */
-   protected byte[] getWhisperReply(WhisperReply packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(0x0A); // whisper?
-      mplew.writeMapleAsciiString(packet.target());
-      mplew.write(packet.reply());
-      return mplew.getPacket();
+   protected void getWhisperReply(MaplePacketLittleEndianWriter writer, WhisperReply packet) {
+      writer.write(0x0A); // whisper?
+      writer.writeMapleAsciiString(packet.target());
+      writer.write(packet.reply());
    }
 
-   protected byte[] giveFameResponse(GiveFameResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
-      mplew.write(0);
-      mplew.writeMapleAsciiString(packet.characterName());
-      mplew.write(packet.mode());
-      mplew.writeShort(packet.newFame());
-      mplew.writeShort(0);
-      return mplew.getPacket();
+   protected void giveFameResponse(MaplePacketLittleEndianWriter writer, GiveFameResponse packet) {
+      writer.write(0);
+      writer.writeMapleAsciiString(packet.characterName());
+      writer.write(packet.mode());
+      writer.writeShort(packet.newFame());
+      writer.writeShort(0);
    }
 
    /**
@@ -216,20 +192,14 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] giveFameErrorResponse(GiveFameErrorResponse packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
-      mplew.write(packet.status());
-      return mplew.getPacket();
+   protected void giveFameErrorResponse(MaplePacketLittleEndianWriter writer, GiveFameErrorResponse packet) {
+      writer.write(packet.status());
    }
 
-   protected byte[] receiveFame(ReceiveFame packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FAME_RESPONSE.getValue());
-      mplew.write(5);
-      mplew.writeMapleAsciiString(packet.characterNameFrom());
-      mplew.write(packet.mode());
-      return mplew.getPacket();
+   protected void receiveFame(MaplePacketLittleEndianWriter writer, ReceiveFame packet) {
+      writer.write(5);
+      writer.writeMapleAsciiString(packet.characterNameFrom());
+      writer.write(packet.mode());
    }
 
    /**
@@ -237,76 +207,61 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] multiChat(MultiChat packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MULTICHAT.getValue());
-      mplew.write(packet.mode());
-      mplew.writeMapleAsciiString(packet.name());
-      mplew.writeMapleAsciiString(packet.text());
-      return mplew.getPacket();
+   protected void multiChat(MaplePacketLittleEndianWriter writer, MultiChat packet) {
+      writer.write(packet.mode());
+      writer.writeMapleAsciiString(packet.name());
+      writer.writeMapleAsciiString(packet.text());
    }
 
-   protected byte[] getFindReply(FindReply packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(9);
-      mplew.writeMapleAsciiString(packet.target());
-      mplew.write(packet.mapType()); // 0: mts 1: map 2: cs
-      mplew.writeInt(packet.mapId()); // -1 if mts, cs
+   protected void getFindReply(MaplePacketLittleEndianWriter writer, FindReply packet) {
+      writer.write(9);
+      writer.writeMapleAsciiString(packet.target());
+      writer.write(packet.mapType()); // 0: mts 1: map 2: cs
+      writer.writeInt(packet.mapId()); // -1 if mts, cs
       if (packet.mapType() == 1) {
-         mplew.write(new byte[8]);
+         writer.write(new byte[8]);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getBuddyFindReply(BuddyFindReply packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.WHISPER.getValue());
-      mplew.write(72);
-      mplew.writeMapleAsciiString(packet.target());
-      mplew.write(packet.mapType()); // 0: mts 1: map 2: cs
-      mplew.writeInt(packet.mapId()); // -1 if mts, cs
+   protected void getBuddyFindReply(MaplePacketLittleEndianWriter writer, BuddyFindReply packet) {
+      writer.write(72);
+      writer.writeMapleAsciiString(packet.target());
+      writer.write(packet.mapType()); // 0: mts 1: map 2: cs
+      writer.writeInt(packet.mapId()); // -1 if mts, cs
       if (packet.mapType() == 1) {
-         mplew.write(new byte[8]);
+         writer.write(new byte[8]);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] itemMegaphone(ItemMegaphone packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(8);
-      mplew.writeMapleAsciiString(packet.message());
-      mplew.write(packet.channel() - 1);
-      mplew.write(packet.whisper() ? 1 : 0);
+   protected void itemMegaphone(MaplePacketLittleEndianWriter writer, ItemMegaphone packet) {
+      writer.write(8);
+      writer.writeMapleAsciiString(packet.message());
+      writer.write(packet.channel() - 1);
+      writer.write(packet.whisper() ? 1 : 0);
       if (packet.item() == null) {
-         mplew.write(0);
+         writer.write(0);
       } else {
-         mplew.write(packet.item().position());
-         addItemInfo(mplew, packet.item(), true);
+         writer.write(packet.item().position());
+         addItemInfo(writer, packet.item(), true);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getMultiMegaphone(MultiMegaphone packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SERVERMESSAGE.getValue());
-      mplew.write(0x0A);
+   protected void getMultiMegaphone(MaplePacketLittleEndianWriter writer, MultiMegaphone packet) {
+      writer.write(0x0A);
       if (packet.messages()[0] != null) {
-         mplew.writeMapleAsciiString(packet.messages()[0]);
+         writer.writeMapleAsciiString(packet.messages()[0]);
       }
-      mplew.write(packet.messages().length);
+      writer.write(packet.messages().length);
       for (int i = 1; i < packet.messages().length; i++) {
          if (packet.messages()[i] != null) {
-            mplew.writeMapleAsciiString(packet.messages()[i]);
+            writer.writeMapleAsciiString(packet.messages()[i]);
          }
       }
       for (int i = 0; i < 10; i++) {
-         mplew.write(packet.channel() - 1);
+         writer.write(packet.channel() - 1);
       }
-      mplew.write(packet.showEar() ? 1 : 0);
-      mplew.write(1);
-      return mplew.getPacket();
+      writer.write(packet.showEar() ? 1 : 0);
+      writer.write(1);
    }
 
    /**
@@ -316,14 +271,10 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * ?.<br> - The Reps you have received from ? will be reduced in half. 1:
     * <Family> ? has reached Lv. ?.<br> 2: <Guild> ? has reached Lv. ?.<br>
     */
-   protected byte[] levelUpMessage(NotifyLevelUp packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_LEVELUP.getValue());
-      mplew.write(packet.theType());
-      mplew.writeInt(packet.level());
-      mplew.writeMapleAsciiString(packet.characterName());
-
-      return mplew.getPacket();
+   protected void levelUpMessage(MaplePacketLittleEndianWriter writer, NotifyLevelUp packet) {
+      writer.write(packet.theType());
+      writer.writeInt(packet.level());
+      writer.writeMapleAsciiString(packet.characterName());
    }
 
    /**
@@ -333,13 +284,9 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * Please congratulate them.<br> 1: <Family ? is now married. Please
     * congratulate them.<br>
     */
-   protected byte[] marriageMessage(NotifyMarriage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_MARRIAGE.getValue());
-      mplew.write(packet.theType());  // 0: guild, 1: family
-      mplew.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
-
-      return mplew.getPacket();
+   protected void marriageMessage(MaplePacketLittleEndianWriter writer, NotifyMarriage packet) {
+      writer.write(packet.theType());  // 0: guild, 1: family
+      writer.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
    }
 
    /**
@@ -348,34 +295,24 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * Possible values for <code>type</code>:<br> 0: <Guild ? has advanced to
     * a(an) ?.<br> 1: <Family ? has advanced to a(an) ?.<br>
     */
-   protected byte[] jobMessage(NotifyJobAdvance packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NOTIFY_JOB_CHANGE.getValue());
-      mplew.write(packet.theType());
-      mplew.writeInt(packet.job()); //Why fking int?
-      mplew.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
-
-      return mplew.getPacket();
+   protected void jobMessage(MaplePacketLittleEndianWriter writer, NotifyJobAdvance packet) {
+      writer.write(packet.theType());
+      writer.writeInt(packet.job()); //Why fking int?
+      writer.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
    }
 
-   protected byte[] coupleMessage(SpouseMessage packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SPOUSE_CHAT.getValue());
-      mplew.write(packet.spouse() ? 5 : 4); // v2 = CInPacket::Decode1(a1) - 4;
+   protected void coupleMessage(MaplePacketLittleEndianWriter writer, SpouseMessage packet) {
+      writer.write(packet.spouse() ? 5 : 4); // v2 = CInPacket::Decode1(a1) - 4;
       if (packet.spouse()) { // if ( v2 ) {
-         mplew.writeMapleAsciiString(packet.fiance());
+         writer.writeMapleAsciiString(packet.fiance());
       }
-      mplew.write(packet.spouse() ? 5 : 1);
-      mplew.writeMapleAsciiString(packet.text());
-      return mplew.getPacket();
+      writer.write(packet.spouse() ? 5 : 1);
+      writer.writeMapleAsciiString(packet.text());
    }
 
-   protected byte[] sendYellowTip(YellowTip packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_WEEK_EVENT_MESSAGE.getValue());
-      mplew.write(0xFF);
-      mplew.writeMapleAsciiString(packet.tip());
-      mplew.writeShort(0);
-      return mplew.getPacket();
+   protected void sendYellowTip(MaplePacketLittleEndianWriter writer, YellowTip packet) {
+      writer.write(0xFF);
+      writer.writeMapleAsciiString(packet.tip());
+      writer.writeShort(0);
    }
 }

@@ -16,19 +16,16 @@ public class GuestLoginPacketFactory extends AbstractPacketFactory {
    }
 
    private GuestLoginPacketFactory() {
-      registry.setHandler(GuestTOS.class, packet -> this.sendGuestTOS((GuestTOS) packet));
+      registry.setHandler(GuestTOS.class, packet -> create(SendOpcode.GUEST_ID_LOGIN, this::sendGuestTOS, packet));
    }
 
-   protected byte[] sendGuestTOS(GuestTOS packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.GUEST_ID_LOGIN.getValue());
-      mplew.writeShort(0x100);
-      mplew.writeInt(Randomizer.nextInt(999999));
-      mplew.writeLong(0);
-      mplew.writeLong(getTime(-2));
-      mplew.writeLong(getTime(System.currentTimeMillis()));
-      mplew.writeInt(0);
-      mplew.writeMapleAsciiString("http://maplesolaxia.com");
-      return mplew.getPacket();
+   protected void sendGuestTOS(MaplePacketLittleEndianWriter writer, GuestTOS packet) {
+      writer.writeShort(0x100);
+      writer.writeInt(Randomizer.nextInt(999999));
+      writer.writeLong(0);
+      writer.writeLong(getTime(-2));
+      writer.writeLong(getTime(System.currentTimeMillis()));
+      writer.writeInt(0);
+      writer.writeMapleAsciiString("http://maplesolaxia.com");
    }
 }

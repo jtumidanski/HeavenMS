@@ -21,73 +21,58 @@ public class BuddyPacketFactory extends AbstractPacketFactory {
    }
 
    private BuddyPacketFactory() {
-      registry.setHandler(UpdateBuddyList.class, packet -> this.updateBuddylist((UpdateBuddyList) packet));
-      registry.setHandler(BuddyListMessage.class, packet -> this.buddylistMessage((BuddyListMessage) packet));
-      registry.setHandler(RequestAddBuddy.class, packet -> this.requestBuddylistAdd((RequestAddBuddy) packet));
-      registry.setHandler(UpdateBuddyChannel.class, packet -> this.updateBuddyChannel((UpdateBuddyChannel) packet));
-      registry.setHandler(UpdateBuddyCapacity.class, packet -> this.updateBuddyCapacity((UpdateBuddyCapacity) packet));
+      registry.setHandler(UpdateBuddyList.class, packet -> create(SendOpcode.BUDDYLIST, this::updateBuddylist, packet));
+      registry.setHandler(BuddyListMessage.class, packet -> create(SendOpcode.BUDDYLIST, this::buddylistMessage, packet));
+      registry.setHandler(RequestAddBuddy.class, packet -> create(SendOpcode.BUDDYLIST, this::requestBuddylistAdd, packet));
+      registry.setHandler(UpdateBuddyChannel.class, packet -> create(SendOpcode.BUDDYLIST, this::updateBuddyChannel, packet));
+      registry.setHandler(UpdateBuddyCapacity.class, packet -> create(SendOpcode.BUDDYLIST, this::updateBuddyCapacity, packet));
    }
 
-   protected byte[] updateBuddylist(UpdateBuddyList packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BUDDYLIST.getValue());
-      mplew.write(7);
-      mplew.write(packet.buddies().size());
+   protected void updateBuddylist(MaplePacketLittleEndianWriter writer, UpdateBuddyList packet) {
+      writer.write(7);
+      writer.write(packet.buddies().size());
       for (BuddyListEntry buddy : packet.buddies()) {
          if (buddy.visible()) {
-            mplew.writeInt(buddy.characterId()); // cid
-            mplew.writeAsciiString(StringUtil.getRightPaddedStr(buddy.name(), '\0', 13));
-            mplew.write(0); // opposite status
-            mplew.writeInt(buddy.channel() - 1);
-            mplew.writeAsciiString(StringUtil.getRightPaddedStr(buddy.group(), '\0', 13));
-            mplew.writeInt(0);//mapid?
+            writer.writeInt(buddy.characterId()); // cid
+            writer.writeAsciiString(StringUtil.getRightPaddedStr(buddy.name(), '\0', 13));
+            writer.write(0); // opposite status
+            writer.writeInt(buddy.channel() - 1);
+            writer.writeAsciiString(StringUtil.getRightPaddedStr(buddy.group(), '\0', 13));
+            writer.writeInt(0);//mapid?
          }
       }
       for (int x = 0; x < packet.buddies().size(); x++) {
-         mplew.writeInt(0);//mapid?
+         writer.writeInt(0);//mapid?
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] buddylistMessage(BuddyListMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BUDDYLIST.getValue());
-      mplew.write(packet.message());
-      return mplew.getPacket();
+   protected void buddylistMessage(MaplePacketLittleEndianWriter writer, BuddyListMessage packet) {
+      writer.write(packet.message());
    }
 
-   protected byte[] requestBuddylistAdd(RequestAddBuddy packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BUDDYLIST.getValue());
-      mplew.write(9);
-      mplew.writeInt(packet.characterIdFrom());
-      mplew.writeMapleAsciiString(packet.characterNameFrom());
-      mplew.writeInt(packet.characterIdFrom());
-      mplew.writeAsciiString(StringUtil.getRightPaddedStr(packet.characterNameFrom(), '\0', 11));
-      mplew.write(0x09);
-      mplew.write(0xf0);
-      mplew.write(0x01);
-      mplew.writeInt(0x0f);
-      mplew.writeNullTerminatedAsciiString("Default Group");
-      mplew.writeInt(packet.characterIdTo());
-      return mplew.getPacket();
+   protected void requestBuddylistAdd(MaplePacketLittleEndianWriter writer, RequestAddBuddy packet) {
+      writer.write(9);
+      writer.writeInt(packet.characterIdFrom());
+      writer.writeMapleAsciiString(packet.characterNameFrom());
+      writer.writeInt(packet.characterIdFrom());
+      writer.writeAsciiString(StringUtil.getRightPaddedStr(packet.characterNameFrom(), '\0', 11));
+      writer.write(0x09);
+      writer.write(0xf0);
+      writer.write(0x01);
+      writer.writeInt(0x0f);
+      writer.writeNullTerminatedAsciiString("Default Group");
+      writer.writeInt(packet.characterIdTo());
    }
 
-   protected byte[] updateBuddyChannel(UpdateBuddyChannel packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BUDDYLIST.getValue());
-      mplew.write(0x14);
-      mplew.writeInt(packet.characterId());
-      mplew.write(0);
-      mplew.writeInt(packet.channel());
-      return mplew.getPacket();
+   protected void updateBuddyChannel(MaplePacketLittleEndianWriter writer, UpdateBuddyChannel packet) {
+      writer.write(0x14);
+      writer.writeInt(packet.characterId());
+      writer.write(0);
+      writer.writeInt(packet.channel());
    }
 
-   protected byte[] updateBuddyCapacity(UpdateBuddyCapacity packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BUDDYLIST.getValue());
-      mplew.write(0x15);
-      mplew.write(packet.capacity());
-      return mplew.getPacket();
+   protected void updateBuddyCapacity(MaplePacketLittleEndianWriter writer, UpdateBuddyCapacity packet) {
+      writer.write(0x15);
+      writer.write(packet.capacity());
    }
 }

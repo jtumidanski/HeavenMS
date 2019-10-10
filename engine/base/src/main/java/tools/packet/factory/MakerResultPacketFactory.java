@@ -19,75 +19,63 @@ public class MakerResultPacketFactory extends AbstractPacketFactory {
    }
 
    private MakerResultPacketFactory() {
-      registry.setHandler(MakerResult.class, packet -> this.makerResult((MakerResult) packet));
-      registry.setHandler(MakerCrystalResult.class, packet -> this.makerResultCrystal((MakerCrystalResult) packet));
-      registry.setHandler(MakerResultDesynth.class, packet -> this.makerResultDesynth((MakerResultDesynth) packet));
-      registry.setHandler(MakerEnableActions.class, packet -> this.makerEnableActions((MakerEnableActions) packet));
+      registry.setHandler(MakerResult.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerResult, packet));
+      registry.setHandler(MakerCrystalResult.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerResultCrystal, packet));
+      registry.setHandler(MakerResultDesynth.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerResultDesynth, packet));
+      registry.setHandler(MakerEnableActions.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerEnableActions, packet));
    }
 
    // MAKER_RESULT packets thanks to Arnah (Vertisy)
-   protected byte[] makerResult(MakerResult packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(packet.success() ? 0 : 1); // 0 = success, 1 = fail
-      mplew.writeInt(1); // 1 or 2 doesn't matter, same methods
-      mplew.writeBool(!packet.success());
+   protected void makerResult(MaplePacketLittleEndianWriter writer, MakerResult packet) {
+      writer.writeInt(packet.success() ? 0 : 1); // 0 = success, 1 = fail
+      writer.writeInt(1); // 1 or 2 doesn't matter, same methods
+      writer.writeBool(!packet.success());
       if (packet.success()) {
-         mplew.writeInt(packet.itemMade());
-         mplew.writeInt(packet.itemCount());
+         writer.writeInt(packet.itemMade());
+         writer.writeInt(packet.itemCount());
       }
-      mplew.writeInt(packet.itemsLost().size()); // Loop
+      writer.writeInt(packet.itemsLost().size()); // Loop
       for (Pair<Integer, Integer> item : packet.itemsLost()) {
-         mplew.writeInt(item.getLeft());
-         mplew.writeInt(item.getRight());
+         writer.writeInt(item.getLeft());
+         writer.writeInt(item.getRight());
       }
-      mplew.writeInt(packet.incBuffGems().size());
+      writer.writeInt(packet.incBuffGems().size());
       for (Integer gem : packet.incBuffGems()) {
-         mplew.writeInt(gem);
+         writer.writeInt(gem);
       }
       if (packet.catalystId() != -1) {
-         mplew.write(1); // stimulator
-         mplew.writeInt(packet.catalystId());
+         writer.write(1); // stimulator
+         writer.writeInt(packet.catalystId());
       } else {
-         mplew.write(0);
+         writer.write(0);
       }
 
-      mplew.writeInt(packet.mesos());
-      return mplew.getPacket();
+      writer.writeInt(packet.mesos());
    }
 
-   protected byte[] makerResultCrystal(MakerCrystalResult packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(0); // Always successful!
-      mplew.writeInt(3); // Monster Crystal
-      mplew.writeInt(packet.itemIdGained());
-      mplew.writeInt(packet.itemIdLost());
-      return mplew.getPacket();
+   protected void makerResultCrystal(MaplePacketLittleEndianWriter writer, MakerCrystalResult packet) {
+      writer.writeInt(0); // Always successful!
+      writer.writeInt(3); // Monster Crystal
+      writer.writeInt(packet.itemIdGained());
+      writer.writeInt(packet.itemIdLost());
    }
 
-   protected byte[] makerResultDesynth(MakerResultDesynth packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(0); // Always successful!
-      mplew.writeInt(4); // Mode Desynth
-      mplew.writeInt(packet.itemId()); // Item desynthed
-      mplew.writeInt(packet.itemsGained().size()); // Loop of items gained, (int, int)
+   protected void makerResultDesynth(MaplePacketLittleEndianWriter writer, MakerResultDesynth packet) {
+      writer.writeInt(0); // Always successful!
+      writer.writeInt(4); // Mode Desynth
+      writer.writeInt(packet.itemId()); // Item desynthed
+      writer.writeInt(packet.itemsGained().size()); // Loop of items gained, (int, int)
       for (Pair<Integer, Integer> item : packet.itemsGained()) {
-         mplew.writeInt(item.getLeft());
-         mplew.writeInt(item.getRight());
+         writer.writeInt(item.getLeft());
+         writer.writeInt(item.getRight());
       }
-      mplew.writeInt(packet.mesos()); // Mesos spent.
-      return mplew.getPacket();
+      writer.writeInt(packet.mesos()); // Mesos spent.
    }
 
-   protected byte[] makerEnableActions(MakerEnableActions packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAKER_RESULT.getValue());
-      mplew.writeInt(0); // Always successful!
-      mplew.writeInt(0); // Monster Crystal
-      mplew.writeInt(0);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void makerEnableActions(MaplePacketLittleEndianWriter writer, MakerEnableActions packet) {
+      writer.writeInt(0); // Always successful!
+      writer.writeInt(0); // Monster Crystal
+      writer.writeInt(0);
+      writer.writeInt(0);
    }
 }

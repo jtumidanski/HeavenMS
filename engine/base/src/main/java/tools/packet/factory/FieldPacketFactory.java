@@ -34,48 +34,42 @@ public class FieldPacketFactory extends AbstractPacketFactory {
    }
 
    private FieldPacketFactory() {
-      registry.setHandler(ShowBossHP.class, packet -> this.showBossHP((ShowBossHP) packet));
-      registry.setHandler(CustomShowBossHP.class, packet -> this.customShowBossHP((CustomShowBossHP) packet));
-      registry.setHandler(EnvironmentChange.class, packet -> this.environmentChange((EnvironmentChange) packet));
-      registry.setHandler(MapEffect.class, packet -> this.mapEffect((MapEffect) packet));
-      registry.setHandler(MapSound.class, packet -> this.mapSound((MapSound) packet));
-      registry.setHandler(DojoAnimation.class, packet -> this.sendDojoAnimation((DojoAnimation) packet));
-      registry.setHandler(TrembleEffect.class, packet -> this.trembleEffect((TrembleEffect) packet));
-      registry.setHandler(EnvironmentMove.class, packet -> this.environmentMove((EnvironmentMove) packet));
-      registry.setHandler(EnvironmentMoveList.class, packet -> this.environmentMoveList((EnvironmentMoveList) packet));
-      registry.setHandler(BlowWeather.class, packet -> this.startMapEffect((BlowWeather) packet));
-      registry.setHandler(RemoveWeather.class, packet -> this.removeMapEffect((RemoveWeather) packet));
-      registry.setHandler(ChangeBackgroundEffect.class, packet -> this.changeBackgroundEffect((ChangeBackgroundEffect) packet));
-      registry.setHandler(ForcedEquip.class, packet -> this.showForcedEquip((ForcedEquip) packet));
-      registry.setHandler(ForcedStatReset.class, packet -> this.resetForcedStats((ForcedStatReset) packet));
-      registry.setHandler(ForcedStatSet.class, packet -> this.aranGodlyStats((ForcedStatSet) packet));
-      registry.setHandler(CrimsonBalrogBoat.class, packet -> this.crogBoatPacket((CrimsonBalrogBoat) packet));
-      registry.setHandler(Boat.class, packet -> this.boatPacket((Boat) packet));
+      registry.setHandler(ShowBossHP.class, packet -> create(SendOpcode.FIELD_EFFECT, this::showBossHP, packet));
+      registry.setHandler(CustomShowBossHP.class, packet -> create(SendOpcode.FIELD_EFFECT, this::customShowBossHP, packet));
+      registry.setHandler(EnvironmentChange.class, packet -> create(SendOpcode.FIELD_EFFECT, this::environmentChange, packet));
+      registry.setHandler(MapEffect.class, packet -> create(SendOpcode.FIELD_EFFECT, this::mapEffect, packet));
+      registry.setHandler(MapSound.class, packet -> create(SendOpcode.FIELD_EFFECT, this::mapSound, packet));
+      registry.setHandler(DojoAnimation.class, packet -> create(SendOpcode.FIELD_EFFECT, this::sendDojoAnimation, packet));
+      registry.setHandler(TrembleEffect.class, packet -> create(SendOpcode.FIELD_EFFECT, this::trembleEffect, packet));
+      registry.setHandler(EnvironmentMove.class, packet -> create(SendOpcode.FIELD_OBSTACLE_ONOFF, this::environmentMove, packet));
+      registry.setHandler(EnvironmentMoveList.class, packet -> create(SendOpcode.FIELD_OBSTACLE_ONOFF_LIST, this::environmentMoveList, packet));
+      registry.setHandler(BlowWeather.class, packet -> create(SendOpcode.BLOW_WEATHER, this::startMapEffect, packet));
+      registry.setHandler(RemoveWeather.class, packet -> create(SendOpcode.BLOW_WEATHER, this::removeMapEffect, packet));
+      registry.setHandler(ChangeBackgroundEffect.class, packet -> create(SendOpcode.SET_BACK_EFFECT, this::changeBackgroundEffect, packet));
+      registry.setHandler(ForcedEquip.class, packet -> create(SendOpcode.FORCED_MAP_EQUIP, this::showForcedEquip, packet));
+      registry.setHandler(ForcedStatReset.class, packet -> create(SendOpcode.FORCED_STAT_RESET, this::resetForcedStats, packet, 2));
+      registry.setHandler(ForcedStatSet.class, packet -> create(SendOpcode.FORCED_STAT_SET, this::aranGodlyStats, packet));
+      registry.setHandler(CrimsonBalrogBoat.class, packet -> create(SendOpcode.CONTI_MOVE, this::crogBoatPacket, packet));
+      registry.setHandler(Boat.class, packet -> create(SendOpcode.CONTI_STATE, this::boatPacket, packet));
    }
 
-   protected byte[] showBossHP(ShowBossHP packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(5);
-      mplew.writeInt(packet.objectId());
-      mplew.writeInt(packet.currentHP());
-      mplew.writeInt(packet.maximumHP());
-      mplew.write(packet.tagColor());
-      mplew.write(packet.tagBackgroundColor());
-      return mplew.getPacket();
+   protected void showBossHP(MaplePacketLittleEndianWriter writer, ShowBossHP packet) {
+      writer.write(5);
+      writer.writeInt(packet.objectId());
+      writer.writeInt(packet.currentHP());
+      writer.writeInt(packet.maximumHP());
+      writer.write(packet.tagColor());
+      writer.write(packet.tagBackgroundColor());
    }
 
-   protected byte[] customShowBossHP(CustomShowBossHP packet) {
+   protected void customShowBossHP(MaplePacketLittleEndianWriter writer, CustomShowBossHP packet) {
       Pair<Integer, Integer> customHP = normalizedCustomMaxHP(packet.currentHP(), packet.maximumHP());
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(packet.call());
-      mplew.writeInt(packet.objectId());
-      mplew.writeInt(customHP.left);
-      mplew.writeInt(customHP.right);
-      mplew.write(packet.tagColor());
-      mplew.write(packet.tagBackgroundColor());
-      return mplew.getPacket();
+      writer.write(packet.call());
+      writer.writeInt(packet.objectId());
+      writer.writeInt(customHP.left);
+      writer.writeInt(customHP.right);
+      writer.write(packet.tagColor());
+      writer.write(packet.tagBackgroundColor());
    }
 
    protected Pair<Integer, Integer> normalizedCustomMaxHP(long currHP, long maxHP) {
@@ -91,89 +85,59 @@ public class FieldPacketFactory extends AbstractPacketFactory {
       return new Pair<>(sendHP, sendMaxHP);
    }
 
-   protected byte[] environmentChange(EnvironmentChange packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(packet.mode());
-      mplew.writeMapleAsciiString(packet.env());
-      return mplew.getPacket();
+   protected void environmentChange(MaplePacketLittleEndianWriter writer, EnvironmentChange packet) {
+      writer.write(packet.mode());
+      writer.writeMapleAsciiString(packet.env());
    }
 
-   protected byte[] mapEffect(MapEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(3);
-      mplew.writeMapleAsciiString(packet.path());
-      return mplew.getPacket();
+   protected void mapEffect(MaplePacketLittleEndianWriter writer, MapEffect packet) {
+      writer.write(3);
+      writer.writeMapleAsciiString(packet.path());
    }
 
-   protected byte[] mapSound(MapSound packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(4);
-      mplew.writeMapleAsciiString(packet.path());
-      return mplew.getPacket();
+   protected void mapSound(MaplePacketLittleEndianWriter writer, MapSound packet) {
+      writer.write(4);
+      writer.writeMapleAsciiString(packet.path());
    }
 
-   protected byte[] sendDojoAnimation(DojoAnimation packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(packet.firstByte());
-      mplew.writeMapleAsciiString(packet.animation());
-      return mplew.getPacket();
+   protected void sendDojoAnimation(MaplePacketLittleEndianWriter writer, DojoAnimation packet) {
+      writer.write(packet.firstByte());
+      writer.writeMapleAsciiString(packet.animation());
    }
 
-   protected byte[] trembleEffect(TrembleEffect packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_EFFECT.getValue());
-      mplew.write(1);
-      mplew.write(packet.theType());
-      mplew.writeInt(packet.delay());
-      return mplew.getPacket();
+   protected void trembleEffect(MaplePacketLittleEndianWriter writer, TrembleEffect packet) {
+      writer.write(1);
+      writer.write(packet.theType());
+      writer.writeInt(packet.delay());
    }
 
-   protected byte[] environmentMove(EnvironmentMove packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_OBSTACLE_ONOFF.getValue());
-      mplew.writeMapleAsciiString(packet.environment());
-      mplew.writeInt(packet.mode());   // 0: stop and back to start, 1: move
-      return mplew.getPacket();
+   protected void environmentMove(MaplePacketLittleEndianWriter writer, EnvironmentMove packet) {
+      writer.writeMapleAsciiString(packet.environment());
+      writer.writeInt(packet.mode());   // 0: stop and back to start, 1: move
    }
 
-   protected byte[] environmentMoveList(EnvironmentMoveList packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_OBSTACLE_ONOFF_LIST.getValue());
-      mplew.writeInt(packet.getEnvironmentMoveList().size());
+   protected void environmentMoveList(MaplePacketLittleEndianWriter writer, EnvironmentMoveList packet) {
+      writer.writeInt(packet.getEnvironmentMoveList().size());
       for (Map.Entry<String, Integer> envMove : packet.getEnvironmentMoveList()) {
-         mplew.writeMapleAsciiString(envMove.getKey());
-         mplew.writeInt(envMove.getValue());
+         writer.writeMapleAsciiString(envMove.getKey());
+         writer.writeInt(envMove.getValue());
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] environmentMoveReset() {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FIELD_OBSTACLE_ALL_RESET.getValue());
-      return mplew.getPacket();
+   protected void environmentMoveReset(MaplePacketLittleEndianWriter writer) {
    }
 
-   protected byte[] startMapEffect(BlowWeather packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BLOW_WEATHER.getValue());
-      mplew.write(packet.active() ? 0 : 1);
-      mplew.writeInt(packet.itemId());
+   protected void startMapEffect(MaplePacketLittleEndianWriter writer, BlowWeather packet) {
+      writer.write(packet.active() ? 0 : 1);
+      writer.writeInt(packet.itemId());
       if (packet.active()) {
-         mplew.writeMapleAsciiString(packet.message());
+         writer.writeMapleAsciiString(packet.message());
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] removeMapEffect(RemoveWeather packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.BLOW_WEATHER.getValue());
-      mplew.write(0);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void removeMapEffect(MaplePacketLittleEndianWriter writer, RemoveWeather packet) {
+      writer.write(0);
+      writer.writeInt(0);
    }
 
    /**
@@ -183,51 +147,33 @@ public class FieldPacketFactory extends AbstractPacketFactory {
     *
     * @return a packet to change the background effect of a specified layer.
     */
-   protected byte[] changeBackgroundEffect(ChangeBackgroundEffect packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SET_BACK_EFFECT.getValue());
-      mplew.writeBool(packet.remove());
-      mplew.writeInt(0); // not sure what this int32 does yet
-      mplew.write(packet.layer());
-      mplew.writeInt(packet.transition());
-      return mplew.getPacket();
+   protected void changeBackgroundEffect(MaplePacketLittleEndianWriter writer, ChangeBackgroundEffect packet) {
+      writer.writeBool(packet.remove());
+      writer.writeInt(0); // not sure what this int32 does yet
+      writer.write(packet.layer());
+      writer.writeInt(packet.transition());
    }
 
-   protected byte[] showForcedEquip(ForcedEquip packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FORCED_MAP_EQUIP.getValue());
+   protected void showForcedEquip(MaplePacketLittleEndianWriter writer, ForcedEquip packet) {
       if (packet.team() > -1) {
-         mplew.write(packet.team());   // 00 = red, 01 = blue
+         writer.write(packet.team());   // 00 = red, 01 = blue
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] resetForcedStats(ForcedStatReset packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
-      mplew.writeShort(SendOpcode.FORCED_STAT_RESET.getValue());
-      return mplew.getPacket();
+   protected void resetForcedStats(MaplePacketLittleEndianWriter writer, ForcedStatReset packet) {
    }
 
-   protected byte[] aranGodlyStats(ForcedStatSet packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.FORCED_STAT_SET.getValue());
-      mplew.write(new byte[]{(byte) 0x1F, (byte) 0x0F, 0, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xFF, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0x78, (byte) 0x8C});
-      return mplew.getPacket();
+   protected void aranGodlyStats(MaplePacketLittleEndianWriter writer, ForcedStatSet packet) {
+      writer.write(new byte[]{(byte) 0x1F, (byte) 0x0F, 0, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xFF, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0x78, (byte) 0x8C});
    }
 
-   protected byte[] crogBoatPacket(CrimsonBalrogBoat packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CONTI_MOVE.getValue());
-      mplew.write(10);
-      mplew.write(packet.theType() ? 4 : 5);
-      return mplew.getPacket();
+   protected void crogBoatPacket(MaplePacketLittleEndianWriter writer, CrimsonBalrogBoat packet) {
+      writer.write(10);
+      writer.write(packet.theType() ? 4 : 5);
    }
 
-   protected byte[] boatPacket(Boat packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.CONTI_STATE.getValue());
-      mplew.write(packet.theType() ? 1 : 2);
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void boatPacket(MaplePacketLittleEndianWriter writer, Boat packet) {
+      writer.write(packet.theType() ? 1 : 2);
+      writer.write(0);
    }
 }

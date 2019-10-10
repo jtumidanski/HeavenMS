@@ -32,24 +32,24 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
    }
 
    private StatusInfoPacketFactory() {
-      registry.setHandler(ShowEXPGain.class, packet -> this.getShowExpGain((ShowEXPGain) packet));
-      registry.setHandler(ShowFameGain.class, packet -> this.getShowFameGain((ShowFameGain) packet));
-      registry.setHandler(ShowMesoGain.class, packet -> this.getShowMesoGain((ShowMesoGain) packet));
-      registry.setHandler(ShowQuestForfeit.class, packet -> this.forfeitQuest((ShowQuestForfeit) packet));
-      registry.setHandler(CompleteQuest.class, packet -> this.completeQuest((CompleteQuest) packet));
-      registry.setHandler(UpdateQuest.class, packet -> this.updateQuest((UpdateQuest) packet));
-      registry.setHandler(ShowInventoryFull.class, packet -> this.getShowInventoryFull((ShowInventoryFull) packet));
-      registry.setHandler(ShowItemUnavailable.class, packet -> this.showItemUnavailable((ShowItemUnavailable) packet));
-      registry.setHandler(UpdateAreaInfo.class, packet -> this.updateAreaInfo((UpdateAreaInfo) packet));
-      registry.setHandler(GetGuildPointMessage.class, packet -> this.getGPMessage((GetGuildPointMessage) packet));
-      registry.setHandler(GetItemMessage.class, packet -> this.getItemMessage((GetItemMessage) packet));
-      registry.setHandler(ShowInfoText.class, packet -> this.showInfoText((ShowInfoText) packet));
-      registry.setHandler(GetDojoInfo.class, packet -> this.getDojoInfo((GetDojoInfo) packet));
-      registry.setHandler(GetDojoInfoMessage.class, packet -> this.getDojoInfoMessage((GetDojoInfoMessage) packet));
-      registry.setHandler(UpdateDojoStats.class, packet -> this.updateDojoStats((UpdateDojoStats) packet));
-      registry.setHandler(ShowItemExpired.class, packet -> this.itemExpired((ShowItemExpired) packet));
-      registry.setHandler(ShowBunny.class, packet -> this.bunnyPacket((ShowBunny) packet));
-      registry.setHandler(ShowItemGain.class, packet -> this.getShowItemGain((ShowItemGain) packet));
+      registry.setHandler(ShowEXPGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowExpGain, packet));
+      registry.setHandler(ShowFameGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowFameGain, packet));
+      registry.setHandler(ShowMesoGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowMesoGain, packet));
+      registry.setHandler(ShowQuestForfeit.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::forfeitQuest, packet));
+      registry.setHandler(CompleteQuest.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::completeQuest, packet));
+      registry.setHandler(UpdateQuest.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::updateQuest, packet));
+      registry.setHandler(ShowInventoryFull.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowInventoryFull, packet));
+      registry.setHandler(ShowItemUnavailable.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::showItemUnavailable, packet));
+      registry.setHandler(UpdateAreaInfo.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::updateAreaInfo, packet));
+      registry.setHandler(GetGuildPointMessage.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getGPMessage, packet, 7));
+      registry.setHandler(GetItemMessage.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getItemMessage, packet, 7));
+      registry.setHandler(ShowInfoText.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::showInfoText, packet));
+      registry.setHandler(GetDojoInfo.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getDojoInfo, packet));
+      registry.setHandler(GetDojoInfoMessage.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getDojoInfoMessage, packet));
+      registry.setHandler(UpdateDojoStats.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::updateDojoStats, packet));
+      registry.setHandler(ShowItemExpired.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::itemExpired, packet));
+      registry.setHandler(ShowBunny.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::bunnyPacket, packet));
+      registry.setHandler(ShowItemGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowItemGain, packet));
    }
 
    /**
@@ -57,27 +57,24 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
     *
     * @return The exp gained packet.
     */
-   protected byte[] getShowExpGain(ShowEXPGain packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
-      mplew.writeBool(packet.white());
-      mplew.writeInt(packet.gain());
-      mplew.writeBool(packet.inChat());
-      mplew.writeInt(0); // bonus event exp
-      mplew.write(0); // third monster kill event
-      mplew.write(0); // RIP byte, this is always a 0
-      mplew.writeInt(0); //wedding bonus
+   protected void getShowExpGain(MaplePacketLittleEndianWriter writer, ShowEXPGain packet) {
+      writer.write(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
+      writer.writeBool(packet.white());
+      writer.writeInt(packet.gain());
+      writer.writeBool(packet.inChat());
+      writer.writeInt(0); // bonus event exp
+      writer.write(0); // third monster kill event
+      writer.write(0); // RIP byte, this is always a 0
+      writer.writeInt(0); //wedding bonus
       if (packet.inChat()) { // quest bonus rate stuff
-         mplew.write(0);
+         writer.write(0);
       }
 
-      mplew.write(0); //0 = party bonus, 100 = 1x Bonus EXP, 200 = 2x Bonus EXP
-      mplew.writeInt(packet.party()); // party bonus
-      mplew.writeInt(packet.equip()); //equip bonus
-      mplew.writeInt(0); //Internet Cafe Bonus
-      mplew.writeInt(0); //Rainbow Week Bonus
-      return mplew.getPacket();
+      writer.write(0); //0 = party bonus, 100 = 1x Bonus EXP, 200 = 2x Bonus EXP
+      writer.writeInt(packet.party()); // party bonus
+      writer.writeInt(packet.equip()); //equip bonus
+      writer.writeInt(0); //Internet Cafe Bonus
+      writer.writeInt(0); //Rainbow Week Bonus
    }
 
    /**
@@ -85,12 +82,9 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
     *
     * @return The meso gain packet.
     */
-   protected byte[] getShowFameGain(ShowFameGain packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(4);
-      mplew.writeInt(packet.gain());
-      return mplew.getPacket();
+   protected void getShowFameGain(MaplePacketLittleEndianWriter writer, ShowFameGain packet) {
+      writer.write(4);
+      writer.writeInt(packet.gain());
    }
 
    /**
@@ -98,146 +92,104 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
     *
     * @return The meso gain packet.
     */
-   protected byte[] getShowMesoGain(ShowMesoGain packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
+   protected void getShowMesoGain(MaplePacketLittleEndianWriter writer, ShowMesoGain packet) {
       if (!packet.inChat()) {
-         mplew.write(0);
-         mplew.writeShort(1); //v83
+         writer.write(0);
+         writer.writeShort(1); //v83
       } else {
-         mplew.write(5);
+         writer.write(5);
       }
-      mplew.writeInt(packet.gain());
-      mplew.writeShort(0);
-      return mplew.getPacket();
+      writer.writeInt(packet.gain());
+      writer.writeShort(0);
    }
 
-   protected byte[] forfeitQuest(ShowQuestForfeit packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(1);
-      mplew.writeShort(packet.questId());
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void forfeitQuest(MaplePacketLittleEndianWriter writer, ShowQuestForfeit packet) {
+      writer.write(1);
+      writer.writeShort(packet.questId());
+      writer.write(0);
    }
 
-   protected byte[] completeQuest(CompleteQuest packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(1);
-      mplew.writeShort(packet.questId());
-      mplew.write(2);
-      mplew.writeLong(getTime(packet.time()));
-      return mplew.getPacket();
+   protected void completeQuest(MaplePacketLittleEndianWriter writer, CompleteQuest packet) {
+      writer.write(1);
+      writer.writeShort(packet.questId());
+      writer.write(2);
+      writer.writeLong(getTime(packet.time()));
    }
 
-   protected byte[] updateQuest(UpdateQuest packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(1);
-      mplew.writeShort(packet.infoUpdate() ? packet.infoNumber() : packet.questId());
+   protected void updateQuest(MaplePacketLittleEndianWriter writer, UpdateQuest packet) {
+      writer.write(1);
+      writer.writeShort(packet.infoUpdate() ? packet.infoNumber() : packet.questId());
       if (packet.infoUpdate()) {
-         mplew.write(1);
+         writer.write(1);
       } else {
-         mplew.write(packet.questStatusId());
+         writer.write(packet.questStatusId());
       }
 
-      mplew.writeMapleAsciiString(packet.questData());
-      mplew.skip(5);
-      return mplew.getPacket();
+      writer.writeMapleAsciiString(packet.questData());
+      writer.skip(5);
    }
 
-   protected byte[] getShowInventoryFull(ShowInventoryFull packet) {
-      return getShowInventoryStatus(0xff);
+   protected void getShowInventoryFull(MaplePacketLittleEndianWriter writer, ShowInventoryFull packet) {
+      getShowInventoryStatus(writer, 0xff);
    }
 
-   protected byte[] showItemUnavailable(ShowItemUnavailable packet) {
-      return getShowInventoryStatus(0xfe);
+   protected void showItemUnavailable(MaplePacketLittleEndianWriter writer, ShowItemUnavailable packet) {
+      getShowInventoryStatus(writer, 0xfe);
    }
 
-   protected byte[] getShowInventoryStatus(int mode) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(0);
-      mplew.write(mode);
-      mplew.writeInt(0);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getShowInventoryStatus(MaplePacketLittleEndianWriter writer, int mode) {
+      writer.write(0);
+      writer.write(mode);
+      writer.writeInt(0);
+      writer.writeInt(0);
    }
 
-   protected byte[] updateAreaInfo(UpdateAreaInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(0x0A); //0x0B in v95
-      mplew.writeShort(packet.areaId());//infoNumber
-      mplew.writeMapleAsciiString(packet.info());
-      return mplew.getPacket();
+   protected void updateAreaInfo(MaplePacketLittleEndianWriter writer, UpdateAreaInfo packet) {
+      writer.write(0x0A); //0x0B in v95
+      writer.writeShort(packet.areaId());//infoNumber
+      writer.writeMapleAsciiString(packet.info());
    }
 
-   protected byte[] getGPMessage(GetGuildPointMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(6);
-      mplew.writeInt(packet.change());
-      return mplew.getPacket();
+   protected void getGPMessage(MaplePacketLittleEndianWriter writer, GetGuildPointMessage packet) {
+      writer.write(6);
+      writer.writeInt(packet.change());
    }
 
-   protected byte[] getItemMessage(GetItemMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(7);
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(7);
-      mplew.writeInt(packet.itemId());
-      return mplew.getPacket();
+   protected void getItemMessage(MaplePacketLittleEndianWriter writer, GetItemMessage packet) {
+      writer.write(7);
+      writer.writeInt(packet.itemId());
    }
 
-   protected byte[] showInfoText(ShowInfoText packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(9);
-      mplew.writeMapleAsciiString(packet.text());
-      return mplew.getPacket();
+   protected void showInfoText(MaplePacketLittleEndianWriter writer, ShowInfoText packet) {
+      writer.write(9);
+      writer.writeMapleAsciiString(packet.text());
    }
 
-   protected byte[] getDojoInfo(GetDojoInfo packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(10);
-      mplew.write(new byte[]{(byte) 0xB7, 4});//QUEST ID f5
-      mplew.writeMapleAsciiString(packet.info());
-      return mplew.getPacket();
+   protected void getDojoInfo(MaplePacketLittleEndianWriter writer, GetDojoInfo packet) {
+      writer.write(10);
+      writer.write(new byte[]{(byte) 0xB7, 4});//QUEST ID f5
+      writer.writeMapleAsciiString(packet.info());
    }
 
-   protected byte[] getDojoInfoMessage(GetDojoInfoMessage packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(9);
-      mplew.writeMapleAsciiString(packet.message());
-      return mplew.getPacket();
+   protected void getDojoInfoMessage(MaplePacketLittleEndianWriter writer, GetDojoInfoMessage packet) {
+      writer.write(9);
+      writer.writeMapleAsciiString(packet.message());
    }
 
-   protected byte[] updateDojoStats(UpdateDojoStats packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(10);
-      mplew.write(new byte[]{(byte) 0xB7, 4}); //?
-      mplew.writeMapleAsciiString("pt=" + packet.dojoPoints() + ";belt=" + packet.belt() + ";tuto=" + (packet.finishedDojoTutorial() ? "1" : "0"));
-      return mplew.getPacket();
+   protected void updateDojoStats(MaplePacketLittleEndianWriter writer, UpdateDojoStats packet) {
+      writer.write(10);
+      writer.write(new byte[]{(byte) 0xB7, 4}); //?
+      writer.writeMapleAsciiString("pt=" + packet.dojoPoints() + ";belt=" + packet.belt() + ";tuto=" + (packet.finishedDojoTutorial() ? "1" : "0"));
    }
 
-   protected byte[] itemExpired(ShowItemExpired packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(2);
-      mplew.writeInt(packet.itemId());
-      return mplew.getPacket();
+   protected void itemExpired(MaplePacketLittleEndianWriter writer, ShowItemExpired packet) {
+      writer.write(2);
+      writer.writeInt(packet.itemId());
    }
 
-   protected byte[] bunnyPacket(ShowBunny packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.write(9);
-      mplew.writeAsciiString("Protect the Moon Bunny!!!");
-      return mplew.getPacket();
+   protected void bunnyPacket(MaplePacketLittleEndianWriter writer, ShowBunny packet) {
+      writer.write(9);
+      writer.writeAsciiString("Protect the Moon Bunny!!!");
    }
 
    /**
@@ -245,14 +197,11 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
     *
     * @return The item gain packet.
     */
-   protected byte[] getShowItemGain(ShowItemGain packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOW_STATUS_INFO.getValue());
-      mplew.writeShort(0);
-      mplew.writeInt(packet.itemId());
-      mplew.writeInt(packet.quantity());
-      mplew.writeInt(0);
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getShowItemGain(MaplePacketLittleEndianWriter writer, ShowItemGain packet) {
+      writer.writeShort(0);
+      writer.writeInt(packet.itemId());
+      writer.writeInt(packet.quantity());
+      writer.writeInt(0);
+      writer.writeInt(0);
    }
 }

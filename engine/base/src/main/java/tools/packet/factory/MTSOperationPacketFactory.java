@@ -24,140 +24,113 @@ public class MTSOperationPacketFactory extends AbstractPacketFactory {
    }
 
    private MTSOperationPacketFactory() {
-      registry.setHandler(SendMTS.class, packet -> this.sendMTS((SendMTS) packet));
-      registry.setHandler(ShowMTSCash.class, packet -> this.showMTSCash((ShowMTSCash) packet));
-      registry.setHandler(MTSWantedListingOver.class, packet -> this.wantedListingOver((MTSWantedListingOver) packet));
-      registry.setHandler(MTSConfirmSell.class, packet -> this.confirmSell((MTSConfirmSell) packet));
-      registry.setHandler(MTSConfirmBuy.class, packet -> this.confirmBuy((MTSConfirmBuy) packet));
-      registry.setHandler(MTSFailBuy.class, packet -> this.failBuy((MTSFailBuy) packet));
-      registry.setHandler(MTSConfirmTransfer.class, packet -> this.confirmTransfer((MTSConfirmTransfer) packet));
-      registry.setHandler(GetNotYetSoldMTSInventory.class, packet -> this.notYetSoldInv((GetNotYetSoldMTSInventory) packet));
-      registry.setHandler(MTSTransferInventory.class, packet -> this.transferInventory((MTSTransferInventory) packet));
+      registry.setHandler(SendMTS.class, packet -> create(SendOpcode.MTS_OPERATION, this::sendMTS, packet));
+      registry.setHandler(ShowMTSCash.class, packet -> create(SendOpcode.MTS_OPERATION2, this::showMTSCash, packet));
+      registry.setHandler(MTSWantedListingOver.class, packet -> create(SendOpcode.MTS_OPERATION, this::wantedListingOver, packet));
+      registry.setHandler(MTSConfirmSell.class, packet -> create(SendOpcode.MTS_OPERATION, this::confirmSell, packet));
+      registry.setHandler(MTSConfirmBuy.class, packet -> create(SendOpcode.MTS_OPERATION, this::confirmBuy, packet));
+      registry.setHandler(MTSFailBuy.class, packet -> create(SendOpcode.MTS_OPERATION, this::failBuy, packet));
+      registry.setHandler(MTSConfirmTransfer.class, packet -> create(SendOpcode.MTS_OPERATION, this::confirmTransfer, packet));
+      registry.setHandler(GetNotYetSoldMTSInventory.class, packet -> create(SendOpcode.MTS_OPERATION, this::notYetSoldInv, packet));
+      registry.setHandler(MTSTransferInventory.class, packet -> create(SendOpcode.MTS_OPERATION, this::transferInventory, packet));
    }
 
-   protected byte[] sendMTS(SendMTS packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x15); //operation
-      mplew.writeInt(packet.pages() * 16); //testing, change to 10 if fails
-      mplew.writeInt(packet.items().size()); //number of items
-      mplew.writeInt(packet.tab());
-      mplew.writeInt(packet.theType());
-      mplew.writeInt(packet.page());
-      mplew.write(1);
-      mplew.write(1);
+   protected void sendMTS(MaplePacketLittleEndianWriter writer, SendMTS packet) {
+      writer.write(0x15); //operation
+      writer.writeInt(packet.pages() * 16); //testing, change to 10 if fails
+      writer.writeInt(packet.items().size()); //number of items
+      writer.writeInt(packet.tab());
+      writer.writeInt(packet.theType());
+      writer.writeInt(packet.page());
+      writer.write(1);
+      writer.write(1);
       for (MTSItemInfo item : packet.items()) {
-         addItemInfo(mplew, item.item(), true);
-         mplew.writeInt(item.id()); //id
-         mplew.writeInt(item.taxes()); //this + below = price
-         mplew.writeInt(item.price()); //price
-         mplew.writeInt(0);
-         mplew.writeLong(getTime(item.endingDate()));
-         mplew.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
-         mplew.writeMapleAsciiString(item.seller()); //char name
+         addItemInfo(writer, item.item(), true);
+         writer.writeInt(item.id()); //id
+         writer.writeInt(item.taxes()); //this + below = price
+         writer.writeInt(item.price()); //price
+         writer.writeInt(0);
+         writer.writeLong(getTime(item.endingDate()));
+         writer.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
+         writer.writeMapleAsciiString(item.seller()); //char name
          for (int j = 0; j < 28; j++) {
-            mplew.write(0);
+            writer.write(0);
          }
       }
-      mplew.write(1);
-      return mplew.getPacket();
+      writer.write(1);
    }
 
-   protected byte[] showMTSCash(ShowMTSCash packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION2.getValue());
-      mplew.writeInt(packet.nxPrepaid());
-      mplew.writeInt(packet.maplePoint());
-      return mplew.getPacket();
+   protected void showMTSCash(MaplePacketLittleEndianWriter writer, ShowMTSCash packet) {
+      writer.writeInt(packet.nxPrepaid());
+      writer.writeInt(packet.maplePoint());
    }
 
-   protected byte[] wantedListingOver(MTSWantedListingOver packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x3D);
-      mplew.writeInt(packet.nx());
-      mplew.writeInt(packet.items());
-      return mplew.getPacket();
+   protected void wantedListingOver(MaplePacketLittleEndianWriter writer, MTSWantedListingOver packet) {
+      writer.write(0x3D);
+      writer.writeInt(packet.nx());
+      writer.writeInt(packet.items());
    }
 
-   protected byte[] confirmSell(MTSConfirmSell packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x1D);
-      return mplew.getPacket();
+   protected void confirmSell(MaplePacketLittleEndianWriter writer, MTSConfirmSell packet) {
+      writer.write(0x1D);
    }
 
-   protected byte[] confirmBuy(MTSConfirmBuy packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x33);
-      return mplew.getPacket();
+   protected void confirmBuy(MaplePacketLittleEndianWriter writer, MTSConfirmBuy packet) {
+      writer.write(0x33);
    }
 
-   protected byte[] failBuy(MTSFailBuy packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x34);
-      mplew.write(0x42);
-      return mplew.getPacket();
+   protected void failBuy(MaplePacketLittleEndianWriter writer, MTSFailBuy packet) {
+      writer.write(0x34);
+      writer.write(0x42);
    }
 
-   protected byte[] confirmTransfer(MTSConfirmTransfer packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x27);
-      mplew.writeInt(packet.quantity());
-      mplew.writeInt(packet.position());
-      return mplew.getPacket();
+   protected void confirmTransfer(MaplePacketLittleEndianWriter writer, MTSConfirmTransfer packet) {
+      writer.write(0x27);
+      writer.writeInt(packet.quantity());
+      writer.writeInt(packet.position());
    }
 
-   protected byte[] notYetSoldInv(GetNotYetSoldMTSInventory packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x23);
-      mplew.writeInt(packet.items().size());
+   protected void notYetSoldInv(MaplePacketLittleEndianWriter writer, GetNotYetSoldMTSInventory packet) {
+      writer.write(0x23);
+      writer.writeInt(packet.items().size());
       if (!packet.items().isEmpty()) {
          for (MTSItemInfo item : packet.items()) {
-            addItemInfo(mplew, item.item(), true);
-            mplew.writeInt(item.id()); //id
-            mplew.writeInt(item.taxes()); //this + below = price
-            mplew.writeInt(item.price()); //price
-            mplew.writeInt(0);
-            mplew.writeLong(getTime(item.endingDate()));
-            mplew.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
-            mplew.writeMapleAsciiString(item.seller()); //char name
+            addItemInfo(writer, item.item(), true);
+            writer.writeInt(item.id()); //id
+            writer.writeInt(item.taxes()); //this + below = price
+            writer.writeInt(item.price()); //price
+            writer.writeInt(0);
+            writer.writeLong(getTime(item.endingDate()));
+            writer.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
+            writer.writeMapleAsciiString(item.seller()); //char name
             for (int i = 0; i < 28; i++) {
-               mplew.write(0);
+               writer.write(0);
             }
          }
       } else {
-         mplew.writeInt(0);
+         writer.writeInt(0);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] transferInventory(MTSTransferInventory packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MTS_OPERATION.getValue());
-      mplew.write(0x21);
-      mplew.writeInt(packet.items().size());
+   protected void transferInventory(MaplePacketLittleEndianWriter writer, MTSTransferInventory packet) {
+      writer.write(0x21);
+      writer.writeInt(packet.items().size());
       if (!packet.items().isEmpty()) {
          for (MTSItemInfo item : packet.items()) {
-            addItemInfo(mplew, item.item(), true);
-            mplew.writeInt(item.id()); //id
-            mplew.writeInt(item.taxes()); //taxes
-            mplew.writeInt(item.price()); //price
-            mplew.writeInt(0);
-            mplew.writeLong(getTime(item.endingDate()));
-            mplew.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
-            mplew.writeMapleAsciiString(item.seller()); //char name
+            addItemInfo(writer, item.item(), true);
+            writer.writeInt(item.id()); //id
+            writer.writeInt(item.taxes()); //taxes
+            writer.writeInt(item.price()); //price
+            writer.writeInt(0);
+            writer.writeLong(getTime(item.endingDate()));
+            writer.writeMapleAsciiString(item.seller()); //account name (what was nexon thinking?)
+            writer.writeMapleAsciiString(item.seller()); //char name
             for (int i = 0; i < 28; i++) {
-               mplew.write(0);
+               writer.write(0);
             }
          }
       }
-      mplew.write(0xD0 + packet.items().size());
-      mplew.write(new byte[]{-1, -1, -1, 0});
-      return mplew.getPacket();
+      writer.write(0xD0 + packet.items().size());
+      writer.write(new byte[]{-1, -1, -1, 0});
    }
 }

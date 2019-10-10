@@ -22,13 +22,13 @@ public class NPCTalkPacketFactory extends AbstractPacketFactory {
    }
 
    private NPCTalkPacketFactory() {
-      registry.setHandler(GetNPCTalk.class, packet -> this.getNPCTalk((GetNPCTalk) packet));
-      registry.setHandler(GetDimensionalMirror.class, packet -> this.getDimensionalMirror((GetDimensionalMirror) packet));
-      registry.setHandler(GetNPCTalkStyle.class, packet -> this.getNPCTalkStyle((GetNPCTalkStyle) packet));
-      registry.setHandler(GetNPCTalkNum.class, packet -> this.getNPCTalkNum((GetNPCTalkNum) packet));
-      registry.setHandler(GetNPCTalkText.class, packet -> this.getNPCTalkText((GetNPCTalkText) packet));
-      registry.setHandler(AskQuiz.class, packet -> this.onAskQuiz((AskQuiz) packet));
-      registry.setHandler(AskSpeedQuiz.class, packet -> this.onAskSpeedQuiz((AskSpeedQuiz) packet));
+      registry.setHandler(GetNPCTalk.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalk, packet));
+      registry.setHandler(GetDimensionalMirror.class, packet -> create(SendOpcode.NPC_TALK, this::getDimensionalMirror, packet));
+      registry.setHandler(GetNPCTalkStyle.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalkStyle, packet));
+      registry.setHandler(GetNPCTalkNum.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalkNum, packet));
+      registry.setHandler(GetNPCTalkText.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalkText, packet));
+      registry.setHandler(AskQuiz.class, packet -> create(SendOpcode.NPC_TALK, this::onAskQuiz, packet));
+      registry.setHandler(AskSpeedQuiz.class, packet -> create(SendOpcode.NPC_TALK, this::onAskSpeedQuiz, packet));
    }
 
    /**
@@ -36,108 +36,87 @@ public class NPCTalkPacketFactory extends AbstractPacketFactory {
     * 1: Npc talking (right)<br> 2: Player talking (left)<br> 3: Player talking
     * (left)<br>
     */
-   protected byte[] getNPCTalk(GetNPCTalk packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(4); // ?
-      mplew.writeInt(packet.npcId());
-      mplew.write(packet.messageType());
-      mplew.write(packet.speaker());
-      mplew.writeMapleAsciiString(packet.talk());
-      mplew.write(HexTool.getByteArrayFromHexString(packet.endBytes()));
-      return mplew.getPacket();
+   protected void getNPCTalk(MaplePacketLittleEndianWriter writer, GetNPCTalk packet) {
+      writer.write(4); // ?
+      writer.writeInt(packet.npcId());
+      writer.write(packet.messageType());
+      writer.write(packet.speaker());
+      writer.writeMapleAsciiString(packet.talk());
+      writer.write(HexTool.getByteArrayFromHexString(packet.endBytes()));
    }
 
-   protected byte[] getDimensionalMirror(GetDimensionalMirror packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(4); // ?
-      mplew.writeInt(9010022);
-      mplew.write(0x0E);
-      mplew.write(0);
-      mplew.writeInt(0);
-      mplew.writeMapleAsciiString(packet.talk());
-      return mplew.getPacket();
+   protected void getDimensionalMirror(MaplePacketLittleEndianWriter writer, GetDimensionalMirror packet) {
+      writer.write(4); // ?
+      writer.writeInt(9010022);
+      writer.write(0x0E);
+      writer.write(0);
+      writer.writeInt(0);
+      writer.writeMapleAsciiString(packet.talk());
    }
 
-   protected byte[] getNPCTalkStyle(GetNPCTalkStyle packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(4); // ?
-      mplew.writeInt(packet.npcId());
-      mplew.write(7);
-      mplew.write(0); //speaker
-      mplew.writeMapleAsciiString(packet.talk());
-      mplew.write(packet.styles().length);
+   protected void getNPCTalkStyle(MaplePacketLittleEndianWriter writer, GetNPCTalkStyle packet) {
+      writer.write(4); // ?
+      writer.writeInt(packet.npcId());
+      writer.write(7);
+      writer.write(0); //speaker
+      writer.writeMapleAsciiString(packet.talk());
+      writer.write(packet.styles().length);
       for (int style : packet.styles()) {
-         mplew.writeInt(style);
+         writer.writeInt(style);
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getNPCTalkNum(GetNPCTalkNum packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(4); // ?
-      mplew.writeInt(packet.npcId());
-      mplew.write(3);
-      mplew.write(0); //speaker
-      mplew.writeMapleAsciiString(packet.talk());
-      mplew.writeInt(packet.theDef());
-      mplew.writeInt(packet.min());
-      mplew.writeInt(packet.max());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getNPCTalkNum(MaplePacketLittleEndianWriter writer, GetNPCTalkNum packet) {
+      writer.write(4); // ?
+      writer.writeInt(packet.npcId());
+      writer.write(3);
+      writer.write(0); //speaker
+      writer.writeMapleAsciiString(packet.talk());
+      writer.writeInt(packet.theDef());
+      writer.writeInt(packet.min());
+      writer.writeInt(packet.max());
+      writer.writeInt(0);
    }
 
-   protected byte[] getNPCTalkText(GetNPCTalkText packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(4); // Doesn't matter
-      mplew.writeInt(packet.npcId());
-      mplew.write(2);
-      mplew.write(0); //speaker
-      mplew.writeMapleAsciiString(packet.talk());
-      mplew.writeMapleAsciiString(packet.theDef());//:D
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void getNPCTalkText(MaplePacketLittleEndianWriter writer, GetNPCTalkText packet) {
+      writer.write(4); // Doesn't matter
+      writer.writeInt(packet.npcId());
+      writer.write(2);
+      writer.write(0); //speaker
+      writer.writeMapleAsciiString(packet.talk());
+      writer.writeMapleAsciiString(packet.theDef());//:D
+      writer.writeInt(0);
    }
 
    // thanks NPC Quiz packets thanks to Eric
-   protected byte[] onAskQuiz(AskQuiz packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(packet.speakerTypeId());
-      mplew.writeInt(packet.speakerTemplateId());
-      mplew.write(0x6);
-      mplew.write(0);
-      mplew.write(packet.resCode());
+   protected void onAskQuiz(MaplePacketLittleEndianWriter writer, AskQuiz packet) {
+      writer.write(packet.speakerTypeId());
+      writer.writeInt(packet.speakerTemplateId());
+      writer.write(0x6);
+      writer.write(0);
+      writer.write(packet.resCode());
       if (packet.resCode() == 0x0) {//fail has no bytes <3
-         mplew.writeMapleAsciiString(packet.title());
-         mplew.writeMapleAsciiString(packet.problemText());
-         mplew.writeMapleAsciiString(packet.hintText());
-         mplew.writeShort(packet.minInput());
-         mplew.writeShort(packet.maxInput());
-         mplew.writeInt(packet.remainInitialQuiz());
+         writer.writeMapleAsciiString(packet.title());
+         writer.writeMapleAsciiString(packet.problemText());
+         writer.writeMapleAsciiString(packet.hintText());
+         writer.writeShort(packet.minInput());
+         writer.writeShort(packet.maxInput());
+         writer.writeInt(packet.remainInitialQuiz());
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] onAskSpeedQuiz(AskSpeedQuiz packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.NPC_TALK.getValue());
-      mplew.write(packet.speakerTypeId());
-      mplew.writeInt(packet.speakerTemplateId());
-      mplew.write(0x7);
-      mplew.write(0);
-      mplew.write(packet.resCode());
+   protected void onAskSpeedQuiz(MaplePacketLittleEndianWriter writer, AskSpeedQuiz packet) {
+      writer.write(packet.speakerTypeId());
+      writer.writeInt(packet.speakerTemplateId());
+      writer.write(0x7);
+      writer.write(0);
+      writer.write(packet.resCode());
       if (packet.resCode() == 0x0) {//fail has no bytes <3
-         mplew.writeInt(packet.theType());
-         mplew.writeInt(packet.answer());
-         mplew.writeInt(packet.correct());
-         mplew.writeInt(packet.remain());
-         mplew.writeInt(packet.remainInitialQuiz());
+         writer.writeInt(packet.theType());
+         writer.writeInt(packet.answer());
+         writer.writeInt(packet.correct());
+         writer.writeInt(packet.remain());
+         writer.writeInt(packet.remainInitialQuiz());
       }
-      return mplew.getPacket();
    }
 }

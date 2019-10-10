@@ -2,7 +2,6 @@ package tools.packet.factory;
 
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 import client.MapleCharacter;
 import net.opcodes.SendOpcode;
@@ -117,18 +116,15 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
    }
 
    protected <T extends PacketInput> byte[] create(PlayerInteractionAction subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {
-      return create((Function<T, byte[]>) castInput -> {
-         final MaplePacketLittleEndianWriter writer = newWriter(size);
-         writer.writeShort(SendOpcode.PLAYER_INTERACTION.getValue());
+      return create(SendOpcode.PLAYER_INTERACTION, (BiConsumer<MaplePacketLittleEndianWriter, T>) (writer, castPacket) -> {
          writer.write(subOp.getValue());
          if (decorator != null) {
-            decorator.accept(writer, castInput);
+            decorator.accept(writer, castPacket);
          }
-         return writer.getPacket();
       }, packetInput);
    }
 
-   protected <T extends PacketInput> byte[] create(PlayerInteractionAction subOp, PacketInput packetInput, Integer size) {
+   protected byte[] create(PlayerInteractionAction subOp, PacketInput packetInput, Integer size) {
       return create(subOp, null, packetInput, size);
    }
 
@@ -136,7 +132,7 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
       return create(subOp, decorator, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
    }
 
-   protected <T extends PacketInput> byte[] create(PlayerInteractionAction subOp, PacketInput packetInput) {
+   protected byte[] create(PlayerInteractionAction subOp, PacketInput packetInput) {
       return create(subOp, null, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
    }
 

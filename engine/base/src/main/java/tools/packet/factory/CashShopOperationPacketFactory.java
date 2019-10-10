@@ -64,10 +64,10 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
       registry.setHandler(DeleteCashItem.class, packet -> create(CashShopOperationSubOp.DELETE_CASH_ITEM, this::deleteCashItem, packet));
       registry.setHandler(RefundCashItem.class, packet -> create(CashShopOperationSubOp.REFUND_CASH_ITEM, this::refundCashItem, packet));
       registry.setHandler(PutIntoCashInventory.class, packet -> create(CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory, packet));
-      registry.setHandler(ShowCash.class, packet -> create(this::showCash, packet));
-      registry.setHandler(SendMapleLife.class, packet -> create(this::sendMapleLifeCharacterInfo, packet));
-      registry.setHandler(SendMapleNameLifeError.class, packet -> create(this::sendMapleLifeNameError, packet));
-      registry.setHandler(SendMapleLifeError.class, packet -> create(this::sendMapleLifeError, packet));
+      registry.setHandler(ShowCash.class, packet -> create(SendOpcode.QUERY_CASH_RESULT, this::showCash, packet));
+      registry.setHandler(SendMapleLife.class, packet -> create(SendOpcode.MAPLELIFE_RESULT, this::sendMapleLifeCharacterInfo, packet));
+      registry.setHandler(SendMapleNameLifeError.class, packet -> create(SendOpcode.MAPLELIFE_RESULT, this::sendMapleLifeNameError, packet));
+      registry.setHandler(SendMapleLifeError.class, packet -> create(SendOpcode.MAPLELIFE_ERROR, this::sendMapleLifeError, packet));
       registry.setHandler(ShowWishList.class, packet -> {
          CashShopOperationSubOp subOp = ((ShowWishList) packet).update() ? CashShopOperationSubOp.SHOW_WISHLIST_UPDATE : CashShopOperationSubOp.SHOW_WISHLIST;
          return create(subOp, this::showWishList, packet);
@@ -202,36 +202,24 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
       addCashItemInformation(writer, packet.item(), packet.accountId());
    }
 
-   protected byte[] showCash(ShowCash packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.QUERY_CASH_RESULT.getValue());
-      mplew.writeInt(packet.nxCredit());
-      mplew.writeInt(packet.maplePoint());
-      mplew.writeInt(packet.nxPrepaid());
-      return mplew.getPacket();
+   protected void showCash(MaplePacketLittleEndianWriter writer, ShowCash packet) {
+      writer.writeInt(packet.nxCredit());
+      writer.writeInt(packet.maplePoint());
+      writer.writeInt(packet.nxPrepaid());
    }
 
-   protected byte[] sendMapleLifeCharacterInfo(SendMapleLife packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAPLELIFE_RESULT.getValue());
-      mplew.writeInt(0);
-      return mplew.getPacket();
+   protected void sendMapleLifeCharacterInfo(MaplePacketLittleEndianWriter writer, SendMapleLife packet) {
+      writer.writeInt(0);
    }
 
-   protected byte[] sendMapleLifeNameError(SendMapleNameLifeError packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAPLELIFE_RESULT.getValue());
-      mplew.writeInt(2);
-      mplew.writeInt(3);
-      mplew.write(0);
-      return mplew.getPacket();
+   protected void sendMapleLifeNameError(MaplePacketLittleEndianWriter writer, SendMapleNameLifeError packet) {
+      writer.writeInt(2);
+      writer.writeInt(3);
+      writer.write(0);
    }
 
-   protected byte[] sendMapleLifeError(SendMapleLifeError packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.MAPLELIFE_ERROR.getValue());
-      mplew.write(0);
-      mplew.writeInt(packet.code());
-      return mplew.getPacket();
+   protected void sendMapleLifeError(MaplePacketLittleEndianWriter writer, SendMapleLifeError packet) {
+      writer.write(0);
+      writer.writeInt(packet.code());
    }
 }

@@ -20,28 +20,22 @@ public class AriantPacketFactory extends AbstractPacketFactory {
    }
 
    private AriantPacketFactory() {
-      registry.setHandler(ShowAriantScoreboard.class, packet -> this.showScoreBoard((ShowAriantScoreboard) packet));
-      registry.setHandler(UpdateAriantRanking.class, packet -> this.updateRanking((UpdateAriantRanking) packet));
+      registry.setHandler(ShowAriantScoreboard.class, packet -> create(SendOpcode.ARIANT_ARENA_SHOW_RESULT, this::showScoreBoard, packet));
+      registry.setHandler(UpdateAriantRanking.class, packet -> create(SendOpcode.ARIANT_ARENA_USER_SCORE, this::updateRanking, packet));
    }
 
-   protected byte[] showScoreBoard(ShowAriantScoreboard packet) {   // thanks lrenex for pointing match's end scoreboard packet
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ARIANT_ARENA_SHOW_RESULT.getValue());
-      return mplew.getPacket();
+   protected void showScoreBoard(MaplePacketLittleEndianWriter writer, ShowAriantScoreboard packet) {   // thanks lrenex for pointing match's end scoreboard packet
    }
 
-   protected byte[] updateIndividualRanking(final MapleCharacter chr, final int score) {
-      return updateRanking(new UpdateAriantRanking(Collections.singletonList(new AriantScore(chr.getName(), score))));
+   protected void updateIndividualRanking(MaplePacketLittleEndianWriter writer, final MapleCharacter chr, final int score) {
+      updateRanking(writer, new UpdateAriantRanking(Collections.singletonList(new AriantScore(chr.getName(), score))));
    }
 
-   protected byte[] updateRanking(UpdateAriantRanking packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.ARIANT_ARENA_USER_SCORE.getValue());
-      mplew.write(packet.scores().size());
+   protected void updateRanking(MaplePacketLittleEndianWriter writer, UpdateAriantRanking packet) {
+      writer.write(packet.scores().size());
       for (AriantScore e : packet.scores()) {
-         mplew.writeMapleAsciiString(e.characterName());
-         mplew.writeInt(e.score());
+         writer.writeMapleAsciiString(e.characterName());
+         writer.writeInt(e.score());
       }
-      return mplew.getPacket();
    }
 }

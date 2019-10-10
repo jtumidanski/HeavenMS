@@ -25,9 +25,9 @@ public class OwlOfMinervaPacketFactory extends AbstractPacketFactory {
    }
 
    private OwlOfMinervaPacketFactory() {
-      registry.setHandler(GetOwlMessage.class, packet -> this.getOwlMessage((GetOwlMessage) packet));
-      registry.setHandler(OwlOfMinervaResult.class, packet -> this.owlOfMinerva((OwlOfMinervaResult) packet));
-      registry.setHandler(GetOwlOpen.class, packet -> this.getOwlOpen((GetOwlOpen) packet));
+      registry.setHandler(GetOwlMessage.class, packet -> create(SendOpcode.SHOP_LINK_RESULT, this::getOwlMessage, packet, 3));
+      registry.setHandler(OwlOfMinervaResult.class, packet -> create(SendOpcode.SHOP_SCANNER_RESULT, this::owlOfMinerva, packet));
+      registry.setHandler(GetOwlOpen.class, packet -> create(SendOpcode.SHOP_SCANNER_RESULT, this::getOwlOpen, packet));
    }
 
    // 0: Success
@@ -40,22 +40,16 @@ public class OwlOfMinervaPacketFactory extends AbstractPacketFactory {
    // 18: The owner of the store is currently undergoing store maintenance. Please try again in a bit.
    // 23: This can only be used inside the Free Market.
    // default: This character is unable to do it.
-   protected byte[] getOwlMessage(GetOwlMessage packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);
-      mplew.writeShort(SendOpcode.SHOP_LINK_RESULT.getValue());
-      mplew.write(packet.message());
-      return mplew.getPacket();
+   protected void getOwlMessage(MaplePacketLittleEndianWriter writer, GetOwlMessage packet) {
+      writer.write(packet.message());
    }
 
-   protected byte[] owlOfMinerva(OwlOfMinervaResult packet) {
+   protected void owlOfMinerva(MaplePacketLittleEndianWriter writer, OwlOfMinervaResult packet) {
       byte itemType = ItemConstants.getInventoryType(packet.getItemId()).getType();
-
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.SHOP_SCANNER_RESULT.getValue()); // header.
-      mplew.write(6);
-      mplew.writeInt(0);
-      mplew.writeInt(packet.getItemId());
-      mplew.writeInt(packet.getHmsAvailable().size());
+      writer.write(6);
+      writer.writeInt(0);
+      writer.writeInt(packet.getItemId());
+      writer.writeInt(packet.getHmsAvailable().size());
       for (Pair<MaplePlayerShopItem, AbstractMapleMapObject> hme : packet.getHmsAvailable()) {
          MaplePlayerShopItem item = hme.getLeft();
          AbstractMapleMapObject mo = hme.getRight();
@@ -64,45 +58,39 @@ public class OwlOfMinervaPacketFactory extends AbstractPacketFactory {
             MaplePlayerShop ps = (MaplePlayerShop) mo;
             MapleCharacter owner = ps.getOwner();
 
-            mplew.writeMapleAsciiString(owner.getName());
-            mplew.writeInt(owner.getMapId());
-            mplew.writeMapleAsciiString(ps.getDescription());
-            mplew.writeInt(item.bundles());
-            mplew.writeInt(item.item().quantity());
-            mplew.writeInt(item.price());
-            mplew.writeInt(owner.getId());
-            mplew.write(owner.getClient().getChannel() - 1);
+            writer.writeMapleAsciiString(owner.getName());
+            writer.writeInt(owner.getMapId());
+            writer.writeMapleAsciiString(ps.getDescription());
+            writer.writeInt(item.bundles());
+            writer.writeInt(item.item().quantity());
+            writer.writeInt(item.price());
+            writer.writeInt(owner.getId());
+            writer.write(owner.getClient().getChannel() - 1);
          } else {
             MapleHiredMerchant hm = (MapleHiredMerchant) mo;
 
-            mplew.writeMapleAsciiString(hm.getOwner());
-            mplew.writeInt(hm.getMapId());
-            mplew.writeMapleAsciiString(hm.getDescription());
-            mplew.writeInt(item.bundles());
-            mplew.writeInt(item.item().quantity());
-            mplew.writeInt(item.price());
-            mplew.writeInt(hm.getOwnerId());
-            mplew.write(hm.getChannel() - 1);
+            writer.writeMapleAsciiString(hm.getOwner());
+            writer.writeInt(hm.getMapId());
+            writer.writeMapleAsciiString(hm.getDescription());
+            writer.writeInt(item.bundles());
+            writer.writeInt(item.item().quantity());
+            writer.writeInt(item.price());
+            writer.writeInt(hm.getOwnerId());
+            writer.write(hm.getChannel() - 1);
          }
 
-         mplew.write(itemType);
+         writer.write(itemType);
          if (itemType == MapleInventoryType.EQUIP.getType()) {
-            addItemInfo(mplew, item.item(), true);
+            addItemInfo(writer, item.item(), true);
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] getOwlOpen(GetOwlOpen packet) {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-
-      mplew.writeShort(SendOpcode.SHOP_SCANNER_RESULT.getValue());
-      mplew.write(7);
-      mplew.write(packet.leaderboards().size());
+   protected void getOwlOpen(MaplePacketLittleEndianWriter writer, GetOwlOpen packet) {
+      writer.write(7);
+      writer.write(packet.leaderboards().size());
       for (Integer i : packet.leaderboards()) {
-         mplew.writeInt(i);
+         writer.writeInt(i);
       }
-
-      return mplew.getPacket();
    }
 }

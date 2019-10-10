@@ -22,14 +22,14 @@ public class RemovePacketFactory extends AbstractPacketFactory {
    }
 
    private RemovePacketFactory() {
-      registry.setHandler(RemoveTV.class, packet -> this.removeTV((RemoveTV) packet));
-      registry.setHandler(RemoveSummon.class, packet -> this.removeSummon((RemoveSummon) packet));
-      registry.setHandler(RemoveKite.class, packet -> this.removeKite((RemoveKite) packet));
-      registry.setHandler(RemovePlayer.class, packet -> this.removePlayerFromMap((RemovePlayer) packet));
-      registry.setHandler(RemoveItem.class, packet -> this.removeItemFromMap((RemoveItem) packet));
-      registry.setHandler(RemoveMist.class, packet -> this.removeMist((RemoveMist) packet));
-      registry.setHandler(RemoveNPC.class, packet -> this.removeNPC((RemoveNPC) packet));
-      registry.setHandler(RemoveDragon.class, packet -> this.removeDragon((RemoveDragon) packet));
+      registry.setHandler(RemoveTV.class, packet -> create(SendOpcode.REMOVE_TV, this::removeTV, packet, 2));
+      registry.setHandler(RemoveSummon.class, packet -> create(SendOpcode.REMOVE_SPECIAL_MAPOBJECT, this::removeSummon, packet, 11));
+      registry.setHandler(RemoveKite.class, packet -> create(SendOpcode.REMOVE_KITE, this::removeKite, packet));
+      registry.setHandler(RemovePlayer.class, packet -> create(SendOpcode.REMOVE_PLAYER_FROM_MAP, this::removePlayerFromMap, packet));
+      registry.setHandler(RemoveItem.class, packet -> create(SendOpcode.REMOVE_ITEM_FROM_MAP, this::removeItemFromMap, packet));
+      registry.setHandler(RemoveMist.class, packet -> create(SendOpcode.REMOVE_MIST, this::removeMist, packet));
+      registry.setHandler(RemoveNPC.class, packet -> create(SendOpcode.REMOVE_NPC, this::removeNPC, packet));
+      registry.setHandler(RemoveDragon.class, packet -> create(SendOpcode.REMOVE_DRAGON, this::removeDragon, packet));
    }
 
    /**
@@ -37,10 +37,7 @@ public class RemovePacketFactory extends AbstractPacketFactory {
     *
     * @return The Remove TV Packet
     */
-   protected byte[] removeTV(RemoveTV packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(2);
-      mplew.writeShort(SendOpcode.REMOVE_TV.getValue());
-      return mplew.getPacket();
+   protected void removeTV(MaplePacketLittleEndianWriter writer, RemoveTV packet) {
    }
 
    /**
@@ -48,28 +45,20 @@ public class RemovePacketFactory extends AbstractPacketFactory {
     *
     * @return The packet removing the object.
     */
-   protected byte[] removeSummon(RemoveSummon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(11);
-      mplew.writeShort(SendOpcode.REMOVE_SPECIAL_MAPOBJECT.getValue());
-      mplew.writeInt(packet.getSummon().getOwner().getId());
-      mplew.writeInt(packet.getSummon().getObjectId());
-      mplew.write(packet.isAnimated() ? 4 : 1); // ?
-      return mplew.getPacket();
+   protected void removeSummon(MaplePacketLittleEndianWriter writer, RemoveSummon packet) {
+      writer.writeInt(packet.getSummon().getOwner().getId());
+      writer.writeInt(packet.getSummon().getObjectId());
+      writer.write(packet.isAnimated() ? 4 : 1); // ?
    }
 
-   protected byte[] removeKite(RemoveKite packet) {    // thanks to Arnah (Vertisy)
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_KITE.getValue());
-      mplew.write(packet.animationType()); // 0 is 10/10, 1 just vanishes
-      mplew.writeInt(packet.objectId());
-      return mplew.getPacket();
+   protected void removeKite(MaplePacketLittleEndianWriter writer, RemoveKite packet) {
+      // thanks to Arnah (MaplePacketLittleEndianWriter writer, Vertisy)
+      writer.write(packet.animationType()); // 0 is 10/10, 1 just vanishes
+      writer.writeInt(packet.objectId());
    }
 
-   protected byte[] removePlayerFromMap(RemovePlayer packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_PLAYER_FROM_MAP.getValue());
-      mplew.writeInt(packet.characterId());
-      return mplew.getPacket();
+   protected void removePlayerFromMap(MaplePacketLittleEndianWriter writer, RemovePlayer packet) {
+      writer.writeInt(packet.characterId());
    }
 
    /**
@@ -79,32 +68,23 @@ public class RemovePacketFactory extends AbstractPacketFactory {
     *
     * @return
     */
-   protected byte[] removeItemFromMap(RemoveItem packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_ITEM_FROM_MAP.getValue());
-      mplew.write(packet.animation()); // expire
-      mplew.writeInt(packet.objectId());
+   protected void removeItemFromMap(MaplePacketLittleEndianWriter writer, RemoveItem packet) {
+      writer.write(packet.animation()); // expire
+      writer.writeInt(packet.objectId());
       if (packet.animation() >= 2) {
-         mplew.writeInt(packet.characterId());
+         writer.writeInt(packet.characterId());
          if (packet.pet()) {
-            mplew.write(packet.slot());
+            writer.write(packet.slot());
          }
       }
-      return mplew.getPacket();
    }
 
-   protected byte[] removeMist(RemoveMist packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_MIST.getValue());
-      mplew.writeInt(packet.objectId());
-      return mplew.getPacket();
+   protected void removeMist(MaplePacketLittleEndianWriter writer, RemoveMist packet) {
+      writer.writeInt(packet.objectId());
    }
 
-   protected byte[] removeNPC(RemoveNPC packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_NPC.getValue());
-      mplew.writeInt(packet.objectId());
-      return mplew.getPacket();
+   protected void removeNPC(MaplePacketLittleEndianWriter writer, RemoveNPC packet) {
+      writer.writeInt(packet.objectId());
    }
 
    /**
@@ -112,10 +92,7 @@ public class RemovePacketFactory extends AbstractPacketFactory {
     *
     * @return The packet
     */
-   protected byte[] removeDragon(RemoveDragon packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.writeShort(SendOpcode.REMOVE_DRAGON.getValue());
-      mplew.writeInt(packet.characterId());
-      return mplew.getPacket();
+   protected void removeDragon(MaplePacketLittleEndianWriter writer, RemoveDragon packet) {
+      writer.writeInt(packet.characterId());
    }
 }
