@@ -19,19 +19,9 @@ public class NameChangePacketFactory extends AbstractPacketFactory {
    }
 
    private NameChangePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof NameChangeError) {
-         return create(this::sendNameTransferRules, packetInput);
-      } else if (packetInput instanceof CheckNameChange) {
-         return create(this::sendNameTransferCheck, packetInput);
-      } else if (packetInput instanceof NameChangeCancel) {
-         return create(this::showNameChangeCancel, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(NameChangeError.class, packet -> this.sendNameTransferRules((NameChangeError) packet));
+      registry.setHandler(CheckNameChange.class, packet -> this.sendNameTransferCheck((CheckNameChange) packet));
+      registry.setHandler(NameChangeCancel.class, packet -> this.showNameChangeCancel((NameChangeCancel) packet));
    }
 
    /*  1: name change already submitted

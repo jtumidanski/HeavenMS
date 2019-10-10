@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.message.BuddyFindReply;
 import tools.packet.message.ChatText;
 import tools.packet.message.ClearAvatarMegaphone;
@@ -37,55 +35,27 @@ public class MessagePacketFactory extends AbstractPacketFactory {
    }
 
    private MessagePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ServerNotice) {
-         return create(this::serverNotice, packetInput);
-      } else if (packetInput instanceof ServerMessage) {
-         return create(this::serverMessage, packetInput);
-      } else if (packetInput instanceof GetAvatarMegaphone) {
-         return create(this::getAvatarMega, packetInput);
-      } else if (packetInput instanceof ClearAvatarMegaphone) {
-         return create(this::byeAvatarMega, packetInput);
-      } else if (packetInput instanceof GachaponMessage) {
-         return create(this::gachaponMessage, packetInput);
-      } else if (packetInput instanceof ChatText) {
-         return create(this::getChatText, packetInput);
-      } else if (packetInput instanceof Whisper) {
-         return create(this::getWhisper, packetInput);
-      } else if (packetInput instanceof WhisperReply) {
-         return create(this::getWhisperReply, packetInput);
-      } else if (packetInput instanceof GiveFameResponse) {
-         return create(this::giveFameResponse, packetInput);
-      } else if (packetInput instanceof GiveFameErrorResponse) {
-         return create(this::giveFameErrorResponse, packetInput);
-      } else if (packetInput instanceof ReceiveFame) {
-         return create(this::receiveFame, packetInput);
-      } else if (packetInput instanceof MultiChat) {
-         return create(this::multiChat, packetInput);
-      } else if (packetInput instanceof FindReply) {
-         return create(this::getFindReply, packetInput);
-      } else if (packetInput instanceof BuddyFindReply) {
-         return create(this::getBuddyFindReply, packetInput);
-      } else if (packetInput instanceof ItemMegaphone) {
-         return create(this::itemMegaphone, packetInput);
-      } else if (packetInput instanceof MultiMegaphone) {
-         return create(this::getMultiMegaphone, packetInput);
-      } else if (packetInput instanceof NotifyLevelUp) {
-         return create(this::levelUpMessage, packetInput);
-      } else if (packetInput instanceof NotifyMarriage) {
-         return create(this::marriageMessage, packetInput);
-      } else if (packetInput instanceof NotifyJobAdvance) {
-         return create(this::jobMessage, packetInput);
-      } else if (packetInput instanceof SpouseMessage) {
-         return create(this::coupleMessage, packetInput);
-      } else if (packetInput instanceof YellowTip) {
-         return create(this::sendYellowTip, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ServerNotice.class, packet -> this.serverNotice((ServerNotice) packet));
+      registry.setHandler(ServerMessage.class, packet -> this.serverMessage((ServerMessage) packet));
+      registry.setHandler(GetAvatarMegaphone.class, packet -> this.getAvatarMega((GetAvatarMegaphone) packet));
+      registry.setHandler(ClearAvatarMegaphone.class, packet -> this.byeAvatarMega((ClearAvatarMegaphone) packet));
+      registry.setHandler(GachaponMessage.class, packet -> this.gachaponMessage((GachaponMessage) packet));
+      registry.setHandler(ChatText.class, packet -> this.getChatText((ChatText) packet));
+      registry.setHandler(Whisper.class, packet -> this.getWhisper((Whisper) packet));
+      registry.setHandler(WhisperReply.class, packet -> this.getWhisperReply((WhisperReply) packet));
+      registry.setHandler(GiveFameResponse.class, packet -> this.giveFameResponse((GiveFameResponse) packet));
+      registry.setHandler(GiveFameErrorResponse.class, packet -> this.giveFameErrorResponse((GiveFameErrorResponse) packet));
+      registry.setHandler(ReceiveFame.class, packet -> this.receiveFame((ReceiveFame) packet));
+      registry.setHandler(MultiChat.class, packet -> this.multiChat((MultiChat) packet));
+      registry.setHandler(FindReply.class, packet -> this.getFindReply((FindReply) packet));
+      registry.setHandler(BuddyFindReply.class, packet -> this.getBuddyFindReply((BuddyFindReply) packet));
+      registry.setHandler(ItemMegaphone.class, packet -> this.itemMegaphone((ItemMegaphone) packet));
+      registry.setHandler(MultiMegaphone.class, packet -> this.getMultiMegaphone((MultiMegaphone) packet));
+      registry.setHandler(NotifyLevelUp.class, packet -> this.levelUpMessage((NotifyLevelUp) packet));
+      registry.setHandler(NotifyMarriage.class, packet -> this.marriageMessage((NotifyMarriage) packet));
+      registry.setHandler(NotifyJobAdvance.class, packet -> this.jobMessage((NotifyJobAdvance) packet));
+      registry.setHandler(SpouseMessage.class, packet -> this.coupleMessage((SpouseMessage) packet));
+      registry.setHandler(YellowTip.class, packet -> this.sendYellowTip((YellowTip) packet));
    }
 
    /**

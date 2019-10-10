@@ -7,9 +7,7 @@ import client.MapleCharacter;
 import client.MapleFamilyEntitlement;
 import client.MapleFamilyEntry;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.family.FamilyGainReputation;
 import tools.packet.family.FamilyJoinResponse;
 import tools.packet.family.FamilyLogonNotice;
@@ -31,31 +29,17 @@ public class FamilyPacketFactory extends AbstractPacketFactory {
       return instance;
    }
 
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof LoadFamily) {
-         return create(this::loadFamily, packetInput);
-      } else if (packetInput instanceof FamilyMessage) {
-         return create(this::sendFamilyMessage, packetInput);
-      } else if (packetInput instanceof GetFamilyInfo) {
-         return create(this::getFamilyInfo, packetInput);
-      } else if (packetInput instanceof ShowPedigree) {
-         return create(this::showPedigree, packetInput);
-      } else if (packetInput instanceof SendFamilyInvite) {
-         return create(this::sendFamilyInvite, packetInput);
-      } else if (packetInput instanceof FamilySummonRequest) {
-         return create(this::sendFamilySummonRequest, packetInput);
-      } else if (packetInput instanceof FamilyLogonNotice) {
-         return create(this::sendFamilyLoginNotice, packetInput);
-      } else if (packetInput instanceof FamilyJoinResponse) {
-         return create(this::sendFamilyJoinResponse, packetInput);
-      } else if (packetInput instanceof SeniorMessage) {
-         return create(this::getSeniorMessage, packetInput);
-      } else if (packetInput instanceof FamilyGainReputation) {
-         return create(this::sendGainRep, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+   private FamilyPacketFactory() {
+      registry.setHandler(LoadFamily.class, packet -> this.loadFamily((LoadFamily) packet));
+      registry.setHandler(FamilyMessage.class, packet -> this.sendFamilyMessage((FamilyMessage) packet));
+      registry.setHandler(GetFamilyInfo.class, packet -> this.getFamilyInfo((GetFamilyInfo) packet));
+      registry.setHandler(ShowPedigree.class, packet -> this.showPedigree((ShowPedigree) packet));
+      registry.setHandler(SendFamilyInvite.class, packet -> this.sendFamilyInvite((SendFamilyInvite) packet));
+      registry.setHandler(FamilySummonRequest.class, packet -> this.sendFamilySummonRequest((FamilySummonRequest) packet));
+      registry.setHandler(FamilyLogonNotice.class, packet -> this.sendFamilyLoginNotice((FamilyLogonNotice) packet));
+      registry.setHandler(FamilyJoinResponse.class, packet -> this.sendFamilyJoinResponse((FamilyJoinResponse) packet));
+      registry.setHandler(SeniorMessage.class, packet -> this.getSeniorMessage((SeniorMessage) packet));
+      registry.setHandler(FamilyGainReputation.class, packet -> this.sendGainRep((FamilyGainReputation) packet));
    }
 
    protected byte[] loadFamily(LoadFamily packet) {

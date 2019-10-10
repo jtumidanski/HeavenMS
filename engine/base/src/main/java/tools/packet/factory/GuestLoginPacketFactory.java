@@ -1,11 +1,9 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Randomizer;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.GuestTOS;
-import tools.packet.PacketInput;
 
 public class GuestLoginPacketFactory extends AbstractPacketFactory {
    private static GuestLoginPacketFactory instance;
@@ -18,15 +16,7 @@ public class GuestLoginPacketFactory extends AbstractPacketFactory {
    }
 
    private GuestLoginPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GuestTOS) {
-         return create(this::sendGuestTOS, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GuestTOS.class, packet -> this.sendGuestTOS((GuestTOS) packet));
    }
 
    protected byte[] sendGuestTOS(GuestTOS packet) {

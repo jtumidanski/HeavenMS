@@ -3,10 +3,7 @@ package tools.packet.factory;
 import java.awt.Point;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
-import tools.packet.factory.AbstractPacketFactory;
 import tools.packet.reactor.DestroyReactor;
 import tools.packet.reactor.SpawnReactor;
 import tools.packet.reactor.TriggerReactor;
@@ -22,19 +19,9 @@ public class ReactorPacketFactory extends AbstractPacketFactory {
    }
 
    private ReactorPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof SpawnReactor) {
-         return create(this::spawnReactor, packetInput);
-      } else if (packetInput instanceof TriggerReactor) {
-         return create(this::triggerReactor, packetInput);
-      } else if (packetInput instanceof DestroyReactor) {
-         return create(this::destroyReactor, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(SpawnReactor.class, packet -> this.spawnReactor((SpawnReactor) packet));
+      registry.setHandler(TriggerReactor.class, packet -> this.triggerReactor((TriggerReactor) packet));
+      registry.setHandler(DestroyReactor.class, packet -> this.destroyReactor((DestroyReactor) packet));
    }
 
    // is there a way to spawn reactors non-animated?

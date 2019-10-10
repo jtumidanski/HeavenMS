@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.HexTool;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.npctalk.AskQuiz;
 import tools.packet.npctalk.AskSpeedQuiz;
 import tools.packet.npctalk.GetDimensionalMirror;
@@ -24,27 +22,13 @@ public class NPCTalkPacketFactory extends AbstractPacketFactory {
    }
 
    private NPCTalkPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetNPCTalk) {
-         return create(this::getNPCTalk, packetInput);
-      } else if (packetInput instanceof GetDimensionalMirror) {
-         return create(this::getDimensionalMirror, packetInput);
-      } else if (packetInput instanceof GetNPCTalkStyle) {
-         return create(this::getNPCTalkStyle, packetInput);
-      } else if (packetInput instanceof GetNPCTalkNum) {
-         return create(this::getNPCTalkNum, packetInput);
-      } else if (packetInput instanceof GetNPCTalkText) {
-         return create(this::getNPCTalkText, packetInput);
-      } else if (packetInput instanceof AskQuiz) {
-         return create(this::onAskQuiz, packetInput);
-      } else if (packetInput instanceof AskSpeedQuiz) {
-         return create(this::onAskSpeedQuiz, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetNPCTalk.class, packet -> this.getNPCTalk((GetNPCTalk) packet));
+      registry.setHandler(GetDimensionalMirror.class, packet -> this.getDimensionalMirror((GetDimensionalMirror) packet));
+      registry.setHandler(GetNPCTalkStyle.class, packet -> this.getNPCTalkStyle((GetNPCTalkStyle) packet));
+      registry.setHandler(GetNPCTalkNum.class, packet -> this.getNPCTalkNum((GetNPCTalkNum) packet));
+      registry.setHandler(GetNPCTalkText.class, packet -> this.getNPCTalkText((GetNPCTalkText) packet));
+      registry.setHandler(AskQuiz.class, packet -> this.onAskQuiz((AskQuiz) packet));
+      registry.setHandler(AskSpeedQuiz.class, packet -> this.onAskSpeedQuiz((AskSpeedQuiz) packet));
    }
 
    /**

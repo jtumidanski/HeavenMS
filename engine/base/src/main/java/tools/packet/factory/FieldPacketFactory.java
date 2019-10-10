@@ -3,10 +3,8 @@ package tools.packet.factory;
 import java.util.Map;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.field.Boat;
 import tools.packet.field.CrimsonBalrogBoat;
 import tools.packet.field.effect.BlowWeather;
@@ -36,47 +34,23 @@ public class FieldPacketFactory extends AbstractPacketFactory {
    }
 
    private FieldPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowBossHP) {
-         return create(this::showBossHP, packetInput);
-      } else if (packetInput instanceof CustomShowBossHP) {
-         return create(this::customShowBossHP, packetInput);
-      } else if (packetInput instanceof EnvironmentChange) {
-         return create(this::environmentChange, packetInput);
-      } else if (packetInput instanceof MapEffect) {
-         return create(this::mapEffect, packetInput);
-      } else if (packetInput instanceof MapSound) {
-         return create(this::mapSound, packetInput);
-      } else if (packetInput instanceof DojoAnimation) {
-         return create(this::sendDojoAnimation, packetInput);
-      } else if (packetInput instanceof TrembleEffect) {
-         return create(this::trembleEffect, packetInput);
-      } else if (packetInput instanceof EnvironmentMove) {
-         return create(this::environmentMove, packetInput);
-      } else if (packetInput instanceof EnvironmentMoveList) {
-         return create(this::environmentMoveList, packetInput);
-      } else if (packetInput instanceof BlowWeather) {
-         return create(this::startMapEffect, packetInput);
-      } else if (packetInput instanceof RemoveWeather) {
-         return create(this::removeMapEffect, packetInput);
-      } else if (packetInput instanceof ChangeBackgroundEffect) {
-         return create(this::changeBackgroundEffect, packetInput);
-      } else if (packetInput instanceof ForcedEquip) {
-         return create(this::showForcedEquip, packetInput);
-      } else if (packetInput instanceof ForcedStatReset) {
-         return create(this::resetForcedStats, packetInput);
-      } else if (packetInput instanceof ForcedStatSet) {
-         return create(this::aranGodlyStats, packetInput);
-      } else if (packetInput instanceof CrimsonBalrogBoat) {
-         return create(this::crogBoatPacket, packetInput);
-      } else if (packetInput instanceof Boat) {
-         return create(this::boatPacket, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowBossHP.class, packet -> this.showBossHP((ShowBossHP) packet));
+      registry.setHandler(CustomShowBossHP.class, packet -> this.customShowBossHP((CustomShowBossHP) packet));
+      registry.setHandler(EnvironmentChange.class, packet -> this.environmentChange((EnvironmentChange) packet));
+      registry.setHandler(MapEffect.class, packet -> this.mapEffect((MapEffect) packet));
+      registry.setHandler(MapSound.class, packet -> this.mapSound((MapSound) packet));
+      registry.setHandler(DojoAnimation.class, packet -> this.sendDojoAnimation((DojoAnimation) packet));
+      registry.setHandler(TrembleEffect.class, packet -> this.trembleEffect((TrembleEffect) packet));
+      registry.setHandler(EnvironmentMove.class, packet -> this.environmentMove((EnvironmentMove) packet));
+      registry.setHandler(EnvironmentMoveList.class, packet -> this.environmentMoveList((EnvironmentMoveList) packet));
+      registry.setHandler(BlowWeather.class, packet -> this.startMapEffect((BlowWeather) packet));
+      registry.setHandler(RemoveWeather.class, packet -> this.removeMapEffect((RemoveWeather) packet));
+      registry.setHandler(ChangeBackgroundEffect.class, packet -> this.changeBackgroundEffect((ChangeBackgroundEffect) packet));
+      registry.setHandler(ForcedEquip.class, packet -> this.showForcedEquip((ForcedEquip) packet));
+      registry.setHandler(ForcedStatReset.class, packet -> this.resetForcedStats((ForcedStatReset) packet));
+      registry.setHandler(ForcedStatSet.class, packet -> this.aranGodlyStats((ForcedStatSet) packet));
+      registry.setHandler(CrimsonBalrogBoat.class, packet -> this.crogBoatPacket((CrimsonBalrogBoat) packet));
+      registry.setHandler(Boat.class, packet -> this.boatPacket((Boat) packet));
    }
 
    protected byte[] showBossHP(ShowBossHP packet) {

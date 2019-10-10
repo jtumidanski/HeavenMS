@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.monster.book.ChangeCover;
 import tools.packet.monster.book.SetCard;
 
@@ -18,17 +16,8 @@ public class MonsterBookPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterBookPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof SetCard) {
-         return create(this::addCard, packetInput);
-      } else if (packetInput instanceof ChangeCover) {
-         return create(this::changeCover, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(SetCard.class, packet -> this.addCard((SetCard) packet));
+      registry.setHandler(ChangeCover.class, packet -> this.changeCover((ChangeCover) packet));
    }
 
    protected byte[] addCard(SetCard packet) {

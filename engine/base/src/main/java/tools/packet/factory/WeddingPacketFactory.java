@@ -4,13 +4,11 @@ import client.MapleCharacter;
 import client.inventory.Item;
 import client.processor.CharacterProcessor;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
-import tools.packet.wedding.MarriageResultError;
 import tools.packet.wedding.MarriageRequest;
 import tools.packet.wedding.MarriageResult;
+import tools.packet.wedding.MarriageResultError;
 import tools.packet.wedding.SendWishList;
 import tools.packet.wedding.TakePhoto;
 import tools.packet.wedding.WeddingGiftResult;
@@ -53,31 +51,15 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
    }
 
    private WeddingPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof MarriageRequest) {
-         return create(this::marriageRequest, packetInput);
-      } else if (packetInput instanceof TakePhoto) {
-         return create(this::takePhoto, packetInput);
-      } else if (packetInput instanceof MarriageResult) {
-         return create(this::marriageResult, packetInput);
-      } else if (packetInput instanceof MarriageResultError) {
-         return create(this::marriageResultError, packetInput);
-      } else if (packetInput instanceof WeddingPartnerTransfer) {
-         return create(this::weddingPartnerTransfer, packetInput);
-      } else if (packetInput instanceof WeddingProgress) {
-         return create(this::weddingProgress, packetInput);
-      } else if (packetInput instanceof WeddingInvitation) {
-         return create(this::sendWeddingInvitation, packetInput);
-      } else if (packetInput instanceof SendWishList) {
-         return create(this::sendWishList, packetInput);
-      } else if (packetInput instanceof WeddingGiftResult) {
-         return create(this::weddingGiftResult, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(MarriageRequest.class, packet -> this.marriageRequest((MarriageRequest) packet));
+      registry.setHandler(TakePhoto.class, packet -> this.takePhoto((TakePhoto) packet));
+      registry.setHandler(MarriageResult.class, packet -> this.marriageResult((MarriageResult) packet));
+      registry.setHandler(MarriageResultError.class, packet -> this.marriageResultError((MarriageResultError) packet));
+      registry.setHandler(WeddingPartnerTransfer.class, packet -> this.weddingPartnerTransfer((WeddingPartnerTransfer) packet));
+      registry.setHandler(WeddingProgress.class, packet -> this.weddingProgress((WeddingProgress) packet));
+      registry.setHandler(WeddingInvitation.class, packet -> this.sendWeddingInvitation((WeddingInvitation) packet));
+      registry.setHandler(SendWishList.class, packet -> this.sendWishList((SendWishList) packet));
+      registry.setHandler(WeddingGiftResult.class, packet -> this.weddingGiftResult((WeddingGiftResult) packet));
    }
 
    /**
@@ -196,7 +178,7 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
 
    /**
     * The World Map includes 'loverPos' in which this packet controls
-
+    *
     * @return mplew
     */
    protected byte[] weddingPartnerTransfer(WeddingPartnerTransfer packet) {
@@ -249,7 +231,7 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
 
    /**
     * Handles all of WeddingWishlist packets
-
+    *
     * @return mplew
     */
    protected byte[] weddingGiftResult(WeddingGiftResult packet) {

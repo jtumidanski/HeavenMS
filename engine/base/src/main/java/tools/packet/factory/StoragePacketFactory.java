@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import client.inventory.Item;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.storage.ArrangeStorage;
 import tools.packet.storage.GetStorage;
 import tools.packet.storage.MesoStorage;
@@ -23,25 +21,12 @@ public class StoragePacketFactory extends AbstractPacketFactory {
    }
 
    private StoragePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetStorage) {
-         return create(this::getStorage, packetInput);
-      } else if (packetInput instanceof StorageError) {
-         return create(this::getStorageError, packetInput);
-      } else if (packetInput instanceof MesoStorage) {
-         return create(this::mesoStorage, packetInput);
-      } else if (packetInput instanceof StoreInStorage) {
-         return create(this::storeStorage, packetInput);
-      } else if (packetInput instanceof TakeOutOfStorage) {
-         return create(this::takeOutStorage, packetInput);
-      } else if (packetInput instanceof ArrangeStorage) {
-         return create(this::arrangeStorage, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetStorage.class, packet -> this.getStorage((GetStorage) packet));
+      registry.setHandler(StorageError.class, packet -> this.getStorageError((StorageError) packet));
+      registry.setHandler(MesoStorage.class, packet -> this.mesoStorage((MesoStorage) packet));
+      registry.setHandler(StoreInStorage.class, packet -> this.storeStorage((StoreInStorage) packet));
+      registry.setHandler(TakeOutOfStorage.class, packet -> this.takeOutStorage((TakeOutOfStorage) packet));
+      registry.setHandler(ArrangeStorage.class, packet -> this.arrangeStorage((ArrangeStorage) packet));
    }
 
    protected byte[] getStorage(GetStorage packet) {

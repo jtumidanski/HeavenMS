@@ -7,8 +7,8 @@ import constants.ServerConstants;
 import net.opcodes.SendOpcode;
 import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.character.CharacterList;
 import tools.packet.PacketInput;
+import tools.packet.character.CharacterList;
 
 public class CharacterListPacketFactory extends AbstractPacketFactory {
    private static CharacterListPacketFactory instance;
@@ -21,15 +21,7 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterListPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof CharacterList) {
-         return create(this::getCharList, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(CharacterList.class, packet -> this.getCharList((CharacterList) packet));
    }
 
    /**

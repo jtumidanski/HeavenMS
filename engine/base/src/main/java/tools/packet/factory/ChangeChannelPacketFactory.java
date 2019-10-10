@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.ChangeChannel;
-import tools.packet.PacketInput;
 
 public class ChangeChannelPacketFactory extends AbstractPacketFactory {
    private static ChangeChannelPacketFactory instance;
@@ -17,15 +15,7 @@ public class ChangeChannelPacketFactory extends AbstractPacketFactory {
    }
 
    private ChangeChannelPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ChangeChannel) {
-         return create(this::getChannelChange, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ChangeChannel.class, packet -> this.getChannelChange((ChangeChannel) packet));
    }
 
    /**

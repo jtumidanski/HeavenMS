@@ -5,9 +5,7 @@ import java.util.Map;
 import client.status.MonsterStatus;
 import net.opcodes.SendOpcode;
 import server.life.MobSkill;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.monster.ApplyMonsterStatus;
 import tools.packet.monster.CancelMonsterStatus;
 import tools.packet.monster.CatchMonster;
@@ -31,39 +29,22 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof KillMonster) {
-         return create(this::killMonster, packetInput);
-      } else if (packetInput instanceof ShowMonsterHP) {
-         return create(this::showMonsterHP, packetInput);
-      } else if (packetInput instanceof ApplyMonsterStatus) {
-         return create(this::applyMonsterStatus, packetInput);
-      } else if (packetInput instanceof CancelMonsterStatus) {
-         return create(this::cancelMonsterStatus, packetInput);
-      } else if (packetInput instanceof DamageMonster) {
-         return create(this::damageMonster, packetInput);
-      } else if (packetInput instanceof HealMonster) {
-         return create(this::healMonster, packetInput);
-      } else if (packetInput instanceof CatchMonster) {
-         return create(this::catchMonster, packetInput);
-      } else if (packetInput instanceof CatchMonsterWithItem) {
-         return create(this::catchMonsterWithItem, packetInput);
-      } else if (packetInput instanceof DamageMonsterFriendly) {
-         return create(this::damageMonsterFriendly, packetInput);
-      } else if (packetInput instanceof CatchMonsterFailure) {
-         return create(this::catchMessage, packetInput);
-      } else if (packetInput instanceof DamageSummon) {
-         return create(this::damageSummon, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(KillMonster.class, packet -> this.killMonster((KillMonster) packet));
+      registry.setHandler(ShowMonsterHP.class, packet -> this.showMonsterHP((ShowMonsterHP) packet));
+      registry.setHandler(ApplyMonsterStatus.class, packet -> this.applyMonsterStatus((ApplyMonsterStatus) packet));
+      registry.setHandler(CancelMonsterStatus.class, packet -> this.cancelMonsterStatus((CancelMonsterStatus) packet));
+      registry.setHandler(DamageMonster.class, packet -> this.damageMonster((DamageMonster) packet));
+      registry.setHandler(HealMonster.class, packet -> this.healMonster((HealMonster) packet));
+      registry.setHandler(CatchMonster.class, packet -> this.catchMonster((CatchMonster) packet));
+      registry.setHandler(CatchMonsterWithItem.class, packet -> this.catchMonsterWithItem((CatchMonsterWithItem) packet));
+      registry.setHandler(DamageMonsterFriendly.class, packet -> this.damageMonsterFriendly((DamageMonsterFriendly) packet));
+      registry.setHandler(CatchMonsterFailure.class, packet -> this.catchMessage((CatchMonsterFailure) packet));
+      registry.setHandler(DamageSummon.class, packet -> this.damageSummon((DamageSummon) packet));
    }
 
    /**
     * Gets a packet telling the client that a monster was killed.
+    *
     * @return The kill monster packet.
     */
    protected byte[] killMonster(KillMonster packet) {

@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.maker.MakerCrystalResult;
 import tools.packet.maker.MakerEnableActions;
 import tools.packet.maker.MakerResult;
@@ -21,21 +19,10 @@ public class MakerResultPacketFactory extends AbstractPacketFactory {
    }
 
    private MakerResultPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof MakerResult) {
-         return create(this::makerResult, packetInput);
-      } else if (packetInput instanceof MakerCrystalResult) {
-         return create(this::makerResultCrystal, packetInput);
-      } else if (packetInput instanceof MakerResultDesynth) {
-         return create(this::makerResultDesynth, packetInput);
-      } else if (packetInput instanceof MakerEnableActions) {
-         return create(this::makerEnableActions, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(MakerResult.class, packet -> this.makerResult((MakerResult) packet));
+      registry.setHandler(MakerCrystalResult.class, packet -> this.makerResultCrystal((MakerCrystalResult) packet));
+      registry.setHandler(MakerResultDesynth.class, packet -> this.makerResultDesynth((MakerResultDesynth) packet));
+      registry.setHandler(MakerEnableActions.class, packet -> this.makerEnableActions((MakerEnableActions) packet));
    }
 
    // MAKER_RESULT packets thanks to Arnah (Vertisy)

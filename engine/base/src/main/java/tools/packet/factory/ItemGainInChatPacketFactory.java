@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.showitemgaininchat.ShowBuybackEffect;
 import tools.packet.showitemgaininchat.ShowGainCard;
 import tools.packet.showitemgaininchat.ShowInfo;
@@ -28,37 +26,18 @@ public class ItemGainInChatPacketFactory extends AbstractPacketFactory {
    }
 
    private ItemGainInChatPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowItemGainInChat) {
-         return create(this::getShowItemGain, packetInput);
-      } else if (packetInput instanceof ShowOwnBuffEffect) {
-         return create(this::showOwnBuffEffect, packetInput);
-      } else if (packetInput instanceof ShowOwnBerserk) {
-         return create(this::showOwnBerserk, packetInput);
-      } else if (packetInput instanceof ShowOwnPetLevelUp) {
-         return create(this::showOwnPetLevelUp, packetInput);
-      } else if (packetInput instanceof ShowGainCard) {
-         return create(this::showGainCard, packetInput);
-      } else if (packetInput instanceof ShowIntro) {
-         return create(this::showIntro, packetInput);
-      } else if (packetInput instanceof ShowInfo) {
-         return create(this::showInfo, packetInput);
-      } else if (packetInput instanceof ShowBuybackEffect) {
-         return create(this::showBuybackEffect, packetInput);
-      } else if (packetInput instanceof ShowSpecialEffect) {
-         return create(this::showSpecialEffect, packetInput);
-      } else if (packetInput instanceof ShowMakerEffect) {
-         return create(this::showMakerEffect, packetInput);
-      } else if (packetInput instanceof ShowOwnRecovery) {
-         return create(this::showOwnRecovery, packetInput);
-      } else if (packetInput instanceof ShowWheelsLeft) {
-         return create(this::showWheelsLeft, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowItemGainInChat.class, packet -> this.getShowItemGain((ShowItemGainInChat) packet));
+      registry.setHandler(ShowOwnBuffEffect.class, packet -> this.showOwnBuffEffect((ShowOwnBuffEffect) packet));
+      registry.setHandler(ShowOwnBerserk.class, packet -> this.showOwnBerserk((ShowOwnBerserk) packet));
+      registry.setHandler(ShowOwnPetLevelUp.class, packet -> this.showOwnPetLevelUp((ShowOwnPetLevelUp) packet));
+      registry.setHandler(ShowGainCard.class, packet -> this.showGainCard((ShowGainCard) packet));
+      registry.setHandler(ShowIntro.class, packet -> this.showIntro((ShowIntro) packet));
+      registry.setHandler(ShowInfo.class, packet -> this.showInfo((ShowInfo) packet));
+      registry.setHandler(ShowBuybackEffect.class, packet -> this.showBuybackEffect((ShowBuybackEffect) packet));
+      registry.setHandler(ShowSpecialEffect.class, packet -> this.showSpecialEffect((ShowSpecialEffect) packet));
+      registry.setHandler(ShowMakerEffect.class, packet -> this.showMakerEffect((ShowMakerEffect) packet));
+      registry.setHandler(ShowOwnRecovery.class, packet -> this.showOwnRecovery((ShowOwnRecovery) packet));
+      registry.setHandler(ShowWheelsLeft.class, packet -> this.showWheelsLeft((ShowWheelsLeft) packet));
    }
 
    /**

@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import client.MapleCharacter;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.ShowAllCharacter;
 import tools.packet.ShowAllCharacterInfo;
 
@@ -19,17 +17,8 @@ public class ViewAllCharactersPacketFactory extends AbstractPacketFactory {
    }
 
    private ViewAllCharactersPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowAllCharacter) {
-         return create(this::showAllCharacter, packetInput);
-      } else if (packetInput instanceof ShowAllCharacterInfo) {
-         return create(this::showAllCharacterInfo, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowAllCharacter.class, packet -> this.showAllCharacter((ShowAllCharacter) packet));
+      registry.setHandler(ShowAllCharacterInfo.class, packet -> this.showAllCharacterInfo((ShowAllCharacterInfo) packet));
    }
 
    protected byte[] showAllCharacter(ShowAllCharacter packet) {

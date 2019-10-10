@@ -22,21 +22,10 @@ public class GenericPacketFactory extends AbstractPacketFactory {
    }
 
    private GenericPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof EnableReport) {
-         return create(this::enableReport, packetInput);
-      } else if (packetInput instanceof GetEnergy) {
-         return create(this::getEnergy, packetInput);
-      } else if (packetInput instanceof DojoWarpUp) {
-         return create(this::dojoWarpUp, packetInput);
-      } else if (packetInput instanceof SetNPCScriptable) {
-         return create(this::setNPCScriptable, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(EnableReport.class, packet -> this.enableReport((EnableReport) packet));
+      registry.setHandler(GetEnergy.class, packet -> this.getEnergy((GetEnergy) packet));
+      registry.setHandler(DojoWarpUp.class, packet -> this.dojoWarpUp((DojoWarpUp) packet));
+      registry.setHandler(SetNPCScriptable.class, packet -> this.setNPCScriptable((SetNPCScriptable) packet));
    }
 
    protected byte[] enableReport(EnableReport packet) { // thanks to snow

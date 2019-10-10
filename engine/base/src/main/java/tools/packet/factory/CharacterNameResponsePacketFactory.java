@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.CharacterName;
-import tools.packet.PacketInput;
 
 public class CharacterNameResponsePacketFactory extends AbstractPacketFactory {
    private static CharacterNameResponsePacketFactory instance;
@@ -17,15 +15,7 @@ public class CharacterNameResponsePacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterNameResponsePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof CharacterName) {
-         return create(this::charNameResponse, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(CharacterName.class, packet -> this.charNameResponse((CharacterName) packet));
    }
 
    protected byte[] charNameResponse(CharacterName packet) {

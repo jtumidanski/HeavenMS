@@ -1,10 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
-import tools.packet.factory.AbstractPacketFactory;
 import tools.packet.remove.RemoveDragon;
 import tools.packet.remove.RemoveItem;
 import tools.packet.remove.RemoveKite;
@@ -25,29 +22,14 @@ public class RemovePacketFactory extends AbstractPacketFactory {
    }
 
    private RemovePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof RemoveTV) {
-         return create(this::removeTV, packetInput);
-      } else if (packetInput instanceof RemoveSummon) {
-         return create(this::removeSummon, packetInput);
-      } else if (packetInput instanceof RemoveKite) {
-         return create(this::removeKite, packetInput);
-      } else if (packetInput instanceof RemovePlayer) {
-         return create(this::removePlayerFromMap, packetInput);
-      } else if (packetInput instanceof RemoveItem) {
-         return create(this::removeItemFromMap, packetInput);
-      } else if (packetInput instanceof RemoveMist) {
-         return create(this::removeMist, packetInput);
-      } else if (packetInput instanceof RemoveNPC) {
-         return create(this::removeNPC, packetInput);
-      } else if (packetInput instanceof RemoveDragon) {
-         return create(this::removeDragon, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(RemoveTV.class, packet -> this.removeTV((RemoveTV) packet));
+      registry.setHandler(RemoveSummon.class, packet -> this.removeSummon((RemoveSummon) packet));
+      registry.setHandler(RemoveKite.class, packet -> this.removeKite((RemoveKite) packet));
+      registry.setHandler(RemovePlayer.class, packet -> this.removePlayerFromMap((RemovePlayer) packet));
+      registry.setHandler(RemoveItem.class, packet -> this.removeItemFromMap((RemoveItem) packet));
+      registry.setHandler(RemoveMist.class, packet -> this.removeMist((RemoveMist) packet));
+      registry.setHandler(RemoveNPC.class, packet -> this.removeNPC((RemoveNPC) packet));
+      registry.setHandler(RemoveDragon.class, packet -> this.removeDragon((RemoveDragon) packet));
    }
 
    /**

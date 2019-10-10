@@ -4,9 +4,7 @@ import constants.ItemConstants;
 import net.opcodes.SendOpcode;
 import server.MapleItemInformationProvider;
 import server.MapleShopItem;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.shop.ConfirmShopTransaction;
 import tools.packet.shop.DestroyHiredMerchantBox;
 import tools.packet.shop.GetNPCShop;
@@ -26,27 +24,13 @@ public class ShopPacketFactory extends AbstractPacketFactory {
    }
 
    private ShopPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof UpdateHiredMerchantBox) {
-         return create(this::updateHiredMerchantBox, packetInput);
-      } else if (packetInput instanceof GetNPCShop) {
-         return create(this::getNPCShop, packetInput);
-      } else if (packetInput instanceof ConfirmShopTransaction) {
-         return create(this::shopTransaction, packetInput);
-      } else if (packetInput instanceof ShowHiredMerchantBox) {
-         return create(this::hiredMerchantBox, packetInput);
-      } else if (packetInput instanceof RetrieveFirstMessage) {
-         return create(this::retrieveFirstMessage, packetInput);
-      } else if (packetInput instanceof RemoteChannelChange) {
-         return create(this::remoteChannelChange, packetInput);
-      } else if (packetInput instanceof DestroyHiredMerchantBox) {
-         return create(this::removeHiredMerchantBox, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(UpdateHiredMerchantBox.class, packet -> this.updateHiredMerchantBox((UpdateHiredMerchantBox) packet));
+      registry.setHandler(GetNPCShop.class, packet -> this.getNPCShop((GetNPCShop) packet));
+      registry.setHandler(ConfirmShopTransaction.class, packet -> this.shopTransaction((ConfirmShopTransaction) packet));
+      registry.setHandler(ShowHiredMerchantBox.class, packet -> this.hiredMerchantBox((ShowHiredMerchantBox) packet));
+      registry.setHandler(RetrieveFirstMessage.class, packet -> this.retrieveFirstMessage((RetrieveFirstMessage) packet));
+      registry.setHandler(RemoteChannelChange.class, packet -> this.remoteChannelChange((RemoteChannelChange) packet));
+      registry.setHandler(DestroyHiredMerchantBox.class, packet -> this.removeHiredMerchantBox((DestroyHiredMerchantBox) packet));
    }
 
    protected byte[] updateHiredMerchantBox(UpdateHiredMerchantBox packet) {

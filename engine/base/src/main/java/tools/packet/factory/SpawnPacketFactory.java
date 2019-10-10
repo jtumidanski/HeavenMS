@@ -14,13 +14,10 @@ import constants.ItemConstants;
 import net.opcodes.SendOpcode;
 import net.server.guild.MapleGuildSummary;
 import server.life.MapleMonster;
-import server.maps.MapleDragon;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
-import tools.FilePrinter;
 import tools.Randomizer;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.spawn.CannotSpawnKite;
 import tools.packet.spawn.ControlMonster;
 import tools.packet.spawn.MakeMonsterInvisible;
@@ -56,59 +53,29 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    private SpawnPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof SpawnPortal) {
-         return create(this::spawnPortal, packetInput);
-      } else if (packetInput instanceof SpawnDoor) {
-         return create(this::spawnDoor, packetInput);
-      } else if (packetInput instanceof RemoveDoor) {
-         return create(this::removeDoor, packetInput);
-      } else if (packetInput instanceof SpawnSummon) {
-         return create(this::spawnSummon, packetInput);
-      } else if (packetInput instanceof SpawnNPC) {
-         return create(this::spawnNPC, packetInput);
-      } else if (packetInput instanceof SpawnNPCRequestController) {
-         return create(this::spawnNPCRequestController, packetInput);
-      } else if (packetInput instanceof RemoveMonsterInvisibility) {
-         return create(this::removeMonsterInvisibility, packetInput);
-      } else if (packetInput instanceof SpawnFakeMonster) {
-         return create(this::spawnFakeMonster, packetInput);
-      } else if (packetInput instanceof MakeMonsterReal) {
-         return create(this::makeMonsterReal, packetInput);
-      } else if (packetInput instanceof StopMonsterControl) {
-         return create(this::stopControllingMonster, packetInput);
-      } else if (packetInput instanceof SpawnPlayer) {
-         return create(this::spawnPlayerMapObject, packetInput);
-      } else if (packetInput instanceof SpawnKite) {
-         return create(this::spawnKite, packetInput);
-      } else if (packetInput instanceof SpawnMist) {
-         return create(this::spawnMist, packetInput);
-      } else if (packetInput instanceof ShowPet) {
-         return create(this::showPet, packetInput);
-      } else if (packetInput instanceof SpawnHiredMerchant) {
-         return create(this::spawnHiredMerchantBox, packetInput);
-      } else if (packetInput instanceof SpawnPlayerNPC) {
-         return create(this::spawnPlayerNPC, packetInput);
-      } else if (packetInput instanceof RemoveNPCController) {
-         return create(this::removeNPCController, packetInput);
-      } else if (packetInput instanceof SpawnGuide) {
-         return create(this::spawnGuide, packetInput);
-      } else if (packetInput instanceof SpawnDragon) {
-         return create(this::spawnDragon, packetInput);
-      } else if (packetInput instanceof SpawnMonster) {
-         return create(this::spawnMonster, packetInput);
-      } else if (packetInput instanceof ControlMonster) {
-         return create(this::controlMonster, packetInput);
-      } else if (packetInput instanceof MakeMonsterInvisible) {
-         return create(this::makeMonsterInvisible, packetInput);
-      } else if (packetInput instanceof CannotSpawnKite) {
-         return create(this::sendCannotSpawnKite, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(SpawnPortal.class, packet -> this.spawnPortal((SpawnPortal) packet));
+      registry.setHandler(SpawnDoor.class, packet -> this.spawnDoor((SpawnDoor) packet));
+      registry.setHandler(RemoveDoor.class, packet -> this.removeDoor((RemoveDoor) packet));
+      registry.setHandler(SpawnSummon.class, packet -> this.spawnSummon((SpawnSummon) packet));
+      registry.setHandler(SpawnNPC.class, packet -> this.spawnNPC((SpawnNPC) packet));
+      registry.setHandler(SpawnNPCRequestController.class, packet -> this.spawnNPCRequestController((SpawnNPCRequestController) packet));
+      registry.setHandler(RemoveMonsterInvisibility.class, packet -> this.removeMonsterInvisibility((RemoveMonsterInvisibility) packet));
+      registry.setHandler(SpawnFakeMonster.class, packet -> this.spawnFakeMonster((SpawnFakeMonster) packet));
+      registry.setHandler(MakeMonsterReal.class, packet -> this.makeMonsterReal((MakeMonsterReal) packet));
+      registry.setHandler(StopMonsterControl.class, packet -> this.stopControllingMonster((StopMonsterControl) packet));
+      registry.setHandler(SpawnPlayer.class, packet -> this.spawnPlayerMapObject((SpawnPlayer) packet));
+      registry.setHandler(SpawnKite.class, packet -> this.spawnKite((SpawnKite) packet));
+      registry.setHandler(SpawnMist.class, packet -> this.spawnMist((SpawnMist) packet));
+      registry.setHandler(ShowPet.class, packet -> this.showPet((ShowPet) packet));
+      registry.setHandler(SpawnHiredMerchant.class, packet -> this.spawnHiredMerchantBox((SpawnHiredMerchant) packet));
+      registry.setHandler(SpawnPlayerNPC.class, packet -> this.spawnPlayerNPC((SpawnPlayerNPC) packet));
+      registry.setHandler(RemoveNPCController.class, packet -> this.removeNPCController((RemoveNPCController) packet));
+      registry.setHandler(SpawnGuide.class, packet -> this.spawnGuide((SpawnGuide) packet));
+      registry.setHandler(SpawnDragon.class, packet -> this.spawnDragon((SpawnDragon) packet));
+      registry.setHandler(SpawnMonster.class, packet -> this.spawnMonster((SpawnMonster) packet));
+      registry.setHandler(ControlMonster.class, packet -> this.controlMonster((ControlMonster) packet));
+      registry.setHandler(MakeMonsterInvisible.class, packet -> this.makeMonsterInvisible((MakeMonsterInvisible) packet));
+      registry.setHandler(CannotSpawnKite.class, packet -> this.sendCannotSpawnKite((CannotSpawnKite) packet));
    }
 
    /**
@@ -630,17 +597,17 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       return mplew.getPacket();
    }
 
-   protected byte[] spawnDragon(MapleDragon dragon) {
+   protected byte[] spawnDragon(SpawnDragon packet) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.SPAWN_DRAGON.getValue());
-      mplew.writeInt(dragon.getOwner().getId());//objectid = owner id
-      mplew.writeShort(dragon.getPosition().x);
+      mplew.writeInt(packet.getDragon().getOwner().getId());//objectid = owner id
+      mplew.writeShort(packet.getDragon().getPosition().x);
       mplew.writeShort(0);
-      mplew.writeShort(dragon.getPosition().y);
+      mplew.writeShort(packet.getDragon().getPosition().y);
       mplew.writeShort(0);
-      mplew.write(dragon.getStance());
+      mplew.write(packet.getDragon().getStance());
       mplew.write(0);
-      mplew.writeShort(dragon.getOwner().getJob().getId());
+      mplew.writeShort(packet.getDragon().getOwner().getJob().getId());
       return mplew.getPacket();
    }
 

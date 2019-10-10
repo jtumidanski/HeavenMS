@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.rps.OpenRPSNPC;
 import tools.packet.rps.RPSMesoError;
 import tools.packet.rps.RPSMode;
@@ -20,21 +18,10 @@ public class RPSPacketFactory extends AbstractPacketFactory {
    }
 
    private RPSPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof OpenRPSNPC) {
-         return create(this::openRPSNPC, packetInput);
-      } else if (packetInput instanceof RPSMesoError) {
-         return create(this::rpsMesoError, packetInput);
-      } else if (packetInput instanceof RPSSelection) {
-         return create(this::rpsSelection, packetInput);
-      } else if (packetInput instanceof RPSMode) {
-         return create(this::rpsMode, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(OpenRPSNPC.class, packet -> this.openRPSNPC((OpenRPSNPC) packet));
+      registry.setHandler(RPSMesoError.class, packet -> this.rpsMesoError((RPSMesoError) packet));
+      registry.setHandler(RPSSelection.class, packet -> this.rpsSelection((RPSSelection) packet));
+      registry.setHandler(RPSMode.class, packet -> this.rpsMode((RPSMode) packet));
    }
 
    protected byte[] openRPSNPC(OpenRPSNPC packet) {

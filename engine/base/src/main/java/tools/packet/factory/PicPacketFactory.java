@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.WrongPic;
 
 public class PicPacketFactory extends AbstractPacketFactory {
@@ -17,15 +15,7 @@ public class PicPacketFactory extends AbstractPacketFactory {
    }
 
    private PicPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof WrongPic) {
-         return create(this::wrongPic, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(WrongPic.class, packet -> this.wrongPic((WrongPic) packet));
    }
 
    protected byte[] wrongPic(WrongPic packet) {

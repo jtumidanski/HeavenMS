@@ -8,10 +8,8 @@ import server.maps.AbstractMapleMapObject;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.owl.GetOwlMessage;
 import tools.packet.owl.GetOwlOpen;
 import tools.packet.owl.OwlOfMinervaResult;
@@ -27,19 +25,9 @@ public class OwlOfMinervaPacketFactory extends AbstractPacketFactory {
    }
 
    private OwlOfMinervaPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetOwlMessage) {
-         return create(this::getOwlMessage, packetInput);
-      } else if (packetInput instanceof OwlOfMinervaResult) {
-         return create(this::owlOfMinerva, packetInput);
-      } else if (packetInput instanceof GetOwlOpen) {
-         return create(this::getOwlOpen, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetOwlMessage.class, packet -> this.getOwlMessage((GetOwlMessage) packet));
+      registry.setHandler(OwlOfMinervaResult.class, packet -> this.owlOfMinerva((OwlOfMinervaResult) packet));
+      registry.setHandler(GetOwlOpen.class, packet -> this.getOwlOpen((GetOwlOpen) packet));
    }
 
    // 0: Success

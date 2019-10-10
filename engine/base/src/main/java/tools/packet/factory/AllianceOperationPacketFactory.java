@@ -7,10 +7,8 @@ import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
-import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.alliance.AddGuildToAlliance;
 import tools.packet.alliance.AllianceInvite;
 import tools.packet.alliance.AllianceMemberOnline;
@@ -34,35 +32,17 @@ public class AllianceOperationPacketFactory extends AbstractPacketFactory {
    }
 
    private AllianceOperationPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetAllianceInfo) {
-         return create(this::getAllianceInfo, packetInput);
-      } else if (packetInput instanceof UpdateAllianceInfo) {
-         return create(this::updateAllianceInfo, packetInput);
-      } else if (packetInput instanceof GetGuildAlliances) {
-         return create(this::getGuildAlliances, packetInput);
-      } else if (packetInput instanceof AddGuildToAlliance) {
-         return create(this::addGuildToAlliance, packetInput);
-      } else if (packetInput instanceof AllianceMemberOnline) {
-         return create(this::allianceMemberOnline, packetInput);
-      } else if (packetInput instanceof AllianceNotice) {
-         return create(this::allianceNotice, packetInput);
-      } else if (packetInput instanceof ChangeAllianceRankTitles) {
-         return create(this::changeAllianceRankTitle, packetInput);
-      } else if (packetInput instanceof UpdateAllianceJobLevel) {
-         return create(this::updateAllianceJobLevel, packetInput);
-      } else if (packetInput instanceof RemoveGuildFromAlliance) {
-         return create(this::removeGuildFromAlliance, packetInput);
-      } else if (packetInput instanceof DisbandAlliance) {
-         return create(this::disbandAlliance, packetInput);
-      } else if (packetInput instanceof AllianceInvite) {
-         return create(this::allianceInvite, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetAllianceInfo.class, packet -> this.getAllianceInfo((GetAllianceInfo) packet));
+      registry.setHandler(UpdateAllianceInfo.class, packet -> this.updateAllianceInfo((UpdateAllianceInfo) packet));
+      registry.setHandler(GetGuildAlliances.class, packet -> this.getGuildAlliances((GetGuildAlliances) packet));
+      registry.setHandler(AddGuildToAlliance.class, packet -> this.addGuildToAlliance((AddGuildToAlliance) packet));
+      registry.setHandler(AllianceMemberOnline.class, packet -> this.allianceMemberOnline((AllianceMemberOnline) packet));
+      registry.setHandler(AllianceNotice.class, packet -> this.allianceNotice((AllianceNotice) packet));
+      registry.setHandler(ChangeAllianceRankTitles.class, packet -> this.changeAllianceRankTitle((ChangeAllianceRankTitles) packet));
+      registry.setHandler(UpdateAllianceJobLevel.class, packet -> this.updateAllianceJobLevel((UpdateAllianceJobLevel) packet));
+      registry.setHandler(RemoveGuildFromAlliance.class, packet -> this.removeGuildFromAlliance((RemoveGuildFromAlliance) packet));
+      registry.setHandler(DisbandAlliance.class, packet -> this.disbandAlliance((DisbandAlliance) packet));
+      registry.setHandler(AllianceInvite.class, packet -> this.allianceInvite((AllianceInvite) packet));
    }
 
    protected byte[] getAllianceInfo(GetAllianceInfo packet) {

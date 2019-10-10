@@ -2,9 +2,11 @@ package tools.packet.factory;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Function;
@@ -28,6 +30,7 @@ import constants.ItemConstants;
 import net.server.PlayerCoolDownValueHolder;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMiniGame;
+import tools.FilePrinter;
 import tools.PacketFactory;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -38,6 +41,19 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    protected final long FT_UT_OFFSET = 116444736010800000L + (10000L * TimeZone.getDefault().getOffset(System.currentTimeMillis())); // normalize with timezone offset suggested by Ari
    protected final long DEFAULT_TIME = 150842304000000000L;//00 80 05 BB 46 E6 17 02
    protected final long PERMANENT = 150841440000000000L; // 00 C0 9B 90 7D E5 17 02
+
+   protected HandlerRegistry registry = new HandlerRegistry();
+
+   @Override
+   public byte[] create(PacketInput packetInput) {
+      Optional<Function<PacketInput, byte[]>> handler = registry.getHandler(packetInput.getClass());
+      if (handler.isPresent()) {
+         return handler.get().apply(packetInput);
+      }
+
+      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
+      return new byte[0];
+   }
 
    public void announce(MapleClient client, PacketInput packetInput) {
       client.announce(create(packetInput));

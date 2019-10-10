@@ -4,9 +4,7 @@ import client.MapleClient;
 import constants.ServerConstants;
 import net.opcodes.SendOpcode;
 import net.server.Server;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.login.AuthSuccess;
 import tools.packet.login.LoginFailed;
 import tools.packet.login.PermanentBan;
@@ -23,21 +21,10 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
    }
 
    private LoginStatusPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof LoginFailed) {
-         return create(this::getLoginFailed, packetInput);
-      } else if (packetInput instanceof PermanentBan) {
-         return create(this::getPermBan, packetInput);
-      } else if (packetInput instanceof TemporaryBan) {
-         return create(this::getTempBan, packetInput);
-      } else if (packetInput instanceof AuthSuccess) {
-         return create(this::getAuthSuccess, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(LoginFailed.class, packet -> this.getLoginFailed((LoginFailed) packet));
+      registry.setHandler(PermanentBan.class, packet -> this.getPermBan((PermanentBan) packet));
+      registry.setHandler(TemporaryBan.class, packet -> this.getTempBan((TemporaryBan) packet));
+      registry.setHandler(AuthSuccess.class, packet -> this.getAuthSuccess((AuthSuccess) packet));
    }
 
    /**

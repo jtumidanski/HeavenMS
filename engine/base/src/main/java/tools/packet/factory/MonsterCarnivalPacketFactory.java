@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.monster.carnival.MonsterCarnivalMessage;
 import tools.packet.monster.carnival.MonsterCarnivalPartyPoints;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerDied;
@@ -22,25 +20,12 @@ public class MonsterCarnivalPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterCarnivalPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof MonsterCarnivalStart) {
-         return create(this::startMonsterCarnival, packetInput);
-      } else if (packetInput instanceof MonsterCarnivalPlayerDied) {
-         return create(this::playerDiedMessage, packetInput);
-      } else if (packetInput instanceof MonsterCarnivalPlayerSummoned) {
-         return create(this::playerSummoned, packetInput);
-      } else if (packetInput instanceof MonsterCarnivalMessage) {
-         return create(this::message, packetInput);
-      } else if (packetInput instanceof MonsterCarnivalPointObtained) {
-         return create(this::obtainedPoints, packetInput);
-      } else if (packetInput instanceof MonsterCarnivalPartyPoints) {
-         return create(this::partyPoints, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(MonsterCarnivalStart.class, packet -> this.startMonsterCarnival((MonsterCarnivalStart) packet));
+      registry.setHandler(MonsterCarnivalPlayerDied.class, packet -> this.playerDiedMessage((MonsterCarnivalPlayerDied) packet));
+      registry.setHandler(MonsterCarnivalPlayerSummoned.class, packet -> this.playerSummoned((MonsterCarnivalPlayerSummoned) packet));
+      registry.setHandler(MonsterCarnivalMessage.class, packet -> this.message((MonsterCarnivalMessage) packet));
+      registry.setHandler(MonsterCarnivalPointObtained.class, packet -> this.obtainedPoints((MonsterCarnivalPointObtained) packet));
+      registry.setHandler(MonsterCarnivalPartyPoints.class, packet -> this.partyPoints((MonsterCarnivalPartyPoints) packet));
    }
 
    protected byte[] obtainedPoints(MonsterCarnivalPointObtained packet) { // CPQ

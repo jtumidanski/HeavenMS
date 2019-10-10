@@ -15,9 +15,7 @@ import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
 import server.MapleItemInformationProvider;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.character.CharacterKnockBack;
 import tools.packet.character.CharacterLook;
 import tools.packet.character.DamageCharacter;
@@ -42,37 +40,18 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof CharacterLook) {
-         return create(this::updateCharLook, packetInput);
-      } else if (packetInput instanceof GetCharacterInfo) {
-         return create(this::charInfo, packetInput);
-      } else if (packetInput instanceof FacialExpression) {
-         return create(this::facialExpression, packetInput);
-      } else if (packetInput instanceof UpdateGender) {
-         return create(this::updateGender, packetInput);
-      } else if (packetInput instanceof SetAutoMpPot) {
-         return create(this::sendAutoMpPot, packetInput);
-      } else if (packetInput instanceof SetAutoHpPot) {
-         return create(this::sendAutoHpPot, packetInput);
-      } else if (packetInput instanceof UpdateSkill) {
-         return create(this::updateSkill, packetInput);
-      } else if (packetInput instanceof SummonSkill) {
-         return create(this::summonSkill, packetInput);
-      } else if (packetInput instanceof SkillCooldown) {
-         return create(this::skillCooldown, packetInput);
-      } else if (packetInput instanceof DamageCharacter) {
-         return create(this::damagePlayer, packetInput);
-      } else if (packetInput instanceof UpdateMount) {
-         return create(this::updateMount, packetInput);
-      } else if (packetInput instanceof CharacterKnockBack) {
-         return create(this::leftKnockBack, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(CharacterLook.class, packet -> this.updateCharLook((CharacterLook) packet));
+      registry.setHandler(GetCharacterInfo.class, packet -> this.charInfo((GetCharacterInfo) packet));
+      registry.setHandler(FacialExpression.class, packet -> this.facialExpression((FacialExpression) packet));
+      registry.setHandler(UpdateGender.class, packet -> this.updateGender((UpdateGender) packet));
+      registry.setHandler(SetAutoMpPot.class, packet -> this.sendAutoMpPot((SetAutoMpPot) packet));
+      registry.setHandler(SetAutoHpPot.class, packet -> this.sendAutoHpPot((SetAutoHpPot) packet));
+      registry.setHandler(UpdateSkill.class, packet -> this.updateSkill((UpdateSkill) packet));
+      registry.setHandler(SummonSkill.class, packet -> this.summonSkill((SummonSkill) packet));
+      registry.setHandler(SkillCooldown.class, packet -> this.skillCooldown((SkillCooldown) packet));
+      registry.setHandler(DamageCharacter.class, packet -> this.damagePlayer((DamageCharacter) packet));
+      registry.setHandler(UpdateMount.class, packet -> this.updateMount((UpdateMount) packet));
+      registry.setHandler(CharacterKnockBack.class, packet -> this.leftKnockBack((CharacterKnockBack) packet));
    }
 
    protected byte[] updateCharLook(CharacterLook packet) {

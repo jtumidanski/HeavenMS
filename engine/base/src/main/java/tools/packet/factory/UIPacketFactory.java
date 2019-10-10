@@ -5,9 +5,7 @@ import java.util.List;
 import client.KeyBinding;
 import net.opcodes.SendOpcode;
 import net.server.SkillMacro;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.ui.DisableMiniMap;
 import tools.packet.ui.DisableUI;
 import tools.packet.ui.FinishedSort;
@@ -36,45 +34,22 @@ public class UIPacketFactory extends AbstractPacketFactory {
    }
 
    private UIPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof OpenUI) {
-         return create(this::openUI, packetInput);
-      } else if (packetInput instanceof LockUI) {
-         return create(this::lockUI, packetInput);
-      } else if (packetInput instanceof DisableUI) {
-         return create(this::disableUI, packetInput);
-      } else if (packetInput instanceof GetKeyMap) {
-         return create(this::getKeymap, packetInput);
-      } else if (packetInput instanceof GetMacros) {
-         return create(this::getMacros, packetInput);
-      } else if (packetInput instanceof DisableMiniMap) {
-         return create(this::disableMinimap, packetInput);
-      } else if (packetInput instanceof FinishedSort) {
-         return create(this::finishedSort, packetInput);
-      } else if (packetInput instanceof FinishedSort2) {
-         return create(this::finishedSort2, packetInput);
-      } else if (packetInput instanceof GetClock) {
-         return create(this::getClock, packetInput);
-      } else if (packetInput instanceof GetClockTime) {
-         return create(this::getClockTime, packetInput);
-      } else if (packetInput instanceof StopClock) {
-         return create(this::removeClock, packetInput);
-      } else if (packetInput instanceof GMEffect) {
-         return create(this::getGMEffect, packetInput);
-      } else if (packetInput instanceof ShowBlockedUI) {
-         return create(this::blockedMessage2, packetInput);
-      } else if (packetInput instanceof ShowNotes) {
-         return create(this::showNotes, packetInput);
-      } else if (packetInput instanceof ShowOXQuiz) {
-         return create(this::showOXQuiz, packetInput);
-      } else if (packetInput instanceof RefreshTeleportRockMapList) {
-         return create(this::trockRefreshMapList, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(OpenUI.class, packet -> this.openUI((OpenUI) packet));
+      registry.setHandler(LockUI.class, packet -> this.lockUI((LockUI) packet));
+      registry.setHandler(DisableUI.class, packet -> this.disableUI((DisableUI) packet));
+      registry.setHandler(GetKeyMap.class, packet -> this.getKeymap((GetKeyMap) packet));
+      registry.setHandler(GetMacros.class, packet -> this.getMacros((GetMacros) packet));
+      registry.setHandler(DisableMiniMap.class, packet -> this.disableMinimap((DisableMiniMap) packet));
+      registry.setHandler(FinishedSort.class, packet -> this.finishedSort((FinishedSort) packet));
+      registry.setHandler(FinishedSort2.class, packet -> this.finishedSort2((FinishedSort2) packet));
+      registry.setHandler(GetClock.class, packet -> this.getClock((GetClock) packet));
+      registry.setHandler(GetClockTime.class, packet -> this.getClockTime((GetClockTime) packet));
+      registry.setHandler(StopClock.class, packet -> this.removeClock((StopClock) packet));
+      registry.setHandler(GMEffect.class, packet -> this.getGMEffect((GMEffect) packet));
+      registry.setHandler(ShowBlockedUI.class, packet -> this.blockedMessage2((ShowBlockedUI) packet));
+      registry.setHandler(ShowNotes.class, packet -> this.showNotes((ShowNotes) packet));
+      registry.setHandler(ShowOXQuiz.class, packet -> this.showOXQuiz((ShowOXQuiz) packet));
+      registry.setHandler(RefreshTeleportRockMapList.class, packet -> this.trockRefreshMapList((RefreshTeleportRockMapList) packet));
    }
 
    /**

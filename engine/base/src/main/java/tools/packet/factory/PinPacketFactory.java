@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.pin.PinCodePacket;
 import tools.packet.pin.PinRegistered;
 
@@ -18,23 +16,12 @@ public class PinPacketFactory extends AbstractPacketFactory {
    }
 
    private PinPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof PinCodePacket) {
-         return create(this::pinOperation, packetInput);
-      } else if (packetInput instanceof PinRegistered) {
-         return create(this::pinRegistered, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(PinCodePacket.class, packet -> this.pinOperation((PinCodePacket) packet));
+      registry.setHandler(PinRegistered.class, packet -> this.pinRegistered((PinRegistered) packet));
    }
 
    /**
     * Gets a packet detailing a PIN operation.
-    *
-    * @return
     */
    protected byte[] pinOperation(PinCodePacket packet) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(3);

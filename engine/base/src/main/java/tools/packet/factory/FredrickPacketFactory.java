@@ -25,19 +25,9 @@ public class FredrickPacketFactory extends AbstractPacketFactory {
    }
 
    private FredrickPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof FredrickMessage) {
-         return create(this::fredrickMessage, packetInput);
-      } else if (packetInput instanceof GetFredrick) {
-         return create(this::getFredrick, packetInput);
-      } else if (packetInput instanceof GetFredrickInfo) {
-         return create(this::getFredrickInfo, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(FredrickMessage.class, packet -> this.fredrickMessage((FredrickMessage) packet));
+      registry.setHandler(GetFredrick.class, packet -> this.getFredrick((GetFredrick) packet));
+      registry.setHandler(GetFredrickInfo.class, packet -> this.getFredrickInfo((GetFredrickInfo) packet));
    }
 
    protected byte[] fredrickMessage(FredrickMessage packet) {

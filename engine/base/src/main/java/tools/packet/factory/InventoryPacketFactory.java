@@ -8,12 +8,10 @@ import constants.ExpTable;
 import constants.ItemConstants;
 import net.opcodes.SendOpcode;
 import server.MapleItemInformationProvider;
-import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
-import tools.packet.PacketInput;
 import tools.packet.inventory.SlotLimitUpdate;
 
 public class InventoryPacketFactory extends AbstractPacketFactory {
@@ -27,19 +25,9 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
    }
 
    private InventoryPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ModifyInventoryPacket) {
-         return create(this::modifyInventory, packetInput);
-      } else if (packetInput instanceof InventoryFull) {
-         return create(this::modifyInventory, new ModifyInventoryPacket(((InventoryFull) packetInput).updateTick(), ((InventoryFull) packetInput).modifications()));
-      } else if (packetInput instanceof SlotLimitUpdate) {
-         return create(this::updateInventorySlotLimit, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ModifyInventoryPacket.class, packet -> this.modifyInventory((ModifyInventoryPacket) packet));
+      registry.setHandler(InventoryFull.class, packet -> this.modifyInventory(new ModifyInventoryPacket(((InventoryFull) packet).updateTick(), ((InventoryFull) packet).modifications())));
+      registry.setHandler(SlotLimitUpdate.class, packet -> this.updateInventorySlotLimit((SlotLimitUpdate) packet));
    }
 
    protected byte[] modifyInventory(ModifyInventoryPacket packet) {

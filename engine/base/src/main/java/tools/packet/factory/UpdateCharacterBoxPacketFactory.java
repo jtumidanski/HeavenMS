@@ -3,9 +3,7 @@ package tools.packet.factory;
 import net.opcodes.SendOpcode;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.character.box.AddMatchCard;
 import tools.packet.character.box.AddOmokBox;
 import tools.packet.character.box.RemoveMiniGameBox;
@@ -24,25 +22,12 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    }
 
    private UpdateCharacterBoxPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof AddOmokBox) {
-         return create(this::addOmokBox, packetInput);
-      } else if (packetInput instanceof AddMatchCard) {
-         return create(this::addMatchCardBox, packetInput);
-      } else if (packetInput instanceof RemoveMiniGameBox) {
-         return create(this::removeMinigameBox, packetInput);
-      } else if (packetInput instanceof UpdatePlayerShopBox) {
-         return create(this::updatePlayerShopBox, packetInput);
-      } else if (packetInput instanceof RemovePlayerShop) {
-         return create(this::removePlayerShopBox, packetInput);
-      } else if (packetInput instanceof UseChalkboard) {
-         return create(this::useChalkboard, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(AddOmokBox.class, packet -> this.addOmokBox((AddOmokBox) packet));
+      registry.setHandler(AddMatchCard.class, packet -> this.addMatchCardBox((AddMatchCard) packet));
+      registry.setHandler(RemoveMiniGameBox.class, packet -> this.removeMinigameBox((RemoveMiniGameBox) packet));
+      registry.setHandler(UpdatePlayerShopBox.class, packet -> this.updatePlayerShopBox((UpdatePlayerShopBox) packet));
+      registry.setHandler(RemovePlayerShop.class, packet -> this.removePlayerShopBox((RemovePlayerShop) packet));
+      registry.setHandler(UseChalkboard.class, packet -> this.useChalkboard((UseChalkboard) packet));
    }
 
    protected byte[] addOmokBox(AddOmokBox packet) {

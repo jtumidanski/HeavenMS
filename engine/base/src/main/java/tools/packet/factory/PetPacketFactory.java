@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.pet.PetChat;
 import tools.packet.pet.PetCommandResponse;
 import tools.packet.pet.PetExceptionList;
@@ -21,23 +19,11 @@ public class PetPacketFactory extends AbstractPacketFactory {
    }
 
    private PetPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof PetChat) {
-         return create(this::petChat, packetInput);
-      } else if (packetInput instanceof PetFoodResponse) {
-         return create(this::petFoodResponse, packetInput);
-      } else if (packetInput instanceof PetCommandResponse) {
-         return create(this::commandResponse, packetInput);
-      } else if (packetInput instanceof PetNameChange) {
-         return create(this::changePetName, packetInput);
-      } else if (packetInput instanceof PetExceptionList) {
-         return create(this::loadExceptionList, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(PetChat.class, packet -> this.petChat((PetChat) packet));
+      registry.setHandler(PetFoodResponse.class, packet -> this.petFoodResponse((PetFoodResponse) packet));
+      registry.setHandler(PetCommandResponse.class, packet -> this.commandResponse((PetCommandResponse) packet));
+      registry.setHandler(PetNameChange.class, packet -> this.changePetName((PetNameChange) packet));
+      registry.setHandler(PetExceptionList.class, packet -> this.loadExceptionList((PetExceptionList) packet));
    }
 
    protected byte[] petChat(PetChat packet) {

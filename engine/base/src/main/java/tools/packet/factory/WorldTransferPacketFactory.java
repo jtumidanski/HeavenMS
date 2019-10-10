@@ -6,9 +6,7 @@ import constants.GameConstants;
 import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.world.World;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.transfer.world.WorldTransferCancel;
 import tools.packet.transfer.world.WorldTransferError;
 
@@ -23,17 +21,8 @@ public class WorldTransferPacketFactory extends AbstractPacketFactory {
    }
 
    private WorldTransferPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof WorldTransferError) {
-         return create(this::sendWorldTransferRules, packetInput);
-      } else if (packetInput instanceof WorldTransferCancel) {
-         return create(this::showWorldTransferCancel, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(WorldTransferError.class, packet -> this.sendWorldTransferRules((WorldTransferError) packet));
+      registry.setHandler(WorldTransferCancel.class, packet -> this.showWorldTransferCancel((WorldTransferCancel) packet));
    }
 
    /*  1: cannot find char info,

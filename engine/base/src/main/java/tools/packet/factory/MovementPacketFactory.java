@@ -4,11 +4,8 @@ import java.util.List;
 
 import net.opcodes.SendOpcode;
 import server.movement.LifeMovementFragment;
-import tools.FilePrinter;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
-import tools.packet.factory.AbstractPacketFactory;
 import tools.packet.movement.MoveDragon;
 import tools.packet.movement.MoveMonster;
 import tools.packet.movement.MoveMonsterResponse;
@@ -27,25 +24,12 @@ public class MovementPacketFactory extends AbstractPacketFactory {
    }
 
    private MovementPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof MoveMonsterResponse) {
-         return create(this::moveMonsterResponse, packetInput);
-      } else if (packetInput instanceof MovePlayer) {
-         return create(this::movePlayer, packetInput);
-      } else if (packetInput instanceof MoveSummon) {
-         return create(this::moveSummon, packetInput);
-      } else if (packetInput instanceof MoveMonster) {
-         return create(this::moveMonster, packetInput);
-      } else if (packetInput instanceof MovePet) {
-         return create(this::movePet, packetInput);
-      } else if (packetInput instanceof MoveDragon) {
-         return create(this::moveDragon, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(MoveMonsterResponse.class, packet -> this.moveMonsterResponse((MoveMonsterResponse) packet));
+      registry.setHandler(MovePlayer.class, packet -> this.movePlayer((MovePlayer) packet));
+      registry.setHandler(MoveSummon.class, packet -> this.moveSummon((MoveSummon) packet));
+      registry.setHandler(MoveMonster.class, packet -> this.moveMonster((MoveMonster) packet));
+      registry.setHandler(MovePet.class, packet -> this.movePet((MovePet) packet));
+      registry.setHandler(MoveDragon.class, packet -> this.moveDragon((MoveDragon) packet));
    }
 
    /**

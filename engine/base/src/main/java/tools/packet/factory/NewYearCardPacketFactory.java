@@ -2,10 +2,8 @@ package tools.packet.factory;
 
 import client.newyear.NewYearCardRecord;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.NewYearCardResolution;
-import tools.packet.PacketInput;
 
 public class NewYearCardPacketFactory extends AbstractPacketFactory {
    private static NewYearCardPacketFactory instance;
@@ -18,15 +16,7 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
    }
 
    private NewYearCardPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof NewYearCardResolution) {
-         return create(this::onNewYearCardRes, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(NewYearCardResolution.class, packet -> this.onNewYearCardRes((NewYearCardResolution) packet));
    }
 
    protected byte[] onNewYearCardRes(NewYearCardResolution packet) {

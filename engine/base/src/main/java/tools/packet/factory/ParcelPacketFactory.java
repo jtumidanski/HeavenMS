@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
 import server.DueyPackage;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.parcel.DueyParcelNotification;
 import tools.packet.parcel.DueyParcelReceived;
 import tools.packet.parcel.RemoveDueyItem;
@@ -21,21 +19,10 @@ public class ParcelPacketFactory extends AbstractPacketFactory {
    }
 
    private ParcelPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof RemoveDueyItem) {
-         return create(this::removeItemFromDuey, packetInput);
-      } else if (packetInput instanceof DueyParcelReceived) {
-         return create(this::sendDueyParcelReceived, packetInput);
-      } else if (packetInput instanceof DueyParcelNotification) {
-         return create(this::sendDueyParcelNotification, packetInput);
-      } else if (packetInput instanceof SendDuey) {
-         return create(this::sendDuey, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(RemoveDueyItem.class, packet -> this.removeItemFromDuey((RemoveDueyItem) packet));
+      registry.setHandler(DueyParcelReceived.class, packet -> this.sendDueyParcelReceived((DueyParcelReceived) packet));
+      registry.setHandler(DueyParcelNotification.class, packet -> this.sendDueyParcelNotification((DueyParcelNotification) packet));
+      registry.setHandler(SendDuey.class, packet -> this.sendDuey((SendDuey) packet));
    }
 
    protected byte[] removeItemFromDuey(RemoveDueyItem packet) {

@@ -6,17 +6,16 @@ import java.util.stream.IntStream;
 
 import client.inventory.Item;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.Gift;
+import tools.packet.PacketInput;
 import tools.packet.cashshop.CashShopOperationSubOp;
 import tools.packet.cashshop.SendMapleLife;
 import tools.packet.cashshop.SendMapleLifeError;
 import tools.packet.cashshop.SendMapleNameLifeError;
 import tools.packet.cashshop.ShowCash;
 import tools.packet.cashshop.operation.DeleteCashItem;
-import tools.packet.Gift;
-import tools.packet.PacketInput;
 import tools.packet.cashshop.operation.PutIntoCashInventory;
 import tools.packet.cashshop.operation.RefundCashItem;
 import tools.packet.cashshop.operation.ShowBoughtCashItem;
@@ -47,60 +46,32 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
    }
 
    private CashShopOperationPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowWorldTransferSuccess) {
-         return create(CashShopOperationSubOp.WORLD_TRANSFER_SUCCESS, this::showWorldTransferSuccess, packetInput);
-      } else if (packetInput instanceof ShowNameChangeSuccess) {
-         return create(CashShopOperationSubOp.NAME_CHANGE_SUCCESS, this::showNameChangeSuccess, packetInput);
-      } else if (packetInput instanceof ShowCouponRedeemSuccess) {
-         return create(CashShopOperationSubOp.COUPON_REDEEMED_SUCCESS, this::showCouponRedeemedItems, packetInput);
-      } else if (packetInput instanceof ShowBoughtCashPackageSuccess) {
-         return create(CashShopOperationSubOp.BOUGHT_CASH_PACKAGE_SUCCESS, this::showBoughtCashPackage, packetInput);
-      } else if (packetInput instanceof ShowBoughtQuestItem) {
-         return create(CashShopOperationSubOp.BOUGHT_QUEST_ITEM_SUCCESS, this::showBoughtQuestItem, packetInput);
-      } else if (packetInput instanceof ShowWishList) {
-         CashShopOperationSubOp subOp = ((ShowWishList) packetInput).update() ? CashShopOperationSubOp.SHOW_WISHLIST_UPDATE : CashShopOperationSubOp.SHOW_WISHLIST;
-         return create(subOp, this::showWishList, packetInput);
-      } else if (packetInput instanceof ShowBoughtCashItem) {
-         return create(CashShopOperationSubOp.BOUGHT_CASH_ITEM_SUCCESS, this::showBoughtCashItem, packetInput);
-      } else if (packetInput instanceof ShowBoughtCashRing) {
-         return create(CashShopOperationSubOp.BOUGHT_CASH_RING_SUCCESS, this::showBoughtCashRing, packetInput);
-      } else if (packetInput instanceof ShowCashShopMessage) {
-         return create(CashShopOperationSubOp.CASH_SHOP_MESSAGE, this::showCashShopMessage, packetInput, 4);
-      } else if (packetInput instanceof ShowCashInventory) {
-         return create(CashShopOperationSubOp.CASH_INVENTORY, this::showCashInventory, packetInput);
-      } else if (packetInput instanceof ShowGifts) {
-         return create(CashShopOperationSubOp.GIFTS, this::showGifts, packetInput);
-      } else if (packetInput instanceof ShowGiftSucceed) {
-         return create(CashShopOperationSubOp.GIFT_SUCCEED, this::showGiftSucceed, packetInput); //0x5D, Couldn't be sent
-      } else if (packetInput instanceof ShowBoughtInventorySlots) {
-         return create(CashShopOperationSubOp.BOUGHT_INVENTORY_SLOTS, this::showBoughtInventorySlots, packetInput, 6);
-      } else if (packetInput instanceof ShowBoughtStorageSlots) {
-         return create(CashShopOperationSubOp.BOUGHT_STORAGE_SLOTS, this::showBoughtStorageSlots, packetInput, 5);
-      } else if (packetInput instanceof ShowBoughtCharacterSlots) {
-         return create(CashShopOperationSubOp.BOUGHT_CHARACTER_SLOTS, this::showBoughtCharacterSlot, packetInput, 5);
-      } else if (packetInput instanceof TakeFromCashInventory) {
-         return create(CashShopOperationSubOp.TAKE_FROM_CASH_INVENTORY, this::takeFromCashInventory, packetInput);
-      } else if (packetInput instanceof DeleteCashItem) {
-         return create(CashShopOperationSubOp.DELETE_CASH_ITEM, this::deleteCashItem, packetInput);
-      } else if (packetInput instanceof RefundCashItem) {
-         return create(CashShopOperationSubOp.REFUND_CASH_ITEM, this::refundCashItem, packetInput);
-      } else if (packetInput instanceof PutIntoCashInventory) {
-         return create(CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory, packetInput);
-      } else if (packetInput instanceof ShowCash) {
-         return create(this::showCash, packetInput);
-      } else if (packetInput instanceof SendMapleLife) {
-         return create(this::sendMapleLifeCharacterInfo, packetInput);
-      } else if (packetInput instanceof SendMapleNameLifeError) {
-         return create(this::sendMapleLifeNameError, packetInput);
-      } else if (packetInput instanceof SendMapleLifeError) {
-         return create(this::sendMapleLifeError, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowWorldTransferSuccess.class, packet -> create(CashShopOperationSubOp.WORLD_TRANSFER_SUCCESS, this::showWorldTransferSuccess, packet));
+      registry.setHandler(ShowNameChangeSuccess.class, packet -> create(CashShopOperationSubOp.NAME_CHANGE_SUCCESS, this::showNameChangeSuccess, packet));
+      registry.setHandler(ShowCouponRedeemSuccess.class, packet -> create(CashShopOperationSubOp.COUPON_REDEEMED_SUCCESS, this::showCouponRedeemedItems, packet));
+      registry.setHandler(ShowBoughtCashPackageSuccess.class, packet -> create(CashShopOperationSubOp.BOUGHT_CASH_PACKAGE_SUCCESS, this::showBoughtCashPackage, packet));
+      registry.setHandler(ShowBoughtQuestItem.class, packet -> create(CashShopOperationSubOp.BOUGHT_QUEST_ITEM_SUCCESS, this::showBoughtQuestItem, packet));
+      registry.setHandler(ShowBoughtCashItem.class, packet -> create(CashShopOperationSubOp.BOUGHT_CASH_ITEM_SUCCESS, this::showBoughtCashItem, packet));
+      registry.setHandler(ShowBoughtCashRing.class, packet -> create(CashShopOperationSubOp.BOUGHT_CASH_RING_SUCCESS, this::showBoughtCashRing, packet));
+      registry.setHandler(ShowCashShopMessage.class, packet -> create(CashShopOperationSubOp.CASH_SHOP_MESSAGE, this::showCashShopMessage, packet));
+      registry.setHandler(ShowCashInventory.class, packet -> create(CashShopOperationSubOp.CASH_INVENTORY, this::showCashInventory, packet));
+      registry.setHandler(ShowGifts.class, packet -> create(CashShopOperationSubOp.GIFTS, this::showGifts, packet));
+      registry.setHandler(ShowGiftSucceed.class, packet -> create(CashShopOperationSubOp.GIFT_SUCCEED, this::showGiftSucceed, packet)); //0x5D, Couldn't n)t
+      registry.setHandler(ShowBoughtInventorySlots.class, packet -> create(CashShopOperationSubOp.BOUGHT_INVENTORY_SLOTS, this::showBoughtInventorySlots, packet));
+      registry.setHandler(ShowBoughtStorageSlots.class, packet -> create(CashShopOperationSubOp.BOUGHT_STORAGE_SLOTS, this::showBoughtStorageSlots, packet));
+      registry.setHandler(ShowBoughtCharacterSlots.class, packet -> create(CashShopOperationSubOp.BOUGHT_CHARACTER_SLOTS, this::showBoughtCharacterSlot, packet));
+      registry.setHandler(TakeFromCashInventory.class, packet -> create(CashShopOperationSubOp.TAKE_FROM_CASH_INVENTORY, this::takeFromCashInventory, packet));
+      registry.setHandler(DeleteCashItem.class, packet -> create(CashShopOperationSubOp.DELETE_CASH_ITEM, this::deleteCashItem, packet));
+      registry.setHandler(RefundCashItem.class, packet -> create(CashShopOperationSubOp.REFUND_CASH_ITEM, this::refundCashItem, packet));
+      registry.setHandler(PutIntoCashInventory.class, packet -> create(CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory, packet));
+      registry.setHandler(ShowCash.class, packet -> create(this::showCash, packet));
+      registry.setHandler(SendMapleLife.class, packet -> create(this::sendMapleLifeCharacterInfo, packet));
+      registry.setHandler(SendMapleNameLifeError.class, packet -> create(this::sendMapleLifeNameError, packet));
+      registry.setHandler(SendMapleLifeError.class, packet -> create(this::sendMapleLifeError, packet));
+      registry.setHandler(ShowWishList.class, packet -> {
+         CashShopOperationSubOp subOp = ((ShowWishList) packet).update() ? CashShopOperationSubOp.SHOW_WISHLIST_UPDATE : CashShopOperationSubOp.SHOW_WISHLIST;
+         return create(subOp, this::showWishList, packet);
+      });
    }
 
    protected <T extends PacketInput> byte[] create(CashShopOperationSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {

@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.event.CoconutHit;
 import tools.packet.event.CoconutScore;
 import tools.packet.event.HitSnowBall;
@@ -21,23 +19,11 @@ public class EventPacketFactory extends AbstractPacketFactory {
    }
 
    private EventPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof RollSnowBall) {
-         return create(this::rollSnowBall, packetInput);
-      } else if (packetInput instanceof HitSnowBall) {
-         return create(this::hitSnowBall, packetInput);
-      } else if (packetInput instanceof SnowBallMessage) {
-         return create(this::snowballMessage, packetInput);
-      } else if (packetInput instanceof CoconutScore) {
-         return create(this::coconutScore, packetInput);
-      } else if (packetInput instanceof CoconutHit) {
-         return create(this::hitCoconut, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(RollSnowBall.class, packet -> this.rollSnowBall((RollSnowBall) packet));
+      registry.setHandler(HitSnowBall.class, packet -> this.hitSnowBall((HitSnowBall) packet));
+      registry.setHandler(SnowBallMessage.class, packet -> this.snowballMessage((SnowBallMessage) packet));
+      registry.setHandler(CoconutScore.class, packet -> this.coconutScore((CoconutScore) packet));
+      registry.setHandler(CoconutHit.class, packet -> this.hitCoconut((CoconutHit) packet));
    }
 
    protected byte[] rollSnowBall(RollSnowBall packet) {

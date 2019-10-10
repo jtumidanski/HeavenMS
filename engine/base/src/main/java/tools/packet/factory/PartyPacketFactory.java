@@ -12,11 +12,9 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;
-import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.party.PartyCreated;
 import tools.packet.party.PartyInvite;
 import tools.packet.party.PartyPortal;
@@ -36,27 +34,13 @@ public class PartyPacketFactory extends AbstractPacketFactory {
    }
 
    private PartyPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof PartyCreated) {
-         return create(this::partyCreated, packetInput);
-      } else if (packetInput instanceof PartyInvite) {
-         return create(this::partyInvite, packetInput);
-      } else if (packetInput instanceof PartySearchInvite) {
-         return create(this::partySearchInvite, packetInput);
-      } else if (packetInput instanceof PartyStatusMessage) {
-         return create(this::partyStatusMessage, packetInput);
-      } else if (packetInput instanceof PartyPortal) {
-         return create(this::partyPortal, packetInput);
-      } else if (packetInput instanceof UpdateParty) {
-         return create(this::updateParty, packetInput);
-      } else if (packetInput instanceof UpdatePartyMemberHp) {
-         return create(this::updatePartyMemberHP, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(PartyCreated.class, packet -> this.partyCreated((PartyCreated) packet));
+      registry.setHandler(PartyInvite.class, packet -> this.partyInvite((PartyInvite) packet));
+      registry.setHandler(PartySearchInvite.class, packet -> this.partySearchInvite((PartySearchInvite) packet));
+      registry.setHandler(PartyStatusMessage.class, packet -> this.partyStatusMessage((PartyStatusMessage) packet));
+      registry.setHandler(PartyPortal.class, packet -> this.partyPortal((PartyPortal) packet));
+      registry.setHandler(UpdateParty.class, packet -> this.updateParty((UpdateParty) packet));
+      registry.setHandler(UpdatePartyMemberHp.class, packet -> this.updatePartyMemberHP((UpdatePartyMemberHp) packet));
    }
 
    protected byte[] partyCreated(PartyCreated packet) {

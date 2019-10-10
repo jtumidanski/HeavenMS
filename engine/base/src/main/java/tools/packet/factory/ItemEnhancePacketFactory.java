@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.item.enhance.SendHammer;
 import tools.packet.item.enhance.SendHammerMessage;
 import tools.packet.item.enhance.SendVegaScroll;
@@ -19,19 +17,9 @@ public class ItemEnhancePacketFactory extends AbstractPacketFactory {
    }
 
    private ItemEnhancePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof SendVegaScroll) {
-         return create(this::sendVegaScroll, packetInput);
-      } else if (packetInput instanceof SendHammer) {
-         return create(this::sendHammerData, packetInput);
-      } else if (packetInput instanceof SendHammerMessage) {
-         return create(this::sendHammerMessage, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(SendVegaScroll.class, packet -> this.sendVegaScroll((SendVegaScroll) packet));
+      registry.setHandler(SendHammer.class, packet -> this.sendHammerData((SendHammer) packet));
+      registry.setHandler(SendHammerMessage.class, packet -> this.sendHammerMessage((SendHammerMessage) packet));
    }
 
    protected byte[] sendVegaScroll(SendVegaScroll packet) {

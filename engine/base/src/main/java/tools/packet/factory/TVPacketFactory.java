@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.EnableTV;
-import tools.packet.PacketInput;
 import tools.packet.SendTV;
 
 public class TVPacketFactory extends AbstractPacketFactory {
@@ -18,17 +16,8 @@ public class TVPacketFactory extends AbstractPacketFactory {
    }
 
    private TVPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof EnableTV) {
-         return create(this::enableTV, packetInput);
-      } else if (packetInput instanceof SendTV) {
-         return create(this::sendTV, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(EnableTV.class, packet -> this.enableTV((EnableTV) packet));
+      registry.setHandler(SendTV.class, packet -> this.sendTV((SendTV) packet));
    }
 
    protected byte[] enableTV(EnableTV packet) {

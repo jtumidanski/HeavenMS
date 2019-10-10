@@ -5,12 +5,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.character.npc.GetPlayerNPC;
 import tools.packet.character.npc.RemovePlayerNPC;
-import tools.packet.factory.AbstractPacketFactory;
 
 public class PlayerNPCPacketFactory extends AbstractPacketFactory {
    private static PlayerNPCPacketFactory instance;
@@ -23,17 +20,8 @@ public class PlayerNPCPacketFactory extends AbstractPacketFactory {
    }
 
    private PlayerNPCPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetPlayerNPC) {
-         return create(this::getPlayerNPC, packetInput);
-      } else if (packetInput instanceof RemovePlayerNPC) {
-         return create(this::removePlayerNPC, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetPlayerNPC.class, packet -> this.getPlayerNPC((GetPlayerNPC) packet));
+      registry.setHandler(RemovePlayerNPC.class, packet -> this.removePlayerNPC((RemovePlayerNPC) packet));
    }
 
    protected byte[] getPlayerNPC(GetPlayerNPC packet) {     // thanks to Arnah

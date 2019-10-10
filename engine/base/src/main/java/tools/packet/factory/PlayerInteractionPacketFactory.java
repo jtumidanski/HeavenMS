@@ -11,7 +11,6 @@ import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MaplePlayerShopSoldItem;
 import server.maps.MapleSoldItem;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
@@ -71,102 +70,50 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
    }
 
    private PlayerInteractionPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetHiredMerchant) {
-         return create(PlayerInteractionAction.ROOM, this::getHiredMerchant, packetInput);
-      } else if (packetInput instanceof UpdateHiredMerchant) {
-         return create(PlayerInteractionAction.UPDATE_MERCHANT, this::updateHiredMerchant, packetInput);
-      } else if (packetInput instanceof MerchantChat) {
-         return create(PlayerInteractionAction.CHAT, this::hiredMerchantChat, packetInput);
-      } else if (packetInput instanceof MerchantVisitorLeave) {
-         return create(PlayerInteractionAction.EXIT, this::hiredMerchantVisitorLeave, packetInput);
-      } else if (packetInput instanceof MerchantOwnerLeave) {
-         return create(PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerLeave, packetInput);
-      } else if (packetInput instanceof MerchantOwnerMaintenanceLeave) {
-         return create(PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerMaintenanceLeave, packetInput);
-      } else if (packetInput instanceof MerchantMaintenanceMessage) {
-         return create(PlayerInteractionAction.ROOM, this::hiredMerchantMaintenanceMessage, packetInput, 5);
-      } else if (packetInput instanceof LeaveHiredMerchant) {
-         return create(PlayerInteractionAction.EXIT, this::leaveHiredMerchant, packetInput);
-      } else if (packetInput instanceof MerchantVisitorAdd) {
-         return create(PlayerInteractionAction.VISIT, this::hiredMerchantVisitorAdd, packetInput);
-      } else if (packetInput instanceof PlayerShopChat) {
-         return create(PlayerInteractionAction.CHAT, this::getPlayerShopChat, packetInput);
-      } else if (packetInput instanceof PlayerShopNewVisitor) {
-         return create(PlayerInteractionAction.VISIT, this::getPlayerShopNewVisitor, packetInput);
-      } else if (packetInput instanceof PlayerShopRemoveVisitor) {
-         return create(PlayerInteractionAction.EXIT, this::getPlayerShopRemoveVisitor, packetInput, 4);
-      } else if (packetInput instanceof TradePartnerAdd) {
-         return create(PlayerInteractionAction.VISIT, this::getTradePartnerAdd, packetInput);
-      } else if (packetInput instanceof TradeInvite) {
-         return create(PlayerInteractionAction.INVITE, this::tradeInvite, packetInput);
-      } else if (packetInput instanceof GetTradeMeso) {
-         return create(PlayerInteractionAction.SET_MESO, this::getTradeMesoSet, packetInput, 8);
-      } else if (packetInput instanceof TradeItemAdd) {
-         return create(PlayerInteractionAction.SET_ITEMS, this::getTradeItemAdd, packetInput);
-      } else if (packetInput instanceof PlayerShopItemUpdate) {
-         return create(PlayerInteractionAction.UPDATE_MERCHANT, this::getPlayerShopItemUpdate, packetInput);
-      } else if (packetInput instanceof PlayerShopOwnerUpdate) {
-         return create(PlayerInteractionAction.UPDATE_PLAYERSHOP, this::getPlayerShopOwnerUpdate, packetInput);
-      } else if (packetInput instanceof GetPlayerShop) {
-         return create(PlayerInteractionAction.ROOM, this::getPlayerShop, packetInput);
-      } else if (packetInput instanceof GetTradeStart) {
-         return create(PlayerInteractionAction.ROOM, this::getTradeStart, packetInput);
-      } else if (packetInput instanceof TradeConfirmation) {
-         return create(PlayerInteractionAction.CONFIRM, packetInput, 3);
-      } else if (packetInput instanceof GetTradeResult) {
-         return create(PlayerInteractionAction.EXIT, this::getTradeResult, packetInput, 5);
-      } else if (packetInput instanceof GetMiniGame) {
-         return create(PlayerInteractionAction.ROOM, this::getMiniGame, packetInput);
-      } else if (packetInput instanceof GetMiniGameReady) {
-         return create(PlayerInteractionAction.READY, packetInput, 3);
-      } else if (packetInput instanceof GetMiniGameUnReady) {
-         return create(PlayerInteractionAction.UN_READY, packetInput, 3);
-      } else if (packetInput instanceof GetMiniGameStart) {
-         return create(PlayerInteractionAction.START, this::getMiniGameStart, packetInput, 4);
-      } else if (packetInput instanceof GetMiniGameSkipOwner) {
-         return create(PlayerInteractionAction.SKIP, this::getMiniGameSkipOwner, packetInput, 4);
-      } else if (packetInput instanceof GetMiniGameRequestTie) {
-         return create(PlayerInteractionAction.REQUEST_TIE, packetInput, 3);
-      } else if (packetInput instanceof GetMiniGameDenyTie) {
-         return create(PlayerInteractionAction.ANSWER_TIE, packetInput, 3);
-      } else if (packetInput instanceof GetMiniRoomError) {
-         return create(PlayerInteractionAction.ROOM, this::getMiniRoomError, packetInput, 5);
-      } else if (packetInput instanceof GetMiniGameSkipVisitor) {
-         return create(PlayerInteractionAction.SKIP, packetInput, 4);
-      } else if (packetInput instanceof MiniGameMoveOmok) {
-         return create(PlayerInteractionAction.MOVE_OMOK, this::getMiniGameMoveOmok, packetInput, 12);
-      } else if (packetInput instanceof MiniGameNewVisitor) {
-         return create(PlayerInteractionAction.VISIT, this::getMiniGameNewVisitor, packetInput);
-      } else if (packetInput instanceof MiniGameRemoveVisitor) {
-         return create(PlayerInteractionAction.EXIT, this::getMiniGameRemoveVisitor, packetInput, 3);
-      } else if (packetInput instanceof MiniGameOwnerWin) {
-         return create(PlayerInteractionAction.GET_RESULT, this::getMiniGameOwnerWin, packetInput);
-      } else if (packetInput instanceof MiniGameVisitorWin) {
-         return create(PlayerInteractionAction.GET_RESULT, this::getMiniGameVisitorWin, packetInput);
-      } else if (packetInput instanceof MiniGameTie) {
-         return create(PlayerInteractionAction.GET_RESULT, this::getMiniGameTie, packetInput);
-      } else if (packetInput instanceof MiniGameClose) {
-         return create(PlayerInteractionAction.EXIT, this::getMiniGameClose, packetInput, 5);
-      } else if (packetInput instanceof GetMatchCard) {
-         return create(PlayerInteractionAction.ROOM, this::getMatchCard, packetInput);
-      } else if (packetInput instanceof GetMatchCardStart) {
-         return create(PlayerInteractionAction.START, this::getMatchCardStart, packetInput);
-      } else if (packetInput instanceof NewMatchCardVisitor) {
-         return create(PlayerInteractionAction.VISIT, this::getMatchCardNewVisitor, packetInput);
-      } else if (packetInput instanceof MatchCardSelect) {
-         return create(PlayerInteractionAction.SELECT_CARD, this::getMatchCardSelect, packetInput, 6);
-      } else if (packetInput instanceof TradeChat) {
-         return create(PlayerInteractionAction.CHAT, this::getTradeChat, packetInput);
-      } else if (packetInput instanceof PlayerShopErrorMessage) {
-         return create(PlayerInteractionAction.EXIT, this::shopErrorMessage, packetInput);
-      }
-
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetHiredMerchant.class, packet -> create(PlayerInteractionAction.ROOM, this::getHiredMerchant, packet));
+      registry.setHandler(UpdateHiredMerchant.class, packet -> create(PlayerInteractionAction.UPDATE_MERCHANT, this::updateHiredMerchant, packet));
+      registry.setHandler(MerchantChat.class, packet -> create(PlayerInteractionAction.CHAT, this::hiredMerchantChat, packet));
+      registry.setHandler(MerchantVisitorLeave.class, packet -> create(PlayerInteractionAction.EXIT, this::hiredMerchantVisitorLeave, packet));
+      registry.setHandler(MerchantOwnerLeave.class, packet -> create(PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerLeave, packet));
+      registry.setHandler(MerchantOwnerMaintenanceLeave.class, packet -> create(PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerMaintenanceLeave, packet));
+      registry.setHandler(MerchantMaintenanceMessage.class, packet -> create(PlayerInteractionAction.ROOM, this::hiredMerchantMaintenanceMessage, packet, 5));
+      registry.setHandler(LeaveHiredMerchant.class, packet -> create(PlayerInteractionAction.EXIT, this::leaveHiredMerchant, packet));
+      registry.setHandler(MerchantVisitorAdd.class, packet -> create(PlayerInteractionAction.VISIT, this::hiredMerchantVisitorAdd, packet));
+      registry.setHandler(PlayerShopChat.class, packet -> create(PlayerInteractionAction.CHAT, this::getPlayerShopChat, packet));
+      registry.setHandler(PlayerShopNewVisitor.class, packet -> create(PlayerInteractionAction.VISIT, this::getPlayerShopNewVisitor, packet));
+      registry.setHandler(PlayerShopRemoveVisitor.class, packet -> create(PlayerInteractionAction.EXIT, this::getPlayerShopRemoveVisitor, packet, 4));
+      registry.setHandler(TradePartnerAdd.class, packet -> create(PlayerInteractionAction.VISIT, this::getTradePartnerAdd, packet));
+      registry.setHandler(TradeInvite.class, packet -> create(PlayerInteractionAction.INVITE, this::tradeInvite, packet));
+      registry.setHandler(GetTradeMeso.class, packet -> create(PlayerInteractionAction.SET_MESO, this::getTradeMesoSet, packet, 8));
+      registry.setHandler(TradeItemAdd.class, packet -> create(PlayerInteractionAction.SET_ITEMS, this::getTradeItemAdd, packet));
+      registry.setHandler(PlayerShopItemUpdate.class, packet -> create(PlayerInteractionAction.UPDATE_MERCHANT, this::getPlayerShopItemUpdate, packet));
+      registry.setHandler(PlayerShopOwnerUpdate.class, packet -> create(PlayerInteractionAction.UPDATE_PLAYERSHOP, this::getPlayerShopOwnerUpdate, packet));
+      registry.setHandler(GetPlayerShop.class, packet -> create(PlayerInteractionAction.ROOM, this::getPlayerShop, packet));
+      registry.setHandler(GetTradeStart.class, packet -> create(PlayerInteractionAction.ROOM, this::getTradeStart, packet));
+      registry.setHandler(TradeConfirmation.class, packet -> create(PlayerInteractionAction.CONFIRM, packet, 3));
+      registry.setHandler(GetTradeResult.class, packet -> create(PlayerInteractionAction.EXIT, this::getTradeResult, packet, 5));
+      registry.setHandler(GetMiniGame.class, packet -> create(PlayerInteractionAction.ROOM, this::getMiniGame, packet));
+      registry.setHandler(GetMiniGameReady.class, packet -> create(PlayerInteractionAction.READY, packet, 3));
+      registry.setHandler(GetMiniGameUnReady.class, packet -> create(PlayerInteractionAction.UN_READY, packet, 3));
+      registry.setHandler(GetMiniGameStart.class, packet -> create(PlayerInteractionAction.START, this::getMiniGameStart, packet, 4));
+      registry.setHandler(GetMiniGameSkipOwner.class, packet -> create(PlayerInteractionAction.SKIP, this::getMiniGameSkipOwner, packet, 4));
+      registry.setHandler(GetMiniGameRequestTie.class, packet -> create(PlayerInteractionAction.REQUEST_TIE, packet));
+      registry.setHandler(GetMiniGameDenyTie.class, packet -> create(PlayerInteractionAction.ANSWER_TIE, packet));
+      registry.setHandler(GetMiniRoomError.class, packet -> create(PlayerInteractionAction.ROOM, this::getMiniRoomError, packet, 5));
+      registry.setHandler(GetMiniGameSkipVisitor.class, packet -> create(PlayerInteractionAction.SKIP, packet));
+      registry.setHandler(MiniGameMoveOmok.class, packet -> create(PlayerInteractionAction.MOVE_OMOK, this::getMiniGameMoveOmok, packet, 12));
+      registry.setHandler(MiniGameNewVisitor.class, packet -> create(PlayerInteractionAction.VISIT, this::getMiniGameNewVisitor, packet));
+      registry.setHandler(MiniGameRemoveVisitor.class, packet -> create(PlayerInteractionAction.EXIT, this::getMiniGameRemoveVisitor, packet, 3));
+      registry.setHandler(MiniGameOwnerWin.class, packet -> create(PlayerInteractionAction.GET_RESULT, this::getMiniGameOwnerWin, packet));
+      registry.setHandler(MiniGameVisitorWin.class, packet -> create(PlayerInteractionAction.GET_RESULT, this::getMiniGameVisitorWin, packet));
+      registry.setHandler(MiniGameTie.class, packet -> create(PlayerInteractionAction.GET_RESULT, this::getMiniGameTie, packet));
+      registry.setHandler(MiniGameClose.class, packet -> create(PlayerInteractionAction.EXIT, this::getMiniGameClose, packet, 5));
+      registry.setHandler(GetMatchCard.class, packet -> create(PlayerInteractionAction.ROOM, this::getMatchCard, packet));
+      registry.setHandler(GetMatchCardStart.class, packet -> create(PlayerInteractionAction.START, this::getMatchCardStart, packet));
+      registry.setHandler(NewMatchCardVisitor.class, packet -> create(PlayerInteractionAction.VISIT, this::getMatchCardNewVisitor, packet));
+      registry.setHandler(MatchCardSelect.class, packet -> create(PlayerInteractionAction.SELECT_CARD, this::getMatchCardSelect, packet, 6));
+      registry.setHandler(TradeChat.class, packet -> create(PlayerInteractionAction.CHAT, this::getTradeChat, packet));
+      registry.setHandler(PlayerShopErrorMessage.class, packet -> create(PlayerInteractionAction.EXIT, this::shopErrorMessage, packet));
    }
 
    protected <T extends PacketInput> byte[] create(PlayerInteractionAction subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {

@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import client.inventory.ScrollResult;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.foreigneffect.CancelChair;
 import tools.packet.foreigneffect.CancelSkill;
 import tools.packet.foreigneffect.ShowBerserk;
@@ -40,59 +38,29 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
    }
 
    private ForeignEffectPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowBuffEffect) {
-         return create(this::showBuffEffect, packetInput);
-      } else if (packetInput instanceof ShowBuffEffectWithLevel) {
-         return create(this::showBuffEffectWithLevel, packetInput);
-      } else if (packetInput instanceof ShowBerserk) {
-         return create(this::showBerserk, packetInput);
-      } else if (packetInput instanceof ShowPetLevelUp) {
-         return create(this::showPetLevelUp, packetInput);
-      } else if (packetInput instanceof ShowForeignCardEffect) {
-         return create(this::showForeignCardEffect, packetInput);
-      } else if (packetInput instanceof ShowForeignInfo) {
-         return create(this::showForeignInfo, packetInput);
-      } else if (packetInput instanceof ShowForeignBuybackEffect) {
-         return create(this::showForeignBuybackEffect, packetInput);
-      } else if (packetInput instanceof ShowForeignMakerEffect) {
-         return create(this::showForeignMakerEffect, packetInput);
-      } else if (packetInput instanceof ShowForeignEffect) {
-         return create(this::showForeignEffect, packetInput);
-      } else if (packetInput instanceof ShowRecovery) {
-         return create(this::showRecovery, packetInput);
-      } else if (packetInput instanceof ShowScrollEffect) {
-         return create(this::getScrollEffect, packetInput);
-      } else if (packetInput instanceof ShowSkillBookResult) {
-         return create(this::skillBookResult, packetInput);
-      } else if (packetInput instanceof ShowCombo) {
-         return create(this::showCombo, packetInput);
-      } else if (packetInput instanceof ShowHint) {
-         return create(this::sendHint, packetInput);
-      } else if (packetInput instanceof ShowSkillEffect) {
-         return create(this::skillEffect, packetInput);
-      } else if (packetInput instanceof ShowItemEffect) {
-         return create(this::itemEffect, packetInput);
-      } else if (packetInput instanceof ShowGuideHint) {
-         return create(this::guideHint, packetInput);
-      } else if (packetInput instanceof ShowGuideTalk) {
-         return create(this::talkGuide, packetInput);
-      } else if (packetInput instanceof ShowChair) {
-         return create(this::showChair, packetInput);
-      } else if (packetInput instanceof CancelChair) {
-         return create(this::cancelChair, packetInput);
-      } else if (packetInput instanceof CancelSkill) {
-         return create(this::skillCancel, packetInput);
-      } else if (packetInput instanceof ShowTitleEarned) {
-         return create(this::earnTitleMessage, packetInput);
-      } else if (packetInput instanceof ShowBlockedMessage) {
-         return create(this::blockedMessage, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowBuffEffect.class, packet -> this.showBuffEffect((ShowBuffEffect) packet));
+      registry.setHandler(ShowBuffEffectWithLevel.class, packet -> this.showBuffEffectWithLevel((ShowBuffEffectWithLevel) packet));
+      registry.setHandler(ShowBerserk.class, packet -> this.showBerserk((ShowBerserk) packet));
+      registry.setHandler(ShowPetLevelUp.class, packet -> this.showPetLevelUp((ShowPetLevelUp) packet));
+      registry.setHandler(ShowForeignCardEffect.class, packet -> this.showForeignCardEffect((ShowForeignCardEffect) packet));
+      registry.setHandler(ShowForeignInfo.class, packet -> this.showForeignInfo((ShowForeignInfo) packet));
+      registry.setHandler(ShowForeignBuybackEffect.class, packet -> this.showForeignBuybackEffect((ShowForeignBuybackEffect) packet));
+      registry.setHandler(ShowForeignMakerEffect.class, packet -> this.showForeignMakerEffect((ShowForeignMakerEffect) packet));
+      registry.setHandler(ShowForeignEffect.class, packet -> this.showForeignEffect((ShowForeignEffect) packet));
+      registry.setHandler(ShowRecovery.class, packet -> this.showRecovery((ShowRecovery) packet));
+      registry.setHandler(ShowScrollEffect.class, packet -> this.getScrollEffect((ShowScrollEffect) packet));
+      registry.setHandler(ShowSkillBookResult.class, packet -> this.skillBookResult((ShowSkillBookResult) packet));
+      registry.setHandler(ShowCombo.class, packet -> this.showCombo((ShowCombo) packet));
+      registry.setHandler(ShowHint.class, packet -> this.sendHint((ShowHint) packet));
+      registry.setHandler(ShowSkillEffect.class, packet -> this.skillEffect((ShowSkillEffect) packet));
+      registry.setHandler(ShowItemEffect.class, packet -> this.itemEffect((ShowItemEffect) packet));
+      registry.setHandler(ShowGuideHint.class, packet -> this.guideHint((ShowGuideHint) packet));
+      registry.setHandler(ShowGuideTalk.class, packet -> this.talkGuide((ShowGuideTalk) packet));
+      registry.setHandler(ShowChair.class, packet -> this.showChair((ShowChair) packet));
+      registry.setHandler(CancelChair.class, packet -> this.cancelChair((CancelChair) packet));
+      registry.setHandler(CancelSkill.class, packet -> this.skillCancel((CancelSkill) packet));
+      registry.setHandler(ShowTitleEarned.class, packet -> this.earnTitleMessage((ShowTitleEarned) packet));
+      registry.setHandler(ShowBlockedMessage.class, packet -> this.blockedMessage((ShowBlockedMessage) packet));
    }
 
    protected byte[] showBuffEffect(ShowBuffEffect packet) {

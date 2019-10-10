@@ -1,10 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
-import tools.packet.factory.AbstractPacketFactory;
 import tools.packet.pyramid.PyramidGuage;
 import tools.packet.pyramid.PyramidScore;
 
@@ -19,17 +16,8 @@ public class PyramidPacketFactory extends AbstractPacketFactory {
    }
 
    private PyramidPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof PyramidScore) {
-         return create(this::pyramidScore, packetInput);
-      } else if (packetInput instanceof PyramidGuage) {
-         return create(this::pyramidGauge, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(PyramidScore.class, packet -> this.pyramidScore((PyramidScore) packet));
+      registry.setHandler(PyramidGuage.class, packet -> this.pyramidGauge((PyramidGuage) packet));
    }
 
    protected byte[] pyramidScore(PyramidScore packet) {//Type cannot be higher than 4 (Rank D), otherwise you'll crash

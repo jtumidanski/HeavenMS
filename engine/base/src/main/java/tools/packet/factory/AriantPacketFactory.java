@@ -4,9 +4,7 @@ import java.util.Collections;
 
 import client.MapleCharacter;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.pq.ariant.AriantScore;
 import tools.packet.pq.ariant.ShowAriantScoreboard;
 import tools.packet.pq.ariant.UpdateAriantRanking;
@@ -22,17 +20,8 @@ public class AriantPacketFactory extends AbstractPacketFactory {
    }
 
    private AriantPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowAriantScoreboard) {
-         return create(this::showScoreBoard, packetInput);
-      } else if (packetInput instanceof UpdateAriantRanking) {
-         return create(this::updateRanking, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowAriantScoreboard.class, packet -> this.showScoreBoard((ShowAriantScoreboard) packet));
+      registry.setHandler(UpdateAriantRanking.class, packet -> this.updateRanking((UpdateAriantRanking) packet));
    }
 
    protected byte[] showScoreBoard(ShowAriantScoreboard packet) {   // thanks lrenex for pointing match's end scoreboard packet

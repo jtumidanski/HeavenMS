@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.statusinfo.CompleteQuest;
 import tools.packet.statusinfo.GetDojoInfo;
 import tools.packet.statusinfo.GetDojoInfoMessage;
@@ -34,49 +32,24 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
    }
 
    private StatusInfoPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowEXPGain) {
-         return create(this::getShowExpGain, packetInput);
-      } else if (packetInput instanceof ShowFameGain) {
-         return create(this::getShowFameGain, packetInput);
-      } else if (packetInput instanceof ShowMesoGain) {
-         return create(this::getShowMesoGain, packetInput);
-      } else if (packetInput instanceof ShowQuestForfeit) {
-         return create(this::forfeitQuest, packetInput);
-      } else if (packetInput instanceof CompleteQuest) {
-         return create(this::completeQuest, packetInput);
-      } else if (packetInput instanceof UpdateQuest) {
-         return create(this::updateQuest, packetInput);
-      } else if (packetInput instanceof ShowInventoryFull) {
-         return create(this::getShowInventoryFull, packetInput);
-      } else if (packetInput instanceof ShowItemUnavailable) {
-         return create(this::showItemUnavailable, packetInput);
-      } else if (packetInput instanceof UpdateAreaInfo) {
-         return create(this::updateAreaInfo, packetInput);
-      } else if (packetInput instanceof GetGuildPointMessage) {
-         return create(this::getGPMessage, packetInput);
-      } else if (packetInput instanceof GetItemMessage) {
-         return create(this::getItemMessage, packetInput);
-      } else if (packetInput instanceof ShowInfoText) {
-         return create(this::showInfoText, packetInput);
-      } else if (packetInput instanceof GetDojoInfo) {
-         return create(this::getDojoInfo, packetInput);
-      } else if (packetInput instanceof GetDojoInfoMessage) {
-         return create(this::getDojoInfoMessage, packetInput);
-      } else if (packetInput instanceof UpdateDojoStats) {
-         return create(this::updateDojoStats, packetInput);
-      } else if (packetInput instanceof ShowItemExpired) {
-         return create(this::itemExpired, packetInput);
-      } else if (packetInput instanceof ShowBunny) {
-         return create(this::bunnyPacket, packetInput);
-      } else if (packetInput instanceof ShowItemGain) {
-         return create(this::getShowItemGain, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowEXPGain.class, packet -> this.getShowExpGain((ShowEXPGain) packet));
+      registry.setHandler(ShowFameGain.class, packet -> this.getShowFameGain((ShowFameGain) packet));
+      registry.setHandler(ShowMesoGain.class, packet -> this.getShowMesoGain((ShowMesoGain) packet));
+      registry.setHandler(ShowQuestForfeit.class, packet -> this.forfeitQuest((ShowQuestForfeit) packet));
+      registry.setHandler(CompleteQuest.class, packet -> this.completeQuest((CompleteQuest) packet));
+      registry.setHandler(UpdateQuest.class, packet -> this.updateQuest((UpdateQuest) packet));
+      registry.setHandler(ShowInventoryFull.class, packet -> this.getShowInventoryFull((ShowInventoryFull) packet));
+      registry.setHandler(ShowItemUnavailable.class, packet -> this.showItemUnavailable((ShowItemUnavailable) packet));
+      registry.setHandler(UpdateAreaInfo.class, packet -> this.updateAreaInfo((UpdateAreaInfo) packet));
+      registry.setHandler(GetGuildPointMessage.class, packet -> this.getGPMessage((GetGuildPointMessage) packet));
+      registry.setHandler(GetItemMessage.class, packet -> this.getItemMessage((GetItemMessage) packet));
+      registry.setHandler(ShowInfoText.class, packet -> this.showInfoText((ShowInfoText) packet));
+      registry.setHandler(GetDojoInfo.class, packet -> this.getDojoInfo((GetDojoInfo) packet));
+      registry.setHandler(GetDojoInfoMessage.class, packet -> this.getDojoInfoMessage((GetDojoInfoMessage) packet));
+      registry.setHandler(UpdateDojoStats.class, packet -> this.updateDojoStats((UpdateDojoStats) packet));
+      registry.setHandler(ShowItemExpired.class, packet -> this.itemExpired((ShowItemExpired) packet));
+      registry.setHandler(ShowBunny.class, packet -> this.bunnyPacket((ShowBunny) packet));
+      registry.setHandler(ShowItemGain.class, packet -> this.getShowItemGain((ShowItemGain) packet));
    }
 
    /**

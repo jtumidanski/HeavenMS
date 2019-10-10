@@ -4,12 +4,11 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.packet.PacketInput;
 import tools.packet.cashshop.CashShopGachaponSubOp;
 import tools.packet.cashshop.gachapon.CashShopGachaponFailed;
 import tools.packet.cashshop.gachapon.CashShopGachaponSuccess;
-import tools.packet.PacketInput;
 
 public class CashShopGachaponPacketFactoryPacketFactory extends AbstractCashShopPacketFactory {
    private static CashShopGachaponPacketFactoryPacketFactory instance;
@@ -22,17 +21,8 @@ public class CashShopGachaponPacketFactoryPacketFactory extends AbstractCashShop
    }
 
    private CashShopGachaponPacketFactoryPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof CashShopGachaponFailed) {
-         return create(CashShopGachaponSubOp.FAILURE, this::onCashItemGachaponOpenFailed, packetInput);
-      } else if (packetInput instanceof CashShopGachaponSuccess) {
-         return create(CashShopGachaponSubOp.SUCCESS, this::onCashGachaponOpenSuccess, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(CashShopGachaponFailed.class, packet -> create(CashShopGachaponSubOp.FAILURE, this::onCashItemGachaponOpenFailed, packet));
+      registry.setHandler(CashShopGachaponFailed.class, packet -> create(CashShopGachaponSubOp.SUCCESS, this::onCashGachaponOpenSuccess, packet));
    }
 
    protected <T extends PacketInput> byte[] create(CashShopGachaponSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {

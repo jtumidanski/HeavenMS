@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
 import server.MTSItemInfo;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
 import tools.packet.mtsoperation.MTSConfirmBuy;
 import tools.packet.mtsoperation.MTSConfirmSell;
@@ -26,31 +24,15 @@ public class MTSOperationPacketFactory extends AbstractPacketFactory {
    }
 
    private MTSOperationPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof SendMTS) {
-         return create(this::sendMTS, packetInput);
-      } else if (packetInput instanceof ShowMTSCash) {
-         return create(this::showMTSCash, packetInput);
-      } else if (packetInput instanceof MTSWantedListingOver) {
-         return create(this::wantedListingOver, packetInput);
-      } else if (packetInput instanceof MTSConfirmSell) {
-         return create(this::confirmSell, packetInput);
-      } else if (packetInput instanceof MTSConfirmBuy) {
-         return create(this::confirmBuy, packetInput);
-      } else if (packetInput instanceof MTSFailBuy) {
-         return create(this::failBuy, packetInput);
-      } else if (packetInput instanceof MTSConfirmTransfer) {
-         return create(this::confirmTransfer, packetInput);
-      } else if (packetInput instanceof GetNotYetSoldMTSInventory) {
-         return create(this::notYetSoldInv, packetInput);
-      } else if (packetInput instanceof MTSTransferInventory) {
-         return create(this::transferInventory, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(SendMTS.class, packet -> this.sendMTS((SendMTS) packet));
+      registry.setHandler(ShowMTSCash.class, packet -> this.showMTSCash((ShowMTSCash) packet));
+      registry.setHandler(MTSWantedListingOver.class, packet -> this.wantedListingOver((MTSWantedListingOver) packet));
+      registry.setHandler(MTSConfirmSell.class, packet -> this.confirmSell((MTSConfirmSell) packet));
+      registry.setHandler(MTSConfirmBuy.class, packet -> this.confirmBuy((MTSConfirmBuy) packet));
+      registry.setHandler(MTSFailBuy.class, packet -> this.failBuy((MTSFailBuy) packet));
+      registry.setHandler(MTSConfirmTransfer.class, packet -> this.confirmTransfer((MTSConfirmTransfer) packet));
+      registry.setHandler(GetNotYetSoldMTSInventory.class, packet -> this.notYetSoldInv((GetNotYetSoldMTSInventory) packet));
+      registry.setHandler(MTSTransferInventory.class, packet -> this.transferInventory((MTSTransferInventory) packet));
    }
 
    protected byte[] sendMTS(SendMTS packet) {

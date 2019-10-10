@@ -1,10 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
-import tools.packet.factory.AbstractPacketFactory;
 import tools.packet.report.ReportResponse;
 import tools.packet.report.SendPolice;
 
@@ -19,17 +16,8 @@ public class ReportPacketFactory extends AbstractPacketFactory {
    }
 
    private ReportPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ReportResponse) {
-         return create(this::reportResponse, packetInput);
-      } else if (packetInput instanceof SendPolice) {
-         return create(this::sendPolice, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ReportResponse.class, packet -> this.reportResponse((ReportResponse) packet));
+      registry.setHandler(SendPolice.class, packet -> this.sendPolice((SendPolice) packet));
    }
 
    /**

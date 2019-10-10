@@ -2,10 +2,8 @@ package tools.packet.factory;
 
 import client.BuddyListEntry;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.buddy.BuddyListMessage;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
@@ -23,23 +21,11 @@ public class BuddyPacketFactory extends AbstractPacketFactory {
    }
 
    private BuddyPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof UpdateBuddyList) {
-         return create(this::updateBuddylist, packetInput);
-      } else if (packetInput instanceof BuddyListMessage) {
-         return create(this::buddylistMessage, packetInput);
-      } else if (packetInput instanceof RequestAddBuddy) {
-         return create(this::requestBuddylistAdd, packetInput);
-      } else if (packetInput instanceof UpdateBuddyChannel) {
-         return create(this::updateBuddyChannel, packetInput);
-      } else if (packetInput instanceof UpdateBuddyCapacity) {
-         return create(this::updateBuddyCapacity, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(UpdateBuddyList.class, packet -> this.updateBuddylist((UpdateBuddyList) packet));
+      registry.setHandler(BuddyListMessage.class, packet -> this.buddylistMessage((BuddyListMessage) packet));
+      registry.setHandler(RequestAddBuddy.class, packet -> this.requestBuddylistAdd((RequestAddBuddy) packet));
+      registry.setHandler(UpdateBuddyChannel.class, packet -> this.updateBuddyChannel((UpdateBuddyChannel) packet));
+      registry.setHandler(UpdateBuddyCapacity.class, packet -> this.updateBuddyCapacity((UpdateBuddyCapacity) packet));
    }
 
    protected byte[] updateBuddylist(UpdateBuddyList packet) {

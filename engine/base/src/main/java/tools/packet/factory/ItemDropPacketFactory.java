@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.item.drop.DropItemFromMapObject;
 import tools.packet.item.drop.UpdateMapItemObject;
 
@@ -18,17 +16,8 @@ public class ItemDropPacketFactory extends AbstractPacketFactory {
    }
 
    private ItemDropPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof UpdateMapItemObject) {
-         return create(this::updateMapItemObject, packetInput);
-      } else if (packetInput instanceof DropItemFromMapObject) {
-         return create(this::dropItemFromMapObject, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(UpdateMapItemObject.class, packet -> this.updateMapItemObject((UpdateMapItemObject) packet));
+      registry.setHandler(DropItemFromMapObject.class, packet -> this.dropItemFromMapObject((DropItemFromMapObject) packet));
    }
 
    protected byte[] updateMapItemObject(UpdateMapItemObject packet) {

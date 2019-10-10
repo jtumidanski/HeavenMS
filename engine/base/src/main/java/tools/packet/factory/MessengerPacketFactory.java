@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.messenger.MessengerAddCharacter;
 import tools.packet.messenger.MessengerChat;
 import tools.packet.messenger.MessengerInvite;
@@ -23,27 +21,13 @@ public class MessengerPacketFactory extends AbstractPacketFactory {
    }
 
    private MessengerPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof MessengerInvite) {
-         return create(this::messengerInvite, packetInput);
-      } else if (packetInput instanceof MessengerAddCharacter) {
-         return create(this::addMessengerPlayer, packetInput);
-      } else if (packetInput instanceof MessengerRemoveCharacter) {
-         return create(this::removeMessengerPlayer, packetInput);
-      } else if (packetInput instanceof MessengerUpdateCharacter) {
-         return create(this::updateMessengerPlayer, packetInput);
-      } else if (packetInput instanceof MessengerJoin) {
-         return create(this::joinMessenger, packetInput);
-      } else if (packetInput instanceof MessengerChat) {
-         return create(this::messengerChat, packetInput);
-      } else if (packetInput instanceof MessengerNote) {
-         return create(this::messengerNote, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(MessengerInvite.class, packet -> this.messengerInvite((MessengerInvite) packet));
+      registry.setHandler(MessengerAddCharacter.class, packet -> this.addMessengerPlayer((MessengerAddCharacter) packet));
+      registry.setHandler(MessengerRemoveCharacter.class, packet -> this.removeMessengerPlayer((MessengerRemoveCharacter) packet));
+      registry.setHandler(MessengerUpdateCharacter.class, packet -> this.updateMessengerPlayer((MessengerUpdateCharacter) packet));
+      registry.setHandler(MessengerJoin.class, packet -> this.joinMessenger((MessengerJoin) packet));
+      registry.setHandler(MessengerChat.class, packet -> this.messengerChat((MessengerChat) packet));
+      registry.setHandler(MessengerNote.class, packet -> this.messengerNote((MessengerNote) packet));
    }
 
    protected byte[] messengerInvite(MessengerInvite packet) {

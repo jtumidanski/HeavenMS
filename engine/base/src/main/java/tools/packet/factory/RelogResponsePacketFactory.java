@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.RelogResponse;
 
 public class RelogResponsePacketFactory extends AbstractPacketFactory {
@@ -17,15 +15,7 @@ public class RelogResponsePacketFactory extends AbstractPacketFactory {
    }
 
    private RelogResponsePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof RelogResponse) {
-         create(this::getRelogResponse, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(RelogResponse.class, packet -> this.getRelogResponse((RelogResponse) packet));
    }
 
    /**

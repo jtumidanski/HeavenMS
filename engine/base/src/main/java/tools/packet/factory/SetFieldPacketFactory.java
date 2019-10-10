@@ -2,10 +2,8 @@ package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
 import net.server.Server;
-import tools.FilePrinter;
 import tools.Randomizer;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.field.set.GetCharacterInfo;
 import tools.packet.field.set.WarpToMap;
 
@@ -20,17 +18,8 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
    }
 
    private SetFieldPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetCharacterInfo) {
-         return create(this::getCharInfo, packetInput);
-      } else if (packetInput instanceof WarpToMap) {
-         return create(this::getWarpToMap, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetCharacterInfo.class, packet -> this.getCharInfo((GetCharacterInfo) packet));
+      registry.setHandler(WarpToMap.class, packet -> this.getWarpToMap((WarpToMap) packet));
    }
 
    /**

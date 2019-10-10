@@ -1,10 +1,8 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.serverlist.GetServerStatus;
-import tools.packet.PacketInput;
 
 public class ServerStatusPacketFactory extends AbstractPacketFactory {
    private static ServerStatusPacketFactory instance;
@@ -17,15 +15,7 @@ public class ServerStatusPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerStatusPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GetServerStatus) {
-         return create(this::getServerStatus, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GetServerStatus.class, packet -> this.getServerStatus((GetServerStatus) packet));
    }
 
    /**

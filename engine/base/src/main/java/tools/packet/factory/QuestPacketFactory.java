@@ -1,16 +1,14 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
+import tools.packet.quest.ShowQuestComplete;
 import tools.packet.quest.info.AddQuestTimeLimit;
 import tools.packet.quest.info.QuestError;
 import tools.packet.quest.info.QuestExpire;
 import tools.packet.quest.info.QuestFailure;
 import tools.packet.quest.info.QuestFinish;
 import tools.packet.quest.info.RemoveQuestTimeLimit;
-import tools.packet.quest.ShowQuestComplete;
 import tools.packet.quest.info.UpdateQuestInfo;
 
 public class QuestPacketFactory extends AbstractPacketFactory {
@@ -24,29 +22,14 @@ public class QuestPacketFactory extends AbstractPacketFactory {
    }
 
    private QuestPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof UpdateQuestInfo) {
-         return create(this::updateQuestInfo, packetInput);
-      } else if (packetInput instanceof AddQuestTimeLimit) {
-         return create(this::addQuestTimeLimit, packetInput);
-      } else if (packetInput instanceof RemoveQuestTimeLimit) {
-         return create(this::removeQuestTimeLimit, packetInput);
-      } else if (packetInput instanceof QuestFinish) {
-         return create(this::updateQuestFinish, packetInput);
-      } else if (packetInput instanceof QuestError) {
-         return create(this::questError, packetInput);
-      } else if (packetInput instanceof QuestFailure) {
-         return create(this::questFailure, packetInput);
-      } else if (packetInput instanceof QuestExpire) {
-         return create(this::questExpire, packetInput);
-      } else if (packetInput instanceof ShowQuestComplete) {
-         return create(this::getShowQuestCompletion, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(UpdateQuestInfo.class, packet -> this.updateQuestInfo((UpdateQuestInfo) packet));
+      registry.setHandler(AddQuestTimeLimit.class, packet -> this.addQuestTimeLimit((AddQuestTimeLimit) packet));
+      registry.setHandler(RemoveQuestTimeLimit.class, packet -> this.removeQuestTimeLimit((RemoveQuestTimeLimit) packet));
+      registry.setHandler(QuestFinish.class, packet -> this.updateQuestFinish((QuestFinish) packet));
+      registry.setHandler(QuestError.class, packet -> this.questError((QuestError) packet));
+      registry.setHandler(QuestFailure.class, packet -> this.questFailure((QuestFailure) packet));
+      registry.setHandler(QuestExpire.class, packet -> this.questExpire((QuestExpire) packet));
+      registry.setHandler(ShowQuestComplete.class, packet -> this.getShowQuestCompletion((ShowQuestComplete) packet));
    }
 
    protected byte[] updateQuestInfo(UpdateQuestInfo packet) {

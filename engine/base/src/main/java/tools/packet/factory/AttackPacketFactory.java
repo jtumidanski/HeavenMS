@@ -5,10 +5,8 @@ import java.util.Map;
 
 import net.opcodes.SendOpcode;
 import net.server.channel.handlers.SummonAttackEntry;
-import tools.FilePrinter;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.attack.MagicAttack;
 import tools.packet.attack.RangedAttack;
@@ -26,23 +24,11 @@ public class AttackPacketFactory extends AbstractPacketFactory {
    }
 
    private AttackPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof CloseRangeAttack) {
-         return create(this::closeRangeAttack, packetInput);
-      } else if (packetInput instanceof RangedAttack) {
-         return create(this::rangedAttack, packetInput);
-      } else if (packetInput instanceof MagicAttack) {
-         return create(this::magicAttack, packetInput);
-      } else if (packetInput instanceof SummonAttack) {
-         return create(this::summonAttack, packetInput);
-      } else if (packetInput instanceof ThrowGrenade) {
-         return create(this::throwGrenade, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(CloseRangeAttack.class, packet -> this.closeRangeAttack((CloseRangeAttack) packet));
+      registry.setHandler(RangedAttack.class, packet -> this.rangedAttack((RangedAttack) packet));
+      registry.setHandler(MagicAttack.class, packet -> this.magicAttack((MagicAttack) packet));
+      registry.setHandler(SummonAttack.class, packet -> this.summonAttack((SummonAttack) packet));
+      registry.setHandler(ThrowGrenade.class, packet -> this.throwGrenade((ThrowGrenade) packet));
    }
 
    protected byte[] closeRangeAttack(CloseRangeAttack packet) {

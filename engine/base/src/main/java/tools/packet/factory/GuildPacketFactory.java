@@ -7,10 +7,8 @@ import client.database.data.GlobalUserRank;
 import client.database.data.GuildData;
 import net.opcodes.SendOpcode;
 import net.server.guild.MapleGuildCharacter;
-import tools.FilePrinter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.guild.CreateGuildMessage;
 import tools.packet.guild.GenericGuildMessage;
 import tools.packet.guild.GuildCapacityChange;
@@ -44,55 +42,27 @@ public class GuildPacketFactory extends AbstractPacketFactory {
    }
 
    private GuildPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GuildMemberOnline) {
-         return create(this::guildMemberOnline, packetInput);
-      } else if (packetInput instanceof GuildInvite) {
-         return create(this::guildInvite, packetInput);
-      } else if (packetInput instanceof CreateGuildMessage) {
-         return create(this::createGuildMessage, packetInput);
-      } else if (packetInput instanceof GenericGuildMessage) {
-         return create(this::genericGuildMessage, packetInput);
-      } else if (packetInput instanceof ResponseGuildMessage) {
-         return create(this::responseGuildMessage, packetInput);
-      } else if (packetInput instanceof NewGuildMember) {
-         return create(this::newGuildMember, packetInput);
-      } else if (packetInput instanceof GuildMemberLeft) {
-         return create(this::memberLeft, packetInput);
-      } else if (packetInput instanceof GuildMemberChangeRank) {
-         return create(this::changeRank, packetInput);
-      } else if (packetInput instanceof GuildNotice) {
-         return create(this::guildNotice, packetInput);
-      } else if (packetInput instanceof GuildMemberLevelJobUpdate) {
-         return create(this::guildMemberLevelJobUpdate, packetInput);
-      } else if (packetInput instanceof GuildRankTitleChange) {
-         return create(this::rankTitleChange, packetInput);
-      } else if (packetInput instanceof GuildDisband) {
-         return create(this::guildDisband, packetInput);
-      } else if (packetInput instanceof GuildQuestWaitingNotice) {
-         return create(this::guildQuestWaitingNotice, packetInput);
-      } else if (packetInput instanceof GuildEmblemChange) {
-         return create(this::guildEmblemChange, packetInput);
-      } else if (packetInput instanceof GuildCapacityChange) {
-         return create(this::guildCapacityChange, packetInput);
-      } else if (packetInput instanceof ShowGuildRanks) {
-         return create(this::showGuildRanks, packetInput);
-      } else if (packetInput instanceof ShowPlayerRanks) {
-         return create(this::showPlayerRanks, packetInput);
-      } else if (packetInput instanceof UpdateGuildPoints) {
-         return create(this::updateGP, packetInput);
-      } else if (packetInput instanceof ShowGuildInfo) {
-         return create(this::showGuildInfo, packetInput);
-      } else if (packetInput instanceof GuildNameChange) {
-         return create(this::guildNameChanged, packetInput);
-      } else if (packetInput instanceof GuildMarkChanged) {
-         return create(this::guildMarkChanged, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GuildMemberOnline.class, packet -> this.guildMemberOnline((GuildMemberOnline) packet));
+      registry.setHandler(GuildInvite.class, packet -> this.guildInvite((GuildInvite) packet));
+      registry.setHandler(CreateGuildMessage.class, packet -> this.createGuildMessage((CreateGuildMessage) packet));
+      registry.setHandler(GenericGuildMessage.class, packet -> this.genericGuildMessage((GenericGuildMessage) packet));
+      registry.setHandler(ResponseGuildMessage.class, packet -> this.responseGuildMessage((ResponseGuildMessage) packet));
+      registry.setHandler(NewGuildMember.class, packet -> this.newGuildMember((NewGuildMember) packet));
+      registry.setHandler(GuildMemberLeft.class, packet -> this.memberLeft((GuildMemberLeft) packet));
+      registry.setHandler(GuildMemberChangeRank.class, packet -> this.changeRank((GuildMemberChangeRank) packet));
+      registry.setHandler(GuildNotice.class, packet -> this.guildNotice((GuildNotice) packet));
+      registry.setHandler(GuildMemberLevelJobUpdate.class, packet -> this.guildMemberLevelJobUpdate((GuildMemberLevelJobUpdate) packet));
+      registry.setHandler(GuildRankTitleChange.class, packet -> this.rankTitleChange((GuildRankTitleChange) packet));
+      registry.setHandler(GuildDisband.class, packet -> this.guildDisband((GuildDisband) packet));
+      registry.setHandler(GuildQuestWaitingNotice.class, packet -> this.guildQuestWaitingNotice((GuildQuestWaitingNotice) packet));
+      registry.setHandler(GuildEmblemChange.class, packet -> this.guildEmblemChange((GuildEmblemChange) packet));
+      registry.setHandler(GuildCapacityChange.class, packet -> this.guildCapacityChange((GuildCapacityChange) packet));
+      registry.setHandler(ShowGuildRanks.class, packet -> this.showGuildRanks((ShowGuildRanks) packet));
+      registry.setHandler(ShowPlayerRanks.class, packet -> this.showPlayerRanks((ShowPlayerRanks) packet));
+      registry.setHandler(UpdateGuildPoints.class, packet -> this.updateGP((UpdateGuildPoints) packet));
+      registry.setHandler(ShowGuildInfo.class, packet -> this.showGuildInfo((ShowGuildInfo) packet));
+      registry.setHandler(GuildNameChange.class, packet -> this.guildNameChanged((GuildNameChange) packet));
+      registry.setHandler(GuildMarkChanged.class, packet -> this.guildMarkChanged((GuildMarkChanged) packet));
    }
 
    protected byte[] guildMemberOnline(GuildMemberOnline packet) {
@@ -206,14 +176,14 @@ public class GuildPacketFactory extends AbstractPacketFactory {
       return mplew.getPacket();
    }
 
-   protected byte[] guildMemberLevelJobUpdate(MapleGuildCharacter mgc) {
+   protected byte[] guildMemberLevelJobUpdate(GuildMemberLevelJobUpdate packet) {
       final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
       mplew.writeShort(SendOpcode.GUILD_OPERATION.getValue());
       mplew.write(0x3C);
-      mplew.writeInt(mgc.getGuildId());
-      mplew.writeInt(mgc.getId());
-      mplew.writeInt(mgc.getLevel());
-      mplew.writeInt(mgc.getJobId());
+      mplew.writeInt(packet.guildId());
+      mplew.writeInt(packet.characterId());
+      mplew.writeInt(packet.level());
+      mplew.writeInt(packet.jobId());
       return mplew.getPacket();
    }
 

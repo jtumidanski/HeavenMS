@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.buff.CancelBuff;
 import tools.packet.buff.CancelDebuff;
 import tools.packet.buff.CancelForeignBuff;
@@ -22,25 +20,12 @@ public class CancelBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    private CancelBuffPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof CancelForeignDebuff) {
-         return create(this::cancelForeignDebuff, packetInput);
-      } else if (packetInput instanceof CancelForeignBuff) {
-         return create(this::cancelForeignBuff, packetInput);
-      } else if (packetInput instanceof CancelBuff) {
-         return create(this::cancelBuff, packetInput);
-      } else if (packetInput instanceof CancelDebuff) {
-         return create(this::cancelDebuff, packetInput);
-      } else if (packetInput instanceof CancelForeignSlowDebuff) {
-         return create(this::cancelForeignSlowDebuff, packetInput);
-      } else if (packetInput instanceof CancelForeignChairSkillEffect) {
-         return create(this::cancelForeignChairSkillEffect, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(CancelForeignDebuff.class, packet -> this.cancelForeignDebuff((CancelForeignDebuff) packet));
+      registry.setHandler(CancelForeignBuff.class, packet -> this.cancelForeignBuff((CancelForeignBuff) packet));
+      registry.setHandler(CancelBuff.class, packet -> this.cancelBuff((CancelBuff) packet));
+      registry.setHandler(CancelDebuff.class, packet -> this.cancelDebuff((CancelDebuff) packet));
+      registry.setHandler(CancelForeignSlowDebuff.class, packet -> this.cancelForeignSlowDebuff((CancelForeignSlowDebuff) packet));
+      registry.setHandler(CancelForeignChairSkillEffect.class, packet -> this.cancelForeignChairSkillEffect((CancelForeignChairSkillEffect) packet));
    }
 
    protected byte[] cancelForeignDebuff(CancelForeignDebuff packet) {

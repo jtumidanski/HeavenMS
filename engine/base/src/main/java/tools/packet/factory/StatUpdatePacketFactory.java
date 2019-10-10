@@ -8,11 +8,9 @@ import client.MapleStat;
 import client.inventory.MaplePet;
 import constants.GameConstants;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.stat.EnableActions;
-import tools.packet.PacketInput;
 import tools.packet.stat.UpdatePetStats;
 import tools.packet.stat.UpdatePlayerStats;
 
@@ -29,19 +27,9 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
    }
 
    private StatUpdatePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof UpdatePlayerStats) {
-         return create(this::updatePlayerStats, packetInput);
-      } else if (packetInput instanceof EnableActions) {
-         return create(this::enableActions, packetInput);
-      } else if (packetInput instanceof UpdatePetStats) {
-         return create(this::petStatUpdate, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(UpdatePlayerStats.class, packet -> this.updatePlayerStats((UpdatePlayerStats) packet));
+      registry.setHandler(EnableActions.class, packet -> this.enableActions((EnableActions) packet));
+      registry.setHandler(UpdatePetStats.class, packet -> this.petStatUpdate((UpdatePetStats) packet));
    }
 
    /**

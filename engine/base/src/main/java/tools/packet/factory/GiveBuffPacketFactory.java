@@ -6,10 +6,8 @@ import constants.skills.Buccaneer;
 import constants.skills.Corsair;
 import constants.skills.ThunderBreaker;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveDebuff;
 import tools.packet.buff.GiveFinalAttack;
@@ -32,33 +30,16 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    private GiveBuffPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof GiveBuff) {
-         return create(this::giveBuff, packetInput);
-      } else if (packetInput instanceof GiveDebuff) {
-         return create(this::giveDebuff, packetInput);
-      } else if (packetInput instanceof GiveForeignDebuff) {
-         return create(this::giveForeignDebuff, packetInput);
-      } else if (packetInput instanceof GiveForeignBuff) {
-         return create(this::giveForeignBuff, packetInput);
-      } else if (packetInput instanceof GiveForeignSlowDebuff) {
-         return create(this::giveForeignSlowDebuff, packetInput);
-      } else if (packetInput instanceof GiveForeignChairSkillEffect) {
-         return create(this::giveForeignChairSkillEffect, packetInput);
-      } else if (packetInput instanceof GivePirateBuff) {
-         return create(this::givePirateBuff, packetInput);
-      } else if (packetInput instanceof GiveFinalAttack) {
-         return create(this::giveFinalAttack, packetInput);
-      } else if (packetInput instanceof ShowMonsterRiding) {
-         return create(this::showMonsterRiding, packetInput);
-      } else if (packetInput instanceof GiveForeignPirateBuff) {
-         return create(this::giveForeignPirateBuff, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(GiveBuff.class, packet -> this.giveBuff((GiveBuff) packet));
+      registry.setHandler(GiveDebuff.class, packet -> this.giveDebuff((GiveDebuff) packet));
+      registry.setHandler(GiveForeignDebuff.class, packet -> this.giveForeignDebuff((GiveForeignDebuff) packet));
+      registry.setHandler(GiveForeignBuff.class, packet -> this.giveForeignBuff((GiveForeignBuff) packet));
+      registry.setHandler(GiveForeignSlowDebuff.class, packet -> this.giveForeignSlowDebuff((GiveForeignSlowDebuff) packet));
+      registry.setHandler(GiveForeignChairSkillEffect.class, packet -> this.giveForeignChairSkillEffect((GiveForeignChairSkillEffect) packet));
+      registry.setHandler(GivePirateBuff.class, packet -> this.givePirateBuff((GivePirateBuff) packet));
+      registry.setHandler(GiveFinalAttack.class, packet -> this.giveFinalAttack((GiveFinalAttack) packet));
+      registry.setHandler(ShowMonsterRiding.class, packet -> this.showMonsterRiding((ShowMonsterRiding) packet));
+      registry.setHandler(GiveForeignPirateBuff.class, packet -> this.giveForeignPirateBuff((GiveForeignPirateBuff) packet));
    }
 
    /**

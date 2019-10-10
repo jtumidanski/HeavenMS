@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import client.database.data.BbsThreadData;
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.guild.bbs.GetThreadList;
 import tools.packet.guild.bbs.ShowThread;
 
@@ -19,17 +17,8 @@ public class GuildBBSPacketFactory extends AbstractPacketFactory {
    }
 
    private GuildBBSPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof ShowThread) {
-         return create(this::showThread, packetInput);
-      } else if (packetInput instanceof GetThreadList) {
-         return create(this::getThreadList, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(ShowThread.class, packet -> this.showThread((ShowThread) packet));
+      registry.setHandler(GetThreadList.class, packet -> this.getThreadList((GetThreadList) packet));
    }
 
    protected byte[] showThread(ShowThread packet) throws RuntimeException {

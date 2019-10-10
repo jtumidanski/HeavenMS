@@ -5,9 +5,7 @@ import java.util.List;
 import client.MapleClient;
 import net.opcodes.SendOpcode;
 import server.CashShop;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.SetCashShop;
 import tools.packet.SetITC;
 
@@ -22,17 +20,8 @@ public class SpecialShopPacketFactory extends AbstractPacketFactory {
    }
 
    private SpecialShopPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof SetITC) {
-         return create(this::setMTS, packetInput);
-      } else if (packetInput instanceof SetCashShop) {
-         return create(this::setCashShop, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(SetITC.class, packet -> this.setMTS((SetITC) packet));
+      registry.setHandler(SetCashShop.class, packet -> this.setCashShop((SetCashShop) packet));
    }
 
    protected byte[] setMTS(SetITC packet) {

@@ -2,9 +2,7 @@ package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
 import server.WorldRecommendation;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.RecommendedWorldMessage;
 
 public class RecommendedWorldMessagePacketFactory extends AbstractPacketFactory {
@@ -18,15 +16,7 @@ public class RecommendedWorldMessagePacketFactory extends AbstractPacketFactory 
    }
 
    private RecommendedWorldMessagePacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof RecommendedWorldMessage) {
-         return create(this::sendRecommended, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(RecommendedWorldMessage.class, packet -> this.sendRecommended((RecommendedWorldMessage) packet));
    }
 
    protected byte[] sendRecommended(RecommendedWorldMessage packet) {

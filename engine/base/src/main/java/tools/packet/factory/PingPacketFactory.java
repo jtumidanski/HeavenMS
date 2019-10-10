@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import net.opcodes.SendOpcode;
-import tools.FilePrinter;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.PacketInput;
 import tools.packet.Ping;
 
 public class PingPacketFactory extends AbstractPacketFactory {
@@ -17,15 +15,7 @@ public class PingPacketFactory extends AbstractPacketFactory {
    }
 
    private PingPacketFactory() {
-   }
-
-   @Override
-   public byte[] create(PacketInput packetInput) {
-      if (packetInput instanceof Ping) {
-         create(this::getPing, packetInput);
-      }
-      FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to handle invalid input " + packetInput.toString());
-      return new byte[0];
+      registry.setHandler(Ping.class, packet -> this.getPing((Ping) packet));
    }
 
    /**
