@@ -369,8 +369,8 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                }
 
                MapleMount mount = player.getMount();   // thanks Ari for noticing a scenario where Silver Mane quest couldn't be started
-               if (mount.getItemId() != 0) {
-                  PacketCreator.announce(player, new UpdateMount(player.getId(), mount.getLevel(), mount.getExp(), mount.getTiredness(), false));
+               if (mount.itemId() != 0) {
+                  PacketCreator.announce(player, new UpdateMount(player.getId(), mount.level(), mount.exp(), mount.tiredness(), false));
                }
 
                player.reloadQuestExpirations();

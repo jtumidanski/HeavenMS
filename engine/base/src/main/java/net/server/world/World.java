@@ -1489,12 +1489,11 @@ public class World {
       }
    }
 
-   public void registerMountHunger(MapleCharacter chr) {
-      if (chr.isGM() && ServerConstants.GM_PETS_NEVER_HUNGRY || ServerConstants.PETS_NEVER_HUNGRY) {
+   public void registerMountHunger(int ownerId, boolean isGm) {
+      if (isGm && ServerConstants.GM_PETS_NEVER_HUNGRY || ServerConstants.PETS_NEVER_HUNGRY) {
          return;
       }
 
-      Integer key = chr.getId();
       activeMountsLock.lock();
       try {
          int initProc;
@@ -1504,18 +1503,16 @@ public class World {
             initProc = ServerConstants.MOUNT_EXHAUST_COUNT - 1;
          }
 
-         activeMounts.put(key, initProc);
+         activeMounts.put(ownerId, initProc);
       } finally {
          activeMountsLock.unlock();
       }
    }
 
-   public void unregisterMountHunger(MapleCharacter chr) {
-      Integer key = chr.getId();
-
+   public void unregisterMountHunger(int ownerId) {
       activeMountsLock.lock();
       try {
-         activeMounts.remove(key);
+         activeMounts.remove(ownerId);
       } finally {
          activeMountsLock.unlock();
       }

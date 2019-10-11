@@ -59,18 +59,18 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
             try {
                Item item = useInv.getItem(packet.position());
                if (item != null && item.id() == packet.itemId() && mount != null) {
-                  int curTiredness = mount.getTiredness();
+                  int curTiredness = mount.tiredness();
                   int healedTiredness = Math.min(curTiredness, 30);
 
                   float healedFactor = (float) healedTiredness / 30;
-                  mount.setTiredness(curTiredness - healedTiredness);
+                  mount.tiredness_$eq(curTiredness - healedTiredness);
 
                   if (healedFactor > 0.0f) {
-                     mount.setExp(mount.getExp() + (int) Math.ceil(healedFactor * (2 * mount.getLevel() + 6)));
-                     int level = mount.getLevel();
-                     boolean levelup = mount.getExp() >= ExpTable.getMountExpNeededForLevel(level) && level < 31;
+                     mount.exp_$eq(mount.exp() + (int) Math.ceil(healedFactor * (2 * mount.level() + 6)));
+                     int level = mount.level();
+                     boolean levelup = mount.exp() >= ExpTable.getMountExpNeededForLevel(level) && level < 31;
                      if (levelup) {
-                        mount.setLevel(level + 1);
+                        mount.level_$eq(level + 1);
                      }
 
                      mountLevelup = levelup;
@@ -84,7 +84,7 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
 
             if (mountLevelup != null) {
                Boolean finalMountLevelup = mountLevelup;
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.getLevel(), mount.getExp(), mount.getTiredness(), finalMountLevelup));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.level(), mount.exp(), mount.tiredness(), finalMountLevelup));
             }
          } finally {
             client.releaseClient();

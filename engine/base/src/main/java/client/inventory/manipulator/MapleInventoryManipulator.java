@@ -610,7 +610,7 @@ public class MapleInventoryManipulator {
       }
       if (dst == -18) {
          if (chr.getMount() != null) {
-            chr.getMount().setItemId(source.id());
+            chr.getMount().itemId_$eq(source.id());
          }
       }
 

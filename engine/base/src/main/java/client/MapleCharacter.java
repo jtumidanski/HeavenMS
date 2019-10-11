@@ -3462,8 +3462,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       List<Pair<MapleBuffStat, MapleBuffStatValueHolder>> toCancel = deregisterBuffStats(buffstats);
       if (effect.isMonsterRiding()) {
-         this.getClient().getWorldServer().unregisterMountHunger(this);
-         this.getMount().setActive(false);
+         this.getClient().getWorldServer().unregisterMountHunger(getId());
+         this.getMount().active_$eq(false);
       }
 
       if (!overwrite) {
@@ -6340,8 +6340,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public MapleMount mount(int id, int skillid) {
       MapleMount mount = this.mount;
-      mount.setItemId(id);
-      mount.setSkillId(skillid);
+      mount.itemId_$eq(id);
+      mount.skillId_$eq(skillid);
       return mount;
    }
 
@@ -7071,9 +7071,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int messengerId = messenger != null ? messenger.getId() : 0;
          int messengerPosition = messenger != null ? messengerposition : 4;
 
-         int mountLevel = mount != null ? mount.getLevel() : 1;
-         int mountExp = mount != null ? mount.getExp() : 0;
-         int mountTiredness = mount != null ? mount.getTiredness() : 0;
+         int mountLevel = mount != null ? mount.level() : 1;
+         int mountExp = mount != null ? mount.exp() : 0;
+         int mountTiredness = mount != null ? mount.tiredness() : 0;
 
          CharacterAdministrator.getInstance().update(con, id, level, fame, str, dex, luk, int_, Math.abs(exp.get()),
                Math.abs(gachaexp.get()), hp, mp, maxhp, maxmp, sp.substring(0, sp.length() - 1), remainingAp, gmLevel,
@@ -7723,9 +7723,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (mount != null) {
          int tiredness = mount.incrementAndGetTiredness();
 
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new UpdateMount(this.getId(), mount.getLevel(), mount.getExp(), mount.getTiredness(), false));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new UpdateMount(this.getId(), mount.level(), mount.exp(), mount.tiredness(), false));
          if (tiredness > 99) {
-            mount.setTiredness(99);
+            mount.tiredness_$eq(99);
             this.dispelSkill(this.getJobType() * 10000000 + 1004);
             MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your mount grew tired! Treat it some revitalizer before riding it again!");
             return false;
@@ -8310,10 +8310,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       evtLock.lock();
 
-      if (mount != null) {
-         mount.empty();
-         mount = null;
-      }
+      emptyMount();
       if (remove) {
          partyQuest = null;
          events = null;
@@ -8331,6 +8328,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             map = null;
             setListener(null);
          }, 5 * 60 * 1000);
+      }
+   }
+
+   private void emptyMount() {
+      if (mount != null) {
+         getClient().getWorldServer().unregisterMountHunger(getId());
+         mount = null;
       }
    }
 

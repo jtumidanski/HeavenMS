@@ -499,14 +499,14 @@ public class CharacterProcessor {
 
             MapleMount mapleMount;
             if (mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18) != null) {
-               mapleMount = new MapleMount(mapleCharacter, mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id(), mountid);
+               mapleMount = new MapleMount(mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id(), mountid);
             } else {
-               mapleMount = new MapleMount(mapleCharacter, 0, mountid);
+               mapleMount = new MapleMount(0, mountid);
             }
-            mapleMount.setExp(characterData.mountExp());
-            mapleMount.setLevel(characterData.mountLevel());
-            mapleMount.setTiredness(characterData.mountTiredness());
-            mapleMount.setActive(false);
+            mapleMount.exp_$eq(characterData.mountExp());
+            mapleMount.level_$eq(characterData.mountLevel());
+            mapleMount.tiredness_$eq(characterData.mountTiredness());
+            mapleMount.active_$eq(false);
             mapleCharacter.setMount(mapleMount);
          }
          return mapleCharacter;

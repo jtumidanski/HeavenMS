@@ -365,7 +365,7 @@ public class MapleStatEffect {
       }
 
       if (this.getFatigue() != 0) {
-         applyto.getMount().setTiredness(applyto.getMount().getTiredness() + this.getFatigue());
+         applyto.getMount().tiredness_$eq(applyto.getMount().tiredness() + this.getFatigue());
       }
 
       if (summonMovementType != null && pos != null) {
@@ -628,7 +628,7 @@ public class MapleStatEffect {
 
          // thanks inhyuk for noticing some skill mounts not acting properly for other players when changing maps
          givemount = applyto.mount(ridingMountId, sourceid);
-         applyto.getClient().getWorldServer().registerMountHunger(applyto);
+         applyto.getClient().getWorldServer().registerMountHunger(applyto.getId(), applyto.isGM());
 
          localDuration = sourceid;
          localsourceid = ridingMountId;
@@ -681,7 +681,7 @@ public class MapleStatEffect {
                localstatups = statups;
             }
             buff = PacketCreator.create(new GiveBuff(localsourceid, localDuration, localstatups));
-            mbuff = PacketCreator.create(new ShowMonsterRiding(applyto.getId(), givemount.getItemId(), givemount.getSkillId()));
+            mbuff = PacketCreator.create(new ShowMonsterRiding(applyto.getId(), givemount.itemId(), givemount.skillId()));
             localDuration = duration;
          } else if (isShadowPartner()) {
             List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.SHADOWPARTNER, 0));

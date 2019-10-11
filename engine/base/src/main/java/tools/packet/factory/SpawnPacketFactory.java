@@ -303,9 +303,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
          writer.writeInt(1); // mob level
          writer.writeLong(0); // mob exp + tiredness
       } else {
-         writer.writeInt(chr.getMount().getLevel());
-         writer.writeInt(chr.getMount().getExp());
-         writer.writeInt(chr.getMount().getTiredness());
+         writer.writeInt(chr.getMount().level());
+         writer.writeInt(chr.getMount().exp());
+         writer.writeInt(chr.getMount().tiredness());
       }
 
       MaplePlayerShop mps = chr.getPlayerShop();
@@ -398,8 +398,8 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       if (bv != null) {
          MapleMount mount = chr.getMount();
          if (mount != null) {
-            writer.writeInt(mount.getItemId());
-            writer.writeInt(mount.getSkillId());
+            writer.writeInt(mount.itemId());
+            writer.writeInt(mount.skillId());
          } else {
             writer.writeLong(0);
          }

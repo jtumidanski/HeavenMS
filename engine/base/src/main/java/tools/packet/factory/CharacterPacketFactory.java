@@ -93,10 +93,10 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       Item mount;     //mounts can potentially crash the client if the player's level is not properly checked
       if (chr.getMount() != null && (mount = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18)) != null && MapleItemInformationProvider.getInstance().getEquipLevelReq(mount.id()) <= chr.getLevel()) {
          MapleMount mmount = chr.getMount();
-         writer.write(mmount.getId()); //mount
-         writer.writeInt(mmount.getLevel()); //level
-         writer.writeInt(mmount.getExp()); //exp
-         writer.writeInt(mmount.getTiredness()); //tiredness
+         writer.write(mmount.id()); //mount
+         writer.writeInt(mmount.level()); //level
+         writer.writeInt(mmount.exp()); //exp
+         writer.writeInt(mmount.tiredness()); //tiredness
       } else {
          writer.write(0);
       }
