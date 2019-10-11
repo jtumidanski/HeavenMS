@@ -92,18 +92,7 @@ public class MobSkillFactory {
                   lt = (Point) ltd.getData();
                   rb = (Point) skillData.getChildByPath("rb").getData();
                }
-               ret = new MobSkill(skillId, level);
-               ret.addSummons(toSummon);
-               ret.setCoolTime(cooltime);
-               ret.setDuration(duration);
-               ret.setHp(hp);
-               ret.setMpCon(mpCon);
-               ret.setSpawnEffect(effect);
-               ret.setX(x);
-               ret.setY(y);
-               ret.setProp(prop);
-               ret.setLimit(limit);
-               ret.setLtRb(lt, rb);
+               ret = new MobSkill(skillId, level, toSummon, cooltime, duration, hp, mpCon, effect, x, y, prop, limit, lt, rb);
             }
             mobSkills.put(skillId + "" + level, ret);
          }

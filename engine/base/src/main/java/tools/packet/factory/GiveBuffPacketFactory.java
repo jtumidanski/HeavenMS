@@ -68,12 +68,12 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    protected void giveDebuff(MaplePacketLittleEndianWriter writer, GiveDebuff packet) {
-      writeLongMaskD(writer, packet.getStatups());
-      for (Pair<MapleDisease, Integer> statup : packet.getStatups()) {
+      writeLongMaskD(writer, packet.statups());
+      for (Pair<MapleDisease, Integer> statup : packet.statups()) {
          writer.writeShort(statup.getRight().shortValue());
-         writer.writeShort(packet.getMobSkill().getSkillId());
-         writer.writeShort(packet.getMobSkill().getSkillLevel());
-         writer.writeInt((int) packet.getMobSkill().getDuration());
+         writer.writeShort(packet.mobSkill().skillId());
+         writer.writeShort(packet.mobSkill().level());
+         writer.writeInt((int) packet.mobSkill().duration());
       }
       writer.writeShort(0); // ??? wk charges have 600 here o.o
       writer.writeShort(900);//Delay
@@ -82,14 +82,14 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
 
    protected void giveForeignDebuff(MaplePacketLittleEndianWriter writer, GiveForeignDebuff packet) {
       // Poison damage visibility and missing diseases status visibility, extended through map transitions thanks to Ronan
-      writer.writeInt(packet.getCharacterId());
-      writeLongMaskD(writer, packet.getStatups());
-      for (Pair<MapleDisease, Integer> statup : packet.getStatups()) {
+      writer.writeInt(packet.characterId());
+      writeLongMaskD(writer, packet.statups());
+      for (Pair<MapleDisease, Integer> statup : packet.statups()) {
          if (statup.getLeft() == MapleDisease.POISON) {
             writer.writeShort(statup.getRight().shortValue());
          }
-         writer.writeShort(packet.getMobSkill().getSkillId());
-         writer.writeShort(packet.getMobSkill().getSkillLevel());
+         writer.writeShort(packet.mobSkill().skillId());
+         writer.writeShort(packet.mobSkill().level());
       }
       writer.writeShort(0); // same as give_buff
       writer.writeShort(900);//Delay
@@ -106,14 +106,14 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    protected void giveForeignSlowDebuff(MaplePacketLittleEndianWriter writer, GiveForeignSlowDebuff packet) {
-      writer.writeInt(packet.getCharacterId());
+      writer.writeInt(packet.characterId());
       writeLongMaskSlowD(writer);
-      for (Pair<MapleDisease, Integer> statup : packet.getStatups()) {
+      for (Pair<MapleDisease, Integer> statup : packet.statups()) {
          if (statup.getLeft() == MapleDisease.POISON) {
             writer.writeShort(statup.getRight().shortValue());
          }
-         writer.writeShort(packet.getMobSkill().getSkillId());
-         writer.writeShort(packet.getMobSkill().getSkillLevel());
+         writer.writeShort(packet.mobSkill().skillId());
+         writer.writeShort(packet.mobSkill().level());
       }
       writer.writeShort(0); // same as give_buff
       writer.writeShort(900);//Delay

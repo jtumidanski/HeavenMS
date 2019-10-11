@@ -29,8 +29,8 @@ public class PlayerDiseaseAdministrator extends AbstractQueryExecutor implements
          ps.setInt(1, characterId);
          ps.setInt(2, data.getKey().ordinal());
          MobSkill ms = data.getValue().getRight();
-         ps.setInt(3, ms.getSkillId());
-         ps.setInt(4, ms.getSkillLevel());
+         ps.setInt(3, ms.skillId());
+         ps.setInt(4, ms.level());
          ps.setInt(5, data.getValue().getLeft().intValue());
       }, playerDiseases);
    }

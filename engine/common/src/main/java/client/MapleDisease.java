@@ -21,8 +21,6 @@
 */
 package client;
 
-import constants.GameConstants;
-
 public enum MapleDisease {
    NULL(0x0),
    SLOW(0x1, 126),
@@ -67,7 +65,7 @@ public enum MapleDisease {
          MapleDisease.SEAL, MapleDisease.DARKNESS, MapleDisease.WEAKEN, MapleDisease.CURSE};
 
    public static MapleDisease getRandom() {
-      MapleDisease[] diseases = GameConstants.CPQ_DISEASES;
+      MapleDisease[] diseases = CPQ_DISEASES;
       return diseases[(int) (Math.random() * diseases.length)];
    }
 

@@ -67,8 +67,8 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
       for (Integer val : stats.values()) {
          writer.writeShort(val);
          if (monsterSkill) {
-            writer.writeShort(mobskill.getSkillId());
-            writer.writeShort(mobskill.getSkillLevel());
+            writer.writeShort(mobskill.skillId());
+            writer.writeShort(mobskill.level());
          } else {
             writer.writeInt(skill);
          }
@@ -86,8 +86,8 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
       for (Map.Entry<MonsterStatus, Integer> stat : stati.entrySet()) {
          writer.writeShort(stat.getValue());
          if (packet.getStatusEffect().isMonsterSkill()) {
-            writer.writeShort(packet.getStatusEffect().getMobSkill().getSkillId());
-            writer.writeShort(packet.getStatusEffect().getMobSkill().getSkillLevel());
+            writer.writeShort(packet.getStatusEffect().getMobSkill().skillId());
+            writer.writeShort(packet.getStatusEffect().getMobSkill().level());
          } else {
             writer.writeInt(packet.getStatusEffect().getSkill().getId());
          }

@@ -1645,7 +1645,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          for (Entry<MapleDisease, Pair<Long, MobSkill>> di : chr.getAllDiseases().entrySet()) {
             MapleDisease disease = di.getKey();
             MobSkill skill = di.getValue().getRight();
-            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
+            final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.x()));
 
             if (disease != MapleDisease.SLOW) {
                PacketCreator.announce(this, new GiveForeignDebuff(cid, debuff, skill));
@@ -2401,7 +2401,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       for (Entry<MapleDisease, Pair<DiseaseValueHolder, MobSkill>> di : chrDiseases) {
          MapleDisease disease = di.getKey();
          MobSkill skill = di.getValue().getRight();
-         final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
+         final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.x()));
 
          if (disease != MapleDisease.SLOW) {
             MasterBroadcaster.getInstance().sendToAllInMap(map, new GiveForeignDebuff(id, debuff, skill));
@@ -2422,8 +2422,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          chrLock.lock();
          try {
             long curTime = Server.getInstance().getCurrentTime();
-            diseaseExpires.put(disease, curTime + skill.getDuration());
-            diseases.put(disease, new Pair<>(new DiseaseValueHolder(curTime, skill.getDuration()), skill));
+            diseaseExpires.put(disease, curTime + skill.duration());
+            diseases.put(disease, new Pair<>(new DiseaseValueHolder(curTime, skill.duration()), skill));
          } finally {
             chrLock.unlock();
          }
@@ -2432,7 +2432,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             sitChair(-1);
          }
 
-         final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.getX()));
+         final List<Pair<MapleDisease, Integer>> debuff = Collections.singletonList(new Pair<>(disease, skill.x()));
          PacketCreator.announce(client, new GiveDebuff(debuff, skill));
 
          if (disease != MapleDisease.SLOW) {

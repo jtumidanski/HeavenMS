@@ -54,6 +54,7 @@ import server.life.MobSkill;
 import server.life.MobSkillFactory;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
+import server.processor.MobSkillProcessor;
 import tools.FilePrinter;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
@@ -169,7 +170,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
             mpattack += attackInfo.mpBurn();
             MobSkill mobSkill = MobSkillFactory.getMobSkill(attackInfo.diseaseSkill(), attackInfo.diseaseLevel());
             if (mobSkill != null && damage > 0) {
-               mobSkill.applyEffect(chr, attacker, false, banishPlayers);
+               MobSkillProcessor.getInstance().applyEffect(chr, attacker, mobSkill, false, banishPlayers);
             }
 
             attacker.setMp(attacker.getMp() - attackInfo.mpCon());

@@ -94,6 +94,7 @@ import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
 import server.partyquest.MonsterCarnival;
 import server.processor.DropEntryProcessor;
+import server.processor.MobSkillProcessor;
 import server.processor.maps.MapleMapObjectProcessor;
 import server.processor.maps.MapleMapObjectTypeProcessor;
 import server.processor.maps.MapleMapProcessor;
@@ -1876,7 +1877,7 @@ public class MapleMap {
          if (teamS != null) {
             teamS.stream()
                   .filter(Objects::nonNull)
-                  .forEach(skill -> skill.getSkill().applyEffect(null, monster, false, null));
+                  .forEach(skill -> MobSkillProcessor.getInstance().applyEffect(null, monster, skill.getSkill(), false, null));
          }
       }
 
@@ -3970,7 +3971,7 @@ public class MapleMap {
             .filter(mapObject -> mapObject.getType() == MapleMapObjectType.MONSTER)
             .map(mapObject -> (MapleMonster) mapObject)
             .filter(monster -> monster.getTeam() == team)
-            .forEach(monster -> skill.getSkill().applyEffect(null, monster, false, null));
+            .forEach(monster -> MobSkillProcessor.getInstance().applyEffect(null, monster, skill.getSkill(), false, null));
    }
 
    public final List<Integer> getSkillIds() {

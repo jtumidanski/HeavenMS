@@ -1348,7 +1348,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       List<MonsterStatus> toCancel = new ArrayList<>();
       for (Entry<MonsterStatus, MonsterStatusEffect> effects : stati.entrySet()) {
          MonsterStatusEffect mse = effects.getValue();
-         if (mse.getMobSkill() != null && mse.getMobSkill().getSkillId() == skillId.getSkillId()) { //not checking for level.
+         if (mse.getMobSkill() != null && mse.getMobSkill().skillId() == skillId.skillId()) { //not checking for level.
             toCancel.add(effects.getKey());
          }
       }
@@ -1528,7 +1528,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          return false;
       }
 
-      int useSkillid = toUse.getSkillId();
+      int useSkillid = toUse.skillId();
       if (useSkillid >= 143 && useSkillid <= 145) {
          if (this.isBuffed(MonsterStatus.WEAPON_REFLECT) || this.isBuffed(MonsterStatus.MAGIC_REFLECT)) {
             return false;
@@ -1538,12 +1538,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       monsterLock.lock();
       try {
          for (Pair<Integer, Integer> skill : usedSkills) {   // thanks OishiiKawaiiDesu for noticing an issue with mobskill cooldown
-            if (skill.getLeft() == useSkillid && skill.getRight() == toUse.getSkillLevel()) {
+            if (skill.getLeft() == useSkillid && skill.getRight() == toUse.skillId()) {
                return false;
             }
          }
 
-         int mpCon = toUse.getMpCon();
+         int mpCon = toUse.mpCon();
          if (mp < mpCon) {
             return false;
          }
@@ -1565,12 +1565,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    }
 
    private void usedSkill(MobSkill skill) {
-      final int skillId = skill.getSkillId(), level = skill.getSkillLevel();
-      long cooltime = skill.getCoolTime();
+      final int skillId = skill.skillId(), level = skill.skillId();
+      long cooltime = skill.coolTime();
 
       monsterLock.lock();
       try {
-         mp -= skill.getMpCon();
+         mp -= skill.mpCon();
 
          Pair<Integer, Integer> skillKey = new Pair<>(skillId, level);
          this.usedSkills.add(skillKey);

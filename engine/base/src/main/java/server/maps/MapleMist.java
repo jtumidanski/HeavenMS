@@ -146,7 +146,7 @@ public class MapleMist extends AbstractMapleMapObject {
                (skill, skillLevel) -> spawnMistForOwner(skillLevel),
                new byte[0]);
       }
-      return PacketCreator.create(new SpawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this));
+      return PacketCreator.create(new SpawnMist(getObjectId(), mob.getId(), skill.skillId(), skill.level(), this));
    }
 
    private byte[] spawnMistForOwner(Integer skillLevel) {
@@ -157,7 +157,7 @@ public class MapleMist extends AbstractMapleMapObject {
       if (owner != null) {
          return spawnMistForOwner(level);
       }
-      return PacketCreator.create(new SpawnMist(getObjectId(), mob.getId(), skill.getSkillId(), skill.getSkillLevel(), this));
+      return PacketCreator.create(new SpawnMist(getObjectId(), mob.getId(), skill.skillId(), skill.level(), this));
    }
 
    @Override
