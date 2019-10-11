@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.messenger.MessengerAddCharacter;
 import tools.packet.messenger.MessengerChat;
@@ -21,13 +20,13 @@ public class MessengerPacketFactory extends AbstractPacketFactory {
    }
 
    private MessengerPacketFactory() {
-      registry.setHandler(MessengerInvite.class, packet -> create(SendOpcode.MESSENGER, this::messengerInvite, packet));
-      registry.setHandler(MessengerAddCharacter.class, packet -> create(SendOpcode.MESSENGER, this::addMessengerPlayer, packet));
-      registry.setHandler(MessengerRemoveCharacter.class, packet -> create(SendOpcode.MESSENGER, this::removeMessengerPlayer, packet));
-      registry.setHandler(MessengerUpdateCharacter.class, packet -> create(SendOpcode.MESSENGER, this::updateMessengerPlayer, packet));
-      registry.setHandler(MessengerJoin.class, packet -> create(SendOpcode.MESSENGER, this::joinMessenger, packet));
-      registry.setHandler(MessengerChat.class, packet -> create(SendOpcode.MESSENGER, this::messengerChat, packet));
-      registry.setHandler(MessengerNote.class, packet -> create(SendOpcode.MESSENGER, this::messengerNote, packet));
+      Handler.handle(MessengerInvite.class).decorate(this::messengerInvite).register(registry);
+      Handler.handle(MessengerAddCharacter.class).decorate(this::addMessengerPlayer).register(registry);
+      Handler.handle(MessengerRemoveCharacter.class).decorate(this::removeMessengerPlayer).register(registry);
+      Handler.handle(MessengerUpdateCharacter.class).decorate(this::updateMessengerPlayer).register(registry);
+      Handler.handle(MessengerJoin.class).decorate(this::joinMessenger).register(registry);
+      Handler.handle(MessengerChat.class).decorate(this::messengerChat).register(registry);
+      Handler.handle(MessengerNote.class).decorate(this::messengerNote).register(registry);
    }
 
    protected void messengerInvite(MaplePacketLittleEndianWriter writer, MessengerInvite packet) {

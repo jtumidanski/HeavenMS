@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.item.enhance.SendHammer;
 import tools.packet.item.enhance.SendHammerMessage;
@@ -17,9 +16,9 @@ public class ItemEnhancePacketFactory extends AbstractPacketFactory {
    }
 
    private ItemEnhancePacketFactory() {
-      registry.setHandler(SendVegaScroll.class, packet -> create(SendOpcode.VEGA_SCROLL, this::sendVegaScroll, packet, 3));
-      registry.setHandler(SendHammer.class, packet -> create(SendOpcode.VICIOUS_HAMMER, this::sendHammerData, packet));
-      registry.setHandler(SendHammerMessage.class, packet -> create(SendOpcode.VICIOUS_HAMMER, this::sendHammerMessage, packet));
+      Handler.handle(SendVegaScroll.class).decorate(this::sendVegaScroll).size(3).register(registry);
+      Handler.handle(SendHammer.class).decorate(this::sendHammerData).register(registry);
+      Handler.handle(SendHammerMessage.class).decorate(this::sendHammerMessage).register(registry);
    }
 
    protected void sendVegaScroll(MaplePacketLittleEndianWriter writer, SendVegaScroll packet) {

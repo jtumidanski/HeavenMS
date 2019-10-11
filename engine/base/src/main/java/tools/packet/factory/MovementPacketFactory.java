@@ -2,7 +2,6 @@ package tools.packet.factory;
 
 import java.util.List;
 
-import net.opcodes.SendOpcode;
 import server.movement.LifeMovementFragment;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -24,12 +23,12 @@ public class MovementPacketFactory extends AbstractPacketFactory {
    }
 
    private MovementPacketFactory() {
-      registry.setHandler(MoveMonsterResponse.class, packet -> create(SendOpcode.MOVE_MONSTER_RESPONSE, this::moveMonsterResponse, packet, 13));
-      registry.setHandler(MovePlayer.class, packet -> create(SendOpcode.MOVE_PLAYER, this::movePlayer, packet));
-      registry.setHandler(MoveSummon.class, packet -> create(SendOpcode.MOVE_SUMMON, this::moveSummon, packet));
-      registry.setHandler(MoveMonster.class, packet -> create(SendOpcode.MOVE_MONSTER, this::moveMonster, packet));
-      registry.setHandler(MovePet.class, packet -> create(SendOpcode.MOVE_PET, this::movePet, packet));
-      registry.setHandler(MoveDragon.class, packet -> create(SendOpcode.MOVE_DRAGON, this::moveDragon, packet));
+      Handler.handle(MoveMonsterResponse.class).decorate(this::moveMonsterResponse).size(13).register(registry);
+      Handler.handle(MovePlayer.class).decorate(this::movePlayer).register(registry);
+      Handler.handle(MoveSummon.class).decorate(this::moveSummon).register(registry);
+      Handler.handle(MoveMonster.class).decorate(this::moveMonster).register(registry);
+      Handler.handle(MovePet.class).decorate(this::movePet).register(registry);
+      Handler.handle(MoveDragon.class).decorate(this::moveDragon).register(registry);
    }
 
    /**

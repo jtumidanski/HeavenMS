@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.EnableTV;
 import tools.packet.SendTV;
@@ -16,8 +15,8 @@ public class TVPacketFactory extends AbstractPacketFactory {
    }
 
    private TVPacketFactory() {
-      registry.setHandler(EnableTV.class, packet -> create(SendOpcode.ENABLE_TV, this::enableTV, packet, 7));
-      registry.setHandler(SendTV.class, packet -> create(SendOpcode.SEND_TV, this::sendTV, packet));
+      Handler.handle(EnableTV.class).decorate(this::enableTV).size(7).register(registry);
+      Handler.handle(SendTV.class).decorate(this::sendTV).register(registry);
    }
 
    protected void enableTV(MaplePacketLittleEndianWriter writer, EnableTV packet) {

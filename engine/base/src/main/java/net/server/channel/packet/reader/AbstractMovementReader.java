@@ -9,16 +9,13 @@ import net.server.MovementData;
 import net.server.PacketReader;
 import net.server.RelativeMovementData;
 import net.server.channel.packet.movement.BaseMovementPacket;
+import tools.TriFunction;
 import tools.data.input.LittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public abstract class AbstractMovementReader<T extends BaseMovementPacket> implements PacketReader<T> {
    protected Point readStartingPosition(SeekableLittleEndianAccessor accessor) {
       return new Point(accessor.readShort(), accessor.readShort());
-   }
-
-   interface TriFunction<T, U , V, W> {
-      T apply(U u, V v, W w);
    }
 
    protected T producePacket(SeekableLittleEndianAccessor accessor, int yOffset, TriFunction<T, Boolean, List<MovementData>, List<Byte>> function) {

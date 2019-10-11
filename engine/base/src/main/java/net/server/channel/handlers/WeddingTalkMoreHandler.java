@@ -29,7 +29,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
-import tools.packet.wedding.WeddingProgress;
+import tools.packet.wedding.WeddingEnd;
 
 /**
  * @author Ronan
@@ -48,7 +48,7 @@ public final class WeddingTalkMoreHandler extends AbstractPacketHandler<NoOpPack
          MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "High Priest John: Your blessings have been added to their love. What a noble act for a lovely couple!");
       }
 
-      PacketCreator.announce(client, new WeddingProgress(true, 0, 0, (byte) 3));
+      PacketCreator.announce(client, new WeddingEnd(true, 0, 0, (byte) 3));
       PacketCreator.announce(client, new EnableActions());
    }
 }

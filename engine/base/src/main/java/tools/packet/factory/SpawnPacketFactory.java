@@ -11,7 +11,6 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.newyear.NewYearCardRecord;
 import constants.ItemConstants;
-import net.opcodes.SendOpcode;
 import net.server.guild.MapleGuildSummary;
 import server.life.MapleMonster;
 import server.maps.MapleMiniGame;
@@ -53,29 +52,29 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    private SpawnPacketFactory() {
-      registry.setHandler(SpawnPortal.class, packet -> create(SendOpcode.SPAWN_PORTAL, this::spawnPortal, packet, 14));
-      registry.setHandler(SpawnDoor.class, packet -> create(SendOpcode.SPAWN_DOOR, this::spawnDoor, packet, 11));
-      registry.setHandler(RemoveDoor.class, packet -> create(((RemoveDoor) packet).town() ? SendOpcode.SPAWN_PORTAL : SendOpcode.REMOVE_DOOR, this::removeDoor, packet, 10));
-      registry.setHandler(SpawnSummon.class, packet -> create(SendOpcode.SPAWN_SPECIAL_MAPOBJECT, this::spawnSummon, packet, 25));
-      registry.setHandler(SpawnNPC.class, packet -> create(SendOpcode.SPAWN_NPC, this::spawnNPC, packet, 24));
-      registry.setHandler(SpawnNPCRequestController.class, packet -> create(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER, this::spawnNPCRequestController, packet, 23));
-      registry.setHandler(RemoveMonsterInvisibility.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::removeMonsterInvisibility, packet));
-      registry.setHandler(SpawnFakeMonster.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::spawnFakeMonster, packet));
-      registry.setHandler(MakeMonsterReal.class, packet -> create(SendOpcode.SPAWN_MONSTER, this::makeMonsterReal, packet));
-      registry.setHandler(StopMonsterControl.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::stopControllingMonster, packet, 7));
-      registry.setHandler(SpawnPlayer.class, packet -> create(SendOpcode.SPAWN_PLAYER, this::spawnPlayerMapObject, packet));
-      registry.setHandler(SpawnKite.class, packet -> create(SendOpcode.SPAWN_KITE, this::spawnKite, packet));
-      registry.setHandler(SpawnMist.class, packet -> create(SendOpcode.SPAWN_MIST, this::spawnMist, packet));
-      registry.setHandler(ShowPet.class, packet -> create(SendOpcode.SPAWN_PET, this::showPet, packet));
-      registry.setHandler(SpawnHiredMerchant.class, packet -> create(SendOpcode.SPAWN_HIRED_MERCHANT, this::spawnHiredMerchantBox, packet));
-      registry.setHandler(SpawnPlayerNPC.class, packet -> create(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER, this::spawnPlayerNPC, packet));
-      registry.setHandler(RemoveNPCController.class, packet -> create(SendOpcode.SPAWN_NPC_REQUEST_CONTROLLER, this::removeNPCController, packet));
-      registry.setHandler(SpawnGuide.class, packet -> create(SendOpcode.SPAWN_GUIDE, this::spawnGuide, packet, 3));
-      registry.setHandler(SpawnDragon.class, packet -> create(SendOpcode.SPAWN_DRAGON, this::spawnDragon, packet));
-      registry.setHandler(SpawnMonster.class, packet -> create(SendOpcode.SPAWN_MONSTER, this::spawnMonster, packet));
-      registry.setHandler(ControlMonster.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::controlMonster, packet));
-      registry.setHandler(MakeMonsterInvisible.class, packet -> create(SendOpcode.SPAWN_MONSTER_CONTROL, this::makeMonsterInvisible, packet));
-      registry.setHandler(CannotSpawnKite.class, packet -> create(SendOpcode.CANNOT_SPAWN_KITE, this::sendCannotSpawnKite, packet));
+      Handler.handle(SpawnPortal.class).decorate(this::spawnPortal).size(14).register(registry);
+      Handler.handle(SpawnDoor.class).decorate(this::spawnDoor).size(11).register(registry);
+      Handler.handle(RemoveDoor.class).decorate(this::removeDoor).size(10).register(registry);
+      Handler.handle(SpawnSummon.class).decorate(this::spawnSummon).size(25).register(registry);
+      Handler.handle(SpawnNPC.class).decorate(this::spawnNPC).size(24).register(registry);
+      Handler.handle(SpawnNPCRequestController.class).decorate(this::spawnNPCRequestController).size(23).register(registry);
+      Handler.handle(RemoveMonsterInvisibility.class).decorate(this::removeMonsterInvisibility).register(registry);
+      Handler.handle(SpawnFakeMonster.class).decorate(this::spawnFakeMonster).register(registry);
+      Handler.handle(MakeMonsterReal.class).decorate(this::makeMonsterReal).register(registry);
+      Handler.handle(StopMonsterControl.class).decorate(this::stopControllingMonster).size(7).register(registry);
+      Handler.handle(SpawnPlayer.class).decorate(this::spawnPlayerMapObject).register(registry);
+      Handler.handle(SpawnKite.class).decorate(this::spawnKite).register(registry);
+      Handler.handle(SpawnMist.class).decorate(this::spawnMist).register(registry);
+      Handler.handle(ShowPet.class).decorate(this::showPet).register(registry);
+      Handler.handle(SpawnHiredMerchant.class).decorate(this::spawnHiredMerchantBox).register(registry);
+      Handler.handle(SpawnPlayerNPC.class).decorate(this::spawnPlayerNPC).register(registry);
+      Handler.handle(RemoveNPCController.class).decorate(this::removeNPCController).register(registry);
+      Handler.handle(SpawnGuide.class).decorate(this::spawnGuide).size(3).register(registry);
+      Handler.handle(SpawnDragon.class).decorate(this::spawnDragon).register(registry);
+      Handler.handle(SpawnMonster.class).decorate(this::spawnMonster).register(registry);
+      Handler.handle(ControlMonster.class).decorate(this::controlMonster).register(registry);
+      Handler.handle(MakeMonsterInvisible.class).decorate(this::makeMonsterInvisible).register(registry);
+      Handler.handle(CannotSpawnKite.class).decorate(this::sendCannotSpawnKite).register(registry);
    }
 
    /**

@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.pin.PinCodePacket;
 import tools.packet.pin.PinRegistered;
@@ -16,8 +15,8 @@ public class PinPacketFactory extends AbstractPacketFactory {
    }
 
    private PinPacketFactory() {
-      registry.setHandler(PinCodePacket.class, packet -> create(SendOpcode.CHECK_PINCODE, this::pinOperation, packet, 3));
-      registry.setHandler(PinRegistered.class, packet -> create(SendOpcode.UPDATE_PINCODE, this::pinRegistered, packet, 3));
+      Handler.handle(PinCodePacket.class).decorate(this::pinOperation).size(3).register(registry);
+      Handler.handle(PinRegistered.class).decorate(this::pinRegistered).size(3).register(registry);
    }
 
    /**

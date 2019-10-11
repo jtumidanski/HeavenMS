@@ -2,7 +2,6 @@ package tools.packet.factory;
 
 import client.MapleClient;
 import constants.ServerConstants;
-import net.opcodes.SendOpcode;
 import net.server.Server;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.login.AuthSuccess;
@@ -21,10 +20,10 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
    }
 
    private LoginStatusPacketFactory() {
-      registry.setHandler(LoginFailed.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getLoginFailed, packet, 8));
-      registry.setHandler(PermanentBan.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getPermBan, packet));
-      registry.setHandler(TemporaryBan.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getTempBan, packet, 17));
-      registry.setHandler(AuthSuccess.class, packet -> create(SendOpcode.LOGIN_STATUS, this::getAuthSuccess, packet));
+      Handler.handle(LoginFailed.class).decorate(this::getLoginFailed).size(8).register(registry);
+      Handler.handle(PermanentBan.class).decorate(this::getPermBan).register(registry);
+      Handler.handle(TemporaryBan.class).decorate(this::getTempBan).size(17).register(registry);
+      Handler.handle(AuthSuccess.class).decorate(this::getAuthSuccess).register(registry);
    }
 
    /**

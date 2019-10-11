@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.AddNewCharacter;
 
@@ -15,7 +14,7 @@ public class AddNewCharacterPacketFactory extends AbstractPacketFactory {
    }
 
    private AddNewCharacterPacketFactory() {
-      registry.setHandler(AddNewCharacter.class, packet -> create(SendOpcode.ADD_NEW_CHAR_ENTRY, this::addNewCharEntry, packet));
+      Handler.handle(AddNewCharacter.class).decorate(this::addNewCharEntry).register(registry);
    }
 
    protected void addNewCharEntry(MaplePacketLittleEndianWriter writer, AddNewCharacter packet) {

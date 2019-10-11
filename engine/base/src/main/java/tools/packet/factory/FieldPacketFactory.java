@@ -2,7 +2,6 @@ package tools.packet.factory;
 
 import java.util.Map;
 
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.field.Boat;
@@ -34,23 +33,23 @@ public class FieldPacketFactory extends AbstractPacketFactory {
    }
 
    private FieldPacketFactory() {
-      registry.setHandler(ShowBossHP.class, packet -> create(SendOpcode.FIELD_EFFECT, this::showBossHP, packet));
-      registry.setHandler(CustomShowBossHP.class, packet -> create(SendOpcode.FIELD_EFFECT, this::customShowBossHP, packet));
-      registry.setHandler(EnvironmentChange.class, packet -> create(SendOpcode.FIELD_EFFECT, this::environmentChange, packet));
-      registry.setHandler(MapEffect.class, packet -> create(SendOpcode.FIELD_EFFECT, this::mapEffect, packet));
-      registry.setHandler(MapSound.class, packet -> create(SendOpcode.FIELD_EFFECT, this::mapSound, packet));
-      registry.setHandler(DojoAnimation.class, packet -> create(SendOpcode.FIELD_EFFECT, this::sendDojoAnimation, packet));
-      registry.setHandler(TrembleEffect.class, packet -> create(SendOpcode.FIELD_EFFECT, this::trembleEffect, packet));
-      registry.setHandler(EnvironmentMove.class, packet -> create(SendOpcode.FIELD_OBSTACLE_ONOFF, this::environmentMove, packet));
-      registry.setHandler(EnvironmentMoveList.class, packet -> create(SendOpcode.FIELD_OBSTACLE_ONOFF_LIST, this::environmentMoveList, packet));
-      registry.setHandler(BlowWeather.class, packet -> create(SendOpcode.BLOW_WEATHER, this::startMapEffect, packet));
-      registry.setHandler(RemoveWeather.class, packet -> create(SendOpcode.BLOW_WEATHER, this::removeMapEffect, packet));
-      registry.setHandler(ChangeBackgroundEffect.class, packet -> create(SendOpcode.SET_BACK_EFFECT, this::changeBackgroundEffect, packet));
-      registry.setHandler(ForcedEquip.class, packet -> create(SendOpcode.FORCED_MAP_EQUIP, this::showForcedEquip, packet));
-      registry.setHandler(ForcedStatReset.class, packet -> create(SendOpcode.FORCED_STAT_RESET, this::resetForcedStats, packet, 2));
-      registry.setHandler(ForcedStatSet.class, packet -> create(SendOpcode.FORCED_STAT_SET, this::aranGodlyStats, packet));
-      registry.setHandler(CrimsonBalrogBoat.class, packet -> create(SendOpcode.CONTI_MOVE, this::crogBoatPacket, packet));
-      registry.setHandler(Boat.class, packet -> create(SendOpcode.CONTI_STATE, this::boatPacket, packet));
+      Handler.handle(ShowBossHP.class).decorate(this::showBossHP).register(registry);
+      Handler.handle(CustomShowBossHP.class).decorate(this::customShowBossHP).register(registry);
+      Handler.handle(EnvironmentChange.class).decorate(this::environmentChange).register(registry);
+      Handler.handle(MapEffect.class).decorate(this::mapEffect).register(registry);
+      Handler.handle(MapSound.class).decorate(this::mapSound).register(registry);
+      Handler.handle(DojoAnimation.class).decorate(this::sendDojoAnimation).register(registry);
+      Handler.handle(TrembleEffect.class).decorate(this::trembleEffect).register(registry);
+      Handler.handle(EnvironmentMove.class).decorate(this::environmentMove).register(registry);
+      Handler.handle(EnvironmentMoveList.class).decorate(this::environmentMoveList).register(registry);
+      Handler.handle(BlowWeather.class).decorate(this::startMapEffect).register(registry);
+      Handler.handle(RemoveWeather.class).decorate(this::removeMapEffect).register(registry);
+      Handler.handle(ChangeBackgroundEffect.class).decorate(this::changeBackgroundEffect).register(registry);
+      Handler.handle(ForcedEquip.class).decorate(this::showForcedEquip).register(registry);
+      Handler.handle(ForcedStatReset.class).decorate(this::resetForcedStats).size(2).register(registry);
+      Handler.handle(ForcedStatSet.class).decorate(this::aranGodlyStats).register(registry);
+      Handler.handle(CrimsonBalrogBoat.class).decorate(this::crogBoatPacket).register(registry);
+      Handler.handle(Boat.class).decorate(this::boatPacket).register(registry);
    }
 
    protected void showBossHP(MaplePacketLittleEndianWriter writer, ShowBossHP packet) {

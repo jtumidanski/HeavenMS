@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.monster.carnival.MonsterCarnivalMessage;
 import tools.packet.monster.carnival.MonsterCarnivalPartyPoints;
@@ -20,12 +19,12 @@ public class MonsterCarnivalPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterCarnivalPacketFactory() {
-      registry.setHandler(MonsterCarnivalStart.class, packet -> create(SendOpcode.MONSTER_CARNIVAL_OBTAINED_CP, this::startMonsterCarnival, packet));
-      registry.setHandler(MonsterCarnivalPlayerDied.class, packet -> create(SendOpcode.MONSTER_CARNIVAL_PARTY_CP, this::playerDiedMessage, packet));
-      registry.setHandler(MonsterCarnivalMessage.class, packet -> create(SendOpcode.MONSTER_CARNIVAL_MESSAGE, this::message, packet, 3));
-      registry.setHandler(MonsterCarnivalPlayerSummoned.class, packet -> create(SendOpcode.MONSTER_CARNIVAL_SUMMON, this::playerSummoned, packet));
-      registry.setHandler(MonsterCarnivalPointObtained.class, packet -> create(SendOpcode.MONSTER_CARNIVAL_DIED, this::obtainedPoints, packet));
-      registry.setHandler(MonsterCarnivalPartyPoints.class, packet -> create(SendOpcode.MONSTER_CARNIVAL_START, this::partyPoints, packet, 25));
+      Handler.handle(MonsterCarnivalStart.class).decorate(this::startMonsterCarnival).register(registry);
+      Handler.handle(MonsterCarnivalPlayerDied.class).decorate(this::playerDiedMessage).register(registry);
+      Handler.handle(MonsterCarnivalMessage.class).decorate(this::message).size(3).register(registry);
+      Handler.handle(MonsterCarnivalPlayerSummoned.class).decorate(this::playerSummoned).register(registry);
+      Handler.handle(MonsterCarnivalPointObtained.class).decorate(this::obtainedPoints).register(registry);
+      Handler.handle(MonsterCarnivalPartyPoints.class).decorate(this::partyPoints).size(25).register(registry);
    }
 
    protected void obtainedPoints(MaplePacketLittleEndianWriter writer, MonsterCarnivalPointObtained packet) { // CPQ

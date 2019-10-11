@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import net.server.Server;
 import tools.Randomizer;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -18,8 +17,8 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
    }
 
    private SetFieldPacketFactory() {
-      registry.setHandler(GetCharacterInfo.class, packet -> create(SendOpcode.SET_FIELD, this::getCharInfo, packet));
-      registry.setHandler(WarpToMap.class, packet -> create(SendOpcode.SET_FIELD, this::getWarpToMap, packet));
+      Handler.handle(GetCharacterInfo.class).decorate(this::getCharInfo).register(registry);
+      Handler.handle(WarpToMap.class).decorate(this::getWarpToMap).register(registry);
    }
 
    /**

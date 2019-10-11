@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.remove.RemoveDragon;
 import tools.packet.remove.RemoveItem;
@@ -22,14 +21,14 @@ public class RemovePacketFactory extends AbstractPacketFactory {
    }
 
    private RemovePacketFactory() {
-      registry.setHandler(RemoveTV.class, packet -> create(SendOpcode.REMOVE_TV, this::removeTV, packet, 2));
-      registry.setHandler(RemoveSummon.class, packet -> create(SendOpcode.REMOVE_SPECIAL_MAPOBJECT, this::removeSummon, packet, 11));
-      registry.setHandler(RemoveKite.class, packet -> create(SendOpcode.REMOVE_KITE, this::removeKite, packet));
-      registry.setHandler(RemovePlayer.class, packet -> create(SendOpcode.REMOVE_PLAYER_FROM_MAP, this::removePlayerFromMap, packet));
-      registry.setHandler(RemoveItem.class, packet -> create(SendOpcode.REMOVE_ITEM_FROM_MAP, this::removeItemFromMap, packet));
-      registry.setHandler(RemoveMist.class, packet -> create(SendOpcode.REMOVE_MIST, this::removeMist, packet));
-      registry.setHandler(RemoveNPC.class, packet -> create(SendOpcode.REMOVE_NPC, this::removeNPC, packet));
-      registry.setHandler(RemoveDragon.class, packet -> create(SendOpcode.REMOVE_DRAGON, this::removeDragon, packet));
+      Handler.handle(RemoveTV.class).decorate(this::removeTV).size(2).register(registry);
+      Handler.handle(RemoveSummon.class).decorate(this::removeSummon).size(11).register(registry);
+      Handler.handle(RemoveKite.class).decorate(this::removeKite).register(registry);
+      Handler.handle(RemovePlayer.class).decorate(this::removePlayerFromMap).register(registry);
+      Handler.handle(RemoveItem.class).decorate(this::removeItemFromMap).register(registry);
+      Handler.handle(RemoveMist.class).decorate(this::removeMist).register(registry);
+      Handler.handle(RemoveNPC.class).decorate(this::removeNPC).register(registry);
+      Handler.handle(RemoveDragon.class).decorate(this::removeDragon).register(registry);
    }
 
    /**

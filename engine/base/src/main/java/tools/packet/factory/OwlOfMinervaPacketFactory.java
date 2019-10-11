@@ -3,7 +3,6 @@ package tools.packet.factory;
 import client.MapleCharacter;
 import client.inventory.MapleInventoryType;
 import constants.ItemConstants;
-import net.opcodes.SendOpcode;
 import server.maps.AbstractMapleMapObject;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
@@ -25,9 +24,9 @@ public class OwlOfMinervaPacketFactory extends AbstractPacketFactory {
    }
 
    private OwlOfMinervaPacketFactory() {
-      registry.setHandler(GetOwlMessage.class, packet -> create(SendOpcode.SHOP_LINK_RESULT, this::getOwlMessage, packet, 3));
-      registry.setHandler(OwlOfMinervaResult.class, packet -> create(SendOpcode.SHOP_SCANNER_RESULT, this::owlOfMinerva, packet));
-      registry.setHandler(GetOwlOpen.class, packet -> create(SendOpcode.SHOP_SCANNER_RESULT, this::getOwlOpen, packet));
+      Handler.handle(GetOwlMessage.class).decorate(this::getOwlMessage).size(3).register(registry);
+      Handler.handle(OwlOfMinervaResult.class).decorate(this::owlOfMinerva).register(registry);
+      Handler.handle(GetOwlOpen.class).decorate(this::getOwlOpen).register(registry);
    }
 
    // 0: Success

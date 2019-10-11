@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import server.MTSItemInfo;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
@@ -24,15 +23,15 @@ public class MTSOperationPacketFactory extends AbstractPacketFactory {
    }
 
    private MTSOperationPacketFactory() {
-      registry.setHandler(SendMTS.class, packet -> create(SendOpcode.MTS_OPERATION, this::sendMTS, packet));
-      registry.setHandler(ShowMTSCash.class, packet -> create(SendOpcode.MTS_OPERATION2, this::showMTSCash, packet));
-      registry.setHandler(MTSWantedListingOver.class, packet -> create(SendOpcode.MTS_OPERATION, this::wantedListingOver, packet));
-      registry.setHandler(MTSConfirmSell.class, packet -> create(SendOpcode.MTS_OPERATION, this::confirmSell, packet));
-      registry.setHandler(MTSConfirmBuy.class, packet -> create(SendOpcode.MTS_OPERATION, this::confirmBuy, packet));
-      registry.setHandler(MTSFailBuy.class, packet -> create(SendOpcode.MTS_OPERATION, this::failBuy, packet));
-      registry.setHandler(MTSConfirmTransfer.class, packet -> create(SendOpcode.MTS_OPERATION, this::confirmTransfer, packet));
-      registry.setHandler(GetNotYetSoldMTSInventory.class, packet -> create(SendOpcode.MTS_OPERATION, this::notYetSoldInv, packet));
-      registry.setHandler(MTSTransferInventory.class, packet -> create(SendOpcode.MTS_OPERATION, this::transferInventory, packet));
+      Handler.handle(SendMTS.class).decorate(this::sendMTS).register(registry);
+      Handler.handle(ShowMTSCash.class).decorate(this::showMTSCash).register(registry);
+      Handler.handle(MTSWantedListingOver.class).decorate(this::wantedListingOver).register(registry);
+      Handler.handle(MTSConfirmSell.class).decorate(this::confirmSell).register(registry);
+      Handler.handle(MTSConfirmBuy.class).decorate(this::confirmBuy).register(registry);
+      Handler.handle(MTSFailBuy.class).decorate(this::failBuy).register(registry);
+      Handler.handle(MTSConfirmTransfer.class).decorate(this::confirmTransfer).register(registry);
+      Handler.handle(GetNotYetSoldMTSInventory.class).decorate(this::notYetSoldInv).register(registry);
+      Handler.handle(MTSTransferInventory.class).decorate(this::transferInventory).register(registry);
    }
 
    protected void sendMTS(MaplePacketLittleEndianWriter writer, SendMTS packet) {

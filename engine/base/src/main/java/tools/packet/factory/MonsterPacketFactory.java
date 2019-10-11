@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.Map;
 
 import client.status.MonsterStatus;
-import net.opcodes.SendOpcode;
 import server.life.MobSkill;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.monster.ApplyMonsterStatus;
@@ -29,17 +28,17 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterPacketFactory() {
-      registry.setHandler(KillMonster.class, packet -> create(SendOpcode.KILL_MONSTER, this::killMonster, packet));
-      registry.setHandler(ShowMonsterHP.class, packet -> create(SendOpcode.SHOW_MONSTER_HP, this::showMonsterHP, packet));
-      registry.setHandler(ApplyMonsterStatus.class, packet -> create(SendOpcode.APPLY_MONSTER_STATUS, this::applyMonsterStatus, packet));
-      registry.setHandler(CancelMonsterStatus.class, packet -> create(SendOpcode.CANCEL_MONSTER_STATUS, this::cancelMonsterStatus, packet));
-      registry.setHandler(DamageMonster.class, packet -> create(SendOpcode.DAMAGE_MONSTER, this::damageMonster, packet));
-      registry.setHandler(HealMonster.class, packet -> create(SendOpcode.DAMAGE_MONSTER, this::healMonster, packet));
-      registry.setHandler(CatchMonster.class, packet -> create(SendOpcode.CATCH_MONSTER, this::catchMonster, packet));
-      registry.setHandler(CatchMonsterWithItem.class, packet -> create(SendOpcode.CATCH_MONSTER_WITH_ITEM, this::catchMonsterWithItem, packet));
-      registry.setHandler(DamageMonsterFriendly.class, packet -> create(SendOpcode.DAMAGE_MONSTER, this::damageMonsterFriendly, packet));
-      registry.setHandler(CatchMonsterFailure.class, packet -> create(SendOpcode.BRIDLE_MOB_CATCH_FAIL, this::catchMessage, packet));
-      registry.setHandler(DamageSummon.class, packet -> create(SendOpcode.DAMAGE_SUMMON, this::damageSummon, packet));
+      Handler.handle(KillMonster.class).decorate(this::killMonster).register(registry);
+      Handler.handle(ShowMonsterHP.class).decorate(this::showMonsterHP).register(registry);
+      Handler.handle(ApplyMonsterStatus.class).decorate(this::applyMonsterStatus).register(registry);
+      Handler.handle(CancelMonsterStatus.class).decorate(this::cancelMonsterStatus).register(registry);
+      Handler.handle(DamageMonster.class).decorate(this::damageMonster).register(registry);
+      Handler.handle(HealMonster.class).decorate(this::healMonster).register(registry);
+      Handler.handle(CatchMonster.class).decorate(this::catchMonster).register(registry);
+      Handler.handle(CatchMonsterWithItem.class).decorate(this::catchMonsterWithItem).register(registry);
+      Handler.handle(DamageMonsterFriendly.class).decorate(this::damageMonsterFriendly).register(registry);
+      Handler.handle(CatchMonsterFailure.class).decorate(this::catchMessage).register(registry);
+      Handler.handle(DamageSummon.class).decorate(this::damageSummon).register(registry);
    }
 
    /**

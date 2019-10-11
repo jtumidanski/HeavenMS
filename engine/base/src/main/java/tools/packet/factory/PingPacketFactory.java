@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.Ping;
 
@@ -15,7 +14,7 @@ public class PingPacketFactory extends AbstractPacketFactory {
    }
 
    private PingPacketFactory() {
-      registry.setHandler(Ping.class, packet -> create(SendOpcode.PING, this::getPing, packet, 2));
+      Handler.handle(Ping.class).decorate(this::getPing).size(2).register(registry);
    }
 
    /**

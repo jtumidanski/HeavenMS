@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.DeleteCharacter;
 
@@ -15,7 +14,7 @@ public class DeleteCharacterPacketFactory extends AbstractPacketFactory {
    }
 
    private DeleteCharacterPacketFactory() {
-      registry.setHandler(DeleteCharacter.class, packet -> create(SendOpcode.DELETE_CHAR_RESPONSE, this::deleteCharResponse, packet));
+      Handler.handle(DeleteCharacter.class).decorate(this::deleteCharResponse).register(registry);
    }
 
    protected void deleteCharResponse(MaplePacketLittleEndianWriter writer, DeleteCharacter packet) {

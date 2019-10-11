@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.showitemgaininchat.ShowBuybackEffect;
 import tools.packet.showitemgaininchat.ShowGainCard;
@@ -26,18 +25,18 @@ public class ItemGainInChatPacketFactory extends AbstractPacketFactory {
    }
 
    private ItemGainInChatPacketFactory() {
-      registry.setHandler(ShowItemGainInChat.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::getShowItemGain, packet));
-      registry.setHandler(ShowOwnBuffEffect.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showOwnBuffEffect, packet));
-      registry.setHandler(ShowOwnBerserk.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showOwnBerserk, packet));
-      registry.setHandler(ShowOwnPetLevelUp.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showOwnPetLevelUp, packet));
-      registry.setHandler(ShowGainCard.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showGainCard, packet, 3));
-      registry.setHandler(ShowIntro.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showIntro, packet));
-      registry.setHandler(ShowInfo.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showInfo, packet));
-      registry.setHandler(ShowBuybackEffect.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showBuybackEffect, packet));
-      registry.setHandler(ShowSpecialEffect.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showSpecialEffect, packet));
-      registry.setHandler(ShowMakerEffect.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showMakerEffect, packet));
-      registry.setHandler(ShowOwnRecovery.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showOwnRecovery, packet));
-      registry.setHandler(ShowWheelsLeft.class, packet -> create(SendOpcode.SHOW_ITEM_GAIN_INCHAT, this::showWheelsLeft, packet));
+      Handler.handle(ShowItemGainInChat.class).decorate(this::getShowItemGain).register(registry);
+      Handler.handle(ShowOwnBuffEffect.class).decorate(this::showOwnBuffEffect).register(registry);
+      Handler.handle(ShowOwnBerserk.class).decorate(this::showOwnBerserk).register(registry);
+      Handler.handle(ShowOwnPetLevelUp.class).decorate(this::showOwnPetLevelUp).register(registry);
+      Handler.handle(ShowGainCard.class).decorate(this::showGainCard).size(3).register(registry);
+      Handler.handle(ShowIntro.class).decorate(this::showIntro).register(registry);
+      Handler.handle(ShowInfo.class).decorate(this::showInfo).register(registry);
+      Handler.handle(ShowBuybackEffect.class).decorate(this::showBuybackEffect).register(registry);
+      Handler.handle(ShowSpecialEffect.class).decorate(this::showSpecialEffect).register(registry);
+      Handler.handle(ShowMakerEffect.class).decorate(this::showMakerEffect).register(registry);
+      Handler.handle(ShowOwnRecovery.class).decorate(this::showOwnRecovery).register(registry);
+      Handler.handle(ShowWheelsLeft.class).decorate(this::showWheelsLeft).register(registry);
    }
 
    /**

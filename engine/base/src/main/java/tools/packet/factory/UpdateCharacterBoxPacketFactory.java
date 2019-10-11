@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -22,12 +21,12 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    }
 
    private UpdateCharacterBoxPacketFactory() {
-      registry.setHandler(AddOmokBox.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::addOmokBox, packet));
-      registry.setHandler(AddMatchCard.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::addMatchCardBox, packet));
-      registry.setHandler(RemoveMiniGameBox.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::removeMinigameBox, packet, 7));
-      registry.setHandler(UpdatePlayerShopBox.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::updatePlayerShopBox, packet));
-      registry.setHandler(RemovePlayerShop.class, packet -> create(SendOpcode.UPDATE_CHAR_BOX, this::removePlayerShopBox, packet, 7));
-      registry.setHandler(UseChalkboard.class, packet -> create(SendOpcode.CHALKBOARD, this::useChalkboard, packet));
+      Handler.handle(AddOmokBox.class).decorate(this::addOmokBox).register(registry);
+      Handler.handle(AddMatchCard.class).decorate(this::addMatchCardBox).register(registry);
+      Handler.handle(RemoveMiniGameBox.class).decorate(this::removeMinigameBox).size(7).register(registry);
+      Handler.handle(UpdatePlayerShopBox.class).decorate(this::updatePlayerShopBox).register(registry);
+      Handler.handle(RemovePlayerShop.class).decorate(this::removePlayerShopBox).size(7).register(registry);
+      Handler.handle(UseChalkboard.class).decorate(this::useChalkboard).register(registry);
    }
 
    protected void addOmokBox(MaplePacketLittleEndianWriter writer, AddOmokBox packet) {

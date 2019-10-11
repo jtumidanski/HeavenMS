@@ -11,7 +11,6 @@ import client.MonsterBook;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
-import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
 import server.MapleItemInformationProvider;
@@ -40,18 +39,18 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterPacketFactory() {
-      registry.setHandler(CharacterLook.class, packet -> create(SendOpcode.UPDATE_CHAR_LOOK, this::updateCharLook, packet));
-      registry.setHandler(GetCharacterInfo.class, packet -> create(SendOpcode.CHAR_INFO, this::charInfo, packet));
-      registry.setHandler(FacialExpression.class, packet -> create(SendOpcode.FACIAL_EXPRESSION, this::facialExpression, packet, 10));
-      registry.setHandler(UpdateGender.class, packet -> create(SendOpcode.SET_GENDER, this::updateGender, packet, 3));
-      registry.setHandler(SetAutoMpPot.class, packet -> create(SendOpcode.AUTO_MP_POT, this::sendAutoMpPot, packet, 6));
-      registry.setHandler(SetAutoHpPot.class, packet -> create(SendOpcode.AUTO_HP_POT, this::sendAutoHpPot, packet));
-      registry.setHandler(UpdateSkill.class, packet -> create(SendOpcode.UPDATE_SKILLS, this::updateSkill, packet));
-      registry.setHandler(SummonSkill.class, packet -> create(SendOpcode.SUMMON_SKILL, this::summonSkill, packet));
-      registry.setHandler(SkillCooldown.class, packet -> create(SendOpcode.COOLDOWN, this::skillCooldown, packet));
-      registry.setHandler(DamageCharacter.class, packet -> create(SendOpcode.DAMAGE_PLAYER, this::damagePlayer, packet));
-      registry.setHandler(UpdateMount.class, packet -> create(SendOpcode.SET_TAMING_MOB_INFO, this::updateMount, packet));
-      registry.setHandler(CharacterKnockBack.class, packet -> create(SendOpcode.LEFT_KNOCK_BACK, this::leftKnockBack, packet, 2));
+      Handler.handle(CharacterLook.class).decorate(this::updateCharLook).register(registry);
+      Handler.handle(GetCharacterInfo.class).decorate(this::charInfo).register(registry);
+      Handler.handle(FacialExpression.class).decorate(this::facialExpression).size(10).register(registry);
+      Handler.handle(UpdateGender.class).decorate(this::updateGender).size(3).register(registry);
+      Handler.handle(SetAutoMpPot.class).decorate(this::sendAutoMpPot).size(6).register(registry);
+      Handler.handle(SetAutoHpPot.class).decorate(this::sendAutoHpPot).register(registry);
+      Handler.handle(UpdateSkill.class).decorate(this::updateSkill).register(registry);
+      Handler.handle(SummonSkill.class).decorate(this::summonSkill).register(registry);
+      Handler.handle(SkillCooldown.class).decorate(this::skillCooldown).register(registry);
+      Handler.handle(DamageCharacter.class).decorate(this::damagePlayer).register(registry);
+      Handler.handle(UpdateMount.class).decorate(this::updateMount).register(registry);
+      Handler.handle(CharacterKnockBack.class).decorate(this::leftKnockBack).size(2).register(registry);
    }
 
    protected void updateCharLook(MaplePacketLittleEndianWriter writer, CharacterLook packet) {

@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import client.database.data.BbsThreadData;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.guild.bbs.GetThreadList;
 import tools.packet.guild.bbs.ShowThread;
@@ -17,8 +16,8 @@ public class GuildBBSPacketFactory extends AbstractPacketFactory {
    }
 
    private GuildBBSPacketFactory() {
-      registry.setHandler(ShowThread.class, packet -> create(SendOpcode.GUILD_BBS_PACKET, this::showThread, packet));
-      registry.setHandler(GetThreadList.class, packet -> create(SendOpcode.GUILD_BBS_PACKET, this::getThreadList, packet));
+      Handler.handle(ShowThread.class).decorate(this::showThread).register(registry);
+      Handler.handle(GetThreadList.class).decorate(this::getThreadList).register(registry);
    }
 
    protected void showThread(MaplePacketLittleEndianWriter writer, ShowThread packet) throws RuntimeException {

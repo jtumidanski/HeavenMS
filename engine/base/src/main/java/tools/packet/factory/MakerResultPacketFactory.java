@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.maker.MakerCrystalResult;
@@ -19,10 +18,10 @@ public class MakerResultPacketFactory extends AbstractPacketFactory {
    }
 
    private MakerResultPacketFactory() {
-      registry.setHandler(MakerResult.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerResult, packet));
-      registry.setHandler(MakerCrystalResult.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerResultCrystal, packet));
-      registry.setHandler(MakerResultDesynth.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerResultDesynth, packet));
-      registry.setHandler(MakerEnableActions.class, packet -> create(SendOpcode.MAKER_RESULT, this::makerEnableActions, packet));
+      Handler.handle(MakerResult.class).decorate(this::makerResult).register(registry);
+      Handler.handle(MakerCrystalResult.class).decorate(this::makerResultCrystal).register(registry);
+      Handler.handle(MakerResultDesynth.class).decorate(this::makerResultDesynth).register(registry);
+      Handler.handle(MakerEnableActions.class).decorate(this::makerEnableActions).register(registry);
    }
 
    // MAKER_RESULT packets thanks to Arnah (Vertisy)

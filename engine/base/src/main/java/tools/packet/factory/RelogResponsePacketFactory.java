@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.RelogResponse;
 
@@ -15,7 +14,7 @@ public class RelogResponsePacketFactory extends AbstractPacketFactory {
    }
 
    private RelogResponsePacketFactory() {
-      registry.setHandler(RelogResponse.class, packet -> create(SendOpcode.RELOG_RESPONSE, this::getRelogResponse, packet, 3));
+      Handler.handle(RelogResponse.class).decorate(this::getRelogResponse).size(3).register(registry);
    }
 
    /**

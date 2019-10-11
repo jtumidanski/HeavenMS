@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.List;
 
 import client.KeyBinding;
-import net.opcodes.SendOpcode;
 import net.server.SkillMacro;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.ui.DisableMiniMap;
@@ -34,22 +33,22 @@ public class UIPacketFactory extends AbstractPacketFactory {
    }
 
    private UIPacketFactory() {
-      registry.setHandler(OpenUI.class, packet -> create(SendOpcode.OPEN_UI, this::openUI, packet, 3));
-      registry.setHandler(LockUI.class, packet -> create(SendOpcode.LOCK_UI, this::lockUI, packet, 3));
-      registry.setHandler(DisableUI.class, packet -> create(SendOpcode.DISABLE_UI, this::disableUI, packet));
-      registry.setHandler(GetKeyMap.class, packet -> create(SendOpcode.KEYMAP, this::getKeymap, packet));
-      registry.setHandler(GetMacros.class, packet -> create(SendOpcode.MACRO_SYS_DATA_INIT, this::getMacros, packet));
-      registry.setHandler(DisableMiniMap.class, packet -> create(SendOpcode.ADMIN_RESULT, this::disableMinimap, packet));
-      registry.setHandler(FinishedSort.class, packet -> create(SendOpcode.GATHER_ITEM_RESULT, this::finishedSort, packet, 4));
-      registry.setHandler(FinishedSort2.class, packet -> create(SendOpcode.SORT_ITEM_RESULT, this::finishedSort2, packet, 4));
-      registry.setHandler(GetClock.class, packet -> create(SendOpcode.CLOCK, this::getClock, packet));
-      registry.setHandler(GetClockTime.class, packet -> create(SendOpcode.CLOCK, this::getClockTime, packet));
-      registry.setHandler(StopClock.class, packet -> create(SendOpcode.STOP_CLOCK, this::removeClock, packet));
-      registry.setHandler(GMEffect.class, packet -> create(SendOpcode.ADMIN_RESULT, this::getGMEffect, packet));
-      registry.setHandler(ShowBlockedUI.class, packet -> create(SendOpcode.BLOCKED_SERVER, this::blockedMessage2, packet));
-      registry.setHandler(ShowNotes.class, packet -> create(SendOpcode.MEMO_RESULT, this::showNotes, packet));
-      registry.setHandler(ShowOXQuiz.class, packet -> create(SendOpcode.OX_QUIZ, this::showOXQuiz, packet, 6));
-      registry.setHandler(RefreshTeleportRockMapList.class, packet -> create(SendOpcode.MAP_TRANSFER_RESULT, this::trockRefreshMapList, packet));
+      Handler.handle(OpenUI.class).decorate(this::openUI).size(3).register(registry);
+      Handler.handle(LockUI.class).decorate(this::lockUI).size(3).register(registry);
+      Handler.handle(DisableUI.class).decorate(this::disableUI).register(registry);
+      Handler.handle(GetKeyMap.class).decorate(this::getKeymap).register(registry);
+      Handler.handle(GetMacros.class).decorate(this::getMacros).register(registry);
+      Handler.handle(DisableMiniMap.class).decorate(this::disableMinimap).register(registry);
+      Handler.handle(FinishedSort.class).decorate(this::finishedSort).size(4).register(registry);
+      Handler.handle(FinishedSort2.class).decorate(this::finishedSort2).size(4).register(registry);
+      Handler.handle(GetClock.class).decorate(this::getClock).register(registry);
+      Handler.handle(GetClockTime.class).decorate(this::getClockTime).register(registry);
+      Handler.handle(StopClock.class).decorate(this::removeClock).register(registry);
+      Handler.handle(GMEffect.class).decorate(this::getGMEffect).register(registry);
+      Handler.handle(ShowBlockedUI.class).decorate(this::blockedMessage2).register(registry);
+      Handler.handle(ShowNotes.class).decorate(this::showNotes).register(registry);
+      Handler.handle(ShowOXQuiz.class).decorate(this::showOXQuiz).size(6).register(registry);
+      Handler.handle(RefreshTeleportRockMapList.class).decorate(this::trockRefreshMapList).register(registry);
    }
 
    /**

@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.ChannelLoad;
 import tools.packet.serverlist.ServerList;
@@ -17,8 +16,8 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerListPacketFactory() {
-      registry.setHandler(ServerList.class, packet -> create(SendOpcode.SERVERLIST, this::getServerList, packet));
-      registry.setHandler(ServerListEnd.class, packet -> create(SendOpcode.SERVERLIST, this::getEndOfServerList, packet, 3));
+      Handler.handle(ServerList.class).decorate(this::getServerList).register(registry);
+      Handler.handle(ServerListEnd.class).decorate(this::getEndOfServerList).size(3).register(registry);
    }
 
    /**

@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.List;
 import java.util.Map;
 
-import net.opcodes.SendOpcode;
 import net.server.channel.handlers.SummonAttackEntry;
 import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -24,11 +23,11 @@ public class AttackPacketFactory extends AbstractPacketFactory {
    }
 
    private AttackPacketFactory() {
-      registry.setHandler(CloseRangeAttack.class, packet -> create(SendOpcode.CLOSE_RANGE_ATTACK, this::closeRangeAttack, packet));
-      registry.setHandler(RangedAttack.class, packet -> create(SendOpcode.RANGED_ATTACK, this::rangedAttack, packet));
-      registry.setHandler(MagicAttack.class, packet -> create(SendOpcode.MAGIC_ATTACK, this::magicAttack, packet));
-      registry.setHandler(SummonAttack.class, packet -> create(SendOpcode.SUMMON_ATTACK, this::summonAttack, packet));
-      registry.setHandler(ThrowGrenade.class, packet -> create(SendOpcode.THROW_GRENADE, this::throwGrenade, packet));
+      Handler.handle(CloseRangeAttack.class).decorate(this::closeRangeAttack).register(registry);
+      Handler.handle(RangedAttack.class).decorate(this::rangedAttack).register(registry);
+      Handler.handle(MagicAttack.class).decorate(this::magicAttack).register(registry);
+      Handler.handle(SummonAttack.class).decorate(this::summonAttack).register(registry);
+      Handler.handle(ThrowGrenade.class).decorate(this::throwGrenade).register(registry);
    }
 
    protected void closeRangeAttack(MaplePacketLittleEndianWriter writer, CloseRangeAttack packet) {

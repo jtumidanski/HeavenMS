@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.HexTool;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.npctalk.AskQuiz;
@@ -22,13 +21,13 @@ public class NPCTalkPacketFactory extends AbstractPacketFactory {
    }
 
    private NPCTalkPacketFactory() {
-      registry.setHandler(GetNPCTalk.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalk, packet));
-      registry.setHandler(GetDimensionalMirror.class, packet -> create(SendOpcode.NPC_TALK, this::getDimensionalMirror, packet));
-      registry.setHandler(GetNPCTalkStyle.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalkStyle, packet));
-      registry.setHandler(GetNPCTalkNum.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalkNum, packet));
-      registry.setHandler(GetNPCTalkText.class, packet -> create(SendOpcode.NPC_TALK, this::getNPCTalkText, packet));
-      registry.setHandler(AskQuiz.class, packet -> create(SendOpcode.NPC_TALK, this::onAskQuiz, packet));
-      registry.setHandler(AskSpeedQuiz.class, packet -> create(SendOpcode.NPC_TALK, this::onAskSpeedQuiz, packet));
+      Handler.handle(GetNPCTalk.class).decorate(this::getNPCTalk).register(registry);
+      Handler.handle(GetDimensionalMirror.class).decorate(this::getDimensionalMirror).register(registry);
+      Handler.handle(GetNPCTalkStyle.class).decorate(this::getNPCTalkStyle).register(registry);
+      Handler.handle(GetNPCTalkNum.class).decorate(this::getNPCTalkNum).register(registry);
+      Handler.handle(GetNPCTalkText.class).decorate(this::getNPCTalkText).register(registry);
+      Handler.handle(AskQuiz.class).decorate(this::onAskQuiz).register(registry);
+      Handler.handle(AskSpeedQuiz.class).decorate(this::onAskSpeedQuiz).register(registry);
    }
 
    /**

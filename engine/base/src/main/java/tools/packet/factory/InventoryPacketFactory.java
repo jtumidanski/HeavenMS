@@ -6,7 +6,6 @@ import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
 import constants.ExpTable;
 import constants.ItemConstants;
-import net.opcodes.SendOpcode;
 import server.MapleItemInformationProvider;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -25,10 +24,11 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
    }
 
    private InventoryPacketFactory() {
-      registry.setHandler(ModifyInventoryPacket.class, packet -> create(SendOpcode.INVENTORY_OPERATION, this::modifyInventory, packet));
-      registry.setHandler(InventoryFull.class, packet -> create(SendOpcode.INVENTORY_OPERATION, this::modifyInventory,
-            new ModifyInventoryPacket(((InventoryFull) packet).updateTick(), ((InventoryFull) packet).modifications())));
-      registry.setHandler(SlotLimitUpdate.class, packet -> create(SendOpcode.INVENTORY_GROW, this::updateInventorySlotLimit, packet));
+      Handler.handle(ModifyInventoryPacket.class).decorate(this::modifyInventory).register(registry);
+      Handler.handle(InventoryFull.class)
+            .decorate((writer, packet) -> modifyInventory(writer, new ModifyInventoryPacket(packet.updateTick(), packet.modifications())))
+            .register(registry);
+      Handler.handle(SlotLimitUpdate.class).decorate(this::updateInventorySlotLimit).register(registry);
    }
 
    protected void modifyInventory(MaplePacketLittleEndianWriter writer, ModifyInventoryPacket packet) {

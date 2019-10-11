@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.List;
 
 import constants.GameConstants;
-import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.world.World;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -21,8 +20,8 @@ public class WorldTransferPacketFactory extends AbstractPacketFactory {
    }
 
    private WorldTransferPacketFactory() {
-      registry.setHandler(WorldTransferError.class, packet -> create(SendOpcode.CASHSHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT, this::sendWorldTransferRules, packet));
-      registry.setHandler(WorldTransferCancel.class, packet -> create(SendOpcode.CANCEL_TRANSFER_WORLD_RESULT, this::showWorldTransferCancel, packet));
+      Handler.handle(WorldTransferError.class).decorate(this::sendWorldTransferRules).register(registry);
+      Handler.handle(WorldTransferCancel.class).decorate(this::showWorldTransferCancel).register(registry);
    }
 
    /*  1: cannot find char info,

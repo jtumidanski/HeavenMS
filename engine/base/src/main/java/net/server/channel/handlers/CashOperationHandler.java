@@ -67,6 +67,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.cashshop.ShowCash;
+import tools.packet.cashshop.operation.ShowWishListUpdate;
 import tools.packet.stat.EnableActions;
 import tools.packet.cashshop.operation.PutIntoCashInventory;
 import tools.packet.cashshop.operation.ShowBoughtCashItem;
@@ -79,7 +80,6 @@ import tools.packet.cashshop.operation.ShowBoughtStorageSlots;
 import tools.packet.cashshop.operation.ShowCashShopMessage;
 import tools.packet.cashshop.operation.ShowGiftSucceed;
 import tools.packet.cashshop.operation.ShowNameChangeSuccess;
-import tools.packet.cashshop.operation.ShowWishList;
 import tools.packet.cashshop.operation.ShowWorldTransferSuccess;
 import tools.packet.cashshop.operation.TakeFromCashInventory;
 import tools.packet.cashshop.CashShopMessage;
@@ -214,7 +214,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             cs.addToWishList(sn);
          }
       }
-      PacketCreator.announce(c, new ShowWishList(chr.getCashShop().getWishList(), true));
+      PacketCreator.announce(c, new ShowWishListUpdate(chr.getCashShop().getWishList(), true));
    }
 
    private void purchaseMesoCashItem(MapleClient c, MapleCharacter chr, int serialNumber) {

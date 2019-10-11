@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.monster.book.ChangeCover;
 import tools.packet.monster.book.SetCard;
@@ -16,8 +15,8 @@ public class MonsterBookPacketFactory extends AbstractPacketFactory {
    }
 
    private MonsterBookPacketFactory() {
-      registry.setHandler(SetCard.class, packet -> create(SendOpcode.MONSTER_BOOK_SET_CARD, this::addCard, packet, 11));
-      registry.setHandler(ChangeCover.class, packet -> create(SendOpcode.MONSTER_BOOK_SET_COVER, this::changeCover, packet, 6));
+      Handler.handle(SetCard.class).decorate(this::addCard).size(11).register(registry);
+      Handler.handle(ChangeCover.class).decorate(this::changeCover).size(6).register(registry);
    }
 
    protected void addCard(MaplePacketLittleEndianWriter writer, SetCard packet) {

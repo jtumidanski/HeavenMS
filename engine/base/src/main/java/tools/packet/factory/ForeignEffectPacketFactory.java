@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import client.inventory.ScrollResult;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.foreigneffect.CancelChair;
 import tools.packet.foreigneffect.CancelSkill;
@@ -38,29 +37,29 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
    }
 
    private ForeignEffectPacketFactory() {
-      registry.setHandler(ShowBuffEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showBuffEffect, packet));
-      registry.setHandler(ShowBuffEffectWithLevel.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showBuffEffectWithLevel, packet));
-      registry.setHandler(ShowBerserk.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showBerserk, packet));
-      registry.setHandler(ShowPetLevelUp.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showPetLevelUp, packet));
-      registry.setHandler(ShowForeignCardEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignCardEffect, packet, 7));
-      registry.setHandler(ShowForeignInfo.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignInfo, packet));
-      registry.setHandler(ShowForeignBuybackEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignBuybackEffect, packet));
-      registry.setHandler(ShowForeignMakerEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignMakerEffect, packet));
-      registry.setHandler(ShowForeignEffect.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showForeignEffect, packet));
-      registry.setHandler(ShowRecovery.class, packet -> create(SendOpcode.SHOW_FOREIGN_EFFECT, this::showRecovery, packet));
-      registry.setHandler(ShowScrollEffect.class, packet -> create(SendOpcode.SHOW_SCROLL_EFFECT, this::getScrollEffect, packet));
-      registry.setHandler(ShowSkillBookResult.class, packet -> create(SendOpcode.SKILL_LEARN_ITEM_RESULT, this::skillBookResult, packet));
-      registry.setHandler(ShowCombo.class, packet -> create(SendOpcode.SHOW_COMBO, this::showCombo, packet, 6));
-      registry.setHandler(ShowHint.class, packet -> create(SendOpcode.PLAYER_HINT, this::sendHint, packet));
-      registry.setHandler(ShowSkillEffect.class, packet -> create(SendOpcode.SKILL_EFFECT, this::skillEffect, packet));
-      registry.setHandler(ShowItemEffect.class, packet -> create(SendOpcode.SHOW_ITEM_EFFECT, this::itemEffect, packet));
-      registry.setHandler(ShowGuideHint.class, packet -> create(SendOpcode.TALK_GUIDE, this::guideHint, packet, 11));
-      registry.setHandler(ShowGuideTalk.class, packet -> create(SendOpcode.TALK_GUIDE, this::talkGuide, packet));
-      registry.setHandler(ShowChair.class, packet -> create(SendOpcode.SHOW_CHAIR, this::showChair, packet));
-      registry.setHandler(CancelChair.class, packet -> create(SendOpcode.CANCEL_CHAIR, this::cancelChair, packet));
-      registry.setHandler(CancelSkill.class, packet -> create(SendOpcode.CANCEL_SKILL_EFFECT, this::skillCancel, packet));
-      registry.setHandler(ShowTitleEarned.class, packet -> create(SendOpcode.SCRIPT_PROGRESS_MESSAGE, this::earnTitleMessage, packet));
-      registry.setHandler(ShowBlockedMessage.class, packet -> create(SendOpcode.BLOCKED_MAP, this::blockedMessage, packet));
+      Handler.handle(ShowBuffEffect.class).decorate(this::showBuffEffect).register(registry);
+      Handler.handle(ShowBuffEffectWithLevel.class).decorate(this::showBuffEffectWithLevel).register(registry);
+      Handler.handle(ShowBerserk.class).decorate(this::showBerserk).register(registry);
+      Handler.handle(ShowPetLevelUp.class).decorate(this::showPetLevelUp).register(registry);
+      Handler.handle(ShowForeignCardEffect.class).decorate(this::showForeignCardEffect).size(7).register(registry);
+      Handler.handle(ShowForeignInfo.class).decorate(this::showForeignInfo).register(registry);
+      Handler.handle(ShowForeignBuybackEffect.class).decorate(this::showForeignBuybackEffect).register(registry);
+      Handler.handle(ShowForeignMakerEffect.class).decorate(this::showForeignMakerEffect).register(registry);
+      Handler.handle(ShowForeignEffect.class).decorate(this::showForeignEffect).register(registry);
+      Handler.handle(ShowRecovery.class).decorate(this::showRecovery).register(registry);
+      Handler.handle(ShowScrollEffect.class).decorate(this::getScrollEffect).register(registry);
+      Handler.handle(ShowSkillBookResult.class).decorate(this::skillBookResult).register(registry);
+      Handler.handle(ShowCombo.class).decorate(this::showCombo).size(6).register(registry);
+      Handler.handle(ShowHint.class).decorate(this::sendHint).register(registry);
+      Handler.handle(ShowSkillEffect.class).decorate(this::skillEffect).register(registry);
+      Handler.handle(ShowItemEffect.class).decorate(this::itemEffect).register(registry);
+      Handler.handle(ShowGuideHint.class).decorate(this::guideHint).size(11).register(registry);
+      Handler.handle(ShowGuideTalk.class).decorate(this::talkGuide).register(registry);
+      Handler.handle(ShowChair.class).decorate(this::showChair).register(registry);
+      Handler.handle(CancelChair.class).decorate(this::cancelChair).register(registry);
+      Handler.handle(CancelSkill.class).decorate(this::skillCancel).register(registry);
+      Handler.handle(ShowTitleEarned.class).decorate(this::earnTitleMessage).register(registry);
+      Handler.handle(ShowBlockedMessage.class).decorate(this::blockedMessage).register(registry);
    }
 
    protected void showBuffEffect(MaplePacketLittleEndianWriter writer, ShowBuffEffect packet) {

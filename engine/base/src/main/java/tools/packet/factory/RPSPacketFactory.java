@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.rps.OpenRPSNPC;
 import tools.packet.rps.RPSMesoError;
@@ -18,10 +17,10 @@ public class RPSPacketFactory extends AbstractPacketFactory {
    }
 
    private RPSPacketFactory() {
-      registry.setHandler(OpenRPSNPC.class, packet -> create(SendOpcode.RPS_GAME, this::openRPSNPC, packet));
-      registry.setHandler(RPSMesoError.class, packet -> create(SendOpcode.RPS_GAME, this::rpsMesoError, packet));
-      registry.setHandler(RPSSelection.class, packet -> create(SendOpcode.RPS_GAME, this::rpsSelection, packet));
-      registry.setHandler(RPSMode.class, packet -> create(SendOpcode.RPS_GAME, this::rpsMode, packet));
+      Handler.handle(OpenRPSNPC.class).decorate(this::openRPSNPC).register(registry);
+      Handler.handle(RPSMesoError.class).decorate(this::rpsMesoError).register(registry);
+      Handler.handle(RPSSelection.class).decorate(this::rpsSelection).register(registry);
+      Handler.handle(RPSMode.class).decorate(this::rpsMode).register(registry);
    }
 
    protected void openRPSNPC(MaplePacketLittleEndianWriter writer, OpenRPSNPC packet) {

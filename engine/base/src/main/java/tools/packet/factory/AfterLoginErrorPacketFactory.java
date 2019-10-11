@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.AfterLoginError;
 
@@ -15,7 +14,7 @@ public class AfterLoginErrorPacketFactory extends AbstractPacketFactory {
    }
 
    private AfterLoginErrorPacketFactory() {
-      registry.setHandler(AfterLoginError.class, packet -> create(SendOpcode.SELECT_CHARACTER_BY_VAC, this::getAfterLoginError, packet, 8));
+      Handler.handle(AfterLoginError.class).decorate(this::getAfterLoginError).size(8).register(registry);
    }
 
    protected void getAfterLoginError(MaplePacketLittleEndianWriter writer, AfterLoginError packet) {//same as above o.o

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import client.MapleCharacter;
-import net.opcodes.SendOpcode;
 import server.channel.PlayerInteractionAction;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShopItem;
@@ -69,71 +68,144 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
    }
 
    private PlayerInteractionPacketFactory() {
-      registry.setHandler(GetHiredMerchant.class, packet -> create(PlayerInteractionAction.ROOM, this::getHiredMerchant, packet));
-      registry.setHandler(UpdateHiredMerchant.class, packet -> create(PlayerInteractionAction.UPDATE_MERCHANT, this::updateHiredMerchant, packet));
-      registry.setHandler(MerchantChat.class, packet -> create(PlayerInteractionAction.CHAT, this::hiredMerchantChat, packet));
-      registry.setHandler(MerchantVisitorLeave.class, packet -> create(PlayerInteractionAction.EXIT, this::hiredMerchantVisitorLeave, packet));
-      registry.setHandler(MerchantOwnerLeave.class, packet -> create(PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerLeave, packet));
-      registry.setHandler(MerchantOwnerMaintenanceLeave.class, packet -> create(PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerMaintenanceLeave, packet));
-      registry.setHandler(MerchantMaintenanceMessage.class, packet -> create(PlayerInteractionAction.ROOM, this::hiredMerchantMaintenanceMessage, packet, 5));
-      registry.setHandler(LeaveHiredMerchant.class, packet -> create(PlayerInteractionAction.EXIT, this::leaveHiredMerchant, packet));
-      registry.setHandler(MerchantVisitorAdd.class, packet -> create(PlayerInteractionAction.VISIT, this::hiredMerchantVisitorAdd, packet));
-      registry.setHandler(PlayerShopChat.class, packet -> create(PlayerInteractionAction.CHAT, this::getPlayerShopChat, packet));
-      registry.setHandler(PlayerShopNewVisitor.class, packet -> create(PlayerInteractionAction.VISIT, this::getPlayerShopNewVisitor, packet));
-      registry.setHandler(PlayerShopRemoveVisitor.class, packet -> create(PlayerInteractionAction.EXIT, this::getPlayerShopRemoveVisitor, packet, 4));
-      registry.setHandler(TradePartnerAdd.class, packet -> create(PlayerInteractionAction.VISIT, this::getTradePartnerAdd, packet));
-      registry.setHandler(TradeInvite.class, packet -> create(PlayerInteractionAction.INVITE, this::tradeInvite, packet));
-      registry.setHandler(GetTradeMeso.class, packet -> create(PlayerInteractionAction.SET_MESO, this::getTradeMesoSet, packet, 8));
-      registry.setHandler(TradeItemAdd.class, packet -> create(PlayerInteractionAction.SET_ITEMS, this::getTradeItemAdd, packet));
-      registry.setHandler(PlayerShopItemUpdate.class, packet -> create(PlayerInteractionAction.UPDATE_MERCHANT, this::getPlayerShopItemUpdate, packet));
-      registry.setHandler(PlayerShopOwnerUpdate.class, packet -> create(PlayerInteractionAction.UPDATE_PLAYERSHOP, this::getPlayerShopOwnerUpdate, packet));
-      registry.setHandler(GetPlayerShop.class, packet -> create(PlayerInteractionAction.ROOM, this::getPlayerShop, packet));
-      registry.setHandler(GetTradeStart.class, packet -> create(PlayerInteractionAction.ROOM, this::getTradeStart, packet));
-      registry.setHandler(TradeConfirmation.class, packet -> create(PlayerInteractionAction.CONFIRM, packet, 3));
-      registry.setHandler(GetTradeResult.class, packet -> create(PlayerInteractionAction.EXIT, this::getTradeResult, packet, 5));
-      registry.setHandler(GetMiniGame.class, packet -> create(PlayerInteractionAction.ROOM, this::getMiniGame, packet));
-      registry.setHandler(GetMiniGameReady.class, packet -> create(PlayerInteractionAction.READY, packet, 3));
-      registry.setHandler(GetMiniGameUnReady.class, packet -> create(PlayerInteractionAction.UN_READY, packet, 3));
-      registry.setHandler(GetMiniGameStart.class, packet -> create(PlayerInteractionAction.START, this::getMiniGameStart, packet, 4));
-      registry.setHandler(GetMiniGameSkipOwner.class, packet -> create(PlayerInteractionAction.SKIP, this::getMiniGameSkipOwner, packet, 4));
-      registry.setHandler(GetMiniGameRequestTie.class, packet -> create(PlayerInteractionAction.REQUEST_TIE, packet));
-      registry.setHandler(GetMiniGameDenyTie.class, packet -> create(PlayerInteractionAction.ANSWER_TIE, packet));
-      registry.setHandler(GetMiniRoomError.class, packet -> create(PlayerInteractionAction.ROOM, this::getMiniRoomError, packet, 5));
-      registry.setHandler(GetMiniGameSkipVisitor.class, packet -> create(PlayerInteractionAction.SKIP, packet));
-      registry.setHandler(MiniGameMoveOmok.class, packet -> create(PlayerInteractionAction.MOVE_OMOK, this::getMiniGameMoveOmok, packet, 12));
-      registry.setHandler(MiniGameNewVisitor.class, packet -> create(PlayerInteractionAction.VISIT, this::getMiniGameNewVisitor, packet));
-      registry.setHandler(MiniGameRemoveVisitor.class, packet -> create(PlayerInteractionAction.EXIT, this::getMiniGameRemoveVisitor, packet, 3));
-      registry.setHandler(MiniGameOwnerWin.class, packet -> create(PlayerInteractionAction.GET_RESULT, this::getMiniGameOwnerWin, packet));
-      registry.setHandler(MiniGameVisitorWin.class, packet -> create(PlayerInteractionAction.GET_RESULT, this::getMiniGameVisitorWin, packet));
-      registry.setHandler(MiniGameTie.class, packet -> create(PlayerInteractionAction.GET_RESULT, this::getMiniGameTie, packet));
-      registry.setHandler(MiniGameClose.class, packet -> create(PlayerInteractionAction.EXIT, this::getMiniGameClose, packet, 5));
-      registry.setHandler(GetMatchCard.class, packet -> create(PlayerInteractionAction.ROOM, this::getMatchCard, packet));
-      registry.setHandler(GetMatchCardStart.class, packet -> create(PlayerInteractionAction.START, this::getMatchCardStart, packet));
-      registry.setHandler(NewMatchCardVisitor.class, packet -> create(PlayerInteractionAction.VISIT, this::getMatchCardNewVisitor, packet));
-      registry.setHandler(MatchCardSelect.class, packet -> create(PlayerInteractionAction.SELECT_CARD, this::getMatchCardSelect, packet, 6));
-      registry.setHandler(TradeChat.class, packet -> create(PlayerInteractionAction.CHAT, this::getTradeChat, packet));
-      registry.setHandler(PlayerShopErrorMessage.class, packet -> create(PlayerInteractionAction.EXIT, this::shopErrorMessage, packet));
+      Handler.handle(GetHiredMerchant.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getHiredMerchant))
+            .register(registry);
+      Handler.handle(UpdateHiredMerchant.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.UPDATE_MERCHANT, this::updateHiredMerchant))
+            .register(registry);
+      Handler.handle(MerchantChat.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.CHAT, this::hiredMerchantChat))
+            .register(registry);
+      Handler.handle(MerchantVisitorLeave.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::hiredMerchantVisitorLeave))
+            .register(registry);
+      Handler.handle(MerchantOwnerLeave.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerLeave))
+            .register(registry);
+      Handler.handle(MerchantOwnerMaintenanceLeave.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.REAL_CLOSE_MERCHANT, this::hiredMerchantOwnerMaintenanceLeave))
+            .register(registry);
+      Handler.handle(MerchantMaintenanceMessage.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::hiredMerchantMaintenanceMessage))
+            .size(5).register(registry);
+      Handler.handle(LeaveHiredMerchant.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::leaveHiredMerchant))
+            .register(registry);
+      Handler.handle(MerchantVisitorAdd.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.VISIT, this::hiredMerchantVisitorAdd))
+            .register(registry);
+      Handler.handle(PlayerShopChat.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.CHAT, this::getPlayerShopChat))
+            .register(registry);
+      Handler.handle(PlayerShopNewVisitor.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.VISIT, this::getPlayerShopNewVisitor))
+            .register(registry);
+      Handler.handle(PlayerShopRemoveVisitor.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::getPlayerShopRemoveVisitor))
+            .size(4).register(registry);
+      Handler.handle(TradePartnerAdd.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.VISIT, this::getTradePartnerAdd))
+            .register(registry);
+      Handler.handle(TradeInvite.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.INVITE, this::tradeInvite))
+            .register(registry);
+      Handler.handle(GetTradeMeso.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.SET_MESO, this::getTradeMesoSet))
+            .size(8).register(registry);
+      Handler.handle(TradeItemAdd.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.SET_ITEMS, this::getTradeItemAdd))
+            .register(registry);
+      Handler.handle(PlayerShopItemUpdate.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.UPDATE_MERCHANT, this::getPlayerShopItemUpdate))
+            .register(registry);
+      Handler.handle(PlayerShopOwnerUpdate.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.UPDATE_PLAYERSHOP, this::getPlayerShopOwnerUpdate))
+            .register(registry);
+      Handler.handle(GetPlayerShop.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getPlayerShop))
+            .register(registry);
+      Handler.handle(GetTradeStart.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getTradeStart))
+            .register(registry);
+      Handler.handle(TradeConfirmation.class)
+            .decorate((writer, packet) -> decorate(writer, PlayerInteractionAction.CONFIRM))
+            .size(3).register(registry);
+      Handler.handle(GetTradeResult.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::getTradeResult))
+            .size(5).register(registry);
+      Handler.handle(GetMiniGame.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getMiniGame))
+            .register(registry);
+      Handler.handle(GetMiniGameReady.class)
+            .decorate((writer, packet) -> decorate(writer, PlayerInteractionAction.READY))
+            .size(3).register(registry);
+      Handler.handle(GetMiniGameUnReady.class)
+            .decorate((writer, packet) -> decorate(writer, PlayerInteractionAction.UN_READY))
+            .size(3).register(registry);
+      Handler.handle(GetMiniGameStart.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.START, this::getMiniGameStart))
+            .size(4).register(registry);
+      Handler.handle(GetMiniGameSkipOwner.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.SKIP, this::getMiniGameSkipOwner))
+            .size(4).register(registry);
+      Handler.handle(GetMiniGameRequestTie.class)
+            .decorate((writer, packet) -> decorate(writer, PlayerInteractionAction.REQUEST_TIE)).register(registry);
+      Handler.handle(GetMiniGameDenyTie.class)
+            .decorate((writer, packet) -> decorate(writer, PlayerInteractionAction.ANSWER_TIE)).register(registry);
+      Handler.handle(GetMiniRoomError.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getMiniRoomError))
+            .size(5).register(registry);
+      Handler.handle(GetMiniGameSkipVisitor.class)
+            .decorate((writer, packet) -> decorate(writer, PlayerInteractionAction.SKIP)).register(registry);
+      Handler.handle(MiniGameMoveOmok.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.MOVE_OMOK, this::getMiniGameMoveOmok))
+            .size(12).register(registry);
+      Handler.handle(MiniGameNewVisitor.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.VISIT, this::getMiniGameNewVisitor))
+            .register(registry);
+      Handler.handle(MiniGameRemoveVisitor.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::getMiniGameRemoveVisitor))
+            .size(3).register(registry);
+      Handler.handle(MiniGameOwnerWin.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.GET_RESULT, this::getMiniGameOwnerWin))
+            .register(registry);
+      Handler.handle(MiniGameVisitorWin.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.GET_RESULT, this::getMiniGameVisitorWin))
+            .register(registry);
+      Handler.handle(MiniGameTie.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.GET_RESULT, this::getMiniGameTie))
+            .register(registry);
+      Handler.handle(MiniGameClose.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::getMiniGameClose))
+            .size(5).register(registry);
+      Handler.handle(GetMatchCard.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getMatchCard))
+            .register(registry);
+      Handler.handle(GetMatchCardStart.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.START, this::getMatchCardStart))
+            .register(registry);
+      Handler.handle(NewMatchCardVisitor.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.VISIT, this::getMatchCardNewVisitor))
+            .register(registry);
+      Handler.handle(MatchCardSelect.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.SELECT_CARD, this::getMatchCardSelect))
+            .size(6).register(registry);
+      Handler.handle(TradeChat.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.CHAT, this::getTradeChat))
+            .register(registry);
+      Handler.handle(PlayerShopErrorMessage.class)
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.EXIT, this::shopErrorMessage))
+            .register(registry);
    }
 
-   protected <T extends PacketInput> byte[] create(PlayerInteractionAction subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {
-      return create(SendOpcode.PLAYER_INTERACTION, (BiConsumer<MaplePacketLittleEndianWriter, T>) (writer, castPacket) -> {
-         writer.write(subOp.getValue());
-         if (decorator != null) {
-            decorator.accept(writer, castPacket);
-         }
-      }, packetInput);
+   protected <T extends PacketInput> void decorate(MaplePacketLittleEndianWriter writer, T packet, PlayerInteractionAction subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator) {
+      writer.write(subOp.getValue());
+      decorator.accept(writer, packet);
    }
 
-   protected byte[] create(PlayerInteractionAction subOp, PacketInput packetInput, Integer size) {
-      return create(subOp, null, packetInput, size);
-   }
-
-   protected <T extends PacketInput> byte[] create(PlayerInteractionAction subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput) {
-      return create(subOp, decorator, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
-   }
-
-   protected byte[] create(PlayerInteractionAction subOp, PacketInput packetInput) {
-      return create(subOp, null, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
+   protected void decorate(MaplePacketLittleEndianWriter writer, PlayerInteractionAction subOp) {
+      writer.write(subOp.getValue());
    }
 
    /*

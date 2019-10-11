@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.transfer.name.CheckNameChange;
 import tools.packet.transfer.name.NameChangeCancel;
@@ -17,9 +16,9 @@ public class NameChangePacketFactory extends AbstractPacketFactory {
    }
 
    private NameChangePacketFactory() {
-      registry.setHandler(NameChangeError.class, packet -> create(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE_POSSIBLE_RESULT, this::sendNameTransferRules, packet));
-      registry.setHandler(CheckNameChange.class, packet -> create(SendOpcode.CASHSHOP_CHECK_NAME_CHANGE, this::sendNameTransferCheck, packet));
-      registry.setHandler(NameChangeCancel.class, packet -> create(SendOpcode.CANCEL_NAME_CHANGE_RESULT, this::showNameChangeCancel, packet));
+      Handler.handle(NameChangeError.class).decorate(this::sendNameTransferRules).register(registry);
+      Handler.handle(CheckNameChange.class).decorate(this::sendNameTransferCheck).register(registry);
+      Handler.handle(NameChangeCancel.class).decorate(this::showNameChangeCancel).register(registry);
    }
 
    /*  1: name change already submitted

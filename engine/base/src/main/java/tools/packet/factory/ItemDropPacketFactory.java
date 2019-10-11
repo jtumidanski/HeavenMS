@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.item.drop.DropItemFromMapObject;
 import tools.packet.item.drop.UpdateMapItemObject;
@@ -16,8 +15,8 @@ public class ItemDropPacketFactory extends AbstractPacketFactory {
    }
 
    private ItemDropPacketFactory() {
-      registry.setHandler(UpdateMapItemObject.class, packet -> create(SendOpcode.DROP_ITEM_FROM_MAPOBJECT, this::updateMapItemObject, packet));
-      registry.setHandler(DropItemFromMapObject.class, packet -> create(SendOpcode.DROP_ITEM_FROM_MAPOBJECT, this::dropItemFromMapObject, packet));
+      Handler.handle(UpdateMapItemObject.class).decorate(this::updateMapItemObject).register(registry);
+      Handler.handle(DropItemFromMapObject.class).decorate(this::dropItemFromMapObject).register(registry);
    }
 
    protected void updateMapItemObject(MaplePacketLittleEndianWriter writer, UpdateMapItemObject packet) {

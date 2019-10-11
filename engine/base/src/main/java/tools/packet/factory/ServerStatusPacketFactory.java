@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.serverlist.GetServerStatus;
 
@@ -15,7 +14,7 @@ public class ServerStatusPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerStatusPacketFactory() {
-      registry.setHandler(GetServerStatus.class, packet -> create(SendOpcode.SERVERSTATUS, this::getServerStatus, packet, 4));
+      Handler.handle(GetServerStatus.class).decorate(this::getServerStatus).size(4).register(registry);
    }
 
    /**

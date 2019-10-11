@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.serverlist.ServerIP;
 
@@ -15,7 +14,7 @@ public class ServerIPPacketFactory extends AbstractPacketFactory {
    }
 
    private ServerIPPacketFactory() {
-      registry.setHandler(ServerIP.class, packet -> create(SendOpcode.SERVER_IP, this::getServerIP, packet));
+      Handler.handle(ServerIP.class).decorate(this::getServerIP).register(registry);
    }
 
    /**

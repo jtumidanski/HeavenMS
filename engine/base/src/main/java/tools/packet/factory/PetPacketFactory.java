@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.pet.PetChat;
 import tools.packet.pet.PetCommandResponse;
@@ -19,11 +18,11 @@ public class PetPacketFactory extends AbstractPacketFactory {
    }
 
    private PetPacketFactory() {
-      registry.setHandler(PetChat.class, packet -> create(SendOpcode.PET_CHAT, this::petChat, packet));
-      registry.setHandler(PetFoodResponse.class, packet -> create(SendOpcode.PET_COMMAND, this::petFoodResponse, packet));
-      registry.setHandler(PetCommandResponse.class, packet -> create(SendOpcode.PET_COMMAND, this::commandResponse, packet));
-      registry.setHandler(PetNameChange.class, packet -> create(SendOpcode.PET_NAMECHANGE, this::changePetName, packet));
-      registry.setHandler(PetExceptionList.class, packet -> create(SendOpcode.PET_EXCEPTION_LIST, this::loadExceptionList, packet));
+      Handler.handle(PetChat.class).decorate(this::petChat).register(registry);
+      Handler.handle(PetFoodResponse.class).decorate(this::petFoodResponse).register(registry);
+      Handler.handle(PetCommandResponse.class).decorate(this::commandResponse).register(registry);
+      Handler.handle(PetNameChange.class).decorate(this::changePetName).register(registry);
+      Handler.handle(PetExceptionList.class).decorate(this::loadExceptionList).register(registry);
    }
 
    protected void petChat(MaplePacketLittleEndianWriter writer, PetChat packet) {

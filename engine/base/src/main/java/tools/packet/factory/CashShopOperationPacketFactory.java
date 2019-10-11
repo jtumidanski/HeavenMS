@@ -1,11 +1,9 @@
 package tools.packet.factory;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 import java.util.stream.IntStream;
 
 import client.inventory.Item;
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.Gift;
@@ -32,6 +30,7 @@ import tools.packet.cashshop.operation.ShowGiftSucceed;
 import tools.packet.cashshop.operation.ShowGifts;
 import tools.packet.cashshop.operation.ShowNameChangeSuccess;
 import tools.packet.cashshop.operation.ShowWishList;
+import tools.packet.cashshop.operation.ShowWishListUpdate;
 import tools.packet.cashshop.operation.ShowWorldTransferSuccess;
 import tools.packet.cashshop.operation.TakeFromCashInventory;
 
@@ -46,46 +45,75 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
    }
 
    private CashShopOperationPacketFactory() {
-      registry.setHandler(ShowWorldTransferSuccess.class, packet -> create(CashShopOperationSubOp.WORLD_TRANSFER_SUCCESS, this::showWorldTransferSuccess, packet));
-      registry.setHandler(ShowNameChangeSuccess.class, packet -> create(CashShopOperationSubOp.NAME_CHANGE_SUCCESS, this::showNameChangeSuccess, packet));
-      registry.setHandler(ShowCouponRedeemSuccess.class, packet -> create(CashShopOperationSubOp.COUPON_REDEEMED_SUCCESS, this::showCouponRedeemedItems, packet));
-      registry.setHandler(ShowBoughtCashPackageSuccess.class, packet -> create(CashShopOperationSubOp.BOUGHT_CASH_PACKAGE_SUCCESS, this::showBoughtCashPackage, packet));
-      registry.setHandler(ShowBoughtQuestItem.class, packet -> create(CashShopOperationSubOp.BOUGHT_QUEST_ITEM_SUCCESS, this::showBoughtQuestItem, packet));
-      registry.setHandler(ShowBoughtCashItem.class, packet -> create(CashShopOperationSubOp.BOUGHT_CASH_ITEM_SUCCESS, this::showBoughtCashItem, packet));
-      registry.setHandler(ShowBoughtCashRing.class, packet -> create(CashShopOperationSubOp.BOUGHT_CASH_RING_SUCCESS, this::showBoughtCashRing, packet));
-      registry.setHandler(ShowCashShopMessage.class, packet -> create(CashShopOperationSubOp.CASH_SHOP_MESSAGE, this::showCashShopMessage, packet));
-      registry.setHandler(ShowCashInventory.class, packet -> create(CashShopOperationSubOp.CASH_INVENTORY, this::showCashInventory, packet));
-      registry.setHandler(ShowGifts.class, packet -> create(CashShopOperationSubOp.GIFTS, this::showGifts, packet));
-      registry.setHandler(ShowGiftSucceed.class, packet -> create(CashShopOperationSubOp.GIFT_SUCCEED, this::showGiftSucceed, packet)); //0x5D, Couldn't n)t
-      registry.setHandler(ShowBoughtInventorySlots.class, packet -> create(CashShopOperationSubOp.BOUGHT_INVENTORY_SLOTS, this::showBoughtInventorySlots, packet));
-      registry.setHandler(ShowBoughtStorageSlots.class, packet -> create(CashShopOperationSubOp.BOUGHT_STORAGE_SLOTS, this::showBoughtStorageSlots, packet));
-      registry.setHandler(ShowBoughtCharacterSlots.class, packet -> create(CashShopOperationSubOp.BOUGHT_CHARACTER_SLOTS, this::showBoughtCharacterSlot, packet));
-      registry.setHandler(TakeFromCashInventory.class, packet -> create(CashShopOperationSubOp.TAKE_FROM_CASH_INVENTORY, this::takeFromCashInventory, packet));
-      registry.setHandler(DeleteCashItem.class, packet -> create(CashShopOperationSubOp.DELETE_CASH_ITEM, this::deleteCashItem, packet));
-      registry.setHandler(RefundCashItem.class, packet -> create(CashShopOperationSubOp.REFUND_CASH_ITEM, this::refundCashItem, packet));
-      registry.setHandler(PutIntoCashInventory.class, packet -> create(CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory, packet));
-      registry.setHandler(ShowCash.class, packet -> create(SendOpcode.QUERY_CASH_RESULT, this::showCash, packet));
-      registry.setHandler(SendMapleLife.class, packet -> create(SendOpcode.MAPLELIFE_RESULT, this::sendMapleLifeCharacterInfo, packet));
-      registry.setHandler(SendMapleNameLifeError.class, packet -> create(SendOpcode.MAPLELIFE_RESULT, this::sendMapleLifeNameError, packet));
-      registry.setHandler(SendMapleLifeError.class, packet -> create(SendOpcode.MAPLELIFE_ERROR, this::sendMapleLifeError, packet));
-      registry.setHandler(ShowWishList.class, packet -> {
-         CashShopOperationSubOp subOp = ((ShowWishList) packet).update() ? CashShopOperationSubOp.SHOW_WISHLIST_UPDATE : CashShopOperationSubOp.SHOW_WISHLIST;
-         return create(subOp, this::showWishList, packet);
-      });
+      Handler.handle(ShowWorldTransferSuccess.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.WORLD_TRANSFER_SUCCESS, this::showWorldTransferSuccess))
+            .register(registry);
+      Handler.handle(ShowNameChangeSuccess.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.NAME_CHANGE_SUCCESS, this::showNameChangeSuccess))
+            .register(registry);
+      Handler.handle(ShowCouponRedeemSuccess.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.COUPON_REDEEMED_SUCCESS, this::showCouponRedeemedItems))
+            .register(registry);
+      Handler.handle(ShowBoughtCashPackageSuccess.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_CASH_PACKAGE_SUCCESS, this::showBoughtCashPackage))
+            .register(registry);
+      Handler.handle(ShowBoughtQuestItem.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_QUEST_ITEM_SUCCESS, this::showBoughtQuestItem))
+            .register(registry);
+      Handler.handle(ShowBoughtCashItem.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_CASH_ITEM_SUCCESS, this::showBoughtCashItem))
+            .register(registry);
+      Handler.handle(ShowBoughtCashRing.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_CASH_RING_SUCCESS, this::showBoughtCashRing))
+            .register(registry);
+      Handler.handle(ShowCashShopMessage.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.CASH_SHOP_MESSAGE, this::showCashShopMessage))
+            .register(registry);
+      Handler.handle(ShowCashInventory.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.CASH_INVENTORY, this::showCashInventory))
+            .register(registry);
+      Handler.handle(ShowGifts.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.GIFTS, this::showGifts))
+            .register(registry);
+      Handler.handle(ShowGiftSucceed.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.GIFT_SUCCEED, this::showGiftSucceed))
+            .register(registry);
+      Handler.handle(ShowBoughtInventorySlots.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_INVENTORY_SLOTS, this::showBoughtInventorySlots))
+            .register(registry);
+      Handler.handle(ShowBoughtStorageSlots.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_STORAGE_SLOTS, this::showBoughtStorageSlots))
+            .register(registry);
+      Handler.handle(ShowBoughtCharacterSlots.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.BOUGHT_CHARACTER_SLOTS, this::showBoughtCharacterSlot))
+            .register(registry);
+      Handler.handle(TakeFromCashInventory.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.TAKE_FROM_CASH_INVENTORY, this::takeFromCashInventory))
+            .register(registry);
+      Handler.handle(DeleteCashItem.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.DELETE_CASH_ITEM, this::deleteCashItem))
+            .register(registry);
+      Handler.handle(RefundCashItem.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.REFUND_CASH_ITEM, this::refundCashItem))
+            .register(registry);
+      Handler.handle(PutIntoCashInventory.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.PUT_INTO_CASH_INVENTORY, this::putIntoCashInventory))
+            .register(registry);
+      Handler.handle(ShowCash.class).decorate(this::showCash).register(registry);
+      Handler.handle(SendMapleLife.class).decorate(this::sendMapleLifeCharacterInfo).register(registry);
+      Handler.handle(SendMapleNameLifeError.class).decorate(this::sendMapleLifeNameError).register(registry);
+      Handler.handle(SendMapleLifeError.class).decorate(this::sendMapleLifeError).register(registry);
+      Handler.handle(ShowWishList.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.SHOW_WISHLIST, this::showWishList))
+            .register(registry);
+      Handler.handle(ShowWishListUpdate.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.SHOW_WISHLIST_UPDATE, this::showWishList))
+            .register(registry);
    }
 
-   protected <T extends PacketInput> byte[] create(CashShopOperationSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {
-      return create((Function<T, byte[]>) castInput -> {
-         final MaplePacketLittleEndianWriter writer = newWriter(size);
-         writer.writeShort(SendOpcode.CASHSHOP_OPERATION.getValue());
-         writer.write(subOp.getValue());
-         decorator.accept(writer, castInput);
-         return writer.getPacket();
-      }, packetInput);
-   }
-
-   protected <T extends PacketInput> byte[] create(CashShopOperationSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput) {
-      return create(subOp, decorator, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
+   protected <T extends PacketInput> void decorate(MaplePacketLittleEndianWriter writer, T packet, CashShopOperationSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator) {
+      writer.write(subOp.getValue());
+      decorator.accept(writer, packet);
    }
 
    protected void showWorldTransferSuccess(MaplePacketLittleEndianWriter writer, ShowWorldTransferSuccess packet) {
@@ -129,6 +157,11 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
    }
 
    protected void showWishList(MaplePacketLittleEndianWriter writer, ShowWishList packet) {
+      packet.sns().forEach(writer::writeInt);
+      IntStream.range(0, 10 - packet.sns().size()).forEach(i -> writer.writeInt(0));
+   }
+
+   protected void showWishList(MaplePacketLittleEndianWriter writer, ShowWishListUpdate packet) {
       packet.sns().forEach(writer::writeInt);
       IntStream.range(0, 10 - packet.sns().size()).forEach(i -> writer.writeInt(0));
    }

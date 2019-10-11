@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import net.opcodes.SendOpcode;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import server.maps.MapleDoor;
@@ -34,13 +33,13 @@ public class PartyPacketFactory extends AbstractPacketFactory {
    }
 
    private PartyPacketFactory() {
-      registry.setHandler(PartyCreated.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyCreated, packet));
-      registry.setHandler(PartyInvite.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyInvite, packet));
-      registry.setHandler(PartySearchInvite.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partySearchInvite, packet));
-      registry.setHandler(PartyStatusMessage.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyStatusMessage, packet));
-      registry.setHandler(PartyPortal.class, packet -> create(SendOpcode.PARTY_OPERATION, this::partyPortal, packet));
-      registry.setHandler(UpdateParty.class, packet -> create(SendOpcode.PARTY_OPERATION, this::updateParty, packet));
-      registry.setHandler(UpdatePartyMemberHp.class, packet -> create(SendOpcode.UPDATE_PARTYMEMBER_HP, this::updatePartyMemberHP, packet));
+      Handler.handle(PartyCreated.class).decorate(this::partyCreated).register(registry);
+      Handler.handle(PartyInvite.class).decorate(this::partyInvite).register(registry);
+      Handler.handle(PartySearchInvite.class).decorate(this::partySearchInvite).register(registry);
+      Handler.handle(PartyStatusMessage.class).decorate(this::partyStatusMessage).register(registry);
+      Handler.handle(PartyPortal.class).decorate(this::partyPortal).register(registry);
+      Handler.handle(UpdateParty.class).decorate(this::updateParty).register(registry);
+      Handler.handle(UpdatePartyMemberHp.class).decorate(this::updatePartyMemberHP).register(registry);
    }
 
    protected void partyCreated(MaplePacketLittleEndianWriter writer, PartyCreated packet) {

@@ -5,7 +5,6 @@ import java.util.Collection;
 import client.MapleCharacter;
 import client.database.data.GlobalUserRank;
 import client.database.data.GuildData;
-import net.opcodes.SendOpcode;
 import net.server.guild.MapleGuildCharacter;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -42,27 +41,27 @@ public class GuildPacketFactory extends AbstractPacketFactory {
    }
 
    private GuildPacketFactory() {
-      registry.setHandler(GuildMemberOnline.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildMemberOnline, packet));
-      registry.setHandler(GuildInvite.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildInvite, packet));
-      registry.setHandler(CreateGuildMessage.class, packet -> create(SendOpcode.GUILD_OPERATION, this::createGuildMessage, packet));
-      registry.setHandler(GenericGuildMessage.class, packet -> create(SendOpcode.GUILD_OPERATION, this::genericGuildMessage, packet));
-      registry.setHandler(ResponseGuildMessage.class, packet -> create(SendOpcode.GUILD_OPERATION, this::responseGuildMessage, packet));
-      registry.setHandler(NewGuildMember.class, packet -> create(SendOpcode.GUILD_OPERATION, this::newGuildMember, packet));
-      registry.setHandler(GuildMemberLeft.class, packet -> create(SendOpcode.GUILD_OPERATION, this::memberLeft, packet));
-      registry.setHandler(GuildMemberChangeRank.class, packet -> create(SendOpcode.GUILD_OPERATION, this::changeRank, packet));
-      registry.setHandler(GuildNotice.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildNotice, packet));
-      registry.setHandler(GuildMemberLevelJobUpdate.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildMemberLevelJobUpdate, packet));
-      registry.setHandler(GuildRankTitleChange.class, packet -> create(SendOpcode.GUILD_OPERATION, this::rankTitleChange, packet));
-      registry.setHandler(GuildDisband.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildDisband, packet));
-      registry.setHandler(GuildQuestWaitingNotice.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildQuestWaitingNotice, packet));
-      registry.setHandler(GuildEmblemChange.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildEmblemChange, packet));
-      registry.setHandler(GuildCapacityChange.class, packet -> create(SendOpcode.GUILD_OPERATION, this::guildCapacityChange, packet));
-      registry.setHandler(ShowGuildRanks.class, packet -> create(SendOpcode.GUILD_OPERATION, this::showGuildRanks, packet));
-      registry.setHandler(ShowPlayerRanks.class, packet -> create(SendOpcode.GUILD_OPERATION, this::showPlayerRanks, packet));
-      registry.setHandler(UpdateGuildPoints.class, packet -> create(SendOpcode.GUILD_OPERATION, this::updateGP, packet));
-      registry.setHandler(ShowGuildInfo.class, packet -> create(SendOpcode.GUILD_OPERATION, this::showGuildInfo, packet));
-      registry.setHandler(GuildNameChange.class, packet -> create(SendOpcode.GUILD_NAME_CHANGED, this::guildNameChanged, packet));
-      registry.setHandler(GuildMarkChanged.class, packet -> create(SendOpcode.GUILD_MARK_CHANGED, this::guildMarkChanged, packet));
+      Handler.handle(GuildMemberOnline.class).decorate(this::guildMemberOnline).register(registry);
+      Handler.handle(GuildInvite.class).decorate(this::guildInvite).register(registry);
+      Handler.handle(CreateGuildMessage.class).decorate(this::createGuildMessage).register(registry);
+      Handler.handle(GenericGuildMessage.class).decorate(this::genericGuildMessage).register(registry);
+      Handler.handle(ResponseGuildMessage.class).decorate(this::responseGuildMessage).register(registry);
+      Handler.handle(NewGuildMember.class).decorate(this::newGuildMember).register(registry);
+      Handler.handle(GuildMemberLeft.class).decorate(this::memberLeft).register(registry);
+      Handler.handle(GuildMemberChangeRank.class).decorate(this::changeRank).register(registry);
+      Handler.handle(GuildNotice.class).decorate(this::guildNotice).register(registry);
+      Handler.handle(GuildMemberLevelJobUpdate.class).decorate(this::guildMemberLevelJobUpdate).register(registry);
+      Handler.handle(GuildRankTitleChange.class).decorate(this::rankTitleChange).register(registry);
+      Handler.handle(GuildDisband.class).decorate(this::guildDisband).register(registry);
+      Handler.handle(GuildQuestWaitingNotice.class).decorate(this::guildQuestWaitingNotice).register(registry);
+      Handler.handle(GuildEmblemChange.class).decorate(this::guildEmblemChange).register(registry);
+      Handler.handle(GuildCapacityChange.class).decorate(this::guildCapacityChange).register(registry);
+      Handler.handle(ShowGuildRanks.class).decorate(this::showGuildRanks).register(registry);
+      Handler.handle(ShowPlayerRanks.class).decorate(this::showPlayerRanks).register(registry);
+      Handler.handle(UpdateGuildPoints.class).decorate(this::updateGP).register(registry);
+      Handler.handle(ShowGuildInfo.class).decorate(this::showGuildInfo).register(registry);
+      Handler.handle(GuildNameChange.class).decorate(this::guildNameChanged).register(registry);
+      Handler.handle(GuildMarkChanged.class).decorate(this::guildMarkChanged).register(registry);
    }
 
    protected void guildMemberOnline(MaplePacketLittleEndianWriter writer, GuildMemberOnline packet) {

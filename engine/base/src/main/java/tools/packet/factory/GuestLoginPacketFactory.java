@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.Randomizer;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.GuestTOS;
@@ -16,7 +15,7 @@ public class GuestLoginPacketFactory extends AbstractPacketFactory {
    }
 
    private GuestLoginPacketFactory() {
-      registry.setHandler(GuestTOS.class, packet -> create(SendOpcode.GUEST_ID_LOGIN, this::sendGuestTOS, packet));
+      Handler.handle(GuestTOS.class).decorate(this::sendGuestTOS).register(registry);
    }
 
    protected void sendGuestTOS(MaplePacketLittleEndianWriter writer, GuestTOS packet) {

@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.Collection;
 import java.util.Optional;
 
-import net.opcodes.SendOpcode;
 import net.server.Server;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
@@ -32,17 +31,17 @@ public class AllianceOperationPacketFactory extends AbstractPacketFactory {
    }
 
    private AllianceOperationPacketFactory() {
-      registry.setHandler(GetAllianceInfo.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::getAllianceInfo, packet));
-      registry.setHandler(UpdateAllianceInfo.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::updateAllianceInfo, packet));
-      registry.setHandler(GetGuildAlliances.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::getGuildAlliances, packet));
-      registry.setHandler(AddGuildToAlliance.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::addGuildToAlliance, packet));
-      registry.setHandler(AllianceMemberOnline.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::allianceMemberOnline, packet));
-      registry.setHandler(AllianceNotice.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::allianceNotice, packet));
-      registry.setHandler(ChangeAllianceRankTitles.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::changeAllianceRankTitle, packet));
-      registry.setHandler(UpdateAllianceJobLevel.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::updateAllianceJobLevel, packet));
-      registry.setHandler(RemoveGuildFromAlliance.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::removeGuildFromAlliance, packet));
-      registry.setHandler(DisbandAlliance.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::disbandAlliance, packet));
-      registry.setHandler(AllianceInvite.class, packet -> create(SendOpcode.ALLIANCE_OPERATION, this::allianceInvite, packet));
+      Handler.handle(GetAllianceInfo.class).decorate(this::getAllianceInfo).register(registry);
+      Handler.handle(UpdateAllianceInfo.class).decorate(this::updateAllianceInfo).register(registry);
+      Handler.handle(GetGuildAlliances.class).decorate(this::getGuildAlliances).register(registry);
+      Handler.handle(AddGuildToAlliance.class).decorate(this::addGuildToAlliance).register(registry);
+      Handler.handle(AllianceMemberOnline.class).decorate(this::allianceMemberOnline).register(registry);
+      Handler.handle(AllianceNotice.class).decorate(this::allianceNotice).register(registry);
+      Handler.handle(ChangeAllianceRankTitles.class).decorate(this::changeAllianceRankTitle).register(registry);
+      Handler.handle(UpdateAllianceJobLevel.class).decorate(this::updateAllianceJobLevel).register(registry);
+      Handler.handle(RemoveGuildFromAlliance.class).decorate(this::removeGuildFromAlliance).register(registry);
+      Handler.handle(DisbandAlliance.class).decorate(this::disbandAlliance).register(registry);
+      Handler.handle(AllianceInvite.class).decorate(this::allianceInvite).register(registry);
    }
 
    protected void getAllianceInfo(MaplePacketLittleEndianWriter writer, GetAllianceInfo packet) {

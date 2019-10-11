@@ -21,9 +21,10 @@ import tools.data.input.LittleEndianAccessor;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.cashshop.CashShopOperationSubOp;
 import tools.packet.cashshop.operation.ShowWishList;
+import tools.packet.cashshop.operation.ShowWishListUpdate;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({MaplePacketLittleEndianWriter.class, CashShopOperationPacketFactory.class})
+@PrepareForTest({MaplePacketLittleEndianWriter.class, CashShopOperationPacketFactory.class, Handler.class})
 public class CashShopOperationPacketFactoryUnitTest {
 
    private CashShopOperationPacketFactory cashShopOperationPacketFactory;
@@ -32,23 +33,25 @@ public class CashShopOperationPacketFactoryUnitTest {
    public void setup() {
       cashShopOperationPacketFactory = PowerMockito.spy(CashShopOperationPacketFactory.getInstance());
       PowerMockito.mockStatic(CashShopOperationPacketFactory.class);
+      Mockito.when(CashShopOperationPacketFactory.getInstance()).thenReturn(cashShopOperationPacketFactory);
+
       MaplePacketLittleEndianWriter writer = Mockito.spy(MaplePacketLittleEndianWriter.class);
       PowerMockito.mockStatic(MaplePacketLittleEndianWriter.class);
-
-      Mockito.doReturn(writer).when(cashShopOperationPacketFactory).newWriter(MaplePacketLittleEndianWriter.DEFAULT_SIZE);
+//      Handler registry = Mockito.spy(Handler.class);
+//      PowerMockito.mockStatic(Handler.class);
+//      Mockito.doReturn(writer).when(registry).newWriter(MaplePacketLittleEndianWriter.DEFAULT_SIZE);
    }
 
    @Test
    public void showWishList_update() {
       //Setup
       List<Integer> sns = Arrays.asList(1, 2, 3);
-      ShowWishList input = new ShowWishList(sns, true);
+      ShowWishListUpdate input = new ShowWishListUpdate(sns, true);
 
       //Do
-      byte[] packet = cashShopOperationPacketFactory.create(input);
+      byte[] packet = CashShopOperationPacketFactory.getInstance().create(input);
 
       //Assert
-      Mockito.verify(cashShopOperationPacketFactory, Mockito.times(1)).showWishList(Mockito.any(MaplePacketLittleEndianWriter.class), Mockito.any(ShowWishList.class));
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
       Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
       Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST_UPDATE.getValue());
@@ -60,13 +63,12 @@ public class CashShopOperationPacketFactoryUnitTest {
    public void showWishList_fullUpdate() {
       //Setup
       List<Integer> sns = Arrays.asList(1, 2, 3, 4, 5, 6, 7, 8, 9, 10);
-      ShowWishList input = new ShowWishList(sns, true);
+      ShowWishListUpdate input = new ShowWishListUpdate(sns, true);
 
       //Do
-      byte[] packet = cashShopOperationPacketFactory.create(input);
+      byte[] packet = CashShopOperationPacketFactory.getInstance().create(input);
 
       //Assert
-      Mockito.verify(cashShopOperationPacketFactory, Mockito.times(1)).showWishList(Mockito.any(MaplePacketLittleEndianWriter.class), Mockito.any(ShowWishList.class));
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
       Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
       Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST_UPDATE.getValue());
@@ -78,13 +80,12 @@ public class CashShopOperationPacketFactoryUnitTest {
    public void showWishList_emptyUpdate() {
       //Setup
       List<Integer> sns = Collections.emptyList();
-      ShowWishList input = new ShowWishList(sns, true);
+      ShowWishListUpdate input = new ShowWishListUpdate(sns, true);
 
       //Do
-      byte[] packet = cashShopOperationPacketFactory.create(input);
+      byte[] packet = CashShopOperationPacketFactory.getInstance().create(input);
 
       //Assert
-      Mockito.verify(cashShopOperationPacketFactory, Mockito.times(1)).showWishList(Mockito.any(MaplePacketLittleEndianWriter.class), Mockito.any(ShowWishList.class));
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
       Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
       Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST_UPDATE.getValue());
@@ -98,10 +99,9 @@ public class CashShopOperationPacketFactoryUnitTest {
       ShowWishList input = new ShowWishList(sns, false);
 
       //Do
-      byte[] packet = cashShopOperationPacketFactory.create(input);
+      byte[] packet = CashShopOperationPacketFactory.getInstance().create(input);
 
       //Assert
-      Mockito.verify(cashShopOperationPacketFactory, Mockito.times(1)).showWishList(Mockito.any(MaplePacketLittleEndianWriter.class), Mockito.any(ShowWishList.class));
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
       Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
       Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST.getValue());

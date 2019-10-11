@@ -6,7 +6,6 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleFamilyEntitlement;
 import client.MapleFamilyEntry;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.family.FamilyGainReputation;
 import tools.packet.family.FamilyJoinResponse;
@@ -30,16 +29,16 @@ public class FamilyPacketFactory extends AbstractPacketFactory {
    }
 
    private FamilyPacketFactory() {
-      registry.setHandler(LoadFamily.class, packet -> create(SendOpcode.FAMILY_PRIVILEGE_LIST, this::loadFamily, packet));
-      registry.setHandler(FamilyMessage.class, packet -> create(SendOpcode.FAMILY_RESULT, this::sendFamilyMessage, packet, 6));
-      registry.setHandler(GetFamilyInfo.class, packet -> create(SendOpcode.FAMILY_INFO_RESULT, this::getFamilyInfo, packet));
-      registry.setHandler(ShowPedigree.class, packet -> create(SendOpcode.FAMILY_CHART_RESULT, this::showPedigree, packet));
-      registry.setHandler(SendFamilyInvite.class, packet -> create(SendOpcode.FAMILY_JOIN_REQUEST, this::sendFamilyInvite, packet));
-      registry.setHandler(FamilySummonRequest.class, packet -> create(SendOpcode.FAMILY_SUMMON_REQUEST, this::sendFamilySummonRequest, packet));
-      registry.setHandler(FamilyLogonNotice.class, packet -> create(SendOpcode.FAMILY_NOTIFY_LOGIN_OR_LOGOUT, this::sendFamilyLoginNotice, packet));
-      registry.setHandler(FamilyJoinResponse.class, packet -> create(SendOpcode.FAMILY_JOIN_REQUEST_RESULT, this::sendFamilyJoinResponse, packet));
-      registry.setHandler(SeniorMessage.class, packet -> create(SendOpcode.FAMILY_JOIN_ACCEPTED, this::getSeniorMessage, packet));
-      registry.setHandler(FamilyGainReputation.class, packet -> create(SendOpcode.FAMILY_REP_GAIN, this::sendGainRep, packet));
+      Handler.handle(LoadFamily.class).decorate(this::loadFamily).register(registry);
+      Handler.handle(FamilyMessage.class).decorate(this::sendFamilyMessage).size(6).register(registry);
+      Handler.handle(GetFamilyInfo.class).decorate(this::getFamilyInfo).register(registry);
+      Handler.handle(ShowPedigree.class).decorate(this::showPedigree).register(registry);
+      Handler.handle(SendFamilyInvite.class).decorate(this::sendFamilyInvite).register(registry);
+      Handler.handle(FamilySummonRequest.class).decorate(this::sendFamilySummonRequest).register(registry);
+      Handler.handle(FamilyLogonNotice.class).decorate(this::sendFamilyLoginNotice).register(registry);
+      Handler.handle(FamilyJoinResponse.class).decorate(this::sendFamilyJoinResponse).register(registry);
+      Handler.handle(SeniorMessage.class).decorate(this::getSeniorMessage).register(registry);
+      Handler.handle(FamilyGainReputation.class).decorate(this::sendGainRep).register(registry);
    }
 
    protected void loadFamily(MaplePacketLittleEndianWriter writer, LoadFamily packet) {

@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.pyramid.PyramidGuage;
 import tools.packet.pyramid.PyramidScore;
@@ -16,8 +15,8 @@ public class PyramidPacketFactory extends AbstractPacketFactory {
    }
 
    private PyramidPacketFactory() {
-      registry.setHandler(PyramidScore.class, packet -> create(SendOpcode.PYRAMID_SCORE, this::pyramidScore, packet, 7));
-      registry.setHandler(PyramidGuage.class, packet -> create(SendOpcode.PYRAMID_GAUGE, this::pyramidGauge, packet, 6));
+      Handler.handle(PyramidScore.class).decorate(this::pyramidScore).size(7).register(registry);
+      Handler.handle(PyramidGuage.class).decorate(this::pyramidGauge).size(6).register(registry);
    }
 
    protected void pyramidScore(MaplePacketLittleEndianWriter writer, PyramidScore packet) {//Type cannot be higher than 4 (MaplePacketLittleEndianWriter writer, Rank D), otherwise you'll crash

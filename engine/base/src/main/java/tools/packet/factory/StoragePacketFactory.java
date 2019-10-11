@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import client.inventory.Item;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.storage.ArrangeStorage;
 import tools.packet.storage.GetStorage;
@@ -21,12 +20,12 @@ public class StoragePacketFactory extends AbstractPacketFactory {
    }
 
    private StoragePacketFactory() {
-      registry.setHandler(GetStorage.class, packet -> create(SendOpcode.STORAGE, this::getStorage, packet));
-      registry.setHandler(StorageError.class, packet -> create(SendOpcode.STORAGE, this::getStorageError, packet));
-      registry.setHandler(MesoStorage.class, packet -> create(SendOpcode.STORAGE, this::mesoStorage, packet));
-      registry.setHandler(StoreInStorage.class, packet -> create(SendOpcode.STORAGE, this::storeStorage, packet));
-      registry.setHandler(TakeOutOfStorage.class, packet -> create(SendOpcode.STORAGE, this::takeOutStorage, packet));
-      registry.setHandler(ArrangeStorage.class, packet -> create(SendOpcode.STORAGE, this::arrangeStorage, packet));
+      Handler.handle(GetStorage.class).decorate(this::getStorage).register(registry);
+      Handler.handle(StorageError.class).decorate(this::getStorageError).register(registry);
+      Handler.handle(MesoStorage.class).decorate(this::mesoStorage).register(registry);
+      Handler.handle(StoreInStorage.class).decorate(this::storeStorage).register(registry);
+      Handler.handle(TakeOutOfStorage.class).decorate(this::takeOutStorage).register(registry);
+      Handler.handle(ArrangeStorage.class).decorate(this::arrangeStorage).register(registry);
    }
 
    protected void getStorage(MaplePacketLittleEndianWriter writer, GetStorage packet) {

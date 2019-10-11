@@ -4,7 +4,6 @@ import java.util.List;
 
 import client.MapleCharacter;
 import constants.ServerConstants;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.character.CharacterList;
 
@@ -19,7 +18,7 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterListPacketFactory() {
-      registry.setHandler(CharacterList.class, packet -> create(SendOpcode.CHARLIST, this::getCharList, packet));
+      Handler.handle(CharacterList.class).decorate(this::getCharList).register(registry);
    }
 
    /**

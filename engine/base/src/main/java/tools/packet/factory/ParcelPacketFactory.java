@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import server.DueyPackage;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.parcel.DueyParcelNotification;
@@ -19,10 +18,10 @@ public class ParcelPacketFactory extends AbstractPacketFactory {
    }
 
    private ParcelPacketFactory() {
-      registry.setHandler(RemoveDueyItem.class, packet -> create(SendOpcode.PARCEL, this::removeItemFromDuey, packet));
-      registry.setHandler(DueyParcelReceived.class, packet -> create(SendOpcode.PARCEL, this::sendDueyParcelReceived, packet));
-      registry.setHandler(DueyParcelNotification.class, packet -> create(SendOpcode.PARCEL, this::sendDueyParcelNotification, packet));
-      registry.setHandler(SendDuey.class, packet -> create(SendOpcode.PARCEL, this::sendDuey, packet));
+      Handler.handle(RemoveDueyItem.class).decorate(this::removeItemFromDuey).register(registry);
+      Handler.handle(DueyParcelReceived.class).decorate(this::sendDueyParcelReceived).register(registry);
+      Handler.handle(DueyParcelNotification.class).decorate(this::sendDueyParcelNotification).register(registry);
+      Handler.handle(SendDuey.class).decorate(this::sendDuey).register(registry);
    }
 
    protected void removeItemFromDuey(MaplePacketLittleEndianWriter writer, RemoveDueyItem packet) {

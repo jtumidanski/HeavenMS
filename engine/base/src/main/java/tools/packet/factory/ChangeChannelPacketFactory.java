@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.ChangeChannel;
 
@@ -15,7 +14,7 @@ public class ChangeChannelPacketFactory extends AbstractPacketFactory {
    }
 
    private ChangeChannelPacketFactory() {
-      registry.setHandler(ChangeChannel.class, packet -> create(SendOpcode.CHANGE_CHANNEL, this::getChannelChange, packet));
+      Handler.handle(ChangeChannel.class).decorate(this::getChannelChange).register(registry);
    }
 
    /**

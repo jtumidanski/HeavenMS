@@ -4,7 +4,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.character.npc.GetPlayerNPC;
 import tools.packet.character.npc.RemovePlayerNPC;
@@ -20,8 +19,8 @@ public class PlayerNPCPacketFactory extends AbstractPacketFactory {
    }
 
    private PlayerNPCPacketFactory() {
-      registry.setHandler(GetPlayerNPC.class, packet -> create(SendOpcode.IMITATED_NPC_DATA, this::getPlayerNPC, packet));
-      registry.setHandler(RemovePlayerNPC.class, packet -> create(SendOpcode.IMITATED_NPC_DATA, this::removePlayerNPC, packet));
+      Handler.handle(GetPlayerNPC.class).decorate(this::getPlayerNPC).register(registry);
+      Handler.handle(RemovePlayerNPC.class).decorate(this::removePlayerNPC).register(registry);
    }
 
    protected void getPlayerNPC(MaplePacketLittleEndianWriter writer, GetPlayerNPC packet) {     // thanks to Arnah

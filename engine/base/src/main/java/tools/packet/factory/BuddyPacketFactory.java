@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import client.BuddyListEntry;
-import net.opcodes.SendOpcode;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.buddy.BuddyListMessage;
@@ -21,11 +20,11 @@ public class BuddyPacketFactory extends AbstractPacketFactory {
    }
 
    private BuddyPacketFactory() {
-      registry.setHandler(UpdateBuddyList.class, packet -> create(SendOpcode.BUDDYLIST, this::updateBuddylist, packet));
-      registry.setHandler(BuddyListMessage.class, packet -> create(SendOpcode.BUDDYLIST, this::buddylistMessage, packet));
-      registry.setHandler(RequestAddBuddy.class, packet -> create(SendOpcode.BUDDYLIST, this::requestBuddylistAdd, packet));
-      registry.setHandler(UpdateBuddyChannel.class, packet -> create(SendOpcode.BUDDYLIST, this::updateBuddyChannel, packet));
-      registry.setHandler(UpdateBuddyCapacity.class, packet -> create(SendOpcode.BUDDYLIST, this::updateBuddyCapacity, packet));
+      Handler.handle(UpdateBuddyList.class).decorate(this::updateBuddylist).register(registry);
+      Handler.handle(BuddyListMessage.class).decorate(this::buddylistMessage).register(registry);
+      Handler.handle(RequestAddBuddy.class).decorate(this::requestBuddylistAdd).register(registry);
+      Handler.handle(UpdateBuddyChannel.class).decorate(this::updateBuddyChannel).register(registry);
+      Handler.handle(UpdateBuddyCapacity.class).decorate(this::updateBuddyCapacity).register(registry);
    }
 
    protected void updateBuddylist(MaplePacketLittleEndianWriter writer, UpdateBuddyList packet) {

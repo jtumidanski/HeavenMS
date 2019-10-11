@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import client.MapleCharacter;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.ShowAllCharacter;
 import tools.packet.ShowAllCharacterInfo;
@@ -17,8 +16,8 @@ public class ViewAllCharactersPacketFactory extends AbstractPacketFactory {
    }
 
    private ViewAllCharactersPacketFactory() {
-      registry.setHandler(ShowAllCharacter.class, packet -> create(SendOpcode.VIEW_ALL_CHAR, this::showAllCharacter, packet, 11));
-      registry.setHandler(ShowAllCharacterInfo.class, packet -> create(SendOpcode.VIEW_ALL_CHAR, this::showAllCharacterInfo, packet));
+      Handler.handle(ShowAllCharacter.class).decorate(this::showAllCharacter).size(11).register(registry);
+      Handler.handle(ShowAllCharacterInfo.class).decorate(this::showAllCharacterInfo).register(registry);
    }
 
    protected void showAllCharacter(MaplePacketLittleEndianWriter writer, ShowAllCharacter packet) {

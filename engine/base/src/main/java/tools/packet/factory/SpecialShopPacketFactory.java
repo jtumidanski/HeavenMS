@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.List;
 
 import client.MapleClient;
-import net.opcodes.SendOpcode;
 import server.CashShop;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.SetCashShop;
@@ -20,8 +19,8 @@ public class SpecialShopPacketFactory extends AbstractPacketFactory {
    }
 
    private SpecialShopPacketFactory() {
-      registry.setHandler(SetITC.class, packet -> create(SendOpcode.SET_ITC, this::setMTS, packet));
-      registry.setHandler(SetCashShop.class, packet -> create(SendOpcode.SET_CASH_SHOP, this::setCashShop, packet));
+      Handler.handle(SetITC.class).decorate(this::setMTS).register(registry);
+      Handler.handle(SetCashShop.class).decorate(this::setCashShop).register(registry);
    }
 
    protected void setMTS(MaplePacketLittleEndianWriter writer, SetITC packet) {

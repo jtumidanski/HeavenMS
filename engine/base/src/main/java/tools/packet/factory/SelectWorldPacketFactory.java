@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.SelectWorld;
 
@@ -15,7 +14,7 @@ public class SelectWorldPacketFactory extends AbstractPacketFactory {
    }
 
    private SelectWorldPacketFactory() {
-      registry.setHandler(SelectWorld.class, packet -> create(SendOpcode.LAST_CONNECTED_WORLD, this::selectWorld, packet));
+      Handler.handle(SelectWorld.class).decorate(this::selectWorld).register(registry);
    }
 
    protected void selectWorld(MaplePacketLittleEndianWriter writer, SelectWorld packet) {

@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import constants.ItemConstants;
-import net.opcodes.SendOpcode;
 import server.MapleItemInformationProvider;
 import server.MapleShopItem;
 import tools.data.output.MaplePacketLittleEndianWriter;
@@ -24,13 +23,13 @@ public class ShopPacketFactory extends AbstractPacketFactory {
    }
 
    private ShopPacketFactory() {
-      registry.setHandler(UpdateHiredMerchantBox.class, packet -> create(SendOpcode.UPDATE_HIRED_MERCHANT, this::updateHiredMerchantBox, packet));
-      registry.setHandler(GetNPCShop.class, packet -> create(SendOpcode.OPEN_NPC_SHOP, this::getNPCShop, packet));
-      registry.setHandler(ConfirmShopTransaction.class, packet -> create(SendOpcode.CONFIRM_SHOP_TRANSACTION, this::shopTransaction, packet, 3));
-      registry.setHandler(ShowHiredMerchantBox.class, packet -> create(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT, this::hiredMerchantBox, packet));
-      registry.setHandler(RetrieveFirstMessage.class, packet -> create(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT, this::retrieveFirstMessage, packet));
-      registry.setHandler(RemoteChannelChange.class, packet -> create(SendOpcode.ENTRUSTED_SHOP_CHECK_RESULT, this::remoteChannelChange, packet));
-      registry.setHandler(DestroyHiredMerchantBox.class, packet -> create(SendOpcode.DESTROY_HIRED_MERCHANT, this::removeHiredMerchantBox, packet));
+      Handler.handle(UpdateHiredMerchantBox.class).decorate(this::updateHiredMerchantBox).register(registry);
+      Handler.handle(GetNPCShop.class).decorate(this::getNPCShop).register(registry);
+      Handler.handle(ConfirmShopTransaction.class).decorate(this::shopTransaction).size(3).register(registry);
+      Handler.handle(ShowHiredMerchantBox.class).decorate(this::hiredMerchantBox).register(registry);
+      Handler.handle(RetrieveFirstMessage.class).decorate(this::retrieveFirstMessage).register(registry);
+      Handler.handle(RemoteChannelChange.class).decorate(this::remoteChannelChange).register(registry);
+      Handler.handle(DestroyHiredMerchantBox.class).decorate(this::removeHiredMerchantBox).register(registry);
    }
 
    protected void updateHiredMerchantBox(MaplePacketLittleEndianWriter writer, UpdateHiredMerchantBox packet) {

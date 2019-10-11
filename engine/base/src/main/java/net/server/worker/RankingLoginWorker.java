@@ -32,6 +32,7 @@ import client.database.provider.CharacterProvider;
 import constants.ServerConstants;
 import net.server.Server;
 import tools.DatabaseConnection;
+import tools.TriConsumer;
 
 /**
  * @author Matze
@@ -40,10 +41,6 @@ import tools.DatabaseConnection;
  */
 public class RankingLoginWorker implements Runnable {
    private long lastUpdate = System.currentTimeMillis();
-
-   private interface TriConsumer<T, U, V> {
-      void apply(T t, U u, V v);
-   }
 
    private void performRanking(Supplier<List<CharacterRankData>> rankSupplier, TriConsumer<Integer, Integer, Integer> consumer) {
       List<CharacterRankData> rankData = rankSupplier.get();

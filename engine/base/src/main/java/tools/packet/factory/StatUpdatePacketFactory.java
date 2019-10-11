@@ -7,7 +7,6 @@ import java.util.List;
 import client.MapleStat;
 import client.inventory.MaplePet;
 import constants.GameConstants;
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.stat.EnableActions;
@@ -27,9 +26,9 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
    }
 
    private StatUpdatePacketFactory() {
-      registry.setHandler(UpdatePlayerStats.class, packet -> create(SendOpcode.STAT_CHANGED, this::updatePlayerStats, packet));
-      registry.setHandler(EnableActions.class, packet -> create(SendOpcode.STAT_CHANGED, this::enableActions, packet));
-      registry.setHandler(UpdatePetStats.class, packet -> create(SendOpcode.STAT_CHANGED, this::petStatUpdate, packet));
+      Handler.handle(UpdatePlayerStats.class).decorate(this::updatePlayerStats).register(registry);
+      Handler.handle(EnableActions.class).decorate(this::enableActions).register(registry);
+      Handler.handle(UpdatePetStats.class).decorate(this::petStatUpdate).register(registry);
    }
 
    /**

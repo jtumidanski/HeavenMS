@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import client.newyear.NewYearCardRecord;
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.NewYearCardResolution;
 
@@ -16,7 +15,7 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
    }
 
    private NewYearCardPacketFactory() {
-      registry.setHandler(NewYearCardResolution.class, packet -> create(SendOpcode.NEW_YEAR_CARD_RES, this::onNewYearCardRes, packet));
+      Handler.handle(NewYearCardResolution.class).decorate(this::onNewYearCardRes).register(registry);
    }
 
    protected void onNewYearCardRes(MaplePacketLittleEndianWriter writer, NewYearCardResolution packet) {

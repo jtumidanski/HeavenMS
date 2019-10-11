@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.statusinfo.CompleteQuest;
 import tools.packet.statusinfo.GetDojoInfo;
@@ -32,24 +31,24 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
    }
 
    private StatusInfoPacketFactory() {
-      registry.setHandler(ShowEXPGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowExpGain, packet));
-      registry.setHandler(ShowFameGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowFameGain, packet));
-      registry.setHandler(ShowMesoGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowMesoGain, packet));
-      registry.setHandler(ShowQuestForfeit.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::forfeitQuest, packet));
-      registry.setHandler(CompleteQuest.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::completeQuest, packet));
-      registry.setHandler(UpdateQuest.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::updateQuest, packet));
-      registry.setHandler(ShowInventoryFull.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowInventoryFull, packet));
-      registry.setHandler(ShowItemUnavailable.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::showItemUnavailable, packet));
-      registry.setHandler(UpdateAreaInfo.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::updateAreaInfo, packet));
-      registry.setHandler(GetGuildPointMessage.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getGPMessage, packet, 7));
-      registry.setHandler(GetItemMessage.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getItemMessage, packet, 7));
-      registry.setHandler(ShowInfoText.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::showInfoText, packet));
-      registry.setHandler(GetDojoInfo.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getDojoInfo, packet));
-      registry.setHandler(GetDojoInfoMessage.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getDojoInfoMessage, packet));
-      registry.setHandler(UpdateDojoStats.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::updateDojoStats, packet));
-      registry.setHandler(ShowItemExpired.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::itemExpired, packet));
-      registry.setHandler(ShowBunny.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::bunnyPacket, packet));
-      registry.setHandler(ShowItemGain.class, packet -> create(SendOpcode.SHOW_STATUS_INFO, this::getShowItemGain, packet));
+      Handler.handle(ShowEXPGain.class).decorate(this::getShowExpGain).register(registry);
+      Handler.handle(ShowFameGain.class).decorate(this::getShowFameGain).register(registry);
+      Handler.handle(ShowMesoGain.class).decorate(this::getShowMesoGain).register(registry);
+      Handler.handle(ShowQuestForfeit.class).decorate(this::forfeitQuest).register(registry);
+      Handler.handle(CompleteQuest.class).decorate(this::completeQuest).register(registry);
+      Handler.handle(UpdateQuest.class).decorate(this::updateQuest).register(registry);
+      Handler.handle(ShowInventoryFull.class).decorate(this::getShowInventoryFull).register(registry);
+      Handler.handle(ShowItemUnavailable.class).decorate(this::showItemUnavailable).register(registry);
+      Handler.handle(UpdateAreaInfo.class).decorate(this::updateAreaInfo).register(registry);
+      Handler.handle(GetGuildPointMessage.class).decorate(this::getGPMessage).size(7).register(registry);
+      Handler.handle(GetItemMessage.class).decorate(this::getItemMessage).size(7).register(registry);
+      Handler.handle(ShowInfoText.class).decorate(this::showInfoText).register(registry);
+      Handler.handle(GetDojoInfo.class).decorate(this::getDojoInfo).register(registry);
+      Handler.handle(GetDojoInfoMessage.class).decorate(this::getDojoInfoMessage).register(registry);
+      Handler.handle(UpdateDojoStats.class).decorate(this::updateDojoStats).register(registry);
+      Handler.handle(ShowItemExpired.class).decorate(this::itemExpired).register(registry);
+      Handler.handle(ShowBunny.class).decorate(this::bunnyPacket).register(registry);
+      Handler.handle(ShowItemGain.class).decorate(this::getShowItemGain).register(registry);
    }
 
    /**

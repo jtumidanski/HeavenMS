@@ -3,7 +3,6 @@ package tools.packet.factory;
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.processor.CharacterProcessor;
-import net.opcodes.SendOpcode;
 import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.wedding.MarriageRequest;
@@ -11,6 +10,7 @@ import tools.packet.wedding.MarriageResult;
 import tools.packet.wedding.MarriageResultError;
 import tools.packet.wedding.SendWishList;
 import tools.packet.wedding.TakePhoto;
+import tools.packet.wedding.WeddingEnd;
 import tools.packet.wedding.WeddingGiftResult;
 import tools.packet.wedding.WeddingInvitation;
 import tools.packet.wedding.WeddingPartnerTransfer;
@@ -51,15 +51,16 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
    }
 
    private WeddingPacketFactory() {
-      registry.setHandler(MarriageRequest.class, packet -> create(SendOpcode.MARRIAGE_REQUEST, this::marriageRequest, packet));
-      registry.setHandler(TakePhoto.class, packet -> create(SendOpcode.WEDDING_PHOTO, this::takePhoto, packet));
-      registry.setHandler(MarriageResult.class, packet -> create(SendOpcode.MARRIAGE_RESULT, this::marriageResult, packet));
-      registry.setHandler(MarriageResultError.class, packet -> create(SendOpcode.MARRIAGE_RESULT, this::marriageResultError, packet));
-      registry.setHandler(WeddingPartnerTransfer.class, packet -> create(SendOpcode.NOTIFY_MARRIED_PARTNER_MAP_TRANSFER, this::weddingPartnerTransfer, packet));
-      registry.setHandler(WeddingProgress.class, packet -> create(((WeddingProgress) packet).blessEffect() ? SendOpcode.WEDDING_CEREMONY_END : SendOpcode.WEDDING_PROGRESS, this::weddingProgress, packet));
-      registry.setHandler(WeddingInvitation.class, packet -> create(SendOpcode.MARRIAGE_RESULT, this::sendWeddingInvitation, packet));
-      registry.setHandler(SendWishList.class, packet -> create(SendOpcode.MARRIAGE_REQUEST, this::sendWishList, packet));
-      registry.setHandler(WeddingGiftResult.class, packet -> create(SendOpcode.WEDDING_GIFT_RESULT, this::weddingGiftResult, packet));
+      Handler.handle(MarriageRequest.class).decorate(this::marriageRequest).register(registry);
+      Handler.handle(TakePhoto.class).decorate(this::takePhoto).register(registry);
+      Handler.handle(MarriageResult.class).decorate(this::marriageResult).register(registry);
+      Handler.handle(MarriageResultError.class).decorate(this::marriageResultError).register(registry);
+      Handler.handle(WeddingPartnerTransfer.class).decorate(this::weddingPartnerTransfer).register(registry);
+      Handler.handle(WeddingEnd.class).decorate(this::weddingProgress).register(registry);
+      Handler.handle(WeddingProgress.class).decorate(this::weddingProgress).register(registry);
+      Handler.handle(WeddingInvitation.class).decorate(this::sendWeddingInvitation).register(registry);
+      Handler.handle(SendWishList.class).decorate(this::sendWishList).register(registry);
+      Handler.handle(WeddingGiftResult.class).decorate(this::weddingGiftResult).register(registry);
    }
 
    /**
@@ -180,6 +181,14 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
     * @return writer
     */
    protected void weddingProgress(MaplePacketLittleEndianWriter writer, WeddingProgress packet) {
+      if (!packet.blessEffect()) { // in order for ceremony packet to send, byte step = 2 must be sent first
+         writer.write(packet.step());
+      }
+      writer.writeInt(packet.groomId());
+      writer.writeInt(packet.brideId());
+   }
+
+   protected void weddingProgress(MaplePacketLittleEndianWriter writer, WeddingEnd packet) {
       if (!packet.blessEffect()) { // in order for ceremony packet to send, byte step = 2 must be sent first
          writer.write(packet.step());
       }

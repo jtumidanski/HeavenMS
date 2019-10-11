@@ -5,7 +5,6 @@ import client.MapleDisease;
 import constants.skills.Buccaneer;
 import constants.skills.Corsair;
 import constants.skills.ThunderBreaker;
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.buff.GiveBuff;
@@ -30,16 +29,16 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    private GiveBuffPacketFactory() {
-      registry.setHandler(GiveBuff.class, packet -> create(SendOpcode.GIVE_BUFF, this::giveBuff, packet));
-      registry.setHandler(GiveDebuff.class, packet -> create(SendOpcode.GIVE_BUFF, this::giveDebuff, packet));
-      registry.setHandler(GiveForeignDebuff.class, packet -> create(SendOpcode.GIVE_FOREIGN_BUFF, this::giveForeignDebuff, packet));
-      registry.setHandler(GiveForeignBuff.class, packet -> create(SendOpcode.GIVE_FOREIGN_BUFF, this::giveForeignBuff, packet));
-      registry.setHandler(GiveForeignSlowDebuff.class, packet -> create(SendOpcode.GIVE_FOREIGN_BUFF, this::giveForeignSlowDebuff, packet));
-      registry.setHandler(GiveForeignChairSkillEffect.class, packet -> create(SendOpcode.GIVE_FOREIGN_BUFF, this::giveForeignChairSkillEffect, packet));
-      registry.setHandler(GivePirateBuff.class, packet -> create(SendOpcode.GIVE_BUFF, this::givePirateBuff, packet));
-      registry.setHandler(GiveFinalAttack.class, packet -> create(SendOpcode.GIVE_BUFF, this::giveFinalAttack, packet));
-      registry.setHandler(ShowMonsterRiding.class, packet -> create(SendOpcode.GIVE_FOREIGN_BUFF, this::showMonsterRiding, packet));
-      registry.setHandler(GiveForeignPirateBuff.class, packet -> create(SendOpcode.GIVE_FOREIGN_BUFF, this::giveForeignPirateBuff, packet));
+      Handler.handle(GiveBuff.class).decorate(this::giveBuff).register(registry);
+      Handler.handle(GiveDebuff.class).decorate(this::giveDebuff).register(registry);
+      Handler.handle(GiveForeignDebuff.class).decorate(this::giveForeignDebuff).register(registry);
+      Handler.handle(GiveForeignBuff.class).decorate(this::giveForeignBuff).register(registry);
+      Handler.handle(GiveForeignSlowDebuff.class).decorate(this::giveForeignSlowDebuff).register(registry);
+      Handler.handle(GiveForeignChairSkillEffect.class).decorate(this::giveForeignChairSkillEffect).register(registry);
+      Handler.handle(GivePirateBuff.class).decorate(this::givePirateBuff).register(registry);
+      Handler.handle(GiveFinalAttack.class).decorate(this::giveFinalAttack).register(registry);
+      Handler.handle(ShowMonsterRiding.class).decorate(this::showMonsterRiding).register(registry);
+      Handler.handle(GiveForeignPirateBuff.class).decorate(this::giveForeignPirateBuff).register(registry);
    }
 
    /**

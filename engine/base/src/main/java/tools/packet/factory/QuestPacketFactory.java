@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.quest.ShowQuestComplete;
 import tools.packet.quest.info.AddQuestTimeLimit;
@@ -22,14 +21,14 @@ public class QuestPacketFactory extends AbstractPacketFactory {
    }
 
    private QuestPacketFactory() {
-      registry.setHandler(UpdateQuestInfo.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::updateQuestInfo, packet));
-      registry.setHandler(AddQuestTimeLimit.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::addQuestTimeLimit, packet));
-      registry.setHandler(RemoveQuestTimeLimit.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::removeQuestTimeLimit, packet));
-      registry.setHandler(QuestFinish.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::updateQuestFinish, packet));
-      registry.setHandler(QuestError.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::questError, packet));
-      registry.setHandler(QuestFailure.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::questFailure, packet));
-      registry.setHandler(QuestExpire.class, packet -> create(SendOpcode.UPDATE_QUEST_INFO, this::questExpire, packet));
-      registry.setHandler(ShowQuestComplete.class, packet -> create(SendOpcode.QUEST_CLEAR, this::getShowQuestCompletion, packet));
+      Handler.handle(UpdateQuestInfo.class).decorate(this::updateQuestInfo).register(registry);
+      Handler.handle(AddQuestTimeLimit.class).decorate(this::addQuestTimeLimit).register(registry);
+      Handler.handle(RemoveQuestTimeLimit.class).decorate(this::removeQuestTimeLimit).register(registry);
+      Handler.handle(QuestFinish.class).decorate(this::updateQuestFinish).register(registry);
+      Handler.handle(QuestError.class).decorate(this::questError).register(registry);
+      Handler.handle(QuestFailure.class).decorate(this::questFailure).register(registry);
+      Handler.handle(QuestExpire.class).decorate(this::questExpire).register(registry);
+      Handler.handle(ShowQuestComplete.class).decorate(this::getShowQuestCompletion).register(registry);
    }
 
    protected void updateQuestInfo(MaplePacketLittleEndianWriter writer, UpdateQuestInfo packet) {

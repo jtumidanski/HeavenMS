@@ -5,7 +5,6 @@ import java.util.List;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.fredrick.FredrickMessage;
@@ -23,9 +22,9 @@ public class FredrickPacketFactory extends AbstractPacketFactory {
    }
 
    private FredrickPacketFactory() {
-      registry.setHandler(FredrickMessage.class, packet -> create(SendOpcode.FREDRICK_MESSAGE, this::fredrickMessage, packet));
-      registry.setHandler(GetFredrick.class, packet -> create(SendOpcode.FREDRICK, this::getFredrick, packet));
-      registry.setHandler(GetFredrickInfo.class, packet -> create(SendOpcode.FREDRICK, this::getFredrickInfo, packet));
+      Handler.handle(FredrickMessage.class).decorate(this::fredrickMessage).register(registry);
+      Handler.handle(GetFredrick.class).decorate(this::getFredrick).register(registry);
+      Handler.handle(GetFredrickInfo.class).decorate(this::getFredrickInfo).register(registry);
    }
 
    protected void fredrickMessage(MaplePacketLittleEndianWriter writer, FredrickMessage packet) {

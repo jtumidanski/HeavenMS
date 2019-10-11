@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.event.CoconutHit;
 import tools.packet.event.CoconutScore;
@@ -19,11 +18,11 @@ public class EventPacketFactory extends AbstractPacketFactory {
    }
 
    private EventPacketFactory() {
-      registry.setHandler(RollSnowBall.class, packet -> create(SendOpcode.SNOWBALL_STATE, this::rollSnowBall, packet));
-      registry.setHandler(HitSnowBall.class, packet -> create(SendOpcode.HIT_SNOWBALL, this::hitSnowBall, packet, 7));
-      registry.setHandler(SnowBallMessage.class, packet -> create(SendOpcode.SNOWBALL_MESSAGE, this::snowballMessage, packet, 7));
-      registry.setHandler(CoconutScore.class, packet -> create(SendOpcode.COCONUT_SCORE, this::coconutScore, packet, 6));
-      registry.setHandler(CoconutHit.class, packet -> create(SendOpcode.COCONUT_HIT, this::hitCoconut, packet, 7));
+      Handler.handle(RollSnowBall.class).decorate(this::rollSnowBall).register(registry);
+      Handler.handle(HitSnowBall.class).decorate(this::hitSnowBall).size(7).register(registry);
+      Handler.handle(SnowBallMessage.class).decorate(this::snowballMessage).size(7).register(registry);
+      Handler.handle(CoconutScore.class).decorate(this::coconutScore).size(6).register(registry);
+      Handler.handle(CoconutHit.class).decorate(this::hitCoconut).size(7).register(registry);
    }
 
    protected void rollSnowBall(MaplePacketLittleEndianWriter writer, RollSnowBall packet) {

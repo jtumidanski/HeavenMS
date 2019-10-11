@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.DojoWarpUp;
@@ -19,10 +18,10 @@ public class GenericPacketFactory extends AbstractPacketFactory {
    }
 
    private GenericPacketFactory() {
-      registry.setHandler(EnableReport.class, packet -> create(SendOpcode.CLAIM_STATUS_CHANGED, this::enableReport, packet, 3));
-      registry.setHandler(GetEnergy.class, packet -> create(SendOpcode.SESSION_VALUE, this::getEnergy, packet));
-      registry.setHandler(DojoWarpUp.class, packet -> create(SendOpcode.DOJO_WARP_UP, this::dojoWarpUp, packet));
-      registry.setHandler(SetNPCScriptable.class, packet -> create(SendOpcode.SET_NPC_SCRIPTABLE, this::setNPCScriptable, packet));
+      Handler.handle(EnableReport.class).decorate(this::enableReport).size(3).register(registry);
+      Handler.handle(GetEnergy.class).decorate(this::getEnergy).register(registry);
+      Handler.handle(DojoWarpUp.class).decorate(this::dojoWarpUp).register(registry);
+      Handler.handle(SetNPCScriptable.class).decorate(this::setNPCScriptable).register(registry);
    }
 
    protected void enableReport(MaplePacketLittleEndianWriter writer, EnableReport packet) { // thanks to snow

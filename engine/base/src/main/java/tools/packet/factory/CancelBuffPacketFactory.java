@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.buff.CancelBuff;
 import tools.packet.buff.CancelDebuff;
@@ -20,12 +19,12 @@ public class CancelBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    private CancelBuffPacketFactory() {
-      registry.setHandler(CancelForeignDebuff.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignDebuff, packet));
-      registry.setHandler(CancelForeignBuff.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignBuff, packet));
-      registry.setHandler(CancelBuff.class, packet -> create(SendOpcode.CANCEL_BUFF, this::cancelBuff, packet));
-      registry.setHandler(CancelDebuff.class, packet -> create(SendOpcode.CANCEL_BUFF, this::cancelDebuff, packet, 19));
-      registry.setHandler(CancelForeignSlowDebuff.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignSlowDebuff, packet));
-      registry.setHandler(CancelForeignChairSkillEffect.class, packet -> create(SendOpcode.CANCEL_FOREIGN_BUFF, this::cancelForeignChairSkillEffect, packet, 19));
+      Handler.handle(CancelForeignDebuff.class).decorate(this::cancelForeignDebuff).register(registry);
+      Handler.handle(CancelForeignBuff.class).decorate(this::cancelForeignBuff).register(registry);
+      Handler.handle(CancelBuff.class).decorate(this::cancelBuff).register(registry);
+      Handler.handle(CancelDebuff.class).decorate(this::cancelDebuff).size(19).register(registry);
+      Handler.handle(CancelForeignSlowDebuff.class).decorate(this::cancelForeignSlowDebuff).register(registry);
+      Handler.handle(CancelForeignChairSkillEffect.class).decorate(this::cancelForeignChairSkillEffect).size(19).register(registry);
    }
 
    protected void cancelForeignDebuff(MaplePacketLittleEndianWriter writer, CancelForeignDebuff packet) {

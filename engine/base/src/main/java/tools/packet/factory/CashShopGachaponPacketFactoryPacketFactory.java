@@ -1,9 +1,7 @@
 package tools.packet.factory;
 
 import java.util.function.BiConsumer;
-import java.util.function.Function;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.PacketInput;
 import tools.packet.cashshop.CashShopGachaponSubOp;
@@ -21,19 +19,18 @@ public class CashShopGachaponPacketFactoryPacketFactory extends AbstractCashShop
    }
 
    private CashShopGachaponPacketFactoryPacketFactory() {
-      registry.setHandler(CashShopGachaponFailed.class, packet -> create(CashShopGachaponSubOp.FAILURE, this::onCashItemGachaponOpenFailed, packet));
-      registry.setHandler(CashShopGachaponFailed.class, packet -> create(CashShopGachaponSubOp.SUCCESS, this::onCashGachaponOpenSuccess, packet));
+      Handler.handle(CashShopGachaponFailed.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopGachaponSubOp.FAILURE, this::onCashItemGachaponOpenFailed))
+            .register(registry);
+      Handler.handle(CashShopGachaponSuccess.class)
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopGachaponSubOp.SUCCESS, this::onCashGachaponOpenSuccess))
+            .decorate(this::onCashGachaponOpenSuccess)
+            .register(registry);
    }
 
-   protected <T extends PacketInput> byte[] create(CashShopGachaponSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput, Integer size) {
-      return create(SendOpcode.CASHSHOP_GACHAPON_STAMP_RESULT, (BiConsumer<MaplePacketLittleEndianWriter, T>) (writer, castInput) -> {
-         writer.write(subOp.getValue());
-         decorator.accept(writer, castInput);
-      }, packetInput);
-   }
-
-   protected <T extends PacketInput> byte[] create(CashShopGachaponSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator, PacketInput packetInput) {
-      return create(subOp, decorator, packetInput, MaplePacketLittleEndianWriter.DEFAULT_SIZE);
+   protected <T extends PacketInput> void decorate(MaplePacketLittleEndianWriter writer, T packet, CashShopGachaponSubOp subOp, BiConsumer<MaplePacketLittleEndianWriter, T> decorator) {
+      writer.write(subOp.getValue());
+      decorator.accept(writer, packet);
    }
 
    // Cash Shop Surprise packets found thanks to Arnah (Vertisy)

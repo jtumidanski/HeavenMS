@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.CharacterName;
 
@@ -15,7 +14,7 @@ public class CharacterNameResponsePacketFactory extends AbstractPacketFactory {
    }
 
    private CharacterNameResponsePacketFactory() {
-      registry.setHandler(CharacterName.class, packet -> create(SendOpcode.CHAR_NAME_RESPONSE, this::charNameResponse, packet));
+      Handler.handle(CharacterName.class).decorate(this::charNameResponse).register(registry);
    }
 
    protected void charNameResponse(MaplePacketLittleEndianWriter writer, CharacterName packet) {

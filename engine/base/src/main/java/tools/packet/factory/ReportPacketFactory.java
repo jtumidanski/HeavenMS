@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.report.ReportResponse;
 import tools.packet.report.SendPolice;
@@ -16,8 +15,8 @@ public class ReportPacketFactory extends AbstractPacketFactory {
    }
 
    private ReportPacketFactory() {
-      registry.setHandler(ReportResponse.class, packet -> create(SendOpcode.SUE_CHARACTER_RESULT, this::reportResponse, packet));
-      registry.setHandler(SendPolice.class, packet -> create(SendOpcode.DATA_CRC_CHECK_FAILED, this::sendPolice, packet));
+      Handler.handle(ReportResponse.class).decorate(this::reportResponse).register(registry);
+      Handler.handle(SendPolice.class).decorate(this::sendPolice).register(registry);
    }
 
    /**

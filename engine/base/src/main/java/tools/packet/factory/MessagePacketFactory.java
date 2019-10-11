@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.message.BuddyFindReply;
 import tools.packet.message.ChatText;
@@ -35,27 +34,27 @@ public class MessagePacketFactory extends AbstractPacketFactory {
    }
 
    private MessagePacketFactory() {
-      registry.setHandler(ServerNotice.class, packet -> create(SendOpcode.SERVERMESSAGE, this::serverNotice, packet));
-      registry.setHandler(ServerMessage.class, packet -> create(SendOpcode.SERVERMESSAGE, this::serverMessage, packet));
-      registry.setHandler(GetAvatarMegaphone.class, packet -> create(SendOpcode.SET_AVATAR_MEGAPHONE, this::getAvatarMega, packet));
-      registry.setHandler(ClearAvatarMegaphone.class, packet -> create(SendOpcode.CLEAR_AVATAR_MEGAPHONE, this::byeAvatarMega, packet));
-      registry.setHandler(GachaponMessage.class, packet -> create(SendOpcode.SERVERMESSAGE, this::gachaponMessage, packet));
-      registry.setHandler(ChatText.class, packet -> create(SendOpcode.CHATTEXT, this::getChatText, packet));
-      registry.setHandler(Whisper.class, packet -> create(SendOpcode.WHISPER, this::getWhisper, packet));
-      registry.setHandler(WhisperReply.class, packet -> create(SendOpcode.WHISPER, this::getWhisperReply, packet));
-      registry.setHandler(GiveFameResponse.class, packet -> create(SendOpcode.FAME_RESPONSE, this::giveFameResponse, packet));
-      registry.setHandler(GiveFameErrorResponse.class, packet -> create(SendOpcode.FAME_RESPONSE, this::giveFameErrorResponse, packet));
-      registry.setHandler(ReceiveFame.class, packet -> create(SendOpcode.FAME_RESPONSE, this::receiveFame, packet));
-      registry.setHandler(MultiChat.class, packet -> create(SendOpcode.MULTICHAT, this::multiChat, packet));
-      registry.setHandler(FindReply.class, packet -> create(SendOpcode.WHISPER, this::getFindReply, packet));
-      registry.setHandler(BuddyFindReply.class, packet -> create(SendOpcode.WHISPER, this::getBuddyFindReply, packet));
-      registry.setHandler(ItemMegaphone.class, packet -> create(SendOpcode.SERVERMESSAGE, this::itemMegaphone, packet));
-      registry.setHandler(MultiMegaphone.class, packet -> create(SendOpcode.SERVERMESSAGE, this::getMultiMegaphone, packet));
-      registry.setHandler(NotifyLevelUp.class, packet -> create(SendOpcode.NOTIFY_LEVELUP, this::levelUpMessage, packet));
-      registry.setHandler(NotifyMarriage.class, packet -> create(SendOpcode.NOTIFY_MARRIAGE, this::marriageMessage, packet));
-      registry.setHandler(NotifyJobAdvance.class, packet -> create(SendOpcode.NOTIFY_JOB_CHANGE, this::jobMessage, packet));
-      registry.setHandler(SpouseMessage.class, packet -> create(SendOpcode.SPOUSE_CHAT, this::coupleMessage, packet));
-      registry.setHandler(YellowTip.class, packet -> create(SendOpcode.SET_WEEK_EVENT_MESSAGE, this::sendYellowTip, packet));
+      Handler.handle(ServerNotice.class).decorate(this::serverNotice).register(registry);
+      Handler.handle(ServerMessage.class).decorate(this::serverMessage).register(registry);
+      Handler.handle(GetAvatarMegaphone.class).decorate(this::getAvatarMega).register(registry);
+      Handler.handle(ClearAvatarMegaphone.class).decorate(this::byeAvatarMega).register(registry);
+      Handler.handle(GachaponMessage.class).decorate(this::gachaponMessage).register(registry);
+      Handler.handle(ChatText.class).decorate(this::getChatText).register(registry);
+      Handler.handle(Whisper.class).decorate(this::getWhisper).register(registry);
+      Handler.handle(WhisperReply.class).decorate(this::getWhisperReply).register(registry);
+      Handler.handle(GiveFameResponse.class).decorate(this::giveFameResponse).register(registry);
+      Handler.handle(GiveFameErrorResponse.class).decorate(this::giveFameErrorResponse).register(registry);
+      Handler.handle(ReceiveFame.class).decorate(this::receiveFame).register(registry);
+      Handler.handle(MultiChat.class).decorate(this::multiChat).register(registry);
+      Handler.handle(FindReply.class).decorate(this::getFindReply).register(registry);
+      Handler.handle(BuddyFindReply.class).decorate(this::getBuddyFindReply).register(registry);
+      Handler.handle(ItemMegaphone.class).decorate(this::itemMegaphone).register(registry);
+      Handler.handle(MultiMegaphone.class).decorate(this::getMultiMegaphone).register(registry);
+      Handler.handle(NotifyLevelUp.class).decorate(this::levelUpMessage).register(registry);
+      Handler.handle(NotifyMarriage.class).decorate(this::marriageMessage).register(registry);
+      Handler.handle(NotifyJobAdvance.class).decorate(this::jobMessage).register(registry);
+      Handler.handle(SpouseMessage.class).decorate(this::coupleMessage).register(registry);
+      Handler.handle(YellowTip.class).decorate(this::sendYellowTip).register(registry);
    }
 
    /**
