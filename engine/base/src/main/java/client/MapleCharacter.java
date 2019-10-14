@@ -8379,7 +8379,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void createDragon() {
-      dragon = new MapleDragon(this);
+      dragon = MapleMapObjectProcessor.getInstance().createDragon(this);
    }
 
    public MapleDragon getDragon() {

@@ -540,14 +540,14 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    protected void spawnDragon(MaplePacketLittleEndianWriter writer, SpawnDragon packet) {
-      writer.writeInt(packet.getDragon().getOwner().getId());//objectid = owner id
+      writer.writeInt(packet.getDragon().ownerId());//objectid = owner id
       writer.writeShort(packet.getDragon().position().x);
       writer.writeShort(0);
       writer.writeShort(packet.getDragon().position().y);
       writer.writeShort(0);
       writer.write(packet.getDragon().stance());
       writer.write(0);
-      writer.writeShort(packet.getDragon().getOwner().getJob().getId());
+      writer.writeShort(packet.getDragon().ownerId());
    }
 
    /**

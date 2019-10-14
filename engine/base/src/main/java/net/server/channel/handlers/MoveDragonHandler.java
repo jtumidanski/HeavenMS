@@ -46,9 +46,9 @@ public class MoveDragonHandler extends AbstractMoveHandler<MoveDragonPacket> {
          processMovementList(packet.movementDataList(), dragon);
          if (packet.hasMovement()) {
             if (chr.isHidden()) {
-               chr.getMap().broadcastGMMessage(chr, PacketCreator.create(new MoveDragon(dragon.getOwner().getId(), packet.startPosition(), packet.movementList())));
+               chr.getMap().broadcastGMMessage(chr, PacketCreator.create(new MoveDragon(dragon.ownerId(), packet.startPosition(), packet.movementList())));
             } else {
-               MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> PacketCreator.create(new MoveDragon(dragon.getOwner().getId(), packet.startPosition(), packet.movementList())), chr, dragon.position());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> PacketCreator.create(new MoveDragon(dragon.ownerId(), packet.startPosition(), packet.movementList())), chr, dragon.position());
             }
          }
       }

@@ -569,7 +569,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void kite(MapleClient c, MapleCharacter player, short position, int itemId, String message) {
-      MapleKite kite = new MapleKite(player, message, itemId);
+      MapleKite kite = new MapleKite(player.getName(), player.position(), player.getFh(), message, itemId);
 
       if (!GameConstants.isFreeMarketRoom(player.getMapId())) {
          player.getMap().spawnKite(kite);

@@ -27,7 +27,7 @@ public class DragonSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Maple
 
    @Override
    public void sendDestroyData(MapleDragon object, MapleClient client) {
-      PacketCreator.announce(client, new RemoveDragon(object.getOwner().getId()));
+      PacketCreator.announce(client, new RemoveDragon(object.ownerId()));
    }
 
    @Override

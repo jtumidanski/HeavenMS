@@ -131,4 +131,10 @@ public class MapleMapObjectProcessor {
       movementData[12] = (byte) (object.stance() & 0xFF);
       return movementData;
    }
+
+   public MapleDragon createDragon(MapleCharacter character) {
+      MapleDragon dragon = new MapleDragon(character.getId(), character.position(), character.stance());
+      MapleMapObjectProcessor.getInstance().sendSpawnData(dragon, character.getClient());
+      return dragon;
+   }
 }

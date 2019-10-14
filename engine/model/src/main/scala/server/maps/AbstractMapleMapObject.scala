@@ -5,7 +5,11 @@ import java.awt.Point
 abstract class AbstractMapleMapObject() extends MapleMapObject {
   private var _position: Option[Point] = Option.apply(new Point())
 
-  override var objectId: Int = 0
+  private var _objectId: Int = 0
+
+  override def objectId: Int = _objectId
+
+  override def objectId_$eq(value: Int): Unit = _objectId = value
 
   def position: Point = {
     new Point(_position.get)
