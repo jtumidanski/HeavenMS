@@ -41,8 +41,8 @@ import tools.packet.stat.EnableActions;
  */
 public class MapleDoorObject extends AbstractMapleMapObject {
    private final int ownerId;
-   private final MapleMap from;
-   private final MapleMap to;
+   private int destinationMapId;
+   private int originMapId;
    private final ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_DOOR, true);
    private int pairOid;
    private int linkedPortalId;
@@ -50,14 +50,14 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    private ReentrantReadWriteLock.ReadLock rlock = locks.readLock();
    private ReentrantReadWriteLock.WriteLock wlock = locks.writeLock();
 
-   public MapleDoorObject(int owner, MapleMap destination, MapleMap origin, int townPortalId, Point targetPosition, Point toPosition) {
+   public MapleDoorObject(int owner, int destinationMapId, int originMapId, int townPortalId, Point targetPosition, Point toPosition) {
       super();
       setPosition(targetPosition);
 
       ownerId = owner;
       linkedPortalId = townPortalId;
-      from = origin;
-      to = destination;
+      this.originMapId = originMapId;
+      this.destinationMapId = destinationMapId;
       linkedPos = toPosition;
    }
 
@@ -94,9 +94,9 @@ public class MapleDoorObject extends AbstractMapleMapObject {
       if (chr.getId() == ownerId || (party != null && party.getMemberById(ownerId) != null)) {
          PacketCreator.announce(chr, new ShowSpecialEffect(7));
          if (!inTown() && party == null) {
-            chr.changeMap(to, getLinkedPortalId());
+            chr.changeMap(destinationMapId, getLinkedPortalId());
          } else {
-            chr.changeMap(to, getLinkedPortalPosition());
+            chr.changeMap(destinationMapId, getLinkedPortalPosition());
          }
       } else {
          PacketCreator.announce(chr, new ShowBlockedMessage(6));
@@ -111,12 +111,12 @@ public class MapleDoorObject extends AbstractMapleMapObject {
 
    public void sendSpawnData(MapleClient client, boolean launched) {
       MapleCharacter chr = client.getPlayer();
-      if (this.getFrom().getId() == chr.getMapId()) {
+      if (this.getFrom() == chr.getMapId()) {
          if (chr.getParty() != null && (this.getOwnerId() == chr.getId() || chr.getParty().getMemberById(this.getOwnerId()) != null)) {
-            PacketCreator.announce(client, new PartyPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
+            PacketCreator.announce(client, new PartyPortal(this.getFrom(), this.getTo(), this.toPosition()));
          }
 
-         PacketCreator.announce(chr, new SpawnPortal(this.getFrom().getId(), this.getTo().getId(), this.toPosition()));
+         PacketCreator.announce(chr, new SpawnPortal(this.getFrom(), this.getTo(), this.toPosition()));
          if (!this.inTown()) {
             PacketCreator.announce(chr, new SpawnDoor(this.getOwnerId(), this.getPosition(), launched));
          }
@@ -126,7 +126,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    @Override
    public void sendDestroyData(MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-      if (from.getId() == chr.getMapId()) {
+      if (originMapId == chr.getMapId()) {
          MapleParty party = chr.getParty();
          if (party != null && (ownerId == chr.getId() || party.getMemberById(ownerId) != null)) {
             PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
@@ -136,7 +136,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    }
 
    public void sendDestroyData(MapleClient client, boolean partyUpdate) {
-      if (client != null && from.getId() == client.getPlayer().getMapId()) {
+      if (client != null && originMapId == client.getPlayer().getMapId()) {
          PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
          PacketCreator.announce(client, new RemoveDoor(ownerId, inTown()));
       }
@@ -158,20 +158,20 @@ public class MapleDoorObject extends AbstractMapleMapObject {
       return getLinkedPortalId() == -1;
    }
 
-   public MapleMap getFrom() {
-      return from;
+   public int getFrom() {
+      return originMapId;
    }
 
-   public MapleMap getTo() {
-      return to;
+   public int getTo() {
+      return destinationMapId;
    }
 
-   public MapleMap getTown() {
-      return inTown() ? from : to;
+   public int getTown() {
+      return inTown() ? originMapId : destinationMapId;
    }
 
-   public MapleMap getArea() {
-      return !inTown() ? from : to;
+   public int getArea() {
+      return !inTown() ? originMapId : destinationMapId;
    }
 
    public Point getAreaPosition() {

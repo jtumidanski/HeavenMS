@@ -1976,7 +1976,7 @@ public class MapleMap {
       }, new SpawnCondition() {
          @Override
          public boolean canSpawn(MapleCharacter chr) {
-            return chr.getMapId() == door.getFrom().getId();
+            return chr.getMapId() == door.getFrom();
          }
       });
    }

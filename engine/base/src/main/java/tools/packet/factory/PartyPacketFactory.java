@@ -52,8 +52,8 @@ public class PartyPacketFactory extends AbstractPacketFactory {
 
          if (door != null) {
             MapleDoorObject mdo = door.getAreaDoor();
-            writer.writeInt(mdo.getTo().getId());
-            writer.writeInt(mdo.getFrom().getId());
+            writer.writeInt(mdo.getTo());
+            writer.writeInt(mdo.getFrom());
             writer.writeInt(mdo.getPosition().x);
             writer.writeInt(mdo.getPosition().y);
          } else {
@@ -152,8 +152,8 @@ public class PartyPacketFactory extends AbstractPacketFactory {
                MapleDoor door = partyDoors.get(partychar.getId());
                if (door != null) {
                   MapleDoorObject mdo = door.getTownDoor();
-                  lew.writeInt(mdo.getTown().getId());
-                  lew.writeInt(mdo.getArea().getId());
+                  lew.writeInt(mdo.getTown());
+                  lew.writeInt(mdo.getArea());
                   lew.writeInt(mdo.getPosition().x);
                   lew.writeInt(mdo.getPosition().y);
                } else {

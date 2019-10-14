@@ -1495,6 +1495,22 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       eventAfterChangedMap(this.getMapId());
    }
 
+   public void changeMap(final int target, final Point pos) {
+      canWarpCounter++;
+
+      eventChangedMap(target);
+      MapleMap to = getWarpMap(target);
+      changeMapInternal(to, pos, PacketCreator.create(new WarpToMap(getClient().getChannel(), to.getId(), 0x80, getHp(), Option.apply(pos))));
+      canWarpMap = false;
+
+      canWarpCounter--;
+      if (canWarpCounter == 0) {
+         canWarpMap = true;
+      }
+
+      eventAfterChangedMap(this.getMapId());
+   }
+
    public void changeMap(final MapleMap target, final Point pos) {
       canWarpCounter++;
 
