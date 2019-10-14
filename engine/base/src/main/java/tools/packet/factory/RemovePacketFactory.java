@@ -45,9 +45,9 @@ public class RemovePacketFactory extends AbstractPacketFactory {
     * @return The packet removing the object.
     */
    protected void removeSummon(MaplePacketLittleEndianWriter writer, RemoveSummon packet) {
-      writer.writeInt(packet.getSummon().getOwner().getId());
-      writer.writeInt(packet.getSummon().getObjectId());
-      writer.write(packet.isAnimated() ? 4 : 1); // ?
+      writer.writeInt(packet.ownerId());
+      writer.writeInt(packet.objectId());
+      writer.write(packet.animated() ? 4 : 1); // ?
    }
 
    protected void removeKite(MaplePacketLittleEndianWriter writer, RemoveKite packet) {

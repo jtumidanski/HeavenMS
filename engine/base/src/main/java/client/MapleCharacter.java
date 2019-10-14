@@ -3315,7 +3315,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                   MapleSummon summon = summons.get(summonId);
                   if (summon != null) {
-                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> PacketCreator.create(new RemoveSummon(summon, true)), summon.getPosition());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> PacketCreator.create(new RemoveSummon(summon.getOwner().getId(), summon.getObjectId(), true)), summon.getPosition());
                      getMap().removeMapObject(summon);
                      removeVisibleMapObject(summon);
 

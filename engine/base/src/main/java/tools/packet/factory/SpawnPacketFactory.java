@@ -174,7 +174,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     */
    protected void removeMonsterInvisibility(MaplePacketLittleEndianWriter writer, RemoveMonsterInvisibility packet) {
       writer.write(1);
-      writer.writeInt(packet.getMonster().getObjectId());
+      writer.writeInt(packet.monsterObjectId());
    }
 
    /**
@@ -652,7 +652,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     */
    protected void makeMonsterInvisible(MaplePacketLittleEndianWriter writer, MakeMonsterInvisible packet) {
       writer.write(0);
-      writer.writeInt(packet.getMonster().getObjectId());
+      writer.writeInt(packet.monsterObjectId());
    }
 
    protected void sendCannotSpawnKite(MaplePacketLittleEndianWriter writer, CannotSpawnKite packet) {

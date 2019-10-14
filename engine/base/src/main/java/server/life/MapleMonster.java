@@ -2134,7 +2134,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       for (MapleMonster mob : puppetControlled) {
          PacketCreator.announce(chrController, new StopMonsterControl(mob.getObjectId()));
       }
-      PacketCreator.announce(chrController, new RemoveSummon(puppet, false));
+      PacketCreator.announce(chrController, new RemoveSummon(puppet.getOwner().getId(), puppet.getObjectId(), false));
 
       MapleClient c = chrController.getClient();
       for (MapleMonster mob : puppetControlled) {

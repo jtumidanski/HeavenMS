@@ -63,7 +63,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
 
    @Override
    public void sendDestroyData(MapleClient client) {
-      PacketCreator.announce(client, new RemoveSummon(this, true));
+      PacketCreator.announce(client, new RemoveSummon(getOwner().getId(), getObjectId(), true));
    }
 
    public MapleCharacter getOwner() {
