@@ -1,6 +1,5 @@
 package server.maps.spawner;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
@@ -31,8 +30,8 @@ public class PlayerNPCSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Ma
 
    @Override
    public void sendDestroyData(MaplePlayerNPC object, MapleClient client) {
-      PacketCreator.announce(client, new RemoveNPCController(object.getObjectId()));
-      PacketCreator.announce(client, new RemovePlayerNPC(object.getObjectId()));
+      PacketCreator.announce(client, new RemoveNPCController(object.objectId()));
+      PacketCreator.announce(client, new RemovePlayerNPC(object.objectId()));
    }
 
    @Override

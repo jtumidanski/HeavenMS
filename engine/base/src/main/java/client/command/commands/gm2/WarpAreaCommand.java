@@ -51,12 +51,12 @@ public class WarpAreaCommand extends Command {
             return;
          }
 
-         Point pos = player.getPosition();
+         Point pos = player.position();
 
          Collection<MapleCharacter> characters = player.getMap().getAllPlayers();
 
          for (MapleCharacter victim : characters) {
-            if (victim.getPosition().distanceSq(pos) <= 50000) {
+            if (victim.position().distanceSq(pos) <= 50000) {
                victim.saveLocationOnWarp();
                victim.changeMap(target, target.getRandomPlayerSpawnpoint());
             }

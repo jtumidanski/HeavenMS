@@ -23,7 +23,7 @@ class Reactor9208002 {
             if (status == "display") {
                if (!rm.getReactor().isRecentHitFromAttack()) {
                   String prevCombo = eim.getProperty("stage1combo")
-                  String n = "" + (rm.getReactor().getObjectId() % 1000)
+                  String n = "" + (rm.getReactor().objectId() % 1000)
                   prevCombo += padWithZeroes(n, 3)
 
                   eim.setProperty("stage1combo", prevCombo)
@@ -36,7 +36,7 @@ class Reactor9208002 {
             } else { //active
                String prevGuess = "" + eim.getProperty("stage1guess")
                if (prevGuess.length() != (3 * (stage + 3))) {
-                  String n = "" + (rm.getReactor().getObjectId() % 1000)
+                  String n = "" + (rm.getReactor().objectId() % 1000)
                   prevGuess += padWithZeroes(n, 3)
 
                   eim.setProperty("stage1guess", prevGuess)

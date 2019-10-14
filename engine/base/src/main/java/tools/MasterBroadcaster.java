@@ -92,7 +92,7 @@ public class MasterBroadcaster {
    private Boolean passRangeCheck(double rangeThreshold, MapleCharacter mapleCharacter, Point referencePoint) {
       //
       if (rangeThreshold < Double.POSITIVE_INFINITY) {
-         return referencePoint.distanceSq(mapleCharacter.getPosition()) <= rangeThreshold;
+         return referencePoint.distanceSq(mapleCharacter.position()) <= rangeThreshold;
       } else {
          return true;
       }
@@ -110,14 +110,14 @@ public class MasterBroadcaster {
    public void sendToAllInMapRange(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, boolean ranged) {
       sendToAllInMap(map, mapleCharacter -> {
          double rangeSq = ranged ? MapleMapProcessor.getInstance().getRangedDistance() : Double.POSITIVE_INFINITY;
-         return passRepeatToSource(repeatToSource, source, mapleCharacter) && passRangeCheck(rangeSq, mapleCharacter, source.getPosition());
+         return passRepeatToSource(repeatToSource, source, mapleCharacter) && passRangeCheck(rangeSq, mapleCharacter, source.position());
       }, packetCreator);
    }
 
    public void sendToAllInMapRange(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, boolean ranged) {
       sendToAllInMap(map, mapleCharacter -> {
          double rangeSq = ranged ? MapleMapProcessor.getInstance().getRangedDistance() : Double.POSITIVE_INFINITY;
-         return passRepeatToSource(repeatToSource, source, mapleCharacter) && passRangeCheck(rangeSq, mapleCharacter, source.getPosition());
+         return passRepeatToSource(repeatToSource, source, mapleCharacter) && passRangeCheck(rangeSq, mapleCharacter, source.position());
       }, character -> PacketCreator.create(packetInput));
    }
 

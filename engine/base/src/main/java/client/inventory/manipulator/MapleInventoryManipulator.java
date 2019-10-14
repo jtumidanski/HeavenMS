@@ -752,7 +752,7 @@ public class MapleInventoryManipulator {
          }
       }
 
-      Point dropPos = new Point(chr.getPosition());
+      Point dropPos = new Point(chr.position());
       if (quantity < source.quantity() && !ItemConstants.isRechargeable(itemId)) {
          Item target = source.copy();
          target.quantity_$eq(quantity);

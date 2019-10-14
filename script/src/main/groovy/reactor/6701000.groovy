@@ -17,7 +17,7 @@ class Reactor6701000 {
 
       for (int i = 0; i < 7; i++) {
          mobObj = MapleLifeFactory.getMonster(startId + Math.floor(Math.random() * 3).intValue())
-         mapObj.spawnMonsterOnGroundBelow(mobObj, rm.getReactor().getPosition())
+         mapObj.spawnMonsterOnGroundBelow(mobObj, rm.getReactor().position())
       }
    }
 

@@ -36,10 +36,10 @@ public class KiteSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<MapleKi
    }
 
    public final byte[] makeSpawnData(MapleKite object) {
-      return PacketCreator.create(new SpawnKite(object.getObjectId(), object.getItemId(), object.getOwner().getName(), object.getText(), object.getPos(), object.getFt()));
+      return PacketCreator.create(new SpawnKite(object.objectId(), object.getItemId(), object.getOwner().getName(), object.getText(), object.getPos(), object.getFt()));
    }
 
    public final byte[] makeDestroyData(MapleKite object) {
-      return PacketCreator.create(new RemoveKite(object.getObjectId(), 0));
+      return PacketCreator.create(new RemoveKite(object.objectId(), 0));
    }
 }

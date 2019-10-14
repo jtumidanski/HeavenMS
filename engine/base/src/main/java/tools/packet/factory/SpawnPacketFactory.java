@@ -135,35 +135,35 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    protected void spawnNPC(MaplePacketLittleEndianWriter writer, SpawnNPC packet) {
-      writer.writeInt(packet.getNpc().getObjectId());
-      writer.writeInt(packet.getNpc().getId());
-      writer.writeShort(packet.getNpc().getPosition().x);
-      writer.writeShort(packet.getNpc().getCy());
-      if (packet.getNpc().getF() == 1) {
+      writer.writeInt(packet.getNpc().objectId());
+      writer.writeInt(packet.getNpc().id());
+      writer.writeShort(packet.getNpc().position().x);
+      writer.writeShort(packet.getNpc().cy());
+      if (packet.getNpc().f() == 1) {
          writer.write(0);
       } else {
          writer.write(1);
       }
-      writer.writeShort(packet.getNpc().getFh());
-      writer.writeShort(packet.getNpc().getRx0());
-      writer.writeShort(packet.getNpc().getRx1());
+      writer.writeShort(packet.getNpc().fh());
+      writer.writeShort(packet.getNpc().rx0());
+      writer.writeShort(packet.getNpc().rx1());
       writer.write(1);
    }
 
    protected void spawnNPCRequestController(MaplePacketLittleEndianWriter writer, SpawnNPCRequestController packet) {
       writer.write(1);
-      writer.writeInt(packet.getNpc().getObjectId());
-      writer.writeInt(packet.getNpc().getId());
-      writer.writeShort(packet.getNpc().getPosition().x);
-      writer.writeShort(packet.getNpc().getCy());
-      if (packet.getNpc().getF() == 1) {
+      writer.writeInt(packet.getNpc().objectId());
+      writer.writeInt(packet.getNpc().id());
+      writer.writeShort(packet.getNpc().position().x);
+      writer.writeShort(packet.getNpc().cy());
+      if (packet.getNpc().f() == 1) {
          writer.write(0);
       } else {
          writer.write(1);
       }
-      writer.writeShort(packet.getNpc().getFh());
-      writer.writeShort(packet.getNpc().getRx0());
-      writer.writeShort(packet.getNpc().getRx1());
+      writer.writeShort(packet.getNpc().fh());
+      writer.writeShort(packet.getNpc().rx0());
+      writer.writeShort(packet.getNpc().rx1());
       writer.writeBool(packet.isMiniMap());
    }
 
@@ -184,16 +184,16 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     */
    protected void spawnFakeMonster(MaplePacketLittleEndianWriter writer, SpawnFakeMonster packet) {
       writer.write(1);
-      writer.writeInt(packet.getMonster().getObjectId());
+      writer.writeInt(packet.getMonster().objectId());
       writer.write(5);
-      writer.writeInt(packet.getMonster().getId());
+      writer.writeInt(packet.getMonster().id());
       writer.skip(15);
       writer.write(0x88);
       writer.skip(6);
-      writer.writePos(packet.getMonster().getPosition());
-      writer.write(packet.getMonster().getStance());
+      writer.writePos(packet.getMonster().position());
+      writer.write(packet.getMonster().stance());
       writer.writeShort(0);//life.getStartFh()
-      writer.writeShort(packet.getMonster().getFh());
+      writer.writeShort(packet.getMonster().fh());
       if (packet.getEffectId() > 0) {
          writer.write(packet.getEffectId());
          writer.write(0);
@@ -210,16 +210,16 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     * @return The packet to make the mob targettable.
     */
    protected void makeMonsterReal(MaplePacketLittleEndianWriter writer, MakeMonsterReal packet) {
-      writer.writeInt(packet.getMonster().getObjectId());
+      writer.writeInt(packet.getMonster().objectId());
       writer.write(5);
-      writer.writeInt(packet.getMonster().getId());
+      writer.writeInt(packet.getMonster().id());
       writer.skip(15);
       writer.write(0x88);
       writer.skip(6);
-      writer.writePos(packet.getMonster().getPosition());
-      writer.write(packet.getMonster().getStance());
+      writer.writePos(packet.getMonster().position());
+      writer.write(packet.getMonster().stance());
       writer.writeShort(0);//life.getStartFh()
-      writer.writeShort(packet.getMonster().getFh());
+      writer.writeShort(packet.getMonster().fh());
       writer.writeShort(-1);
       writer.writeInt(0);
    }
@@ -281,13 +281,13 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       writer.writeInt(ItemConstants.getInventoryType(chr.getChair()) == MapleInventoryType.SETUP ? chr.getChair() : 0);
 
       if (enteringField) {
-         Point spawnPos = new Point(chr.getPosition());
+         Point spawnPos = new Point(chr.position());
          spawnPos.y -= 42;
          writer.writePos(spawnPos);
          writer.write(6);
       } else {
-         writer.writePos(chr.getPosition());
-         writer.write(chr.getStance());
+         writer.writePos(chr.position());
+         writer.write(chr.stance());
       }
 
       writer.writeShort(0);//chr.getFh()
@@ -442,7 +442,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     */
    protected void addAnnounceBox(final MaplePacketLittleEndianWriter writer, MaplePlayerShop shop, int availability) {
       writer.write(4);
-      writer.writeInt(shop.getObjectId());
+      writer.writeInt(shop.objectId());
       writer.writeMapleAsciiString(shop.getDescription());
       writer.write(0);
       writer.write(0);
@@ -502,12 +502,12 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    protected void spawnHiredMerchantBox(MaplePacketLittleEndianWriter writer, SpawnHiredMerchant packet) {
       writer.writeInt(packet.getHiredMerchant().getOwnerId());
       writer.writeInt(packet.getHiredMerchant().getItemId());
-      writer.writeShort((short) packet.getHiredMerchant().getPosition().getX());
-      writer.writeShort((short) packet.getHiredMerchant().getPosition().getY());
+      writer.writeShort((short) packet.getHiredMerchant().position().getX());
+      writer.writeShort((short) packet.getHiredMerchant().position().getY());
       writer.writeShort(0);
       writer.writeMapleAsciiString(packet.getHiredMerchant().getOwner());
       writer.write(0x05);
-      writer.writeInt(packet.getHiredMerchant().getObjectId());
+      writer.writeInt(packet.getHiredMerchant().objectId());
       writer.writeMapleAsciiString(packet.getHiredMerchant().getDescription());
       writer.write(packet.getHiredMerchant().getItemId() % 100);
       writer.write(new byte[]{1, 4});
@@ -515,9 +515,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    protected void spawnPlayerNPC(MaplePacketLittleEndianWriter writer, SpawnPlayerNPC packet) {
       writer.write(1);
-      writer.writeInt(packet.getPlayerNPC().getObjectId());
+      writer.writeInt(packet.getPlayerNPC().objectId());
       writer.writeInt(packet.getPlayerNPC().getScriptId());
-      writer.writeShort(packet.getPlayerNPC().getPosition().x);
+      writer.writeShort(packet.getPlayerNPC().position().x);
       writer.writeShort(packet.getPlayerNPC().getCY());
       writer.write(packet.getPlayerNPC().getDirection());
       writer.writeShort(packet.getPlayerNPC().getFH());
@@ -541,11 +541,11 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    protected void spawnDragon(MaplePacketLittleEndianWriter writer, SpawnDragon packet) {
       writer.writeInt(packet.getDragon().getOwner().getId());//objectid = owner id
-      writer.writeShort(packet.getDragon().getPosition().x);
+      writer.writeShort(packet.getDragon().position().x);
       writer.writeShort(0);
-      writer.writeShort(packet.getDragon().getPosition().y);
+      writer.writeShort(packet.getDragon().position().y);
       writer.writeShort(0);
-      writer.write(packet.getDragon().getStance());
+      writer.write(packet.getDragon().stance());
       writer.write(0);
       writer.writeShort(packet.getDragon().getOwner().getJob().getId());
    }
@@ -557,16 +557,16 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     */
    protected void spawnMonster(MaplePacketLittleEndianWriter writer, SpawnMonster packet) {
       MapleMonster life = packet.getMonster();
-      writer.writeInt(life.getObjectId());
+      writer.writeInt(life.objectId());
       writer.write(life.getController() == null ? 5 : 1);
-      writer.writeInt(life.getId());
+      writer.writeInt(life.id());
       writer.skip(15);
       writer.write(0x88);
       writer.skip(6);
-      writer.writePos(life.getPosition());
-      writer.write(life.getStance());
+      writer.writePos(life.position());
+      writer.write(life.stance());
       writer.writeShort(0); //Origin FH //life.getStartFh()
-      writer.writeShort(life.getFh());
+      writer.writeShort(life.fh());
 
       /*
        * -4: Fake -3: Appear after linked mob is dead -2: Fade in 1: Smoke 3:
@@ -611,16 +611,16 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
     */
    protected void controlMonster(MaplePacketLittleEndianWriter writer, ControlMonster packet) {
       writer.write(packet.isAggro() ? 2 : 1);
-      writer.writeInt(packet.getMonster().getObjectId());
+      writer.writeInt(packet.getMonster().objectId());
       writer.write(packet.getMonster().getController() == null ? 5 : 1);
-      writer.writeInt(packet.getMonster().getId());
+      writer.writeInt(packet.getMonster().id());
       writer.skip(15);
       writer.write(0x88);
       writer.skip(6);
-      writer.writePos(packet.getMonster().getPosition());
-      writer.write(packet.getMonster().getStance());
+      writer.writePos(packet.getMonster().position());
+      writer.write(packet.getMonster().stance());
       writer.writeShort(0); //Origin FH //life.getStartFh()
-      writer.writeShort(packet.getMonster().getFh());
+      writer.writeShort(packet.getMonster().fh());
 
 
       /*

@@ -125,7 +125,7 @@ class NPC9040009 {
       while (iter.hasNext()) {
          MapleReactor mo = iter.next()
          if (mo.getName() != "statuegate") {
-            reactors << mo.getObjectId()
+            reactors << mo.objectId()
          }
       }
 

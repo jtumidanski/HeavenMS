@@ -25,8 +25,8 @@ public class ReactorPacketFactory extends AbstractPacketFactory {
 
    // is there a way to spawn reactors non-animated?
    protected void spawnReactor(MaplePacketLittleEndianWriter writer, SpawnReactor packet) {
-      Point pos = packet.getReactor().getPosition();
-      writer.writeInt(packet.getReactor().getObjectId());
+      Point pos = packet.getReactor().position();
+      writer.writeInt(packet.getReactor().objectId());
       writer.writeInt(packet.getReactor().getId());
       writer.write(packet.getReactor().getState());
       writer.writePos(pos);
@@ -36,8 +36,8 @@ public class ReactorPacketFactory extends AbstractPacketFactory {
 
    // is there a way to trigger reactors without performing the hit animation?
    protected void triggerReactor(MaplePacketLittleEndianWriter writer, TriggerReactor packet) {
-      Point pos = packet.getReactor().getPosition();
-      writer.writeInt(packet.getReactor().getObjectId());
+      Point pos = packet.getReactor().position();
+      writer.writeInt(packet.getReactor().objectId());
       writer.write(packet.getReactor().getState());
       writer.writePos(pos);
       writer.write(packet.getStance());
@@ -46,8 +46,8 @@ public class ReactorPacketFactory extends AbstractPacketFactory {
    }
 
    protected void destroyReactor(MaplePacketLittleEndianWriter writer, DestroyReactor packet) {
-      Point pos = packet.getReactor().getPosition();
-      writer.writeInt(packet.getReactor().getObjectId());
+      Point pos = packet.getReactor().position();
+      writer.writeInt(packet.getReactor().objectId());
       writer.write(packet.getReactor().getState());
       writer.writePos(pos);
    }

@@ -62,7 +62,7 @@ public class PnpcCommand extends Command {
 
       MapleNPC npc = MapleLifeFactory.getNPC(npcId);
 
-      Point checkpos = player.getMap().getGroundBelow(player.getPosition());
+      Point checkpos = player.getMap().getGroundBelow(player.position());
       int xpos = checkpos.x;
       int ypos = checkpos.y;
       int fh = player.getMap().getFootholds().findBelow(checkpos).id();
@@ -75,11 +75,11 @@ public class PnpcCommand extends Command {
 
          for (Channel ch : player.getWorldServer().getChannels()) {
             npc = MapleLifeFactory.getNPC(npcId);
-            npc.setPosition(checkpos);
-            npc.setCy(ypos);
-            npc.setRx0(xpos + 50);
-            npc.setRx1(xpos - 50);
-            npc.setFh(fh);
+            npc.position_$eq(checkpos);
+            npc.cy_$eq(ypos);
+            npc.rx0_$eq(xpos + 50);
+            npc.rx1_$eq(xpos - 50);
+            npc.fh_$eq(fh);
 
             MapleMap map = ch.getMapFactory().getMap(mapId);
             map.addMapObject(npc);

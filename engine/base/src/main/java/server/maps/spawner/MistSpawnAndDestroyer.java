@@ -43,21 +43,21 @@ public class MistSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<MapleMi
                (skill, skillLevel) -> spawnMistForOwner(object, skillLevel),
                new byte[0]);
       }
-      return PacketCreator.create(new SpawnMist(object.getObjectId(), object.getMobOwner().getId(), object.getSkill().skillId(), object.getSkill().level(), object));
+      return PacketCreator.create(new SpawnMist(object.objectId(), object.getMobOwner().id(), object.getSkill().skillId(), object.getSkill().level(), object));
    }
 
    private byte[] spawnMistForOwner(MapleMist object, Integer skillLevel) {
-      return object.getSourceSkill().map(skill -> PacketCreator.create(new SpawnMist(object.getObjectId(), object.getOwner().getId(), skill.getId(), skillLevel, object))).orElse(new byte[0]);
+      return object.getSourceSkill().map(skill -> PacketCreator.create(new SpawnMist(object.objectId(), object.getOwner().getId(), skill.getId(), skillLevel, object))).orElse(new byte[0]);
    }
 
    public byte[] makeFakeSpawnData(MapleMist object, int level) {
       if (object.getOwner() != null) {
          return spawnMistForOwner(object, level);
       }
-      return PacketCreator.create(new SpawnMist(object.getObjectId(), object.getMobOwner().getId(), object.getSkill().skillId(), object.getSkill().level(), object));
+      return PacketCreator.create(new SpawnMist(object.objectId(), object.getMobOwner().id(), object.getSkill().skillId(), object.getSkill().level(), object));
    }
 
    public byte[] makeDestroyData(MapleMist object) {
-      return PacketCreator.create(new RemoveMist(object.getObjectId()));
+      return PacketCreator.create(new RemoveMist(object.objectId()));
    }
 }

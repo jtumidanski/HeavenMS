@@ -135,12 +135,12 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
          TimerManager.getInstance().schedule(new Runnable() {
             @Override
             public void run() {
-               MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.getObjectId(), damage), monster.getPosition());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.objectId(), damage), monster.position());
                map.damageMonster(attacker, monster, damage);
             }
          }, animationTime);
       } else {
-         MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.getObjectId(), damage), monster.getPosition());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(monster.objectId(), damage), monster.position());
          map.damageMonster(attacker, monster, damage);
       }
    }
@@ -213,7 +213,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
 
             for (Integer oned : attack.getDamage().keySet()) {
                MapleMapObject mapobject = map.getMapObject(oned);
-               if (mapobject != null && mapobject.getType() == MapleMapObjectType.ITEM) {
+               if (mapobject != null && mapobject.type() == MapleMapObjectType.ITEM) {
                   final MapleMapItem mapitem = (MapleMapItem) mapobject;
                   if (mapitem.getMeso() == 0) { //Maybe it is possible some how?
                      return;
@@ -232,7 +232,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                               if (mapitem.isPickedUp()) {
                                  return;
                               }
-                              map.pickItemDrop(PacketCreator.create(new RemoveItem(mapitem.getObjectId(), 4, 0)), mapitem);
+                              map.pickItemDrop(PacketCreator.create(new RemoveItem(mapitem.objectId(), 4, 0)), mapitem);
                            } finally {
                               mapitem.unlockItem();
                            }
@@ -242,7 +242,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   } finally {
                      mapitem.unlockItem();
                   }
-               } else if (mapobject != null && mapobject.getType() != MapleMapObjectType.MONSTER) {
+               } else if (mapobject != null && mapobject.type() != MapleMapObjectType.MONSTER) {
                   return;
                }
             }
@@ -250,7 +250,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
          for (Integer oned : attack.getDamage().keySet()) {
             final MapleMonster monster = map.getMonsterByOid(oned);
             if (monster != null) {
-               double distance = player.getPosition().distanceSq(monster.getPosition());
+               double distance = player.position().distanceSq(monster.position());
                double distanceToDetect = 200000.0;
 
                if (attack.ranged()) {
@@ -278,7 +278,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                }
 
                if (distance > distanceToDetect) {
-                  AutobanFactory.DISTANCE_HACK.alert(player, "Distance Sq to monster: " + distance + " SID: " + attack.skill() + " MID: " + monster.getId());
+                  AutobanFactory.DISTANCE_HACK.alert(player, "Distance Sq to monster: " + distance + " SID: " + attack.skill() + " MID: " + monster.id());
                   monster.refreshMobPosition();
                }
 
@@ -323,7 +323,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            TimerManager.getInstance().schedule(new Runnable() {
                               @Override
                               public void run() {
-                                 map.spawnMesoDrop(Math.min((int) Math.max(((double) eachdf / (double) 20000) * (double) maxmeso, 1), maxmeso), new Point((int) (monster.getPosition().getX() + Randomizer.nextInt(100) - 50), (int) (monster.getPosition().getY())), monster, player, true, (byte) 2);
+                                 map.spawnMesoDrop(Math.min((int) Math.max(((double) eachdf / (double) 20000) * (double) maxmeso, 1), maxmeso), new Point((int) (monster.position().getX() + Randomizer.nextInt(100) - 50), (int) (monster.position().getY())), monster, player, true, (byte) 2);
                               }
                            }, delay);
                            delay += 100;
@@ -339,7 +339,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (steal.getEffect(player.getSkillLevel(steal)).makeChanceResult()) {
                         monster.addStolen(0);
                         MapleMonsterInformationProvider mi = MapleMonsterInformationProvider.getInstance();
-                        List<Integer> dropPool = mi.retrieveDropPool(monster.getId());
+                        List<Integer> dropPool = mi.retrieveDropPool(monster.id());
                         if (!dropPool.isEmpty()) {
                            Integer rndPool = (int) Math.floor(Math.random() * dropPool.get(dropPool.size() - 1));
 
@@ -347,7 +347,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                            while (rndPool >= dropPool.get(i)) i++;
 
                            List<MonsterDropEntry> toSteal = new ArrayList<>();
-                           toSteal.add(mi.retrieveDrop(monster.getId()).get(i));
+                           toSteal.add(mi.retrieveDrop(monster.id()).get(i));
 
                            map.dropItemsFromMonster(toSteal, player, monster);
                            monster.addStolen(toSteal.get(0).itemId());
@@ -365,7 +365,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                } else if (attack.skill() == Outlaw.HOMING_BEACON || attack.skill() == Corsair.BULLSEYE) {
                   SkillFactory.getSkill(attack.skill())
                         .map(skill -> skill.getEffect(player.getSkillLevel(skill)))
-                        .ifPresent(effect -> effect.applyBeaconBuff(player, monster.getObjectId()));
+                        .ifPresent(effect -> effect.applyBeaconBuff(player, monster.objectId()));
                } else if (attack.skill() == Outlaw.FLAME_THROWER) {
                   if (!monster.isBoss()) {
                      SkillFactory.executeIfHasSkill(player, attack.skill(), (skill, skillLevel) -> {
@@ -557,7 +557,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                } else {
                   if (attack.skill() == Aran.BODY_PRESSURE) {
                      int finalTotDamageToOneMonster = totDamageToOneMonster;
-                     MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(monster.getObjectId(), finalTotDamageToOneMonster));
+                     MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(monster.objectId(), finalTotDamageToOneMonster));
                   }
 
                   map.damageMonster(player, monster, totDamageToOneMonster);
@@ -569,7 +569,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.x());
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.getId(), player.getId(), toUse.x(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.id(), player.getId(), toUse.x(), 0, 0, false, 0, true, monster.objectId(), 0, 0), true, player);
                      }
                   }
                }
@@ -580,7 +580,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                      if (ms.left == 145) {
                         MobSkill toUse = MobSkillFactory.getMobSkill(ms.left, ms.right);
                         player.addHP(-toUse.y());
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.getId(), player.getId(), toUse.y(), 0, 0, false, 0, true, monster.getObjectId(), 0, 0), true, player);
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(0, monster.id(), player.getId(), toUse.y(), 0, 0, false, 0, true, monster.objectId(), 0, 0), true, player);
                      }
                   }
                }

@@ -49,7 +49,7 @@ public class ReachCommand extends Command {
          } else {
             MapleMap map = victim.getMap();
             player.saveLocationOnWarp();
-            player.forceChangeMap(map, map.findClosestPortal(victim.getPosition()));
+            player.forceChangeMap(map, map.findClosestPortal(victim.position()));
          }
       }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Unknown player."));
    }

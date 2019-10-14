@@ -214,13 +214,13 @@ class EventHenesysPQ {
 
    // Happens when a friendly mob dies
    static def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
-      if (mob.getId() == 9300061) {
+      if (mob.id() == 9300061) {
          eim.schedule("bunnyDefeated", 5 * 1000)
       }
    }
 
    static def friendlyItemDrop(EventInstanceManager eim, MapleMonster mob) {
-      if (mob.getId() == 9300061) {
+      if (mob.id() == 9300061) {
          int cakes = eim.getIntProperty("bunnyCake") + 1
          eim.setIntProperty("bunnyCake", cakes)
 
@@ -229,7 +229,7 @@ class EventHenesysPQ {
    }
 
    static def friendlyDamaged(EventInstanceManager eim, MapleMonster mob) {
-      if (mob.getId() == 9300061) {
+      if (mob.id() == 9300061) {
          int bunnyDamage = eim.getIntProperty("bunnyDamaged") + 1
          if (bunnyDamage > 5) {
             MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, "The Moon Bunny is feeling sick. Please protect it so it can make delicious rice cakes.")

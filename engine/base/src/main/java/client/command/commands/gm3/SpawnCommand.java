@@ -48,10 +48,10 @@ public class SpawnCommand extends Command {
       }
       if (params.length == 2) {
          for (int i = 0; i < Integer.parseInt(params[1]); i++) {
-            player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(Integer.parseInt(params[0])), player.getPosition());
+            player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(Integer.parseInt(params[0])), player.position());
          }
       } else {
-         player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(Integer.parseInt(params[0])), player.getPosition());
+         player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(Integer.parseInt(params[0])), player.position());
       }
    }
 }

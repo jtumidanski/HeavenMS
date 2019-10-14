@@ -40,7 +40,7 @@ public class ItemVacCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      List<MapleMapObject> list = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
+      List<MapleMapObject> list = player.getMap().getMapObjectsInRange(player.position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
       for (MapleMapObject item : list) {
          player.pickupItem(item);
       }

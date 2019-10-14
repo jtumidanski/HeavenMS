@@ -50,7 +50,7 @@ public final class DamageSummonHandler extends AbstractPacketHandler<DamageSummo
          if (summon.getHP() <= 0) {
             player.cancelEffectFromBuffStat(MapleBuffStat.PUPPET);
          }
-         MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), new DamageSummon(player.getId(), packet.objectId(), packet.damage(), packet.monsterIdFrom()), player, summon.getPosition());
+         MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), new DamageSummon(player.getId(), packet.objectId(), packet.damage(), packet.monsterIdFrom()), player, summon.position());
       }
    }
 }

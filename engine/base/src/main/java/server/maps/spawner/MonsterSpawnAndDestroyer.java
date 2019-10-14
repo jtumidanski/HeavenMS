@@ -42,8 +42,8 @@ public class MonsterSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Mapl
 
    @Override
    public void sendDestroyData(MapleMonster object, MapleClient client) {
-      PacketCreator.announce(client, new KillMonster(object.getObjectId(), false));
-      PacketCreator.announce(client, new KillMonster(object.getObjectId(), true));
+      PacketCreator.announce(client, new KillMonster(object.objectId(), false));
+      PacketCreator.announce(client, new KillMonster(object.objectId(), true));
    }
 
    @Override

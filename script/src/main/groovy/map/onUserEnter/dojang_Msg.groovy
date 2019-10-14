@@ -8,7 +8,7 @@ class Mapdojang_Msg {
 
    def start(MapScriptMethods ms) {
       if (ms.getPlayer().getMap().getId() == 925020000) {
-         if (ms.getPlayer().getMap().findClosestPlayerSpawnpoint(ms.getPlayer().getPosition()).getId() == 0) {
+         if (ms.getPlayer().getMap().findClosestPlayerSpawnpoint(ms.getPlayer().position()).getId() == 0) {
             int messageIndex = (Math.random() * messages.length) | 0
             ms.getPlayer().startMapEffect(messages[messageIndex], 5120024)
          }

@@ -247,7 +247,7 @@ class EventPapulatusBattle {
    }
 
    static def isPapulatus(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return mobid == 8500002
    }
 

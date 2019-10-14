@@ -25,7 +25,7 @@ class Quest20527 {
          if (status == 0) {
             MapleMount mount = qm.getPlayer().getMount()
 
-            if (mount != null && mount.getLevel() >= 3) {
+            if (mount != null && mount.level() >= 3) {
                qm.forceCompleteQuest()
                qm.sendNext("Alright, I'll get you started in how to train Mimio, the next step for Mimianas. When you're ready, talk to me again.")
             } else {

@@ -107,7 +107,7 @@ public class DebuffCommand extends Command {
          return;
       }
 
-      for (MapleMapObject mmo : player.getMap().getMapObjectsInRange(player.getPosition(), 777777.7, Collections.singletonList(MapleMapObjectType.PLAYER))) {
+      for (MapleMapObject mmo : player.getMap().getMapObjectsInRange(player.position(), 777777.7, Collections.singletonList(MapleMapObjectType.PLAYER))) {
          MapleCharacter chr = (MapleCharacter) mmo;
 
          if (chr.getId() != player.getId()) {

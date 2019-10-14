@@ -319,14 +319,14 @@ public class MapleMapFactory {
 
    private static AbstractLoadedMapleLife loadLife(int id, String type, int cy, int f, int fh, int rx0, int rx1, int x, int y, int hide) {
       AbstractLoadedMapleLife myLife = MapleLifeFactory.getLife(id, type);
-      myLife.setCy(cy);
-      myLife.setF(f);
-      myLife.setFh(fh);
-      myLife.setRx0(rx0);
-      myLife.setRx1(rx1);
-      myLife.setPosition(new Point(x, y));
+      myLife.cy_$eq(cy);
+      myLife.f_$eq(f);
+      myLife.fh_$eq(fh);
+      myLife.rx0_$eq(rx0);
+      myLife.rx1_$eq(rx1);
+      myLife.position_$eq(new Point(x, y));
       if (hide == 1) {
-         myLife.setHide(true);
+         myLife.hide_$eq(true);
       }
       return myLife;
    }
@@ -336,7 +336,7 @@ public class MapleMapFactory {
       int x = MapleDataTool.getInt(reactor.getChildByPath("x"));
       int y = MapleDataTool.getInt(reactor.getChildByPath("y"));
       myReactor.setFacingDirection(FacingDirection);
-      myReactor.setPosition(new Point(x, y));
+      myReactor.position_$eq(new Point(x, y));
       myReactor.setDelay(MapleDataTool.getInt(reactor.getChildByPath("reactorTime")) * 1000);
       myReactor.setName(MapleDataTool.getString(reactor.getChildByPath("name"), ""));
       myReactor.resetReactorActions(0);

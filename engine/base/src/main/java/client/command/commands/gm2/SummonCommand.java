@@ -71,7 +71,7 @@ public class SummonCommand extends Command {
 
          MapleMap map = player.getMap();
          victim.saveLocationOnWarp();
-         victim.forceChangeMap(map, map.findClosestPortal(player.getPosition()));
+         victim.forceChangeMap(map, map.findClosestPortal(player.position()));
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Unknown player.");
       }

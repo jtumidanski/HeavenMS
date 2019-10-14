@@ -53,7 +53,7 @@ public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobP
 
          if (packet.damage() < 0 || packet.damage() > GameConstants.MAX_FIELD_MOB_DAMAGE) {
             MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(packet.mobId(), packet.damage()), true, chr);
-            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.getId()) + " with damage " + packet.damage());
+            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.id()) + " with damage " + packet.damage());
             return;
          }
       }

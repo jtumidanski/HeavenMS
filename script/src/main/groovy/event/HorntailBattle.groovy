@@ -266,12 +266,12 @@ class EventHorntailBattle {
    }
 
    static def isHorntailHead(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 8810000 || mobid == 8810001)
    }
 
    static def isHorntail(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 8810018)
    }
 

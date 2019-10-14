@@ -93,7 +93,7 @@ public final class QuestActionHandler extends AbstractPacketHandler<QuestActionP
 
    private boolean isNpcNearby(QuestActionPacket packet, MapleCharacter player, MapleQuest quest, int npcId) {
       Point playerP;
-      Point pos = player.getPosition();
+      Point pos = player.position();
 
       if (packet.x() != -1 && packet.y() != -1) {
          playerP = new Point(packet.x(), packet.y());
@@ -110,7 +110,7 @@ public final class QuestActionHandler extends AbstractPacketHandler<QuestActionP
             return false;
          }
 
-         Point npcP = npc.getPosition();
+         Point npcP = npc.position();
          if (Math.abs(npcP.getX() - playerP.getX()) > 1200 || Math.abs(npcP.getY() - playerP.getY()) > 800) {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Approach the NPC to fulfill this quest operation.");
             return false;

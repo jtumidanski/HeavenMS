@@ -36,12 +36,12 @@ public class SpawnPoint {
    private boolean immobile, denySpawn = false;
 
    public SpawnPoint(final MapleMonster monster, Point pos, boolean immobile, int mobTime, int mobInterval, int team) {
-      this.monster = monster.getId();
+      this.monster = monster.id();
       this.pos = new Point(pos);
       this.mobTime = mobTime;
       this.team = team;
-      this.fh = monster.getFh();
-      this.f = monster.getF();
+      this.fh = monster.fh();
+      this.f = monster.f();
       this.immobile = immobile;
       this.mobInterval = mobInterval;
       this.nextPossibleSpawn = Server.getInstance().getCurrentTime();
@@ -72,10 +72,10 @@ public class SpawnPoint {
 
    public MapleMonster getMonster() {
       MapleMonster mob = new MapleMonster(MapleLifeFactory.getMonster(monster));
-      mob.setPosition(new Point(pos));
+      mob.position_$eq(new Point(pos));
       mob.setTeam(team);
-      mob.setFh(fh);
-      mob.setF(f);
+      mob.fh_$eq(fh);
+      mob.f_$eq(f);
       spawnedMonsters.incrementAndGet();
       mob.addListener(new MonsterListener() {
          @Override

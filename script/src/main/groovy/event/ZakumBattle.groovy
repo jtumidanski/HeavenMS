@@ -248,7 +248,7 @@ class EventZakumBattle {
    }
 
    static def isZakum(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 8800002)
    }
 

@@ -46,7 +46,7 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
 
    protected void addAnnounceBox(final MaplePacketLittleEndianWriter writer, MapleMiniGame game, int amount, int joinable) {
       writer.write(game.getGameType().getValue());
-      writer.writeInt(game.getObjectId()); // gameid/shopid
+      writer.writeInt(game.objectId()); // gameid/shopid
       writer.writeMapleAsciiString(game.getDescription()); // desc
       writer.writeBool(!game.getPassword().isEmpty());    // password here, thanks GabrielSin!
       writer.write(game.getPieceType());
@@ -63,7 +63,7 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    protected void updatePlayerShopBoxInfo(final MaplePacketLittleEndianWriter writer, MaplePlayerShop shop) {
       byte[] roomInfo = shop.getShopRoomInfo();
       writer.write(4);
-      writer.writeInt(shop.getObjectId());
+      writer.writeInt(shop.objectId());
       writer.writeMapleAsciiString(shop.getDescription());
       writer.write(0);                 // pw
       writer.write(shop.getItemId() % 100);

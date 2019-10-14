@@ -104,7 +104,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
       int itemGanho = ii.getCreateItem(itemId);
       int mobItem = ii.getMobItem(itemId);
 
-      if (itemGanho != 0 && mobItem == mob.getId()) {
+      if (itemGanho != 0 && mobItem == mob.id()) {
          int timeCatch = ii.getUseDelay(itemId);
          int mobHp = ii.getMobHP(itemId);
 
@@ -114,7 +114,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
                mob.getMap().killMonster(mob, null, false);
                MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
                MapleInventoryManipulator.addById(client, itemGanho, (short) 1, "", -1);
-            } else if (mob.getId() != 9500336) {
+            } else if (mob.id() != 9500336) {
                if (mobHp != 0) {
                   abm.spam(10);
                   PacketCreator.announce(client, new CatchMonsterFailure(0));
@@ -128,7 +128,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void useFishNet(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9500336) {
+      if (mob.id() == 9500336) {
          if ((abm.getLastSpam(10) + 3000) < currentServerTime()) {
             abm.spam(10);
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
@@ -143,7 +143,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void usePurificationMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9300175) {
+      if (mob.id() == 9300175) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
@@ -157,7 +157,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void useThirdTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9300191) {
+      if (mob.id() == 9300191) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 3)) {
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
@@ -171,7 +171,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void useSecondTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9300189) {
+      if (mob.id() == 9300189) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 3)) {
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
@@ -185,7 +185,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void useFirstTransparentMarble(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9300187) {
+      if (mob.id() == 9300187) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 3)) {
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
@@ -199,7 +199,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void useCliffsMagicCane(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9500320) {
+      if (mob.id() == 9500320) {
          if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
             mob.getMap().killMonster(mob, null, false);
@@ -213,7 +213,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void useElementRock(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9300157) {
+      if (mob.id() == 9300157) {
          if ((abm.getLastSpam(10) + 800) < currentServerTime()) {
             if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
                if (chr.canHold(4031868, 1)) {
@@ -239,7 +239,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void usePouch(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9500197) {
+      if (mob.id() == 9500197) {
          if ((abm.getLastSpam(10) + 1000) < currentServerTime()) {
             if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
                MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
@@ -256,7 +256,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    }
 
    private void usePheromonePerfume(MapleClient client, MapleCharacter chr, int monsterId, int itemId, MapleMonster mob) {
-      if (mob.getId() == 9300101) {
+      if (mob.id() == 9300101) {
          MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 1));
          mob.getMap().killMonster(mob, null, false);
          MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);

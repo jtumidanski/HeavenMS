@@ -71,20 +71,20 @@ public class WhereaMiCommand extends Command {
 
       player.yellowMessage("Players on this map:");
       for (MapleCharacter chr : chars) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + chr.getName() + " - " + chr.getId() + " - Oid: " + chr.getObjectId());
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + chr.getName() + " - " + chr.getId() + " - Oid: " + chr.objectId());
       }
 
       if (!playernpcs.isEmpty()) {
          player.yellowMessage("PlayerNPCs on this map:");
          for (MaplePlayerNPC pnpc : playernpcs) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + pnpc.getName() + " - Scriptid: " + pnpc.getScriptId() + " - Oid: " + pnpc.getObjectId());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + pnpc.getName() + " - Scriptid: " + pnpc.getScriptId() + " - Oid: " + pnpc.objectId());
          }
       }
 
       if (!npcs.isEmpty()) {
          player.yellowMessage("NPCs on this map:");
          for (MapleNPC npc : npcs) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + npc.getName() + " - " + npc.getId() + " - Oid: " + npc.getObjectId());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + npc.getName() + " - " + npc.id() + " - Oid: " + npc.objectId());
          }
       }
 
@@ -92,7 +92,7 @@ public class WhereaMiCommand extends Command {
          player.yellowMessage("Monsters on this map:");
          for (MapleMonster mob : mobs) {
             if (mob.isAlive()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + mob.getName() + " - " + mob.getId() + " - Oid: " + mob.getObjectId());
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + mob.getName() + " - " + mob.id() + " - Oid: " + mob.objectId());
             }
          }
       }

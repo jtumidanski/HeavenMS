@@ -58,8 +58,8 @@ public final class MapleOxQuiz {
    }
 
    private boolean isCorrectAnswer(MapleCharacter chr, int answer) {
-      double x = chr.getPosition().getX();
-      double y = chr.getPosition().getY();
+      double x = chr.position().getX();
+      double y = chr.position().getY();
       if ((x > -234 && y > -26 && answer == 0) || (x < -234 && y > -26 && answer == 1)) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Correct!");
          return true;

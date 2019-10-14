@@ -86,7 +86,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
             return;
          } else if (ItemConstants.isTownScroll(packet.itemId())) {
             int banMap = chr.getMapId();
-            int banSp = chr.getMap().findClosestPlayerSpawnpoint(chr.getPosition()).getId();
+            int banSp = chr.getMap().findClosestPlayerSpawnpoint(chr.position()).getId();
             long banTime = currentServerTime();
 
             if (ii.getItemEffect(toUse.id()).applyTo(chr)) {

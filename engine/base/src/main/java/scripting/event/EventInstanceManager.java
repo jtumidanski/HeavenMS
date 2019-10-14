@@ -585,9 +585,9 @@ public class EventInstanceManager {
          int inc;
 
          if (ServerConstants.JAVA_8) {
-            inc = (int) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.getId());
+            inc = (int) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.id());
          } else {
-            inc = ((Double) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.getId())).intValue();
+            inc = ((Double) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.id())).intValue();
          }
 
          if (inc != 0) {
@@ -896,11 +896,11 @@ public class EventInstanceManager {
    public void spawnNpc(int npcId, Point pos, MapleMap map) {
       MapleNPC npc = MapleLifeFactory.getNPC(npcId);
       if (npc != null) {
-         npc.setPosition(pos);
-         npc.setCy(pos.y);
-         npc.setRx0(pos.x + 50);
-         npc.setRx1(pos.x - 50);
-         npc.setFh(map.getFootholds().findBelow(pos).id());
+         npc.position_$eq(pos);
+         npc.cy_$eq(pos.y);
+         npc.rx0_$eq(pos.x + 50);
+         npc.rx1_$eq(pos.x - 50);
+         npc.fh_$eq(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
          MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
       }

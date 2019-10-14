@@ -48,7 +48,7 @@ public class PlayerNpcCommand extends Command {
       Optional<MapleCharacter> target = c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]);
 
       if (target.isPresent()) {
-         if (!MaplePlayerNPC.spawnPlayerNPC(player.getMapId(), player.getPosition(), target.get())) {
+         if (!MaplePlayerNPC.spawnPlayerNPC(player.getMapId(), player.position(), target.get())) {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not deploy PlayerNPC. Either there's no room available here or depleted out scriptids to use.");
          }
       }

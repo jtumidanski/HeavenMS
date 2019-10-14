@@ -367,7 +367,7 @@ public class CharacterProcessor {
          portal = mapleCharacter.getMap().getPortal(0);
          mapleCharacter.setInitialSpawnPoint(0);
       }
-      mapleCharacter.setPosition(portal.getPosition());
+      mapleCharacter.position_$eq(portal.getPosition());
    }
 
    private void loadPetIgnores(Connection connection, CharacterData data, MapleCharacter mapleCharacter) {

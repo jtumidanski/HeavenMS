@@ -202,7 +202,7 @@ class EventMahaBattle {
    }
 
    static def isMaha(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return mobid == 9001014
    }
 

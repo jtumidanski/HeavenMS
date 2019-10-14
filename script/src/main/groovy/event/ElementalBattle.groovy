@@ -260,7 +260,7 @@ class EventElementalBattle {
    }
 
    static def isElemental(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return mobid == 9300086 || mobid == 9300100
    }
 

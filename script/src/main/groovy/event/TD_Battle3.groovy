@@ -186,7 +186,7 @@ class EventTD_Battle3 {
    }
 
    def isTDBoss(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return mobid == tdBossId
    }
 

@@ -86,7 +86,7 @@ public class ItemDropCommand extends Command {
                toDrop.owner_$eq("TRIAL-MODE");
             }
 
-            c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
+            c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().position(), true, true);
 
             return;
          } else {
@@ -113,6 +113,6 @@ public class ItemDropCommand extends Command {
          toDrop.owner_$eq("TRIAL-MODE");
       }
 
-      c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().getPosition(), true, true);
+      c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().position(), true, true);
    }
 }

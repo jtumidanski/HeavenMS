@@ -23,6 +23,7 @@ package server.life;
 
 import client.MapleClient;
 import server.MapleShopFactory;
+import server.life.AbstractLoadedMapleLife;
 import server.maps.MapleMapObjectType;
 import server.processor.MapleShopProcessor;
 
@@ -35,15 +36,15 @@ public class MapleNPC extends AbstractLoadedMapleLife {
    }
 
    public boolean hasShop() {
-      return MapleShopFactory.getInstance().getShopForNPC(getId()) != null;
+      return MapleShopFactory.getInstance().getShopForNPC(id()) != null;
    }
 
    public void sendShop(MapleClient c) {
-      MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShopForNPC(getId()), c);
+      MapleShopProcessor.getInstance().sendShop(MapleShopFactory.getInstance().getShopForNPC(id()), c);
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.NPC;
    }
 

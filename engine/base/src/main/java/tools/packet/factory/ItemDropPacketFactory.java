@@ -21,12 +21,12 @@ public class ItemDropPacketFactory extends AbstractPacketFactory {
 
    protected void updateMapItemObject(MaplePacketLittleEndianWriter writer, UpdateMapItemObject packet) {
       writer.write(2);
-      writer.writeInt(packet.getMapItem().getObjectId());
+      writer.writeInt(packet.getMapItem().objectId());
       writer.writeBool(packet.getMapItem().getMeso() > 0);
       writer.writeInt(packet.getMapItem().getItemId());
       writer.writeInt(packet.isGiveOwnership() ? 0 : -1);
       writer.write(packet.getMapItem().hasExpiredOwnershipTime() ? 2 : packet.getMapItem().getDropType());
-      writer.writePos(packet.getMapItem().getPosition());
+      writer.writePos(packet.getMapItem().position());
       writer.writeInt(packet.isGiveOwnership() ? 0 : -1);
 
       if (packet.getMapItem().getMeso() == 0) {
@@ -42,13 +42,13 @@ public class ItemDropPacketFactory extends AbstractPacketFactory {
       }
 
       writer.write(packet.getMod());
-      writer.writeInt(packet.getMapItem().getObjectId());
+      writer.writeInt(packet.getMapItem().objectId());
       writer.writeBool(packet.getMapItem().getMeso() > 0); // 1 mesos, 0 item, 2 and above all item meso bag,
       writer.writeInt(packet.getMapItem().getItemId()); // drop object ID
       writer.writeInt(packet.getMapItem().getClientsideOwnerId()); // owner charid/partyid :)
       writer.write(dropType); // 0 = timeout for non-owner, 1 = timeout for non-owner's party, 2 = FFA, 3 = explosive/FFA
       writer.writePos(packet.getDropTo());
-      writer.writeInt(packet.getMapItem().getDropper().getObjectId()); // dropper oid, found thanks to Li Jixue
+      writer.writeInt(packet.getMapItem().getDropper().objectId()); // dropper oid, found thanks to Li Jixue
 
       if (packet.getMod() != 2) {
          writer.writePos(packet.getDropFrom());

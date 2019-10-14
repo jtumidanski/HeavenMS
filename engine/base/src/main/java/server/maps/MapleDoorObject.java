@@ -47,7 +47,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
 
    public MapleDoorObject(int owner, int destinationMapId, int originMapId, int townPortalId, Point targetPosition, Point toPosition) {
       super();
-      setPosition(targetPosition);
+      position_$eq(targetPosition);
 
       ownerId = owner;
       linkedPortalId = townPortalId;
@@ -132,7 +132,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    }
 
    public Point getAreaPosition() {
-      return !inTown() ? getPosition() : getLinkedPortalPosition();
+      return !inTown() ? this.position() : getLinkedPortalPosition();
    }
 
    public Point toPosition() {
@@ -144,7 +144,7 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.DOOR;
    }
 }

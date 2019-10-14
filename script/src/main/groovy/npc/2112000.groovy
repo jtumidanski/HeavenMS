@@ -29,13 +29,13 @@ class NPC2112000 {
    }
 
    def playersTooClose() {
-      Point npcpos = cm.getMap().getMapObject(cm.getNpcObjectId()).getPosition()
+      Point npcpos = cm.getMap().getMapObject(cm.getNpcObjectId()).position()
       MapleMapObject[] listchr = cm.getMap().getPlayers()
 
       for (Iterator<MapleMapObject> iterator = listchr.iterator(); iterator.hasNext();) {
          MapleMapObject chr = iterator.next()
 
-         Point chrpos = chr.getPosition()
+         Point chrpos = chr.position()
          if (Math.sqrt(Math.pow((npcpos.getX() - chrpos.getX()), 2) + Math.pow((npcpos.getY() - chrpos.getY()), 2)) < 310) {
             return true
          }

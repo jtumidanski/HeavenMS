@@ -36,6 +36,6 @@ public class PianusCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(8510000), player.getPosition());
+      player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(8510000), player.position());
    }
 }

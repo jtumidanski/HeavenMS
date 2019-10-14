@@ -45,6 +45,6 @@ public class CakeCommand extends Command {
          monster.setStartingHp(newHp);
       }
 
-      player.getMap().spawnMonsterOnGroundBelow(monster, player.getPosition());
+      player.getMap().spawnMonsterOnGroundBelow(monster, player.position());
    }
 }

@@ -182,7 +182,7 @@ class NPC9201044 {
                         MapleCharacter[] party = cm.getEventInstance().getPlayers()
                         for (int i = 0; i < party.size(); i++) {
                            for (int y = 0; y < map.getAreas().size(); y++) {
-                              if (map.getArea(y).contains(party[i].getPosition())) {
+                              if (map.getArea(y).contains(party[i].position())) {
                                  playersOnCombo++
                                  objset[y] += 1
                                  break

@@ -46,7 +46,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
          }
 
          this.movementType = movementType;
-         setPosition(pos);
+         position_$eq(pos);
       });
    }
 
@@ -79,7 +79,7 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.SUMMON;
    }
 

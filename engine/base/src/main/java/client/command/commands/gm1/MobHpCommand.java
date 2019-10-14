@@ -38,7 +38,7 @@ public class MobHpCommand extends Command {
       MapleCharacter player = c.getPlayer();
       for (MapleMonster monster : player.getMap().getAllMonsters()) {
          if (monster != null && monster.getHp() > 0) {
-            player.yellowMessage(monster.getName() + " (" + monster.getId() + ") has " + monster.getHp() + " / " + monster.getMaxHp() + " HP.");
+            player.yellowMessage(monster.getName() + " (" + monster.id() + ") has " + monster.getHp() + " / " + monster.getMaxHp() + " HP.");
 
          }
       }

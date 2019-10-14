@@ -92,7 +92,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
             MapleMapObject mmo = map.getMapObject(oid);
             if (mmo instanceof MapleMonster) {
                attacker = (MapleMonster) mmo;
-               if (attacker.getId() != monsteridfrom) {
+               if (attacker.id() != monsteridfrom) {
                   attacker = null;
                }
             }
@@ -108,9 +108,9 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   if (loseItems != null) {
                      if (chr.getBuffEffect(MapleBuffStat.AURA) == null) {
                         MapleInventoryType type;
-                        final int playerpos = chr.getPosition().x;
+                        final int playerpos = chr.position().x;
                         byte d = 1;
-                        Point pos = new Point(0, chr.getPosition().y);
+                        Point pos = new Point(0, chr.position().y);
                         for (LoseItem loseItem : loseItems) {
                            type = ItemConstants.getInventoryType(loseItem.id());
 
@@ -139,7 +139,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
 
                               for (byte b = 0; b < qty; b++) {
                                  pos.x = playerpos + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
-                                 map.spawnItemDrop(chr, chr, new Item(loseItem.id(), (short) 0, (short) 1), map.calcDropPos(pos, chr.getPosition()), true, true);
+                                 map.spawnItemDrop(chr, chr, new Item(loseItem.id(), (short) 0, (short) 1), map.calcDropPos(pos, chr.position()), true, true);
                                  d++;
                               }
                            }

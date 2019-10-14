@@ -56,7 +56,7 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
    public void handlePacket(NoOpPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
       try {
-         for (MapleMapObject mmo : chr.getMap().getMapObjectsInRange(chr.getPosition(), 23000, Arrays.asList(MapleMapObjectType.HIRED_MERCHANT, MapleMapObjectType.PLAYER))) {
+         for (MapleMapObject mmo : chr.getMap().getMapObjectsInRange(chr.position(), 23000, Arrays.asList(MapleMapObjectType.HIRED_MERCHANT, MapleMapObjectType.PLAYER))) {
             if (mmo instanceof MapleCharacter) {
                MapleCharacter mc = (MapleCharacter) mmo;
 
@@ -71,7 +71,7 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
             }
          }
 
-         Point cpos = chr.getPosition();
+         Point cpos = chr.position();
          MaplePortal portal = chr.getMap().findClosestTeleportPortal(cpos);
          if (portal != null && portal.getPosition().distance(cpos) < 120.0) {
             PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.NOT_NEAR_PORTAL));

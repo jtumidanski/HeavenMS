@@ -180,7 +180,7 @@ class EventMK_PrimeMinister {
 
    // Happens when an opposing mob dies
    def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
-      if (mob.getId() == mobId) {
+      if (mob.id() == mobId) {
          eim.getMapInstance(entryMap).getPortal(1).setPortalState(true)
 
          eim.showClearEffect()

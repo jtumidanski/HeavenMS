@@ -49,8 +49,8 @@ public final class ItemPickupHandler extends AbstractPacketHandler<ItemPickupPac
          return;
       }
 
-      Point charPos = chr.getPosition();
-      Point obPos = ob.getPosition();
+      Point charPos = chr.position();
+      Point obPos = ob.position();
       if (Math.abs(charPos.getX() - obPos.getX()) > 800 || Math.abs(charPos.getY() - obPos.getY()) > 600) {
          FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to pick up an item too far away. Mapid: " + chr.getMapId() + " Player pos: " + charPos + " Object pos: " + obPos);
          return;

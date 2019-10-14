@@ -14,24 +14,24 @@ public class MapleKite extends AbstractMapleMapObject {
 
    public MapleKite(MapleCharacter owner, String text, int itemId) {
       this.owner = owner;
-      this.pos = owner.getPosition();
+      this.pos = owner.position();
       this.ft = owner.getFh();
       this.text = text;
       this.itemId = itemId;
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.KITE;
    }
 
    @Override
-   public Point getPosition() {
+   public Point position() {
       return pos.getLocation();
    }
 
    @Override
-   public void setPosition(Point position) {
+   public void position_$eq(Point position) {
       throw new UnsupportedOperationException();
    }
 

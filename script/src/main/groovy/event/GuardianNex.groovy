@@ -135,7 +135,7 @@ class EventGuardianNex {
    // Happens when an opposing mob dies
    def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
       int nex = eim.getIntProperty("nex")
-      if (mob.getId() == eventBossIds[nex]) {
+      if (mob.id() == eventBossIds[nex]) {
          eim.showClearEffect()
          eim.clearPQ()
       }

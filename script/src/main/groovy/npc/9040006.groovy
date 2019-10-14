@@ -199,7 +199,7 @@ class NPC9040006 {
 
          //check item location
          for (int i = 0; i < 4; i++) {
-            if (cm.getPlayer().getMap().getArea(i).contains(item.getPosition())) {
+            if (cm.getPlayer().getMap().getArea(i).contains(item.position())) {
                itemInArea[i] = id - 4001027
                break
             }

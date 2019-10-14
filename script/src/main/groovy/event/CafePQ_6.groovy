@@ -212,7 +212,7 @@ class EventCafePQ_6 {
       MapleCharacter dropper = eim.getPlayers().get(0)
 
       itemObj.quantity_$eq((short) getDroppedQuantity(mob))
-      mapObj.spawnItemDrop(mob, dropper, itemObj, mob.getPosition(), true, false)
+      mapObj.spawnItemDrop(mob, dropper, itemObj, mob.position(), true, false)
    }
 
    // Invoked when a monster that's registered has been killed

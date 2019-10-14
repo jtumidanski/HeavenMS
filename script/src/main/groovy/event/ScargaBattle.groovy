@@ -245,7 +245,7 @@ class EventScargaBattle {
    }
 
    static def isScarga(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 9420544) || (mobid == 9420549)
    }
 

@@ -89,7 +89,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      }
 
                      Point spawnPos = client.getPlayer().getMap().getRandomSP(client.getPlayer().getTeam());
-                     mob.setPosition(spawnPos);
+                     mob.position_$eq(spawnPos);
 
                      client.getPlayer().getMap().addMonsterSpawn(mob, 1, client.getPlayer().getTeam());
                      client.getPlayer().getMap().addAllMonsterSpawn(mob, 1, client.getPlayer().getTeam());

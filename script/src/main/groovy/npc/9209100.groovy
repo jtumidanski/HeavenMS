@@ -40,7 +40,7 @@ class NPC9209100 {
          }
 
          if (status == 0) {
-            if (playerNearby(cm.getPlayer().getPosition(), cm.getMap().getPortal("chimney01").getPosition())) {
+            if (playerNearby(cm.getPlayer().position(), cm.getMap().getPortal("chimney01").getPosition())) {
                cm.sendOk("Hey, hey~~ Please don't go sneaking into someone else's house without permission, you don't want to get a naughty remark on Santa's list this year, do you?")
             } else {
                cm.sendOk("Hohoho~~ have you a Great Year full of health, realization and happiness!")

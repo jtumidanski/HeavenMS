@@ -320,7 +320,7 @@ class EventWeddingCathedral {
    }
 
    static def isCakeBoss(MapleMonster mob) {
-      return mob.getId() == 9400606
+      return mob.id() == 9400606
    }
 
    // Happens when a player left the party

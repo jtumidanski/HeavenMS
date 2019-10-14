@@ -246,7 +246,7 @@ class EventHolidayPQ_3 {
       // 77% chance of not fake
       MapleCharacter dropper = eim.getPlayers().get(0)
 
-      mapObj.spawnItemDrop(mob, dropper, itemObj, mob.getPosition(), true, false)
+      mapObj.spawnItemDrop(mob, dropper, itemObj, mob.position(), true, false)
       eim.setIntProperty("missingDrops", 0)
    }
 
@@ -384,7 +384,7 @@ class EventHolidayPQ_3 {
    }
 
    static def isScrooge(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return mobid >= 9400319 && mobid <= 9400321
    }
 

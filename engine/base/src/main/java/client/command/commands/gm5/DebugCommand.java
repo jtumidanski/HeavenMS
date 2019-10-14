@@ -69,11 +69,11 @@ public class DebugCommand extends Command {
             break;
 
          case "monster":
-            List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+            List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
             for (MapleMapObject monstermo : monsters) {
                MapleMonster monster = (MapleMonster) monstermo;
                MapleCharacter controller = monster.getController();
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Monster ID: " + monster.getId() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Monster ID: " + monster.id() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
             }
             break;
 
@@ -82,7 +82,7 @@ public class DebugCommand extends Command {
             break;
 
          case "portal":
-            MaplePortal portal = player.getMap().findClosestPortal(player.getPosition());
+            MaplePortal portal = player.getMap().findClosestPortal(player.position());
             if (portal != null) {
                MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Closest portal: " + portal.getId() + " '" + portal.getName() + "' Type: " + portal.getType() + " --> toMap: " + portal.getTargetMapId() + " scriptname: '" + portal.getScriptName() + "' state: " + (portal.getPortalState() ? 1 : 0) + ".");
             } else {
@@ -91,7 +91,7 @@ public class DebugCommand extends Command {
             break;
 
          case "spawnpoint":
-            SpawnPoint sp = player.getMap().findClosestSpawnpoint(player.getPosition());
+            SpawnPoint sp = player.getMap().findClosestSpawnpoint(player.position());
             if (sp != null) {
                MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Closest mob spawn point: " + " Position: x " + sp.getPosition().getX() + " y " + sp.getPosition().getY() + " Spawns mobid: '" + sp.getMonsterId() + "' --> canSpawn: " + !sp.getDenySpawn() + " canSpawnRightNow: " + sp.shouldSpawn() + ".");
             } else {
@@ -100,7 +100,7 @@ public class DebugCommand extends Command {
             break;
 
          case "pos":
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current map position: (" + player.getPosition().getX() + ", " + player.getPosition().getY() + ").");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current map position: (" + player.position().getX() + ", " + player.position().getY() + ").");
             break;
 
          case "map":
@@ -134,7 +134,7 @@ public class DebugCommand extends Command {
 
             for (MapleMapObject mmo : player.getMap().getReactors()) {
                MapleReactor mr = (MapleReactor) mmo;
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Id: " + mr.getId() + " Oid: " + mr.getObjectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.getPosition().getX() + " y " + mr.getPosition().getY() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Id: " + mr.getId() + " Oid: " + mr.objectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.position().getX() + " y " + mr.position().getY() + ".");
             }
             break;
 

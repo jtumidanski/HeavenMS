@@ -23,36 +23,16 @@ package server.maps;
 
 import java.awt.Point;
 
-public abstract class AbstractMapleMapObject implements MapleMapObject {
-   private Point position = new Point();
-   private int objectId;
+public interface MapleMapObject {
+   int objectId();
 
-   @Override
-   public abstract MapleMapObjectType getType();
+   void objectId_$eq(int id);
 
-   @Override
-   public Point getPosition() {
-      return new Point(position);
-   }
+   MapleMapObjectType type();
 
-   @Override
-   public void setPosition(Point position) {
-      this.position.x = position.x;
-      this.position.y = position.y;
-   }
+   Point position();
 
-   @Override
-   public int getObjectId() {
-      return objectId;
-   }
+   void position_$eq(Point position);
 
-   @Override
-   public void setObjectId(int id) {
-      this.objectId = id;
-   }
-
-   @Override
-   public void nullifyPosition() {
-      this.position = null;
-   }
+   void nullifyPosition();
 }

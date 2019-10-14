@@ -80,7 +80,7 @@ class NPC9020001 {
 
       for (int i = 0; i < eim.getPlayerCount(); i++) {
          for (int j = 0; j < areaRects.length; j++) {
-            if (areaRects[j].contains(players[i].getPosition())) {
+            if (areaRects[j].contains(players[i].position())) {
                playerPlacement[j] += 1
                break
             }

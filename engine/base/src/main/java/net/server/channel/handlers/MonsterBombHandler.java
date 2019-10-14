@@ -41,8 +41,8 @@ public final class MonsterBombHandler extends AbstractPacketHandler<MonsterBombP
       if (!client.getPlayer().isAlive() || monster == null) {
          return;
       }
-      if (monster.getId() == 8500003 || monster.getId() == 8500004) {
-         MasterBroadcaster.getInstance().sendToAllInMap(monster.getMap(), new KillMonster(monster.getObjectId(), 4));
+      if (monster.id() == 8500003 || monster.id() == 8500004) {
+         MasterBroadcaster.getInstance().sendToAllInMap(monster.getMap(), new KillMonster(monster.objectId(), 4));
          client.getPlayer().getMap().removeMapObject(packet.objectId());
       }
    }

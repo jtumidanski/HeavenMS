@@ -135,7 +135,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void sprayItems(boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-      sprayItems((int) reactor.getPosition().getX(), (int) reactor.getPosition().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
+      sprayItems((int) reactor.position().getX(), (int) reactor.position().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
    }
 
    public void sprayItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
@@ -151,7 +151,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void dropItems(boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-      dropItems((int) reactor.getPosition().getX(), (int) reactor.getPosition().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
+      dropItems((int) reactor.position().getX(), (int) reactor.position().getY(), meso, mesoChance, minMeso, maxMeso, minItems);
    }
 
    public void dropItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
@@ -183,7 +183,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
                int range = maxMeso - minMeso;
                int displayDrop = (int) (Math.random() * range) + minMeso;
                int mesoDrop = (displayDrop * c.getWorldServer().getMesoRate());
-               reactor.getMap().spawnMesoDrop(mesoDrop, reactor.getMap().calcDropPos(dropPos, reactor.getPosition()), reactor, c.getPlayer(), false, (byte) 2);
+               reactor.getMap().spawnMesoDrop(mesoDrop, reactor.getMap().calcDropPos(dropPos, reactor.position()), reactor, c.getPlayer(), false, (byte) 2);
             } else {
                Item drop;
 
@@ -216,7 +216,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
                   int range = maxMeso - minMeso;
                   int displayDrop = (int) (Math.random() * range) + minMeso;
                   int mesoDrop = (displayDrop * worldMesoRate);
-                  r.getMap().spawnMesoDrop(mesoDrop, r.getMap().calcDropPos(dropPos, r.getPosition()), r, chr, false, (byte) 2);
+                  r.getMap().spawnMesoDrop(mesoDrop, r.getMap().calcDropPos(dropPos, r.position()), r, chr, false, (byte) 2);
                } else {
                   Item drop;
 
@@ -282,7 +282,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public Point getPosition() {
-      Point pos = reactor.getPosition();
+      Point pos = reactor.position();
       pos.y -= 10;
       return pos;
    }
@@ -309,7 +309,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
 
          if (chr != null) {
             map.damageMonster(chr, mm, damage);
-            MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(mm.getObjectId(), damage));
+            MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(mm.objectId(), damage));
          }
       }
    }

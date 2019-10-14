@@ -22,14 +22,14 @@ public class SummonSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Maple
 
    @Override
    public void sendSpawnData(MapleSummon object, MapleClient client) {
-      PacketCreator.announce(client, new SpawnSummon(object.getOwner().getId(), object.getObjectId(),
-            object.getSkill(), object.getSkillLevel(), object.getPosition(), object.getStance(),
+      PacketCreator.announce(client, new SpawnSummon(object.getOwner().getId(), object.objectId(),
+            object.getSkill(), object.getSkillLevel(), object.position(), object.stance(),
             object.getMovementType().getValue(), object.isPuppet(), false));
    }
 
    @Override
    public void sendDestroyData(MapleSummon object, MapleClient client) {
-      PacketCreator.announce(client, new RemoveSummon(object.getOwner().getId(), object.getObjectId(), true));
+      PacketCreator.announce(client, new RemoveSummon(object.getOwner().getId(), object.objectId(), true));
    }
 
    @Override

@@ -502,7 +502,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.MINI_GAME;
    }
 

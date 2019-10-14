@@ -51,7 +51,7 @@ class NPC1104101 {
             cm.sendOk("Darn, you found me! Then, there's only one way out! Let's fight, like #rBlack Wings#k should!")
          } else if (status == 1) {
             MapleMap mapobj = cm.getMap()
-            Point npcpos = mapobj.getMapObject(cm.getNpcObjectId()).getPosition()
+            Point npcpos = mapobj.getMapObject(cm.getNpcObjectId()).position()
 
             spawnMob(npcpos.x, npcpos.y, 9001009, mapobj)
             mapobj.destroyNPC(npcid)

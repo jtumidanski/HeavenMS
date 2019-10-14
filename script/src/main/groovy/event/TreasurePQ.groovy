@@ -272,7 +272,7 @@ class EventTreasurePQ {
    }
 
    static def isMV(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 9400589)
    }
 

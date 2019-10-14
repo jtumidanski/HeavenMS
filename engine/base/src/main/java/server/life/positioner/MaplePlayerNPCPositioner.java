@@ -161,8 +161,8 @@ public class MaplePlayerNPCPositioner {
 
             for (MaplePlayerNPC pn : playerNpcs) {
                m.removeMapObject(pn);
-               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.objectId()));
             }
          }
 
@@ -188,7 +188,7 @@ public class MaplePlayerNPCPositioner {
       List<MapleMapObject> mmoList = map.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC));
       List<Point> otherPlayerNpcs = new LinkedList<>();
       for (MapleMapObject mmo : mmoList) {
-         otherPlayerNpcs.add(mmo.getPosition());
+         otherPlayerNpcs.add(mmo.position());
       }
 
       int cx = calcDx(initStep), cy = calcDy(initStep);

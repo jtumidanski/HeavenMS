@@ -278,7 +278,7 @@ class EventEllinPQ {
    }
 
    static def isPoisonGolem(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 9300182)
    }
 

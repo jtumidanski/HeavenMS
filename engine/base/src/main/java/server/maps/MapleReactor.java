@@ -120,7 +120,7 @@ public class MapleReactor extends AbstractMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.REACTOR;
    }
 
@@ -256,7 +256,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                         if (stats.getNextState(state, b) == -1) {//end of reactor
                            if (reactorType < 100) {//reactor broken
                               if (delay > 0) {
-                                 map.destroyReactor(getObjectId());
+                                 map.destroyReactor(this.objectId());
                               } else {//trigger as normal
                                  MasterBroadcaster.getInstance().sendToAllInMap(map, new TriggerReactor(this, stance));
                               }
@@ -368,7 +368,7 @@ public class MapleReactor extends AbstractMapleMapObject {
    }
 
    public Rectangle getArea() {
-      return new Rectangle(getPosition().x + stats.getTL().x, getPosition().y + stats.getTL().y, stats.getBR().x - stats.getTL().x, stats.getBR().y - stats.getTL().y);
+      return new Rectangle(this.position().x + stats.getTL().x, this.position().y + stats.getTL().y, stats.getBR().x - stats.getTL().x, stats.getBR().y - stats.getTL().y);
    }
 
    public String getName() {

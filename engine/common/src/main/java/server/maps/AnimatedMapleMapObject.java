@@ -21,18 +21,10 @@
 */
 package server.maps;
 
-import java.awt.Point;
+public interface AnimatedMapleMapObject extends MapleMapObject {
+   int stance();
 
-public interface MapleMapObject {
-   int getObjectId();
+   void stance_$eq(int stance);
 
-   void setObjectId(int id);
-
-   MapleMapObjectType getType();
-
-   Point getPosition();
-
-   void setPosition(Point position);
-
-   void nullifyPosition();
+   boolean isFacingLeft();
 }

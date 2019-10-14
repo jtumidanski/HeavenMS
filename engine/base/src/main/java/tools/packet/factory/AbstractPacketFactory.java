@@ -301,7 +301,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
 
    protected void addAnnounceBox(final MaplePacketLittleEndianWriter mplew, MapleMiniGame game, int ammount, int joinable) {
       mplew.write(game.getGameType().getValue());
-      mplew.writeInt(game.getObjectId()); // gameid/shopid
+      mplew.writeInt(game.objectId()); // gameid/shopid
       mplew.writeMapleAsciiString(game.getDescription()); // desc
       mplew.writeBool(!game.getPassword().isEmpty());    // password here, thanks GabrielSin!
       mplew.write(game.getPieceType());

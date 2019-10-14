@@ -187,7 +187,7 @@ class EventDelliBattle {
 
    // Happens when a friendly mob dies
    def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
-      if (mob.getId() == 9300162) {
+      if (mob.id() == 9300162) {
          end(eim)
       }
    }

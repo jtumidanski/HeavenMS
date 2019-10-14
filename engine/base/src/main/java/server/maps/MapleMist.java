@@ -85,17 +85,17 @@ public class MapleMist extends AbstractMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.MIST;
    }
 
    @Override
-   public Point getPosition() {
+   public Point position() {
       return mistPosition.getLocation();
    }
 
    @Override
-   public void setPosition(Point position) {
+   public void position_$eq(Point position) {
       throw new UnsupportedOperationException();
    }
 

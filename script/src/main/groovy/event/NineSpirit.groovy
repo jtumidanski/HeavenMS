@@ -74,7 +74,7 @@ class EventNineSpirit {
    def playerEntry(EventInstanceManager eim, MapleCharacter player) {
       MapleMap nest = eim.getMapInstance(eventMap)
       if (!player.haveItem(4001094)) {
-         eim.spawnNpc(2081008, nest.getReactorById(2406000).getPosition(), nest)
+         eim.spawnNpc(2081008, nest.getReactorById(2406000).position(), nest)
       }
 
       player.changeMap(nest, 1)

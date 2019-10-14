@@ -503,7 +503,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       useCS = false;
 
-      setStance(0);
+      stance_$eq(0);
       inventory = new MapleInventory[MapleInventoryType.values().length];
       savedLocations = new SavedLocation[SavedLocationType.values().length];
 
@@ -520,7 +520,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          savedLocations[i] = null;
       }
       quests = new LinkedHashMap<>();
-      setPosition(new Point(0, 0));
+      position_$eq(new Point(0, 0));
 
       petLootCd = Server.getInstance().getCurrentTime();
    }
@@ -997,11 +997,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       c.setAccountName(this.client.getAccountName());//No null's for accountName
       this.setClient(c);
       this.map = c.getChannelServer().getMapFactory().getMap(getMapId());
-      MaplePortal portal = map.findClosestPlayerSpawnpoint(getPosition());
+      MaplePortal portal = map.findClosestPlayerSpawnpoint(this.position());
       if (portal == null) {
          portal = map.getPortal(0);
       }
-      this.setPosition(portal.getPosition());
+      this.position_$eq(portal.getPosition());
       this.initialSpawnPoint = portal.getId();
    }
 
@@ -1026,8 +1026,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             for (MapleSummon ms : this.getSummonsValues()) {
                getMap().broadcastNONGMMessage(this,
                      PacketCreator.create(
-                           new SpawnSummon(ms.getOwner().getId(), ms.getObjectId(), ms.getSkill(), ms.getSkillLevel(),
-                                 ms.getPosition(), ms.getStance(), ms.getMovementType().getValue(), ms.isPuppet(), false)
+                           new SpawnSummon(ms.getOwner().getId(), ms.objectId(), ms.getSkill(), ms.getSkillLevel(),
+                                 ms.position(), ms.stance(), ms.getMovementType().getValue(), ms.isPuppet(), false)
                      ), false);
             }
          } else {
@@ -1330,7 +1330,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       silentPartyUpdate();
 
       if (dragon != null) {
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveDragon(dragon.getObjectId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveDragon(dragon.objectId()));
          dragon = null;
       }
 
@@ -1372,12 +1372,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void broadcastStance(int newStance) {
-      setStance(newStance);
+      stance_$eq(newStance);
       broadcastStance();
    }
 
    private void broadcastStance() {
-      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new MovePlayer(id, this.getIdleMovementBytes()), false, this);
+      MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new MovePlayer(id, MapleMapObjectProcessor.getInstance().getIdleMovementBytes(this)), false, this);
    }
 
    public MapleMap getWarpMap(int map) {
@@ -1442,7 +1442,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       int banMap = this.getMapId();
-      int banSp = this.getMap().findClosestPlayerSpawnpoint(this.getPosition()).getId();
+      int banSp = this.getMap().findClosestPlayerSpawnpoint(this.position()).getId();
       long banTime = System.currentTimeMillis();
 
       if (msg != null) {
@@ -1749,7 +1749,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       map.removePlayer(this);
       if (client.getChannelServer().getPlayerStorage().getCharacterById(getId()).isPresent()) {
          map = to;
-         setPosition(pos);
+         position_$eq(pos);
          map.addPlayer(this);
          visitMap(map);
 
@@ -2024,7 +2024,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             boolean isPet = petIndex > -1;
-            final byte[] pickupPacket = PacketCreator.create(new RemoveItem(mapitem.getObjectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex));
+            final byte[] pickupPacket = PacketCreator.create(new RemoveItem(mapitem.objectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex));
 
             Item mItem = mapitem.getItem();
             boolean hasSpaceInventory;
@@ -2032,7 +2032,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                int mapId = this.getMapId();
 
                if ((mapId > 209000000 && mapId < 209000016) || (mapId >= 990000500 && mapId <= 990000502)) {//happyville trees and guild PQ
-                  if (!mapitem.isPlayerDrop() || mapitem.getDropper().getObjectId() == client.getPlayer().getObjectId()) {
+                  if (!mapitem.isPlayerDrop() || mapitem.getDropper().objectId() == client.getPlayer().objectId()) {
                      if (mapitem.getMeso() > 0) {
                         if (!mpcs.isEmpty()) {
                            int mesosamm = mapitem.getMeso() / mpcs.size();
@@ -3319,7 +3319,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                   MapleSummon summon = summons.get(summonId);
                   if (summon != null) {
-                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> PacketCreator.create(new RemoveSummon(summon.getOwner().getId(), summon.getObjectId(), true)), summon.getPosition());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> PacketCreator.create(new RemoveSummon(summon.getOwner().getId(), summon.objectId(), true)), summon.position());
                      getMap().removeMapObject(summon);
                      removeVisibleMapObject(summon);
 
@@ -4570,7 +4570,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public int getFh() {
-      Point pos = this.getPosition();
+      Point pos = this.position();
       pos.y -= 6;
 
       if (map.getFootholds().findBelow(pos) == null) {
@@ -5624,7 +5624,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean attemptCatchFish(int baitLevel) {
-      return ServerConstants.USE_FISHING_SYSTEM && GameConstants.isFishingArea(mapid) && this.getPosition().getY() > 0 && ItemConstants.isFishingChair(chair.get()) && this.getWorldServer().registerFisherPlayer(this, baitLevel);
+      return ServerConstants.USE_FISHING_SYSTEM && GameConstants.isFishingArea(mapid) && this.position().getY() > 0 && ItemConstants.isFishingChair(chair.get()) && this.getWorldServer().registerFisherPlayer(this, baitLevel);
    }
 
    public void leaveMap() {
@@ -6491,7 +6491,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       cancelAllBuffs(false);  // thanks Oblivium91 for finding out players still could revive in area and take damage before returning to town
       updateHp(50);
-      setStance(0);
+      stance_$eq(0);
    }
 
    private void prepareDragonBlood(final MapleStatEffect bloodEffect) {
@@ -6897,7 +6897,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void saveLocationOnWarp() {  // suggestion to remember the map before warp command thanks to Lei
-      MaplePortal closest = map.findClosestPortal(getPosition());
+      MaplePortal closest = map.findClosestPortal(this.position());
       int curMapid = getMapId();
 
       for (int i = 0; i < savedLocations.length; i++) {
@@ -6908,7 +6908,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void saveLocation(String type) {
-      MaplePortal closest = map.findClosestPortal(getPosition());
+      MaplePortal closest = map.findClosestPortal(this.position());
       savedLocations[SavedLocationType.fromString(type).ordinal()] = new SavedLocation(getMapId(), closest != null ? closest.getId() : 0);
    }
 
@@ -7079,7 +7079,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (map == null || map.getId() == 610020000 || map.getId() == 610020001) {  // reset to first spawnpoint on those maps
             spawnPoint = 0;
          } else {
-            MaplePortal closest = map.findClosestPlayerSpawnpoint(getPosition());
+            MaplePortal closest = map.findClosestPlayerSpawnpoint(this.position());
             if (closest != null) {
                spawnPoint = closest.getId();
             } else {
@@ -8036,16 +8036,16 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    @Override
-   public int getObjectId() {
+   public int objectId() {
       return getId();
    }
 
    @Override
-   public void setObjectId(int id) {
+   public void objectId_$eq(int id) {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.PLAYER;
    }
 

@@ -124,7 +124,7 @@ public class MobSkillProcessor {
             }
             break;
          case 131: // Mist
-            monster.getMap().spawnMist(new MapleMist(calculateBoundingBox(mobSkill, monster.getPosition(), monster.isFacingLeft()), monster, mobSkill), mobSkill.x() * 100, false, false, false);
+            monster.getMap().spawnMist(new MapleMist(calculateBoundingBox(mobSkill, monster.position(), monster.isFacingLeft()), monster, mobSkill), mobSkill.x() * 100, false, false, false);
             break;
          case 132:
             disease = MapleDisease.CONFUSE;
@@ -189,19 +189,19 @@ public class MobSkillProcessor {
                         if (bossRushMap) {
                            toSpawn.disableDrops();  // no littering on BRPQ pls
                         }
-                        toSpawn.setPosition(monster.getPosition());
+                        toSpawn.position_$eq(monster.position());
                         int ypos, xpos;
-                        xpos = (int) monster.getPosition().getX();
-                        ypos = (int) monster.getPosition().getY();
+                        xpos = (int) monster.position().getX();
+                        ypos = (int) monster.position().getY();
                         switch (mobId) {
                            case 8500003: // Pap bomb high
-                              toSpawn.setFh((int) Math.ceil(Math.random() * 19.0));
+                              toSpawn.fh_$eq((int) Math.ceil(Math.random() * 19.0));
                               ypos = -590;
                               break;
                            case 8500004: // Pap bomb
-                              xpos = (int) (monster.getPosition().getX() + Randomizer.nextInt(1000) - 500);
+                              xpos = (int) (monster.position().getX() + Randomizer.nextInt(1000) - 500);
                               if (ypos != -590) {
-                                 ypos = (int) monster.getPosition().getY();
+                                 ypos = (int) monster.position().getY();
                               }
                               break;
                            case 8510100: //Pianus bomb
@@ -209,7 +209,7 @@ public class MobSkillProcessor {
                                  ypos = 78;
                                  xpos = Randomizer.nextInt(5) + (Randomizer.nextInt(2) == 1 ? 180 : 0);
                               } else {
-                                 xpos = (int) (monster.getPosition().getX() + Randomizer.nextInt(1000) - 500);
+                                 xpos = (int) (monster.position().getX() + Randomizer.nextInt(1000) - 500);
                               }
                               break;
                         }
@@ -229,11 +229,11 @@ public class MobSkillProcessor {
                               }
                               break;
                         }
-                        toSpawn.setPosition(new Point(xpos, ypos));
-                        if (toSpawn.getId() == 8500004) {
+                        toSpawn.position_$eq(new Point(xpos, ypos));
+                        if (toSpawn.id() == 8500004) {
                            map.spawnFakeMonster(toSpawn);
                         } else {
-                           map.spawnMonsterWithEffect(toSpawn, mobSkill.spawnEffect(), toSpawn.getPosition());
+                           map.spawnMonsterWithEffect(toSpawn, mobSkill.spawnEffect(), toSpawn.position());
                         }
                         monster.addSummonedMob(toSpawn);
                      }
@@ -276,7 +276,7 @@ public class MobSkillProcessor {
    }
 
    private List<MapleCharacter> getPlayersInRange(MobSkill mobSkill, MapleMonster monster, MapleCharacter player) {
-      return monster.getMap().getPlayersInRange(calculateBoundingBox(mobSkill, monster.getPosition(), monster.isFacingLeft()), Collections.singletonList(player));
+      return monster.getMap().getPlayersInRange(calculateBoundingBox(mobSkill, monster.position(), monster.isFacingLeft()), Collections.singletonList(player));
    }
 
    private Rectangle calculateBoundingBox(MobSkill mobSkill, Point posFrom, boolean facingLeft) {
@@ -287,6 +287,6 @@ public class MobSkillProcessor {
    }
 
    private List<MapleMapObject> getObjectsInRange(MobSkill mobSkill, MapleMonster monster, MapleMapObjectType objectType) {
-      return monster.getMap().getMapObjectsInBox(calculateBoundingBox(mobSkill, monster.getPosition(), monster.isFacingLeft()), Collections.singletonList(objectType));
+      return monster.getMap().getMapObjectsInBox(calculateBoundingBox(mobSkill, monster.position(), monster.isFacingLeft()), Collections.singletonList(objectType));
    }
 }

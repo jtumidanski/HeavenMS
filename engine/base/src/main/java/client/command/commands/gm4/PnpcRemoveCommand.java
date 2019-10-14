@@ -46,7 +46,7 @@ public class PnpcRemoveCommand extends Command {
       int mapId = player.getMapId();
       int npcId = params.length > 0 ? Integer.parseInt(params[0]) : -1;
 
-      Point pos = player.getPosition();
+      Point pos = player.position();
       int xpos = pos.x;
       int ypos = pos.y;
 

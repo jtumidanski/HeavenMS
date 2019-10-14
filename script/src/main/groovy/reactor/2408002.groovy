@@ -49,7 +49,7 @@ class Reactor2408002 {
       Item tehWomanfred = new Item(vvpKey, (short) 0, (short) 1)
       MapleReactor theWomanfred = womanfred.getReactorByName("keyDrop1")
       MapleCharacter dropper = eim.getPlayers().get(0)
-      womanfred.spawnItemDrop(theWomanfred, dropper, tehWomanfred, theWomanfred.getPosition(), true, true)
+      womanfred.spawnItemDrop(theWomanfred, dropper, tehWomanfred, theWomanfred.position(), true, true)
       MessageBroadcaster.getInstance().sendMapServerNotice(eim.getMapInstance(240050100), ServerNoticeType.LIGHT_BLUE, "A bright flash of light, then a key suddenly appears somewhere in the map.")
    }
 

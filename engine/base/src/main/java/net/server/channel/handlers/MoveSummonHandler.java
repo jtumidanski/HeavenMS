@@ -45,7 +45,7 @@ public final class MoveSummonHandler extends AbstractMoveHandler<MoveSummonPacke
       Collection<MapleSummon> summons = player.getSummonsValues();
       MapleSummon summon = null;
       for (MapleSummon sum : summons) {
-         if (sum.getObjectId() == packet.objectId()) {
+         if (sum.objectId() == packet.objectId()) {
             summon = sum;
             break;
          }
@@ -53,7 +53,7 @@ public final class MoveSummonHandler extends AbstractMoveHandler<MoveSummonPacke
       if (summon != null) {
          processMovementList(packet.movementDataList(), summon);
          MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(),
-               character -> PacketCreator.create(new MoveSummon(player.getId(), packet.objectId(), packet.startPosition(), packet.movementList())), player, summon.getPosition());
+               character -> PacketCreator.create(new MoveSummon(player.getId(), packet.objectId(), packet.startPosition(), packet.movementList())), player, summon.position());
       }
    }
 }

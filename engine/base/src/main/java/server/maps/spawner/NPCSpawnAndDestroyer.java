@@ -30,8 +30,8 @@ public class NPCSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<MapleNPC
 
    @Override
    public void sendDestroyData(MapleNPC object, MapleClient client) {
-      PacketCreator.announce(client, new RemoveNPCController(object.getObjectId()));
-      PacketCreator.announce(client, new RemoveNPC(object.getObjectId()));
+      PacketCreator.announce(client, new RemoveNPCController(object.objectId()));
+      PacketCreator.announce(client, new RemoveNPC(object.objectId()));
    }
 
    @Override

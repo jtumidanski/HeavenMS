@@ -99,7 +99,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
                      PacketCreator.announce(chr, new ShowWheelsLeft(chr.getItemQuantity(5510000, false)));
 
                      chr.updateHp(50);
-                     chr.changeMap(map, map.findClosestPlayerSpawnpoint(chr.getPosition()));
+                     chr.changeMap(map, map.findClosestPlayerSpawnpoint(chr.position()));
                   } else {
                      boolean executeStandardPath = true;
                      if (chr.getEventInstance() != null) {
@@ -164,7 +164,7 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
             }
 
             if (portal != null) {
-               if (portal.getPosition().distanceSq(chr.getPosition()) > 400000) {
+               if (portal.getPosition().distanceSq(chr.position()) > 400000) {
                   PacketCreator.announce(client, new EnableActions());
                   return;
                }

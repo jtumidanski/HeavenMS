@@ -127,7 +127,7 @@ class NPC9201045 {
                            for (int i = 0; i < party.size(); i++) {
                               MapleCharacter chr = party[i]
 
-                              if (chr.isAlive() && !area.contains(chr.getPosition())) {
+                              if (chr.isAlive() && !area.contains(chr.position())) {
                                  pass = false
                                  break
                               }
@@ -163,7 +163,7 @@ class NPC9201045 {
                }
             } else {
                Rectangle area = cm.getMap().getArea(0)
-               if (area.contains(cm.getPlayer().getPosition())) {
+               if (area.contains(cm.getPlayer().position())) {
                   if (cm.getPlayer().isAlive()) {
                      cm.warp(670010700, "st01")
                   } else {

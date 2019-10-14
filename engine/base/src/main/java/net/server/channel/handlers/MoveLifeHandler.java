@@ -70,7 +70,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
       MapleMap map = player.getMap();
 
       MapleMapObject mmo = map.getMapObject(packet.objectId());
-      if (mmo == null || mmo.getType() != MapleMapObjectType.MONSTER) {
+      if (mmo == null || mmo.type() != MapleMapObjectType.MONSTER) {
          return;
       }
 
@@ -146,7 +146,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
       }
 
       Point startPos = new Point(packet.startX(), packet.startY() - 2);
-      Point serverStartPos = new Point(monster.getPosition());
+      Point serverStartPos = new Point(monster.position());
 
       processMovementList(packet.movementDataList(), monster);
 
@@ -168,7 +168,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
          byte[] movePacket = PacketCreator.create(new MoveMonster(packet.objectId(), nextMovementCouldBeSkill, rawActivity, useSkillId, useSkillLevel, pOption, startPos, packet.movementList()));
          MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> movePacket, player, serverStartPos);
          //updatePosition(res, monster, -2); //does this need to be done after the packet is broadcast?
-         map.moveMonster(monster, monster.getPosition());
+         map.moveMonster(monster, monster.position());
       }
 
       if (banishPlayers != null) {

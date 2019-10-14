@@ -108,8 +108,8 @@ public class MaplePlayerNPCPodium {
 
             for (MaplePlayerNPC pn : playerNpcs) {
                m.removeMapObject(pn);
-               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.objectId()));
             }
          }
 

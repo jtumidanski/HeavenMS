@@ -45,11 +45,11 @@ public class KillAllCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       MapleMap map = player.getMap();
-      List<MapleMapObject> monsters = map.getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+      List<MapleMapObject> monsters = map.getMapObjectsInRange(player.position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
       int count = 0;
       for (MapleMapObject monstermo : monsters) {
          MapleMonster monster = (MapleMonster) monstermo;
-         if (!monster.getStats().isFriendly() && !(monster.getId() >= 8810010 && monster.getId() <= 8810018)) {
+         if (!monster.getStats().isFriendly() && !(monster.id() >= 8810010 && monster.id() <= 8810018)) {
             map.damageMonster(player, monster, Integer.MAX_VALUE);
             count++;
          }

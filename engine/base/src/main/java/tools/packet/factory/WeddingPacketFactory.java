@@ -115,16 +115,16 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             writer.writeShort(0);
             writer.write(0);
          });
-         writer.writeShort(guest.getPosition().x); // v18 = *(_DWORD *)(v13 + 3204);
-         writer.writeShort(guest.getPosition().y); // v20 = *(_DWORD *)(v13 + 3208);
+         writer.writeShort(guest.position().x); // v18 = *(_DWORD *)(v13 + 3204);
+         writer.writeShort(guest.position().y); // v20 = *(_DWORD *)(v13 + 3208);
          // Begin Screenshot Encoding
          writer.write(1); // // if ( *(_DWORD *)(v13 + 288) ) { COutPacket::Encode1(&thisa, v20);
          // CPet::EncodeScreenShotPacket(*(CPet **)(v13 + 288), &thisa);
          writer.writeInt(1); // dwTemplateID
          writer.writeMapleAsciiString(guest.getName()); // m_sName
-         writer.writeShort(guest.getPosition().x); // m_ptCurPos.x
-         writer.writeShort(guest.getPosition().y); // m_ptCurPos.y
-         writer.write(guest.getStance()); // guest.m_bMoveAction
+         writer.writeShort(guest.position().x); // m_ptCurPos.x
+         writer.writeShort(guest.position().y); // m_ptCurPos.y
+         writer.write(guest.stance()); // guest.m_bMoveAction
       }
    }
 

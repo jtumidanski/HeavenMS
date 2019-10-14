@@ -64,7 +64,7 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
       int oid = packet.objectId();
       MapleSummon summon = null;
       for (MapleSummon sum : player.getSummonsValues()) {
-         if (sum.getObjectId() == oid) {
+         if (sum.objectId() == oid) {
             summon = sum;
          }
       }
@@ -82,8 +82,8 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
          allDamage.add(new SummonAttackEntry(packet.monsterObjectId()[x], packet.damage()[x]));
       }
 
-      byte[] attackPacket = PacketCreator.create(new SummonAttack(player.getId(), summon.getObjectId(), packet.direction(), allDamage));
-      MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), character -> attackPacket, player, summon.getPosition());
+      byte[] attackPacket = PacketCreator.create(new SummonAttack(player.getId(), summon.objectId(), packet.direction(), allDamage));
+      MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), character -> attackPacket, player, summon.position());
 
       if (player.getMap().isOwnershipRestricted(player)) {
          return;
@@ -98,7 +98,7 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
             if (damage > maxDmg) {
                AutobanFactory.DAMAGE_HACK.alert(client.getPlayer(), "Possible packet editing summon damage exploit.");
 
-               FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " used a summon of skillid " + summon.getSkill() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(target.getId()) + " with damage " + damage + " (max: " + maxDmg + ")");
+               FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " used a summon of skillid " + summon.getSkill() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(target.id()) + " with damage " + damage + " (max: " + maxDmg + ")");
                damage = maxDmg;
             }
 

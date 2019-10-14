@@ -63,7 +63,7 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
          MapleMonster m = (MapleMonster) mo;
          if (m.getSpawnEffect() == 0 || m.getHp() < m.getMaxHp()) {     // avoid effect-spawning mobs
             if (m.getController() == chr) {
-               PacketCreator.announce(client, new StopMonsterControl(m.getObjectId()));
+               PacketCreator.announce(client, new StopMonsterControl(m.objectId()));
                MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
                m.aggroRedirectController();
             } else {

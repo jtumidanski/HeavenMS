@@ -45,7 +45,7 @@ public class ForceVacCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      List<MapleMapObject> items = player.getMap().getMapObjectsInRange(player.getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
+      List<MapleMapObject> items = player.getMap().getMapObjectsInRange(player.position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM));
       for (MapleMapObject item : items) {
          MapleMapItem mapItem = (MapleMapItem) item;
 
@@ -71,7 +71,7 @@ public class ForceVacCommand extends Command {
                }
             }
 
-            player.getMap().pickItemDrop(PacketCreator.create(new RemoveItem(mapItem.getObjectId(), 2, player.getId())), mapItem);
+            player.getMap().pickItemDrop(PacketCreator.create(new RemoveItem(mapItem.objectId(), 2, player.getId())), mapItem);
          } finally {
             mapItem.unlockItem();
          }

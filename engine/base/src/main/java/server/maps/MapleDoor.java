@@ -62,8 +62,8 @@ public class MapleDoor {
                this.areaDoor = new MapleDoorObject(ownerId, town.getId(), target.getId(), townPortal.getId(), targetPosition, townPortal.getPosition());
                this.townDoor = new MapleDoorObject(ownerId, target.getId(), town.getId(), -1, townPortal.getPosition(), targetPosition);
 
-               this.areaDoor.setPairOid(this.townDoor.getObjectId());
-               this.townDoor.setPairOid(this.areaDoor.getObjectId());
+               this.areaDoor.setPairOid(this.townDoor.objectId());
+               this.townDoor.setPairOid(this.areaDoor.objectId());
             } else {
                this.ownerId = -1;
             }

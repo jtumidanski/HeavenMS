@@ -45,7 +45,7 @@ public final class BeholderHandler extends AbstractPacketHandler<BeholderPacket>
       Collection<MapleSummon> summons = client.getPlayer().getSummonsValues();
       MapleSummon summon = null;
       for (MapleSummon sum : summons) {
-         if (sum.getObjectId() == packet.objectId()) {
+         if (sum.objectId() == packet.objectId()) {
             summon = sum;
          }
       }

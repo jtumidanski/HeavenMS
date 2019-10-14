@@ -63,24 +63,24 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
       if (obj instanceof MapleNPC) {
          MapleNPC npc = (MapleNPC) obj;
          if (ServerConstants.USE_DEBUG) {
-            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Talking to NPC " + npc.getId());
+            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Talking to NPC " + npc.id());
          }
 
-         if (npc.getId() == 9010009) {   //is duey
+         if (npc.id() == 9010009) {   //is duey
             DueyProcessor.dueySendTalk(client, false);
          } else {
             if (client.getCM() != null || client.getQM() != null) {
                PacketCreator.announce(client, new EnableActions());
                return;
             }
-            if (npc.getId() >= 9100100 && npc.getId() <= 9100200) {
+            if (npc.id() >= 9100100 && npc.id() <= 9100200) {
                // Custom handling for gachapon scripts to reduce the amount of scripts needed.
-               NPCScriptManager.getInstance().start(client, npc.getId(), "gachapon", null);
+               NPCScriptManager.getInstance().start(client, npc.id(), "gachapon", null);
             } else {
-               boolean hasNpcScript = NPCScriptManager.getInstance().start(client, npc.getId(), packet.objectId(), null);
+               boolean hasNpcScript = NPCScriptManager.getInstance().start(client, npc.id(), packet.objectId(), null);
                if (!hasNpcScript) {
                   if (!npc.hasShop()) {
-                     FilePrinter.printError(FilePrinter.NPC_UNCODED, "NPC " + npc.getName() + "(" + npc.getId() + ") is not coded.");
+                     FilePrinter.printError(FilePrinter.NPC_UNCODED, "NPC " + npc.getName() + "(" + npc.id() + ") is not coded.");
                      return;
                   } else if (client.getPlayer().getShop() != null) {
                      PacketCreator.announce(client, new EnableActions());

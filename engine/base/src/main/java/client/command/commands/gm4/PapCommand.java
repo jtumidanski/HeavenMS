@@ -38,6 +38,6 @@ public class PapCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       // thanks Conrad for noticing mobid typo here
-      player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(8500001), player.getPosition());
+      player.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(8500001), player.position());
    }
 }

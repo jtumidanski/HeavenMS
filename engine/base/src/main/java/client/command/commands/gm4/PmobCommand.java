@@ -55,18 +55,18 @@ public class PmobCommand extends Command {
       int mobId = Integer.parseInt(params[0]);
       int mobTime = (params.length > 1) ? Integer.parseInt(params[1]) : -1;
 
-      Point checkpos = player.getMap().getGroundBelow(player.getPosition());
+      Point checkpos = player.getMap().getGroundBelow(player.position());
       int xpos = checkpos.x;
       int ypos = checkpos.y;
       int fh = player.getMap().getFootholds().findBelow(checkpos).id();
 
       MapleMonster mob = MapleLifeFactory.getMonster(mobId);
       if (mob != null && !mob.getName().equals("MISSINGNO")) {
-         mob.setPosition(checkpos);
-         mob.setCy(ypos);
-         mob.setRx0(xpos + 50);
-         mob.setRx1(xpos - 50);
-         mob.setFh(fh);
+         mob.position_$eq(checkpos);
+         mob.cy_$eq(ypos);
+         mob.rx0_$eq(xpos + 50);
+         mob.rx1_$eq(xpos - 50);
+         mob.fh_$eq(fh);
 
          DatabaseConnection.getInstance().withConnection(connection ->
                PlayerLifeAdministrator.getInstance().create(connection, mobId, 0, fh, ypos, xpos + 50,

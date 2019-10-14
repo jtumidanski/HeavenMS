@@ -132,7 +132,7 @@ class EventBalrogQuest {
    }
 
    static def isBalrog(MapleMonster mob) {
-      return mob.getId() == 9300326
+      return mob.id() == 9300326
    }
 
    // Happens when an opposing mob dies

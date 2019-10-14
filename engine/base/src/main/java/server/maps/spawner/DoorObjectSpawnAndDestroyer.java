@@ -40,7 +40,7 @@ public class DoorObjectSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<M
 
          PacketCreator.announce(chr, new SpawnPortal(object.getFrom(), object.getTo(), object.toPosition()));
          if (!object.inTown()) {
-            PacketCreator.announce(chr, new SpawnDoor(object.getOwnerId(), object.getPosition(), launched));
+            PacketCreator.announce(chr, new SpawnDoor(object.getOwnerId(), object.position(), launched));
          }
       }
    }

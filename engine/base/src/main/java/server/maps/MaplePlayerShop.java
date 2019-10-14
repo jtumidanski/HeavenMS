@@ -78,7 +78,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    private Lock visitorLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.VISITOR_PSHOP, true);
 
    public MaplePlayerShop(MapleCharacter owner, String description, int itemid) {
-      this.setPosition(owner.getPosition());
+      this.position_$eq(owner.position());
       this.owner = owner;
       this.description = description;
       this.itemid = itemid;
@@ -568,7 +568,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.SHOP;
    }
 }

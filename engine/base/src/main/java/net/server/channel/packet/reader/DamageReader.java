@@ -400,12 +400,12 @@ public class DamageReader implements PacketReader<AttackPacket> {
 
             // Warn if the damage is over 1.5x what we calculated above.
             if (damage > maxWithCrit * 1.5) {
-               AutobanFactory.DAMAGE_HACK.alert(chr, "DMG: " + damage + " MaxDMG: " + maxWithCrit + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.getId() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
+               AutobanFactory.DAMAGE_HACK.alert(chr, "DMG: " + damage + " MaxDMG: " + maxWithCrit + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.id() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
             }
 
             // Add a ab point if its over 5x what we calculated.
             if (damage > maxWithCrit * 5) {
-               AutobanFactory.DAMAGE_HACK.addPoint(chr.getAutobanManager(), "DMG: " + damage + " MaxDMG: " + maxWithCrit + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.getId() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
+               AutobanFactory.DAMAGE_HACK.addPoint(chr.getAutobanManager(), "DMG: " + damage + " MaxDMG: " + maxWithCrit + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.id() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
             }
 
             if (ret.skill() == Marksman.SNIPE || (canCrit && damage > hitDmgMax)) {

@@ -11,7 +11,7 @@ class Reactor2519001 {
 
    def act() {
       int denyWidth = 320, denyHeight = 150
-      Point denyPos = rm.getReactor().getPosition()
+      Point denyPos = rm.getReactor().position()
       Rectangle denyArea = new Rectangle((denyPos.getX() - denyWidth / 2).intValue(), (denyPos.getY() - denyHeight / 2).intValue(), denyWidth, denyHeight)
 
       rm.getReactor().getMap().setAllowSpawnPointInBox(false, denyArea)

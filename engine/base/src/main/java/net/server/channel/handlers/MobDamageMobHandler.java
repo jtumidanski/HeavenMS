@@ -105,7 +105,7 @@ public final class MobDamageMobHandler extends AbstractPacketHandler<MobDamageMo
          if (dmg > maxDmg) {
             AutobanFactory.DAMAGE_HACK.alert(client.getPlayer(), "Possible packet editing hypnotize damage exploit.");   // thanks Rien dev team
 
-            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " had hypnotized " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(attacker.getId()) + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(damaged.getId()) + " with damage " + dmg + " (max: " + maxDmg + ")");
+            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " had hypnotized " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(attacker.id()) + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(damaged.id()) + " with damage " + dmg + " (max: " + maxDmg + ")");
             dmg = maxDmg;
          }
 

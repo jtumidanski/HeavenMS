@@ -626,7 +626,7 @@ public class AbstractPlayerInteraction {
             if (from != null) {
                evolved = PetProcessor.getInstance().loadFromDb(id, (short) 0, petId);
 
-               Point pos = getPlayer().getPosition();
+               Point pos = getPlayer().position();
                pos.y -= 12;
                evolved.pos_$eq(pos);
                evolved.fh_$eq(getPlayer().getMap().getFootholds().findBelow(evolved.pos()).id());
@@ -927,9 +927,9 @@ public class AbstractPlayerInteraction {
    public void resetMap(int mapid) {
       getMap(mapid).resetReactors();
       getMap(mapid).killAllMonsters();
-      for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
+      for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
          getMap(mapid).removeMapObject(i);
-         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveItem(i.getObjectId(), 0, c.getPlayer().getId()));
+         MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveItem(i.objectId(), 0, c.getPlayer().getId()));
       }
    }
 
@@ -981,11 +981,11 @@ public class AbstractPlayerInteraction {
    public void spawnNpc(int npcId, Point pos, MapleMap map) {
       MapleNPC npc = MapleLifeFactory.getNPC(npcId);
       if (npc != null) {
-         npc.setPosition(pos);
-         npc.setCy(pos.y);
-         npc.setRx0(pos.x + 50);
-         npc.setRx1(pos.x - 50);
-         npc.setFh(map.getFootholds().findBelow(pos).id());
+         npc.position_$eq(pos);
+         npc.cy_$eq(pos.y);
+         npc.rx0_$eq(pos.x + 50);
+         npc.rx1_$eq(pos.x - 50);
+         npc.fh_$eq(map.getFootholds().findBelow(pos).id());
          map.addMapObject(npc);
          MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
       }
@@ -993,7 +993,7 @@ public class AbstractPlayerInteraction {
 
    public void spawnMonster(int id, int x, int y) {
       MapleMonster monster = MapleLifeFactory.getMonster(id);
-      monster.setPosition(new Point(x, y));
+      monster.position_$eq(new Point(x, y));
       getPlayer().getMap().spawnMonster(monster);
    }
 

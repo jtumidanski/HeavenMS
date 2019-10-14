@@ -33,7 +33,7 @@ class Reactor2001013 {
 
          int nextHashed = (11 * (count)) % 14
 
-         Point nextPos = rm.getMap().getReactorById(2001002 + nextHashed).getPosition()
+         Point nextPos = rm.getMap().getReactorById(2001002 + nextHashed).position()
          rm.spawnMonster(9300040, 1, nextPos)
       }
    }

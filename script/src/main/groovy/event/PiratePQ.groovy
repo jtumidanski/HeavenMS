@@ -399,7 +399,7 @@ class EventPiratePQ {
    }
 
    static def isLordPirate(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 9300105) || (mobid == 9300106) || (mobid == 9300107) || (mobid == 9300119)
    }
 

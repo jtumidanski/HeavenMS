@@ -389,18 +389,18 @@ class EventMagatiaPQ_Z {
             generateStg6Combo(eim)
             map.getReactorByName("rnj6_out").forceHitReactor((byte) 1)
          }
-      } else if (mob.getId() == 9300139 || mob.getId() == 9300140) {
+      } else if (mob.id() == 9300139 || mob.id() == 9300140) {
          eim.showClearEffect()
          eim.giveEventPlayersStageReward(7)
 
          eim.spawnNpc(2112006, new Point(-370, -150), map)
 
-         int gain = (eim.getIntProperty("escortFail") == 1) ? 90000 : ((mob.getId() == 9300139) ? 105000 : 140000)
+         int gain = (eim.getIntProperty("escortFail") == 1) ? 90000 : ((mob.id() == 9300139) ? 105000 : 140000)
          eim.giveEventPlayersExp(gain)
 
          map.killAllMonstersNotFriendly()
 
-         if (mob.getId() == 9300139) {
+         if (mob.id() == 9300139) {
             eim.setIntProperty("normalClear", 1)
          }
 

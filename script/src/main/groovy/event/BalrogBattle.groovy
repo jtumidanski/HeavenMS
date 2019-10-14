@@ -303,12 +303,12 @@ class EventBalrogBattle {
    }
 
    static def isUnsealedBalrog(MapleMonster mob) {
-      int balrogid = mob.getId() - 8830000
+      int balrogid = mob.id() - 8830000
       return balrogid >= 0 && balrogid <= 2
    }
 
    def isBalrogBody(MapleMonster mob) {
-      return mob.getId() == minMobId
+      return mob.id() == minMobId
    }
 
    // Happens when a player left the party

@@ -37,9 +37,9 @@ public class PosCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      float xpos = player.getPosition().x;
-      float ypos = player.getPosition().y;
-      float fh = player.getMap().getFootholds().findBelow(player.getPosition()).id();
+      float xpos = player.position().x;
+      float ypos = player.position().y;
+      float fh = player.getMap().getFootholds().findBelow(player.position()).id();
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Position: (" + xpos + ", " + ypos + ")");
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Foothold ID: " + fh);
    }

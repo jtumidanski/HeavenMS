@@ -38,7 +38,7 @@ public class HorntailCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      final Point targetPoint = player.getPosition();
+      final Point targetPoint = player.position();
       final MapleMap targetMap = player.getMap();
 
       targetMap.spawnHorntailOnGroundBelow(targetPoint);

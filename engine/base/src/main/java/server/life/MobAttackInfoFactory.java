@@ -39,14 +39,14 @@ public class MobAttackInfoFactory {
    private static MapleDataProvider dataSource = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Mob.wz"));
 
    public static MobAttackInfo getMobAttackInfo(MapleMonster mob, int attack) {
-      MobAttackInfo ret = mobAttacks.get(mob.getId() + "" + attack);
+      MobAttackInfo ret = mobAttacks.get(mob.id() + "" + attack);
       if (ret != null) {
          return ret;
       }
       synchronized (mobAttacks) {
-         ret = mobAttacks.get(mob.getId() + "" + attack);
+         ret = mobAttacks.get(mob.id() + "" + attack);
          if (ret == null) {
-            MapleData mobData = dataSource.getData(StringUtil.getLeftPaddedStr(mob.getId() + ".img", '0', 11));
+            MapleData mobData = dataSource.getData(StringUtil.getLeftPaddedStr(mob.id() + ".img", '0', 11));
             if (mobData != null) {
 //					MapleData infoData = mobData.getChildByPath("info");
                String linkedmob = MapleDataTool.getString("link", mobData, "");
@@ -64,9 +64,9 @@ public class MobAttackInfoFactory {
                int disease = MapleDataTool.getInt("disease", attackData, 0);
                int level = MapleDataTool.getInt("level", attackData, 0);
                int mpCon = MapleDataTool.getInt("conMP", attackData, 0);
-               ret = new MobAttackInfo(mob.getId(), attack, deadlyAttack != null, mpBurn, disease, level, mpCon);
+               ret = new MobAttackInfo(mob.id(), attack, deadlyAttack != null, mpBurn, disease, level, mpCon);
             }
-            mobAttacks.put(mob.getId() + "" + attack, ret);
+            mobAttacks.put(mob.id() + "" + attack, ret);
          }
          return ret;
       }

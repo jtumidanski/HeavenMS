@@ -94,13 +94,13 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       this.CY = CY;
       this.job = 7777;    // supposed to be developer
 
-      setPosition(new Point(CX, CY));
-      setObjectId(oid);
+      position_$eq(new Point(CX, CY));
+      this.objectId_$eq(oid);
    }
 
    public MaplePlayerNPC(int id, int x, int cy, String name, int hair, int face, byte skin, int gender, int dir, int fh, int rx0,
                          int rx1, int scriptId, int worldRank, int overallRank, int worldJobRank, int overallJobRank, int job) {
-      setObjectId(id);
+      this.objectId_$eq(id);
       this.CY = cy;
       this.name = name;
       this.hair = hair;
@@ -117,7 +117,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       this.worldJobRank = worldJobRank;
       this.overallJobRank = overallJobRank;
       this.job = job;
-      setPosition(new Point(x, cy));
+      position_$eq(new Point(x, cy));
    }
 
    private static void getRunningMetadata() {
@@ -329,8 +329,8 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
                MapleMap m = channel.getMapFactory().getMap(mapid);
                m.removeMapObject(pn);
 
-               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
-               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.getObjectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
+               MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.objectId()));
             }
          }
       }
@@ -364,8 +364,8 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
                      for (MapleMapObject pnpcObj : m.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
                         MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
                         m.removeMapObject(pnpcObj);
-                        MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.getObjectId()));
-                        MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.getObjectId()));
+                        MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
+                        MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.objectId()));
                      }
                   }
                });
@@ -443,17 +443,17 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.PLAYER_NPC;
    }
 
    public void updatePlayerNPCPosition(MapleMap map, Point newPos) {
-      setPosition(newPos);
+      position_$eq(newPos);
       RX0 = newPos.x + 50;
       RX1 = newPos.x - 50;
       CY = newPos.y;
       FH = map.getFootholds().findBelow(newPos).id();
 
-      DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcAdministrator.getInstance().updatePosition(connection, newPos.x, CY, FH, RX0, RX1, getObjectId()));
+      DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcAdministrator.getInstance().updatePosition(connection, newPos.x, CY, FH, RX0, RX1, this.objectId()));
    }
 }

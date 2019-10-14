@@ -254,7 +254,7 @@ class EventShowaBattle {
    }
 
    static def isTheBoss(MapleMonster mob) {
-      return mob.getId() == 9400300
+      return mob.id() == 9400300
    }
 
    // Happens when a player left the party

@@ -199,7 +199,7 @@ class EventPinkBeanBattle {
                MapleMap mapObj = eim.getMapFactory().getMap(270050100)
                MapleReactor reactObj = mapObj.getReactorById(2708000)
                MapleCharacter dropper = eim.getPlayers().get(0)
-               mapObj.spawnItemDrop(dropper, dropper, itemObj, reactObj.getPosition(), true, true)
+               mapObj.spawnItemDrop(dropper, dropper, itemObj, reactObj.position(), true, true)
 
                MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "With the last of its guardians fallen, Pink Bean loses its invulnerability. The real fight starts now!")
             } else {
@@ -302,12 +302,12 @@ class EventPinkBeanBattle {
    }
 
    static def isPinkBean(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid == 8820001)
    }
 
    static def isJrBoss(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return (mobid >= 8820002 && mobid <= 8820006)
    }
 
@@ -318,15 +318,15 @@ class EventPinkBeanBattle {
    static def spawnJrBoss(MapleMonster mobObj, boolean gotKilled) {
       int spawnid
       if (gotKilled) {
-         spawnid = mobObj.getId() + 17
+         spawnid = mobObj.id() + 17
 
       } else {
-         mobObj.getMap().killMonster(mobObj.getId())
-         spawnid = mobObj.getId() - 17
+         mobObj.getMap().killMonster(mobObj.id())
+         spawnid = mobObj.id() - 17
       }
 
       MapleMonster mob = MapleLifeFactory.getMonster(spawnid)
-      mobObj.getMap().spawnMonsterOnGroundBelow(mob, mobObj.getPosition())
+      mobObj.getMap().spawnMonsterOnGroundBelow(mob, mobObj.position())
    }
 
    // Happens when a player left the party

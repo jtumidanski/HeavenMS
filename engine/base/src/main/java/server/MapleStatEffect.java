@@ -195,7 +195,7 @@ public class MapleStatEffect {
             case FPWizard.MP_EATER:
             case ILWizard.MP_EATER:
             case Cleric.MP_EATER:
-               if (obj == null || obj.getType() != MapleMapObjectType.MONSTER) {
+               if (obj == null || obj.type() != MapleMapObjectType.MONSTER) {
                   return;
                }
                MapleMonster mob = (MapleMonster) obj; // x is absorb percentage
@@ -380,9 +380,9 @@ public class MapleStatEffect {
       if (isMagicDoor() && !FieldLimit.DOOR.check(applyto.getMap().getFieldLimit())) { // Magic Door
          int y = applyto.getFh();
          if (y == 0) {
-            y = applyto.getPosition().y;
+            y = applyto.position().y;
          }
-         Point doorPosition = new Point(applyto.getPosition().x, y);
+         Point doorPosition = new Point(applyto.position().x, y);
          MapleDoor door = new MapleDoor(applyto, doorPosition);
 
          if (door.getOwnerId() >= 0) {
@@ -404,7 +404,7 @@ public class MapleStatEffect {
             applyto.cancelBuffStats(MapleBuffStat.SOULARROW);  // cancel door buff
          }
       } else if (isMist()) {
-         Rectangle bounds = calculateBoundingBox(sourceid == NightWalker.POISON_BOMB ? pos : applyfrom.getPosition(), applyfrom.isFacingLeft());
+         Rectangle bounds = calculateBoundingBox(sourceid == NightWalker.POISON_BOMB ? pos : applyfrom.position(), applyfrom.isFacingLeft());
          MapleMist mist = new MapleMist(bounds, applyfrom, this);
          applyfrom.getMap().spawnMist(mist, getDuration(), mist.isPoisonMist(), false, mist.isRecoveryMist());
       } else if (isTimeLeap()) {
@@ -474,7 +474,7 @@ public class MapleStatEffect {
       int affectedc = 1;
 
       if (isPartyBuff() && (applyfrom.getParty() != null || isGmBuff())) {
-         Rectangle bounds = (!useMaxRange) ? calculateBoundingBox(applyfrom.getPosition(), applyfrom.isFacingLeft()) : new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
+         Rectangle bounds = (!useMaxRange) ? calculateBoundingBox(applyfrom.position(), applyfrom.isFacingLeft()) : new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
          List<MapleMapObject> affecteds = applyfrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.PLAYER));
          List<MapleCharacter> affectedp = new ArrayList<>(affecteds.size());
          for (MapleMapObject affectedmo : affecteds) {
@@ -504,7 +504,7 @@ public class MapleStatEffect {
    }
 
    private void applyMonsterBuff(MapleCharacter applyfrom) {
-      Rectangle bounds = calculateBoundingBox(applyfrom.getPosition(), applyfrom.isFacingLeft());
+      Rectangle bounds = calculateBoundingBox(applyfrom.position(), applyfrom.isFacingLeft());
       List<MapleMapObject> affected = applyfrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.MONSTER));
       SkillFactory.getSkill(sourceid).ifPresent(skill_ -> {
          int i = 0;
@@ -556,7 +556,7 @@ public class MapleStatEffect {
       chr.registerEffect(this, localStartTime, localStartTime + localDuration, true);
       SummonMovementType summonMovementType = getSummonMovementType();
       if (summonMovementType != null) {
-         final MapleSummon tosummon = new MapleSummon(chr, sourceid, chr.getPosition(), summonMovementType);
+         final MapleSummon tosummon = new MapleSummon(chr, sourceid, chr.position(), summonMovementType);
          if (!tosummon.isStationary()) {
             chr.addSummon(sourceid, tosummon);
             tosummon.addHP(x);

@@ -28,7 +28,7 @@ public class MapItemSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Mapl
       if (chr.needQuestItem(object.getQuest(), object.getItemId())) {
          object.lockItem();
          try {
-            PacketCreator.announce(client, new DropItemFromMapObject(chr, object, null, object.getPosition(), (byte) 2));
+            PacketCreator.announce(client, new DropItemFromMapObject(chr, object, null, object.position(), (byte) 2));
          } finally {
             object.unlockItem();
          }
@@ -37,7 +37,7 @@ public class MapItemSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Mapl
 
    @Override
    public void sendDestroyData(MapleMapItem object, MapleClient client) {
-      PacketCreator.announce(client, new RemoveItem(object.getObjectId(), 1, 0));
+      PacketCreator.announce(client, new RemoveItem(object.objectId(), 1, 0));
    }
 
    @Override

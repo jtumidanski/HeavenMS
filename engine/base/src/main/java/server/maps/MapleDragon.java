@@ -32,19 +32,19 @@ public class MapleDragon extends AbstractAnimatedMapleMapObject {
    public MapleDragon(MapleCharacter chr) {
       super();
       this.owner = chr;
-      this.setPosition(chr.getPosition());
-      this.setStance(chr.getStance());
+      this.position_$eq(chr.position());
+      this.stance_$eq(chr.stance());
       MapleMapObjectProcessor.getInstance().sendSpawnData(this, chr.getClient());
    }
 
    @Override
-   public MapleMapObjectType getType() {
+   public MapleMapObjectType type() {
       return MapleMapObjectType.DRAGON;
    }
 
    @Override
-   public int getObjectId() {
-      return owner.getId();
+   public int objectId() {
+      return owner.objectId();
    }
 
    public MapleCharacter getOwner() {

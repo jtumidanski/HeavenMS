@@ -32,7 +32,7 @@ public class PlayerNpcProvider extends AbstractQueryExecutor {
       }, resultSetTransformer::transform);
 
       results.parallelStream().forEach(npc ->
-            PlayerNpcEquipProvider.getInstance().getEquips(connection, npc.getObjectId())
+            PlayerNpcEquipProvider.getInstance().getEquips(connection, npc.objectId())
                   .forEach(data -> npc.getEquips().put(data.getLeft(), data.getRight())));
 
       return results;

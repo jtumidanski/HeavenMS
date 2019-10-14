@@ -58,19 +58,19 @@ public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<Mob
       int damage = Randomizer.nextInt(((monster.getMaxHp() / 13 + monster.getPADamage() * 10)) * 2 + 500) / 10; //Beng's formula.
 
       if (monster.getHp() - damage < 1) {     // friendly dies
-         if (monster.getId() == 9300102) {
+         if (monster.id() == 9300102) {
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The Watch Hog has been injured by the aliens. Better luck next time...");
-         } else if (monster.getId() == 9300061) {  //moon bunny
+         } else if (monster.id() == 9300061) {  //moon bunny
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The Moon Bunny went home because he was sick.");
-         } else if (monster.getId() == 9300093) {   //tylus
+         } else if (monster.id() == 9300093) {   //tylus
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Tylus has fallen by the overwhelming forces of the ambush.");
-         } else if (monster.getId() == 9300137) {   //juliet
+         } else if (monster.id() == 9300137) {   //juliet
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Juliet has fainted in the middle of the combat.");
-         } else if (monster.getId() == 9300138) {   //romeo
+         } else if (monster.id() == 9300138) {   //romeo
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Romeo has fainted in the middle of the combat.");
-         } else if (monster.getId() == 9400322 || monster.getId() == 9400327 || monster.getId() == 9400332) { //snowman
+         } else if (monster.id() == 9400322 || monster.id() == 9400327 || monster.id() == 9400332) { //snowman
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The Snowman has melted on the heat of the battle.");
-         } else if (monster.getId() == 9300162) {   //delli
+         } else if (monster.id() == 9300162) {   //delli
             MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Delli vanished after the ambush, sheets still laying on the ground...");
          }
 
@@ -90,7 +90,7 @@ public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<Mob
       }
 
       int finalRemainingHp = remainingHp;
-      MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonsterFriendly(monster.getObjectId(), damage, finalRemainingHp, monster.getMaxHp()), monster.getPosition());
+      MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonsterFriendly(monster.objectId(), damage, finalRemainingHp, monster.getMaxHp()), monster.position());
       PacketCreator.announce(client, new EnableActions());
    }
 }

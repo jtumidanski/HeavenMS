@@ -87,7 +87,7 @@ public class SpawnPetProcessor {
                if (lead) {
                   chr.shiftPetsRight();
                }
-               Point pos = chr.getPosition();
+               Point pos = chr.position();
                pos.y -= 12;
                pet.pos_$eq(pos);
                pet.fh_$eq(chr.getMap().getFootholds().findBelow(pet.pos()).id());

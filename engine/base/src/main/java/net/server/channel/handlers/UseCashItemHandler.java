@@ -756,7 +756,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             MapleMap targetMap = victim.get().getMap();
             if (!FieldLimit.CANNOTVIPROCK.check(targetMap.getFieldLimit()) && (targetMap.getForcedReturnId() == 999999999 || targetMap.getId() < 100000000)) {
                if (!victim.get().isGM() || victim.get().gmLevel() <= player.gmLevel()) {   // thanks Yoboes for noticing non-GM's being unreachable through rocks
-                  player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnpoint(victim.get().getPosition()));
+                  player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnpoint(victim.get().position()));
                   success = true;
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);

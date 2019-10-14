@@ -114,7 +114,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(summonItemId);
       for (int[] toSpawnChild : toSpawn) {
          if (Randomizer.nextInt(100) < toSpawnChild[1]) {
-            client.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), client.getPlayer().getPosition());
+            client.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), client.getPlayer().position());
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -158,10 +158,10 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void killMonster(MapleClient c, int mobToKill, int amount) {
-      List<MapleMapObject> monsterx = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+      List<MapleMapObject> monsterx = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
       for (int x = 0; x < amount; x++) {
          MapleMonster monster = (MapleMonster) monsterx.get(x);
-         if (monster.getId() == mobToKill) {
+         if (monster.id() == mobToKill) {
             c.getPlayer().getMap().killMonster(monster, c.getPlayer(), true);
          }
       }
@@ -173,16 +173,16 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
 
    private void summon(MapleClient c, int mobId, int quantity) {
       for (int i = 0; i < quantity; i++) {
-         c.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), c.getPlayer().getPosition());
+         c.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), c.getPlayer().position());
       }
    }
 
    private void monsterHpBroadcast(MapleClient c, int mobHp) {
       MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, "Monsters HP");
-      List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().getPosition(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+      List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
       for (MapleMapObject mobs : monsters) {
          MapleMonster monster = (MapleMonster) mobs;
-         if (monster.getId() == mobHp) {
+         if (monster.id() == mobHp) {
             MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, monster.getName() + ": " + monster.getHp());
          }
       }

@@ -45,11 +45,11 @@ public class NpcCommand extends Command {
       }
       MapleNPC npc = MapleLifeFactory.getNPC(Integer.parseInt(params[0]));
       if (npc != null) {
-         npc.setPosition(player.getPosition());
-         npc.setCy(player.getPosition().y);
-         npc.setRx0(player.getPosition().x + 50);
-         npc.setRx1(player.getPosition().x - 50);
-         npc.setFh(player.getMap().getFootholds().findBelow(c.getPlayer().getPosition()).id());
+         npc.position_$eq(player.position());
+         npc.cy_$eq(player.position().y);
+         npc.rx0_$eq(player.position().x + 50);
+         npc.rx1_$eq(player.position().x - 50);
+         npc.fh_$eq(player.getMap().getFootholds().findBelow(c.getPlayer().position()).id());
          player.getMap().addMapObject(npc);
          MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new SpawnNPC(npc));
       }

@@ -249,13 +249,13 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
             breakMarriage(chr);
          }
 
-         chr.getMap().disappearingItemDrop(chr, chr, wItem, chr.getPosition());
+         chr.getMap().disappearingItemDrop(chr, chr, wItem, chr.position());
       } else if (weddingToken) {
          if (chr.getPartnerId() > 0) {
             breakEngagement(chr);
          }
 
-         chr.getMap().disappearingItemDrop(chr, chr, wItem, chr.getPosition());
+         chr.getMap().disappearingItemDrop(chr, chr, wItem, chr.position());
       }
    }
 

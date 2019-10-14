@@ -28,9 +28,6 @@ import client.MapleClient;
 import client.inventory.Item;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import tools.PacketCreator;
-import tools.packet.item.drop.DropItemFromMapObject;
-import tools.packet.remove.RemoveItem;
 
 public class MapleMapItem extends AbstractMapleMapObject {
    protected MapleClient ownerClient;
@@ -43,7 +40,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    private Lock itemLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.MAP_ITEM);
 
    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
-      setPosition(position);
+      position_$eq(position);
       this.item = item;
       this.dropper = dropper;
       this.character_ownerid = owner.getId();
@@ -56,7 +53,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop, int questid) {
-      setPosition(position);
+      position_$eq(position);
       this.item = item;
       this.dropper = dropper;
       this.character_ownerid = owner.getId();
@@ -70,7 +67,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public MapleMapItem(int meso, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
-      setPosition(position);
+      position_$eq(position);
       this.item = null;
       this.dropper = dropper;
       this.character_ownerid = owner.getId();
@@ -198,7 +195,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    @Override
-   public final MapleMapObjectType getType() {
+   public final MapleMapObjectType type() {
       return MapleMapObjectType.ITEM;
    }
 }

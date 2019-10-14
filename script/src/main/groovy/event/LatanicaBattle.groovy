@@ -259,7 +259,7 @@ class EventLatanicaBattle {
    }
 
    static def isLatanica(MapleMonster mob) {
-      int mobid = mob.getId()
+      int mobid = mob.id()
       return mobid == 9420513
    }
 
