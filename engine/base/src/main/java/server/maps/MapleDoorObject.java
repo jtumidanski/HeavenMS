@@ -23,17 +23,12 @@ import java.awt.Point;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import client.MapleCharacter;
-import client.MapleClient;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.world.MapleParty;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowBlockedMessage;
-import tools.packet.party.PartyPortal;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
-import tools.packet.spawn.RemoveDoor;
-import tools.packet.spawn.SpawnDoor;
-import tools.packet.spawn.SpawnPortal;
 import tools.packet.stat.EnableActions;
 
 /**
@@ -104,44 +99,6 @@ public class MapleDoorObject extends AbstractMapleMapObject {
       }
    }
 
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      sendSpawnData(client, true);
-   }
-
-   public void sendSpawnData(MapleClient client, boolean launched) {
-      MapleCharacter chr = client.getPlayer();
-      if (this.getFrom() == chr.getMapId()) {
-         if (chr.getParty() != null && (this.getOwnerId() == chr.getId() || chr.getParty().getMemberById(this.getOwnerId()) != null)) {
-            PacketCreator.announce(client, new PartyPortal(this.getFrom(), this.getTo(), this.toPosition()));
-         }
-
-         PacketCreator.announce(chr, new SpawnPortal(this.getFrom(), this.getTo(), this.toPosition()));
-         if (!this.inTown()) {
-            PacketCreator.announce(chr, new SpawnDoor(this.getOwnerId(), this.getPosition(), launched));
-         }
-      }
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      MapleCharacter chr = client.getPlayer();
-      if (originMapId == chr.getMapId()) {
-         MapleParty party = chr.getParty();
-         if (party != null && (ownerId == chr.getId() || party.getMemberById(ownerId) != null)) {
-            PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
-         }
-         PacketCreator.announce(client, new RemoveDoor(ownerId, inTown()));
-      }
-   }
-
-   public void sendDestroyData(MapleClient client, boolean partyUpdate) {
-      if (client != null && originMapId == client.getPlayer().getMapId()) {
-         PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
-         PacketCreator.announce(client, new RemoveDoor(ownerId, inTown()));
-      }
-   }
-
    public int getOwnerId() {
       return ownerId;
    }
@@ -180,6 +137,10 @@ public class MapleDoorObject extends AbstractMapleMapObject {
 
    public Point toPosition() {
       return getLinkedPortalPosition();
+   }
+
+   public int getOriginMapId() {
+      return originMapId;
    }
 
    @Override

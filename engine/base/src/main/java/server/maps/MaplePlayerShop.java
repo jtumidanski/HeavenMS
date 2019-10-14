@@ -568,16 +568,6 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
    }
 
    @Override
-   public void sendDestroyData(MapleClient client) {
-      PacketCreator.announce(client, new RemovePlayerShop(this.getOwner().getId()));
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      PacketCreator.announce(client, new UpdatePlayerShopBox(this));
-   }
-
-   @Override
    public MapleMapObjectType getType() {
       return MapleMapObjectType.SHOP;
    }

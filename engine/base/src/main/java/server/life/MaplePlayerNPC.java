@@ -52,7 +52,6 @@ import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
 import tools.DatabaseConnection;
 import tools.MasterBroadcaster;
-import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.character.npc.GetPlayerNPC;
 import tools.packet.character.npc.RemovePlayerNPC;
@@ -446,18 +445,6 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    @Override
    public MapleMapObjectType getType() {
       return MapleMapObjectType.PLAYER_NPC;
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      PacketCreator.announce(client, new SpawnPlayerNPC(this));
-      PacketCreator.announce(client, new GetPlayerNPC(this));
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      PacketCreator.announce(client, new RemoveNPCController(this.getObjectId()));
-      PacketCreator.announce(client, new RemovePlayerNPC(this.getObjectId()));
    }
 
    public void updatePlayerNPCPosition(MapleMap map, Point newPos) {

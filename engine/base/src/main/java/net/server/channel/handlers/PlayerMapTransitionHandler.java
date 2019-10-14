@@ -31,6 +31,7 @@ import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
 import server.life.MapleMonster;
 import server.maps.MapleMapObject;
+import server.processor.maps.MapleMapObjectProcessor;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.buff.GiveBuff;
@@ -63,14 +64,14 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
          if (m.getSpawnEffect() == 0 || m.getHp() < m.getMaxHp()) {     // avoid effect-spawning mobs
             if (m.getController() == chr) {
                PacketCreator.announce(client, new StopMonsterControl(m.getObjectId()));
-               m.sendDestroyData(client);
+               MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
                m.aggroRedirectController();
             } else {
-               m.sendDestroyData(client);
+               MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
             }
 
             m.aggroSwitchController(chr, false);
-            m.sendSpawnData(client);
+            MapleMapObjectProcessor.getInstance().sendSpawnData(m, client);
          }
       }
    }

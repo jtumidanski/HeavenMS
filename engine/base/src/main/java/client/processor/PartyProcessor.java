@@ -8,6 +8,8 @@ import client.MapleCharacter;
 import net.server.world.MapleParty;
 import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;
+import server.maps.spawner.DoorObjectSpawnAndDestroyer;
+import server.processor.maps.MapleMapObjectProcessor;
 
 public class PartyProcessor {
    private static PartyProcessor ourInstance = new PartyProcessor();
@@ -52,7 +54,7 @@ public class PartyProcessor {
          for (MapleDoor door : partyDoors.values()) {
             for (MapleCharacter pchar : partyMembers) {
                MapleDoorObject mdo = door.getTownDoor();
-               mdo.sendDestroyData(pchar.getClient(), true);
+               DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, pchar.getClient(), true);
                pchar.removeVisibleMapObject(mdo);
             }
          }
@@ -62,7 +64,7 @@ public class PartyProcessor {
             for (MapleDoor door : leaverDoors) {
                for (MapleCharacter pchar : partyMembers) {
                   MapleDoorObject mdo = door.getTownDoor();
-                  mdo.sendDestroyData(pchar.getClient(), true);
+                  DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, pchar.getClient(), true);
                   pchar.removeVisibleMapObject(mdo);
                }
             }
@@ -75,7 +77,7 @@ public class PartyProcessor {
             if (door != null) {
                for (MapleCharacter pchar : partyMembers) {
                   MapleDoorObject mdo = door.getTownDoor();
-                  mdo.sendSpawnData(pchar.getClient());
+                  MapleMapObjectProcessor.getInstance().sendSpawnData(mdo, pchar.getClient());
                   pchar.addVisibleMapObject(mdo);
                }
             }
@@ -88,21 +90,21 @@ public class PartyProcessor {
          if (partyDoors != null) {
             for (MapleDoor door : partyDoors.values()) {
                MapleDoorObject mdo = door.getTownDoor();
-               mdo.sendDestroyData(partyLeaver.getClient(), true);
+               DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, partyLeaver.getClient(), true);
                partyLeaver.removeVisibleMapObject(mdo);
             }
          }
 
          for (MapleDoor door : leaverDoors) {
             MapleDoorObject mdo = door.getTownDoor();
-            mdo.sendDestroyData(partyLeaver.getClient(), true);
+            DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, partyLeaver.getClient(), true);
             partyLeaver.removeVisibleMapObject(mdo);
          }
 
          for (MapleDoor door : leaverDoors) {
             door.updateDoorPortal(partyLeaver);
             MapleDoorObject mdo = door.getTownDoor();
-            mdo.sendSpawnData(partyLeaver.getClient());
+            MapleMapObjectProcessor.getInstance().sendSpawnData(mdo, partyLeaver.getClient());
             partyLeaver.addVisibleMapObject(mdo);
          }
       }

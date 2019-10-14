@@ -3,10 +3,6 @@ package server.maps;
 import java.awt.Point;
 
 import client.MapleCharacter;
-import client.MapleClient;
-import tools.PacketCreator;
-import tools.packet.remove.RemoveKite;
-import tools.packet.spawn.SpawnKite;
 
 public class MapleKite extends AbstractMapleMapObject {
 
@@ -14,14 +10,14 @@ public class MapleKite extends AbstractMapleMapObject {
    private MapleCharacter owner;
    private String text;
    private int ft;
-   private int itemid;
+   private int itemId;
 
-   public MapleKite(MapleCharacter owner, String text, int itemid) {
+   public MapleKite(MapleCharacter owner, String text, int itemId) {
       this.owner = owner;
       this.pos = owner.getPosition();
       this.ft = owner.getFh();
       this.text = text;
-      this.itemid = itemid;
+      this.itemId = itemId;
    }
 
    @Override
@@ -43,21 +39,19 @@ public class MapleKite extends AbstractMapleMapObject {
       return owner;
    }
 
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      client.announce(makeDestroyData());
+   public Point getPos() {
+      return pos;
    }
 
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      client.announce(makeSpawnData());
+   public String getText() {
+      return text;
    }
 
-   public final byte[] makeSpawnData() {
-      return PacketCreator.create(new SpawnKite(getObjectId(), itemid, owner.getName(), text, pos, ft));
+   public int getFt() {
+      return ft;
    }
 
-   public final byte[] makeDestroyData() {
-      return PacketCreator.create(new RemoveKite(getObjectId(), 0));
+   public int getItemId() {
+      return itemId;
    }
 }

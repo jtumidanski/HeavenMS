@@ -40,11 +40,11 @@ public class MapleDoorProcessor {
       town.removeMapObject(townDoor);
 
       target.getCharacters().forEach(character -> {
-         areaDoor.sendDestroyData(character.getClient());
+         MapleMapObjectProcessor.getInstance().sendDestroyData(areaDoor, character.getClient());
          character.removeVisibleMapObject(areaDoor);
       });
       town.getCharacters().forEach(character -> {
-         townDoor.sendDestroyData(character.getClient());
+         MapleMapObjectProcessor.getInstance().sendDestroyData(townDoor, character.getClient());
          character.removeVisibleMapObject(townDoor);
       });
 
@@ -54,7 +54,7 @@ public class MapleDoorProcessor {
          town.getCharacters().stream()
                .filter(character -> character.getMainTownDoor() != null)
                .forEach(character -> {
-                  townDoor.sendSpawnData(character.getClient());
+                  MapleMapObjectProcessor.getInstance().sendSpawnData(townDoor, character.getClient());
                   character.addVisibleMapObject(townDoor);
                });
       }

@@ -193,6 +193,7 @@ import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
 import server.partyquest.PartyQuest;
 import server.processor.maps.MapleDoorProcessor;
+import server.processor.maps.MapleMapObjectProcessor;
 import server.quest.MapleQuest;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
@@ -264,7 +265,6 @@ import tools.packet.showitemgaininchat.ShowOwnBerserk;
 import tools.packet.showitemgaininchat.ShowOwnBuffEffect;
 import tools.packet.showitemgaininchat.ShowOwnRecovery;
 import tools.packet.spawn.ShowPet;
-import tools.packet.spawn.SpawnPlayer;
 import tools.packet.spawn.SpawnSummon;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
@@ -1207,8 +1207,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          MapleClient chrC = chr.getClient();
 
          if (chrC != null) {     // propagate new job 3rd-person effects (FJ, Aran 1st strike, etc)
-            this.sendDestroyData(chrC);
-            this.sendSpawnData(chrC);
+            MapleMapObjectProcessor.getInstance().sendDestroyData(this, chrC);
+            MapleMapObjectProcessor.getInstance().sendSpawnData(this, chrC);
          }
       }
 
@@ -3071,6 +3071,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          chrLock.unlock();
          effLock.unlock();
       }
+   }
+
+   public boolean hasBuffFromSourceIdDirty(int sourceId) {
+      return buffEffects.containsKey(sourceId);
    }
 
    public boolean hasActiveBuff(int sourceid) {
@@ -8043,27 +8047,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    @Override
    public MapleMapObjectType getType() {
       return MapleMapObjectType.PLAYER;
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      PacketCreator.announce(client, new RemovePlayer(this.getObjectId()));
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      if (!this.isHidden() || client.getPlayer().gmLevel() > 1) {
-         PacketCreator.announce(client, new SpawnPlayer(client, this, false));
-
-         if (buffEffects.containsKey(ChairProcessor.getInstance().getJobMapChair(job))) { // mustn't effLock, chrLock this function
-            PacketCreator.announce(client, new GiveForeignChairSkillEffect(id));
-         }
-      }
-
-      if (this.isHidden()) {
-         List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-         getMap().broadcastGMMessage(this, PacketCreator.create(new GiveForeignBuff(getId(), dsstat)), false);
-      }
    }
 
    @Override

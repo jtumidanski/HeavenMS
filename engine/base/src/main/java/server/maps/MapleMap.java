@@ -89,6 +89,10 @@ import server.life.MonsterGlobalDropEntry;
 import server.life.MonsterListener;
 import server.life.SelfDestruction;
 import server.life.SpawnPoint;
+import server.maps.spawner.DoorObjectSpawnAndDestroyer;
+import server.maps.spawner.KiteSpawnAndDestroyer;
+import server.maps.spawner.MistSpawnAndDestroyer;
+import server.maps.spawner.ReactorSpawnAndDestroyer;
 import server.partyquest.GuardianSpawnPoint;
 import server.partyquest.MapleCarnivalFactory;
 import server.partyquest.MapleCarnivalFactory.MCSkill;
@@ -1960,7 +1964,7 @@ public class MapleMap {
 
    public void spawnReactor(final MapleReactor reactor) {
       reactor.setMap(this);
-      spawnAndAddRangedMapObject(reactor, c -> c.announce(reactor.makeSpawnData()));
+      spawnAndAddRangedMapObject(reactor, c -> c.announce(ReactorSpawnAndDestroyer.getInstance().makeSpawnData(reactor)));
    }
 
    public void spawnDoor(final MapleDoorObject door) {
@@ -1969,7 +1973,7 @@ public class MapleMap {
          public void sendPackets(MapleClient c) {
             MapleCharacter chr = c.getPlayer();
             if (chr != null) {
-               door.sendSpawnData(c, false);
+               DoorObjectSpawnAndDestroyer.getInstance().sendSpawnData(door, c, false);
                chr.addVisibleMapObject(door);
             }
          }
@@ -2006,7 +2010,13 @@ public class MapleMap {
 
    public void spawnMist(final MapleMist mist, final int duration, boolean poison, boolean fake, boolean recovery) {
       addMapObject(mist);
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> fake ? mist.makeFakeSpawnData(30) : mist.makeSpawnData());
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> {
+         if (fake) {
+            return MistSpawnAndDestroyer.getInstance().makeFakeSpawnData(mist, 30);
+         } else {
+            return MistSpawnAndDestroyer.getInstance().makeSpawnData(mist);
+         }
+      });
       TimerManager tMan = TimerManager.getInstance();
       final ScheduledFuture<?> poisonSchedule;
       if (poison) {
@@ -2054,7 +2064,7 @@ public class MapleMap {
             if (poisonSchedule != null) {
                poisonSchedule.cancel(false);
             }
-            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> mist.makeDestroyData());
+            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> MistSpawnAndDestroyer.getInstance().makeDestroyData(mist));
          }
       };
 
@@ -2063,13 +2073,13 @@ public class MapleMap {
 
    public void spawnKite(final MapleKite kite) {
       addMapObject(kite);
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> kite.makeSpawnData());
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> KiteSpawnAndDestroyer.getInstance().makeSpawnData(kite));
 
       Runnable expireKite = new Runnable() {
          @Override
          public void run() {
             removeMapObject(kite);
-            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> kite.makeDestroyData());
+            MasterBroadcaster.getInstance().sendToAllInMap(MapleMap.this, character -> KiteSpawnAndDestroyer.getInstance().makeDestroyData(kite));
          }
       };
 
@@ -2781,7 +2791,7 @@ public class MapleMap {
 
       for (MapleMapObject o : objects) {
          if (MapleMapObjectTypeProcessor.getInstance().isNonRangedType(o.getType())) {
-            o.sendSpawnData(mapleClient);
+            MapleMapObjectProcessor.getInstance().sendSpawnData(o, mapleClient);
          } else if (o.getType() == MapleMapObjectType.MONSTER) {
             ((MapleMonster) o).aggroUpdateController();
          } else if (o.getType() == MapleMapObjectType.SUMMON) {
@@ -2805,11 +2815,11 @@ public class MapleMap {
          for (MapleMapObject o : getMapObjectsInRange(chr.getPosition(), MapleMapProcessor.getInstance().getRangedDistance(), rangedMapobjectTypes)) {
             if (o.getType() == MapleMapObjectType.REACTOR) {
                if (((MapleReactor) o).isAlive()) {
-                  o.sendSpawnData(chr.getClient());
+                  MapleMapObjectProcessor.getInstance().sendSpawnData(o, chr.getClient());
                   chr.addVisibleMapObject(o);
                }
             } else {
-               o.sendSpawnData(chr.getClient());
+               MapleMapObjectProcessor.getInstance().sendSpawnData(o, chr.getClient());
                chr.addVisibleMapObject(o);
             }
          }
@@ -3009,7 +3019,7 @@ public class MapleMap {
 
       for (MapleMapObject mo : getMapObjectsInRange(player.getPosition(), MapleMapProcessor.getInstance().getRangedDistance(), rangedMapobjectTypes)) {
          if (!player.isMapObjectVisible(mo)) {
-            mo.sendSpawnData(player.getClient());
+            MapleMapObjectProcessor.getInstance().sendSpawnData(mo, player.getClient());
             player.addVisibleMapObject(mo);
          }
       }

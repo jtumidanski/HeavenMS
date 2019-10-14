@@ -201,23 +201,4 @@ public class MapleMapItem extends AbstractMapleMapObject {
    public final MapleMapObjectType getType() {
       return MapleMapObjectType.ITEM;
    }
-
-   @Override
-   public void sendSpawnData(final MapleClient client) {
-      MapleCharacter chr = client.getPlayer();
-
-      if (chr.needQuestItem(questid, getItemId())) {
-         this.lockItem();
-         try {
-            PacketCreator.announce(client, new DropItemFromMapObject(chr, this, null, getPosition(), (byte) 2));
-         } finally {
-            this.unlockItem();
-         }
-      }
-   }
-
-   @Override
-   public void sendDestroyData(final MapleClient client) {
-      PacketCreator.announce(client, new RemoveItem(getObjectId(), 1, 0));
-   }
 }

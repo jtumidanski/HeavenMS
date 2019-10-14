@@ -32,14 +32,13 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import scripting.reactor.ReactorScriptManager;
 import server.TimerManager;
+import server.maps.spawner.ReactorSpawnAndDestroyer;
 import server.partyquest.GuardianSpawnPoint;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
-import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.reactor.DestroyReactor;
-import tools.packet.reactor.SpawnReactor;
 import tools.packet.reactor.TriggerReactor;
 
 /**
@@ -155,26 +154,6 @@ public class MapleReactor extends AbstractMapleMapObject {
 
    public boolean isActive() {
       return alive && stats.getType(state) != -1;
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      client.announce(makeDestroyData());
-   }
-
-   public final byte[] makeDestroyData() {
-      return PacketCreator.create(new DestroyReactor(this));
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      if (this.isAlive()) {
-         client.announce(makeSpawnData());
-      }
-   }
-
-   public final byte[] makeSpawnData() {
-      return PacketCreator.create(new SpawnReactor(this));
    }
 
    public void resetReactorActions(int newState) {
@@ -357,7 +336,7 @@ public class MapleReactor extends AbstractMapleMapObject {
          this.unlockReactor();
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> this.makeSpawnData());
+      MasterBroadcaster.getInstance().sendToAllInMap(map, character -> ReactorSpawnAndDestroyer.getInstance().makeSpawnData(this));
    }
 
    public void delayedRespawn() {

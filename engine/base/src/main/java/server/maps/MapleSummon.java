@@ -24,11 +24,7 @@ package server.maps;
 import java.awt.Point;
 
 import client.MapleCharacter;
-import client.MapleClient;
 import client.SkillFactory;
-import tools.PacketCreator;
-import tools.packet.remove.RemoveSummon;
-import tools.packet.spawn.SpawnSummon;
 
 /**
  * @author Jan
@@ -52,18 +48,6 @@ public class MapleSummon extends AbstractAnimatedMapleMapObject {
          this.movementType = movementType;
          setPosition(pos);
       });
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      PacketCreator.announce(client, new SpawnSummon(getOwner().getId(), getObjectId(),
-            getSkill(), getSkillLevel(), getPosition(), getStance(),
-            getMovementType().getValue(), isPuppet(), false));
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      PacketCreator.announce(client, new RemoveSummon(getOwner().getId(), getObjectId(), true));
    }
 
    public MapleCharacter getOwner() {

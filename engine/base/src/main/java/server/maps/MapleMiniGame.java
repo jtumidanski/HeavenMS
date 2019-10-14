@@ -502,14 +502,6 @@ public class MapleMiniGame extends AbstractMapleMapObject {
    }
 
    @Override
-   public void sendDestroyData(MapleClient client) {
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-   }
-
-   @Override
    public MapleMapObjectType getType() {
       return MapleMapObjectType.MINI_GAME;
    }

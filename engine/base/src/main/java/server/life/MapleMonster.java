@@ -87,13 +87,10 @@ import tools.packet.monster.ApplyMonsterStatus;
 import tools.packet.monster.CancelMonsterStatus;
 import tools.packet.monster.DamageMonster;
 import tools.packet.monster.HealMonster;
-import tools.packet.monster.KillMonster;
 import tools.packet.monster.ShowMonsterHP;
 import tools.packet.movement.MoveMonster;
 import tools.packet.remove.RemoveSummon;
 import tools.packet.spawn.ControlMonster;
-import tools.packet.spawn.SpawnFakeMonster;
-import tools.packet.spawn.SpawnMonster;
 import tools.packet.spawn.SpawnSummon;
 import tools.packet.spawn.StopMonsterControl;
 
@@ -1076,30 +1073,6 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       } finally {
          statiLock.unlock();
       }
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      if (hp.get() <= 0) { // mustn't monsterLock this function
-         return;
-      }
-      if (fake) {
-         PacketCreator.announce(client, new SpawnFakeMonster(this, 0));
-      } else {
-         PacketCreator.announce(client, new SpawnMonster(this, false));
-      }
-
-      announceMonsterStatus(client);
-
-      if (hasBossHPBar()) {
-         client.announceBossHpBar(this, this.hashCode(), makeBossHPBarPacket());
-      }
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      PacketCreator.announce(client, new KillMonster(getObjectId(), false));
-      PacketCreator.announce(client, new KillMonster(getObjectId(), true));
    }
 
    @Override

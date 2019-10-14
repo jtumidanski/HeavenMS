@@ -26,7 +26,6 @@ import java.awt.Rectangle;
 import java.util.Optional;
 
 import client.MapleCharacter;
-import client.MapleClient;
 import client.Skill;
 import client.SkillFactory;
 import constants.skills.BlazeWizard;
@@ -37,9 +36,6 @@ import constants.skills.Shadower;
 import server.MapleStatEffect;
 import server.life.MapleMonster;
 import server.life.MobSkill;
-import tools.PacketCreator;
-import tools.packet.remove.RemoveMist;
-import tools.packet.spawn.SpawnMist;
 
 /**
  * @author LaiLaiNoob
@@ -135,42 +131,17 @@ public class MapleMist extends AbstractMapleMapObject {
       return mistPosition;
    }
 
-   public final byte[] makeDestroyData() {
-      return PacketCreator.create(new RemoveMist(getObjectId()));
-   }
-
-   public final byte[] makeSpawnData() {
-      if (owner != null) {
-         return SkillFactory.applyForSkill(owner,
-               source.getSourceId(),
-               (skill, skillLevel) -> spawnMistForOwner(skillLevel),
-               new byte[0]);
-      }
-      return PacketCreator.create(new SpawnMist(getObjectId(), mob.getId(), skill.skillId(), skill.level(), this));
-   }
-
-   private byte[] spawnMistForOwner(Integer skillLevel) {
-      return getSourceSkill().map(skill -> PacketCreator.create(new SpawnMist(getObjectId(), owner.getId(), skill.getId(), skillLevel, this))).orElse(new byte[0]);
-   }
-
-   public final byte[] makeFakeSpawnData(int level) {
-      if (owner != null) {
-         return spawnMistForOwner(level);
-      }
-      return PacketCreator.create(new SpawnMist(getObjectId(), mob.getId(), skill.skillId(), skill.level(), this));
-   }
-
-   @Override
-   public void sendSpawnData(MapleClient client) {
-      client.announce(makeSpawnData());
-   }
-
-   @Override
-   public void sendDestroyData(MapleClient client) {
-      client.announce(makeDestroyData());
-   }
-
    public boolean makeChanceResult() {
       return source.makeChanceResult();
    }
+
+   public MapleStatEffect getSource() {
+      return source;
+   }
+
+   public MobSkill getSkill() {
+      return skill;
+   }
+
+
 }
