@@ -458,7 +458,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
          writer.writeInt(newyears.size());
          for (NewYearCardRecord nyc : newyears) {
-            writer.writeInt(nyc.getId());
+            writer.writeInt(nyc.id());
          }
       } else {
          writer.write(0);

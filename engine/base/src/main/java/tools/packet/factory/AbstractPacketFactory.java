@@ -562,17 +562,17 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    }
 
    protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter mplew) {
-      mplew.writeInt(newyear.getId());
-      mplew.writeInt(newyear.getSenderId());
-      mplew.writeMapleAsciiString(newyear.getSenderName());
-      mplew.writeBool(newyear.isSenderCardDiscarded());
-      mplew.writeLong(newyear.getDateSent());
-      mplew.writeInt(newyear.getReceiverId());
-      mplew.writeMapleAsciiString(newyear.getReceiverName());
-      mplew.writeBool(newyear.isReceiverCardDiscarded());
-      mplew.writeBool(newyear.isReceiverCardReceived());
-      mplew.writeLong(newyear.getDateReceived());
-      mplew.writeMapleAsciiString(newyear.getMessage());
+      mplew.writeInt(newyear.id());
+      mplew.writeInt(newyear.senderId());
+      mplew.writeMapleAsciiString(newyear.senderName());
+      mplew.writeBool(newyear.senderDiscardCard());
+      mplew.writeLong(newyear.dateSent());
+      mplew.writeInt(newyear.receiverId());
+      mplew.writeMapleAsciiString(newyear.receiverName());
+      mplew.writeBool(newyear.receiverDiscardCard());
+      mplew.writeBool(newyear.receiverReceivedCard());
+      mplew.writeLong(newyear.dateReceived());
+      mplew.writeMapleAsciiString(newyear.message());
    }
 
    protected void addAreaInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {

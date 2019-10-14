@@ -37,8 +37,8 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
-import client.newyear.NewYearCardRecord;
 import client.processor.ItemProcessor;
+import client.processor.NewYearCardProcessor;
 import constants.ItemConstants;
 import constants.ServerConstants;
 import server.MapleItemInformationProvider;
@@ -761,10 +761,10 @@ public class MapleInventoryManipulator {
 
          if (ItemConstants.isNewYearCardEtc(itemId)) {
             if (itemId == 4300000) {
-               NewYearCardRecord.removeAllNewYearCard(true, chr);
+               NewYearCardProcessor.getInstance().removeAllNewYearCard(true, chr);
                c.getAbstractPlayerInteraction().removeAll(4300000);
             } else {
-               NewYearCardRecord.removeAllNewYearCard(false, chr);
+               NewYearCardProcessor.getInstance().removeAllNewYearCard(false, chr);
                c.getAbstractPlayerInteraction().removeAll(4301000);
             }
          }
@@ -792,10 +792,10 @@ public class MapleInventoryManipulator {
             chr.equipChanged();
          } else if (ItemConstants.isNewYearCardEtc(itemId)) {
             if (itemId == 4300000) {
-               NewYearCardRecord.removeAllNewYearCard(true, chr);
+               NewYearCardProcessor.getInstance().removeAllNewYearCard(true, chr);
                c.getAbstractPlayerInteraction().removeAll(4300000);
             } else {
-               NewYearCardRecord.removeAllNewYearCard(false, chr);
+               NewYearCardProcessor.getInstance().removeAllNewYearCard(false, chr);
                c.getAbstractPlayerInteraction().removeAll(4301000);
             }
          }

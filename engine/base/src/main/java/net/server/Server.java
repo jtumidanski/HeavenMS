@@ -79,6 +79,7 @@ import client.inventory.manipulator.MapleCashIdGenerator;
 import client.newyear.NewYearCardRecord;
 import client.processor.CharacterProcessor;
 import client.processor.MapleFamilyProcessor;
+import client.processor.NewYearCardProcessor;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.OpcodeConstants;
@@ -333,7 +334,7 @@ public class Server {
    }
 
    public void setNewYearCard(NewYearCardRecord nyc) {
-      newyears.put(nyc.getId(), nyc);
+      newyears.put(nyc.id(), nyc);
    }
 
    public NewYearCardRecord getNewYearCard(int cardid) {
@@ -872,7 +873,7 @@ public class Server {
       MapleQuest.loadAllQuest();
       System.out.println("Quest loaded in " + ((System.currentTimeMillis() - timeToTake) / 1000.0) + " seconds\r\n");
 
-      NewYearCardRecord.startPendingNewYearCardRequests();
+      NewYearCardProcessor.getInstance().startPendingNewYearCardRequests();
 
       if (ServerConstants.USE_THREAD_TRACKER) {
          ThreadTracker.getInstance().registerThreadTrackerTask();

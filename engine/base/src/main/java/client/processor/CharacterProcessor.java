@@ -78,7 +78,6 @@ import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleCashIdGenerator;
-import client.newyear.NewYearCardRecord;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.ServerConstants;
@@ -434,7 +433,7 @@ public class CharacterProcessor {
          CharacterProcessor.getInstance().loadInventory(characterData.id(), channelserver, mapleCharacter);
          World world = Server.getInstance().getWorld(characterData.world());
          CharacterProcessor.getInstance().correctMarriageDatabaseData(characterData, mapleCharacter, world);
-         NewYearCardRecord.loadPlayerNewYearCards(mapleCharacter);
+         NewYearCardProcessor.getInstance().loadPlayerNewYearCards(mapleCharacter);
          CharacterProcessor.getInstance().loadPetIgnores(connection, characterData, mapleCharacter);
 
          if (channelserver) {

@@ -19,14 +19,14 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
    }
 
    protected void onNewYearCardRes(MaplePacketLittleEndianWriter writer, NewYearCardResolution packet) {
-      writer.write(packet.getMode());
-      switch (packet.getMode()) {
+      writer.write(packet.mode());
+      switch (packet.mode()) {
          case 4: // Successfully sent a New Year Card\r\n to %s.
          case 6: // Successfully received a New Year Card.
-            encodeNewYearCard(packet.getNewYearCardRecord(), writer);
+            encodeNewYearCard(packet.newYearCardRecord(), writer);
             break;
          case 8: // Successfully deleted a New Year Card.
-            writer.writeInt(packet.getNewYearCardRecord().getId());
+            writer.writeInt(packet.newYearCardRecord().id());
             break;
          case 5: // Nexon's stupid and makes 4 modes do the same operation..
          case 7:
@@ -40,44 +40,44 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
             // 0x15: An error occured during DB operation.
             // 0x16: An unknown error occured !
             // 0xF: You cannot send a card to yourself !
-            writer.write(packet.getMessage());
+            writer.write(packet.message());
             break;
          case 0xA:   // GetUnreceivedList_Done
             int nSN = 1;
             writer.writeInt(nSN);
             if ((nSN - 1) <= 98 && nSN > 0) {//lol nexon are you kidding
                for (int i = 0; i < nSN; i++) {
-                  writer.writeInt(packet.getNewYearCardRecord().getId());
-                  writer.writeInt(packet.getNewYearCardRecord().getSenderId());
-                  writer.writeMapleAsciiString(packet.getNewYearCardRecord().getSenderName());
+                  writer.writeInt(packet.newYearCardRecord().id());
+                  writer.writeInt(packet.newYearCardRecord().senderId());
+                  writer.writeMapleAsciiString(packet.newYearCardRecord().senderName());
                }
             }
             break;
          case 0xC:   // NotiArrived
-            writer.writeInt(packet.getNewYearCardRecord().getId());
-            writer.writeMapleAsciiString(packet.getNewYearCardRecord().getSenderName());
+            writer.writeInt(packet.newYearCardRecord().id());
+            writer.writeMapleAsciiString(packet.newYearCardRecord().senderName());
             break;
          case 0xD:   // BroadCast_AddCardInfo
-            writer.writeInt(packet.getNewYearCardRecord().getId());
-            writer.writeInt(packet.getCharacter().getId());
+            writer.writeInt(packet.newYearCardRecord().id());
+            writer.writeInt(packet.characterId());
             break;
          case 0xE:   // BroadCast_RemoveCardInfo
-            writer.writeInt(packet.getNewYearCardRecord().getId());
+            writer.writeInt(packet.newYearCardRecord().id());
             break;
       }
    }
 
    protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter writer) {
-      writer.writeInt(newyear.getId());
-      writer.writeInt(newyear.getSenderId());
-      writer.writeMapleAsciiString(newyear.getSenderName());
-      writer.writeBool(newyear.isSenderCardDiscarded());
-      writer.writeLong(newyear.getDateSent());
-      writer.writeInt(newyear.getReceiverId());
-      writer.writeMapleAsciiString(newyear.getReceiverName());
-      writer.writeBool(newyear.isReceiverCardDiscarded());
-      writer.writeBool(newyear.isReceiverCardReceived());
-      writer.writeLong(newyear.getDateReceived());
-      writer.writeMapleAsciiString(newyear.getMessage());
+      writer.writeInt(newyear.id());
+      writer.writeInt(newyear.senderId());
+      writer.writeMapleAsciiString(newyear.senderName());
+      writer.writeBool(newyear.senderDiscardCard());
+      writer.writeLong(newyear.dateSent());
+      writer.writeInt(newyear.receiverId());
+      writer.writeMapleAsciiString(newyear.receiverName());
+      writer.writeBool(newyear.receiverDiscardCard());
+      writer.writeBool(newyear.receiverReceivedCard());
+      writer.writeLong(newyear.dateReceived());
+      writer.writeMapleAsciiString(newyear.message());
    }
 }

@@ -8088,12 +8088,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public Set<NewYearCardRecord> getReceivedNewYearRecords() {
-      return newyears.stream().filter(NewYearCardRecord::isReceiverCardReceived).collect(Collectors.toSet());
+      return newyears.stream().filter(NewYearCardRecord::receiverReceivedCard).collect(Collectors.toSet());
    }
 
    public NewYearCardRecord getNewYearRecord(int cardid) {
       return newyears.stream()
-            .filter(newYearCardRecord -> newYearCardRecord.getId() == cardid)
+            .filter(newYearCardRecord -> newYearCardRecord.id() == cardid)
             .findFirst()
             .orElse(null);
    }
