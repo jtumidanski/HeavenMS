@@ -26,9 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import client.MapleClient;
-import client.creator.novice.BeginnerCreator;
-import client.creator.novice.LegendCreator;
-import client.creator.novice.NoblesseCreator;
+import client.creator.CharacterFactory;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.CreateCharacterReader;
 import net.server.login.packet.CreateCharacterPacket;
@@ -56,11 +54,11 @@ public final class CreateCharHandler extends AbstractPacketHandler<CreateCharact
 
       int status;
       if (packet.job() == 0) { // Knights of Cygnus
-         status = NoblesseCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
+         status = CharacterFactory.getInstance().createNoblesse(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
       } else if (packet.job() == 1) { // Adventurer
-         status = BeginnerCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
+         status = CharacterFactory.getInstance().createBeginner(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
       } else if (packet.job() == 2) { // Aran
-         status = LegendCreator.createCharacter(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
+         status = CharacterFactory.getInstance().createLegend(client, packet.name(), packet.face(), packet.hair() + packet.hairColor(), packet.skinColor(), packet.top(), packet.bottom(), packet.shoes(), packet.weapon(), packet.gender());
       } else {
          PacketCreator.announce(client, new DeleteCharacter(0, DeleteCharacterResponse.UNKNOWN_ERROR));
          return;

@@ -30,11 +30,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.Skill;
 import client.SkillFactory;
-import client.creator.veteran.BowmanCreator;
-import client.creator.veteran.MagicianCreator;
-import client.creator.veteran.PirateCreator;
-import client.creator.veteran.ThiefCreator;
-import client.creator.veteran.WarriorCreator;
+import client.creator.CharacterFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -423,23 +419,19 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       int createStatus;
       switch (jobId) {
          case 0:
-            createStatus = WarriorCreator.createCharacter(c, name, face, hair + hairColor, skin, gender, improveSp);
+            createStatus = CharacterFactory.getInstance().createWarrior(c, name, face, hair + hairColor, skin, gender, improveSp);
             break;
-
          case 1:
-            createStatus = MagicianCreator.createCharacter(c, name, face, hair + hairColor, skin, gender, improveSp);
+            createStatus = CharacterFactory.getInstance().createMagician(c, name, face, hair + hairColor, skin, gender, improveSp);
             break;
-
          case 2:
-            createStatus = BowmanCreator.createCharacter(c, name, face, hair + hairColor, skin, gender, improveSp);
+            createStatus = CharacterFactory.getInstance().createBowman(c, name, face, hair + hairColor, skin, gender, improveSp);
             break;
-
          case 3:
-            createStatus = ThiefCreator.createCharacter(c, name, face, hair + hairColor, skin, gender, improveSp);
+            createStatus = CharacterFactory.getInstance().createThief(c, name, face, hair + hairColor, skin, gender, improveSp);
             break;
-
          default:
-            createStatus = PirateCreator.createCharacter(c, name, face, hair + hairColor, skin, gender, improveSp);
+            createStatus = CharacterFactory.getInstance().createPirate(c, name, face, hair + hairColor, skin, gender, improveSp);
       }
 
       if (createStatus == 0) {

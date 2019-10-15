@@ -87,6 +87,7 @@ import net.server.guild.MapleGuildCharacter;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
+import scala.jdk.javaapi.CollectionConverters;
 import server.events.RescueGaga;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
@@ -627,24 +628,18 @@ public class CharacterProcessor {
 
 
    public final boolean insertNewChar(MapleCharacter character, CharacterFactoryRecipe recipe) {
-      character.init(recipe.getStr(), recipe.getDex(), recipe.getInt(), recipe.getLuk(), recipe.getMaxHp(), recipe.getMaxMp(), recipe.getMeso());
-      character.setMaxHp(recipe.getMaxHp());
-      character.setMaxMp(recipe.getMaxMp());
-      character.setLevel(recipe.getLevel());
-      character.setRemainingAp(recipe.getRemainingAp());
-      character.setRemainingSp(GameConstants.getSkillBook(character.getJob().getId()), recipe.getRemainingSp());
-      character.setMapId(recipe.getMap());
+      character.init(recipe.str(), recipe.dex(), recipe.intelligence(), recipe.luk(), recipe.maxHp(), recipe.maxMp(), recipe.meso());
+      character.setMaxHp(recipe.maxHp());
+      character.setMaxMp(recipe.maxMp());
+      character.setLevel(recipe.level());
+      character.setRemainingAp(recipe.remainingAp());
+      character.setRemainingSp(GameConstants.getSkillBook(character.getJob().getId()), recipe.remainingSp());
+      character.setMapId(recipe.map());
 
-      List<Pair<Skill, Integer>> startingSkills = recipe.getStartingSkillLevel();
-      for (Pair<Skill, Integer> skEntry : startingSkills) {
-         Skill skill = skEntry.getLeft();
-         character.changeSkillLevel(skill, skEntry.getRight().byteValue(), skill.getMaxLevel(), -1);
-      }
+      CollectionConverters.asJava(recipe.getStartingSkillLevel()).forEach(entry ->
+            SkillFactory.getSkill(entry.getLeft()).ifPresent(skill -> character.changeSkillLevel(skill, entry.getRight().byteValue(), skill.getMaxLevel(), -1)));
 
-      List<Pair<Item, MapleInventoryType>> itemsWithType = recipe.getStartingItems();
-      for (Pair<Item, MapleInventoryType> itEntry : itemsWithType) {
-         character.getInventory(itEntry.getRight()).addItem(itEntry.getLeft());
-      }
+      CollectionConverters.asJava(recipe.getStartingItems()).forEach(entry -> character.getInventory(entry.getRight()).addItem(entry.getLeft()));
 
       character.getEvents().put("rescueGaga", new RescueGaga(0));
 
