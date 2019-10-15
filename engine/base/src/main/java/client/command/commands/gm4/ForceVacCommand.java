@@ -34,7 +34,6 @@ import client.processor.PetProcessor;
 import server.maps.MapleMapItem;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import tools.PacketCreator;
 import tools.packet.remove.RemoveItem;
 
 public class ForceVacCommand extends Command {
@@ -71,7 +70,7 @@ public class ForceVacCommand extends Command {
                }
             }
 
-            player.getMap().pickItemDrop(PacketCreator.create(new RemoveItem(mapItem.objectId(), 2, player.getId())), mapItem);
+            player.getMap().pickItemDrop(new RemoveItem(mapItem.objectId(), 2, player.getId()), mapItem);
          } finally {
             mapItem.unlockItem();
          }

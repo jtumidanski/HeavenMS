@@ -44,7 +44,7 @@ import server.life.MapleMonsterInformationProvider;
 import server.maps.MapleSummon;
 import tools.FilePrinter;
 import tools.MasterBroadcaster;
-import tools.PacketCreator;
+import tools.packet.PacketInput;
 import tools.packet.attack.SummonAttack;
 
 public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonDamagePacket> {
@@ -82,8 +82,8 @@ public final class SummonDamageHandler extends AbstractDealDamageHandler<SummonD
          allDamage.add(new SummonAttackEntry(packet.monsterObjectId()[x], packet.damage()[x]));
       }
 
-      byte[] attackPacket = PacketCreator.create(new SummonAttack(player.getId(), summon.objectId(), packet.direction(), allDamage));
-      MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), character -> attackPacket, player, summon.position());
+      PacketInput attackPacket = new SummonAttack(player.getId(), summon.objectId(), packet.direction(), allDamage);
+      MasterBroadcaster.getInstance().sendToAllInMapRange(player.getMap(), attackPacket, player, summon.position());
 
       if (player.getMap().isOwnershipRestricted(player)) {
          return;

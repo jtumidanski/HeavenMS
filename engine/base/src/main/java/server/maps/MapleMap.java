@@ -110,6 +110,7 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.PacketInput;
 import tools.packet.buff.GiveForeignBuff;
 import tools.packet.character.CharacterLook;
 import tools.packet.character.box.UseChalkboard;
@@ -997,8 +998,8 @@ public class MapleMap {
             .count();
    }
 
-   public void pickItemDrop(byte[] pickupPacket, MapleMapItem mdrop) { // mdrop must be already locked and not-pickedup checked by now
-      MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> pickupPacket, mdrop.position());
+   public void pickItemDrop(PacketInput pickupPacket, MapleMapItem mdrop) { // mdrop must be already locked and not-pickedup checked by now
+      MasterBroadcaster.getInstance().sendToAllInMapRange(this, pickupPacket, mdrop.position());
 
       droppedItemCount.decrementAndGet();
       this.removeMapObject(mdrop);
@@ -2657,9 +2658,9 @@ public class MapleMap {
 
       removeMapObject(chr.objectId());
       if (!chr.isHidden()) {
-         MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new RemovePlayer(chr.getId())));
+         MasterBroadcaster.getInstance().sendToAllInMap(this, new RemovePlayer(chr.getId()));
       } else {
-         MasterBroadcaster.getInstance().sendToAllGMInMap(this, character -> PacketCreator.create(new RemovePlayer(chr.getId())));
+         MasterBroadcaster.getInstance().sendToAllGMInMap(this, new RemovePlayer(chr.getId()));
       }
 
       chr.leaveMap();
@@ -3159,7 +3160,7 @@ public class MapleMap {
                return true;
             }
 
-            MapleMap.this.pickItemDrop(PacketCreator.create(new RemoveItem(mapitem.objectId(), 0, 0)), mapitem);
+            MapleMap.this.pickItemDrop(new RemoveItem(mapitem.objectId(), 0, 0), mapitem);
             return true;
          } finally {
             mapitem.unlockItem();
@@ -3472,7 +3473,7 @@ public class MapleMap {
    private void clearDrop(MapleMapObject i, int characterId) {
       droppedItemCount.decrementAndGet();
       removeMapObject(i);
-      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new RemoveItem(i.objectId(), 0, characterId)));
+      MasterBroadcaster.getInstance().sendToAllInMap(this, new RemoveItem(i.objectId(), 0, characterId));
    }
 
    public int getFieldLimit() {
@@ -4202,7 +4203,7 @@ public class MapleMap {
                      unregisterItemDrop(mapitem);
 
                      reactor.setShouldCollect(false);
-                     MasterBroadcaster.getInstance().sendToAllInMapRange(MapleMap.this, character -> PacketCreator.create(new RemoveItem(mapitem.objectId(), 0, 0)), mapitem.position());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(MapleMap.this, new RemoveItem(mapitem.objectId(), 0, 0), mapitem.position());
 
                      droppedItemCount.decrementAndGet();
                      MapleMap.this.removeMapObject(mapitem);

@@ -49,6 +49,7 @@ import tools.PacketCreator;
 import tools.Randomizer;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.GetEnergy;
+import tools.packet.PacketInput;
 import tools.packet.attack.RangedAttack;
 import tools.packet.character.SkillCooldown;
 
@@ -206,19 +207,19 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                visProjectile = 0;
             }
 
-            byte[] packet;
+            PacketInput packet;
             switch (attack.skill()) {
                case 3121004: // Hurricane
                case 3221001: // Pierce
                case 5221004: // Rapid Fire
                case 13111002: // KoC Hurricane
-                  packet = PacketCreator.create(new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.rangedDirection(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display()));
+                  packet = new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.rangedDirection(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display());
                   break;
                default:
-                  packet = PacketCreator.create(new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display()));
+                  packet = new RangedAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), visProjectile, attack.getDamage(), attack.speed(), attack.direction(), attack.display());
                   break;
             }
-            MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> packet, false, chr, true);
+            MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), packet, false, chr, true);
 
             if (attack.skill() != 0) {
                int cooldown = SkillFactory.getSkill(attack.skill())

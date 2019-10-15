@@ -82,6 +82,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.packet.PacketInput;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowBossHP;
 import tools.packet.field.effect.ShowEffect;
@@ -1128,19 +1129,18 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
    }
 
-   private void broadcastMonsterStatusMessage(byte[] packet) {
-      MasterBroadcaster.getInstance().sendToAllInMapRange(map, character -> packet, this.position());
+   private void broadcastMonsterStatusMessage(PacketInput packet) {
+      MasterBroadcaster.getInstance().sendToAllInMapRange(map, packet, this.position());
 
       MapleCharacter chrController = getActiveController();
       if (chrController != null && !chrController.isMapObjectVisible(MapleMonster.this)) {
-         chrController.announce(packet);
+         PacketCreator.announce(chrController, packet);
       }
    }
 
    private int broadcastStatusEffect(final MonsterStatusEffect status) {
       int animationTime = status.getSkill().getAnimationTime();
-      byte[] packet = PacketCreator.create(new ApplyMonsterStatus(this.objectId(), status, null));
-      broadcastMonsterStatusMessage(packet);
+      broadcastMonsterStatusMessage(new ApplyMonsterStatus(this.objectId(), status, null));
 
       return animationTime;
    }
@@ -1216,8 +1216,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          @Override
          public void run() {
             if (isAlive()) {
-               byte[] packet = PacketCreator.create(new CancelMonsterStatus(MapleMonster.this.objectId(), status.getStati()));
-               broadcastMonsterStatusMessage(packet);
+               broadcastMonsterStatusMessage(new CancelMonsterStatus(MapleMonster.this.objectId(), status.getStati()));
             }
 
             statiLock.lock();
@@ -1338,8 +1337,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          @Override
          public void run() {
             if (isAlive()) {
-               byte[] packet = PacketCreator.create(new CancelMonsterStatus(MapleMonster.this.objectId(), stats));
-               broadcastMonsterStatusMessage(packet);
+               broadcastMonsterStatusMessage(new CancelMonsterStatus(MapleMonster.this.objectId(), stats));
 
                statiLock.lock();
                try {
@@ -1353,8 +1351,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          }
       };
       final MonsterStatusEffect effect = new MonsterStatusEffect(stats, null, skill, true);
-      byte[] packet = PacketCreator.create(new ApplyMonsterStatus(this.objectId(), effect, reflection));
-      broadcastMonsterStatusMessage(packet);
+      broadcastMonsterStatusMessage(new ApplyMonsterStatus(this.objectId(), effect, reflection));
 
       statiLock.lock();
       try {
@@ -1394,8 +1391,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
 
       if (oldEffect != null) {
-         byte[] packet = PacketCreator.create(new CancelMonsterStatus(this.objectId(), oldEffect.getStati()));
-         broadcastMonsterStatusMessage(packet);
+         broadcastMonsterStatusMessage(new CancelMonsterStatus(this.objectId(), oldEffect.getStati()));
       }
    }
 

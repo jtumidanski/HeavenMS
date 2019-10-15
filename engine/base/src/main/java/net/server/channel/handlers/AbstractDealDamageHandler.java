@@ -232,7 +232,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                               if (mapitem.isPickedUp()) {
                                  return;
                               }
-                              map.pickItemDrop(PacketCreator.create(new RemoveItem(mapitem.objectId(), 4, 0)), mapitem);
+                              map.pickItemDrop(new RemoveItem(mapitem.objectId(), 4, 0), mapitem);
                            } finally {
                               mapitem.unlockItem();
                            }

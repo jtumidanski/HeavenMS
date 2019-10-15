@@ -206,6 +206,7 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
+import tools.packet.PacketInput;
 import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
@@ -2024,7 +2025,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             boolean isPet = petIndex > -1;
-            final byte[] pickupPacket = PacketCreator.create(new RemoveItem(mapitem.objectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex));
+            PacketInput pickupPacket = new RemoveItem(mapitem.objectId(), (isPet) ? 5 : 2, this.getId(), isPet, petIndex);
 
             Item mItem = mapitem.getItem();
             boolean hasSpaceInventory;
@@ -3319,7 +3320,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
                   MapleSummon summon = summons.get(summonId);
                   if (summon != null) {
-                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), character -> PacketCreator.create(new RemoveSummon(summon.getOwner().getId(), summon.objectId(), true)), summon.position());
+                     MasterBroadcaster.getInstance().sendToAllInMapRange(getMap(), new RemoveSummon(summon.getOwner().getId(), summon.objectId(), true), summon.position());
                      getMap().removeMapObject(summon);
                      removeVisibleMapObject(summon);
 

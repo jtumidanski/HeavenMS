@@ -99,7 +99,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
       }
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(),
-            character -> PacketCreator.create(new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display())),
+            new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()),
             false, chr, true);
       int numFinisherOrbs = 0;
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);

@@ -67,12 +67,12 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
          }
 
          if (!chr.isHidden()) {
-            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), character -> PacketCreator.create(new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show())));
+            MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "General", packet.message());
             }
          } else {
-            MasterBroadcaster.getInstance().sendToAllGMInMap(chr.getMap(), character -> PacketCreator.create(new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show())));
+            MasterBroadcaster.getInstance().sendToAllGMInMap(chr.getMap(), new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "GM General", packet.message());
             }

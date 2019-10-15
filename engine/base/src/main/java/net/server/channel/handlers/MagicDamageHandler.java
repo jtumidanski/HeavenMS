@@ -38,6 +38,7 @@ import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.GetEnergy;
+import tools.packet.PacketInput;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.attack.MagicAttack;
 import tools.packet.character.SkillCooldown;
@@ -70,14 +71,14 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 
-      byte[] packet;
+      PacketInput packet;
       if ((attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG)) {
-         packet = PacketCreator.create(new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.charge(), attack.speed(), attack.direction(), attack.display()));
+         packet = new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.charge(), attack.speed(), attack.direction(), attack.display());
       } else {
-         packet = PacketCreator.create(new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display()));
+         packet = new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display());
       }
 
-      MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), character -> packet, false, chr, true);
+      MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), packet, false, chr, true);
       MapleStatEffect effect = getAttackEffect(attack, chr, null);
 
       SkillFactory.getSkill(attack.skill()).ifPresent(skill -> {
