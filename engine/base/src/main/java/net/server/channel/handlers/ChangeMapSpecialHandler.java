@@ -21,13 +21,14 @@
 */
 package net.server.channel.handlers;
 
+import client.MapleCharacter;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ChangeMapSpecialPacket;
 import net.server.channel.packet.reader.ChangeMapSpecialReader;
-import server.MapleTrade;
 import server.MapleTradeResult;
 import server.maps.MaplePortal;
+import server.processor.MapleTradeProcessor;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
 
@@ -39,18 +40,18 @@ public final class ChangeMapSpecialHandler extends AbstractPacketHandler<ChangeM
 
    @Override
    public void handlePacket(ChangeMapSpecialPacket packet, MapleClient client) {
-      MaplePortal portal = client.getPlayer().getMap().getPortal(packet.startWarp());
-      if (portal == null || client.getPlayer().portalDelay() > currentServerTime() || client.getPlayer().getBlockedPortals().contains(portal.getScriptName())) {
+      MapleCharacter character = client.getPlayer();
+      MaplePortal portal = character.getMap().getPortal(packet.startWarp());
+      if (portal == null || character.portalDelay() > currentServerTime() || character.getBlockedPortals().contains(portal.getScriptName())) {
          PacketCreator.announce(client, new EnableActions());
          return;
       }
-      if (client.getPlayer().isChangingMaps() || client.getPlayer().isBanned()) {
+      if (character.isChangingMaps() || character.isBanned()) {
          PacketCreator.announce(client, new EnableActions());
          return;
       }
-      if (client.getPlayer().getTrade() != null) {
-         MapleTrade.cancelTrade(client.getPlayer(), MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
-      }
+
+      character.getTrade().ifPresent(trade -> MapleTradeProcessor.getInstance().cancelTrade(character, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP));
       portal.enterPortal(client);
    }
 }

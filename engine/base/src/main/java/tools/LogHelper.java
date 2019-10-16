@@ -14,8 +14,8 @@ import server.expeditions.MapleExpedition;
 public class LogHelper {
 
    public static void logTrade(MapleTrade trade1, MapleTrade trade2) {
-      String name1 = trade1.getChr().getName();
-      String name2 = trade2.getChr().getName();
+      String name1 = trade1.getOwner().getName();
+      String name2 = trade2.getOwner().getName();
       StringBuilder log = new StringBuilder("TRADE BETWEEN " + name1 + " AND " + name2 + "\r\n");
       //Trade 1 to trade 2
       log.append(trade1.getExchangeMesos()).append(" mesos from ").append(name1).append(" to ").append(name2).append(" \r\n");

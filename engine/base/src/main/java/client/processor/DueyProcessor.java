@@ -51,6 +51,7 @@ import scala.Option;
 import server.DueyPackage;
 import server.MapleItemInformationProvider;
 import server.MapleTrade;
+import server.MapleTradeUtil;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
 import tools.PacketCreator;
@@ -150,7 +151,7 @@ public class DueyProcessor {
    public static void dueySendItem(MapleClient c, byte invTypeId, short itemPos, short amount, int sendMesos, String sendMessage, String recipient, boolean quick) {
       if (c.tryAcquireClient()) {
          try {
-            int fee = MapleTrade.getFee(sendMesos);
+            int fee = MapleTradeUtil.getFee(sendMesos);
             if (!quick) {
                fee += 5000;
             } else if (!c.getPlayer().haveItem(5330000)) {

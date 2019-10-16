@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import client.MapleCharacter;
+import server.MapleTrade;
 import server.channel.PlayerInteractionAction;
 import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShopItem;
@@ -420,8 +421,9 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
       writer.write(packet.getNumber());
       if (packet.getNumber() == 1) {
          writer.write(0);
-         addCharLook(writer, packet.getTrade().getPartner().getChr(), false);
-         writer.writeMapleAsciiString(packet.getTrade().getPartner().getChr().getName());
+         MapleTrade partnerTrade = packet.getTrade().getPartnerTrade().orElseThrow();
+         addCharLook(writer, partnerTrade.getOwner(), false);
+         writer.writeMapleAsciiString(partnerTrade.getOwner().getName());
       }
       writer.write(packet.getNumber());
       addCharLook(writer, packet.getCharacter(), false);

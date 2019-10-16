@@ -192,6 +192,7 @@ import server.partyquest.AriantColiseum;
 import server.partyquest.MonsterCarnival;
 import server.partyquest.MonsterCarnivalParty;
 import server.partyquest.PartyQuest;
+import server.processor.MapleTradeProcessor;
 import server.processor.maps.MapleDoorProcessor;
 import server.processor.maps.MapleMapObjectProcessor;
 import server.quest.MapleQuest;
@@ -358,7 +359,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private MapleShop shop = null;
    private MapleSkinColor skinColor = MapleSkinColor.NORMAL;
    private MapleStorage storage = null;
-   private MapleTrade trade = null;
+   private Optional<MapleTrade> trade = Optional.empty();
    private MonsterBook monsterbook;
    private CashShop cashshop;
    private Set<NewYearCardRecord> newyears = new LinkedHashSet<>();
@@ -1736,7 +1737,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       this.unregisterChairBuff();
       this.clearBanishPlayerData();
-      MapleTrade.cancelTrade(this, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
+      MapleTradeProcessor.getInstance().cancelTrade(this, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
       this.closePlayerInteractions();
 
       MapleParty e = null;
@@ -4946,7 +4947,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void closeTrade() {
-      MapleTrade.cancelTrade(this, MapleTradeResult.PARTNER_CANCEL);
+      MapleTradeProcessor.getInstance().cancelTrade(this, MapleTradeResult.PARTNER_CANCEL);
    }
 
    public void closePlayerShop() {
@@ -5305,12 +5306,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return summons.containsValue(summon);
    }
 
-   public MapleTrade getTrade() {
+   public Optional<MapleTrade> getTrade() {
       return trade;
    }
 
    public void setTrade(MapleTrade trade) {
-      this.trade = trade;
+      this.trade = Optional.ofNullable(trade);
    }
 
    public int getVanquisherKills() {

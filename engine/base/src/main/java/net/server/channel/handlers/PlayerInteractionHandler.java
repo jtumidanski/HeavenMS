@@ -23,6 +23,7 @@ package net.server.channel.handlers;
 
 import java.awt.Point;
 import java.util.Arrays;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -86,6 +87,7 @@ import server.maps.MapleMiniGame.MiniGameType;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import server.maps.MaplePortal;
+import server.processor.MapleTradeProcessor;
 import tools.FilePrinter;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
@@ -105,6 +107,7 @@ import tools.packet.character.interaction.GetMiniGameSkipVisitor;
 import tools.packet.character.interaction.GetMiniGameStart;
 import tools.packet.character.interaction.GetMiniGameUnReady;
 import tools.packet.character.interaction.GetMiniRoomError;
+import tools.packet.character.interaction.GetTradeMeso;
 import tools.packet.character.interaction.MatchCardSelect;
 import tools.packet.character.interaction.MerchantOwnerMaintenanceLeave;
 import tools.packet.character.interaction.MiniGameClose;
@@ -142,7 +145,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private boolean isTradeOpen(MapleCharacter chr) {
-      if (chr.getTrade() != null) {   // thanks to Rien dev team
+      if (chr.getTrade().isPresent()) {   // thanks to Rien dev team
          //Apparently there is a dupe exploit that causes racing conditions when saving/retrieving from the db with stuff like trade open.
          PacketCreator.announce(chr, new EnableActions());
          return true;
@@ -488,7 +491,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private void confirmAction(MapleCharacter chr) {
-      MapleTrade.completeTrade(chr);
+      MapleTradeProcessor.getInstance().completeTrade(chr);
    }
 
    private void setItemsAction(MapleClient c, MapleCharacter chr, byte slotType, short pos, short quantity, byte targetSlot) {
@@ -525,54 +528,58 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      MapleTrade trade = chr.getTrade();
-      if (trade != null) {
-         if ((quantity <= item.quantity() && quantity >= 0) || ItemConstants.isRechargeable(item.id())) {
-            if (ii.isDropRestricted(item.id())) { // ensure that undroppable items do not make it to the trade window
-               if (!MapleKarmaManipulator.hasKarmaFlag(item)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "That item is untradeable.");
-                  PacketCreator.announce(c, new EnableActions());
-                  return;
-               }
+      if (chr.getTrade().isEmpty()) {
+         return;
+      }
+
+      MapleTrade trade = chr.getTrade().get();
+      if ((quantity <= item.quantity() && quantity >= 0) || ItemConstants.isRechargeable(item.id())) {
+         if (ii.isDropRestricted(item.id())) { // ensure that undroppable items do not make it to the trade window
+            if (!MapleKarmaManipulator.hasKarmaFlag(item)) {
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "That item is untradeable.");
+               PacketCreator.announce(c, new EnableActions());
+               return;
+            }
+         }
+
+         MapleInventory inv = chr.getInventory(ivType);
+         inv.lockInventory();
+         try {
+            Item checkItem = chr.getInventory(ivType).getItem(pos);
+            if (checkItem != item || checkItem.position() != item.position()) {
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Invalid item description.");
+               PacketCreator.announce(c, new EnableActions());
+               return;
             }
 
-            MapleInventory inv = chr.getInventory(ivType);
-            inv.lockInventory();
-            try {
-               Item checkItem = chr.getInventory(ivType).getItem(pos);
-               if (checkItem != item || checkItem.position() != item.position()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Invalid item description.");
-                  PacketCreator.announce(c, new EnableActions());
-                  return;
-               }
-
-               Item tradeItem = item.copy();
-               if (ItemConstants.isRechargeable(item.id())) {
-                  quantity = item.quantity();
-               }
-
-               tradeItem.quantity_$eq(quantity);
-               tradeItem.position_(targetSlot);
-
-               if (trade.addItem(tradeItem)) {
-                  MapleInventoryManipulator.removeFromSlot(c, ivType, item.position(), quantity, true);
-
-                  PacketCreator.announce(trade.getChr(), new TradeItemAdd((byte) 0, tradeItem));
-                  if (trade.getPartner() != null) {
-                     PacketCreator.announce(trade.getPartner().getChr(), new TradeItemAdd((byte) 1, tradeItem));
-                  }
-               }
-            } catch (Exception e) {
-               FilePrinter.printError(FilePrinter.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.id()) + " qty. " + item.quantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
-            } finally {
-               inv.unlockInventory();
+            Item tradeItem = item.copy();
+            if (ItemConstants.isRechargeable(item.id())) {
+               quantity = item.quantity();
             }
+
+            tradeItem.quantity_$eq(quantity);
+            tradeItem.position_(targetSlot);
+
+            if (trade.addItem(tradeItem)) {
+               MapleInventoryManipulator.removeFromSlot(c, ivType, item.position(), quantity, true);
+
+               PacketCreator.announce(trade.getOwner(), new TradeItemAdd((byte) 0, tradeItem));
+               trade.getPartnerTrade().ifPresent(partner -> PacketCreator.announce(partner.getOwner(), new TradeItemAdd((byte) 1, tradeItem)));
+            }
+         } catch (Exception e) {
+            FilePrinter.printError(FilePrinter.TRADE_EXCEPTION, e, "Player '" + chr + "' tried to add " + ii.getName(item.id()) + " qty. " + item.quantity() + " in trade (slot " + targetSlot + ") then exception occurred.");
+         } finally {
+            inv.unlockInventory();
          }
       }
    }
 
    private void setMesoAction(MapleCharacter chr, int amount) {
-      chr.getTrade().setMeso(amount);
+      chr.getTrade().ifPresent(trade -> {
+         trade.setMeso(amount);
+         PacketCreator.announce(trade.getOwner(), new GetTradeMeso((byte) 0, trade.getMeso()));
+         trade.getPartnerTrade().ifPresent(partner -> PacketCreator.announce(partner.getOwner(), new GetTradeMeso((byte) 1, trade.getMeso())));
+      });
    }
 
    private void selectCardAction(MapleCharacter chr, int turn, int slot) {
@@ -748,19 +755,18 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private void exitAction(MapleCharacter chr) {
-      if (chr.getTrade() != null) {
-         MapleTrade.cancelTrade(chr, MapleTradeResult.PARTNER_CANCEL);
-      } else {
-         chr.closePlayerShop();
-         chr.closeMiniGame(false);
-         chr.closeHiredMerchant(true);
-      }
+      chr.getTrade().ifPresentOrElse(trade -> MapleTradeProcessor.getInstance().cancelTrade(chr, MapleTradeResult.PARTNER_CANCEL),
+            () -> {
+               chr.closePlayerShop();
+               chr.closeMiniGame(false);
+               chr.closeHiredMerchant(true);
+            });
    }
 
    private void chatAction(MapleClient c, MapleCharacter chr, String message) {
       MapleHiredMerchant merchant = chr.getHiredMerchant();
-      if (chr.getTrade() != null) {
-         chr.getTrade().chat(message);
+      if (chr.getTrade().isPresent()) {
+         chr.getTrade().ifPresent(trade -> MapleTradeProcessor.getInstance().chat(trade, message));
       } else if (chr.getPlayerShop() != null) { //mini game
          MaplePlayerShop shop = chr.getPlayerShop();
          if (shop != null) {
@@ -777,9 +783,11 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private void visitAction(MapleClient c, MapleCharacter chr, int oid, String pw) {
-      if (chr.getTrade() != null && chr.getTrade().getPartner() != null) {
-         if (!chr.getTrade().isFullTrade() && !chr.getTrade().getPartner().isFullTrade()) {
-            MapleTrade.visitTrade(chr, chr.getTrade().getPartner().getChr());
+      if (chr.getTrade().isPresent() && chr.getTrade().flatMap(MapleTrade::getPartnerTrade).isPresent()) {
+         MapleTrade trade = chr.getTrade().get();
+         Optional<MapleTrade> partnerTrade = trade.getPartnerTrade();
+         if (!trade.isFullTrade() && !partnerTrade.map(MapleTrade::isFullTrade).orElse(true)) {
+            MapleTradeProcessor.getInstance().visitTrade(chr, partnerTrade.get().getOwner());
          } else {
             PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.FULL_CAPACITY));
          }
@@ -820,7 +828,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private void declineAction(MapleCharacter chr) {
-      MapleTrade.declineTrade(chr);
+      MapleTradeProcessor.getInstance().declineTrade(chr);
    }
 
    private void inviteAction(MapleCharacter chr, int otherCid) {
@@ -829,7 +837,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      MapleTrade.inviteTrade(chr, other);
+      MapleTradeProcessor.getInstance().inviteTrade(chr, other);
    }
 
    private void createAction(MapleClient c, MapleCharacter chr, BaseCreatePlayerInteractionPacket packet) {
@@ -840,7 +848,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
       byte createType = packet.createType();
       if (createType == 3) {  // trade
-         MapleTrade.startTrade(chr);
+         MapleTradeProcessor.getInstance().startTrade(chr);
       } else if (createType == 1 && packet instanceof CreateOmokPlayerInteractionPacket) { // omok mini game
          omokMiniGame(c, chr, ((CreateOmokPlayerInteractionPacket) packet).description(),
                ((CreateOmokPlayerInteractionPacket) packet).hasPassword(),

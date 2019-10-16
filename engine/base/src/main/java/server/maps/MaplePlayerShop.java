@@ -41,6 +41,7 @@ import net.opcodes.SendOpcode;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleTrade;
+import server.MapleTradeUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -313,7 +314,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                      }
 
                      c.getPlayer().gainMeso(-price, false);
-                     price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
+                     price -= MapleTradeUtil.getFee(price);  // thanks BHB for pointing out trade fees not applying here
                      owner.gainMeso(price, true);
 
                      MaplePlayerShopSoldItem soldItem = new MaplePlayerShopSoldItem(c.getPlayer().getName(), pItem.item().id(), quantity, price);

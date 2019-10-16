@@ -50,6 +50,7 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;
 import server.MapleTrade;
+import server.MapleTradeUtil;
 import server.processor.maps.MapleHiredMerchantProcessor;
 import tools.DatabaseConnection;
 import tools.MasterBroadcaster;
@@ -277,7 +278,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          if (c.getPlayer().getMeso() >= price) {
             if (MapleHiredMerchantProcessor.getInstance().canBuy(c, newItem)) {
                c.getPlayer().gainMeso(-price, false);
-               price -= MapleTrade.getFee(price);  // thanks BHB for pointing out trade fees not applying here
+               price -= MapleTradeUtil.getFee(price);  // thanks BHB for pointing out trade fees not applying here
 
                synchronized (sold) {
                   sold.add(new MapleSoldItem(c.getPlayer().getName(), pItem.item().id(), newItem.quantity(), price));

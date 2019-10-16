@@ -733,7 +733,7 @@ public class MapleInventoryManipulator {
       MapleInventory inv = chr.getInventory(type);
       Item source = inv.getItem(src);
 
-      if (chr.getTrade() != null || chr.getMiniGame() != null || source == null) { //Only check needed would prob be merchants (to see if the player is in one)
+      if (chr.getTrade().isPresent() || chr.getMiniGame() != null || source == null) { //Only check needed would prob be merchants (to see if the player is in one)
          return;
       }
       int itemId = source.id();

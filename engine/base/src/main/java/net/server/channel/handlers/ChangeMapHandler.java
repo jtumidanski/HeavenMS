@@ -32,10 +32,10 @@ import client.inventory.manipulator.MapleInventoryManipulator;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ChangeMapPacket;
 import net.server.channel.packet.reader.ChangeMapReader;
-import server.MapleTrade;
 import server.MapleTradeResult;
 import server.maps.MapleMap;
 import server.maps.MaplePortal;
+import server.processor.MapleTradeProcessor;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.packet.ChangeChannel;
@@ -63,9 +63,9 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
          PacketCreator.announce(client, new EnableActions());
          return;
       }
-      if (chr.getTrade() != null) {
-         MapleTrade.cancelTrade(chr, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
-      }
+
+      chr.getTrade().ifPresent(trade -> MapleTradeProcessor.getInstance().cancelTrade(chr, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP));
+
       if (packet.cashShop()) { //Cash Shop :)
          if (!chr.getCashShop().isOpened()) {
             client.disconnect(false, false);
