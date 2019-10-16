@@ -42,7 +42,7 @@ public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacke
       if (packet.hasMovement()) {
          client.getPlayer().getMap().movePlayer(client.getPlayer(), client.getPlayer().position());
          if (client.getPlayer().isHidden()) {
-            client.getPlayer().getMap().broadcastGMMessage(client.getPlayer(), PacketCreator.create(new MovePlayer(client.getPlayer().getId(), packet.movementList())), false);
+            client.getPlayer().getMap().broadcastGMMessage(client.getPlayer(), new MovePlayer(client.getPlayer().getId(), packet.movementList()), false);
          } else {
             MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new MovePlayer(client.getPlayer().getId(), packet.movementList()), false, client.getPlayer());
          }

@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.locks.Lock;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -45,6 +46,15 @@ public class MasterBroadcaster {
       sendToAllInMap(map, null, packetCreator);
    }
 
+   public void sendToAllInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, null, packetCreator);
+      } finally {
+         lock.unlock();
+      }
+   }
+
    public void sendToAllInMap(MapleMap map, PacketInput packetInput) {
       sendToAllInMap(map, null, character -> PacketCreator.create(packetInput));
    }
@@ -53,12 +63,39 @@ public class MasterBroadcaster {
     * Sends a packet to everyone in the map, conditionally excluding the source of the packet.
     *
     * @param map            the map
-    * @param packetInput  the packet to send
+    * @param packetInput    the packet to send
     * @param repeatToSource true if the packet should be sent to the source
     * @param source         the source
     */
    public void sendToAllInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source) {
       sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), character -> PacketCreator.create(packetInput));
+   }
+
+   /**
+    * Sends a packet to everyone in the map, conditionally excluding the source of the packet.
+    *
+    * @param map            the map
+    * @param packetInput    the packet to send
+    * @param repeatToSource true if the packet should be sent to the source
+    * @param source         the source
+    * @param lock           item to lock on
+    */
+   public void sendToAllInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), character -> PacketCreator.create(packetInput));
+      } finally {
+         lock.unlock();
+      }
+   }
+
+   public void sendToAllInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), packetCreator);
+      } finally {
+         lock.unlock();
+      }
    }
 
    /**
@@ -98,7 +135,7 @@ public class MasterBroadcaster {
     * Sends a packet to everyone in the map, conditionally excluding the source of the packet, and conditionally excluding those out of range.
     *
     * @param map            the map
-    * @param packetInput  the packet
+    * @param packetInput    the packet
     * @param repeatToSource true if the packet should be repeated to the source
     * @param source         the source of the packet
     * @param ranged         true if the range of the characters in the map should be considered
@@ -121,6 +158,15 @@ public class MasterBroadcaster {
       sendToAllInMap(map, mapleCharacter -> passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), character -> PacketCreator.create(packetInput));
    }
 
+   public void sendToAllInMapRange(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, Point referencePoint, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, mapleCharacter -> passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), packetCreator);
+      } finally {
+         lock.unlock();
+      }
+   }
+
    /**
     * Sends a packet to everyone in the map, excluding the source, and those out of range of the reference point.
     *
@@ -136,11 +182,64 @@ public class MasterBroadcaster {
    /**
     * Sends a packet to all GMs in the map. Including the source.
     *
-    * @param map           the map
-    * @param packetInput   the packet
+    * @param map         the map
+    * @param packetInput the packet
     */
    public void sendToAllGMInMap(MapleMap map, PacketInput packetInput) {
       sendToAllInMap(map, MapleCharacter::isGM, character -> PacketCreator.create(packetInput));
+   }
+
+   public void sendToAllGMInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, Lock lock) {
+      sendToAllGMInMap(map, character -> PacketCreator.create(packetInput), repeatToSource, source, lock);
+   }
+
+   public void sendToAllGMInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, character -> {
+            if (character.isGM()) {
+               return !repeatToSource && character != source;
+            }
+            return false;
+         }, packetCreator);
+      } finally {
+         lock.unlock();
+      }
+   }
+
+   public void sendToAllNonGMInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, Lock lock) {
+      sendToAllNonGMInMap(map, character -> PacketCreator.create(packetInput), repeatToSource, source, lock);
+   }
+
+   public void sendToAllNonGMInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, character -> {
+            if (!character.isGM()) {
+               return !repeatToSource && character != source;
+            }
+            return false;
+         }, packetCreator);
+      } finally {
+         lock.unlock();
+      }
+   }
+
+   /**
+    * Sends a packet to all GMs in the map. Including the source.
+    *
+    * @param map         the map
+    * @param source      the source of the packet
+    * @param packetInput the packet
+    * @param lock        thing to lock on
+    */
+   public void sendToGMAndAboveInMap(MapleMap map, MapleCharacter source, PacketInput packetInput, Lock lock) {
+      lock.lock();
+      try {
+         sendToAllInMap(map, character -> character != source && (character.gmLevel() >= source.gmLevel()), character -> PacketCreator.create(packetInput));
+      } finally {
+         lock.unlock();
+      }
    }
 
    /**

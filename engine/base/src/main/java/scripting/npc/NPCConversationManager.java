@@ -57,6 +57,7 @@ import net.server.world.MaplePartyCharacter;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
 import scripting.AbstractPlayerInteraction;
+import server.MapleGachaponItem;
 import server.MapleItemInformationProvider;
 import server.MapleMarriage;
 import server.MapleShop;
@@ -69,7 +70,6 @@ import server.events.gm.MapleEvent;
 import server.expeditions.MapleExpedition;
 import server.expeditions.MapleExpeditionType;
 import server.gachapon.MapleGachapon;
-import server.gachapon.MapleGachapon.MapleGachaponItem;
 import server.life.MapleLifeFactory;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMap;
@@ -447,15 +447,15 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
       MapleGachaponItem item = MapleGachapon.getInstance().process(npc);
 
-      Item itemGained = gainItem(item.getId(), (short) (item.getId() / 10000 == 200 ? 100 : 1), true, true); // For normal potions, make it give 100.
+      Item itemGained = gainItem(item.id(), (short) (item.id() / 10000 == 200 ? 100 : 1), true, true); // For normal potions, make it give 100.
 
-      sendNext("You have obtained a #b#t" + item.getId() + "##k.");
+      sendNext("You have obtained a #b#t" + item.id() + "##k.");
 
       String map = c.getChannelServer().getMapFactory().getMap(maps[(getNpc() != 9100117 && getNpc() != 9100109) ? (getNpc() - 9100100) : getNpc() == 9100109 ? 8 : 9]).getMapName();
 
-      LogHelper.logGacha(getPlayer(), item.getId(), map);
+      LogHelper.logGacha(getPlayer(), item.id(), map);
 
-      if (item.getTier() > 0) { //Uncommon and Rare
+      if (item.tier() > 0) { //Uncommon and Rare
          Server.getInstance().broadcastMessage(c.getWorld(), PacketCreator.create(new GachaponMessage(itemGained, map, getPlayer().getName())));
       }
    }

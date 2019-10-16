@@ -241,8 +241,8 @@ public class MapleMapFactory {
             MapleData guardianGenData = mcData.getChildByPath("guardianGenPos");
             for (MapleData node : guardianGenData.getChildren()) {
                GuardianSpawnPoint pt = new GuardianSpawnPoint(new Point(MapleDataTool.getIntConvert("x", node), MapleDataTool.getIntConvert("y", node)));
-               pt.setTeam(MapleDataTool.getIntConvert("team", node, -1));
-               pt.setTaken(false);
+               pt.team_$eq(MapleDataTool.getIntConvert("team", node, -1));
+               pt.taken_$eq(false);
                map.addGuardianSpawnPoint(pt);
             }
             if (mcData.getChildByPath("skill") != null) {

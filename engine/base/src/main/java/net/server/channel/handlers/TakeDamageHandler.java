@@ -299,7 +299,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          int finalFake = fake;
          MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), finalDamage, finalFake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
       } else {
-         map.broadcastGMMessage(chr, PacketCreator.create(new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y)), false);
+         map.broadcastGMMessage(chr, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
       }
       if (GameConstants.isDojo(map.getId())) {
          chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_DMG);

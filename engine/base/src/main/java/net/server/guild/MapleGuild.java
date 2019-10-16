@@ -247,10 +247,7 @@ public class MapleGuild {
             .map(member -> ps.getCharacterById(member.getId()))
             .flatMap(Optional::stream)
             .filter(MapleCharacter::isLoggedinWorld)
-            .forEach(character -> {
-               byte[] packet = PacketCreator.create(new GuildNameChange(character.getId(), this.getName()));
-               character.getMap().broadcastMessage(character, packet);
-            });
+            .forEach(character -> character.getMap().broadcastMessage(character, new GuildNameChange(character.getId(), this.getName())));
    }
 
    public void broadcastEmblemChanged() {
@@ -259,10 +256,7 @@ public class MapleGuild {
             .map(member -> ps.getCharacterById(member.getId()))
             .flatMap(Optional::stream)
             .filter(MapleCharacter::isLoggedinWorld)
-            .forEach(character -> {
-               byte[] packet = PacketCreator.create(new GuildMarkChanged(character.getId(), getLogoBG(), getLogoBGColor(), getLogo(), getLogoColor()));
-               character.getMap().broadcastMessage(character, packet);
-            });
+            .forEach(character -> character.getMap().broadcastMessage(character, new GuildMarkChanged(character.getId(), getLogoBG(), getLogoBGColor(), getLogo(), getLogoColor())));
    }
 
    public void broadcastInfoChanged() {

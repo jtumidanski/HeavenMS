@@ -759,9 +759,9 @@ public class World {
          if (bDifferentGuild) {
             if (character.isLoggedinWorld()) {
                Server.getInstance().getGuild(guildid).ifPresentOrElse(guild -> {
-                  character.getMap().broadcastMessage(character, PacketCreator.create(new GuildNameChange(cid, guild.getName())));
-                  character.getMap().broadcastMessage(character, PacketCreator.create(new GuildMarkChanged(cid, guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor())));
-               }, () -> character.getMap().broadcastMessage(character, PacketCreator.create(new GuildNameChange(cid, ""))));
+                  character.getMap().broadcastMessage(character, new GuildNameChange(cid, guild.getName()));
+                  character.getMap().broadcastMessage(character, new GuildMarkChanged(cid, guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor()));
+               }, () -> character.getMap().broadcastMessage(character, new GuildNameChange(cid, "")));
             }
          }
       });

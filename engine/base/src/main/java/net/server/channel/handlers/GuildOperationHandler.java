@@ -218,7 +218,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       mapleCharacter.getMGC().setGuildId(0);
       mapleCharacter.getMGC().setGuildRank(5);
       mapleCharacter.saveGuildStatus();
-      mapleCharacter.getMap().broadcastMessage(mapleCharacter, PacketCreator.create(new GuildNameChange(mapleCharacter.getId(), "")));
+      mapleCharacter.getMap().broadcastMessage(mapleCharacter, new GuildNameChange(mapleCharacter.getId(), ""));
    }
 
    private void joinGuild(MapleClient client, MapleCharacter mapleCharacter, JoinGuildPacket packet) {
@@ -257,8 +257,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       mapleCharacter.saveGuildStatus(); // update database
       mapleCharacter.getGuild().ifPresent(guild -> {
          // thanks Vcoc for pointing out an issue with updating guild tooltip to players in the map
-         mapleCharacter.getMap().broadcastMessage(mapleCharacter, PacketCreator.create(new GuildNameChange(mapleCharacter.getId(), guild.getName())));
-         mapleCharacter.getMap().broadcastMessage(mapleCharacter, PacketCreator.create(new GuildMarkChanged(mapleCharacter.getId(), guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor())));
+         mapleCharacter.getMap().broadcastMessage(mapleCharacter, new GuildNameChange(mapleCharacter.getId(), guild.getName()));
+         mapleCharacter.getMap().broadcastMessage(mapleCharacter, new GuildMarkChanged(mapleCharacter.getId(), guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor()));
       });
 
    }

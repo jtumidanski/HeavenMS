@@ -251,7 +251,7 @@ public class ItemProcessor {
       MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, lvupStr);
 
       PacketCreator.announce(c, new ShowSpecialEffect(15));
-      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), PacketCreator.create(new ShowForeignEffect(c.getPlayer().getId(), 15)));
+      c.getPlayer().getMap().broadcastMessage(c.getPlayer(), new ShowForeignEffect(c.getPlayer().getId(), 15));
       c.getPlayer().forceUpdateItem(equip);
    }
 

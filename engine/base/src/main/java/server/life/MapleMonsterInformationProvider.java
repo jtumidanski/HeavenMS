@@ -80,7 +80,7 @@ public class MapleMonsterInformationProvider {
       List<MonsterGlobalDropEntry> continentItems = continentDrops.get(continentId);
       if (continentItems == null) {   // continent separated global drops found thanks to marcuswoon
          continentItems = globalDrops.stream()
-               .filter(entry -> entry.continentid < 0 || entry.continentid == continentId)
+               .filter(entry -> entry.continentId() < 0 || entry.continentId() == continentId)
                .collect(Collectors.toList());
          continentDrops.put(continentId, continentItems);
       }

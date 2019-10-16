@@ -1021,24 +1021,23 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             this.hidden = false;
             PacketCreator.announce(this, new GMEffect(0x10, (byte) 0));
             List<MapleBuffStat> dsstat = Collections.singletonList(MapleBuffStat.DARKSIGHT);
-            getMap().broadcastGMMessage(this, PacketCreator.create(new CancelForeignBuff(id, dsstat)), false);
+            getMap().broadcastGMMessage(this, new CancelForeignBuff(id, dsstat), false);
             getMap().broadcastSpawnPlayerMapObjectMessage(this, this, false);
 
             for (MapleSummon ms : this.getSummonsValues()) {
                getMap().broadcastNONGMMessage(this,
-                     PacketCreator.create(
-                           new SpawnSummon(ms.getOwner().getId(), ms.objectId(), ms.getSkill(), ms.getSkillLevel(),
-                                 ms.position(), ms.stance(), ms.getMovementType().getValue(), ms.isPuppet(), false)
-                     ), false);
+                     new SpawnSummon(ms.getOwner().getId(), ms.objectId(), ms.getSkill(), ms.getSkillLevel(),
+                           ms.position(), ms.stance(), ms.getMovementType().getValue(), ms.isPuppet(), false)
+                     , false);
             }
          } else {
             this.hidden = true;
             PacketCreator.announce(this, new GMEffect(0x10, (byte) 1));
             if (!login) {
-               getMap().broadcastNONGMMessage(this, PacketCreator.create(new RemovePlayer(getId())), false);
+               getMap().broadcastNONGMMessage(this, new RemovePlayer(getId()), false);
             }
             List<Pair<MapleBuffStat, Integer>> ldsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-            getMap().broadcastGMMessage(this, PacketCreator.create(new GiveForeignBuff(id, ldsstat)), false);
+            getMap().broadcastGMMessage(this, new GiveForeignBuff(id, ldsstat), false);
             this.releaseControlledMonsters();
          }
          PacketCreator.announce(client, new EnableActions());
@@ -1887,7 +1886,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (!isHidden) {
             MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false, MapleCharacter.this);
          } else {
-            getMap().broadcastGMMessage(MapleCharacter.this, PacketCreator.create(new ShowBerserk(getId(), skillLevel, MapleCharacter.this.berserk)), false);
+            getMap().broadcastGMMessage(MapleCharacter.this, new ShowBerserk(getId(), skillLevel, MapleCharacter.this.berserk), false);
          }
       }, 5000, 3000);
    }
@@ -5400,8 +5399,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
             PacketCreator.announce(client, new GiveBuff(energybar, 0, stat));
             PacketCreator.announce(this, new ShowOwnBuffEffect(skill.getId(), 2));
-            getMap().broadcastMessage(this, PacketCreator.create(new ShowBuffEffect(id, skill.getId(), 2, (byte) 3)));
-            getMap().broadcastMessage(this, PacketCreator.create(new GiveForeignBuff(energybar, stat)));
+            getMap().broadcastMessage(this, new ShowBuffEffect(id, skill.getId(), 2, (byte) 3));
+            getMap().broadcastMessage(this, new GiveForeignBuff(energybar, stat));
          }
          if (energybar >= 10000 && energybar < 11000) {
             energybar = 15000;
@@ -5411,7 +5410,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.ENERGY_CHARGE, energybar));
                setBuffedValue(MapleBuffStat.ENERGY_CHARGE, energybar);
                PacketCreator.announce(client, new GiveBuff(energybar, 0, stat));
-               getMap().broadcastMessage(chr, PacketCreator.create(new GiveForeignBuff(energybar, stat)));
+               getMap().broadcastMessage(chr, new GiveForeignBuff(energybar, stat));
             }, statEffect.getDuration());
          }
       });

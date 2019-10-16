@@ -273,27 +273,14 @@ public class MapleMap {
       return world;
    }
 
-   public void broadcastMessage(MapleCharacter source, final byte[] packet) {
-      chrRLock.lock();
-      try {
-         characters.stream()
-               .filter(character -> character != source)
-               .forEach(character -> character.getClient().announce(packet));
-
-      } finally {
-         chrRLock.unlock();
-      }
+   //TODO - JDT Move
+   public void broadcastMessage(MapleCharacter source, PacketInput packet) {
+      MasterBroadcaster.getInstance().sendToAllInMap(this, packet, false, source, chrRLock);
    }
 
-   public void broadcastGMMessage(MapleCharacter source, final byte[] packet) {
-      chrRLock.lock();
-      try {
-         characters.stream()
-               .filter(character -> character != source && (character.gmLevel() >= source.gmLevel()))
-               .forEach(character -> character.getClient().announce(packet));
-      } finally {
-         chrRLock.unlock();
-      }
+   //TODO - JDT Move
+   public void broadcastGMMessage(MapleCharacter source, PacketInput packet) {
+      MasterBroadcaster.getInstance().sendToGMAndAboveInMap(this, source, packet, chrRLock);
    }
 
    public void toggleDrops() {
@@ -684,19 +671,19 @@ public class MapleMap {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       for (final MonsterGlobalDropEntry de : globalEntry) {
-         if (Randomizer.nextInt(999999) < de.chance) {
+         if (Randomizer.nextInt(999999) < de.chance()) {
             if (droptype == 3) {
                pos.x = mobpos + (d % 2 == 0 ? (40 * (d + 1) / 2) : -(40 * (d / 2)));
             } else {
                pos.x = mobpos + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
             }
-            if (de.itemId != 0) {
-               if (ItemConstants.getInventoryType(de.itemId) == MapleInventoryType.EQUIP) {
-                  idrop = ii.randomizeStats((Equip) ii.getEquipById(de.itemId));
+            if (de.itemId() != 0) {
+               if (ItemConstants.getInventoryType(de.itemId()) == MapleInventoryType.EQUIP) {
+                  idrop = ii.randomizeStats((Equip) ii.getEquipById(de.itemId()));
                } else {
-                  idrop = new Item(de.itemId, (short) 0, (short) (de.Maximum != 1 ? Randomizer.nextInt(de.Maximum - de.Minimum) + de.Minimum : 1));
+                  idrop = new Item(de.itemId(), (short) 0, (short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1));
                }
-               spawnDrop(idrop, calcDropPos(pos, mob.position()), mob, chr, droptype, de.questid);
+               spawnDrop(idrop, calcDropPos(pos, mob.position()), mob, chr, droptype, de.questId());
                d++;
             }
          }
@@ -2482,7 +2469,7 @@ public class MapleMap {
          PacketCreator.announce(chr, new GMEffect(0x10, (byte) 1));
 
          List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-         broadcastGMMessage(chr, PacketCreator.create(new GiveForeignBuff(chr.getId(), dsstat)), false);
+         broadcastGMMessage(chr, new GiveForeignBuff(chr.getId(), dsstat), false);
       } else {
          broadcastSpawnPlayerMapObjectMessage(chr, chr, true);
       }
@@ -2515,9 +2502,9 @@ public class MapleMap {
          dragon.position_$eq(chr.position());
          this.addMapObject(dragon);
          if (chr.isHidden()) {
-            this.broadcastGMMessage(chr, PacketCreator.create(new SpawnDragon(dragon)));
+            this.broadcastGMMessage(chr, new SpawnDragon(dragon));
          } else {
-            this.broadcastMessage(chr, PacketCreator.create(new SpawnDragon(dragon)));
+            this.broadcastMessage(chr, new SpawnDragon(dragon));
          }
       }
 
@@ -2676,9 +2663,9 @@ public class MapleMap {
       if (chr.getDragon() != null) {
          removeMapObject(chr.getDragon());
          if (chr.isHidden()) {
-            this.broadcastGMMessage(chr, PacketCreator.create(new RemoveDragon(chr.getId())));
+            this.broadcastGMMessage(chr, new RemoveDragon(chr.getId()));
          } else {
-            this.broadcastMessage(chr, PacketCreator.create(new RemoveDragon(chr.getId())));
+            this.broadcastMessage(chr, new RemoveDragon(chr.getId()));
          }
       }
    }
@@ -2710,73 +2697,29 @@ public class MapleMap {
       }
    }
 
+   //TODO JDT
    private void broadcastItemDropMessage(MapleMapItem mdrop, Point dropperPos, Point dropPos, byte mod, Point rangedFrom) {
-      broadcastItemDropMessage(mdrop, dropperPos, dropPos, mod, MapleMapProcessor.getInstance().getRangedDistance(), rangedFrom);
+      MasterBroadcaster.getInstance().sendToAllInMapRange(this, character -> PacketCreator.create(new DropItemFromMapObject(character, mdrop, dropperPos, dropPos, mod)), rangedFrom, chrRLock);
    }
 
+   //TODO JDT
    private void broadcastItemDropMessage(MapleMapItem mdrop, Point dropperPos, Point dropPos, byte mod) {
-      broadcastItemDropMessage(mdrop, dropperPos, dropPos, mod, Double.POSITIVE_INFINITY, null);
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new DropItemFromMapObject(character, mdrop, dropperPos, dropPos, mod)));
    }
 
-   private void broadcastItemDropMessage(MapleMapItem mdrop, Point dropperPos, Point dropPos, byte mod, double rangeSq, Point rangedFrom) {
-      chrRLock.lock();
-      try {
-         for (MapleCharacter chr : characters) {
-            final byte[] packet = PacketCreator.create(new DropItemFromMapObject(chr, mdrop, dropperPos, dropPos, mod));
-
-            if (rangeSq < Double.POSITIVE_INFINITY) {
-               if (rangedFrom.distanceSq(chr.position()) <= rangeSq) {
-                  chr.announce(packet);
-               }
-            } else {
-               chr.announce(packet);
-            }
-         }
-      } finally {
-         chrRLock.unlock();
-      }
-   }
-
+   //TODO JDT
    public void broadcastSpawnPlayerMapObjectMessage(MapleCharacter source, MapleCharacter player, boolean enteringField) {
-      broadcastSpawnPlayerMapObjectMessage(source, player, enteringField, false);
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new SpawnPlayer(character.getClient(), player, enteringField)), false, source, chrRLock);
    }
 
+   //TODO JDT
    public void broadcastGMSpawnPlayerMapObjectMessage(MapleCharacter source, MapleCharacter player, boolean enteringField) {
-      broadcastSpawnPlayerMapObjectMessage(source, player, enteringField, true);
+      MasterBroadcaster.getInstance().sendToAllGMInMap(this, character -> PacketCreator.create(new SpawnPlayer(character.getClient(), player, enteringField)), false, source, chrRLock);
    }
 
-   private void broadcastSpawnPlayerMapObjectMessage(MapleCharacter source, MapleCharacter player, boolean enteringField, boolean gmBroadcast) {
-      chrRLock.lock();
-      try {
-         if (gmBroadcast) {
-            for (MapleCharacter chr : characters) {
-               if (chr.isGM()) {
-                  if (chr != source) {
-                     PacketCreator.announce(chr, new SpawnPlayer(chr.getClient(), player, enteringField));
-                  }
-               }
-            }
-         } else {
-            for (MapleCharacter chr : characters) {
-               if (chr != source) {
-                  PacketCreator.announce(chr, new SpawnPlayer(chr.getClient(), player, enteringField));
-               }
-            }
-         }
-      } finally {
-         chrRLock.unlock();
-      }
-   }
-
+   //TODO JDT
    public void broadcastUpdateCharLookMessage(MapleCharacter source, MapleCharacter player) {
-      chrRLock.lock();
-      try {
-         characters.stream()
-               .filter(character -> character != source)
-               .forEach(character -> PacketCreator.announce(character, new CharacterLook(character.getClient(), player)));
-      } finally {
-         chrRLock.unlock();
-      }
+      MasterBroadcaster.getInstance().sendToAllInMap(this, character -> PacketCreator.create(new CharacterLook(character.getClient(), player)), false, source, chrRLock);
    }
 
    private void sendObjectPlacement(MapleClient mapleClient) {
@@ -3386,38 +3329,14 @@ public class MapleMap {
       this.seats = seats;
    }
 
-   public void broadcastGMMessage(MapleCharacter source, final byte[] packet, boolean repeatToSource) {
-      broadcastGMMessage(repeatToSource ? null : source, packet, Double.POSITIVE_INFINITY, source.position());
+   //TODO JDT
+   public void broadcastGMMessage(MapleCharacter source, PacketInput packet, boolean repeatToSource) {
+      MasterBroadcaster.getInstance().sendToAllGMInMap(this, packet, false, source, chrRLock);
    }
 
-   private void broadcastGMMessage(MapleCharacter source, final byte[] packet, double rangeSq, Point rangedFrom) {
-      chrRLock.lock();
-      try {
-         for (MapleCharacter chr : characters) {
-            if (chr != source && chr.isGM()) {
-               if (rangeSq < Double.POSITIVE_INFINITY) {
-                  if (rangedFrom.distanceSq(chr.position()) <= rangeSq) {
-                     chr.getClient().announce(packet);
-                  }
-               } else {
-                  chr.getClient().announce(packet);
-               }
-            }
-         }
-      } finally {
-         chrRLock.unlock();
-      }
-   }
-
-   public void broadcastNONGMMessage(MapleCharacter source, final byte[] packet, boolean repeatToSource) {
-      chrRLock.lock();
-      try {
-         characters.stream()
-               .filter(character -> character != source && !character.isGM())
-               .forEach(character -> character.getClient().announce(packet));
-      } finally {
-         chrRLock.unlock();
-      }
+   //TODO JDT
+   public void broadcastNONGMMessage(MapleCharacter source, PacketInput packet, boolean repeatToSource) {
+      MasterBroadcaster.getInstance().sendToAllNonGMInMap(this, packet, false, source, chrRLock);
    }
 
    public MapleOxQuiz getOx() {
@@ -3912,7 +3831,7 @@ public class MapleMap {
    public GuardianSpawnPoint getRandomGuardianSpawn(int team) {
       boolean alltaken = false;
       for (GuardianSpawnPoint a : this.guardianSpawns) {
-         if (!a.isTaken()) {
+         if (!a.taken()) {
             alltaken = false;
             break;
          }
@@ -3923,7 +3842,7 @@ public class MapleMap {
       if (this.guardianSpawns.size() > 0) {
          while (true) {
             for (GuardianSpawnPoint gsp : this.guardianSpawns) {
-               if (!gsp.isTaken() && Math.random() < 0.3 && (gsp.getTeam() == -1 || gsp.getTeam() == team)) {
+               if (!gsp.taken() && Math.random() < 0.3 && (gsp.team() == -1 || gsp.team() == team)) {
                   return gsp;
                }
             }
@@ -3953,8 +3872,8 @@ public class MapleMap {
          }
          int reactorID = 9980000 + team;
          MapleReactor reactor = new MapleReactor(MapleReactorFactory.getReactorS(reactorID), reactorID);
-         pt.setTaken(true);
-         reactor.position_$eq(pt.getPosition());
+         pt.taken_$eq(true);
+         reactor.position_$eq(pt.position());
          reactor.setName(team + "" + num); //lol
          reactor.resetReactorActions(0);
          this.spawnReactor(reactor);

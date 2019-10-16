@@ -45,7 +45,7 @@ public class CharacterSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Ma
 
       if (object.isHidden()) {
          List<Pair<MapleBuffStat, Integer>> dsstat = Collections.singletonList(new Pair<>(MapleBuffStat.DARKSIGHT, 0));
-         object.getMap().broadcastGMMessage(object, PacketCreator.create(new GiveForeignBuff(object.getId(), dsstat)), false);
+         object.getMap().broadcastGMMessage(object, new GiveForeignBuff(object.getId(), dsstat), false);
       }
    }
 

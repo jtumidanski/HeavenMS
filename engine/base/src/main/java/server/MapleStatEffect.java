@@ -219,10 +219,8 @@ public class MapleStatEffect {
       mapPlayers.remove(applyfrom.getId());
 
       boolean hwResult = applyTo(applyfrom);
-      for (MapleCharacter chr : mapPlayers.values()) {    // Echo of Hero not buffing players in the map detected thanks to Masterrulax
-         applyTo(applyfrom, chr, false, null, false, 1);
-      }
-
+      // Echo of Hero not buffing players in the map detected thanks to Masterrulax
+      mapPlayers.values().forEach(character -> applyTo(applyfrom, character, false, null, false, 1));
       return hwResult;
    }
 

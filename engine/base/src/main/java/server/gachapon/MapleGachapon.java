@@ -21,6 +21,7 @@
  */
 package server.gachapon;
 
+import server.MapleGachaponItem;
 import server.MapleItemInformationProvider;
 import tools.Randomizer;
 
@@ -136,24 +137,6 @@ public class MapleGachapon {
          int[] global = GLOBAL.getItems(tier);
          int chance = Randomizer.nextInt(gacha.length + global.length);
          return chance < gacha.length ? gacha[chance] : global[chance - gacha.length];
-      }
-   }
-
-   public class MapleGachaponItem {
-      private int id;
-      private int tier;
-
-      public MapleGachaponItem(int t, int i) {
-         id = i;
-         tier = t;
-      }
-
-      public int getTier() {
-         return tier;
-      }
-
-      public int getId() {
-         return id;
       }
    }
 }
