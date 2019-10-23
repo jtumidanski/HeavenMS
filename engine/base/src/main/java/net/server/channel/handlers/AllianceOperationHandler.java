@@ -208,7 +208,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
             MapleGuildProcessor.getInstance().resetAllianceGuildPlayersRank(guildId);
 
             chr.getMGC().setAllianceRank(2);
-            guild.getMGC(chr.getId()).ifPresent(guildCharacter -> guildCharacter.setAllianceRank(2));
+            guild.findMember(chr.getId()).ifPresent(guildCharacter -> guildCharacter.setAllianceRank(2));
             chr.saveGuildStatus();
 
             Server.getInstance().allianceMessage(alliance.id(), new AddGuildToAlliance(alliance, guildId, c.getWorld()), -1, -1);

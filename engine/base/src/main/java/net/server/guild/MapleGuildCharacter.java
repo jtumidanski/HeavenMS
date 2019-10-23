@@ -21,10 +21,12 @@
 */
 package net.server.guild;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 
 public class MapleGuildCharacter {
-   private MapleCharacter character;
+   private Optional<MapleCharacter> character;
    private int level;
    private int id;
    private int world, channel;
@@ -36,7 +38,7 @@ public class MapleGuildCharacter {
    private String name;
 
    public MapleGuildCharacter(MapleCharacter c) {
-      this.character = c;
+      this.character = Optional.of(c);
       this.name = c.getName();
       this.level = c.getLevel();
       this.id = c.getId();
@@ -50,7 +52,7 @@ public class MapleGuildCharacter {
    }
 
    public MapleGuildCharacter(MapleCharacter c, int _id, int _lv, String _name, int _channel, int _world, int _job, int _rank, int _gid, boolean _on, int _allianceRank) {
-      this.character = c;
+      this.character = Optional.ofNullable(c);
       this.level = _lv;
       this.id = _id;
       this.name = _name;
@@ -65,12 +67,16 @@ public class MapleGuildCharacter {
       this.allianceRank = _allianceRank;
    }
 
-   public MapleCharacter getCharacter() {
+   public Optional<MapleCharacter> getCharacter() {
       return character;
    }
 
    public void setCharacter(MapleCharacter ch) {
-      this.character = ch;
+      this.character = Optional.of(ch);
+   }
+
+   public void clear() {
+      this.character = Optional.empty();
    }
 
    public int getLevel() {
@@ -111,7 +117,7 @@ public class MapleGuildCharacter {
 
    public void setGuildId(int gid) {
       guildid = gid;
-      character.setGuildId(gid);
+      character.ifPresent(reference -> setGuildId(gid));
    }
 
    public int getGuildRank() {
@@ -120,7 +126,7 @@ public class MapleGuildCharacter {
 
    public void setGuildRank(int rank) {
       guildrank = rank;
-      character.setGuildRank(rank);
+      character.ifPresent(reference -> reference.setGuildRank(rank));
    }
 
    public void setOfflineGuildRank(int rank) {
@@ -133,7 +139,7 @@ public class MapleGuildCharacter {
 
    public void setAllianceRank(int rank) {
       allianceRank = rank;
-      character.setAllianceRank(rank);
+      character.ifPresent(reference -> reference.setAllianceRank(rank));
    }
 
    public boolean isOnline() {

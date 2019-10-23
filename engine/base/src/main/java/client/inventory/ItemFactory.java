@@ -22,6 +22,7 @@ package client.inventory;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
@@ -69,9 +70,9 @@ public enum ItemFactory {
 
    public static List<Pair<Item, Integer>> loadEquippedItems(int id, boolean isAccount, boolean login) {
       if (isAccount) {
-         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByAccount(connection, id, login)).orElse(new ArrayList<>());
+         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByAccount(connection, id, login)).orElse(Collections.emptyList());
       } else {
-         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByCharacter(connection, id, login)).orElse(new ArrayList<>());
+         return DatabaseConnection.getInstance().withConnectionResult(connection -> InventoryItemProvider.getInstance().getEquipsByCharacter(connection, id, login)).orElse(Collections.emptyList());
       }
    }
 

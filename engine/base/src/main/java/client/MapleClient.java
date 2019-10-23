@@ -685,7 +685,7 @@ public class MapleClient {
             if (!this.serverTransition) {
                MapleGuildCharacter guildCharacter = player.getMGC();
                if (guildCharacter != null) {
-                  guildCharacter.setCharacter(null);
+                  guildCharacter.clear();
                }
                world.removePlayer(player);
                //getChannelServer().removePlayer(player); already being done

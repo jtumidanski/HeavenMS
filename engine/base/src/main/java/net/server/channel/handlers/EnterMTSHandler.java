@@ -22,6 +22,7 @@
 package net.server.channel.handlers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import client.MapleCharacter;
@@ -143,6 +144,6 @@ public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
    }
 
    private List<MTSItemInfo> getTransfer(int cid) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> MtsItemProvider.getInstance().getTransferItems(connection, cid)).orElse(new ArrayList<>());
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> MtsItemProvider.getInstance().getTransferItems(connection, cid)).orElse(Collections.emptyList());
    }
 }

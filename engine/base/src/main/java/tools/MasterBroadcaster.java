@@ -414,6 +414,21 @@ public class MasterBroadcaster {
       return channels.parallelStream().map(channel -> channel.getPlayerStorage().getCharacterById(characterId)).flatMap(character -> character.stream().flatMap(Stream::of)).findFirst().orElse(null);
    }
 
+   public void sendToGuild(MapleGuild guild, Function<MapleCharacter, Boolean> filter, PacketInput packetInput, boolean repeatToSource, Integer sourceId) {
+      if (filter == null) {
+         sendToGuild(guild, packetInput, repeatToSource, sourceId);
+      } else {
+         sendToGuild(guild, character -> {
+            boolean otherFilter = filter.apply(character);
+            if (repeatToSource) {
+               return otherFilter;
+            } else {
+               return character.getId() != sourceId && otherFilter;
+            }
+         }, packetInput);
+      }
+   }
+
    public void sendToGuild(MapleGuild guild, PacketInput packetInput, boolean repeatToSource, Integer sourceId) {
       sendToGuild(guild, character -> {
          if (repeatToSource) {
@@ -428,20 +443,20 @@ public class MasterBroadcaster {
       sendToGuild(guild, null, packetInput);
    }
 
+   protected Stream<MapleCharacter> getGuildCharacters(MapleGuild guild) {
+      List<Channel> channels = Server.getInstance().getChannelsFromWorld(guild.getWorldId());
+      return guild.getMembers().parallelStream()
+            .map(guildCharacter -> getCharacter(channels, guildCharacter.getId()))
+            .filter(Objects::nonNull);
+   }
+
    public void sendToGuild(MapleGuild guild, Function<MapleCharacter, Boolean> filter, PacketInput packetInput) {
       //TODO can this be simplified to below?
-      //send(guild.getMembers().stream().map(MapleGuildCharacter::getCharacter).filter(Objects::nonNull).collect(Collectors.toList()), null, character -> PacketCreator.create(packetInput));
+      //send(guild.getMemberCharacters().filter(Objects::nonNull).collect(Collectors.toList()), null, character -> PacketCreator.create(packetInput));
       if (filter == null) {
-         List<Channel> channels = Server.getInstance().getChannelsFromWorld(guild.getWorldId());
-         guild.getMembers().parallelStream()
-               .map(guildCharacter -> getCharacter(channels, guildCharacter.getId()))
-               .filter(Objects::nonNull)
-               .forEach(character -> PacketCreator.announce(character, packetInput));
+         getGuildCharacters(guild).forEach(character -> PacketCreator.announce(character, packetInput));
       } else {
-         List<Channel> channels = Server.getInstance().getChannelsFromWorld(guild.getWorldId());
-         guild.getMembers().parallelStream()
-               .map(guildCharacter -> getCharacter(channels, guildCharacter.getId()))
-               .filter(Objects::nonNull)
+         getGuildCharacters(guild)
                .filter(filter::apply)
                .forEach(character -> PacketCreator.announce(character, packetInput));
       }

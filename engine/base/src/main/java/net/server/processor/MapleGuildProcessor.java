@@ -1,12 +1,9 @@
 package net.server.processor;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import client.MapleCharacter;
@@ -145,7 +142,7 @@ public class MapleGuildProcessor {
 
    protected Stream<MapleCharacter> getGuildMemberStream(MapleGuild guild) {
       PlayerStorage ps = Server.getInstance().getWorld(guild.getWorldId()).getPlayerStorage();
-      return guild.getMembers().stream()
+      return guild.getMembers().parallelStream()
             .map(mapleGuildCharacter -> ps.getCharacterById(mapleGuildCharacter.getId()))
             .flatMap(Optional::stream);
    }
@@ -181,18 +178,14 @@ public class MapleGuildProcessor {
          }
 
          guild.increaseCapacity(5);
+         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildCapacityChange(guild.getId(), guild.getCapacity()), false, -1);
          writeToDB(guild, false);
-
-         World world = character.getWorldServer();
-         List<Integer> memberIds = getLoggedInMemberStream(guild).map(MapleCharacter::getId).collect(Collectors.toList());
-         MasterBroadcaster.getInstance().sendToWorld(world, memberIds, new GuildCapacityChange(guild.getId(), guild.getCapacity()), false, -1);
       });
 
    }
 
    public void guildChat(MapleCharacter character, String message) {
-      List<Integer> memberIds = character.getGuild().map(guild -> getLoggedInMemberStream(guild).map(MapleCharacter::getId).collect(Collectors.toList())).orElse(new ArrayList<>());
-      MasterBroadcaster.getInstance().sendToWorld(character.getWorldServer(), memberIds, new MultiChat(character.getName(), message, 2), false, character.getId());
+      character.getGuild().ifPresent(guild -> MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new MultiChat(character.getName(), message, 2), false, character.getId()));
    }
 
    public boolean addGuildMember(MapleGuildCharacter guildCharacterToAdd, MapleCharacter characterToAdd) {
@@ -208,9 +201,8 @@ public class MapleGuildProcessor {
 
       referenceGuild.addGuildMember(guildCharacterToAdd, characterToAdd);
 
-      List<Integer> memberIds = getLoggedInMemberStream(referenceGuild).map(MapleCharacter::getId).collect(Collectors.toList());
       PacketInput packetInput = new NewGuildMember(guildCharacterToAdd.getGuildId(), guildCharacterToAdd.getId(), guildCharacterToAdd.getName(), guildCharacterToAdd.getJobId(), guildCharacterToAdd.getLevel(), guildCharacterToAdd.getGuildRank(), guildCharacterToAdd.isOnline());
-      MasterBroadcaster.getInstance().sendToWorld(characterToAdd.getWorldServer(), memberIds, packetInput, false, -1);
+      MasterBroadcaster.getInstance().sendToGuild(referenceGuild, MapleCharacter::isLoggedinWorld, packetInput, false, -1);
       return true;
    }
 
@@ -218,19 +210,14 @@ public class MapleGuildProcessor {
       World world = character.getWorldServer();
       world.getGuild(character.getMGC()).ifPresent(guild -> {
          guild.leaveGuild(character.getMGC());
-
-         List<Integer> memberIds = getLoggedInMemberStream(guild).map(MapleCharacter::getId).collect(Collectors.toList());
-         MasterBroadcaster.getInstance().sendToWorld(world, memberIds, new GuildMemberLeft(character.getGuildId(), character.getId(), character.getName(), false), false, -1);
+         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildMemberLeft(character.getGuildId(), character.getId(), character.getName(), false), false, -1);
       });
    }
 
    public void setGuildNotice(MapleGuild guild, String notice) {
       guild.setGuildNotice(notice);
+      MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildNotice(guild.getId(), notice), false, -1);
       writeToDB(guild, false);
-
-      List<Integer> memberIds = getLoggedInMemberStream(guild).map(MapleCharacter::getId).collect(Collectors.toList());
-      World world = Server.getInstance().getWorld(guild.getWorldId());
-      MasterBroadcaster.getInstance().sendToWorld(world, memberIds, new GuildNotice(guild.getId(), notice), false, -1);
    }
 
    public void gainGP(MapleGuild guild, int amount) {
@@ -359,7 +346,7 @@ public class MapleGuildProcessor {
             setGuildAndRank(guildCharacter.getWorld(), guildCharacter.getId(), guild.getId(), newRank);
             guildCharacter.setGuildRank(newRank);
          } else {
-            Server.getInstance().getWorld(guildCharacter.getWorld()).setOfflineGuildStatus((short) guild.getId(), (byte) newRank, guildCharacter.getId());
+            setOfflineGuildStatus((short) guild.getId(), (byte) newRank, guildCharacter.getId());
             guildCharacter.setOfflineGuildRank(newRank);
          }
       } catch (Exception re) {
@@ -384,7 +371,7 @@ public class MapleGuildProcessor {
                } else {
                   DatabaseConnection.getInstance().withConnection(
                         connection -> NoteAdministrator.getInstance().sendNote(connection, guildCharacter.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.parseByte("0")));
-                  Server.getInstance().getWorld(guildCharacter.getWorld()).setOfflineGuildStatus((short) 0, (byte) 5, cid);
+                  setOfflineGuildStatus((short) 0, (byte) 5, cid);
                }
             }, () -> System.out.println("Unable to find member with name " + name + " and id " + cid));
    }
@@ -392,25 +379,20 @@ public class MapleGuildProcessor {
    public void changeRankTitle(int guildId, String[] ranks) {
       ifGuildPresent(guildId, guild -> {
          guild.changeRankTitle(ranks);
-         MasterBroadcaster.getInstance().sendToGuild(guild, new GuildRankTitleChange(guildId, ranks));
          writeToDB(guild, false);
+         MasterBroadcaster.getInstance().sendToGuild(guild, new GuildRankTitleChange(guildId, ranks));
       });
    }
 
    public void setGuildEmblem(int guildId, short bg, byte bgcolor, short logo, byte logocolor) {
       ifGuildPresent(guildId, guild -> {
          guild.setGuildEmblem(bg, bgcolor, logo, logocolor);
-         changeEmblem(guild.getWorldId(), guildId, getLoggedInMemberStream(guild).map(MapleCharacter::getId).collect(Collectors.toList()), new MapleGuildSummary(guild));
          writeToDB(guild, false);
+         MapleGuildSummary summary = new MapleGuildSummary(guild);
+         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildEmblemChange(guildId, summary.getLogoBG(), summary.getLogoBGColor(), summary.getLogo(), summary.getLogoColor()), true, -1);
+         Server.getInstance().getWorld(guild.getWorldId()).updateGuildSummary(guildId, summary);
+         getLoggedInMemberStream(guild).forEach(character -> setGuildAndRank(guild.getWorldId(), character.getId(), -1, -1));
       });
-   }
-
-   protected void changeEmblem(int worldId, int gid, List<Integer> affectedPlayers, MapleGuildSummary mgs) {
-      World world = Server.getInstance().getWorld(worldId);
-      world.updateGuildSummary(gid, mgs);
-      MasterBroadcaster.getInstance().sendToWorld(world, affectedPlayers, character ->
-            PacketCreator.create(new GuildEmblemChange(gid, mgs.getLogoBG(), mgs.getLogoBGColor(), mgs.getLogo(), mgs.getLogoColor())), true, -1);
-      setGuildAndRank(worldId, affectedPlayers, -1, -1, -1);   //respawn player
    }
 
    public void disbandGuild(int guildId) {
@@ -420,17 +402,9 @@ public class MapleGuildProcessor {
                MapleAllianceProcessor.getInstance().disbandAlliance(guild.getAllianceId());
             }
          }
-         setGuildAndRank(guild.getWorldId(), getLoggedInMemberStream(guild).map(MapleCharacter::getId).collect(Collectors.toList()), 0, 5, -1);
+         getLoggedInMemberStream(guild).forEach(character -> setGuildAndRank(guild.getWorldId(), character.getId(), 0, 5));
          writeToDB(guild, true);
       });
-   }
-
-   protected void setGuildAndRank(int worldId, List<Integer> cids, int guildid, int rank, int exception) {
-      for (int cid : cids) {
-         if (cid != exception) {
-            setGuildAndRank(worldId, cid, guildid, rank);
-         }
-      }
    }
 
    protected void setGuildAndRank(int worldId, int cid, int guildid, int rank) {
@@ -470,9 +444,7 @@ public class MapleGuildProcessor {
    }
 
    public void removeGuildCharacter(MapleGuildCharacter mgc) {
-      if (mgc.getCharacter() != null) {
-         removeGuildCharacter(mgc.getCharacter());
-      }
+      mgc.getCharacter().ifPresent(this::removeGuildCharacter);
    }
 
    public void resetAllianceGuildPlayersRank(int gId) {
@@ -482,5 +454,9 @@ public class MapleGuildProcessor {
    protected void resetAllianceGuildPlayersRank(MapleGuild guild) {
       getLoggedInMemberStream(guild).forEach(character -> character.setAllianceRank(5));
       DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateAllianceRank(connection, guild.getId(), 5));
+   }
+
+   public void setOfflineGuildStatus(int guildId, int guildRank, int characterId) {
+      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, guildId, guildRank, characterId));
    }
 }

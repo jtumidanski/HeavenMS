@@ -21,7 +21,6 @@
  */
 package net.server.channel.handlers;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -30,6 +29,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.mina.core.session.IoSession;
 
@@ -118,16 +118,11 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
    }
 
    private List<Pair<Long, PlayerBuffValueHolder>> getLocalStartTimes(List<PlayerBuffValueHolder> lpbvl) {
-      List<Pair<Long, PlayerBuffValueHolder>> timedBuffs = new ArrayList<>();
       long currentServerTime = currentServerTime();
-
-      for (PlayerBuffValueHolder pb : lpbvl) {
-         timedBuffs.add(new Pair<>(currentServerTime - pb.usedTime, pb));
-      }
-
-      timedBuffs.sort(Comparator.comparing(Pair::getLeft));
-
-      return timedBuffs;
+      return lpbvl.stream()
+            .map(playerBuffValueHolder -> new Pair<>(currentServerTime - playerBuffValueHolder.usedTime, playerBuffValueHolder))
+            .sorted(Comparator.comparing(Pair::getLeft))
+            .collect(Collectors.toList());
    }
 
    private boolean tryAcquireAccount(int accId) {
@@ -447,10 +442,12 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
    private void loggingInPartnerOperations(World world, MapleCharacter player) {
       int partnerId = player.getPartnerId();
-      world.getPlayerStorage().getCharacterById(partnerId).filter(partner -> !partner.isAwayFromWorld()).ifPresent(partner -> {
-         PacketCreator.announce(player, new WeddingPartnerTransfer(partnerId, partner.getMapId()));
-         PacketCreator.announce(partner, new WeddingPartnerTransfer(player.getId(), player.getMapId()));
-      });
+      world.getPlayerStorage().getCharacterById(partnerId)
+            .filter(partner -> !partner.isAwayFromWorld())
+            .ifPresent(partner -> {
+               PacketCreator.announce(player, new WeddingPartnerTransfer(partnerId, partner.getMapId()));
+               PacketCreator.announce(partner, new WeddingPartnerTransfer(player.getId(), player.getMapId()));
+            });
    }
 
    private void loggingInPartyOperations(MapleClient c, World wserv, MapleCharacter player) {
@@ -468,8 +465,11 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
    private void loggingInGuildOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
       server.getGuild(player.getGuildId(), player.getWorld(), player).ifPresentOrElse(guild -> {
-         guild.getMGC(player.getId()).ifPresent(guildCharacter -> guildCharacter.setCharacter(player));
-         player.setMGC(guild.getMGC(player.getId()).orElseThrow());
+         guild.findMember(player.getId()).ifPresent(reference -> {
+            reference.setCharacter(player);
+            player.setMGC(reference);
+         });
+
          MapleGuildProcessor.getInstance().setMemberOnline(player, true, client.getChannel());
          PacketCreator.announce(client, new ShowGuildInfo(player));
          loggingInAllianceOperations(client, server, player, newcomer);

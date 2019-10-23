@@ -1193,8 +1193,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       Arrays.stream(skills)
             .filter(id -> id != 0)
             .mapToObj(SkillFactory::getSkill)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .forEach(skill -> {
                int skillLevel = getSkillLevel(skill);
                if (skillLevel > 0) {

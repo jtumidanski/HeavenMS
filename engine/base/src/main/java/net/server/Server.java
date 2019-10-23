@@ -1066,7 +1066,7 @@ public class Server {
          }
 
          if (mc != null) {
-            g.getMGC(mc.getId()).ifPresentOrElse(guildCharacter -> {
+            g.findMember(mc.getId()).ifPresentOrElse(guildCharacter -> {
                mc.setMGC(guildCharacter);
                guildCharacter.setCharacter(mc);
             }, () -> FilePrinter.printError(FilePrinter.GUILD_CHAR_ERROR, "Could not find " + mc.getName() + " when loading guild " + id + "."));

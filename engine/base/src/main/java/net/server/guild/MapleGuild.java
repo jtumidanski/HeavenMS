@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import net.server.audit.locks.MonitoredLockType;
@@ -138,6 +139,15 @@ public class MapleGuild {
       }
    }
 
+   public List<MapleCharacter> getMemberCharacters() {
+      membersLock.lock();
+      try {
+         return members.stream().map(MapleGuildCharacter::getCharacter).flatMap(Optional::stream).collect(Collectors.toList());
+      } finally {
+         membersLock.unlock();
+      }
+   }
+
    public int getCapacity() {
       return capacity;
    }
@@ -213,15 +223,6 @@ public class MapleGuild {
       this.logoBGColor = bgcolor;
       this.logo = logo;
       this.logoColor = logocolor;
-   }
-
-   public Optional<MapleGuildCharacter> getMGC(int characterId) {
-      membersLock.lock();
-      try {
-         return members.stream().filter(mapleGuildCharacter -> mapleGuildCharacter.getId() == characterId).findFirst();
-      } finally {
-         membersLock.unlock();
-      }
    }
 
    public void increaseCapacity(int amount) {

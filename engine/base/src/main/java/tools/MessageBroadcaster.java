@@ -65,14 +65,14 @@ public class MessageBroadcaster {
    }
 
    public void sendGuildServerNotice(MapleGuild guild, ServerNoticeType noticeType, String message) {
-      MasterBroadcaster.getInstance().send(guild.getMembers().stream().map(MapleGuildCharacter::getCharacter).collect(Collectors.toList()), character -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
+      List<MapleCharacter> guildMembers = guild.getMemberCharacters();
+      MasterBroadcaster.getInstance().send(guildMembers, character -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
    }
 
    public void sendAllianceServerNotice(MapleAlliance alliance, ServerNoticeType noticeType, String message) {
       alliance.guilds().parallelStream()
             .map(guildId -> Server.getInstance().getGuild(guildId))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .forEach(guild -> sendGuildServerNotice(guild, noticeType, message));
    }
 
@@ -100,9 +100,7 @@ public class MessageBroadcaster {
       }
       {
          List<MapleCharacter> guildMembers = originator.getGuild()
-               .map(guild -> guild.getMembers().stream()
-                     .map(MapleGuildCharacter::getCharacter)
-                     .collect(Collectors.toList()))
+               .map(MapleGuild::getMemberCharacters)
                .orElse(Collections.emptyList());
          MasterBroadcaster.getInstance().send(guildMembers, recipient -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
       }

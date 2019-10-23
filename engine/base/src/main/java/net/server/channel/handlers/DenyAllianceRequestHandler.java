@@ -40,9 +40,7 @@ public final class DenyAllianceRequestHandler extends AbstractPacketHandler<Deny
    @Override
    public void handlePacket(DenyAllianceRequestPacket packet, MapleClient client) {
       client.getWorldServer().getPlayerStorage().getCharacterByName(packet.inviterName())
-            .map(MapleCharacter::getAlliance)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(MapleCharacter::getAlliance)
             .ifPresent(alliance -> MapleAllianceProcessor.getInstance().answerInvitation(client.getPlayer().getId(), packet.guildName(), alliance.id(), false));
    }
 }

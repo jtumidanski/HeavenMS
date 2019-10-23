@@ -42,8 +42,7 @@ public class EmpowerMeCommand extends Command {
       final int[] array = {2311003, 2301004, 1301007, 4101004, 2001002, 1101007, 1005, 2301003, 5121009, 1111002, 4111001, 4111002, 4211003, 4211005, 1321000, 2321004, 3121002};
       Arrays.stream(array)
             .mapToObj(SkillFactory::getSkill)
-            .filter(Optional::isPresent)
-            .map(Optional::get)
+            .flatMap(Optional::stream)
             .forEach(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
    }
 }

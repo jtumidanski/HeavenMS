@@ -53,7 +53,6 @@ import client.BuddyListEntry;
 import client.BuddyListOperation;
 import client.MapleCharacter;
 import client.MapleFamily;
-import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.MarriageAdministrator;
 import client.database.administrator.PlayerNpcAdministrator;
 import client.database.data.MarriageData;
@@ -672,14 +671,20 @@ public class World {
          return Optional.empty();
       }
 
-      int guildId = mgc.getGuildId();
+      Optional<MapleCharacter> character = mgc.getCharacter();
+      if (character.isEmpty()) {
+         return Optional.empty();
+      }
 
-      return Server.getInstance().getGuild(guildId, mgc.getWorld(), mgc.getCharacter()).map(guild -> {
-         if (gsStore.get(guildId) == null) {
-            gsStore.put(guildId, new MapleGuildSummary(guild));
-         }
-         return guild;
-      });
+      Optional<MapleGuild> guild = Server.getInstance().getGuild(mgc.getGuildId(), mgc.getWorld(), character.get());
+      if (guild.isEmpty()) {
+         return Optional.empty();
+      }
+
+      if (!gsStore.containsKey(mgc.getGuildId())) {
+         gsStore.put(mgc.getGuildId(), new MapleGuildSummary(guild.get()));
+      }
+      return guild;
    }
 
    public boolean isWorldCapacityFull() {
@@ -722,10 +727,6 @@ public class World {
          server.getGuild(i, getId(), null)
                .ifPresentOrElse(guild -> gsStore.put(i, new MapleGuildSummary(guild)), () -> gsStore.remove(i));
       }
-   }
-
-   public void setOfflineGuildStatus(int guildid, int guildrank, int cid) {
-      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, guildid, guildrank, cid));
    }
 
    public boolean isGuildQueued(int guildId) {
