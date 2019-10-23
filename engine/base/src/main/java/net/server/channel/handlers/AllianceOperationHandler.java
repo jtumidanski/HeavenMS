@@ -25,7 +25,6 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.opcodes.SendOpcode;
 import net.server.AbstractPacketHandler;
 import net.server.PacketReader;
 import net.server.Server;
@@ -45,14 +44,16 @@ import net.server.channel.packet.reader.ExistingAllianceOperationReader;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
+import net.server.processor.MapleGuildProcessor;
+import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.alliance.AddGuildToAlliance;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.ChangeAllianceRankTitles;
 import tools.packet.alliance.DisbandAlliance;
+import tools.packet.alliance.GetAlliancePlayerInfo;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.RemoveGuildFromAlliance;
 import tools.packet.alliance.UpdateAllianceInfo;
@@ -80,15 +81,6 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       return null;
    }
 
-   private static byte[] sendShowInfo(int allianceId, int playerId) {
-      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
-      writer.writeShort(SendOpcode.ALLIANCE_OPERATION.getValue());
-      writer.write(0x02);
-      writer.writeInt(allianceId);
-      writer.writeInt(playerId);
-      return writer.getPacket();
-   }
-
    @Override
    public void handlePacket(AllianceOperationPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
@@ -113,7 +105,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       }
 
       if (packet instanceof AllianceMessagePacket) {
-         Server.getInstance().allianceMessage(alliance.id(), sendShowInfo(allianceId, chr.getId()), -1, -1);
+         Server.getInstance().allianceMessage(alliance.id(), new GetAlliancePlayerInfo(allianceId, chr.getId()), -1, -1);
          MapleAllianceProcessor.getInstance().saveToDB(alliance);
       } else if (packet instanceof LeaveAlliancePacket) {
          leaveAlliance(allianceId, alliance, chr);
@@ -139,7 +131,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
 
    private void setAllianceNotice(MapleAlliance alliance, String notice) {
       Server.getInstance().setAllianceNotice(alliance.id(), notice);
-      Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new AllianceNotice(alliance.id(), notice)), -1, -1);
+      Server.getInstance().allianceMessage(alliance.id(), new AllianceNotice(alliance.id(), notice), -1, -1);
 
       MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "* Alliance Notice : " + notice);
       MapleAllianceProcessor.getInstance().saveToDB(alliance);
@@ -157,7 +149,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
    private void changeRanks(MapleAlliance alliance, String[] ranks) {
 
       Server.getInstance().setAllianceRanks(alliance.id(), ranks);
-      Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new ChangeAllianceRankTitles(alliance.id(), ranks)), -1, -1);
+      Server.getInstance().allianceMessage(alliance.id(), new ChangeAllianceRankTitles(alliance.id(), ranks), -1, -1);
       MapleAllianceProcessor.getInstance().saveToDB(alliance);
    }
 
@@ -182,12 +174,12 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
 
 
       Server.getInstance().getGuild(guildIdToExpel).ifPresent(guild -> {
-         Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new RemoveGuildFromAlliance(alliance, guildIdToExpel, c.getWorld())), -1, -1);
+         Server.getInstance().allianceMessage(alliance.id(), new RemoveGuildFromAlliance(alliance, guildIdToExpel, c.getWorld()), -1, -1);
          Server.getInstance().removeGuildFromAlliance(alliance.id(), guildIdToExpel);
 
-         Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new GetGuildAlliances(alliance, c.getWorld())), -1, -1);
-         Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new AllianceNotice(alliance.id(), alliance.notice())), -1, -1);
-         Server.getInstance().guildMessage(guildIdToExpel, PacketCreator.create(new DisbandAlliance(allianceIdForGuild)));
+         Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, c.getWorld()), -1, -1);
+         Server.getInstance().allianceMessage(alliance.id(), new AllianceNotice(alliance.id(), alliance.notice()), -1, -1);
+         MasterBroadcaster.getInstance().sendToGuild(guildIdToExpel, new DisbandAlliance(allianceIdForGuild));
 
          MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "[" + guild.getName() + "] guild has been expelled from the union.");
          MapleAllianceProcessor.getInstance().saveToDB(alliance);
@@ -213,15 +205,15 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
             int guildId = chr.getGuildId();
 
             Server.getInstance().addGuildtoAlliance(alliance.id(), guildId);
-            Server.getInstance().resetAllianceGuildPlayersRank(guildId);
+            MapleGuildProcessor.getInstance().resetAllianceGuildPlayersRank(guildId);
 
             chr.getMGC().setAllianceRank(2);
-            guild.getMGC(chr.getId()).setAllianceRank(2);
+            guild.getMGC(chr.getId()).ifPresent(guildCharacter -> guildCharacter.setAllianceRank(2));
             chr.saveGuildStatus();
 
-            Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new AddGuildToAlliance(alliance, guildId, c.getWorld())), -1, -1);
-            Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new UpdateAllianceInfo(alliance, c.getWorld())), -1, -1);
-            Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new AllianceNotice(alliance.id(), alliance.notice())), -1, -1);
+            Server.getInstance().allianceMessage(alliance.id(), new AddGuildToAlliance(alliance, guildId, c.getWorld()), -1, -1);
+            Server.getInstance().allianceMessage(alliance.id(), new UpdateAllianceInfo(alliance, c.getWorld()), -1, -1);
+            Server.getInstance().allianceMessage(alliance.id(), new AllianceNotice(alliance.id(), alliance.notice()), -1, -1);
             MessageBroadcaster.getInstance().sendGuildServerNotice(guild, ServerNoticeType.PINK_TEXT, "Your guild has joined the [" + alliance.name() + "] union.");
             MapleAllianceProcessor.getInstance().saveToDB(alliance);
          });
@@ -255,7 +247,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
          newLeader.getMGC().setAllianceRank(1);
          newLeader.saveGuildStatus();
 
-         Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new GetGuildAlliances(alliance, newLeader.getWorld())), -1, -1);
+         Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, newLeader.getWorld()), -1, -1);
          MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "'" + newLeader.getName() + "' has been appointed as the new head of this Alliance.");
       });
    }
@@ -269,7 +261,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       chr.getMGC().setAllianceRank(newRank);
       chr.saveGuildStatus();
 
-      Server.getInstance().allianceMessage(alliance.id(), PacketCreator.create(new GetGuildAlliances(alliance, chr.getWorld())), -1, -1);
+      Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, chr.getWorld()), -1, -1);
       MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "'" + chr.getName() + "' has been reassigned to '" + alliance.rankTitle(newRank) + "' in this Alliance.");
    }
 }

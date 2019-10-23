@@ -12,10 +12,14 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import client.MapleCharacter;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
+import net.server.Server;
+import net.server.channel.Channel;
+import net.server.guild.MapleGuild;
 import net.server.world.World;
 import server.maps.MapleMap;
 import server.maps.MapleMiniGame;
@@ -390,6 +394,11 @@ public class MasterBroadcaster {
       sendToWorld(world, mapleCharacter -> passRepeatToSource(repeatToSource, source.orElse(null), mapleCharacter) && targetIds.contains(mapleCharacter.getId()), packetCreator);
    }
 
+   public void sendToWorld(World world, List<Integer> targetIds, PacketInput packetInput, boolean repeatToSource, Integer sourceId) {
+      Optional<MapleCharacter> source = world.getPlayerStorage().getCharacterById(sourceId);
+      sendToWorld(world, mapleCharacter -> passRepeatToSource(repeatToSource, source.orElse(null), mapleCharacter) && targetIds.contains(mapleCharacter.getId()), character -> PacketCreator.create(packetInput));
+   }
+
    /**
     * Sends a packet to everyone in the world, excluding those filtered out.
     *
@@ -399,6 +408,47 @@ public class MasterBroadcaster {
     */
    private void sendToWorld(World world, Function<MapleCharacter, Boolean> filter, Function<MapleCharacter, byte[]> packetCreator) {
       send(world.getPlayerStorage().getAllCharacters(), filter, packetCreator);
+   }
+
+   private MapleCharacter getCharacter(List<Channel> channels, int characterId) {
+      return channels.parallelStream().map(channel -> channel.getPlayerStorage().getCharacterById(characterId)).flatMap(character -> character.stream().flatMap(Stream::of)).findFirst().orElse(null);
+   }
+
+   public void sendToGuild(MapleGuild guild, PacketInput packetInput, boolean repeatToSource, Integer sourceId) {
+      sendToGuild(guild, character -> {
+         if (repeatToSource) {
+            return true;
+         } else {
+            return character.getId() != sourceId;
+         }
+      }, packetInput);
+   }
+
+   public void sendToGuild(MapleGuild guild, PacketInput packetInput) {
+      sendToGuild(guild, null, packetInput);
+   }
+
+   public void sendToGuild(MapleGuild guild, Function<MapleCharacter, Boolean> filter, PacketInput packetInput) {
+      //TODO can this be simplified to below?
+      //send(guild.getMembers().stream().map(MapleGuildCharacter::getCharacter).filter(Objects::nonNull).collect(Collectors.toList()), null, character -> PacketCreator.create(packetInput));
+      if (filter == null) {
+         List<Channel> channels = Server.getInstance().getChannelsFromWorld(guild.getWorldId());
+         guild.getMembers().parallelStream()
+               .map(guildCharacter -> getCharacter(channels, guildCharacter.getId()))
+               .filter(Objects::nonNull)
+               .forEach(character -> PacketCreator.announce(character, packetInput));
+      } else {
+         List<Channel> channels = Server.getInstance().getChannelsFromWorld(guild.getWorldId());
+         guild.getMembers().parallelStream()
+               .map(guildCharacter -> getCharacter(channels, guildCharacter.getId()))
+               .filter(Objects::nonNull)
+               .filter(filter::apply)
+               .forEach(character -> PacketCreator.announce(character, packetInput));
+      }
+   }
+
+   public void sendToGuild(int guildId, PacketInput packetInput) {
+      Server.getInstance().getGuild(guildId).ifPresent(guild -> sendToGuild(guild, packetInput));
    }
 
    /**

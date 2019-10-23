@@ -28,6 +28,7 @@ import net.server.Server;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -122,7 +123,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
             leader.getMGC().setGuildId(gid);
 
             // initialize guild structure
-            Server.getInstance().changeRank(gid, leader.getId(), 1);
+            MapleGuildProcessor.getInstance().changeRank(gid, leader.getId(), 1);
 
             PacketCreator.announce(leader, new ShowGuildInfo(leader));
             MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You have successfully created a Guild.");
@@ -135,13 +136,12 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                mgc.setGuildRank(cofounder ? 2 : 5);
                mgc.setAllianceRank(5);
 
-               Server.getInstance().addGuildMember(mgc, chr);
-
+               MapleGuildProcessor.getInstance().addGuildMember(mgc, chr);
                if (chr.isLoggedinWorld()) {
                   PacketCreator.announce(chr, new ShowGuildInfo(chr));
 
                   if (cofounder) {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have successfully cofounded a Guild.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have successfully co-founded a Guild.");
                   } else {
                      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have successfully joined the new Guild.");
                   }
@@ -151,8 +151,8 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
             }
 
             Server.getInstance().getGuild(leader.getGuildId(), leader.getWorld(), leader).ifPresent(guild -> {
-               guild.broadcastNameChanged();
-               guild.broadcastEmblemChanged();
+               MapleGuildProcessor.getInstance().broadcastNameChanged(guild);
+               MapleGuildProcessor.getInstance().broadcastEmblemChanged(guild);
             });
          }
 

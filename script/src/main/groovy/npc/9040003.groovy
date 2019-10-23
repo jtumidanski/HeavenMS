@@ -1,5 +1,6 @@
 package npc
 
+import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 
@@ -50,7 +51,7 @@ class NPC9040003 {
                cm.sendNext("After what I thought would be an immortal sleep, I have finally found someone that will save Sharenian. This old man will now pave the way for you to finish the quest.")
 
                clearStage(4, eim)
-               cm.getGuild().gainGP(30)
+               MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), 30)
                cm.getPlayer().getMap().getReactorByName("ghostgate").forceHitReactor((byte) 1)
 
                cm.dispose()

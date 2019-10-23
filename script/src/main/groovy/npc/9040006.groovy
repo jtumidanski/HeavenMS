@@ -1,5 +1,6 @@
 package npc
 
+import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
@@ -55,7 +56,7 @@ class NPC9040006 {
                   if (combo == guess) {
                      cm.getPlayer().getMap().getReactorByName("watergate").forceHitReactor((byte) 1)
                      clearStage(3, eim)
-                     cm.getGuild().gainGP(25)
+                     MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), 25)
 
                      removeGroundItems()
                      cm.sendOk("Excellent work. You may proceed to the next stage.")

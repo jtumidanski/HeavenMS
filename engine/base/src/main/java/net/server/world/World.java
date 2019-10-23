@@ -101,13 +101,9 @@ import server.maps.MapleMiniDungeonInfo;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
-import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.buddy.UpdateBuddyChannel;
-import tools.packet.guild.GuildEmblemChange;
-import tools.packet.guild.GuildMarkChanged;
-import tools.packet.guild.GuildNameChange;
 import tools.packet.message.MultiChat;
 import tools.packet.message.ServerMessage;
 import tools.packet.message.Whisper;
@@ -728,50 +724,8 @@ public class World {
       }
    }
 
-   public void setGuildAndRank(List<Integer> cids, int guildid, int rank, int exception) {
-      for (int cid : cids) {
-         if (cid != exception) {
-            setGuildAndRank(cid, guildid, rank);
-         }
-      }
-   }
-
    public void setOfflineGuildStatus(int guildid, int guildrank, int cid) {
       DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateGuildStatus(connection, guildid, guildrank, cid));
-   }
-
-   public void setGuildAndRank(int cid, int guildid, int rank) {
-      getPlayerStorage().getCharacterById(cid).ifPresent(character -> {
-         boolean bDifferentGuild;
-         if (guildid == -1 && rank == -1) {
-            bDifferentGuild = true;
-         } else {
-            bDifferentGuild = guildid != character.getGuildId();
-            character.getMGC().setGuildId(guildid);
-            character.getMGC().setGuildRank(rank);
-
-            if (bDifferentGuild) {
-               character.getMGC().setAllianceRank(5);
-            }
-
-            character.saveGuildStatus();
-         }
-         if (bDifferentGuild) {
-            if (character.isLoggedinWorld()) {
-               Server.getInstance().getGuild(guildid).ifPresentOrElse(guild -> {
-                  character.getMap().broadcastMessage(character, new GuildNameChange(cid, guild.getName()));
-                  character.getMap().broadcastMessage(character, new GuildMarkChanged(cid, guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor()));
-               }, () -> character.getMap().broadcastMessage(character, new GuildNameChange(cid, "")));
-            }
-         }
-      });
-   }
-
-   public void changeEmblem(int gid, List<Integer> affectedPlayers, MapleGuildSummary mgs) {
-      updateGuildSummary(gid, mgs);
-      MasterBroadcaster.getInstance().sendToWorld(this, affectedPlayers, character ->
-            PacketCreator.create(new GuildEmblemChange(gid, mgs.getLogoBG(), mgs.getLogoBGColor(), mgs.getLogo(), mgs.getLogoColor())), true, -1);
-      setGuildAndRank(affectedPlayers, -1, -1, -1);   //respawn player
    }
 
    public boolean isGuildQueued(int guildId) {

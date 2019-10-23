@@ -148,6 +148,10 @@ public class MapleGuildCharacter {
       return name;
    }
 
+   public boolean is(int characterId) {
+      return characterId == id;
+   }
+
    @Override
    public boolean equals(Object other) {
       if (!(other instanceof MapleGuildCharacter)) {

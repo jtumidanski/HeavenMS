@@ -1,5 +1,6 @@
 package reactor
 
+import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 import server.maps.MapleReactor
@@ -20,7 +21,7 @@ class Reactor9208007 {
             eim.showClearEffect(false, maps[i])
          }
 
-         rm.getGuild().gainGP(20)
+         MapleGuildProcessor.getInstance().gainGP(rm.getGuild(), 20)
       }
    }
 

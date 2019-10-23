@@ -1,5 +1,6 @@
 package npc
 
+import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 
@@ -31,7 +32,7 @@ class NPC9040010 {
                      points = 100
                   }
 
-                  cm.getGuild().gainGP(points)
+                  MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), points)
                }
 
                eim.clearPQ()

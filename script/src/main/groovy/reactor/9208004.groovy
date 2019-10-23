@@ -1,6 +1,6 @@
 package reactor
 
-
+import net.server.processor.MapleGuildProcessor
 import scripting.reactor.ReactorActionManager
 
 
@@ -8,7 +8,7 @@ class Reactor9208004 {
    ReactorActionManager rm
 
    def act() {
-      rm.getGuild().gainGP(20)
+      MapleGuildProcessor.getInstance().gainGP(rm.getGuild(), 20)
    }
 
    def hit() {

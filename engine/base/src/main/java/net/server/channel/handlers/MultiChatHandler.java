@@ -29,6 +29,7 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.MultiChatPacket;
 import net.server.channel.packet.reader.MultiChatReader;
+import net.server.processor.MapleGuildProcessor;
 import net.server.world.World;
 import tools.FilePrinter;
 import tools.LogHelper;
@@ -74,7 +75,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
       player.getGuild().ifPresent(guild -> {
          int allianceId = guild.getAllianceId();
          if (allianceId > 0) {
-            Server.getInstance().allianceMessage(allianceId, PacketCreator.create(new MultiChat(player.getName(), packet.message(), 3)), player.getId(), -1);
+            Server.getInstance().allianceMessage(allianceId, new MultiChat(player.getName(), packet.message(), 3), player.getId(), -1);
             if (ServerConstants.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Ally", packet.message());
             }
@@ -83,7 +84,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
    }
 
    private void guildChat(MultiChatPacket packet, MapleClient client, MapleCharacter player) {
-      Server.getInstance().guildChat(player.getGuildId(), player.getName(), player.getId(), packet.message());
+      MapleGuildProcessor.getInstance().guildChat(player, packet.message());
       if (ServerConstants.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Guild", packet.message());
       }

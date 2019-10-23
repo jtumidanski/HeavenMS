@@ -70,6 +70,7 @@ import net.server.coordinator.MapleLoginBypassCoordinator;
 import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MapleGuildProcessor;
 import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
 import net.server.world.MapleParty;
@@ -662,7 +663,7 @@ public class MapleClient {
                         }
                      }
                      player.getGuild().ifPresent(guild -> {
-                        Server.getInstance().setGuildMemberOnline(player, false, player.getClient().getChannel());
+                        MapleGuildProcessor.getInstance().setMemberOnline(player, false, player.getClient().getChannel());
                         PacketCreator.announce(player, new ShowGuildInfo(player));
 
                      });

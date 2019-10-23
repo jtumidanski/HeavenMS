@@ -464,9 +464,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       int allianceId = c.getPlayer().getGuild().map(MapleGuild::getAllianceId).orElse(0);
       Server.getInstance().getAlliance(allianceId)
             .ifPresent(alliance -> {
+               Server.getInstance().allianceMessage(allianceId, new GetGuildAlliances(alliance, c.getWorld()), -1, -1);
+               Server.getInstance().allianceMessage(allianceId, new AllianceNotice(allianceId, alliance.notice()), -1, -1);
                alliance.increaseCapacity(1);
-               Server.getInstance().allianceMessage(allianceId, PacketCreator.create(new GetGuildAlliances(alliance, c.getWorld())), -1, -1);
-               Server.getInstance().allianceMessage(allianceId, PacketCreator.create(new AllianceNotice(allianceId, alliance.notice())), -1, -1);
                PacketCreator.announce(c, new UpdateAllianceInfo(alliance, c.getWorld()));
             });
    }

@@ -84,6 +84,7 @@ import constants.ServerConstants;
 import net.server.Server;
 import net.server.SkillMacro;
 import net.server.guild.MapleGuildCharacter;
+import net.server.processor.MapleGuildProcessor;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
@@ -197,7 +198,7 @@ public class CharacterProcessor {
 
          BuddyAdministrator.getInstance().deleteForCharacter(connection, cid);
          BbsThreadAdministrator.getInstance().deleteThreadsFromCharacter(connection, cid);
-         CharacterProvider.getInstance().getGuildDataForCharacter(connection, cid, senderAccId).ifPresent(result -> Server.getInstance().deleteGuildCharacter(
+         CharacterProvider.getInstance().getGuildDataForCharacter(connection, cid, senderAccId).ifPresent(result -> MapleGuildProcessor.getInstance().removeGuildCharacter(
                new MapleGuildCharacter(player, cid, 0, result.name(), (byte) -1, (byte) -1, 0, result.guildRank(), result.guildId(), false, result.allianceRank())));
          WishListAdministrator.getInstance().deleteForCharacter(connection, cid);
          CoolDownAdministrator.getInstance().deleteForCharacter(connection, cid);

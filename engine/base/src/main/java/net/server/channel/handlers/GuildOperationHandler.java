@@ -140,7 +140,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       if (packet.notice().length() > 100) {
          return;
       }
-      Server.getInstance().setGuildNotice(mapleCharacter.getGuildId(), packet.notice());
+
+      mapleCharacter.getGuild().ifPresent(guild -> MapleGuildProcessor.getInstance().setGuildNotice(guild, packet.notice()));
    }
 
    private void changeGuildEmblem(MapleClient client, MapleCharacter mapleCharacter, ChangeGuildEmblemPacket packet) {
@@ -153,16 +154,13 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      Server.getInstance().setGuildEmblem(mapleCharacter.getGuildId(), packet.background(), packet.backgroundColor(), packet.logo(), packet.logoColor());
+      MapleGuildProcessor.getInstance().setGuildEmblem(mapleCharacter.getGuildId(), packet.background(), packet.backgroundColor(), packet.logo(), packet.logoColor());
 
-      mapleCharacter.getAlliance().ifPresent(alliance -> {
-         byte[] packetData = PacketCreator.create(new GetGuildAlliances(alliance, client.getWorld()));
-         Server.getInstance().allianceMessage(alliance.id(), packetData, -1, -1);
-      });
+      mapleCharacter.getAlliance().ifPresent(alliance -> Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, client.getWorld()), -1, -1));
 
       mapleCharacter.gainMeso(-ServerConstants.CHANGE_EMBLEM_COST, true, false, true);
-      mapleCharacter.getGuild().ifPresent(MapleGuild::broadcastNameChanged);
-      mapleCharacter.getGuild().ifPresent(MapleGuild::broadcastEmblemChanged);
+      mapleCharacter.getGuild().ifPresent(guild -> MapleGuildProcessor.getInstance().broadcastNameChanged(guild));
+      mapleCharacter.getGuild().ifPresent(guild -> MapleGuildProcessor.getInstance().broadcastEmblemChanged(guild));
    }
 
    private void changeRank(MapleCharacter mapleCharacter, ChangeGuildRankPacket packet) {
@@ -173,7 +171,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       if (packet.rank() <= 1 || packet.rank() > 5) {
          return;
       }
-      Server.getInstance().changeRank(mapleCharacter.getGuildId(), packet.playerId(), packet.rank());
+      MapleGuildProcessor.getInstance().changeRank(mapleCharacter.getGuildId(), packet.playerId(), packet.rank());
    }
 
    private void changeRankAndTitle(MapleCharacter mapleCharacter, ChangeGuildRankAndTitlePacket packet) {
@@ -182,7 +180,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      Server.getInstance().changeRankTitle(mapleCharacter.getGuildId(), packet.ranks());
+      MapleGuildProcessor.getInstance().changeRankTitle(mapleCharacter.getGuildId(), packet.ranks());
    }
 
    private void expelMember(MapleCharacter mapleCharacter, ExpelFromGuildPacket packet) {
@@ -191,7 +189,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      Server.getInstance().expelMember(mapleCharacter.getMGC(), packet.name(), packet.playerId());
+      MapleGuildProcessor.getInstance().expelMember(mapleCharacter.getMGC(), packet.name(), packet.playerId());
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
       if (allianceId > 0) {
@@ -206,8 +204,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       }
 
       PacketCreator.announce(client, new UpdateGuildPoints(mapleCharacter.getGuildId(), 0));
-      Server.getInstance().leaveGuild(mapleCharacter.getMGC());
-
+      MapleGuildProcessor.getInstance().leaveGuild(mapleCharacter);
       PacketCreator.announce(client, new ShowGuildInfo(null));
 
       int allianceId = mapleCharacter.getGuild().map(MapleGuild::getAllianceId).orElse(0);
@@ -240,8 +237,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       mapleCharacter.getMGC().setGuildRank(5); // start at lowest rank
       mapleCharacter.getMGC().setAllianceRank(5);
 
-      int s = Server.getInstance().addGuildMember(mapleCharacter.getMGC(), mapleCharacter);
-      if (s == 0) {
+      boolean success = MapleGuildProcessor.getInstance().addGuildMember(mapleCharacter.getMGC(), mapleCharacter);
+      if (!success) {
          MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "The guild you are trying to join is already full.");
          mapleCharacter.getMGC().setGuildId(0);
          return;

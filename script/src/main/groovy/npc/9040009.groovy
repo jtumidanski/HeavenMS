@@ -1,5 +1,6 @@
 package npc
 
+import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.maps.MapleReactor
@@ -77,7 +78,7 @@ class NPC9040009 {
                         if (stage == 3) {
                            cm.getPlayer().getMap().getReactorByName("statuegate").forceHitReactor((byte) 1)
                            clearStage(1, eim)
-                           cm.getGuild().gainGP(15)
+                           MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), 15)
 
                            cm.sendOk("Excellent work. You may proceed to the next stage.")
                         } else {

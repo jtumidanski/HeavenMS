@@ -65,7 +65,7 @@ class NPC2010007 {
                   cm.getPlayer().disbandGuild()
                   cm.dispose()
                } else if (sel == 2) {
-                  cm.getPlayer().increaseGuildCapacity()
+                  MapleGuildProcessor.getInstance().increaseGuildCapacity(cm.getPlayer())
                   cm.dispose()
                }
             }

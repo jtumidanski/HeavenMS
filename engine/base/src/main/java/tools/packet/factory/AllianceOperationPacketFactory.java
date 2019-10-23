@@ -15,6 +15,7 @@ import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.ChangeAllianceRankTitles;
 import tools.packet.alliance.DisbandAlliance;
 import tools.packet.alliance.GetAllianceInfo;
+import tools.packet.alliance.GetAlliancePlayerInfo;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.RemoveGuildFromAlliance;
 import tools.packet.alliance.UpdateAllianceInfo;
@@ -42,6 +43,13 @@ public class AllianceOperationPacketFactory extends AbstractPacketFactory {
       Handler.handle(RemoveGuildFromAlliance.class).decorate(this::removeGuildFromAlliance).register(registry);
       Handler.handle(DisbandAlliance.class).decorate(this::disbandAlliance).register(registry);
       Handler.handle(AllianceInvite.class).decorate(this::allianceInvite).register(registry);
+      Handler.handle(GetAlliancePlayerInfo.class).decorate(this::getAlliancePlayerInfo).register(registry);
+   }
+
+   protected void getAlliancePlayerInfo(MaplePacketLittleEndianWriter writer, GetAlliancePlayerInfo packet) {
+      writer.write(0x02);
+      writer.writeInt(packet.allianceId());
+      writer.writeInt(packet.playerId());
    }
 
    protected void getAllianceInfo(MaplePacketLittleEndianWriter writer, GetAllianceInfo packet) {

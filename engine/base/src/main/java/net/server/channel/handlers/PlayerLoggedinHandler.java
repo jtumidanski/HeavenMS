@@ -67,6 +67,7 @@ import net.server.coordinator.MapleSessionCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
+import net.server.processor.MapleGuildProcessor;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
@@ -467,9 +468,9 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
    private void loggingInGuildOperations(MapleClient client, Server server, MapleCharacter player, boolean newcomer) {
       server.getGuild(player.getGuildId(), player.getWorld(), player).ifPresentOrElse(guild -> {
-         guild.getMGC(player.getId()).setCharacter(player);
-         player.setMGC(guild.getMGC(player.getId()));
-         server.setGuildMemberOnline(player, true, client.getChannel());
+         guild.getMGC(player.getId()).ifPresent(guildCharacter -> guildCharacter.setCharacter(player));
+         player.setMGC(guild.getMGC(player.getId()).orElseThrow());
+         MapleGuildProcessor.getInstance().setMemberOnline(player, true, client.getChannel());
          PacketCreator.announce(client, new ShowGuildInfo(player));
          loggingInAllianceOperations(client, server, player, newcomer);
       }, () -> {
@@ -489,7 +490,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                   PacketCreator.announce(client, new AllianceNotice(alliance.id(), alliance.notice()));
 
                   if (newcomer) {
-                     server.allianceMessage(allianceId, PacketCreator.create(new AllianceMemberOnline(allianceId, player.getGuildId(), player.getId(), true)), player.getId(), -1);
+                     server.allianceMessage(allianceId, new AllianceMemberOnline(allianceId, player.getGuildId(), player.getId(), true), player.getId(), -1);
                   }
                });
       }
@@ -501,7 +502,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
          server.addAlliance(allianceId, alliance.get());
          return alliance;
       } else {
-         player.getGuild().ifPresent(guild -> guild.setAllianceId(0));
+         player.getGuild().ifPresent(guild -> MapleGuildProcessor.getInstance().setGuildAllianceId(guild, 0));
          return Optional.empty();
       }
    }

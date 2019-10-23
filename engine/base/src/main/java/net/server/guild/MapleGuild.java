@@ -22,146 +22,44 @@
 package net.server.guild;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 
 import client.MapleCharacter;
-import client.database.administrator.CharacterAdministrator;
-import client.database.administrator.GuildAdministrator;
-import client.database.administrator.NoteAdministrator;
-import client.database.data.GuildData;
-import client.database.provider.CharacterProvider;
-import client.database.provider.GuildProvider;
-import net.server.PlayerStorage;
-import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import net.server.channel.Channel;
-import net.server.processor.MapleAllianceProcessor;
-import tools.DatabaseConnection;
-import tools.MasterBroadcaster;
-import tools.PacketCreator;
-import tools.Pair;
-import tools.packet.guild.GuildCapacityChange;
-import tools.packet.guild.GuildDisband;
-import tools.packet.guild.GuildMarkChanged;
-import tools.packet.guild.GuildMemberChangeRank;
-import tools.packet.guild.GuildMemberLeft;
-import tools.packet.guild.GuildMemberLevelJobUpdate;
-import tools.packet.guild.GuildMemberOnline;
-import tools.packet.guild.GuildNameChange;
-import tools.packet.guild.GuildNotice;
-import tools.packet.guild.GuildRankTitleChange;
-import tools.packet.guild.NewGuildMember;
-import tools.packet.guild.ShowGuildInfo;
-import tools.packet.guild.UpdateGuildPoints;
-import tools.packet.message.MultiChat;
-import tools.packet.statusinfo.GetGuildPointMessage;
 
 public class MapleGuild {
-
    private final List<MapleGuildCharacter> members;
    private final Lock membersLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.GUILD, true);
    private String[] rankTitles = new String[5]; // 1 = master, 2 = jr, 5 = lowest member
    private String name, notice;
    private int id, gp, logo, logoColor, leader, capacity, logoBG, logoBGColor, signature, allianceId;
-   private int world;
-   private Map<Integer, List<Integer>> notifications = new LinkedHashMap<>();
-   private boolean bDirty = true;
+   private int worldId;
 
-   public MapleGuild(int guildid, int world) {
-      this.world = world;
+   public MapleGuild(int guildId, int worldId) {
+      this.id = guildId;
+      this.worldId = worldId;
       members = new ArrayList<>();
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         id = guildid;
-         Optional<GuildData> guildData = GuildProvider.getInstance().getGuildDataById(connection, guildid);
-         if (guildData.isEmpty()) {
-            return;
-         }
-
-         guildData.ifPresent(data -> {
-            name = data.name();
-            gp = data.gp();
-            logo = data.logo();
-            logoColor = data.logoColor();
-            logoBG = data.logoBackground();
-            logoBGColor = data.logoBackgroundColor();
-            capacity = data.capacity();
-            rankTitles = data.rankTitles();
-            leader = data.leaderId();
-            notice = data.notice();
-            signature = data.signature();
-            allianceId = data.allianceId();
-         });
-
-         CharacterProvider.getInstance().getGuildCharacterData(connection, guildid)
-               .forEach(data -> members.add(new MapleGuildCharacter(null, data.id(), data.level(),
-                     data.name(), (byte) -1, world, data.job(), data.guildRank(), guildid, false,
-                     data.allianceRank())));
-      });
    }
 
-   private void buildNotifications() {
-      if (!bDirty) {
-         return;
-      }
-      Set<Integer> chs = Server.getInstance().getOpenChannels(world);
-      synchronized (notifications) {
-         if (notifications.keySet().size() != chs.size()) {
-            notifications.clear();
-            for (Integer ch : chs) {
-               notifications.put(ch, new LinkedList<>());
-            }
-         } else {
-            for (List<Integer> l : notifications.values()) {
-               l.clear();
-            }
-         }
-      }
-
-      membersLock.lock();
-      try {
-         for (MapleGuildCharacter mgc : members) {
-            if (!mgc.isOnline()) {
-               continue;
-            }
-
-            List<Integer> chl;
-            synchronized (notifications) {
-               chl = notifications.get(mgc.getChannel());
-            }
-            if (chl != null) {
-               chl.add(mgc.getId());
-            }
-            //Unable to connect to Channel... error was here
-         }
-      } finally {
-         membersLock.unlock();
-      }
-
-      bDirty = false;
-   }
-
-   public void writeToDB(boolean bDisband) {
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         if (!bDisband) {
-            GuildAdministrator.getInstance().update(connection, gp, logo, logoColor, logoBG, logoBGColor, rankTitles, capacity, notice, this.id);
-         } else {
-            CharacterAdministrator.getInstance().removeAllCharactersFromGuild(connection, this.id);
-            GuildAdministrator.getInstance().deleteGuild(connection, this.id);
-            membersLock.lock();
-            try {
-               this.broadcast(PacketCreator.create(new GuildDisband(this.id)));
-            } finally {
-               membersLock.unlock();
-            }
-         }
-      });
+   public MapleGuild(int guildId, int worldId, String name, int gp, int logo, int logoColor, int logoBG,
+                     int logoBGColor, int capacity, String[] rankTitles, int leader, String notice, int signature,
+                     int allianceId) {
+      this(guildId, worldId);
+      this.name = name;
+      this.gp = gp;
+      this.logo = logo;
+      this.logoColor = logoColor;
+      this.logoBG = logoBG;
+      this.logoBGColor = logoBGColor;
+      this.capacity = capacity;
+      this.rankTitles = rankTitles;
+      this.leader = leader;
+      this.notice = notice;
+      this.signature = signature;
+      this.allianceId = allianceId;
    }
 
    public int getId() {
@@ -212,6 +110,14 @@ public class MapleGuild {
       logoBGColor = c;
    }
 
+   public int getWorldId() {
+      return worldId;
+   }
+
+   public String[] getRankTitles() {
+      return rankTitles;
+   }
+
    public String getNotice() {
       if (notice == null) {
          return "";
@@ -240,168 +146,20 @@ public class MapleGuild {
       return signature;
    }
 
-   public void broadcastNameChanged() {
-      PlayerStorage ps = Server.getInstance().getWorld(world).getPlayerStorage();
-
-      getMembers().stream()
-            .map(member -> ps.getCharacterById(member.getId()))
-            .flatMap(Optional::stream)
-            .filter(MapleCharacter::isLoggedinWorld)
-            .forEach(character -> character.getMap().broadcastMessage(character, new GuildNameChange(character.getId(), this.getName())));
-   }
-
-   public void broadcastEmblemChanged() {
-      PlayerStorage ps = Server.getInstance().getWorld(world).getPlayerStorage();
-      getMembers().stream()
-            .map(member -> ps.getCharacterById(member.getId()))
-            .flatMap(Optional::stream)
-            .filter(MapleCharacter::isLoggedinWorld)
-            .forEach(character -> character.getMap().broadcastMessage(character, new GuildMarkChanged(character.getId(), getLogoBG(), getLogoBGColor(), getLogo(), getLogoColor())));
-   }
-
-   public void broadcastInfoChanged() {
-      PlayerStorage ps = Server.getInstance().getWorld(world).getPlayerStorage();
-
-      for (MapleGuildCharacter mgc : getMembers()) {
-         Optional<MapleCharacter> chr = ps.getCharacterById(mgc.getId());
-         if (chr.isEmpty() || !chr.get().isLoggedinWorld()) {
-            continue;
-         }
-
-         byte[] packet = PacketCreator.create(new ShowGuildInfo(chr.get()));
-         chr.get().announce(packet);
-      }
-   }
-
-   public void broadcast(final byte[] packet) {
-      broadcast(packet, -1, BCOp.NONE);
-   }
-
-   public void broadcast(final byte[] packet, int exception) {
-      broadcast(packet, exception, BCOp.NONE);
-   }
-
-   public void broadcast(final byte[] packet, int exceptionId, BCOp bcop) {
-      membersLock.lock(); // membersLock awareness thanks to ProjectNano dev team
-      try {
-         synchronized (notifications) {
-            if (bDirty) {
-               buildNotifications();
-            }
-            try {
-               for (Integer b : Server.getInstance().getOpenChannels(world)) {
-                  if (notifications.get(b).size() > 0) {
-                     if (bcop == BCOp.DISBAND) {
-                        Server.getInstance().getWorld(world).setGuildAndRank(notifications.get(b), 0, 5, exceptionId);
-                     } else if (bcop == BCOp.EMBLEMCHANGE) {
-                        Server.getInstance().getWorld(world).changeEmblem(this.id, notifications.get(b), new MapleGuildSummary(this));
-                     } else {
-                        MasterBroadcaster.getInstance().sendToWorld(Server.getInstance().getWorld(world), notifications.get(b), character -> packet, false, exceptionId);
-                     }
-                  }
-               }
-            } catch (Exception re) {
-               re.printStackTrace();
-               System.out.println("Failed to contact channel(s) for broadcast.");//fu?
-            }
-         }
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-
-   public void guildMessage(final byte[] serverNotice) {
-      membersLock.lock();
-      try {
-         members.stream().map(this::getChannelForGuildMember).forEach(pair -> sendGuildMessageForPair(serverNotice, pair));
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-   /**
-    * Sends a guild message for a <code>MapleGuildCharacter</code> - <code>Optional<Channel></code> pair.
-    *
-    * @param serverNotice the server notice
-    * @param pair         the pair
-    */
-   private void sendGuildMessageForPair(byte[] serverNotice, Pair<MapleGuildCharacter, Optional<Channel>> pair) {
-      pair.getRight().ifPresent(channel -> channel.getPlayerStorage().getCharacterById(pair.getLeft().getId()).ifPresent(character -> character.getClient().announce(serverNotice)));
-   }
-
-   /**
-    * Given a guild member, create a pair with a channel the member is associated with.
-    *
-    * @param member the guild member
-    * @return a pair
-    */
-   private Pair<MapleGuildCharacter, Optional<Channel>> getChannelForGuildMember(MapleGuildCharacter member) {
-      return new Pair<>(
-            member,
-            Server.getInstance().getChannelsFromWorld(world).stream()
-                  .filter(channel -> channel.getPlayerStorage().getCharacterById(member.getId()).isPresent())
-                  .findFirst()
-      );
-   }
-
-   public void broadcastMessage(byte[] packet) {
-      Server.getInstance().guildMessage(id, packet);
-   }
-
-   public final void setOnline(int cid, boolean online, int channel) {
-      membersLock.lock();
-      try {
-         boolean bBroadcast = true;
-         for (MapleGuildCharacter mgc : members) {
-            if (mgc.getId() == cid) {
-               if (mgc.isOnline() && online) {
-                  bBroadcast = false;
-               }
-               mgc.setOnline(online);
-               mgc.setChannel(channel);
-               break;
-            }
-         }
-         if (bBroadcast) {
-            this.broadcast(PacketCreator.create(new GuildMemberOnline(id, cid, online)), cid);
-         }
-         bDirty = true;
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-   public void guildChat(String name, int cid, String message) {
-      membersLock.lock();
-      try {
-         this.broadcast(PacketCreator.create(new MultiChat(name, message, 2)), cid);
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
    public String getRankTitle(int rank) {
       return rankTitles[rank - 1];
    }
 
-   public int addGuildMember(MapleGuildCharacter mgc, MapleCharacter chr) {
+   public void addGuildMember(MapleGuildCharacter mgc, MapleCharacter chr) {
       membersLock.lock();
       try {
-         if (members.size() >= capacity) {
-            return 0;
-         }
          for (int i = members.size() - 1; i >= 0; i--) {
             if (members.get(i).getGuildRank() < 5 || members.get(i).getName().compareTo(mgc.getName()) < 0) {
                mgc.setCharacter(chr);
                members.add(i + 1, mgc);
-               bDirty = true;
                break;
             }
          }
-
-         this.broadcast(PacketCreator.create(new NewGuildMember(mgc.getGuildId(), mgc.getId(), mgc.getName(), mgc.getJobId(), mgc.getLevel(), mgc.getGuildRank(), mgc.isOnline())));
-         return 1;
       } finally {
          membersLock.unlock();
       }
@@ -410,76 +168,16 @@ public class MapleGuild {
    public void leaveGuild(MapleGuildCharacter mgc) {
       membersLock.lock();
       try {
-         this.broadcast(PacketCreator.create(new GuildMemberLeft(mgc.getGuildId(), mgc.getId(), mgc.getName(), false)));
          members.remove(mgc);
-         bDirty = true;
       } finally {
          membersLock.unlock();
       }
    }
 
-   public void expelMember(MapleGuildCharacter initiator, String name, int cid) {
+   public Optional<MapleGuildCharacter> findMember(int characterId) {
       membersLock.lock();
       try {
-         java.util.Iterator<MapleGuildCharacter> itr = members.iterator();
-         while (itr.hasNext()) {
-            MapleGuildCharacter mgc = itr.next();
-            if (mgc.getId() == cid && initiator.getGuildRank() < mgc.getGuildRank()) {
-               this.broadcast(PacketCreator.create(new GuildMemberLeft(mgc.getGuildId(), mgc.getId(), mgc.getName(), true)));
-               itr.remove();
-               bDirty = true;
-               try {
-                  if (mgc.isOnline()) {
-                     Server.getInstance().getWorld(mgc.getWorld()).setGuildAndRank(cid, 0, 5);
-                  } else {
-                     DatabaseConnection.getInstance().withConnection(
-                           connection -> NoteAdministrator.getInstance().sendNote(connection, mgc.getName(), initiator.getName(), "You have been expelled from the guild.", Byte.parseByte("0")));
-                     Server.getInstance().getWorld(mgc.getWorld()).setOfflineGuildStatus((short) 0, (byte) 5, cid);
-                  }
-               } catch (Exception re) {
-                  re.printStackTrace();
-                  return;
-               }
-               return;
-            }
-         }
-         System.out.println("Unable to find member with name " + name + " and id " + cid);
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-   public void changeRank(int cid, int newRank) {
-      membersLock.lock();
-      try {
-         for (MapleGuildCharacter mgc : members) {
-            if (cid == mgc.getId()) {
-               changeRank(mgc, newRank);
-               return;
-            }
-         }
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-   public void changeRank(MapleGuildCharacter mgc, int newRank) {
-      try {
-         if (mgc.isOnline()) {
-            Server.getInstance().getWorld(mgc.getWorld()).setGuildAndRank(mgc.getId(), this.id, newRank);
-            mgc.setGuildRank(newRank);
-         } else {
-            Server.getInstance().getWorld(mgc.getWorld()).setOfflineGuildStatus((short) this.id, (byte) newRank, mgc.getId());
-            mgc.setOfflineGuildRank(newRank);
-         }
-      } catch (Exception re) {
-         re.printStackTrace();
-         return;
-      }
-
-      membersLock.lock();
-      try {
-         this.broadcast(PacketCreator.create(new GuildMemberChangeRank(mgc.getGuildId(), mgc.getId(), mgc.getGuildRank())));
+         return members.parallelStream().filter(guildCharacter -> guildCharacter.getId() == characterId).findFirst();
       } finally {
          membersLock.unlock();
       }
@@ -487,30 +185,6 @@ public class MapleGuild {
 
    public void setGuildNotice(String notice) {
       this.notice = notice;
-      writeToDB(false);
-
-      membersLock.lock();
-      try {
-         this.broadcast(PacketCreator.create(new GuildNotice(this.id, notice)));
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-   public void memberLevelJobUpdate(MapleGuildCharacter mgc) {
-      membersLock.lock();
-      try {
-         for (MapleGuildCharacter member : members) {
-            if (mgc.equals(member)) {
-               member.setJobId(mgc.getJobId());
-               member.setLevel(mgc.getLevel());
-               this.broadcast(PacketCreator.create(new GuildMemberLevelJobUpdate(mgc.getGuildId(), mgc.getId(), mgc.getLevel(), mgc.getJobId())));
-               break;
-            }
-         }
-      } finally {
-         membersLock.unlock();
-      }
    }
 
    @Override
@@ -532,31 +206,6 @@ public class MapleGuild {
 
    public void changeRankTitle(String[] ranks) {
       System.arraycopy(ranks, 0, rankTitles, 0, 5);
-
-      membersLock.lock();
-      try {
-         this.broadcast(PacketCreator.create(new GuildRankTitleChange(this.id, ranks)));
-      } finally {
-         membersLock.unlock();
-      }
-
-      this.writeToDB(false);
-   }
-
-   public void disbandGuild() {
-      if (allianceId > 0) {
-         if (!MapleAllianceProcessor.getInstance().removeGuildFromAlliance(allianceId, id, world)) {
-            MapleAllianceProcessor.getInstance().disbandAlliance(allianceId);
-         }
-      }
-
-      membersLock.lock();
-      try {
-         this.writeToDB(true);
-         this.broadcast(null, -1, BCOp.DISBAND);
-      } finally {
-         membersLock.unlock();
-      }
    }
 
    public void setGuildEmblem(short bg, byte bgcolor, short logo, byte logocolor) {
@@ -564,58 +213,27 @@ public class MapleGuild {
       this.logoBGColor = bgcolor;
       this.logo = logo;
       this.logoColor = logocolor;
-      this.writeToDB(false);
+   }
 
+   public Optional<MapleGuildCharacter> getMGC(int characterId) {
       membersLock.lock();
       try {
-         this.broadcast(null, -1, BCOp.EMBLEMCHANGE);
+         return members.stream().filter(mapleGuildCharacter -> mapleGuildCharacter.getId() == characterId).findFirst();
       } finally {
          membersLock.unlock();
       }
    }
 
-   public MapleGuildCharacter getMGC(int cid) {
-      membersLock.lock();
-      try {
-         for (MapleGuildCharacter mgc : members) {
-            if (mgc.getId() == cid) {
-               return mgc;
-            }
-         }
-         return null;
-      } finally {
-         membersLock.unlock();
-      }
-   }
-
-   public boolean increaseCapacity() {
-      if (capacity > 99) {
-         return false;
-      }
-      capacity += 5;
-      this.writeToDB(false);
-
-      membersLock.lock();
-      try {
-         this.broadcast(PacketCreator.create(new GuildCapacityChange(this.id, this.capacity)));
-      } finally {
-         membersLock.unlock();
-      }
-
-      return true;
+   public void increaseCapacity(int amount) {
+      capacity += amount;
    }
 
    public void gainGP(int amount) {
       this.gp += amount;
-      this.writeToDB(false);
-      this.guildMessage(PacketCreator.create(new UpdateGuildPoints(this.id, this.gp)));
-      this.guildMessage(PacketCreator.create(new GetGuildPointMessage(amount)));
    }
 
    public void removeGP(int amount) {
       this.gp -= amount;
-      this.writeToDB(false);
-      this.guildMessage(PacketCreator.create(new UpdateGuildPoints(this.id, this.gp)));
    }
 
    public int getAllianceId() {
@@ -624,24 +242,5 @@ public class MapleGuild {
 
    public void setAllianceId(int aid) {
       this.allianceId = aid;
-      DatabaseConnection.getInstance().withConnection(connection -> GuildAdministrator.getInstance().setAlliance(connection, id, aid));
-   }
-
-   public void resetAllianceGuildPlayersRank() {
-      membersLock.lock();
-      try {
-         for (MapleGuildCharacter mgc : members) {
-            if (mgc.isOnline()) {
-               mgc.setAllianceRank(5);
-            }
-         }
-      } finally {
-         membersLock.unlock();
-      }
-      DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().updateAllianceRank(connection, id, 5));
-   }
-
-   private enum BCOp {
-      NONE, DISBAND, EMBLEMCHANGE
    }
 }

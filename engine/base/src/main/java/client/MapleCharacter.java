@@ -1336,7 +1336,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (this.guildid > 0) {
-         getGuild().ifPresent(guild -> guild.broadcast(PacketCreator.create(new NotifyJobAdvance(0, job.getId(), name)), this.getId()));
+         getGuild().ifPresent(guild -> MasterBroadcaster.getInstance().sendToGuild(guild, new NotifyJobAdvance(0, job.getId(), name), false, this.getId()));
       }
 
       MapleFamily family = getFamily();
@@ -2328,7 +2328,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return;
       }
       try {
-         Server.getInstance().disbandGuild(guildid);
+         MapleGuildProcessor.getInstance().disbandGuild(guildid);
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -5370,11 +5370,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       try {
-         Server.getInstance().memberLevelJobUpdate(this.mgc);
+         MapleGuildProcessor.getInstance().memberLevelJobUpdate(mgc);
          //Server.getInstance().getGuild(guildid, world, mgc).gainGP(40);
          getGuild()
                .map(MapleGuild::getAllianceId)
-               .ifPresent(id -> Server.getInstance().allianceMessage(id, PacketCreator.create(new UpdateAllianceJobLevel(id, this.getGuildId(), getId(), getLevel(), getJob().getId())), getId(), -1));
+               .ifPresent(id -> Server.getInstance().allianceMessage(id, new UpdateAllianceJobLevel(id, this.getGuildId(), getId(), getLevel(), getJob().getId()), getId(), -1));
       } catch (Exception e) {
          e.printStackTrace();
       }
@@ -5458,23 +5458,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public boolean hasEmptySlot(byte invType) {
       return getInventory(MapleInventoryType.getByType(invType)).getNextFreeSlot() > -1;
-   }
-
-   public void increaseGuildCapacity() {
-      getGuild().ifPresent(guild -> {
-         int cost = MapleGuildProcessor.getInstance().getIncreaseGuildCost(guild.getCapacity());
-
-         if (getMeso() < cost) {
-            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.POP_UP, "You don't have enough mesos.");
-            return;
-         }
-
-         if (Server.getInstance().increaseGuildCapacity(guildid)) {
-            gainMeso(-cost, true, false, true);
-         } else {
-            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.POP_UP, "Your guild already reached the maximum capacity of players.");
-         }
-      });
    }
 
    private boolean canBuyback(int fee, boolean usingMesos) {
@@ -5814,7 +5797,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       silentPartyUpdate();
 
       if (this.guildid > 0) {
-         getGuild().ifPresent(guild -> guild.broadcast(PacketCreator.create(new NotifyLevelUp(2, level, name)), this.getId()));
+         getGuild().ifPresent(guild -> MasterBroadcaster.getInstance().sendToGuild(guild, new NotifyLevelUp(2, level, name), false, this.getId()));
       }
 
       if (level % 20 == 0) {
@@ -8275,7 +8258,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void broadcastMarriageMessage() {
-      getGuild().ifPresent(guild -> guild.broadcast(PacketCreator.create(new NotifyMarriage(0, name))));
+      getGuild().ifPresent(guild -> MasterBroadcaster.getInstance().sendToGuild(guild, new NotifyMarriage(0, name)));
 
       MapleFamily family = this.getFamily();
       if (family != null) {
