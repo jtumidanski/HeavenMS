@@ -675,7 +675,7 @@ public final class Channel {
          public void run() {
             final int delta = (dojoMapId) % 100;
             final int dojoBaseMap = (slot < 5) ? 925030000 : 925020000;
-            MapleParty party = null;
+            Optional<MapleParty> party = Optional.empty();
 
             for (int i = 0; i < 5; i++) { //only 32 stages, but 38 maps
                if (stage + i > 38) {
@@ -689,7 +689,7 @@ public final class Channel {
                }
             }
 
-            freeDojoSlot(slot, party);
+            party.ifPresent(reference -> freeDojoSlot(slot, reference));
          }
       }, clockTime + 3000);   // let the TIMES UP display for 3 seconds, then warp
 

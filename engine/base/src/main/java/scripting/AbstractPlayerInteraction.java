@@ -27,6 +27,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -753,7 +754,7 @@ public class AbstractPlayerInteraction {
       return null;
    }
 
-   public MapleParty getParty() {
+   public Optional<MapleParty> getParty() {
       return getPlayer().getParty();
    }
 
@@ -766,11 +767,11 @@ public class AbstractPlayerInteraction {
    }
 
    public boolean isPartyLeader() {
-      if (getParty() == null) {
+      if (getParty().isEmpty()) {
          return false;
       }
 
-      return getParty().getLeaderId() == getPlayer().getId();
+      return getParty().map(party -> party.getLeaderId() == getPlayer().getId()).orElse(false);
    }
 
    public boolean isEventLeader() {
@@ -801,16 +802,13 @@ public class AbstractPlayerInteraction {
          removeAll(id);
          return;
       }
-      for (MaplePartyCharacter mpc : getParty().getMembers()) {
-         if (mpc == null || !mpc.isOnline()) {
-            continue;
-         }
-
-         MapleCharacter chr = mpc.getPlayer();
-         if (chr != null && chr.getClient() != null) {
-            removeAll(id, chr.getClient());
-         }
-      }
+      getParty()
+            .map(MapleParty::getMembers).orElse(Collections.emptyList()).parallelStream()
+            .filter(MaplePartyCharacter::isOnline)
+            .map(MaplePartyCharacter::getPlayer)
+            .flatMap(Optional::stream)
+            .filter(character -> character.getClient() != null)
+            .forEach(character -> removeAll(id, character.getClient()));
    }
 
    public void giveCharacterExp(int amount, MapleCharacter chr) {
@@ -834,7 +832,11 @@ public class AbstractPlayerInteraction {
       //4 players = +10% bonus (110)
       //5 players = +20% bonus (120)
       //6 players = +30% bonus (130)
-      MapleParty party = getPlayer().getParty();
+      if (getPlayer().getParty().isEmpty()) {
+         return;
+      }
+
+      MapleParty party = getPlayer().getParty().get();
       int size = party.getMembers().size();
 
       if (instance) {
@@ -842,8 +844,8 @@ public class AbstractPlayerInteraction {
             if (member == null || !member.isOnline()) {
                size--;
             } else {
-               MapleCharacter chr = member.getPlayer();
-               if (chr != null && chr.getEventInstance() == null) {
+               Optional<MapleCharacter> chr = member.getPlayer();
+               if (chr.isPresent() && chr.get().getEventInstance() == null) {
                   size--;
                }
             }
@@ -851,24 +853,19 @@ public class AbstractPlayerInteraction {
       }
 
       int bonus = size < 4 ? 100 : 70 + (size * 10);
-      for (MaplePartyCharacter member : party.getMembers()) {
-         if (member == null || !member.isOnline()) {
-            continue;
-         }
-         MapleCharacter player = member.getPlayer();
-         if (player == null) {
-            continue;
-         }
-         if (instance && player.getEventInstance() == null) {
-            continue; // They aren't in the instance, don't give EXP.
-         }
-         int base = PartyQuest.getExp(PQ, player.getLevel());
-         int exp = base * bonus / 100;
-         player.gainExp(exp, true, true);
-         if (ServerConstants.PQ_BONUS_EXP_RATE > 0 && System.currentTimeMillis() <= ServerConstants.EVENT_END_TIMESTAMP) {
-            player.gainExp((int) (exp * ServerConstants.PQ_BONUS_EXP_RATE), true, true);
-         }
-      }
+      party.getMembers().stream()
+            .filter(MaplePartyCharacter::isOnline)
+            .map(MaplePartyCharacter::getPlayer)
+            .flatMap(Optional::stream)
+            .filter(character -> !(instance && character.getEventInstance() == null))
+            .forEach(character -> {
+               int base = PartyQuest.getExp(PQ, character.getLevel());
+               int exp = base * bonus / 100;
+               character.gainExp(exp, true, true);
+               if (ServerConstants.PQ_BONUS_EXP_RATE > 0 && System.currentTimeMillis() <= ServerConstants.EVENT_END_TIMESTAMP) {
+                  character.gainExp((int) (exp * ServerConstants.PQ_BONUS_EXP_RATE), true, true);
+               }
+            });
    }
 
    public void removeFromParty(int id, List<MapleCharacter> party) {

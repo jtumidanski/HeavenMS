@@ -2031,7 +2031,7 @@ public class MapleMap {
                for (MapleMapObject mo : players) {
                   if (mist.makeChanceResult()) {
                      MapleCharacter chr = (MapleCharacter) mo;
-                     if (mist.getOwner().getId() == chr.getId() || mist.getOwner().getParty() != null && mist.getOwner().getParty().containsMembers(chr.getMPC())) {
+                     if (mist.getOwner().getId() == chr.getId() || mist.getOwner().getParty().map(party -> party.containsMembers(chr.getMPC())).orElse(false)) {
                         mist.getSourceSkill()
                               .map(skill -> skill.getEffect(chr.getSkillLevel(skill.getId())))
                               .ifPresent(effect -> chr.addMP(effect.getX() * chr.getMp() / 100));

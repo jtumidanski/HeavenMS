@@ -4,7 +4,6 @@ import java.awt.Point;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.server.world.MapleParty;
 import server.maps.MapleDoorObject;
 import server.maps.MapleMapObject;
 import tools.PacketCreator;
@@ -34,7 +33,7 @@ public class DoorObjectSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<M
    public void sendSpawnData(MapleDoorObject object, MapleClient client, boolean launched) {
       MapleCharacter chr = client.getPlayer();
       if (object.getFrom() == chr.getMapId()) {
-         if (chr.getParty() != null && (object.getOwnerId() == chr.getId() || chr.getParty().getMemberById(object.getOwnerId()) != null)) {
+         if (chr.getParty().isPresent() && (object.getOwnerId() == chr.getId() || chr.getParty().map(party -> party.isMember(object.getOwnerId())).orElse(false))) {
             PacketCreator.announce(client, new PartyPortal(object.getFrom(), object.getTo(), object.toPosition()));
          }
 
@@ -49,8 +48,7 @@ public class DoorObjectSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<M
    public void sendDestroyData(MapleDoorObject object, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
       if (object.getOriginMapId() == chr.getMapId()) {
-         MapleParty party = chr.getParty();
-         if (party != null && (object.getOwnerId() == chr.getId() || party.getMemberById(object.getOwnerId()) != null)) {
+         if (chr.getParty().isPresent() && (object.getOwnerId() == chr.getId() || chr.getParty().map(party -> party.isMember(object.getOwnerId())).orElse(false))) {
             PacketCreator.announce(client, new PartyPortal(999999999, 999999999, new Point(-1, -1)));
          }
          PacketCreator.announce(client, new RemoveDoor(object.getOwnerId(), object.inTown()));

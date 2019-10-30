@@ -21,6 +21,8 @@
  */
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
@@ -66,8 +68,8 @@ public class PartySearchStartHandler extends AbstractPacketHandler<PartySearchSt
       }
 
 
-      MapleParty party = client.getPlayer().getParty();
-      if (party == null || !client.getPlayer().isPartyLeader()) {
+      Optional<MapleParty> party = client.getPlayer().getParty();
+      if (party.isEmpty() || !client.getPlayer().isPartyLeader()) {
          return;
       }
 

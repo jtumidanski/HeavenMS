@@ -56,7 +56,7 @@ class NPC2042005 {
                   if (party[i].getLevel() >= cpqMinLvl && party[i].getLevel() <= cpqMaxLvl) {
                      lvlOk++
 
-                     if (party[i].getPlayer().getMapId() != leaderMapid) {
+                     if (!party[i].inMap(leaderMapid)) {
                         isOutMap++
                      }
                   }

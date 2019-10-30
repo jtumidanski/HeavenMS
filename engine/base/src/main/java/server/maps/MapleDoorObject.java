@@ -20,6 +20,7 @@
 package server.maps;
 
 import java.awt.Point;
+import java.util.Optional;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import client.MapleCharacter;
@@ -85,10 +86,10 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    }
 
    public void warp(final MapleCharacter chr) {
-      MapleParty party = chr.getParty();
-      if (chr.getId() == ownerId || (party != null && party.getMemberById(ownerId) != null)) {
+      Optional<MapleParty> party = chr.getParty();
+      if (chr.getId() == ownerId || party.map(reference -> reference.isMember(ownerId)).orElse(false)) {
          PacketCreator.announce(chr, new ShowSpecialEffect(7));
-         if (!inTown() && party == null) {
+         if (!inTown() && party.isEmpty()) {
             chr.changeMap(destinationMapId, getLinkedPortalId());
          } else {
             chr.changeMap(destinationMapId, getLinkedPortalPosition());

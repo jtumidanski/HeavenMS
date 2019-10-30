@@ -29,8 +29,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-import client.MapleClient;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
@@ -40,6 +41,7 @@ import server.maps.MapleDoor;
 public class MapleParty {
 
    private int id;
+   private int worldId;
    private MapleParty enemy = null;
    private int leaderId;
    private List<MaplePartyCharacter> members = new LinkedList<>();
@@ -52,9 +54,10 @@ public class MapleParty {
 
    private MonitoredReentrantLock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.PARTY, true);
 
-   public MapleParty(int id, MaplePartyCharacter chrfor) {
+   public MapleParty(int id, int worldId, MaplePartyCharacter chrfor) {
       this.leaderId = chrfor.getId();
       this.id = id;
+      this.worldId = worldId;
    }
 
    public boolean containsMembers(MaplePartyCharacter member) {
@@ -71,7 +74,6 @@ public class MapleParty {
       try {
          histMembers.put(member.getId(), nextEntry);
          nextEntry++;
-
          members.add(member);
       } finally {
          lock.unlock();
@@ -82,7 +84,6 @@ public class MapleParty {
       lock.lock();
       try {
          histMembers.remove(member.getId());
-
          members.remove(member);
       } finally {
          lock.unlock();
@@ -102,18 +103,17 @@ public class MapleParty {
       }
    }
 
-   public MaplePartyCharacter getMemberById(int id) {
+   public Optional<MaplePartyCharacter> getMemberById(int id) {
       lock.lock();
       try {
-         for (MaplePartyCharacter chr : members) {
-            if (chr.getId() == id) {
-               return chr;
-            }
-         }
-         return null;
+         return members.parallelStream().filter(maplePartyCharacter -> maplePartyCharacter.getId() == id).findFirst();
       } finally {
          lock.unlock();
       }
+   }
+
+   public boolean isMember(int id) {
+      return getMemberById(id).isPresent();
    }
 
    public Collection<MaplePartyCharacter> getMembers() {
@@ -137,15 +137,7 @@ public class MapleParty {
    public List<MaplePartyCharacter> getPartyMembersOnline() {
       lock.lock();
       try {
-         List<MaplePartyCharacter> ret = new LinkedList<>();
-
-         for (MaplePartyCharacter mpc : members) {
-            if (mpc.isOnline()) {
-               ret.add(mpc);
-            }
-         }
-
-         return ret;
+         return members.stream().filter(MaplePartyCharacter::isOnline).collect(Collectors.toList());
       } finally {
          lock.unlock();
       }
@@ -175,13 +167,10 @@ public class MapleParty {
    public MaplePartyCharacter getLeader() {
       lock.lock();
       try {
-         for (MaplePartyCharacter mpc : members) {
-            if (mpc.getId() == leaderId) {
-               return mpc;
-            }
-         }
-
-         return null;
+         return members.parallelStream()
+               .filter(maplePartyCharacter -> maplePartyCharacter.getId() == leaderId)
+               .findFirst()
+               .orElseThrow();
       } finally {
          lock.unlock();
       }
@@ -259,23 +248,12 @@ public class MapleParty {
       }
    }
 
-   public void assignNewLeader(MapleClient c) {
-      World world = c.getWorldServer();
-      MaplePartyCharacter newLeadr = null;
-
+   public Optional<MaplePartyCharacter> assignNewLeader() {
       lock.lock();
       try {
-         for (MaplePartyCharacter mpc : members) {
-            if (mpc.getId() != leaderId && (newLeadr == null || newLeadr.getLevel() < mpc.getLevel())) {
-               newLeadr = mpc;
-            }
-         }
+         return members.stream().filter(maplePartyCharacter -> maplePartyCharacter.getId() != leaderId).max(Comparator.comparingInt(MaplePartyCharacter::getLevel));
       } finally {
          lock.unlock();
-      }
-
-      if (newLeadr != null) {
-         world.updateParty(this.getId(), PartyOperation.CHANGE_LEADER, newLeadr);
       }
    }
 
@@ -319,5 +297,9 @@ public class MapleParty {
       }
       final MapleParty other = (MapleParty) obj;
       return id == other.id;
+   }
+
+   public int getWorldId() {
+      return worldId;
    }
 }

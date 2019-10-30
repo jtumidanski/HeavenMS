@@ -1,10 +1,12 @@
 package net.server.processor;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
-import client.MapleClient;
 import constants.ServerConstants;
+import net.server.Server;
 import net.server.coordinator.MapleMatchCheckerCoordinator;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory;
 import net.server.world.MapleParty;
@@ -13,12 +15,15 @@ import net.server.world.PartyOperation;
 import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import server.maps.MapleMap;
+import server.maps.MapleMiniDungeon;
+import server.maps.MapleMiniDungeonInfo;
 import server.partyquest.MonsterCarnival;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.party.PartyCreated;
 import tools.packet.party.PartyStatusMessage;
+import tools.packet.party.UpdateParty;
 
 public class MaplePartyProcessor {
    private static MaplePartyProcessor ourInstance = new MaplePartyProcessor();
@@ -31,8 +36,8 @@ public class MaplePartyProcessor {
    }
 
    public boolean createParty(MapleCharacter player, boolean silentCheck) {
-      MapleParty party = player.getParty();
-      if (party == null) {
+      Optional<MapleParty> party = player.getParty();
+      if (party.isEmpty()) {
          if (player.getLevel() < 10 && !ServerConstants.USE_PARTY_FOR_STARTERS) {
             PacketCreator.announce(player, new PartyStatusMessage(10));
             return false;
@@ -42,16 +47,16 @@ public class MaplePartyProcessor {
          }
 
          MaplePartyCharacter partyCharacter = new MaplePartyCharacter(player);
-         party = player.getWorldServer().createParty(partyCharacter);
-         player.setParty(party);
+         party = Optional.of(player.getWorldServer().createParty(partyCharacter));
+         player.setParty(party.get());
          player.setMPC(partyCharacter);
          player.getMap().addPartyMember(player);
          player.silentPartyUpdate();
 
          player.updatePartySearchAvailability(false);
-         player.partyOperationUpdate(party, null);
+         player.partyOperationUpdate(party.get(), null);
 
-         PacketCreator.announce(player, new PartyCreated(party, partyCharacter.getId()));
+         PacketCreator.announce(player, new PartyCreated(party.get(), partyCharacter.getId()));
 
          return true;
       } else {
@@ -64,23 +69,23 @@ public class MaplePartyProcessor {
    }
 
    public boolean joinParty(MapleCharacter player, int partyid, boolean silentCheck) {
-      MapleParty party = player.getParty();
       World world = player.getWorldServer();
 
-      if (party == null) {
+      Optional<MapleParty> party = player.getParty();
+      if (party.isEmpty()) {
          party = world.getParty(partyid);
-         if (party != null) {
-            if (party.getMembers().size() < 6) {
+         if (party.isPresent()) {
+            if (party.get().getMembers().size() < 6) {
                MaplePartyCharacter partyCharacter = new MaplePartyCharacter(player);
                player.getMap().addPartyMember(player);
 
-               world.updateParty(party.getId(), PartyOperation.JOIN, partyCharacter);
+               updateParty(party.get(), PartyOperation.JOIN, partyCharacter);
                player.receivePartyMemberHP();
                player.updatePartyMemberHP();
 
-               player.resetPartySearchInvite(party.getLeaderId());
+               player.resetPartySearchInvite(party.get().getLeaderId());
                player.updatePartySearchAvailability(false);
-               player.partyOperationUpdate(party, null);
+               player.partyOperationUpdate(party.get(), null);
                return true;
             } else {
                if (!silentCheck) {
@@ -99,21 +104,19 @@ public class MaplePartyProcessor {
       return false;
    }
 
-   public void leaveParty(MapleParty party, MapleClient c) {
-      World world = c.getWorldServer();
-      MapleCharacter player = c.getPlayer();
+   public void leaveParty(MapleParty party, MapleCharacter player) {
       MaplePartyCharacter partyCharacter = player.getMPC();
 
       if (party != null && partyCharacter != null) {
          if (partyCharacter.getId() == party.getLeaderId()) {
-            c.getWorldServer().removeMapPartyMembers(party.getId());
+            player.getClient().getWorldServer().removeMapPartyMembers(party.getId());
 
             MonsterCarnival monsterCarnival = player.getMonsterCarnival();
             if (monsterCarnival != null) {
                monsterCarnival.leftParty(player.getId());
             }
 
-            world.updateParty(party.getId(), PartyOperation.DISBAND, partyCharacter);
+            updateParty(party, PartyOperation.DISBAND, partyCharacter);
 
             EventInstanceManager eim = player.getEventInstance();
             if (eim != null) {
@@ -130,7 +133,7 @@ public class MaplePartyProcessor {
                monsterCarnival.leftParty(player.getId());
             }
 
-            world.updateParty(party.getId(), PartyOperation.LEAVE, partyCharacter);
+            updateParty(party, PartyOperation.LEAVE, partyCharacter);
 
             EventInstanceManager eim = player.getEventInstance();
             if (eim != null) {
@@ -140,24 +143,20 @@ public class MaplePartyProcessor {
 
          player.setParty(null);
 
-         MapleMatchCheckerCoordinator matchCheckerCoordinator = c.getWorldServer().getMatchCheckerCoordinator();
+         MapleMatchCheckerCoordinator matchCheckerCoordinator = player.getClient().getWorldServer().getMatchCheckerCoordinator();
          if (matchCheckerCoordinator.getMatchConfirmationLeaderid(player.getId()) == player.getId() && matchCheckerCoordinator.getMatchConfirmationType(player.getId()) == MatchCheckerListenerFactory.MatchCheckerType.GUILD_CREATION) {
             matchCheckerCoordinator.dismissMatchConfirmation(player.getId());
          }
       }
    }
 
-   public void expelFromParty(MapleParty party, MapleClient c, int expelCid) {
-      World world = c.getWorldServer();
-      MapleCharacter player = c.getPlayer();
+   public void expelFromParty(MapleParty party, MapleCharacter player, int expelCid) {
       MaplePartyCharacter partyCharacter = player.getMPC();
 
       if (party != null && partyCharacter != null) {
          if (partyCharacter.equals(party.getLeader())) {
-            MaplePartyCharacter expelled = party.getMemberById(expelCid);
-            if (expelled != null) {
-               MapleCharacter emc = expelled.getPlayer();
-               if (emc != null) {
+            party.getMemberById(expelCid).ifPresent(expelled -> {
+               expelled.getPlayer().ifPresentOrElse(emc -> {
                   List<MapleCharacter> partyMembers = emc.getPartyMembersOnline();
 
                   MapleMap map = emc.getMap();
@@ -176,15 +175,107 @@ public class MaplePartyProcessor {
                   }
 
                   emc.setParty(null);
-                  world.updateParty(party.getId(), PartyOperation.EXPEL, expelled);
+                  updateParty(party, PartyOperation.EXPEL, expelled);
 
                   emc.updatePartySearchAvailability(true);
                   emc.partyOperationUpdate(party, partyMembers);
-               } else {
-                  world.updateParty(party.getId(), PartyOperation.EXPEL, expelled);
-               }
-            }
+               }, () -> updateParty(party, PartyOperation.EXPEL, expelled));
+            });
          }
+      }
+   }
+
+   public void assignNewLeader(MapleParty party) {
+      party.assignNewLeader().ifPresent(maplePartyCharacter -> updateParty(party, PartyOperation.CHANGE_LEADER, maplePartyCharacter));
+   }
+
+   public void updateParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
+      if (party == null) {
+         throw new IllegalArgumentException("no party with the specified partyid exists");
+      }
+
+      switch (operation) {
+         case JOIN:
+            party.addMember(target);
+            break;
+         case LEAVE:
+         case EXPEL:
+            party.removeMember(target);
+            break;
+         case DISBAND:
+            Server.getInstance().getWorld(party.getWorldId()).disbandParty(party.getId());
+            break;
+         case SILENT_UPDATE:
+         case LOG_ONOFF:
+            party.updateMember(target);
+            break;
+         case CHANGE_LEADER:
+            party.getLeader().getPlayer().ifPresent(leader -> {
+               EventInstanceManager eim = leader.getEventInstance();
+               if (eim != null && eim.isEventLeader(leader)) {
+                  eim.changedLeader(target);
+               } else {
+                  int oldLeaderMapid = leader.getMapId();
+
+                  if (MapleMiniDungeonInfo.isDungeonMap(oldLeaderMapid)) {
+                     if (oldLeaderMapid != target.getMapId()) {
+                        MapleMiniDungeon mmd = leader.getClient().getChannelServer().getMiniDungeon(oldLeaderMapid);
+                        if (mmd != null) {
+                           mmd.close();
+                        }
+                     }
+                  }
+               }
+               party.setLeader(target);
+            });
+            break;
+         default:
+            System.out.println("Unhandled updateParty operation " + operation.name());
+      }
+
+      Collection<MaplePartyCharacter> partyMembers = party.getMembers();
+      updateCharacterParty(party, operation, target, partyMembers);
+
+      for (MaplePartyCharacter partychar : partyMembers) {
+         Server.getInstance().getWorld(party.getWorldId()).getPlayerStorage().getCharacterById(partychar.getId()).ifPresent(character -> {
+            if (operation == PartyOperation.DISBAND) {
+               character.setParty(null);
+               character.setMPC(null);
+            } else {
+               character.setParty(party);
+               character.setMPC(partychar);
+            }
+            PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
+         });
+      }
+
+      switch (operation) {
+         case LEAVE:
+         case EXPEL:
+            Server.getInstance().getWorld(party.getWorldId()).getPlayerStorage().getCharacterById(target.getId()).ifPresent(character -> {
+               PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
+               character.setParty(null);
+               character.setMPC(null);
+            });
+         default:
+            break;
+      }
+   }
+
+   private void updateCharacterParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target, Collection<MaplePartyCharacter> partyMembers) {
+      switch (operation) {
+         case JOIN:
+            Server.getInstance().getWorld(party.getWorldId()).registerCharacterParty(target.getId(), party.getId());
+            break;
+         case LEAVE:
+         case EXPEL:
+            Server.getInstance().getWorld(party.getWorldId()).unregisterCharacterParty(target.getId());
+            break;
+         case DISBAND:
+            partyMembers.forEach(partyCharacter -> Server.getInstance().getWorld(party.getWorldId()).unregisterCharacterParty(partyCharacter.getId()));
+            break;
+         default:
+            break;
       }
    }
 }

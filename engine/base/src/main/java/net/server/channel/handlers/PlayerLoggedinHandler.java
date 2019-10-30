@@ -68,6 +68,8 @@ import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
 import net.server.processor.MapleGuildProcessor;
+import net.server.processor.MaplePartyProcessor;
+import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
@@ -328,8 +330,8 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
 
             player.showNote();
-            if (player.getParty() != null) {
-               loggingInPartyOperations(client, world, player);
+            if (player.getParty().isPresent()) {
+               loggingInPartyOperations(client, player, player.getParty().get());
             }
 
             MapleInventory eqpInv = player.getInventory(MapleInventoryType.EQUIPPED);
@@ -450,7 +452,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             });
    }
 
-   private void loggingInPartyOperations(MapleClient c, World wserv, MapleCharacter player) {
+   private void loggingInPartyOperations(MapleClient c, MapleCharacter player, MapleParty party) {
       MaplePartyCharacter pchar = player.getMPC();
 
       //Use this in case of enabling party HPbar HUD when logging in, however "you created a party" will appear on chat.
@@ -459,7 +461,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
       pchar.setChannel(c.getChannel());
       pchar.setMapId(player.getMapId());
       pchar.setOnline(true);
-      wserv.updateParty(player.getParty().getId(), PartyOperation.LOG_ONOFF, pchar);
+      MaplePartyProcessor.getInstance().updateParty(party, PartyOperation.LOG_ONOFF, pchar);
       player.updatePartyMemberHP();
    }
 

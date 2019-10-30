@@ -358,8 +358,7 @@ public class MaplePartySearchCoordinator {
       }
 
       for (MapleCharacter leader : searchedLeaders) {
-         MapleParty party = leader.getParty();
-         if (party != null && party.getMembers().size() < 6) {
+         if (leader.getParty().map(party -> party.getMembers().size() < 6).orElseThrow()) {
             addQueueLeader(leader);
          } else {
             if (leader.isLoggedinWorld()) {

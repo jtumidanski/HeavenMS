@@ -23,6 +23,7 @@ package net.server.channel.handlers;
 
 import java.awt.Point;
 import java.util.List;
+import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -111,23 +112,23 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      return;
                   }
                   final MapleDisease dis = skill.getDisease();
-                  MapleParty enemies = client.getPlayer().getParty().getEnemy();
+                  MapleParty enemies = client.getPlayer().getParty().orElseThrow().getEnemy();
                   if (skill.targetsAll) {
                      int hitChance = 0;
                      if (dis.getDisease() == 121 || dis.getDisease() == 122 || dis.getDisease() == 125 || dis.getDisease() == 126) {
                         hitChance = (int) (Math.random() * 100);
                      }
                      if (hitChance <= 80) {
-                        for (MaplePartyCharacter mpc : enemies.getPartyMembers()) {
-                           MapleCharacter mc = mpc.getPlayer();
-                           if (mc != null) {
-                              if (dis == null) {
-                                 mc.dispel();
-                              } else {
-                                 mc.giveDebuff(dis, skill.getSkill());
-                              }
-                           }
-                        }
+                        enemies.getPartyMembers().parallelStream()
+                              .map(MaplePartyCharacter::getPlayer)
+                              .flatMap(Optional::stream)
+                              .forEach(character -> {
+                                 if (dis == null) {
+                                    character.dispel();
+                                 } else {
+                                    character.giveDebuff(dis, skill.getSkill());
+                                 }
+                              });
                      }
                   } else {
                      int amount = enemies.getMembers().size() - 1;

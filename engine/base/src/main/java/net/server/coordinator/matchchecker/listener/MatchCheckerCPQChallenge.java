@@ -19,14 +19,16 @@
 */
 package net.server.coordinator.matchchecker.listener;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import constants.LanguageConstants;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
+import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import scripting.npc.NPCConversationManager;
 import scripting.npc.NPCScriptManager;
@@ -69,14 +71,10 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                break;
             }
 
-            MapleCharacter chr = leader;
-
-            List<MaplePartyCharacter> chrMembers = new LinkedList<>();
-            for (MaplePartyCharacter mpc : chr.getParty().getMembers()) {
-               if (mpc.isOnline()) {
-                  chrMembers.add(mpc);
-               }
-            }
+            List<MaplePartyCharacter> chrMembers = leader.getParty()
+                  .map(MapleParty::getMembers).orElse(Collections.emptyList()).stream()
+                  .filter(MaplePartyCharacter::isOnline)
+                  .collect(Collectors.toList());
 
             if (message.contentEquals("cpq1")) {
                NPCScriptManager.getInstance().start("cpqchallenge", ldr.getClient(), npcid, chrMembers);
@@ -84,7 +82,7 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                NPCScriptManager.getInstance().start("cpqchallenge2", ldr.getClient(), npcid, chrMembers);
             }
 
-            cm.sendOk(LanguageConstants.getMessage(chr, LanguageConstants.CPQChallengeRoomSent));
+            cm.sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomSent));
          }
 
          @Override
@@ -105,8 +103,10 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                ldr.getClient().getCM().startCPQ2(chr, ldr.getMapId() + 1);
             }
 
-            ldr.getParty().setEnemy(chr.getParty());
-            chr.getParty().setEnemy(ldr.getParty());
+            if (ldr.getParty().isPresent() && chr.getParty().isPresent()) {
+               ldr.getParty().get().setEnemy(chr.getParty().get());
+               chr.getParty().get().setEnemy(ldr.getParty().get());
+            }
             chr.setChallenged(false);
          }
 

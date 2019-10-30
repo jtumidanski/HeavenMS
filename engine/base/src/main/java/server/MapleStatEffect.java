@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
@@ -410,22 +411,23 @@ public class MapleStatEffect {
          applyto.removeAllCooldownsExcept(Buccaneer.TIME_LEAP, true);
       } else if (cp != 0 && applyto.getMonsterCarnival() != null) {
          applyto.gainCP(cp);
-      } else if (nuffSkill != 0 && applyto.getParty() != null && applyto.getMap().isCPQMap()) { // by Drago-Dragohe4rt
+      } else if (nuffSkill != 0 && applyto.getParty().isPresent() && applyto.getMap().isCPQMap()) { // by Drago-Dragohe4rt
          final MCSkill skill = MapleCarnivalFactory.getInstance().getSkill(nuffSkill);
          if (skill != null) {
             final MapleDisease dis = skill.getDisease();
-            MapleParty opposition = applyfrom.getParty().getEnemy();
+            MapleParty opposition = applyfrom.getParty().orElseThrow().getEnemy();
             if (skill.targetsAll) {
-               for (MaplePartyCharacter enemyChrs : opposition.getPartyMembers()) {
-                  MapleCharacter chrApp = enemyChrs.getPlayer();
-                  if (chrApp != null && chrApp.getMap().isCPQMap()) {
-                     if (dis == null) {
-                        chrApp.dispel();
-                     } else {
-                        chrApp.giveDebuff(dis, MCSkill.getMobSkill(dis.getDisease(), skill.level));
-                     }
-                  }
-               }
+               opposition.getPartyMembers().parallelStream()
+                     .map(MaplePartyCharacter::getPlayer)
+                     .flatMap(Optional::stream)
+                     .filter(character -> character.getMap().isCPQMap())
+                     .forEach(character -> {
+                        if (dis == null) {
+                           character.dispel();
+                        } else {
+                           character.giveDebuff(dis, MCSkill.getMobSkill(dis.getDisease(), skill.level));
+                        }
+                     });
             } else {
                int amount = opposition.getMembers().size() - 1;
                int randd = (int) Math.floor(Math.random() * amount);
@@ -441,13 +443,12 @@ public class MapleStatEffect {
          }
       } else if (cureDebuffs.size() > 0) { // by Drago-Dragohe4rt
          for (final MapleDisease debuff : cureDebuffs) {
-            if (applyfrom.getParty() != null) {
-               for (MaplePartyCharacter mpc : applyfrom.getParty().getPartyMembers()) {
-                  MapleCharacter chr = mpc.getPlayer();
-                  if (chr != null) {
-                     chr.dispelDebuff(debuff);
-                  }
-               }
+            if (applyfrom.getParty().isPresent()) {
+               applyfrom.getParty()
+                     .map(MapleParty::getPartyMembers).orElse(Collections.emptyList()).parallelStream()
+                     .map(MaplePartyCharacter::getPlayer)
+                     .flatMap(Optional::stream)
+                     .forEach(character -> character.dispelDebuff(debuff));
             } else {
                applyfrom.dispelDebuff(debuff);
             }
@@ -472,7 +473,7 @@ public class MapleStatEffect {
    private int applyBuff(MapleCharacter applyfrom, boolean useMaxRange) {
       int affectedc = 1;
 
-      if (isPartyBuff() && (applyfrom.getParty() != null || isGmBuff())) {
+      if (isPartyBuff() && (applyfrom.getParty().isPresent() || isGmBuff())) {
          Rectangle bounds = (!useMaxRange) ? calculateBoundingBox(applyfrom.position(), applyfrom.isFacingLeft()) : new Rectangle(Integer.MIN_VALUE / 2, Integer.MIN_VALUE / 2, Integer.MAX_VALUE, Integer.MAX_VALUE);
          List<MapleMapObject> affecteds = applyfrom.getMap().getMapObjectsInRect(bounds, Collections.singletonList(MapleMapObjectType.PLAYER));
          List<MapleCharacter> affectedp = new ArrayList<>(affecteds.size());

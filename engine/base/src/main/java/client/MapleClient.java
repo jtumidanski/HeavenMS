@@ -71,9 +71,9 @@ import net.server.coordinator.MapleSessionCoordinator;
 import net.server.coordinator.MapleSessionCoordinator.AntiMulticlientResult;
 import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MapleGuildProcessor;
+import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
-import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
@@ -546,15 +546,14 @@ public class MapleClient {
       return date.get(Calendar.YEAR) == birthday.get(Calendar.YEAR) && date.get(Calendar.MONTH) == birthday.get(Calendar.MONTH) && date.get(Calendar.DAY_OF_MONTH) == birthday.get(Calendar.DAY_OF_MONTH);
    }
 
-   private void removePartyPlayer(World world) {
+   private void removePartyPlayer() {
       MapleMap map = player.getMap();
-      final MapleParty party = player.getParty();
       final int idz = player.getId();
 
-      if (party != null) {
+      player.getParty().ifPresent(party -> {
          final MaplePartyCharacter maplePartyCharacter = new MaplePartyCharacter(player);
          maplePartyCharacter.setOnline(false);
-         world.updateParty(party.getId(), PartyOperation.LOG_ONOFF, maplePartyCharacter);
+         MaplePartyProcessor.getInstance().updateParty(party, PartyOperation.LOG_ONOFF, maplePartyCharacter);
          if (party.getLeader().getId() == idz && map != null) {
             MaplePartyCharacter lchr = null;
             for (MaplePartyCharacter partyMember : party.getMembers()) {
@@ -563,10 +562,10 @@ public class MapleClient {
                }
             }
             if (lchr != null) {
-               world.updateParty(party.getId(), PartyOperation.CHANGE_LEADER, lchr);
+               MaplePartyProcessor.getInstance().updateParty(party, PartyOperation.CHANGE_LEADER, lchr);
             }
          }
-      }
+      });
    }
 
    private void removePlayer(World world, boolean serverTransition) {
@@ -580,7 +579,7 @@ public class MapleClient {
          player.closePartySearchInteractions();
 
          if (!serverTransition) {    // thanks MedicOP for detecting an issue with party leader change on changing channels
-            removePartyPlayer(world);
+            removePartyPlayer();
 
             EventInstanceManager eim = player.getEventInstance();
             if (eim != null) {
@@ -773,11 +772,11 @@ public class MapleClient {
       if (partyId != null) {
          this.setPlayer(chr);
 
-         MapleParty party = chr.getWorldServer().getParty(partyId);
-         chr.setParty(party);
-         chr.getMPC();
-         chr.leaveParty();   // thanks Vcoc for pointing out deleted characters would still stay in a party
-
+         chr.getWorldServer().getParty(partyId).ifPresent(party -> {
+            chr.setParty(party);
+            chr.getMPC();
+            chr.leaveParty();   // thanks Vcoc for pointing out deleted characters would still stay in a party
+         });
          this.setPlayer(null);
       }
 

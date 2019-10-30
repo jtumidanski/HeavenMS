@@ -353,7 +353,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private MapleMiniGame miniGame;
    private MapleRockPaperScissor rps;
    private MapleMount mount;
-   private MapleParty party;
+   private Optional<MapleParty> party;
    private MaplePet[] pets = new MaplePet[3];
    private MaplePlayerShop playerShop = null;
    private MapleShop shop = null;
@@ -1739,12 +1739,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       MapleTradeProcessor.getInstance().cancelTrade(this, MapleTradeResult.UNSUCCESSFUL_ANOTHER_MAP);
       this.closePlayerInteractions();
 
-      MapleParty e = null;
-      if (this.getParty() != null && this.getParty().getEnemy() != null) {
-         e = this.getParty().getEnemy();
-      }
-      final MapleParty k = e;
-
+      MapleParty e = getParty().map(MapleParty::getEnemy).orElse(null);
       client.announce(warpPacket);
       map.removePlayer(this);
       if (client.getChannelServer().getPlayerStorage().getCharacterById(getId()).isPresent()) {
@@ -1755,18 +1750,18 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          prtLock.lock();
          try {
-            if (party != null) {
+            party.ifPresent(reference -> {
                mpc.setMapId(to.getId());
-               PacketCreator.announce(client, new UpdateParty(client.getChannel(), party, PartyOperation.SILENT_UPDATE, null));
+               PacketCreator.announce(client, new UpdateParty(client.getChannel(), reference, PartyOperation.SILENT_UPDATE, null));
                updatePartyMemberHPInternal();
-            }
+            });
          } finally {
             prtLock.unlock();
          }
-         if (MapleCharacter.this.getParty() != null) {
-            MapleCharacter.this.getParty().setEnemy(k);
-         }
-         silentPartyUpdateInternal(getParty());  // EIM script calls inside
+         MapleCharacter.this.getParty().ifPresent(reference -> {
+            reference.setEnemy(e);
+            silentPartyUpdateInternal(reference);
+         });
 
          if (getMap().getHPDec() > 0) {
             resetHpDecreaseTask();
@@ -4065,7 +4060,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public Collection<MapleDoor> getDoors() {
       prtLock.lock();
       try {
-         return (party != null ? Collections.unmodifiableCollection(party.getDoors().values()) : (pdoor != null ? Collections.singleton(pdoor) : new LinkedHashSet<>()));
+         if (party.isPresent()) {
+            return Collections.unmodifiableCollection(party.get().getDoors().values());
+         } else {
+            return pdoor != null ? Collections.singleton(pdoor) : new LinkedHashSet<>();
+         }
       } finally {
          prtLock.unlock();
       }
@@ -4091,7 +4090,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void applyPartyDoor(MapleDoor door, boolean partyUpdate) {
-      MapleParty chrParty;
+      Optional<MapleParty> chrParty;
       prtLock.lock();
       try {
          if (!partyUpdate) {
@@ -4099,26 +4098,22 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          chrParty = getParty();
-         if (chrParty != null) {
-            chrParty.addDoor(id, door);
-         }
+         chrParty.ifPresent(reference -> reference.addDoor(id, door));
       } finally {
          prtLock.unlock();
       }
 
-      silentPartyUpdateInternal(chrParty);
+      chrParty.ifPresent(this::silentPartyUpdateInternal);
    }
 
    public MapleDoor removePartyDoor(boolean partyUpdate) {
       MapleDoor ret = null;
-      MapleParty chrParty;
+      Optional<MapleParty> chrParty;
 
       prtLock.lock();
       try {
          chrParty = getParty();
-         if (chrParty != null) {
-            chrParty.removeDoor(id);
-         }
+         chrParty.ifPresent(reference -> reference.removeDoor(id));
 
          if (!partyUpdate) {
             ret = pdoor;
@@ -4128,7 +4123,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          prtLock.unlock();
       }
 
-      silentPartyUpdateInternal(chrParty);
+      chrParty.ifPresent(this::silentPartyUpdateInternal);
       return ret;
    }
 
@@ -4805,7 +4800,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
    }
 
-   public MapleParty getParty() {
+   public Optional<MapleParty> getParty() {
       prtLock.lock();
       try {
          return party;
@@ -4820,10 +4815,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (p == null) {
             this.mpc = null;
             doorSlot = -1;
-
-            party = null;
+            party = Optional.empty();
          } else {
-            party = p;
+            party = Optional.of(p);
          }
       } finally {
          prtLock.unlock();
@@ -4833,54 +4827,38 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public int getPartyId() {
       prtLock.lock();
       try {
-         return (party != null ? party.getId() : -1);
+         return party.map(MapleParty::getId).orElse(-1);
       } finally {
          prtLock.unlock();
       }
    }
 
    public List<MapleCharacter> getPartyMembersOnline() {
-      List<MapleCharacter> list = new LinkedList<>();
-
       prtLock.lock();
       try {
-         if (party != null) {
-            for (MaplePartyCharacter mpc : party.getMembers()) {
-               MapleCharacter mc = mpc.getPlayer();
-               if (mc != null) {
-                  list.add(mc);
-               }
-            }
-         }
+         return party.map(MapleParty::getPartyMembers).orElse(Collections.emptyList()).stream()
+               .map(MaplePartyCharacter::getPlayer)
+               .flatMap(Optional::stream)
+               .filter(MapleCharacter::isLoggedinWorld)
+               .collect(Collectors.toList());
       } finally {
          prtLock.unlock();
       }
-
-      return list;
    }
 
    public List<MapleCharacter> getPartyMembersOnSameMap() {
-      List<MapleCharacter> list = new LinkedList<>();
       int thisMapHash = this.getMap().hashCode();
 
       prtLock.lock();
       try {
-         if (party != null) {
-            for (MaplePartyCharacter mpc : party.getMembers()) {
-               MapleCharacter chr = mpc.getPlayer();
-               if (chr != null) {
-                  MapleMap chrMap = chr.getMap();
-                  if (chrMap != null && chrMap.hashCode() == thisMapHash && chr.isLoggedinWorld()) {
-                     list.add(chr);
-                  }
-               }
-            }
-         }
+         return party.map(MapleParty::getPartyMembers).orElse(Collections.emptyList()).stream()
+               .map(MaplePartyCharacter::getPlayer)
+               .flatMap(Optional::stream)
+               .filter(character -> character.getMap() != null && character.getMap().hashCode() == thisMapHash && character.isLoggedinWorld())
+               .collect(Collectors.toList());
       } finally {
          prtLock.unlock();
       }
-
-      return list;
    }
 
    public boolean isPartyMember(MapleCharacter chr) {
@@ -4890,14 +4868,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public boolean isPartyMember(int cid) {
       prtLock.lock();
       try {
-         if (party != null) {
-            return party.getMemberById(cid) != null;
-         }
+         return party.map(reference -> reference.isMember(cid)).orElse(false);
       } finally {
          prtLock.unlock();
       }
-
-      return false;
    }
 
    public MaplePlayerShop getPlayerShop() {
@@ -5595,8 +5569,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public boolean isPartyLeader() {
       prtLock.lock();
       try {
-         MapleParty party = getParty();
-         return party != null && party.getLeaderId() == getId();
+         return getParty().map(reference -> reference.getLeaderId() == getId()).orElse(false);
       } finally {
          prtLock.unlock();
       }
@@ -5907,23 +5880,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean leaveParty() {
-      MapleParty party;
-      boolean partyLeader;
-
-      prtLock.lock();
-      try {
-         party = getParty();
-         partyLeader = isPartyLeader();
-      } finally {
-         prtLock.unlock();
-      }
-
-      if (party != null) {
+      if (getParty().isPresent()) {
+         boolean partyLeader = isPartyLeader();
          if (partyLeader) {
-            party.assignNewLeader(client);
+            MaplePartyProcessor.getInstance().assignNewLeader(getParty().get());
          }
-         MaplePartyProcessor.getInstance().leaveParty(party, client);
-
+         MaplePartyProcessor.getInstance().leaveParty(getParty().get(), this);
          return true;
       } else {
          return false;
@@ -7070,7 +7032,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
          }
 
-         int partyId = party != null ? party.getId() : -1;
+         int partyId = party.map(MapleParty::getId).orElse(-1);
          int messengerId = messenger != null ? messenger.getId() : 0;
          int messengerPosition = messenger != null ? messengerposition : 4;
 
@@ -7363,7 +7325,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public int fetchDoorSlot() {
       prtLock.lock();
       try {
-         doorSlot = (party == null) ? 0 : party.getPartyDoor(this.getId());
+         doorSlot = party.map(reference -> reference.getPartyDoor(getId())).orElse((byte) 0);
          return doorSlot;
       } finally {
          prtLock.unlock();
@@ -7680,12 +7642,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void silentPartyUpdate() {
-      silentPartyUpdateInternal(getParty());
+      getParty().ifPresent(this::silentPartyUpdateInternal);
    }
 
    private void silentPartyUpdateInternal(MapleParty chrParty) {
       if (chrParty != null) {
-         getWorldServer().updateParty(chrParty.getId(), PartyOperation.SILENT_UPDATE, getMPC());
+         MaplePartyProcessor.getInstance().updateParty(chrParty, PartyOperation.SILENT_UPDATE, getMPC());
       }
    }
 

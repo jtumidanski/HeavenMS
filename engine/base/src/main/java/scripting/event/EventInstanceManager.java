@@ -360,7 +360,7 @@ public class EventInstanceManager {
 
    public void registerParty(MapleCharacter chr) {
       if (chr.isPartyLeader()) {
-         registerParty(chr.getParty(), chr.getMap());
+         registerParty(chr.getParty().orElseThrow(), chr.getMap());
       }
    }
 
@@ -840,7 +840,7 @@ public class EventInstanceManager {
    }
 
    public boolean isLeader(MapleCharacter chr) {
-      return (chr.getParty().getLeaderId() == chr.getId());
+      return chr.getParty().map(party -> party.getLeaderId() == chr.getId()).orElse(false);
    }
 
    public boolean isEventLeader(MapleCharacter chr) {

@@ -21,6 +21,8 @@
 */
 package net.server.world;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleJob;
 
@@ -33,10 +35,10 @@ public class MaplePartyCharacter {
    private int mapid;
    private boolean online;
    private MapleJob job;
-   private MapleCharacter character;
+   private Optional<MapleCharacter> character;
 
    public MaplePartyCharacter(MapleCharacter maplechar) {
-      this.character = maplechar;
+      this.character = Optional.of(maplechar);
       this.name = maplechar.getName();
       this.level = maplechar.getLevel();
       this.channel = maplechar.getClient().getChannel();
@@ -52,8 +54,15 @@ public class MaplePartyCharacter {
       this.name = "";
    }
 
-   public MapleCharacter getPlayer() {
+   public Optional<MapleCharacter> getPlayer() {
       return character;
+   }
+
+   public boolean inMap(int mapId) {
+      return getPlayer()
+            .map(MapleCharacter::getMapId)
+            .map(id -> id != mapId)
+            .orElse(false);
    }
 
    public MapleJob getJob() {
@@ -73,7 +82,7 @@ public class MaplePartyCharacter {
    }
 
    public boolean isLeader() {
-      return getPlayer().isPartyLeader();
+      return getPlayer().map(MapleCharacter::isPartyLeader).orElse(false);
    }
 
    public boolean isOnline() {
@@ -83,7 +92,7 @@ public class MaplePartyCharacter {
    public void setOnline(boolean online) {
       this.online = online;
       if (!online) {
-         this.character = null;  // thanks Feras for noticing offline party members retaining whole character object unnecessarily
+         this.character = Optional.empty();  // thanks Feras for noticing offline party members retaining whole character object unnecessarily
       }
    }
 
@@ -108,7 +117,7 @@ public class MaplePartyCharacter {
    }
 
    public int getGuildId() {
-      return character.getGuildId();
+      return getPlayer().map(MapleCharacter::getGuildId).orElse(-1);
    }
 
    @Override
@@ -133,7 +142,9 @@ public class MaplePartyCharacter {
       final MaplePartyCharacter other = (MaplePartyCharacter) obj;
       if (name == null) {
          return other.name == null;
-      } else return name.equals(other.name);
+      } else {
+         return name.equals(other.name);
+      }
    }
 
    public int getWorld() {

@@ -33,7 +33,6 @@ import net.server.processor.MapleGuildProcessor;
 import net.server.world.World;
 import tools.FilePrinter;
 import tools.LogHelper;
-import tools.PacketCreator;
 import tools.packet.message.MultiChat;
 
 public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacket> {
@@ -91,7 +90,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
    }
 
    private void partyChat(MultiChatPacket packet, MapleClient client, MapleCharacter player, World world) {
-      world.partyChat(player.getParty(), packet.message(), player.getName());
+      player.getParty().ifPresent(party -> world.partyChat(party, packet.message(), player.getName()));
       if (ServerConstants.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Party", packet.message());
       }

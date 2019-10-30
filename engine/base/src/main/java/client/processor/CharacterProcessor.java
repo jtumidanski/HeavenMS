@@ -346,15 +346,14 @@ public class CharacterProcessor {
    }
 
    private void loadPartyData(CharacterData data, MapleCharacter mapleCharacter, World world) {
-      MapleParty party = world.getParty(data.partyId());
-      if (party != null) {
+      world.getParty(data.partyId()).ifPresent(party -> {
          //TODO this seems like a bug
-         mapleCharacter.setMPC(party.getMemberById(data.id()));
+         party.getMemberById(data.id()).ifPresent(mapleCharacter::setMPC);
          if (mapleCharacter.getMPC() != null) {
             mapleCharacter.setMPC(new MaplePartyCharacter(mapleCharacter));
             mapleCharacter.setParty(party);
          }
-      }
+      });
    }
 
    private void loadMapData(MapleClient client, CharacterData data, MapleCharacter mapleCharacter) {

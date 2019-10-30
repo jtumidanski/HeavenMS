@@ -101,12 +101,12 @@ class EventAmoriaPQ {
                if (ch.isLeader()) {
                   hasLeader = true
                }
-               if (!ch.getPlayer().isMarried()) {
+               if (!ch.getPlayer().map({ character -> character.isMarried() }).orElse(false)) {
                   hasNotMarried = true
                }
                eligible.push(ch)
 
-               mask |= (1 << ch.getPlayer().getGender())
+               mask |= (1 << ch.getPlayer().map({ character -> character.getGender() }).orElse(0))
             }
          }
       }

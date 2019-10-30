@@ -1,5 +1,7 @@
 package server.partyquest;
 
+import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
@@ -55,6 +57,7 @@ public class MonsterCarnival {
 
          p1.getMembers().stream()
                .map(MaplePartyCharacter::getPlayer)
+               .flatMap(Optional::stream)
                .forEach(character -> {
                   character.setMonsterCarnival(this);
                   character.setTeam(0);
@@ -68,6 +71,7 @@ public class MonsterCarnival {
                });
          p2.getMembers().stream()
                .map(MaplePartyCharacter::getPlayer)
+               .flatMap(Optional::stream)
                .forEach(character -> {
                   character.setMonsterCarnival(this);
                   character.setTeam(1);
@@ -82,16 +86,10 @@ public class MonsterCarnival {
 
          if (team1 == null || team2 == null) {
             for (MaplePartyCharacter mpc : p1.getMembers()) {
-               MapleCharacter chr = mpc.getPlayer();
-               if (chr != null) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQError));
-               }
+               mpc.getPlayer().ifPresent(chr -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQError)));
             }
             for (MaplePartyCharacter mpc : p2.getMembers()) {
-               MapleCharacter chr = mpc.getPlayer();
-               if (chr != null) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQError));
-               }
+               mpc.getPlayer().ifPresent(chr -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQError)));
             }
             return;
          }
@@ -114,13 +112,13 @@ public class MonsterCarnival {
 
    public void playerDisconnected(int charid) {
       int team = -1;
-      for (MaplePartyCharacter mpc : leader1.getParty().getMembers()) {
+      for (MaplePartyCharacter mpc : leader1.getParty().map(MapleParty::getMembers).orElse(Collections.emptyList())) {
          if (mpc.getId() == charid) {
             team = 0;
             break;
          }
       }
-      for (MaplePartyCharacter mpc : leader2.getParty().getMembers()) {
+      for (MaplePartyCharacter mpc : leader2.getParty().map(MapleParty::getMembers).orElse(Collections.emptyList())) {
          if (mpc.getId() == charid) {
             team = 1;
             break;
@@ -204,8 +202,8 @@ public class MonsterCarnival {
          out = cs.getMapFactory().getMap(980000010);
       }
 
-      disposeParty(leader1, warpOut, cs, out);
-      disposeParty(leader2, warpOut, cs, out);
+      disposeParty(leader1, warpOut, out);
+      disposeParty(leader2, warpOut, out);
 
       if (this.timer != null) {
          this.timer.cancel(true);
@@ -221,17 +219,19 @@ public class MonsterCarnival {
       }
       redTotalCP = 0;
       blueTotalCP = 0;
-      leader1.getParty().setEnemy(null);
-      leader2.getParty().setEnemy(null);
+      leader1.getParty().ifPresent(party -> party.setEnemy(null));
+      leader2.getParty().ifPresent(party -> party.setEnemy(null));
       map.dispose();
       map = null;
 
       cs.finishMonsterCarnival(cpq1, room);
    }
 
-   private void disposeParty(MapleCharacter partyLeader, boolean warpOut, Channel cs, MapleMap out) {
-      partyLeader.getParty().getMembers().stream()
+   private void disposeParty(MapleCharacter partyLeader, boolean warpOut, MapleMap out) {
+      partyLeader.getParty()
+            .map(MapleParty::getMembers).orElse(Collections.emptyList()).stream()
             .map(MaplePartyCharacter::getPlayer)
+            .flatMap(Optional::stream)
             .forEach(character -> {
                character.resetCP();
                character.setTeam(-1);
@@ -253,8 +253,10 @@ public class MonsterCarnival {
    private void finishForParty(MapleCharacter leader, int totalCP, int cpq1MapOffset, int mapOffset) {
       Channel cs = map.getChannelServer();
 
-      leader.getParty().getMembers().stream()
+      leader.getParty()
+            .map(MapleParty::getMembers).orElse(Collections.emptyList()).stream()
             .map(MaplePartyCharacter::getPlayer)
+            .flatMap(Optional::stream)
             .forEach(character -> {
                character.gainFestivalPoints(totalCP);
                character.setMonsterCarnival(null);
@@ -318,8 +320,10 @@ public class MonsterCarnival {
    }
 
    private void completeForParty(Channel channel, MapleCharacter leader, boolean win) {
-      leader.getParty().getMembers().stream()
+      leader.getParty()
+            .map(MapleParty::getMembers).orElse(Collections.emptyList()).stream()
             .map(MaplePartyCharacter::getPlayer)
+            .flatMap(Optional::stream)
             .forEach(character -> {
                if (win) {
                   PacketCreator.announce(character, new ShowEffect("quest/carnival/win"));

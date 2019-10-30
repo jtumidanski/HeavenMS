@@ -33,6 +33,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -65,12 +66,10 @@ import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.Channel;
 import net.server.coordinator.MapleMonsterAggroCoordinator;
 import net.server.world.MapleParty;
-import net.server.world.MaplePartyCharacter;
 import scripting.event.EventInstanceManager;
 import server.MapleStatEffect;
 import server.TimerManager;
 import server.loot.MapleLootManager;
-import server.life.AbstractLoadedMapleLife;
 import server.maps.MapleMap;
 import server.maps.MapleMapObjectType;
 import server.maps.MapleSummon;
@@ -444,16 +443,15 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          from.getMap().broadcastBossHpMessage(this, this.hashCode(), makeBossHPBarPacket(), this.position());
       } else if (!isBoss()) {
          int remainingHP = (int) Math.max(1, hp.get() * 100f / getMaxHp());
-         byte[] packet = PacketCreator.create(new ShowMonsterHP(this.objectId(), remainingHP));
-         if (from.getParty() != null) {
-            for (MaplePartyCharacter mpc : from.getParty().getMembers()) {
-               MapleCharacter member = from.getMap().getCharacterById(mpc.getId()); // god bless
-               if (member != null) {
-                  member.announce(packet.clone()); // clone it just in case of crypto
-               }
-            }
+         //byte[] packet = PacketCreator.create(new ShowMonsterHP(this.objectId(), remainingHP));
+         if (from.getParty().isPresent()) {
+            from.getParty()
+                  .map(MapleParty::getMembers).orElse(Collections.emptyList()).parallelStream()
+                  .map(partyCharacter -> from.getMap().getCharacterById(partyCharacter.getId()))
+                  .filter(Objects::nonNull)
+                  .forEach(character -> PacketCreator.announce(character, new ShowMonsterHP(this.objectId(), remainingHP)));
          } else {
-            from.announce(packet);
+            PacketCreator.announce(from, new ShowMonsterHP(this.objectId(), remainingHP));
          }
       }
    }
@@ -643,12 +641,12 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          if (chr != null) {
             long damage = e.getValue().longValue();
 
-            MapleParty p = chr.getParty();
-            if (p != null) {
-               Map<MapleCharacter, Long> partyParticipation = partyExpDist.get(p);
+            Optional<MapleParty> p = chr.getParty();
+            if (p.isPresent()) {
+               Map<MapleCharacter, Long> partyParticipation = partyExpDist.get(p.get());
                if (partyParticipation == null) {
                   partyParticipation = new HashMap<>(6);
-                  partyExpDist.put(p, partyParticipation);
+                  partyExpDist.put(p.get(), partyParticipation);
 
                   totalEntries += 1;
                }

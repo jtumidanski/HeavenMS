@@ -47,6 +47,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
+import client.AbstractMapleCharacterObject;
 import client.BuddyList;
 import client.BuddyListAddResult;
 import client.BuddyListEntry;
@@ -89,14 +90,10 @@ import net.server.worker.ServerMessageWorker;
 import net.server.worker.TimedMapObjectWorker;
 import net.server.worker.TimeoutWorker;
 import net.server.worker.WeddingReservationWorker;
-import scripting.event.EventInstanceManager;
 import server.MapleStorage;
 import server.TimerManager;
 import server.maps.AbstractMapleMapObject;
 import server.maps.MapleHiredMerchant;
-import server.maps.MapleMap;
-import server.maps.MapleMiniDungeon;
-import server.maps.MapleMiniDungeonInfo;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
 import tools.DatabaseConnection;
@@ -113,7 +110,6 @@ import tools.packet.messenger.MessengerJoin;
 import tools.packet.messenger.MessengerNote;
 import tools.packet.messenger.MessengerRemoveCharacter;
 import tools.packet.messenger.MessengerUpdateCharacter;
-import tools.packet.party.UpdateParty;
 import tools.packets.Fishing;
 
 /**
@@ -835,7 +831,7 @@ public class World {
       System.out.println("Guest list: " + marriageGuests);
    }
 
-   private void registerCharacterParty(Integer chrid, Integer partyid) {
+   public void registerCharacterParty(Integer chrid, Integer partyid) {
       partyLock.lock();
       try {
          partyChars.put(chrid, partyid);
@@ -844,14 +840,10 @@ public class World {
       }
    }
 
-   private void unregisterCharacterPartyInternal(Integer chrid) {
-      partyChars.remove(chrid);
-   }
-
-   private void unregisterCharacterParty(Integer chrid) {
+   public void unregisterCharacterParty(Integer chrid) {
       partyLock.lock();
       try {
-         unregisterCharacterPartyInternal(chrid);
+         partyChars.remove(chrid);
       } finally {
          partyLock.unlock();
       }
@@ -868,7 +860,7 @@ public class World {
 
    public MapleParty createParty(MaplePartyCharacter chrfor) {
       int partyid = runningPartyId.getAndIncrement();
-      MapleParty party = new MapleParty(partyid, chrfor);
+      MapleParty party = new MapleParty(partyid, id, chrfor);
 
       partyLock.lock();
       try {
@@ -882,143 +874,36 @@ public class World {
       return party;
    }
 
-   public MapleParty getParty(int partyid) {
+   public Optional<MapleParty> getParty(int partyid) {
       partyLock.lock();
       try {
-         return parties.get(partyid);
+         return Optional.ofNullable(parties.get(partyid));
       } finally {
          partyLock.unlock();
       }
    }
 
-   private MapleParty disbandParty(int partyid) {
+   public MapleParty disbandParty(int partyId) {
       partyLock.lock();
       try {
-         return parties.remove(partyid);
+         return parties.remove(partyId);
       } finally {
          partyLock.unlock();
       }
    }
 
-   private void updateCharacterParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target, Collection<MaplePartyCharacter> partyMembers) {
-      switch (operation) {
-         case JOIN:
-            registerCharacterParty(target.getId(), party.getId());
-            break;
-
-         case LEAVE:
-         case EXPEL:
-            unregisterCharacterParty(target.getId());
-            break;
-
-         case DISBAND:
-            partyLock.lock();
-            try {
-               for (MaplePartyCharacter partychar : partyMembers) {
-                  unregisterCharacterPartyInternal(partychar.getId());
-               }
-            } finally {
-               partyLock.unlock();
-            }
-            break;
-
-         default:
-            break;
-      }
-   }
-
-   private void updateParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
-      Collection<MaplePartyCharacter> partyMembers = party.getMembers();
-      updateCharacterParty(party, operation, target, partyMembers);
-
-      for (MaplePartyCharacter partychar : partyMembers) {
-         getPlayerStorage().getCharacterById(partychar.getId()).ifPresent(character -> {
-            if (operation == PartyOperation.DISBAND) {
-               character.setParty(null);
-               character.setMPC(null);
-            } else {
-               character.setParty(party);
-               character.setMPC(partychar);
-            }
-            PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
-         });
-      }
-      switch (operation) {
-         case LEAVE:
-         case EXPEL:
-            getPlayerStorage().getCharacterById(target.getId()).ifPresent(character -> {
-               PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
-               character.setParty(null);
-               character.setMPC(null);
-            });
-         default:
-            break;
-      }
-   }
-
-   public void updateParty(int partyid, PartyOperation operation, MaplePartyCharacter target) {
-      MapleParty party = getParty(partyid);
-      if (party == null) {
-         throw new IllegalArgumentException("no party with the specified partyid exists");
-      }
-      switch (operation) {
-         case JOIN:
-            party.addMember(target);
-            break;
-         case EXPEL:
-         case LEAVE:
-            party.removeMember(target);
-            break;
-         case DISBAND:
-            disbandParty(partyid);
-            break;
-         case SILENT_UPDATE:
-         case LOG_ONOFF:
-            party.updateMember(target);
-            break;
-         case CHANGE_LEADER:
-            MapleCharacter mc = party.getLeader().getPlayer();
-            if (mc != null) {
-               EventInstanceManager eim = mc.getEventInstance();
-
-               if (eim != null && eim.isEventLeader(mc)) {
-                  eim.changedLeader(target);
-               } else {
-                  int oldLeaderMapid = mc.getMapId();
-
-                  if (MapleMiniDungeonInfo.isDungeonMap(oldLeaderMapid)) {
-                     if (oldLeaderMapid != target.getMapId()) {
-                        MapleMiniDungeon mmd = mc.getClient().getChannelServer().getMiniDungeon(oldLeaderMapid);
-                        if (mmd != null) {
-                           mmd.close();
-                        }
-                     }
-                  }
-               }
-               party.setLeader(target);
-            }
-            break;
-         default:
-            System.out.println("Unhandled updateParty operation " + operation.name());
-      }
-      updateParty(party, operation, target);
-   }
-
-   public void removeMapPartyMembers(int partyid) {
-      MapleParty party = getParty(partyid);
-      if (party == null) {
+   public void removeMapPartyMembers(int partyId) {
+      Optional<MapleParty> party = getParty(partyId);
+      if (party.isEmpty()) {
          return;
       }
 
-      for (MaplePartyCharacter mpc : party.getMembers()) {
-         MapleCharacter mc = mpc.getPlayer();
-         if (mc != null) {
-            MapleMap map = mc.getMap();
-            if (map != null) {
-               map.removeParty(partyid);
-            }
-         }
-      }
+      party.map(MapleParty::getMembers).orElse(Collections.emptyList()).stream()
+            .map(MaplePartyCharacter::getPlayer)
+            .flatMap(Optional::stream)
+            .map(AbstractMapleCharacterObject::getMap)
+            .filter(Objects::nonNull)
+            .forEach(mapleMap -> mapleMap.removeParty(partyId));
    }
 
    public int find(String name) {

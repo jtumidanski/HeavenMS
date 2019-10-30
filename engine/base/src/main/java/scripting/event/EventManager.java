@@ -567,7 +567,7 @@ public class EventManager {
    }
 
    public boolean startInstance(int lobbyId, MapleParty party, MapleMap map) {
-      return startInstance(lobbyId, party, map, party.getLeader().getPlayer());
+      return startInstance(lobbyId, party, map, party.getLeader().getPlayer().orElseThrow());
    }
 
    public boolean startInstance(int lobbyId, MapleParty party, MapleMap map, MapleCharacter leader) {
@@ -639,7 +639,7 @@ public class EventManager {
    }
 
    public boolean startInstance(int lobbyId, MapleParty party, MapleMap map, int difficulty) {
-      return startInstance(lobbyId, party, map, difficulty, party.getLeader().getPlayer());
+      return startInstance(lobbyId, party, map, difficulty, party.getLeader().getPlayer().orElseThrow());
    }
 
    public boolean startInstance(int lobbyId, MapleParty party, MapleMap map, int difficulty, MapleCharacter leader) {

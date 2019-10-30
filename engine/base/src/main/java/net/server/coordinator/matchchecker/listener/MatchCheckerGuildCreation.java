@@ -160,7 +160,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
          public void onMatchDeclined(int leaderid, Set<MapleCharacter> matchPlayers, String message) {
             for (MapleCharacter chr : matchPlayers) {
                if (chr.getId() == leaderid && chr.getClient() != null) {
-                  MaplePartyProcessor.getInstance().leaveParty(chr.getParty(), chr.getClient());
+                  chr.getParty().ifPresent(party -> MaplePartyProcessor.getInstance().leaveParty(party, chr));
                }
 
                if (chr.isLoggedinWorld()) {
@@ -181,7 +181,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
             }
 
             String msg;
-            if (leader != null && leader.getParty() == null) {
+            if (leader != null && leader.getParty().isEmpty()) {
                msg = "The Guild creation has been dismissed since the leader left the founding party.";
             } else {
                msg = "The Guild creation has been dismissed since a member was already in a party when they answered.";
@@ -189,7 +189,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
 
             for (MapleCharacter chr : matchPlayers) {
                if (chr.getId() == leaderid && chr.getClient() != null) {
-                  MaplePartyProcessor.getInstance().leaveParty(chr.getParty(), chr.getClient());
+                  chr.getParty().ifPresent(party -> MaplePartyProcessor.getInstance().leaveParty(party, chr));
                }
 
                if (chr.isLoggedinWorld()) {

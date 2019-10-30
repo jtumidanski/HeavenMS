@@ -41,7 +41,6 @@ import net.server.coordinator.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.processor.MaplePartyProcessor;
 import net.server.world.MapleParty;
-import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
 import scala.Option;
@@ -61,33 +60,31 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
    public void handlePacket(BasePartyOperationPacket packet, MapleClient client) {
       MapleCharacter player = client.getPlayer();
       World world = client.getWorldServer();
-      MapleParty party = player.getParty();
 
       if (packet instanceof CreatePartyPacket) {
          create(player);
       } else if (packet instanceof LeavePartyPacket) {
-         leave(client, player, party);
+         leave(player, player.getParty().orElseThrow());
       } else if (packet instanceof JoinPartyPacket) {
          join(player, ((JoinPartyPacket) packet).partyId());
       } else if (packet instanceof InvitePartyPacket) {
-         invite(client, player, world, party, ((InvitePartyPacket) packet).name());
+         invite(player, world, player.getParty().orElse(null), ((InvitePartyPacket) packet).name());
       } else if (packet instanceof ExpelPartyPacket) {
-         expel(client, party, ((ExpelPartyPacket) packet).characterId());
+         expel(player, player.getParty().orElseThrow(), ((ExpelPartyPacket) packet).characterId());
       } else if (packet instanceof ChangeLeaderPartyPacket) {
-         changeLeader(world, party, ((ChangeLeaderPartyPacket) packet).leaderId());
+         changeLeader(player.getParty().orElseThrow(), ((ChangeLeaderPartyPacket) packet).leaderId());
       }
    }
 
-   private void changeLeader(World world, MapleParty party, int newLeader) {
-      MaplePartyCharacter partyCharacter = party.getMemberById(newLeader);
-      world.updateParty(party.getId(), PartyOperation.CHANGE_LEADER, partyCharacter);
+   private void changeLeader(MapleParty party, int newLeader) {
+      party.getMemberById(newLeader).ifPresent(maplePartyCharacter -> MaplePartyProcessor.getInstance().updateParty(party, PartyOperation.CHANGE_LEADER, maplePartyCharacter));
    }
 
-   private void expel(MapleClient client, MapleParty party, int characterId) {
-      MaplePartyProcessor.getInstance().expelFromParty(party, client, characterId);
+   private void expel(MapleCharacter player, MapleParty party, int characterId) {
+      MaplePartyProcessor.getInstance().expelFromParty(party, player, characterId);
    }
 
-   private void invite(MapleClient client, MapleCharacter player, World world, MapleParty party, String name) {
+   private void invite(MapleCharacter player, World world, MapleParty party, String name) {
       Optional<MapleCharacter> invitedOptional = world.getPlayerStorage().getCharacterByName(name);
       if (invitedOptional.isEmpty()) {
          PacketCreator.announce(player, new PartyStatusMessage(19));
@@ -102,19 +99,19 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
             return;
          }
 
-         if (invited.getParty() == null) {
+         if (invited.getParty().isEmpty()) {
             if (party == null) {
                if (!MaplePartyProcessor.getInstance().createParty(player, false)) {
                   return;
                }
 
-               party = player.getParty();
+               party = player.getParty().orElseThrow();
             }
             if (party.getMembers().size() < 6) {
                if (MapleInviteCoordinator.createInvite(InviteType.PARTY, player, party.getId(), invited.getId())) {
                   PacketCreator.announce(invited, new PartyInvite(party.getId(), player.getName()));
                } else {
-                  PacketCreator.announce(client, new PartyStatusMessage(22, Option.apply(invited.getName())));
+                  PacketCreator.announce(player, new PartyStatusMessage(22, Option.apply(invited.getName())));
                }
             } else {
                PacketCreator.announce(player, new PartyStatusMessage(17));
@@ -135,11 +132,11 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
       }
    }
 
-   private void leave(MapleClient client, MapleCharacter player, MapleParty party) {
+   private void leave(MapleCharacter player, MapleParty party) {
       if (party != null) {
          List<MapleCharacter> partymembers = player.getPartyMembersOnline();
 
-         MaplePartyProcessor.getInstance().leaveParty(party, client);
+         MaplePartyProcessor.getInstance().leaveParty(party, player);
          player.updatePartySearchAvailability(true);
          player.partyOperationUpdate(party, partymembers);
       }
