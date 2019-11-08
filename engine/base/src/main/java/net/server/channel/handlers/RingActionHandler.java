@@ -21,7 +21,7 @@
 */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
+import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -151,8 +151,8 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       DatabaseConnection.getInstance().withConnection(connection -> eraseEngagementOffline(characterId, connection));
    }
 
-   private static void eraseEngagementOffline(int characterId, Connection con) {
-      CharacterAdministrator.getInstance().eraseEngagement(con, characterId);
+   private static void eraseEngagementOffline(int characterId, EntityManager entityManager) {
+      CharacterAdministrator.getInstance().eraseEngagement(entityManager, characterId);
    }
 
    private static void breakEngagementOffline(int characterId) {

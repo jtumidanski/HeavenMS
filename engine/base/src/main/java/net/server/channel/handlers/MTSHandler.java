@@ -21,10 +21,11 @@
  */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+
+import javax.persistence.EntityManager;
 
 import client.MapleClient;
 import client.database.administrator.AccountAdministrator;
@@ -357,9 +358,9 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
       return date;
    }
 
-   private void transferFromCart(MapleClient c, int id, Connection con) {
-      MtsItemAdministrator.getInstance().transfer(con, c.getPlayer().getId(), id);
-      MtsCartAdministrator.getInstance().removeItemFromCarts(con, id);
+   private void transferFromCart(MapleClient c, int id, EntityManager entityManager) {
+      MtsItemAdministrator.getInstance().transfer(entityManager, c.getPlayer().getId(), id);
+      MtsCartAdministrator.getInstance().removeItemFromCarts(entityManager, id);
    }
 
    private void buyFromCart(MapleClient c, int id) {

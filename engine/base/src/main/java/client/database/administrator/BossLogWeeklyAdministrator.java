@@ -1,9 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.boss.BossLogWeekly;
+import entity.boss.BossType;
 
 public class BossLogWeeklyAdministrator extends AbstractQueryExecutor {
    private static BossLogWeeklyAdministrator instance;
@@ -18,19 +21,17 @@ public class BossLogWeeklyAdministrator extends AbstractQueryExecutor {
    private BossLogWeeklyAdministrator() {
    }
 
-   public void deleteByAttemptTimeAndBossType(Connection connection, Timestamp timestamp, String type) {
-      String sql = "DELETE FROM bosslog_weekly WHERE attempttime <= ? AND bosstype LIKE ?";
-      execute(connection, sql, ps -> {
-         ps.setTimestamp(1, timestamp);
-         ps.setString(2, type);
-      });
+   public void deleteByAttemptTimeAndBossType(EntityManager entityManager, Timestamp timestamp, String type) {
+      Query query = entityManager.createQuery("DELETE FROM BossLogWeekly WHERE attemptTime <= :timestamp AND bossType = :bossType");
+      query.setParameter("timestamp", timestamp);
+      query.setParameter("bossType", BossType.valueOf(type));
+      execute(entityManager, query);
    }
 
-   public void addAttempt(Connection connection, int characterId, String type) {
-      String sql = "INSERT INTO bosslog_weekly (characterid, bosstype) VALUES (?,?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setString(2, type);
-      });
+   public void addAttempt(EntityManager entityManager, int characterId, String type) {
+      BossLogWeekly bossLogWeekly = new BossLogWeekly();
+      bossLogWeekly.setCharacterId(characterId);
+      bossLogWeekly.setBossType(BossType.valueOf(type));
+      insert(entityManager, bossLogWeekly);
    }
 }

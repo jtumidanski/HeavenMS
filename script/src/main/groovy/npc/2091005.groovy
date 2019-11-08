@@ -135,14 +135,14 @@ class NPC2091005 {
                         cm.dispose()
                      }
                   } else if (selectedMenu == 1) { //I want to challenge him with a party.
-                     MapleParty party = cm.getPlayer().getParty()
-                     if (party == null) {
+                     Optional<MapleParty> party = cm.getPlayer().getParty()
+                     if (party.isEmpty()) {
                         cm.sendNext("Where do you think you're going? You're not even the party leader! Go tell your party leader to talk to me.")
                         cm.dispose()
                         return
                      }
 
-                     if (party.getLeader().getId() != cm.getPlayer().getId()) {
+                     if (party.get().getLeader().getId() != cm.getPlayer().getId()) {
                         cm.sendNext("Where do you think you're going? You're not even the party leader! Go tell your party leader to talk to me.")
                         cm.dispose()
                      }
@@ -151,11 +151,11 @@ class NPC2091005 {
                      //    cm.sendNext("You're going to take on the challenge as a one-man party?");
                      //}
 
-                     else if (!isBetween(party, 30)) {
+                     else if (!isBetween(party.get(), 30)) {
                         cm.sendNext("Your partys level ranges are too broad to enter. Please make sure all of your party members are within #r30 levels#k of each other.")
                         cm.dispose()
                      } else {
-                        int avDojo = cm.getClient().getChannelServer().getAvailableDojo(true, cm.getParty())
+                        int avDojo = cm.getClient().getChannelServer().getAvailableDojo(true, cm.getParty().orElseThrow())
 
                         if (avDojo < 0) {
                            if (avDojo == -1) {
@@ -273,10 +273,10 @@ class NPC2091005 {
                }
 
                if (selectedMenu == 0) {
-                  boolean hasParty = (cm.getParty() != null)
+                  boolean hasParty = (cm.getParty().isPresent())
 
                   boolean firstEnter = false
-                  int avDojo = cm.getClient().getChannelServer().lookupPartyDojo(cm.getParty())
+                  int avDojo = cm.getClient().getChannelServer().lookupPartyDojo(cm.getParty().orElse(null))
                   if (avDojo < 0) {
                      if (hasParty) {
                         if (!cm.isPartyLeader()) {
@@ -285,14 +285,14 @@ class NPC2091005 {
                            return
                         }
 
-                        if (!isBetween(cm.getParty(), 35)) {
+                        if (!isBetween(cm.getParty().get(), 35)) {
                            cm.sendOk("Your partys level ranges are too broad to enter. Please make sure all of your party members are within #r35 levels#k of each other.")
                            cm.dispose()
                            return
                         }
                      }
 
-                     avDojo = cm.getClient().getChannelServer().getAvailableDojo(hasParty, cm.getParty())
+                     avDojo = cm.getClient().getChannelServer().getAvailableDojo(hasParty, cm.getParty().orElse(null))
                      firstEnter = true
                   }
 

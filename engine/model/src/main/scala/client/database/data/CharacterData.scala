@@ -1,6 +1,7 @@
 package client.database.data
 
 import java.sql.Timestamp
+import java.util.Date
 
 class CharacterData(private var _accountId: Int, private var _id: Int, private var _name: String,
                     private var _gender: Int, private var _skinColor: Int, private var _face: Int,
@@ -20,7 +21,7 @@ class CharacterData(private var _accountId: Int, private var _id: Int, private v
                     private var _allianceRank: Int, private var _familyId: Int, private var _monsterBookCover: Int,
                     private var _ariantPoints: Int, private var _dojoPoints: Int, private var _lastDojoStage: Int,
                     private var _dataString: String, private var _buddyCapacity: Int,
-                    private var _lastExpGainTime: Timestamp, private var _partyInvite: Boolean,
+                    private var _lastExpGainTime: Date, private var _partyInvite: Boolean,
                     private var _equipSlotLimit: Int, private var _useSlotLimit: Int, private var _setupSlotLimit: Int,
                     private var _etcSlotLimit: Int, private var _partnerId: Int, private var _marriageItemId: Int,
                     private var _partyId: Int, private var _messengerId: Int, private var _messengerPosition: Int) {
@@ -132,7 +133,7 @@ class CharacterData(private var _accountId: Int, private var _id: Int, private v
 
   def buddyCapacity: Int = _buddyCapacity
 
-  def lastExpGainTime: Timestamp = _lastExpGainTime
+  def lastExpGainTime: Timestamp = _lastExpGainTime.asInstanceOf[Timestamp]
 
   def partyInvite: Boolean = _partyInvite
 

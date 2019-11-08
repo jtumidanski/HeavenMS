@@ -1,7 +1,7 @@
 package client.database.data
 
 class NoteData(private var _id: Int, private var _from: String, private var _message: String,
-               private var _timestamp: Long, private var _fame: Byte) {
+               private var _timestamp: Long, private var _fame: Int) {
   def id: Int = _id
 
   def from: String = _from
@@ -10,5 +10,5 @@ class NoteData(private var _id: Int, private var _from: String, private var _mes
 
   def timestamp: Long = _timestamp
 
-  def fame: Byte = _fame
+  def fame: Int = _fame
 }

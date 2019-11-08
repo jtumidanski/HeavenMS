@@ -1,120 +1,79 @@
 package client.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
+import client.database.utility.SqlTransformer;
+import tools.DatabaseConnection;
 
 public abstract class AbstractQueryExecutor {
-   protected <T> Optional<T> getSingle(Connection connection, String sql, int columnIndex) {
-      return getSingle(connection, sql, null, columnIndex);
-   }
-
-   protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, int columnIndex) {
-      return getNew(connection, sql, setParams, resultSet -> (T) resultSet.getObject(columnIndex));
-   }
-
-   protected <T> Optional<T> getSingle(Connection connection, String sql, String columnLabel) {
-      return getSingle(connection, sql, null, columnLabel);
-   }
-
-   protected <T> Optional<T> getSingle(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, String columnLabel) {
-      return getNew(connection, sql, setParams, resultSet -> (T) resultSet.getObject(columnLabel));
-   }
-
-   protected void execute(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         setParams.accept(ps);
-         ps.executeUpdate();
-      } catch (SQLException exception) {
-         exception.printStackTrace();
+   protected <T> T getSingleWithDefault(TypedQuery<T> query, T defaultValue) {
+      try {
+         return query.getSingleResult();
+      } catch (NoResultException exception) {
+         return defaultValue;
       }
    }
 
-   protected void executeNoParam(Connection connection, String sql) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         ps.executeUpdate();
-      } catch (SQLException exception) {
-         exception.printStackTrace();
+   protected <T, U> T getSingleWithDefault(TypedQuery<U> query, SqlTransformer<T, U> transformer, T defaultValue) {
+      try {
+         U result = query.getSingleResult();
+         return transformer.transform(result);
+      } catch (NoResultException exception) {
+         return defaultValue;
       }
    }
 
-   protected int insertAndReturnKey(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams) {
-      int id = -1;
-      try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-         setParams.accept(ps);
-         ps.executeUpdate();
-         try (ResultSet rs = ps.getGeneratedKeys()) {
-            rs.next();
-            id = rs.getInt(1);
-         }
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-      return id;
-   }
-
-   protected <T> void batch(Connection connection, String sql, SQLBiConsumer<PreparedStatement, T> setParams, Iterable<T> dataPoints) {
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         for (T dataPoint : dataPoints) {
-            setParams.accept(ps, dataPoint);
-            ps.addBatch();
-         }
-         ps.executeBatch();
-      } catch (SQLException exception) {
-         exception.printStackTrace();
-      }
-   }
-
-   protected <T> Optional<T> getNew(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult) {
-      return getInternal(connection, sql, setParams, rs -> {
-         if (rs != null && rs.next()) {
-            try {
-               return Optional.of(getResult.apply(rs));
-            } catch (NullPointerException exception) {
-               return Optional.empty();
-            }
-         }
+   protected <T> Optional<T> getSingleOptional(TypedQuery<T> query) {
+      try {
+         return Optional.of(query.getSingleResult());
+      } catch (NoResultException exception) {
          return Optional.empty();
-      }, Optional.empty());
-   }
-
-   protected <T> Optional<T> getNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
-      return getNew(connection, sql, null, getResult);
-   }
-
-   protected <T> List<T> getList(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, List<T>> getResult) {
-      return getInternal(connection, sql, setParams, getResult, new ArrayList<>());
-   }
-
-   protected <T> List<T> getListNew(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult) {
-      return getInternal(connection, sql, setParams, rs -> {
-         List<T> result = new ArrayList<>();
-         while (rs != null && rs.next()) {
-            result.add(getResult.apply(rs));
-         }
-         return result;
-      }, new ArrayList<>());
-   }
-
-   protected <T> List<T> getListNew(Connection connection, String sql, SQLFunction<ResultSet, T> getResult) {
-      return getListNew(connection, sql, null, getResult);
-   }
-
-   private <T> T getInternal(Connection connection, String sql, SQLConsumer<PreparedStatement> setParams, SQLFunction<ResultSet, T> getResult, T default_) {
-      T result = default_;
-      try (PreparedStatement ps = connection.prepareStatement(sql)) {
-         if (setParams != null) {
-            setParams.accept(ps);
-         }
-         ResultSet rs = ps.executeQuery();
-         result = getResult.apply(rs);
-      } catch (SQLException exception) {
-         exception.printStackTrace();
       }
-      return result;
+   }
+
+   protected <T, U> Optional<T> getSingleOptional(TypedQuery<U> query, SqlTransformer<T, U> transformer) {
+      try {
+         U result = query.getSingleResult();
+         return Optional.of(transformer.transform(result));
+      } catch (NoResultException exception) {
+         return Optional.empty();
+      }
+   }
+
+   protected <T, U> List<T> getResultList(TypedQuery<U> query, SqlTransformer<T, U> transformer) {
+      return query.getResultStream().map(transformer::transform).collect(Collectors.toList());
+   }
+
+   protected boolean resultExists(Query query) {
+      try {
+         query.getSingleResult();
+         return true;
+      } catch (NoResultException exception) {
+         return false;
+      }
+   }
+
+   protected <T> void update(EntityManager entityManager, Class<T> clazz, int id, Consumer<T> consumer) {
+      T thing = entityManager.find(clazz, id);
+      DatabaseConnection.getInstance().thing(entityManager, em -> consumer.accept(thing));
+   }
+
+   protected void execute(EntityManager entityManager, Query query) {
+      DatabaseConnection.getInstance().thing(entityManager, em -> query.executeUpdate());
+   }
+
+   protected void insert(EntityManager entityManager, Object object) {
+      DatabaseConnection.getInstance().thing(entityManager, em -> em.persist(object));
+   }
+
+   protected void insertBulk(EntityManager entityManager, List<?> objects) {
+      DatabaseConnection.getInstance().thing(entityManager, em -> objects.forEach(em::persist));
    }
 }

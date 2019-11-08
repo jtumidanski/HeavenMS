@@ -23,7 +23,6 @@
 */
 package net.server.channel.handlers;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,6 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -63,11 +64,11 @@ import tools.packet.cashshop.CashShopMessage;
  */
 public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePacket> {
 
-   private List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, Connection con, int codeid) {
+   private List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, EntityManager entityManager, int codeid) {
       Map<Integer, Integer> couponItems = new HashMap<>();
       Map<Integer, Integer> couponPoints = new HashMap<>(5);
 
-      NxCodeItemProvider.getInstance().get(con, codeid).forEach(item -> {
+      NxCodeItemProvider.getInstance().get(entityManager, codeid).forEach(item -> {
          if (item.theType() < 5) {
             couponPoints.merge(item.theType(), item.quantity(), Integer::sum);
          } else {

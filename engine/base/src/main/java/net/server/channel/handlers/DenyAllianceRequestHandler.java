@@ -19,8 +19,6 @@
 */
 package net.server.channel.handlers;
 
-import java.util.Optional;
-
 import client.MapleCharacter;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;

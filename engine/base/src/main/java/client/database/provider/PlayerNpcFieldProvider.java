@@ -1,11 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.PlayerNpcFieldData;
 import client.database.utility.PlayerNpcFieldTransformer;
+import entity.PlayerNpcField;
 
 public class PlayerNpcFieldProvider extends AbstractQueryExecutor {
    private static PlayerNpcFieldProvider instance;
@@ -20,9 +22,8 @@ public class PlayerNpcFieldProvider extends AbstractQueryExecutor {
    private PlayerNpcFieldProvider() {
    }
 
-   public List<PlayerNpcFieldData> get(Connection connection) {
-      String sql = "SELECT * FROM playernpcs_field";
-      PlayerNpcFieldTransformer transformer = new PlayerNpcFieldTransformer();
-      return getListNew(connection, sql, transformer::transform);
+   public List<PlayerNpcFieldData> get(EntityManager entityManager) {
+      TypedQuery<PlayerNpcField> query = entityManager.createQuery("FROM PlayerNpcField", PlayerNpcField.class);
+      return getResultList(query, new PlayerNpcFieldTransformer());
    }
 }

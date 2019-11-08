@@ -1,16 +1,14 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.PlayerDiseaseData;
+import entity.PlayerDisease;
 
-public class PlayerDiseaseTransformer implements SqlTransformer<PlayerDiseaseData, ResultSet> {
+public class PlayerDiseaseTransformer implements SqlTransformer<PlayerDiseaseData, PlayerDisease> {
    @Override
-   public PlayerDiseaseData transform(ResultSet resultSet) throws SQLException {
-      return new PlayerDiseaseData(resultSet.getInt("disease"),
-            resultSet.getInt("mobskillid"),
-            resultSet.getInt("mobskilllv"),
-            resultSet.getInt("length"));
+   public PlayerDiseaseData transform(PlayerDisease resultSet) {
+      return new PlayerDiseaseData(resultSet.getDisease(),
+            resultSet.getMobSkillId(),
+            resultSet.getMobSkillLevel(),
+            resultSet.getLength());
    }
 }

@@ -1,9 +1,10 @@
 package client.database.administrator;
 
-import java.sql.Connection;
-import java.util.Arrays;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Ring;
 
 public class RingAdministrator extends AbstractQueryExecutor {
    private static RingAdministrator instance;
@@ -18,32 +19,33 @@ public class RingAdministrator extends AbstractQueryExecutor {
    private RingAdministrator() {
    }
 
-   public void deleteRing(Connection connection, int ringId) {
-      String sql = "DELETE FROM rings WHERE id = ?";
-      execute(connection, sql, ps -> ps.setInt(1, ringId));
+   public void deleteRing(EntityManager entityManager, int ringId) {
+      Query query = entityManager.createQuery("DELETE FROM Ring WHERE id = :id");
+      query.setParameter("id", ringId);
+      execute(entityManager, query);
    }
 
-   public void deleteRing(Connection connection, int ringId, int partnerRingId) {
-      String sql = "DELETE FROM rings WHERE id=?";
-      batch(connection, sql, (ps, data) -> ps.setInt(1, data), Arrays.asList(ringId, partnerRingId));
+   public void deleteRing(EntityManager entityManager, int ringId, int partnerRingId) {
+      Query query = entityManager.createQuery("DELETE FROM Ring WHERE id = :id OR id = :partnerRingId");
+      query.setParameter("id", ringId);
+      query.setParameter("partnerRingId", partnerRingId);
+      execute(entityManager, query);
    }
 
-   public void addRing(Connection connection, int ringId, int itemId, int parnterRingId, int partnerCharacterId, String partnerName) {
-      String sql = "INSERT INTO rings (id, itemid, partnerRingId, partnerChrId, partnername) VALUES (?, ?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, ringId);
-         ps.setInt(2, itemId);
-         ps.setInt(3, parnterRingId);
-         ps.setInt(4, partnerCharacterId);
-         ps.setString(5, partnerName);
-      });
+   public void addRing(EntityManager entityManager, int ringId, int itemId, int parnterRingId, int partnerCharacterId, String partnerName) {
+      Ring ring = new Ring();
+      ring.setId(ringId);
+      ring.setItemId(itemId);
+      ring.setPartnerRingId(parnterRingId);
+      ring.setPartnerCharacterId(partnerCharacterId);
+      ring.setPartnerName(partnerName);
+      insert(entityManager, ring);
    }
 
-   public void updatePartnerName(Connection connection, String newName, String oldName) {
-      String sql = "UPDATE rings SET partnername = ? WHERE partnername = ?";
-      execute(connection, sql, ps -> {
-         ps.setString(1, newName);
-         ps.setString(2, oldName);
-      });
+   public void updatePartnerName(EntityManager entityManager, String newName, String oldName) {
+      Query query = entityManager.createQuery("UPDATE Ring SET partnerName = :newPartnerName WHERE partnerName = :oldPartnerName");
+      query.setParameter("newPartnerName", newName);
+      query.setParameter("oldPartnerName", oldName);
+      execute(entityManager, query);
    }
 }

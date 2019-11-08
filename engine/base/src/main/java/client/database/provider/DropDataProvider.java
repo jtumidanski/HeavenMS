@@ -1,11 +1,10 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
-import client.database.utility.MonsterDropEntryTransformer;
-import client.database.utility.MonsterGlobalDropEntryTransformer;
 import server.life.MonsterDropEntry;
 import server.life.MonsterGlobalDropEntry;
 
@@ -22,20 +21,27 @@ public class DropDataProvider extends AbstractQueryExecutor {
    private DropDataProvider() {
    }
 
-   public List<Integer> getMonstersWhoDrop(Connection connection, int itemId) {
-      String sql = "SELECT dropperid FROM drop_data WHERE itemid = ? LIMIT 50";
-      return getListNew(connection, sql, ps -> ps.setInt(1, itemId), rs -> rs.getInt("dropperid"));
+   public List<Integer> getMonstersWhoDrop(EntityManager entityManager, int itemId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT d.dropperId FROM DropData d WHERE d.itemId = :itemId", Integer.class);
+      query.setParameter("itemId", itemId);
+      query.setMaxResults(50);
+      return query.getResultList();
    }
 
-   public List<MonsterDropEntry> getDropDataForMonster(Connection connection, int monsterId) {
-      String sql = "SELECT itemid, chance, minimum_quantity, maximum_quantity, questid FROM drop_data WHERE dropperid = ?";
-      MonsterDropEntryTransformer transformer = new MonsterDropEntryTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, monsterId), transformer::transform);
+   public List<MonsterDropEntry> getDropDataForMonster(EntityManager entityManager, int monsterId) {
+      TypedQuery<MonsterDropEntry> query = entityManager.createQuery(
+            "SELECT NEW server.life.MonsterDropEntry(d.itemId, d.chance, d.minimumQuantity, d.maximumQuantity, d.questId) " +
+                  "FROM DropData d " +
+                  "WHERE d.dropperId = :dropperId", MonsterDropEntry.class);
+      query.setParameter("dropperId", monsterId);
+      return query.getResultList();
    }
 
-   public List<MonsterGlobalDropEntry> getGlobalDropData(Connection connection) {
-      String sql = "SELECT * FROM drop_data_global WHERE chance > 0";
-      MonsterGlobalDropEntryTransformer transformer = new MonsterGlobalDropEntryTransformer();
-      return getListNew(connection, sql, transformer::transform);
+   public List<MonsterGlobalDropEntry> getGlobalDropData(EntityManager entityManager) {
+      TypedQuery<MonsterGlobalDropEntry> query = entityManager.createQuery(
+            "SELECT NEW server.life.MonsterGlobalDropEntry(d.itemId, d.chance, d.continent, d.minimumQuantity, d.maximumQuantity, d.questId) " +
+                  "FROM DropDataGlobal d " +
+                  "WHERE d.chance > 0", MonsterGlobalDropEntry.class);
+      return query.getResultList();
    }
 }

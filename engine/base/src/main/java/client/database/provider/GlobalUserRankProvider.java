@@ -1,14 +1,14 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.CharacterData;
 import client.database.data.GlobalUserRank;
 import client.database.data.WorldRankData;
-import client.database.utility.WorldRankTransformer;
 
 public class GlobalUserRankProvider extends AbstractQueryExecutor {
    private static GlobalUserRankProvider instance;
@@ -23,18 +23,26 @@ public class GlobalUserRankProvider extends AbstractQueryExecutor {
    private GlobalUserRankProvider() {
    }
 
-   public List<WorldRankData> getWorldRanks(Connection connection, int worldId) {
-      String sql = "SELECT `characters`.`name`, `characters`.`level`, `characters`.`world` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` < 2 AND `accounts`.`banned` = '0' AND `characters`.`world` = ? ORDER BY world, level DESC, exp DESC, lastExpGainTime ASC LIMIT 50";
-      WorldRankTransformer transformer = new WorldRankTransformer();
-      List<CharacterData> characterDataList = getListNew(connection, sql, ps -> ps.setInt(1, worldId), transformer::transform);
-      return parseMultiWorldRanks(characterDataList);
+   public List<WorldRankData> getWorldRanks(EntityManager entityManager, int worldId) {
+      TypedQuery<CharacterData> query = entityManager.createQuery("" +
+            "SELECT NEW client.database.data.CharacterData(c.world, c.name, c.level) " +
+            "FROM Character c LEFT JOIN Account a ON a.id = c.accountId " +
+            "WHERE c.gm < 2 AND a.banned = false AND c.world = :world " +
+            "ORDER BY c.world, c.level DESC, c.exp DESC, c.lastExpGainTime ASC", CharacterData.class);
+      query.setParameter("world", worldId);
+      query.setMaxResults(50);
+      return parseMultiWorldRanks(query.getResultList());
    }
 
-   public List<WorldRankData> getWorldRanksRange(Connection connection, int worldId) {
-      String sql = "SELECT `characters`.`name`, `characters`.`level`, `characters`.`world` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` < 2 AND `accounts`.`banned` = '0' AND `characters`.`world` >= 0 AND `characters`.`world` <= ? ORDER BY world, level DESC, exp DESC, lastExpGainTime ASC LIMIT 50";
-      WorldRankTransformer transformer = new WorldRankTransformer();
-      List<CharacterData> characterDataList = getListNew(connection, sql, ps -> ps.setInt(1, worldId), transformer::transform);
-      return parseMultiWorldRanks(characterDataList);
+   public List<WorldRankData> getWorldRanksRange(EntityManager entityManager, int worldId) {
+      TypedQuery<CharacterData> query = entityManager.createQuery("" +
+            "SELECT NEW client.database.data.CharacterData(c.world, c.name, c.level) " +
+            "FROM Character c LEFT JOIN Account a ON a.id = c.accountId " +
+            "WHERE c.gm < 2 AND a.banned = false AND c.world >= 0 AND c.world <= :world " +
+            "ORDER BY c.world, c.level DESC, c.exp DESC, c.lastExpGainTime ASC", CharacterData.class);
+      query.setParameter("world", worldId);
+      query.setMaxResults(50);
+      return parseMultiWorldRanks(query.getResultList());
    }
 
    private List<WorldRankData> parseMultiWorldRanks(List<CharacterData> characterDataList) {
@@ -50,14 +58,19 @@ public class GlobalUserRankProvider extends AbstractQueryExecutor {
       return rankSystem;
    }
 
-   public List<WorldRankData> getRanksWholeServer(Connection connection, int worldId) {
-      String sql = "SELECT `characters`.`name`, `characters`.`level`, `characters`.`world` FROM `characters` LEFT JOIN accounts ON accounts.id = characters.accountid WHERE `characters`.`gm` < 2 AND `accounts`.`banned` = '0' AND `characters`.`world` >= 0 AND `characters`.`world` <= ? ORDER BY level DESC, exp DESC, lastExpGainTime ASC LIMIT 50";
-      WorldRankTransformer transformer = new WorldRankTransformer();
-      List<CharacterData> characterDataList = getListNew(connection, sql, ps -> ps.setInt(1, Math.abs(worldId)), transformer::transform);
+   public List<WorldRankData> getRanksWholeServer(EntityManager entityManager, int worldId) {
+      TypedQuery<CharacterData> query = entityManager.createQuery("" +
+            "SELECT NEW client.database.data.CharacterData(c.world, c.name, c.level) " +
+            "FROM Character c LEFT JOIN Account a ON a.id = c.accountId " +
+            "WHERE c.gm < 2 AND a.banned = false AND c.world >= 0 AND c.world <= :world " +
+            "ORDER BY c.level DESC, c.exp DESC, c.lastExpGainTime ASC", CharacterData.class);
+      query.setParameter("world", worldId);
+      query.setMaxResults(50);
 
+      List<CharacterData> characterDataList = query.getResultList();
       List<WorldRankData> rankSystem = new ArrayList<>();
-      rankSystem.add(new WorldRankData(0));
 
+      rankSystem.add(new WorldRankData(0));
       for (CharacterData characterData : characterDataList) {
          rankSystem.get(characterData.world()).addUserRank(new GlobalUserRank(characterData.name(), characterData.level()));
       }

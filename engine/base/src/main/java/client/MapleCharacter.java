@@ -26,7 +26,6 @@ import static client.ServerNoticeConstants.LEVEL_200;
 
 import java.awt.Point;
 import java.lang.ref.WeakReference;
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +49,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
 
 import org.apache.mina.util.ConcurrentHashSet;
 
@@ -703,7 +704,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void updatePartySearchAvailability(boolean psearchAvailable) {
       if (psearchAvailable) {
-         if (canRecvPartySearchInvite && getParty() == null) {
+         if (canRecvPartySearchInvite && getParty().isEmpty()) {
             this.getWorldServer().getPartySearchCoordinator().attachPlayer(this);
          }
       } else {
@@ -717,7 +718,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       canRecvPartySearchInvite = !canRecvPartySearchInvite;
 
       if (canRecvPartySearchInvite) {
-         updatePartySearchAvailability(getParty() == null);
+         updatePartySearchAvailability(getParty().isEmpty());
       } else {
          this.getWorldServer().getPartySearchCoordinator().detachPlayer(this);
       }
@@ -1228,7 +1229,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return;//the fuck you doing idiot!
       }
 
-      if (canRecvPartySearchInvite && getParty() == null) {
+      if (canRecvPartySearchInvite && getParty().isPresent()) {
          this.updatePartySearchAvailability(false);
          this.job = newJob;
          this.updatePartySearchAvailability(true);
@@ -4060,11 +4061,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public Collection<MapleDoor> getDoors() {
       prtLock.lock();
       try {
-         if (party.isPresent()) {
-            return Collections.unmodifiableCollection(party.get().getDoors().values());
-         } else {
-            return pdoor != null ? Collections.singleton(pdoor) : new LinkedHashSet<>();
-         }
+         return party.map(mapleParty -> Collections.unmodifiableCollection(mapleParty.getDoors().values())).orElseGet(() -> pdoor != null ? Collections.singleton(pdoor) : new LinkedHashSet<>());
       } finally {
          prtLock.unlock();
       }
@@ -6682,7 +6679,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void receivePartyMemberHP() {
       prtLock.lock();
       try {
-         if (party != null) {
+         if (party.isPresent()) {
             for (MapleCharacter partychar : this.getPartyMembersOnSameMap()) {
                PacketCreator.announce(this, new UpdatePartyMemberHp(partychar.getId(), partychar.getHp(), partychar.getCurrentMaxHp()));
             }
@@ -6882,12 +6879,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       Server.getInstance().updateCharacterEntry(this);
 
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         updateCharacter(connection);
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
+
+         updateCharacter(entityManager);
          updatePets();
-         updatePetIgnores(connection);
-         updateKeyMap(connection);
-         updateSkillMacros(connection);
+         updatePetIgnores(entityManager);
+         updateKeyMap(entityManager);
+         updateSkillMacros(entityManager);
 
          List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
          for (MapleInventory iv : inventory) {
@@ -6895,94 +6894,94 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                itemsWithType.add(new Pair<>(item, iv.getType()));
             }
          }
-         ItemFactory.INVENTORY.saveItems(itemsWithType, id, connection);
+         ItemFactory.INVENTORY.saveItems(itemsWithType, id, entityManager);
 
-         updateSkills(connection);
-         updateSavedLocations(connection);
-         updateTeleportRockLocations(connection);
-         updateBuddies(connection);
-         updateAreaInfo(connection);
-         updateEventStats(connection);
-         updateQuestInfo(connection);
+         updateSkills(entityManager);
+         updateSavedLocations(entityManager);
+         updateTeleportRockLocations(entityManager);
+         updateBuddies(entityManager);
+         updateAreaInfo(entityManager);
+         updateEventStats(entityManager);
+         updateQuestInfo(entityManager);
 
-         MapleFamilyProcessor.getInstance().saveCharactersFamilyReputation(connection, getFamilyEntry());
+         MapleFamilyProcessor.getInstance().saveCharactersFamilyReputation(entityManager, getFamilyEntry());
 
          if (cashshop != null) {
-            cashshop.save(connection);
+            cashshop.save(entityManager);
          }
 
-         connection.commit();
+         entityManager.getTransaction().commit();
 
          if (storage != null && usedStorage) {
-            storage.saveToDB(connection);
+            storage.saveToDB(entityManager);
             usedStorage = false;
          }
 
-         connection.commit();
+         entityManager.getTransaction().commit();
       });
    }
 
-   private void updateQuestInfo(Connection con) {
-      CharacterProcessor.getInstance().deleteQuestProgressWhereCharacterId(con, id);
+   private void updateQuestInfo(EntityManager entityManager) {
+      CharacterProcessor.getInstance().deleteQuestProgressWhereCharacterId(entityManager, id);
 
       synchronized (quests) {
          for (MapleQuestStatus q : quests.values()) {
-            int questId = QuestStatusAdministrator.getInstance().create(con, id, q);
-            QuestProgressAdministrator.getInstance().create(con, id, questId, q.getProgress().keySet().stream().map(key -> new Pair<>(key, q.getProgress(key))).collect(Collectors.toList()));
-            MedalMapAdministrator.getInstance().create(con, id, questId, q.getMedalMaps());
+            int questId = QuestStatusAdministrator.getInstance().create(entityManager, id, q);
+            QuestProgressAdministrator.getInstance().create(entityManager, id, questId, q.getProgress().keySet().stream().map(key -> new Pair<>(key, q.getProgress(key))).collect(Collectors.toList()));
+            MedalMapAdministrator.getInstance().create(entityManager, id, questId, q.getMedalMaps());
          }
       }
    }
 
-   private void updateEventStats(Connection con) {
-      EventStatAdministrator.getInstance().deleteForCharacter(con, id);
-      EventStatAdministrator.getInstance().create(con, id, events.entrySet());
+   private void updateEventStats(EntityManager entityManager) {
+      EventStatAdministrator.getInstance().deleteForCharacter(entityManager, id);
+      EventStatAdministrator.getInstance().create(entityManager, id, events.entrySet());
    }
 
-   private void updateAreaInfo(Connection con) {
-      AreaInfoAdministrator.getInstance().deleteForCharacter(con, id);
-      AreaInfoAdministrator.getInstance().create(con, id, area_info.entrySet());
+   private void updateAreaInfo(EntityManager entityManager) {
+      AreaInfoAdministrator.getInstance().deleteForCharacter(entityManager, id);
+      AreaInfoAdministrator.getInstance().create(entityManager, id, area_info.entrySet());
    }
 
-   private void updateBuddies(Connection con) {
-      BuddyAdministrator.getInstance().deleteNotPendingForCharacter(con, id);
-      BuddyAdministrator.getInstance().addBuddies(con, id, buddylist.getBuddies());
+   private void updateBuddies(EntityManager entityManager) {
+      BuddyAdministrator.getInstance().deleteNotPendingForCharacter(entityManager, id);
+      BuddyAdministrator.getInstance().addBuddies(entityManager, id, buddylist.getBuddies());
    }
 
-   private void updateTeleportRockLocations(Connection con) {
-      TeleportRockLocationAdministrator.getInstance().deleteForCharacter(con, id);
-      TeleportRockLocationAdministrator.getInstance().create(con, id, trockmaps.stream().filter(id -> id != 999999999).collect(Collectors.toList()), 0);
-      TeleportRockLocationAdministrator.getInstance().create(con, id, viptrockmaps.stream().filter(id -> id != 999999999).collect(Collectors.toList()), 1);
+   private void updateTeleportRockLocations(EntityManager entityManager) {
+      TeleportRockLocationAdministrator.getInstance().deleteForCharacter(entityManager, id);
+      TeleportRockLocationAdministrator.getInstance().create(entityManager, id, trockmaps.stream().filter(id -> id != 999999999).collect(Collectors.toList()), 0);
+      TeleportRockLocationAdministrator.getInstance().create(entityManager, id, viptrockmaps.stream().filter(id -> id != 999999999).collect(Collectors.toList()), 1);
    }
 
-   private void updateSavedLocations(Connection con) {
-      SavedLocationAdministrator.getInstance().deleteForCharacter(con, id);
+   private void updateSavedLocations(EntityManager entityManager) {
+      SavedLocationAdministrator.getInstance().deleteForCharacter(entityManager, id);
 
       Collection<Pair<String, SavedLocation>> locations = Arrays.stream(SavedLocationType.values())
             .filter(type -> savedLocations[type.ordinal()] != null)
             .map(type -> new Pair<>(type.name(), savedLocations[type.ordinal()]))
             .collect(Collectors.toList());
-      SavedLocationAdministrator.getInstance().create(con, id, locations);
+      SavedLocationAdministrator.getInstance().create(entityManager, id, locations);
    }
 
-   private void updateSkills(Connection con) {
-      SkillAdministrator.getInstance().replace(con, id, skills.entrySet());
+   private void updateSkills(EntityManager entityManager) {
+      SkillAdministrator.getInstance().replace(entityManager, id, skills.entrySet());
    }
 
-   private void updateSkillMacros(Connection con) {
-      SkillMacroAdministrator.getInstance().deleteForCharacter(con, id);
-      SkillMacroAdministrator.getInstance().create(con, id, Arrays.stream(skillMacros).filter(Objects::nonNull).collect(Collectors.toList()));
+   private void updateSkillMacros(EntityManager entityManager) {
+      SkillMacroAdministrator.getInstance().deleteForCharacter(entityManager, id);
+      SkillMacroAdministrator.getInstance().create(entityManager, id, Arrays.stream(skillMacros).filter(Objects::nonNull).collect(Collectors.toList()));
    }
 
-   private void updateKeyMap(Connection con) {
-      KeyMapAdministrator.getInstance().deleteForCharacter(con, id);
-      KeyMapAdministrator.getInstance().create(con, id, Collections.unmodifiableSet(keymap.entrySet()));
+   private void updateKeyMap(EntityManager entityManager) {
+      KeyMapAdministrator.getInstance().deleteForCharacter(entityManager, id);
+      KeyMapAdministrator.getInstance().create(entityManager, id, Collections.unmodifiableSet(keymap.entrySet()));
    }
 
-   private void updatePetIgnores(Connection con) {
+   private void updatePetIgnores(EntityManager entityManager) {
       for (Entry<Integer, Set<Integer>> es : getExcluded().entrySet()) {    // this set is already protected
-         PetIgnoreAdministrator.getInstance().deletePetIgnore(con, es.getKey());
-         PetIgnoreAdministrator.getInstance().create(con, es.getKey(), es.getValue());
+         PetIgnoreAdministrator.getInstance().deletePetIgnore(entityManager, es.getKey());
+         PetIgnoreAdministrator.getInstance().create(entityManager, es.getKey(), es.getValue());
       }
    }
 
@@ -6997,7 +6996,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       petList.forEach(pet -> PetProcessor.getInstance().saveToDb(pet));
    }
 
-   private void updateCharacter(Connection con) {
+   private void updateCharacter(EntityManager entityManager) {
       effLock.lock();
       statWlock.lock();
       prtLock.lock();
@@ -7040,7 +7039,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int mountExp = mount != null ? mount.exp() : 0;
          int mountTiredness = mount != null ? mount.tiredness() : 0;
 
-         CharacterAdministrator.getInstance().update(con, id, level, fame, str, dex, luk, int_, Math.abs(exp.get()),
+         CharacterAdministrator.getInstance().update(entityManager, id, level, fame, str, dex, luk, int_, Math.abs(exp.get()),
                Math.abs(gachaexp.get()), hp, mp, maxhp, maxmp, sp.substring(0, sp.length() - 1), remainingAp, gmLevel,
                skinColor.getId(), gender, job.getId(), hair, face, mapId, meso.get(), hpMpApUsed, spawnPoint,
                partyId, buddylist.capacity(), messengerId, messengerPosition, mountLevel, mountExp, mountTiredness,
@@ -7747,7 +7746,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void updatePartyMemberHPInternal() {
-      if (party != null) {
+      if (party.isPresent()) {
          int currentMaxHp = getCurrentMaxHp();
          int currentHp = getHp();
 
@@ -8260,7 +8259,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          events = null;
          mpc = null;
          mgc = null;
-         party = null;
+         party = Optional.empty();
          MapleFamilyEntry familyEntry = getFamilyEntry();
          if (familyEntry != null) {
             familyEntry.setCharacter(null);
@@ -8542,7 +8541,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             this.setTotalCP(this.getTotalCP() + gain);
          }
          this.setCP(this.getCP() + gain);
-         if (this.getParty() != null) {
+         if (this.getParty().isPresent()) {
             this.getMonsterCarnival().setCP(this.getMonsterCarnival().getCP(team) + gain, team);
             if (gain > 0) {
                this.getMonsterCarnival().setTotalCP(this.getMonsterCarnival().getTotalCP(team) + gain, team);
@@ -8553,7 +8552,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          PacketCreator.announce(this, new MonsterCarnivalPointObtained(this.getCP(), this.getTotalCP()));
-         if (this.getParty() != null && getTeam() != -1) {
+         if (this.getParty().isPresent() && getTeam() != -1) {
             MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new MonsterCarnivalPartyPoints(getTeam(), this.getMonsterCarnival().getCP(team), this.getMonsterCarnival().getTotalCP(team)));
          }
       }

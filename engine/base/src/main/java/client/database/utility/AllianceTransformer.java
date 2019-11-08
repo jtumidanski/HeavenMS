@@ -1,19 +1,17 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.AllianceData;
+import entity.Alliance;
 
-public class AllianceTransformer implements SqlTransformer<AllianceData, ResultSet> {
+public class AllianceTransformer implements SqlTransformer<AllianceData, Alliance> {
    @Override
-   public AllianceData transform(ResultSet resultSet) throws SQLException {
-      return new AllianceData(resultSet.getInt("capacity"), resultSet.getString("name"),
-            resultSet.getString("notice"),
-            resultSet.getString("rank1"),
-            resultSet.getString("rank2"),
-            resultSet.getString("rank3"),
-            resultSet.getString("rank4"),
-            resultSet.getString("rank5"));
+   public AllianceData transform(Alliance resultSet) {
+      return new AllianceData(resultSet.getCapacity(), resultSet.getName(),
+            resultSet.getNotice(),
+            resultSet.getRank1(),
+            resultSet.getRank2(),
+            resultSet.getRank3(),
+            resultSet.getRank4(),
+            resultSet.getRank5());
    }
 }

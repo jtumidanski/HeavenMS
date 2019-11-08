@@ -1,8 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import java.util.function.Consumer;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Alliance;
 
 public class AllianceAdministrator extends AbstractQueryExecutor {
    private static AllianceAdministrator instance;
@@ -17,27 +21,32 @@ public class AllianceAdministrator extends AbstractQueryExecutor {
    private AllianceAdministrator() {
    }
 
-   public int createAlliance(Connection connection, String name) {
-      String sql = "INSERT INTO `alliance` (`name`) VALUES (?)";
-      return insertAndReturnKey(connection, sql, ps -> ps.setString(1, name));
+   protected void update(EntityManager entityManager, int id, Consumer<Alliance> consumer) {
+      super.update(entityManager, Alliance.class, id, consumer);
    }
 
-   public void deleteAlliance(Connection connection, int allianceId) {
-      String sql = "DELETE FROM `alliance` WHERE id = ?";
-      execute(connection, sql, ps -> ps.setInt(1, allianceId));
+   public int createAlliance(EntityManager entityManager, String name) {
+      Alliance alliance = new Alliance();
+      alliance.setName(name);
+      insert(entityManager, alliance);
+      return alliance.getId();
    }
 
-   public void updateAlliance(Connection connection, int allianceId, int capacity, String notice, String rank1, String rank2, String rank3, String rank4, String rank5) {
-      String sql = "UPDATE `alliance` SET capacity = ?, notice = ?, rank1 = ?, rank2 = ?, rank3 = ?, rank4 = ?, rank5 = ? WHERE id = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, capacity);
-         ps.setString(2, notice);
-         ps.setString(3, rank1);
-         ps.setString(4, rank2);
-         ps.setString(5, rank3);
-         ps.setString(6, rank4);
-         ps.setString(7, rank5);
-         ps.setInt(8, allianceId);
+   public void deleteAlliance(EntityManager entityManager, int allianceId) {
+      Query query = entityManager.createQuery("DELETE FROM Alliance WHERE id = :id");
+      query.setParameter("id", allianceId);
+      execute(entityManager, query);
+   }
+
+   public void updateAlliance(EntityManager entityManager, int allianceId, int capacity, String notice, String rank1, String rank2, String rank3, String rank4, String rank5) {
+      update(entityManager, allianceId, alliance -> {
+         alliance.setCapacity(capacity);
+         alliance.setNotice(notice);
+         alliance.setRank1(rank1);
+         alliance.setRank2(rank2);
+         alliance.setRank3(rank3);
+         alliance.setRank4(rank4);
+         alliance.setRank5(rank5);
       });
    }
 }

@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.MonsterBookData;
@@ -19,9 +20,9 @@ public class MonsterBookProvider extends AbstractQueryExecutor {
    private MonsterBookProvider() {
    }
 
-   public List<MonsterBookData> getDataForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT cardid, level FROM monsterbook WHERE charid = ? ORDER BY cardid ASC";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
-            rs -> new MonsterBookData(rs.getInt("cardid"), rs.getInt("level")));
+   public List<MonsterBookData> getDataForCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<MonsterBookData> query = entityManager.createQuery("SELECT NEW client.database.data.MonsterBookData(m.cardId, m.level) FROM MonsterBook m WHERE m.characterId = :characterId ORDER BY m.cardId ASC", MonsterBookData.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 }

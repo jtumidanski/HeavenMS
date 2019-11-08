@@ -40,7 +40,6 @@ import client.inventory.manipulator.MapleKarmaManipulator;
 import net.opcodes.SendOpcode;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import server.MapleTrade;
 import server.MapleTradeUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;

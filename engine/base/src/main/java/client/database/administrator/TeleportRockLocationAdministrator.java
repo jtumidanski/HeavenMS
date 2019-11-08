@@ -1,10 +1,13 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.TransferRockLocation;
 
 public class TeleportRockLocationAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static TeleportRockLocationAdministrator instance;
@@ -20,17 +23,20 @@ public class TeleportRockLocationAdministrator extends AbstractQueryExecutor imp
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM trocklocations WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM TransferRockLocation WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, List<Integer> mapIds, int vip) {
-      String sql = "INSERT INTO trocklocations(characterid, mapid, vip) VALUES (?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data);
-         ps.setInt(3, vip);
-      }, mapIds);
+   public void create(EntityManager entityManager, int characterId, List<Integer> mapIds, int vip) {
+      List<TransferRockLocation> transferRockLocations = mapIds.stream().map(id -> {
+         TransferRockLocation transferRockLocation = new TransferRockLocation();
+         transferRockLocation.setCharacterId(characterId);
+         transferRockLocation.setMapId(id);
+         transferRockLocation.setVip(vip);
+         return transferRockLocation;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, transferRockLocations);
    }
 }

@@ -51,16 +51,16 @@ class NPC9103001 {
             cm.sendSimple("#e#b<Party Quest: Ludibrium Maze>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nThis is the entrance to the Ludibrium Maze. Enjoy!\r\n#b#L0#Enter the Lubidrium Maze#l\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#What is the Ludibrium Maze?")
          } else if (status == 1) {
             if (selection == 0) {
-               if (cm.getParty() == null) {
+               if (cm.getParty().isEmpty()) {
                   cm.sendOk("Try taking on the Maze Quest with your party.")
                   cm.dispose()
                } else if (!cm.isLeader()) {
                   cm.sendOk("If you DO decide to tackle it, please have your Party Leader notify me!")
                   cm.dispose()
                } else {
-                  MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+                  MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                   if (eli.size() > 0) {
-                     if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                     if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                         cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
                      }
                   } else {

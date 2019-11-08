@@ -1,9 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.WorldTransfer;
 
 public class WorldTransferAdministrator extends AbstractQueryExecutor {
    private static WorldTransferAdministrator instance;
@@ -18,30 +20,30 @@ public class WorldTransferAdministrator extends AbstractQueryExecutor {
    private WorldTransferAdministrator() {
    }
 
-   public void create(Connection connection, int characterId, int oldWorld, int newWorld) {
-      String sql = "INSERT INTO worldtransfers (characterid, `from`, `to`) VALUES (?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, oldWorld);
-         ps.setInt(3, newWorld);
-      });
+   public void create(EntityManager entityManager, int characterId, int oldWorld, int newWorld) {
+      WorldTransfer worldTransfer = new WorldTransfer();
+      worldTransfer.setCharacterId(characterId);
+      worldTransfer.setFromWorld(oldWorld);
+      worldTransfer.setToWorld(newWorld);
+      insert(entityManager, worldTransfer);
    }
 
-   public void cancelPendingForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM worldtransfers WHERE characterid=? AND completionTime IS NULL";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void cancelPendingForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM WorldTransfer WHERE characterId = :characterId AND completionTime IS NULL");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void markComplete(Connection connection, int transferId) {
-      String sql = "UPDATE worldtransfers SET completionTime = ? WHERE id = ?";
-      execute(connection, sql, ps -> {
-         ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-         ps.setInt(2, transferId);
-      });
+   public void markComplete(EntityManager entityManager, int transferId) {
+      Query query = entityManager.createQuery("UPDATE WorldTransfer SET completionTime = :time WHERE id = :id");
+      query.setParameter("time", new Timestamp(System.currentTimeMillis()));
+      query.setParameter("id", transferId);
+      execute(entityManager, query);
    }
 
-   public void cancelById(Connection connection, int transferId) {
-      String sql = "DELETE FROM worldtransfers WHERE id = ?";
-      execute(connection, sql, ps -> ps.setInt(1, transferId));
+   public void cancelById(EntityManager entityManager, int transferId) {
+      Query query = entityManager.createQuery("DELETE FROM WorldTransfer WHERE id = :id");
+      query.setParameter("id", transferId);
+      execute(entityManager, query);
    }
 }

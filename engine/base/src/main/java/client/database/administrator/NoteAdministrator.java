@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Note;
 import net.server.Server;
 
 public class NoteAdministrator extends AbstractQueryExecutor {
@@ -18,27 +21,26 @@ public class NoteAdministrator extends AbstractQueryExecutor {
    private NoteAdministrator() {
    }
 
-   public void sendNote(Connection connection, String to, String from, String msg, byte fame) {
-      String sql = "INSERT INTO notes (`to`, `from`, `message`, `timestamp`, `fame`) VALUES (?, ?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setString(1, to);
-         ps.setString(2, from);
-         ps.setString(3, msg);
-         ps.setLong(4, Server.getInstance().getCurrentTime());
-         ps.setByte(5, fame);
-      });
+   public void sendNote(EntityManager entityManager, String to, String from, String msg, byte fame) {
+      Note note = new Note();
+      note.setNoteTo(to);
+      note.setNoteFrom(from);
+      note.setMessage(msg);
+      note.setTimestamp(Server.getInstance().getCurrentTime());
+      note.setFame((int) fame);
+      insert(entityManager, note);
    }
 
-   public void clearNote(Connection connection, int noteId) {
-      String sql = "UPDATE notes SET `deleted` = 1 WHERE id = ?";
-      execute(connection, sql, ps -> ps.setInt(1, noteId));
+   public void clearNote(EntityManager entityManager, int noteId) {
+      Query query = entityManager.createQuery("UPDATE Note SET deleted = 1 WHERE id = :id");
+      query.setParameter("id", noteId);
+      execute(entityManager, query);
    }
 
-   public void deleteWhereNamesLike(Connection connection, String fromName, String toName) {
-      String sql = "DELETE FROM `notes` WHERE `from` LIKE ? AND `to` LIKE ?";
-      execute(connection, sql, ps -> {
-         ps.setString(1, fromName);
-         ps.setString(2, toName);
-      });
+   public void deleteWhereNamesLike(EntityManager entityManager, String fromName, String toName) {
+      Query query = entityManager.createQuery("DELETE FROM Note WHERE noteFrom LIKE :from AND noteTo LIKE :to");
+      query.setParameter("from", fromName);
+      query.setParameter("to", toName);
+      execute(entityManager, query);
    }
 }

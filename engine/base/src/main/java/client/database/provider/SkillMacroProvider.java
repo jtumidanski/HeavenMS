@@ -1,11 +1,15 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.SkillMacroData;
 import client.database.utility.SkillMacroTransformer;
+import entity.SkillMacro;
 
 public class SkillMacroProvider extends AbstractQueryExecutor {
    private static SkillMacroProvider instance;
@@ -20,9 +24,10 @@ public class SkillMacroProvider extends AbstractQueryExecutor {
    private SkillMacroProvider() {
    }
 
-   public List<SkillMacroData> getForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT * FROM skillmacros WHERE characterid = ?";
+   public List<SkillMacroData> getForCharacter(EntityManager entityManager, int characterId) {
       SkillMacroTransformer transformer = new SkillMacroTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+      TypedQuery<SkillMacro> query = entityManager.createQuery("FROM SkillMacro s WHERE s.characterId = :characterId", SkillMacro.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultStream().map(transformer::transform).collect(Collectors.toList());
    }
 }

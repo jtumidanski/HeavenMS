@@ -23,13 +23,14 @@
 */
 package client.processor;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
 
 import client.DueyAction;
 import client.MapleCharacter;
@@ -50,7 +51,6 @@ import net.server.channel.Channel;
 import scala.Option;
 import server.DueyPackage;
 import server.MapleItemInformationProvider;
-import server.MapleTrade;
 import server.MapleTradeUtil;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
@@ -79,14 +79,16 @@ public class DueyProcessor {
             }));
    }
 
-   private static void deletePackageFromInventoryDB(Connection con, int packageId) {
-      ItemFactory.DUEY.saveItems(new LinkedList<>(), packageId, con);
+   private static void deletePackageFromInventoryDB(EntityManager entityManager, int packageId) {
+      ItemFactory.DUEY.saveItems(new LinkedList<>(), packageId, entityManager);
    }
 
    private static void removePackageFromDB(int packageId) {
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         DueyPackageAdministrator.getInstance().removePackage(connection, packageId);
-         deletePackageFromInventoryDB(connection, packageId);
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
+         DueyPackageAdministrator.getInstance().removePackage(entityManager, packageId);
+         deletePackageFromInventoryDB(entityManager, packageId);
+         entityManager.getTransaction().commit();
       });
    }
 
@@ -320,14 +322,16 @@ public class DueyProcessor {
    }
 
    public static void runDueyExpireSchedule() {
-      DatabaseConnection.getInstance().withConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
          Calendar c = Calendar.getInstance();
          c.add(Calendar.DATE, -30);
          Timestamp ts = new Timestamp(c.getTime().getTime());
 
-         List<Integer> toRemove = DueyPackageProvider.getInstance().getPackagesAfter(connection, ts);
+         entityManager.getTransaction().begin();
+         List<Integer> toRemove = DueyPackageProvider.getInstance().getPackagesAfter(entityManager, ts);
          toRemove.forEach(DueyProcessor::removePackageFromDB);
-         DueyPackageAdministrator.getInstance().deletePackagesAfter(connection, ts);
+         DueyPackageAdministrator.getInstance().deletePackagesAfter(entityManager, ts);
+         entityManager.getTransaction().commit();
       });
    }
 }

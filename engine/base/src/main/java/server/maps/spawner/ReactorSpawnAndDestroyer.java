@@ -1,6 +1,5 @@
 package server.maps.spawner;
 
-import client.MapleCharacter;
 import client.MapleClient;
 import server.maps.MapleMapObject;
 import server.maps.MapleReactor;

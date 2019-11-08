@@ -1,10 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.utility.MapleStorageTransformer;
+import entity.Storage;
 import server.MapleStorage;
 
 public class StorageProvider extends AbstractQueryExecutor {
@@ -20,12 +23,10 @@ public class StorageProvider extends AbstractQueryExecutor {
    private StorageProvider() {
    }
 
-   public Optional<MapleStorage> getByAccountAndWorld(Connection connection, int accountId, int worldId) {
-      String sql = "SELECT storageid, slots, meso FROM storages WHERE accountid = ? AND world = ?";
-      MapleStorageTransformer transformer = new MapleStorageTransformer();
-      return getNew(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-         ps.setInt(2, worldId);
-      }, transformer::transform);
+   public Optional<MapleStorage> getByAccountAndWorld(EntityManager entityManager, int accountId, int worldId) {
+      TypedQuery<Storage> query = entityManager.createQuery("FROM Storage s WHERE s.accountId = :accountId AND s.world = :world", Storage.class);
+      query.setParameter("accountId", accountId);
+      query.setParameter("world", worldId);
+      return getSingleOptional(query, new MapleStorageTransformer());
    }
 }

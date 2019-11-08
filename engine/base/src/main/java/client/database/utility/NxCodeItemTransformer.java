@@ -1,15 +1,13 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.NxCodeItemData;
+import entity.nx.NxCodeItem;
 
-public class NxCodeItemTransformer implements SqlTransformer<NxCodeItemData, ResultSet> {
+public class NxCodeItemTransformer implements SqlTransformer<NxCodeItemData, NxCodeItem> {
    @Override
-   public NxCodeItemData transform(ResultSet resultSet) throws SQLException {
-      return new NxCodeItemData(resultSet.getInt("type"),
-            resultSet.getInt("quantity"),
-            resultSet.getInt("item"));
+   public NxCodeItemData transform(NxCodeItem resultSet) {
+      return new NxCodeItemData(resultSet.getType(),
+            resultSet.getQuantity(),
+            resultSet.getItem());
    }
 }

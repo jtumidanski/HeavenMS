@@ -1,10 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.FredStorage;
 import tools.Pair;
 
 public class FredStorageAdministrator extends AbstractQueryExecutor {
@@ -20,29 +22,34 @@ public class FredStorageAdministrator extends AbstractQueryExecutor {
    private FredStorageAdministrator() {
    }
 
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM `fredstorage` WHERE `cid` = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM FredStorage WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void deleteForCharacterBatch(Connection connection, List<Integer> characterIds) {
-      String sql = "DELETE FROM `fredstorage` WHERE `cid` = ?";
-      batch(connection, sql, (ps, data) -> ps.setInt(1, data), characterIds);
+   public void deleteForCharacterBatch(EntityManager entityManager, List<Integer> characterIds) {
+      Query query = entityManager.createQuery("DELETE FROM FredStorage WHERE characterId IN :characterIds");
+      query.setParameter("characterIds", characterIds);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId) {
-      String sql = "INSERT INTO `fredstorage` (`cid`, `daynotes`, `timestamp`) VALUES (?, 0, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+   public void create(EntityManager entityManager, int characterId) {
+      FredStorage fredStorage = new FredStorage();
+      fredStorage.setCharacterId(characterId);
+      fredStorage.setDayNotes(0);
+      fredStorage.setTimestamp(new Timestamp(System.currentTimeMillis()));
+      insert(entityManager, fredStorage);
+   }
+
+   public void updateNotesBatch(EntityManager entityManager, List<Pair<Integer, Integer>> data) {
+      entityManager.getTransaction().begin();
+      data.forEach(dataPoint -> {
+         Query query = entityManager.createQuery("UPDATE FredStorage SET dayNotes = :dayNotes WHERE characterId = :characterId");
+         query.setParameter("dayNotes", dataPoint.getLeft());
+         query.setParameter("characterId", dataPoint.getRight());
+         query.executeUpdate();
       });
-   }
-
-   public void updateNotesBatch(Connection connection, List<Pair<Integer, Integer>> data) {
-      String sql = "UPDATE `fredstorage` SET `daynotes` = ? WHERE `cid` = ?";
-      batch(connection, sql, (ps, dataPoint) -> {
-         ps.setInt(1, dataPoint.getLeft());
-         ps.setInt(2, dataPoint.getRight());
-      }, data);
+      entityManager.getTransaction().commit();
    }
 }

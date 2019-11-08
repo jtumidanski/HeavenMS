@@ -99,16 +99,16 @@ class NPC1052013 {
                cm.sendSimple("#e#b<Party Quest: Premium Road - " + levels[selection] + ">\r\n#k#n" + em.getProperty("party") + "\r\n\r\nThe #p1052014# operates differently than the common ones. They do not use mesos or gachapon tickets, rather #rERASERS#k, that can be obtained by completing the missions held on the Premium Road. To go there, you must find partners and attend to a Party Quest. When teamed up and ready, have your #bparty leader#k talk to me.#b\r\n#L0#I want to participate in the party quest.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.")
             } else if (status == 2) {
                if (selection == 0) {
-                  if (cm.getParty() == null) {
+                  if (cm.getParty().isEmpty()) {
                      cm.sendOk("You can participate in the party quest only if you are in a party.")
                      cm.dispose()
                   } else if (!cm.isLeader()) {
                      cm.sendOk("Your party leader must talk to me to start this party quest.")
                      cm.dispose()
                   } else {
-                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                      if (eli.size() > 0) {
-                        if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                        if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                            cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
                         }
                      } else {

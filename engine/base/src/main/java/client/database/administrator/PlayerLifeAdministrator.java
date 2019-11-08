@@ -1,8 +1,10 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
 
 import client.database.AbstractQueryExecutor;
+import entity.PLife;
 
 public class PlayerLifeAdministrator extends AbstractQueryExecutor {
    private static PlayerLifeAdministrator instance;
@@ -17,23 +19,22 @@ public class PlayerLifeAdministrator extends AbstractQueryExecutor {
    private PlayerLifeAdministrator() {
    }
 
-   public void create(Connection connection, int lifeId, int f, int fh, int cy, int rx0, int rx1, String type,
+   public void create(EntityManager entityManager, int lifeId, int f, int fh, int cy, int rx0, int rx1, String type,
                       int xpos, int ypos, int worldId, int mapId, int mobTime, int hide) {
-      String sql = "INSERT INTO plife ( life, f, fh, cy, rx0, rx1, type, x, y, world, map, mobtime, hide ) VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, lifeId);
-         ps.setInt(2, f);
-         ps.setInt(3, fh);
-         ps.setInt(4, ypos);
-         ps.setInt(5, rx0);
-         ps.setInt(6, rx1);
-         ps.setString(7, type);
-         ps.setInt(8, xpos);
-         ps.setInt(9, ypos);
-         ps.setInt(10, worldId);
-         ps.setInt(11, mapId);
-         ps.setInt(12, mobTime);
-         ps.setInt(13, hide);
-      });
+      PLife pLife = new PLife();
+      pLife.setLife(lifeId);
+      pLife.setF(f);
+      pLife.setFh(fh);
+      pLife.setCy(cy);
+      pLife.setRx0(rx0);
+      pLife.setRx1(rx1);
+      pLife.setType(type);
+      pLife.setX(xpos);
+      pLife.setY(ypos);
+      pLife.setWorld(worldId);
+      pLife.setMap(mapId);
+      pLife.setMobTime(mobTime);
+      pLife.setHide(hide);
+      insert(entityManager, pLife);
    }
 }

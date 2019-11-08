@@ -2089,7 +2089,7 @@ public class MapleItemInformationProvider {
             MakerRecipeProvider.getInstance().getMakerDisassembledItems(connection, itemId).stream()
                   .map(data -> new Pair<>(data.requiredItem(), data.count()))
                   .collect(Collectors.toList()))
-            .get();
+            .orElse(Collections.emptyList());
    }
 
    public int getMakerDisassembledFee(Integer itemId) {

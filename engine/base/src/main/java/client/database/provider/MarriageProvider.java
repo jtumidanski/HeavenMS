@@ -1,11 +1,11 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.MarriageData;
-import client.database.utility.MarriageTransformer;
 
 public class MarriageProvider extends AbstractQueryExecutor {
    private static MarriageProvider instance;
@@ -20,18 +20,16 @@ public class MarriageProvider extends AbstractQueryExecutor {
    private MarriageProvider() {
    }
 
-   public Optional<MarriageData> getById(Connection connection, int marriageId) {
-      String sql = "SELECT * FROM marriages WHERE marriageid = ?";
-      MarriageTransformer transformer = new MarriageTransformer();
-      return getNew(connection, sql, ps -> ps.setInt(1, marriageId), transformer::transform);
+   public Optional<MarriageData> getById(EntityManager entityManager, int marriageId) {
+      TypedQuery<MarriageData> query = entityManager.createQuery("SELECT NEW client.database.data.MarriageData(m.marriageId, m.husbandId, m.wifeId) FROM Marriage m WHERE m.marriageId = :marriageId", MarriageData.class);
+      query.setParameter("marriageId", marriageId);
+      return getSingleOptional(query);
    }
 
-   public Optional<MarriageData> getBySpouses(Connection connection, int spouse1, int spouse2) {
-      String sql = "SELECT * FROM marriages WHERE husbandid = ? OR wifeid = ?";
-      MarriageTransformer transformer = new MarriageTransformer();
-      return getNew(connection, sql, ps -> {
-         ps.setInt(1, spouse1);
-         ps.setInt(2, spouse2);
-      }, transformer::transform);
+   public Optional<MarriageData> getBySpouses(EntityManager entityManager, int spouse1, int spouse2) {
+      TypedQuery<MarriageData> query = entityManager.createQuery("SELECT NEW client.database.data.MarriageData(m.marriageId, m.husbandId, m.wifeId) FROM Marriage m WHERE m.husbandId = :spouse1 OR m.wifeId = :spouse2", MarriageData.class);
+      query.setParameter("spouse1", spouse1);
+      query.setParameter("spouse2", spouse2);
+      return getSingleOptional(query);
    }
 }

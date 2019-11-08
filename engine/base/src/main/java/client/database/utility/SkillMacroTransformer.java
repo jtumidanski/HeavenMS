@@ -1,18 +1,16 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.SkillMacroData;
+import entity.SkillMacro;
 
-public class SkillMacroTransformer implements SqlTransformer<SkillMacroData, ResultSet> {
+public class SkillMacroTransformer implements SqlTransformer<SkillMacroData, SkillMacro> {
    @Override
-   public SkillMacroData transform(ResultSet resultSet) throws SQLException {
-      return new SkillMacroData(resultSet.getInt("position"),
-            resultSet.getInt("skill1"),
-            resultSet.getInt("skill2"),
-            resultSet.getInt("skill3"),
-            resultSet.getString("name"),
-            resultSet.getInt("shout"));
+   public SkillMacroData transform(SkillMacro resultSet) {
+      return new SkillMacroData(resultSet.getPosition(),
+            resultSet.getSkill1(),
+            resultSet.getSkill2(),
+            resultSet.getSkill3(),
+            resultSet.getName(),
+            resultSet.getShout());
    }
 }

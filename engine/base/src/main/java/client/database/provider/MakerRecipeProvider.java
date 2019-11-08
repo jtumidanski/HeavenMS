@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.MakerRecipeData;
@@ -19,16 +20,15 @@ public class MakerRecipeProvider extends AbstractQueryExecutor {
    private MakerRecipeProvider() {
    }
 
-   public List<MakerRecipeData> getRecipeForItem(Connection connection, int itemId) {
-      String sql = "SELECT req_item, count FROM makerrecipedata WHERE itemid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, itemId),
-            rs -> new MakerRecipeData(rs.getInt("req_item"), rs.getInt("count")));
+   public List<MakerRecipeData> getRecipeForItem(EntityManager entityManager, int itemId) {
+      TypedQuery<MakerRecipeData> query = entityManager.createQuery("SELECT NEW client.database.data.MakerRecipeData(m.requiredItem, m.count) FROM MakerRecipeData m WHERE m.itemId = :itemId", MakerRecipeData.class);
+      query.setParameter("itemId", itemId);
+      return query.getResultList();
    }
 
-   public List<MakerRecipeData> getMakerDisassembledItems(Connection connection, int itemId) {
-      String sql = "SELECT req_item, count FROM makerrecipedata WHERE itemid = ? AND req_item >= 4260000 AND req_item < 4270000";
-      return getListNew(connection, sql, ps -> ps.setInt(1, itemId),
-            rs -> new MakerRecipeData(rs.getInt("req_item"), rs.getInt("count") / 2));
+   public List<MakerRecipeData> getMakerDisassembledItems(EntityManager entityManager, int itemId) {
+      TypedQuery<MakerRecipeData> query = entityManager.createQuery("SELECT NEW client.database.data.MakerRecipeData(m.requiredItem, m.count / 2) FROM MakerRecipeData m WHERE m.itemId = :itemId AND m.requiredItem >= 4260000 AND m.requiredItem < 4270000 ", MakerRecipeData.class);
+      query.setParameter("itemId", itemId);
+      return query.getResultList();
    }
-
 }

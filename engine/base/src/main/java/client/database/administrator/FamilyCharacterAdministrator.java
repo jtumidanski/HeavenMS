@@ -1,8 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import java.util.function.Consumer;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.family.FamilyCharacter;
 
 public class FamilyCharacterAdministrator extends AbstractQueryExecutor {
    private static FamilyCharacterAdministrator instance;
@@ -17,53 +21,45 @@ public class FamilyCharacterAdministrator extends AbstractQueryExecutor {
    private FamilyCharacterAdministrator() {
    }
 
-   public void updatePrecepts(Connection connection, int characterId, String message) {
-      String sql = "UPDATE family_character SET precepts = ? WHERE cid = ?";
-      execute(connection, sql, ps -> {
-         ps.setString(1, message);
-         ps.setInt(2, characterId);
+   protected void update(EntityManager entityManager, int id, Consumer<FamilyCharacter> consumer) {
+      super.update(entityManager, FamilyCharacter.class, id, consumer);
+   }
+
+   public void updatePrecepts(EntityManager entityManager, int characterId, String message) {
+      update(entityManager, characterId, familyCharacter -> familyCharacter.setPrecepts(message));
+   }
+
+   public void updateMember(EntityManager entityManager, int characterId, int reputation, int todaysReputation, int totalReputation, int reputationToSenior) {
+      update(entityManager, characterId, familyCharacter -> {
+         familyCharacter.setReputation(reputation);
+         familyCharacter.setTodaysRep(todaysReputation);
+         familyCharacter.setTotalReputation(totalReputation);
+         familyCharacter.setRepToSenior(reputationToSenior);
       });
    }
 
-   public void updateMember(Connection connection, int characterId, int reputation, int todaysReputation, int totalReputation, int reputationToSenior) {
-      String sql = "UPDATE family_character SET reputation = ?, todaysrep = ?, totalreputation = ?, reptosenior = ? WHERE cid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, reputation);
-         ps.setInt(2, todaysReputation);
-         ps.setInt(3, totalReputation);
-         ps.setInt(4, reputationToSenior);
-         ps.setInt(5, characterId);
+   public void changeFamily(EntityManager entityManager, int characterId, int familyId, int seniorId) {
+      update(entityManager, characterId, familyCharacter -> {
+         familyCharacter.setFamilyId(familyId);
+         familyCharacter.setSeniorId(seniorId);
       });
    }
 
-   public void changeFamily(Connection connection, int characterId, int familyId, int seniorId) {
-      String sql = "UPDATE family_character SET familyid = ?, seniorid = ?, reptosenior = 0 WHERE cid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, familyId);
-         ps.setInt(2, seniorId);
-         ps.setInt(3, characterId);
-      });
+   public void setFamilyForCharacter(EntityManager entityManager, int characterId, int familyId) {
+      update(entityManager, characterId, familyCharacter -> familyCharacter.setFamilyId(familyId));
    }
 
-   public void setFamilyForCharacter(Connection connection, int characterId, int familyId) {
-      String sql = "UPDATE family_character SET familyid = ? WHERE cid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, familyId);
-         ps.setInt(2, characterId);
-      });
+   public void create(EntityManager entityManager, int characterId, int familyId, int seniorId) {
+      FamilyCharacter familyCharacter = new FamilyCharacter();
+      familyCharacter.setCharacterId(characterId);
+      familyCharacter.setFamilyId(familyId);
+      familyCharacter.setSeniorId(seniorId);
+      insert(entityManager, familyCharacter);
    }
 
-   public void create(Connection connection, int characterId, int familyId, int seniorId) {
-      String sql = "INSERT INTO family_character (cid, familyid, seniorid) VALUES (?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, familyId);
-         ps.setInt(3, seniorId);
-      });
-   }
-
-   public void resetReputationOlderThan(Connection connection, long resetTime) {
-      String sql = "UPDATE family_character SET todaysrep = 0, reptosenior = 0 WHERE lastresettime <= ?";
-      execute(connection, sql, ps -> ps.setLong(1, resetTime));
+   public void resetReputationOlderThan(EntityManager entityManager, long resetTime) {
+      Query query = entityManager.createQuery("UPDATE FamilyCharacter SET todaysRep = 0, repToSenior = 0 WHERE lastResetTime <= :lastResetTime");
+      query.setParameter("lastResetTime", resetTime);
+      execute(entityManager, query);
    }
 }

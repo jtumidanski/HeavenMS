@@ -1,15 +1,13 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import entity.Storage;
 import server.MapleStorage;
 
-public class MapleStorageTransformer implements SqlTransformer<MapleStorage, ResultSet> {
+public class MapleStorageTransformer implements SqlTransformer<MapleStorage, Storage> {
    @Override
-   public MapleStorage transform(ResultSet resultSet) throws SQLException {
-      return new MapleStorage(resultSet.getInt("storageid"),
-            (byte) resultSet.getInt("slots"),
-            resultSet.getInt("meso"));
+   public MapleStorage transform(Storage resultSet) {
+      return new MapleStorage(resultSet.getStorageId(),
+            resultSet.getSlots().byteValue(),
+            resultSet.getMeso());
    }
 }

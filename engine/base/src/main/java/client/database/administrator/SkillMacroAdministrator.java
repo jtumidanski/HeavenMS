@@ -1,7 +1,9 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
@@ -21,21 +23,24 @@ public class SkillMacroAdministrator extends AbstractQueryExecutor implements De
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM skillmacros WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM SkillMacro WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, List<SkillMacro> macros) {
-      String sql = "INSERT INTO skillmacros (characterid, skill1, skill2, skill3, name, shout, position) VALUES (?, ?, ?, ?, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.skill1());
-         ps.setInt(3, data.skill2());
-         ps.setInt(4, data.skill3());
-         ps.setString(5, data.name());
-         ps.setInt(6, data.shout());
-         ps.setInt(7, data.position());
-      }, macros);
+   public void create(EntityManager entityManager, int characterId, List<SkillMacro> macros) {
+      List<entity.SkillMacro> skillMacroList = macros.stream().map(macro -> {
+         entity.SkillMacro skillMacro = new entity.SkillMacro();
+         skillMacro.setCharacterId(characterId);
+         skillMacro.setSkill1(macro.skill1());
+         skillMacro.setSkill2(macro.skill2());
+         skillMacro.setSkill3(macro.skill3());
+         skillMacro.setName(macro.name());
+         skillMacro.setShout(macro.shout());
+         skillMacro.setPosition(macro.position());
+         return skillMacro;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, skillMacroList);
    }
 }

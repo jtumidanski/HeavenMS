@@ -40,7 +40,6 @@ import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
 import net.server.coordinator.partysearch.PartySearchEchelon;
 import net.server.coordinator.partysearch.PartySearchStorage;
-import net.server.world.MapleParty;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;

@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,8 +19,9 @@ public class PetIgnoreProvider extends AbstractQueryExecutor {
    private PetIgnoreProvider() {
    }
 
-   public List<Integer> getIgnoresForPet(Connection connection, int petId) {
-      String sql = "SELECT itemid FROM petignores WHERE petid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, petId), rs -> rs.getInt(1));
+   public List<Integer> getIgnoresForPet(EntityManager entityManager, int petId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT p.itemId FROM PetIgnore p WHERE p.pet.id = :petId", Integer.class);
+      query.setParameter("petId", petId);
+      return query.getResultList();
    }
 }

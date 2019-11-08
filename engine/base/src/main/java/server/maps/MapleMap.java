@@ -655,7 +655,7 @@ public class MapleMap {
                } else {
                   idrop = new Item(de.itemId(), (short) 0, (short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1));
                }
-               spawnDrop(idrop, calcDropPos(pos, mob.position()), mob, chr, droptype, de.questId());
+               spawnDrop(idrop, calcDropPos(pos, mob.position()), mob, chr, droptype, (short) de.questId());
             }
             d++;
          }
@@ -683,7 +683,7 @@ public class MapleMap {
                } else {
                   idrop = new Item(de.itemId(), (short) 0, (short) (de.maximum() != 1 ? Randomizer.nextInt(de.maximum() - de.minimum()) + de.minimum() : 1));
                }
-               spawnDrop(idrop, calcDropPos(pos, mob.position()), mob, chr, droptype, de.questId());
+               spawnDrop(idrop, calcDropPos(pos, mob.position()), mob, chr, droptype, (short) de.questId());
                d++;
             }
          }
@@ -697,7 +697,7 @@ public class MapleMap {
          return;
       }
 
-      final byte droptype = (byte) (mob.getStats().isExplosiveReward() ? 3 : mob.getStats().isFFALoot() ? 2 : chr.getParty() != null ? 1 : 0);
+      final byte droptype = (byte) (mob.getStats().isExplosiveReward() ? 3 : mob.getStats().isFFALoot() ? 2 : chr.getParty().isPresent() ? 1 : 0);
       final int mobpos = mob.position().x;
       int chRate = !mob.isBoss() ? chr.getDropRate() : chr.getBossDropRate();
       byte d = 1;
@@ -728,7 +728,7 @@ public class MapleMap {
          return;
       }
 
-      final byte droptype = (byte) (chr.getParty() != null ? 1 : 0);
+      final byte droptype = (byte) (chr.getParty().isPresent() ? 1 : 0);
       final int mobpos = mob.position().x;
       int chRate = 1000000;   // guaranteed item drop
       byte d = 1;
@@ -742,7 +742,7 @@ public class MapleMap {
    }
 
    public void dropFromReactor(final MapleCharacter chr, final MapleReactor reactor, Item drop, Point dropPos, short questid) {
-      spawnDrop(drop, this.calcDropPos(dropPos, reactor.position()), reactor, chr, (byte) (chr.getParty() != null ? 1 : 0), questid);
+      spawnDrop(drop, this.calcDropPos(dropPos, reactor.position()), reactor, chr, (byte) (chr.getParty().isPresent() ? 1 : 0), questid);
    }
 
    private void stopItemMonitor() {

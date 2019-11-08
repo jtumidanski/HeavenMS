@@ -226,7 +226,6 @@ public class GuildPacketFactory extends AbstractPacketFactory {
          writer.writeInt(0);
          writer.writeInt(0);
       }
-      return;
    }
 
    protected void updateGP(MaplePacketLittleEndianWriter writer, UpdateGuildPoints packet) {

@@ -1,7 +1,7 @@
 package client.database.provider;
 
-import java.sql.Connection;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,9 +18,9 @@ public class IpBanProvider extends AbstractQueryExecutor {
    private IpBanProvider() {
    }
 
-   public long getIpBanCount(Connection connection, String ipAddress) {
-      String sql = "SELECT COUNT(*) FROM ipbans WHERE ? LIKE CONCAT(ip, '%')";
-      Optional<Long> result = getSingle(connection, sql, ps -> ps.setString(1, ipAddress), 1);
-      return result.orElse(0L);
+   public long getIpBanCount(EntityManager entityManager, String ipAddress) {
+      TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(*) FROM IpBan i WHERE :ipAddress LIKE CONCAT(i.ip, '%')", Long.class);
+      query.setParameter("ipAddress", ipAddress);
+      return getSingleWithDefault(query, 0L);
    }
 }

@@ -46,7 +46,7 @@ class NewYearCardRecord(private var _senderId: Int, private var _senderName: Str
   }
 
   def setExtraNewYearCardRecord(id: Int, senderDiscardCard: Boolean, receiverDiscardCard: Boolean,
-                                receiverReceivedCard: Boolean, dateSent: Long, dateReceived: Long) = {
+                                receiverReceivedCard: Boolean, dateSent: Long, dateReceived: Long): Unit = {
     this.id = id
     this.senderDiscardCard = senderDiscardCard
     this.receiverDiscardCard = receiverDiscardCard

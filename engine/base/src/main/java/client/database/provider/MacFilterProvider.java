@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,8 +19,8 @@ public class MacFilterProvider extends AbstractQueryExecutor {
    private MacFilterProvider() {
    }
 
-   public List<String> getMacFilters(Connection connection) {
-      String sql = "SELECT filter FROM macfilters";
-      return getListNew(connection, sql, rs -> rs.getString("filter"));
+   public List<String> getMacFilters(EntityManager entityManager) {
+      TypedQuery<String> query = entityManager.createQuery("SELECT m.filter FROM MacFilter m", String.class);
+      return query.getResultList();
    }
 }

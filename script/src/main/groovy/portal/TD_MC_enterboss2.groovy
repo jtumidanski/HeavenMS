@@ -32,12 +32,12 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.giveCharacterExp(4400, pi.getPlayer())
 
       EventManager em = pi.getEventManager("MK_PrimeMinister")
-      MapleParty party = pi.getPlayer().getParty()
-      if (party != null) {
-         MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty())
+      Optional<MapleParty> party = pi.getPlayer().getParty()
+      if (party.isPresent()) {
+         MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty().orElseThrow())
          // thanks Conrad for pointing out missing eligible party declaration here
          if (eli.size() > 0) {
-            if (em.startInstance(party, pi.getMap(), 1)) {
+            if (em.startInstance(party.get(), pi.getMap(), 1)) {
                pi.playPortalSound()
                return true
             } else {
@@ -57,11 +57,11 @@ boolean enter(PortalPlayerInteraction pi) {
    } else if (pi.isQuestStarted(2333) || (pi.isQuestCompleted(2332) && !pi.isQuestStarted(2333))) {
       EventManager em = pi.getEventManager("MK_PrimeMinister")
 
-      MapleParty party = pi.getPlayer().getParty()
-      if (party != null) {
-         MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty())
+      Optional<MapleParty> party = pi.getPlayer().getParty()
+      if (party.isPresent()) {
+         MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty().orElseThrow())
          if (eli.size() > 0) {
-            if (em.startInstance(party, pi.getMap(), 1)) {
+            if (em.startInstance(party.get(), pi.getMap(), 1)) {
                pi.playPortalSound()
                return true
             } else {

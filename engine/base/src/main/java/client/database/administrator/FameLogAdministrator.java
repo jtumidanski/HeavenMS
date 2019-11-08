@@ -1,9 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.FameLog;
 
 public class FameLogAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static FameLogAdministrator instance;
@@ -18,17 +21,17 @@ public class FameLogAdministrator extends AbstractQueryExecutor implements Delet
    private FameLogAdministrator() {
    }
 
-   public void addForCharacter(Connection connection, int fromId, int toId) {
-      String sql = "INSERT INTO famelog (characterid, characterid_to) VALUES (?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, fromId);
-         ps.setInt(2, toId);
-      });
+   public void addForCharacter(EntityManager entityManager, int fromId, int toId) {
+      FameLog fameLog = new FameLog();
+      fameLog.setCharacterId(fromId);
+      fameLog.setCharacterIdTo(toId);
+      insert(entityManager, fameLog);
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM famelog WHERE characterid_to = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM FameLog WHERE characterIdTo = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 }

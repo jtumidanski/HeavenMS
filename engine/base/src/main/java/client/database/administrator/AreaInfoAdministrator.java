@@ -1,11 +1,13 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.Map;
 import java.util.Set;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.AreaInfo;
 
 public class AreaInfoAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static AreaInfoAdministrator instance;
@@ -21,17 +23,21 @@ public class AreaInfoAdministrator extends AbstractQueryExecutor implements Dele
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM area_info WHERE charid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM AreaInfo WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, Set<Map.Entry<Short, String>> areas) {
-      String sql = "INSERT INTO area_info (id, charid, area, info) VALUES (DEFAULT, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.getKey());
-         ps.setString(3, data.getValue());
-      }, areas);
+   public void create(EntityManager entityManager, int characterId, Set<Map.Entry<Short, String>> areas) {
+      entityManager.getTransaction().begin();
+      for (Map.Entry<Short, String> entry : areas) {
+         AreaInfo areaInfo = new AreaInfo();
+         areaInfo.setCharacterId(characterId);
+         areaInfo.setArea(entry.getKey().intValue());
+         areaInfo.setInfo(entry.getValue());
+         entityManager.persist(areaInfo);
+      }
+      entityManager.getTransaction().commit();
    }
 }

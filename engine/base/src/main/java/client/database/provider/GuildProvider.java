@@ -1,8 +1,9 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.GuildData;
@@ -20,47 +21,34 @@ public class GuildProvider extends AbstractQueryExecutor {
    private GuildProvider() {
    }
 
-   public int getByName(Connection connection, String name) {
-      String sql = "SELECT guildid FROM guilds WHERE name = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, name), 1);
-      return result.orElse(-1);
+   public int getByName(EntityManager entityManager, String name) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT g.guildId FROM Guild g WHERE g.name = :name", Integer.class);
+      query.setParameter("name", name);
+      return getSingleWithDefault(query, -1);
    }
 
-   public int getByLeader(Connection connection, int leaderId) {
-      String sql = "SELECT guildid FROM guilds WHERE leader = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, leaderId), "guildid");
-      return result.orElse(-1);
+   public int getByLeader(EntityManager entityManager, int leaderId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT g.guildId FROM Guild g WHERE g.leader = :leaderId", Integer.class);
+      query.setParameter("leaderId", leaderId);
+      return getSingleWithDefault(query, -1);
    }
 
-   public Optional<GuildData> getGuildDataById(Connection connection, int guildId) {
-      String sql = "SELECT * FROM guilds WHERE guildid = ?";
-      return getNew(connection, sql, ps -> ps.setInt(1, guildId), rs -> {
-         String[] rankTitles = new String[5];
-         for (int i = 1; i <= 5; i++) {
-            rankTitles[i - 1] = rs.getString("rank" + i + "title");
-         }
-
-         return new GuildData(
-               rs.getString("name"),
-               rs.getInt("GP"),
-               rs.getInt("logo"),
-               rs.getInt("logoColor"),
-               rs.getInt("logoBG"),
-               rs.getInt("logoBGColor"),
-               rs.getInt("capacity"),
-               rankTitles,
-               rs.getInt("leader"),
-               rs.getString("notice"),
-               rs.getInt("signature"),
-               rs.getInt("allianceId")
-         );
-      });
+   public Optional<GuildData> getGuildDataById(EntityManager entityManager, int guildId) {
+      TypedQuery<GuildData> query = entityManager.createQuery("" +
+            "SELECT NEW client.database.data.GuildData(g.name, g.gp, g.logo, g.logoColor, g.logoBackground, " +
+            "g.logoBackgroundColor, g.capacity, g.rank1Title, g.rank2Title, g.rank3Title, g.rank4Title, g.rank5Title, " +
+            "g.leader, g.notice, g.signature, g.allianceId) " +
+            "FROM Guild g WHERE g.guildId = :guildId", GuildData.class);
+      query.setParameter("guildId", guildId);
+      return getSingleOptional(query);
    }
 
-   public List<GuildData> getGuildRankData(Connection connection) {
-      String sql = "SELECT `name`, `GP`, `logoBG`, `logoBGColor`, `logo`, `logoColor` FROM guilds ORDER BY `GP` DESC LIMIT 50";
-      return getListNew(connection, sql, rs -> new GuildData(rs.getString("name"), rs.getInt("GP"),
-            rs.getInt("logo"), rs.getInt("logoColor"), rs.getInt("logoBG"),
-            rs.getInt("logoBGColor")));
+   public List<GuildData> getGuildRankData(EntityManager entityManager) {
+      TypedQuery<GuildData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.GuildData(g.name, g.gp, g.logoBackground, g.logoBackgroundColor, g.logo, g.logoColor) " +
+                  "FROM Guild g " +
+                  "ORDER BY g.gp DESC", GuildData.class);
+      query.setMaxResults(50);
+      return query.getResultList();
    }
 }

@@ -1,22 +1,19 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.FamilyData;
+import entity.family.FamilyCharacter;
 
-public class FamilyDataFromResultSetTransformer implements SqlTransformer<FamilyData, ResultSet> {
+public class FamilyDataFromResultSetTransformer implements SqlTransformer<FamilyData, FamilyCharacter> {
    @Override
-   public FamilyData transform(ResultSet resultSet) throws SQLException {
+   public FamilyData transform(FamilyCharacter resultSet) {
       return new FamilyData(
-            resultSet.getInt("cid"),
-            resultSet.getInt("familyid"),
-            resultSet.getInt("seniorid"),
-            resultSet.getInt("reputation"),
-            resultSet.getInt("todaysrep"),
-            resultSet.getInt("totalreputation"),
-            resultSet.getInt("reptosenior"),
-            resultSet.getString("precepts")
-      );
+            resultSet.getCharacterId(),
+            resultSet.getFamilyId(),
+            resultSet.getSeniorId(),
+            resultSet.getReputation(),
+            resultSet.getTodaysRep(),
+            resultSet.getTotalReputation(),
+            resultSet.getRepToSenior(),
+            resultSet.getPrecepts());
    }
 }

@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,8 +19,9 @@ public class InventoryEquipmentProvider extends AbstractQueryExecutor {
    private InventoryEquipmentProvider() {
    }
 
-   public List<Integer> getRings(Connection connection, int inventoryItemId) {
-      String sql = "SELECT ringid FROM inventoryequipment WHERE inventoryitemid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, inventoryItemId), rs -> rs.getInt("ringid"));
+   public List<Integer> getRings(EntityManager entityManager, int inventoryItemId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT i.ringId FROM InventoryEquipment i WHERE i.inventoryItemId = :inventoryItemId", Integer.class);
+      query.setParameter("inventoryItemId", inventoryItemId);
+      return query.getResultList();
    }
 }

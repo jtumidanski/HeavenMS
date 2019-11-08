@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -52,7 +51,6 @@ import client.database.data.AccountData;
 import client.database.data.AccountLoginData;
 import client.database.data.CharNameAndIdData;
 import client.database.provider.AccountProvider;
-import client.database.provider.BitVotingRecordProvider;
 import client.database.provider.CharacterProvider;
 import client.database.provider.HwidBanProvider;
 import client.database.provider.IpBanProvider;
@@ -238,25 +236,6 @@ public class MapleClient {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> IpBanProvider.getInstance().getIpBanCount(connection, session.getRemoteAddress().toString())).orElse(0L) > 0;
    }
 
-   public int getVoteTime() {
-      if (voteTime != -1) {
-         return voteTime;
-      }
-      voteTime = DatabaseConnection.getInstance().withConnectionResult(connection -> BitVotingRecordProvider.getInstance().getVoteDate(connection, accountName)).orElse(-1);
-      return voteTime;
-   }
-
-   public void resetVoteTime() {
-      voteTime = -1;
-   }
-
-   public boolean hasVotedAlready() {
-      Date currentDate = new Date();
-      int timeNow = (int) (currentDate.getTime() / 1000);
-      int difference = (timeNow - getVoteTime());
-      return difference < 86400 && difference > 0;
-   }
-
    public boolean hasBannedHWID() {
       if (hwid == null) {
          return false;
@@ -273,13 +252,13 @@ public class MapleClient {
 
    private void loadHWIDIfNecessary() {
       if (hwid == null) {
-         hwid = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getHwid(connection, accId)).orElse(null);
+         hwid = DatabaseConnection.getInstance().withConnectionResult(entityManager -> AccountProvider.getInstance().getHwid(entityManager, accId)).orElseThrow();
       }
    }
 
    private void loadMacsIfNecessary() {
       if (macs.isEmpty()) {
-         DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getMacs(connection, accId)).ifPresent(result -> macs.addAll(result));
+         macs.addAll(DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getMacs(connection, accId)).orElseThrow());
       }
    }
 
@@ -388,11 +367,11 @@ public class MapleClient {
          gmLevel = 0;
          pin = accountData.get().pin();
          pic = accountData.get().pic();
-         gender = accountData.get().gender();
-         characterSlots = accountData.get().characterSlots();
+         gender = accountData.get().gender().byteValue();
+         characterSlots = accountData.get().characterSlots().byteValue();
          lang = accountData.get().language();
          String passwordHash = accountData.get().password();
-         byte tos = accountData.get().tos();
+         boolean tos = accountData.get().tos();
 
          if (accountData.get().banned()) {
             return 3;
@@ -402,10 +381,10 @@ public class MapleClient {
             loggedIn = false;
             loginok = 7;
          } else if (passwordHash.charAt(0) == '$' && passwordHash.charAt(1) == '2' && BCrypt.checkpw(pwd, passwordHash)) {
-            loginok = (tos == 0) ? 23 : 0;
+            loginok = tos ? 23 : 0;
          } else if (pwd.equals(passwordHash) || checkHash(passwordHash, "SHA-1", pwd) || checkHash(passwordHash, "SHA-512", pwd)) {
             // thanks GabrielSin for detecting some no-bcrypt inconsistencies here
-            loginok = (tos == 0) ? (!ServerConstants.BCRYPT_MIGRATION ? 23 : -23) : (!ServerConstants.BCRYPT_MIGRATION ? 0 : -10); // migrate to bcrypt
+            loginok = tos ? (!ServerConstants.BCRYPT_MIGRATION ? 23 : -23) : (!ServerConstants.BCRYPT_MIGRATION ? 0 : -10); // migrate to bcrypt
          } else {
             loggedIn = false;
             loginok = 4;

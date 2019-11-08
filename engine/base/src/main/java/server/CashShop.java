@@ -22,7 +22,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package server;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -30,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
+
+import javax.persistence.EntityManager;
 
 import client.database.administrator.AccountAdministrator;
 import client.database.administrator.GiftAdministrator;
@@ -256,8 +257,8 @@ public class CashShop {
       notes--;
    }
 
-   public void save(Connection con) {
-      AccountAdministrator.getInstance().saveNxInformation(con, accountId, nxCredit, maplePoint, nxPrepaid);
+   public void save(EntityManager entityManager) {
+      AccountAdministrator.getInstance().saveNxInformation(entityManager, accountId, nxCredit, maplePoint, nxPrepaid);
 
       List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
 
@@ -266,10 +267,10 @@ public class CashShop {
          itemsWithType.add(new Pair<>(item, item.inventoryType()));
       }
 
-      factory.saveItems(itemsWithType, accountId, con);
+      factory.saveItems(itemsWithType, accountId, entityManager);
 
-      WishListAdministrator.getInstance().deleteForCharacter(con, characterId);
-      WishListAdministrator.getInstance().addForCharacter(con, characterId, wishList);
+      WishListAdministrator.getInstance().deleteForCharacter(entityManager, characterId);
+      WishListAdministrator.getInstance().addForCharacter(entityManager, characterId, wishList);
    }
 
    private Item getCashShopItemByItemid(int itemid) {

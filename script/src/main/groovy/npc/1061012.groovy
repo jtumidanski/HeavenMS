@@ -35,9 +35,9 @@ class NPC1061012 {
             } else if (em.getProperty("started") == "true") {
                cm.sendOk("Someone else is already attempting to defeat the Jr.Balrog in another world.")
             } else {
-               MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+               MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                if (eli.size() > 0) {
-                  if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                  if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                      cm.sendOk("A party in your name is already registered in this instance.")
                   }
                } else {
@@ -56,15 +56,15 @@ class NPC1061012 {
    }
 
    def checkJob() {
-      MapleParty party = cm.getParty()
+      Optional<MapleParty> party = cm.getParty()
 
-      if (party == null) {
+      if (party.isEmpty()) {
          return -1
       }
       //    if (party.getMembers().size() != 2) {
       //	return 0;
       //    }
-      Iterator it = party.getMembers().iterator()
+      Iterator it = party.get().getMembers().iterator()
 
       while (it.hasNext()) {
          MaplePartyCharacter cPlayer = it.next()

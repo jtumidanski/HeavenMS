@@ -1,33 +1,31 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import constants.GameConstants;
+import entity.PlayerNpc;
 import server.life.MaplePlayerNPC;
 
-public class PlayerNpcFromResultSetTransformer implements SqlTransformer<MaplePlayerNPC, ResultSet> {
+public class PlayerNpcFromResultSetTransformer implements SqlTransformer<MaplePlayerNPC, PlayerNpc> {
    @Override
-   public MaplePlayerNPC transform(ResultSet resultSet) throws SQLException {
+   public MaplePlayerNPC transform(PlayerNpc resultSet) {
       return new MaplePlayerNPC(
-            resultSet.getInt("id"),
-            resultSet.getInt("x"),
-            resultSet.getInt("cy"),
-            resultSet.getString("name"),
-            resultSet.getInt("hair"),
-            resultSet.getInt("face"),
-            resultSet.getByte("skin"),
-            resultSet.getInt("gender"),
-            resultSet.getInt("dir"),
-            resultSet.getInt("fh"),
-            resultSet.getInt("rx0"),
-            resultSet.getInt("rx1"),
-            resultSet.getInt("scriptid"),
-            resultSet.getInt("worldrank"),
-            resultSet.getInt("overallrank"),
-            resultSet.getInt("worldjobrank"),
-            GameConstants.getOverallJobRankByScriptId(resultSet.getInt("scriptid")),
-            resultSet.getInt("job")
+            resultSet.getId(),
+            resultSet.getX(),
+            resultSet.getCy(),
+            resultSet.getName(),
+            resultSet.getHair(),
+            resultSet.getFace(),
+            resultSet.getSkin(),
+            resultSet.getGender(),
+            resultSet.getDir(),
+            resultSet.getFh(),
+            resultSet.getRx0(),
+            resultSet.getRx1(),
+            resultSet.getScriptId(),
+            resultSet.getWorldRank(),
+            resultSet.getOverallRank(),
+            resultSet.getWorldJobRank(),
+            GameConstants.getOverallJobRankByScriptId(resultSet.getScriptId()),
+            resultSet.getJob()
       );
    }
 }

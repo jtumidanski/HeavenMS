@@ -19,7 +19,6 @@
 */
 package net.server.coordinator;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -33,6 +32,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+import javax.persistence.EntityManager;
 
 import org.apache.mina.core.session.IoSession;
 
@@ -107,16 +108,16 @@ public class MapleSessionCoordinator {
       return 3600000 * (baseTime + subdegreeTime);
    }
 
-   private static void updateAccessAccount(Connection con, String remoteHwid, int accountId, int loginRelevance) {
+   private static void updateAccessAccount(EntityManager entityManager, String remoteHwid, int accountId, int loginRelevance) {
       java.sql.Timestamp nextTimestamp = new java.sql.Timestamp(Server.getInstance().getCurrentTime() + hwidExpirationUpdate(loginRelevance));
       if (loginRelevance < Byte.MAX_VALUE) {
          loginRelevance++;
       }
-      HwidAccountAdministrator.getInstance().updateByAccountId(con, accountId, remoteHwid, loginRelevance, nextTimestamp);
+      HwidAccountAdministrator.getInstance().updateByAccountId(entityManager, accountId, remoteHwid, loginRelevance, nextTimestamp);
    }
 
-   private static void registerAccessAccount(Connection con, String remoteHwid, int accountId) {
-      HwidAccountAdministrator.getInstance().create(con, accountId, remoteHwid, new java.sql.Timestamp(Server.getInstance().getCurrentTime() + hwidExpirationUpdate(0)));
+   private static void registerAccessAccount(EntityManager entityManager, String remoteHwid, int accountId) {
+      HwidAccountAdministrator.getInstance().create(entityManager, accountId, remoteHwid, new java.sql.Timestamp(Server.getInstance().getCurrentTime() + hwidExpirationUpdate(0)));
    }
 
    private static boolean associateHwidAccountIfAbsent(String remoteHwid, int accountId) {

@@ -21,7 +21,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.server.world;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +45,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import javax.persistence.EntityManager;
 
 import client.AbstractMapleCharacterObject;
 import client.BuddyList;
@@ -247,18 +248,18 @@ public class World {
       return (chr.getId() << 2) + petSlot;
    }
 
-   private static void executePlayerNpcMapDataUpdate(Connection con, boolean isPodium, Map<Integer, ?> playerNpcData, int value, int worldId, int mapId) {
+   private static void executePlayerNpcMapDataUpdate(EntityManager entityManager, boolean isPodium, Map<Integer, ?> playerNpcData, int value, int worldId, int mapId) {
       if (playerNpcData.containsKey(mapId)) {
          if (isPodium) {
-            PlayerNpcAdministrator.getInstance().setPodium(con, value, worldId, mapId);
+            PlayerNpcAdministrator.getInstance().setPodium(entityManager, value, worldId, mapId);
          } else {
-            PlayerNpcAdministrator.getInstance().setStep(con, value, worldId, mapId);
+            PlayerNpcAdministrator.getInstance().setStep(entityManager, value, worldId, mapId);
          }
       } else {
          if (isPodium) {
-            PlayerNpcAdministrator.getInstance().addPodium(con, value, worldId, mapId);
+            PlayerNpcAdministrator.getInstance().addPodium(entityManager, value, worldId, mapId);
          } else {
-            PlayerNpcAdministrator.getInstance().addStep(con, value, worldId, mapId);
+            PlayerNpcAdministrator.getInstance().addStep(entityManager, value, worldId, mapId);
          }
       }
    }

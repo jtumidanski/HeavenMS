@@ -1,15 +1,13 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import entity.SpecialCashItem;
 import server.CashShop;
 
-public class SpecialCashItemTransformer implements SqlTransformer<CashShop.SpecialCashItem, ResultSet> {
+public class SpecialCashItemTransformer implements SqlTransformer<CashShop.SpecialCashItem, SpecialCashItem> {
    @Override
-   public CashShop.SpecialCashItem transform(ResultSet resultSet) throws SQLException {
-      return new CashShop.SpecialCashItem(resultSet.getInt("sn"),
-            resultSet.getInt("modifier"),
-            resultSet.getByte("info"));
+   public CashShop.SpecialCashItem transform(SpecialCashItem resultSet) {
+      return new CashShop.SpecialCashItem(resultSet.getSn(),
+            resultSet.getModifier(),
+            resultSet.getInfo().byteValue());
    }
 }

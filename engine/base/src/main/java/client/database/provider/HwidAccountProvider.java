@@ -1,7 +1,10 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import tools.Pair;
@@ -19,13 +22,16 @@ public class HwidAccountProvider extends AbstractQueryExecutor {
    private HwidAccountProvider() {
    }
 
-   public List<String> getHwidForAccount(Connection connection, int accountId) {
-      String sql = "SELECT SQL_CACHE hwid FROM hwidaccounts WHERE accountid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), rs -> rs.getString("hwid"));
+   public List<String> getHwidForAccount(EntityManager entityManager, int accountId) {
+      TypedQuery<String> query = entityManager.createQuery("SELECT h.hwid FROM HwidAccount h WHERE h.accountId = :accountId", String.class);
+      query.setParameter("accountId", accountId);
+      return query.getResultList();
    }
 
-   public List<Pair<String, Integer>> getForAccount(Connection connection, int accountId) {
-      String sql = "SELECT SQL_CACHE * FROM hwidaccounts WHERE accountid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), rs -> new Pair<>(rs.getString("hwid"), rs.getInt("relevance")));
+   public List<Pair<String, Integer>> getForAccount(EntityManager entityManager, int accountId) {
+      Query query = entityManager.createQuery("SELECT h.hwid, h.relevance FROM HwidAccount h WHERE h.accountId = :accountId");
+      query.setParameter("accountId", accountId);
+      List<Object[]> results = (List<Object[]>) query.getResultList();
+      return results.stream().map(result -> new Pair<>((String) result[0], (int) result[1])).collect(Collectors.toList());
    }
 }

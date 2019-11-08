@@ -1,7 +1,7 @@
 package client.database.provider;
 
-import java.sql.Connection;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,9 +18,9 @@ public class HwidBanProvider extends AbstractQueryExecutor {
    private HwidBanProvider() {
    }
 
-   public long getHwidBanCount(Connection connection, String hwid) {
-      String sql = "SELECT COUNT(*) FROM hwidbans WHERE hwid LIKE ?";
-      Optional<Long> result = getSingle(connection, sql, ps -> ps.setString(1, hwid), 1);
-      return result.orElse(0L);
+   public long getHwidBanCount(EntityManager entityManager, String hwid) {
+      TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(*) FROM HwidBan h WHERE h.hwid LIKE :hwid", Long.class);
+      query.setParameter("hwid", hwid);
+      return getSingleWithDefault(query, 0L);
    }
 }

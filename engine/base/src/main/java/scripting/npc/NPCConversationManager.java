@@ -560,7 +560,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
          return false;
       }
 
-      MapleParty partyz = getPlayer().getParty().orElseGet(new Supplier<MapleParty>() {
+      MapleParty partyz = getPlayer().getParty().orElseGet(new Supplier<>() {
          @Override
          public MapleParty get() {
             return null;
@@ -608,7 +608,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public boolean isUsingOldPqNpcStyle() {
-      return ServerConstants.USE_OLD_GMS_STYLED_PQ_NPCS && this.getPlayer().getParty() != null;
+      return ServerConstants.USE_OLD_GMS_STYLED_PQ_NPCS && this.getPlayer().getParty().isPresent();
    }
 
    public int[] getAvailableMasteryBooks() {
@@ -735,7 +735,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
          final MapleMap lobbyMap = getPlayer().getMap();
          if (challenger != null) {
-            if (challenger.getParty() == null) {
+            if (challenger.getParty().isEmpty()) {
                throw new RuntimeException("No opponent found!");
             }
 

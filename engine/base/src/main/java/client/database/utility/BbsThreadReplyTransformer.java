@@ -1,19 +1,16 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.BbsThreadReplyData;
+import entity.bbs.BBSReply;
 
-public class BbsThreadReplyTransformer implements SqlTransformer<BbsThreadReplyData, ResultSet> {
+public class BbsThreadReplyTransformer implements SqlTransformer<BbsThreadReplyData, BBSReply> {
    @Override
-   public BbsThreadReplyData transform(ResultSet resultSet) throws SQLException {
+   public BbsThreadReplyData transform(BBSReply bbsReply) {
       return new BbsThreadReplyData(
-            resultSet.getInt("threadId"),
-            resultSet.getInt("replyid"),
-            resultSet.getInt("postercid"),
-            resultSet.getLong("timestamp"),
-            resultSet.getString("content")
-      );
+            bbsReply.getThreadId(),
+            bbsReply.getReplyId(),
+            bbsReply.getPosterId(),
+            bbsReply.getTimestamp(),
+            bbsReply.getContent());
    }
 }

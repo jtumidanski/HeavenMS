@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.MakerReagentData;
@@ -19,9 +20,9 @@ public class MakerReagentProvider extends AbstractQueryExecutor {
    private MakerReagentProvider() {
    }
 
-   public Optional<MakerReagentData> getForItem(Connection connection, int itemId) {
-      String sql = "SELECT stat, value FROM makerreagentdata WHERE itemid = ?";
-      return getNew(connection, sql, ps -> ps.setInt(1, itemId),
-            rs -> new MakerReagentData(rs.getString("stat"), rs.getInt("value")));
+   public Optional<MakerReagentData> getForItem(EntityManager entityManager, int itemId) {
+      TypedQuery<MakerReagentData> query = entityManager.createQuery("SELECT NEW client.database.data.MakerReagentData(m.stat, m.value) FROM MakerReagentData m WHERE m.itemId = :itemId", MakerReagentData.class);
+      query.setParameter("itemId", itemId);
+      return getSingleOptional(query);
    }
 }

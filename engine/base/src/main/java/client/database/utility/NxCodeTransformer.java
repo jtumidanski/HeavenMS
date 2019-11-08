@@ -1,15 +1,13 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.NxCodeData;
+import entity.nx.NxCode;
 
-public class NxCodeTransformer implements SqlTransformer<NxCodeData, ResultSet> {
+public class NxCodeTransformer implements SqlTransformer<NxCodeData, NxCode> {
    @Override
-   public NxCodeData transform(ResultSet resultSet) throws SQLException {
-      return new NxCodeData(resultSet.getString("retriever"),
-            resultSet.getLong("expiration"),
-            resultSet.getInt("id"));
+   public NxCodeData transform(NxCode resultSet) {
+      return new NxCodeData(resultSet.getRetriever(),
+            resultSet.getExpiration(),
+            resultSet.getId());
    }
 }

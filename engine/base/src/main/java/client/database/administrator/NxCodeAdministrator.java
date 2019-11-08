@@ -1,6 +1,8 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 
@@ -17,16 +19,16 @@ public class NxCodeAdministrator extends AbstractQueryExecutor {
    private NxCodeAdministrator() {
    }
 
-   public void setRetriever(Connection connection, int codeId, String name) {
-      String sql = "UPDATE nxcode SET retriever = ? WHERE code = ?";
-      execute(connection, sql, ps -> {
-         ps.setString(1, name);
-         ps.setInt(2, codeId);
-      });
+   public void setRetriever(EntityManager entityManager, int codeId, String name) {
+      Query query = entityManager.createQuery("UPDATE NxCode SET retriever = :retriever WHERE code = :code");
+      query.setParameter("retriever", name);
+      query.setParameter("code", codeId);
+      execute(entityManager, query);
    }
 
-   public void deleteExpired(Connection connection, long time) {
-      String sql = "DELETE FROM nxcode WHERE expiration <= ?";
-      execute(connection, sql, ps -> ps.setLong(1, time));
+   public void deleteExpired(EntityManager entityManager, long time) {
+      Query query = entityManager.createQuery("DELETE FROM NxCode WHERE expiration <= :time");
+      query.setParameter("time", time);
+      execute(entityManager, query);
    }
 }

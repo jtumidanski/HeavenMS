@@ -19,7 +19,6 @@
 package server;
 
 import java.io.File;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
+
+import javax.persistence.EntityManager;
 
 import client.MapleClient;
 import client.database.administrator.StorageAdministrator;
@@ -75,9 +76,9 @@ public class MapleStorage {
       this.meso = meso;
    }
 
-   private static MapleStorage create(Connection connection, int id, int world) {
-      StorageAdministrator.getInstance().create(connection, id, world);
-      Optional<MapleStorage> mapleStorage = StorageProvider.getInstance().getByAccountAndWorld(connection, id, world);
+   private static MapleStorage create(EntityManager entityManager, int id, int world) {
+      StorageAdministrator.getInstance().create(entityManager, id, world);
+      Optional<MapleStorage> mapleStorage = StorageProvider.getInstance().getByAccountAndWorld(entityManager, id, world);
       return mapleStorage.map(MapleStorage::loadItemsForStorage).orElseThrow();
    }
 
@@ -115,8 +116,8 @@ public class MapleStorage {
       }
    }
 
-   public void saveToDB(Connection con) {
-      StorageAdministrator.getInstance().update(con, id, slots, meso);
+   public void saveToDB(EntityManager entityManager) {
+      StorageAdministrator.getInstance().update(entityManager, id, slots, meso);
 
       List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
 
@@ -125,7 +126,7 @@ public class MapleStorage {
          itemsWithType.add(new Pair<>(item, item.inventoryType()));
       }
 
-      ItemFactory.STORAGE.saveItems(itemsWithType, id, con);
+      ItemFactory.STORAGE.saveItems(itemsWithType, id, entityManager);
    }
 
    public Item getItem(byte slot) {

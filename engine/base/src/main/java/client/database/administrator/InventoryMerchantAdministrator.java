@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.InventoryMerchant;
 
 public class InventoryMerchantAdministrator extends AbstractQueryExecutor {
    private static InventoryMerchantAdministrator instance;
@@ -17,17 +20,17 @@ public class InventoryMerchantAdministrator extends AbstractQueryExecutor {
    private InventoryMerchantAdministrator() {
    }
 
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM `inventorymerchant` WHERE `characterid` = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM InventoryMerchant WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int itemId, int characterId, int bundle) {
-      String sql = "INSERT INTO `inventorymerchant` VALUES (DEFAULT, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, itemId);
-         ps.setInt(2, characterId);
-         ps.setInt(3, bundle);
-      });
+   public void create(EntityManager entityManager, int itemId, int characterId, int bundle) {
+      InventoryMerchant inventoryMerchant = new InventoryMerchant();
+      inventoryMerchant.setInventoryItemId(itemId);
+      inventoryMerchant.setCharacterId(characterId);
+      inventoryMerchant.setBundles((short) bundle);
+      insert(entityManager, inventoryMerchant);
    }
 }

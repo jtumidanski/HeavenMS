@@ -1,9 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.NameChange;
 
 public class NameChangeAdministrator extends AbstractQueryExecutor {
    private static NameChangeAdministrator instance;
@@ -18,25 +20,24 @@ public class NameChangeAdministrator extends AbstractQueryExecutor {
    private NameChangeAdministrator() {
    }
 
-   public void markCompleted(Connection connection, int id) {
-      String sql = "UPDATE namechanges SET completionTime = ? WHERE id = ?";
-      execute(connection, sql, ps -> {
-         ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
-         ps.setInt(2, id);
-      });
+   public void markCompleted(EntityManager entityManager, int id) {
+      Query query = entityManager.createQuery("UPDATE NameChange SET completionTime = :time WHERE id = :id");
+      query.setParameter("time", new Timestamp(System.currentTimeMillis()));
+      query.setParameter("id", id);
+      execute(entityManager, query);
    }
 
-   public void cancelPendingNameChange(Connection connection, int characterId) {
-      String sql = "DELETE FROM namechanges WHERE characterid=? AND completionTime IS NULL";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void cancelPendingNameChange(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM NameChange WHERE characterId = :characterId AND completionTime IS NULL");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, String oldName, String newName) {
-      String sql = "INSERT INTO namechanges (characterid, old, new) VALUES (?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setString(2, oldName);
-         ps.setString(3, newName);
-      });
+   public void create(EntityManager entityManager, int characterId, String oldName, String newName) {
+      NameChange nameChange = new NameChange();
+      nameChange.setCharacterId(characterId);
+      nameChange.setOld(oldName);
+      nameChange.setNewName(newName);
+      insert(entityManager, nameChange);
    }
 }

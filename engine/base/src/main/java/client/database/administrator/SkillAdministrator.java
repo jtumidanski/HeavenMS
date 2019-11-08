@@ -1,8 +1,13 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import client.Skill;
 import client.SkillEntry;
@@ -23,38 +28,54 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM skills WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Skill WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void deleteForSkillCharacter(Connection connection, int skillId, int characterId) {
-      String sql = "DELETE FROM skills WHERE skillid = ? AND characterid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, skillId);
-         ps.setInt(2, characterId);
+   public void deleteForSkillCharacter(EntityManager entityManager, int skillId, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Skill WHERE skillId = :skillId AND characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      query.setParameter("skillId", skillId);
+      execute(entityManager, query);
+   }
+
+   public void create(EntityManager entityManager, int characterId, Set<Map.Entry<Skill, SkillEntry>> skills) {
+      List<entity.Skill> skillList = skills.stream().map(data -> {
+         entity.Skill skill = new entity.Skill();
+         skill.setCharacterId(characterId);
+         skill.setSkillId(data.getKey().getId());
+         skill.setSkillLevel((int) data.getValue().skillLevel());
+         skill.setMasterLevel(data.getValue().masterLevel());
+         skill.setExpiration(data.getValue().expiration());
+         return skill;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, skillList);
+   }
+
+   public void replace(EntityManager entityManager, int characterId, Set<Map.Entry<Skill, SkillEntry>> skills) {
+      entityManager.getTransaction().begin();
+
+      skills.forEach(skillEntry -> {
+         entity.Skill skill;
+         TypedQuery<entity.Skill> skillQuery = entityManager.createQuery("FROM Skill WHERE characterId = :characterId AND skillId = :skillId", entity.Skill.class);
+         skillQuery.setParameter("characterId", characterId);
+         skillQuery.setParameter("skillId", skillEntry.getKey().getId());
+         try {
+            skill = skillQuery.getSingleResult();
+         } catch (NoResultException exception) {
+            skill = new entity.Skill();
+            skill.setCharacterId(characterId);
+            skill.setSkillId(skillEntry.getKey().getId());
+         }
+
+         skill.setSkillLevel((int) skillEntry.getValue().skillLevel());
+         skill.setMasterLevel(skillEntry.getValue().masterLevel());
+         skill.setExpiration(skillEntry.getValue().expiration());
+         entityManager.persist(skill);
       });
-   }
 
-   public void create(Connection connection, int characterId, Set<Map .Entry<Skill, SkillEntry>> skills) {
-      String sql = "INSERT INTO skills (characterid, skillid, skilllevel, masterlevel, expiration) VALUES (?, ?, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.getKey().getId());
-         ps.setInt(3, data.getValue().skillLevel());
-         ps.setInt(4, data.getValue().masterLevel());
-         ps.setLong(5, data.getValue().expiration());
-      }, skills);
-   }
-
-   public void replace(Connection connection, int characterId, Set<Map .Entry<Skill, SkillEntry>> skills) {
-      String sql = "REPLACE INTO skills (characterid, skillid, skilllevel, masterlevel, expiration) VALUES (?, ?, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.getKey().getId());
-         ps.setInt(3, data.getValue().skillLevel());
-         ps.setInt(4, data.getValue().masterLevel());
-         ps.setLong(5, data.getValue().expiration());
-      }, skills);
+      entityManager.getTransaction().commit();
    }
 }

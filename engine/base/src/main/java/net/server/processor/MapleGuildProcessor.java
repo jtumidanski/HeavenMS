@@ -118,7 +118,7 @@ public class MapleGuildProcessor {
 
       MapleMatchCheckerCoordinator mmce = guildLeader.getWorldServer().getMatchCheckerCoordinator();
       for (MapleCharacter chr : guildLeader.getMap().getAllPlayers()) {
-         if (chr.getParty() == null && chr.getGuild().isEmpty() && mmce.getMatchConfirmationLeaderid(chr.getId()) == -1) {
+         if (chr.getParty().isEmpty() && chr.getGuild().isEmpty() && mmce.getMatchConfirmationLeaderid(chr.getId()) == -1) {
             guildMembers.add(chr);
          }
       }

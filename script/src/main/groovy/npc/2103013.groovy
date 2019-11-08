@@ -96,20 +96,20 @@ class NPC2103013 {
             } else if (selected == 1) {
                String pqMode = "EASY"
                //Finish this
-               MapleParty pqparty = cm.getPlayer().getParty()
+               Optional<MapleParty> pqparty = cm.getPlayer().getParty()
                if (party == 1) {
-                  if (pqparty == null) {
+                  if (pqparty.isEmpty()) {
                      cm.sendOk("Create a fucking party faggot.")//BE NICE
                      cm.dispose()
                      return
                   } else {
-                     if (pqparty.getMembers().size() < 2) {
+                     if (pqparty.get().getMembers().size() < 2) {
                         cm.sendOk("Get more members...")
                         cm.dispose()
                         return
                      } else {
                         int i = 0
-                        for (MaplePartyCharacter pqchar : pqparty.getMembers()) {
+                        for (MaplePartyCharacter pqchar : pqparty.get().getMembers()) {
                            if (i > 1) {
                               break
                            }

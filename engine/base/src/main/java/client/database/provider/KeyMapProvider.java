@@ -1,11 +1,11 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.KeyMapData;
-import client.database.utility.KeyMapTransformer;
 
 public class KeyMapProvider extends AbstractQueryExecutor {
    private static KeyMapProvider instance;
@@ -20,9 +20,9 @@ public class KeyMapProvider extends AbstractQueryExecutor {
    private KeyMapProvider() {
    }
 
-   public List<KeyMapData> getForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT `key`,`type`,`action` FROM keymap WHERE characterid = ?";
-      KeyMapTransformer transformer = new KeyMapTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public List<KeyMapData> getForCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<KeyMapData> query = entityManager.createQuery("SELECT NEW client.database.data.KeyMapData(k.key, k.type, k.action) FROM KeyMap k WHERE k.characterId = :characterId", KeyMapData.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 }

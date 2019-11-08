@@ -139,18 +139,18 @@ class NPC9000037 {
                cm.dispose()
             } else {
                if (selection == 0) {
-                  if (cm.getParty() == null) {
+                  if (cm.getParty().isEmpty()) {
                      cm.sendOk("You can participate in the party quest only if you are in a party.")
                      cm.dispose()
                   } else if (!cm.isLeader()) {
                      cm.sendOk("Your party leader must talk to me to start this party quest.")
                      cm.dispose()
                   } else {
-                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                      if (eli.size() > 0) {
                         int lobby = detectTeamLobby(eli), i
                         for (i = lobby; i < 8; i++) {
-                           if (em.startInstance(i, cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                           if (em.startInstance(i, cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                               break
                            }
                         }

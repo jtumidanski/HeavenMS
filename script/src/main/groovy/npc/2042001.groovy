@@ -189,7 +189,7 @@ class NPC2042001 {
                   status = 10
                   cm.sendOk("If you want to start the battle, let the #bParty Leader#k talk to me.")
                } else {
-                  MaplePartyCharacter[] party = cm.getParty().getMembers()
+                  MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                   int inMap = cm.partyMembersInMap()
                   int lvlOk = 0
                   int isOutMap = 0
@@ -229,7 +229,7 @@ class NPC2042001 {
                      cm.dispose()
                   }
                } else {
-                  MaplePartyCharacter[] party = cm.getParty().getMembers()
+                  MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                   if ((selection >= 0 && selection <= 3) && party.size() < (ServerConstants.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 2)) {
                      cm.sendOk("You need at least 2 players to participate in the battle!")
                   } else if ((selection >= 4 && selection <= 5) && party.size() < (ServerConstants.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 3)) {

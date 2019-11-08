@@ -19,10 +19,10 @@
 */
 package client;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import javax.persistence.EntityManager;
 
 import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.FamilyCharacterAdministrator;
@@ -104,25 +104,23 @@ public class MapleFamilyEntry {
       Server.getInstance().getWorld(oldFamily.getWorld()).removeFamily(oldFamily.getID());
 
       //db
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         connection.setAutoCommit(false);
-         boolean success = updateDBChangeFamily(connection, getChrId(), newFamily.getID(), senior.getChrId());
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
+         boolean success = updateDBChangeFamily(entityManager, getChrId(), newFamily.getID(), senior.getChrId());
          for (MapleFamilyEntry junior : juniors) { // better to duplicate this than the SQL code
             if (junior != null) {
-               success = junior.updateNewFamilyDB(connection); // recursively updates juniors in db
+               success = junior.updateNewFamilyDB(entityManager); // recursively updates juniors in db
                if (!success) {
                   break;
                }
             }
          }
          if (!success) {
-            connection.rollback();
+            entityManager.getTransaction().rollback();
             FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Could not absorb " + oldFamily.getName() + " family into " + newFamily.getName() + " family. (SQL ERROR)");
          } else {
-            connection.commit();
+            entityManager.getTransaction().commit();
          }
-         connection.setAutoCommit(true);
-
       });
    }
 
@@ -148,29 +146,28 @@ public class MapleFamilyEntry {
       doFullCount(); //to make sure all counts are correct
       // update db
 
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         connection.setAutoCommit(false);
-         boolean success = updateDBChangeFamily(connection, getChrId(), getFamily().getID(), 0);
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
+         boolean success = updateDBChangeFamily(entityManager, getChrId(), getFamily().getID(), 0);
 
          for (MapleFamilyEntry junior : juniors) { // better to duplicate this than the SQL code
             if (junior != null) {
-               success = junior.updateNewFamilyDB(connection); // recursively updates juniors in db
+               success = junior.updateNewFamilyDB(entityManager); // recursively updates juniors in db
                if (!success) {
                   break;
                }
             }
          }
          if (!success) {
-            connection.rollback();
+            entityManager.getTransaction().rollback();
             FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Could not fork family with new leader " + getName() + ". (Old senior : " + oldSenior.getName() + ", leader :" + oldFamily.getLeader().getName() + ")");
          } else {
-            connection.commit();
+            entityManager.getTransaction().commit();
          }
-         connection.setAutoCommit(true);
       });
    }
 
-   private synchronized boolean updateNewFamilyDB(Connection con) {
+   private synchronized boolean updateNewFamilyDB(EntityManager con) {
       if (!updateFamilyEntryDB(con, getChrId(), getFamily().getID())) {
          return false;
       }
@@ -188,7 +185,7 @@ public class MapleFamilyEntry {
       return true;
    }
 
-   private static boolean updateFamilyEntryDB(Connection con, int cid, int familyid) {
+   private static boolean updateFamilyEntryDB(EntityManager con, int cid, int familyid) {
       FamilyCharacterAdministrator.getInstance().setFamilyForCharacter(con, cid, familyid);
       return true;
    }
@@ -364,16 +361,16 @@ public class MapleFamilyEntry {
       return false;
    }
 
-   private static boolean updateDBChangeFamily(int cid, int familyid, int seniorid) {
+   private boolean updateDBChangeFamily(int cid, int familyid, int seniorid) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyid, seniorid)).orElse(false);
    }
 
-   private static boolean updateDBChangeFamily(Connection con, int cid, int familyid, int seniorid) {
+   private boolean updateDBChangeFamily(EntityManager con, int cid, int familyid, int seniorid) {
       FamilyCharacterAdministrator.getInstance().changeFamily(con, cid, familyid, seniorid);
       return updateCharacterFamilyDB(con, cid, familyid, false);
    }
 
-   private static boolean updateCharacterFamilyDB(Connection con, int charid, int familyid, boolean fork) {
+   private boolean updateCharacterFamilyDB(EntityManager con, int charid, int familyid, boolean fork) {
       CharacterAdministrator.getInstance().setFamilyId(con, charid, familyid);
       return true;
    }
@@ -554,11 +551,11 @@ public class MapleFamilyEntry {
       return true;
    }
 
-   public boolean saveReputation(Connection con) {
+   public boolean saveReputation(EntityManager entityManager) {
       if (!repChanged) {
          return true;
       }
-      FamilyCharacterAdministrator.getInstance().updateMember(con, getChrId(), getReputation(), getTodaysRep(), getTotalReputation(), getRepsToSenior());
+      FamilyCharacterAdministrator.getInstance().updateMember(entityManager, getChrId(), getReputation(), getTodaysRep(), getTotalReputation(), getRepsToSenior());
       return true;
    }
 

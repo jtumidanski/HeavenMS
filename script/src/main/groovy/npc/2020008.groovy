@@ -22,7 +22,7 @@ class NPC2020008 {
 
    def start() {
       if (cm.isQuestStarted(6192)) {
-         if (cm.getParty() == null) {
+         if (cm.getParty().isEmpty()) {
             cm.sendOk("Form a party to start this instance.")
             cm.dispose()
             return
@@ -35,9 +35,9 @@ class NPC2020008 {
             return
          }
 
-         MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+         MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
          if (eli.size() > 0) {
-            if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+            if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                cm.sendOk("Another party is already challenging this instance. Please try another channel, or wait for the current party to finish.")
             }
          } else {

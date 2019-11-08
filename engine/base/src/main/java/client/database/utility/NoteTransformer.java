@@ -1,19 +1,17 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.NoteData;
+import entity.Note;
 
-public class NoteTransformer implements SqlTransformer<NoteData, ResultSet> {
+public class NoteTransformer implements SqlTransformer<NoteData, Note> {
    @Override
-   public NoteData transform(ResultSet resultSet) throws SQLException {
+   public NoteData transform(Note resultSet) {
       return new NoteData(
-            resultSet.getInt("id"),
-            resultSet.getString("from"),
-            resultSet.getString("message"),
-            resultSet.getLong("timestamp"),
-            resultSet.getByte("fame")
+            resultSet.getId(),
+            resultSet.getNoteFrom(),
+            resultSet.getMessage(),
+            resultSet.getTimestamp(),
+            resultSet.getFame()
       );
    }
 }

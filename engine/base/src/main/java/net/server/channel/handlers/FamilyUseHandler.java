@@ -21,6 +21,8 @@
 */
 package net.server.channel.handlers;
 
+import java.util.Optional;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamilyEntitlement;
@@ -60,19 +62,19 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
          return; // shouldn't even be able to request it
       }
       PacketCreator.announce(client, new GetFamilyInfo(entry));
-      MapleCharacter victim;
+      Optional<MapleCharacter> victim;
       if (type == MapleFamilyEntitlement.FAMILY_REUINION || type == MapleFamilyEntitlement.SUMMON_FAMILY) {
-         victim = client.getChannelServer().getPlayerStorage().getCharacterByName(packet.characterName()).get();
-         if (victim != null && victim != client.getPlayer()) {
-            if (victim.getFamily() == client.getPlayer().getFamily()) {
-               MapleMap targetMap = victim.getMap();
+         victim = client.getChannelServer().getPlayerStorage().getCharacterByName(packet.characterName());
+         if (victim.isPresent() && victim.get() != client.getPlayer()) {
+            if (victim.get().getFamily() == client.getPlayer().getFamily()) {
+               MapleMap targetMap = victim.get().getMap();
                MapleMap ownMap = client.getPlayer().getMap();
                if (targetMap != null) {
                   if (type == MapleFamilyEntitlement.FAMILY_REUINION) {
                      if (!FieldLimit.CANNOTMIGRATE.check(ownMap.getFieldLimit()) && !FieldLimit.CANNOTVIPROCK.check(targetMap.getFieldLimit())
                            && (targetMap.getForcedReturnId() == 999999999 || targetMap.getId() < 100000000) && targetMap.getEventInstance() == null) {
 
-                        client.getPlayer().changeMap(victim.getMap(), victim.getMap().getPortal(0));
+                        client.getPlayer().changeMap(victim.get().getMap(), victim.get().getMap().getPortal(0));
                         useEntitlement(entry, type);
                      } else {
                         PacketCreator.announce(client, new FamilyMessage(75, 0)); // wrong message, but close enough. (client should check this first anyway)
@@ -81,12 +83,12 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
                      if (!FieldLimit.CANNOTMIGRATE.check(targetMap.getFieldLimit()) && !FieldLimit.CANNOTVIPROCK.check(ownMap.getFieldLimit())
                            && (ownMap.getForcedReturnId() == 999999999 || ownMap.getId() < 100000000) && ownMap.getEventInstance() == null) {
 
-                        if (MapleInviteCoordinator.hasInvite(InviteType.FAMILY_SUMMON, victim.getId())) {
+                        if (MapleInviteCoordinator.hasInvite(InviteType.FAMILY_SUMMON, victim.get().getId())) {
                            PacketCreator.announce(client, new FamilyMessage(74, 0));
                            return;
                         }
-                        MapleInviteCoordinator.createInvite(InviteType.FAMILY_SUMMON, client.getPlayer(), victim, victim.getId(), client.getPlayer().getMap());
-                        PacketCreator.announce(victim, new FamilySummonRequest(client.getPlayer().getFamily().getName(), client.getPlayer().getName()));
+                        MapleInviteCoordinator.createInvite(InviteType.FAMILY_SUMMON, client.getPlayer(), victim.get(), victim.get().getId(), client.getPlayer().getMap());
+                        PacketCreator.announce(victim.get(), new FamilySummonRequest(client.getPlayer().getFamily().getName(), client.getPlayer().getName()));
                         useEntitlement(entry, type);
                      } else {
                         PacketCreator.announce(client, new FamilyMessage(75, 0));

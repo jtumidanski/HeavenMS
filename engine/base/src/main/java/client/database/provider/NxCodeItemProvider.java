@@ -1,11 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.NxCodeItemData;
 import client.database.utility.NxCodeItemTransformer;
+import entity.nx.NxCodeItem;
 
 public class NxCodeItemProvider extends AbstractQueryExecutor {
    private static NxCodeItemProvider instance;
@@ -20,9 +22,9 @@ public class NxCodeItemProvider extends AbstractQueryExecutor {
    private NxCodeItemProvider() {
    }
 
-   public List<NxCodeItemData> get(Connection connection, int codeId) {
-      String sql = "SELECT * FROM nxcode_items WHERE codeid = ?";
-      NxCodeItemTransformer transformer = new NxCodeItemTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, codeId), transformer::transform);
+   public List<NxCodeItemData> get(EntityManager entityManager, int codeId) {
+      TypedQuery<NxCodeItem> query = entityManager.createQuery("FROM NxCodeItem n WHERE n.codeId = :codeId", NxCodeItem.class);
+      query.setParameter("codeId", codeId);
+      return getResultList(query, new NxCodeItemTransformer());
    }
 }

@@ -1,9 +1,10 @@
 package client.database.provider;
 
-import java.sql.Connection;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
+import entity.boss.BossType;
 
 public class BossLogDailyProvider extends AbstractQueryExecutor {
    private static BossLogDailyProvider instance;
@@ -18,12 +19,10 @@ public class BossLogDailyProvider extends AbstractQueryExecutor {
    private BossLogDailyProvider() {
    }
 
-   public long countEntriesForCharacter(Connection connection, int characterId, String type) {
-      String sql = "SELECT COUNT(*) FROM bosslog_daily WHERE characterid = ? AND bosstype LIKE ?";
-      Optional<Long> result = getSingle(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setString(2, type);
-      }, 1);
-      return result.orElse(-1L);
+   public long countEntriesForCharacter(EntityManager entityManager, int characterId, String type) {
+      TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(*) FROM BossLogDaily b WHERE b.characterId = :characterId AND b.bossType = :bossType", Long.class);
+      query.setParameter("characterId", characterId);
+      query.setParameter("bossType", BossType.valueOf(type));
+      return getSingleWithDefault(query, -1L);
    }
 }

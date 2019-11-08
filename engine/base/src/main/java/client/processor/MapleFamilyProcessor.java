@@ -1,10 +1,11 @@
 package client.processor;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleFamily;
@@ -124,22 +125,21 @@ public class MapleFamilyProcessor {
    }
 
    public void saveAllMembersRep(MapleFamily mapleFamily) { //was used for autosave worker, but character autosave should be enough
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         connection.setAutoCommit(false);
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
          boolean success = true;
          for (MapleFamilyEntry entry : mapleFamily.getMembers()) {
-            success = entry.saveReputation(connection);
+            success = entry.saveReputation(entityManager);
             if (!success) {
                break;
             }
          }
          if (!success) {
-            connection.rollback();
+            entityManager.getTransaction().rollback();
             FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Family rep autosave failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime().toString() + ".");
          } else {
-            connection.commit();
+            entityManager.getTransaction().commit();
          }
-         connection.setAutoCommit(true);
          //reset repChanged after successful save
          for (MapleFamilyEntry entry : mapleFamily.getMembers()) {
             entry.savedSuccessfully();
@@ -154,19 +154,19 @@ public class MapleFamilyProcessor {
       }
    }
 
-   public void saveCharactersFamilyReputation(Connection connection, MapleFamilyEntry familyEntry) {
+   public void saveCharactersFamilyReputation(EntityManager entityManager, MapleFamilyEntry familyEntry) {
       if (familyEntry != null) {
-         if (familyEntry.saveReputation(connection)) {
+         if (familyEntry.saveReputation(entityManager)) {
             familyEntry.savedSuccessfully();
          }
          MapleFamilyEntry senior = familyEntry.getSenior();
          if (senior != null && senior.getChr() == null) { //only save for offline family members
-            if (senior.saveReputation(connection)) {
+            if (senior.saveReputation(entityManager)) {
                senior.savedSuccessfully();
             }
             senior = senior.getSenior(); //save one level up as well
             if (senior != null && senior.getChr() == null) {
-               if (senior.saveReputation(connection)) {
+               if (senior.saveReputation(entityManager)) {
                   senior.savedSuccessfully();
                }
             }

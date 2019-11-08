@@ -1,16 +1,17 @@
 package client.database.provider;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
-import client.database.utility.EquipFromResultSetTransformer;
-import client.inventory.BetterItemFactory;
+import client.database.data.GetInventoryItems;
+import client.database.utility.InventoryEquipTransformer;
+import client.database.utility.InventoryItemTransformer;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import client.processor.ItemProcessor;
 import tools.Pair;
 
 public class InventoryItemProvider extends AbstractQueryExecutor {
@@ -26,88 +27,136 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
    private InventoryItemProvider() {
    }
 
-   public List<Pair<Item, MapleInventoryType>> getItemsByCharacterAndType(Connection connection, int characterId, int type, boolean loggedIn) {
-      String sql = constructGetItemsByQuery(false, loggedIn);
-      return getListNew(connection, sql, ps -> {
-         ps.setInt(1, type);
-         ps.setInt(2, characterId);
-      }, this::processGetItemsByTypeResults);
+   public List<Pair<Item, MapleInventoryType>> getItemsByCharacterAndType(EntityManager entityManager, int characterId, int type, boolean loggedIn) {
+      TypedQuery<GetInventoryItems> query;
+      if (loggedIn) {
+         query = entityManager.createQuery(
+               "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                     "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                     "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                     "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
+                     "WHERE ii.type = :type AND ii.characterId = :characterId AND ii.inventoryType = :inventoryType", GetInventoryItems.class);
+         query.setParameter("type", type);
+         query.setParameter("characterId", characterId);
+         query.setParameter("inventoryType", MapleInventoryType.EQUIPPED.getType());
+      } else {
+         query = entityManager.createQuery(
+               "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                     "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                     "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                     "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
+                     "WHERE ii.type = :type AND ii.characterId = :characterId", GetInventoryItems.class);
+         query.setParameter("type", type);
+         query.setParameter("characterId", characterId);
+      }
+      return getResultList(query, new InventoryItemTransformer());
    }
 
-   public List<Pair<Item, MapleInventoryType>> getItemsByAccountAndType(Connection connection, int accountId, int type, boolean loggedIn) {
-      String sql = constructGetItemsByQuery(true, loggedIn);
-      return getListNew(connection, sql, ps -> {
-         ps.setInt(1, type);
-         ps.setInt(2, accountId);
-      }, this::processGetItemsByTypeResults);
+   public List<Pair<Item, MapleInventoryType>> getItemsByAccountAndType(EntityManager entityManager, int accountId, int type, boolean loggedIn) {
+      TypedQuery<GetInventoryItems> query;
+      if (loggedIn) {
+         query = entityManager.createQuery(
+               "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                     "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                     "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                     "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
+                     "WHERE ii.type = :type AND ii.accountId = :accountId AND ii.inventoryType = :inventoryType", GetInventoryItems.class);
+         query.setParameter("type", type);
+         query.setParameter("accountId", accountId);
+         query.setParameter("inventoryType", MapleInventoryType.EQUIPPED.getType());
+      } else {
+         query = entityManager.createQuery(
+               "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                     "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                     "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                     "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                     "FROM InventoryItem ii LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryItemId " +
+                     "WHERE ii.type = :type AND ii.accountId = :accountId", GetInventoryItems.class);
+         query.setParameter("type", type);
+         query.setParameter("accountId", accountId);
+      }
+      return getResultList(query, new InventoryItemTransformer());
    }
 
-   public List<Pair<Item, Integer>> getEquipsByCharacter(Connection connection, int characterId, boolean loggedIn) {
-      String sql = constructGetEquipsByQuery(false, loggedIn);
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), this::processGetEquipsByTypeResults);
+   public List<Pair<Item, Integer>> getEquipsByCharacter(EntityManager entityManager, int characterId, boolean loggedIn) {
+      TypedQuery<GetInventoryItems> query = constructGetEquipsByQuery(entityManager, false, loggedIn, characterId);
+      return getResultList(query, new InventoryEquipTransformer());
    }
 
-   public List<Pair<Item, Integer>> getEquipsByAccount(Connection connection, int accountId, boolean loggedIn) {
-      String sql = constructGetEquipsByQuery(true, loggedIn);
-      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), this::processGetEquipsByTypeResults);
+   public List<Pair<Item, Integer>> getEquipsByAccount(EntityManager entityManager, int accountId, boolean loggedIn) {
+      TypedQuery<GetInventoryItems> query = constructGetEquipsByQuery(entityManager, true, loggedIn, accountId);
+      return getResultList(query, new InventoryEquipTransformer());
    }
 
-   private Pair<Item, Integer> processGetEquipsByTypeResults(ResultSet rs) throws SQLException {
-      EquipFromResultSetTransformer equipTransformer = new EquipFromResultSetTransformer();
-      Integer cid = rs.getInt("characterid");
-      return new Pair<>(equipTransformer.transform(rs), cid);
-   }
-
-   private Pair<Item, MapleInventoryType> processGetItemsByTypeResults(ResultSet resultSet) throws SQLException {
-      EquipFromResultSetTransformer equipTransformer = new EquipFromResultSetTransformer();
-
-      MapleInventoryType inventoryType = MapleInventoryType.getByType(resultSet.getByte("inventorytype"));
-      if (inventoryType != null) {
-         if (inventoryType.equals(MapleInventoryType.EQUIP) || inventoryType.equals(MapleInventoryType.EQUIPPED)) {
-            return new Pair<>(equipTransformer.transform(resultSet), inventoryType);
+   private TypedQuery<GetInventoryItems> constructGetEquipsByQuery(EntityManager entityManager, boolean account, boolean loggedIn, int id) {
+      TypedQuery<GetInventoryItems> query;
+      if (account) {
+         if (loggedIn) {
+            query = entityManager.createQuery(
+                  "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                        "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                        "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                        "FROM InventoryItem ii " +
+                        "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryEquipmentId " +
+                        "LEFT JOIN Character c ON c.id = ii.characterId " +
+                        "WHERE c.accountId = :accountId AND ii.inventoryType = :type", GetInventoryItems.class);
+            query.setParameter("accountId", id);
+            query.setParameter("type", MapleInventoryType.EQUIPPED.getType());
          } else {
-            Item item = BetterItemFactory.getInstance().create(resultSet.getInt("itemid"), (byte) resultSet.getInt("position"),
-                  (short) resultSet.getInt("quantity"), resultSet.getInt("petid"));
-            item.owner_$eq(resultSet.getString("owner"));
-            item.expiration_(resultSet.getLong("expiration"));
-            item.giftFrom_$eq(resultSet.getString("giftFrom"));
-            ItemProcessor.getInstance().setFlag(item, (short) resultSet.getInt("flag"));
-            return new Pair<>(item, inventoryType);
+            query = entityManager.createQuery(
+                  "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                        "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                        "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                        "FROM InventoryItem ii " +
+                        "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryEquipmentId " +
+                        "LEFT JOIN Character c ON c.id = ii.characterId " +
+                        "WHERE c.accountId = :accountId", GetInventoryItems.class);
+            query.setParameter("accountId", id);
+         }
+      } else {
+         if (loggedIn) {
+            query = entityManager.createQuery(
+                  "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                        "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                        "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                        "FROM InventoryItem ii " +
+                        "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryEquipmentId " +
+                        "LEFT JOIN Character c ON c.id = ii.characterId " +
+                        "WHERE c.id = :characterId AND ii.inventoryType = :type", GetInventoryItems.class);
+            query.setParameter("characterId", id);
+            query.setParameter("type", MapleInventoryType.EQUIPPED.getType());
+         } else {
+            query = entityManager.createQuery(
+                  "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
+                        "ii.petId, ii.owner, ii.expiration, ii.giftFrom, ii.flag, ie.acc, ie.avoid, ie.dex, ie.hands, ie.hp, " +
+                        "ie.intelligence, ie.jump, ie.vicious, ie.luk, ie.matk, ie.mdef, ie.mp, ie.speed, ie.str, ie.watk, " +
+                        "ie.wdef, ie.upgradeSlots, ie.level, ie.itemExp, ie.itemLevel, ie.ringId, ii.characterId) " +
+                        "FROM InventoryItem ii " +
+                        "LEFT JOIN InventoryEquipment ie ON ii.inventoryItemId = ie.inventoryEquipmentId " +
+                        "LEFT JOIN Character c ON c.id = ii.characterId " +
+                        "WHERE c.id = :characterId", GetInventoryItems.class);
+            query.setParameter("characterId", id);
          }
       }
-      return null;
+      return query;
    }
 
-   private String constructGetItemsByQuery(boolean account, boolean loggedIn) {
-      StringBuilder query = new StringBuilder();
-      query.append("SELECT * FROM `inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`) WHERE `type` = ? AND `");
-      query.append(account ? "accountid" : "characterid").append("` = ?");
-
-      if (loggedIn) {
-         query.append(" AND `inventorytype` = ").append(MapleInventoryType.EQUIPPED.getType());
-      }
-      return query.toString();
+   public List<Integer> getPetsForCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT i.petId FROM InventoryItem i WHERE i.characterId = :characterId AND i.petId > -1", Integer.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 
-   private String constructGetEquipsByQuery(boolean account, boolean loggedIn) {
-      return "SELECT * FROM " +
-            "(SELECT id, accountid FROM characters) AS accountterm " +
-            "RIGHT JOIN " +
-            "(SELECT * FROM (`inventoryitems` LEFT JOIN `inventoryequipment` USING(`inventoryitemid`))) AS equipterm" +
-            " ON accountterm.id=equipterm.characterid " +
-            "WHERE accountterm.`" +
-            (account ? "accountid" : "characterid") +
-            "` = ?" +
-            (loggedIn ? " AND `inventorytype` = " + MapleInventoryType.EQUIPPED.getType() : "");
-   }
-
-   public List<Integer> getPetsForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT petid FROM inventoryitems WHERE characterid = ? AND petid > -1";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt(1));
-   }
-
-   public List<Pair<Integer, Integer>> get(Connection connection, int characterId) {
-      String sql = "SELECT inventoryitemid, petid FROM inventoryitems WHERE characterid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new Pair<>(rs.getInt("inventoryitemid"), rs.getInt("petid")));
+   public List<Pair<Integer, Integer>> get(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("SELECT i.inventoryItemId, i.petId FROM InventoryItem i WHERE i.characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      List<Object[]> results = (List<Object[]>) query.getResultList();
+      return results.stream().map(result -> new Pair<>((int) result[0], (int) result[1])).collect(Collectors.toList());
    }
 }

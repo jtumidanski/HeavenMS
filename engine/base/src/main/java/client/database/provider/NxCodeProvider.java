@@ -1,12 +1,14 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.NxCodeData;
 import client.database.utility.NxCodeTransformer;
+import entity.nx.NxCode;
 
 public class NxCodeProvider extends AbstractQueryExecutor {
    private static NxCodeProvider instance;
@@ -21,14 +23,15 @@ public class NxCodeProvider extends AbstractQueryExecutor {
    private NxCodeProvider() {
    }
 
-   public Optional<NxCodeData> get(Connection connection, String code) {
-      String sql = "SELECT * FROM nxcode WHERE code = ?";
-      NxCodeTransformer transformer = new NxCodeTransformer();
-      return getNew(connection, sql, ps -> ps.setString(1, code), transformer::transform);
+   public Optional<NxCodeData> get(EntityManager entityManager, String code) {
+      TypedQuery<NxCode> query = entityManager.createQuery("FROM NxCode n WHERE n.code = :code", NxCode.class);
+      query.setParameter("code", code);
+      return getSingleOptional(query, new NxCodeTransformer());
    }
 
-   public List<Integer> getExpiredCodes(Connection connection, long time) {
-      String sql = "SELECT * FROM nxcode WHERE expiration <= ?";
-      return getListNew(connection, sql, ps -> ps.setLong(1, time), rs -> rs.getInt("id"));
+   public List<Integer> getExpiredCodes(EntityManager entityManager, long time) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT n.id FROM NxCode n WHERE n.expiration <= :time", Integer.class);
+      query.setParameter("time", time);
+      return query.getResultList();
    }
 }

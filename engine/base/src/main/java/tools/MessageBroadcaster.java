@@ -14,7 +14,6 @@ import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
-import net.server.guild.MapleGuildCharacter;
 import server.maps.MapleMap;
 import tools.packet.message.ServerNotice;
 

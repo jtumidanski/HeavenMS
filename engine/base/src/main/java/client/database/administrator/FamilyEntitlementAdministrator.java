@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.family.FamilyEntitlement;
 
 public class FamilyEntitlementAdministrator extends AbstractQueryExecutor {
    private static FamilyEntitlementAdministrator instance;
@@ -17,25 +20,24 @@ public class FamilyEntitlementAdministrator extends AbstractQueryExecutor {
    private FamilyEntitlementAdministrator() {
    }
 
-   public void deleteByCharacterAndId(Connection connection, int characterId, int entitlementId) {
-      String sql = "DELETE FROM family_entitlement WHERE entitlementid = ? AND charid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, entitlementId);
-         ps.setInt(2, characterId);
-      });
+   public void deleteByCharacterAndId(EntityManager entityManager, int characterId, int entitlementId) {
+      Query query = entityManager.createQuery("DELETE FROM FamilyEntitlement WHERE entitlementId = :entitlementId AND characterId = :characterId");
+      query.setParameter("entitlementId", entitlementId);
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int entitlementId, int characterId) {
-      String sql = "INSERT INTO family_entitlement (entitlementid, charid, timestamp) VALUES (?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, entitlementId);
-         ps.setInt(2, characterId);
-         ps.setLong(3, System.currentTimeMillis());
-      });
+   public void create(EntityManager entityManager, int entitlementId, int characterId) {
+      FamilyEntitlement familyEntitlement = new FamilyEntitlement();
+      familyEntitlement.setEntitlementId(entitlementId);
+      familyEntitlement.setCharacterId(characterId);
+      familyEntitlement.setTimestamp(System.currentTimeMillis());
+      insert(entityManager, familyEntitlement);
    }
 
-   public void deleteOlderThan(Connection connection, long time) {
-      String sql = "DELETE FROM family_entitlement WHERE timestamp <= ?";
-      execute(connection, sql, ps -> ps.setLong(1, time));
+   public void deleteOlderThan(EntityManager entityManager, long time) {
+      Query query = entityManager.createQuery("DELETE FROM FamilyEntitlement WHERE timestamp <= :time");
+      query.setParameter("time", time);
+      execute(entityManager, query);
    }
 }

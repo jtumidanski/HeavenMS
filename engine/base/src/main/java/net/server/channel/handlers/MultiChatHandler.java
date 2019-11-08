@@ -60,7 +60,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
       World world = client.getWorldServer();
       if (packet.theType() == 0) {
          buddyChat(packet, client, player, world);
-      } else if (packet.theType() == 1 && player.getParty() != null) {
+      } else if (packet.theType() == 1 && player.getParty().isPresent()) {
          partyChat(packet, client, player, world);
       } else if (packet.theType() == 2 && player.getGuildId() > 0) {
          guildChat(packet, client, player);

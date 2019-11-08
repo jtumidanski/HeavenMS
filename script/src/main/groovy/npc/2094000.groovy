@@ -51,16 +51,16 @@ class NPC2094000 {
             cm.sendSimple("#e#b<Party Quest: Pirate Ship>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nHelp! My son has been kidnapped and is bound on the hands of the fearful #rLord Pirate#k. I need your help... Would you please assemble or join a team to save him? Have your #bparty leader#k talk to me or make yourself a party.#b\r\n#L0#I want to participate in the party quest.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.")
          } else if (status == 1) {
             if (selection == 0) {
-               if (cm.getParty() == null) {
+               if (cm.getParty().isEmpty()) {
                   cm.sendOk("You can participate in the party quest only if you are in a party.")
                   cm.dispose()
                } else if (!cm.isLeader()) {
                   cm.sendOk("Your party leader must talk to me to start this party quest.")
                   cm.dispose()
                } else {
-                  MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+                  MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                   if (eli.size() > 0) {
-                     if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                     if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                         cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
                      }
                   } else {

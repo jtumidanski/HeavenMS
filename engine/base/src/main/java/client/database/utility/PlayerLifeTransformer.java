@@ -1,26 +1,24 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.PlayerLifeData;
+import entity.PLife;
 
-public class PlayerLifeTransformer implements SqlTransformer<PlayerLifeData, ResultSet> {
+public class PlayerLifeTransformer implements SqlTransformer<PlayerLifeData, PLife> {
    @Override
-   public PlayerLifeData transform(ResultSet resultSet) throws SQLException {
+   public PlayerLifeData transform(PLife resultSet) {
       return new PlayerLifeData(
-            resultSet.getInt("life"),
-            resultSet.getString("type"),
-            resultSet.getInt("cy"),
-            resultSet.getInt("f"),
-            resultSet.getInt("fh"),
-            resultSet.getInt("rx0"),
-            resultSet.getInt("rx1"),
-            resultSet.getInt("x"),
-            resultSet.getInt("y"),
-            resultSet.getInt("hide"),
-            resultSet.getInt("mobtime"),
-            resultSet.getInt("team")
+            resultSet.getLife(),
+            resultSet.getType(),
+            resultSet.getCy(),
+            resultSet.getF(),
+            resultSet.getFh(),
+            resultSet.getRx0(),
+            resultSet.getRx1(),
+            resultSet.getX(),
+            resultSet.getY(),
+            resultSet.getHide(),
+            resultSet.getMobTime(),
+            resultSet.getTeam()
       );
    }
 }

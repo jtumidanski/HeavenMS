@@ -52,16 +52,16 @@ class NPC1012112 {
                cm.sendSimple("#e#b<Party Quest: Primrose Hill>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nI'm Tory. Inside here is a beautiful hill where the primrose blooms. There's a tiger that lives in the hill, Growlie, and he seems to be looking for something to eat. Would you like to head over to the hill of primrose and join forces with your party members to help Growlie out?#b\r\n#L0#I want to participate in the party quest.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.\r\n#L3#I would like to redeem an instance hat.")
             } else if (status == 1) {
                if (selection == 0) {
-                  if (cm.getParty() == null) {
+                  if (cm.getParty().isEmpty()) {
                      cm.sendOk("Hi there! I'm Tory. This place is covered with mysterious aura of the full moon, and no one person can enter here by him/herself.")
                      cm.dispose()
                   } else if (!cm.isLeader()) {
                      cm.sendOk("If you'd like to enter here, the leader of your party will have to talk to me. Talk to your party leader about this.")
                      cm.dispose()
                   } else {
-                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                      if (eli.size() > 0) {
-                        if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                        if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                            cm.sendOk("Someone is already attempting the PQ. Please wait for them to finish, or find another channel.")
                         }
                      } else {

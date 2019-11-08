@@ -21,9 +21,9 @@ boolean enter(PortalPlayerInteraction pi) {
       MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Your party leader must enter the portal to start the battle.")
       return false
    } else {
-      MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty())
+      MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty().orElseThrow())
       if (eli.size() > 0) {
-         if (!em.startInstance(pi.getParty(), pi.getPlayer().getMap(), 1)) {
+         if (!em.startInstance(pi.getParty().orElseThrow(), pi.getPlayer().getMap(), 1)) {
             MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The battle against the boss has already begun, so you may not enter this place yet.")
             return false
          }

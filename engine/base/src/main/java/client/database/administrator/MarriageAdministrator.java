@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Marriage;
 
 public class MarriageAdministrator extends AbstractQueryExecutor {
    private static MarriageAdministrator instance;
@@ -17,16 +20,17 @@ public class MarriageAdministrator extends AbstractQueryExecutor {
    private MarriageAdministrator() {
    }
 
-   public void endMarriage(Connection connection, int playerId) {
-      String sql = "DELETE FROM marriages WHERE marriageid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, playerId));
+   public void endMarriage(EntityManager entityManager, int playerId) {
+      Query query = entityManager.createQuery("DELETE FROM Marriage WHERE marriageId = :marriageId");
+      query.setParameter("marriageId", playerId);
+      execute(entityManager, query);
    }
 
-   public int createMarriage(Connection connection, int spouse1, int spouse2) {
-      String sql = "INSERT INTO marriages (husbandid, wifeid) VALUES (?, ?)";
-      return insertAndReturnKey(connection, sql, ps -> {
-         ps.setInt(1, spouse1);
-         ps.setInt(2, spouse2);
-      });
+   public int createMarriage(EntityManager entityManager, int spouse1, int spouse2) {
+      Marriage marriage = new Marriage();
+      marriage.setHusbandId(spouse1);
+      marriage.setWifeId(spouse2);
+      insert(entityManager, marriage);
+      return marriage.getMarriageId();
    }
 }

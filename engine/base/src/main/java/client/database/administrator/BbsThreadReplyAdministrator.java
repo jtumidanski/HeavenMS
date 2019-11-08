@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.bbs.BBSReply;
 import net.server.Server;
 
 public class BbsThreadReplyAdministrator extends AbstractQueryExecutor {
@@ -18,23 +21,24 @@ public class BbsThreadReplyAdministrator extends AbstractQueryExecutor {
    private BbsThreadReplyAdministrator() {
    }
 
-   public void deleteById(Connection connection, int replyId) {
-      String sql = "DELETE FROM bbs_replies WHERE replyid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, replyId));
+   public void deleteById(EntityManager entityManager, int replyId) {
+      Query query = entityManager.createQuery("DELETE FROM BBSReply WHERE replyId = :replyId");
+      query.setParameter("replyId", replyId);
+      execute(entityManager, query);
    }
 
-   public void deleteByThreadId(Connection connection, int threadId) {
-      String sql = "DELETE FROM bbs_replies WHERE threadid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, threadId));
+   public void deleteByThreadId(EntityManager entityManager, int threadId) {
+      Query query = entityManager.createQuery("DELETE FROM BBSReply WHERE threadId = :threadId");
+      query.setParameter("threadId", threadId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int threadId, int playerId, String text) {
-      String sql = "INSERT INTO bbs_replies (`threadid`, `postercid`, `timestamp`, `content`) VALUES (?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, threadId);
-         ps.setInt(2, playerId);
-         ps.setLong(3, Server.getInstance().getCurrentTime());
-         ps.setString(4, text);
-      });
+   public void create(EntityManager entityManager, int threadId, int playerId, String text) {
+      BBSReply bbsReply = new BBSReply();
+      bbsReply.setThreadId(threadId);
+      bbsReply.setPosterId(playerId);
+      bbsReply.setTimestamp(Server.getInstance().getCurrentTime());
+      bbsReply.setContent(text);
+      insert(entityManager, bbsReply);
    }
 }

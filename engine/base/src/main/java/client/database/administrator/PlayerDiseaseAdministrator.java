@@ -1,12 +1,16 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.MapleDisease;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.PlayerDisease;
 import server.life.MobSkill;
 import tools.Pair;
 
@@ -23,21 +27,23 @@ public class PlayerDiseaseAdministrator extends AbstractQueryExecutor implements
    private PlayerDiseaseAdministrator() {
    }
 
-   public void addPlayerDiseasesForCharacter(Connection connection, int characterId, Set<Map.Entry<MapleDisease, Pair<Long, MobSkill>>> playerDiseases) {
-      String sql = "INSERT INTO playerdiseases (charid, disease, mobskillid, mobskilllv, length) VALUES (?, ?, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.getKey().ordinal());
-         MobSkill ms = data.getValue().getRight();
-         ps.setInt(3, ms.skillId());
-         ps.setInt(4, ms.level());
-         ps.setInt(5, data.getValue().getLeft().intValue());
-      }, playerDiseases);
+   public void addPlayerDiseasesForCharacter(EntityManager entityManager, int characterId, Set<Map.Entry<MapleDisease, Pair<Long, MobSkill>>> playerDiseases) {
+      List<PlayerDisease> playerDiseaseList = playerDiseases.stream().map(disease -> {
+         PlayerDisease playerDisease = new PlayerDisease();
+         playerDisease.setCharacterId(characterId);
+         playerDisease.setDisease(disease.getKey().ordinal());
+         playerDisease.setMobSkillId(disease.getValue().getRight().skillId());
+         playerDisease.setMobSkillLevel(disease.getValue().getRight().level());
+         playerDisease.setLength(disease.getValue().getLeft().intValue());
+         return playerDisease;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, playerDiseaseList);
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM playerdiseases WHERE charid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM PlayerDisease WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 }

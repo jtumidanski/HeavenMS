@@ -13,7 +13,7 @@ class Mapdojang_1st {
       if (stage % 6 == 1) {
          ms.getClient().getChannelServer().startDojoSchedule(ms.getMapId())
       } else if (stage % 6 == 0) {
-         ms.getClient().getChannelServer().dismissDojoSchedule(ms.getMapId(), ms.getParty())
+         ms.getClient().getChannelServer().dismissDojoSchedule(ms.getMapId(), ms.getParty().orElseThrow())
       }
 
       boolean callBoss = ms.getClient().getChannelServer().setDojoProgress(ms.getMapId())

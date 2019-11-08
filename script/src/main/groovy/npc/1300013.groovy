@@ -52,9 +52,9 @@ class NPC1300013 {
             } else if (selection == 1) {
                EventManager em = cm.getEventManager("MK_PrimeMinister2")
 
-               MapleParty party = cm.getPlayer().getParty()
-               if (party != null) {
-                  if (!em.startInstance(party, cm.getMap(), 1)) {
+               Optional<MapleParty> party = cm.getPlayer().getParty()
+               if (party.isPresent()) {
+                  if (!em.startInstance(party.get(), cm.getMap(), 1)) {
                      cm.sendOk("Another party is already challenging the boss in this channel.")
                   }
                } else {

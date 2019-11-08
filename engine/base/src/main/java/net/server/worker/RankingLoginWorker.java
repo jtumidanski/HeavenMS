@@ -21,9 +21,10 @@
 */
 package net.server.worker;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.function.Supplier;
+
+import javax.persistence.EntityManager;
 
 import client.MapleJob;
 import client.database.administrator.CharacterAdministrator;
@@ -48,7 +49,7 @@ public class RankingLoginWorker implements Runnable {
       for (CharacterRankData characterRankData : rankData) {
          int rankMove = 0;
          rank++;
-         if (characterRankData.lastLogin() < lastUpdate || characterRankData.loggedIn() > 0) {
+         if (characterRankData.lastLogin().getTime() < lastUpdate || characterRankData.loggedIn() > 0) {
             rankMove = characterRankData.move();
          }
          rankMove += characterRankData.rank() - rank;
@@ -56,33 +57,34 @@ public class RankingLoginWorker implements Runnable {
       }
    }
 
-   private void updateRanking(Connection connection, int job, int world) {
+   private void updateRanking(EntityManager entityManager, int job, int world) {
       if (job != -1) {
          performRanking(
-               () -> CharacterProvider.getInstance().getRankByJob(connection, world, job),
-               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateJobRank(connection, characterId, rank, rankMove)
+               () -> CharacterProvider.getInstance().getRankByJob(entityManager, world, job),
+               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateJobRank(entityManager, characterId, rank, rankMove)
          );
       } else {
          performRanking(
-               () -> CharacterProvider.getInstance().getRank(connection, world),
-               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateRank(connection, characterId, rank, rankMove)
+               () -> CharacterProvider.getInstance().getRank(entityManager, world),
+               (characterId, rank, rankMove) -> CharacterAdministrator.getInstance().updateRank(entityManager, characterId, rank, rankMove)
          );
       }
    }
 
    @Override
    public void run() {
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
          if (ServerConstants.USE_REFRESH_RANK_MOVE) {
-            CharacterAdministrator.getInstance().resetAllJobRankMove(connection);
-            CharacterAdministrator.getInstance().resetAllRankMove(connection);
+            CharacterAdministrator.getInstance().resetAllJobRankMove(entityManager);
+            CharacterAdministrator.getInstance().resetAllRankMove(entityManager);
          }
          for (int j = 0; j < Server.getInstance().getWorldsSize(); j++) {
-            updateRanking(connection, -1, j);    //overall ranking
+            updateRanking(entityManager, -1, j);    //overall ranking
             for (int i = 0; i <= MapleJob.getMax(); i++) {
-               updateRanking(connection, i, j);
+               updateRanking(entityManager, i, j);
             }
-            connection.commit();
+            entityManager.getTransaction().commit();
          }
       });
       lastUpdate = System.currentTimeMillis();

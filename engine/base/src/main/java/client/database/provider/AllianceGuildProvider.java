@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,8 +19,9 @@ public class AllianceGuildProvider extends AbstractQueryExecutor {
    private AllianceGuildProvider() {
    }
 
-   public List<Integer> getGuildsForAlliance(Connection connection, int allianceId) {
-      String sql = "SELECT guildid FROM allianceguilds WHERE allianceid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, allianceId), rs -> rs.getInt("guildid"));
+   public List<Integer> getGuildsForAlliance(EntityManager entityManager, int allianceId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT a.guildId FROM AllianceGuild a WHERE a.allianceId = :allianceId", Integer.class);
+      query.setParameter("allianceId", allianceId);
+      return query.getResultList();
    }
 }

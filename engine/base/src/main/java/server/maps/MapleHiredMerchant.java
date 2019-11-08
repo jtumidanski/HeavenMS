@@ -49,7 +49,6 @@ import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;
-import server.MapleTrade;
 import server.MapleTradeUtil;
 import server.processor.maps.MapleHiredMerchantProcessor;
 import tools.DatabaseConnection;

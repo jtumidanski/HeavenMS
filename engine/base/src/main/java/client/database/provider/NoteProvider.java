@@ -1,12 +1,14 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.NoteData;
 import client.database.utility.NoteTransformer;
+import entity.Note;
 
 public class NoteProvider extends AbstractQueryExecutor {
    private static NoteProvider instance;
@@ -21,14 +23,15 @@ public class NoteProvider extends AbstractQueryExecutor {
    private NoteProvider() {
    }
 
-   public List<NoteData> getFirstNote(Connection connection, String characterName) {
-      String sql = "SELECT * FROM notes WHERE `to` = ? AND `deleted` = 0";
-      NoteTransformer transformer = new NoteTransformer();
-      return getListNew(connection, sql, ps -> ps.setString(1, characterName), transformer::transform);
+   public List<NoteData> getFirstNote(EntityManager entityManager, String characterName) {
+      TypedQuery<Note> query = entityManager.createQuery("FROM Note n WHERE n.noteTo = :to AND n.deleted = 0", Note.class);
+      query.setParameter("to", characterName);
+      return getResultList(query, new NoteTransformer());
    }
 
-   public Optional<Integer> getFameForActiveNotes(Connection connection, int noteId) {
-      String sql = "SELECT `fame` FROM notes WHERE id=? AND deleted=0";
-      return getSingle(connection, sql, ps -> ps.setInt(1, noteId), "fame");
+   public Optional<Integer> getFameForActiveNotes(EntityManager entityManager, int noteId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT n.fame FROM Note n WHERE n.id = :noteId AND n.deleted = 0", Integer.class);
+      query.setParameter("noteId", noteId);
+      return getSingleOptional(query);
    }
 }

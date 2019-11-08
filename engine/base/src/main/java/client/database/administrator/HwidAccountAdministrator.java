@@ -1,9 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
+import java.util.Calendar;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.HwidAccount;
 
 public class HwidAccountAdministrator extends AbstractQueryExecutor {
    private static HwidAccountAdministrator instance;
@@ -18,27 +21,26 @@ public class HwidAccountAdministrator extends AbstractQueryExecutor {
    private HwidAccountAdministrator() {
    }
 
-   public void updateByAccountId(Connection connection, int accountId, String hwid, int relevance, Timestamp timestamp) {
-      String sql = "UPDATE hwidaccounts SET relevance = ?, expiresat = ? WHERE accountid = ? AND hwid LIKE ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, relevance);
-         ps.setTimestamp(2, timestamp);
-         ps.setInt(3, accountId);
-         ps.setString(4, hwid);
-      });
+   public void updateByAccountId(EntityManager entityManager, int accountId, String hwid, int relevance, Timestamp timestamp) {
+      Query query = entityManager.createQuery("UPDATE HwidAccount SET relevance = :relevance, expiresAt = :timestamp WHERE accountId = :accountId AND hwid LIKE :hwid");
+      query.setParameter("relevance", relevance);
+      query.setParameter("timestamp", timestamp);
+      query.setParameter("accountId", accountId);
+      query.setParameter("hwid", hwid);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int accountId, String hwid, Timestamp timestamp) {
-      String sql = "INSERT INTO hwidaccounts (accountid, hwid, expiresat) VALUES (?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-         ps.setString(2, hwid);
-         ps.setTimestamp(3, timestamp);
-      });
+   public void create(EntityManager entityManager, int accountId, String hwid, Timestamp timestamp) {
+      HwidAccount hwidAccount = new HwidAccount();
+      hwidAccount.setAccountId(accountId);
+      hwidAccount.setHwid(hwid);
+      hwidAccount.setExpiresAt(timestamp);
+      insert(entityManager, hwidAccount);
    }
 
-   public void deleteExpired(Connection connection) {
-      String sql = "DELETE FROM hwidaccounts WHERE expiresat < CURRENT_TIMESTAMP";
-      executeNoParam(connection, sql);
+   public void deleteExpired(EntityManager entityManager) {
+      Query query = entityManager.createQuery("DELETE FROM HwidAccount WHERE expiresAt < :timestamp");
+      query.setParameter("timestamp", new Timestamp(Calendar.getInstance().getTimeInMillis()));
+      execute(entityManager, query);
    }
 }

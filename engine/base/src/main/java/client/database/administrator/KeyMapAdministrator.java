@@ -1,12 +1,16 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.KeyBinding;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.KeyMap;
 
 public class KeyMapAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static KeyMapAdministrator instance;
@@ -22,28 +26,30 @@ public class KeyMapAdministrator extends AbstractQueryExecutor implements Delete
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM keymap WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM KeyMap WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, int key, int type, int action) {
-      String sql = "INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, key);
-         ps.setInt(3, type);
-         ps.setInt(4, action);
-      });
+   public void create(EntityManager entityManager, int characterId, int key, int type, int action) {
+      KeyMap keyMap = new KeyMap();
+      keyMap.setCharacterId(characterId);
+      keyMap.setKey(key);
+      keyMap.setType(type);
+      keyMap.setAction(action);
+      insert(entityManager, keyMap);
    }
 
-   public void create(Connection connection, int characterId, Set<Map.Entry<Integer, KeyBinding>> bindings) {
-      String sql = "INSERT INTO keymap (characterid, `key`, `type`, `action`) VALUES (?, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.getKey());
-         ps.setInt(3, data.getValue().theType());
-         ps.setInt(4, data.getValue().action());
-      }, bindings);
+   public void create(EntityManager entityManager, int characterId, Set<Map.Entry<Integer, KeyBinding>> bindings) {
+      List<KeyMap> keyMapList = bindings.stream().map(binding -> {
+         KeyMap keyMap = new KeyMap();
+         keyMap.setCharacterId(characterId);
+         keyMap.setKey(binding.getKey());
+         keyMap.setType(binding.getValue().theType());
+         keyMap.setAction(binding.getValue().action());
+         return keyMap;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, keyMapList);
    }
 }

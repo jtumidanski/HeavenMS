@@ -110,7 +110,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
    private void guildMatch(MapleClient client, MapleCharacter mapleCharacter, GuildMatchPacket packet) {
       World world = client.getWorldServer();
 
-      if (mapleCharacter.getParty() != null) {
+      if (mapleCharacter.getParty().isPresent()) {
          world.getMatchCheckerCoordinator().dismissMatchConfirmation(mapleCharacter.getId());
          return;
       }

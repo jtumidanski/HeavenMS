@@ -26,7 +26,6 @@ import net.server.PacketReader;
 import net.server.channel.packet.movement.MovePlayerPacket;
 import net.server.channel.packet.reader.MovePlayerReader;
 import tools.MasterBroadcaster;
-import tools.PacketCreator;
 import tools.packet.movement.MovePlayer;
 
 public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacket> {

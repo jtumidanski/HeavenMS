@@ -1,8 +1,10 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
 
 import client.database.AbstractQueryExecutor;
+import entity.HwidBan;
 
 public class HwidBanAdministrator extends AbstractQueryExecutor {
    private static HwidBanAdministrator instance;
@@ -17,8 +19,9 @@ public class HwidBanAdministrator extends AbstractQueryExecutor {
    private HwidBanAdministrator() {
    }
 
-   public void banHwid(Connection connection, String hwid) {
-      String sql = "INSERT INTO hwidbans (hwid) VALUES (?)";
-      execute(connection, sql, ps -> ps.setString(1, hwid));
+   public void banHwid(EntityManager entityManager, String hwid) {
+      HwidBan hwidBan = new HwidBan();
+      hwidBan.setHwid(hwid);
+      insert(entityManager, hwidBan);
    }
 }

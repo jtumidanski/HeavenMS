@@ -84,7 +84,7 @@ class NPC9040000 {
                      cm.sendOk("Your guild is not currently on strategy time on this channel. Check again if your guild is currently planning a Guild Quest or, if so, the channel they are allotted on.")
                   } else {
                      if (cm.isLeader()) {
-                        em.getEligibleParty(cm.getParty())
+                        em.getEligibleParty(cm.getParty().orElseThrow())
                         eim.registerParty(cm.getPlayer())
                      } else {
                         eim.registerPlayer(cm.getPlayer())

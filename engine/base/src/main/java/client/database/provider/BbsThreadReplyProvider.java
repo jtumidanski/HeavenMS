@@ -1,12 +1,15 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.BbsThreadReplyData;
 import client.database.utility.BbsThreadReplyTransformer;
+import entity.bbs.BBSReply;
 
 public class BbsThreadReplyProvider extends AbstractQueryExecutor {
    private static BbsThreadReplyProvider instance;
@@ -21,15 +24,16 @@ public class BbsThreadReplyProvider extends AbstractQueryExecutor {
    private BbsThreadReplyProvider() {
    }
 
-   public List<BbsThreadReplyData> getByThreadId(Connection connection, int threadId) {
-      String sql = "SELECT * FROM bbs_replies WHERE threadid = ?";
+   public List<BbsThreadReplyData> getByThreadId(EntityManager entityManager, int threadId) {
+      TypedQuery<BBSReply> query = entityManager.createQuery("FROM BBSReply b WHERE b.threadId = :threadId", BBSReply.class);
+      query.setParameter("threadId", threadId);
       BbsThreadReplyTransformer transformer = new BbsThreadReplyTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, threadId), transformer::transform);
+      return query.getResultList().stream().map(transformer::transform).collect(Collectors.toList());
    }
 
-   public Optional<BbsThreadReplyData> getByReplyId(Connection connection, int replyId) {
-      String sql = "SELECT * FROM bbs_replies WHERE replyid = ?";
-      BbsThreadReplyTransformer transformer = new BbsThreadReplyTransformer();
-      return getNew(connection, sql, ps -> ps.setInt(1, replyId), transformer::transform);
+   public Optional<BbsThreadReplyData> getByReplyId(EntityManager entityManager, int replyId) {
+      TypedQuery<BBSReply> query = entityManager.createQuery("FROM BBSReply b WHERE b.replyId = :replyId", BBSReply.class);
+      query.setParameter("replyId", replyId);
+      return getSingleOptional(query, new BbsThreadReplyTransformer());
    }
 }

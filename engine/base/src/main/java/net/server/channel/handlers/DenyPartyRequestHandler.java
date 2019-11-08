@@ -45,7 +45,7 @@ public final class DenyPartyRequestHandler extends AbstractPacketHandler<DenyPar
       client.getChannelServer().getPlayerStorage().getCharacterByName(cname[cname.length - 1]).ifPresent(characterFrom -> {
          MapleCharacter chr = client.getPlayer();
          if (MapleInviteCoordinator.answerInvite(InviteType.PARTY, chr.getId(), characterFrom.getPartyId(), false).result == InviteResult.DENIED) {
-            chr.updatePartySearchAvailability(chr.getParty() == null);
+            chr.updatePartySearchAvailability(chr.getParty().isEmpty());
             PacketCreator.announce(characterFrom, new PartyStatusMessage(23, Option.apply(chr.getName())));
          }
       });

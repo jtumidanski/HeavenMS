@@ -1,9 +1,10 @@
 package client.database.administrator;
 
-import java.sql.Connection;
-import java.util.Arrays;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.InventoryEquipment;
 
 public class InventoryEquipmentAdministrator extends AbstractQueryExecutor {
    private static InventoryEquipmentAdministrator instance;
@@ -18,45 +19,54 @@ public class InventoryEquipmentAdministrator extends AbstractQueryExecutor {
    private InventoryEquipmentAdministrator() {
    }
 
-   public void create(Connection connection, int inventoryItemId, int upgradeSlots, int level, int strength,
+   public void create(EntityManager entityManager, int inventoryItemId, int upgradeSlots, int level, int strength,
                       int dexterity, int intelligence, int luck, int hp, int mp, int weaponAttack, int magicAttack,
                       int weaponDefense, int magicDefense, int accuracy, int avoidability, int hands, int speed,
                       int jump, int locked, int vicious, int itemLevel, float itemExp, int ringId) {
-      String sql = "INSERT INTO `inventoryequipment` VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, inventoryItemId);
-         ps.setInt(2, upgradeSlots);
-         ps.setInt(3, level);
-         ps.setInt(4, strength);
-         ps.setInt(5, dexterity);
-         ps.setInt(6, intelligence);
-         ps.setInt(7, luck);
-         ps.setInt(8, hp);
-         ps.setInt(9, mp);
-         ps.setInt(10, weaponAttack);
-         ps.setInt(11, magicAttack);
-         ps.setInt(12, weaponDefense);
-         ps.setInt(13, magicDefense);
-         ps.setInt(14, accuracy);
-         ps.setInt(15, avoidability);
-         ps.setInt(16, hands);
-         ps.setInt(17, speed);
-         ps.setInt(18, jump);
-         ps.setInt(19, locked);
-         ps.setInt(20, vicious);
-         ps.setInt(21, itemLevel);
-         ps.setFloat(22, itemExp);
-         ps.setInt(23, ringId);
-      });
+      InventoryEquipment inventoryEquipment = new InventoryEquipment();
+      inventoryEquipment.setInventoryItemId(inventoryItemId);
+      inventoryEquipment.setUpgradeSlots(upgradeSlots);
+      inventoryEquipment.setLevel(level);
+      inventoryEquipment.setStr(strength);
+      inventoryEquipment.setDex(dexterity);
+      inventoryEquipment.setIntelligence(intelligence);
+      inventoryEquipment.setLuk(luck);
+      inventoryEquipment.setHp(hp);
+      inventoryEquipment.setMp(mp);
+      inventoryEquipment.setWatk(weaponAttack);
+      inventoryEquipment.setMatk(magicAttack);
+      inventoryEquipment.setWdef(weaponDefense);
+      inventoryEquipment.setMdef(magicDefense);
+      inventoryEquipment.setAcc(accuracy);
+      inventoryEquipment.setAvoid(avoidability);
+      inventoryEquipment.setHands(hands);
+      inventoryEquipment.setSpeed(speed);
+      inventoryEquipment.setJump(jump);
+      inventoryEquipment.setLocked(locked);
+      inventoryEquipment.setVicious(vicious);
+      inventoryEquipment.setItemLevel(itemLevel);
+      inventoryEquipment.setItemExp(itemExp);
+      inventoryEquipment.setRingId(ringId);
+      insert(entityManager, inventoryEquipment);
    }
 
-   public void updateRing(Connection connection, int ringId, int partnerRingId) {
-      String sql = "UPDATE inventoryequipment SET ringid=-1 WHERE ringid=?";
-      batch(connection, sql, (ps, data) -> ps.setInt(1, data), Arrays.asList(ringId, partnerRingId));
+   public void updateRing(EntityManager entityManager, int ringId, int partnerRingId) {
+      entityManager.getTransaction().begin();
+
+      Query ringQuery = entityManager.createQuery("UPDATE InventoryEquipment SET ringId = -1 WHERE ringId = :ringId");
+      ringQuery.setParameter("ringId", ringId);
+      ringQuery.executeUpdate();
+
+      Query partnerRingQuery = entityManager.createQuery("UPDATE InventoryEquipment SET ringId = -1 WHERE ringId = :ringId");
+      partnerRingQuery.setParameter("ringId", partnerRingId);
+      partnerRingQuery.executeUpdate();
+
+      entityManager.getTransaction().commit();
    }
 
-   public void deleteById(Connection connection, int inventoryItemId) {
-      String sql = "DELETE FROM inventoryequipment WHERE inventoryitemid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, inventoryItemId));
+   public void deleteById(EntityManager entityManager, int inventoryItemId) {
+      Query query = entityManager.createQuery("DELETE FROM InventoryEquipment WHERE inventoryItemId = :inventoryItemId");
+      query.setParameter("inventoryItemId", inventoryItemId);
+      execute(entityManager, query);
    }
 }

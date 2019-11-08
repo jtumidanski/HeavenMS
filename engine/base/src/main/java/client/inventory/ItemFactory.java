@@ -20,12 +20,12 @@
  */
 package client.inventory;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
 
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
@@ -88,17 +88,17 @@ public enum ItemFactory {
       }
    }
 
-   public void saveItems(List<Pair<Item, MapleInventoryType>> items, int id, Connection con) {
-      saveItems(items, null, id, con);
+   public void saveItems(List<Pair<Item, MapleInventoryType>> items, int id, EntityManager entityManager) {
+      saveItems(items, null, id, entityManager);
    }
 
-   public void saveItems(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, Connection con) {
+   public void saveItems(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, EntityManager entityManager) {
       // thanks Arufonsu, MedicOP, BHB for pointing a "synchronized" bottleneck here
 
       if (value != 6) {
-         saveItemsCommon(items, id, con);
+         saveItemsCommon(items, id, entityManager);
       } else {
-         saveItemsMerchant(items, bundlesList, id, con);
+         saveItemsMerchant(items, bundlesList, id, entityManager);
       }
    }
 
@@ -110,14 +110,14 @@ public enum ItemFactory {
       }
    }
 
-   private void saveItemsCommon(List<Pair<Item, MapleInventoryType>> items, int id, Connection con) {
+   private void saveItemsCommon(List<Pair<Item, MapleInventoryType>> items, int id, EntityManager entityManager) {
       Lock lock = locks[id % lockCount];
       lock.lock();
       try {
          if (account) {
-            InventoryItemAdministrator.getInstance().deleteForAccountByType(con, id, value);
+            InventoryItemAdministrator.getInstance().deleteForAccountByType(entityManager, id, value);
          } else {
-            InventoryItemAdministrator.getInstance().deleteForCharacterByType(con, id, value);
+            InventoryItemAdministrator.getInstance().deleteForCharacterByType(entityManager, id, value);
          }
 
 
@@ -125,12 +125,12 @@ public enum ItemFactory {
             for (Pair<Item, MapleInventoryType> pair : items) {
                Item item = pair.getLeft();
                MapleInventoryType mit = pair.getRight();
-               int genKey = InventoryItemAdministrator.getInstance().create(con, value, account ? -1 : id, account ? id : -1,
+               int genKey = InventoryItemAdministrator.getInstance().create(entityManager, value, account ? -1 : id, account ? id : -1,
                      item.id(), mit.getType(), item.position(), item.quantity(), item.owner(),
                      item.petId(), item.flag(), item.expiration(), item.giftFrom());
 
                if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-                  saveEquipItem(con, (Equip) item, genKey);
+                  saveEquipItem(entityManager, (Equip) item, genKey);
                }
             }
          }
@@ -163,16 +163,16 @@ public enum ItemFactory {
       }).orElse(new ArrayList<>());
    }
 
-   private void saveItemsMerchant(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, Connection con) {
+   private void saveItemsMerchant(List<Pair<Item, MapleInventoryType>> items, List<Short> bundlesList, int id, EntityManager entityManager) {
       Lock lock = locks[id % lockCount];
       lock.lock();
       try {
-         InventoryMerchantAdministrator.getInstance().deleteForCharacter(con, id);
+         InventoryMerchantAdministrator.getInstance().deleteForCharacter(entityManager, id);
          if (account) {
-            InventoryItemAdministrator.getInstance().deleteForAccountByType(con, id, value);
+            InventoryItemAdministrator.getInstance().deleteForAccountByType(entityManager, id, value);
 
          } else {
-            InventoryItemAdministrator.getInstance().deleteForCharacterByType(con, id, value);
+            InventoryItemAdministrator.getInstance().deleteForCharacterByType(entityManager, id, value);
          }
 
 
@@ -184,13 +184,13 @@ public enum ItemFactory {
                MapleInventoryType mit = pair.getRight();
                i++;
 
-               int genKey = InventoryItemAdministrator.getInstance().create(con, value, account ? -1 : id,
+               int genKey = InventoryItemAdministrator.getInstance().create(entityManager, value, account ? -1 : id,
                      account ? id : -1, item.id(), mit.getType(), item.position(), item.quantity(),
                      item.owner(), item.petId(), item.flag(), item.expiration(), item.giftFrom());
-               InventoryMerchantAdministrator.getInstance().create(con, genKey, id, bundles);
+               InventoryMerchantAdministrator.getInstance().create(entityManager, genKey, id, bundles);
 
                if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-                  saveEquipItem(con, (Equip) item, genKey);
+                  saveEquipItem(entityManager, (Equip) item, genKey);
                }
             }
          }
@@ -199,8 +199,8 @@ public enum ItemFactory {
       }
    }
 
-   private void saveEquipItem(Connection con, Equip item, int genKey) {
-      InventoryEquipmentAdministrator.getInstance().create(con, genKey, item.slots(),
+   private void saveEquipItem(EntityManager entityManager, Equip item, int genKey) {
+      InventoryEquipmentAdministrator.getInstance().create(entityManager, genKey, item.slots(),
             item.level(), item.str(), item.dex(), item._int(), item.luk(),
             item.hp(), item.mp(), item.watk(), item.matk(), item.wdef(),
             item.mdef(), item.acc(), item.avoid(), item.hands(), item.speed(),

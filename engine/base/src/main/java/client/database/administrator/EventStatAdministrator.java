@@ -1,11 +1,15 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.EventStat;
 import server.events.MapleEvents;
 
 public class EventStatAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
@@ -22,17 +26,20 @@ public class EventStatAdministrator extends AbstractQueryExecutor implements Del
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM eventstats WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM EventStat WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, Set<Map.Entry<String, MapleEvents>> events) {
-      String sql = "INSERT INTO eventstats (characterid, name, info) VALUES (?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setString(2, data.getKey());
-         ps.setInt(3, data.getValue().getInfo());
-      }, events);
+   public void create(EntityManager entityManager, int characterId, Set<Map.Entry<String, MapleEvents>> events) {
+      List<EventStat> eventStatList = events.stream().map(entry -> {
+         EventStat eventStat = new EventStat();
+         eventStat.setCharacterId(characterId);
+         eventStat.setName(entry.getKey());
+         eventStat.setInfo(entry.getValue().getInfo());
+         return eventStat;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, eventStatList);
    }
 }

@@ -18,6 +18,10 @@ class DueyPackage(private var _packageId: Int, private var _item: Option[Item]) 
 
   private var timestamp: Calendar = _
 
+  def this(packageId: Int) = {
+    this(packageId, Option.empty)
+  }
+
   def sentTimeInMilliseconds: Long = {
     val ts: Calendar = timestamp
     if (ts != null) {

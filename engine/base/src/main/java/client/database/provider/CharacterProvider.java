@@ -1,8 +1,11 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.CharNameAndIdData;
@@ -11,12 +14,8 @@ import client.database.data.CharacterGuildData;
 import client.database.data.CharacterGuildFamilyData;
 import client.database.data.CharacterIdNameAccountId;
 import client.database.data.CharacterRankData;
-import client.database.utility.CharNameAndIdTransformer;
 import client.database.utility.CharacterFromResultSetTransformer;
-import client.database.utility.CharacterGuildTransformer;
-import client.database.utility.CharacterIdNameAccountIdTransformer;
-import client.database.utility.CharacterJobRankTransformer;
-import client.database.utility.CharacterRankTransformer;
+import entity.Character;
 import tools.Pair;
 
 public class CharacterProvider extends AbstractQueryExecutor {
@@ -32,177 +31,189 @@ public class CharacterProvider extends AbstractQueryExecutor {
    private CharacterProvider() {
    }
 
-   public Optional<Integer> getCharacterForNameAndWorld(Connection connection, String name, int worldId) {
-      String sql = "SELECT id FROM characters WHERE name LIKE ? AND world = ?";
-      return getSingle(connection, sql, ps -> {
-         ps.setString(1, name);
-         ps.setInt(2, worldId);
-      }, "id");
+   public Optional<Integer> getCharacterForNameAndWorld(EntityManager entityManager, String name, int worldId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.id FROM Character c WHERE c.name LIKE :name AND c.world = :world", Integer.class);
+      query.setParameter("name", name);
+      query.setParameter("world", worldId);
+      return getSingleOptional(query);
    }
 
-   public List<CharNameAndIdData> getCharacterInfoForWorld(Connection connection, int accountId, int worldId) {
-      String sql = "SELECT id, name FROM characters WHERE accountid = ? AND world = ?";
-      return getListNew(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-         ps.setInt(2, worldId);
-      }, rs -> new CharNameAndIdData(rs.getString("name"), rs.getInt("id")));
+   public List<CharNameAndIdData> getCharacterInfoForWorld(EntityManager entityManager, int accountId, int worldId) {
+      TypedQuery<CharNameAndIdData> query = entityManager.createQuery("SELECT NEW client.CharacterNameAndId(c.id, c.name) FROM Character c WHERE c.accountId = :accountId AND c.world = :worldId", CharNameAndIdData.class);
+      query.setParameter("accountId", accountId);
+      query.setParameter("worldId", worldId);
+      return query.getResultList();
    }
 
-   public CharNameAndIdData getCharacterInfoForName(Connection connection, String name) {
-      String sql = "SELECT id, name, buddyCapacity FROM characters WHERE name LIKE ?";
-      CharNameAndIdTransformer transformer = new CharNameAndIdTransformer();
-      Optional<CharNameAndIdData> result = getNew(connection, sql, ps -> ps.setString(1, name), transformer::transform);
-      return result.orElse(null);
+   public CharNameAndIdData getCharacterInfoForName(EntityManager entityManager, String name) {
+      TypedQuery<CharNameAndIdData> query = entityManager.createQuery("SELECT NEW client.database.data.CharNameAndIdData(c.name, c.id, c.buddyCapacity) FROM Character c WHERE c.name LIKE :name", CharNameAndIdData.class);
+      query.setParameter("name", name);
+      return getSingleWithDefault(query, null);
    }
 
-
-   public int countReborns(Connection connection, int characterId) {
-      String sql = "SELECT reborns FROM characters WHERE id=?;";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
-      return result.orElse(0);
+   public int countReborns(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.reborns FROM Character c WHERE c.id = :id", Integer.class);
+      query.setParameter("id", characterId);
+      return getSingleWithDefault(query, 0);
    }
 
-   public int getWorldId(Connection connection, int characterId) {
-      String sql = "SELECT world FROM characters WHERE id = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), "world");
-      return result.orElse(0);
+   public int getWorldId(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.world FROM Character c WHERE c.id = :id", Integer.class);
+      query.setParameter("id", characterId);
+      return getSingleWithDefault(query, 0);
    }
 
-   public Optional<CharacterGuildData> getGuildDataForCharacter(Connection connection, int characterId, int accountId) {
-      String sql = "SELECT id, guildid, guildrank, name, allianceRank, level, job FROM characters WHERE id = ? AND accountid = ?";
-      CharacterGuildTransformer transformer = new CharacterGuildTransformer();
-      return getNew(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, accountId);
-      }, rs -> {
-         if (rs.getInt("guildid") > 0) {
-            return transformer.transform(rs);
-         }
-         return null;
-      });
+   public Optional<CharacterGuildData> getGuildDataForCharacter(EntityManager entityManager, int characterId, int accountId) {
+      TypedQuery<CharacterGuildData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.CharacterGuildData(c.id, c.guildId, c.guildRank, c.name, c.allianceRank, c.level, c.job) " +
+                  "FROM Character c WHERE c.id = :id AND c.accountId = :accountId AND c.guildId > 0", CharacterGuildData.class);
+      query.setParameter("id", characterId);
+      query.setParameter("accountId", accountId);
+      return getSingleOptional(query);
    }
 
 
-   public List<CharacterGuildData> getGuildCharacterData(Connection connection, int guildId) {
-      String sql = "SELECT id, guildid, guildrank, name, allianceRank, level, job FROM characters WHERE guildid = ? ORDER BY guildrank ASC, name ASC";
-      CharacterGuildTransformer transformer = new CharacterGuildTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, guildId), transformer::transform);
+   public List<CharacterGuildData> getGuildCharacterData(EntityManager entityManager, int guildId) {
+      TypedQuery<CharacterGuildData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.CharacterGuildData(c.id, c.guildId, c.guildRank, c.name, c.allianceRank, c.level, c.job) " +
+                  "FROM Character c WHERE c.guildId = :guildId ORDER BY c.guildRank ASC, c.name ASC", CharacterGuildData.class);
+      query.setParameter("guildId", guildId);
+      return query.getResultList();
    }
 
-   public Optional<Pair<Integer, Integer>> getIdAndAccountIdForName(Connection connection, String name) {
-      String sql = "SELECT id, accountid FROM characters WHERE name = ?";
-      return getNew(connection, sql, ps -> ps.setString(1, name),
-            rs -> new Pair<>(rs.getInt(2), rs.getInt(1)));
+   public Optional<Pair<Integer, Integer>> getIdAndAccountIdForName(EntityManager entityManager, String name) {
+      Query query = entityManager.createQuery("SELECT c.id, c.accountId FROM Character c WHERE c.name = :name");
+      query.setParameter("name", name);
+      try {
+         Object[] result = (Object[]) query.getSingleResult();
+         return Optional.of(new Pair<>((int) result[0], (int) result[1]));
+      } catch (NoResultException exception) {
+         return Optional.empty();
+      }
    }
 
-   public Integer getAccountIdForName(Connection connection, String name) {
-      String sql = "SELECT accountid FROM characters WHERE name = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, name), 1);
-      return result.orElse(null);
+   public Integer getAccountIdForName(EntityManager entityManager, String name) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.accountId FROM Character c WHERE c.name = :name", Integer.class);
+      query.setParameter("name", name);
+      return query.getSingleResult();
    }
 
-   public int getAccountIdForCharacterId(Connection connection, int characterId) {
-      String sql = "SELECT accountid FROM characters WHERE id = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
-      return result.orElse(-1);
+   public int getAccountIdForCharacterId(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.accountId FROM Character c WHERE c.id = :id", Integer.class);
+      query.setParameter("id", characterId);
+      return query.getSingleResult();
    }
 
-   public int getIdForName(Connection connection, String name) {
-      String sql = "SELECT id FROM characters WHERE name = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setString(1, name), 1);
-      return result.orElse(-1);
+   public int getIdForName(EntityManager entityManager, String name) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.id FROM Character c WHERE c.name = :name", Integer.class);
+      query.setParameter("name", name);
+      return query.getSingleResult();
    }
 
-   public String getNameForId(Connection connection, int characterId) {
-      String sql = "SELECT name FROM characters WHERE id = ?";
-      Optional<String> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
-      return result.orElse(null);
+   public String getNameForId(EntityManager entityManager, int characterId) {
+      TypedQuery<String> query = entityManager.createQuery("SELECT c.name FROM Character c WHERE c.id = :id", String.class);
+      query.setParameter("id", characterId);
+      return query.getSingleResult();
    }
 
-   public long getMerchantMesos(Connection connection, int characterId) {
-      String sql = "SELECT MerchantMesos FROM characters WHERE id = ?";
-      Optional<Long> merchantMesos = getSingle(connection, sql, ps -> ps.setInt(1, characterId), "MerchantMesos");
-      return merchantMesos.orElse((long) 0);
+   public long getMerchantMesos(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.merchantMesos FROM Character c WHERE c.id = :id", Integer.class);
+      query.setParameter("id", characterId);
+      return (long) query.getSingleResult();
    }
 
-   public List<Integer> getCharacterLevels(Connection connection, int accountId) {
-      String sql = "SELECT `level` FROM `characters` WHERE accountid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), rs -> rs.getInt("level"));
+   public List<Integer> getCharacterLevels(EntityManager entityManager, int accountId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.level FROM Character c WHERE c.accountId = :accountId", Integer.class);
+      query.setParameter("accountId", accountId);
+      return query.getResultList();
    }
 
-   public Optional<Integer> getGmLevel(Connection connection, String name) {
-      String sql = "SELECT gm FROM characters WHERE name = ?";
-      return getSingle(connection, sql, ps -> ps.setString(1, name), "gm");
+   public Optional<Integer> getGmLevel(EntityManager entityManager, String name) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.gm FROM Character c WHERE c.name = :name", Integer.class);
+      query.setParameter("name", name);
+      return Optional.of(query.getSingleResult());
    }
 
-   public Optional<Integer> getMarriageItem(Connection connection, int characterId) {
-      String sql = "SELECT marriageItemId FROM characters WHERE id=?";
-      return getSingle(connection, sql, ps -> ps.setInt(1, characterId), "marriageItemId");
+   public Optional<Integer> getMarriageItem(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.marriageItemId FROM Character c WHERE c.id = :id", Integer.class);
+      query.setParameter("id", characterId);
+      return Optional.of(query.getSingleResult());
    }
 
-   public Optional<CharacterIdNameAccountId> getByName(Connection connection, String name) {
-      String sql = "SELECT `id`, `accountid`, `name` FROM `characters` WHERE `name` = ?";
-      CharacterIdNameAccountIdTransformer transformer = new CharacterIdNameAccountIdTransformer();
-      return getNew(connection, sql, ps -> ps.setString(1, name), transformer::transform);
+   public Optional<CharacterIdNameAccountId> getByName(EntityManager entityManager, String name) {
+      TypedQuery<CharacterIdNameAccountId> query = entityManager.createQuery("SELECT NEW client.database.data.CharacterIdNameAccountId(c.id, c.accountId, c.name) FROM Character c WHERE c.name = :name", CharacterIdNameAccountId.class);
+      query.setParameter("name", name);
+      return Optional.of(query.getSingleResult());
    }
 
-   public List<CharacterRankData> getRankByJob(Connection connection, int worldId, int jobId) {
-      String sql = "SELECT c.id, c.jobRank, c.jobRankMove, a.lastlogin AS lastlogin, a.loggedin FROM characters AS c LEFT JOIN accounts AS a ON c.accountid = a.id WHERE c.gm < 2 AND c.world = ? AND c.job DIV 100 = ? ORDER BY c.level DESC , c.exp DESC , c.lastExpGainTime ASC, c.fame DESC , c.meso DESC";
-      CharacterJobRankTransformer transformer = new CharacterJobRankTransformer();
-      return getListNew(connection, sql, ps -> {
-         ps.setInt(1, worldId);
-         ps.setInt(2, jobId);
-      }, transformer::transform);
+   public List<CharacterRankData> getRankByJob(EntityManager entityManager, int worldId, int jobId) {
+      TypedQuery<CharacterRankData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.CharacterRankData(a.lastLogin, a.loggedIn, c.jobRankMove, c.jobRank, c.id) " +
+                  "FROM Character c LEFT JOIN Account a ON c.accountId = a.id " +
+                  "WHERE c.gm < 2 AND c.world = :world AND c.job / 100 = :job " +
+                  "ORDER BY c.level DESC, c.exp DESC, c.lastExpGainTime ASC, c.fame DESC, c.meso DESC", CharacterRankData.class);
+      query.setParameter("world", worldId);
+      query.setParameter("job", jobId);
+      return query.getResultList();
    }
 
-   public List<CharacterRankData> getRank(Connection connection, int worldId) {
-      String sql = "SELECT c.id, c.rank, c.rankMove, a.lastlogin AS lastlogin, a.loggedin FROM characters AS c LEFT JOIN accounts AS a ON c.accountid = a.id WHERE c.gm < 2 AND c.world = ? ORDER BY c.level DESC , c.exp DESC , c.lastExpGainTime ASC, c.fame DESC , c.meso DESC";
-      CharacterRankTransformer transformer = new CharacterRankTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, worldId), transformer::transform);
+   public List<CharacterRankData> getRank(EntityManager entityManager, int worldId) {
+      TypedQuery<CharacterRankData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.CharacterRankData(a.lastLogin, a.loggedIn, c.rankMove, c.rank, c.id) " +
+                  "FROM Character  c LEFT JOIN Account a ON c.accountId = a.id " +
+                  "WHERE c.gm < 2 AND c.world = :world " +
+                  "ORDER BY c.level DESC, c.exp DESC, c.lastExpGainTime ASC, c.fame DESC, c.meso DESC", CharacterRankData.class);
+      query.setParameter("world", worldId);
+      return query.getResultList();
    }
 
-   public Optional<CharacterData> getById(Connection connection, int characterId) {
-      String sql = "SELECT * FROM characters WHERE id = ?";
-      CharacterFromResultSetTransformer transformer = new CharacterFromResultSetTransformer();
-      return getNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public Optional<CharacterData> getById(EntityManager entityManager, int characterId) {
+      TypedQuery<Character> query = entityManager.createQuery("FROM Character c WHERE c.id = :id", Character.class);
+      query.setParameter("id", characterId);
+      return getSingleOptional(query, new CharacterFromResultSetTransformer());
    }
 
-   public List<CharacterData> getByAccountId(Connection connection, int accountId) {
-      String sql = "SELECT * FROM characters WHERE accountid = ? ORDER BY world, id";
-      CharacterFromResultSetTransformer transformer = new CharacterFromResultSetTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, accountId), transformer::transform);
+   public List<CharacterData> getByAccountId(EntityManager entityManager, int accountId) {
+      TypedQuery<Character> query = entityManager.createQuery("FROM Character c WHERE c.accountId = :accountId ORDER BY c.world, c.id", Character.class);
+      query.setParameter("accountId", accountId);
+      return getResultList(query, new CharacterFromResultSetTransformer());
    }
 
-   public Optional<CharacterData> getHighestLevelOtherCharacterData(Connection connection, int accountId, int characterId) {
-      String sql = "SELECT name, level FROM characters WHERE accountid = ? AND id != ? ORDER BY level DESC limit 1";
-      return getNew(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-         ps.setInt(2, characterId);
-      }, rs -> new CharacterData(
-            rs.getString("name"),
-            rs.getInt("level")));
+   public Optional<CharacterData> getHighestLevelOtherCharacterData(EntityManager entityManager, int accountId, int characterId) {
+      TypedQuery<CharacterData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.CharacterData(c.name, c.level) " +
+                  "FROM Character c " +
+                  "WHERE c.accountId = :accountId AND c.id != :id " +
+                  "ORDER BY c.level DESC", CharacterData.class);
+      query.setParameter("accountId", accountId);
+      query.setParameter("id", characterId);
+      query.setMaxResults(1);
+      return getSingleOptional(query);
    }
 
-   public int getCharactersInWorld(Connection connection, int accountId, int worldId) {
-      String sql = "SELECT COUNT(*) AS rowcount FROM characters WHERE accountid = ? AND world = ?";
-      return getNew(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-         ps.setInt(2, worldId);
-      }, rs -> rs.getInt("rowcount")).orElse(0);
+   public int getCharactersInWorld(EntityManager entityManager, int accountId, int worldId) {
+      TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(*) FROM Character c WHERE c.accountId = :accountId AND c.world = :world", Long.class);
+      query.setParameter("accountId", accountId);
+      query.setParameter("world", worldId);
+      try {
+         return query.getSingleResult().intValue();
+      } catch (NoResultException exception) {
+         return 0;
+      }
    }
 
-   public int getMesosForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT meso FROM characters WHERE id = ?";
-      return getNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("meso")).orElse(0);
+   public int getMesosForCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT c.meso FROM Character c WHERE c.id = :id", Integer.class);
+      query.setParameter("id", characterId);
+      return query.getSingleResult();
    }
 
-   public Optional<CharacterGuildFamilyData> getGuildFamilyInformation(Connection connection, int characterId) {
-      String sql = "SELECT `world`, `guildid`, `guildrank`, `familyId` FROM characters WHERE id = ?";
-      return getNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new CharacterGuildFamilyData(
-            rs.getInt("world"),
-            rs.getInt("guildid"),
-            rs.getInt("guildrank"),
-            rs.getInt("familyId")
-      ));
+   public Optional<CharacterGuildFamilyData> getGuildFamilyInformation(EntityManager entityManager, int characterId) {
+      TypedQuery<CharacterGuildFamilyData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.CharacterGuildFamilyData(c.world, c.guildId, c.guildRank, c.familyId) " +
+                  "FROM Character c " +
+                  "WHERE c.id = :id", CharacterGuildFamilyData.class);
+      query.setParameter("id", characterId);
+      return Optional.of(query.getSingleResult());
    }
 }

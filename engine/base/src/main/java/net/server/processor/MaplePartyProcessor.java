@@ -155,32 +155,30 @@ public class MaplePartyProcessor {
 
       if (party != null && partyCharacter != null) {
          if (partyCharacter.equals(party.getLeader())) {
-            party.getMemberById(expelCid).ifPresent(expelled -> {
-               expelled.getPlayer().ifPresentOrElse(emc -> {
-                  List<MapleCharacter> partyMembers = emc.getPartyMembersOnline();
+            party.getMemberById(expelCid).ifPresent(expelled -> expelled.getPlayer().ifPresentOrElse(emc -> {
+               List<MapleCharacter> partyMembers = emc.getPartyMembersOnline();
 
-                  MapleMap map = emc.getMap();
-                  if (map != null) {
-                     map.removePartyMember(emc);
-                  }
+               MapleMap map = emc.getMap();
+               if (map != null) {
+                  map.removePartyMember(emc);
+               }
 
-                  MonsterCarnival monsterCarnival = player.getMonsterCarnival();
-                  if (monsterCarnival != null) {
-                     monsterCarnival.leftParty(emc.getId());
-                  }
+               MonsterCarnival monsterCarnival = player.getMonsterCarnival();
+               if (monsterCarnival != null) {
+                  monsterCarnival.leftParty(emc.getId());
+               }
 
-                  EventInstanceManager eim = emc.getEventInstance();
-                  if (eim != null) {
-                     eim.leftParty(emc);
-                  }
+               EventInstanceManager eim = emc.getEventInstance();
+               if (eim != null) {
+                  eim.leftParty(emc);
+               }
 
-                  emc.setParty(null);
-                  updateParty(party, PartyOperation.EXPEL, expelled);
+               emc.setParty(null);
+               updateParty(party, PartyOperation.EXPEL, expelled);
 
-                  emc.updatePartySearchAvailability(true);
-                  emc.partyOperationUpdate(party, partyMembers);
-               }, () -> updateParty(party, PartyOperation.EXPEL, expelled));
-            });
+               emc.updatePartySearchAvailability(true);
+               emc.partyOperationUpdate(party, partyMembers);
+            }, () -> updateParty(party, PartyOperation.EXPEL, expelled)));
          }
       }
    }

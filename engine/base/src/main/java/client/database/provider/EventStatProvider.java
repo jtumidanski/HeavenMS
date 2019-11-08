@@ -1,7 +1,9 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import tools.Pair;
@@ -19,8 +21,10 @@ public class EventStatProvider extends AbstractQueryExecutor {
    private EventStatProvider() {
    }
 
-   public List<Pair<String, Integer>> getInfo(Connection connection, int characterId) {
-      String sql = "SELECT `name`,`info` FROM eventstats WHERE characterid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new Pair<>(rs.getString("name"), rs.getInt("info")));
+   public List<Pair<String, Integer>> getInfo(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("SELECT e.name, e.info FROM EventStat e WHERE e.characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      List<Object[]> results = (List<Object[]>) query.getResultList();
+      return results.stream().map(result -> new Pair<>((String) result[0], (int) result[1])).collect(Collectors.toList());
    }
 }

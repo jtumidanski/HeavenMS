@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import client.MapleDisease;
 import client.MapleJob;
 import constants.skills.Aran;
 import provider.MapleData;

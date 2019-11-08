@@ -1,10 +1,13 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.MedalMap;
 
 public class MedalMapAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static MedalMapAdministrator instance;
@@ -20,17 +23,20 @@ public class MedalMapAdministrator extends AbstractQueryExecutor implements Dele
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM medalmaps WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM MedalMap WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, int questId, List<Integer> medalMaps) {
-      String sql = "INSERT INTO medalmaps VALUES (DEFAULT, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, questId);
-         ps.setInt(3, data);
-      }, medalMaps);
+   public void create(EntityManager entityManager, int characterId, int questId, List<Integer> medalMaps) {
+      List<MedalMap> medalMapList = medalMaps.stream().map(mapId -> {
+         MedalMap medalMap = new MedalMap();
+         medalMap.setCharacterId(characterId);
+         medalMap.setQuestStatusId(questId);
+         medalMap.setMapId(mapId);
+         return medalMap;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, medalMapList);
    }
 }

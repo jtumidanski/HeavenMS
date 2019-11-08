@@ -1,16 +1,14 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.SkillData;
+import entity.Skill;
 
-public class SkillTransformer implements SqlTransformer<SkillData, ResultSet> {
+public class SkillTransformer implements SqlTransformer<SkillData, Skill> {
    @Override
-   public SkillData transform(ResultSet resultSet) throws SQLException {
-      return new SkillData(resultSet.getInt("skillid"),
-            resultSet.getByte("skilllevel"),
-            resultSet.getInt("masterlevel"),
-            resultSet.getLong("expiration"));
+   public SkillData transform(Skill resultSet) {
+      return new SkillData(resultSet.getSkillId(),
+            resultSet.getSkillLevel().byteValue(),
+            resultSet.getMasterLevel(),
+            resultSet.getExpiration());
    }
 }

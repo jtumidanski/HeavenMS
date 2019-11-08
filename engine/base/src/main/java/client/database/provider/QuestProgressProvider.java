@@ -1,11 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.QuestProgressData;
 import client.database.utility.QuestProgressTransformer;
+import entity.quest.QuestProgress;
 
 public class QuestProgressProvider extends AbstractQueryExecutor {
    private static QuestProgressProvider instance;
@@ -20,9 +22,9 @@ public class QuestProgressProvider extends AbstractQueryExecutor {
    private QuestProgressProvider() {
    }
 
-   public List<QuestProgressData> getProgress(Connection connection, int characterId) {
-      String sql = "SELECT * FROM questprogress WHERE characterid = ?";
-      QuestProgressTransformer transformer = new QuestProgressTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public List<QuestProgressData> getProgress(EntityManager entityManager, int characterId) {
+      TypedQuery<QuestProgress> query = entityManager.createQuery("FROM QuestProgress p WHERE p.characterId = :characterId", QuestProgress.class);
+      query.setParameter("characterId", characterId);
+      return getResultList(query, new QuestProgressTransformer());
    }
 }

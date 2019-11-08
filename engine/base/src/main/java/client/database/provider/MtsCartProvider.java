@@ -1,8 +1,10 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -19,22 +21,27 @@ public class MtsCartProvider extends AbstractQueryExecutor {
    private MtsCartProvider() {
    }
 
-   public boolean isItemInCart(Connection connection, int characterId, int itemId) {
-      String sql = "SELECT cid FROM mts_cart WHERE cid = ? AND itemid = ?";
-      return getSingle(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, itemId);
-      }, "cid").isPresent();
+   public boolean isItemInCart(EntityManager entityManager, int characterId, int itemId) {
+      Query query = entityManager.createQuery("SELECT m.id FROM MtsCart m WHERE m.characterId = :characterId AND m.itemId = :itemId");
+      query.setParameter("characterId", characterId);
+      query.setParameter("itemId", itemId);
+      try {
+         query.getSingleResult();
+         return true;
+      } catch (NoResultException exception) {
+         return false;
+      }
    }
 
-   public long countCartSize(Connection connection, int characterId) {
-      String sql = "SELECT COUNT(*) FROM mts_cart WHERE cid = ?";
-      Optional<Long> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), 1);
-      return result.orElse(0L);
+   public long countCartSize(EntityManager entityManager, int characterId) {
+      TypedQuery<Long> query = entityManager.createQuery("SELECT COUNT(*) FROM MtsCart m WHERE m.characterId = :characterId", Long.class);
+      query.setParameter("characterId", characterId);
+      return getSingleWithDefault(query, 0L);
    }
 
-   public List<Integer> getCartItems(Connection connection, int characterId) {
-      String sql = "SELECT * FROM mts_cart WHERE cid = ? ORDER BY id DESC";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("itemid"));
+   public List<Integer> getCartItems(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT m.itemId FROM MtsCart m WHERE m.characterId = :characterId ORDER BY m.id DESC", Integer.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 }

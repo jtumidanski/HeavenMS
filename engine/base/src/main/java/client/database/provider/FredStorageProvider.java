@@ -1,13 +1,12 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.FrederickStorageData;
-import client.database.utility.FredStorageDataTransformer;
 import client.processor.FredrickProcessor;
 
 public class FredStorageProvider extends AbstractQueryExecutor {
@@ -23,15 +22,16 @@ public class FredStorageProvider extends AbstractQueryExecutor {
    private FredStorageProvider() {
    }
 
-   public int get(Connection connection, int characterId) {
-      String sql = "SELECT `timestamp` FROM `fredstorage` WHERE `cid` = ?";
-      Optional<Timestamp> result = getSingle(connection, sql, ps -> ps.setInt(1, characterId), "timestamp");
-      return result.map(timestamp -> FredrickProcessor.timestampElapsedDays(timestamp, System.currentTimeMillis())).orElse(0);
+   public int get(EntityManager entityManager, int characterId) {
+      TypedQuery<Timestamp> query = entityManager.createQuery("SELECT f.timestamp FROM FredStorage f WHERE f.characterId = :characterId", Timestamp.class);
+      query.setParameter("characterId", characterId);
+      return FredrickProcessor.timestampElapsedDays(query.getSingleResult(), System.currentTimeMillis());
    }
 
-   public List<FrederickStorageData> get(Connection connection) {
-      String sql = "SELECT * FROM fredstorage f LEFT JOIN (SELECT id, name, world, lastLogoutTime FROM characters) AS c ON c.id = f.cid";
-      FredStorageDataTransformer transformer = new FredStorageDataTransformer();
-      return getListNew(connection, sql, transformer::transform);
+   public List<FrederickStorageData> get(EntityManager entityManager) {
+      TypedQuery<FrederickStorageData> query = entityManager.createQuery("" +
+            "SELECT NEW client.database.data.FrederickStorageData(c.id, c.name, c.world, f.timestamp, f.dayNotes, c.lastLogoutTime) " +
+            "FROM FredStorage f LEFT JOIN Character c ON c.id = f.characterId", FrederickStorageData.class);
+      return query.getResultList();
    }
 }

@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,9 +19,9 @@ public class WishListProvider extends AbstractQueryExecutor {
    private WishListProvider() {
    }
 
-   public List<Integer> getWishListSn(Connection connection, int characterId) {
-      String sql = "SELECT `sn` FROM `wishlists` WHERE `charid` = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId),
-            rs -> rs.getInt("sn"));
+   public List<Integer> getWishListSn(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT w.sn FROM Wishlist w WHERE w.characterId = :characterId", Integer.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 }

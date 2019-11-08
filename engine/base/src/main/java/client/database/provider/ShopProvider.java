@@ -1,11 +1,12 @@
 package client.database.provider;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
+import entity.Shop;
 import server.MapleShop;
 
 public class ShopProvider extends AbstractQueryExecutor {
@@ -21,17 +22,29 @@ public class ShopProvider extends AbstractQueryExecutor {
    private ShopProvider() {
    }
 
-   public Optional<MapleShop> getById(Connection connection, int shopId) {
-      String sql = "SELECT * FROM shops WHERE shopid = ?";
-      return getNew(connection, sql, ps -> ps.setInt(1, shopId), this::processGetShopResultSet);
+   public Optional<MapleShop> getById(EntityManager entityManager, int shopId) {
+      TypedQuery<Shop> query = entityManager.createQuery("FROM Shop s WHERE s.shopId = :shopId", Shop.class);
+      query.setParameter("shopId", shopId);
+      try {
+         Shop shop = query.getSingleResult();
+         return Optional.of(processGetShopResultSet(shop));
+      } catch (NoResultException exception) {
+         return Optional.empty();
+      }
    }
 
-   public Optional<MapleShop> getByNPC(Connection connection, int npcId) {
-      String sql = "SELECT * FROM shops WHERE npcid = ?";
-      return getNew(connection, sql, ps -> ps.setInt(1, npcId), this::processGetShopResultSet);
+   public Optional<MapleShop> getByNPC(EntityManager entityManager, int npcId) {
+      TypedQuery<Shop> query = entityManager.createQuery("FROM Shop s WHERE s.npcId = :npcId", Shop.class);
+      query.setParameter("npcId", npcId);
+      try {
+         Shop shop = query.getSingleResult();
+         return Optional.of(processGetShopResultSet(shop));
+      } catch (NoResultException exception) {
+         return Optional.empty();
+      }
    }
 
-   private MapleShop processGetShopResultSet(ResultSet rs) throws SQLException {
-      return new MapleShop(rs.getInt("shopid"), rs.getInt("npcid"));
+   private MapleShop processGetShopResultSet(Shop shop) {
+      return new MapleShop(shop.getShopId(), shop.getNpcId());
    }
 }

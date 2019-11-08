@@ -1,10 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.MapleQuestStatus;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.quest.QuestStatus;
 
 public class QuestStatusAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static QuestStatusAdministrator instance;
@@ -20,21 +22,22 @@ public class QuestStatusAdministrator extends AbstractQueryExecutor implements D
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM queststatus WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM QuestStatus WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public int create(Connection connection, int characterId, MapleQuestStatus mapleQuestStatus) {
-      String sql = "INSERT INTO queststatus (`queststatusid`, `characterid`, `quest`, `status`, `time`, `expires`, `forfeited`, `completed`) VALUES (DEFAULT, ?, ?, ?, ?, ?, ?, ?)";
-      return insertAndReturnKey(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, mapleQuestStatus.getQuest().getId());
-         ps.setInt(3, mapleQuestStatus.getStatus().getId());
-         ps.setInt(4, (int) (mapleQuestStatus.getCompletionTime() / 1000));
-         ps.setLong(5, mapleQuestStatus.getExpirationTime());
-         ps.setInt(6, mapleQuestStatus.getForfeited());
-         ps.setInt(7, mapleQuestStatus.getCompleted());
-      });
+   public int create(EntityManager entityManager, int characterId, MapleQuestStatus mapleQuestStatus) {
+      QuestStatus questStatus = new QuestStatus();
+      questStatus.setCharacterId(characterId);
+      questStatus.setQuest((int) mapleQuestStatus.getQuest().getId());
+      questStatus.setStatus(mapleQuestStatus.getStatus().getId());
+      questStatus.setTime((int) (mapleQuestStatus.getCompletionTime() / 1000));
+      questStatus.setExpires(mapleQuestStatus.getExpirationTime());
+      questStatus.setForfeited(mapleQuestStatus.getForfeited());
+      questStatus.setCompleted(mapleQuestStatus.getCompleted());
+      insert(entityManager, questStatus);
+      return questStatus.getQuestStatusId();
    }
 }

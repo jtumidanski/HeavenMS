@@ -1,7 +1,9 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import tools.Pair;
@@ -19,8 +21,10 @@ public class AreaInfoProvider extends AbstractQueryExecutor {
    private AreaInfoProvider() {
    }
 
-   public List<Pair<Short, String>> getAreaInfo(Connection connection, int characterId) {
-      String sql = "SELECT `area`,`info` FROM area_info WHERE charid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> new Pair<>(rs.getShort("area"), rs.getString("info")));
+   public List<Pair<Short, String>> getAreaInfo(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("SELECT ai.area, ai.info FROM AreaInfo ai WHERE ai.characterId = :characterId", Pair.class);
+      query.setParameter("characterId", characterId);
+      List<Object[]> list = (List<Object[]>) query.getResultList();
+      return list.stream().map(result -> new Pair<>((short) result[0], (String) result[1])).collect(Collectors.toList());
    }
 }

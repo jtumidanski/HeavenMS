@@ -1,9 +1,13 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.List;
+import java.util.function.Consumer;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
+import entity.bbs.BBSThread;
 import net.server.Server;
 
 public class BbsThreadAdministrator extends AbstractQueryExecutor {
@@ -19,61 +23,75 @@ public class BbsThreadAdministrator extends AbstractQueryExecutor {
    private BbsThreadAdministrator() {
    }
 
-   public void deleteThreadsFromCharacter(Connection connection, int characterId) {
-      String getThreadSql = "SELECT threadid FROM bbs_threads WHERE postercid = ?";
-      List<Integer> result = getListNew(connection, getThreadSql, ps -> ps.setInt(1, characterId),
-            rs -> rs.getInt("threadid"));
+   protected void update(EntityManager entityManager, int id, Consumer<BBSThread> consumer) {
+      super.update(entityManager, BBSThread.class, id, consumer);
+   }
 
-      if (result.isEmpty()) {
+   public void deleteThreadsFromCharacter(EntityManager entityManager, int characterId) {
+      entityManager.getTransaction().begin();
+
+      TypedQuery<Integer> threadQuery = entityManager.createQuery("SELECT b.threadId FROM BBSThread b WHERE b.posterId = :characterId", Integer.class);
+      threadQuery.setParameter("characterId", characterId);
+      List<Integer> threads = threadQuery.getResultList();
+
+      if (threads.size() == 0) {
+         entityManager.getTransaction().commit();
          return;
       }
 
-      String deleteRepliesSql = "DELETE FROM bbs_replies WHERE threadid = ?";
-      result.forEach(threadId -> execute(connection, deleteRepliesSql, ps -> ps.setInt(1, threadId)));
+      Query deleteReplyQuery = entityManager.createQuery("DELETE FROM BBSReply WHERE threadId in :threadIds");
+      deleteReplyQuery.setParameter("threadIds", threads);
+      deleteReplyQuery.executeUpdate();
 
-      String deleteThreadSql = "DELETE FROM bbs_threads WHERE postercid = ?";
-      execute(connection, deleteThreadSql, ps -> ps.setInt(1, characterId));
+      Query deleteThreadQuery = entityManager.createQuery("DELETE FROM BBSThread b WHERE b.posterId = :characterId");
+      deleteThreadQuery.setParameter("characterId", characterId);
+      deleteThreadQuery.executeUpdate();
+
+      entityManager.getTransaction().commit();
    }
 
-   public void decrementReplyCount(Connection connection, int threadId) {
-      String sql = "UPDATE bbs_threads SET replycount = replycount - 1 WHERE threadid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, threadId));
+   public void decrementReplyCount(EntityManager entityManager, int threadId) {
+      Query query = entityManager.createQuery("UPDATE BBSThread SET replyCount = replyCount - 1 WHERE threadId = :threadId");
+      query.setParameter("threadId", threadId);
+      execute(entityManager, query);
    }
 
-   public void incrementReplyCount(Connection connection, int threadId) {
-      String sql = "UPDATE bbs_threads SET replycount = replycount + 1 WHERE threadid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, threadId));
+   public void incrementReplyCount(EntityManager entityManager, int threadId) {
+      Query query = entityManager.createQuery("UPDATE BBSThread SET replyCount = replyCount + 1 WHERE threadId = :threadId");
+      query.setParameter("threadId", threadId);
+      execute(entityManager, query);
    }
 
-   public void deleteById(Connection connection, int threadId) {
-      String sql = "DELETE FROM bbs_threads WHERE threadid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, threadId));
+   public void deleteById(EntityManager entityManager, int threadId) {
+      Query query = entityManager.createQuery("DELETE FROM BBSThread WHERE threadId = :threadId");
+      query.setParameter("threadId", threadId);
+      execute(entityManager, query);
    }
 
-   public void editThread(Connection connection, int threadId, int guildId, int posterId, boolean privileged, String title, int icon, String text) {
-      String sql = "UPDATE bbs_threads SET `name` = ?, `timestamp` = ?, " + "`icon` = ?, " + "`startpost` = ? WHERE guildid = ? AND localthreadid = ? AND (postercid = ? OR ?)";
-      execute(connection, sql, ps -> {
-         ps.setString(1, title);
-         ps.setLong(2, Server.getInstance().getCurrentTime());
-         ps.setInt(3, icon);
-         ps.setString(4, text);
-         ps.setInt(5, guildId);
-         ps.setInt(6, threadId);
-         ps.setInt(7, posterId);
-         ps.setBoolean(8, privileged);
-      });
+   public void editThread(EntityManager entityManager, int threadId, int guildId, int posterId, boolean privileged, String title, int icon, String text) {
+      Query query = entityManager.createQuery(
+            "UPDATE BBSThread SET name = :name, timestamp = :timestamp, icon = :icon, startPost = :startPost " +
+                  "WHERE guildId = :guildId AND localThreadId = :localThreadId AND (posterId = :posterId OR :privileged)");
+      query.setParameter("name", title);
+      query.setParameter("timestamp", Server.getInstance().getCurrentTime());
+      query.setParameter("icon", icon);
+      query.setParameter("startPost", text);
+      query.setParameter("guildId", guildId);
+      query.setParameter("localThreadId", threadId);
+      query.setParameter("posterId", posterId);
+      query.setParameter("privileged", privileged);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int posterId, String title, int icon, String text, int guildId, int threadId) {
-      String sql = "INSERT INTO bbs_threads " + "(`postercid`, `name`, `timestamp`, `icon`, `startpost`, " + "`guildid`, `localthreadid`) " + "VALUES(?, ?, ?, ?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, posterId);
-         ps.setString(2, title);
-         ps.setLong(3, Server.getInstance().getCurrentTime());
-         ps.setInt(4, icon);
-         ps.setString(5, text);
-         ps.setInt(6, guildId);
-         ps.setInt(7, threadId);
-      });
+   public void create(EntityManager entityManager, int posterId, String title, int icon, String text, int guildId, int threadId) {
+      BBSThread bbsThread = new BBSThread();
+      bbsThread.setPosterId(posterId);
+      bbsThread.setName(title);
+      bbsThread.setTimestamp(Server.getInstance().getCurrentTime());
+      bbsThread.setIcon(icon);
+      bbsThread.setStartPost(text);
+      bbsThread.setGuildId(guildId);
+      bbsThread.setLocalThreadId(threadId);
+      insert(entityManager, bbsThread);
    }
 }

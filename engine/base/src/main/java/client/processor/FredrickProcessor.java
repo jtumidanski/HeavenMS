@@ -23,13 +23,14 @@
 */
 package client.processor;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -112,8 +113,8 @@ public class FredrickProcessor {
       DatabaseConnection.getInstance().withConnection(connection -> removeFredrickLog(connection, cid));
    }
 
-   private static void removeFredrickLog(Connection con, int cid) {
-      FredStorageAdministrator.getInstance().deleteForCharacter(con, cid);
+   private static void removeFredrickLog(EntityManager entityManager, int cid) {
+      FredStorageAdministrator.getInstance().deleteForCharacter(entityManager, cid);
    }
 
    public static void insertFredrickLog(int cid) {

@@ -22,7 +22,6 @@
 package server.life;
 
 import java.awt.Point;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -33,6 +32,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -98,14 +99,14 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       this.objectId_$eq(oid);
    }
 
-   public MaplePlayerNPC(int id, int x, int cy, String name, int hair, int face, byte skin, int gender, int dir, int fh, int rx0,
+   public MaplePlayerNPC(int id, int x, int cy, String name, int hair, int face, int skin, int gender, int dir, int fh, int rx0,
                          int rx1, int scriptId, int worldRank, int overallRank, int worldJobRank, int overallJobRank, int job) {
       this.objectId_$eq(id);
       this.CY = cy;
       this.name = name;
       this.hair = hair;
       this.face = face;
-      this.skin = skin;
+      this.skin = (byte) skin;
       this.gender = gender;
       this.dir = dir;
       this.FH = fh;
@@ -128,24 +129,24 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       });
    }
 
-   private static void getRunningOverallRanks(Connection connection) {
-      runningOverallRank.set(PlayerNpcProvider.getInstance().getMaxRank(connection) + 1);
+   private static void getRunningOverallRanks(EntityManager entityManager) {
+      runningOverallRank.set(PlayerNpcProvider.getInstance().getMaxRank(entityManager) + 1);
    }
 
-   private static void getRunningWorldRanks(Connection connection) {
+   private static void getRunningWorldRanks(EntityManager entityManager) {
       int numWorlds = Server.getInstance().getWorldsSize();
       for (int i = 0; i < numWorlds; i++) {
          runningWorldRank.add(new AtomicInteger(1));
       }
 
 
-      PlayerNpcProvider.getInstance().getMaxRankByWorld(connection).stream()
+      PlayerNpcProvider.getInstance().getMaxRankByWorld(entityManager).stream()
             .filter(result -> result.getLeft() < numWorlds)
             .forEach(result -> runningWorldRank.get(result.getLeft()).set(result.getRight() + 1));
    }
 
-   private static void getRunningWorldJobRanks(Connection connection) {
-      PlayerNpcProvider.getInstance().getMaxRankByJobAndWorld(connection).forEach(result -> runningWorldJobRank.put(result.getLeft(), result.getRight()));
+   private static void getRunningWorldJobRanks(EntityManager entityManager) {
+      PlayerNpcProvider.getInstance().getMaxRankByJobAndWorld(entityManager).forEach(result -> runningWorldJobRank.put(result.getLeft(), result.getRight()));
    }
 
    private static int getAndIncrementRunningWorldJobRanks(int world, int job) {

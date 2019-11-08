@@ -60,16 +60,16 @@ class NPC9020000 {
                cm.dispose()
             } else {
                if (selection == 0) {
-                  if (cm.getParty() == null) {
+                  if (cm.getParty().isEmpty()) {
                      cm.sendOk("You can participate in the party quest only if you are in a party.")
                      cm.dispose()
                   } else if (!cm.isLeader()) {
                      cm.sendOk("Your party leader must talk to me to start this party quest.")
                      cm.dispose()
                   } else {
-                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty())
+                     MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                      if (eli.size() > 0) {
-                        if (!em.startInstance(cm.getParty(), cm.getPlayer().getMap(), 1)) {
+                        if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
                            cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
                         }
                      } else {

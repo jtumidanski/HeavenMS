@@ -1,11 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.SkillData;
 import client.database.utility.SkillTransformer;
+import entity.Skill;
 
 public class SkillProvider extends AbstractQueryExecutor {
    private static SkillProvider instance;
@@ -20,9 +22,9 @@ public class SkillProvider extends AbstractQueryExecutor {
    private SkillProvider() {
    }
 
-   public List<SkillData> getSkills(Connection connection, int characterId) {
-      String sql = "SELECT skillid,skilllevel,masterlevel,expiration FROM skills WHERE characterid = ?";
-      SkillTransformer transformer = new SkillTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public List<SkillData> getSkills(EntityManager entityManager, int characterId) {
+      TypedQuery<Skill> query = entityManager.createQuery("FROM Skill s WHERE s.characterId = :characterId", Skill.class);
+      query.setParameter("characterId", characterId);
+      return getResultList(query, new SkillTransformer());
    }
 }

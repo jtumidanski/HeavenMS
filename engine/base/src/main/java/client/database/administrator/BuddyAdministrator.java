@@ -1,11 +1,15 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.BuddyListEntry;
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.Buddy;
 
 public class BuddyAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static BuddyAdministrator instance;
@@ -21,43 +25,47 @@ public class BuddyAdministrator extends AbstractQueryExecutor implements DeleteF
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM buddies WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Buddy WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void deleteNotPendingForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM buddies WHERE characterid = ? AND pending = 0";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteNotPendingForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Buddy WHERE characterId = :characterId AND pending = 0");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void deletePendingForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM buddies WHERE pending = 1 AND characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deletePendingForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Buddy WHERE pending = 1 AND characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void addBuddy(Connection connection, int characterId, int buddyId) {
-      String sql = "INSERT INTO buddies (characterid, `buddyid`, `pending`) VALUES (?, ?, 1)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, buddyId);
-      });
+   public void addBuddy(EntityManager entityManager, int characterId, int buddyId) {
+      Buddy buddy = new Buddy();
+      buddy.setCharacterId(characterId);
+      buddy.setBuddyId(buddyId);
+      buddy.setPending(1);
+      insert(entityManager, buddy);
    }
 
-   public void addBuddies(Connection connection, int characterId, Collection<BuddyListEntry> buddies) {
-      String sql = "INSERT INTO buddies (characterid, `buddyid`, `pending`, `group`) VALUES (?, ?, 0, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, data.characterId());
-         ps.setString(3, data.group());
-      }, buddies);
+   public void addBuddies(EntityManager entityManager, int characterId, Collection<BuddyListEntry> buddies) {
+      List<Buddy> buddyList = buddies.stream().map(buddyListEntry -> {
+         Buddy buddy = new Buddy();
+         buddy.setCharacterId(characterId);
+         buddy.setBuddyId(buddyListEntry.characterId());
+         buddy.setPending(0);
+         buddy.setBuddyGroup(buddyListEntry.group());
+         return buddy;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, buddyList);
    }
 
-   public void deleteForCharacterOrBuddyId(Connection connection, int characterId) {
-      String sql = "DELETE FROM buddies WHERE characterid = ? OR buddyid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, characterId);
-         ps.setInt(2, characterId);
-      });
+   public void deleteForCharacterOrBuddyId(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Buddy WHERE characterId = :characterId OR buddyId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 }

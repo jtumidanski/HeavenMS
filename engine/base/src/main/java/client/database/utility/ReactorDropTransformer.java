@@ -1,15 +1,13 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import entity.ReactorDrop;
 import server.maps.ReactorDropEntry;
 
-public class ReactorDropTransformer implements SqlTransformer<ReactorDropEntry, ResultSet> {
+public class ReactorDropTransformer implements SqlTransformer<ReactorDropEntry, ReactorDrop> {
    @Override
-   public ReactorDropEntry transform(ResultSet resultSet) throws SQLException {
-      return new ReactorDropEntry(resultSet.getInt("itemid"),
-            resultSet.getInt("chance"),
-            resultSet.getInt("questid"));
+   public ReactorDropEntry transform(ReactorDrop resultSet) {
+      return new ReactorDropEntry(resultSet.getItemId(),
+            resultSet.getChance(),
+            resultSet.getQuestId());
    }
 }

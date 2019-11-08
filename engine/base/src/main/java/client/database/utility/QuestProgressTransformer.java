@@ -1,15 +1,13 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.QuestProgressData;
+import entity.quest.QuestProgress;
 
-public class QuestProgressTransformer implements SqlTransformer<QuestProgressData, ResultSet> {
+public class QuestProgressTransformer implements SqlTransformer<QuestProgressData, QuestProgress> {
    @Override
-   public QuestProgressData transform(ResultSet resultSet) throws SQLException {
-      return new QuestProgressData(resultSet.getInt("queststatusid"),
-            resultSet.getInt("progressid"),
-            resultSet.getString("progress"));
+   public QuestProgressData transform(QuestProgress resultSet) {
+      return new QuestProgressData(resultSet.getQuestStatusId(),
+            resultSet.getProgressId(),
+            resultSet.getProgress());
    }
 }

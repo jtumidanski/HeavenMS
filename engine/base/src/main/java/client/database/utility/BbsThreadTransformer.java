@@ -1,13 +1,12 @@
 package client.database.utility;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import client.database.data.BbsThreadData;
+import entity.bbs.BBSThread;
 
-public class BbsThreadTransformer implements SqlTransformer<BbsThreadData, ResultSet> {
+public class BbsThreadTransformer implements SqlTransformer<BbsThreadData, BBSThread> {
    @Override
-   public BbsThreadData transform(ResultSet resultSet) throws SQLException {
-      return null;
+   public BbsThreadData transform(BBSThread bbsThread) {
+      return new BbsThreadData(bbsThread.getPosterId(), bbsThread.getTimestamp(),
+            bbsThread.getName(), bbsThread.getStartPost(), bbsThread.getIcon(), bbsThread.getReplyCount(), bbsThread.getThreadId());
    }
 }

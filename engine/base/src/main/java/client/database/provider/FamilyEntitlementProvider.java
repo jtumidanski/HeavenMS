@@ -1,7 +1,8 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,8 +19,9 @@ public class FamilyEntitlementProvider extends AbstractQueryExecutor {
    private FamilyEntitlementProvider() {
    }
 
-   public List<Integer> getIdsByCharacter(Connection connection, int characterId) {
-      String sql = "SELECT entitlementid FROM family_entitlement WHERE charid = ?";
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), rs -> rs.getInt("entitlementid"));
+   public List<Integer> getIdsByCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT f.entitlementId FROM FamilyEntitlement f WHERE f.characterId = :characterId", Integer.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 }

@@ -1,11 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.PlayerDiseaseData;
 import client.database.utility.PlayerDiseaseTransformer;
+import entity.PlayerDisease;
 
 public class PlayerDiseaseProvider extends AbstractQueryExecutor {
    private static PlayerDiseaseProvider instance;
@@ -20,9 +22,9 @@ public class PlayerDiseaseProvider extends AbstractQueryExecutor {
    private PlayerDiseaseProvider() {
    }
 
-   public List<PlayerDiseaseData> getForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT * FROM playerdiseases WHERE charid = ?";
-      PlayerDiseaseTransformer transformer = new PlayerDiseaseTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public List<PlayerDiseaseData> getForCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<PlayerDisease> query = entityManager.createQuery("FROM PlayerDisease p WHERE p.characterId = :characterId", PlayerDisease.class);
+      query.setParameter("characterId", characterId);
+      return getResultList(query, new PlayerDiseaseTransformer());
    }
 }

@@ -1,8 +1,12 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import java.util.function.Consumer;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Guild;
 
 public class GuildAdministrator extends AbstractQueryExecutor {
    private static GuildAdministrator instance;
@@ -17,51 +21,43 @@ public class GuildAdministrator extends AbstractQueryExecutor {
    private GuildAdministrator() {
    }
 
-   public void deleteGuild(Connection connection, int guildId) {
-      String sql = "DELETE FROM guilds WHERE guildid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, guildId));
+   protected void update(EntityManager entityManager, int id, Consumer<Guild> consumer) {
+      super.update(entityManager, Guild.class, id, consumer);
    }
 
-   public void createGuild(Connection connection, int leaderId, String name) {
-      String sql = "INSERT INTO guilds (`leader`, `name`, `signature`) VALUES (?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, leaderId);
-         ps.setString(2, name);
-         ps.setInt(3, (int) System.currentTimeMillis());
-      });
+   public void deleteGuild(EntityManager entityManager, int guildId) {
+      Query query = entityManager.createQuery("DELETE FROM Guild WHERE guildId = :guildId");
+      query.setParameter("guildId", guildId);
+      execute(entityManager, query);
    }
 
-   public void update(Connection connection, int gp, int logo, int logoColor, int logoBackground,
+   public void createGuild(EntityManager entityManager, int leaderId, String name) {
+      Guild guild = new Guild();
+      guild.setLeader(leaderId);
+      guild.setName(name);
+      guild.setSignature((int) System.currentTimeMillis());
+      insert(entityManager, guild);
+   }
+
+   public void update(EntityManager entityManager, int gp, int logo, int logoColor, int logoBackground,
                       int logoBackgroundColor, String[] rankTitles, int capacity, String notice, int guildId) {
-      StringBuilder builder = new StringBuilder();
-      builder.append("UPDATE guilds SET GP = ?, logo = ?, logoColor = ?, logoBG = ?, logoBGColor = ?, ");
-      for (int i = 0; i < 5; i++) {
-         builder.append("rank").append(i + 1).append("title = ?, ");
-      }
-      builder.append("capacity = ?, notice = ? WHERE guildid = ?");
-
-      execute(connection, builder.toString(), ps -> {
-         ps.setInt(1, gp);
-         ps.setInt(2, logo);
-         ps.setInt(3, logoColor);
-         ps.setInt(4, logoBackground);
-         ps.setInt(5, logoBackgroundColor);
-         for (int i = 6; i < 11; i++) {
-            ps.setString(i, rankTitles[i - 6]);
-         }
-         ps.setInt(11, capacity);
-         ps.setString(12, notice);
-         ps.setInt(13, guildId);
-         ps.execute();
-
+      update(entityManager, guildId, guild -> {
+         guild.setGp(gp);
+         guild.setLogo(logo);
+         guild.setLogoColor(logoColor);
+         guild.setLogoBackground(logoBackground);
+         guild.setLogoBackgroundColor(logoBackgroundColor);
+         guild.setRank1Title(rankTitles[0]);
+         guild.setRank2Title(rankTitles[1]);
+         guild.setRank3Title(rankTitles[2]);
+         guild.setRank4Title(rankTitles[3]);
+         guild.setRank5Title(rankTitles[4]);
+         guild.setCapacity(capacity);
+         guild.setNotice(notice);
       });
    }
 
-   public void setAlliance(Connection connection, int guildId, int allianceId) {
-      String sql = "UPDATE guilds SET allianceId = ? WHERE guildid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, allianceId);
-         ps.setInt(2, guildId);
-      });
+   public void setAlliance(EntityManager entityManager, int guildId, int allianceId) {
+      update(entityManager, guildId, guild -> guild.setAllianceId(allianceId));
    }
 }

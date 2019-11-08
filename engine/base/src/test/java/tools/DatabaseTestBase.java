@@ -18,8 +18,8 @@ public abstract class DatabaseTestBase {
       databaseConnection = PowerMockito.spy(DatabaseConnection.getInstance());
       PowerMockito.mockStatic(DatabaseConnection.class);
       Mockito.when(DatabaseConnection.getInstance()).thenReturn(databaseConnection);
-      Mockito.doNothing().when(databaseConnection).initHikariDataSource();
-      Mockito.doReturn(connection).when(databaseConnection).getConnection();
+//      Mockito.doNothing().when(databaseConnection).initHikariDataSource();
+//      Mockito.doReturn(connection).when(databaseConnection).getConnection();
       Mockito.doCallRealMethod().when(databaseConnection).withConnectionResult(Mockito.any());
    }
 

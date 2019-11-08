@@ -1,18 +1,11 @@
 package tools;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import javax.persistence.EntityManager;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
-import client.database.SQLConsumer;
 import client.database.provider.AccountProvider;
-import constants.ServerConstants;
 
 /**
  * @author Frz - Big Daddy
@@ -20,7 +13,6 @@ import constants.ServerConstants;
  * @author Ronan - some connection pool to this beautiful code
  */
 public class DatabaseConnection {
-   private static HikariDataSource ds;
 
    private static DatabaseConnection ourInstance = new DatabaseConnection();
 
@@ -35,158 +27,39 @@ public class DatabaseConnection {
          System.out.println("[SEVERE] SQL Driver Not Found. Consider death by clams.");
          e.printStackTrace();
       }
-      ds = null;
    }
 
-   public void initHikariDataSource() {
-      // Connection Pool on database ftw!
-
-      HikariConfig config = new HikariConfig();
-      config.setJdbcUrl(ServerConstants.DB_URL);
-
-      config.setUsername(ServerConstants.DB_USER);
-      config.setPassword(ServerConstants.DB_PASS);
-
-      // Make sure pool size is comfortable for the worst case scenario.
-      // Under 100 accounts? Make it 10. Over 10000 accounts? Make it 30.
-      int poolSize = (int) Math.ceil(0.00202020202 * 100 + 9.797979798);
-      if (poolSize < 10) {
-         poolSize = 10;
-      } else if (poolSize > 30) {
-         poolSize = 30;
-      }
-
-      config.setConnectionTimeout(30 * 1000);
-      config.setMaximumPoolSize(poolSize);
-
-      config.addDataSourceProperty("cachePrepStmts", true);
-      config.addDataSourceProperty("prepStmtCacheSize", 25);
-      config.addDataSourceProperty("prepStmtCacheSqlLimit", 2048);
-
-      ds = new HikariDataSource(config);
+   public void withConnection(Consumer<EntityManager> consumer) {
+      EntityManager entityManager = PersistenceManager.getInstance();
+      consumer.accept(entityManager);
    }
 
-   public Connection getConnection() throws SQLException {
-      if (ds == null) {
-         if (ServerConstants.DB_CONNECTION_POOL) {
-            initHikariDataSource();
-         }
-      }
-
-      Connection connection = null;
-      if (ds != null) {
-         try {
-            connection = ds.getConnection();
-         } catch (SQLException sqle) {
-            sqle.printStackTrace();
-         }
-      } else {
-         int denies = 0;
-         while (true) {   // There is no way it can pass with a null out of here?
-            try {
-               connection = DriverManager.getConnection(ServerConstants.DB_URL, ServerConstants.DB_USER, ServerConstants.DB_PASS);
-               break;
-            } catch (SQLException sqle) {
-               denies++;
-
-               if (denies == 3) {
-                  // Give up, throw exception. Nothing good will come from this.
-                  FilePrinter.printError(FilePrinter.SQL_EXCEPTION, "SQL Driver refused to give a connection after " + denies + " tries. Problem: " + sqle.getMessage());
-                  throw sqle;
-               }
-            }
-         }
-      }
-
-      return connection;
-   }
-
-   public void withConnection(Consumer<Connection> consumer) {
-      Connection connection = null;
-      try {
-         connection = getConnection();
-         consumer.accept(connection);
-      } catch (SQLException e) {
-         e.printStackTrace();
-      } finally {
-         try {
-            if (connection != null) {
-               connection.close();
-            }
-         } catch (SQLException exception) {
-            exception.printStackTrace();
-         }
-      }
-   }
-
-   public void withExplicitCommitConnection(SQLConsumer<Connection> consumer) {
-      Connection connection = null;
-      try {
-         connection = getConnection();
-         connection.setAutoCommit(false);
-
-         consumer.accept(connection);
-
-         connection.setAutoCommit(true);
-      } catch (SQLException e) {
-         e.printStackTrace();
-         try {
-            if (connection != null) {
-               connection.rollback();
-               connection.setAutoCommit(true);
-            }
-         } catch (SQLException exception) {
-            exception.printStackTrace();
-         }
-      } finally {
-         try {
-            if (connection != null) {
-               connection.close();
-            }
-         } catch (SQLException exception) {
-            exception.printStackTrace();
-         }
-      }
-   }
-
-   public <T> Optional<T> withConnectionResult(Function<Connection, T> function) {
-      Connection connection = null;
-      Optional<T> result = Optional.empty();
-      try {
-         connection = getConnection();
-         result = Optional.ofNullable(function.apply(connection));
-      } catch (SQLException e) {
-         e.printStackTrace();
-      } finally {
-         try {
-            if (connection != null) {
-               connection.close();
-            }
-         } catch (SQLException exception) {
-            exception.printStackTrace();
-         }
-      }
+   public <T> Optional<T> withConnectionResult(Function<EntityManager, T> function) {
+      Optional<T> result;
+      EntityManager entityManager = PersistenceManager.getInstance();
+      result = Optional.ofNullable(function.apply(entityManager));
       return result;
    }
 
-   public <T> Optional<T> withConnectionResultOpt(Function<Connection, Optional<T>> function) {
-      Connection connection = null;
-      Optional<T> result = Optional.empty();
-      try {
-         connection = getConnection();
-         result = function.apply(connection);
-      } catch (SQLException e) {
-         e.printStackTrace();
-      } finally {
-         try {
-            if (connection != null) {
-               connection.close();
-            }
-         } catch (SQLException exception) {
-            exception.printStackTrace();
-         }
-      }
+   public <T> Optional<T> withConnectionResultOpt(Function<EntityManager, Optional<T>> function) {
+      Optional<T> result;
+      EntityManager entityManager = PersistenceManager.getInstance();
+      result = function.apply(entityManager);
       return result;
+   }
+
+   public void thing(EntityManager entityManager, Consumer<EntityManager> consumer) {
+      boolean newTransaction = false;
+      if (!entityManager.getTransaction().isActive()) {
+         newTransaction = true;
+         entityManager.getTransaction().begin();
+      }
+
+      consumer.accept(entityManager);
+
+      if (newTransaction) {
+         entityManager.getTransaction().commit();
+      }
    }
 
    private long getNumberOfAccounts() {

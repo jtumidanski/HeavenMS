@@ -1,11 +1,13 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.MacBan;
 
 public class MacBanAdministrator extends AbstractQueryExecutor {
    private static MacBanAdministrator instance;
@@ -20,16 +22,19 @@ public class MacBanAdministrator extends AbstractQueryExecutor {
    private MacBanAdministrator() {
    }
 
-   public void addMacBan(Connection connection, int accountId, Set<String> macs, List<String> filtered) {
-      String sql = "INSERT INTO macbans (mac, aid) VALUES (?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setString(1, data);
-         ps.setString(2, String.valueOf(accountId));
-      }, macs.stream().filter(mac -> !filtered.contains(mac)).collect(Collectors.toList()));
+   public void addMacBan(EntityManager entityManager, int accountId, Set<String> macs, List<String> filtered) {
+      List<MacBan> macBanList = macs.stream().filter(mac -> !filtered.contains(mac)).map(mac -> {
+         MacBan macBan = new MacBan();
+         macBan.setMac(mac);
+         macBan.setAid(String.valueOf(accountId));
+         return macBan;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, macBanList);
    }
 
-   public void removeMacBan(Connection connection, int accountId) {
-      String sql = "DELETE FROM macbans WHERE aid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, accountId));
+   public void removeMacBan(EntityManager entityManager, int accountId) {
+      Query query = entityManager.createQuery("DELETE FROM MacBan WHERE aid = :accountId");
+      query.setParameter("accountId", accountId);
+      execute(entityManager, query);
    }
 }

@@ -1,6 +1,5 @@
 package client.processor;
 
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import javax.persistence.EntityManager;
 
 import client.KeyBinding;
 import client.MapleCharacter;
@@ -85,7 +86,6 @@ import net.server.Server;
 import net.server.SkillMacro;
 import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MapleGuildProcessor;
-import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
 import scala.jdk.javaapi.CollectionConverters;
@@ -136,26 +136,24 @@ public class CharacterProcessor {
       return DatabaseConnection.getInstance().withConnectionResultOpt(connection -> CharacterProvider.getInstance().getByName(connection, name)).orElse(null);
    }
 
-   public boolean doWorldTransfer(Connection con, int characterId, int oldWorld, int newWorld, int worldTransferId) {
-      CharacterAdministrator.getInstance().performWorldTransfer(con, characterId, oldWorld, newWorld, worldTransferId);
+   public boolean doWorldTransfer(EntityManager entityManager, int characterId, int oldWorld, int newWorld, int worldTransferId) {
+      CharacterAdministrator.getInstance().performWorldTransfer(entityManager, characterId, oldWorld, newWorld, worldTransferId);
       return true;
    }
 
-   public String checkWorldTransferEligibility(Connection con, int characterId, int oldWorld, int newWorld) {
+   public String checkWorldTransferEligibility(EntityManager entityManager, int characterId, int oldWorld, int newWorld) {
       if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER) {
          return "World transfers disabled.";
       }
 
-      int accountId = -1;
-
-      Optional<CharacterData> characterDataResult = CharacterProvider.getInstance().getById(con, characterId);
+      Optional<CharacterData> characterDataResult = CharacterProvider.getInstance().getById(entityManager, characterId);
       if (characterDataResult.isEmpty()) {
          return "Character does not exist.";
       }
 
       CharacterData characterData = characterDataResult.get();
 
-      accountId = characterData.accountId();
+      int accountId = characterData.accountId();
       if (characterData.level() < 20) {
          return "Character is under level 20.";
       }
@@ -169,12 +167,13 @@ public class CharacterProcessor {
          return "Character is the leader of a guild.";
       }
 
-      Calendar tempBan = AccountProvider.getInstance().getTempBanCalendar(con, accountId);
+
+      Calendar tempBan = AccountProvider.getInstance().getTempBanCalendar(entityManager, accountId);
       if (tempBan != null) {
          return "Account has been banned.";
       }
 
-      int charCountInNewWorld = CharacterProvider.getInstance().getCharactersInWorld(con, accountId, newWorld);
+      int charCountInNewWorld = CharacterProvider.getInstance().getCharactersInWorld(entityManager, accountId, newWorld);
       if (charCountInNewWorld >= 3) {
          return "Too many characters on destination world.";
       }
@@ -188,68 +187,68 @@ public class CharacterProcessor {
          return false;
       }
 
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         int world = CharacterProvider.getInstance().getWorldId(connection, cid);
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         int world = CharacterProvider.getInstance().getWorldId(entityManager, cid);
 
-         BuddyProvider.getInstance().getBuddies(connection, cid).stream()
+         BuddyProvider.getInstance().getBuddies(entityManager, cid).stream()
                .map(buddyId -> Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(buddyId))
                .flatMap(Optional::stream)
                .forEach(buddy -> buddy.deleteBuddy(cid));
 
-         BuddyAdministrator.getInstance().deleteForCharacter(connection, cid);
-         BbsThreadAdministrator.getInstance().deleteThreadsFromCharacter(connection, cid);
-         CharacterProvider.getInstance().getGuildDataForCharacter(connection, cid, senderAccId).ifPresent(result -> MapleGuildProcessor.getInstance().removeGuildCharacter(
+         BuddyAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         BbsThreadAdministrator.getInstance().deleteThreadsFromCharacter(entityManager, cid);
+         CharacterProvider.getInstance().getGuildDataForCharacter(entityManager, cid, senderAccId).ifPresent(result -> MapleGuildProcessor.getInstance().removeGuildCharacter(
                new MapleGuildCharacter(player, cid, 0, result.name(), (byte) -1, (byte) -1, 0, result.guildRank(), result.guildId(), false, result.allianceRank())));
-         WishListAdministrator.getInstance().deleteForCharacter(connection, cid);
-         CoolDownAdministrator.getInstance().deleteForCharacter(connection, cid);
-         PlayerDiseaseAdministrator.getInstance().deleteForCharacter(connection, cid);
-         AreaInfoAdministrator.getInstance().deleteForCharacter(connection, cid);
-         MonsterBookAdministrator.getInstance().deleteForCharacter(connection, cid);
-         CharacterAdministrator.getInstance().deleteCharacter(connection, cid);
-         FameLogAdministrator.getInstance().deleteForCharacter(connection, cid);
-         cleanupInventoryEquipment(connection, cid);
-         deleteQuestProgressWhereCharacterId(connection, cid);
+         WishListAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         CoolDownAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         PlayerDiseaseAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         AreaInfoAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         MonsterBookAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         CharacterAdministrator.getInstance().deleteCharacter(entityManager, cid);
+         FameLogAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         cleanupInventoryEquipment(entityManager, cid);
+         deleteQuestProgressWhereCharacterId(entityManager, cid);
          FredrickProcessor.removeFredrickLog(cid);
-         MtsItemAdministrator.getInstance().deleteForCharacter(connection, cid);
-         MtsCartAdministrator.getInstance().deleteForCharacter(connection, cid);
-         InventoryItemAdministrator.getInstance().deleteForCharacter(connection, cid);
-         KeyMapAdministrator.getInstance().deleteForCharacter(connection, cid);
-         SavedLocationAdministrator.getInstance().deleteForCharacter(connection, cid);
-         TeleportRockLocationAdministrator.getInstance().deleteForCharacter(connection, cid);
-         SkillMacroAdministrator.getInstance().deleteForCharacter(connection, cid);
-         SkillAdministrator.getInstance().deleteForCharacter(connection, cid);
-         EventStatAdministrator.getInstance().deleteForCharacter(connection, cid);
-         ServerQueueAdministrator.getInstance().deleteForCharacter(connection, cid);
+         MtsItemAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         MtsCartAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         InventoryItemAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         KeyMapAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         SavedLocationAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         TeleportRockLocationAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         SkillMacroAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         SkillAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         EventStatAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         ServerQueueAdministrator.getInstance().deleteForCharacter(entityManager, cid);
       });
       Server.getInstance().deleteCharacterEntry(senderAccId, cid);
       return true;
    }
 
-   private void cleanupInventoryEquipment(Connection connection, int cid) {
-      InventoryItemProvider.getInstance().get(connection, cid).forEach(pair -> {
-         InventoryEquipmentProvider.getInstance().getRings(connection, pair.getLeft()).stream()
+   private void cleanupInventoryEquipment(EntityManager entityManager, int cid) {
+      InventoryItemProvider.getInstance().get(entityManager, cid).forEach(pair -> {
+         InventoryEquipmentProvider.getInstance().getRings(entityManager, pair.getLeft()).stream()
                .filter(ringId -> ringId > 1)
                .forEach(ringId -> {
-                  RingAdministrator.getInstance().deleteRing(connection, ringId);
+                  RingAdministrator.getInstance().deleteRing(entityManager, ringId);
                   MapleCashIdGenerator.getInstance().freeCashId(ringId);
                });
-         InventoryEquipmentAdministrator.getInstance().deleteById(connection, pair.getLeft());
+         InventoryEquipmentAdministrator.getInstance().deleteById(entityManager, pair.getLeft());
          if (pair.getRight() > -1) {
-            PetAdministrator.getInstance().deletePet(connection, pair.getRight());
+            PetAdministrator.getInstance().deletePet(entityManager, pair.getRight());
             MapleCashIdGenerator.getInstance().freeCashId(pair.getRight());
          }
       });
    }
 
-   public void deleteQuestProgressWhereCharacterId(Connection con, int cid) {
-      MedalMapAdministrator.getInstance().deleteForCharacter(con, cid);
-      QuestProgressAdministrator.getInstance().deleteForCharacter(con, cid);
-      QuestStatusAdministrator.getInstance().deleteForCharacter(con, cid);
+   public void deleteQuestProgressWhereCharacterId(EntityManager entityManager, int cid) {
+      MedalMapAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+      QuestProgressAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+      QuestStatusAdministrator.getInstance().deleteForCharacter(entityManager, cid);
    }
 
-   private void loadPlayerDiseases(Connection connection, CharacterData characterData, MapleCharacter mapleCharacter) {
+   private void loadPlayerDiseases(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
       Map<MapleDisease, Pair<Long, MobSkill>> loadedDiseases = new LinkedHashMap<>();
-      PlayerDiseaseProvider.getInstance().getForCharacter(connection, characterData.id()).forEach(playerDiseaseData -> {
+      PlayerDiseaseProvider.getInstance().getForCharacter(entityManager, characterData.id()).forEach(playerDiseaseData -> {
          final MapleDisease disease = MapleDisease.ordinal(playerDiseaseData.disease());
          if (disease != MapleDisease.NULL) {
             MobSkill ms = MobSkillFactory.getMobSkill(playerDiseaseData.mobSkillId(), playerDiseaseData.mobSkillLevel());
@@ -258,24 +257,24 @@ public class CharacterProcessor {
             }
          }
       });
-      PlayerDiseaseAdministrator.getInstance().deleteForCharacter(connection, characterData.id());
+      PlayerDiseaseAdministrator.getInstance().deleteForCharacter(entityManager, characterData.id());
       if (!loadedDiseases.isEmpty()) {
          Server.getInstance().getPlayerBuffStorage().addDiseasesToStorage(mapleCharacter.getId(), loadedDiseases);
       }
    }
 
-   private void loadCoolDowns(Connection connection, CharacterData characterData, MapleCharacter mapleCharacter) {
+   private void loadCoolDowns(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
       long curTime = Server.getInstance().getCurrentTime();
-      CoolDownProvider.getInstance().getForCharacter(connection, characterData.id()).forEach(coolDownData -> {
+      CoolDownProvider.getInstance().getForCharacter(entityManager, characterData.id()).forEach(coolDownData -> {
          if (coolDownData.skillId() == 5221999 || (coolDownData.length() + coolDownData.startTime() >= curTime)) {
             mapleCharacter.giveCoolDowns(coolDownData.skillId(), coolDownData.startTime(), coolDownData.length());
          }
       });
-      CoolDownAdministrator.getInstance().deleteForCharacter(connection, characterData.id());
+      CoolDownAdministrator.getInstance().deleteForCharacter(entityManager, characterData.id());
    }
 
-   private void loadSkills(Connection connection, CharacterData characterData, MapleCharacter mapleCharacter) {
-      SkillProvider.getInstance().getSkills(connection, characterData.id()).forEach(skillData -> {
+   private void loadSkills(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
+      SkillProvider.getInstance().getSkills(entityManager, characterData.id()).forEach(skillData -> {
          Optional<Skill> skill = SkillFactory.getSkill(skillData.skillId());
          if (skill.isPresent()) {
             SkillEntry skillEntry = new SkillEntry(skillData.skillLevel(), skillData.masterLevel(), skillData.expiration());
@@ -284,9 +283,9 @@ public class CharacterProcessor {
       });
    }
 
-   private void loadQuests(Connection connection, CharacterData characterData, MapleCharacter mapleCharacter) {
+   private void loadQuests(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
       Map<Integer, MapleQuestStatus> loadedQuestStatus = new LinkedHashMap<>();
-      QuestStatusProvider.getInstance().getQuestData(connection, characterData.id()).forEach(questData -> {
+      QuestStatusProvider.getInstance().getQuestData(entityManager, characterData.id()).forEach(questData -> {
          MapleQuest q = MapleQuest.getInstance(questData.questId());
          MapleQuestStatus status = new MapleQuestStatus(q, MapleQuestStatus.Status.getById(questData.status()));
          if (questData.time() > -1) {
@@ -302,13 +301,13 @@ public class CharacterProcessor {
          mapleCharacter.addQuest(q.getId(), status);
          loadedQuestStatus.put(questData.questStatusId(), status);
       });
-      QuestProgressProvider.getInstance().getProgress(connection, characterData.id()).forEach(questProgress -> {
+      QuestProgressProvider.getInstance().getProgress(entityManager, characterData.id()).forEach(questProgress -> {
          MapleQuestStatus status = loadedQuestStatus.get(questProgress.questStatusId());
          if (status != null) {
             status.setProgress(questProgress.progressId(), questProgress.progress());
          }
       });
-      MedalMapProvider.getInstance().get(connection, characterData.id()).forEach(medalMap -> {
+      MedalMapProvider.getInstance().get(entityManager, characterData.id()).forEach(medalMap -> {
          MapleQuestStatus status = loadedQuestStatus.get(medalMap.getLeft());
          if (status != null) {
             status.addMedalMap(medalMap.getRight());
@@ -317,8 +316,8 @@ public class CharacterProcessor {
       loadedQuestStatus.clear();
    }
 
-   private void loadTeleportLocations(Connection connection, CharacterData data, MapleCharacter mapleCharacter) {
-      List<Pair<Integer, Integer>> locations = TeleportRockProvider.getInstance().getTeleportLocations(connection, data.id());
+   private void loadTeleportLocations(EntityManager entityManager, CharacterData data, MapleCharacter mapleCharacter) {
+      List<Pair<Integer, Integer>> locations = TeleportRockProvider.getInstance().getTeleportLocations(entityManager, data.id());
       int v = 0, r = 0;
       for (Pair<Integer, Integer> location : locations) {
          if (location.getRight() == 1) {
@@ -371,10 +370,10 @@ public class CharacterProcessor {
       mapleCharacter.position_$eq(portal.getPosition());
    }
 
-   private void loadPetIgnores(Connection connection, CharacterData data, MapleCharacter mapleCharacter) {
-      InventoryItemProvider.getInstance().getPetsForCharacter(connection, data.id()).forEach(petId -> {
+   private void loadPetIgnores(EntityManager entityManager, CharacterData data, MapleCharacter mapleCharacter) {
+      InventoryItemProvider.getInstance().getPetsForCharacter(entityManager, data.id()).forEach(petId -> {
          mapleCharacter.resetExcluded(petId);
-         PetIgnoreProvider.getInstance().getIgnoresForPet(connection, petId).forEach(itemId -> mapleCharacter.addExcluded(petId, itemId));
+         PetIgnoreProvider.getInstance().getIgnoresForPet(entityManager, petId).forEach(itemId -> mapleCharacter.addExcluded(petId, itemId));
       });
       mapleCharacter.commitExcludedItems();
    }
@@ -447,12 +446,12 @@ public class CharacterProcessor {
 
          CharacterProcessor.getInstance().loadTeleportLocations(connection, characterData, mapleCharacter);
 
-         AccountProvider.getInstance().getAccountDataById(connection, characterData.accountId()).ifPresent(accountData -> {
+         DatabaseConnection.getInstance().withConnection(entityManager -> AccountProvider.getInstance().getAccountDataById(entityManager, characterData.accountId()).ifPresent(accountData -> {
             MapleClient retClient = mapleCharacter.getClient();
             retClient.setAccountName(accountData.name());
-            retClient.setCharacterSlots(accountData.characterSlots());
+            retClient.setCharacterSlots(accountData.characterSlots().byteValue());
             retClient.setLanguage(accountData.language());
-         });
+         }));
 
          AreaInfoProvider.getInstance().getAreaInfo(connection, characterData.id())
                .forEach(areaInfo -> mapleCharacter.getAreaInfos().put(areaInfo.getLeft(), areaInfo.getRight()));
@@ -644,8 +643,9 @@ public class CharacterProcessor {
       character.getEvents().put("rescueGaga", new RescueGaga(0));
 
 
-      DatabaseConnection.getInstance().withExplicitCommitConnection(connection -> {
-         int key = CharacterAdministrator.getInstance().create(connection, character.getStr(), character.getDex(), character.getLuk(), character.getInt(), character.gmLevel(), character.getSkinColor().getId(),
+      DatabaseConnection.getInstance().withConnection(entityManager -> {
+         entityManager.getTransaction().begin();
+         int key = CharacterAdministrator.getInstance().create(entityManager, character.getStr(), character.getDex(), character.getLuk(), character.getInt(), character.gmLevel(), character.getSkinColor().getId(),
                character.getGender(), character.getJob().getId(), character.getHair(), character.getFace(), character.getMapId(), Math.abs(character.getMeso()), character.getAccountID(), character.getName(), character.getWorld(), character.getHp(), character.getMp(),
                character.getMaxHp(), character.getMaxMp(), character.getLevel(), character.getRemainingAp(), character.getRemainingSps());
          character.setId(key);
@@ -667,7 +667,7 @@ public class CharacterProcessor {
 
 
          for (int i = 0; i < selectedKey.length; i++) {
-            KeyMapAdministrator.getInstance().create(connection, character.getId(), selectedKey[i], selectedType[i], selectedAction[i]);
+            KeyMapAdministrator.getInstance().create(entityManager, character.getId(), selectedKey[i], selectedType[i], selectedAction[i]);
          }
 
          List<Pair<Item, MapleInventoryType>> itemsByType = new ArrayList<>();
@@ -677,13 +677,13 @@ public class CharacterProcessor {
                .forEach(inventory -> inventory.list()
                      .forEach(item -> itemsByType.add(new Pair<>(item, inventory.getType()))));
 
-         ItemFactory.INVENTORY.saveItems(itemsByType, character.getId(), connection);
+         ItemFactory.INVENTORY.saveItems(itemsByType, character.getId(), entityManager);
 
          if (!character.getSkills().isEmpty()) {
-            SkillAdministrator.getInstance().create(connection, character.getId(), character.getSkills().entrySet());
+            SkillAdministrator.getInstance().create(entityManager, character.getId(), character.getSkills().entrySet());
          }
 
-         connection.commit();
+         entityManager.getTransaction().commit();
       });
       return true;
    }

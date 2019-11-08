@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Gift;
 
 public class GiftAdministrator extends AbstractQueryExecutor {
    private static GiftAdministrator instance;
@@ -17,19 +20,19 @@ public class GiftAdministrator extends AbstractQueryExecutor {
    private GiftAdministrator() {
    }
 
-   public void createGift(Connection connection, int recipient, String from, String message, int sn, int ringid) {
-      String sql = "INSERT INTO `gifts` VALUES (DEFAULT, ?, ?, ?, ?, ?)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, recipient);
-         ps.setString(2, from);
-         ps.setString(3, message);
-         ps.setInt(4, sn);
-         ps.setInt(5, ringid);
-      });
+   public void createGift(EntityManager entityManager, int recipient, String from, String message, int sn, int ringId) {
+      Gift gift = new Gift();
+      gift.setGiftedTo(recipient);
+      gift.setGiftedFrom(from);
+      gift.setMessage(message);
+      gift.setSn(sn);
+      gift.setRingId(ringId);
+      insert(entityManager, gift);
    }
 
-   public void deleteAllGiftsForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM `gifts` WHERE `to` = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteAllGiftsForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM Gift WHERE giftedTo = :to");
+      query.setParameter("to", characterId);
+      execute(entityManager, query);
    }
 }

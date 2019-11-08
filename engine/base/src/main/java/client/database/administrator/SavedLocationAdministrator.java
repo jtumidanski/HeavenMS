@@ -1,10 +1,14 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
 import client.database.DeleteForCharacter;
+import entity.LocationType;
 import server.maps.SavedLocation;
 import tools.Pair;
 
@@ -22,18 +26,21 @@ public class SavedLocationAdministrator extends AbstractQueryExecutor implements
    }
 
    @Override
-   public void deleteForCharacter(Connection connection, int characterId) {
-      String sql = "DELETE FROM savedlocations WHERE characterid = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM SavedLocation WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
-   public void create(Connection connection, int characterId, Collection<Pair<String, SavedLocation>> savedLocations) {
-      String sql = "INSERT INTO savedlocations (characterid, `locationtype`, `map`, `portal`) VALUES (?, ?, ?, ?)";
-      batch(connection, sql, (ps, data) -> {
-         ps.setInt(1, characterId);
-         ps.setString(2, data.getLeft());
-         ps.setInt(3, data.getRight().mapId());
-         ps.setInt(4, data.getRight().portal());
-      }, savedLocations);
+   public void create(EntityManager entityManager, int characterId, Collection<Pair<String, SavedLocation>> savedLocations) {
+      List<entity.SavedLocation> savedLocationList = savedLocations.stream().map(location -> {
+         entity.SavedLocation savedLocation = new entity.SavedLocation();
+         savedLocation.setCharacterId(characterId);
+         savedLocation.setLocationType(LocationType.valueOf(location.getLeft()));
+         savedLocation.setMap(location.getRight().mapId());
+         savedLocation.setPortal(location.getRight().portal());
+         return savedLocation;
+      }).collect(Collectors.toList());
+      insertBulk(entityManager, savedLocationList);
    }
 }

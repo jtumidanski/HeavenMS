@@ -1,12 +1,15 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.BbsThreadData;
 import client.database.utility.BbsThreadTransformer;
+import entity.bbs.BBSThread;
 
 public class BbsThreadProvider extends AbstractQueryExecutor {
    private static BbsThreadProvider instance;
@@ -21,29 +24,33 @@ public class BbsThreadProvider extends AbstractQueryExecutor {
    private BbsThreadProvider() {
    }
 
-   public Optional<BbsThreadData> getByThreadAndGuildId(Connection connection, int threadId, int guildId, boolean localThread) {
-      String sql = "SELECT * FROM bbs_threads WHERE guildid = ? AND " + (localThread ? "local" : "") + "threadid = ?";
-      BbsThreadTransformer transformer = new BbsThreadTransformer();
-      return getNew(connection, sql, ps -> {
-         ps.setInt(1, guildId);
-         ps.setInt(2, threadId);
-      }, rs -> {
-            BbsThreadData threadData = transformer.transform(rs);
-            BbsThreadReplyProvider.getInstance().getByThreadId(connection, !localThread ? threadId : threadData.threadId())
-                  .forEach(threadData::addReply);
-            return threadData;
-      });
+   public Optional<BbsThreadData> getByThreadAndGuildId(EntityManager entityManager, int threadId, int guildId, boolean localThread) {
+      String threadColumn = localThread ? "localThreadId" : "threadId";
+      TypedQuery<BBSThread> query = entityManager.createQuery("FROM BBSThread b WHERE b.guildId = :guildId AND b." + threadColumn + " = :threadId", BBSThread.class);
+      query.setParameter("guildId", guildId);
+      query.setParameter("threadId", threadId);
+
+      try {
+         BBSThread bbsThread = query.getSingleResult();
+         BbsThreadTransformer transformer = new BbsThreadTransformer();
+         BbsThreadData threadData = transformer.transform(bbsThread);
+         BbsThreadReplyProvider.getInstance().getByThreadId(entityManager, !localThread ? threadId : threadData.threadId())
+               .forEach(threadData::addReply);
+         return Optional.of(threadData);
+      } catch (NoResultException exception) {
+         return Optional.empty();
+      }
    }
 
-   public List<BbsThreadData> getThreadsForGuild(Connection connection, int guildId) {
-      String sql = "SELECT * FROM bbs_threads WHERE guildid = ? ORDER BY localthreadid DESC";
-      BbsThreadTransformer transformer = new BbsThreadTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, guildId), transformer::transform);
+   public List<BbsThreadData> getThreadsForGuild(EntityManager entityManager, int guildId) {
+      TypedQuery<BBSThread> query = entityManager.createQuery("FROM BBSThread  b WHERE b.guildId = :guildId ORDER BY b.localThreadId DESC", BBSThread.class);
+      query.setParameter("guildId", guildId);
+      return getResultList(query, new BbsThreadTransformer());
    }
 
-   public int getNextLocalThreadId(Connection connection, int guildId) {
-      String sql = "SELECT MAX(localthreadid) AS lastLocalId FROM bbs_threads WHERE guildid = ?";
-      Optional<Integer> result = getSingle(connection, sql, ps -> ps.setInt(1, guildId), "lastLocalId");
-      return result.orElse(-1) + 1;
+   public int getNextLocalThreadId(EntityManager entityManager, int guildId) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT MAX(b.localThreadId) FROM BBSThread b WHERE b.guildId = :guildId", Integer.class);
+      query.setParameter("guildId", guildId);
+      return query.getSingleResult();
    }
 }

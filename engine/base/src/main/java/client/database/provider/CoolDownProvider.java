@@ -1,11 +1,11 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.CoolDownData;
-import client.database.utility.CoolDownTransformer;
 
 public class CoolDownProvider extends AbstractQueryExecutor {
    private static CoolDownProvider instance;
@@ -20,9 +20,9 @@ public class CoolDownProvider extends AbstractQueryExecutor {
    private CoolDownProvider() {
    }
 
-   public List<CoolDownData> getForCharacter(Connection connection, int characterId) {
-      String sql = "SELECT SkillID,StartTime,length FROM cooldowns WHERE charid = ?";
-      CoolDownTransformer transformer = new CoolDownTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public List<CoolDownData> getForCharacter(EntityManager entityManager, int characterId) {
+      TypedQuery<CoolDownData> query = entityManager.createQuery("SELECT NEW client.database.data.CoolDownData(c.skillId, c.startTime, c.length) FROM Cooldown c WHERE c.characterId = :characterId", CoolDownData.class);
+      query.setParameter("characterId", characterId);
+      return query.getResultList();
    }
 }

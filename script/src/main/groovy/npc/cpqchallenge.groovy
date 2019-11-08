@@ -47,7 +47,7 @@ class NPCcpqchallenge {
          }
 
          if (status == 0) {
-            if (cm.getParty().getMembers().size() == party.size()) {
+            if (cm.getParty().orElseThrow().getMembers().size() == party.size()) {
                cm.getPlayer().setChallenged(true)
                String snd = ""
                for (int i = 0; i < party.size(); i++ )
@@ -59,7 +59,7 @@ class NPCcpqchallenge {
                cm.dispose()
             }
          } else if (status == 1) {
-            if (party.size() == cm.getParty().getMembers().size()) {
+            if (party.size() == cm.getParty().orElseThrow().getMembers().size()) {
                cm.answerCPQChallenge(true)
             } else {
                cm.answerCPQChallenge(false)

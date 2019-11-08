@@ -1,11 +1,11 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.MakerCreateData;
-import client.database.utility.MakerCreateTransformer;
 
 public class MakerCreateProvider extends AbstractQueryExecutor {
    private static MakerCreateProvider instance;
@@ -20,9 +20,12 @@ public class MakerCreateProvider extends AbstractQueryExecutor {
    private MakerCreateProvider() {
    }
 
-   public Optional<MakerCreateData> getMakerCreateDataForItem(Connection connection, int itemId) {
-      String sql = "SELECT req_level, req_maker_level, req_meso, quantity FROM makercreatedata WHERE itemid = ?";
-      MakerCreateTransformer transformer = new MakerCreateTransformer();
-      return getNew(connection, sql, ps -> ps.setInt(1, itemId), transformer::transform);
+   public Optional<MakerCreateData> getMakerCreateDataForItem(EntityManager entityManager, int itemId) {
+      TypedQuery<MakerCreateData> query = entityManager.createQuery(
+            "SELECT NEW client.database.data.MakerCreateData(m.requiredLevel, m.requiredMakerLevel, m.requiredMeso, m.quantity) " +
+                  "FROM MakerCreateData m " +
+                  "WHERE m.itemId = :itemId", MakerCreateData.class);
+      query.setParameter("itemId", itemId);
+      return getSingleOptional(query);
    }
 }

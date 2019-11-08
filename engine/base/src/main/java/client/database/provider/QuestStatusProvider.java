@@ -1,11 +1,13 @@
 package client.database.provider;
 
-import java.sql.Connection;
 import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.QuestData;
 import client.database.utility.QuestStatusTransformer;
+import entity.quest.QuestStatus;
 
 public class QuestStatusProvider extends AbstractQueryExecutor {
    private static QuestStatusProvider instance;
@@ -20,9 +22,9 @@ public class QuestStatusProvider extends AbstractQueryExecutor {
    private QuestStatusProvider() {
    }
 
-   public List<QuestData> getQuestData(Connection connection, int characterId) {
-      String sql = "SELECT * FROM queststatus WHERE characterid = ?";
-      QuestStatusTransformer transformer = new QuestStatusTransformer();
-      return getListNew(connection, sql, ps -> ps.setInt(1, characterId), transformer::transform);
+   public List<QuestData> getQuestData(EntityManager entityManager, int characterId) {
+      TypedQuery<QuestStatus> query = entityManager.createQuery("FROM QuestStatus q WHERE q.characterId = :characterId", QuestStatus.class);
+      query.setParameter("characterId", characterId);
+      return getResultList(query, new QuestStatusTransformer());
    }
 }

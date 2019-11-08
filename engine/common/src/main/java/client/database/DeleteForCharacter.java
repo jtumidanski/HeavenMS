@@ -1,7 +1,7 @@
 package client.database;
 
-import java.sql.Connection;
+import javax.persistence.EntityManager;
 
 public interface DeleteForCharacter {
-   void deleteForCharacter(Connection connection, int characterId);
+   void deleteForCharacter(EntityManager entityManager, int characterId);
 }

@@ -798,7 +798,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void removePartyItems(int id) {
-      if (getParty() == null) {
+      if (getParty().isEmpty()) {
          removeAll(id);
          return;
       }

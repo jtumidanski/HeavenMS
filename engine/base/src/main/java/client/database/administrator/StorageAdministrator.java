@@ -1,8 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.Storage;
 
 public class StorageAdministrator extends AbstractQueryExecutor {
    private static StorageAdministrator instance;
@@ -17,20 +20,20 @@ public class StorageAdministrator extends AbstractQueryExecutor {
    private StorageAdministrator() {
    }
 
-   public void create(Connection connection, int accountId, int worldId) {
-      String sql = "INSERT INTO storages (accountid, world, slots, meso) VALUES (?, ?, 4, 0)";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, accountId);
-         ps.setInt(2, worldId);
-      });
+   public void create(EntityManager entityManager, int accountId, int worldId) {
+      Storage storage = new Storage();
+      storage.setAccountId(accountId);
+      storage.setWorld(worldId);
+      storage.setSlots(4);
+      storage.setMeso(0);
+      insert(entityManager, storage);
    }
 
-   public void update(Connection connection, int storageId, int slots, int mesos) {
-      String sql = "UPDATE storages SET slots = ?, meso = ? WHERE storageid = ?";
-      execute(connection, sql, ps -> {
-         ps.setInt(1, slots);
-         ps.setInt(2, mesos);
-         ps.setInt(3, storageId);
-      });
+   public void update(EntityManager entityManager, int storageId, int slots, int mesos) {
+      Query query = entityManager.createQuery("UPDATE Storage SET slots = :slots, meso = :meso WHERE storageId = :storageId");
+      query.setParameter("slots", slots);
+      query.setParameter("meso", mesos);
+      query.setParameter("storageId", storageId);
+      execute(entityManager, query);
    }
 }

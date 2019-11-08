@@ -1,9 +1,11 @@
 package client.database.administrator;
 
-import java.sql.Connection;
 import java.sql.Timestamp;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import entity.duey.DueyPackage;
 
 public class DueyPackageAdministrator extends AbstractQueryExecutor {
    private static DueyPackageAdministrator instance;
@@ -18,33 +20,33 @@ public class DueyPackageAdministrator extends AbstractQueryExecutor {
    private DueyPackageAdministrator() {
    }
 
-   public void uncheck(Connection connection, int characterId) {
-      String sql = "UPDATE dueypackages SET Checked = 0 WHERE ReceiverId = ?";
-      execute(connection, sql, ps -> ps.setInt(1, characterId));
+   public void uncheck(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("UPDATE DueyPackage SET checked = 0 WHERE receiverId = :receiverId");
+      query.setParameter("receiverId", characterId);
+      execute(entityManager, query);
    }
 
-   public void removePackage(Connection connection, int packageId) {
-      String sql = "DELETE FROM dueypackages WHERE PackageId = ?";
-      execute(connection, sql, ps -> ps.setInt(1, packageId));
+   public void removePackage(EntityManager entityManager, int packageId) {
+      Query query = entityManager.createQuery("DELETE FROM DueyPackage WHERE packageId = :packageId");
+      query.setParameter("packageId", packageId);
+      execute(entityManager, query);
    }
 
-   public void deletePackagesAfter(Connection connection, Timestamp timestamp) {
-      String sql = "DELETE FROM dueypackages WHERE `TimeStamp` < ?";
-      execute(connection, sql, ps -> ps.setTimestamp(1, timestamp));
+   public void deletePackagesAfter(EntityManager entityManager, Timestamp timestamp) {
+      Query query = entityManager.createQuery("DELETE FROM DueyPackage WHERE timestamp < :timestamp");
+      query.setParameter("timestamp", timestamp);
+      execute(entityManager, query);
    }
 
-   public int create(Connection connection, int receipientId, String senderName, int mesos, String message, boolean quick) {
-      String sql = "INSERT INTO `dueypackages` (ReceiverId, SenderName, Mesos, TimeStamp, Message, Type, Checked) VALUES (?, ?, ?, ?, ?, ?, 1)";
-
-      Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-
-      return insertAndReturnKey(connection, sql, ps -> {
-         ps.setInt(1, receipientId);
-         ps.setString(2, senderName);
-         ps.setInt(3, mesos);
-         ps.setTimestamp(4, timestamp);
-         ps.setString(5, message);
-         ps.setInt(6, quick ? 1 : 0);
-      });
+   public int create(EntityManager entityManager, int receipientId, String senderName, int mesos, String message, boolean quick) {
+      DueyPackage dueyPackage = new DueyPackage();
+      dueyPackage.setReceiverId(receipientId);
+      dueyPackage.setSenderName(senderName);
+      dueyPackage.setMesos(mesos);
+      dueyPackage.setTimestamp(new Timestamp(System.currentTimeMillis()));
+      dueyPackage.setMessage(message);
+      dueyPackage.setChecked(quick ? 1 : 0);
+      insert(entityManager, dueyPackage);
+      return dueyPackage.getPackageId();
    }
 }

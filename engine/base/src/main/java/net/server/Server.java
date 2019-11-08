@@ -25,7 +25,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.Security;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -44,6 +43,8 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
+import javax.persistence.EntityManager;
 
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.buffer.SimpleBufferAllocator;
@@ -204,19 +205,19 @@ public class Server {
       return Math.max(0, nextDay.getTimeInMillis() - System.currentTimeMillis());
    }
 
-   public static void cleanNxcodeCoupons(Connection con) {
+   public static void cleanNxcodeCoupons(EntityManager entityManager) {
       if (!ServerConstants.USE_CLEAR_OUTDATED_COUPONS) {
          return;
       }
 
       long timeClear = System.currentTimeMillis() - 14 * 24 * 60 * 60 * 1000;
 
-      List<Integer> expiredCodes = NxCodeProvider.getInstance().getExpiredCodes(con, timeClear);
-      NxCodeItemAdministrator.getInstance().deleteItems(con, expiredCodes);
-      NxCodeAdministrator.getInstance().deleteExpired(con, timeClear);
+      List<Integer> expiredCodes = NxCodeProvider.getInstance().getExpiredCodes(entityManager, timeClear);
+      NxCodeItemAdministrator.getInstance().deleteItems(entityManager, expiredCodes);
+      NxCodeAdministrator.getInstance().deleteExpired(entityManager, timeClear);
    }
 
-   private static List<WorldRankData> updatePlayerRankingFromDB(int worldId) {
+   private List<WorldRankData> updatePlayerRankingFromDB(int worldId) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          if (!ServerConstants.USE_WHOLE_SERVER_RANKING) {
             if (worldId >= 0) {
@@ -663,8 +664,8 @@ public class Server {
       return couponRates;
    }
 
-   private void loadCouponRates(Connection c) {
-      NxCouponProvider.getInstance().getCoupons(c).forEach(coupon -> couponRates.put(coupon.couponId(), coupon.rate()));
+   private void loadCouponRates(EntityManager entityManager) {
+      DatabaseConnection.getInstance().withConnection(session -> NxCouponProvider.getInstance().getCoupons(session).forEach(coupon -> couponRates.put(coupon.couponId(), coupon.rate())));
    }
 
    public List<Integer> getActiveCoupons() {
@@ -702,8 +703,7 @@ public class Server {
    public void updateActiveCoupons() {
       synchronized (activeCoupons) {
          activeCoupons.clear();
-         DatabaseConnection.getInstance().withConnectionResult(connection -> NxCouponProvider.getInstance().getActiveCoupons(connection))
-               .ifPresent(result -> result.forEach(coupon -> activeCoupons.add(coupon.couponId())));
+         DatabaseConnection.getInstance().withConnection(session -> NxCouponProvider.getInstance().getActiveCoupons(session).forEach(coupon -> activeCoupons.add(coupon.couponId())));
       }
    }
 
@@ -895,7 +895,7 @@ public class Server {
       }
 
       try {
-         Integer worldCount = Math.min(GameConstants.WORLD_NAMES.length, Integer.parseInt(p.getProperty("worlds")));
+         int worldCount = Math.min(GameConstants.WORLD_NAMES.length, Integer.parseInt(p.getProperty("worlds")));
 
          for (int i = 0; i < worldCount; i++) {
             initWorld(p);
@@ -1311,12 +1311,11 @@ public class Server {
    }
 
    public void loadAllAccountsCharactersView() {
-      DatabaseConnection.getInstance().withConnection(connection -> AccountProvider.getInstance().getAllAccountIds(connection)
-            .forEach(accountId -> {
-               if (isFirstAccountLogin(accountId)) {
-                  loadAccountCharactersView(accountId, 0, 0);
-               }
-            }));
+      DatabaseConnection.getInstance().withConnection(entityManager -> AccountProvider.getInstance().getAllAccountIds(entityManager).forEach(id -> {
+         if (isFirstAccountLogin(id)) {
+            loadAccountCharactersView(id, 0, 0);
+         }
+      }));
    }
 
    private boolean isFirstAccountLogin(Integer accId) {

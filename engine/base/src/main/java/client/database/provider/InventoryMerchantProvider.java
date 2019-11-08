@@ -1,7 +1,7 @@
 package client.database.provider;
 
-import java.sql.Connection;
-import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 
@@ -18,9 +18,9 @@ public class InventoryMerchantProvider extends AbstractQueryExecutor {
    private InventoryMerchantProvider() {
    }
 
-   public Short getBundleForItem(Connection connection, int inventoryItemId) {
-      String sql = "SELECT `bundles` FROM `inventorymerchant` WHERE `inventoryitemid` = ?";
-      Optional<Short> result = getSingle(connection, sql, ps -> ps.setInt(1, inventoryItemId), "bundles");
-      return result.orElse((short) 0);
+   public Short getBundleForItem(EntityManager entityManager, int inventoryItemId) {
+      TypedQuery<Short> query = entityManager.createQuery("SELECT i.bundles FROM InventoryMerchant i WHERE i.inventoryItemId = :inventoryItemId", Short.class);
+      query.setParameter("inventoryItemId", inventoryItemId);
+      return getSingleWithDefault(query, (short) 0);
    }
 }
