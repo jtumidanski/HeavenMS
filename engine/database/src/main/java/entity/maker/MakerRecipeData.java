@@ -1,6 +1,7 @@
 package entity.maker;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -46,5 +47,23 @@ public class MakerRecipeData implements Serializable {
 
    public void setCount(Integer count) {
       this.count = count;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) {
+         return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+         return false;
+      }
+      MakerRecipeData that = (MakerRecipeData) o;
+      return itemId.equals(that.itemId) &&
+            requiredItem.equals(that.requiredItem);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hash(itemId, requiredItem);
    }
 }

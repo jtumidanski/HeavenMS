@@ -3,7 +3,7 @@
 
 USE `heavenms`;
 
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
   #-- copy+paste inside here as many drop data as possible from the spider (drop generator) files --
 (5100004, 2383034, 1, 1, 0, 10000),
 (2100108, 2381030, 1, 1, 0, 10000),
@@ -18704,7 +18704,7 @@ USE `heavenms`;
   #reinsert Kerning Square loot
   DELETE FROM temp_data WHERE dropperid>=4300006 AND dropperid<=4300013;
 
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (3400000,1002098,1,1,0,1500),
 (3400000,1002154,1,1,0,1500),
 (3400000,1002170,1,1,0,1500),
@@ -19207,7 +19207,7 @@ USE `heavenms`;
 
   # delete/normalize item drops from Horntail
   DELETE FROM temp_data WHERE dropperid=8810018;
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (8810018,0,40000,50000,0,400000),
 (8810018,1122000,1,1,0,151200),
 (8810018,1302056,1,1,0,151200),
@@ -19283,7 +19283,7 @@ USE `heavenms`;
 
   #insert things that should be present by now, but aren't yet.
 
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (3000001, 0, 80, 120, 0, 400000),
 (2386010, 8143000, 1, 1, 0, 10000),
 (3230100, 4001004, 1, 1, 0, 5000),
@@ -20307,7 +20307,7 @@ USE `heavenms`;
 # (dropperid, itemid, minqty, maxqty, questid, chance)
 
   # add more skill/mastery books
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (8150000, 2280013, 1, 1, 0, 40000),
 (8200005, 2280014, 1, 1, 0, 1000),
 (9300028, 2280015, 1, 1, 0, 100000),
@@ -20465,7 +20465,7 @@ USE `heavenms`;
   UPDATE IGNORE temp_data SET chance=1000 WHERE itemid >= 2280000 and itemid < 2300000 and chance < 1000;
 
   # make some mobs drop unusual accessory scrolls
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (6090003, 2040103, 1, 1, 0, 3000),
 (6090003, 2040209, 1, 1, 0, 3000),
 (6090002, 2040106, 1, 1, 0, 3000),
@@ -20505,19 +20505,19 @@ USE `heavenms`;
 
   -- missing content for Bob found thanks to drmdsr & Thora
   # normalize item drops for Bob the Snail
-  INSERT INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
-  SELECT  9400551, temp_data.itemid, temp_data.minimum_quantity, temp_data.maximum_quantity, temp_data.questid, LEAST(temp_data.chance * 80, 999999)
+  INSERT INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+  SELECT  9400551, temp_data.itemid, temp_data.minimumQuantity, temp_data.maximumQuantity, temp_data.questid, LEAST(temp_data.chance * 80, 999999)
   FROM    temp_data
   WHERE   temp_data.dropperid = 100100;
 
   DELETE FROM temp_data WHERE dropperid=9400551 AND itemid=4000019;
-  UPDATE IGNORE temp_data SET minimum_quantity=1000, maximum_quantity=5000 WHERE dropperid=9400551 AND itemid=0;
+  UPDATE IGNORE temp_data SET minimumQuantity=1000, maximumQuantity=5000 WHERE dropperid=9400551 AND itemid=0;
 
   # normalize item drops for left-side Pianus
   DELETE FROM temp_data WHERE dropperid=8520000;
 
-  INSERT INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
-  SELECT  8520000, temp_data.itemid, temp_data.minimum_quantity, temp_data.maximum_quantity, temp_data.questid, temp_data.chance
+  INSERT INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+  SELECT  8520000, temp_data.itemid, temp_data.minimumQuantity, temp_data.maximumQuantity, temp_data.questid, temp_data.chance
   FROM    temp_data
   WHERE   temp_data.dropperid = 8510000;
 
@@ -20525,18 +20525,18 @@ USE `heavenms`;
   DELETE FROM temp_data WHERE dropperid=8820000;
   DELETE FROM temp_data WHERE dropperid>=8820010 AND dropperid<=8820014;
 
-  INSERT INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
-  SELECT  8820000, temp_data.itemid, temp_data.minimum_quantity, temp_data.maximum_quantity, temp_data.questid, temp_data.chance
+  INSERT INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+  SELECT  8820000, temp_data.itemid, temp_data.minimumQuantity, temp_data.maximumQuantity, temp_data.questid, temp_data.chance
   FROM    temp_data
   WHERE   temp_data.dropperid = 8820001;
 
-  INSERT INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
-  SELECT  9300153, temp_data.itemid, temp_data.minimum_quantity, temp_data.maximum_quantity, temp_data.questid, temp_data.chance
+  INSERT INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+  SELECT  9300153, temp_data.itemid, temp_data.minimumQuantity, temp_data.maximumQuantity, temp_data.questid, temp_data.chance
   FROM    temp_data
   WHERE   temp_data.dropperid = 5110300;
 
   # reinsert other Freezer's data
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9420501, 0, 92, 138, 0, 400000),
 (9420501, 4000372, 1, 1, 0, 300000),
 (9420501, 400003, 1, 1, 0, 10000),
@@ -20567,7 +20567,7 @@ USE `heavenms`;
 
   # zhelms, pink bean customs
   DELETE FROM temp_data WHERE itemid=1002357;
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (8800002, 1002357, 1, 2, 0, 300000),
 (8800002, 1002390, 3, 5, 0, 80000),
 (8800002, 1002430, 3, 5, 0, 40000),
@@ -20592,18 +20592,18 @@ USE `heavenms`;
   UPDATE IGNORE temp_data SET chance=600000 WHERE itemid=4000058;
 
   # update USE drops that were supposed to be ETC
-  INSERT IGNORE INTO temp_data (dropperid, itemid, minimum_quantity, maximum_quantity, questid, chance)
+  INSERT IGNORE INTO temp_data (dropperid, itemid, minimumQuantity, maximumQuantity, questid, chance)
     SELECT dropperid, 4001006, 1, 1, 0, 10000
     FROM   temp_data
     WHERE  itemid = 2050099;  #Flaming feather
 
-  INSERT IGNORE INTO temp_data (dropperid, itemid, minimum_quantity, maximum_quantity, questid, chance)
+  INSERT IGNORE INTO temp_data (dropperid, itemid, minimumQuantity, maximumQuantity, questid, chance)
     SELECT dropperid, 4000176, 1, 1, 0, 600000
     FROM   temp_data
     WHERE  itemid = 2011000;  #Poisonous Mushroom
 
   # add Giant Cake anniversary-themed drops
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9400606, 1012098, 1, 1, 0, 120000),
 (9400606, 1012101, 1, 1, 0, 120000),
 (9400606, 1012102, 1, 1, 0, 120000),
@@ -20770,7 +20770,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 
 # add CPQ items, CPQ specific items found thanks to Dragohe4rt
 # thanks Vcoc for pointing out inexistent itemids among those listed here
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300127, 2022157, 1, 1, 0, 200000),
 (9300127, 2022158, 1, 1, 0, 200000),
 (9300127, 2022159, 1, 1, 0, 200000),
@@ -21093,7 +21093,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 (9300324, 4001129, 1, 1, 0, 12987);
 
 # add AriantPQ items, AriantPQ specific items found thanks to Dragohe4rt
-  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300157, 2100067, 1, 1, 0, 100000),
 (9300157, 2022266, 1, 1, 0, 200000),
 (9300157, 2022267, 1, 1, 0, 200000),
@@ -21104,8 +21104,8 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
     `id` bigint(20) NOT NULL AUTO_INCREMENT,
     `dropperid` int(11) NOT NULL,
     `itemid` int(11) NOT NULL DEFAULT '0',
-    `minimum_quantity` int(11) NOT NULL DEFAULT '1',
-    `maximum_quantity` int(11) NOT NULL DEFAULT '1',
+    `minimumQuantity` int(11) NOT NULL DEFAULT '1',
+    `maximumQuantity` int(11) NOT NULL DEFAULT '1',
     `questid` int(11) NOT NULL DEFAULT '0',
     `chance` int(11) NOT NULL DEFAULT '0',
     PRIMARY KEY (`id`),
@@ -21115,9 +21115,9 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
   ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
   #pass (sorted) data from one table to another
-  INSERT INTO drop_data (dropperid, itemid, minimum_quantity, maximum_quantity, questid, chance)
+  INSERT INTO drop_data (dropperid, itemid, minimumQuantity, maximumQuantity, questid, chance)
   (
-    SELECT dropperid, itemid, minimum_quantity, maximum_quantity, questid, chance
+    SELECT dropperid, itemid, minimumQuantity, maximumQuantity, questid, chance
     FROM temp_data
   );
   DROP TABLE temp_data;
@@ -21194,7 +21194,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 
   # reinsert loot for Dark Nependeath
   DELETE FROM drop_data WHERE dropperid=4130104;
-  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (4130104, 4000062, 1, 1, 0, 600000),
 (4130104, 2041014, 1, 1, 0, 300),
 (4130104, 4004004, 1, 1, 0, 10000),
@@ -21228,7 +21228,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 (4130104, 1060085, 1, 1, 0, 700);
 
   # reinsert dojo loot
-  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300184, 2022359, 1, 1, 0, 200000),
 (9300184, 2022360, 1, 1, 0, 200000),
 (9300184, 2022361, 1, 1, 0, 200000),
@@ -21518,7 +21518,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 (9300215, 2022420, 1, 1, 0, 200000),
 (9300215, 2022421, 1, 1, 0, 200000);
 
-  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300217, 2022430, 1, 1, 0, 200000),
 (9300217, 2022431, 1, 1, 0, 200000),
 (9300217, 2022432, 1, 1, 0, 200000),
@@ -21789,7 +21789,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 (9400533, 4031597, 1, 1, 0, 999999),
 (9400534, 4031597, 1, 1, 0, 999999);
 
-  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300341, 0, 12, 18, 0, 400000),
 (9300341, 1002019, 1, 1, 0, 1500),
 (9300341, 1060002, 1, 1, 0, 700),
@@ -21853,38 +21853,38 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 
  -- Copying drops from some mobs to other versions of them
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 9300342, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 1210102;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 9300342, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 1210102;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 6300001, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6300000;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 6300001, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6300000;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 6300002, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6300000;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 6300002, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6300000;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 6400001, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6400000;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 6400001, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6400000;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 6130102, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6130103;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 6130102, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6130103;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 6230201, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6230200;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 6230201, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 6230200;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 3000002, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 3000002, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 3000003, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 3000003, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
 
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 3000004, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 3000004, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
 
  -- Thanks to DietStory v1.02 dev team
  -- There are two Jr. Boogies mob ids for some unknown reason. 3230301 had no drops, but 3230300 had all the correct drops.
  -- Just copying the drops from the one with the correct drop data.
- INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
- SELECT 3230301, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3230300;
+ INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
+ SELECT 3230301, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3230300;
 
   # update quest reactor items
   UPDATE reactordrops SET questid=2086 WHERE itemid=4031165;
@@ -22710,7 +22710,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
   DELETE FROM `reactordrops` WHERE itemid=4032980;
 
   # MapleMesoFetcher ftw! Set meso drop for remaining mobs which drops more than 4 items.
-  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (100122, 0, 35, 52, 0, 400000),
 (100123, 0, 38, 55, 0, 400000),
 (100124, 0, 40, 59, 0, 400000),
@@ -23161,7 +23161,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
   # MapleArrowFetcher! Set proper arrow quantity drop for the mobs.
 
 UPDATE drop_data
-SET minimum_quantity = CASE
+SET minimumQuantity = CASE
                        WHEN dropperid = 100100 AND itemid = 2060000 THEN 1
                        WHEN dropperid = 100100 AND itemid = 2061000 THEN 1
                        WHEN dropperid = 100101 AND itemid = 2060000 THEN 2
@@ -23540,8 +23540,8 @@ SET minimum_quantity = CASE
                        WHEN dropperid = 9500321 AND itemid = 2061001 THEN 6
                        WHEN dropperid = 9500366 AND itemid = 2060000 THEN 19
                        WHEN dropperid = 9500369 AND itemid = 2060000 THEN 19
-  ELSE minimum_quantity END,
-    maximum_quantity = CASE
+  ELSE minimumQuantity END,
+    maximumQuantity = CASE
                        WHEN dropperid = 100100 AND itemid = 2060000 THEN 2
                        WHEN dropperid = 100100 AND itemid = 2061000 THEN 2
                        WHEN dropperid = 100101 AND itemid = 2060000 THEN 3
@@ -23920,14 +23920,14 @@ SET minimum_quantity = CASE
                        WHEN dropperid = 9500321 AND itemid = 2061001 THEN 8
                        WHEN dropperid = 9500366 AND itemid = 2060000 THEN 24
                        WHEN dropperid = 9500369 AND itemid = 2060000 THEN 24
-  ELSE maximum_quantity END
+  ELSE maximumQuantity END
 ;
 
   UPDATE drop_data SET `chance`=1287 WHERE `chance`=1500;
 
   # MapleSkillbookChanceFetcher! Tuning up some skillbook drop chances in order to fit their dropper's availability (whether's a boss or not) and level.
   # thanks unnqca for reporting some skillbooks having unusually high drop chances.
-  REPLACE INTO drop_data (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`) VALUES
+  REPLACE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (851000, 2290132, 1, 1, 0, 3861),
 (7090000, 2290087, 1, 1, 0, 10000),
 (8090000, 2290045, 1, 1, 0, 10000),

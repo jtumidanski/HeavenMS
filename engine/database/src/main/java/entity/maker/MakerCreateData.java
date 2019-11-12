@@ -1,6 +1,7 @@
 package entity.maker;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -15,7 +16,6 @@ public class MakerCreateData implements Serializable {
    private Integer id;
 
    @Id
-   @Column(nullable = false)
    private Integer itemId;
 
    @Column(nullable = false, name = "req_level")
@@ -123,5 +123,23 @@ public class MakerCreateData implements Serializable {
 
    public void setTuc(Integer tuc) {
       this.tuc = tuc;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) {
+         return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+         return false;
+      }
+      MakerCreateData that = (MakerCreateData) o;
+      return id.equals(that.id) &&
+            itemId.equals(that.itemId);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hash(id, itemId);
    }
 }

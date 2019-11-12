@@ -1,6 +1,7 @@
 package entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,10 +21,10 @@ public class TempData implements Serializable {
    @Id
    private Integer itemId = 0;
 
-   @Column(nullable = false, name = "minimum_quantity")
+   @Column(nullable = false)
    private Integer minimumQuantity;
 
-   @Column(nullable = false, name = "maximum_quantity")
+   @Column(nullable = false)
    private Integer maximumQuantity;
 
    @Column(nullable = false)
@@ -81,5 +82,23 @@ public class TempData implements Serializable {
 
    public void setChance(Integer chance) {
       this.chance = chance;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) {
+         return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+         return false;
+      }
+      TempData tempData = (TempData) o;
+      return dropperId.equals(tempData.dropperId) &&
+            itemId.equals(tempData.itemId);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hash(dropperId, itemId);
    }
 }

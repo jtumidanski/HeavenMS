@@ -3,6 +3,7 @@ package entity;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -59,5 +60,23 @@ public class HwidAccount implements Serializable {
 
    public void setExpiresAt(Timestamp expiresAt) {
       this.expiresAt = expiresAt;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) {
+         return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+         return false;
+      }
+      HwidAccount that = (HwidAccount) o;
+      return accountId.equals(that.accountId) &&
+            hwid.equals(that.hwid);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hash(accountId, hwid);
    }
 }

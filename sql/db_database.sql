@@ -8,11 +8,9 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION = @@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8 */;
 
-DROP DATABASE IF EXISTS `heavenms`;
-CREATE DATABASE `heavenms` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
 USE `heavenms`;
 
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (9400121, 4000138, 1, 1, 0, 600000),
        (9400121, 4010006, 1, 1, 0, 45000),
        (9400121, 2000006, 1, 1, 0, 999999),
@@ -1324,7 +1322,7 @@ VALUES (9400121, 4000138, 1, 1, 0, 600000),
        (3110102, 1072294, 1, 1, 0, 800),
        (3110102, 2044210, 1, 1, 0, 300),
        (3110102, 4130003, 1, 1, 0, 6000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (3110102, 4130004, 1, 1, 0, 6000),
        (3110102, 4130011, 1, 1, 0, 6000),
        (3110300, 2000003, 1, 1, 0, 20000),
@@ -2605,7 +2603,7 @@ VALUES (3110102, 4130004, 1, 1, 0, 6000),
        (4230102, 1002215, 1, 1, 0, 1500),
        (4230102, 1002212, 1, 1, 0, 1500),
        (4230102, 1082066, 1, 1, 0, 1000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (4230102, 1072141, 1, 1, 0, 800),
        (4230102, 1072303, 1, 1, 0, 800),
        (4230102, 2330002, 1, 1, 0, 500),
@@ -3890,7 +3888,7 @@ VALUES (4230102, 1072141, 1, 1, 0, 800),
        (5120003, 2041023, 1, 1, 0, 300),
        (5120003, 1032019, 1, 1, 0, 1000),
        (5120003, 2070004, 1, 1, 0, 500);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (5120003, 2070010, 1, 1, 0, 500),
        (5120003, 1002153, 1, 1, 0, 1500),
        (5120003, 1002181, 1, 1, 0, 1500),
@@ -5172,7 +5170,7 @@ VALUES (5120003, 2070010, 1, 1, 0, 500),
        (6130208, 4130012, 1, 1, 0, 6000),
        (6130209, 4000289, 1, 1, 0, 600000),
        (6130209, 4000021, 1, 1, 0, 50000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (6130209, 4003005, 1, 1, 0, 200000),
        (6130209, 4020004, 1, 1, 0, 9000),
        (6130209, 4020002, 1, 1, 0, 9000),
@@ -6457,7 +6455,7 @@ VALUES (6130209, 4003005, 1, 1, 0, 200000),
        (7160000, 2040619, 1, 1, 0, 300),
        (7160000, 4130003, 1, 1, 0, 6000),
        (7160000, 4130007, 1, 1, 0, 6000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (7160000, 4130011, 1, 1, 0, 6000),
        (7220000, 4000284, 1, 1, 0, 600000),
        (7220000, 4000284, 1, 1, 0, 600000),
@@ -7741,7 +7739,7 @@ VALUES (7160000, 4130011, 1, 1, 0, 6000),
        (8170000, 1061106, 1, 1, 0, 800),
        (8170000, 1050083, 1, 1, 0, 700),
        (8170000, 1051069, 1, 1, 0, 700);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (8170000, 1072211, 1, 1, 0, 800),
        (8170000, 1072178, 1, 1, 0, 800),
        (8170000, 1462013, 1, 1, 0, 500),
@@ -9007,7 +9005,7 @@ VALUES (8170000, 1072211, 1, 1, 0, 800),
        (8830000, 2020015, 1, 1, 0, 999999),
        (8830000, 2049100, 1, 1, 0, 3000),
        (8830000, 2049000, 1, 1, 0, 1500);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (8830000, 2040739, 1, 1, 0, 3000),
        (8830000, 1072376, 1, 1, 0, 8000),
        (8830000, 4001261, 1, 1, 0, 600000),
@@ -10270,7 +10268,7 @@ VALUES (8830000, 2040739, 1, 1, 0, 3000),
        (130101, 4031846, 1, 1, 2173, 50000),
        (1210100, 4031846, 1, 1, 2173, 50000),
        (8180001, 4031464, 1, 1, 6303, 1000000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (7130104, 4031436, 1, 1, 3828, 1000000),
        (3110302, 4031694, 1, 1, 3312, 50000),
        (3110303, 4031694, 1, 1, 3312, 100000),
@@ -11460,7 +11458,7 @@ VALUES (7130104, 4031436, 1, 1, 3828, 1000000),
        (9420530, 1382019, 1, 1, 0, 1800),
        (9420530, 2041002, 1, 1, 0, 1000),
        (9420530, 2040901, 1, 1, 0, 1000);
-INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`, `chance`)
+INSERT IGNORE INTO `temp_data` (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
 VALUES (9420530, 2020014, 1, 1, 0, 10000),
        (9420530, 400006, 1, 1, 0, 333333),
        (9420530, 400002, 1, 1, 0, 10000),
@@ -12573,7 +12571,7 @@ VALUES (9420530, 2020014, 1, 1, 0, 10000),
        (7140000, 4031171, 1, 1, 7101, 100000),
        (9500137, 4031171, 1, 1, 7101, 100000);
 
-INSERT INTO `drop_data_global` (`id`, `continent`, `itemid`, `minimum_quantity`, `maximum_quantity`, `questid`,
+INSERT INTO `drop_data_global` (`id`, `continent`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`,
                                 `chance`, `comments`)
 VALUES (1, -1, 4031865, 1, 1, 0, 35000, 'NX Card 100 PTS'),
        (2, -1, 4031866, 1, 1, 0, 20000, 'NX Card 250 PTS'),
@@ -20576,15 +20574,6 @@ VALUES (57, 3990000, 500, 1),
 
 INSERT INTO `specialcashitems` (`id`, `sn`, `modifier`, `info`)
 VALUES (1, 10000617, 1024, 1);
-
-ALTER TABLE `dueyitems`
-    ADD CONSTRAINT `dueyitems_ibfk_1` FOREIGN KEY (`PackageId`) REFERENCES `dueypackages` (`PackageId`) ON DELETE CASCADE;
-
-ALTER TABLE `famelog`
-    ADD CONSTRAINT `famelog_ibfk_1` FOREIGN KEY (`characterid`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
-
-ALTER TABLE `family_character`
-    ADD CONSTRAINT `family_character_ibfk_1` FOREIGN KEY (`cid`) REFERENCES `characters` (`id`) ON DELETE CASCADE;
 
 /*!40101 SET CHARACTER_SET_CLIENT = @OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS = @OLD_CHARACTER_SET_RESULTS */;

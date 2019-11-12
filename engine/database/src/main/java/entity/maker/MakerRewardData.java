@@ -1,6 +1,7 @@
 package entity.maker;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -56,5 +57,23 @@ public class MakerRewardData implements Serializable {
 
    public void setProb(Integer prob) {
       this.prob = prob;
+   }
+
+   @Override
+   public boolean equals(Object o) {
+      if (this == o) {
+         return true;
+      }
+      if (o == null || getClass() != o.getClass()) {
+         return false;
+      }
+      MakerRewardData that = (MakerRewardData) o;
+      return itemId.equals(that.itemId) &&
+            rewardId.equals(that.rewardId);
+   }
+
+   @Override
+   public int hashCode() {
+      return Objects.hash(itemId, rewardId);
    }
 }

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -13,7 +14,7 @@ public class DropData implements Serializable {
    private static final long serialVersionUID = 1L;
 
    @Id
-   @GeneratedValue
+   @GeneratedValue(strategy=GenerationType.IDENTITY)
    private Integer id;
 
    @Column(nullable = false)
@@ -22,10 +23,10 @@ public class DropData implements Serializable {
    @Column(nullable = false)
    private Integer itemId;
 
-   @Column(nullable = false, name = "minimum_quantity")
+   @Column(nullable = false)
    private Integer minimumQuantity;
 
-   @Column(nullable = false, name = "maximum_quantity")
+   @Column(nullable = false)
    private Integer maximumQuantity;
 
    @Column(nullable = false)
