@@ -39,7 +39,7 @@ public class CharacterProvider extends AbstractQueryExecutor {
    }
 
    public List<CharNameAndIdData> getCharacterInfoForWorld(EntityManager entityManager, int accountId, int worldId) {
-      TypedQuery<CharNameAndIdData> query = entityManager.createQuery("SELECT NEW client.CharacterNameAndId(c.id, c.name) FROM Character c WHERE c.accountId = :accountId AND c.world = :worldId", CharNameAndIdData.class);
+      TypedQuery<CharNameAndIdData> query = entityManager.createQuery("SELECT NEW client.database.data.CharNameAndIdData(c.name, c.id, c.buddyCapacity) FROM Character c WHERE c.accountId = :accountId AND c.world = :worldId", CharNameAndIdData.class);
       query.setParameter("accountId", accountId);
       query.setParameter("worldId", worldId);
       return query.getResultList();
@@ -107,7 +107,7 @@ public class CharacterProvider extends AbstractQueryExecutor {
    public int getIdForName(EntityManager entityManager, String name) {
       TypedQuery<Integer> query = entityManager.createQuery("SELECT c.id FROM Character c WHERE c.name = :name", Integer.class);
       query.setParameter("name", name);
-      return query.getSingleResult();
+      return getSingleWithDefault(query, -1);
    }
 
    public String getNameForId(EntityManager entityManager, int characterId) {

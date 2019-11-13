@@ -39,7 +39,7 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
                      "WHERE ii.type = :type AND ii.characterId = :characterId AND ii.inventoryType = :inventoryType", GetInventoryItems.class);
          query.setParameter("type", type);
          query.setParameter("characterId", characterId);
-         query.setParameter("inventoryType", MapleInventoryType.EQUIPPED.getType());
+         query.setParameter("inventoryType", (int) MapleInventoryType.EQUIPPED.getType());
       } else {
          query = entityManager.createQuery(
                "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
@@ -66,7 +66,7 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
                      "WHERE ii.type = :type AND ii.accountId = :accountId AND ii.inventoryType = :inventoryType", GetInventoryItems.class);
          query.setParameter("type", type);
          query.setParameter("accountId", accountId);
-         query.setParameter("inventoryType", MapleInventoryType.EQUIPPED.getType());
+         query.setParameter("inventoryType", (int) MapleInventoryType.EQUIPPED.getType());
       } else {
          query = entityManager.createQuery(
                "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
@@ -105,7 +105,7 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
                         "LEFT JOIN Character c ON c.id = ii.characterId " +
                         "WHERE c.accountId = :accountId AND ii.inventoryType = :type", GetInventoryItems.class);
             query.setParameter("accountId", id);
-            query.setParameter("type", MapleInventoryType.EQUIPPED.getType());
+            query.setParameter("type", (int) MapleInventoryType.EQUIPPED.getType());
          } else {
             query = entityManager.createQuery(
                   "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +
@@ -130,7 +130,7 @@ public class InventoryItemProvider extends AbstractQueryExecutor {
                         "LEFT JOIN Character c ON c.id = ii.characterId " +
                         "WHERE c.id = :characterId AND ii.inventoryType = :type", GetInventoryItems.class);
             query.setParameter("characterId", id);
-            query.setParameter("type", MapleInventoryType.EQUIPPED.getType());
+            query.setParameter("type", (int) MapleInventoryType.EQUIPPED.getType());
          } else {
             query = entityManager.createQuery(
                   "SELECT NEW client.database.data.GetInventoryItems(ii.inventoryType, ii.itemId, ii.position, ii.quantity, " +

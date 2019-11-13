@@ -159,6 +159,8 @@ public class CharacterAdministrator extends AbstractQueryExecutor {
       character.setMaxMp(maxMp);
       character.setLevel(level);
       character.setAp(ap);
+      character.setDataString("");
+      character.setPartySearch(0);
 
       StringBuilder sps = new StringBuilder();
       for (int value : sp) {

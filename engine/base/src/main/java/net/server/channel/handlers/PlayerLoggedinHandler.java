@@ -73,6 +73,7 @@ import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.PartyOperation;
 import net.server.world.World;
+import scala.Option;
 import scripting.event.EventInstanceManager;
 import server.life.MobSkill;
 import tools.DatabaseConnection;
@@ -346,9 +347,9 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
             PacketCreator.announce(client, new UpdateBuddyList(player.getBuddylist().getBuddies()));
 
-            CharacterNameAndId pendingBuddyRequest = client.getPlayer().getBuddylist().pollPendingRequest();
-            if (pendingBuddyRequest != null) {
-               PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.id(), client.getPlayer().getId(), pendingBuddyRequest.name()));
+            Option<CharacterNameAndId> pendingBuddyRequest = client.getPlayer().getBuddylist().pollPendingRequest();
+            if (pendingBuddyRequest.isDefined()) {
+               PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.get().id(), client.getPlayer().getId(), pendingBuddyRequest.get().name()));
             }
 
             PacketCreator.announce(client, new UpdateGender(player.getGender()));

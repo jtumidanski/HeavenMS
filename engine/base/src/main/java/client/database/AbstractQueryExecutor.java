@@ -48,7 +48,7 @@ public abstract class AbstractQueryExecutor {
    }
 
    protected <T, U> List<T> getResultList(TypedQuery<U> query, SqlTransformer<T, U> transformer) {
-      return query.getResultStream().map(transformer::transform).collect(Collectors.toList());
+      return query.getResultList().parallelStream().map(transformer::transform).collect(Collectors.toList());
    }
 
    protected boolean resultExists(Query query) {

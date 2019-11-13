@@ -403,6 +403,7 @@ public class PacketCreator {
          case CLAIM_STATUS_CHANGED:
          case SESSION_VALUE:
          case DOJO_WARP_UP:
+         case SET_NPC_SCRIPTABLE:
             return Optional.of(GenericPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());

@@ -23,7 +23,7 @@ public class Account implements Serializable {
    private static final long serialVersionUID = 1L;
 
    @Id
-   @GeneratedValue(strategy=GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Integer id;
 
    @Column(nullable = false, length = 13)
@@ -33,10 +33,10 @@ public class Account implements Serializable {
    private String password;
 
    @Column(nullable = false, length = 10)
-   private String pin;
+   private String pin = "";
 
    @Column(nullable = false, length = 26)
-   private String pic;
+   private String pic = "";
 
    @Column(nullable = false)
    private Integer loggedIn = 0;
@@ -72,7 +72,7 @@ public class Account implements Serializable {
    private Integer characterSlots = 3;
 
    @Column(nullable = false)
-   private Integer gender = 3;
+   private Integer gender = 1;
 
    @Column(nullable = false)
    private Timestamp tempBan;

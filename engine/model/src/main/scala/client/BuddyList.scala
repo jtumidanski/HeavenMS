@@ -86,8 +86,12 @@ class BuddyList(var capacity: Int) {
     pendingRequests.addOne(buddy)
   }
 
-  def pollPendingRequest: CharacterNameAndId = {
-    pendingRequests.removeLast(true)
+  def pollPendingRequest: Option[CharacterNameAndId] = {
+    if (pendingRequests.isEmpty) {
+      Option.empty
+    } else {
+      Option.apply(pendingRequests.removeLast(true))
+    }
   }
 
   def hasPendingRequest: Boolean = {

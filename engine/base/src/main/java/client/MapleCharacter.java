@@ -49,7 +49,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
-
 import javax.persistence.EntityManager;
 
 import org.apache.mina.util.ConcurrentHashSet;
@@ -354,7 +353,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private MapleMiniGame miniGame;
    private MapleRockPaperScissor rps;
    private MapleMount mount;
-   private Optional<MapleParty> party;
+   private Optional<MapleParty> party = Optional.empty();
    private MaplePet[] pets = new MaplePet[3];
    private MaplePlayerShop playerShop = null;
    private MapleShop shop = null;
@@ -2185,9 +2184,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void nextPendingRequest(MapleClient c) {
-      CharacterNameAndId pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
-      if (pendingBuddyRequest != null) {
-         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
+      Option<CharacterNameAndId> pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
+      if (pendingBuddyRequest.isDefined()) {
+         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.get().id(), c.getPlayer().getId(), pendingBuddyRequest.get().name()));
       }
    }
 
@@ -6911,6 +6910,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          entityManager.getTransaction().commit();
+         entityManager.getTransaction().begin();
 
          if (storage != null && usedStorage) {
             storage.saveToDB(entityManager);

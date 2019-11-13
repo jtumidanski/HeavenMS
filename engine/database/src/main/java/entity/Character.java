@@ -24,7 +24,7 @@ public class Character implements Serializable {
    private static final long serialVersionUID = 1L;
 
    @Id
-   @GeneratedValue(strategy=GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Integer id;
 
    @Column(nullable = false)
@@ -40,10 +40,10 @@ public class Character implements Serializable {
    private Integer level = 1;
 
    @Column(nullable = false)
-   private Integer exp;
+   private Integer exp = 0;
 
    @Column(nullable = false)
-   private Integer gachaponExp;
+   private Integer gachaponExp = 0;
 
    @Column(nullable = false)
    private Integer str = 12;

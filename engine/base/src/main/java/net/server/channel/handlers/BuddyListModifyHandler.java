@@ -41,6 +41,7 @@ import net.server.channel.packet.buddy.BaseBuddyPacket;
 import net.server.channel.packet.buddy.DeleteBuddyPacket;
 import net.server.channel.packet.reader.BuddyReader;
 import net.server.world.World;
+import scala.Option;
 import tools.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -55,9 +56,9 @@ public class BuddyListModifyHandler extends AbstractPacketHandler<BaseBuddyPacke
    }
 
    private void nextPendingRequest(MapleClient c) {
-      CharacterNameAndId pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
-      if (pendingBuddyRequest != null) {
-         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.id(), c.getPlayer().getId(), pendingBuddyRequest.name()));
+      Option<CharacterNameAndId> pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
+      if (pendingBuddyRequest.isDefined()) {
+         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.get().id(), c.getPlayer().getId(), pendingBuddyRequest.get().name()));
       }
    }
 

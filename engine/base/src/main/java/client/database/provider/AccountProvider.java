@@ -3,6 +3,7 @@ package client.database.provider;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -53,7 +54,7 @@ public class AccountProvider extends AbstractQueryExecutor {
    }
 
    public Calendar getTempBanCalendar(EntityManager entityManager, int accountId) {
-      TypedQuery<Timestamp> query = entityManager.createQuery("SELECT a.tempBan FROM Account a WHERE a.id = :id", Timestamp.class);
+      TypedQuery<Date> query = entityManager.createQuery("SELECT a.tempBan FROM Account a WHERE a.id = :id", Date.class);
       query.setParameter("id", accountId);
       Calendar tempBan = Calendar.getInstance();
       tempBan.setTimeInMillis(query.getSingleResult().getTime());

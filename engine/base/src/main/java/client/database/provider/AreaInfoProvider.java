@@ -22,7 +22,7 @@ public class AreaInfoProvider extends AbstractQueryExecutor {
    }
 
    public List<Pair<Short, String>> getAreaInfo(EntityManager entityManager, int characterId) {
-      Query query = entityManager.createQuery("SELECT ai.area, ai.info FROM AreaInfo ai WHERE ai.characterId = :characterId", Pair.class);
+      Query query = entityManager.createQuery("SELECT NEW tools.Pair(ai.area, ai.info) FROM AreaInfo ai WHERE ai.characterId = :characterId", Pair.class);
       query.setParameter("characterId", characterId);
       List<Object[]> list = (List<Object[]>) query.getResultList();
       return list.stream().map(result -> new Pair<>((short) result[0], (String) result[1])).collect(Collectors.toList());
