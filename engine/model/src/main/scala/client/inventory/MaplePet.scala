@@ -4,7 +4,7 @@ import java.awt.Point
 
 import server.movement.{AbsoluteLifeMovement, LifeMovement, LifeMovementFragment}
 
-class MaplePet(private var _id: Int, private var _position: Short, var uniqueId: Int) extends Item(_id, _position, 1) {
+class MaplePet(_id: Int, _position: Short, var uniqueId: Int) extends Item(_id, _position, 1) {
   var name: String = ""
 
   var closeness: Int = 0

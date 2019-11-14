@@ -33,7 +33,7 @@ public class InventoryItem implements Serializable {
    private Integer itemId;
 
    @Column(nullable = false)
-   private Integer inventoryType;
+   private Integer inventoryType = 0;
 
    @Column(nullable = false)
    private Integer position;

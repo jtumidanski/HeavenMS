@@ -42,6 +42,7 @@ public class QuestStatus implements Serializable {
    private Integer info;
 
    public QuestStatus() {
+      info = 0;
    }
 
    public Integer getQuestStatusId() {

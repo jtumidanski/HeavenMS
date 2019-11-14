@@ -285,6 +285,7 @@ public class PacketCreator {
          case NOTIFY_MARRIAGE:
          case NOTIFY_JOB_CHANGE:
          case SPOUSE_CHAT:
+         case SET_WEEK_EVENT_MESSAGE:
             return Optional.of(MessagePacketFactory.getInstance());
          case BUDDYLIST:
             return Optional.of(BuddyPacketFactory.getInstance());

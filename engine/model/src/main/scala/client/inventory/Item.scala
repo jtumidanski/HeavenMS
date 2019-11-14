@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import constants.ItemConstants
 
-class Item(private var _id: Int, private var _position: Short, private var _quantity: Short, private var _pet: Option[MaplePet], private var _petId: Int) extends Comparable[Item] {
+class Item(var _id: Int, var _position: Short, var _quantity: Short, var _pet: Option[MaplePet], var _petId: Int) extends Comparable[Item] {
   def id: Int = _id
 
   def position: Short = _position

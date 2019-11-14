@@ -5,7 +5,7 @@ import java.util
 import constants.ServerConstants
 import tools.Pair
 
-class Equip(private var _id: Int, private var _position: Short, private var _slots: Int, private var _elemental: Boolean)
+class Equip(_id: Int, _position: Short, private var _slots: Int, _elemental: Boolean)
   extends Item(_id, _position, 1) {
 
   var itemExp: Float = 0
@@ -66,7 +66,7 @@ class Equip(private var _id: Int, private var _position: Short, private var _slo
   }
 
   override def copy(): Item = {
-    val ret: Equip = new Equip(_id, _position, _slots, _elemental)
+    val ret: Equip = new Equip(id, position, slots, elemental)
     ret.str = str
     ret.dex = dex
     ret._int = _int
@@ -84,7 +84,7 @@ class Equip(private var _id: Int, private var _position: Short, private var _slo
     ret.jump = jump
     ret.flag = flag
     ret.vicious = vicious
-    ret._slots = _slots
+//    ret._slots = _slots
     ret.itemLevel = itemLevel
     ret.itemExp = itemExp
     ret.level = level
