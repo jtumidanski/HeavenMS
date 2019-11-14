@@ -48,9 +48,9 @@ public class QuestScriptManager extends AbstractScriptManager {
    }
 
    private ScriptEngine getQuestScriptEngine(MapleClient c, short questid) {
-      ScriptEngine iv = getScriptEngine("quest/" + questid + ".groovy", c);
+      ScriptEngine iv = getScriptEngine("quest/" + questid, c);
       if (iv == null && GameConstants.isMedalQuest(questid)) {
-         iv = getScriptEngine("quest/medalQuest.groovy", c);   // start generic medal quest
+         iv = getScriptEngine("quest/medalQuest", c);   // start generic medal quest
       }
 
       return iv;

@@ -200,7 +200,7 @@ public class PacketReaderFactory {
       readers.put(CancelItemEffectReader.class, new CancelItemEffectReader());
       readers.put(PlayerInteractionReader.class, new PlayerInteractionReader());
       readers.put(RPSActionReader.class, new RPSActionReader());
-      readers.put(DistributeAPReader.class, new DeleteCharacterReader());
+      readers.put(DistributeAPReader.class, new DistributeAPReader());
       readers.put(DistributeSPReader.class, new DistributeSPReader());
       readers.put(KeymapChangeReader.class, new KeymapChangeReader());
       readers.put(ChangeMapSpecialReader.class, new ChangeMapSpecialReader());
