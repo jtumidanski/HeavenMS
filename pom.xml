@@ -11,6 +11,8 @@
     <modules>
         <module>engine</module>
         <module>script</module>
+        <module>bos</module>
+        <module>shared</module>
     </modules>
 
     <name>HeavenMS</name>
@@ -27,6 +29,7 @@
         <maven.compiler.source>1.11</maven.compiler.source>
         <maven.compiler.target>1.11</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jersey.version>2.29.1</jersey.version>
     </properties>
 
 </project>

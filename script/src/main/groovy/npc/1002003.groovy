@@ -1,6 +1,6 @@
 package npc
 
-
+import client.processor.BuddyListProcessor
 import scripting.npc.NPCConversationManager
 
 /*
@@ -49,9 +49,12 @@ class NPC1002003 {
                cm.dispose()
             } else {
                int newCapacity = capacity + 5
-               cm.gainMeso(-240000)
-               cm.getPlayer().setBuddyCapacity(newCapacity)
-               cm.sendOk("Alright! Your buddy list will have 5 extra slots by now. Check and see for it yourself. And if you still need more room on your buddy list, you know who to find. Of course, it isn't going to be for free ... well, so long ...")
+               BuddyListProcessor.getInstance().updateCapacity(cm.getPlayer(), newCapacity, {
+                  cm.gainMeso(-240000)
+                  cm.sendOk("Alright! Your buddy list will have 5 extra slots by now. Check and see for it yourself. And if you still need more room on your buddy list, you know who to find. Of course, it isn't going to be for free ... well, so long ...")
+               }, {
+                  cm.sendOk("There was an issue increasing the size of your buddy list. Please try again later.")
+               })
                cm.dispose()
             }
          }
