@@ -33,7 +33,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.CharacterProcessor;
-import client.processor.DueyProcessor;
+import client.processor.npc.DueyProcessor;
 import client.processor.MapleRingProcessor;
 import client.processor.NoteProcessor;
 import net.server.AbstractPacketHandler;

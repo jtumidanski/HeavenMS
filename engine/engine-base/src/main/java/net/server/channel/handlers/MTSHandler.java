@@ -38,7 +38,7 @@ import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.Channel;

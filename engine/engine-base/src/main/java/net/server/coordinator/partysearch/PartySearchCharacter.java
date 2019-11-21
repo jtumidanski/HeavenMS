@@ -22,7 +22,6 @@ package net.server.coordinator.partysearch;
 import java.lang.ref.WeakReference;
 
 import client.MapleCharacter;
-import net.server.coordinator.MaplePartySearchCoordinator;
 
 /**
  * @author Ronan

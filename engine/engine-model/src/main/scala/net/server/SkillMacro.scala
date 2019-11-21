@@ -7,9 +7,15 @@ class SkillMacro(private var _name: String, private var _shout: Int, private var
 
   def skill1: Int = _skill1
 
+  def setSkill1(value: Int): Unit = _skill1 = value
+
   def skill2: Int = _skill2
 
+  def setSkill2(value: Int): Unit = _skill2 = value
+
   def skill3: Int = _skill3
+
+  def setSkill3(value: Int): Unit = _skill3 = value
 
   def position: Int = _position
 }

@@ -7,7 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import server.MapleShopItem;
 
 public class ShopItemProvider extends AbstractQueryExecutor {

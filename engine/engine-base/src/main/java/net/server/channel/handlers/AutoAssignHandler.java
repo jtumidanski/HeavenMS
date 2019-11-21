@@ -22,7 +22,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.processor.AssignAPProcessor;
+import client.processor.stat.AssignAPProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.AssignAPPacket;
 import net.server.channel.packet.reader.AssignAPReader;

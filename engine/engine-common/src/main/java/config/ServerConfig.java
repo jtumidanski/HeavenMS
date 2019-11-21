@@ -4,13 +4,8 @@ public class ServerConfig {
     //Thread Tracker Configuration
     public boolean USE_THREAD_TRACKER;
 
-    //Database Configuration
-    public String DB_URL;
-    public String DB_USER;
-    public String DB_PASS;
-    public boolean DB_CONNECTION_POOL;
-
     //Login Configuration
+    public int WORLDS;
     public int WLDLIST_SIZE;
     public int CHANNEL_SIZE;
     public int CHANNEL_LOAD;

@@ -38,7 +38,7 @@ import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;

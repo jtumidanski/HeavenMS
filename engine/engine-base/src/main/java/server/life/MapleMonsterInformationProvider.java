@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 import client.database.provider.DropDataProvider;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;

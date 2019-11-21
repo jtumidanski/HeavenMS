@@ -21,7 +21,7 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.FieldDamageMobPacket;
 import net.server.channel.packet.reader.FieldDamageMobReader;

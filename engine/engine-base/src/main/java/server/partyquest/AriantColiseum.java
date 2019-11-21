@@ -28,7 +28,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
 import client.MapleCharacter;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import server.TimerManager;
 import server.expeditions.MapleExpedition;
 import server.expeditions.MapleExpeditionType;

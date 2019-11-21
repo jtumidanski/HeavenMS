@@ -34,7 +34,7 @@ import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.LoginPasswordReader;
-import net.server.coordinator.MapleSessionCoordinator;
+import net.server.coordinator.session.MapleSessionCoordinator;
 import net.server.login.packet.LoginPasswordPacket;
 import tools.BCrypt;
 import tools.DatabaseConnection;

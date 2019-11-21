@@ -19,7 +19,7 @@ import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.ItemProcessor;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.WeddingReader;
 import net.server.channel.packet.wedding.AddRegistryItemPacket;

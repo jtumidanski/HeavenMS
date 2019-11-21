@@ -24,7 +24,7 @@ import java.util.Collection;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.Server;
 import net.server.world.World;
 

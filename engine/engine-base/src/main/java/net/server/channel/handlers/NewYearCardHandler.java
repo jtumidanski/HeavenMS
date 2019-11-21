@@ -25,7 +25,7 @@ import client.database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.newyear.NewYearCardRecord;
 import client.processor.NewYearCardProcessor;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.newyear.BaseNewYearCardPacket;

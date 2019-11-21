@@ -8,7 +8,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.inventory.PetFlag;
 import client.inventory.manipulator.MapleCashIdGenerator;
-import constants.ExpTable;
+import constants.game.ExpTable;
 import server.MapleItemInformationProvider;
 import tools.DatabaseConnection;
 import tools.MasterBroadcaster;

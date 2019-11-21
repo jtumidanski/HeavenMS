@@ -37,7 +37,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.ModifyInventory;
 import client.inventory.ScrollResult;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ScrollPacket;
 import net.server.channel.packet.reader.ScrollReader;

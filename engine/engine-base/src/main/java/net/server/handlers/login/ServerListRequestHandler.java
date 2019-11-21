@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import client.MapleClient;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;

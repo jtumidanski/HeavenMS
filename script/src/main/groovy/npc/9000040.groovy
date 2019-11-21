@@ -1,6 +1,6 @@
 package npc
 
-import client.processor.MakerProcessor
+import client.processor.action.MakerProcessor
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
 

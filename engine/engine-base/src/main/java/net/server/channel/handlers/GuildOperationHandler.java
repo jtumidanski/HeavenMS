@@ -27,7 +27,7 @@ import java.util.Set;
 import client.MapleCharacter;
 import client.MapleClient;
 import config.YamlConfig;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.guild.BaseGuildOperationPacket;

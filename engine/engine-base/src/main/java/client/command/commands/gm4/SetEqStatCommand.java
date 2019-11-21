@@ -30,7 +30,7 @@ import client.inventory.Equip;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 
 public class SetEqStatCommand extends Command {
    {

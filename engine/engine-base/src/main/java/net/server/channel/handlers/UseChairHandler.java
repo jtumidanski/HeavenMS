@@ -23,7 +23,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.inventory.MapleInventoryType;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseChairPacket;
 import net.server.channel.packet.reader.UseChairReader;

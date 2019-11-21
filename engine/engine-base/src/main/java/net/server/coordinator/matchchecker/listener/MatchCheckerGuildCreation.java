@@ -23,7 +23,7 @@ import java.util.Set;
 
 import client.MapleCharacter;
 import config.YamlConfig;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.Server;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;

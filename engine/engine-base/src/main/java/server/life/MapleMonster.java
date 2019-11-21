@@ -64,7 +64,7 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.Channel;
-import net.server.coordinator.MapleMonsterAggroCoordinator;
+import net.server.coordinator.world.MapleMonsterAggroCoordinator;
 import net.server.world.MapleParty;
 import scripting.event.EventInstanceManager;
 import server.MapleStatEffect;

@@ -27,7 +27,7 @@ import java.util.Arrays;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.ItemFactory;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;

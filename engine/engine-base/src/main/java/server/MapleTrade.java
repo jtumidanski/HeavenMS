@@ -34,7 +34,7 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import config.YamlConfig;
-import net.server.coordinator.MapleInviteCoordinator;
+import net.server.coordinator.world.MapleInviteCoordinator;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.character.interaction.GetTradeResult;

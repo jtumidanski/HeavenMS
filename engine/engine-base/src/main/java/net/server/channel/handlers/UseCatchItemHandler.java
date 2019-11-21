@@ -26,7 +26,7 @@ import client.MapleClient;
 import client.autoban.AutobanManager;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.UseCatchItemPacket;

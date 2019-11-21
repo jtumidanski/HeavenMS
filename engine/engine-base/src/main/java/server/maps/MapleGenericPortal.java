@@ -25,7 +25,7 @@ import java.awt.Point;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;

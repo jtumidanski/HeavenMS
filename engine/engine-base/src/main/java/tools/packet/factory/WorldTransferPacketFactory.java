@@ -2,7 +2,7 @@ package tools.packet.factory;
 
 import java.util.List;
 
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.Server;
 import net.server.world.World;
 import tools.data.output.MaplePacketLittleEndianWriter;

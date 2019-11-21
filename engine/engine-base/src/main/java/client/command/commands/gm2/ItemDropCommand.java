@@ -32,7 +32,7 @@ import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
 import client.processor.PetProcessor;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 
 public class ItemDropCommand extends Command {

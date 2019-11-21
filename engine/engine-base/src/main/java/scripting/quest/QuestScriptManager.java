@@ -29,7 +29,7 @@ import javax.script.ScriptEngine;
 
 import client.MapleClient;
 import client.MapleQuestStatus;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import scripting.AbstractScriptManager;
 import server.quest.MapleQuest;
 import tools.FilePrinter;

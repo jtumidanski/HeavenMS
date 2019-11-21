@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import client.MapleClient;
 import net.MaplePacketHandler;
-import net.server.channel.worker.PacketReaderFactory;
+import net.server.channel.task.PacketReaderFactory;
 import tools.FilePrinter;
 import tools.data.input.SeekableLittleEndianAccessor;
 

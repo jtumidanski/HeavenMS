@@ -12,7 +12,7 @@ import client.database.data.AllianceData;
 import client.database.provider.AllianceGuildProvider;
 import client.database.provider.AllianceProvider;
 import net.server.Server;
-import net.server.coordinator.MapleInviteCoordinator;
+import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;

@@ -36,7 +36,7 @@ import java.util.concurrent.locks.Lock;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.MapleItemInformationProvider;

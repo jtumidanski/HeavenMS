@@ -37,7 +37,7 @@ import client.processor.CharacterProcessor;
 import client.processor.MapleRingProcessor;
 import client.processor.NoteProcessor;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.cash.operation.BaseCashOperationPacket;

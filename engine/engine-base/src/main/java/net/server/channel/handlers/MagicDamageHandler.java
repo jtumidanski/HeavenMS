@@ -32,7 +32,7 @@ import constants.skills.FPArchMage;
 import constants.skills.ILArchMage;
 import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
-import net.server.channel.worker.PacketReaderFactory;
+import net.server.channel.task.PacketReaderFactory;
 import server.MapleStatEffect;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;

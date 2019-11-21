@@ -26,7 +26,7 @@ import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.SetGenderReader;
-import net.server.coordinator.MapleSessionCoordinator;
+import net.server.coordinator.session.MapleSessionCoordinator;
 import net.server.login.packet.SetGenderPacket;
 import tools.PacketCreator;
 import tools.packet.login.AuthSuccess;

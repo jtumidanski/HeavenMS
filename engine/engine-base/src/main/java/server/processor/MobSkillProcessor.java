@@ -10,7 +10,7 @@ import java.util.Map;
 import client.MapleCharacter;
 import client.MapleDisease;
 import client.status.MonsterStatus;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.life.MobSkill;

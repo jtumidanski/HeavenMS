@@ -6,7 +6,7 @@ import java.util.List;
 
 import client.MapleStat;
 import client.inventory.MaplePet;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.stat.EnableActions;

@@ -27,7 +27,7 @@ import java.util.Map;
 import client.MapleCharacter;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;

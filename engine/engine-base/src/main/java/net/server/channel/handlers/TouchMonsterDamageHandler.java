@@ -26,7 +26,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
-import net.server.channel.worker.PacketReaderFactory;
+import net.server.channel.task.PacketReaderFactory;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public final class TouchMonsterDamageHandler extends AbstractDealDamageHandler<AttackPacket> {

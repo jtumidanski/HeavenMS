@@ -22,7 +22,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.processor.DueyProcessor;
+import client.processor.npc.DueyProcessor;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.duey.BaseDueyPacket;

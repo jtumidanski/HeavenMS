@@ -40,7 +40,7 @@ import client.inventory.ModifyInventory;
 import client.processor.ItemProcessor;
 import client.processor.NewYearCardProcessor;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import server.maps.MapleMap;
 import tools.FilePrinter;

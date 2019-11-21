@@ -6,7 +6,7 @@ import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
 import config.YamlConfig;
-import constants.LanguageConstants;
+import constants.string.LanguageConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.MapleParty;

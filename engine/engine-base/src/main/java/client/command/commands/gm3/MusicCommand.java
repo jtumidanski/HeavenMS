@@ -26,7 +26,7 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.field.effect.MusicChange;

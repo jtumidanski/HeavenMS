@@ -48,7 +48,7 @@ import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
 import client.processor.PetProcessor;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;

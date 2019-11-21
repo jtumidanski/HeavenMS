@@ -10,7 +10,7 @@ import client.MapleMount;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.newyear.NewYearCardRecord;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import net.server.guild.MapleGuildSummary;
 import server.life.MapleMonster;
 import server.maps.MapleMiniGame;

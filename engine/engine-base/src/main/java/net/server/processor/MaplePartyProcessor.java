@@ -7,7 +7,7 @@ import java.util.Optional;
 import client.MapleCharacter;
 import config.YamlConfig;
 import net.server.Server;
-import net.server.coordinator.MapleMatchCheckerCoordinator;
+import net.server.coordinator.matchchecker.MapleMatchCheckerCoordinator;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;

@@ -41,7 +41,7 @@ import client.database.administrator.PlayerNpcAdministrator;
 import client.database.provider.PlayerNpcProvider;
 import client.inventory.MapleInventoryType;
 import config.YamlConfig;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.World;

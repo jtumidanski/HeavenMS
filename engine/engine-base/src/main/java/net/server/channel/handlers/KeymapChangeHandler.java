@@ -30,7 +30,7 @@ import client.KeyBinding;
 import client.Skill;
 import client.SkillFactory;
 import client.inventory.MapleInventoryType;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.keymap.AutoHPKeymapChangePacket;
 import net.server.channel.packet.keymap.AutoMPKeymapChangePacket;

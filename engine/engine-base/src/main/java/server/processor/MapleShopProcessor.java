@@ -12,7 +12,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import constants.ShopTransactionOperation;
 import scala.Option;
 import server.MapleItemInformationProvider;

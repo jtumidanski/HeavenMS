@@ -23,7 +23,7 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.processor.FredrickProcessor;
+import client.processor.npc.FredrickProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.fredrick.BaseFrederickPacket;
 import net.server.channel.packet.reader.FrederickReader;

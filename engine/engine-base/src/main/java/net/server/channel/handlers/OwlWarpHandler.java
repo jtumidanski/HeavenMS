@@ -20,7 +20,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.OwlWarpPacket;
 import net.server.channel.packet.reader.OwlWarpReader;

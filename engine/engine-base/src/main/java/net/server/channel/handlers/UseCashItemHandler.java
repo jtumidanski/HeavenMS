@@ -40,18 +40,19 @@ import client.inventory.ModifyInventory;
 import client.inventory.ScrollResult;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
-import client.processor.AssignAPProcessor;
-import client.processor.AssignSPProcessor;
-import client.processor.DueyProcessor;
+import client.processor.stat.AssignAPProcessor;
+import client.processor.stat.AssignSPProcessor;
+import client.processor.npc.DueyProcessor;
 import client.processor.ItemProcessor;
 import client.processor.NoteProcessor;
 import client.processor.PetProcessor;
 import config.YamlConfig;
-import constants.GameConstants;
-import constants.ItemConstants;
+import constants.game.GameConstants;
+import constants.inventory.ItemConstants;
 import constants.items.UseableCashItems;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.SkillMacro;
 import net.server.channel.packet.cash.use.AbstractUseCashItemPacket;
 import net.server.channel.packet.cash.use.UseApResetPacket;
 import net.server.channel.packet.cash.use.UseAvatarMegaphone;
@@ -721,6 +722,33 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          if ((curLevel < skillSPTo.get().getMaxLevel()) && curLevelSPFrom > 0) {
             player.changeSkillLevel(skillSPFrom.get(), (byte) (curLevelSPFrom - 1), player.getMasterLevel(skillSPFrom.get()), -1);
             player.changeSkillLevel(skillSPTo.get(), (byte) (curLevel + 1), player.getMasterLevel(skillSPTo.get()), -1);
+
+            // update macros, thanks to Arnah
+            if((curLevelSPFrom - 1) == 0){
+               boolean updated = false;
+               for(SkillMacro macro : player.getMacros()){
+                  if(macro == null) continue;
+
+                  boolean update = false;// cleaner?
+                  if(macro.skill1() == from){
+                     update = true;
+                     macro.setSkill1(0);
+                  }
+                  if(macro.skill2() == from){
+                     update = true;
+                     macro.setSkill2(0);
+                  }
+                  if(macro.skill3() == from){
+                     update = true;
+                     macro.setSkill3(0);
+                  }
+                  if(update){
+                     updated = true;
+                     player.updateMacros(macro.position(), macro);
+                  }
+               }
+               if(updated) player.sendMacros();
+            }
          }
       }
       remove(c, position, itemId);

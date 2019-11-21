@@ -38,7 +38,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import constants.GameConstants;
+import constants.game.GameConstants;
 import provider.MapleData;
 import provider.MapleDataEntity;
 

@@ -1,6 +1,6 @@
 package npc
 
-import constants.GameConstants
+import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType

@@ -33,7 +33,7 @@ import java.util.Map.Entry;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.Server;
 import server.maps.MaplePortal;
 import server.maps.FieldLimit;

@@ -24,7 +24,7 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.SkillFactory;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import constants.skills.Aran;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;

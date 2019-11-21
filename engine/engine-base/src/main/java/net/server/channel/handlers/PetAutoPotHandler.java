@@ -21,11 +21,14 @@
 */
 package net.server.channel.handlers;
 
+import client.MapleCharacter;
 import client.MapleClient;
-import client.processor.PetAutopotProcessor;
+import client.processor.action.PetAutopotProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetAutoPotPacket;
 import net.server.channel.packet.reader.PetAutoPotReader;
+import server.MapleItemInformationProvider;
+import server.MapleStatEffect;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
 
@@ -49,6 +52,18 @@ public final class PetAutoPotHandler extends AbstractPacketHandler<PetAutoPotPac
 
    @Override
    public void handlePacket(PetAutoPotPacket packet, MapleClient client) {
+      MapleCharacter character = client.getPlayer();
+      MapleStatEffect stat = MapleItemInformationProvider.getInstance().getItemEffect(packet.itemId());
+      if (stat.getHp() > 0 || stat.getHpRate() > 0.0) {
+         float estimatedHp = ((float) character.getHp()) / character.getMaxHp();
+         character.setAutopotHpAlert(estimatedHp);
+      }
+
+      if (stat.getMp() > 0 || stat.getMpRate() > 0.0) {
+         float estimatedMp = ((float) character.getMp()) / character.getMaxMp();
+         character.setAutopotMpAlert(estimatedMp);
+      }
+
       PetAutopotProcessor.getInstance().runAutopotAction(client, packet.slot(), packet.itemId());
    }
 }

@@ -28,8 +28,8 @@ import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 import client.MapleClient;
 import config.YamlConfig;
-import constants.OpcodeConstants;
-import net.server.coordinator.MapleSessionCoordinator;
+import constants.net.OpcodeConstants;
+import net.server.coordinator.session.MapleSessionCoordinator;
 import tools.FilePrinter;
 import tools.HexTool;
 import tools.MapleAESOFB;

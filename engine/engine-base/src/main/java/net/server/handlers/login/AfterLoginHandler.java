@@ -24,7 +24,7 @@ package net.server.handlers.login;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.AfterLoginReader;
-import net.server.coordinator.MapleSessionCoordinator;
+import net.server.coordinator.session.MapleSessionCoordinator;
 import net.server.login.packet.AfterLoginPacket;
 import tools.PacketCreator;
 import tools.packet.pin.PinCodePacket;

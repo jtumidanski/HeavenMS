@@ -43,7 +43,7 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
-import client.processor.FredrickProcessor;
+import client.processor.npc.FredrickProcessor;
 import config.YamlConfig;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;

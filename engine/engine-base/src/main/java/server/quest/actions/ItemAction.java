@@ -31,7 +31,7 @@ import client.MapleClient;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;

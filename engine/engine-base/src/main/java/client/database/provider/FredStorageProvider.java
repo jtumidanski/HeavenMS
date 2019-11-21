@@ -7,7 +7,7 @@ import javax.persistence.TypedQuery;
 
 import client.database.AbstractQueryExecutor;
 import client.database.data.FrederickStorageData;
-import client.processor.FredrickProcessor;
+import client.processor.npc.FredrickProcessor;
 
 public class FredStorageProvider extends AbstractQueryExecutor {
    private static FredStorageProvider instance;

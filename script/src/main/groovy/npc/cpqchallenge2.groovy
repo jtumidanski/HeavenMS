@@ -1,8 +1,7 @@
 package npc
 
 import client.MapleCharacter
-import constants.GameConstants
-import net.server.world.MapleParty
+import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
 
 /*

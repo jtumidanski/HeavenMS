@@ -30,7 +30,7 @@ import client.MapleClient;
 import client.inventory.Equip;
 import client.inventory.Item;
 import config.YamlConfig;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 
 /**
  * @author RonanLana

@@ -40,7 +40,7 @@ import javax.script.ScriptException;
 
 import client.MapleCharacter;
 import config.YamlConfig;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import jdk.nashorn.api.scripting.ScriptUtils;
 import net.server.Server;
 import net.server.audit.LockCollector;
@@ -51,7 +51,7 @@ import net.server.channel.Channel;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import net.server.world.World;
-import scripting.event.worker.EventScriptScheduler;
+import scripting.event.scheduler.EventScriptScheduler;
 import server.MapleMarriage;
 import server.ThreadManager;
 import server.expeditions.MapleExpedition;

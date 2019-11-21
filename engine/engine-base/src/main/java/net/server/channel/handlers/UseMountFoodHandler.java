@@ -28,7 +28,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ExpTable;
+import constants.game.ExpTable;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseMountFoodPacket;
 import net.server.channel.packet.reader.UseMountFoodReader;

@@ -21,7 +21,7 @@ package client.inventory.manipulator;
 
 import client.inventory.Item;
 import client.processor.ItemProcessor;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 
 /**
  * @author RonanLana

@@ -22,7 +22,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.processor.AssignSPProcessor;
+import client.processor.stat.AssignSPProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.DistributeSPPacket;
 import net.server.channel.packet.reader.DistributeSPReader;

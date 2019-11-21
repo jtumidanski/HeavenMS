@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import client.MapleClient;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;

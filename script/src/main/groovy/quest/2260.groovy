@@ -1,6 +1,6 @@
 package quest
 
-import constants.GameConstants
+import constants.game.GameConstants
 import scripting.quest.QuestActionManager
 
 class Quest2260 {

@@ -2,7 +2,7 @@ package client.inventory
 
 import java.util.concurrent.atomic.AtomicInteger
 
-import constants.ItemConstants
+import constants.inventory.ItemConstants
 
 class Item(var _id: Int, var _position: Short, var _quantity: Short, var _pet: Option[MaplePet], var _petId: Int) extends Comparable[Item] {
   def id: Int = _id

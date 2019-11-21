@@ -9,7 +9,7 @@ import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
 import client.autoban.AutobanFactory;
-import constants.GameConstants;
+import constants.game.GameConstants;
 import constants.skills.Aran;
 import constants.skills.Beginner;
 import constants.skills.Bishop;

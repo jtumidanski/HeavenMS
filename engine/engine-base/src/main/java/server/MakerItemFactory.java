@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import config.YamlConfig;
-import constants.EquipType;
+import constants.inventory.EquipType;
 import tools.Pair;
 
 /**

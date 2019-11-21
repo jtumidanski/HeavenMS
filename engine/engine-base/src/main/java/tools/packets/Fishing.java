@@ -23,8 +23,8 @@ import java.util.Calendar;
 
 import client.MapleCharacter;
 import config.YamlConfig;
-import constants.GameConstants;
-import constants.ItemConstants;
+import constants.game.GameConstants;
+import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;

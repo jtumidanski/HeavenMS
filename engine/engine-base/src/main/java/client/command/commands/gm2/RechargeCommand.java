@@ -28,7 +28,7 @@ import client.MapleClient;
 import client.command.Command;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
-import constants.ItemConstants;
+import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
