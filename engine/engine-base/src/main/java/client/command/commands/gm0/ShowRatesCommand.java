@@ -26,7 +26,7 @@ package client.command.commands.gm0;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.ServerConstants;
+import config.YamlConfig;
 
 public class ShowRatesCommand extends Command {
    {
@@ -63,7 +63,7 @@ public class ShowRatesCommand extends Command {
          showMsg += "Coupon DROP Rate: #k" + player.getCouponDropRate() + "x#k" + "\r\n";
       showMsg += "BOSS DROP Rate: #e#b" + player.getBossDropRate() + "x#k#n" + "\r\n";
 
-      if (ServerConstants.USE_QUEST_RATE) {
+      if (YamlConfig.config.server.USE_QUEST_RATE) {
          showMsg += "\r\n" + "#eQUEST RATE#n" + "\r\n";
          showMsg += "World QUEST Rate: #e#b" + c.getWorldServer().getQuestRate() + "x#k#n" + "\r\n";
       }

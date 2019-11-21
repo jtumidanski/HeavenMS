@@ -1,6 +1,6 @@
 package npc
 
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
 /*
@@ -36,7 +36,7 @@ class NPC2083000 {
          if (status == 0) {
             if (cm.haveItem(4001086)) {
                cm.sendYesNo("Do you want to access #b#m240050400##k right now?")
-            } else if (ServerConstants.USE_ENABLE_SOLO_EXPEDITIONS) {
+            } else if (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS) {
                if (canBypassHTPQ()) {
                   cm.sendYesNo("Do you want to access #b#m240050400##k right now?")
                } else {

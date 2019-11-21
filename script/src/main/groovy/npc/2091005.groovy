@@ -1,6 +1,6 @@
 package npc
 
-import constants.ServerConstants
+import config.YamlConfig
 import net.server.world.MapleParty
 import scripting.npc.NPCConversationManager
 import tools.MessageBroadcaster
@@ -34,7 +34,7 @@ class NPC2091005 {
          return
       }
 
-      belt_points = ServerConstants.USE_FAST_DOJO_UPGRADE ? [10, 90, 200, 460, 850] : [200, 1800, 4000, 9200, 17000]
+      belt_points = YamlConfig.config.server.USE_FAST_DOJO_UPGRADE ? [10, 90, 200, 460, 850] : [200, 1800, 4000, 9200, 17000]
 
       belt_on_inventory = []
       for (int i = 0; i < belts.length; i++) {

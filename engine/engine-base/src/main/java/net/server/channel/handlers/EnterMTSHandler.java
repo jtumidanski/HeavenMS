@@ -29,7 +29,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.database.provider.MtsItemProvider;
 import client.processor.BuybackProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;
@@ -61,11 +61,11 @@ public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
    public void handlePacket(NoOpPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
 
-      if (!chr.isAlive() && ServerConstants.USE_BUYBACK_SYSTEM) {
+      if (!chr.isAlive() && YamlConfig.config.server.USE_BUYBACK_SYSTEM) {
          BuybackProcessor.processBuyback(client);
          PacketCreator.announce(client, new EnableActions());
       } else {
-         if (!ServerConstants.USE_MTS) {
+         if (!YamlConfig.config.server.USE_MTS) {
             PacketCreator.announce(client, new EnableActions());
             return;
          }

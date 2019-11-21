@@ -4,7 +4,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamilyEntitlement;
 import client.MapleFamilyEntry;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilySummonResponsePacket;
 import net.server.channel.packet.reader.FamilySummonResponseReader;
@@ -26,7 +26,7 @@ public class FamilySummonResponseHandler extends AbstractPacketHandler<FamilySum
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      return ServerConstants.USE_FAMILY_SYSTEM;
+      return YamlConfig.config.server.USE_FAMILY_SYSTEM;
    }
 
    @Override

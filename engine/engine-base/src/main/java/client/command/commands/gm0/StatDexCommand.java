@@ -26,7 +26,7 @@ package client.command.commands.gm0;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.ServerConstants;
+import config.YamlConfig;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -49,10 +49,10 @@ public class StatDexCommand extends Command {
             return;
          }
       } else {
-         amount = Math.min(remainingAp, ServerConstants.MAX_AP - player.getDex());
+         amount = Math.min(remainingAp, YamlConfig.config.server.MAX_AP - player.getDex());
       }
       if (!player.assignDex(Math.max(amount, 0))) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "Please make sure your AP is not over " + ServerConstants.MAX_AP + " and you have enough to distribute.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "Please make sure your AP is not over " + YamlConfig.config.server.MAX_AP + " and you have enough to distribute.");
       }
    }
 }

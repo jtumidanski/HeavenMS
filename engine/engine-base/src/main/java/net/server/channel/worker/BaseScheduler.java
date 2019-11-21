@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ScheduledFuture;
 
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
@@ -92,7 +92,7 @@ public abstract class BaseScheduler {
          if (registeredEntries.isEmpty()) {
             idleProcs++;
 
-            if (idleProcs >= ServerConstants.MOB_STATUS_MONITOR_LIFE) {
+            if (idleProcs >= YamlConfig.config.server.MOB_STATUS_MONITOR_LIFE) {
                if (schedulerTask != null) {
                   schedulerTask.cancel(false);
                   schedulerTask = null;
@@ -138,7 +138,7 @@ public abstract class BaseScheduler {
       try {
          idleProcs = 0;
          if (schedulerTask == null) {
-            schedulerTask = TimerManager.getInstance().register(monitorTask, ServerConstants.MOB_STATUS_MONITOR_PROC, ServerConstants.MOB_STATUS_MONITOR_PROC);
+            schedulerTask = TimerManager.getInstance().register(monitorTask, YamlConfig.config.server.MOB_STATUS_MONITOR_PROC, YamlConfig.config.server.MOB_STATUS_MONITOR_PROC);
          }
 
          registeredEntries.put(key, new Pair<>(removalAction, Server.getInstance().getCurrentTime() + duration));

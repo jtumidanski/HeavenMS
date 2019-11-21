@@ -7,8 +7,8 @@ import client.database.AbstractQueryExecutor;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import net.server.coordinator.MapleInviteCoordinator;
 import server.MapleTrade;
 import server.MapleTradeResult;
@@ -121,7 +121,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
 
    protected void completeTrade(MapleTrade referenceTrade) {
       byte result;
-      boolean show = ServerConstants.USE_DEBUG;
+      boolean show = YamlConfig.config.server.USE_DEBUG;
 
       for (Item item : referenceTrade.getExchangeItems()) {
          MapleKarmaManipulator.toggleKarmaFlagToUntradeable(item);

@@ -47,8 +47,8 @@ import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
 import client.processor.PetProcessor;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -76,7 +76,7 @@ public class CashShop {
       this.accountId = accountId;
       this.characterId = characterId;
 
-      if (!ServerConstants.USE_JOINT_CASHSHOP_INVENTORY) {
+      if (!YamlConfig.config.server.USE_JOINT_CASHSHOP_INVENTORY) {
          if (jobType == 0) {
             factory = ItemFactory.CASH_EXPLORER;
          } else if (jobType == 1) {
@@ -137,7 +137,7 @@ public class CashShop {
 
    public void gainCash(int type, CashItem buyItem, int world) {
       gainCash(type, -buyItem.getPrice());
-      if (!ServerConstants.USE_ENFORCE_ITEM_SUGGESTION) {
+      if (!YamlConfig.config.server.USE_ENFORCE_ITEM_SUGGESTION) {
          Server.getInstance().getWorld(world).addCashItemBought(buyItem.getSN());
       }
    }

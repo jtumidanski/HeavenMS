@@ -26,7 +26,7 @@ import client.MapleClient;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
 import client.processor.MapleFamilyProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.AcceptFamilyPacket;
 import net.server.channel.packet.reader.AcceptFamilyReader;
@@ -53,7 +53,7 @@ public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamil
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      return ServerConstants.USE_FAMILY_SYSTEM;
+      return YamlConfig.config.server.USE_FAMILY_SYSTEM;
    }
 
    @Override
@@ -84,7 +84,7 @@ public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamil
                   if (targetFamily.getLeader() != targetEntry) {
                      return;
                   }
-                  if (inviter.getFamily().getTotalGenerations() + targetFamily.getTotalGenerations() <= ServerConstants.FAMILY_MAX_GENERATIONS) {
+                  if (inviter.getFamily().getTotalGenerations() + targetFamily.getTotalGenerations() <= YamlConfig.config.server.FAMILY_MAX_GENERATIONS) {
                      targetEntry.join(inviter.getFamilyEntry());
                   } else {
                      PacketCreator.announce(inviter, new FamilyMessage(76, 0));
@@ -93,7 +93,7 @@ public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamil
                   }
                }
             } else { // create new family
-               if (chr.getFamily() != null && inviter.getFamily() != null && chr.getFamily().getTotalGenerations() + inviter.getFamily().getTotalGenerations() >= ServerConstants.FAMILY_MAX_GENERATIONS) {
+               if (chr.getFamily() != null && inviter.getFamily() != null && chr.getFamily().getTotalGenerations() + inviter.getFamily().getTotalGenerations() >= YamlConfig.config.server.FAMILY_MAX_GENERATIONS) {
                   PacketCreator.announce(inviter, new FamilyMessage(76, 0));
                   PacketCreator.announce(chr, new FamilyMessage(76, 0));
                   return;

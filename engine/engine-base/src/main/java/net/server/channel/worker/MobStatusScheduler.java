@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import client.status.MonsterStatusEffect;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
@@ -111,7 +111,7 @@ public class MobStatusScheduler extends BaseScheduler {
 
       protected MobStatusOvertimeEntry(int delay, Runnable run) {
          procCount = 0;
-         procLimit = (int) Math.ceil((float) delay / ServerConstants.MOB_STATUS_MONITOR_PROC);
+         procLimit = (int) Math.ceil((float) delay / YamlConfig.config.server.MOB_STATUS_MONITOR_PROC);
          r = run;
       }
 

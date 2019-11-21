@@ -25,7 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilySeparatePacket;
 import net.server.channel.packet.reader.FamilySeparateReader;
@@ -43,7 +43,7 @@ public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparateP
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      if (!ServerConstants.USE_FAMILY_SYSTEM) {
+      if (!YamlConfig.config.server.USE_FAMILY_SYSTEM) {
          return false;
       }
       MapleFamily oldFamily = client.getPlayer().getFamily();

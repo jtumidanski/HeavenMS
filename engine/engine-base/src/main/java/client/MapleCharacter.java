@@ -103,10 +103,10 @@ import client.processor.PartyProcessor;
 import client.processor.PetAutopotProcessor;
 import client.processor.PetProcessor;
 import client.processor.SkillProcessor;
+import config.YamlConfig;
 import constants.ExpTable;
 import constants.GameConstants;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import constants.skills.Aran;
 import constants.skills.Bishop;
 import constants.skills.BlazeWizard;
@@ -1240,7 +1240,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             spGain += 2;
          }
 
-         if (ServerConstants.USE_ENFORCE_JOB_SP_RANGE) {
+         if (YamlConfig.config.server.USE_ENFORCE_JOB_SP_RANGE) {
             spGain = getChangedJobSp(newJob);
          }
       }
@@ -1254,12 +1254,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (this.isCygnus()) {
             gainAp(7, true);
          } else {
-            if (ServerConstants.USE_STARTING_AP_4 || newJob.getId() % 10 >= 1) {
+            if (YamlConfig.config.server.USE_STARTING_AP_4 || newJob.getId() % 10 >= 1) {
                gainAp(5, true);
             }
          }
       } else {    // thanks Periwinks for noticing an AP shortage from lower levels
-         if (ServerConstants.USE_STARTING_AP_4 && newJob.getId() % 1000 >= 1) {
+         if (YamlConfig.config.server.USE_STARTING_AP_4 && newJob.getId() % 1000 >= 1) {
             gainAp(4, true);
          }
       }
@@ -1351,7 +1351,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          createDragon();
       }
 
-      if (ServerConstants.USE_ANNOUNCE_CHANGEJOB) {
+      if (YamlConfig.config.server.USE_ANNOUNCE_CHANGEJOB) {
          if (!this.isGM()) {
             String message = "[" + GameConstants.ordinal(GameConstants.getJobBranch(newJob)) + " Job] " + name + " has just become a " + GameConstants.getJobName(this.job.getId()) + ".";
             MessageBroadcaster.getInstance().sendServerNoticeToAcquaintances(this, ServerNoticeType.LIGHT_BLUE, message);
@@ -1429,7 +1429,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void changeMapBanish(int mapid, String portal, String msg) {
-      if (ServerConstants.USE_SPIKES_AVOID_BANISH) {
+      if (YamlConfig.config.server.USE_SPIKES_AVOID_BANISH) {
          for (Item it : this.getInventory(MapleInventoryType.EQUIPPED).list()) {
             if ((it.flag() & ItemConstants.SPIKES) == ItemConstants.SPIKES) {
                return;
@@ -1688,7 +1688,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int idx = getVisitedMapIndex(map);
 
          if (idx == -1) {
-            if (lastVisitedMaps.size() == ServerConstants.MAP_VISITED_SIZE) {
+            if (lastVisitedMaps.size() == YamlConfig.config.server.MAP_VISITED_SIZE) {
                lastVisitedMaps.remove(0);
             }
          } else {
@@ -2235,7 +2235,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             final int healMP = localchairmp;
 
             if (MapleCharacter.this.getHp() < localmaxhp) {
-               byte recHP = (byte) (healHP / ServerConstants.CHAIR_EXTRA_HEAL_MULTIPLIER);
+               byte recHP = (byte) (healHP / YamlConfig.config.server.CHAIR_EXTRA_HEAL_MULTIPLIER);
 
                PacketCreator.announce(client, new ShowOwnRecovery(recHP));
                MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new ShowRecovery(id, recHP), false, this);
@@ -2300,7 +2300,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void dispel() {
-      if (!(ServerConstants.USE_UNDISPEL_HOLY_SHIELD && this.hasActiveBuff(Bishop.HOLY_SHIELD))) {
+      if (!(YamlConfig.config.server.USE_UNDISPEL_HOLY_SHIELD && this.hasActiveBuff(Bishop.HOLY_SHIELD))) {
          List<MapleBuffStatValueHolder> mbsvhList = getAllStatups();
          for (MapleBuffStatValueHolder mbsvh : mbsvhList) {
             if (mbsvh.effect.isSkill()) {
@@ -2494,13 +2494,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void startHpDecreaseTask(long lastHpTask) {
-      scheduler.add(MapleCharacterScheduler.Type.HP_DECREASE, this::doHurtHp, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL, ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL - lastHpTask);
+      scheduler.add(MapleCharacterScheduler.Type.HP_DECREASE, this::doHurtHp, YamlConfig.config.server.MAP_DAMAGE_OVERTIME_INTERVAL, YamlConfig.config.server.MAP_DAMAGE_OVERTIME_INTERVAL - lastHpTask);
    }
 
    public void resetHpDecreaseTask() {
       scheduler.cancel(MapleCharacterScheduler.Type.HP_DECREASE);
       long lastHpTask = Server.getInstance().getCurrentTime() - lastHpDec;
-      startHpDecreaseTask((lastHpTask > ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL) ? ServerConstants.MAP_DAMAGE_OVERTIME_INTERVAL : lastHpTask);
+      startHpDecreaseTask((lastHpTask > YamlConfig.config.server.MAP_DAMAGE_OVERTIME_INTERVAL) ? YamlConfig.config.server.MAP_DAMAGE_OVERTIME_INTERVAL : lastHpTask);
    }
 
    public void enteredScript(String script, int mapid) {
@@ -3557,7 +3557,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          for (Entry<MapleBuffStat, Byte> it : stats.entrySet()) {
             boolean uniqueBuff = BuffStatProcessor.getInstance().isSingletonStatup(it.getKey());
 
-            if (it.getValue() >= (!uniqueBuff ? ServerConstants.MAX_MONITORED_BUFFSTATS : 1) && effectStatups.contains(it.getKey())) {
+            if (it.getValue() >= (!uniqueBuff ? YamlConfig.config.server.MAX_MONITORED_BUFFSTATS : 1) && effectStatups.contains(it.getKey())) {
                MapleBuffStatValueHolder mbsvh = minStatBuffs.get(it.getKey());
 
                Map<MapleBuffStat, MapleBuffStatValueHolder> lpbe = buffEffects.get(mbsvh.effect.getBuffSourceId());
@@ -3753,7 +3753,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          executeIfHasSkill(DarkKnight.AURA_OF_BEHOLDER, (skill, skillLevel) -> scheduleAuraOfBeholder(beholder, skill, skillLevel));
          executeIfHasSkill(DarkKnight.HEX_OF_BEHOLDER, (skill, skillLevel) -> scheduleHexOfBeholder(beholder, skill, skillLevel));
       } else if (effect.isRecovery()) {
-         int healInterval = (ServerConstants.USE_ULTRA_RECOVERY) ? 2000 : 5000;
+         int healInterval = (YamlConfig.config.server.USE_ULTRA_RECOVERY) ? 2000 : 5000;
          final byte heal = (byte) effect.getX();
 
          chrLock.lock();
@@ -3813,7 +3813,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
 
          boolean active = effect.isActive(this);
-         if (ServerConstants.USE_BUFF_MOST_SIGNIFICANT) {
+         if (YamlConfig.config.server.USE_BUFF_MOST_SIGNIFICANT) {
             toDeploy = new LinkedHashMap<>();
             Map<Integer, Pair<MapleStatEffect, Long>> retrievedEffects = new LinkedHashMap<>();
             Set<MapleBuffStat> retrievedStats = new LinkedHashSet<>();
@@ -3912,7 +3912,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean unregisterChairBuff() {
-      if (!ServerConstants.USE_CHAIR_EXTRAHEAL) {
+      if (!YamlConfig.config.server.USE_CHAIR_EXTRAHEAL) {
          return false;
       }
 
@@ -3926,7 +3926,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private boolean registerChairBuff() {
-      if (!ServerConstants.USE_CHAIR_EXTRAHEAL) {
+      if (!YamlConfig.config.server.USE_CHAIR_EXTRAHEAL) {
          return false;
       }
 
@@ -4234,7 +4234,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean hasNoviceExpRate() {
-      return ServerConstants.USE_ENFORCE_NOVICE_EXPRATE && isBeginnerJob() && level < 11;
+      return YamlConfig.config.server.USE_ENFORCE_NOVICE_EXPRATE && isBeginnerJob() && level < 11;
    }
 
    public int getExpRate() {
@@ -4593,7 +4593,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private int getMaxLevel() {
-      if (!ServerConstants.USE_ENFORCE_JOB_LEVEL_RANGE || isGmJob()) {
+      if (!YamlConfig.config.server.USE_ENFORCE_JOB_LEVEL_RANGE || isGmJob()) {
          return getMaxClassLevel();
       }
 
@@ -5413,7 +5413,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private long getNextBuybackTime() {
-      return lastBuyback + ServerConstants.BUYBACK_COOLDOWN_MINUTES * 60 * 1000;
+      return lastBuyback + YamlConfig.config.server.BUYBACK_COOLDOWN_MINUTES * 60 * 1000;
    }
 
    private boolean isBuybackInvincible() {
@@ -5421,30 +5421,30 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private int getBuybackFee() {
-      float fee = ServerConstants.BUYBACK_FEE;
+      float fee = YamlConfig.config.server.BUYBACK_FEE;
       int grade = Math.min(Math.max(level, 30), 120) - 30;
 
-      fee += (grade * ServerConstants.BUYBACK_LEVEL_STACK_FEE);
-      if (ServerConstants.USE_BUYBACK_WITH_MESOS) {
-         fee *= ServerConstants.BUYBACK_MESO_MULTIPLIER;
+      fee += (grade * YamlConfig.config.server.BUYBACK_LEVEL_STACK_FEE);
+      if (YamlConfig.config.server.USE_BUYBACK_WITH_MESOS) {
+         fee *= YamlConfig.config.server.BUYBACK_MESO_MULTIPLIER;
       }
 
       return (int) Math.floor(fee);
    }
 
    public void showBuybackInfo() {
-      String s = "#eBUYBACK STATUS#n\r\n\r\nCurrent buyback fee: #b" + getBuybackFee() + " " + (ServerConstants.USE_BUYBACK_WITH_MESOS ? "mesos" : "NX") + "#k\r\n\r\n";
+      String s = "#eBUYBACK STATUS#n\r\n\r\nCurrent buyback fee: #b" + getBuybackFee() + " " + (YamlConfig.config.server.USE_BUYBACK_WITH_MESOS ? "mesos" : "NX") + "#k\r\n\r\n";
 
       long timeNow = Server.getInstance().getCurrentTime();
       boolean avail = true;
       if (!isAlive()) {
          long timeLapsed = timeNow - lastDeathtime;
-         long timeRemaining = ServerConstants.BUYBACK_RETURN_MINUTES * 60 * 1000 - (timeLapsed + Math.max(0, getNextBuybackTime() - timeNow));
+         long timeRemaining = YamlConfig.config.server.BUYBACK_RETURN_MINUTES * 60 * 1000 - (timeLapsed + Math.max(0, getNextBuybackTime() - timeNow));
          if (timeRemaining < 1) {
             s += "Buyback #e#rUNAVAILABLE#k#n";
             avail = false;
          } else {
-            s += "Buyback countdown: #e#b" + MapleStringUtil.getTimeRemaining(ServerConstants.BUYBACK_RETURN_MINUTES * 60 * 1000 - timeLapsed) + "#k#n";
+            s += "Buyback countdown: #e#b" + MapleStringUtil.getTimeRemaining(YamlConfig.config.server.BUYBACK_RETURN_MINUTES * 60 * 1000 - timeLapsed) + "#k#n";
          }
          s += "\r\n";
       }
@@ -5460,7 +5460,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public boolean couldBuyback() {  // Ronan's buyback system
       long timeNow = Server.getInstance().getCurrentTime();
 
-      if (timeNow - lastDeathtime > ServerConstants.BUYBACK_RETURN_MINUTES * 60 * 1000) {
+      if (timeNow - lastDeathtime > YamlConfig.config.server.BUYBACK_RETURN_MINUTES * 60 * 1000) {
          MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "The period of time to decide has expired, therefore you are unable to buyback.");
          return false;
       }
@@ -5472,7 +5472,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return false;
       }
 
-      boolean usingMesos = ServerConstants.USE_BUYBACK_WITH_MESOS;
+      boolean usingMesos = YamlConfig.config.server.USE_BUYBACK_WITH_MESOS;
       int fee = getBuybackFee();
 
       if (!canBuyback(fee, usingMesos)) {
@@ -5547,7 +5547,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public boolean attemptCatchFish(int baitLevel) {
-      return ServerConstants.USE_FISHING_SYSTEM && GameConstants.isFishingArea(mapid) && this.position().getY() > 0 && ItemConstants.isFishingChair(chair.get()) && this.getWorldServer().registerFisherPlayer(this, baitLevel);
+      return YamlConfig.config.server.USE_FISHING_SYSTEM && GameConstants.isFishingArea(mapid) && this.position().getY() > 0 && ItemConstants.isFishingChair(chair.get()) && this.getWorldServer().registerFisherPlayer(this, baitLevel);
    }
 
    public void leaveMap() {
@@ -5631,7 +5631,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       int spGain = 3;
-      if (ServerConstants.USE_ENFORCE_JOB_SP_RANGE && !GameConstants.hasSPTable(job)) {
+      if (YamlConfig.config.server.USE_ENFORCE_JOB_SP_RANGE && !GameConstants.hasSPTable(job)) {
          spGain = getSpGain(spGain, job);
       }
 
@@ -5642,7 +5642,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public synchronized void levelUp(boolean takeexp) {
       boolean isBeginner = isBeginnerJob();
-      if (ServerConstants.USE_AUTOASSIGN_STARTERS_AP && isBeginner && level < 11) {
+      if (YamlConfig.config.server.USE_AUTOASSIGN_STARTERS_AP && isBeginner && level < 11) {
          effLock.lock();
          statWlock.lock();
          try {
@@ -5693,7 +5693,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          int maxClassLevel = getMaxClassLevel();
          if (level == maxClassLevel) {
             if (!this.isGM()) {
-               if (ServerConstants.PLAYERNPC_AUTODEPLOY) {
+               if (YamlConfig.config.server.PLAYERNPC_AUTODEPLOY) {
                   ThreadManager.getInstance().newTask(() -> MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapid(job), MapleCharacter.this));
                }
 
@@ -5740,7 +5740,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
 
       if (level % 20 == 0) {
-         if (ServerConstants.USE_ADD_SLOTS_BY_LEVEL) {
+         if (YamlConfig.config.server.USE_ADD_SLOTS_BY_LEVEL) {
             if (!isGM()) {
                for (byte i = 1; i < 5; i++) {
                   gainSlots(i, 4, true);
@@ -5749,14 +5749,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                this.yellowMessage("You reached level " + level + ". Congratulations! As a token of your success, your inventory has been expanded a little bit.");
             }
          }
-         if (ServerConstants.USE_ADD_RATES_BY_LEVEL) { //For the rate upgrade
+         if (YamlConfig.config.server.USE_ADD_RATES_BY_LEVEL) { //For the rate upgrade
             revertLastPlayerRates();
             setPlayerRates();
             this.yellowMessage("You managed to get level " + level + "! Getting experience and items seems a little easier now, huh?");
          }
       }
 
-      if (ServerConstants.USE_PERFECT_PITCH && level >= 30) {
+      if (YamlConfig.config.server.USE_PERFECT_PITCH && level >= 30) {
          //milestones?
          if (MapleInventoryManipulator.checkSpace(client, 4310000, (short) 1, "")) {
             MapleInventoryManipulator.addById(client, 4310000, (short) 1, "", -1);
@@ -5835,7 +5835,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       }
 
-      if (ServerConstants.USE_RANDOMIZE_HPMP_GAIN) {
+      if (YamlConfig.config.server.USE_RANDOMIZE_HPMP_GAIN) {
          if (getJobStyle() == MapleJob.MAGICIAN) {
             addMp += localint_ / 20;
          } else {
@@ -6054,7 +6054,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private List<Integer> activateCouponsEffects() {
       List<Integer> toCommitEffect = new LinkedList<>();
 
-      if (ServerConstants.USE_STACK_COUPON_RATES) {
+      if (YamlConfig.config.server.USE_STACK_COUPON_RATES) {
          for (Entry<Integer, Integer> coupon : activeCoupons.entrySet()) {
             int couponId = coupon.getKey();
             int couponQty = coupon.getValue();
@@ -6589,7 +6589,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
          reapplyLocalStats();
 
-         if (ServerConstants.USE_FIXED_RATIO_HPMP_UPDATE) {
+         if (YamlConfig.config.server.USE_FIXED_RATIO_HPMP_UPDATE) {
             if (localmaxhp != oldlocalmaxhp) {
                Pair<MapleStat, Integer> hpUpdate;
 
@@ -6723,7 +6723,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public synchronized void resetStats() {
-      if (!ServerConstants.USE_AUTOASSIGN_STARTERS_AP) {
+      if (!YamlConfig.config.server.USE_AUTOASSIGN_STARTERS_AP) {
          return;
       }
 
@@ -6825,7 +6825,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void saveCharToDB() {
-      if (ServerConstants.USE_AUTOSAVE) {
+      if (YamlConfig.config.server.USE_AUTOSAVE) {
          Runnable r = () -> saveCharToDB(true);
          ThreadManager.getInstance().newTask(r);  //spawns a new thread to deal with this
       } else {
@@ -7736,7 +7736,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void awardQuestPoint(int awardedPoints) {
-      if (ServerConstants.QUEST_POINT_REQUIREMENT < 1 || awardedPoints < 1) {
+      if (YamlConfig.config.server.QUEST_POINT_REQUIREMENT < 1 || awardedPoints < 1) {
          return;
       }
 
@@ -7744,8 +7744,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       synchronized (quests) {
          questFame += awardedPoints;
 
-         delta = questFame / ServerConstants.QUEST_POINT_REQUIREMENT;
-         questFame %= ServerConstants.QUEST_POINT_REQUIREMENT;
+         delta = questFame / YamlConfig.config.server.QUEST_POINT_REQUIREMENT;
+         questFame %= YamlConfig.config.server.QUEST_POINT_REQUIREMENT;
       }
 
       if (delta > 0) {
@@ -7814,7 +7814,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          MapleQuest mquest = quest.getQuest();
          short questid = mquest.getId();
          if (!mquest.isSameDayRepeatable() && !MapleQuest.isExploitableQuest(questid)) {
-            awardQuestPoint(ServerConstants.QUEST_POINT_PER_QUEST_COMPLETE);
+            awardQuestPoint(YamlConfig.config.server.QUEST_POINT_PER_QUEST_COMPLETE);
          }
          quest.setCompleted(quest.getCompleted() + 1);   // count quest completed Jayd's idea
 
@@ -8149,7 +8149,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private Collection<Item> getUpgradeableEquipList() {
       Collection<Item> fullList = getInventory(MapleInventoryType.EQUIPPED).list();
-      if (ServerConstants.USE_EQUIPMNT_LVLUP_CASH) {
+      if (YamlConfig.config.server.USE_EQUIPMNT_LVLUP_CASH) {
          return fullList;
       }
       return fullList.stream()
@@ -8320,7 +8320,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             return;
          }
 
-         if (completionTime.get().getTime() + ServerConstants.NAME_CHANGE_COOLDOWN > currentTimeMillis) {
+         if (completionTime.get().getTime() + YamlConfig.config.server.NAME_CHANGE_COOLDOWN > currentTimeMillis) {
             return;
          }
 
@@ -8370,7 +8370,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             return;
          }
 
-         if (completionTime.getTime() + ServerConstants.WORLD_TRANSFER_COOLDOWN > currentTimeMillis) {
+         if (completionTime.getTime() + YamlConfig.config.server.WORLD_TRANSFER_COOLDOWN > currentTimeMillis) {
             return;
          }
 
@@ -8405,7 +8405,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public int getReborns() {
-      if (!ServerConstants.USE_REBIRTH_SYSTEM) {
+      if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
       }
@@ -8413,7 +8413,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    private void setReborns(int value) {
-      if (!ServerConstants.USE_REBIRTH_SYSTEM) {
+      if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
       }
@@ -8421,7 +8421,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void executeReborn() {
-      if (!ServerConstants.USE_REBIRTH_SYSTEM) {
+      if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
          yellowMessage("Rebirth system is not enabled!");
          throw new NotEnabledException();
       }

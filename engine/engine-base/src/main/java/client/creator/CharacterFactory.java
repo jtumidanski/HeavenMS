@@ -12,7 +12,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.processor.CharacterProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import constants.skills.Magician;
 import constants.skills.Warrior;
 import net.server.Server;
@@ -226,7 +226,7 @@ public class CharacterFactory {
    }
 
    protected synchronized int createNewCharacter(MapleClient c, String name, int face, int hair, int skin, int gender, CharacterFactoryRecipe recipe) {
-      if (ServerConstants.COLLECTIVE_CHARSLOT ? c.getAvailableCharacterSlots() <= 0 : c.getAvailableCharacterWorldSlots() <= 0) {
+      if (YamlConfig.config.server.COLLECTIVE_CHARSLOT ? c.getAvailableCharacterSlots() <= 0 : c.getAvailableCharacterWorldSlots() <= 0) {
          return -3;
       }
 

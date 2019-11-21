@@ -1,6 +1,6 @@
 package npc
 
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
 /*
@@ -17,7 +17,7 @@ class NPC9010021 {
 
    def start() {
       status = -1
-      if (!ServerConstants.USE_REBIRTH_SYSTEM) {
+      if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
          cm.sendOk("... I came from distant planes to assist the fight against the #rBlack Magician#k. Right now I search my master, have you seen him?")
          cm.dispose()
          return

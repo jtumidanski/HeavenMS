@@ -27,7 +27,7 @@ import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.PacketReader;
 import net.server.channel.packet.movement.MoveLifePacket;
 import net.server.channel.packet.reader.MoveLifeReader;
@@ -163,7 +163,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
       }
 
       if (packet.hasMovement()) {
-         if (ServerConstants.USE_DEBUG_SHOW_RCVD_MVLIFE) {
+         if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_MVLIFE) {
             System.out.println((isSkill ? "SKILL " : (isAttack ? "ATTCK " : " ")) + "castPos: " + castPos + " rawAct: " + rawActivity + " opt: " + pOption + " skillID: " + useSkillId + " skillLV: " + useSkillLevel + " " + "allowSkill: " + nextMovementCouldBeSkill + " mobMp: " + mobMp);
          }
          PacketInput movePacket = new MoveMonster(packet.objectId(), nextMovementCouldBeSkill, rawActivity, useSkillId, useSkillLevel, pOption, startPos, packet.movementList());

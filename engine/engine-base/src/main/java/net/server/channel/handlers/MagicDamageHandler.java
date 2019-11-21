@@ -25,7 +25,7 @@ import client.MapleBuffStat;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.SkillFactory;
-import constants.ServerConstants;
+import config.YamlConfig;
 import constants.skills.Bishop;
 import constants.skills.Evan;
 import constants.skills.FPArchMage;
@@ -67,7 +67,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
       }
 
       if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
-         chr.setDojoEnergy(chr.getDojoEnergy() + +ServerConstants.DOJO_ENERGY_ATK);
+         chr.setDojoEnergy(chr.getDojoEnergy() + +YamlConfig.config.server.DOJO_ENERGY_ATK);
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 

@@ -11,14 +11,6 @@
 
     <artifactId>engine-base</artifactId>
 
-    <repositories>
-        <repository>
-            <id>mvnrepository</id>
-            <name>mvn repository</name>
-            <url>https://mvnrepository.com/</url>
-        </repository>
-    </repositories>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -136,5 +128,4 @@
             <version>${jersey.version}</version>
         </dependency>
     </dependencies>
-
 </project>

@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.channel.Channel;
 import server.life.MaplePlayerNPC;
@@ -87,7 +87,7 @@ public class MaplePlayerNPCPodium {
 
    private static Point reorganizePlayerNpcs(MapleMap map, int newStep, List<MapleMapObject> mmoList) {
       if (!mmoList.isEmpty()) {
-         if (ServerConstants.USE_DEBUG) {
+         if (YamlConfig.config.server.USE_DEBUG) {
             System.out.println("Reorganizing pnpc map, step " + newStep);
          }
 
@@ -139,7 +139,7 @@ public class MaplePlayerNPCPodium {
       int podiumStep = podiumData % (1 << 5), podiumCount = (podiumData / (1 << 5));
 
       if (podiumCount >= 3 * podiumStep) {
-         if (podiumStep >= ServerConstants.PLAYERNPC_AREA_STEPS) {
+         if (podiumStep >= YamlConfig.config.server.PLAYERNPC_AREA_STEPS) {
             return null;
          }
 

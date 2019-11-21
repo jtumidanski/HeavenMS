@@ -31,8 +31,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import client.database.provider.DropDataProvider;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -96,7 +96,7 @@ public class MapleMonsterInformationProvider {
       // this reads the drop entries searching for multi-equip, properly processing them
 
       List<MonsterDropEntry> list = retrieveDrop(monsterId);
-      if (hasNoMultiEquipDrops.contains(monsterId) || !ServerConstants.USE_MULTIPLE_SAME_EQUIP_DROP) {
+      if (hasNoMultiEquipDrops.contains(monsterId) || !YamlConfig.config.server.USE_MULTIPLE_SAME_EQUIP_DROP) {
          return list;
       }
 

@@ -1,7 +1,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.AdminChatPacket;
 import net.server.channel.packet.reader.AdminChatReader;
@@ -29,19 +29,19 @@ public class AdminChatHandler extends AbstractPacketHandler<AdminChatPacket> {
       switch (packet.mode()) {
          case 0:// /alertall, /noticeall, /slideall
             MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.get(packet.noticeType()), packet.message());
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert All", packet.message());
             }
             break;
          case 1:// /alertch, /noticech, /slidech
             MessageBroadcaster.getInstance().sendChannelServerNotice(client.getWorld(), client.getChannel(), ServerNoticeType.get(packet.noticeType()), packet.message());
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert Ch", packet.message());
             }
             break;
          case 2:// /alertm /alertmap, /noticem /noticemap, /slidem /slidemap
             MessageBroadcaster.getInstance().sendMapServerNotice(client.getPlayer().getMap(), ServerNoticeType.get(packet.noticeType()), packet.message());
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert Map", packet.message());
             }
             break;

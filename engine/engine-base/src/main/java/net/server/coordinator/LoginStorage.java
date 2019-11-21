@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 
 /**
@@ -39,8 +39,8 @@ public class LoginStorage {
       List<Long> accHist = loginHistory.putIfAbsent(accountId, new LinkedList<>());
       if (accHist != null) {
          synchronized (accHist) {
-            if (accHist.size() > ServerConstants.MAX_ACCOUNT_LOGIN_ATTEMPT) {
-               long blockExpiration = Server.getInstance().getCurrentTime() + ServerConstants.LOGIN_ATTEMPT_DURATION;
+            if (accHist.size() > YamlConfig.config.server.MAX_ACCOUNT_LOGIN_ATTEMPT) {
+               long blockExpiration = Server.getInstance().getCurrentTime() + YamlConfig.config.server.LOGIN_ATTEMPT_DURATION;
                Collections.fill(accHist, blockExpiration);
 
                return false;
@@ -51,7 +51,7 @@ public class LoginStorage {
       }
 
       synchronized (accHist) {
-         accHist.add(Server.getInstance().getCurrentTime() + ServerConstants.LOGIN_ATTEMPT_DURATION);
+         accHist.add(Server.getInstance().getCurrentTime() + YamlConfig.config.server.LOGIN_ATTEMPT_DURATION);
          return true;
       }
    }

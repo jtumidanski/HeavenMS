@@ -1,7 +1,7 @@
 package server.processor.maps;
 
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 
 public class MapleMapProcessor {
@@ -23,6 +23,6 @@ public class MapleMapProcessor {
    }
 
    public double getRangedDistance() {
-      return (ServerConstants.USE_MAXRANGE ? Double.POSITIVE_INFINITY : 722500);
+      return (YamlConfig.config.server.USE_MAXRANGE ? Double.POSITIVE_INFINITY : 722500);
    }
 }

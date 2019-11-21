@@ -3,7 +3,7 @@ package tools.packet.factory;
 import java.util.List;
 
 import client.MapleCharacter;
-import constants.ServerConstants;
+import config.YamlConfig;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.character.CharacterList;
 
@@ -34,7 +34,7 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
          addCharEntry(writer, chr, false);
       }
 
-      writer.write(ServerConstants.ENABLE_PIC && packet.getClient().cannotBypassPic() ? (packet.getClient().getPic() == null || packet.getClient().getPic().equals("") ? 0 : 1) : 2);
-      writer.writeInt(ServerConstants.COLLECTIVE_CHARSLOT ? chars.size() + packet.getClient().getAvailableCharacterSlots() : packet.getClient().getCharacterSlots());
+      writer.write(YamlConfig.config.server.ENABLE_PIC && packet.getClient().cannotBypassPic() ? (packet.getClient().getPic() == null || packet.getClient().getPic().equals("") ? 0 : 1) : 2);
+      writer.writeInt(YamlConfig.config.server.COLLECTIVE_CHARSLOT ? chars.size() + packet.getClient().getAvailableCharacterSlots() : packet.getClient().getCharacterSlots());
    }
 }

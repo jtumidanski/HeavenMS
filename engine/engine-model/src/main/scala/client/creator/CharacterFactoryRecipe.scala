@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import client.MapleJob
 import client.inventory.{Item, MapleInventoryType}
-import constants.ServerConstants
+import config.YamlConfig
 import tools.Pair
 
 class CharacterFactoryRecipe(private var _job: MapleJob, private var _level: Int, private var _map: Int, private var _top: Int, private var _bottom: Int, private var _shoes: Int, private var _weapon: Int) {
@@ -32,8 +32,8 @@ class CharacterFactoryRecipe(private var _job: MapleJob, private var _level: Int
 
   private var _runningTypePosition: Map[MapleInventoryType, AtomicInteger] = Map()
 
-  if (!ServerConstants.USE_STARTING_AP_4) {
-    if (ServerConstants.USE_AUTOASSIGN_STARTERS_AP) {
+  if (!YamlConfig.config.server.USE_STARTING_AP_4) {
+    if (YamlConfig.config.server.USE_AUTOASSIGN_STARTERS_AP) {
       str = 12
       dex = 5
     } else {

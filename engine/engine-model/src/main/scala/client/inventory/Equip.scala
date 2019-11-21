@@ -2,7 +2,7 @@ package client.inventory
 
 import java.util
 
-import constants.ServerConstants
+import config.YamlConfig
 import tools.Pair
 
 class Equip(_id: Int, _position: Short, private var _slots: Int, _elemental: Boolean)
@@ -122,8 +122,8 @@ class Equip(_id: Int, _position: Short, private var _slots: Int, _elemental: Boo
   def gainStats(stats: java.util.List[Pair[StatUpgrade, Integer]]): Pair[String, Pair[java.lang.Boolean, java.lang.Boolean]] = {
     var gotSlot: Boolean = false
     var gotVicious: Boolean = false
-    var statUp: Int = ServerConstants.MAX_EQUIPMNT_STAT
-    val maxStat: Int = ServerConstants.MAX_EQUIPMNT_STAT
+    var statUp: Int = YamlConfig.config.server.MAX_EQUIPMNT_STAT
+    val maxStat: Int = YamlConfig.config.server.MAX_EQUIPMNT_STAT
     val lvupStr: StringBuilder = new StringBuilder
 
     stats.forEach((stat: Pair[StatUpgrade, Integer]) => {

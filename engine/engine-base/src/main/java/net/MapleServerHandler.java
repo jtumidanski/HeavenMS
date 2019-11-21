@@ -39,6 +39,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
+import config.YamlConfig;
 import constants.ServerConstants;
 import net.server.Server;
 import net.server.audit.LockCollector;
@@ -182,7 +183,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
       short packetId = slea.readShort();
       MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
-      if (ServerConstants.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId))
+      if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId))
          System.out.println("Received packet id " + packetId);
       final MaplePacketHandler packetHandler = processor.getHandler(packetId);
       if (packetHandler != null && packetHandler.validateState(client)) {

@@ -27,8 +27,8 @@ import org.apache.mina.filter.codec.CumulativeProtocolDecoder;
 import org.apache.mina.filter.codec.ProtocolDecoderOutput;
 
 import client.MapleClient;
+import config.YamlConfig;
 import constants.OpcodeConstants;
-import constants.ServerConstants;
 import net.server.coordinator.MapleSessionCoordinator;
 import tools.FilePrinter;
 import tools.HexTool;
@@ -71,7 +71,7 @@ public class MaplePacketDecoder extends CumulativeProtocolDecoder {
          rcvdCrypto.crypt(decryptedPacket);
          MapleCustomEncryption.decryptData(decryptedPacket);
          out.write(decryptedPacket);
-         if (ServerConstants.USE_DEBUG_SHOW_PACKET) { // packet traffic log: Atoot's idea, applied using auto-identation thanks to lrenex
+         if (YamlConfig.config.server.USE_DEBUG_SHOW_PACKET) { // packet traffic log: Atoot's idea, applied using auto-identation thanks to lrenex
             int packetLen = decryptedPacket.length;
             int pHeader = readFirstShort(decryptedPacket);
             String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();

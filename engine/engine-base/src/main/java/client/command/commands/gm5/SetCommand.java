@@ -25,7 +25,7 @@ package client.command.commands.gm5;
 
 import client.MapleClient;
 import client.command.Command;
-import constants.ServerConstants;
+import config.YamlConfig;
 
 public class SetCommand extends Command {
    {
@@ -35,7 +35,7 @@ public class SetCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       for (int i = 0; i < params.length; i++) {
-         ServerConstants.DEBUG_VALUES[i] = Integer.parseInt(params[i]);
+         YamlConfig.config.server.DEBUG_VALUES[i] = Integer.parseInt(params[i]);
       }
    }
 }

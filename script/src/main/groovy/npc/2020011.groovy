@@ -1,6 +1,6 @@
 package npc
 
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
 /*
@@ -117,7 +117,7 @@ class NPC2020011 {
                if (!(cm.isQuestStarted(100200) || cm.isQuestCompleted(100200))) {
                   cm.startQuest(100200)
                }
-               if (ServerConstants.USE_ENABLE_SOLO_EXPEDITIONS && !cm.isQuestCompleted(100201)) {
+               if (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS && !cm.isQuestCompleted(100201)) {
                   cm.completeQuest(100201)
                }
             } else {

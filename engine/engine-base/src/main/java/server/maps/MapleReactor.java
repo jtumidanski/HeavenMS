@@ -27,7 +27,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.locks.Lock;
 
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import scripting.reactor.ReactorScriptManager;
@@ -237,7 +237,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                cancelReactorTimeout();
                attackHit = wHit;
 
-               if (ServerConstants.USE_DEBUG) {
+               if (YamlConfig.config.server.USE_DEBUG) {
                   MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Hitted REACTOR " + this.getId() + " with POS " + charPos + " , STANCE " + stance + " , SkillID " + skillid + " , STATE " + stats.getType(state) + " STATESIZE " + stats.getStateSize(state));
                }
                ReactorScriptManager.getInstance().onHit(c, this);

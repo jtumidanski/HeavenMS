@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.SpouseChatPacket;
 import net.server.channel.packet.reader.SpouseChatReader;
@@ -50,7 +50,7 @@ public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPac
          if (spouse.isPresent()) {
             PacketCreator.announce(spouse.get(), new SpouseMessage(client.getPlayer().getName(), packet.message(), true));
             PacketCreator.announce(client, new SpouseMessage(client.getPlayer().getName(), packet.message(), true));
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Spouse", packet.message());
             }
          } else {

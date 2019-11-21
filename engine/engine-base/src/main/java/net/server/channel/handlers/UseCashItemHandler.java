@@ -46,9 +46,9 @@ import client.processor.DueyProcessor;
 import client.processor.ItemProcessor;
 import client.processor.NoteProcessor;
 import client.processor.PetProcessor;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import constants.items.UseableCashItems;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
@@ -502,7 +502,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void owlSearch(MapleClient c, MapleCharacter player, short position, int itemId, int searchedItemId) {
-      if (!ServerConstants.USE_ENFORCE_ITEM_SUGGESTION) {
+      if (!YamlConfig.config.server.USE_ENFORCE_ITEM_SUGGESTION) {
          c.getWorldServer().addOwlItemSearch(searchedItemId);
       }
       player.setOwlSearch(searchedItemId);

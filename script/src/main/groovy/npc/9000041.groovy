@@ -1,6 +1,6 @@
 package npc
 
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
 /*
@@ -32,7 +32,7 @@ class NPC9000041 {
       }
 
       if (status == 0) {
-         if (!ServerConstants.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
+         if (!YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
             cm.sendOk("The medal ranking system is currently unavailable...")
             cm.dispose()
             return

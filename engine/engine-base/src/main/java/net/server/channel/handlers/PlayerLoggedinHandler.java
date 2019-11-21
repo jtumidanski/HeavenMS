@@ -51,9 +51,9 @@ import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
 import client.processor.BuddyListProcessor;
 import client.processor.CharacterProcessor;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ScriptableNPCConstants;
-import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.PlayerBuffValueHolder;
 import net.server.Server;
@@ -276,7 +276,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
 
             PacketCreator.announce(client, new GetCharacterInfo(player));
             if (!player.isHidden()) {
-               if (player.isGM() && ServerConstants.USE_AUTOHIDE_GM) {
+               if (player.isGM() && YamlConfig.config.server.USE_AUTOHIDE_GM) {
                   player.toggleHide(true);
                }
             }
@@ -397,7 +397,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
 
             player.resetPlayerRates();
-            if (ServerConstants.USE_ADD_RATES_BY_LEVEL) {
+            if (YamlConfig.config.server.USE_ADD_RATES_BY_LEVEL) {
                player.setPlayerRates();
             }
             player.setWorldRates();
@@ -416,7 +416,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                }
             }
 
-            if (ServerConstants.USE_NPCS_SCRIPTABLE) {
+            if (YamlConfig.config.server.USE_NPCS_SCRIPTABLE) {
                PacketCreator.announce(client, new SetNPCScriptable(ScriptableNPCConstants.SCRIPTABLE_NPCS));
             }
 

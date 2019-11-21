@@ -1,6 +1,6 @@
 package quest
 
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.quest.QuestActionManager
 
 class Quest21101 {
@@ -32,7 +32,7 @@ class Quest21101 {
             qm.changeJobById(2100)
             qm.resetStats()
 
-            if (ServerConstants.USE_FULL_ARAN_SKILLSET) {
+            if (YamlConfig.config.server.USE_FULL_ARAN_SKILLSET) {
                qm.teachSkill(21000000, (byte) 0, (byte) 10, -1)   //combo ability
                qm.teachSkill(21001003, (byte) 0, (byte) 20, -1)   //polearm booster
             }

@@ -27,7 +27,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.InventoryMergePacket;
@@ -43,7 +43,7 @@ public final class InventoryMergeHandler extends AbstractPacketHandler<Inventory
       MapleCharacter chr = client.getPlayer();
       chr.getAutobanManager().setTimestamp(2, Server.getInstance().getCurrentTimestamp(), 4);
 
-      if (!ServerConstants.USE_ITEM_SORT) {
+      if (!YamlConfig.config.server.USE_ITEM_SORT) {
          PacketCreator.announce(client, new EnableActions());
          return false;
       }

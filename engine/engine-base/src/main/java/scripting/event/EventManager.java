@@ -39,9 +39,8 @@ import javax.script.Invocable;
 import javax.script.ScriptException;
 
 import client.MapleCharacter;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import jdk.nashorn.api.scripting.ScriptUtils;
 import net.server.Server;
 import net.server.audit.LockCollector;
@@ -99,7 +98,9 @@ public class EventManager {
       this.name = name;
 
       this.openedLobbys = new ArrayList<>();
-      for (int i = 0; i < maxLobbys; i++) this.openedLobbys.add(false);
+      for (int i = 0; i < maxLobbys; i++) {
+         this.openedLobbys.add(false);
+      }
    }
 
    private boolean isDisposed() {
@@ -161,37 +162,20 @@ public class EventManager {
    private List<Integer> convertToIntegerArray(List<Object> list) {
       List<Integer> intList = new ArrayList<>();
 
-      if (ServerConstants.JAVA_8) {
-         for (Object d : list) {
-            intList.add((Integer) d);
-         }
-      } else {
-         for (Object d : list) {
-            intList.add(((Double) d).intValue());
-         }
+      for (Object d : list) {
+         intList.add((Integer) d);
       }
 
       return intList;
    }
 
    public long getLobbyDelay() {
-      return ServerConstants.EVENT_LOBBY_DELAY;
+      return YamlConfig.config.server.EVENT_LOBBY_DELAY;
    }
 
    private List<Integer> getLobbyRange() {
       try {
-         if (!ServerConstants.JAVA_8) {
-            return convertToIntegerArray((List<Object>) iv.invokeFunction("setLobbyRange", (Object) null));
-         } else {  // java 8 support here thanks to MedicOP
-            ScriptObjectMirror object = (ScriptObjectMirror) iv.invokeFunction("setLobbyRange", (Object) null);
-            int[] to = object.to(int[].class);
-            List<Integer> list = new ArrayList<>();
-            for (int i : to) {
-               list.add(i);
-            }
-            return list;
-
-         }
+         return convertToIntegerArray((List<Object>) iv.invokeFunction("setLobbyRange", (Object) null));
       } catch (ScriptException | NoSuchMethodException ex) { // they didn't define a lobby range
          List<Integer> defaultRange = new ArrayList<>();
          defaultRange.add(0);
@@ -303,7 +287,7 @@ public class EventManager {
                instances.remove(name);
             }
          }
-      }, ServerConstants.EVENT_LOBBY_DELAY * 1000);
+      }, YamlConfig.config.server.EVENT_LOBBY_DELAY * 1000);
    }
 
    public void setProperty(String key, String value) {
@@ -782,11 +766,7 @@ public class EventManager {
          if (p != null) {
             List<MaplePartyCharacter> lmpc;
 
-            if (ServerConstants.JAVA_8) {
-               lmpc = new ArrayList<>(((Map<String, MaplePartyCharacter>) (ScriptUtils.convert(p, Map.class))).values());
-            } else {
-               lmpc = new ArrayList<>((List<MaplePartyCharacter>) p);
-            }
+            lmpc = new ArrayList<>(((Map<String, MaplePartyCharacter>) (ScriptUtils.convert(p, Map.class))).values());
 
             party.setEligibleMembers(lmpc);
             return lmpc;
@@ -858,7 +838,7 @@ public class EventManager {
 
    public boolean isQueueFull() {
       synchronized (queuedGuilds) {
-         return queuedGuilds.size() >= ServerConstants.EVENT_MAX_GUILD_QUEUE;
+         return queuedGuilds.size() >= YamlConfig.config.server.EVENT_MAX_GUILD_QUEUE;
       }
    }
 

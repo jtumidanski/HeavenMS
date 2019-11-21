@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import client.inventory.MapleInventoryType;
+import config.YamlConfig;
 
 /**
  * @author Jay Estrella
@@ -105,7 +106,7 @@ public final class ItemConstants {
    }
 
    public static boolean isExpirablePet(int itemId) {
-      return ServerConstants.USE_ERASE_PET_ON_EXPIRATION || itemId == 5000054;
+      return YamlConfig.config.server.USE_ERASE_PET_ON_EXPIRATION || itemId == 5000054;
    }
 
    public static boolean isPermanentItem(int itemId) {

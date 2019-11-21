@@ -18,8 +18,8 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.ItemProcessor;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.WeddingReader;
 import net.server.channel.packet.wedding.AddRegistryItemPacket;
@@ -117,7 +117,7 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
             String groomWishlistProp = "giftedItem" + (groomWishlist ? "G" : "B") + chr.getId();
 
             int giftCount = marriage.getIntProperty(groomWishlistProp);
-            if (giftCount < ServerConstants.WEDDING_GIFT_LIMIT) {
+            if (giftCount < YamlConfig.config.server.WEDDING_GIFT_LIMIT) {
                int cid = marriage.getIntProperty(groomWishlist ? "groomId" : "brideId");
                if (chr.getId() != cid) {   // cannot gift yourself
                   MapleCharacter spouse = marriage.getPlayerById(cid);
@@ -136,7 +136,7 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
                                  marriage.addGiftItem(groomWishlist, newItem);
                                  MapleInventoryManipulator.removeFromSlot(client, type, slot, quantity, false, false);
 
-                                 if (ServerConstants.USE_ENFORCE_MERCHANT_SAVE) {
+                                 if (YamlConfig.config.server.USE_ENFORCE_MERCHANT_SAVE) {
                                     chr.saveCharToDB(false);
                                  }
                                  marriage.saveGiftItemsToDb(client, groomWishlist, cid);

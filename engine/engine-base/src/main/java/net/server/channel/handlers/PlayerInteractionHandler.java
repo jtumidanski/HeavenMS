@@ -34,9 +34,9 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.ItemProcessor;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.ChatPlayerInteraction;
 import net.server.channel.packet.interaction.AddItemPlayerInteractionPacket;
@@ -480,7 +480,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
          PacketCreator.announce(c, new UpdateHiredMerchant(chr, merchant));
 
-         if (ServerConstants.USE_ENFORCE_MERCHANT_SAVE) {
+         if (YamlConfig.config.server.USE_ENFORCE_MERCHANT_SAVE) {
             chr.saveCharToDB(false);
          }
 
@@ -699,7 +699,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MaplePlayerShop shop = chr.getPlayerShop();
       MapleHiredMerchant merchant = chr.getHiredMerchant();
       if (shop != null && shop.isOwner(chr)) {
-         if (ServerConstants.USE_ERASE_PERMIT_ON_OPENSHOP) {
+         if (YamlConfig.config.server.USE_ERASE_PERMIT_ON_OPENSHOP) {
             try {
                MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, shop.getItemId(), 1, true, false);
             } catch (RuntimeException ignored) {
@@ -736,7 +736,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MaplePlayerShop shop = chr.getPlayerShop();
       MapleHiredMerchant merchant = chr.getHiredMerchant();
       if (shop != null && shop.isOwner(chr)) {
-         if (ServerConstants.USE_ERASE_PERMIT_ON_OPENSHOP) {
+         if (YamlConfig.config.server.USE_ERASE_PERMIT_ON_OPENSHOP) {
             try {
                MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, shop.getItemId(), 1, true, false);
             } catch (RuntimeException ignored) {

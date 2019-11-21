@@ -44,9 +44,9 @@ import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.PetProcessor;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.guild.MapleGuild;
 import net.server.world.MapleParty;
@@ -256,14 +256,8 @@ public class AbstractPlayerInteraction {
    private List<Integer> convertToIntegerArray(List<Object> list) {
       List<Integer> intList = new ArrayList<>();      // JAVA 7 Rhino script engine. Thanks Bruno, felipepm10 for noticing a typecast issue here.
 
-      if (ServerConstants.JAVA_8) {
-         for (Object d : list) {
-            intList.add((Integer) d);
-         }
-      } else {
-         for (Object d : list) {
-            intList.add(((Double) d).intValue());
-         }
+      for (Object d : list) {
+         intList.add((Integer) d);
       }
 
       return intList;
@@ -272,18 +266,10 @@ public class AbstractPlayerInteraction {
    public boolean canHoldAll(List<Object> itemids) {
       List<Object> quantity = new LinkedList<>();
 
-      if (ServerConstants.JAVA_8) {
-         Integer intOne = 1;
+      Integer intOne = 1;
 
-         for (int i = 0; i < itemids.size(); i++) {
-            quantity.add(intOne);
-         }
-      } else {
-         Double doubleOne = 1.0;
-
-         for (int i = 0; i < itemids.size(); i++) {
-            quantity.add(doubleOne);
-         }
+      for (int i = 0; i < itemids.size(); i++) {
+         quantity.add(intOne);
       }
 
       return canHoldAll(itemids, quantity);
@@ -656,9 +642,9 @@ public class AbstractPlayerInteraction {
                   it.slots_$eq(3);
                }
 
-               if (ServerConstants.USE_ENHANCED_CRAFTING && c.getPlayer().getCS()) {
+               if (YamlConfig.config.server.USE_ENHANCED_CRAFTING && c.getPlayer().getCS()) {
                   Equip eqp = (Equip) item;
-                  if (!(c.getPlayer().isGM() && ServerConstants.USE_PERFECT_GM_SCROLL)) {
+                  if (!(c.getPlayer().isGM() && YamlConfig.config.server.USE_PERFECT_GM_SCROLL)) {
                      eqp.slots_$eq((byte) (eqp.slots() + 1));
                   }
                   item = MapleItemInformationProvider.getInstance().scrollEquipWithId(item, 2049100, true, 2049100, c.getPlayer().isGM());
@@ -862,8 +848,8 @@ public class AbstractPlayerInteraction {
                int base = PartyQuest.getExp(PQ, character.getLevel());
                int exp = base * bonus / 100;
                character.gainExp(exp, true, true);
-               if (ServerConstants.PQ_BONUS_EXP_RATE > 0 && System.currentTimeMillis() <= ServerConstants.EVENT_END_TIMESTAMP) {
-                  character.gainExp((int) (exp * ServerConstants.PQ_BONUS_EXP_RATE), true, true);
+               if (YamlConfig.config.server.PQ_BONUS_EXP_RATE > 0 && System.currentTimeMillis() <= YamlConfig.config.server.EVENT_END_TIMESTAMP) {
+                  character.gainExp((int) (exp * YamlConfig.config.server.PQ_BONUS_EXP_RATE), true, true);
                }
             });
    }
@@ -1166,7 +1152,7 @@ public class AbstractPlayerInteraction {
    }
 
    public boolean canGetFirstJob(int jobType) {
-      if (ServerConstants.USE_AUTOASSIGN_STARTERS_AP) {
+      if (YamlConfig.config.server.USE_AUTOASSIGN_STARTERS_AP) {
          return true;
       }
 

@@ -31,7 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
@@ -59,7 +59,7 @@ public class MapleMonsterAggroCoordinator {
    private Set<Integer> mapPuppetEntries = new HashSet<>();
 
    private static void updateEntryExpiration(PlayerAggroEntry pae) {
-      pae.toNextUpdate = (int) Math.ceil((120000L / ServerConstants.MOB_STATUS_AGGRO_INTERVAL) / Math.pow(2, pae.expireStreak + pae.currentDamageInstances));
+      pae.toNextUpdate = (int) Math.ceil((120000L / YamlConfig.config.server.MOB_STATUS_AGGRO_INTERVAL) / Math.pow(2, pae.expireStreak + pae.currentDamageInstances));
    }
 
    private static void insertEntryDamage(PlayerAggroEntry pae, int damage) {
@@ -147,12 +147,12 @@ public class MapleMonsterAggroCoordinator {
                runAggroUpdate(1);
                runSortLeadingCharactersAggro();
             }
-         }, ServerConstants.MOB_STATUS_AGGRO_INTERVAL, ServerConstants.MOB_STATUS_AGGRO_INTERVAL);
+         }, YamlConfig.config.server.MOB_STATUS_AGGRO_INTERVAL, YamlConfig.config.server.MOB_STATUS_AGGRO_INTERVAL);
       } finally {
          idleLock.unlock();
       }
 
-      int timeDelta = (int) Math.ceil((Server.getInstance().getCurrentTime() - lastStopTime) / ServerConstants.MOB_STATUS_AGGRO_INTERVAL);
+      int timeDelta = (int) Math.ceil((Server.getInstance().getCurrentTime() - lastStopTime) / YamlConfig.config.server.MOB_STATUS_AGGRO_INTERVAL);
       if (timeDelta > 0) {
          runAggroUpdate(timeDelta);
       }
@@ -300,7 +300,7 @@ public class MapleMonsterAggroCoordinator {
             if (chr != null) {
                if (player.getId() == pae.cid) {
                   return true;
-               } else if (pae.updateStreak < ServerConstants.MOB_STATUS_AGGRO_PERSISTENCE && chr.isAlive()) {  // verifies currently leading players activity
+               } else if (pae.updateStreak < YamlConfig.config.server.MOB_STATUS_AGGRO_PERSISTENCE && chr.isAlive()) {  // verifies currently leading players activity
                   return false;
                }
             }

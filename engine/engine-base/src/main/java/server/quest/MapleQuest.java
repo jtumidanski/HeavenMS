@@ -33,7 +33,7 @@ import java.util.Set;
 import client.MapleCharacter;
 import client.MapleQuestStatus;
 import client.MapleQuestStatus.Status;
-import constants.ServerConstants;
+import config.YamlConfig;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -309,7 +309,7 @@ public class MapleQuest {
       }
 
       IntervalRequirement ir = (IntervalRequirement) startReqs.get(MapleQuestRequirementType.INTERVAL);
-      return ir.getInterval() < ServerConstants.QUEST_POINT_REPEATABLE_INTERVAL * 60 * 60 * 1000;
+      return ir.getInterval() < YamlConfig.config.server.QUEST_POINT_REPEATABLE_INTERVAL * 60 * 60 * 1000;
    }
 
    public boolean canStartWithoutRequirements(MapleCharacter c) {
@@ -412,8 +412,8 @@ public class MapleQuest {
 
       c.updateQuest(newStatus);
 
-      if (id / 100 == 35 && ServerConstants.TOT_MOB_QUEST_REQUIREMENT > 0) {
-         int setProg = 999 - Math.min(999, ServerConstants.TOT_MOB_QUEST_REQUIREMENT);
+      if (id / 100 == 35 && YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT > 0) {
+         int setProg = 999 - Math.min(999, YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT);
 
          for (Integer pid : newStatus.getProgress().keySet()) {
             if (pid >= 8200000 && pid <= 8200012) {

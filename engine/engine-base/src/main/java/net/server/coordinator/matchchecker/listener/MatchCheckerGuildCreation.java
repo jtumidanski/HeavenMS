@@ -22,8 +22,8 @@ package net.server.coordinator.matchchecker.listener;
 import java.util.Set;
 
 import client.MapleCharacter;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
@@ -106,8 +106,8 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                   return;
                }
             }
-            if (leader.getMeso() < ServerConstants.CREATE_GUILD_COST) {
-               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CREATE_GUILD_COST) + " mesos to create a Guild.");
+            if (leader.getMeso() < YamlConfig.config.server.CREATE_GUILD_COST) {
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(YamlConfig.config.server.CREATE_GUILD_COST) + " mesos to create a Guild.");
                broadcastGuildCreationDismiss(matchPlayers);
                return;
             }
@@ -118,7 +118,7 @@ public class MatchCheckerGuildCreation implements MatchCheckerListenerRecipe {
                broadcastGuildCreationDismiss(matchPlayers);
                return;
             }
-            leader.gainMeso(-ServerConstants.CREATE_GUILD_COST, true, false, true);
+            leader.gainMeso(-YamlConfig.config.server.CREATE_GUILD_COST, true, false, true);
 
             leader.getMGC().setGuildId(gid);
 

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import constants.ServerConstants;
+import config.YamlConfig;
 import scripting.event.EventInstanceManager;
 
 /**
@@ -49,7 +49,7 @@ public class MapleEventRecallCoordinator {
    }
 
    public void storeEventInstance(int characterId, EventInstanceManager eim) {
-      if (ServerConstants.USE_ENABLE_RECALL_EVENT && isRecallableEvent(eim)) {
+      if (YamlConfig.config.server.USE_ENABLE_RECALL_EVENT && isRecallableEvent(eim)) {
          eventHistory.put(characterId, eim);
       }
    }

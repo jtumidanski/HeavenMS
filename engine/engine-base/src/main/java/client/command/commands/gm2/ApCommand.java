@@ -26,7 +26,7 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.ServerConstants;
+import config.YamlConfig;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -47,8 +47,8 @@ public class ApCommand extends Command {
          int newAp = Integer.parseInt(params[0]);
          if (newAp < 0) {
             newAp = 0;
-         } else if (newAp > ServerConstants.MAX_AP) {
-            newAp = ServerConstants.MAX_AP;
+         } else if (newAp > YamlConfig.config.server.MAX_AP) {
+            newAp = YamlConfig.config.server.MAX_AP;
          }
 
          player.changeRemainingAp(newAp, false);
@@ -57,8 +57,8 @@ public class ApCommand extends Command {
             int newAp = Integer.parseInt(params[1]);
             if (newAp < 0) {
                newAp = 0;
-            } else if (newAp > ServerConstants.MAX_AP) {
-               newAp = ServerConstants.MAX_AP;
+            } else if (newAp > YamlConfig.config.server.MAX_AP) {
+               newAp = YamlConfig.config.server.MAX_AP;
             }
             victim.changeRemainingAp(newAp, false);
          }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));

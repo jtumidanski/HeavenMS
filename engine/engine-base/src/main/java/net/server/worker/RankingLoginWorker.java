@@ -30,7 +30,7 @@ import client.MapleJob;
 import client.database.administrator.CharacterAdministrator;
 import client.database.data.CharacterRankData;
 import client.database.provider.CharacterProvider;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import tools.DatabaseConnection;
 import tools.TriConsumer;
@@ -75,7 +75,7 @@ public class RankingLoginWorker implements Runnable {
    public void run() {
       DatabaseConnection.getInstance().withConnection(entityManager -> {
          entityManager.getTransaction().begin();
-         if (ServerConstants.USE_REFRESH_RANK_MOVE) {
+         if (YamlConfig.config.server.USE_REFRESH_RANK_MOVE) {
             CharacterAdministrator.getInstance().resetAllJobRankMove(entityManager);
             CharacterAdministrator.getInstance().resetAllRankMove(entityManager);
          }

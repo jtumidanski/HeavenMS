@@ -44,7 +44,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import client.processor.FredrickProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -242,7 +242,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             PacketCreator.announce(chr, new UpdateHiredMerchant(chr, this));
          }
 
-         if (ServerConstants.USE_ENFORCE_MERCHANT_SAVE) {
+         if (YamlConfig.config.server.USE_ENFORCE_MERCHANT_SAVE) {
             chr.saveCharToDB(false);
          }
       }
@@ -288,7 +288,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                   pItem.doesExist_$eq(false);
                }
 
-               if (ServerConstants.USE_ANNOUNCE_SHOPITEMSOLD) {   // idea thanks to Vcoc
+               if (YamlConfig.config.server.USE_ANNOUNCE_SHOPITEMSOLD) {   // idea thanks to Vcoc
                   announceItemSold(newItem, price, getQuantityLeft(pItem.item().id()));
                }
 
@@ -404,7 +404,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
             e.printStackTrace();
          }
 
-         if (ServerConstants.USE_ENFORCE_MERCHANT_SAVE) {
+         if (YamlConfig.config.server.USE_ENFORCE_MERCHANT_SAVE) {
             c.getPlayer().saveCharToDB(false);
          }
 

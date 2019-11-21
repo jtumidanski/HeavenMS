@@ -40,8 +40,8 @@ import client.MapleClient;
 import client.database.administrator.PlayerNpcAdministrator;
 import client.database.provider.PlayerNpcProvider;
 import client.inventory.MapleInventoryType;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.World;
@@ -229,7 +229,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
          }
       }
 
-      if (ServerConstants.USE_DEBUG) {
+      if (YamlConfig.config.server.USE_DEBUG) {
          System.out.println("GOT SID " + scriptId + " POS " + pos);
       }
 

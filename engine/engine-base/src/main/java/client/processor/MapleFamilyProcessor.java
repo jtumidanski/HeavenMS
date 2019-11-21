@@ -17,7 +17,7 @@ import client.database.data.CharacterData;
 import client.database.provider.CharacterProvider;
 import client.database.provider.FamilyCharacterProvider;
 import client.database.provider.FamilyEntitlementProvider;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.world.World;
 import tools.DatabaseConnection;
@@ -177,7 +177,7 @@ public class MapleFamilyProcessor {
 
    public void giveReputationToCharactersSenior(MapleFamilyEntry familyEntry, int level, String name) {
       if (familyEntry != null) {
-         familyEntry.giveReputationToSenior(ServerConstants.FAMILY_REP_PER_LEVELUP, true);
+         familyEntry.giveReputationToSenior(YamlConfig.config.server.FAMILY_REP_PER_LEVELUP, true);
          MapleFamilyEntry senior = familyEntry.getSenior();
          if (senior != null) { //only send the message to direct senior
             MapleCharacter seniorChr = senior.getChr();

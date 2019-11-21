@@ -41,7 +41,7 @@ import client.MapleClient;
 import client.database.administrator.HwidAccountAdministrator;
 import client.database.provider.HwidAccountProvider;
 import client.processor.CharacterProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -130,7 +130,7 @@ public class MapleSessionCoordinator {
             }
             hwidCount++;
          }
-         if (hwidCount < ServerConstants.MAX_ALLOWED_ACCOUNT_HWID) {
+         if (hwidCount < YamlConfig.config.server.MAX_ALLOWED_ACCOUNT_HWID) {
             registerAccessAccount(connection, remoteHwid, accountId);
             return true;
          }
@@ -152,7 +152,7 @@ public class MapleSessionCoordinator {
             }
             hwidCount++;
          }
-         return hwidCount < ServerConstants.MAX_ALLOWED_ACCOUNT_HWID;
+         return hwidCount < YamlConfig.config.server.MAX_ALLOWED_ACCOUNT_HWID;
       }).orElse(false);
    }
 
@@ -208,7 +208,7 @@ public class MapleSessionCoordinator {
    }
 
    public boolean canStartLoginSession(IoSession session) {
-      if (!ServerConstants.DETERRED_MULTICLIENT) {
+      if (!YamlConfig.config.server.DETERRED_MULTICLIENT) {
          return true;
       }
 
@@ -298,7 +298,7 @@ public class MapleSessionCoordinator {
    }
 
    public AntiMulticlientResult attemptLoginSession(IoSession session, String nibbleHwid, int accountId, boolean routineCheck) {
-      if (!ServerConstants.DETERRED_MULTICLIENT) {
+      if (!YamlConfig.config.server.DETERRED_MULTICLIENT) {
          session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, nibbleHwid);
          return AntiMulticlientResult.SUCCESS;
       }
@@ -370,7 +370,7 @@ public class MapleSessionCoordinator {
 
    public AntiMulticlientResult attemptGameSession(IoSession session, int accountId, String remoteHwid) {
       String remoteHost = getSessionRemoteAddress(session);
-      if (!ServerConstants.DETERRED_MULTICLIENT) {
+      if (!YamlConfig.config.server.DETERRED_MULTICLIENT) {
          associateRemoteHostHwid(remoteHost, remoteHwid);
          return AntiMulticlientResult.SUCCESS;
       }

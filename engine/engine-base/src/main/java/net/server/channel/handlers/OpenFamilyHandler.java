@@ -21,7 +21,7 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
@@ -39,7 +39,7 @@ public final class OpenFamilyHandler extends AbstractPacketHandler<NoOpPacket> {
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      return ServerConstants.USE_FAMILY_SYSTEM;
+      return YamlConfig.config.server.USE_FAMILY_SYSTEM;
    }
 
    @Override

@@ -1,6 +1,6 @@
 package npc
 
-import constants.ServerConstants
+import config.YamlConfig
 import net.server.world.MaplePartyCharacter
 import scripting.npc.NPCConversationManager
 
@@ -89,9 +89,9 @@ class NPC2042005 {
                }
             } else {
                MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
-               if ((selection == 0 || selection == 1) && party.size() < (ServerConstants.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 2)) {
+               if ((selection == 0 || selection == 1) && party.size() < (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 2)) {
                   cm.sendOk("You need at least 2 players to participate in the battle!")
-               } else if ((selection == 2) && party.size() < (ServerConstants.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 3)) {
+               } else if ((selection == 2) && party.size() < (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 3)) {
                   cm.sendOk("You need at least 3 players to participate in the battle!")
                } else {
                   cm.cpqLobby2(selection)

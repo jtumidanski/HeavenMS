@@ -42,10 +42,10 @@ import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MaplePet;
 import client.processor.PetProcessor;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ItemConstants;
 import constants.LanguageConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
@@ -357,7 +357,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    public boolean canSpawnPlayerNpc(int mapid) {
       MapleCharacter chr = getPlayer();
-      return !ServerConstants.PLAYERNPC_AUTODEPLOY && chr.getLevel() >= chr.getMaxClassLevel() && !chr.isGM() && MaplePlayerNPC.canSpawnPlayerNpc(chr.getName(), mapid);
+      return !YamlConfig.config.server.PLAYERNPC_AUTODEPLOY && chr.getLevel() >= chr.getMaxClassLevel() && !chr.isGM() && MaplePlayerNPC.canSpawnPlayerNpc(chr.getName(), mapid);
    }
 
    public MaplePlayerNPC getPlayerNPCByScriptid(int scriptId) {
@@ -608,7 +608,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public boolean isUsingOldPqNpcStyle() {
-      return ServerConstants.USE_OLD_GMS_STYLED_PQ_NPCS && this.getPlayer().getParty().isPresent();
+      return YamlConfig.config.server.USE_OLD_GMS_STYLED_PQ_NPCS && this.getPlayer().getParty().isPresent();
    }
 
    public int[] getAvailableMasteryBooks() {

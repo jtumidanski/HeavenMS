@@ -26,7 +26,7 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.database.provider.WorldTransferProvider;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.TransferWorldPacket;
@@ -56,7 +56,7 @@ public final class TransferWorldHandler extends AbstractPacketHandler<TransferWo
       }
 
       MapleCharacter chr = client.getPlayer();
-      if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER || Server.getInstance().getWorldsSize() <= 1) {
+      if (!YamlConfig.config.server.ALLOW_CASHSHOP_WORLD_TRANSFER || Server.getInstance().getWorldsSize() <= 1) {
          PacketCreator.announce(client, new WorldTransferError(9));
          return;
       }
@@ -73,7 +73,7 @@ public final class TransferWorldHandler extends AbstractPacketHandler<TransferWo
          return;
       }
 
-      if (completionTime.get().getTime() + ServerConstants.WORLD_TRANSFER_COOLDOWN > System.currentTimeMillis()) {
+      if (completionTime.get().getTime() + YamlConfig.config.server.WORLD_TRANSFER_COOLDOWN > System.currentTimeMillis()) {
          PacketCreator.announce(client, new WorldTransferError(7));
          return;
       }

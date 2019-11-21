@@ -22,7 +22,7 @@ package client.command.commands.gm6;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.ServerConstants;
+import config.YamlConfig;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -39,7 +39,7 @@ public class SupplyRateCouponCommand extends Command {
          return;
       }
 
-      ServerConstants.USE_SUPPLY_RATE_COUPONS = params[0].compareToIgnoreCase("no") != 0;
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Rate coupons are now " + (ServerConstants.USE_SUPPLY_RATE_COUPONS ? "enabled" : "disabled") + " for purchase at the Cash Shop.");
+      YamlConfig.config.server.USE_SUPPLY_RATE_COUPONS = params[0].compareToIgnoreCase("no") != 0;
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Rate coupons are now " + (YamlConfig.config.server.USE_SUPPLY_RATE_COUPONS ? "enabled" : "disabled") + " for purchase at the Cash Shop.");
    }
 }

@@ -1,6 +1,6 @@
 package net.server.channel.processor;
 
-import constants.ServerConstants;
+import config.YamlConfig;
 
 public class WeddingProcessor {
    private static WeddingProcessor ourInstance = new WeddingProcessor();
@@ -13,6 +13,6 @@ public class WeddingProcessor {
    }
 
    public long getRelativeWeddingTicketExpireTime(int resSlot) {
-      return (resSlot * ServerConstants.WEDDING_RESERVATION_INTERVAL * 60 * 1000);
+      return (resSlot * YamlConfig.config.server.WEDDING_RESERVATION_INTERVAL * 60 * 1000);
    }
 }

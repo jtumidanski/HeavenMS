@@ -41,8 +41,8 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import constants.skills.Aran;
 import constants.skills.Beginner;
 import constants.skills.Bishop;
@@ -544,7 +544,7 @@ public class MapleStatEffect {
    }
 
    public int getBuffLocalDuration() {
-      return !ServerConstants.USE_BUFF_EVERLASTING ? duration : Integer.MAX_VALUE;
+      return !YamlConfig.config.server.USE_BUFF_EVERLASTING ? duration : Integer.MAX_VALUE;
    }
 
    public void silentApplyBuff(MapleCharacter chr, long localStartTime) {

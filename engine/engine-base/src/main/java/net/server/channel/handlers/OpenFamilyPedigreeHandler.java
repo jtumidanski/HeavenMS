@@ -20,7 +20,7 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.OpenFamilyPedigreePacket;
 import net.server.channel.packet.reader.OpenFamilyPedigreeReader;
@@ -38,7 +38,7 @@ public final class OpenFamilyPedigreeHandler extends AbstractPacketHandler<OpenF
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      return ServerConstants.USE_FAMILY_SYSTEM;
+      return YamlConfig.config.server.USE_FAMILY_SYSTEM;
    }
 
    @Override

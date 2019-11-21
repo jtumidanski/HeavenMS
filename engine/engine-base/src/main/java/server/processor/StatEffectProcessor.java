@@ -10,7 +10,7 @@ import client.MapleCharacter;
 import client.MapleDisease;
 import client.SkillFactory;
 import client.status.MonsterStatus;
-import constants.ServerConstants;
+import config.YamlConfig;
 import constants.skills.Aran;
 import constants.skills.Assassin;
 import constants.skills.Bandit;
@@ -364,7 +364,7 @@ public class StatEffectProcessor {
          } else {
             if (isMapChair(sourceid)) {
                addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MAP_CHAIR, 1);
-            } else if ((sourceid == Beginner.NIMBLE_FEET || sourceid == Noblesse.NIMBLE_FEET || sourceid == Evan.NIMBLE_FEET || sourceid == Legend.AGILE_BODY) && ServerConstants.USE_ULTRA_NIMBLE_FEET) {
+            } else if ((sourceid == Beginner.NIMBLE_FEET || sourceid == Noblesse.NIMBLE_FEET || sourceid == Evan.NIMBLE_FEET || sourceid == Legend.AGILE_BODY) && YamlConfig.config.server.USE_ULTRA_NIMBLE_FEET) {
                ret.setJump((short) (ret.getSpeed() * 4));
                ret.setSpeed((short) (ret.getSpeed() * 15));
             }
@@ -385,7 +385,7 @@ public class StatEffectProcessor {
          ret.setLt((Point) ltd.getData());
          ret.setRb((Point) source.getChildByPath("rb").getData());
 
-         if (ServerConstants.USE_MAXRANGE_ECHO_OF_HERO && (sourceid == Beginner.ECHO_OF_HERO || sourceid == Noblesse.ECHO_OF_HERO || sourceid == Legend.ECHO_OF_HERO || sourceid == Evan.ECHO_OF_HERO)) {
+         if (YamlConfig.config.server.USE_MAXRANGE_ECHO_OF_HERO && (sourceid == Beginner.ECHO_OF_HERO || sourceid == Noblesse.ECHO_OF_HERO || sourceid == Legend.ECHO_OF_HERO || sourceid == Evan.ECHO_OF_HERO)) {
             ret.setLt(new Point(Integer.MIN_VALUE, Integer.MIN_VALUE));
             ret.setRb(new Point(Integer.MAX_VALUE, Integer.MAX_VALUE));
          }
@@ -393,7 +393,7 @@ public class StatEffectProcessor {
 
       int x = MapleDataTool.getInt("x", source, 0);
 
-      if ((sourceid == Beginner.RECOVERY || sourceid == Noblesse.RECOVERY || sourceid == Evan.RECOVERY || sourceid == Legend.RECOVERY) && ServerConstants.USE_ULTRA_RECOVERY) {
+      if ((sourceid == Beginner.RECOVERY || sourceid == Noblesse.RECOVERY || sourceid == Evan.RECOVERY || sourceid == Legend.RECOVERY) && YamlConfig.config.server.USE_ULTRA_RECOVERY) {
          x *= 10;
       }
       ret.setX(x);

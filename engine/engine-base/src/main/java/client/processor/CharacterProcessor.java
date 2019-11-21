@@ -76,9 +76,9 @@ import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleCashIdGenerator;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.SkillMacro;
 import net.server.guild.MapleGuildCharacter;
@@ -139,7 +139,7 @@ public class CharacterProcessor {
    }
 
    public String checkWorldTransferEligibility(EntityManager entityManager, int characterId, int oldWorld, int newWorld) {
-      if (!ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER) {
+      if (!YamlConfig.config.server.ALLOW_CASHSHOP_WORLD_TRANSFER) {
          return "World transfers disabled.";
       }
 
@@ -595,7 +595,7 @@ public class CharacterProcessor {
       int[] selectedType;
       int[] selectedAction;
 
-      if (ServerConstants.USE_CUSTOM_KEYSET) {
+      if (YamlConfig.config.server.USE_CUSTOM_KEYSET) {
          selectedKey = GameConstants.getCustomKey(true);
          selectedType = GameConstants.getCustomType(true);
          selectedAction = GameConstants.getCustomAction(true);
@@ -650,7 +650,7 @@ public class CharacterProcessor {
          int[] selectedType;
          int[] selectedAction;
 
-         if (ServerConstants.USE_CUSTOM_KEYSET) {
+         if (YamlConfig.config.server.USE_CUSTOM_KEYSET) {
             selectedKey = GameConstants.getCustomKey(true);
             selectedType = GameConstants.getCustomType(true);
             selectedAction = GameConstants.getCustomAction(true);

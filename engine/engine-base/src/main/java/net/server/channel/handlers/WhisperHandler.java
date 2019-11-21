@@ -27,7 +27,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
 import client.database.provider.CharacterProvider;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.WhisperPacket;
 import net.server.channel.packet.reader.WhisperReader;
@@ -124,7 +124,7 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
       }
       if (player.isPresent()) {
          PacketCreator.announce(player.get(), new Whisper(client.getPlayer().getName(), client.getChannel(), packet.message()));
-         if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+         if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
             LogHelper.logChat(client, "Whisper To " + player.get().getName(), packet.message());
          }
          if (player.get().isHidden() && player.get().gmLevel() >= client.getPlayer().gmLevel()) {
@@ -136,7 +136,7 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
          World world = client.getWorldServer();
          if (world.isConnected(packet.recipient())) {
             world.whisper(client.getPlayer().getName(), packet.recipient(), client.getChannel(), packet.message());
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Whisper To " + packet.recipient(), packet.message());
             }
             player = world.getPlayerStorage().getCharacterByName(packet.recipient());

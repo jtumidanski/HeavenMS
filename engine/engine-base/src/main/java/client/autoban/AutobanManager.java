@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import client.MapleCharacter;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import tools.FilePrinter;
 import tools.StringUtil;
@@ -34,7 +34,7 @@ public class AutobanManager {
    }
 
    public void addPoint(AutobanFactory fac, String reason) {
-      if (ServerConstants.USE_AUTOBAN) {
+      if (YamlConfig.config.server.USE_AUTOBAN) {
          if (chr.isGM() || chr.isBanned()) {
             return;
          }
@@ -58,7 +58,7 @@ public class AutobanManager {
             //chr.sendPolice("You have been blocked by #bMooplePolice for the HACK reason#k.");
          }
       }
-      if (ServerConstants.USE_AUTOBAN_LOG) {
+      if (YamlConfig.config.server.USE_AUTOBAN_LOG) {
          // Lets log every single point too.
          FilePrinter.print(FilePrinter.AUTOBAN_WARNING, StringUtil.makeMapleReadable(chr.getName()) + " caused " + fac.name() + " " + reason);
       }
@@ -115,7 +115,7 @@ public class AutobanManager {
       if (this.timestamp[type] == time) {
          this.timestampcounter[type]++;
          if (this.timestampcounter[type] >= times) {
-            if (ServerConstants.USE_AUTOBAN) {
+            if (YamlConfig.config.server.USE_AUTOBAN) {
                chr.getClient().disconnect(false, false);
             }
 

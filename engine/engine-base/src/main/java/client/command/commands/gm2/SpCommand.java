@@ -26,7 +26,7 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import constants.ServerConstants;
+import config.YamlConfig;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -47,8 +47,8 @@ public class SpCommand extends Command {
          int newSp = Integer.parseInt(params[0]);
          if (newSp < 0) {
             newSp = 0;
-         } else if (newSp > ServerConstants.MAX_AP) {
-            newSp = ServerConstants.MAX_AP;
+         } else if (newSp > YamlConfig.config.server.MAX_AP) {
+            newSp = YamlConfig.config.server.MAX_AP;
          }
 
          player.updateRemainingSp(newSp);
@@ -57,8 +57,8 @@ public class SpCommand extends Command {
             int newSp = Integer.parseInt(params[1]);
             if (newSp < 0) {
                newSp = 0;
-            } else if (newSp > ServerConstants.MAX_AP) {
-               newSp = ServerConstants.MAX_AP;
+            } else if (newSp > YamlConfig.config.server.MAX_AP) {
+               newSp = YamlConfig.config.server.MAX_AP;
             }
             victim.updateRemainingSp(newSp);
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "SP given.");

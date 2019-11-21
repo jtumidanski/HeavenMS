@@ -35,8 +35,8 @@ import client.SkillFactory;
 import client.autoban.AutobanFactory;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import constants.skills.Aran;
 import constants.skills.Assassin;
 import constants.skills.Bandit;
@@ -492,7 +492,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
 
                      int threeSnailsId = player.getJobType() * 10000000 + 1000;
                      if (attack.skill() == threeSnailsId) {
-                        if (ServerConstants.USE_ULTRA_THREE_SNAILS) {
+                        if (YamlConfig.config.server.USE_ULTRA_THREE_SNAILS) {
                            int skillLv = player.getSkillLevel(threeSnailsId);
 
                            if (skillLv > 0) {

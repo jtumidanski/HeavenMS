@@ -53,9 +53,9 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MapleWeaponType;
 import client.processor.ItemProcessor;
+import config.YamlConfig;
 import constants.EquipSlot;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import constants.skills.Assassin;
 import constants.skills.Gunslinger;
 import constants.skills.NightWalker;
@@ -221,7 +221,7 @@ public class MapleItemInformationProvider {
    }
 
    public static boolean rollSuccessChance(double propPercent) {
-      return Math.random() >= testYourLuck(propPercent / 100.0, ServerConstants.SCROLL_CHANCE_RATE);
+      return Math.random() >= testYourLuck(propPercent / 100.0, YamlConfig.config.server.SCROLL_CHANCE_RATE);
    }
 
    private static short getMaximumShortMaxIfOverflow(int value1, int value2) {
@@ -745,42 +745,42 @@ public class MapleItemInformationProvider {
 
       if (!option) {
          if (nEquip.str() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.str_$eq(getMaximumShortMaxIfOverflow(nEquip.str(), (nEquip.str() + chscrollRandomizedStat(range))));
             } else {
                nEquip.str_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.str() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.dex() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.dex_$eq(getMaximumShortMaxIfOverflow(nEquip.dex(), (nEquip.dex() + chscrollRandomizedStat(range))));
             } else {
                nEquip.dex_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.dex() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip._int() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip._int_$eq(getMaximumShortMaxIfOverflow(nEquip._int(), (nEquip._int() + chscrollRandomizedStat(range))));
             } else {
                nEquip._int_$eq(getMaximumShortMaxIfOverflow(0, (nEquip._int() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.luk() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.luk_$eq(getMaximumShortMaxIfOverflow(nEquip.luk(), (nEquip.luk() + chscrollRandomizedStat(range))));
             } else {
                nEquip.luk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.luk() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.acc() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.acc_$eq(getMaximumShortMaxIfOverflow(nEquip.acc(), (nEquip.acc() + chscrollRandomizedStat(range))));
             } else {
                nEquip.acc_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.acc() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.avoid() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(nEquip.avoid(), (nEquip.avoid() + chscrollRandomizedStat(range))));
             } else {
                nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.avoid() + chscrollRandomizedStat(range))));
@@ -788,28 +788,28 @@ public class MapleItemInformationProvider {
          }
       } else {
          if (nEquip.watk() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.watk_$eq(getMaximumShortMaxIfOverflow(nEquip.watk(), (nEquip.watk() + chscrollRandomizedStat(range))));
             } else {
                nEquip.watk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.watk() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.wdef() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(nEquip.wdef(), (nEquip.wdef() + chscrollRandomizedStat(range))));
             } else {
                nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.wdef() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.matk() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.matk_$eq(getMaximumShortMaxIfOverflow(nEquip.matk(), (nEquip.matk() + chscrollRandomizedStat(range))));
             } else {
                nEquip.matk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.matk() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.mdef() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(nEquip.mdef(), (nEquip.mdef() + chscrollRandomizedStat(range))));
             } else {
                nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mdef() + chscrollRandomizedStat(range))));
@@ -817,28 +817,28 @@ public class MapleItemInformationProvider {
          }
 
          if (nEquip.speed() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.speed_$eq(getMaximumShortMaxIfOverflow(nEquip.speed(), (nEquip.speed() + chscrollRandomizedStat(range))));
             } else {
                nEquip.speed_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.speed() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.jump() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.jump_$eq(getMaximumShortMaxIfOverflow(nEquip.jump(), (nEquip.jump() + chscrollRandomizedStat(range))));
             } else {
                nEquip.jump_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.jump() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.hp() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.hp_$eq(getMaximumShortMaxIfOverflow(nEquip.hp(), (nEquip.hp() + chscrollRandomizedStat(range))));
             } else {
                nEquip.hp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.hp() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.mp() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.mp_$eq(getMaximumShortMaxIfOverflow(nEquip.mp(), (nEquip.mp() + chscrollRandomizedStat(range))));
             } else {
                nEquip.mp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mp() + chscrollRandomizedStat(range))));
@@ -848,11 +848,11 @@ public class MapleItemInformationProvider {
    }
 
    private void scrollEquipWithChaos(Equip nEquip, int range) {
-      if (ServerConstants.CHSCROLL_STAT_RATE > 0) {
+      if (YamlConfig.config.server.CHSCROLL_STAT_RATE > 0) {
          int temp;
          int curStr, curDex, curInt, curLuk, curWatk, curWdef, curMatk, curMdef, curAcc, curAvoid, curSpeed, curJump, curHp, curMp;
 
-         if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+         if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
             curStr = nEquip.str();
             curDex = nEquip.dex();
             curInt = nEquip._int();
@@ -884,9 +884,9 @@ public class MapleItemInformationProvider {
             curMp = Short.MIN_VALUE;
          }
 
-         for (int i = 0; i < ServerConstants.CHSCROLL_STAT_RATE; i++) {
+         for (int i = 0; i < YamlConfig.config.server.CHSCROLL_STAT_RATE; i++) {
             if (nEquip.str() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curStr + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.str() + chscrollRandomizedStat(range);
@@ -896,7 +896,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.dex() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curDex + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.dex() + chscrollRandomizedStat(range);
@@ -906,7 +906,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip._int() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curInt + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip._int() + chscrollRandomizedStat(range);
@@ -916,7 +916,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.luk() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curLuk + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.luk() + chscrollRandomizedStat(range);
@@ -926,7 +926,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.watk() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curWatk + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.watk() + chscrollRandomizedStat(range);
@@ -936,7 +936,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.wdef() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curWdef + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.wdef() + chscrollRandomizedStat(range);
@@ -946,7 +946,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.matk() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curMatk + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.matk() + chscrollRandomizedStat(range);
@@ -956,7 +956,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.mdef() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curMdef + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.mdef() + chscrollRandomizedStat(range);
@@ -966,7 +966,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.acc() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curAcc + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.acc() + chscrollRandomizedStat(range);
@@ -976,7 +976,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.avoid() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curAvoid + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.avoid() + chscrollRandomizedStat(range);
@@ -986,7 +986,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.speed() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curSpeed + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.speed() + chscrollRandomizedStat(range);
@@ -996,7 +996,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.jump() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curJump + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.jump() + chscrollRandomizedStat(range);
@@ -1006,7 +1006,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.hp() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curHp + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.hp() + chscrollRandomizedStat(range);
@@ -1016,7 +1016,7 @@ public class MapleItemInformationProvider {
             }
 
             if (nEquip.mp() > 0) {
-               if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                   temp = curMp + chscrollRandomizedStat(range);
                } else {
                   temp = nEquip.mp() + chscrollRandomizedStat(range);
@@ -1042,98 +1042,98 @@ public class MapleItemInformationProvider {
          nEquip.mp_$eq((short) Math.max(0, curMp));
       } else {
          if (nEquip.str() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.str_$eq(getMaximumShortMaxIfOverflow(nEquip.str(), (nEquip.str() + chscrollRandomizedStat(range))));
             } else {
                nEquip.str_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.str() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.dex() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.dex_$eq(getMaximumShortMaxIfOverflow(nEquip.dex(), (nEquip.dex() + chscrollRandomizedStat(range))));
             } else {
                nEquip.dex_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.dex() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip._int() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip._int_$eq(getMaximumShortMaxIfOverflow(nEquip._int(), (nEquip._int() + chscrollRandomizedStat(range))));
             } else {
                nEquip._int_$eq(getMaximumShortMaxIfOverflow(0, (nEquip._int() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.luk() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.luk_$eq(getMaximumShortMaxIfOverflow(nEquip.luk(), (nEquip.luk() + chscrollRandomizedStat(range))));
             } else {
                nEquip.luk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.luk() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.watk() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.watk_$eq(getMaximumShortMaxIfOverflow(nEquip.watk(), (nEquip.watk() + chscrollRandomizedStat(range))));
             } else {
                nEquip.watk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.watk() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.wdef() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(nEquip.wdef(), (nEquip.wdef() + chscrollRandomizedStat(range))));
             } else {
                nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.wdef() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.matk() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.matk_$eq(getMaximumShortMaxIfOverflow(nEquip.matk(), (nEquip.matk() + chscrollRandomizedStat(range))));
             } else {
                nEquip.matk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.matk() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.mdef() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(nEquip.mdef(), (nEquip.mdef() + chscrollRandomizedStat(range))));
             } else {
                nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mdef() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.acc() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.acc_$eq(getMaximumShortMaxIfOverflow(nEquip.acc(), (nEquip.acc() + chscrollRandomizedStat(range))));
             } else {
                nEquip.acc_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.acc() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.avoid() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(nEquip.avoid(), (nEquip.avoid() + chscrollRandomizedStat(range))));
             } else {
                nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.avoid() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.speed() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.speed_$eq(getMaximumShortMaxIfOverflow(nEquip.speed(), (nEquip.speed() + chscrollRandomizedStat(range))));
             } else {
                nEquip.speed_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.speed() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.jump() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.jump_$eq(getMaximumShortMaxIfOverflow(nEquip.jump(), (nEquip.jump() + chscrollRandomizedStat(range))));
             } else {
                nEquip.jump_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.jump() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.hp() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.hp_$eq(getMaximumShortMaxIfOverflow(nEquip.hp(), (nEquip.hp() + chscrollRandomizedStat(range))));
             } else {
                nEquip.hp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.hp() + chscrollRandomizedStat(range))));
             }
          }
          if (nEquip.mp() > 0) {
-            if (ServerConstants.USE_ENHANCED_CHSCROLL) {
+            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
                nEquip.mp_$eq(getMaximumShortMaxIfOverflow(nEquip.mp(), (nEquip.mp() + chscrollRandomizedStat(range))));
             } else {
                nEquip.mp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mp() + chscrollRandomizedStat(range))));
@@ -1144,11 +1144,11 @@ public class MapleItemInformationProvider {
 
    public boolean canUseCleanSlate(Equip nEquip) {
       Map<String, Integer> eqstats = this.getEquipStats(nEquip.id());
-      return ServerConstants.USE_ENHANCED_CLNSLATE || nEquip.slots() < (byte) (eqstats.get("tuc") + nEquip.vicious());  // issue with clean slate found thanks to Masterrulax, vicious added in the check thanks to Crypter (CrypterDEV)
+      return YamlConfig.config.server.USE_ENHANCED_CLNSLATE || nEquip.slots() < (byte) (eqstats.get("tuc") + nEquip.vicious());  // issue with clean slate found thanks to Masterrulax, vicious added in the check thanks to Crypter (CrypterDEV)
    }
 
    public Item scrollEquipWithId(Item equip, int scrollId, boolean usingWhiteScroll, int vegaItemId, boolean isGM) {
-      boolean assertGM = (isGM && ServerConstants.USE_PERFECT_GM_SCROLL);
+      boolean assertGM = (isGM && YamlConfig.config.server.USE_PERFECT_GM_SCROLL);
 
       if (equip instanceof Equip) {
          Equip nEquip = (Equip) equip;
@@ -1195,7 +1195,7 @@ public class MapleItemInformationProvider {
                   case 2049100:
                   case 2049101:
                   case 2049102:
-                     scrollEquipWithChaos(nEquip, ServerConstants.CHSCROLL_STAT_RANGE);
+                     scrollEquipWithChaos(nEquip, YamlConfig.config.server.CHSCROLL_STAT_RANGE);
                      break;
 
                   default:
@@ -1209,7 +1209,7 @@ public class MapleItemInformationProvider {
                   nEquip.level_$eq((byte) (nEquip.level() + 1));
                }
             } else {
-               if (!ServerConstants.USE_PERFECT_SCROLLING && !usingWhiteScroll && !ItemConstants.isCleanSlate(scrollId) && !assertGM && !ItemConstants.isModifierScroll(scrollId)) {
+               if (!YamlConfig.config.server.USE_PERFECT_SCROLLING && !usingWhiteScroll && !ItemConstants.isCleanSlate(scrollId) && !assertGM && !ItemConstants.isModifierScroll(scrollId)) {
                   nEquip.slots_$eq((byte) (nEquip.slots() - 1));
                }
                if (Randomizer.nextInt(100) < stats.get("cursed")) {
@@ -1745,11 +1745,11 @@ public class MapleItemInformationProvider {
    }
 
    public boolean isUnmerchable(int itemId) {
-      if (ServerConstants.USE_ENFORCE_UNMERCHABLE_CASH && isCash(itemId)) {
+      if (YamlConfig.config.server.USE_ENFORCE_UNMERCHABLE_CASH && isCash(itemId)) {
          return true;
       }
 
-      return ServerConstants.USE_ENFORCE_UNMERCHABLE_PET && ItemConstants.isPet(itemId);
+      return YamlConfig.config.server.USE_ENFORCE_UNMERCHABLE_PET && ItemConstants.isPet(itemId);
    }
 
    public Collection<Item> canWearEquipment(MapleCharacter chr, Collection<Item> items) {

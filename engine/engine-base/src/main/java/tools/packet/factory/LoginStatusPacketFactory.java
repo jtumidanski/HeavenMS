@@ -1,7 +1,7 @@
 package tools.packet.factory;
 
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.login.AuthSuccess;
@@ -67,8 +67,8 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
       writer.writeInt(client.getAccID());
       writer.write(client.getGender());
       boolean canFly = Server.getInstance().canFly(client.getAccID());
-      writer.writeBool((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
-      writer.write(((ServerConstants.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
+      writer.writeBool((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
+      writer.write(((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
       writer.write(0); // Country Code.
       writer.writeMapleAsciiString(client.getAccountName());
       writer.write(0);
@@ -76,7 +76,7 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
       writer.writeLong(0);//IsQuietBanTimeStamp
       writer.writeLong(0); //CreationTimeStamp
       writer.writeInt(1); // 1: Remove the "Select the world you want to play in"
-      writer.write(ServerConstants.ENABLE_PIN && client.cannotBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
-      writer.write(ServerConstants.ENABLE_PIC && client.cannotBypassPic() ? (client.getPic() == null || client.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
+      writer.write(YamlConfig.config.server.ENABLE_PIN && client.cannotBypassPin() ? 0 : 1); // 0 = Pin-System Enabled, 1 = Disabled
+      writer.write(YamlConfig.config.server.ENABLE_PIC && client.cannotBypassPic() ? (client.getPic() == null || client.getPic().equals("") ? 0 : 1) : 2); // 0 = Register PIC, 1 = Ask for PIC, 2 = Disabled
    }
 }

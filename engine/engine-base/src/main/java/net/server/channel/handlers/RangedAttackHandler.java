@@ -30,8 +30,8 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.MapleWeaponType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import constants.skills.Aran;
 import constants.skills.Buccaneer;
 import constants.skills.NightLord;
@@ -78,7 +78,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
       }
 
       if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
-         chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_ATK);
+         chr.setDojoEnergy(chr.getDojoEnergy() + YamlConfig.config.server.DOJO_ENERGY_ATK);
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 

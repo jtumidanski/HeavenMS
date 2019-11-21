@@ -1,7 +1,7 @@
 package npc
 
 import client.processor.MakerProcessor
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
 /*
@@ -39,7 +39,7 @@ class NPC9000040 {
          }
 
          if (status == 0) {
-            if (!ServerConstants.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
+            if (!YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
                cm.sendOk("The medal ranking system is currently unavailable...")
                cm.dispose()
                return
@@ -48,7 +48,7 @@ class NPC9000040 {
             int levelLimit = !cm.getPlayer().isCygnus() ? 160 : 110
             String selStr = "The medal ranking system is currently unavailable... Therefore, I am providing the #bEquipment Merge#k service! "
 
-            if (!ServerConstants.USE_STARTER_MERGE && (cm.getPlayer().getLevel() < levelLimit || MakerProcessor.getInstance().getMakerSkillLevel(cm.getPlayer()) < 3)) {
+            if (!YamlConfig.config.server.USE_STARTER_MERGE && (cm.getPlayer().getLevel() < levelLimit || MakerProcessor.getInstance().getMakerSkillLevel(cm.getPlayer()) < 3)) {
                selStr += "However, you must have #rMaker level 3#k and at least #rlevel 110#k (Cygnus Knight), #rlevel 160#k (other classes) and a fund of #r" + cm.numberWithCommas(mergeFee) + " mesos#k to use the service."
                cm.sendOk(selStr)
                cm.dispose()

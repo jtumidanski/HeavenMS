@@ -5,8 +5,8 @@ import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
+import config.YamlConfig;
 import constants.LanguageConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.MapleParty;
@@ -98,7 +98,7 @@ public class MonsterCarnival {
 
          timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeDefault() * 1000); // thanks Atoot for noticing an irregular "event extended" issue here
          effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeDefault() * 1000 - 10 * 1000);
-         respawnTask = TimerManager.getInstance().register(this::respawn, ServerConstants.RESPAWN_INTERVAL);
+         respawnTask = TimerManager.getInstance().register(this::respawn, YamlConfig.config.server.RESPAWN_INTERVAL);
 
          cs.initMonsterCarnival(cpq1, room);
       } catch (Exception e) {

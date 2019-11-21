@@ -37,8 +37,8 @@ import client.MapleClient;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import scripting.AbstractPlayerInteraction;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
@@ -296,7 +296,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void hitMonsterWithReactor(int id, int hitsToKill) {  // until someone comes with a better solution, why not?
-      int customTime = ServerConstants.MOB_REACTOR_REFRESH_TIME;
+      int customTime = YamlConfig.config.server.MOB_REACTOR_REFRESH_TIME;
       if (customTime > 0) {
          reactor.setDelay(customTime);
       }

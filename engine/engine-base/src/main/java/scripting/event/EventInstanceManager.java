@@ -41,8 +41,8 @@ import javax.script.ScriptException;
 
 import client.MapleCharacter;
 import client.SkillFactory;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
@@ -107,9 +107,9 @@ public class EventInstanceManager {
    private boolean eventStarted = false;
 
    // multi-leveled PQ rewards!
-   private Map<Integer, List<Integer>> collectionSet = new HashMap<>(ServerConstants.MAX_EVENT_LEVELS);
-   private Map<Integer, List<Integer>> collectionQty = new HashMap<>(ServerConstants.MAX_EVENT_LEVELS);
-   private Map<Integer, Integer> collectionExp = new HashMap<>(ServerConstants.MAX_EVENT_LEVELS);
+   private Map<Integer, List<Integer>> collectionSet = new HashMap<>(YamlConfig.config.server.MAX_EVENT_LEVELS);
+   private Map<Integer, List<Integer>> collectionQty = new HashMap<>(YamlConfig.config.server.MAX_EVENT_LEVELS);
+   private Map<Integer, Integer> collectionExp = new HashMap<>(YamlConfig.config.server.MAX_EVENT_LEVELS);
 
    // Exp/Meso rewards by CLEAR on a stage
    private List<Integer> onMapClearExp = new ArrayList<>();
@@ -584,11 +584,8 @@ public class EventInstanceManager {
       try {
          int inc;
 
-         if (ServerConstants.JAVA_8) {
-            inc = (int) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.id());
-         } else {
-            inc = ((Double) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.id())).intValue();
-         }
+         inc = (int) invokeScriptFunction("monsterValue", EventInstanceManager.this, mob.id());
+
 
          if (inc != 0) {
             Integer kc = killCount.get(chr);
@@ -615,7 +612,9 @@ public class EventInstanceManager {
    public void dispose() {
       rL.lock();
       try {
-         for (MapleCharacter chr : chars.values()) chr.setEventInstance(null);
+         for (MapleCharacter chr : chars.values()) {
+            chr.setEventInstance(null);
+         }
       } finally {
          rL.unlock();
       }
@@ -639,7 +638,9 @@ public class EventInstanceManager {
 
       wL.lock();
       try {
-         for (MapleCharacter chr : chars.values()) chr.setEventInstance(null);
+         for (MapleCharacter chr : chars.values()) {
+            chr.setEventInstance(null);
+         }
          chars.clear();
          mobs.clear();
          ess = null;
@@ -928,14 +929,8 @@ public class EventInstanceManager {
    private List<Integer> convertToIntegerArray(List<Object> list) {
       List<Integer> intList = new ArrayList<>();
 
-      if (ServerConstants.JAVA_8) {
-         for (Object d : list) {
-            intList.add((Integer) d);
-         }
-      } else {
-         for (Object d : list) {
-            intList.add(((Double) d).intValue());
-         }
+      for (Object d : list) {
+         intList.add((Integer) d);
       }
 
       return intList;
@@ -1007,7 +1002,7 @@ public class EventInstanceManager {
    public final void setEventRewards(int eventLevel, List<Object> rwds, List<Object> qtys, int expGiven) {
       // fixed EXP will be rewarded at the same time the random item is given
 
-      if (eventLevel <= 0 || eventLevel > ServerConstants.MAX_EVENT_LEVELS) {
+      if (eventLevel <= 0 || eventLevel > YamlConfig.config.server.MAX_EVENT_LEVELS) {
          return;
       }
       eventLevel--;    //event level starts from 1
@@ -1132,7 +1127,7 @@ public class EventInstanceManager {
       eventCleared = true;
 
       for (MapleCharacter chr : getPlayers()) {
-         chr.awardQuestPoint(ServerConstants.QUEST_POINT_PER_EVENT_CLEAR);
+         chr.awardQuestPoint(YamlConfig.config.server.QUEST_POINT_PER_EVENT_CLEAR);
       }
 
       sL.lock();

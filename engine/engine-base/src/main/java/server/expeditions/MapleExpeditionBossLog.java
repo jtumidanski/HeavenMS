@@ -28,7 +28,7 @@ import client.database.administrator.BossLogDailyAdministrator;
 import client.database.administrator.BossLogWeeklyAdministrator;
 import client.database.provider.BossLogDailyProvider;
 import client.database.provider.BossLogWeeklyProvider;
-import constants.ServerConstants;
+import config.YamlConfig;
 import tools.DatabaseConnection;
 import tools.Pair;
 
@@ -107,7 +107,7 @@ public class MapleExpeditionBossLog {
    }
 
    public static boolean attemptBoss(int cid, int channel, MapleExpedition exped, boolean log) {
-      if (!ServerConstants.USE_ENABLE_DAILY_EXPEDITIONS) {
+      if (!YamlConfig.config.server.USE_ENABLE_DAILY_EXPEDITIONS) {
          return true;
       }
 

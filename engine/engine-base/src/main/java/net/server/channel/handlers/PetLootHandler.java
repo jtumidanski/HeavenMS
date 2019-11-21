@@ -26,7 +26,7 @@ import java.util.Set;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MaplePet;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetLootPacket;
 import net.server.channel.packet.reader.PetLootReader;
@@ -48,7 +48,7 @@ public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket> {
    @Override
    public void handlePacket(PetLootPacket packet, MapleClient c) {
       MapleCharacter chr = c.getPlayer();
-      if (currentServerTime() - chr.getPetLootCd() < ServerConstants.PET_LOOT_UPON_ATTACK) {
+      if (currentServerTime() - chr.getPetLootCd() < YamlConfig.config.server.PET_LOOT_UPON_ATTACK) {
          PacketCreator.announce(c, new EnableActions());
          return;
       }

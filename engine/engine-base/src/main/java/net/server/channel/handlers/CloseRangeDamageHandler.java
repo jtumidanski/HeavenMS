@@ -33,8 +33,8 @@ import client.MapleClient;
 import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import constants.skills.Beginner;
 import constants.skills.Crusader;
 import constants.skills.DawnWarrior;
@@ -94,7 +94,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          return;
       }
       if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
-         chr.setDojoEnergy(chr.getDojoEnergy() + ServerConstants.DOJO_ENERGY_ATK);
+         chr.setDojoEnergy(chr.getDojoEnergy() + YamlConfig.config.server.DOJO_ENERGY_ATK);
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }
 

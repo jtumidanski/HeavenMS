@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import client.MapleJob;
+import config.YamlConfig;
 import constants.skills.Aran;
 import provider.MapleData;
 import provider.MapleDataDirectoryEntry;
@@ -252,7 +253,7 @@ public class GameConstants {
    private static final int[] jobUpgradeSpUp = {0, 1, 2, 3, 6};
    private final static Map<Integer, String> jobNames = new HashMap<>();
    private final static NumberFormat nfFormatter = new DecimalFormat("#,###,###,###");
-   private final static NumberFormat nfParser = NumberFormat.getInstance(ServerConstants.USE_UNITPRICE_WITH_COMMA ? Locale.FRANCE : Locale.UK);
+   private final static NumberFormat nfParser = NumberFormat.getInstance(YamlConfig.config.server.USE_UNITPRICE_WITH_COMMA ? Locale.FRANCE : Locale.UK);
    // MapleStory default keyset
    private static final int[] DEFAULT_KEY = {18, 65, 2, 23, 3, 4, 5, 6, 16, 17, 19, 25, 26, 27, 31, 34, 35, 37, 38, 40, 43, 44, 45, 46, 50, 56, 59, 60, 61, 62, 63, 64, 57, 48, 29, 7, 24, 33, 41, 39};
    private static final int[] DEFAULT_TYPE = {4, 6, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 4, 4, 5, 6, 6, 6, 6, 6, 6, 5, 4, 5, 4, 4, 4, 4, 4};
@@ -642,7 +643,7 @@ public class GameConstants {
    }
 
    public synchronized static String numberWithCommas(int i) {
-      if (!ServerConstants.USE_DISPLAY_NUMBERS_WITH_COMMA) {
+      if (!YamlConfig.config.server.USE_DISPLAY_NUMBERS_WITH_COMMA) {
          return nfFormatter.format(i);   // will display number on whatever locale is currently assigned on NumberFormat
       } else {
          return NumberFormat.getNumberInstance(Locale.UK).format(i);

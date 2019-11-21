@@ -33,7 +33,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.coordinator.MapleInviteCoordinator;
 import tools.PacketCreator;
 import tools.Pair;
@@ -87,7 +87,7 @@ public class MapleTrade {
    }
 
    public void cancel(byte result) {
-      boolean show = ServerConstants.USE_DEBUG;
+      boolean show = YamlConfig.config.server.USE_DEBUG;
 
       items.forEach(item -> MapleInventoryManipulator.addFromDrop(owner.getClient(), item, show));
       if (meso > 0) {

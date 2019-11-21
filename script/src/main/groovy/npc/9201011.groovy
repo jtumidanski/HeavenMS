@@ -1,7 +1,7 @@
 package npc
 
 import client.MapleCharacter
-import constants.ServerConstants
+import config.YamlConfig
 import net.server.channel.handlers.RingActionHandler
 import scripting.AbstractPlayerInteraction
 import scripting.event.EventInstanceManager
@@ -30,7 +30,7 @@ class NPC9201011 {
    String weddingEventName = "WeddingChapel"
    boolean cathedralWedding = false
    boolean weddingIndoors
-   int weddingBlessingExp = ServerConstants.WEDDING_BLESS_EXP
+   int weddingBlessingExp = YamlConfig.config.server.WEDDING_BLESS_EXP
 
    static def detectPlayerItemid(MapleCharacter player) {
       for (int x = 4031357; x <= 4031364; x++) {
@@ -188,7 +188,7 @@ class NPC9201011 {
             if (state == 0) {    // give player blessings
                eim.gridInsert(cm.getPlayer(), 1)
 
-               if (ServerConstants.WEDDING_BLESSER_SHOWFX) {
+               if (YamlConfig.config.server.WEDDING_BLESSER_SHOWFX) {
                   MapleCharacter target = cm.getPlayer()
                   PacketCreator.announce(target, new ShowSpecialEffect(9))
                   MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9), false, target)

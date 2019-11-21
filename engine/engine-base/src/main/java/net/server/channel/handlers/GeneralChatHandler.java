@@ -25,7 +25,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
 import client.command.CommandsExecutor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.GeneralChatPacket;
 import net.server.channel.packet.reader.GeneralChatReader;
@@ -68,12 +68,12 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
 
          if (!chr.isHidden()) {
             MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "General", packet.message());
             }
          } else {
             MasterBroadcaster.getInstance().sendToAllGMInMap(chr.getMap(), new ChatText(chr.getId(), packet.message(), chr.getWhiteChat(), packet.show()));
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "GM General", packet.message());
             }
          }

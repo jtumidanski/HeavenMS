@@ -59,8 +59,8 @@ import client.database.provider.MacFilterProvider;
 import client.inventory.MapleInventoryType;
 import client.processor.BuddyListProcessor;
 import client.processor.CharacterProcessor;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -303,7 +303,7 @@ public class MapleClient {
    }
 
    public boolean checkPin(String other) {
-      if (!(ServerConstants.ENABLE_PIN && cannotBypassPin())) {
+      if (!(YamlConfig.config.server.ENABLE_PIN && cannotBypassPin())) {
          return true;
       }
 
@@ -329,7 +329,7 @@ public class MapleClient {
    }
 
    public boolean checkPic(String other) {
-      if (!(ServerConstants.ENABLE_PIC && cannotBypassPic())) {
+      if (!(YamlConfig.config.server.ENABLE_PIC && cannotBypassPic())) {
          return true;
       }
 
@@ -385,7 +385,7 @@ public class MapleClient {
             loginok = tos ? 23 : 0;
          } else if (pwd.equals(passwordHash) || checkHash(passwordHash, "SHA-1", pwd) || checkHash(passwordHash, "SHA-512", pwd)) {
             // thanks GabrielSin for detecting some no-bcrypt inconsistencies here
-            loginok = tos ? (!ServerConstants.BCRYPT_MIGRATION ? 23 : -23) : (!ServerConstants.BCRYPT_MIGRATION ? 0 : -10); // migrate to bcrypt
+            loginok = tos ? (!YamlConfig.config.server.BCRYPT_MIGRATION ? 23 : -23) : (!YamlConfig.config.server.BCRYPT_MIGRATION ? 0 : -10); // migrate to bcrypt
          } else {
             loggedIn = false;
             loginok = 4;
@@ -671,7 +671,7 @@ public class MapleClient {
                player.saveCharToDB(true);
 
                player.logOff();
-               if (ServerConstants.INSTANT_NAME_CHANGE) {
+               if (YamlConfig.config.server.INSTANT_NAME_CHANGE) {
                   player.doPendingNameChange();
                }
                clear();

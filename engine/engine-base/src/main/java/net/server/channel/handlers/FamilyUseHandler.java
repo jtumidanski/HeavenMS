@@ -27,7 +27,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleFamilyEntitlement;
 import client.MapleFamilyEntry;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilyUsePacket;
 import net.server.channel.packet.reader.FamilyUseReader;
@@ -52,7 +52,7 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
 
    @Override
    public void handlePacket(FamilyUsePacket packet, MapleClient client) {
-      if (!ServerConstants.USE_FAMILY_SYSTEM) {
+      if (!YamlConfig.config.server.USE_FAMILY_SYSTEM) {
          return;
       }
       MapleFamilyEntitlement type = MapleFamilyEntitlement.values()[packet.entitlementId()];

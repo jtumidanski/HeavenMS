@@ -29,8 +29,8 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.StorageReader;
 import net.server.channel.packet.storage.ArrangeItemsPacket;
@@ -125,7 +125,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
    }
 
    private void arrangeItems(MapleClient c, MapleStorage storage) {
-      if (ServerConstants.USE_STORAGE_ITEM_SORT) {
+      if (YamlConfig.config.server.USE_STORAGE_ITEM_SORT) {
          storage.arrangeItems(c);
       }
       PacketCreator.announce(c, new EnableActions());

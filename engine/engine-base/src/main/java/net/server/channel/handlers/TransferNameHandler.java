@@ -27,7 +27,7 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.database.provider.NameChangeProvider;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.TransferNamePacket;
 import net.server.channel.packet.reader.TransferNameReader;
@@ -55,7 +55,7 @@ public final class TransferNameHandler extends AbstractPacketHandler<TransferNam
          return;
       }
 
-      if (!ServerConstants.ALLOW_CASHSHOP_NAME_CHANGE) {
+      if (!YamlConfig.config.server.ALLOW_CASHSHOP_NAME_CHANGE) {
          PacketCreator.announce(client, new NameChangeError(4));
          return;
       }
@@ -77,7 +77,7 @@ public final class TransferNameHandler extends AbstractPacketHandler<TransferNam
          return;
       }
 
-      if (completionTime.get().getTime() + ServerConstants.NAME_CHANGE_COOLDOWN > System.currentTimeMillis()) {
+      if (completionTime.get().getTime() + YamlConfig.config.server.NAME_CHANGE_COOLDOWN > System.currentTimeMillis()) {
          PacketCreator.announce(client, new NameChangeError(3));
          return;
       }

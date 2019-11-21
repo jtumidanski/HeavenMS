@@ -25,7 +25,7 @@ import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;
@@ -72,7 +72,7 @@ public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> 
       PacketCreator.announce(client, new ShowAllCharacter(charsSize, unk));
 
       for (Pair<Integer, List<MapleCharacter>> wchars : worldChars) {
-         PacketCreator.announce(client, new ShowAllCharacterInfo(wchars.getLeft(), wchars.getRight(), ServerConstants.ENABLE_PIC && client.cannotBypassPic()));
+         PacketCreator.announce(client, new ShowAllCharacterInfo(wchars.getLeft(), wchars.getRight(), YamlConfig.config.server.ENABLE_PIC && client.cannotBypassPic()));
       }
    }
 }

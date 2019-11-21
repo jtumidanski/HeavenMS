@@ -34,7 +34,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import client.MapleCharacter;
 import client.MapleJob;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.coordinator.MapleInviteCoordinator.InviteType;
@@ -332,7 +332,7 @@ public class MaplePartySearchCoordinator {
          } else {
             LeaderSearchMetadata settings = searchSettings.get(leader.getId());
             if (settings != null) {
-               if (settings.reentryCount < ServerConstants.PARTY_SEARCH_REENTRY_LIMIT) {
+               if (settings.reentryCount < YamlConfig.config.server.PARTY_SEARCH_REENTRY_LIMIT) {
                   settings.reentryCount += 1;
                   recalledLeaders.add(leader);
                } else {
@@ -376,7 +376,7 @@ public class MaplePartySearchCoordinator {
          if (leader.isLoggedinWorld()) {
             if (settings != null) {
                recycledLeaders.add(new Pair<>(leader, settings));
-               if (ServerConstants.USE_DEBUG && leader.isGM()) {
+               if (YamlConfig.config.server.USE_DEBUG && leader.isGM()) {
                   MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session is now on waiting queue for up to 7 minutes, to get it working right away please stop your Party Search and retry again later.");
                }
             } else {

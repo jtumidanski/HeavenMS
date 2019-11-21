@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import client.MapleCharacter;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.coordinator.MapleMatchCheckerCoordinator;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory;
@@ -38,7 +38,7 @@ public class MaplePartyProcessor {
    public boolean createParty(MapleCharacter player, boolean silentCheck) {
       Optional<MapleParty> party = player.getParty();
       if (party.isEmpty()) {
-         if (player.getLevel() < 10 && !ServerConstants.USE_PARTY_FOR_STARTERS) {
+         if (player.getLevel() < 10 && !YamlConfig.config.server.USE_PARTY_FOR_STARTERS) {
             PacketCreator.announce(player, new PartyStatusMessage(10));
             return false;
          } else if (player.getAriantColiseum() != null) {

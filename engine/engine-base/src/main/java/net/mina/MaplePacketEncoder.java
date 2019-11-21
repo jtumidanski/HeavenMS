@@ -27,8 +27,8 @@ import org.apache.mina.filter.codec.ProtocolEncoder;
 import org.apache.mina.filter.codec.ProtocolEncoderOutput;
 
 import client.MapleClient;
+import config.YamlConfig;
 import constants.OpcodeConstants;
-import constants.ServerConstants;
 import net.server.coordinator.MapleSessionCoordinator;
 import tools.FilePrinter;
 import tools.HexTool;
@@ -47,7 +47,7 @@ public class MaplePacketEncoder implements ProtocolEncoder {
             try {
                final MapleAESOFB send_crypto = client.getSendCrypto();
                final byte[] input = (byte[]) message;
-               if (ServerConstants.USE_DEBUG_SHOW_PACKET) {
+               if (YamlConfig.config.server.USE_DEBUG_SHOW_PACKET) {
                   int packetLen = input.length;
                   int pHeader = readFirstShort(input);
                   String pHeaderStr = Integer.toHexString(pHeader).toUpperCase();

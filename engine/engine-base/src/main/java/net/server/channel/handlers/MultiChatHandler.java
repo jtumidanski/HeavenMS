@@ -24,7 +24,7 @@ package net.server.channel.handlers;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.autoban.AutobanFactory;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.MultiChatPacket;
@@ -75,7 +75,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
          int allianceId = guild.getAllianceId();
          if (allianceId > 0) {
             Server.getInstance().allianceMessage(allianceId, new MultiChat(player.getName(), packet.message(), 3), player.getId(), -1);
-            if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+            if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Ally", packet.message());
             }
          }
@@ -84,21 +84,21 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
 
    private void guildChat(MultiChatPacket packet, MapleClient client, MapleCharacter player) {
       MapleGuildProcessor.getInstance().guildChat(player, packet.message());
-      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+      if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Guild", packet.message());
       }
    }
 
    private void partyChat(MultiChatPacket packet, MapleClient client, MapleCharacter player, World world) {
       player.getParty().ifPresent(party -> world.partyChat(party, packet.message(), player.getName()));
-      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+      if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Party", packet.message());
       }
    }
 
    private void buddyChat(MultiChatPacket packet, MapleClient client, MapleCharacter player, World world) {
       world.buddyChat(packet.recipientIds(), player.getId(), player.getName(), packet.message());
-      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+      if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Buddy", packet.message());
       }
    }

@@ -8,9 +8,9 @@ import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.StatUpgrade;
 import client.inventory.manipulator.MapleKarmaManipulator;
+import config.YamlConfig;
 import constants.ExpTable;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import server.MapleItemInformationProvider;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -59,7 +59,7 @@ public class ItemProcessor {
    public int getStatModifier(boolean isAttribute) {
       // each set of stat points grants a chance for a bonus stat point upgrade at equip level up.
 
-      if (ServerConstants.USE_EQUIPMNT_LVLUP_POWER) {
+      if (YamlConfig.config.server.USE_EQUIPMNT_LVLUP_POWER) {
          if (isAttribute) {
             return 2;
          } else {
@@ -75,7 +75,7 @@ public class ItemProcessor {
    }
 
    public int randomizeStatUpgrade(int top) {
-      int limit = Math.min(top, ServerConstants.MAX_EQUIPMNT_LVLUP_STAT_UP);
+      int limit = Math.min(top, YamlConfig.config.server.MAX_EQUIPMNT_LVLUP_STAT_UP);
 
       int poolCount = (limit * (limit + 1) / 2) + limit;
       int rnd = Randomizer.rand(0, poolCount);
@@ -135,7 +135,7 @@ public class ItemProcessor {
          }
       }
 
-      return equip.itemLevel() >= ServerConstants.USE_EQUIPMNT_LVLUP;
+      return equip.itemLevel() >= YamlConfig.config.server.USE_EQUIPMNT_LVLUP;
    }
 
 
@@ -145,14 +145,14 @@ public class ItemProcessor {
          return;
       }
 
-      int equipMaxLevel = Math.min(30, Math.max(ii.getEquipLevel(equip.id(), true), ServerConstants.USE_EQUIPMNT_LVLUP));
+      int equipMaxLevel = Math.min(30, Math.max(ii.getEquipLevel(equip.id(), true), YamlConfig.config.server.USE_EQUIPMNT_LVLUP));
       if (equip.itemLevel() >= equipMaxLevel) {
          return;
       }
 
       int reqLevel = ii.getEquipLevelReq(equip.id());
 
-      float masteryModifier = (float) (ServerConstants.EQUIP_EXP_RATE * ExpTable.getExpNeededForLevel(1)) / (float) normalizedMasteryExp(reqLevel);
+      float masteryModifier = (float) (YamlConfig.config.server.EQUIP_EXP_RATE * ExpTable.getExpNeededForLevel(1)) / (float) normalizedMasteryExp(reqLevel);
       float elementModifier = (equip.elemental()) ? 0.85f : 0.6f;
 
       float baseExpGain = gain * elementModifier * masteryModifier;
@@ -160,7 +160,7 @@ public class ItemProcessor {
       equip.itemExp_$eq(equip.itemExp() + baseExpGain);
       int expNeeded = ExpTable.getEquipExpNeededForLevel(equip.itemLevel());
 
-      if (ServerConstants.USE_DEBUG_SHOW_INFO_EQPEXP) {
+      if (YamlConfig.config.server.USE_DEBUG_SHOW_INFO_EQPEXP) {
          System.out.println("'" + ii.getName(equip.id()) + "' -> EXP Gain: " + gain + " Mastery: " + masteryModifier + " Base gain: " + baseExpGain + " exp: " + equip.itemExp() + " / " + expNeeded + ", Kills TNL: " + expNeeded / (baseExpGain / c.getPlayer().getExpRate()));
       }
 
@@ -179,7 +179,7 @@ public class ItemProcessor {
       }
 
       c.getPlayer().forceUpdateItem(equip);
-      //if(ServerConstants.USE_DEBUG) c.getPlayer().dropMessage("'" + ii.getName(this.getItemId()) + "': " + itemExp + " / " + expNeeded);
+      //if(YamlConfig.config.server.USE_DEBUG) c.getPlayer().dropMessage("'" + ii.getName(this.getItemId()) + "': " + itemExp + " / " + expNeeded);
    }
 
    private void gainLevel(Equip equip, MapleClient c) {
@@ -196,7 +196,7 @@ public class ItemProcessor {
       }
 
       if (!stats.isEmpty()) {
-         if (ServerConstants.USE_EQUIPMNT_LVLUP_SLOTS) {
+         if (YamlConfig.config.server.USE_EQUIPMNT_LVLUP_SLOTS) {
             if (equip.vicious() > 0) {
                getUnitSlotUpgrade(stats, StatUpgrade.incVicious);
             }
@@ -206,7 +206,7 @@ public class ItemProcessor {
          equip.upgradeable_$eq(false);
 
          improveDefaultStats(equip, stats);
-         if (ServerConstants.USE_EQUIPMNT_LVLUP_SLOTS) {
+         if (YamlConfig.config.server.USE_EQUIPMNT_LVLUP_SLOTS) {
             if (equip.vicious() > 0) {
                getUnitSlotUpgrade(stats, StatUpgrade.incVicious);
             }
@@ -216,7 +216,7 @@ public class ItemProcessor {
          if (equip.upgradeable()) {
             while (stats.isEmpty()) {
                improveDefaultStats(equip, stats);
-               if (ServerConstants.USE_EQUIPMNT_LVLUP_SLOTS) {
+               if (YamlConfig.config.server.USE_EQUIPMNT_LVLUP_SLOTS) {
                   if (equip.vicious() > 0) {
                      getUnitSlotUpgrade(stats, StatUpgrade.incVicious);
                   }

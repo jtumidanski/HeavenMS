@@ -1,6 +1,6 @@
 package quest
 
-import constants.ServerConstants
+import config.YamlConfig
 import scripting.quest.QuestActionManager
 
 class Quest21201 {
@@ -55,7 +55,7 @@ class Quest21201 {
                qm.gainItem(1142130, true)
                qm.changeJobById(2110)
 
-               if (ServerConstants.USE_FULL_ARAN_SKILLSET) {
+               if (YamlConfig.config.server.USE_FULL_ARAN_SKILLSET) {
                   qm.teachSkill(21100000, (byte) 0, (byte) 20, -1)   //polearm mastery
                   qm.teachSkill(21100002, (byte) 0, (byte) 30, -1)   //final charge
                   qm.teachSkill(21100004, (byte) 0, (byte) 20, -1)   //combo smash

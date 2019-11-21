@@ -23,7 +23,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.autoban.AutobanFactory;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetChatPacket;
 import net.server.channel.packet.reader.PetChatReader;
@@ -51,7 +51,7 @@ public final class PetChatHandler extends AbstractPacketHandler<PetChatPacket> {
          return;
       }
       MasterBroadcaster.getInstance().sendToAllInMap(client.getPlayer().getMap(), new PetChat(client.getPlayer().getId(), pet, packet.act(), packet.text()), true, client.getPlayer());
-      if (ServerConstants.USE_ENABLE_CHAT_LOG) {
+      if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
          LogHelper.logChat(client, "Pet", packet.text());
       }
    }

@@ -30,7 +30,7 @@ import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
 import client.database.administrator.AccountAdministrator;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.LoginPasswordReader;
@@ -56,15 +56,15 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
    public boolean successfulProcess(MapleClient client) {
       String remoteHost = getRemoteIp(client.getSession());
       if (!remoteHost.contentEquals("null")) {
-         if (ServerConstants.USE_IP_VALIDATION) {    // thanks Alex (CanIGetaPR) for suggesting IP validation as a server flag
+         if (YamlConfig.config.server.USE_IP_VALIDATION) {    // thanks Alex (CanIGetaPR) for suggesting IP validation as a server flag
             if (remoteHost.startsWith("127.")) {
-               if (!ServerConstants.LOCALSERVER) { // thanks Mills for noting HOST can also have a field named "localhost"
+               if (!YamlConfig.config.server.LOCALSERVER) { // thanks Mills for noting HOST can also have a field named "localhost"
                   // cannot login as localhost if it's not a local server
                   PacketCreator.announce(client, new LoginFailed(LoginFailedReason.UNABLE_TO_LOG_ON_AS_MASTER_AT_IP));
                   return false;
                }
             } else {
-               if (ServerConstants.LOCALSERVER) {
+               if (YamlConfig.config.server.LOCALSERVER) {
                   // cannot login as non-localhost if it's a local server
                   PacketCreator.announce(client, new LoginFailed(LoginFailedReason.UNABLE_TO_LOG_ON_AS_MASTER_AT_IP));
                   return false;
@@ -84,9 +84,9 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
 
       int loginStatus = client.login(packet.login(), packet.password(), HexTool.toCompressedString(packet.hwid()));
 
-      if (ServerConstants.AUTOMATIC_REGISTER && loginStatus == 5) {
+      if (YamlConfig.config.server.AUTOMATIC_REGISTER && loginStatus == 5) {
          try {
-            String password = ServerConstants.BCRYPT_MIGRATION ? BCrypt.hashpw(packet.password(), BCrypt.gensalt(12)) : hashpwSHA512(packet.password());
+            String password = YamlConfig.config.server.BCRYPT_MIGRATION ? BCrypt.hashpw(packet.password(), BCrypt.gensalt(12)) : hashpwSHA512(packet.password());
             DatabaseConnection.getInstance().withConnection(connection -> client.setAccID(AccountAdministrator.getInstance().create(connection, packet.login(), password)));
          } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             client.setAccID(-1);
@@ -96,7 +96,7 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
          loginStatus = client.login(packet.login(), packet.password(), HexTool.toCompressedString(packet.hwid()));
       }
 
-      if (ServerConstants.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
+      if (YamlConfig.config.server.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted
          String password = BCrypt.hashpw(packet.password(), BCrypt.gensalt(12));
          DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().updatePasswordByName(connection, packet.login(), password));
          loginStatus = (loginStatus == -10) ? 0 : 23;

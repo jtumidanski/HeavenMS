@@ -23,7 +23,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.processor.DueyProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.duey.BaseDueyPacket;
 import net.server.channel.packet.duey.DueyClaimPackagePacket;
@@ -42,7 +42,7 @@ public final class DueyHandler extends AbstractPacketHandler<BaseDueyPacket> {
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      if (!ServerConstants.USE_DUEY) {
+      if (!YamlConfig.config.server.USE_DUEY) {
          PacketCreator.announce(client, new EnableActions());
          return false;
       }

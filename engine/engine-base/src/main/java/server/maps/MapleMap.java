@@ -58,9 +58,9 @@ import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.status.MonsterStatus;
 import client.status.MonsterStatusEffect;
+import config.YamlConfig;
 import constants.GameConstants;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
@@ -718,7 +718,7 @@ public class MapleMap {
       final List<MonsterDropEntry> dropEntry = new ArrayList<>();
       final List<MonsterDropEntry> visibleQuestEntry = new ArrayList<>();
       final List<MonsterDropEntry> otherQuestEntry = new ArrayList<>();
-      DropEntryProcessor.getInstance().sortDropEntries(ServerConstants.USE_SPAWN_RELEVANT_LOOT ? mob.retrieveRelevantDrops() : mi.retrieveEffectiveDrop(mob.id()), dropEntry, visibleQuestEntry, otherQuestEntry, chr);
+      DropEntryProcessor.getInstance().sortDropEntries(YamlConfig.config.server.USE_SPAWN_RELEVANT_LOOT ? mob.retrieveRelevantDrops() : mi.retrieveEffectiveDrop(mob.id()), dropEntry, visibleQuestEntry, otherQuestEntry, chr);
 
       registerMobItemDrops(droptype, mobpos, chRate, pos, dropEntry, visibleQuestEntry, otherQuestEntry, globalEntry, chr, mob);
    }
@@ -752,7 +752,7 @@ public class MapleMap {
       expireItemsTask.cancel(false);
       expireItemsTask = null;
 
-      if (ServerConstants.USE_SPAWN_LOOT_ON_ANIMATION) {
+      if (YamlConfig.config.server.USE_SPAWN_LOOT_ON_ANIMATION) {
          mobSpawnLootTask.cancel(false);
          mobSpawnLootTask = null;
       }
@@ -812,11 +812,11 @@ public class MapleMap {
                   cleanItemMonitor();
                }
             }
-         }, ServerConstants.ITEM_MONITOR_TIME, ServerConstants.ITEM_MONITOR_TIME);
+         }, YamlConfig.config.server.ITEM_MONITOR_TIME, YamlConfig.config.server.ITEM_MONITOR_TIME);
 
-         expireItemsTask = TimerManager.getInstance().register(this::makeDisappearExpiredItemDrops, ServerConstants.ITEM_EXPIRE_CHECK, ServerConstants.ITEM_EXPIRE_CHECK);
+         expireItemsTask = TimerManager.getInstance().register(this::makeDisappearExpiredItemDrops, YamlConfig.config.server.ITEM_EXPIRE_CHECK, YamlConfig.config.server.ITEM_EXPIRE_CHECK);
 
-         if (ServerConstants.USE_SPAWN_LOOT_ON_ANIMATION) {
+         if (YamlConfig.config.server.USE_SPAWN_LOOT_ON_ANIMATION) {
             lootLock.lock();
             try {
                mobLootEntries.clear();
@@ -849,7 +849,7 @@ public class MapleMap {
    }
 
    private void instantiateItemDrop(MapleMapItem mdrop) {
-      if (droppedItemCount.get() >= ServerConstants.ITEM_LIMIT_ON_MAP) {
+      if (droppedItemCount.get() >= YamlConfig.config.server.ITEM_LIMIT_ON_MAP) {
          MapleMapObject mapobj;
 
          do {
@@ -881,7 +881,7 @@ public class MapleMap {
    }
 
    private void registerItemDrop(MapleMapItem mdrop) {
-      droppedItems.put(mdrop, !everlast ? Server.getInstance().getCurrentTime() + ServerConstants.ITEM_EXPIRE_TIME : Long.MAX_VALUE);
+      droppedItems.put(mdrop, !everlast ? Server.getInstance().getCurrentTime() + YamlConfig.config.server.ITEM_EXPIRE_TIME : Long.MAX_VALUE);
    }
 
    private void unregisterItemDrop(MapleMapItem mdrop) {
@@ -920,7 +920,7 @@ public class MapleMap {
    private void registerMobItemDrops(byte droptype, int mobpos, int chRate, Point pos, List<MonsterDropEntry> dropEntry, List<MonsterDropEntry> visibleQuestEntry, List<MonsterDropEntry> otherQuestEntry, List<MonsterGlobalDropEntry> globalEntry, MapleCharacter chr, MapleMonster mob) {
       MobLootEntry mle = new MobLootEntry(droptype, mobpos, chRate, pos, dropEntry, visibleQuestEntry, otherQuestEntry, globalEntry, chr, mob);
 
-      if (ServerConstants.USE_SPAWN_LOOT_ON_ANIMATION) {
+      if (YamlConfig.config.server.USE_SPAWN_LOOT_ON_ANIMATION) {
          int animationTime = mob.getAnimationTime("die1");
 
          lootLock.lock();
@@ -2071,7 +2071,7 @@ public class MapleMap {
          }
       };
 
-      getWorldServer().registerTimedMapObject(expireKite, ServerConstants.KITE_EXPIRE_TIME);
+      getWorldServer().registerTimedMapObject(expireKite, YamlConfig.config.server.KITE_EXPIRE_TIME);
    }
 
    public final void spawnItemDrop(final MapleMapObject dropper, final MapleCharacter owner, final Item item, Point pos, final boolean ffaDrop, final boolean playerDrop) {
@@ -3206,7 +3206,7 @@ public class MapleMap {
         System.out.println("----------------------------------");
         */
 
-      if (ServerConstants.USE_ENABLE_FULL_RESPAWN) {
+      if (YamlConfig.config.server.USE_ENABLE_FULL_RESPAWN) {
          return (monsterSpawn.size() - spawnedMonstersOnMap.get());
       }
 

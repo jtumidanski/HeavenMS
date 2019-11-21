@@ -26,7 +26,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.party.BasePartyOperationPacket;
 import net.server.channel.packet.party.ChangeLeaderPartyPacket;
@@ -90,11 +90,11 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
          PacketCreator.announce(player, new PartyStatusMessage(19));
       } else {
          MapleCharacter invited = invitedOptional.get();
-         if (invited.getLevel() < 10 && (!ServerConstants.USE_PARTY_FOR_STARTERS || player.getLevel() >= 10)) { //min requirement is level 10
+         if (invited.getLevel() < 10 && (!YamlConfig.config.server.USE_PARTY_FOR_STARTERS || player.getLevel() >= 10)) { //min requirement is level 10
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The player you have invited does not meet the requirements.");
             return;
          }
-         if (ServerConstants.USE_PARTY_FOR_STARTERS && invited.getLevel() >= 10 && player.getLevel() < 10) {    //trying to invite high level
+         if (YamlConfig.config.server.USE_PARTY_FOR_STARTERS && invited.getLevel() >= 10 && player.getLevel() < 10) {    //trying to invite high level
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The player you have invited does not meet the requirements.");
             return;
          }

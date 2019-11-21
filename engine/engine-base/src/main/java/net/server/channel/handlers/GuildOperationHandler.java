@@ -26,8 +26,8 @@ import java.util.Set;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import config.YamlConfig;
 import constants.GameConstants;
-import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.guild.BaseGuildOperationPacket;
@@ -149,8 +149,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          System.out.println("[Hack] " + mapleCharacter.getName() + " tried to change guild emblem without being the guild leader.");
          return;
       }
-      if (mapleCharacter.getMeso() < ServerConstants.CHANGE_EMBLEM_COST) {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CHANGE_EMBLEM_COST) + " mesos to change the Guild emblem.");
+      if (mapleCharacter.getMeso() < YamlConfig.config.server.CHANGE_EMBLEM_COST) {
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(YamlConfig.config.server.CHANGE_EMBLEM_COST) + " mesos to change the Guild emblem.");
          return;
       }
 
@@ -158,7 +158,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
       mapleCharacter.getAlliance().ifPresent(alliance -> Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, client.getWorld()), -1, -1));
 
-      mapleCharacter.gainMeso(-ServerConstants.CHANGE_EMBLEM_COST, true, false, true);
+      mapleCharacter.gainMeso(-YamlConfig.config.server.CHANGE_EMBLEM_COST, true, false, true);
       mapleCharacter.getGuild().ifPresent(guild -> MapleGuildProcessor.getInstance().broadcastNameChanged(guild));
       mapleCharacter.getGuild().ifPresent(guild -> MapleGuildProcessor.getInstance().broadcastEmblemChanged(guild));
    }
@@ -276,8 +276,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "You cannot create a new Guild while in one.");
          return;
       }
-      if (mapleCharacter.getMeso() < ServerConstants.CREATE_GUILD_COST) {
-         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(ServerConstants.CREATE_GUILD_COST) + " mesos to create a Guild.");
+      if (mapleCharacter.getMeso() < YamlConfig.config.server.CREATE_GUILD_COST) {
+         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(YamlConfig.config.server.CREATE_GUILD_COST) + " mesos to create a Guild.");
          return;
       }
       if (!isGuildNameAcceptable(packet.name())) {
@@ -286,8 +286,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       }
 
       Set<MapleCharacter> eligibleMembers = new HashSet<>(MapleGuildProcessor.getInstance().getEligiblePlayersForGuild(mapleCharacter));
-      if (eligibleMembers.size() < ServerConstants.CREATE_GUILD_MIN_PARTNERS) {
-         if (mapleCharacter.getMap().getAllPlayers().size() < ServerConstants.CREATE_GUILD_MIN_PARTNERS) {
+      if (eligibleMembers.size() < YamlConfig.config.server.CREATE_GUILD_MIN_PARTNERS) {
+         if (mapleCharacter.getMap().getAllPlayers().size() < YamlConfig.config.server.CREATE_GUILD_MIN_PARTNERS) {
             // thanks NovaStory for noticing message in need of smoother info
             MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "Your Guild doesn't have enough cofounders present here and therefore cannot be created at this time.");
          } else {

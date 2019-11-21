@@ -25,7 +25,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.family.FamilyAddPacket;
 import net.server.channel.packet.reader.FamilyAddReader;
@@ -50,7 +50,7 @@ public final class FamilyAddHandler extends AbstractPacketHandler<FamilyAddPacke
 
    @Override
    public boolean successfulProcess(MapleClient client) {
-      return ServerConstants.USE_FAMILY_SYSTEM;
+      return YamlConfig.config.server.USE_FAMILY_SYSTEM;
    }
 
    @Override
@@ -71,7 +71,7 @@ public final class FamilyAddHandler extends AbstractPacketHandler<FamilyAddPacke
          PacketCreator.announce(client, new EnableActions());
       } else if (MapleInviteCoordinator.hasInvite(InviteType.FAMILY, addChr.get().getId())) {
          PacketCreator.announce(client, new FamilyMessage(73, 0));
-      } else if (chr.getFamily() != null && addChr.get().getFamily() != null && addChr.get().getFamily().getTotalGenerations() + chr.getFamily().getTotalGenerations() > ServerConstants.FAMILY_MAX_GENERATIONS) {
+      } else if (chr.getFamily() != null && addChr.get().getFamily() != null && addChr.get().getFamily().getTotalGenerations() + chr.getFamily().getTotalGenerations() > YamlConfig.config.server.FAMILY_MAX_GENERATIONS) {
          PacketCreator.announce(client, new FamilyMessage(76, 0));
       } else {
          MapleInviteCoordinator.createInvite(InviteType.FAMILY, chr, addChr.get(), addChr.get().getId());

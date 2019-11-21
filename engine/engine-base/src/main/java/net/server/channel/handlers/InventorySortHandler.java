@@ -31,7 +31,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.ModifyInventory;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.InventorySortPacket;
@@ -278,7 +278,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
       MapleCharacter chr = client.getPlayer();
       chr.getAutobanManager().setTimestamp(3, Server.getInstance().getCurrentTimestamp(), 4);
 
-      if (!ServerConstants.USE_ITEM_SORT) {
+      if (!YamlConfig.config.server.USE_ITEM_SORT) {
          PacketCreator.announce(client, new EnableActions());
          return;
       }
@@ -307,7 +307,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
          }
 
          int invTypeCriteria = (MapleInventoryType.getByType(packet.inventoryType()) == MapleInventoryType.EQUIP) ? 3 : 1;
-         int sortCriteria = (ServerConstants.USE_ITEM_SORT_BY_NAME) ? 2 : 0;
+         int sortCriteria = (YamlConfig.config.server.USE_ITEM_SORT_BY_NAME) ? 2 : 0;
          PairedQuicksort pq = new PairedQuicksort(itemarray, sortCriteria, invTypeCriteria);
 
          for (Item item : itemarray) {

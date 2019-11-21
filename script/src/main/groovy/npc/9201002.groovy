@@ -1,7 +1,7 @@
 package npc
 
 import client.MapleCharacter
-import constants.ServerConstants
+import config.YamlConfig
 import net.server.channel.Channel
 import net.server.channel.handlers.RingActionHandler
 import scripting.AbstractPlayerInteraction
@@ -31,7 +31,7 @@ class NPC9201002 {
    String weddingEventName = "WeddingCathedral"
    boolean cathedralWedding = true
    boolean weddingIndoors
-   int weddingBlessingExp = ServerConstants.WEDDING_BLESS_EXP
+   int weddingBlessingExp = YamlConfig.config.server.WEDDING_BLESS_EXP
 
    static def isWeddingIndoors(int mapid) {
       return mapid >= 680000100 && mapid <= 680000500
@@ -313,18 +313,18 @@ class NPC9201002 {
                if (state == 0) {    // give player blessings
                   eim.gridInsert(cm.getPlayer(), 1)
 
-                  if (ServerConstants.WEDDING_BLESSER_SHOWFX) {
+                  if (YamlConfig.config.server.WEDDING_BLESSER_SHOWFX) {
                      MapleCharacter target = cm.getPlayer()
                      PacketCreator.announce(target, new ShowSpecialEffect(9))
                      MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9), false, target)
                   } else {
                      MapleCharacter target = eim.getPlayerById(eim.getIntProperty("groomId"))
                      PacketCreator.announce(target, new ShowSpecialEffect(9))
-                     MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9),false, target)
+                     MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9), false, target)
 
                      target = eim.getPlayerById(eim.getIntProperty("brideId"))
                      PacketCreator.announce(target, new ShowSpecialEffect(9))
-                     MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9),false, target)
+                     MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9), false, target)
                   }
 
                   cm.sendOk("Your blessings have been added to their love. What a noble act for a lovely couple!")

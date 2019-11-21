@@ -23,7 +23,7 @@ package net.server.channel.handlers;
 
 import client.MapleClient;
 import client.processor.DueyProcessor;
-import constants.ServerConstants;
+import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.NPCTalkPacket;
 import net.server.channel.packet.reader.NPCTalkReader;
@@ -45,7 +45,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
          return false;
       }
 
-      if (currentServerTime() - client.getPlayer().getNpcCooldown() < ServerConstants.BLOCK_NPC_RACE_CONDT) {
+      if (currentServerTime() - client.getPlayer().getNpcCooldown() < YamlConfig.config.server.BLOCK_NPC_RACE_CONDT) {
          PacketCreator.announce(client, new EnableActions());
          return false;
       }
@@ -62,7 +62,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
       MapleMapObject obj = client.getPlayer().getMap().getMapObject(packet.objectId());
       if (obj instanceof MapleNPC) {
          MapleNPC npc = (MapleNPC) obj;
-         if (ServerConstants.USE_DEBUG) {
+         if (YamlConfig.config.server.USE_DEBUG) {
             MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Talking to NPC " + npc.id());
          }
 

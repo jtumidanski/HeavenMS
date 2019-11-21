@@ -36,8 +36,8 @@ import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.CharacterProcessor;
 import client.processor.MapleRingProcessor;
 import client.processor.NoteProcessor;
+import config.YamlConfig;
 import constants.ItemConstants;
-import constants.ServerConstants;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.cash.operation.BaseCashOperationPacket;
@@ -259,7 +259,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          if (ItemConstants.isCashStore(cItem.getItemId()) && chr.getLevel() < 16) {
             c.enableCSActions();
             return;
-         } else if (ItemConstants.isRateCoupon(cItem.getItemId()) && !ServerConstants.USE_SUPPLY_RATE_COUPONS) {
+         } else if (ItemConstants.isRateCoupon(cItem.getItemId()) && !YamlConfig.config.server.USE_SUPPLY_RATE_COUPONS) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Rate coupons are currently unavailable to purchase.");
             c.enableCSActions();
             return;
@@ -410,7 +410,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       }
-      if (cItem.getSN() == 50600001 && ServerConstants.ALLOW_CASHSHOP_WORLD_TRANSFER) {
+      if (cItem.getSN() == 50600001 && YamlConfig.config.server.ALLOW_CASHSHOP_WORLD_TRANSFER) {
 
          int worldTransferError = chr.checkWorldTransferEligibility();
          if (worldTransferError != 0 || newWorldId >= Server.getInstance().getWorldsSize() || Server.getInstance().getWorldsSize() <= 1) {
@@ -441,7 +441,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       }
-      if (cItem.getSN() == 50600000 && ServerConstants.ALLOW_CASHSHOP_NAME_CHANGE) {
+      if (cItem.getSN() == 50600000 && YamlConfig.config.server.ALLOW_CASHSHOP_NAME_CHANGE) {
          if (!CharacterProcessor.getInstance().canCreateChar(newName) || chr.getLevel() < 10) { //(longest ban duration isn't tracked currently)
             PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.UNKNOWN_ERROR));
             c.enableCSActions();

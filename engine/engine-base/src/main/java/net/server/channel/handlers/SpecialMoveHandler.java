@@ -27,7 +27,7 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.Skill;
 import client.SkillFactory;
-import constants.ServerConstants;
+import config.YamlConfig;
 import constants.skills.Brawler;
 import constants.skills.Corsair;
 import constants.skills.Priest;
@@ -84,7 +84,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
             return;
          } else if (packet.skillId() != Corsair.BATTLE_SHIP) {
             int cooldownTime = effect.getCooldown();
-            if (StatEffectProcessor.getInstance().isHerosWill(packet.skillId()) && ServerConstants.USE_FAST_REUSE_HERO_WILL) {
+            if (StatEffectProcessor.getInstance().isHerosWill(packet.skillId()) && YamlConfig.config.server.USE_FAST_REUSE_HERO_WILL) {
                cooldownTime /= 60;
             }
 
