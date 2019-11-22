@@ -35,6 +35,10 @@ public class PetMovementReader implements PacketReader<PetMovementPacket> {
    protected List<LifeMovementFragment> parseMovement(LittleEndianAccessor accessor) throws EmptyMovementException {
       List<LifeMovementFragment> results = new ArrayList<>();
       byte numCommands = accessor.readByte();
+      if (numCommands < 1) {
+         throw new EmptyMovementException(accessor);
+      }
+
       for (byte i = 0; i < numCommands; i++) {
          byte command = accessor.readByte();
          switch (command) {
