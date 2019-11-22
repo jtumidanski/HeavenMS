@@ -36,13 +36,13 @@ class NPC2111021 {
 
          if (status == 0) {
             if (cm.isQuestStarted(3345)) {
-               int progress = cm.getQuestProgress(3345, 0)
+               int progress = cm.getQuestProgressInt(3345)
 
                if (progress == 1) {
-                  cm.setQuestProgress(3345, 0, 2)
+                  cm.setQuestProgress(3345, 2)
                   cm.dispose()
                } else if (progress < 4) {
-                  cm.setQuestProgress(3345, 0, 0)
+                  cm.setQuestProgress(3345, 0)
                   cm.dispose()
                } else {
                   cm.dispose()

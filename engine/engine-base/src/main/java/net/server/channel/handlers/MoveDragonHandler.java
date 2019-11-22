@@ -39,6 +39,10 @@ public class MoveDragonHandler extends AbstractMoveHandler<MoveDragonPacket> {
 
    @Override
    public void handlePacket(MoveDragonPacket packet, MapleClient client) {
+      if (packet == null) {
+         return;
+      }
+
       final MapleCharacter chr = client.getPlayer();
       final MapleDragon dragon = chr.getDragon();
       if (dragon != null) {

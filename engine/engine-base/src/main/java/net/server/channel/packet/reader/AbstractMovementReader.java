@@ -12,6 +12,7 @@ import net.server.channel.packet.movement.BaseMovementPacket;
 import tools.TriFunction;
 import tools.data.input.LittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.exceptions.EmptyMovementException;
 
 public abstract class AbstractMovementReader<T extends BaseMovementPacket> implements PacketReader<T> {
    protected Point readStartingPosition(SeekableLittleEndianAccessor accessor) {
@@ -20,7 +21,14 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
 
    protected T producePacket(SeekableLittleEndianAccessor accessor, int yOffset, TriFunction<T, Boolean, List<MovementData>, List<Byte>> function) {
       long movementDataStart = accessor.getPosition();
-      List<MovementData> movementDataList = updatePosition(accessor, yOffset);
+
+      List<MovementData> movementDataList;
+      try {
+         movementDataList = updatePosition(accessor, yOffset);
+      } catch (EmptyMovementException exception) {
+         return null;
+      }
+
       long movementDataLength = accessor.getPosition() - movementDataStart; //how many bytes were read by updatePosition
       boolean hasMovement = movementDataLength > 0;
 
@@ -34,10 +42,14 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
       return function.apply(hasMovement, movementDataList, movementList);
    }
 
-   protected List<MovementData> updatePosition(LittleEndianAccessor accessor, int yOffset) {
+   protected List<MovementData> updatePosition(LittleEndianAccessor accessor, int yOffset) throws EmptyMovementException {
       List<MovementData> movementDataList = new ArrayList<>();
 
       byte numCommands = accessor.readByte();
+      if (numCommands < 1) {
+         throw new EmptyMovementException(accessor);
+      }
+
       for (byte i = 0; i < numCommands; i++) {
          byte command = accessor.readByte();
          switch (command) {

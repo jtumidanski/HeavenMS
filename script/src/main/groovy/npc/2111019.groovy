@@ -36,15 +36,15 @@ class NPC2111019 {
 
          if (status == 0) {
             if (cm.isQuestStarted(3339)) {
-               int progress = cm.getQuestProgress(3339, 0)
+               int progress = cm.getQuestProgressInt(23339, 1)
 
                if (progress == 3) {
                   cm.sendGetText("The pipe reacts as the water starts flowing. A secret compartment with a keypad shows up. #bPassword#k!")
                } else if (progress == 1) {
-                  cm.setQuestProgress(3339, 0, 2)
+                  cm.setQuestProgress(23339, 1, 2)
                   cm.dispose()
                } else if (progress < 3) {
-                  cm.setQuestProgress(3339, 0, 0)
+                  cm.setQuestProgress(23339, 1, 0)
                   cm.dispose()
                } else {
                   cm.warp(261000001, 1)
@@ -59,7 +59,7 @@ class NPC2111019 {
             }
          } else if (status == 1) {
             if (cm.getText() == "my love Phyllia") {
-               cm.setQuestProgress(3339, 0, 4)
+               cm.setQuestProgress(23339, 1, 4)
                cm.warp(261000001, 1)
                cm.dispose()
             } else {

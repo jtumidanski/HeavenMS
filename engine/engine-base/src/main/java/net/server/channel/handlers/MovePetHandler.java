@@ -37,7 +37,7 @@ public final class MovePetHandler extends AbstractPacketHandler<PetMovementPacke
 
    @Override
    public void handlePacket(PetMovementPacket packet, MapleClient client) {
-      if (packet.commands() == null || packet.commands().isEmpty()) {
+      if (packet == null || packet.commands() == null || packet.commands().isEmpty()) {
          return;
       }
       MapleCharacter player = client.getPlayer();

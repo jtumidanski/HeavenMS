@@ -59,19 +59,21 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
          PacketCreator.announce(chr, new GiveBuff(1, beaconid, stat));
       }
 
-      for (MapleMapObject mo : chr.getMap().getMonsters()) {    // thanks BHB, IxianMace, Jefe for noticing several issues regarding mob statuses (such as freeze)
-         MapleMonster m = (MapleMonster) mo;
-         if (m.getSpawnEffect() == 0 || m.getHp() < m.getMaxHp()) {     // avoid effect-spawning mobs
-            if (m.getController() == chr) {
-               PacketCreator.announce(client, new StopMonsterControl(m.objectId()));
-               MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
-               m.aggroRedirectController();
-            } else {
+      if (!chr.isHidden()) {  // thanks Lame for noticing hidden characters controlling mobs
+         for (MapleMapObject mo : chr.getMap().getMonsters()) {    // thanks BHB, IxianMace, Jefe for noticing several issues regarding mob statuses (such as freeze)
+            MapleMonster m = (MapleMonster) mo;
+            if (m.getSpawnEffect() == 0 || m.getHp() < m.getMaxHp()) {     // avoid effect-spawning mobs
+               if (m.getController() == chr) {
+                  PacketCreator.announce(client, new StopMonsterControl(m.objectId()));
+                  MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
+                  m.aggroRedirectController();
+               } else {
+                  MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
+               }
+
+               m.aggroSwitchController(chr, false);
                MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
             }
-
-            m.aggroSwitchController(chr, false);
-            MapleMapObjectProcessor.getInstance().sendSpawnData(m, client);
          }
       }
    }

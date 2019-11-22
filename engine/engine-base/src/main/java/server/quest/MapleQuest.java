@@ -22,6 +22,7 @@
 package server.quest;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,6 +42,7 @@ import provider.MapleDataTool;
 import server.quest.actions.BuffAction;
 import server.quest.actions.ExpAction;
 import server.quest.actions.FameAction;
+import server.quest.actions.InfoAction;
 import server.quest.actions.ItemAction;
 import server.quest.actions.MapleQuestAction;
 import server.quest.actions.MesoAction;
@@ -56,6 +58,7 @@ import server.quest.requirements.CompletedQuestRequirement;
 import server.quest.requirements.EndDateRequirement;
 import server.quest.requirements.FieldEnterRequirement;
 import server.quest.requirements.InfoExRequirement;
+import server.quest.requirements.InfoNumberRequirement;
 import server.quest.requirements.IntervalRequirement;
 import server.quest.requirements.ItemRequirement;
 import server.quest.requirements.JobRequirement;
@@ -71,9 +74,7 @@ import server.quest.requirements.PetRequirement;
 import server.quest.requirements.QuestRequirement;
 import server.quest.requirements.ScriptRequirement;
 import tools.MasterBroadcaster;
-import tools.MessageBroadcaster;
 import tools.PacketCreator;
-import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.quest.info.RemoveQuestTimeLimit;
@@ -91,6 +92,7 @@ public class MapleQuest {
    private final static MapleData questAct = questData.getData("Act.img");
    private final static MapleData questReq = questData.getData("Check.img");
    private static Map<Integer, MapleQuest> quests = new HashMap<>();
+   private static Map<Integer, Integer> infoNumberQuests = new HashMap<>();
    private static Map<Short, Integer> medals = new HashMap<>();
 
    static {
@@ -100,9 +102,8 @@ public class MapleQuest {
       exploitableQuests.add((short) 21752);
    }
 
-   protected short infoNumber, id;
+   protected short id;
    protected int timeLimit, timeLimit2;
-   protected String infoex;
    protected Map<MapleQuestRequirementType, MapleQuestRequirement> startReqs = new EnumMap<>(MapleQuestRequirementType.class);
    protected Map<MapleQuestRequirementType, MapleQuestRequirement> completeReqs = new EnumMap<>(MapleQuestRequirementType.class);
    protected Map<MapleQuestActionType, MapleQuestAction> startActs = new EnumMap<>(MapleQuestActionType.class);
@@ -148,8 +149,6 @@ public class MapleQuest {
             MapleQuestRequirementType type = MapleQuestRequirementType.getByWZName(startReq.getName());
             if (type.equals(MapleQuestRequirementType.INTERVAL)) {
                repeatable = true;
-            } else if (type.equals(MapleQuestRequirementType.INFO_NUMBER)) {
-               infoNumber = (short) MapleDataTool.getInt(startReq, 0);
             } else if (type.equals(MapleQuestRequirementType.MOB)) {
                for (MapleData mob : startReq.getChildren()) {
                   relevantMobs.add(MapleDataTool.getInt(mob.getChildByPath("id")));
@@ -175,9 +174,7 @@ public class MapleQuest {
                continue;
             }
 
-            if (type.equals(MapleQuestRequirementType.INFO_NUMBER)) {
-               infoNumber = (short) MapleDataTool.getInt(completeReq, 0);
-            } else if (type.equals(MapleQuestRequirementType.MOB)) {
+            if (type.equals(MapleQuestRequirementType.MOB)) {
                for (MapleData mob : completeReq.getChildren()) {
                   relevantMobs.add(MapleDataTool.getInt(mob.getChildByPath("id")));
                }
@@ -256,7 +253,20 @@ public class MapleQuest {
          for (MapleData quest : questInfo.getChildren()) {
             int questID = Integer.parseInt(quest.getName());
 
-            quests.put(questID, new MapleQuest(questID));
+            MapleQuest q = new MapleQuest(questID);
+            quests.put(questID, q);
+
+            int infoNumber;
+
+            infoNumber = q.getInfoNumber(Status.STARTED);
+            if (infoNumber > 0) {
+               infoNumberQuests.put(infoNumber, questID);
+            }
+
+            infoNumber = q.getInfoNumber(Status.COMPLETED);
+            if (infoNumber > 0) {
+               infoNumberQuests.put(infoNumber, questID);
+            }
          }
       } catch (Exception ex) {
          ex.printStackTrace();
@@ -271,36 +281,12 @@ public class MapleQuest {
       return autoStart;
    }
 
-   private String getIntervalTimeLeft(MapleCharacter c, IntervalRequirement r) {
-      StringBuilder str = new StringBuilder();
-
-      long futureTime = c.getQuest(MapleQuest.getInstance(getId())).getCompletionTime() + r.getInterval();
-      long leftTime = futureTime - System.currentTimeMillis();
-
-      byte mode = 0;
-      if (leftTime / (60 * 1000) > 0) {
-         mode++;     //counts minutes
-
-         if (leftTime / (60 * 60 * 1000) > 0) {
-            mode++;     //counts hours
-         }
+   public static MapleQuest getInstanceFromInfoNumber(int infoNumber) {
+      Integer id = infoNumberQuests.get(infoNumber);
+      if (id == null) {
+         id = infoNumber;
       }
-
-      switch (mode) {
-         case 2:
-            int hours = (int) ((leftTime / (1000 * 60 * 60)));
-            str.append(hours).append(" hours, ");
-
-         case 1:
-            int minutes = (int) ((leftTime / (1000 * 60)) % 60);
-            str.append(minutes).append(" minutes, ");
-
-         default:
-            int seconds = (int) (leftTime / 1000) % 60;
-            str.append(seconds).append(" seconds");
-      }
-
-      return str.toString();
+      return getInstance(id);
    }
 
    public boolean isSameDayRepeatable() {
@@ -312,105 +298,129 @@ public class MapleQuest {
       return ir.getInterval() < YamlConfig.config.server.QUEST_POINT_REPEATABLE_INTERVAL * 60 * 60 * 1000;
    }
 
-   public boolean canStartWithoutRequirements(MapleCharacter c) {
+   public boolean canStartQuestByStatus(MapleCharacter c) {
       MapleQuestStatus mqs = c.getQuest(this);
-      return !(mqs.getStatus() != Status.NOT_STARTED && !(mqs.getStatus() == Status.COMPLETED && repeatable));
+      return !(!mqs.getStatus().equals(Status.NOT_STARTED) && !(mqs.getStatus().equals(Status.COMPLETED) && repeatable));
    }
 
-   public boolean canStart(MapleCharacter c, int npcid) {
-      if (!canStartWithoutRequirements(c)) {
+   public boolean canQuestByInfoProgress(MapleCharacter chr) {
+      MapleQuestStatus mqs = chr.getQuest(this);
+      List<String> ix = mqs.getInfoEx();
+      if (!ix.isEmpty()) {
+         short questid = mqs.getQuestID();
+         short infoNumber = mqs.getInfoNumber();
+         if (infoNumber <= 0) {
+            infoNumber = questid;  // on default infoNumber mimics questid
+         }
+
+         int ixSize = ix.size();
+         for (int i = 0; i < ixSize; i++) {
+            String progress = chr.getClient().getAbstractPlayerInteraction().getQuestProgress(infoNumber, i);
+            String ixProgress = ix.get(i);
+
+            if (!progress.contentEquals(ixProgress)) {
+               return false;
+            }
+         }
+      }
+
+      return true;
+   }
+
+   public boolean canStart(MapleCharacter chr, int npcid) {
+      if (!canStartQuestByStatus(chr)) {
          return false;
       }
+
       for (MapleQuestRequirement r : startReqs.values()) {
-         if (!r.check(c, npcid)) {
-            if (r.getType().getType() == MapleQuestRequirementType.INTERVAL.getType()) {
-               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "This quest will become available again in approximately " + getIntervalTimeLeft(c, (IntervalRequirement) r) + ".");
-            }
+         if (!r.check(chr, npcid)) {
             return false;
          }
       }
-      return true;
-   }
 
-   public boolean canComplete(MapleCharacter c, Integer npcid) {
-      if (!c.getQuest(this).getStatus().equals(Status.STARTED)) {
+      if (!canQuestByInfoProgress(chr)) {
          return false;
       }
-      for (MapleQuestRequirement r : completeReqs.values()) {
-         if (r == null) {
-            return false;
-         } else if (!r.check(c, npcid)) {
-            if (r.getType() == MapleQuestRequirementType.MESO) { // TODO: find a way to tell the client about the new MESO requirement type.
-               MessageBroadcaster.getInstance().sendServerNotice(c, ServerNoticeType.PINK_TEXT, "You don't have enough mesos to complete this quest.");
-            }
-            return false;
-         }
-      }
+
       return true;
    }
 
-   public void start(MapleCharacter c, int npc) {
-      if (autoStart || canStart(c, npc)) {
-         for (MapleQuestAction a : startActs.values()) {
-            if (!a.check(c, null)) { // would null be good ?
+   public boolean canComplete(MapleCharacter chr, Integer npcid) {
+      MapleQuestStatus mqs = chr.getQuest(this);
+      if (!mqs.getStatus().equals(Status.STARTED)) {
+         return false;
+      }
+
+      for (MapleQuestRequirement r : completeReqs.values()) {
+         if (!r.check(chr, npcid)) {
+            return false;
+         }
+      }
+
+      if (!canQuestByInfoProgress(chr)) {
+         return false;
+      }
+
+      return true;
+   }
+
+   public void start(MapleCharacter chr, int npc) {
+      if (autoStart || canStart(chr, npc)) {
+         Collection<MapleQuestAction> acts = startActs.values();
+         for (MapleQuestAction a : acts) {
+            if (!a.check(chr, null)) { // would null be good ?
                return;
             }
-            a.run(c, null);
          }
-         forceStart(c, npc);
+         for (MapleQuestAction a : acts) {
+            a.run(chr, null);
+         }
+         forceStart(chr, npc);
       }
    }
 
-   public void complete(MapleCharacter c, int npc) {
-      complete(c, npc, null);
+   public void complete(MapleCharacter chr, int npc) {
+      complete(chr, npc, null);
    }
 
-   public void complete(MapleCharacter c, int npc, Integer selection) {
-      if (autoPreComplete || canComplete(c, npc)) {
-         for (MapleQuestAction a : completeActs.values()) {
-            if (!a.check(c, selection)) {
+   public void complete(MapleCharacter chr, int npc, Integer selection) {
+      if (autoPreComplete || canComplete(chr, npc)) {
+         Collection<MapleQuestAction> acts = completeActs.values();
+         for (MapleQuestAction a : acts) {
+            if (!a.check(chr, selection)) {
                return;
             }
          }
-
-         forceComplete(c, npc);
-         for (MapleQuestAction a : completeActs.values()) {
-            a.run(c, selection);
+         forceComplete(chr, npc);
+         for (MapleQuestAction a : acts) {
+            a.run(chr, selection);
          }
       }
    }
 
-   public void reset(MapleCharacter c) {
-      c.updateQuest(new MapleQuestStatus(this, MapleQuestStatus.Status.NOT_STARTED));
+   public void reset(MapleCharacter chr) {
+      chr.updateQuestStatus(new MapleQuestStatus(this, MapleQuestStatus.Status.NOT_STARTED));
    }
 
-   public void forfeit(MapleCharacter c) {
-      if (!c.getQuest(this).getStatus().equals(Status.STARTED)) {
+   public void forfeit(MapleCharacter chr) {
+      if (!chr.getQuest(this).getStatus().equals(Status.STARTED)) {
          return;
       }
       if (timeLimit > 0) {
-         PacketCreator.announce(c, new RemoveQuestTimeLimit(id));
+         PacketCreator.announce(chr, new RemoveQuestTimeLimit(id));
       }
       MapleQuestStatus newStatus = new MapleQuestStatus(this, MapleQuestStatus.Status.NOT_STARTED);
-      newStatus.setForfeited(c.getQuest(this).getForfeited() + 1);
-      c.updateQuest(newStatus);
+      newStatus.setForfeited(chr.getQuest(this).getForfeited() + 1);
+      chr.updateQuestStatus(newStatus);
    }
 
-   public boolean forceStart(MapleCharacter c, int npc) {
+   public boolean forceStart(MapleCharacter chr, int npc) {
       MapleQuestStatus newStatus = new MapleQuestStatus(this, MapleQuestStatus.Status.STARTED, npc);
-      newStatus.setForfeited(c.getQuest(this).getForfeited());
-      newStatus.setCompleted(c.getQuest(this).getCompleted());
 
-      if (timeLimit > 0) {
-         newStatus.setExpirationTime(System.currentTimeMillis() + (timeLimit * 1000));
-         c.questTimeLimit(this, timeLimit);
+      MapleQuestStatus oldStatus = chr.getQuest(this.getId());
+      for (Map.Entry<Integer, String> e : oldStatus.getProgress().entrySet()) {
+         newStatus.setProgress(e.getKey(), e.getValue());
       }
-      if (timeLimit2 > 0) {
-         newStatus.setExpirationTime(System.currentTimeMillis() + timeLimit2);
-         c.questTimeLimit2(this, newStatus.getExpirationTime());
-      }
-
-      c.updateQuest(newStatus);
 
       if (id / 100 == 35 && YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT > 0) {
          int setProg = 999 - Math.min(999, YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT);
@@ -419,27 +429,40 @@ public class MapleQuest {
             if (pid >= 8200000 && pid <= 8200012) {
                String pr = StringUtil.getLeftPaddedStr(Integer.toString(setProg), '0', 3);
                newStatus.setProgress(pid, pr);
-               c.announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, newStatus, false);
             }
          }
       }
 
+      newStatus.setForfeited(chr.getQuest(this).getForfeited());
+      newStatus.setCompleted(chr.getQuest(this).getCompleted());
+
+      if (timeLimit > 0) {
+         newStatus.setExpirationTime(System.currentTimeMillis() + (timeLimit * 1000));
+         chr.questTimeLimit(this, timeLimit);
+      }
+      if (timeLimit2 > 0) {
+         newStatus.setExpirationTime(System.currentTimeMillis() + timeLimit2);
+         chr.questTimeLimit2(this, newStatus.getExpirationTime());
+      }
+
+      chr.updateQuestStatus(newStatus);
+
       return true;
    }
 
-   public boolean forceComplete(MapleCharacter c, int npc) {
+   public boolean forceComplete(MapleCharacter chr, int npc) {
       if (timeLimit > 0) {
-         PacketCreator.announce(c, new RemoveQuestTimeLimit(id));
+         PacketCreator.announce(chr, new RemoveQuestTimeLimit(id));
       }
 
       MapleQuestStatus newStatus = new MapleQuestStatus(this, MapleQuestStatus.Status.COMPLETED, npc);
-      newStatus.setForfeited(c.getQuest(this).getForfeited());
-      newStatus.setCompleted(c.getQuest(this).getCompleted());
+      newStatus.setForfeited(chr.getQuest(this).getForfeited());
+      newStatus.setCompleted(chr.getQuest(this).getCompleted());
       newStatus.setCompletionTime(System.currentTimeMillis());
-      c.updateQuest(newStatus);
+      chr.updateQuestStatus(newStatus);
 
-      PacketCreator.announce(c, new ShowSpecialEffect(9));
-      MasterBroadcaster.getInstance().sendToAllInMap(c.getMap(), new ShowForeignEffect(c.getId(), 9), false, c); //use 9 instead of 12 for both
+      PacketCreator.announce(chr, new ShowSpecialEffect(9)); // Quest completion
+      chr.getMap().broadcastMessage(chr, new ShowForeignEffect(chr.getId(), 9)); //use 9 instead of 12 for both
       return true;
    }
 
@@ -482,24 +505,41 @@ public class MapleQuest {
       return mreq.getRequiredMobCount(mid);
    }
 
-   public short getInfoNumber() {
-      return infoNumber;
+   public short getInfoNumber(Status qs) {
+      boolean checkEnd = qs.equals(Status.STARTED);
+      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
+
+      MapleQuestRequirement req = reqs.get(MapleQuestRequirementType.INFO_NUMBER);
+      if (req != null) {
+         InfoNumberRequirement inReq = (InfoNumberRequirement) req;
+         return inReq.getInfoNumber();
+      } else {
+         return 0;
+      }
    }
 
-   public String getInfoEx() {
-      MapleQuestRequirement req = startReqs.get(MapleQuestRequirementType.INFO_EX);
-      String ret = "";
-      if (req != null) {
-         InfoExRequirement ireq = (InfoExRequirement) req;
-         ret = ireq.getFirstInfo();
-      } else { // Check complete requirements.
-         req = completeReqs.get(MapleQuestRequirementType.INFO_EX);
-         if (req != null) {
-            InfoExRequirement ireq = (InfoExRequirement) req;
-            ret = ireq.getFirstInfo();
-         }
+   public String getInfoEx(Status qs, int index) {
+      boolean checkEnd = qs.equals(Status.STARTED);
+      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
+      try {
+         MapleQuestRequirement req = reqs.get(MapleQuestRequirementType.INFO_EX);
+         InfoExRequirement ixReq = (InfoExRequirement) req;
+         return ixReq.getInfo().get(index);
+      } catch (Exception e) {
+         return "";
       }
-      return ret;
+   }
+
+   public List<String> getInfoEx(Status qs) {
+      boolean checkEnd = qs.equals(Status.STARTED);
+      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
+      try {
+         MapleQuestRequirement req = reqs.get(MapleQuestRequirementType.INFO_EX);
+         InfoExRequirement ixReq = (InfoExRequirement) req;
+         return ixReq.getInfo();
+      } catch (Exception e) {
+         return new LinkedList<>();
+      }
    }
 
    public int getTimeLimit() {
@@ -520,6 +560,9 @@ public class MapleQuest {
             break;
          case FIELD_ENTER:
             ret = new FieldEnterRequirement(this, data);
+            break;
+         case INFO_NUMBER:
+            ret = new InfoNumberRequirement(this, data);
             break;
          case INFO_EX:
             ret = new InfoExRequirement(this, data);
@@ -569,7 +612,6 @@ public class MapleQuest {
          case NORMAL_AUTO_START:
          case START:
          case END:
-         case INFO_NUMBER:
             break;
          default:
             //FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, "Unhandled Requirement Type: " + type.toString() + " QuestID: " + this.getId());
@@ -614,6 +656,9 @@ public class MapleQuest {
          case PETSPEED:
             ret = new PetSpeedAction(this, data);
             break;
+         case INFO:
+            ret = new InfoAction(this, data);
+            break;
          default:
             //FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, "Unhandled Action Type: " + type.toString() + " QuestID: " + this.getId());
             break;
@@ -622,9 +667,11 @@ public class MapleQuest {
    }
 
    public boolean restoreLostItem(MapleCharacter chr, int itemid) {
-      ItemAction itemAct = (ItemAction) startActs.get(MapleQuestActionType.ITEM);
-      if (itemAct != null) {
-         return itemAct.restoreLostItem(chr, itemid);
+      if (chr.getQuest(this).equals(MapleQuestStatus.Status.STARTED)) {
+         ItemAction itemAct = (ItemAction) startActs.get(MapleQuestActionType.ITEM);
+         if (itemAct != null) {
+            return itemAct.restoreLostItem(chr, itemid);
+         }
       }
 
       return false;
@@ -635,8 +682,8 @@ public class MapleQuest {
       return medalid != null ? medalid : -1;
    }
 
-   public int getNpcRequirement(boolean complete) {
-      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !complete ? startReqs : completeReqs;
+   public int getNpcRequirement(boolean checkEnd) {
+      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
 
       MapleQuestRequirement mqr = reqs.get(MapleQuestRequirementType.NPC);
       if (mqr != null) {
@@ -646,8 +693,8 @@ public class MapleQuest {
       }
    }
 
-   public boolean hasScriptRequirement(boolean complete) {
-      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !complete ? startReqs : completeReqs;
+   public boolean hasScriptRequirement(boolean checkEnd) {
+      Map<MapleQuestRequirementType, MapleQuestRequirement> reqs = !checkEnd ? startReqs : completeReqs;
       MapleQuestRequirement mqr = reqs.get(MapleQuestRequirementType.SCRIPT);
 
       if (mqr != null) {

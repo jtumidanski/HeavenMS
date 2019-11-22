@@ -24,8 +24,9 @@ class Quest3529 {
 
          if (status == 0) {
             qm.sendOk("You have regained your memories, talk to #b#p2140001##k to get the pass.")
-         } else if (status == 1) {
+            qm.setQuestProgress(3507, 7081, 1)
             qm.forceCompleteQuest()
+         } else if (status == 1) {
             qm.dispose()
          }
       }

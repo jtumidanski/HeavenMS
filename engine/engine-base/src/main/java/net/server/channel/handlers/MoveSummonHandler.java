@@ -40,6 +40,10 @@ public final class MoveSummonHandler extends AbstractMoveHandler<MoveSummonPacke
 
    @Override
    public void handlePacket(MoveSummonPacket packet, MapleClient client) {
+      if (packet == null) {
+         return;
+      }
+
       MapleCharacter player = client.getPlayer();
       Collection<MapleSummon> summons = player.getSummonsValues();
       MapleSummon summon = null;

@@ -36,11 +36,15 @@ class NPC2103006 {
 
          if (status == 0) {
             if (cm.isQuestStarted(3929)) {
-               if (cm.getQuestProgress(3929, 3) != 1) {
-                  if (cm.haveItem(4031580)) {
-                     cm.gainItem(4031580, (short) -1)
-                     cm.setQuestProgress(3929, 3, 1)
-                  }
+               String progress = cm.getQuestProgress(3929)
+               int slot = 3
+
+               String ch = progress[slot]
+               if (ch == '2') {
+                  String nextProgress = progress.substring(0, slot) + '3' + progress.substring(slot + 1)
+
+                  cm.gainItem(4031580, (short) -1)
+                  cm.setQuestProgress(3929, nextProgress)
                }
             }
 

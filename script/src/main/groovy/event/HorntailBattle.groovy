@@ -186,7 +186,7 @@ class EventHorntailBattle {
          eim.showClearEffect(mob.getMap().getId())
          eim.clearPQ()
 
-         eim.dispatchUpdateQuestMobCount(8810018, 240060200)
+         eim.dispatchRaiseQuestMobCount(8810018, 240060200)
          mob.getMap().broadcastHorntailVictory()
       } else if (isHorntailHead(mob)) {
          int killed = eim.getIntProperty("defeatedHead")

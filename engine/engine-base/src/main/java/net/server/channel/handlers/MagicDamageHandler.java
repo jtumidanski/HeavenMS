@@ -39,7 +39,6 @@ import tools.PacketCreator;
 import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.GetEnergy;
 import tools.packet.PacketInput;
-import tools.packet.attack.CloseRangeAttack;
 import tools.packet.attack.MagicAttack;
 import tools.packet.character.SkillCooldown;
 
@@ -72,11 +71,9 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
       }
 
       PacketInput packet;
-      if ((attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG)) {
-         packet = new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.charge(), attack.speed(), attack.direction(), attack.display());
-      } else {
-         packet = new CloseRangeAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), attack.speed(), attack.direction(), attack.display());
-      }
+      int charge = (attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG) ? attack.charge() : -1;
+      packet = new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), charge, attack.speed(), attack.direction(), attack.display());
+
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), packet, false, chr, true);
       MapleStatEffect effect = getAttackEffect(attack, chr, null);

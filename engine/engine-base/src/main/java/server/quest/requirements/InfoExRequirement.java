@@ -41,8 +41,8 @@ public class InfoExRequirement extends MapleQuestRequirement {
 
    public InfoExRequirement(MapleQuest quest, MapleData data) {
       super(MapleQuestRequirementType.INFO_EX);
-      processData(data);
       questID = quest.getId();
+      processData(data);
    }
 
    @Override
@@ -57,15 +57,10 @@ public class InfoExRequirement extends MapleQuestRequirement {
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcid) {
-      MapleQuestStatus status = chr.getQuest(MapleQuest.getInstance(questID));
-      return infoExpected.contains(status.getInfo());
+      return true;
    }
 
    public List<String> getInfo() {
       return infoExpected;
-   }
-
-   public String getFirstInfo() {
-      return !infoExpected.isEmpty() ? infoExpected.get(0) : "";
    }
 }

@@ -595,7 +595,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       return itemid != baseid && itemExists(baseid) ? baseid : -1;
    }
 
-   private int getEquippedItemid(int itemid) {
+   private int getEquippedCosmeticid(int itemid) {
       if (itemid < 30000) {
          return getPlayer().getFace();
       } else {
@@ -604,7 +604,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public boolean isCosmeticEquipped(int itemid) {
-      return getEquippedItemid(itemid) == itemid;
+      return getEquippedCosmeticid(itemid) == itemid;
    }
 
    public boolean isUsingOldPqNpcStyle() {

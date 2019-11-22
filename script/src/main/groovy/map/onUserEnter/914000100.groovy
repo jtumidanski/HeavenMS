@@ -6,7 +6,7 @@ import scripting.map.MapScriptMethods
 class Map914000100 {
 
    static def start(MapScriptMethods ms) {
-      ms.getPlayer().updateQuestInfo(21000, "1")
+      ms.setQuestProgress(21000, 21002, 1)
    }
 }
 

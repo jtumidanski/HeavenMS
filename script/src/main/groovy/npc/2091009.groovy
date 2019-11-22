@@ -43,10 +43,10 @@ class NPC2091009 {
             return
          }
          if (cm.getText() == "Actions speak louder than words") {
-            if (cm.isQuestStarted(21747) && cm.getQuestProgress(21747, 9300351) == 0) {
+            if (cm.isQuestStarted(21747) && cm.getQuestProgressInt(21747, 9300351) == 0) {
                cm.warp(925040100, 0)
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Although you said the right answer, some mysterious forces is blocking the way in.")
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Although you said the right answer, some mysterious forces are blocking the way in.")
             }
 
             cm.dispose()

@@ -47,13 +47,13 @@ class NPC2012029 {
             MasterBroadcaster.getInstance().sendToAllInMap(cm.getMap(), new PlaySound("orbis/" + harpSounds[cm.getNpc() - 2012027]))
 
             if (cm.isQuestStarted(3114)) {
-               int idx = cm.getQuestProgress(3114, 7777)
+               int idx = -1 * cm.getQuestProgressInt(3114)
 
-               if (idx != -1) {
+               if (idx > -1) {
                   String nextNote = harpSong[idx]
 
                   if (harpNote != nextNote) {
-                     cm.setQuestProgress(3114, 7777, 0)
+                     cm.setQuestProgress(3114, 0)
 
                      PacketCreator.announce(cm.getPlayer(), new ShowEffect("quest/party/wrong_kor"))
                      PacketCreator.announce(cm.getPlayer(), new PlaySound("Party1/Failed"))
@@ -67,7 +67,7 @@ class NPC2012029 {
 
                         if (idx == 45) {     // finished lullaby
                            MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Twinkle, twinkle, little star, how I wonder what you are.")
-                           cm.setQuestProgress(3114, 7777, -1)
+                           cm.setQuestProgress(3114, 42)
 
                            PacketCreator.announce(cm.getPlayer(), new ShowEffect("quest/party/clear"))
                            PacketCreator.announce(cm.getPlayer(), new PlaySound("Party1/Clear"))
@@ -85,7 +85,7 @@ class NPC2012029 {
                         }
                      }
 
-                     cm.setQuestProgress(3114, 7777, idx + 1)
+                     cm.setQuestProgress(3114, -1 * (idx + 1))
                   }
                }
             }

@@ -26,7 +26,7 @@ class Quest20011 {
       if (status == 0) {
          qm.sendNext("There are a number of ways to hunt, but the most basic way is with your #bRegular Attack#k. All you need is a weapon in your hand, since it's a simple matter of just swinging your weapon at monsters.")
       } else if (status == 1) {
-         qm.sendNextPrev("Press the #bC#k to use your Regular Attack. Usually the C is located #bat the bottom left of the keyboard#k, but you don't need me to tell you that, right? Find the C and try it out!")
+         qm.sendPrev("Press the #bC#k to use your Regular Attack. Usually the C is located #bat the bottom left of the keyboard#k, but you don't need me to tell you that, right? Find the C and try it out!")
       } else if (status == 2) {
          qm.sendAcceptDecline("Now that you've tried it, we've got to test it out. In this area, you can find the weakest #r#o100120##ks in Ereve, which is perfect for you. Try hunting #r1#k. I'll give you a reward when you get back.")
       } else if (status == 3) {

@@ -11,7 +11,8 @@ class Reactor1209000 {
 
    def act() {
       if (rm.isQuestStarted(6400)) {
-         rm.setQuestProgress(6400, 0, 2)
+         rm.setQuestProgress(6400, 1, 2)
+         rm.setQuestProgress(6400, 6401, "q3")
       }
       MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Real Bart has found. Return to Jonathan through portal.")
    }

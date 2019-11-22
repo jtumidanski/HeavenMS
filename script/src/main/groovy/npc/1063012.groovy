@@ -17,7 +17,7 @@ class NPC1063012 {
 
    def start() {
       if(cm.isQuestStarted(2236) && cm.haveItem(4032263, 1)) {
-         int progress = cm.getQuestProgress(2236)
+         String progress = cm.getQuestProgress(2236)
          int map = cm.getMapId()
 
          if(map == 105050200) activateShamanRock(0,progress)
@@ -25,7 +25,11 @@ class NPC1063012 {
          else if(map == 105070000) activateShamanRock(2,progress)
 
          else if(map == 105090000) { // workaround... TWO SAME NPC ID ON SAME MAP
-            if(!activateShamanRock(3,progress)) {
+            int npcOid = cm.getQuestProgressInt(2236, 1)
+            if (npcOid == 0) {
+               activateShamanRock(3,progress)
+               cm.setQuestProgress(2236, 1, cm.getNpcObjectId())
+            } else if (cm.getNpcObjectId() != npcOid) {
                activateShamanRock(4,progress)
             }
          }
@@ -40,12 +44,12 @@ class NPC1063012 {
 
    }
 
-   def activateShamanRock(int slot, int progress) {
-      int active = (progress >> slot) % 2
-      if(!active) {
-         progress |= (1 << slot)
+   def activateShamanRock(int slot, String progress) {
+      String ch = progress[slot]
+      if(ch == '0') {
+         String nextProgress = progress.substring(0, slot) + '1' + progress.substring(slot + 1)
 
-         cm.updateQuest(2236, progress)
+         cm.setQuestProgress(2236, nextProgress)
          cm.gainItem(4032263, (short) -1)
          cm.sendOk("The seal took it's place, repelling the evil in the area.")
          return 1

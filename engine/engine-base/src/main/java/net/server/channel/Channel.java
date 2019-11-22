@@ -151,7 +151,6 @@ public final class Channel {
       this.ongoingStartTime = startTime + 10000;  // rude approach to a world's last channel boot time, placeholder for the 1st wedding reservation ever
       this.mapManager = new MapleMapManager(null, world, channel);
       try {
-         eventSM = new EventScriptManager(this, getEvents());
          port = 7575 + this.channel - 1;
          port += (world * 100);
          ip = YamlConfig.config.server.HOST + ":" + port;
@@ -164,7 +163,14 @@ public final class Channel {
          acceptor.bind(new InetSocketAddress(port));
          ((SocketSessionConfig) acceptor.getSessionConfig()).setTcpNoDelay(true);
          expedType.addAll(Arrays.asList(MapleExpeditionType.values()));
-         eventSM.init();
+
+         if (Server.getInstance().isOnline()) {  // postpone event loading to improve boot time... thanks Riizade, daronhudson for noticing slow startup times
+            eventSM = new EventScriptManager(this, getEvents());
+            eventSM.init();
+         } else {
+            String[] ev = {};
+            eventSM = new EventScriptManager(null, ev);
+         }
 
          dojoStage = new int[20];
          dojoFinishTime = new long[20];
@@ -522,6 +528,11 @@ public final class Channel {
 
    public boolean isConnected(String name) {
       return getPlayerStorage().getCharacterByName(name).isPresent();
+   }
+
+   public boolean isActive() {
+      EventScriptManager esm = this.getEventSM();
+      return esm != null && esm.isActive();
    }
 
    public boolean finishedShutdown() {

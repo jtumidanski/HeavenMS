@@ -26,6 +26,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import server.quest.MapleQuest;
 import tools.StringUtil;
@@ -84,20 +85,6 @@ public class MapleQuestStatus {
    public int getNpc() {
       return npc;
    }
-    
-    /*
-    public boolean wasUpdated() {
-        return updated;
-    }
-    
-    private void setUpdated() {
-        this.updated = true;
-    }
-    
-    public void resetUpdated() {
-        this.updated = false;
-    }
-    */
 
    public final void setNpc(int npc) {
       this.npc = npc;
@@ -107,13 +94,11 @@ public class MapleQuestStatus {
       for (int i : MapleQuest.getInstance(questID).getRelevantMobs()) {
          progress.put(i, "000");
       }
-      //this.setUpdated();
    }
 
    public boolean addMedalMap(int mapid) {
       if (medalProgress.contains(mapid)) return false;
       medalProgress.add(mapid);
-      //this.setUpdated();
       return true;
    }
 
@@ -126,33 +111,31 @@ public class MapleQuestStatus {
    }
 
    public boolean progress(int id) {
-      if (progress.get(id) != null) {
-         int current = Integer.parseInt(progress.get(id));
-         String str = StringUtil.getLeftPaddedStr(Integer.toString(current + 1), '0', 3);
-         progress.put(id, str);
-         //this.setUpdated();
-         return true;
+      String currentStr = progress.get(id);
+      if (currentStr == null) {
+         return false;
       }
-      return false;
+      int current = Integer.parseInt(currentStr);
+      if (current >= this.getQuest().getMobAmountNeeded(id)) {
+         return false;
+      }
+
+      String str = StringUtil.getLeftPaddedStr(Integer.toString(++current), '0', 3);
+      progress.put(id, str);
+      return true;
    }
 
    public void setProgress(int id, String pr) {
       progress.put(id, pr);
-      //this.setUpdated();
    }
 
    public boolean madeProgress() {
       return progress.size() > 0;
    }
 
-   public Integer getAnyProgressKey() {
-      if (!progress.isEmpty()) return progress.entrySet().iterator().next().getKey();
-      return 0;
-   }
-
    public String getProgress(int id) {
-      if (progress.get(id) == null) return "";
-      return progress.get(id);
+      String ret = progress.get(id);
+      return Objects.requireNonNullElse(ret, "");
    }
 
    public void resetProgress(int id) {
@@ -167,6 +150,27 @@ public class MapleQuestStatus {
 
    public Map<Integer, String> getProgress() {
       return Collections.unmodifiableMap(progress);
+   }
+
+   public short getInfoNumber() {
+      MapleQuest q = this.getQuest();
+      Status s = this.getStatus();
+
+      return q.getInfoNumber(s);
+   }
+
+   public String getInfoEx(int index) {
+      MapleQuest q = this.getQuest();
+      Status s = this.getStatus();
+
+      return q.getInfoEx(s, index);
+   }
+
+   public List<String> getInfoEx() {
+      MapleQuest q = this.getQuest();
+      Status s = this.getStatus();
+
+      return q.getInfoEx(s);
    }
 
    public long getCompletionTime() {
@@ -209,18 +213,6 @@ public class MapleQuestStatus {
       }
    }
 
-   public String getInfo() {
-      if (!progress.containsKey(0) && !getMedalMaps().isEmpty()) {
-         return Integer.toString(getMedalProgress());
-      }
-      return getProgress(0);
-   }
-
-   public void setInfo(String newInfo) {
-      progress.put(0, newInfo);
-      //this.setUpdated();
-   }
-
    public final String getCustomData() {
       return customData;
    }
@@ -229,7 +221,7 @@ public class MapleQuestStatus {
       this.customData = customData;
    }
 
-   public String getQuestData() {
+   public String getProgressData() {
       StringBuilder str = new StringBuilder();
       for (String ps : progress.values()) {
          str.append(ps);

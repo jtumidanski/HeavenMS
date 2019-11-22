@@ -769,7 +769,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
          attacker.gainExp(_personalExp, _partyExp, true, false, white);
          attacker.increaseEquipExp(_personalExp);
-         attacker.updateQuestMobCount(id());
+         attacker.raiseQuestMobCount(id());
       }
    }
 
@@ -899,7 +899,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }, delay, delay);
    }
 
-   private void dispatchUpdateQuestMobCount() {
+   private void dispatchRaiseQuestMobCount() {
       Set<Integer> attackerChrids = takenDamage.keySet();
       if (!attackerChrids.isEmpty()) {
          Map<Integer, MapleCharacter> mapChars = map.getMapPlayers();
@@ -910,7 +910,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                MapleCharacter chr = mapChars.get(chrid);
 
                if (chr != null && chr.isLoggedinWorld()) {
-                  chr.updateQuestMobCount(mobid);
+                  chr.raiseQuestMobCount(mobid);
                }
             }
          }
@@ -932,7 +932,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
    private synchronized void processMonsterKilled(boolean hasKiller) {
       if (!hasKiller) {    // players won't gain EXP from a mob that has no killer, but a quest count they should
-         dispatchUpdateQuestMobCount();
+         dispatchRaiseQuestMobCount();
       }
 
       this.aggroClearDamages();

@@ -26,11 +26,9 @@ public class RaiseUIStateHandler extends AbstractPacketHandler<RaiseUIStatePacke
             MapleQuestStatus mqs = client.getPlayer().getQuest(quest);
             if (mqs.getStatus() == MapleQuestStatus.Status.NOT_STARTED) {
                quest.forceStart(client.getPlayer(), 22000);
-               client.getPlayer().updateQuestInfo(quest.getId(), "0");
+               client.getPlayer().getAbstractPlayerInteraction().setQuestProgress(quest.getId(), packet.questId(), 0);
             } else if (mqs.getStatus() == MapleQuestStatus.Status.STARTED) {
-               client.getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, mqs, false);
-            } else {
-               //c.announce(MaplePacketCreator.updateQuestInfo(mqs.getQuestID(), 22000, "0"));
+               client.getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, mqs, mqs.getInfoNumber() > 0);
             }
          } finally {
             client.releaseClient();

@@ -635,7 +635,7 @@ public class MapleClient {
                         if (quest.getTimeLimit() > 0) {
                            MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
                            newStatus.setForfeited(player.getQuest(quest).getForfeited() + 1);
-                           player.updateQuest(newStatus);
+                           player.updateQuestStatus(newStatus);
                         }
                      }
                      player.getGuild().ifPresent(guild -> {

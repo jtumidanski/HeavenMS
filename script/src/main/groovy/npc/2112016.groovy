@@ -17,15 +17,15 @@ class NPC2112016 {
 
    def start() {
       if (cm.isQuestStarted(3367)) {
-         int c = cm.getQuestProgress(3367, 30)
-         if (c == 30) {
+         int c = cm.getQuestProgressInt(3367, 30)
+         if (c >= 30) {
             cm.sendNext("(All files have been organized. Report the found files to Yulete.)", (byte) 2)
             cm.dispose()
             return
          }
 
          int book = (cm.getNpcObjectId() % 30)
-         int prog = cm.getQuestProgress(3367, book)
+         int prog = cm.getQuestProgressInt(3367, book)
          if (prog == 0) {
             c++
 
@@ -36,7 +36,7 @@ class NPC2112016 {
                   return
                } else {
                   cm.gainItem(4031797, (short) 1)
-                  cm.setQuestProgress(3367, 31, cm.getQuestProgress(3367, 31) + 1)
+                  cm.setQuestProgress(3367, 31, cm.getQuestProgressInt(3367, 31) + 1)
                }
             }
 

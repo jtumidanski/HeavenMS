@@ -25,9 +25,11 @@ import java.awt.Point;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import provider.MapleData;
 import provider.MapleDataProvider;
@@ -44,6 +46,18 @@ public class MapleLifeFactory {
    private static MapleData mobStringData = stringDataWZ.getData("Mob.img");
    private static MapleData npcStringData = stringDataWZ.getData("Npc.img");
    private static Map<Integer, MapleMonsterStats> monsterStats = new HashMap<>();
+   private static Set<Integer> hpbarBosses = getHpBarBosses();
+
+   private static Set<Integer> getHpBarBosses() {
+      Set<Integer> ret = new HashSet<>();
+
+      MapleDataProvider uiDataWZ = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/UI.wz"));
+      for (MapleData bossData : uiDataWZ.getData("UIWindow.img").getChildByPath("MobGage/Mob").getChildren()) {
+         ret.add(Integer.valueOf(bossData.getName()));
+      }
+
+      return ret;
+   }
 
    public static AbstractLoadedMapleLife getLife(int id, String type) {
       if (type.equalsIgnoreCase("n")) {
@@ -138,8 +152,10 @@ public class MapleLifeFactory {
       stats.isFirstAttack_$eq(firstAttack > 0);
       stats.dropPeriod_$eq(MapleDataTool.getIntConvert("dropItemPeriod", monsterInfoData, stats.dropPeriod() / 10000) * 10000);
 
-      stats.tagColor_$eq((byte) MapleDataTool.getIntConvert("hpTagColor", monsterInfoData, 0));
-      stats.tagBackgroundColor_$eq((byte) MapleDataTool.getIntConvert("hpTagBgcolor", monsterInfoData, 0));
+      if (!(stats.isBoss() && !hpbarBosses.contains(mid))) {  // thanks Riizade, Z1peR, Anesthetic for noticing some bosses crashing players due to missing requirements
+         stats.tagColor_$eq((byte) MapleDataTool.getIntConvert("hpTagColor", monsterInfoData, 0));
+         stats.tagBackgroundColor_$eq((byte) MapleDataTool.getIntConvert("hpTagBgcolor", monsterInfoData, 0));
+      }
 
       for (MapleData idata : monsterData) {
          if (!idata.getName().equals("info")) {

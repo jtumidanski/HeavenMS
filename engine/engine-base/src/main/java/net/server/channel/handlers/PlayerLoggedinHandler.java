@@ -162,12 +162,15 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
 
             Channel channel = world.getChannel(client.getChannel());
-            if (channel == null) {
+            if (channel == null || !channel.isActive()) {
                client.setChannel(1);
                channel = world.getChannel(client.getChannel());
 
                if (channel == null) {
                   client.disconnect(true, false);
+                  return;
+               } else if (!channel.isActive()) {
+                  PacketCreator.announce(client, new AfterLoginError(7));
                   return;
                }
             }

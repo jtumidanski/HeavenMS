@@ -67,6 +67,10 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
 
    @Override
    public void handlePacket(MoveLifePacket packet, MapleClient client) {
+      if (packet == null) {
+         return;
+      }
+
       MapleCharacter player = client.getPlayer();
       MapleMap map = player.getMap();
 

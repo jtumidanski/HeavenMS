@@ -2,7 +2,9 @@ package net.server.channel.handlers;
 
 import java.util.Map;
 
+import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleQuestStatus;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
@@ -11,6 +13,9 @@ import net.server.channel.packet.UseItemUIPacket;
 import net.server.channel.packet.reader.UseItemUIReader;
 import server.MapleItemInformationProvider;
 import server.MapleItemInformationProvider.QuestConsItem;
+import server.quest.MapleQuest;
+import tools.PacketCreator;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Xari
@@ -32,8 +37,15 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
                return;
             }
 
-            int questid = consItem.questid;
+            int infoNumber = consItem.questid;
             Map<Integer, Integer> consumables = consItem.items;
+
+            MapleCharacter chr = client.getPlayer();
+            MapleQuest quest = MapleQuest.getInstanceFromInfoNumber(infoNumber);
+            if (!chr.getQuest(quest).getStatus().equals(MapleQuestStatus.Status.STARTED)) {
+               PacketCreator.announce(client, new EnableActions());
+               return;
+            }
 
             int consId;
             MapleInventory inv = client.getPlayer().getInventory(MapleInventoryType.getByType(packet.inventoryType()));
@@ -49,8 +61,11 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
                inv.unlockInventory();
             }
 
-            int nextValue = Math.min(consumables.get(consId) + Integer.parseInt(client.getPlayer().getQuestInfo(questid)), consItem.exp * consItem.grade);
-            client.getPlayer().updateQuestInfo(questid, "" + nextValue);
+            int questId = quest.getId();
+            int nextValue = Math.min(consumables.get(consId) + client.getAbstractPlayerInteraction().getQuestProgressInt(questId, infoNumber), consItem.exp * consItem.grade);
+            client.getAbstractPlayerInteraction().setQuestProgress(questId, infoNumber, nextValue);
+
+            PacketCreator.announce(client, new EnableActions());
          } finally {
             client.releaseClient();
          }

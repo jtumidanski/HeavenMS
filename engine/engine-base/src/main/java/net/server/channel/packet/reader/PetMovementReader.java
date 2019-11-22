@@ -14,19 +14,25 @@ import server.movement.RelativeLifeMovement;
 import server.movement.TeleportMovement;
 import tools.data.input.LittleEndianAccessor;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.exceptions.EmptyMovementException;
 
 public class PetMovementReader implements PacketReader<PetMovementPacket> {
    @Override
    public PetMovementPacket read(SeekableLittleEndianAccessor accessor) {
       int petId = accessor.readInt();
       accessor.readLong();
-//        Point startPos = StreamUtil.readShortPoint(slea);
-      List<LifeMovementFragment> commands = parseMovement(accessor);
+
+      List<LifeMovementFragment> commands;
+      try {
+         commands = parseMovement(accessor);
+      } catch (EmptyMovementException exception) {
+         return null;
+      }
 
       return new PetMovementPacket(petId, (byte) commands.size(), commands);
    }
 
-   protected List<LifeMovementFragment> parseMovement(LittleEndianAccessor accessor) {
+   protected List<LifeMovementFragment> parseMovement(LittleEndianAccessor accessor) throws EmptyMovementException {
       List<LifeMovementFragment> results = new ArrayList<>();
       byte numCommands = accessor.readByte();
       for (byte i = 0; i < numCommands; i++) {
@@ -87,7 +93,10 @@ public class PetMovementReader implements PacketReader<PetMovementPacket> {
                break;
             default:
                System.out.println("Unhandled Case:" + command);
-               return null;
+               throw new EmptyMovementException(accessor);
+         }
+         if (results.isEmpty()) {
+            throw new EmptyMovementException(accessor);
          }
       }
       return results;

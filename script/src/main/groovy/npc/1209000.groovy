@@ -41,7 +41,7 @@ class NPC1209000 {
       } else if (status == 2) {
          cm.sendNext("The other heroes? They've left to fight the Black Mage. They're buying us time to escape. What? You want to fight with them? No! You can't! You're hurt. You must leave with us!")
       } else if (status == 3) {
-         cm.updateQuest(21002, "1")
+         //cm.updateQuest(21002, "1")
          cm.showIntro("Effect/Direction1.img/aranTutorial/Trio")
          cm.dispose()
       }

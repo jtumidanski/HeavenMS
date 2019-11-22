@@ -24,6 +24,8 @@ import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
+import tools.MessageBroadcaster;
+import tools.ServerNoticeType;
 
 /**
  * @author Ronan
@@ -44,6 +46,11 @@ public class MesoRequirement extends MapleQuestRequirement {
 
    @Override
    public boolean check(MapleCharacter chr, Integer npcid) {
-      return chr.getMeso() >= meso;
+      if (chr.getMeso() >= meso) {
+         return true;
+      } else {
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You don't have enough mesos to complete this quest.");
+         return false;
+      }
    }
 }

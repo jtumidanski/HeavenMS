@@ -95,7 +95,7 @@ class EventMK_PrimeMinister {
       Iterator<MapleCharacter> pIter = map.getAllPlayers().iterator()
       while (pIter.hasNext()) {
          MapleCharacter player = pIter.next()
-         if (player.getQuestStatus(2333) == ((byte) 1) && player.getAbstractPlayerInteraction().getQuestProgress(2333, mobId) == 0) {
+         if (player.getQuestStatus(2333) == ((byte) 1) && player.getAbstractPlayerInteraction().getQuestProgressInt(2333, mobId) == 0) {
             return true
          }
       }

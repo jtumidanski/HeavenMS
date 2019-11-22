@@ -36,6 +36,10 @@ public final class MovePlayerHandler extends AbstractMoveHandler<MovePlayerPacke
 
    @Override
    public void handlePacket(MovePlayerPacket packet, MapleClient client) {
+      if (packet == null) {
+         return;
+      }
+
       processMovementList(packet.movementDataList(), client.getPlayer());
 
       if (packet.hasMovement()) {

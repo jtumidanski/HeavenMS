@@ -102,7 +102,7 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
          return;
       }
       String status = Integer.toString(q.getMedalProgress());
-      String infoex = quest.getInfoEx();
+      String infoex = q.getInfoEx(0);
       getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
       StringBuilder smp = new StringBuilder();
       StringBuilder etm = new StringBuilder();
@@ -134,7 +134,7 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
       getPlayer().announceUpdateQuest(MapleCharacter.DelayedQuestUpdate.UPDATE, q, true);
       PacketCreator.announce(getPlayer(), new ShowTitleEarned(status + "/5 Completed"));
       PacketCreator.announce(getPlayer(), new ShowTitleEarned("The One Who's Touched the Sky title in progress."));
-      if (Integer.toString(q.getMedalProgress()).equals(quest.getInfoEx())) {
+      if (Integer.toString(q.getMedalProgress()).equals(q.getInfoEx(0))) {
          showInfoText("The One Who's Touched the Sky" + rewardstring);
          PacketCreator.announce(getPlayer(), new ShowQuestComplete(quest.getId()));
       } else {

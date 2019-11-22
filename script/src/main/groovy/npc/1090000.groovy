@@ -31,8 +31,7 @@ class NPC1090000 {
          if (cm.getEventInstance() != null) {    // missing script for skill test found thanks to Lost(tm)
             advQuest = 5                       // string visibility thanks to iPunchEm & Glvelturall
             cm.sendNext("Not bad at all. Let's discuss this outside!")
-            cm.setQuestProgress(6330, 0, 1)
-         } else if (cm.getQuestProgress(6330, 0) == 0) {
+         } else if (cm.getQuestProgressInt(6330, 6331) == 0) {
             advQuest = 1
             cm.sendNext("You're ready, right? Now try to withstand my attacks for 2 minutes. I won't go easy on you. Good luck, because you will need it.")
          } else {
@@ -46,8 +45,7 @@ class NPC1090000 {
          if (cm.getEventInstance() != null) {
             advQuest = 6
             cm.sendNext("Not bad at all. Let's discuss this outside!")
-            cm.setQuestProgress(6370, 0, 1)
-         } else if (cm.getQuestProgress(6370, 0) == 0) {
+         } else if (cm.getQuestProgressInt(6370, 6371) == 0) {
             advQuest = 2
             cm.sendNext("You're ready, right? Now try to withstand my attacks for 2 minutes. I won't go easy on you. Good luck, because you will need it.")
          } else {
@@ -120,6 +118,11 @@ class NPC1090000 {
                   cm.sendOk("Unlike most of the other skills you used as a Pirate, this one definitely is different. You can actually ride the 'Battleship' and attack enemies with it. Your DEF level will increase for the time you're on board, so that'll help you tremendously in combat situations. May you become the best Gunslinger out there...")
                }
             } else {
+               if (advQuest < 6) {
+                  cm.setQuestProgress(6330, 6331, 2)
+               } else {
+                  cm.setQuestProgress(6370, 6371, 2)
+               }
                cm.warp(120000101)
             }
 

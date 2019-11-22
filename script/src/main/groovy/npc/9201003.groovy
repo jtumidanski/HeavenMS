@@ -55,7 +55,7 @@ class NPC9201003 {
                cm.sendOk("Hello we're Mom and Dad...")
                cm.dispose()
             } else {
-               if (cm.getQuestProgress(100400, 1) == 0) {
+               if (cm.getQuestProgressInt(100400, 1) == 0) {
                   cm.sendNext("Mom, dad, I have a request to do to both of you... I wanna know more about the path you've already been walking since always, the path of loving and caring for someone dear to me.", (byte) 2)
                } else {
                   if (!hasProofOfLoves(cm.getPlayer())) {

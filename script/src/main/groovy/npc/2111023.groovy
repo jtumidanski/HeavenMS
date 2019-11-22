@@ -36,10 +36,10 @@ class NPC2111023 {
 
          if (status == 0) {
             if (cm.isQuestStarted(3345)) {
-               int progress = cm.getQuestProgress(3345, 0)
+               int progress = cm.getQuestProgressInt(3345)
 
                if (progress == 3 && cm.haveItem(4031739, 1) && cm.haveItem(4031740, 1) && cm.haveItem(4031741, 1)) {
-                  cm.setQuestProgress(3345, 0, 4)
+                  cm.setQuestProgress(3345, 4)
                   cm.gainItem(4031739, (short) -1)
                   cm.gainItem(4031740, (short) -1)
                   cm.gainItem(4031741, (short) -1)
@@ -47,7 +47,7 @@ class NPC2111023 {
                   cm.sendOk("(As you place the shards a light shines over the circle, repelling whatever omens were brewing inside the artifact.)", (byte) 2)
                   cm.dispose()
                } else if (progress < 4) {
-                  cm.setQuestProgress(3345, 0, 0)
+                  cm.setQuestProgress(3345, 0)
                   cm.dispose()
                } else {
                   cm.dispose()

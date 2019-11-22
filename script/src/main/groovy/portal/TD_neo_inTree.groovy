@@ -17,7 +17,7 @@ boolean enter(PortalPlayerInteraction pi) {
 
    for(int i = 0; i < quests.length; i++) {
       if (pi.isQuestActive(quests[i])) {
-         if(pi.getQuestProgress(quests[i], mobs[i]) != 0) {
+         if(pi.getQuestProgressInt(quests[i], mobs[i]) != 0) {
             MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You already faced Nex. Complete your mission.")
             return false
          }

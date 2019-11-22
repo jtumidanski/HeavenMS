@@ -919,6 +919,10 @@ public class Server {
       MapleSkillbookInformationProvider.getInstance();
       OpcodeConstants.generateOpcodeNames();
       CommandsExecutor.getInstance();
+
+      for (Channel ch : this.getAllChannels()) {
+         ch.reloadEventScriptManager();
+      }
    }
 
    public Properties getSubnetInfo() {

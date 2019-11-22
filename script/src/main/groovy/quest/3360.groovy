@@ -6,6 +6,7 @@ import scripting.quest.QuestActionManager
 class Quest3360 {
    QuestActionManager qm
    int status = -1
+   String pass
 
    def start(Byte mode, Byte type, Integer selection) {
       if (mode == -1) {
@@ -29,36 +30,17 @@ class Quest3360 {
          } else if (status == 1) {
             qm.sendAcceptDecline("All right, now, this key is very long and complex. I need you to memorize it very well. I won't say again, so you'd better write it down somewhere. Are you ready?")
          } else if (status == 2) {
-            String pass = generateString()
+            pass = generateString()
             qm.sendOk("The key code is #b" + pass + "#k. Got that? Put the key into the door of the secret passage, and you will be able to walk around the passage freely.")
-            qm.forceStartQuest()
-            qm.setStringQuestProgress(3360, 0, pass)
          } else if (status == 3) {
+            qm.forceStartQuest()
+            qm.setQuestProgress(3360, pass)
             qm.dispose()
          }
       }
    }
 
    def end(Byte mode, Byte type, Integer selection) {
-      if (mode == -1) {
-         qm.dispose()
-      } else {
-         if (mode == 1) {
-            status++
-         } else {
-            status--
-         }
-         if (status == 0) {
-            if (qm.getQuestProgress(3360, 1) == 0) {
-               qm.sendNext("What's up? You haven't opened the Secret Passage yet?")
-            } else {
-               qm.forceCompleteQuest()
-               qm.dispose()
-            }
-         } else if (status == 1) {
-            qm.dispose()
-         }
-      }
    }
 
    static def generateString() {

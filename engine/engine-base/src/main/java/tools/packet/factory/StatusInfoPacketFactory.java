@@ -117,14 +117,16 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
 
    protected void updateQuest(MaplePacketLittleEndianWriter writer, UpdateQuest packet) {
       writer.write(1);
-      writer.writeShort(packet.infoUpdate() ? packet.infoNumber() : packet.questId());
       if (packet.infoUpdate()) {
+         writer.writeShort(packet.questId());
          writer.write(1);
+         writer.writeMapleAsciiString(packet.questData());
       } else {
+         writer.writeShort(packet.questId());
          writer.write(packet.questStatusId());
+         writer.writeMapleAsciiString(packet.questData());
       }
 
-      writer.writeMapleAsciiString(packet.questData());
       writer.skip(5);
    }
 

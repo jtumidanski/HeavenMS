@@ -459,20 +459,31 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    }
 
    protected void addQuestInfo(final MaplePacketLittleEndianWriter mplew, MapleCharacter chr) {
-      mplew.writeShort(chr.getStartedQuestsSize());
-      for (MapleQuestStatus q : chr.getStartedQuests()) {
-         mplew.writeShort(q.getQuest().getId());
-         mplew.writeMapleAsciiString(q.getQuestData());
-         if (q.getQuest().getInfoNumber() > 0) {
-            mplew.writeShort(q.getQuest().getInfoNumber());
-            mplew.writeMapleAsciiString(q.getQuestData());
+      List<MapleQuestStatus> started = chr.getStartedQuests();
+      int startedSize = 0;
+      for (MapleQuestStatus qs : started) {
+         if (qs.getInfoNumber() > 0) {
+            startedSize++;
+         }
+         startedSize++;
+      }
+      mplew.writeShort(startedSize);
+      for (MapleQuestStatus qs : started) {
+         mplew.writeShort(qs.getQuest().getId());
+         mplew.writeMapleAsciiString(qs.getProgressData());
+
+         short infoNumber = qs.getInfoNumber();
+         if (infoNumber > 0) {
+            MapleQuestStatus iqs = chr.getQuest(infoNumber);
+            mplew.writeShort(infoNumber);
+            mplew.writeMapleAsciiString(iqs.getProgressData());
          }
       }
       List<MapleQuestStatus> completed = chr.getCompletedQuests();
       mplew.writeShort(completed.size());
-      for (MapleQuestStatus q : completed) {
-         mplew.writeShort(q.getQuest().getId());
-         mplew.writeLong(getTime(q.getCompletionTime()));
+      for (MapleQuestStatus qs : completed) {
+         mplew.writeShort(qs.getQuest().getId());
+         mplew.writeLong(getTime(qs.getCompletionTime()));
       }
    }
 

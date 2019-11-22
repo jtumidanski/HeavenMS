@@ -22,6 +22,7 @@
 package server.quest.actions;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -166,7 +167,9 @@ public class ItemAction extends MapleQuestAction {
       List<Pair<Item, MapleInventoryType>> randomList = new LinkedList<>();
 
       List<Integer> allSlotUsed = new ArrayList<>(5);
-      for (byte i = 0; i < 5; i++) allSlotUsed.add(0);
+      for (byte i = 0; i < 5; i++) {
+         allSlotUsed.add(0);
+      }
 
       for (ItemData item : items) {
          if (!canGetItem(item, chr)) {
@@ -198,7 +201,7 @@ public class ItemAction extends MapleQuestAction {
                      continue;
                   }
 
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough items in your inventory.");
+                  announceInventoryLimit(Collections.singletonList(item.getId()), chr);
                   return false;
                } else {
                   int idx = type.getType() - 1;   // more slots available from the given items!
@@ -213,14 +216,16 @@ public class ItemAction extends MapleQuestAction {
          MapleClient c = chr.getClient();
 
          List<Integer> rndUsed = new ArrayList<>(5);
-         for (byte i = 0; i < 5; i++) rndUsed.add(allSlotUsed.get(i));
+         for (byte i = 0; i < 5; i++) {
+            rndUsed.add(allSlotUsed.get(i));
+         }
 
          for (Pair<Item, MapleInventoryType> it : randomList) {
             int idx = it.getRight().getType() - 1;
 
             result = MapleInventoryManipulator.checkSpaceProgressively(c, it.getLeft().id(), it.getLeft().quantity(), "", rndUsed.get(idx), false);
             if (result % 2 == 0) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
+               announceInventoryLimit(Collections.singletonList(it.getLeft().id()), chr);
                return false;
             }
 
@@ -234,10 +239,26 @@ public class ItemAction extends MapleQuestAction {
       }
 
       if (!canHold(chr, gainList)) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
+         List<Integer> gainItemids = new LinkedList<>();
+         for (Pair<Item, MapleInventoryType> it : gainList) {
+            gainItemids.add(it.getLeft().id());
+         }
+
+         announceInventoryLimit(gainItemids, chr);
          return false;
       }
       return true;
+   }
+
+   private void announceInventoryLimit(List<Integer> itemids, MapleCharacter chr) {
+      for (Integer id : itemids) {
+         if (MapleItemInformationProvider.getInstance().isPickupRestricted(id) && chr.haveItemWithId(id, true)) {
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you already have a similar one-of-a-kind item in your inventory.");
+            return;
+         }
+      }
+
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
    }
 
    private boolean canHold(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> gainList) {

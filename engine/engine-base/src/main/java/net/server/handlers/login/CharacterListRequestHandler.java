@@ -24,6 +24,7 @@ package net.server.handlers.login;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
+import net.server.channel.Channel;
 import net.server.channel.packet.reader.CharacterListRequestReader;
 import net.server.login.packet.CharacterListRequestPacket;
 import net.server.world.World;
@@ -46,7 +47,8 @@ public final class CharacterListRequestHandler extends AbstractPacketHandler<Cha
          return;
       }
 
-      if (world.getChannel(packet.channel()) == null) {
+      Channel channel = world.getChannel(packet.channel());
+      if (channel == null || !channel.isActive()) {
          PacketCreator.announce(client, new GetServerStatus(ServerStatus.FULL));
          return;
       }
