@@ -17,13 +17,18 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package net.server.channel.task;
+package net.server.channel.services.task;
 
-import java.util.List;
+import config.YamlConfig;
 
 /**
  * @author Ronan
  */
-public interface SchedulerListener {
-   void removedScheduledEntries(List<Object> entries, boolean update);
+public abstract class BaseService {
+   protected static int getChannelSchedulerIndex(int mapid) {
+      int section = 1000000000 / YamlConfig.config.server.CHANNEL_LOCKS;
+      return mapid / section;
+   }
+
+   public abstract void dispose();
 }

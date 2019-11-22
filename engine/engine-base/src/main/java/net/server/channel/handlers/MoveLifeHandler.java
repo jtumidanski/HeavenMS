@@ -74,6 +74,11 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
       MapleCharacter player = client.getPlayer();
       MapleMap map = player.getMap();
 
+      if (player.isChangingMaps()) {
+         // thanks Lame for noticing mob movement shuffle (mob OID on different maps) happening on map transitions
+         return;
+      }
+
       MapleMapObject mmo = map.getMapObject(packet.objectId());
       if (mmo == null || mmo.type() != MapleMapObjectType.MONSTER) {
          return;

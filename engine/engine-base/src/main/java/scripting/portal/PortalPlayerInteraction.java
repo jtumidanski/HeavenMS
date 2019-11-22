@@ -24,6 +24,7 @@ package scripting.portal;
 import client.MapleClient;
 import client.database.provider.CharacterProvider;
 import scripting.AbstractPlayerInteraction;
+import scripting.map.MapScriptManager;
 import server.maps.MaplePortal;
 import tools.DatabaseConnection;
 import tools.PacketCreator;
@@ -40,6 +41,11 @@ public class PortalPlayerInteraction extends AbstractPlayerInteraction {
 
    public MaplePortal getPortal() {
       return portal;
+   }
+
+   public void runMapScript() {
+      MapScriptManager msm = MapScriptManager.getInstance();
+      msm.runMapScript(c, "onUserEnter/" + portal.getScriptName(), false);
    }
 
    public boolean hasLevel30Character() {

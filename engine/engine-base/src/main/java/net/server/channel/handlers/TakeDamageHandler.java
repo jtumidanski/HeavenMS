@@ -229,7 +229,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(oid, finalBouncedamage), false, chr, true);
                   attacker.aggroMonsterDamage(chr, bouncedamage);
                }
-               MapleStatEffect bPressure = chr.getBuffEffect(MapleBuffStat.COMBO_BARRIER);
+               MapleStatEffect bPressure = chr.getBuffEffect(MapleBuffStat.BODY_PRESSURE);
                if (bPressure != null) {
                   Optional<Skill> skill = SkillFactory.getSkill(Aran.BODY_PRESSURE);
                   if (skill.isPresent()) {

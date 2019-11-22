@@ -19,11 +19,8 @@
 */
 package server;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,6 +33,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import client.database.provider.ReactorDropProvider;
+import provider.MapleData;
+import provider.MapleDataProviderFactory;
+import provider.MapleDataTool;
 import tools.DatabaseConnection;
 
 /**
@@ -44,22 +44,10 @@ import tools.DatabaseConnection;
 public class MapleSkillbookInformationProvider {
    private final static MapleSkillbookInformationProvider instance = new MapleSkillbookInformationProvider();
    protected static Map<Integer, SkillBookEntry> foundSkillbooks = new HashMap<>();
-   static String host = "jdbc:mysql://localhost:3306/heavenms";
-   static String driver = "com.mysql.jdbc.Driver";
-   static String username = "root";
-   static String password = "";
-   static String wzPath = "wz";
-   static String rootDirectory = ".";
-   static InputStreamReader fileReader = null;
-   static BufferedReader bufferedReader = null;
-   static int initialStringLength = 50;
-   static int skillbookMinItemid = 2280000;
-   static int skillbookMaxItemid = 2300000;  // exclusively
-   static byte status = 0;
-   static int questId = -1;
-   static int isCompleteState = 0;
-   static int currentItemid = 0;
-   static int currentCount = 0;
+   private static String rootDirectory = ".";
+   private static int skillbookMinItemid = 2280000;
+   private static int skillbookMaxItemid = 2300000;  // exclusively
+   private static int currentItemid = 0;
 
    static {
       loadSkillbooks();
@@ -69,159 +57,30 @@ public class MapleSkillbookInformationProvider {
       return instance;
    }
 
-   private static String getName(String token) {
-      int i, j;
-      char[] dest;
-      String d;
-
-      i = token.lastIndexOf("name");
-      i = token.indexOf("\"", i) + 1; //lower bound of the string
-      j = token.indexOf("\"", i);     //upper bound
-
-      if (j < i) {           //node value containing 'name' in it's scope, cheap fix since we don't deal with strings anyway
-         System.out.println("[CRITICAL] Found this '" + token + "'");
-         return "0";
-      }
-
-      dest = new char[initialStringLength];
-      token.getChars(i, j, dest, 0);
-
-      d = new String(dest);
-      return (d.trim());
-   }
-
-   private static String getValue(String token) {
-      int i, j;
-      char[] dest;
-      String d;
-
-      i = token.lastIndexOf("value");
-      i = token.indexOf("\"", i) + 1; //lower bound of the string
-      j = token.indexOf("\"", i);     //upper bound
-
-      dest = new char[initialStringLength];
-      token.getChars(i, j, dest, 0);
-
-      d = new String(dest);
-      return (d.trim());
-   }
-
-   private static void forwardCursor(int st) {
-      String line = null;
-
-      try {
-         while (status >= st && (line = bufferedReader.readLine()) != null) {
-            simpleToken(line);
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-
-   private static void simpleToken(String token) {
-      if (token.contains("/imgdir")) {
-         status -= 1;
-      } else if (token.contains("imgdir") && !token.endsWith("/>")) {    // '\>' XML node description not being accounted, issue found thanks to Robin Schulz, CanIGetaPR
-         status += 1;
-      }
-   }
-
-   private static void inspectQuestItemList(int st) {
-      String line = null;
-
-      try {
-         while (status >= st && (line = bufferedReader.readLine()) != null) {
-            readItemToken(line);
-         }
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-   }
-
    public static boolean isSkillBook(int itemid) {
       return itemid >= skillbookMinItemid && itemid < skillbookMaxItemid;
    }
 
-   private static void processCurrentItem() {
-      try {
-         if (isSkillBook(currentItemid)) {
-            if (currentCount > 0) {
-               foundSkillbooks.put(currentItemid, SkillBookEntry.QUEST);
-            }
-         }
-      } catch (Exception ignored) {
-      }
-   }
-
-   private static void readItemToken(String token) {
-      if (token.contains("/imgdir")) {
-         status -= 1;
-
-         processCurrentItem();
-
-         currentItemid = 0;
-         currentCount = 0;
-      } else if (token.contains("imgdir") && !token.endsWith("/>")) {
-         status += 1;
-      } else {
-         String d = getName(token);
-
-         if (d.equals("id")) {
-            currentItemid = Integer.parseInt(getValue(token));
-         } else if (d.equals("count")) {
-            currentCount = Integer.parseInt(getValue(token));
-         }
-      }
-   }
-
-   private static void translateActToken(String token) {
-      String d;
-      int temp;
-
-      if (token.contains("/imgdir")) {
-         status -= 1;
-      } else if (token.contains("imgdir") && !token.endsWith("/>")) {
-         if (status == 1) {           //getting QuestId
-            d = getName(token);
-            questId = Integer.parseInt(d);
-         } else if (status == 2) {      //start/complete
-            d = getName(token);
-            isCompleteState = Integer.parseInt(d);
-         } else if (status == 3) {
-            d = getName(token);
-
-            if (d.contains("item")) {
-               temp = status;
-               inspectQuestItemList(temp);
-            } else {
-               forwardCursor(status);
-            }
-         }
-
-         status += 1;
-      }
-   }
-
    private static void fetchSkillbooksFromQuests() {
-      String line = "";
-      int lineNumber = 0; // add line number, thanks to Alex (CanIGetaPR)
+      MapleData actData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "Quest.wz")).getData("Act.img");
 
-      try {
-         fileReader = new InputStreamReader(new FileInputStream(wzPath + "/Quest.wz/Act.img.xml"), "UTF-8");
-         bufferedReader = new BufferedReader(fileReader);
+      for (MapleData questData : actData.getChildren()) {
+         for (MapleData questStatusData : questData.getChildren()) {
+            for (MapleData questNodeData : questStatusData.getChildren()) {
+               if (questNodeData.getName().contentEquals("item")) {
+                  for (MapleData questItemData : questNodeData.getChildren()) {
+                     int itemid = MapleDataTool.getInt("id", questItemData, 0);
+                     int itemcount = MapleDataTool.getInt("count", questItemData, 0);
 
-         while ((line = bufferedReader.readLine()) != null) {
-            lineNumber++;
-            translateActToken(line);
+                     if (isSkillBook(itemid) && itemcount > 0) {
+                        foundSkillbooks.put(currentItemid, SkillBookEntry.QUEST);
+                     }
+                  }
+
+                  break;
+               }
+            }
          }
-
-         bufferedReader.close();
-         fileReader.close();
-      } catch (IOException ioe) {
-         System.out.println("Failed to read Quest.wz file. Line " + lineNumber + ": " + line);
-         ioe.printStackTrace();
-      } catch (Exception e) {
-         System.out.println("Failed to parse Quest.wz XML file.");   // catch this exception, thanks to YonhNi
       }
    }
 

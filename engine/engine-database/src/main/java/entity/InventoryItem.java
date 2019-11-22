@@ -17,7 +17,7 @@ public class InventoryItem implements Serializable {
    private static final long serialVersionUID = 1L;
 
    @Id
-   @GeneratedValue(strategy=GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Integer inventoryItemId;
 
    @Column(nullable = false)
@@ -44,8 +44,7 @@ public class InventoryItem implements Serializable {
    @Column(nullable = false)
    private String owner;
 
-   @Column(nullable = false)
-   private Integer petId = -1;
+   private Integer petId;
 
    @Column(nullable = false)
    private Integer flag;

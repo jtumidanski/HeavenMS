@@ -17,23 +17,13 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package net.server.channel.task;
+package net.server.channel.services;
 
-import net.server.audit.locks.MonitoredLockType;
+import java.util.List;
 
 /**
  * @author Ronan
  */
-public class OverallScheduler extends BaseScheduler {
-   public OverallScheduler() {
-      super(MonitoredLockType.CHANNEL_OVERALL);
-   }
-
-   public void registerDelayedAction(Runnable runAction, long delay) {
-      registerEntry(runAction, runAction, delay);
-   }
-
-   public void forceRunDelayedAction(Runnable runAction) {
-      interruptEntry(runAction);
-   }
+public interface SchedulerListener {
+   void removedScheduledEntries(List<Object> entries, boolean update);
 }

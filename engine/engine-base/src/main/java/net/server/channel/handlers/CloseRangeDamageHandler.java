@@ -51,7 +51,7 @@ import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
-import net.server.channel.task.PacketReaderFactory;
+import net.server.channel.packet.PacketReaderFactory;
 import server.MapleStatEffect;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;

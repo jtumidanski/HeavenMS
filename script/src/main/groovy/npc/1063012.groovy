@@ -17,7 +17,7 @@ class NPC1063012 {
 
    def start() {
       if(cm.isQuestStarted(2236) && cm.haveItem(4032263, 1)) {
-         String progress = cm.getQuestProgress(2236)
+         String progress = cm.getQuestProgress(100300)
          int map = cm.getMapId()
 
          if(map == 105050200) activateShamanRock(0,progress)
@@ -28,7 +28,7 @@ class NPC1063012 {
             int npcOid = cm.getQuestProgressInt(2236, 1)
             if (npcOid == 0) {
                activateShamanRock(3,progress)
-               cm.setQuestProgress(2236, 1, cm.getNpcObjectId())
+               cm.setQuestProgress(100300, 1, cm.getNpcObjectId())
             } else if (cm.getNpcObjectId() != npcOid) {
                activateShamanRock(4,progress)
             }

@@ -51,7 +51,6 @@ import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 
 import client.MapleCharacter;
 import client.processor.CharacterProcessor;
-import client.status.MonsterStatusEffect;
 import config.YamlConfig;
 import net.MapleServerHandler;
 import net.mina.MapleCodecFactory;
@@ -63,13 +62,9 @@ import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.processor.WeddingProcessor;
-import net.server.channel.task.EventScheduler;
-import net.server.channel.task.FaceExpressionScheduler;
-import net.server.channel.task.MobAnimationScheduler;
-import net.server.channel.task.MobClearSkillScheduler;
-import net.server.channel.task.MobMistScheduler;
-import net.server.channel.task.MobStatusScheduler;
-import net.server.channel.task.OverallScheduler;
+import net.server.channel.services.ServiceType;
+import net.server.channel.services.ServicesManager;
+import net.server.channel.services.task.BaseService;
 import net.server.world.MapleParty;
 import net.server.world.World;
 import scripting.event.EventScriptManager;
@@ -82,12 +77,10 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MapleMiniDungeon;
 import server.maps.MapleMiniDungeonInfo;
-import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
-import tools.packet.character.FacialExpression;
 import tools.packet.message.ServerMessage;
 
 public final class Channel {
@@ -100,13 +93,7 @@ public final class Channel {
    private String ip, serverMessage;
    private MapleMapManager mapManager;
    private EventScriptManager eventSM;
-   private MobStatusScheduler[] mobStatusSchedulers = new MobStatusScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private MobAnimationScheduler[] mobAnimationSchedulers = new MobAnimationScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private MobClearSkillScheduler[] mobClearSkillSchedulers = new MobClearSkillScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private MobMistScheduler[] mobMistSchedulers = new MobMistScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private FaceExpressionScheduler[] faceExpressionSchedulers = new FaceExpressionScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private EventScheduler[] eventSchedulers = new EventScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private OverallScheduler[] channelSchedulers = new OverallScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
+   private ServicesManager services = new ServicesManager();
    private Map<Integer, MapleHiredMerchant> hiredMerchants = new HashMap<>();
    private Set<Integer> playersAway = new HashSet<>();
    private Map<MapleExpeditionType, MapleExpedition> expeditions = new HashMap<>();
@@ -181,17 +168,7 @@ public final class Channel {
             dojoTask[i] = null;
          }
 
-         for (int i = 0; i < YamlConfig.config.server.CHANNEL_LOCKS; i++) {
-            faceLock[i] = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHANNEL_FACEEXPRS, true);
-
-            mobStatusSchedulers[i] = new MobStatusScheduler();
-            mobAnimationSchedulers[i] = new MobAnimationScheduler();
-            mobClearSkillSchedulers[i] = new MobClearSkillScheduler();
-            mobMistSchedulers[i] = new MobMistScheduler();
-            faceExpressionSchedulers[i] = new FaceExpressionScheduler(faceLock[i]);
-            eventSchedulers[i] = new EventScheduler();
-            channelSchedulers[i] = new OverallScheduler();
-         }
+         services = new ServicesManager();
 
          System.out.println("    Channel " + getId() + ": Listening on port " + port);
       } catch (Exception e) {
@@ -249,20 +226,23 @@ public final class Channel {
       return (cpq1 ? 0 : 100) + field;
    }
 
-   private static int getChannelSchedulerIndex(int mapid) {
-      int section = 1000000000 / YamlConfig.config.server.CHANNEL_LOCKS;
-      return mapid / section;
-   }
+   public synchronized void reloadEventScriptManager() {
+      if (finishedShutdown) {
+         return;
+      }
 
-   public void reloadEventScriptManager() {
       eventSM.cancel();
       eventSM = null;
       eventSM = new EventScriptManager(this, getEvents());
       eventSM.init();
    }
 
-   public final void shutdown() {
+   public final synchronized void shutdown() {
       try {
+         if (finishedShutdown) {
+            return;
+         }
+
          System.out.println("Shutting down Channel " + channel + " on World " + world);
 
          closeAllMerchants();
@@ -290,6 +270,10 @@ public final class Channel {
       }
    }
 
+   private void closeChannelServices() {
+      services.shutdown();
+   }
+
    private void closeChannelSchedules() {
       for (int i = 0; i < 20; i++) {
          if (dojoTask[i] != null) {
@@ -298,43 +282,7 @@ public final class Channel {
          }
       }
 
-      for (int i = 0; i < YamlConfig.config.server.CHANNEL_LOCKS; i++) {
-         if (mobStatusSchedulers[i] != null) {
-            mobStatusSchedulers[i].dispose();
-            mobStatusSchedulers[i] = null;
-         }
-
-         if (mobAnimationSchedulers[i] != null) {
-            mobAnimationSchedulers[i].dispose();
-            mobAnimationSchedulers[i] = null;
-         }
-
-         if (mobClearSkillSchedulers[i] != null) {
-            mobClearSkillSchedulers[i].dispose();
-            mobClearSkillSchedulers[i] = null;
-         }
-
-         if (mobMistSchedulers[i] != null) {
-            mobMistSchedulers[i].dispose();
-            mobMistSchedulers[i] = null;
-         }
-
-         if (faceExpressionSchedulers[i] != null) {
-            faceExpressionSchedulers[i].dispose();
-            faceExpressionSchedulers[i] = null;
-         }
-
-         if (eventSchedulers[i] != null) {
-            eventSchedulers[i].dispose();
-            eventSchedulers[i] = null;
-         }
-
-         if (channelSchedulers[i] != null) {
-            channelSchedulers[i].dispose();
-            channelSchedulers[i] = null;
-         }
-      }
-
+      closeChannelServices();
       disposeLocks();
    }
 
@@ -372,6 +320,10 @@ public final class Channel {
 
    public MapleMapManager getMapFactory() {
       return mapManager;
+   }
+
+   public BaseService getServiceAccess(ServiceType serviceType) {
+      return services.getAccess(serviceType).getService();
    }
 
    public int getWorld() {
@@ -1033,79 +985,6 @@ public final class Channel {
 
    public boolean canInitMonsterCarnival(boolean cpq1, int field) {
       return !usedMC.contains(getMonsterCarnivalRoom(cpq1, field));
-   }
-
-   public void registerMobStatus(int mapid, MonsterStatusEffect mse, Runnable cancelAction, long duration) {
-      registerMobStatus(mapid, mse, cancelAction, duration, null, -1);
-   }
-
-   public void registerMobStatus(int mapid, MonsterStatusEffect mse, Runnable cancelAction, long duration, Runnable overtimeAction, int overtimeDelay) {
-      mobStatusSchedulers[getChannelSchedulerIndex(mapid)].registerMobStatus(mse, cancelAction, duration, overtimeAction, overtimeDelay);
-   }
-
-   public void interruptMobStatus(int mapid, MonsterStatusEffect mse) {
-      mobStatusSchedulers[getChannelSchedulerIndex(mapid)].interruptMobStatus(mse);
-   }
-
-   public boolean registerMobOnAnimationEffect(int mapid, int mobHash, long delay) {
-      return mobAnimationSchedulers[getChannelSchedulerIndex(mapid)].registerAnimationMode(mobHash, delay);
-   }
-
-   public void registerMobClearSkillAction(int mapid, Runnable runAction, long delay) {
-      mobClearSkillSchedulers[getChannelSchedulerIndex(mapid)].registerClearSkillAction(runAction, delay);
-   }
-
-   public void registerMobMistCancelAction(int mapid, Runnable runAction, long delay) {
-      mobMistSchedulers[getChannelSchedulerIndex(mapid)].registerMistCancelAction(runAction, delay);
-   }
-
-   public void registerEventAction(int mapid, Runnable runAction, long delay) {
-      eventSchedulers[getChannelSchedulerIndex(mapid)].registerDelayedAction(runAction, delay);
-   }
-
-   public void registerOverallAction(int mapid, Runnable runAction, long delay) {
-      channelSchedulers[getChannelSchedulerIndex(mapid)].registerDelayedAction(runAction, delay);
-   }
-
-   public void forceRunOverallAction(int mapid, Runnable runAction) {
-      channelSchedulers[getChannelSchedulerIndex(mapid)].forceRunDelayedAction(runAction);
-   }
-
-   public void registerFaceExpression(final MapleMap map, final MapleCharacter chr, int emote) {
-      int lockid = getChannelSchedulerIndex(map.getId());
-
-      Runnable cancelAction = new Runnable() {
-         @Override
-         public void run() {
-            if (chr.isLoggedinWorld()) {
-               MasterBroadcaster.getInstance().sendToAllInMap(map, new FacialExpression(chr.getId(), 0), false, chr);
-            }
-         }
-      };
-
-      faceLock[lockid].lock();
-      try {
-         if (!chr.isLoggedinWorld()) {
-            return;
-         }
-
-         faceExpressionSchedulers[lockid].registerFaceExpression(chr.getId(), cancelAction);
-      } finally {
-         faceLock[lockid].unlock();
-      }
-
-      MasterBroadcaster.getInstance().sendToAllInMap(map, new FacialExpression(chr.getId(), emote), false, chr);
-   }
-
-   public void unregisterFaceExpression(int mapid, MapleCharacter chr) {
-      int lockid = getChannelSchedulerIndex(mapid);
-
-      faceLock[lockid].lock();
-      try {
-         faceExpressionSchedulers[lockid].unregisterFaceExpression(chr.getId());
-      } finally {
-         faceLock[lockid].unlock();
-      }
    }
 
    public void debugMarriageStatus() {

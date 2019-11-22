@@ -30,6 +30,7 @@ import client.database.administrator.CharacterAdministrator;
 import client.database.administrator.CoolDownAdministrator;
 import client.database.administrator.EventStatAdministrator;
 import client.database.administrator.FameLogAdministrator;
+import client.database.administrator.FamilyCharacterAdministrator;
 import client.database.administrator.InventoryEquipmentAdministrator;
 import client.database.administrator.InventoryItemAdministrator;
 import client.database.administrator.KeyMapAdministrator;
@@ -197,6 +198,7 @@ public class CharacterProcessor {
          AreaInfoAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          MonsterBookAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          CharacterAdministrator.getInstance().deleteCharacter(entityManager, cid);
+         FamilyCharacterAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          FameLogAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          cleanupInventoryEquipment(entityManager, cid);
          deleteQuestProgressWhereCharacterId(entityManager, cid);
@@ -579,6 +581,7 @@ public class CharacterProcessor {
       MapleCharacter ret = new MapleCharacter(-1, c.getAccID(), 12, 5, 4, 4, 50, 5, 0);
       ret.setClient(c);
       ret.setGM(0);
+      ret.setGMLevel(0);
       ret.setMaxHp(50);
       ret.setMaxMp(5);
       ret.setMap(null);

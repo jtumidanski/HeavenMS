@@ -361,7 +361,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
                         .map(MapleStatEffect::getDamage)
                         .orElse(0);
 
-                  int bodyPressureDmg = monster.getMaxHp() * skillDamage / 100;
+                  int bodyPressureDmg = (int) Math.ceil((monster.getMaxHp() * skillDamage) / 100.0);
                   if (bodyPressureDmg > calcDmgMax) {
                      calcDmgMax = bodyPressureDmg;
                   }

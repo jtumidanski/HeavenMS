@@ -11,6 +11,8 @@ import client.MapleCharacter;
 import client.MapleDisease;
 import client.status.MonsterStatus;
 import constants.game.GameConstants;
+import net.server.channel.services.ServiceType;
+import net.server.channel.services.task.OverallService;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.life.MobSkill;
@@ -44,7 +46,8 @@ public class MobSkillProcessor {
          }
       };
 
-      monster.getMap().getChannelServer().registerOverallAction(monster.getMap().getId(), toRun, animationTime);
+      OverallService service = (OverallService) monster.getMap().getChannelServer().getServiceAccess(ServiceType.OVERALL);
+      service.registerOverallAction(monster.getMap().getId(), toRun, animationTime);
    }
 
    public void applyEffect(MapleCharacter player, MapleMonster monster, MobSkill mobSkill, boolean skill, List<MapleCharacter> banishPlayers) {

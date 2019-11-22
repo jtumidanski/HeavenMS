@@ -136,6 +136,8 @@ import net.server.Server;
 import net.server.SkillMacro;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.channel.services.ServiceType;
+import net.server.channel.services.task.FaceExpressionService;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
@@ -414,7 +416,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private boolean loggedIn = false;
    private boolean useCS;  //chaos scroll upon crafting item.
    private long npcCd;
-   private long petLootCd;
    private long lastHpDec = 0;
    private int newWarpMap = -1;
    private boolean canWarpMap = true;  //only one "warp" must be used per call, and this will define the right one.
@@ -520,8 +521,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       }
       quests = new LinkedHashMap<>();
       position_$eq(new Point(0, 0));
-
-      petLootCd = Server.getInstance().getCurrentTime();
    }
 
    public void setMount(MapleMount mapleMount) {
@@ -742,10 +741,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       client.getSession().setAttribute(MapleClient.CLIENT_TRANSITION);
    }
 
-   public long getPetLootCd() {
-      return petLootCd;
-   }
-
    public boolean getCS() {
       return useCS;
    }
@@ -913,7 +908,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          mainstat = localstr;
          secondarystat = localdex;
       }
-      return (int) (((weapon.getMaxDamageMultiplier() * mainstat + secondarystat) / 100.0) * watk);
+      return (int) Math.ceil(((weapon.getMaxDamageMultiplier() * mainstat + secondarystat) / 100.0) * watk);
    }
 
    public int calculateMaxBaseDamage(int watk) {
@@ -929,7 +924,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             int attack = (int) Math.min(Math.floor((2 * getLevel() + 31) / 3), 31);
-            maxbasedamage = (int) (localstr * weapMulti + localdex) * attack / 100;
+            maxbasedamage = (int) Math.ceil((localstr * weapMulti + localdex) * attack / 100.0);
          } else {
             maxbasedamage = 1;
          }
@@ -2488,7 +2483,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       long timeNow = Server.getInstance().getCurrentTime();
       if (timeNow - lastExpression > 2000) {
          lastExpression = timeNow;
-         client.getChannelServer().registerFaceExpression(map, this, emote);
+         FaceExpressionService service = (FaceExpressionService) client.getChannelServer().getServiceAccess(ServiceType.FACE_EXPRESSION);
+         service.registerFaceExpression(map, this, emote);
       }
    }
 
@@ -4875,6 +4871,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void setGMLevel(int level) {
       this.gmLevel = Math.min(level, 6);
       this.gmLevel = Math.max(level, 0);
+      whiteChat = gmLevel >= 4;   // thanks ozanrijen for suggesting default white chat
    }
 
    public void closePartySearchInteractions() {

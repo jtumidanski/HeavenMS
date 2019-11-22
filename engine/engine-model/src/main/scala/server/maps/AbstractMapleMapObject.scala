@@ -17,8 +17,7 @@ abstract class AbstractMapleMapObject() extends MapleMapObject {
 
   override def position_$eq(position: Point): Unit = {
     if (_position.isDefined) {
-      _position.get.x = position.x
-      _position.get.y = position.y
+      _position.get.move(position.x, position.y)
     }
   }
 

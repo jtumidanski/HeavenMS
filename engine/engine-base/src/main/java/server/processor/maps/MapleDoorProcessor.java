@@ -1,6 +1,8 @@
 package server.processor.maps;
 
 import client.MapleCharacter;
+import net.server.channel.services.ServiceType;
+import net.server.channel.services.task.OverallService;
 import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;
 import server.maps.MapleMap;
@@ -21,8 +23,8 @@ public class MapleDoorProcessor {
          long effectTimeLeft = 3000 - destroyDoor.getElapsedDeployTime();   // portal deployment effect duration
          if (effectTimeLeft > 0) {
             MapleMap town = destroyDoor.getTown();
-            // thanks BHB88 for noticing doors crashing players when instantly cancelling buff
-            town.getChannelServer().registerOverallAction(town.getId(), () -> broadcastRemoveDoor(destroyDoor, owner), effectTimeLeft);
+            OverallService service = (OverallService) town.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+            service.registerOverallAction(town.getId(), () -> broadcastRemoveDoor(destroyDoor, owner), effectTimeLeft);
          } else {
             broadcastRemoveDoor(destroyDoor, owner);
          }

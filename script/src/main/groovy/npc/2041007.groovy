@@ -71,7 +71,10 @@ class NPC2041007 {
          } else if (status == 2) {
             cm.dispose()
             if (beauty == 1) {
-               if (cm.haveItem(5150007)) {
+               if (cm.haveItem(5420005)) {
+                  cm.setHair(hairnew[selection])
+                  cm.sendOk("Enjoy your new and improved hairstyle!")
+               } else if (cm.haveItem(5150007)) {
                   cm.gainItem(5150007, (short) -1)
                   cm.setHair(hairnew[selection])
                   cm.sendOk("Enjoy your new and improved hairstyle!")

@@ -108,7 +108,12 @@ public class MapleDataTool {
       } else if (data.getType() == MapleDataType.STRING) {
          return Integer.parseInt(getString(data));
       } else {
-         return (Integer) data.getData();
+         Object numData = data.getData();
+         if (numData instanceof Integer) {
+            return (Integer) numData;
+         } else {
+            return (Short) numData;
+         }
       }
    }
 

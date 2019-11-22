@@ -48,10 +48,6 @@ public final class PetLootHandler extends AbstractPacketHandler<PetLootPacket> {
    @Override
    public void handlePacket(PetLootPacket packet, MapleClient c) {
       MapleCharacter chr = c.getPlayer();
-      if (currentServerTime() - chr.getPetLootCd() < YamlConfig.config.server.PET_LOOT_UPON_ATTACK) {
-         PacketCreator.announce(c, new EnableActions());
-         return;
-      }
 
       int petIndex = chr.getPetIndex(packet.petIndex());
       MaplePet pet = chr.getPet(petIndex);

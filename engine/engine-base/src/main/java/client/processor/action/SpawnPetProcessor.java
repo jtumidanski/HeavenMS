@@ -73,7 +73,6 @@ public class SpawnPetProcessor {
                   long expiration = chr.getInventory(MapleInventoryType.CASH).getItem(slot).expiration();
                   MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, petid, (short) 1, false, false);
                   MapleInventoryManipulator.addById(c, evolveid, (short) 1, null, petId, expiration);
-                  PetProcessor.getInstance().deleteFromDb(chr, petid);
                   PacketCreator.announce(c, new EnableActions());
                   return;
                }

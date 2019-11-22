@@ -76,6 +76,8 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
             if (npc.id() >= 9100100 && npc.id() <= 9100200) {
                // Custom handling for gachapon scripts to reduce the amount of scripts needed.
                NPCScriptManager.getInstance().start(client, npc.id(), "gachapon", null);
+            } else if (npc.getName().endsWith("Maple TV")) {
+               NPCScriptManager.getInstance().start(client, npc.id(), "mapleTV", null);
             } else {
                boolean hasNpcScript = NPCScriptManager.getInstance().start(client, npc.id(), packet.objectId(), null);
                if (!hasNpcScript) {

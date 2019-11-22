@@ -6,9 +6,10 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import client.database.AbstractQueryExecutor;
+import client.database.DeleteForCharacter;
 import entity.family.FamilyCharacter;
 
-public class FamilyCharacterAdministrator extends AbstractQueryExecutor {
+public class FamilyCharacterAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static FamilyCharacterAdministrator instance;
 
    public static FamilyCharacterAdministrator getInstance() {
@@ -19,6 +20,13 @@ public class FamilyCharacterAdministrator extends AbstractQueryExecutor {
    }
 
    private FamilyCharacterAdministrator() {
+   }
+
+   @Override
+   public void deleteForCharacter(EntityManager entityManager, int characterId) {
+      Query query = entityManager.createQuery("DELETE FROM FamilyCharacter WHERE characterId = :characterId");
+      query.setParameter("characterId", characterId);
+      execute(entityManager, query);
    }
 
    protected void update(EntityManager entityManager, int id, Consumer<FamilyCharacter> consumer) {

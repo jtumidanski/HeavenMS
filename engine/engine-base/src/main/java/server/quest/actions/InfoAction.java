@@ -23,7 +23,6 @@ import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
 /**
- *
  * @author Ronan
  */
 public class InfoAction extends MapleQuestAction {

@@ -1,4 +1,4 @@
-package net.server.channel.task;
+package net.server.channel.packet;
 
 import java.util.HashMap;
 import java.util.Map;
