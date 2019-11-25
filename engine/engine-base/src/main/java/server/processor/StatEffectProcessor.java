@@ -182,6 +182,7 @@ public class StatEffectProcessor {
       }
       if (MapleDataTool.getInt("weakness", source, 0) > 0) {
          cure.add(MapleDisease.WEAKEN);
+         cure.add(MapleDisease.SLOW);
       }
       if (MapleDataTool.getInt("curse", source, 0) > 0) {
          cure.add(MapleDisease.CURSE);

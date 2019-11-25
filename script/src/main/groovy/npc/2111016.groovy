@@ -31,7 +31,7 @@ class NPC2111016 {
             status++
          } else {
             status--
-         };
+         }
 
          if (status == 0) {
             cm.dispose()

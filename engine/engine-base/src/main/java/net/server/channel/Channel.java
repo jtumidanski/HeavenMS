@@ -420,7 +420,7 @@ public final class Channel {
             .map(id -> getWorldServer().getPlayerStorage().getCharacterById(id))
             .flatMap(Optional::stream)
             .filter(MapleCharacter::isLoggedin)
-            .forEach(character -> character.getClient().disconnect(true, true));
+            .forEach(character -> character.getClient().forceDisconnect());
    }
 
    public Map<Integer, MapleHiredMerchant> getHiredMerchants() {

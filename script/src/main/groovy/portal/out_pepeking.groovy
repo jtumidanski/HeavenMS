@@ -13,7 +13,7 @@ boolean enter(PortalPlayerInteraction pi) {
    }
 
    //3 Yetis
-   int questProgress = pi.getQuestProgressInt(2330, 3300005) + pi.getQuestProgressInt(2330, 3300006) + pi.getQuestProgressInt(2330, 3300007);
+   int questProgress = pi.getQuestProgressInt(2330, 3300005) + pi.getQuestProgressInt(2330, 3300006) + pi.getQuestProgressInt(2330, 3300007)
    if (questProgress == 3 && !pi.hasItem(4032388)) {
       if (pi.canHold(4032388)) {
          MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You have acquired a key to the Wedding Hall. King Pepe must have dropped it.")

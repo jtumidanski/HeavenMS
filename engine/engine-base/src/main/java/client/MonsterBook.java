@@ -22,6 +22,7 @@
 package client;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,10 +52,10 @@ public final class MonsterBook {
    private Map<Integer, Integer> cards = new LinkedHashMap<>();
    private Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.BOOK);
 
-   private Set<Entry<Integer, Integer>> getCardSet() {
+   public Set<Entry<Integer, Integer>> getCardSet() {
       lock.lock();
       try {
-         return Collections.unmodifiableSet(cards.entrySet());
+         return new HashSet<>(cards.entrySet());
       } finally {
          lock.unlock();
       }
@@ -194,5 +195,9 @@ public final class MonsterBook {
             semaphore.release();
          }
       });
+   }
+
+   public static int[] getCardTierSize() {
+      return DatabaseConnection.getInstance().withConnectionResult(entityManager -> MonsterBookProvider.getInstance().getCardTierSize(entityManager)).orElseThrow();
    }
 }

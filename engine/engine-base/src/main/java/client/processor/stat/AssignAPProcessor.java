@@ -396,15 +396,7 @@ public class AssignAPProcessor {
          } else {
             if (types.length != 2 || gains.length != 2) {
                AutobanFactory.PACKET_EDIT.alert(chr, "Didn't send full packet for Auto Assign.");
-
-               final MapleClient client = c;
-               ThreadManager.getInstance().newTask(new Runnable() {
-                  @Override
-                  public void run() {
-                     client.disconnect(false, false);
-                  }
-               });
-
+               c.disconnect(true, false);
                return;
             }
 

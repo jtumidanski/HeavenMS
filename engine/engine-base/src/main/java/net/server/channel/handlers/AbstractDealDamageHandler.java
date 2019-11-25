@@ -102,7 +102,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
    public static MapleStatEffect getAttackEffect(AttackPacket attackInfo, MapleCharacter chr, Skill theSkill) {
       Skill mySkill = theSkill;
       if (mySkill == null) {
-         mySkill = SkillFactory.getSkill(GameConstants.getHiddenSkill(attackInfo.skill())).orElseThrow();
+         mySkill = SkillFactory.getSkill(attackInfo.skill()).orElseThrow();
       }
 
       int skillLevel = chr.getSkillLevel(mySkill);
@@ -159,7 +159,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
             return;
          }
          if (attack.skill() != 0) {
-            theSkill = SkillFactory.getSkill(GameConstants.getHiddenSkill(attack.skill())).orElseThrow(); //returns back the skill id if its not a hidden skill so we are gucci
+            theSkill = SkillFactory.getSkill(attack.skill()).orElseThrow(); //returns back the skill id if its not a hidden skill so we are gucci
             attackEffect = getAttackEffect(attack, player, theSkill);
             if (attackEffect == null) {
                PacketCreator.announce(player, new EnableActions());
@@ -173,9 +173,9 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
             int mobCount = attackEffect.getMobCount();
             if (attack.skill() != Cleric.HEAL) {
                if (player.isAlive()) {
-                  if(attack.skill() == Aran.BODY_PRESSURE || attack.skill() == Marauder.ENERGY_CHARGE || attack.skill() == ThunderBreaker.ENERGY_CHARGE) {  // thanks IxianMace for noticing Energy Charge skills refreshing on touch, leading to misleading buff applies
+                  if (attack.skill() == Aran.BODY_PRESSURE || attack.skill() == Marauder.ENERGY_CHARGE || attack.skill() == ThunderBreaker.ENERGY_CHARGE) {  // thanks IxianMace for noticing Energy Charge skills refreshing on touch, leading to misleading buff applies
                      // prevent touch dmg skills refreshing
-                  } else if(attack.skill() == NightWalker.POISON_BOMB) {// Poison Bomb
+                  } else if (attack.skill() == NightWalker.POISON_BOMB) {// Poison Bomb
                      attackEffect.applyTo(player, new Point(attack.position().x, attack.position().y));
                   } else {
                      attackEffect.applyTo(player);

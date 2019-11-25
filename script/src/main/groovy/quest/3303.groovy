@@ -28,7 +28,7 @@ class Quest3303 {
          }
 
          if (status == 0) {
-            oreArray = getOreArray();
+            oreArray = getOreArray()
 
             if (oreArray.length > 0) {
                status++
@@ -40,7 +40,7 @@ class Quest3303 {
             }
          } else if (status == 1) {
             if (!qm.haveItem(oreArray[selection], 2)) {     // thanks resinate for noticing a function missing here
-               qm.sendNext("What's this, you haven't got the #rjewel ores#k. No ores no deal!");
+               qm.sendNext("What's this, you haven't got the #rjewel ores#k. No ores no deal!")
                qm.dispose()
                return
             }

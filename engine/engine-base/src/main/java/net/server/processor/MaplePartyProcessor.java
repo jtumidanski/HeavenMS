@@ -50,7 +50,7 @@ public class MaplePartyProcessor {
          party = Optional.of(player.getWorldServer().createParty(partyCharacter));
          player.setParty(party.get());
          player.setMPC(partyCharacter);
-         player.getMap().addPartyMember(player);
+         player.getMap().addPartyMember(player, party.get().getId());
          player.silentPartyUpdate();
 
          player.updatePartySearchAvailability(false);
@@ -77,7 +77,7 @@ public class MaplePartyProcessor {
          if (party.isPresent()) {
             if (party.get().getMembers().size() < 6) {
                MaplePartyCharacter partyCharacter = new MaplePartyCharacter(player);
-               player.getMap().addPartyMember(player);
+               player.getMap().addPartyMember(player, party.get().getId());
 
                updateParty(party.get(), PartyOperation.JOIN, partyCharacter);
                player.receivePartyMemberHP();
@@ -125,7 +125,7 @@ public class MaplePartyProcessor {
          } else {
             MapleMap map = player.getMap();
             if (map != null) {
-               map.removePartyMember(player);
+               map.removePartyMember(player, party.getId());
             }
 
             MonsterCarnival monsterCarnival = player.getMonsterCarnival();
@@ -160,7 +160,7 @@ public class MaplePartyProcessor {
 
                MapleMap map = emc.getMap();
                if (map != null) {
-                  map.removePartyMember(emc);
+                  map.removePartyMember(emc, party.getId());
                }
 
                MonsterCarnival monsterCarnival = player.getMonsterCarnival();

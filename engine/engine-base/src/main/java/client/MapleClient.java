@@ -88,7 +88,6 @@ import server.life.MapleMonster;
 import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.maps.MapleMiniDungeonInfo;
-import server.quest.MapleQuest;
 import tools.BCrypt;
 import tools.DatabaseConnection;
 import tools.FilePrinter;
@@ -625,20 +624,7 @@ public class MapleClient {
                      if (messengerId > 0) {
                         world.leaveMessenger(messengerId, new MapleMessengerCharacter(player, 0));
                      }
-                                                        /*
-                                                        if (fid > 0) {
-                                                                final MapleFamily family = worlda.getFamily(fid);
-                                                                family.
-                                                        }
-                                                        */
-                     for (MapleQuestStatus status : player.getStartedQuests()) { //This is for those quests that you have to stay logged in for a certain amount of time
-                        MapleQuest quest = status.getQuest();
-                        if (quest.getTimeLimit() > 0) {
-                           MapleQuestStatus newStatus = new MapleQuestStatus(quest, MapleQuestStatus.Status.NOT_STARTED);
-                           newStatus.setForfeited(player.getQuest(quest).getForfeited() + 1);
-                           player.updateQuestStatus(newStatus);
-                        }
-                     }
+                     player.forfeitExpirableQuests();    //This is for those quests that you have to stay logged in for a certain amount of time
                      player.getGuild().ifPresent(guild -> {
                         MapleGuildProcessor.getInstance().setMemberOnline(player, false, player.getClient().getChannel());
                         PacketCreator.announce(player, new ShowGuildInfo(player));
@@ -696,7 +682,7 @@ public class MapleClient {
             MapleSessionCoordinator.getInstance().closeSession(session, false);
             session.removeAttribute(MapleClient.CLIENT_KEY);
          }
-         if (!Server.getInstance().hasCharacteridInTransition(session)) {
+         if (!Server.getInstance().hasCharacteridInTransition(this)) {
             updateLoginState(MapleClient.LOGIN_NOTLOGGEDIN);
          }
 
@@ -721,6 +707,12 @@ public class MapleClient {
       this.receive = null;
       this.send = null;
       //this.session = null;
+   }
+
+   public void setCharacterOnSessionTransitionState(int cid) {
+      this.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
+      session.setAttribute(MapleClient.CLIENT_TRANSITION);
+      Server.getInstance().setCharacteridInTransition(this, cid);
    }
 
    public int getChannel() {
@@ -1058,7 +1050,6 @@ public class MapleClient {
 
       player.saveCharToDB();
 
-      player.getClient().updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
       player.setSessionTransitionState();
       try {
          PacketCreator.announce(this, new ChangeChannel(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));

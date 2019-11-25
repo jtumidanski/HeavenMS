@@ -1,6 +1,6 @@
 package npc
 
-
+import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
 /*
@@ -15,6 +15,12 @@ class NPCmapleTV {
    int sel = -1
 
    def start() {
+      if (YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
+         cm.dispose()
+         cm.openNpc(9201088, "scroll_generator")
+         return
+      }
+
       status = -1
       action((byte) 1, (byte) 0, 0)
    }

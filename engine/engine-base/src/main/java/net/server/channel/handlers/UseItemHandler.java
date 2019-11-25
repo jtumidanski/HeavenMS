@@ -66,7 +66,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
 
       Item toUse = chr.getInventory(MapleInventoryType.USE).getItem(packet.slot());
       if (toUse != null && toUse.quantity() > 0 && toUse.id() == packet.itemId()) {
-         if (packet.itemId() == 2022178 || packet.itemId() == 2050004) {
+         if (packet.itemId() == 2050004) {
             chr.dispelDebuffs();
             remove(client, packet.slot());
             return;

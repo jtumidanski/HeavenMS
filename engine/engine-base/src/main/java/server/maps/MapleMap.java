@@ -43,9 +43,6 @@ import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.stream.Collectors;
 
 import client.AbstractMapleCharacterObject;
@@ -70,12 +67,11 @@ import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.Channel;
-import net.server.services.type.ChannelServices;
-import net.server.services.type.WorldServices;
+import net.server.coordinator.world.MapleMonsterAggroCoordinator;
 import net.server.services.task.channel.FaceExpressionService;
 import net.server.services.task.channel.MobMistService;
 import net.server.services.task.channel.OverallService;
-import net.server.coordinator.world.MapleMonsterAggroCoordinator;
+import net.server.services.type.ChannelServices;
 import net.server.world.World;
 import scala.Option;
 import scripting.event.EventInstanceManager;
@@ -1253,7 +1249,7 @@ public class MapleMap {
    public int countBosses() {
       int count = 0;
 
-      for(MapleMonster mob: getAllMonsters()) {
+      for (MapleMonster mob : getAllMonsters()) {
          if (mob.isBoss()) {
             count++;
          }
@@ -2269,7 +2265,7 @@ public class MapleMap {
             .orElse(null);
    }
 
-   private void addPartyMemberInternal(MapleCharacter chr) {
+   private void addPartyMemberInternal(MapleCharacter chr, int partyId) {
       int partyid = chr.getPartyId();
       if (partyid == -1) {
          return;
@@ -2286,7 +2282,7 @@ public class MapleMap {
       }
    }
 
-   private void removePartyMemberInternal(MapleCharacter chr) {
+   private void removePartyMemberInternal(MapleCharacter chr, int partyId) {
       int partyid = chr.getPartyId();
       if (partyid == -1) {
          return;
@@ -2302,19 +2298,19 @@ public class MapleMap {
       }
    }
 
-   public void addPartyMember(MapleCharacter chr) {
+   public void addPartyMember(MapleCharacter chr, int partyId) {
       chrWLock.lock();
       try {
-         addPartyMemberInternal(chr);
+         addPartyMemberInternal(chr, partyId);
       } finally {
          chrWLock.unlock();
       }
    }
 
-   public void removePartyMember(MapleCharacter chr) {
+   public void removePartyMember(MapleCharacter chr, int partyId) {
       chrWLock.lock();
       try {
-         removePartyMemberInternal(chr);
+         removePartyMemberInternal(chr, partyId);
       } finally {
          chrWLock.unlock();
       }
@@ -2336,7 +2332,10 @@ public class MapleMap {
          characters.add(chr);
          chrSize = characters.size();
 
-         addPartyMemberInternal(chr);
+         if (chr.getParty().isPresent() && chr.getParty().get().getMemberById(chr.getId()).isPresent()) {
+            addPartyMemberInternal(chr, chr.getPartyId());
+         }
+
          itemMonitorTimeout = 1;
       } finally {
          chrWLock.unlock();
@@ -2653,7 +2652,9 @@ public class MapleMap {
 
       chrWLock.lock();
       try {
-         removePartyMemberInternal(chr);
+         if (chr.getParty().isPresent() && chr.getParty().get().getMemberById(chr.getId()).isPresent()) {
+            removePartyMemberInternal(chr, chr.getPartyId());
+         }
          characters.remove(chr);
       } finally {
          chrWLock.unlock();
@@ -4154,7 +4155,7 @@ public class MapleMap {
 
       @Override
       public void run() {
-         reactor.lockReactor();
+         reactor.hitLockReactor();
          try {
             if (reactor.getReactorType() == 100) {
                if (reactor.getShouldCollect() && mapitem != null && mapitem == getMapObject(mapitem.objectId())) {
@@ -4198,7 +4199,7 @@ public class MapleMap {
                }
             }
          } finally {
-            reactor.unlockReactor();
+            reactor.hitUnlockReactor();
          }
       }
    }

@@ -41,6 +41,12 @@ public final class CancelChairHandler extends AbstractPacketHandler<CancelChairP
          return;
       }
 
-      mc.sitChair(packet.itemId());
+      if (client.tryAcquireClient()) {
+         try {
+            mc.sitChair(packet.itemId());
+         } finally {
+            client.releaseClient();
+         }
+      }
    }
 }

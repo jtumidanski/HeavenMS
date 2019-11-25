@@ -59,7 +59,7 @@ class Quest2570 {
          qm.sendNextPrev("Now, there is one last thing that you need to remember. More than anything else, you need to keep your HP up. If you fall in battle, you'll lose some of your EXP. And I'm SURE you don't want that, right?")
       } else if (status == 10) {
          qm.sendNextPrev("Well, that's it! I have taught you everything you need to know. I also gave you a few decent weapons, so make good use of them. Now, go forth, grow stronger, and kick around the Black Mage's minions, if you get the chance!")
-         qm.forceStartQuest(2945, "1")
+         qm.forceStartQuest(2945, 1)
       } else if (status == 11) {
          qm.dispose()//let them go back :P
       }

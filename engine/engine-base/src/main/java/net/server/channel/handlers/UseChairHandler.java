@@ -41,6 +41,12 @@ public final class UseChairHandler extends AbstractPacketHandler<UseChairPacket>
          return;
       }
 
-      client.getPlayer().sitChair(itemId);
+      if (client.tryAcquireClient()) {
+         try {
+            client.getPlayer().sitChair(itemId);
+         } finally {
+            client.releaseClient();
+         }
+      }
    }
 }

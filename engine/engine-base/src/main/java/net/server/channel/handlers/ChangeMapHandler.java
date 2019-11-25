@@ -73,8 +73,6 @@ public final class ChangeMapHandler extends AbstractPacketHandler<ChangeMapPacke
          }
          String[] socket = client.getChannelServer().getIP().split(":");
          chr.getCashShop().open(false);
-
-         client.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
          chr.setSessionTransitionState();
          try {
             PacketCreator.announce(client, new ChangeChannel(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));

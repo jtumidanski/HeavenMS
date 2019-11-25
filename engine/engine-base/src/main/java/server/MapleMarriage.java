@@ -62,16 +62,9 @@ public class MapleMarriage extends EventInstanceManager {
 
    public static List<Item> loadGiftItemsFromDb(MapleClient c, int cid) {
       List<Item> items = new LinkedList<>();
-      if (c.tryAcquireClient()) {
-         try {
-            for (Pair<Item, MapleInventoryType> it : ItemFactory.MARRIAGE_GIFTS.loadItems(cid, false)) {
-               items.add(it.getLeft());
-            }
-         } finally {
-            c.releaseClient();
-         }
+      for (Pair<Item, MapleInventoryType> it : ItemFactory.MARRIAGE_GIFTS.loadItems(cid, false)) {
+         items.add(it.getLeft());
       }
-
       return items;
    }
 
@@ -80,14 +73,7 @@ public class MapleMarriage extends EventInstanceManager {
       for (Item it : giftItems) {
          items.add(new Pair<>(it, it.inventoryType()));
       }
-
-      if (c.tryAcquireClient()) {
-         try {
-            DatabaseConnection.getInstance().withConnection(connection -> ItemFactory.MARRIAGE_GIFTS.saveItems(items, cid, connection));
-         } finally {
-            c.releaseClient();
-         }
-      }
+      DatabaseConnection.getInstance().withConnection(entityManager -> ItemFactory.MARRIAGE_GIFTS.saveItems(items, cid, entityManager));
    }
 
    public boolean giftItemToSpouse(int cid) {
@@ -112,18 +98,10 @@ public class MapleMarriage extends EventInstanceManager {
    }
 
    public List<Item> getGiftItems(MapleClient c, boolean groom) {
-      if (c.tryAcquireClient()) {
-         try {
-            List<Item> gifts = getGiftItemsList(groom);
-            synchronized (gifts) {
-               return new LinkedList<>(gifts);
-            }
-         } finally {
-            c.releaseClient();
-         }
+      List<Item> gifts = getGiftItemsList(groom);
+      synchronized (gifts) {
+         return new LinkedList<>(gifts);
       }
-
-      return new LinkedList<>();
    }
 
    private List<Item> getGiftItemsList(boolean groom) {

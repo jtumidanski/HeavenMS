@@ -125,20 +125,18 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
                      MapleInventoryType type = ItemConstants.getInventoryType(itemid);
                      MapleInventory chrInv = chr.getInventory(type);
 
+                     Item newItem = null;
                      chrInv.lockInventory();
                      try {
                         Item item = chrInv.getItem((byte) slot);
                         if (item != null) {
                            if (!ItemProcessor.getInstance().isUntradeable(item)) {
                               if (itemid == item.id() && quantity <= item.quantity()) {
-                                 Item newItem = item.copy();
+                                 newItem = item.copy();
 
                                  marriage.addGiftItem(groomWishlist, newItem);
                                  MapleInventoryManipulator.removeFromSlot(client, type, slot, quantity, false, false);
 
-                                 if (YamlConfig.config.server.USE_ENFORCE_MERCHANT_SAVE) {
-                                    chr.saveCharToDB(false);
-                                 }
                                  marriage.saveGiftItemsToDb(client, groomWishlist, cid);
 
                                  MapleKarmaManipulator.toggleKarmaFlagToUntradeable(newItem);
@@ -152,6 +150,11 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
                         }
                      } finally {
                         chrInv.unlockInventory();
+                     }
+
+                     if (newItem != null) {
+                        if (YamlConfig.config.server.USE_ENFORCE_MERCHANT_SAVE) chr.saveCharToDB(false);
+                        marriage.saveGiftItemsToDb(client, groomWishlist, cid);
                      }
                   } else {
                      PacketCreator.announce(client, new WeddingGiftResult((byte) 0xE, marriage.getWishlistItems(groomWishlist), null));

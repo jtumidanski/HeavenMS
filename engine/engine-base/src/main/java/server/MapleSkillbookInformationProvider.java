@@ -47,7 +47,6 @@ public class MapleSkillbookInformationProvider {
    private static String rootDirectory = ".";
    private static int skillbookMinItemid = 2280000;
    private static int skillbookMaxItemid = 2300000;  // exclusively
-   private static int currentItemid = 0;
 
    static {
       loadSkillbooks();
@@ -73,7 +72,7 @@ public class MapleSkillbookInformationProvider {
                      int itemcount = MapleDataTool.getInt("count", questItemData, 0);
 
                      if (isSkillBook(itemid) && itemcount > 0) {
-                        foundSkillbooks.put(currentItemid, SkillBookEntry.QUEST);
+                        foundSkillbooks.put(itemid, SkillBookEntry.QUEST);
                      }
                   }
 

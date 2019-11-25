@@ -68,8 +68,7 @@ public final class RegisterPicHandler extends AbstractPacketHandler<RegisterPicP
          }
 
          server.unregisterLoginState(client);
-         client.updateLoginState(MapleClient.LOGIN_SERVER_TRANSITION);
-         server.setCharacteridInTransition(session, packet.characterId());
+         client.setCharacterOnSessionTransitionState(packet.characterId());
 
          try {
             PacketCreator.announce(client, new ServerIP(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1]), packet.characterId()));

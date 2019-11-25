@@ -60,8 +60,8 @@ import net.server.Server;
 import net.server.channel.Channel;
 import net.server.channel.packet.PlayerLoggedInPacket;
 import net.server.channel.packet.reader.PlayerLoggedInReader;
-import net.server.coordinator.world.MapleEventRecallCoordinator;
 import net.server.coordinator.session.MapleSessionCoordinator;
+import net.server.coordinator.world.MapleEventRecallCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
@@ -173,32 +173,38 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
 
             MapleCharacter player = world.getPlayerStorage().getCharacterById(packet.characterId()).orElse(null);
-            boolean newcomer = false;
-
             IoSession session = client.getSession();
-
-            if (!server.validateCharacteridInTransition(session, packet.characterId())) {
-               client.disconnect(true, false);
-               return;
-            }
-
             String remoteHwid;
+
             if (player == null) {
                remoteHwid = MapleSessionCoordinator.getInstance().getGameSessionHwid(session);
                if (remoteHwid == null) {
                   client.disconnect(true, false);
                   return;
                }
-
-               player = CharacterProcessor.getInstance().loadCharFromDB(packet.characterId(), client, true);
-               newcomer = true;
             } else {
                remoteHwid = player.getClient().getHWID();
             }
 
-            if (player == null) { //If you are still getting null here then please just uninstall the game >.>, we dont need you fucking with the logs
+            int hwidLen = remoteHwid.length();
+            session.setAttribute(MapleClient.CLIENT_HWID, remoteHwid);
+            session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, remoteHwid.substring(hwidLen - 8, hwidLen));
+            client.setHWID(remoteHwid);
+
+            if (!server.validateCharacteridInTransition(client, packet.characterId())) {
                client.disconnect(true, false);
                return;
+            }
+
+            boolean newcomer = false;
+            if (player == null) {
+               player = CharacterProcessor.getInstance().loadCharFromDB(packet.characterId(), client, true);
+               newcomer = true;
+
+               if (player == null) { //If you are still getting null here then please just uninstall the game >.>, we dont need you fucking with the logs
+                  client.disconnect(true, false);
+                  return;
+               }
             }
 
             client.setPlayer(player);
@@ -254,11 +260,6 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                client.setCharacterSlots((byte) player.getClient().getCharacterSlots());
                player.newClient(client);
             }
-
-            int hwidLen = remoteHwid.length();
-            session.setAttribute(MapleClient.CLIENT_HWID, remoteHwid);
-            session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, remoteHwid.substring(hwidLen - 8, hwidLen));
-            client.setHWID(remoteHwid);
 
             channel.addPlayer(player);
             world.addPlayer(player);

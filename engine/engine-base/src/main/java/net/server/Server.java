@@ -40,9 +40,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.UriBuilder;
 
@@ -50,7 +47,6 @@ import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.buffer.SimpleBufferAllocator;
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
-import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -85,10 +81,10 @@ import client.processor.CharacterProcessor;
 import client.processor.MapleFamilyProcessor;
 import client.processor.NewYearCardProcessor;
 import config.YamlConfig;
+import constants.ServerConstants;
 import constants.game.GameConstants;
 import constants.inventory.ItemConstants;
 import constants.net.OpcodeConstants;
-import constants.ServerConstants;
 import net.MapleServerHandler;
 import net.mina.MapleCodecFactory;
 import net.server.audit.ThreadTracker;
@@ -303,8 +299,8 @@ public class Server {
       }
    }
 
-   private static String getRemoteIp(IoSession session) {
-      return MapleSessionCoordinator.getSessionRemoteAddress(session);
+   private static String getRemoteHost(MapleClient client) {
+      return MapleSessionCoordinator.getSessionRemoteAddress(client.getSession());
    }
 
    public int getCurrentTimestamp() {
@@ -1426,8 +1422,8 @@ public class Server {
       return gmLevel;
    }
 
-   public void setCharacteridInTransition(IoSession session, int charId) {
-      String remoteIp = getRemoteIp(session);
+   public void setCharacteridInTransition(MapleClient client, int charId) {
+      String remoteIp = getRemoteHost(client);
 
       lgnWLock.lock();
       try {
@@ -1437,12 +1433,12 @@ public class Server {
       }
    }
 
-   public boolean validateCharacteridInTransition(IoSession session, int charId) {
+   public boolean validateCharacteridInTransition(MapleClient client, int charId) {
       if (!YamlConfig.config.server.USE_IP_VALIDATION) {
          return true;
       }
 
-      String remoteIp = getRemoteIp(session);
+      String remoteIp = getRemoteHost(client);
 
       lgnWLock.lock();
       try {
@@ -1453,12 +1449,12 @@ public class Server {
       }
    }
 
-   public Integer freeCharacteridInTransition(IoSession session) {
+   public Integer freeCharacteridInTransition(MapleClient client) {
       if (!YamlConfig.config.server.USE_IP_VALIDATION) {
          return null;
       }
 
-      String remoteIp = getRemoteIp(session);
+      String remoteIp = getRemoteHost(client);
 
       lgnWLock.lock();
       try {
@@ -1468,12 +1464,12 @@ public class Server {
       }
    }
 
-   public boolean hasCharacteridInTransition(IoSession session) {
+   public boolean hasCharacteridInTransition(MapleClient client) {
       if (!YamlConfig.config.server.USE_IP_VALIDATION) {
          return true;
       }
 
-      String remoteIp = getRemoteIp(session);
+      String remoteIp = getRemoteHost(client);
 
       lgnRLock.lock();
       try {

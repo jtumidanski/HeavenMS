@@ -34,10 +34,11 @@ class Quest8189 {
             int petidx = -1
             int petItemid
             MaplePet pet
+            int id
             for (int i = 0; i < 3; i++) {
                pet = qm.getPlayer().getPet(petidx)
                if (pet != null) {
-                  int id = pet.getItemId()
+                  id = pet.id()
                   if (id >= 5000029 && id <= 5000033) {
                      petItemid = 5000030
                      petidx = i
@@ -58,9 +59,9 @@ class Quest8189 {
             }
 
             int pool = (petItemid == 5000030) ? 10 : 11
+            int after = 0
             while ({
                double rand = 1 + Math.floor(Math.random() * pool)
-               int after = 0
                if (rand >= 1 && rand <= 3) {
                   after = petItemid
                } else if (rand >= 4 && rand <= 6) {

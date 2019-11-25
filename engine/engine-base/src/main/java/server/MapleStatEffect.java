@@ -380,7 +380,7 @@ public class MapleStatEffect {
       if (isMagicDoor() && !FieldLimit.DOOR.check(applyto.getMap().getFieldLimit())) { // Magic Door
          int y = applyto.getFh();
          if (y == 0) {
-            y = applyto.position().y;
+            y = applyto.getMap().getGroundBelow(applyto.position()).y;    // thanks Lame for pointing out unusual cases of doors sending players on ground below
          }
          Point doorPosition = new Point(applyto.position().x, y);
          MapleDoor door = new MapleDoor(applyto, doorPosition);
@@ -429,7 +429,7 @@ public class MapleStatEffect {
                         }
                      });
             } else {
-               int amount = opposition.getMembers().size() - 1;
+               int amount = opposition.getMembers().size();
                int randd = (int) Math.floor(Math.random() * amount);
                MapleCharacter chrApp = applyfrom.getMap().getCharacterById(opposition.getMemberByPos(randd).getId());
                if (chrApp != null && chrApp.getMap().isCPQMap()) {
@@ -443,15 +443,7 @@ public class MapleStatEffect {
          }
       } else if (cureDebuffs.size() > 0) { // by Drago-Dragohe4rt
          for (final MapleDisease debuff : cureDebuffs) {
-            if (applyfrom.getParty().isPresent()) {
-               applyfrom.getParty()
-                     .map(MapleParty::getPartyMembers).orElse(Collections.emptyList()).parallelStream()
-                     .map(MaplePartyCharacter::getPlayer)
-                     .flatMap(Optional::stream)
-                     .forEach(character -> character.dispelDebuff(debuff));
-            } else {
-               applyfrom.dispelDebuff(debuff);
-            }
+            applyfrom.dispelDebuff(debuff);
          }
       } else if (mobSkill > 0 && mobSkillLevel > 0) {
          MobSkill ms = MobSkillFactory.getMobSkill(mobSkill, mobSkillLevel);

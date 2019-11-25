@@ -80,21 +80,12 @@ public class MapleInventoryManipulator {
       MapleCharacter chr = c.getPlayer();
       MapleInventoryType type = ItemConstants.getInventoryType(itemId);
 
-      if (c.tryAcquireClient()) {
-         try {
-            MapleInventory inv = chr.getInventory(type);
-            inv.lockInventory();
-            try {
-               return addByIdInternal(c, chr, type, inv, itemId, quantity, owner, petid, flag, expiration);
-            } finally {
-               inv.unlockInventory();
-            }
-         } finally {
-            c.releaseClient();
-         }
-      } else {
-         PacketCreator.announce(c, new EnableActions());
-         return false;
+      MapleInventory inv = chr.getInventory(type);
+      inv.lockInventory();
+      try {
+         return addByIdInternal(c, chr, type, inv, itemId, quantity, owner, petid, flag, expiration);
+      } finally {
+         inv.unlockInventory();
       }
    }
 
@@ -201,21 +192,12 @@ public class MapleInventoryManipulator {
       MapleCharacter chr = c.getPlayer();
       MapleInventoryType type = item.inventoryType();
 
-      if (c.tryAcquireClient()) {
-         try {
-            MapleInventory inv = chr.getInventory(type);
-            inv.lockInventory();
-            try {
-               return addFromDropInternal(c, chr, type, inv, item, show, petId);
-            } finally {
-               inv.unlockInventory();
-            }
-         } finally {
-            c.releaseClient();
-         }
-      } else {
-         PacketCreator.announce(c, new EnableActions());
-         return false;
+      MapleInventory inv = chr.getInventory(type);
+      inv.lockInventory();
+      try {
+         return addFromDropInternal(c, chr, type, inv, item, show, petId);
+      } finally {
+         inv.unlockInventory();
       }
    }
 

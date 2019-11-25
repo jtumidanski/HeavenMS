@@ -32,7 +32,6 @@ import client.SkillFactory;
 import client.autoban.AutobanFactory;
 import constants.game.GameConstants;
 import constants.skills.Aran;
-import server.ThreadManager;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
@@ -49,21 +48,11 @@ public class AssignSPProcessor {
       }
 
       MapleCharacter player = c.getPlayer();
-      int remainingSp = player.getRemainingSps()[GameConstants.getSkillBook(skillid / 10000)];
-      boolean isBeginnerSkill = false;
       if ((!GameConstants.isPqSkillMap(player.getMapId()) && GameConstants.isPqSkill(skillid)) || (!player.isGM() && GameConstants.isGMSkills(skillid)) || (!GameConstants.isInJobTree(skillid, player.getJob().getId()) && !player.isGM())) {
          AutobanFactory.PACKET_EDIT.alert(player, "tried to packet edit in distributing sp.");
          FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use skill " + skillid + " without it being in their job.");
 
-         final MapleClient client = c;
-         ThreadManager.getInstance().newTask(new Runnable() {
-            @Override
-            public void run() {
-               client.disconnect(true, false);
-            }
-         });
-
-         return false;
+         c.disconnect(true, false);
       }
 
       return true;

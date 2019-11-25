@@ -78,6 +78,12 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
          int useCount = 0, qtyCount = 0;
          MapleStatEffect stat = null;
 
+         maxHp = chr.getCurrentMaxHp();
+         maxMp = chr.getCurrentMaxMp();
+
+         curHp = chr.getHp();
+         curMp = chr.getMp();
+
          MapleInventory useInv = chr.getInventory(MapleInventoryType.USE);
          useInv.lockInventory();
          try {
@@ -102,12 +108,6 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
                hasHpGain = stat.getHp() > 0 || stat.getHpRate() > 0.0;
                hasMpGain = stat.getMp() > 0 || stat.getMpRate() > 0.0;
 
-               maxHp = chr.getCurrentMaxHp();
-               maxMp = chr.getCurrentMaxMp();
-
-               curHp = chr.getHp();
-               curMp = chr.getMp();
-
                incHp = stat.getHp();
                if (incHp <= 0 && hasHpGain) {
                   incHp = Math.ceil(maxHp * stat.getHpRate());
@@ -120,11 +120,21 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
 
                if (YamlConfig.config.server.USE_COMPULSORY_AUTOPOT) {
                   if (hasHpGain) {
-                     qtyCount = (int) Math.ceil(((YamlConfig.config.server.PET_AUTOHP_RATIO * maxHp) - curHp) / incHp);
+                     double hpRatio = (YamlConfig.config.server.PET_AUTOHP_RATIO * maxHp) - curHp;
+                     if (hpRatio > 0.0) {
+                        qtyCount = (int) Math.ceil(hpRatio / incHp);
+                     }
                   }
 
                   if (hasMpGain) {
-                     qtyCount = Math.max(qtyCount, (int) Math.ceil(((YamlConfig.config.server.PET_AUTOMP_RATIO * maxMp) - curMp) / incMp));
+                     double mpRatio = ((YamlConfig.config.server.PET_AUTOMP_RATIO * maxMp) - curMp);
+                     if (mpRatio > 0.0) {
+                        qtyCount = Math.max(qtyCount, (int) Math.ceil(mpRatio / incMp));
+                     }
+                  }
+
+                  if (qtyCount < 0) { // thanks Flint, Kevs for noticing an issue where negative counts were getting achieved
+                     qtyCount = 0;
                   }
                } else {
                   qtyCount = 1;   // non-compulsory autopot concept thanks to marcuswoon
@@ -155,8 +165,10 @@ public class PetAutopotProcessor extends AbstractQueryExecutor {
             useInv.unlockInventory();
          }
 
-         for (int i = 0; i < useCount; i++) {
-            stat.applyTo(chr);
+         if (stat != null) {
+            for (int i = 0; i < useCount; i++) {
+               stat.applyTo(chr);
+            }
          }
 
          PacketCreator.announce(chr, new EnableActions());
