@@ -100,9 +100,9 @@ class NPC2133000 {
                   cm.dispose()
                }
             } else if (selection == 2) {
-               if (cm.haveItem(1032061) && !cm.haveItem(1032101) && cm.haveItem(4001198, 10)) {
+               if (cm.haveItem(1032061) && !cm.haveItem(1032072) && cm.haveItem(4001198, 10)) {
                   cm.gainItem(1032061, (short) -1)
-                  cm.gainItem(1032101, (short) 1)
+                  cm.gainItem(1032072, (short) 1)
                   cm.gainItem(4001198, (short) -10)
                   cm.dispose()
                } else {

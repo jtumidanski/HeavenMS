@@ -29,7 +29,7 @@ class NPC2131001 {
          return
       }
       if (status == 0) {
-         cm.sendSimple("My name is Pergen, I am the strongest magician around these parts.#b\r\n#L0#Hey, take these rubbles. You can perform your magic on them.#l")
+         cm.sendSimple("My name is #p2131001#, I am the strongest magician around these parts.#b\r\n#L0#Hey, take these rubbles. You can perform your magic on them.#l")
       } else if (status == 1) {
          if (!cm.haveItem(exchangeItem, 100)) {
             cm.sendNext("You don't have enough... I need at least 100.")
