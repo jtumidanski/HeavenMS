@@ -89,18 +89,16 @@ public class MapleLifeFactory {
       MapleData monsterInfoData = monsterData.getChildByPath("info");
 
       List<MobAttackInfoHolder> attackInfos = new LinkedList<>();
-      MapleMonsterStats stats;
+      MapleMonsterStats stats = new MapleMonsterStats();
 
       int linkMid = MapleDataTool.getIntConvert("link", monsterInfoData, 0);
-      if (linkMid == 0) {
-         stats = new MapleMonsterStats();
-      } else {
+
+      if (linkMid != 0) {
          Pair<MapleMonsterStats, List<MobAttackInfoHolder>> linkStats = getMonsterStats(linkMid);
          if (linkStats == null) {
             return null;
          }
 
-         stats = linkStats.getLeft();
          attackInfos.addAll(linkStats.getRight());
       }
 

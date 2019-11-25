@@ -122,6 +122,7 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
          return;
       }
       if (client.finishLogin() == 0) {
+         client.checkChar(client.getAccID());
          login(client);
       } else {
          PacketCreator.announce(client, new LoginFailed(LoginFailedReason.ALREADY_LOGGED_IN));

@@ -162,15 +162,12 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             }
 
             Channel channel = world.getChannel(client.getChannel());
-            if (channel == null || !channel.isActive()) {
+            if (channel == null) {
                client.setChannel(1);
                channel = world.getChannel(client.getChannel());
 
                if (channel == null) {
                   client.disconnect(true, false);
-                  return;
-               } else if (!channel.isActive()) {
-                  PacketCreator.announce(client, new AfterLoginError(7));
                   return;
                }
             }
@@ -179,13 +176,14 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             boolean newcomer = false;
 
             IoSession session = client.getSession();
+
+            if (!server.validateCharacteridInTransition(session, packet.characterId())) {
+               client.disconnect(true, false);
+               return;
+            }
+
             String remoteHwid;
             if (player == null) {
-               if (!server.validateCharacteridInTransition(session, packet.characterId())) {
-                  client.disconnect(true, false);
-                  return;
-               }
-
                remoteHwid = MapleSessionCoordinator.getInstance().getGameSessionHwid(session);
                if (remoteHwid == null) {
                   client.disconnect(true, false);

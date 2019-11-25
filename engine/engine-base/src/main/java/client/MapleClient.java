@@ -115,11 +115,12 @@ public class MapleClient {
    public static final String CLIENT_NIBBLEHWID = "HWID2";
    public static final String CLIENT_REMOTE_ADDRESS = "REMOTE_IP";
    public static final String CLIENT_TRANSITION = "TRANSITION";
-   private static final Lock[] loginLocks = new Lock[200];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
+   private static final int lockCount = 200;
+   private static final Lock loginLocks[] = new Lock[lockCount];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
    private Calendar tempBanCalendar;
 
    static {
-      for (int i = 0; i < 200; i++) {
+      for (int i = 0; i < lockCount; i++) {
          loginLocks[i] = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CLIENT_LOGIN, true);
       }
    }
@@ -278,7 +279,7 @@ public class MapleClient {
    }
 
    public int finishLogin() {
-      Lock loginLock = loginLocks[this.getAccID() % 200];
+      Lock loginLock = loginLocks[this.getAccID() % lockCount];
       loginLock.lock();
       try {
          if (getLoginState() > LOGIN_NOTLOGGEDIN) { // 0 = LOGIN_NOTLOGGEDIN, 1= LOGIN_SERVER_TRANSITION, 2 = LOGIN_LOGGEDIN
@@ -835,17 +836,33 @@ public class MapleClient {
    }
 
    public boolean acceptToS() {
-      boolean disconnectForBeingAFaggot = false;
+      boolean disconnect = false;
       if (accountName == null) {
          return true;
       }
 
       boolean tosStatus = DatabaseConnection.getInstance().withConnectionResult(connection -> AccountProvider.getInstance().getTosStatus(connection, accId)).orElse(false);
       if (tosStatus) {
-         disconnectForBeingAFaggot = true;
+         disconnect = true;
       }
       DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().acceptTos(connection, accId));
-      return disconnectForBeingAFaggot;
+      return disconnect;
+   }
+
+   public void checkChar(int accid) {  /// issue with multiple chars from same account login found by shavit, resinate
+      if (true) {
+         return;
+      }
+
+      for (World w : Server.getInstance().getWorlds()) {
+         for (MapleCharacter chr : w.getPlayerStorage().getAllCharacters()) {
+            if (accid == chr.getAccountID()) {
+               FilePrinter.print(FilePrinter.EXPLOITS, "Player:  " + chr.getName() + " has been removed from " + GameConstants.WORLD_NAMES[w.getId()] + ". Possible Dupe attempt.");
+               chr.getClient().forceDisconnect();
+               w.getPlayerStorage().removePlayer(chr.getId());
+            }
+         }
+      }
    }
 
    public int getVotePoints() {

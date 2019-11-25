@@ -18,6 +18,7 @@ import client.MapleCharacter;
 import client.MapleFamily;
 import client.MapleFamilyEntry;
 import net.server.Server;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.channel.Channel;
 import net.server.guild.MapleGuild;
 import net.server.world.World;
@@ -84,7 +85,7 @@ public class MasterBroadcaster {
     * @param source         the source
     * @param lock           item to lock on
     */
-   public void sendToAllInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, Lock lock) {
+   public void sendToAllInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, MonitoredReadLock lock) {
       lock.lock();
       try {
          sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), character -> PacketCreator.create(packetInput));
@@ -93,7 +94,7 @@ public class MasterBroadcaster {
       }
    }
 
-   public void sendToAllInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, Lock lock) {
+   public void sendToAllInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, MonitoredReadLock lock) {
       lock.lock();
       try {
          sendToAllInMap(map, mapleCharacter -> passRepeatToSource(repeatToSource, source, mapleCharacter), packetCreator);
@@ -162,7 +163,7 @@ public class MasterBroadcaster {
       sendToAllInMap(map, mapleCharacter -> passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), character -> PacketCreator.create(packetInput));
    }
 
-   public void sendToAllInMapRange(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, Point referencePoint, Lock lock) {
+   public void sendToAllInMapRange(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, Point referencePoint, MonitoredReadLock lock) {
       lock.lock();
       try {
          sendToAllInMap(map, mapleCharacter -> passRangeCheck(MapleMapProcessor.getInstance().getRangedDistance(), mapleCharacter, referencePoint), packetCreator);
@@ -193,11 +194,11 @@ public class MasterBroadcaster {
       sendToAllInMap(map, MapleCharacter::isGM, character -> PacketCreator.create(packetInput));
    }
 
-   public void sendToAllGMInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, Lock lock) {
+   public void sendToAllGMInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, MonitoredReadLock lock) {
       sendToAllGMInMap(map, character -> PacketCreator.create(packetInput), repeatToSource, source, lock);
    }
 
-   public void sendToAllGMInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, Lock lock) {
+   public void sendToAllGMInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, MonitoredReadLock lock) {
       lock.lock();
       try {
          sendToAllInMap(map, character -> {
@@ -211,11 +212,11 @@ public class MasterBroadcaster {
       }
    }
 
-   public void sendToAllNonGMInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, Lock lock) {
+   public void sendToAllNonGMInMap(MapleMap map, PacketInput packetInput, boolean repeatToSource, MapleCharacter source, MonitoredReadLock lock) {
       sendToAllNonGMInMap(map, character -> PacketCreator.create(packetInput), repeatToSource, source, lock);
    }
 
-   public void sendToAllNonGMInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, Lock lock) {
+   public void sendToAllNonGMInMap(MapleMap map, Function<MapleCharacter, byte[]> packetCreator, boolean repeatToSource, MapleCharacter source, MonitoredReadLock lock) {
       lock.lock();
       try {
          sendToAllInMap(map, character -> {
@@ -237,7 +238,7 @@ public class MasterBroadcaster {
     * @param packetInput the packet
     * @param lock        thing to lock on
     */
-   public void sendToGMAndAboveInMap(MapleMap map, MapleCharacter source, PacketInput packetInput, Lock lock) {
+   public void sendToGMAndAboveInMap(MapleMap map, MapleCharacter source, PacketInput packetInput, MonitoredReadLock lock) {
       lock.lock();
       try {
          sendToAllInMap(map, character -> character != source && (character.gmLevel() >= source.gmLevel()), character -> PacketCreator.create(packetInput));

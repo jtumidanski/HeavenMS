@@ -46,7 +46,8 @@ public final class NPCAnimationHandler extends AbstractPacketHandler<BaseNPCAnim
       if (packet instanceof NPCTalkPacket) {
          writer.writeShort(SendOpcode.NPC_ACTION.getValue());
          writer.writeInt(((NPCTalkPacket) packet).first());
-         writer.writeShort(((NPCTalkPacket) packet).second());
+         writer.write(((NPCTalkPacket) packet).second());
+         writer.write(((NPCTalkPacket) packet).third());
       } else if (packet instanceof NPCMovePacket) {
          writer.writeShort(SendOpcode.NPC_ACTION.getValue());
          writer.write(((NPCMovePacket) packet).movement());

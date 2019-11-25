@@ -30,8 +30,8 @@ import client.MapleClient;
 import config.YamlConfig;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import net.server.channel.services.ServiceType;
-import net.server.channel.services.task.OverallService;
+import net.server.services.task.channel.OverallService;
+import net.server.services.type.ChannelServices;
 import scripting.reactor.ReactorScriptManager;
 import server.TimerManager;
 import server.maps.spawner.ReactorSpawnAndDestroyer;
@@ -351,7 +351,7 @@ public class MapleReactor extends AbstractMapleMapObject {
       };
 
       delayedRespawnRun = r;
-      OverallService service = (OverallService) map.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+      OverallService service = (OverallService) map.getChannelServer().getServiceAccess(ChannelServices.OVERALL);
       service.registerOverallAction(map.getId(), r, this.getDelay());
    }
 
@@ -359,7 +359,7 @@ public class MapleReactor extends AbstractMapleMapObject {
       Runnable r = delayedRespawnRun;
 
       if (r != null) {
-         OverallService service = (OverallService) map.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+         OverallService service = (OverallService) map.getChannelServer().getServiceAccess(ChannelServices.OVERALL);
          service.forceRunOverallAction(map.getId(), r);
          return true;
       } else {

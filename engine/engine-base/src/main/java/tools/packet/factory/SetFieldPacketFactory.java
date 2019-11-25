@@ -58,6 +58,5 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
          writer.writeBool(false);
       }
       writer.writeLong(getTime(Server.getInstance().getCurrentTime()));
-      writer.skip(18);
    }
 }

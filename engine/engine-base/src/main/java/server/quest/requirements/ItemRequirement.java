@@ -23,6 +23,7 @@ package server.quest.requirements;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import client.MapleCharacter;
 import client.inventory.Item;
@@ -97,11 +98,8 @@ public class ItemRequirement extends MapleQuestRequirement {
       return true;
    }
 
-   public int getItemAmountNeeded(int itemid) {
-      if (items.containsKey(itemid)) {
-         return items.get(itemid);
-      }
-
-      return 0;
+   public int getItemAmountNeeded(int itemid, boolean complete) {
+      Integer amount = items.get(itemid);
+      return Objects.requireNonNullElseGet(amount, () -> complete ? Integer.MAX_VALUE : Integer.MIN_VALUE);
    }
 }

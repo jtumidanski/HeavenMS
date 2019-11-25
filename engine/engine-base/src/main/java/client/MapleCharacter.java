@@ -51,6 +51,7 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.util.ConcurrentHashSet;
 
 import client.autoban.AutobanManager;
@@ -136,14 +137,16 @@ import net.server.Server;
 import net.server.SkillMacro;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import net.server.channel.services.ServiceType;
-import net.server.channel.services.task.FaceExpressionService;
+import net.server.services.task.channel.FaceExpressionService;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
 import net.server.processor.MapleGuildProcessor;
 import net.server.processor.MaplePartyProcessor;
+import net.server.services.task.world.CharacterSaveService;
+import net.server.services.type.ChannelServices;
+import net.server.services.type.WorldServices;
 import net.server.world.MapleMessenger;
 import net.server.world.MapleMessengerCharacter;
 import net.server.world.MapleParty;
@@ -323,6 +326,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private int localchairrate;
    private boolean hidden, equipchanged = true, berserk, hasMerchant, hasSandboxItem = false, whiteChat = false, canRecvPartySearchInvite = true;
    private boolean equippedMesoMagnet = false, equippedItemPouch = false, equippedPetItemIgnore = false;
+   private boolean usedSafetyCharm = false;
    private float autopotHpAlert, autopotMpAlert;
    private int linkedLevel = 0;
    private String linkedName = null;
@@ -738,7 +742,9 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void setSessionTransitionState() {
-      client.getSession().setAttribute(MapleClient.CLIENT_TRANSITION);
+      IoSession session = client.getSession();
+      session.setAttribute(MapleClient.CLIENT_TRANSITION);
+      Server.getInstance().setCharacteridInTransition(session, this.getId());
    }
 
    public boolean getCS() {
@@ -2483,7 +2489,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       long timeNow = Server.getInstance().getCurrentTime();
       if (timeNow - lastExpression > 2000) {
          lastExpression = timeNow;
-         FaceExpressionService service = (FaceExpressionService) client.getChannelServer().getServiceAccess(ServiceType.FACE_EXPRESSION);
+         FaceExpressionService service = (FaceExpressionService) client.getChannelServer().getServiceAccess(ChannelServices.FACE_EXPRESSION);
          service.registerFaceExpression(map, this, emote);
       }
    }
@@ -3334,10 +3340,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public boolean cancelEffect(MapleStatEffect effect, boolean overwrite, long startTime) {
       boolean ret;
 
+      prtLock.lock();
       effLock.lock();
       try {
          ret = cancelEffect(effect, overwrite, startTime, true);
       } finally {
+         prtLock.unlock();
          effLock.unlock();
       }
 
@@ -3808,6 +3816,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          startChairTask();
       }
 
+      prtLock.lock();
       effLock.lock();
       chrLock.lock();
       try {
@@ -3881,6 +3890,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             effects.put(statUp.getKey(), statUp.getValue());
          }
       } finally {
+         prtLock.unlock();
          chrLock.unlock();
          effLock.unlock();
       }
@@ -5085,13 +5095,19 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       int amountNeeded, questStatus = this.getQuestStatus(questid);
       if (questStatus == 0) {
          amountNeeded = MapleQuest.getInstance(questid).getStartItemAmountNeeded(itemid);
+         if (amountNeeded == Integer.MIN_VALUE) {
+            return false;
+         }
       } else if (questStatus != 1) {
          return false;
       } else {
          amountNeeded = MapleQuest.getInstance(questid).getCompleteItemAmountNeeded(itemid);
+         if (amountNeeded == Integer.MAX_VALUE) {
+            return true;
+         }
       }
 
-      return amountNeeded > 0 && getInventory(ItemConstants.getInventoryType(itemid)).countById(itemid) < amountNeeded;
+      return getInventory(ItemConstants.getInventoryType(itemid)).countById(itemid) < amountNeeded;
    }
 
    public int getRank() {
@@ -5448,6 +5464,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (timeNow < getNextBuybackTime() && avail) {
          s += "Buyback available in #r" + MapleStringUtil.getTimeRemaining(getNextBuybackTime() - timeNow) + "#k";
          s += "\r\n";
+      } else {
+         s += "Buyback #bavailable#k";
       }
 
       this.showHint(s);
@@ -6305,6 +6323,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (possesed > 0 && !GameConstants.isDojo(getMapId())) {
          MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "You have used a safety charm, so your EXP points have not been decreased.");
          MapleInventoryManipulator.removeById(client, ItemConstants.getInventoryType(charmID[i]), charmID[i], 1, true, false);
+         usedSafetyCharm = true;
       } else if (getJob() != MapleJob.BEGINNER) { //Hmm...
          if (!FieldLimit.NO_EXP_DECREASE.check(getMap().getFieldLimit())) {  // thanks Conrad for noticing missing FieldLimit check
             int XPdummy = ExpTable.getExpNeededForLevel(getLevel());
@@ -6397,7 +6416,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       changeMap(returnMap);
 
       cancelAllBuffs(false);  // thanks Oblivium91 for finding out players still could revive in area and take damage before returning to town
-      updateHp(50);
+      if (usedSafetyCharm) {  // thanks kvmba for noticing safety charm not providing 30% HP/MP
+         addMPHP((int) Math.ceil(this.getClientMaxHp() * 0.3), (int) Math.ceil(this.getClientMaxMp() * 0.3));
+      } else {
+         updateHp(50);
+      }
       stance_$eq(0);
    }
 
@@ -6822,7 +6845,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    public void saveCharToDB() {
       if (YamlConfig.config.server.USE_AUTOSAVE) {
          Runnable r = () -> saveCharToDB(true);
-         ThreadManager.getInstance().newTask(r);  //spawns a new thread to deal with this
+         CharacterSaveService service = (CharacterSaveService) getWorldServer().getServiceAccess(WorldServices.SAVE_CHARACTER);
+         service.registerSaveCharacter(this.getId(), r);
       } else {
          saveCharToDB(true);
       }

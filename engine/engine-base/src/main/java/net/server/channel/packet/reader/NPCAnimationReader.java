@@ -11,7 +11,7 @@ public class NPCAnimationReader implements PacketReader<BaseNPCAnimationPacket> 
    public BaseNPCAnimationPacket read(SeekableLittleEndianAccessor accessor) {
       int length = (int) accessor.available();
       if (length == 6) {
-         return new NPCTalkPacket(length, accessor.readInt(), accessor.readShort());
+         return new NPCTalkPacket(length, accessor.readInt(), accessor.readByte(), accessor.readByte());
       } else if (length > 6) { // NPC Move
          byte[] bytes = accessor.read(length - 9);
          return new NPCMovePacket(length, bytes);

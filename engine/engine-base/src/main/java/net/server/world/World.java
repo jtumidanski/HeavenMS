@@ -60,9 +60,13 @@ import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.Channel;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.coordinator.world.MapleInviteCoordinator.InviteResult;
@@ -72,6 +76,9 @@ import net.server.coordinator.partysearch.MaplePartySearchCoordinator;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
 import net.server.guild.MapleGuildSummary;
+import net.server.services.BaseService;
+import net.server.services.ServicesManager;
+import net.server.services.type.WorldServices;
 import net.server.task.CharacterAutosaverTask;
 import net.server.task.FamilyDailyResetTask;
 import net.server.task.FishingTask;
@@ -111,8 +118,8 @@ import tools.packets.Fishing;
  */
 public class World {
 
-   private final ReentrantReadWriteLock chnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_CHANNELS, true);
-   private final ReentrantReadWriteLock suggestLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_SUGGEST, true);
+   private final MonitoredReentrantReadWriteLock chnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_CHANNELS, true);
+   private final MonitoredReentrantReadWriteLock suggestLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_SUGGEST, true);
    private int id, flag, exprate, droprate, bossdroprate, mesorate, questrate, travelrate, fishingrate;
    private String eventmsg;
    private List<Channel> channels = new ArrayList<>();
@@ -125,11 +132,12 @@ public class World {
    private Map<Integer, Pair<Integer, Integer>> relationshipCouples = new HashMap<>();
    private Map<Integer, MapleGuildSummary> gsStore = new HashMap<>();
    private PlayerStorage players = new PlayerStorage();
+   private ServicesManager services = new ServicesManager(WorldServices.SAVE_CHARACTER);
    private MapleMatchCheckerCoordinator matchChecker = new MapleMatchCheckerCoordinator();
    private MaplePartySearchCoordinator partySearch = new MaplePartySearchCoordinator();
 
-   private ReadLock chnRLock = chnLock.readLock();
-   private WriteLock chnWLock = chnLock.writeLock();
+   private MonitoredReadLock chnRLock = MonitoredReadLockFactory.createLock(chnLock);
+   private MonitoredWriteLock chnWLock = MonitoredWriteLockFactory.createLock(chnLock);
    private Map<Integer, SortedMap<Integer, MapleCharacter>> accountChars = new HashMap<>();
    private Map<Integer, MapleStorage> accountStorages = new HashMap<>();
 
@@ -143,8 +151,8 @@ public class World {
    private MonitoredReentrantLock partyLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_PARTY, true);
    private Map<Integer, Integer> owlSearched = new LinkedHashMap<>();
    private List<Map<Integer, Integer>> cashItemBought = new ArrayList<>(9);
-   private ReadLock suggestRLock = suggestLock.readLock();
-   private WriteLock suggestWLock = suggestLock.writeLock();
+   private MonitoredReadLock suggestRLock = MonitoredReadLockFactory.createLock(suggestLock);
+   private MonitoredWriteLock suggestWLock = MonitoredWriteLockFactory.createLock(suggestLock);
 
    private Map<Integer, Integer> disabledServerMessages = new HashMap<>();    // reuse owl lock
    private MonitoredReentrantLock srvMessagesLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.WORLD_SRVMESSAGES);
@@ -1708,6 +1716,14 @@ public class World {
       partySearch.runPartySearch();
    }
 
+   public BaseService getServiceAccess(WorldServices sv) {
+      return services.getAccess(sv).getService();
+   }
+
+   private void closeWorldServices() {
+      services.shutdown();
+   }
+
    private void clearWorldData() {
       List<MapleParty> pList;
       partyLock.lock();
@@ -1721,6 +1737,7 @@ public class World {
          p.disposeLocks();
       }
 
+      closeWorldServices();
       disposeLocks();
    }
 

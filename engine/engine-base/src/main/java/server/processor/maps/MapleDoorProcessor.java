@@ -1,8 +1,9 @@
 package server.processor.maps;
 
 import client.MapleCharacter;
-import net.server.channel.services.ServiceType;
-import net.server.channel.services.task.OverallService;
+import net.server.services.type.ChannelServices;
+import net.server.services.type.WorldServices;
+import net.server.services.task.channel.OverallService;
 import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;
 import server.maps.MapleMap;
@@ -23,7 +24,7 @@ public class MapleDoorProcessor {
          long effectTimeLeft = 3000 - destroyDoor.getElapsedDeployTime();   // portal deployment effect duration
          if (effectTimeLeft > 0) {
             MapleMap town = destroyDoor.getTown();
-            OverallService service = (OverallService) town.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+            OverallService service = (OverallService) town.getChannelServer().getServiceAccess(ChannelServices.OVERALL);
             service.registerOverallAction(town.getId(), () -> broadcastRemoveDoor(destroyDoor, owner), effectTimeLeft);
          } else {
             broadcastRemoveDoor(destroyDoor, owner);

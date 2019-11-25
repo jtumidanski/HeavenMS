@@ -1,6 +1,6 @@
 /*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
+    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
+    Copyleft (L) 2016 - 2019 RonanLana
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -17,18 +17,15 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-package net.server.channel.services.task;
-
-import config.YamlConfig;
+package net.server.services;
 
 /**
  * @author Ronan
  */
-public abstract class BaseService {
-   protected static int getChannelSchedulerIndex(int mapid) {
-      int section = 1000000000 / YamlConfig.config.server.CHANNEL_LOCKS;
-      return mapid / section;
-   }
+public interface ServiceType<T extends Enum<?>> {
+   public abstract Service createService();
 
-   public abstract void dispose();
+   public int ordinal();
+
+   public T[] enumValues();
 }

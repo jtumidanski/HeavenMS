@@ -31,6 +31,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
+import client.MapleJob;
 import client.MapleQuestStatus;
 import client.SkillEntry;
 import client.SkillFactory;
@@ -120,6 +121,18 @@ public class AbstractPlayerInteraction {
 
    public MapleCharacter getChar() {
       return c.getPlayer();
+   }
+
+   public int getJobId() {
+      return getPlayer().getJob().getId();
+   }
+
+   public MapleJob getJob() {
+      return getPlayer().getJob();
+   }
+
+   public int getLevel() {
+      return getPlayer().getLevel();
    }
 
    public MapleMap getMap() {

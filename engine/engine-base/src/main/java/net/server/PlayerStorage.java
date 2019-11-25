@@ -34,14 +34,18 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import client.MapleCharacter;
 import client.MapleClient;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 
 public class PlayerStorage {
-   private final ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_STORAGE, true);
+   private final MonitoredReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_STORAGE, true);
    private final Map<Integer, MapleCharacter> storage = new LinkedHashMap<>();
    private final Map<String, MapleCharacter> nameStorage = new LinkedHashMap<>();
-   private ReadLock rlock = locks.readLock();
-   private WriteLock wlock = locks.writeLock();
+   private MonitoredReadLock rlock = MonitoredReadLockFactory.createLock(locks);
+   private MonitoredWriteLock wlock = MonitoredWriteLockFactory.createLock(locks);
 
    public void addPlayer(MapleCharacter chr) {
       wlock.lock();

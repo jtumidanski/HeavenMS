@@ -63,13 +63,18 @@ import constants.game.GameConstants;
 import constants.inventory.ItemConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.Channel;
-import net.server.channel.services.ServiceType;
-import net.server.channel.services.task.FaceExpressionService;
-import net.server.channel.services.task.MobMistService;
-import net.server.channel.services.task.OverallService;
+import net.server.services.type.ChannelServices;
+import net.server.services.type.WorldServices;
+import net.server.services.task.channel.FaceExpressionService;
+import net.server.services.task.channel.MobMistService;
+import net.server.services.task.channel.OverallService;
 import net.server.coordinator.world.MapleMonsterAggroCoordinator;
 import net.server.world.World;
 import scala.Option;
@@ -233,10 +238,10 @@ public class MapleMap {
    private int timeDefault;
    private int timeExpand;
    //locks
-   private ReadLock chrRLock;
-   private WriteLock chrWLock;
-   private ReadLock objectRLock;
-   private WriteLock objectWLock;
+   private MonitoredReadLock chrRLock;
+   private MonitoredWriteLock chrWLock;
+   private MonitoredReadLock objectRLock;
+   private MonitoredWriteLock objectWLock;
    private Lock lootLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.MAP_LOOT, true);
    private List<Integer> skillIds = new ArrayList<>();
    private List<Pair<Integer, Integer>> mobsToSpawn = new ArrayList<>();
@@ -250,13 +255,13 @@ public class MapleMap {
       if (this.monsterRate == 0) {
          this.monsterRate = 1;
       }
-      final ReentrantReadWriteLock chrLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_CHRS, true);
-      chrRLock = chrLock.readLock();
-      chrWLock = chrLock.writeLock();
+      final MonitoredReentrantReadWriteLock chrLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_CHRS, true);
+      chrRLock = MonitoredReadLockFactory.createLock(chrLock);
+      chrWLock = MonitoredWriteLockFactory.createLock(chrLock);
 
-      final ReentrantReadWriteLock objectLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_OBJS, true);
-      objectRLock = objectLock.readLock();
-      objectWLock = objectLock.writeLock();
+      final MonitoredReentrantReadWriteLock objectLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_OBJS, true);
+      objectRLock = MonitoredReadLockFactory.createLock(objectLock);
+      objectWLock = MonitoredWriteLockFactory.createLock(objectLock);
 
       aggroMonitor = new MapleMonsterAggroCoordinator();
    }
@@ -723,6 +728,10 @@ public class MapleMap {
       final List<MonsterDropEntry> visibleQuestEntry = new ArrayList<>();
       final List<MonsterDropEntry> otherQuestEntry = new ArrayList<>();
       DropEntryProcessor.getInstance().sortDropEntries(YamlConfig.config.server.USE_SPAWN_RELEVANT_LOOT ? mob.retrieveRelevantDrops() : mi.retrieveEffectiveDrop(mob.id()), dropEntry, visibleQuestEntry, otherQuestEntry, chr);
+
+      if (dropEntry.isEmpty() && visibleQuestEntry.isEmpty()) {   // thanks resinate
+         return;
+      }
 
       registerMobItemDrops(droptype, mobpos, chRate, pos, dropEntry, visibleQuestEntry, otherQuestEntry, globalEntry, chr, mob);
    }
@@ -1241,6 +1250,18 @@ public class MapleMap {
       return (int) getAllPlayers().stream().filter(AbstractMapleCharacterObject::isAlive).count();
    }
 
+   public int countBosses() {
+      int count = 0;
+
+      for(MapleMonster mob: getAllMonsters()) {
+         if (mob.isBoss()) {
+            count++;
+         }
+      }
+
+      return count;
+   }
+
    public boolean damageMonster(final MapleCharacter chr, final MapleMonster monster, final int damage) {
       if (monster.id() == 8800000) {
          for (MapleMapObject object : chr.getMap().getMapObjects()) {
@@ -1296,6 +1317,9 @@ public class MapleMap {
          spawnedMonstersOnMap.decrementAndGet();
          removeMapObject(monster);
          monster.disposeMapObject();
+         if (monster.hasBossHPBar()) {   // thanks resinate for noticing boss HPbar not clearing after mob defeat in certain scenarios
+            broadcastBossHpMessage(monster, monster.hashCode(), monster.makeBossHPBarPacket(), monster.position());
+         }
 
          return true;
       } finally {
@@ -1370,7 +1394,6 @@ public class MapleMap {
                         if (mons != null) {
                            if (mons.id() == 8800000) {
                               makeMonsterReal(mons);
-                              mons.aggroUpdateController();
                               break;
                            }
                         }
@@ -1763,9 +1786,7 @@ public class MapleMap {
 
       monster.aggroUpdateController();
 
-      if (monster.hasBossHPBar()) {
-         broadcastBossHpMessage(monster, monster.hashCode(), monster.makeBossHPBarPacket(), monster.position());
-      }
+      updateBossSpawn(monster);
 
       spawnedMonstersOnMap.incrementAndGet();
       addSelfDestructive(monster);
@@ -1804,7 +1825,7 @@ public class MapleMap {
    public void dismissRemoveAfter(final MapleMonster monster) {
       Runnable removeAfterAction = monster.popRemoveAfterAction();
       if (removeAfterAction != null) {
-         OverallService service = (OverallService) this.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+         OverallService service = (OverallService) this.getChannelServer().getServiceAccess(ChannelServices.OVERALL);
          service.forceRunOverallAction(mapid, removeAfterAction);
       }
    }
@@ -1863,6 +1884,7 @@ public class MapleMap {
       }, null);
 
       monster.aggroUpdateController();
+      updateBossSpawn(monster);
 
       if ((monster.getTeam() == 1 || monster.getTeam() == 0) && (isCPQMap() || isCPQMap2())) {
          List<MCSkill> teamS = null;
@@ -1876,10 +1898,6 @@ public class MapleMap {
                   .filter(Objects::nonNull)
                   .forEach(skill -> MobSkillProcessor.getInstance().applyEffect(null, monster, skill.getSkill(), false, null));
          }
-      }
-
-      if (monster.hasBossHPBar()) {
-         broadcastBossHpMessage(monster, monster.hashCode(), monster.makeBossHPBarPacket(), monster.position());
       }
 
       if (monster.getDropPeriodTime() > 0) { //9300102 - Watchhog, 9300061 - Moon Bunny (HPQ), 9300093 - Tylus
@@ -1930,9 +1948,7 @@ public class MapleMap {
 
       monster.aggroUpdateController();
 
-      if (monster.hasBossHPBar()) {
-         broadcastBossHpMessage(monster, monster.hashCode(), monster.makeBossHPBarPacket(), monster.position());
-      }
+      updateBossSpawn(monster);
 
       spawnedMonstersOnMap.incrementAndGet();
       addSelfDestructive(monster);
@@ -1951,8 +1967,9 @@ public class MapleMap {
    public void makeMonsterReal(final MapleMonster monster) {
       monster.setFake(false);
       MasterBroadcaster.getInstance().sendToAllInMap(this, new MakeMonsterReal(monster));
-
+      monster.broadcastMonsterStatus();
       monster.aggroUpdateController();
+      updateBossSpawn(monster);
    }
 
    public void spawnReactor(final MapleReactor reactor) {
@@ -2061,7 +2078,7 @@ public class MapleMap {
          }
       };
 
-      MobMistService service = (MobMistService) this.getChannelServer().getServiceAccess(ServiceType.MOB_MIST);
+      MobMistService service = (MobMistService) this.getChannelServer().getServiceAccess(ChannelServices.MOB_MIST);
       service.registerMobMistCancelAction(mapid, mistSchedule, duration);
    }
 
@@ -2161,7 +2178,7 @@ public class MapleMap {
    }
 
    private void registerMapSchedule(Runnable r, long delay) {
-      OverallService service = (OverallService) this.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+      OverallService service = (OverallService) this.getChannelServer().getServiceAccess(ChannelServices.OVERALL);
       service.registerOverallAction(mapid, r, delay);
    }
 
@@ -2630,7 +2647,7 @@ public class MapleMap {
    public void removePlayer(MapleCharacter chr) {
       Channel cserv = chr.getClient().getChannelServer();
 
-      FaceExpressionService service = (FaceExpressionService) this.getChannelServer().getServiceAccess(ServiceType.FACE_EXPRESSION);
+      FaceExpressionService service = (FaceExpressionService) this.getChannelServer().getServiceAccess(ChannelServices.FACE_EXPRESSION);
       service.unregisterFaceExpression(mapid, chr);
       chr.unregisterChairBuff();
 
@@ -2674,6 +2691,21 @@ public class MapleMap {
             this.broadcastGMMessage(chr, new RemoveDragon(chr.getId()));
          } else {
             this.broadcastMessage(chr, new RemoveDragon(chr.getId()));
+         }
+      }
+   }
+
+   private void updateBossSpawn(MapleMonster monster) {
+      if (monster.hasBossHPBar()) {
+         broadcastBossHpMessage(monster, monster.hashCode(), monster.makeBossHPBarPacket(), monster.position());
+      }
+      if (monster.isBoss()) {
+         if (unclaimOwnership() != null) {
+            String mobName = MapleMonsterInformationProvider.getInstance().getMobNameFromId(monster.id());
+            if (mobName != null) {
+               mobName = mobName.trim();
+               MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, "This lawn has been taken siege by " + mobName + "'s forces and will be kept hold until their defeat.");
+            }
          }
       }
    }
@@ -3692,8 +3724,13 @@ public class MapleMap {
       }
    }
 
+   public MapleCharacter unclaimOwnership() {
+      MapleCharacter lastOwner = this.mapOwner;
+      return unclaimOwnership(lastOwner) ? lastOwner : null;
+   }
+
    public boolean unclaimOwnership(MapleCharacter chr) {
-      if (mapOwner == chr) {
+      if (chr != null && mapOwner == chr) {
          this.mapOwner = null;
          chr.setOwnedMap(null);
 
@@ -3728,7 +3765,7 @@ public class MapleMap {
    public void checkMapOwnerActivity() {
       long timeNow = Server.getInstance().getCurrentTime();
       if (timeNow - mapOwnerLastActivityTime > 60000) {
-         if (unclaimOwnership(mapOwner)) {
+         if (unclaimOwnership() != null) {
             MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
          }
       }
@@ -4140,7 +4177,7 @@ public class MapleMap {
                      if (reactor.getDelay() > 0) {
                         MapleMap reactorMap = reactor.getMap();
 
-                        OverallService service = (OverallService) reactorMap.getChannelServer().getServiceAccess(ServiceType.OVERALL);
+                        OverallService service = (OverallService) reactorMap.getChannelServer().getServiceAccess(ChannelServices.OVERALL);
                         service.registerOverallAction(reactorMap.getId(), new Runnable() {
                            @Override
                            public void run() {

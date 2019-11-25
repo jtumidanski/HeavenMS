@@ -22,26 +22,27 @@ package tools;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 
 /**
  * @author Ronan
  */
 public class IntervalBuilder {
 
-   protected ReadLock intervalRlock;
-   protected WriteLock intervalWlock;
+   protected MonitoredReadLock intervalRlock;
+   protected MonitoredWriteLock intervalWlock;
    private List<Line2D> intervalLimits = new ArrayList<>();
 
    public IntervalBuilder() {
-      ReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.INTERVAL, true);
-      intervalRlock = locks.readLock();
-      intervalWlock = locks.writeLock();
+      MonitoredReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.INTERVAL, true);
+      intervalRlock = MonitoredReadLockFactory.createLock(locks);
+      intervalWlock = MonitoredWriteLockFactory.createLock(locks);
    }
 
    private void refitOverlappedIntervals(int st, int en, int newFrom, int newTo) {
@@ -97,7 +98,9 @@ public class IntervalBuilder {
          }
 
          int en = bsearchInterval(to);
-         if (en < st) en = st - 1;
+         if (en < st) {
+            en = st - 1;
+         }
 
          refitOverlappedIntervals(st, en + 1, from, to);
       } finally {

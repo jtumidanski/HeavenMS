@@ -30,16 +30,20 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import client.MapleCharacter;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 
 /**
  * @author Ronan
  */
 public class PartySearchEchelon {
 
-   private final ReentrantReadWriteLock psLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_PARTY_SEARCH_ECHELON, true);
-   private final ReadLock psRLock = psLock.readLock();
-   private final WriteLock psWLock = psLock.writeLock();
+   private final MonitoredReentrantReadWriteLock psLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_PARTY_SEARCH_ECHELON, true);
+   private final MonitoredReadLock psRLock = MonitoredReadLockFactory.createLock(psLock);
+   private final MonitoredWriteLock psWLock = MonitoredWriteLockFactory.createLock(psLock);
 
    private Map<Integer, WeakReference<MapleCharacter>> echelon = new HashMap<>(20);
 

@@ -56,10 +56,6 @@ public class MapleLootManager {
                qItemAmount = qCompleteAmount;
             }
 
-            if (qItemAmount <= 0) {
-               continue;
-            }
-
             int qItemStatus = chrInv.hasItem(dropEntry.itemId(), qItemAmount);
             if (qItemStatus == 2) {
                continue;

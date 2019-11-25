@@ -48,7 +48,7 @@ public final class CharacterListRequestHandler extends AbstractPacketHandler<Cha
       }
 
       Channel channel = world.getChannel(packet.channel());
-      if (channel == null || !channel.isActive()) {
+      if (channel == null) {
          PacketCreator.announce(client, new GetServerStatus(ServerStatus.FULL));
          return;
       }

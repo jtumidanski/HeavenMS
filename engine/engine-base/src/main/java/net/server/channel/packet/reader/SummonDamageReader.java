@@ -18,7 +18,6 @@ public class SummonDamageReader implements PacketReader<SummonDamagePacket> {
 
       for (int x = 0; x < numAttacked; x++) {
          monsterOids[x] = accessor.readInt(); // attacked oid
-         accessor.skip(18);
          damage[x] = accessor.readInt();
       }
 

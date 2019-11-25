@@ -36,9 +36,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.stream.Collectors;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -58,13 +55,17 @@ import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.processor.WeddingProcessor;
-import net.server.channel.services.ServiceType;
-import net.server.channel.services.ServicesManager;
-import net.server.channel.services.task.BaseService;
+import net.server.services.ServicesManager;
+import net.server.services.BaseService;
+import net.server.services.type.ChannelServices;
 import net.server.world.MapleParty;
 import net.server.world.World;
 import scripting.event.EventScriptManager;
@@ -93,7 +94,7 @@ public final class Channel {
    private String ip, serverMessage;
    private MapleMapManager mapManager;
    private EventScriptManager eventSM;
-   private ServicesManager services = new ServicesManager();
+   private ServicesManager services;
    private Map<Integer, MapleHiredMerchant> hiredMerchants = new HashMap<>();
    private Set<Integer> playersAway = new HashSet<>();
    private Map<MapleExpeditionType, MapleExpedition> expeditions = new HashMap<>();
@@ -123,9 +124,9 @@ public final class Channel {
    private Set<Integer> ongoingCathedralGuests = null;
    private long ongoingStartTime;
 
-   private ReentrantReadWriteLock merchantLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MERCHANT, true);
-   private ReadLock merchRlock = merchantLock.readLock();
-   private WriteLock merchWlock = merchantLock.writeLock();
+   private MonitoredReentrantReadWriteLock merchantLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MERCHANT, true);
+   private MonitoredReadLock merchRlock = MonitoredReadLockFactory.createLock(merchantLock);
+   private MonitoredWriteLock merchWlock = MonitoredWriteLockFactory.createLock(merchantLock);
 
    private MonitoredReentrantLock[] faceLock = new MonitoredReentrantLock[YamlConfig.config.server.CHANNEL_LOCKS];
 
@@ -155,8 +156,8 @@ public final class Channel {
             eventSM = new EventScriptManager(this, getEvents());
             eventSM.init();
          } else {
-            String[] ev = {};
-            eventSM = new EventScriptManager(null, ev);
+            String[] ev = {"0_EXAMPLE"};
+            eventSM = new EventScriptManager(this, ev);
          }
 
          dojoStage = new int[20];
@@ -168,7 +169,7 @@ public final class Channel {
             dojoTask[i] = null;
          }
 
-         services = new ServicesManager();
+         services = new ServicesManager(ChannelServices.OVERALL);
 
          System.out.println("    Channel " + getId() + ": Listening on port " + port);
       } catch (Exception e) {
@@ -234,7 +235,6 @@ public final class Channel {
       eventSM.cancel();
       eventSM = null;
       eventSM = new EventScriptManager(this, getEvents());
-      eventSM.init();
    }
 
    public final synchronized void shutdown() {
@@ -249,7 +249,7 @@ public final class Channel {
          disconnectAwayPlayers();
          players.disconnectAll();
 
-         eventSM.cancel();
+         eventSM.dispose();
          eventSM = null;
 
          mapManager.dispose();
@@ -322,7 +322,7 @@ public final class Channel {
       return mapManager;
    }
 
-   public BaseService getServiceAccess(ServiceType serviceType) {
+   public BaseService getServiceAccess(ChannelServices serviceType) {
       return services.getAccess(serviceType).getService();
    }
 

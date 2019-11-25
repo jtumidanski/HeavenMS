@@ -93,8 +93,12 @@ import net.MapleServerHandler;
 import net.mina.MapleCodecFactory;
 import net.server.audit.ThreadTracker;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.Channel;
 import net.server.coordinator.session.MapleSessionCoordinator;
 import net.server.guild.MapleAlliance;
@@ -151,12 +155,12 @@ public class Server {
    private final List<WorldRankData> playerRanking = new LinkedList<>();
    private final Lock srvLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER);
    private final Lock disLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_DISEASES);
-   private final ReentrantReadWriteLock wldLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_WORLDS, true);
-   private final ReadLock wldRLock = wldLock.readLock();
-   private final WriteLock wldWLock = wldLock.writeLock();
-   private final ReentrantReadWriteLock lgnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_LOGIN, true);
-   private final ReadLock lgnRLock = lgnLock.readLock();
-   private final WriteLock lgnWLock = lgnLock.writeLock();
+   private final MonitoredReentrantReadWriteLock wldLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_WORLDS, true);
+   private final MonitoredReadLock wldRLock = MonitoredReadLockFactory.createLock(wldLock);
+   private final MonitoredWriteLock wldWLock = MonitoredWriteLockFactory.createLock(wldLock);
+   private final MonitoredReentrantReadWriteLock lgnLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.SERVER_LOGIN, true);
+   private final MonitoredReadLock lgnRLock = MonitoredReadLockFactory.createLock(lgnLock);
+   private final MonitoredWriteLock lgnWLock = MonitoredWriteLockFactory.createLock(lgnLock);
    private final AtomicLong currentTime = new AtomicLong(0);
    private IoAcceptor acceptor;
    private List<Map<Integer, String>> channels = new LinkedList<>();
@@ -1585,11 +1589,11 @@ public class Server {
          }
       }
 
+      resetServerWorlds();
+
       ThreadManager.getInstance().stop();
       TimerManager.getInstance().purge();
       TimerManager.getInstance().stop();
-
-      resetServerWorlds();
 
       System.out.println("Worlds + Channels are offline.");
       acceptor.unbind();

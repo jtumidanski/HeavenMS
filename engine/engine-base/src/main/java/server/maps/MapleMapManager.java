@@ -26,7 +26,11 @@ import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import scripting.event.EventInstanceManager;
 
 public class MapleMapManager {
@@ -36,17 +40,17 @@ public class MapleMapManager {
 
    private Map<Integer, MapleMap> maps = new HashMap<>();
 
-   private ReadLock mapsRLock;
-   private WriteLock mapsWLock;
+   private MonitoredReadLock mapsRLock;
+   private MonitoredWriteLock mapsWLock;
 
    public MapleMapManager(EventInstanceManager eim, int world, int channel) {
       this.world = world;
       this.channel = channel;
       this.event = eim;
 
-      ReentrantReadWriteLock rrwl = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_MANAGER);
-      this.mapsRLock = rrwl.readLock();
-      this.mapsWLock = rrwl.writeLock();
+      MonitoredReentrantReadWriteLock rrwl = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_MANAGER);
+      this.mapsRLock = MonitoredReadLockFactory.createLock(rrwl);
+      this.mapsWLock = MonitoredWriteLockFactory.createLock(rrwl);
    }
 
    public MapleMap resetMap(int mapid) {

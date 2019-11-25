@@ -1,6 +1,4 @@
-package net.server.channel.services;
-
-import net.server.channel.services.task.BaseService;
+package net.server.services;
 
 public class Service<T extends BaseService> {
 

@@ -1,8 +1,9 @@
-package net.server.channel.services.task;
+package net.server.services.task.channel;
 
 import config.YamlConfig;
 import net.server.audit.locks.MonitoredLockType;
-import net.server.channel.services.BaseScheduler;
+import net.server.services.BaseScheduler;
+import net.server.services.BaseService;
 
 public class OverallService extends BaseService {   // thanks Alex for suggesting a refactor over the several channel schedulers unnecessarily populating the Channel class
 

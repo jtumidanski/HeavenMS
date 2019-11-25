@@ -29,6 +29,7 @@ import server.quest.MapleQuest;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowTitleEarned;
 import tools.packet.quest.ShowQuestComplete;
+import tools.packet.showitemgaininchat.ShowInfo;
 import tools.packet.showitemgaininchat.ShowIntro;
 
 public class MapScriptMethods extends AbstractPlayerInteraction {
@@ -37,6 +38,34 @@ public class MapScriptMethods extends AbstractPlayerInteraction {
 
    public MapScriptMethods(MapleClient c) {
       super(c);
+   }
+
+   public void displayCygnusIntro() {
+      switch (c.getPlayer().getMapId()) {
+         case 913040100:
+            lockUI();
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene0"));
+            break;
+         case 913040101:
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene1"));
+            break;
+         case 913040102:
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene2"));
+            break;
+         case 913040103:
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene3"));
+            break;
+         case 913040104:
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene4"));
+            break;
+         case 913040105:
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene5"));
+            break;
+         case 913040106:
+            lockUI();
+            PacketCreator.announce(c, new ShowInfo("Effect/Direction.img/cygnusJobTutorial/Scene6"));
+            break;
+      }
    }
 
    public void displayAranIntro() {

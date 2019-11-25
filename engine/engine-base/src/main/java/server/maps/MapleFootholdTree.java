@@ -166,25 +166,27 @@ public class MapleFootholdTree {
       }
       Collections.sort(xMatches);
       for (MapleFoothold fh : xMatches) {
-         if (!fh.isWall() && fh.firstY() != fh.secondY()) {
-            int calcY;
-            double s1 = Math.abs(fh.secondY() - fh.firstY());
-            double s2 = Math.abs(fh.secondX() - fh.firstX());
-            double s4 = Math.abs(p.x - fh.firstX());
-            double alpha = Math.atan(s2 / s1);
-            double beta = Math.atan(s1 / s2);
-            double s5 = Math.cos(alpha) * (s4 / Math.cos(beta));
-            if (fh.secondY() < fh.firstY()) {
-               calcY = fh.firstY() - (int) s5;
+         if (!fh.isWall()) {
+            if (fh.firstY() != fh.secondY()) {
+               int calcY;
+               double s1 = Math.abs(fh.secondY() - fh.firstY());
+               double s2 = Math.abs(fh.secondX() - fh.firstX());
+               double s4 = Math.abs(p.x - fh.firstX());
+               double alpha = Math.atan(s2 / s1);
+               double beta = Math.atan(s1 / s2);
+               double s5 = Math.cos(alpha) * (s4 / Math.cos(beta));
+               if (fh.secondY() < fh.firstY()) {
+                  calcY = fh.firstY() - (int) s5;
+               } else {
+                  calcY = fh.firstY() + (int) s5;
+               }
+               if (calcY >= p.y) {
+                  return fh;
+               }
             } else {
-               calcY = fh.firstY() + (int) s5;
-            }
-            if (calcY >= p.y) {
-               return fh;
-            }
-         } else if (!fh.isWall()) {
-            if (fh.firstY() >= p.y) {
-               return fh;
+               if (fh.firstY() >= p.y) {
+                  return fh;
+               }
             }
          }
       }

@@ -64,12 +64,12 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.channel.Channel;
-import net.server.channel.services.ServiceType;
-import net.server.channel.services.task.MobAnimationService;
-import net.server.channel.services.task.MobClearSkillService;
-import net.server.channel.services.task.MobStatusService;
-import net.server.channel.services.task.OverallService;
 import net.server.coordinator.world.MapleMonsterAggroCoordinator;
+import net.server.services.task.channel.MobAnimationService;
+import net.server.services.task.channel.MobClearSkillService;
+import net.server.services.task.channel.MobStatusService;
+import net.server.services.task.channel.OverallService;
+import net.server.services.type.ChannelServices;
 import net.server.world.MapleParty;
 import scripting.event.EventInstanceManager;
 import server.MapleStatEffect;
@@ -401,7 +401,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          }
 
          if (animationTime > 0) {
-            MobAnimationService service = (MobAnimationService) map.getChannelServer().getServiceAccess(ServiceType.MOB_ANIMATION);
+            MobAnimationService service = (MobAnimationService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_ANIMATION);
             return service.registerMobOnAnimationEffect(map.getId(), this.hashCode(), animationTime);
          } else {
             return true;
@@ -850,7 +850,6 @@ public class MapleMonster extends AbstractLoadedMapleLife {
 
                            if (htKilled) {
                               reviveMap.killMonster(ht, killer, true);
-                              ht.broadcastMobHpBar(killer);
                            }
                         }
 
@@ -1069,16 +1068,20 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       return isBoss() && getTagColor() > 0;
    }
 
+   public void broadcastMonsterStatus() {
+      Collection<MonsterStatusEffect> mseList = this.getStati().values();
+      for (MapleCharacter chr : map.getAllPlayers()) {
+         announceMonsterStatusInternal(chr.getClient(), mseList);
+      }
+   }
+
    public void announceMonsterStatus(MapleClient client) {
-      statiLock.lock();
-      try {
-         if (stati.size() > 0) {
-            for (final MonsterStatusEffect mse : this.stati.values()) {
-               PacketCreator.announce(client, new ApplyMonsterStatus(this.objectId(), mse, null));
-            }
-         }
-      } finally {
-         statiLock.unlock();
+      announceMonsterStatusInternal(client, this.getStati().values());
+   }
+
+   public void announceMonsterStatusInternal(MapleClient client, Collection<MonsterStatusEffect> mseList) {
+      for (MonsterStatusEffect mse : mseList) {
+         PacketCreator.announce(client, new ApplyMonsterStatus(id(), mse, null));
       }
    }
 
@@ -1206,7 +1209,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                if (oldEffect != null) {
                   oldEffect.removeActiveStatus(stat);
                   if (oldEffect.getStati().isEmpty()) {
-                     MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ServiceType.MOB_STATUS);
+                     MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_STATUS);
                      service.interruptMobStatus(mapid, oldEffect);
                   }
                }
@@ -1319,7 +1322,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          statiLock.unlock();
       }
 
-      MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ServiceType.MOB_STATUS);
+      MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_STATUS);
       service.registerMobStatus(mapid, status, cancelTask, duration + animationTime - 100, overtimeAction, overtimeDelay);
       return true;
    }
@@ -1369,7 +1372,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          statiLock.unlock();
       }
 
-      MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ServiceType.MOB_STATUS);
+      MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_STATUS);
       service.registerMobStatus(map.getId(), effect, cancelTask, duration);
    }
 
@@ -1572,7 +1575,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          }
       };
 
-      MobClearSkillService service = (MobClearSkillService) map.getChannelServer().getServiceAccess(ServiceType.MOB_CLEAR_SKILL);
+      MobClearSkillService service = (MobClearSkillService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_CLEAR_SKILL);
       service.registerMobClearSkillAction(mmap.getId(), r, cooltime);
    }
 
@@ -1641,7 +1644,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
             }
          };
 
-         MobClearSkillService service = (MobClearSkillService) map.getChannelServer().getServiceAccess(ServiceType.MOB_CLEAR_SKILL);
+         MobClearSkillService service = (MobClearSkillService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_CLEAR_SKILL);
          service.registerMobClearSkillAction(mmap.getId(), r, cooltime);
       } finally {
          monsterLock.unlock();
@@ -1703,7 +1706,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                }
             };
 
-            MobClearSkillService service = (MobClearSkillService) mmap.getChannelServer().getServiceAccess(ServiceType.MOB_CLEAR_SKILL);
+            MobClearSkillService service = (MobClearSkillService) mmap.getChannelServer().getServiceAccess(ChannelServices.MOB_CLEAR_SKILL);
             service.registerMobClearSkillAction(mmap.getId(), r, milli);
          }
       } finally {
@@ -1735,7 +1738,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
    public Map<MonsterStatus, MonsterStatusEffect> getStati() {
       statiLock.lock();
       try {
-         return Collections.unmodifiableMap(stati);
+         return new HashMap<>(stati);
       } finally {
          statiLock.unlock();
       }
@@ -2164,7 +2167,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       };
 
       // had to schedule this since mob wouldn't stick to puppet aggro who knows why
-      OverallService service = (OverallService) this.getMap().getChannelServer().getServiceAccess(ServiceType.OVERALL);
+      OverallService service = (OverallService) this.getMap().getChannelServer().getServiceAccess(ChannelServices.OVERALL);
       service.registerOverallAction(this.getMap().getId(), r, YamlConfig.config.server.UPDATE_INTERVAL);
    }
 
@@ -2233,7 +2236,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       public void run() {
          int curHp = hp.get();
          if (curHp <= 1) {
-            MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ServiceType.MOB_STATUS);
+            MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_STATUS);
             service.interruptMobStatus(map.getId(), status);
             return;
          }
@@ -2242,7 +2245,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          if (damage >= curHp) {
             damage = curHp - 1;
             if (type == 1 || type == 2) {
-               MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ServiceType.MOB_STATUS);
+               MobStatusService service = (MobStatusService) map.getChannelServer().getServiceAccess(ChannelServices.MOB_STATUS);
                service.interruptMobStatus(map.getId(), status);
             }
          }

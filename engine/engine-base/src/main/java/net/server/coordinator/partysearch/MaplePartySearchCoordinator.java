@@ -36,7 +36,11 @@ import client.MapleCharacter;
 import client.MapleJob;
 import config.YamlConfig;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.coordinator.world.MapleInviteCoordinator.InviteType;
 import provider.MapleData;
@@ -55,9 +59,9 @@ public class MaplePartySearchCoordinator {
 
    private static Map<Integer, Set<Integer>> mapNeighbors = fetchNeighbouringMaps();
    private static Map<Integer, MapleJob> jobTable = instantiateJobTable();
-   private final ReentrantReadWriteLock leaderQueueLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_PARTY_SEARCH_QUEUE, true);
-   private final ReadLock leaderQueueRLock = leaderQueueLock.readLock();
-   private final WriteLock leaderQueueWLock = leaderQueueLock.writeLock();
+   private final MonitoredReentrantReadWriteLock leaderQueueLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_PARTY_SEARCH_QUEUE, true);
+   private final MonitoredReadLock leaderQueueRLock = MonitoredReadLockFactory.createLock(leaderQueueLock);
+   private final MonitoredWriteLock leaderQueueWLock = MonitoredWriteLockFactory.createLock(leaderQueueLock);
    private Map<MapleJob, PartySearchStorage> storage = new HashMap<>();
    private Map<MapleJob, PartySearchEchelon> upcomers = new HashMap<>();
    private List<MapleCharacter> leaderQueue = new LinkedList<>();

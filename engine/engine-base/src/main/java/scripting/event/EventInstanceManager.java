@@ -32,9 +32,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.ScriptException;
@@ -45,9 +42,13 @@ import config.YamlConfig;
 import constants.inventory.ItemConstants;
 import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
+import net.server.audit.locks.MonitoredReadLock;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.MonitoredReentrantReadWriteLock;
+import net.server.audit.locks.MonitoredWriteLock;
+import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
+import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.coordinator.world.MapleEventRecallCoordinator;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
@@ -80,7 +81,7 @@ import tools.packet.ui.StopClock;
  * @author Ronan
  */
 public class EventInstanceManager {
-   private final ReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(MonitoredLockType.EIM, true);
+   private final MonitoredReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(MonitoredLockType.EIM, true);
    private Map<Integer, MapleCharacter> chars = new HashMap<>();
    private int leaderId = -1;
    private List<MapleMonster> mobs = new LinkedList<>();
@@ -95,8 +96,8 @@ public class EventInstanceManager {
    private long eventTime = 0;
    private MapleExpedition expedition = null;
    private List<Integer> mapIds = new LinkedList<>();
-   private ReadLock rL = lock.readLock();
-   private WriteLock wL = lock.writeLock();
+   private MonitoredReadLock rL = MonitoredReadLockFactory.createLock(lock);
+   private MonitoredWriteLock wL = MonitoredWriteLockFactory.createLock(lock);
 
    private MonitoredReentrantLock pL = MonitoredReentrantLockFactory.createLock(MonitoredLockType.EIM_PARTY, true);
    private MonitoredReentrantLock sL = MonitoredReentrantLockFactory.createLock(MonitoredLockType.EIM_SCRIPT, true);

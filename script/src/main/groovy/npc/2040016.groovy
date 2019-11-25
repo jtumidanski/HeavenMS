@@ -145,6 +145,17 @@ class NPC2040016 {
             cost = costSet[selectedItem]
          }
 
+         String prompt = "So, you want me to make some #t" + item + "#s? In that case, how many do you want me to make?"
+
+         cm.sendGetNumber(prompt, 1, 1, 100)
+      } else if (status == 3 && mode == 1) {
+         if (equip) {
+            selectedItem = selection
+            qty = 1
+         } else {
+            qty = (selection > 0) ? selection : (selection < 0 ? -selection : 1)
+         }
+
          if (selectedType == 5) { //arrow refine
             int[] itemSet = [2060000, 2061000, 2060001, 2061001, 2060002, 2061002]
             List matSet = [[4003001, 4003004], [4003001, 4003004], [4011000, 4003001, 4003004], [4011000, 4003001, 4003004],
@@ -155,17 +166,6 @@ class NPC2040016 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         }
-
-         String prompt = "So, you want me to make some #t" + item + "#s? In that case, how many do you want me to make?"
-
-         cm.sendGetNumber(prompt, 1, 1, 100)
-      } else if (status == 3 && mode == 1) {
-         if (equip) {
-            selectedItem = selection
-            qty = 1
-         } else {
-            qty = (selection > 0) ? selection : (selection < 0 ? -selection : 1)
          }
 
          String prompt = "You want me to make "

@@ -591,7 +591,11 @@ public class MapleStatEffect {
 
       long leftDuration = (starttime + localDuration) - Server.getInstance().getCurrentTime();
       if (leftDuration > 0) {
-         PacketCreator.announce(target, new GiveBuff((skill ? sourceid : -sourceid), (int) leftDuration, activeStats));
+         if (isDash() || isInfusion()) {
+            PacketCreator.announce(target, new GivePirateBuff(activeStats, (skill ? sourceid : -sourceid), (int) leftDuration));
+         } else {
+            PacketCreator.announce(target, new GiveBuff((skill ? sourceid : -sourceid), (int) leftDuration, activeStats));
+         }
       }
    }
 

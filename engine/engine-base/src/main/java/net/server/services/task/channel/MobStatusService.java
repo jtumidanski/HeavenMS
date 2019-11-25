@@ -1,4 +1,4 @@
-package net.server.channel.services.task;
+package net.server.services.task.channel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,8 +11,9 @@ import net.server.audit.LockCollector;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import net.server.channel.services.BaseScheduler;
-import net.server.channel.services.SchedulerListener;
+import net.server.services.BaseScheduler;
+import net.server.services.SchedulerListener;
+import net.server.services.BaseService;
 
 public class MobStatusService extends BaseService {
 

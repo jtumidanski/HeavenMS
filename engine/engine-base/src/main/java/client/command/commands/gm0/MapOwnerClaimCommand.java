@@ -44,20 +44,25 @@ public class MapOwnerClaimCommand extends Command {
 
             if (YamlConfig.config.server.USE_MAP_OWNERSHIP_SYSTEM) {
                if (chr.getEventInstance() == null) {
-                  MapleMap ownedMap = chr.getOwnedMap();  // thanks Conrad for suggesting not unlease a map as soon as player exits it
-                  if (ownedMap != null) {
-                     ownedMap.unclaimOwnership(chr);
+                  MapleMap map = chr.getMap();
+                  if (map.countBosses() == 0) {   // thanks Conrad for suggesting bosses prevent map leasing
+                     MapleMap ownedMap = chr.getOwnedMap();  // thanks Conrad for suggesting not unlease a map as soon as player exits it
+                     if (ownedMap != null) {
+                        ownedMap.unclaimOwnership(chr);
 
-                     if (chr.getMap() == ownedMap) {
-                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
-                        return;
+                        if (map == ownedMap) {
+                           MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
+                           return;
+                        }
                      }
-                  }
 
-                  if (chr.getMap().claimOwnership(chr)) {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You have leased this lawn for a while, until you leave here or after 1 minute of inactivity.");
+                     if (map.claimOwnership(chr)) {
+                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You have leased this lawn for a while, until you leave here or after 1 minute of inactivity.");
+                     } else {
+                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn has already been leased by a player.");
+                     }
                   } else {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn has already been leased by a player.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn is currently under a boss siege.");
                   }
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn cannot be leased.");
