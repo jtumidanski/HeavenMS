@@ -40,7 +40,7 @@ public final class RelogRequestHandler extends AbstractPacketHandler<NoOpPacket>
    }
 
    @Override
-   public boolean validateState(MapleClient c) {
-      return !c.isLoggedIn();
+   public boolean validateState(MapleClient client) {
+      return !client.isLoggedIn();
    }
 }

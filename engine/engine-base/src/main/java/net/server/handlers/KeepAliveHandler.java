@@ -38,7 +38,7 @@ public class KeepAliveHandler extends AbstractPacketHandler<NoOpPacket> {
    }
 
    @Override
-   public boolean validateState(MapleClient c) {
+   public boolean validateState(MapleClient client) {
       return true;
    }
 }

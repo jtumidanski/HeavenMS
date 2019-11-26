@@ -40,8 +40,8 @@ public abstract class AbstractPacketHandler<T extends MaplePacket> implements Ma
    public abstract void handlePacket(T packet, MapleClient client);
 
    @Override
-   public boolean validateState(MapleClient c) {
-      return c.isLoggedIn();
+   public boolean validateState(MapleClient client) {
+      return client.isLoggedIn();
    }
 
    protected long currentServerTime() {

@@ -33,7 +33,7 @@ public final class AcceptToSHandler extends AbstractPacketHandler<AcceptToSPacke
    }
 
    @Override
-   public boolean validateState(MapleClient c) {
-      return !c.isLoggedIn();
+   public boolean validateState(MapleClient client) {
+      return !client.isLoggedIn();
    }
 }

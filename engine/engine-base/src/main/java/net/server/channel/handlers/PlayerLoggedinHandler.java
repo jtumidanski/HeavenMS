@@ -144,8 +144,8 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
    }
 
    @Override
-   public final boolean validateState(MapleClient c) {
-      return !c.isLoggedIn();
+   public final boolean validateState(MapleClient client) {
+      return !client.isLoggedIn();
    }
 
 
@@ -283,6 +283,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
                }
             }
             player.sendKeymap();
+            player.sendQuickMap();
             player.sendMacros();
 
             // pot bindings being passed through other characters on the account detected thanks to Croosade dev team

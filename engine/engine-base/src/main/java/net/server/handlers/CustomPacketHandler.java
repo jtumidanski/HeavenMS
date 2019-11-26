@@ -41,7 +41,7 @@ public class CustomPacketHandler extends AbstractPacketHandler<CustomPacket> {
    }
 
    @Override
-   public boolean validateState(MapleClient c) {
+   public boolean validateState(MapleClient client) {
       return true;
    }
 }

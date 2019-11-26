@@ -405,6 +405,7 @@ public class PacketCreator {
          case SESSION_VALUE:
          case DOJO_WARP_UP:
          case SET_NPC_SCRIPTABLE:
+         case QUICKSLOT_INIT:
             return Optional.of(GenericPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());

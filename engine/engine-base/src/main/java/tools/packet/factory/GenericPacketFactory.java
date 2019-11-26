@@ -1,10 +1,15 @@
 package tools.packet.factory;
 
+import java.util.Arrays;
+
+import client.keybind.MapleQuickSlotBinding;
+import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.DojoWarpUp;
 import tools.packet.EnableReport;
 import tools.packet.GetEnergy;
+import tools.packet.QuickSlotKey;
 import tools.packet.SetNPCScriptable;
 
 public class GenericPacketFactory extends AbstractPacketFactory {
@@ -22,6 +27,7 @@ public class GenericPacketFactory extends AbstractPacketFactory {
       Handler.handle(GetEnergy.class).decorate(this::getEnergy).register(registry);
       Handler.handle(DojoWarpUp.class).decorate(this::dojoWarpUp).register(registry);
       Handler.handle(SetNPCScriptable.class).decorate(this::setNPCScriptable).register(registry);
+      Handler.handle(QuickSlotKey.class).decorate(this::initQuickSlot).register(registry);
    }
 
    protected void enableReport(MaplePacketLittleEndianWriter writer, EnableReport packet) { // thanks to snow
@@ -45,6 +51,19 @@ public class GenericPacketFactory extends AbstractPacketFactory {
          writer.writeMapleAsciiString(p.getRight());
          writer.writeInt(0); // start time
          writer.writeInt(Integer.MAX_VALUE); // end time
+      }
+   }
+
+   protected void initQuickSlot(MaplePacketLittleEndianWriter writer, QuickSlotKey packet) {
+      writer.writeShort(SendOpcode.QUICKSLOT_INIT.getValue());
+      if (Arrays.equals(packet.keyMap(), MapleQuickSlotBinding.DEFAULT_QUICKSLOTS)) {
+         writer.writeBool(false);
+         return;
+      }
+
+      writer.writeBool(true);
+      for (byte key: packet.keyMap()) {
+         writer.writeInt(key);
       }
    }
 }

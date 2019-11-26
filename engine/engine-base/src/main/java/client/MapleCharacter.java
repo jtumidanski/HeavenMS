@@ -92,6 +92,7 @@ import client.inventory.ModifyInventory;
 import client.inventory.PetDataFactory;
 import client.inventory.StatUpgrade;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.keybind.MapleQuickSlotBinding;
 import client.newyear.NewYearCardRecord;
 import client.processor.BuffStatProcessor;
 import client.processor.ChairProcessor;
@@ -211,6 +212,7 @@ import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
 import tools.packet.PacketInput;
+import tools.packet.QuickSlotKey;
 import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.buff.CancelBuff;
 import tools.packet.buff.CancelDebuff;
@@ -445,6 +447,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    private boolean challenged = false;
    private boolean pendingNameChange; //only used to change name on logout, not to be relied upon elsewhere
    private long loginTime;
+   private byte[] quickSlotLoaded;
+   private MapleQuickSlotBinding quickSlotBinding;
 
    public MapleCharacter(int id, int accountId, int str, int dex, int int_, int luk, int hp, int mp, int meso) {
       this();
@@ -6864,6 +6868,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          updatePets();
          updatePetIgnores(entityManager);
          updateKeyMap(entityManager);
+         CharacterProcessor.getInstance().createQuickSlots(entityManager, this);
          updateSkillMacros(entityManager);
 
          List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
@@ -8265,6 +8270,22 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return System.currentTimeMillis() - loginTime;
    }
 
+   public byte[] getQuickSlotLoaded() {
+      return quickSlotLoaded;
+   }
+
+   public void setQuickSlotLoaded(byte[] quickSlotLoaded) {
+      this.quickSlotLoaded = quickSlotLoaded;
+   }
+
+   public MapleQuickSlotBinding getQuickSlotBinding() {
+      return quickSlotBinding;
+   }
+
+   public void setQuickSlotBinding(MapleQuickSlotBinding quickSlotBinding) {
+      this.quickSlotBinding = quickSlotBinding;
+   }
+
    public boolean isLoggedin() {
       return loggedIn;
    }
@@ -8291,6 +8312,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       if (!dataString.contains(partyquestchar)) {
          this.dataString += partyquestchar;
       }
+   }
+
+   public void sendQuickMap() {
+      if (getQuickSlotBinding() == null) {
+         setQuickSlotBinding(new MapleQuickSlotBinding(MapleQuickSlotBinding.DEFAULT_QUICKSLOTS));
+      }
+      PacketCreator.announce(this, new QuickSlotKey(getQuickSlotBinding().getQuickSlotKeyMapped()));
    }
 
    public void createDragon() {

@@ -22,6 +22,7 @@ import net.server.channel.handlers.CashShopSurpriseHandler;
 import net.server.channel.handlers.ChangeChannelHandler;
 import net.server.channel.handlers.ChangeMapHandler;
 import net.server.channel.handlers.ChangeMapSpecialHandler;
+import net.server.channel.handlers.ChangeQuickSlotHandler;
 import net.server.channel.handlers.CharInfoRequestHandler;
 import net.server.channel.handlers.ClickGuideHandler;
 import net.server.channel.handlers.CloseChalkboardHandler;
@@ -366,5 +367,6 @@ public class HandlerFactory {
       packetProcessor.registerHandler(RecvOpcode.MOVE_SUMMON, new MoveSummonHandler());
       packetProcessor.registerHandler(RecvOpcode.MOVE_DRAGON, new MoveDragonHandler());
       packetProcessor.registerHandler(RecvOpcode.SPECIAL_MOVE, new SpecialMoveHandler());
+      packetProcessor.registerHandler(RecvOpcode.CHANGE_QUICKSLOT, new ChangeQuickSlotHandler());
    }
 }

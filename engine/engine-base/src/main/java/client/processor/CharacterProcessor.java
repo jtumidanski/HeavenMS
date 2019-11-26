@@ -1,5 +1,7 @@
 package client.processor;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 
 import client.KeyBinding;
 import client.MapleCharacter;
@@ -42,6 +45,7 @@ import client.database.administrator.PetAdministrator;
 import client.database.administrator.PlayerDiseaseAdministrator;
 import client.database.administrator.QuestProgressAdministrator;
 import client.database.administrator.QuestStatusAdministrator;
+import client.database.administrator.QuickSlotKeyMapAdministrator;
 import client.database.administrator.RingAdministrator;
 import client.database.administrator.SavedLocationAdministrator;
 import client.database.administrator.ServerQueueAdministrator;
@@ -66,6 +70,7 @@ import client.database.provider.PetIgnoreProvider;
 import client.database.provider.PlayerDiseaseProvider;
 import client.database.provider.QuestProgressProvider;
 import client.database.provider.QuestStatusProvider;
+import client.database.provider.QuickSlotKeyMapProvider;
 import client.database.provider.SavedLocationProvider;
 import client.database.provider.SkillMacroProvider;
 import client.database.provider.SkillProvider;
@@ -77,6 +82,7 @@ import client.inventory.ItemFactory;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleCashIdGenerator;
+import client.keybind.MapleQuickSlotBinding;
 import client.processor.npc.FredrickProcessor;
 import config.YamlConfig;
 import constants.game.GameConstants;
@@ -97,6 +103,7 @@ import server.maps.SavedLocation;
 import server.maps.SavedLocationType;
 import server.quest.MapleQuest;
 import tools.DatabaseConnection;
+import tools.LongTool;
 import tools.Pair;
 
 public class CharacterProcessor {
@@ -501,6 +508,10 @@ public class CharacterProcessor {
             mapleMount.tiredness_$eq(characterData.mountTiredness());
             mapleMount.active_$eq(false);
             mapleCharacter.setMount(mapleMount);
+
+            BigInteger keyMap = QuickSlotKeyMapProvider.getInstance().getForAccount(connection, characterData.accountId());
+            mapleCharacter.setQuickSlotLoaded(LongTool.LongToBytes(keyMap.longValue()));
+            mapleCharacter.setQuickSlotBinding(new MapleQuickSlotBinding(mapleCharacter.getQuickSlotLoaded()));
          }
          return mapleCharacter;
       }).orElse(null);
@@ -669,6 +680,8 @@ public class CharacterProcessor {
             KeyMapAdministrator.getInstance().create(entityManager, character.getId(), selectedKey[i], selectedType[i], selectedAction[i]);
          }
 
+         createQuickSlots(entityManager, character);
+
          List<Pair<Item, MapleInventoryType>> itemsByType = new ArrayList<>();
 
          Arrays.stream(MapleInventoryType.values())
@@ -687,6 +700,21 @@ public class CharacterProcessor {
          BuddyListProcessor.getInstance().syncCharacter(character.getAccountID(), character.getId());
       });
       return true;
+   }
+
+   public void createQuickSlots(EntityManager entityManager, MapleCharacter character) {
+      boolean noChanges = character.getQuickSlotLoaded() == null ||
+            (character.getQuickSlotLoaded() != null && Arrays.equals(character.getQuickSlotLoaded(), character.getQuickSlotBinding().getQuickSlotKeyMapped()));
+      if (!noChanges) {
+         long value = LongTool.BytesToLong(character.getQuickSlotBinding().getQuickSlotKeyMapped());
+
+         try {
+            QuickSlotKeyMapProvider.getInstance().getForAccount(entityManager, character.getAccountID());
+            QuickSlotKeyMapAdministrator.getInstance().update(entityManager, character.getAccountID(), BigInteger.valueOf(value));
+         } catch (NoResultException exception) {
+            QuickSlotKeyMapAdministrator.getInstance().create(entityManager, character.getAccountID(), BigInteger.valueOf(value));
+         }
+      }
    }
 
    public Optional<Byte> canDeleteCharacter(int characterId) {
