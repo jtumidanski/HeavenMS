@@ -63,8 +63,8 @@ import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.processor.WeddingProcessor;
-import net.server.services.ServicesManager;
 import net.server.services.BaseService;
+import net.server.services.ServicesManager;
 import net.server.services.type.ChannelServices;
 import net.server.world.MapleParty;
 import net.server.world.World;
@@ -990,24 +990,20 @@ public final class Channel {
    public void debugMarriageStatus() {
       System.out.println(" ----- WORLD DATA -----");
       getWorldServer().debugMarriageStatus();
-
       System.out.println(" ----- CH. " + channel + " -----");
-      System.out.println(" ----- CATHEDRAL -----");
-      System.out.println("Current Queue: " + cathedralReservationQueue);
-      System.out.println("Cancel Task: " + (cathedralReservationTask != null));
-      System.out.println("Ongoing wid: " + ongoingCathedral);
-      System.out.println();
-      System.out.println("Ongoing wid: " + ongoingCathedral + " isPremium: " + ongoingCathedralType);
-      System.out.println("Guest list: " + ongoingCathedralGuests);
-      System.out.println();
-      System.out.println(" ----- CHAPEL -----");
-      System.out.println("Current Queue: " + chapelReservationQueue);
-      System.out.println("Cancel Task: " + (chapelReservationTask != null));
-      System.out.println("Ongoing wid: " + ongoingChapel);
-      System.out.println();
-      System.out.println("Ongoing wid: " + ongoingChapel + " isPremium: " + ongoingChapelType);
-      System.out.println("Guest list: " + ongoingChapelGuests);
-      System.out.println();
+      printVenueStatus(" ----- CATHEDRAL -----", cathedralReservationQueue, cathedralReservationTask, ongoingCathedral, ongoingCathedralType, ongoingCathedralGuests);
+      printVenueStatus(" ----- CHAPEL -----", chapelReservationQueue, chapelReservationTask, ongoingChapel, ongoingChapelType, ongoingChapelGuests);
       System.out.println("Starttime: " + ongoingStartTime);
+   }
+
+   private void printVenueStatus(String venueName, List<Integer> reservationQueue, ScheduledFuture<?> reservationTask, Integer ongoing, Boolean ongoingType, Set<Integer> ongoingGuests) {
+      System.out.println(venueName);
+      System.out.println("Current Queue: " + reservationQueue);
+      System.out.println("Cancel Task: " + (reservationTask != null));
+      System.out.println("Ongoing wid: " + ongoing);
+      System.out.println();
+      System.out.println("Ongoing wid: " + ongoing + " isPremium: " + ongoingType);
+      System.out.println("Guest list: " + ongoingGuests);
+      System.out.println();
    }
 }

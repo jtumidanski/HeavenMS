@@ -21,8 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 package server.events.gm;
 
-import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import server.TimerManager;
@@ -38,11 +38,11 @@ import tools.packet.ui.GetClock;
  * @author kevintjuh93
  */
 public class MapleSnowball {
-   List<MapleCharacter> characters = new LinkedList<>();
+   private List<MapleCharacter> characters;
    private MapleMap map;
    private int position = 0;
    private int hits = 3;
-   private int snowmanhp = 1000;
+   private int snowmanHp = 1000;
    private boolean hittable = false;
    private int team;
    private boolean winner = false;
@@ -51,11 +51,9 @@ public class MapleSnowball {
       this.map = map;
       this.team = team;
 
-      for (MapleCharacter chr : map.getCharacters()) {
-         if (chr.getTeam() == team) {
-            characters.add(chr);
-         }
-      }
+      characters = map.getAllPlayers().stream()
+            .filter(character -> character.getTeam() == team)
+            .collect(Collectors.toList());
    }
 
    public void startEvent() {
@@ -63,39 +61,26 @@ public class MapleSnowball {
          return;
       }
 
-      for (MapleCharacter chr : characters) {
-         if (chr != null) {
-            MapleSnowball firstSnowBall = map.getSnowball(0);
-            MapleSnowball secondSnowBall = map.getSnowball(1);
-            PacketCreator.announce(chr, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
-            PacketCreator.announce(chr, new GetClock(600));
-         }
-      }
-      hittable = true;
-      TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            if (map.getSnowball(team).getPosition() > map.getSnowball(team == 0 ? 1 : 0).getPosition()) {
-               for (MapleCharacter chr : characters) {
-                  if (chr != null) {
-                     MapleSnowball firstSnowBall = map.getSnowball(0);
-                     PacketCreator.announce(chr, new RollSnowBall(false, 3, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition()));
-                  }
-               }
-               winner = true;
-            } else if (map.getSnowball(team == 0 ? 1 : 0).getPosition() > map.getSnowball(team).getPosition()) {
-               for (MapleCharacter chr : characters) {
-                  if (chr != null) {
-                     MapleSnowball firstSnowBall = map.getSnowball(0);
-                     PacketCreator.announce(chr, new RollSnowBall(false, 4, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition()));
-                  }
-               }
-               winner = true;
-            } //Else
-            warpOut();
-         }
-      }, 600000);
+      characters.parallelStream().forEach(character -> {
+         setSnowballState(1, 0, 1);
+         PacketCreator.announce(character, new GetClock(600));
+      });
 
+      hittable = true;
+      TimerManager.getInstance().schedule(() -> {
+         if (map.getSnowball(team).getPosition() > map.getSnowball(getOpposingTeam(team)).getPosition()) {
+            characters.parallelStream().forEach(character -> setSnowballState(3, 0, 0));
+            winner = true;
+         } else if (map.getSnowball(getOpposingTeam(team)).getPosition() > map.getSnowball(team).getPosition()) {
+            characters.parallelStream().forEach(character -> setSnowballState(4, 0, 0));
+            winner = true;
+         } //Else
+         warpOut();
+      }, 600000);
+   }
+
+   protected int getOpposingTeam(int team) {
+      return team == 0 ? 1 : 0;
    }
 
    public boolean isHittable() {
@@ -111,11 +96,11 @@ public class MapleSnowball {
    }
 
    public int getSnowmanHP() {
-      return snowmanhp;
+      return snowmanHp;
    }
 
    public void setSnowmanHP(int hp) {
-      this.snowmanhp = hp;
+      this.snowmanHp = hp;
    }
 
    public void hit(int what, int damage) {
@@ -123,66 +108,53 @@ public class MapleSnowball {
          if (damage > 0) {
             this.hits--;
          } else {
-            if (this.snowmanhp - damage < 0) {
-               this.snowmanhp = 0;
+            if (this.snowmanHp - damage < 0) {
+               this.snowmanHp = 0;
 
-               TimerManager.getInstance().schedule(new Runnable() {
-
-                  @Override
-                  public void run() {
-                     setSnowmanHP(7500);
-                     message(5);
-                  }
+               TimerManager.getInstance().schedule(() -> {
+                  setSnowmanHP(7500);
+                  message(5);
                }, 10000);
             } else {
-               this.snowmanhp -= damage;
+               this.snowmanHp -= damage;
             }
-            MapleSnowball firstSnowBall = map.getSnowball(0);
-            MapleSnowball secondSnowBall = map.getSnowball(1);
-            MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
+            setSnowballState(1, 0, 1);
          }
       }
 
       if (this.hits == 0) {
          this.position += 1;
          if (this.position == 45) {
-            map.getSnowball(team == 0 ? 1 : 0).message(1);
+            map.getSnowball(getOpposingTeam(team)).message(1);
          } else if (this.position == 290) {
-            map.getSnowball(team == 0 ? 1 : 0).message(2);
+            map.getSnowball(getOpposingTeam(team)).message(2);
          } else if (this.position == 560) {
-            map.getSnowball(team == 0 ? 1 : 0).message(3);
+            map.getSnowball(getOpposingTeam(team)).message(3);
          }
 
          this.hits = 3;
-         MapleSnowball firstSnowBall = map.getSnowball(0);
-         MapleSnowball secondSnowBall = map.getSnowball(1);
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, 0, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, 1, firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(), secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
+         setSnowballState(0, 0, 1);
+         setSnowballState(1, 0, 1);
       }
       MasterBroadcaster.getInstance().sendToAllInMap(map, new HitSnowBall(what, damage));
    }
 
-   public void message(int message) {
-      for (MapleCharacter chr : characters) {
-         if (chr != null) {
-            PacketCreator.announce(chr, new SnowBallMessage(team, message));
-         }
-      }
+   protected void setSnowballState(int state, int firstBall, int secondBall) {
+      MapleSnowball firstSnowBall = map.getSnowball(firstBall);
+      MapleSnowball secondSnowBall = map.getSnowball(secondBall);
+      MasterBroadcaster.getInstance().sendToAllInMap(map, new RollSnowBall(false, state,
+            firstSnowBall.getSnowmanHP(), firstSnowBall.getPosition(),
+            secondSnowBall.getSnowmanHP(), secondSnowBall.getPosition()));
    }
 
-   public void warpOut() {
-      TimerManager.getInstance().schedule(new Runnable() {
+   public void message(int message) {
+      characters.parallelStream().forEach(character -> PacketCreator.announce(character, new SnowBallMessage(team, message)));
+   }
 
-         @Override
-         public void run() {
-            if (winner) {
-               map.warpOutByTeam(team, 109050000);
-            } else {
-               map.warpOutByTeam(team, 109050001);
-            }
-
-            map.setSnowball(team, null);
-         }
+   protected void warpOut() {
+      TimerManager.getInstance().schedule(() -> {
+         map.warpOutByTeam(team, winner ? 109050000 : 109050001);
+         map.setSnowball(team, null);
       }, 10000);
    }
 }

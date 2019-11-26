@@ -49,17 +49,8 @@ public class PlayerNPCPacketFactory extends AbstractPacketFactory {
             maskedEquip.put(pos, equip.get(position));
          }
       }
-      for (Map.Entry<Short, Integer> entry : myEquip.entrySet()) {
-         writer.write(entry.getKey());
-         writer.writeInt(entry.getValue());
-      }
-      writer.write(0xFF);
-      for (Map.Entry<Short, Integer> entry : maskedEquip.entrySet()) {
-         writer.write(entry.getKey());
-         writer.writeInt(entry.getValue());
-      }
-      writer.write(0xFF);
-      Integer cWeapon = equip.get((byte) -111);
+      writeEquips(writer, myEquip, maskedEquip);
+      Integer cWeapon = equip.get((short) -111);
       writer.writeInt(Objects.requireNonNullElse(cWeapon, 0));
       for (int i = 0; i < 3; i++) {
          writer.writeInt(0);

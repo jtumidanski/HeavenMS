@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import server.maps.MapleMiniGame;
 import server.maps.MaplePlayerShop;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.character.box.AddMatchCard;
@@ -42,17 +41,6 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    protected void removeMinigameBox(MaplePacketLittleEndianWriter writer, RemoveMiniGameBox packet) {
       writer.writeInt(packet.characterId());
       writer.write(0);
-   }
-
-   protected void addAnnounceBox(final MaplePacketLittleEndianWriter writer, MapleMiniGame game, int amount, int joinable) {
-      writer.write(game.getGameType().getValue());
-      writer.writeInt(game.objectId()); // gameid/shopid
-      writer.writeMapleAsciiString(game.getDescription()); // desc
-      writer.writeBool(!game.getPassword().isEmpty());    // password here, thanks GabrielSin!
-      writer.write(game.getPieceType());
-      writer.write(amount);
-      writer.write(2);         //player capacity
-      writer.write(joinable);
    }
 
    protected void updatePlayerShopBox(MaplePacketLittleEndianWriter writer, UpdatePlayerShopBox packet) {

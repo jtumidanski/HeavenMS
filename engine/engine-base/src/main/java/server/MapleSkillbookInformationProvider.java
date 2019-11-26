@@ -121,7 +121,7 @@ public class MapleSkillbookInformationProvider {
    private static Set<Integer> foundMatchingDataOnFile(String fileContent) {
       Set<Integer> matches = new HashSet<>(4);
 
-      Matcher searchM = Pattern.compile("22(8|9)[0-9]{4}").matcher(fileContent);
+      Matcher searchM = Pattern.compile("22([89])[0-9]{4}").matcher(fileContent);
       int idx = 0;
       while (searchM.find(idx)) {
          idx = searchM.end();

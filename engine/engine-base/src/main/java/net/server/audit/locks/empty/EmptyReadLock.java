@@ -19,11 +19,6 @@
 */
 package net.server.audit.locks.empty;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.TimeZone;
-
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReadLock;
 import tools.FilePrinter;
@@ -31,25 +26,11 @@ import tools.FilePrinter;
 /**
  * @author RonanLana
  */
-public class EmptyReadLock implements MonitoredReadLock {
+public class EmptyReadLock extends AbstractEmptyLock implements MonitoredReadLock {
    private final MonitoredLockType id;
 
    public EmptyReadLock(MonitoredLockType type) {
       this.id = type;
-   }
-
-   private static String printThreadStack(StackTraceElement[] list) {
-      DateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-      dateFormat.setTimeZone(TimeZone.getDefault());
-      String df = dateFormat.format(new Date());
-
-      StringBuilder s = new StringBuilder("\r\n" + df + "\r\n");
-      for (StackTraceElement stackTraceElement : list) {
-         s.append("    ").append(stackTraceElement.toString()).append("\r\n");
-      }
-      s.append("----------------------------\r\n\r\n");
-
-      return s.toString();
    }
 
    @Override

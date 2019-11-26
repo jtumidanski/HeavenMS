@@ -23,9 +23,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import config.YamlConfig;
 import constants.game.GameConstants;
@@ -645,19 +642,19 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
          }
 
          int newStr = str + deltaStr, newDex = dex + deltaDex, newInt = int_ + deltaInt, newLuk = luk + deltaLuk;
-         if (newStr < 4 && deltaStr != Short.MIN_VALUE || newStr > YamlConfig.config.server.MAX_AP) {
+         if (outOfRange(newStr, deltaStr)) {
             return false;
          }
 
-         if (newDex < 4 && deltaDex != Short.MIN_VALUE || newDex > YamlConfig.config.server.MAX_AP) {
+         if (outOfRange(newDex, deltaDex)) {
             return false;
          }
 
-         if (newInt < 4 && deltaInt != Short.MIN_VALUE || newInt > YamlConfig.config.server.MAX_AP) {
+         if (outOfRange(newInt, deltaInt)) {
             return false;
          }
 
-         if (newLuk < 4 && deltaLuk != Short.MIN_VALUE || newLuk > YamlConfig.config.server.MAX_AP) {
+         if (outOfRange(newLuk, deltaLuk)) {
             return false;
          }
 
@@ -668,6 +665,10 @@ public abstract class AbstractMapleCharacterObject extends AbstractAnimatedMaple
          statWlock.unlock();
          effLock.unlock();
       }
+   }
+
+   public boolean outOfRange(int newAp, int deltaAp) {
+      return newAp < 4 && deltaAp != Short.MIN_VALUE || newAp > YamlConfig.config.server.MAX_AP;
    }
 
    public void updateStrDexIntLuk(int x) {

@@ -23,7 +23,6 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
@@ -34,78 +33,44 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.SetCashShop;
 import tools.packet.cashshop.ShowCash;
-import tools.packet.stat.EnableActions;
 import tools.packet.cashshop.operation.ShowCashInventory;
 import tools.packet.cashshop.operation.ShowGifts;
 import tools.packet.cashshop.operation.ShowWishList;
+import tools.packet.stat.EnableActions;
 
 /**
  * @author Flav
  */
-public class EnterCashShopHandler extends AbstractPacketHandler<NoOpPacket> {
+public class EnterCashShopHandler extends AbstractShopSystem<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;
    }
 
    @Override
+   protected boolean featureDisabled(MapleClient client) {
+      return client.getPlayer().cannotEnterCashShop();
+   }
+
+   @Override
+   protected boolean failsShopSpecificValidation(MapleClient client) {
+      return client.getPlayer().getCashShop().isOpened();
+   }
+
+   @Override
+   protected void openShop(MapleClient client) {
+      MapleCharacter character = client.getPlayer();
+      CashShop cashShop = character.getCashShop();
+      PacketCreator.announce(client, new SetCashShop(client));
+      PacketCreator.announce(client, new ShowCashInventory(client.getAccID(), cashShop.getInventory(), character.getStorage().getSlots(), client.getCharacterSlots()));
+      PacketCreator.announce(client, new ShowGifts(cashShop.loadGifts()));
+      PacketCreator.announce(client, new ShowWishList(cashShop.getWishList(), false));
+      PacketCreator.announce(client, new ShowCash(character.getCashShop().getCash(1), character.getCashShop().getCash(2), character.getCashShop().getCash(4)));
+      character.getCashShop().open(true);
+   }
+
+   @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
-      try {
-         MapleCharacter mc = client.getPlayer();
-
-         if (mc.cannotEnterCashShop()) {
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (mc.getEventInstance() != null) {
-            MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.PINK_TEXT, "Entering Cash Shop or MTS are disabled when registered on an event.");
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (MapleMiniDungeonInfo.isDungeonMap(mc.getMapId())) {
-            MessageBroadcaster.getInstance().sendServerNotice(mc, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (mc.getCashShop().isOpened()) {
-            return;
-         }
-
-         mc.closePlayerInteractions();
-         mc.closePartySearchInteractions();
-
-         mc.unregisterChairBuff();
-         Server.getInstance().getPlayerBuffStorage().addBuffsToStorage(mc.getId(), mc.getAllBuffs());
-         Server.getInstance().getPlayerBuffStorage().addDiseasesToStorage(mc.getId(), mc.getAllDiseases());
-         mc.setAwayFromChannelWorld();
-         mc.notifyMapTransferToPartner(-1);
-         mc.removeIncomingInvites();
-         mc.cancelAllBuffs(true);
-         mc.cancelAllDebuffs();
-         mc.cancelBuffExpireTask();
-         mc.cancelDiseaseExpireTask();
-         mc.cancelSkillCooldownTask();
-         mc.cancelExpirationTask();
-
-         mc.forfeitExpirableQuests();
-         mc.cancelQuestExpirationTask();
-
-         CashShop cashShop = mc.getCashShop();
-         PacketCreator.announce(client, new SetCashShop(client));
-         PacketCreator.announce(client, new ShowCashInventory(client.getAccID(), cashShop.getInventory(), mc.getStorage().getSlots(), client.getCharacterSlots()));
-         PacketCreator.announce(client, new ShowGifts(cashShop.loadGifts()));
-         PacketCreator.announce(client, new ShowWishList(cashShop.getWishList(), false));
-         PacketCreator.announce(client, new ShowCash(mc.getCashShop().getCash(1), mc.getCashShop().getCash(2), mc.getCashShop().getCash(4)));
-
-         client.getChannelServer().removePlayer(mc);
-         mc.getMap().removePlayer(mc);
-         mc.getCashShop().open(true);
-         mc.saveCharToDB();
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
+      genericHandle(client);
    }
 }

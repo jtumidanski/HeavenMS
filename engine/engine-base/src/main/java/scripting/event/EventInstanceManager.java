@@ -294,16 +294,17 @@ public class EventInstanceManager {
          PacketCreator.announce(chr, new GetClock((int) (time / 1000)));
       }
 
-      event_schedule = TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            dismissEventTimer();
+      eventTimeoutRunnable(time);
+   }
 
-            try {
-               invokeScriptFunction("scheduledTimeout", EventInstanceManager.this);
-            } catch (ScriptException | NoSuchMethodException ex) {
-               Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, "Event '" + em.getName() + "' does not implement scheduledTimeout function.", ex);
-            }
+   protected void eventTimeoutRunnable(long time) {
+      event_schedule = TimerManager.getInstance().schedule(() -> {
+         dismissEventTimer();
+
+         try {
+            invokeScriptFunction("scheduledTimeout", EventInstanceManager.this);
+         } catch (ScriptException | NoSuchMethodException ex) {
+            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, "Event '" + em.getName() + "' does not implement scheduledTimeout function.", ex);
          }
       }, time);
    }
@@ -313,19 +314,7 @@ public class EventInstanceManager {
          if (event_schedule.cancel(false)) {
             long nextTime = getTimeLeft() + time;
             eventTime += time;
-
-            event_schedule = TimerManager.getInstance().schedule(new Runnable() {
-               @Override
-               public void run() {
-                  dismissEventTimer();
-
-                  try {
-                     invokeScriptFunction("scheduledTimeout", EventInstanceManager.this);
-                  } catch (ScriptException | NoSuchMethodException ex) {
-                     Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, "Event '" + em.getName() + "' does not implement scheduledTimeout function.", ex);
-                  }
-               }
-            }, nextTime);
+            eventTimeoutRunnable(nextTime);
          }
       } else {
          startEventTimer(time);

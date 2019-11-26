@@ -1,13 +1,6 @@
 package tools.packet.factory;
 
-import client.inventory.Equip;
-import client.inventory.Item;
-import client.inventory.MaplePet;
 import client.inventory.ModifyInventory;
-import constants.game.ExpTable;
-import constants.inventory.ItemConstants;
-import server.MapleItemInformationProvider;
-import tools.StringUtil;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
@@ -68,99 +61,6 @@ public class InventoryPacketFactory extends AbstractPacketFactory {
       if (addMovement > -1) {
          writer.write(addMovement);
       }
-   }
-
-   protected void addItemInfo(final MaplePacketLittleEndianWriter writer, Item item, boolean zeroPosition) {
-      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-      boolean isCash = ii.isCash(item.id());
-      boolean isPet = item.petId() > -1;
-      boolean isRing = false;
-      Equip equip = null;
-      short pos = item.position();
-      byte itemType = item.itemType();
-      if (itemType == 1) {
-         equip = (Equip) item;
-         isRing = equip.ringId() > -1;
-      }
-      if (!zeroPosition) {
-         if (equip != null) {
-            if (pos < 0) {
-               pos *= -1;
-            }
-            writer.writeShort(pos > 100 ? pos - 100 : pos);
-         } else {
-            writer.write(pos);
-         }
-      }
-      writer.write(itemType);
-      writer.writeInt(item.id());
-      writer.writeBool(isCash);
-      if (isCash) {
-         writer.writeLong(isPet ? item.petId() : isRing ? equip.ringId() : item.cashId());
-      }
-      addExpirationTime(writer, item.expiration());
-      if (isPet) {
-         MaplePet pet = item.pet().get();
-         writer.writeAsciiString(StringUtil.getRightPaddedStr(pet.name(), '\0', 13));
-         writer.write(pet.level());
-         writer.writeShort(pet.closeness());
-         writer.write(pet.fullness());
-         addExpirationTime(writer, item.expiration());
-         writer.writeInt(pet.petFlag());  /* pet flags found by -- lrenex & Spoon */
-
-         writer.write(new byte[]{(byte) 0x50, (byte) 0x46}); //wonder what this is
-         writer.writeInt(0);
-         return;
-      }
-      if (equip == null) {
-         writer.writeShort(item.quantity());
-         writer.writeMapleAsciiString(item.owner());
-         writer.writeShort(item.flag()); // flag
-
-         if (ItemConstants.isRechargeable(item.id())) {
-            writer.writeInt(2);
-            writer.write(new byte[]{(byte) 0x54, 0, 0, (byte) 0x34});
-         }
-         return;
-      }
-      writer.write(equip.slots()); // upgrade slots
-      writer.write(equip.level()); // level
-      writer.writeShort(equip.str()); // str
-      writer.writeShort(equip.dex()); // dex
-      writer.writeShort(equip._int()); // int
-      writer.writeShort(equip.luk()); // luk
-      writer.writeShort(equip.hp()); // hp
-      writer.writeShort(equip.mp()); // mp
-      writer.writeShort(equip.watk()); // watk
-      writer.writeShort(equip.matk()); // matk
-      writer.writeShort(equip.wdef()); // wdef
-      writer.writeShort(equip.mdef()); // mdef
-      writer.writeShort(equip.acc()); // accuracy
-      writer.writeShort(equip.avoid()); // avoid
-      writer.writeShort(equip.hands()); // hands
-      writer.writeShort(equip.speed()); // speed
-      writer.writeShort(equip.jump()); // jump
-      writer.writeMapleAsciiString(equip.owner()); // owner name
-      writer.writeShort(equip.flag()); //Item Flags
-
-      if (isCash) {
-         for (int i = 0; i < 10; i++) {
-            writer.write(0x40);
-         }
-      } else {
-         int itemLevel = equip.itemLevel();
-
-         long expNibble = (long) (ExpTable.getExpNeededForLevel(ii.getEquipLevelReq(item.id())) * equip.itemExp());
-         expNibble /= ExpTable.getEquipExpNeededForLevel(itemLevel);
-
-         writer.write(0);
-         writer.write(itemLevel); //Item Level
-         writer.writeInt((int) expNibble);
-         writer.writeInt(equip.vicious()); //WTF NEXON ARE YOU SERIOUS?
-         writer.writeLong(0);
-      }
-      writer.writeLong(getTime(-2));
-      writer.writeInt(-1);
    }
 
    protected void updateInventorySlotLimit(MaplePacketLittleEndianWriter writer, SlotLimitUpdate packet) {

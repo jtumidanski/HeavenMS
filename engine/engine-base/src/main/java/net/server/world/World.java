@@ -42,9 +42,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+import java.util.function.Consumer;
 import javax.persistence.EntityManager;
 
 import client.AbstractMapleCharacterObject;
@@ -68,11 +66,11 @@ import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import net.server.channel.Channel;
+import net.server.coordinator.matchchecker.MapleMatchCheckerCoordinator;
+import net.server.coordinator.partysearch.MaplePartySearchCoordinator;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import net.server.coordinator.world.MapleInviteCoordinator.InviteResult;
 import net.server.coordinator.world.MapleInviteCoordinator.InviteType;
-import net.server.coordinator.matchchecker.MapleMatchCheckerCoordinator;
-import net.server.coordinator.partysearch.MaplePartySearchCoordinator;
 import net.server.guild.MapleGuild;
 import net.server.guild.MapleGuildCharacter;
 import net.server.guild.MapleGuildSummary;
@@ -388,22 +386,21 @@ public class World {
       return exprate;
    }
 
-   public void setExpRate(int exp) {
+   /**
+    * Sets the given rate for all logged in characters.
+    *
+    * @param rate   the rate to set
+    * @param setter a setter to set the appropriate rate
+    */
+   protected void setGenericRate(int rate, Consumer<Integer> setter) {
       Collection<MapleCharacter> list = getPlayerStorage().getAllCharacters();
+      list.parallelStream().filter(MapleCharacter::isLoggedin).forEach(MapleCharacter::revertWorldRates);
+      setter.accept(rate);
+      list.parallelStream().filter(MapleCharacter::isLoggedin).forEach(MapleCharacter::setWorldRates);
+   }
 
-      for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) {
-            continue;
-         }
-         chr.revertWorldRates();
-      }
-      this.exprate = exp;
-      for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) {
-            continue;
-         }
-         chr.setWorldRates();
-      }
+   public void setExpRate(int exp) {
+      setGenericRate(exp, input -> this.exprate = input);
    }
 
    public int getDropRate() {
@@ -411,21 +408,7 @@ public class World {
    }
 
    public void setDropRate(int drop) {
-      Collection<MapleCharacter> list = getPlayerStorage().getAllCharacters();
-
-      for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) {
-            continue;
-         }
-         chr.revertWorldRates();
-      }
-      this.droprate = drop;
-      for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) {
-            continue;
-         }
-         chr.setWorldRates();
-      }
+      setGenericRate(drop, input -> this.droprate = input);
    }
 
    public int getBossDropRate() {  // boss rate concept thanks to Lapeiro
@@ -441,21 +424,7 @@ public class World {
    }
 
    public void setMesoRate(int meso) {
-      Collection<MapleCharacter> list = getPlayerStorage().getAllCharacters();
-
-      for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) {
-            continue;
-         }
-         chr.revertWorldRates();
-      }
-      this.mesorate = meso;
-      for (MapleCharacter chr : list) {
-         if (!chr.isLoggedin()) {
-            continue;
-         }
-         chr.setWorldRates();
-      }
+      setGenericRate(meso, input -> this.mesorate = input);
    }
 
    public int getQuestRate() {

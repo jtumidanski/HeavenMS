@@ -30,7 +30,6 @@ import client.MapleClient;
 import client.database.provider.MtsItemProvider;
 import client.processor.action.BuybackProcessor;
 import config.YamlConfig;
-import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.packet.NoOpPacket;
 import net.server.packet.reader.NoOpReader;
@@ -51,91 +50,67 @@ import tools.packet.stat.EnableActions;
 import tools.packet.ui.ShowBlockedUI;
 
 
-public final class EnterMTSHandler extends AbstractPacketHandler<NoOpPacket> {
+public final class EnterMTSHandler extends AbstractShopSystem<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
       return NoOpReader.class;
    }
 
    @Override
+   protected boolean featureDisabled(MapleClient client) {
+      return !YamlConfig.config.server.USE_MTS;
+   }
+
+   @Override
+   protected boolean failsShopSpecificValidation(MapleClient client) {
+      if (FieldLimit.CANNOTMIGRATE.check(client.getPlayer().getMap().getFieldLimit())) {
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You can't do it here in this map.");
+         PacketCreator.announce(client, new EnableActions());
+         return true;
+      }
+
+      if (!client.getPlayer().isAlive()) {
+         PacketCreator.announce(client, new EnableActions());
+         return true;
+      }
+
+      if (client.getPlayer().getLevel() < 10) {
+         PacketCreator.announce(client, new ShowBlockedUI(5));
+         PacketCreator.announce(client, new EnableActions());
+         return true;
+      }
+
+      return false;
+   }
+
+   @Override
+   protected void openShop(MapleClient client) {
+      MapleCharacter character = client.getPlayer();
+      PacketCreator.announce(client, new SetITC(client));
+      character.getCashShop().open(true);// xD
+      client.enableCSActions();
+      PacketCreator.announce(client, new MTSWantedListingOver(0, 0));
+      PacketCreator.announce(client, new ShowMTSCash(client.getPlayer().getCashShop().getCash(2), client.getPlayer().getCashShop().getCash(4)));
+
+      DatabaseConnection.getInstance().withConnection(connection -> {
+         List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getByTab(connection, 1, 16));
+         long countForTab = MtsItemProvider.getInstance().countByTab(connection, 1);
+         int pages = (int) Math.ceil(countForTab / 16);
+
+         PacketCreator.announce(client, new SendMTS(items, 1, 0, 0, pages));
+         PacketCreator.announce(client, new MTSTransferInventory(getTransfer(character.getId())));
+         PacketCreator.announce(client, new GetNotYetSoldMTSInventory(getNotYetSold(character.getId())));
+      });
+   }
+
+   @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-
       if (!chr.isAlive() && YamlConfig.config.server.USE_BUYBACK_SYSTEM) {
          BuybackProcessor.processBuyback(client);
          PacketCreator.announce(client, new EnableActions());
       } else {
-         if (!YamlConfig.config.server.USE_MTS) {
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (chr.getEventInstance() != null) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Entering Cash Shop or MTS are disabled when registered on an event.");
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (MapleMiniDungeonInfo.isDungeonMap(chr.getMapId())) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (FieldLimit.CANNOTMIGRATE.check(chr.getMap().getFieldLimit())) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't do it here in this map.");
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         if (!chr.isAlive()) {
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-         if (chr.getLevel() < 10) {
-            PacketCreator.announce(client, new ShowBlockedUI(5));
-            PacketCreator.announce(client, new EnableActions());
-            return;
-         }
-
-         chr.closePlayerInteractions();
-         chr.closePartySearchInteractions();
-
-         chr.unregisterChairBuff();
-         Server.getInstance().getPlayerBuffStorage().addBuffsToStorage(chr.getId(), chr.getAllBuffs());
-         Server.getInstance().getPlayerBuffStorage().addDiseasesToStorage(chr.getId(), chr.getAllDiseases());
-         chr.setAwayFromChannelWorld();
-         chr.notifyMapTransferToPartner(-1);
-         chr.removeIncomingInvites();
-         chr.cancelAllBuffs(true);
-         chr.cancelAllDebuffs();
-         chr.cancelBuffExpireTask();
-         chr.cancelDiseaseExpireTask();
-         chr.cancelSkillCooldownTask();
-         chr.cancelExpirationTask();
-
-         chr.forfeitExpirableQuests();
-         chr.cancelQuestExpirationTask();
-
-         chr.saveCharToDB();
-
-         client.getChannelServer().removePlayer(chr);
-         chr.getMap().removePlayer(client.getPlayer());
-         PacketCreator.announce(client, new SetITC(client));
-         chr.getCashShop().open(true);// xD
-         client.enableCSActions();
-         PacketCreator.announce(client, new MTSWantedListingOver(0, 0));
-         PacketCreator.announce(client, new ShowMTSCash(client.getPlayer().getCashShop().getCash(2), client.getPlayer().getCashShop().getCash(4)));
-
-         DatabaseConnection.getInstance().withConnection(connection -> {
-            List<MTSItemInfo> items = new ArrayList<>(MtsItemProvider.getInstance().getByTab(connection, 1, 16));
-            long countForTab = MtsItemProvider.getInstance().countByTab(connection, 1);
-            int pages = (int) Math.ceil(countForTab / 16);
-
-            PacketCreator.announce(client, new SendMTS(items, 1, 0, 0, pages));
-            PacketCreator.announce(client, new MTSTransferInventory(getTransfer(chr.getId())));
-            PacketCreator.announce(client, new GetNotYetSoldMTSInventory(getNotYetSold(chr.getId())));
-         });
+         genericHandle(client);
       }
    }
 

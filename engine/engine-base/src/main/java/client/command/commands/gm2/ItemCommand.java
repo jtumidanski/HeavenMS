@@ -32,57 +32,31 @@ import config.YamlConfig;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 
-public class ItemCommand extends Command {
+public class ItemCommand extends AbstractItemProductionCommand {
    {
       setDescription("");
    }
 
    @Override
-   public void execute(MapleClient c, String[] params) {
-      MapleCharacter player = c.getPlayer();
+   protected String getSyntax() {
+      return "Syntax: !item <itemid> <quantity>";
+   }
 
-      if (params.length < 1) {
-         player.yellowMessage("Syntax: !item <itemid> <quantity>");
-         return;
-      }
+   @Override
+   protected void producePet(MapleClient client, int itemId, short quantity, int petId, long expiration) {
+      MapleCharacter player = client.getPlayer();
+      MapleInventoryManipulator.addById(client, itemId, quantity, player.getName(), petId, expiration);
+   }
 
-      int itemId = Integer.parseInt(params[0]);
-      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-
-      if (ii.getName(itemId) == null) {
-         player.yellowMessage("Item id '" + params[0] + "' does not exist.");
-         return;
-      }
-
-      short quantity = 1;
-      if (params.length >= 2) quantity = Short.parseShort(params[1]);
-
-      if (YamlConfig.config.server.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
-         player.yellowMessage("You cannot create a cash item with this command.");
-         return;
-      }
-
-      if (ItemConstants.isPet(itemId)) {
-         if (params.length >= 2) {   // thanks to istreety & TacoBell
-            quantity = 1;
-            long days = Math.max(1, Integer.parseInt(params[1]));
-            long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
-            int petid = PetProcessor.getInstance().createPet(itemId);
-
-            MapleInventoryManipulator.addById(c, itemId, quantity, player.getName(), petid, expiration);
-            return;
-         } else {
-            player.yellowMessage("Pet Syntax: !item <itemid> <expiration>");
-            return;
-         }
-      }
-
+   @Override
+   public void produceItem(MapleClient client, int itemId, short quantity) {
+      MapleCharacter player = client.getPlayer();
       short flag = 0;
       if (player.gmLevel() < 3) {
          flag |= ItemConstants.ACCOUNT_SHARING;
          flag |= ItemConstants.UNTRADEABLE;
       }
 
-      MapleInventoryManipulator.addById(c, itemId, quantity, player.getName(), -1, flag, -1);
+      MapleInventoryManipulator.addById(client, itemId, quantity, player.getName(), -1, flag, -1);
    }
 }

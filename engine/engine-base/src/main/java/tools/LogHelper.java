@@ -18,19 +18,19 @@ public class LogHelper {
       String name2 = trade2.getOwner().getName();
       StringBuilder log = new StringBuilder("TRADE BETWEEN " + name1 + " AND " + name2 + "\r\n");
       //Trade 1 to trade 2
+      logTrade(trade1, name1, name2, log);
+      //Trade 2 to trade 1
+      logTrade(trade2, name2, name1, log);
+      log.append("\r\n\r\n");
+      FilePrinter.print(FilePrinter.LOG_TRADE, log.toString());
+   }
+
+   protected static void logTrade(MapleTrade trade1, String name1, String name2, StringBuilder log) {
       log.append(trade1.getExchangeMesos()).append(" mesos from ").append(name1).append(" to ").append(name2).append(" \r\n");
       for (Item item : trade1.getItems()) {
          String itemName = MapleItemInformationProvider.getInstance().getName(item.id()) + "(" + item.id() + ")";
          log.append(item.quantity()).append(" ").append(itemName).append(" from ").append(name1).append(" to ").append(name2).append(" \r\n");
       }
-      //Trade 2 to trade 1
-      log.append(trade2.getExchangeMesos()).append(" mesos from ").append(name2).append(" to ").append(name1).append(" \r\n");
-      for (Item item : trade2.getItems()) {
-         String itemName = MapleItemInformationProvider.getInstance().getName(item.id()) + "(" + item.id() + ")";
-         log.append(item.quantity()).append(" ").append(itemName).append(" from ").append(name2).append(" to ").append(name1).append(" \r\n");
-      }
-      log.append("\r\n\r\n");
-      FilePrinter.print(FilePrinter.LOG_TRADE, log.toString());
    }
 
    public static void logExpedition(MapleExpedition expedition) {

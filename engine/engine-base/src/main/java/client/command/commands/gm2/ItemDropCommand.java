@@ -25,79 +25,49 @@ package client.command.commands.gm2;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.command.Command;
 import client.inventory.BetterItemFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
-import client.processor.PetProcessor;
-import config.YamlConfig;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 
-public class ItemDropCommand extends Command {
+public class ItemDropCommand extends AbstractItemProductionCommand {
    {
       setDescription("");
    }
 
    @Override
-   public void execute(MapleClient c, String[] params) {
-      MapleCharacter player = c.getPlayer();
+   protected String getSyntax() {
+      return "Syntax: !drop <itemid> <quantity>";
+   }
 
-      if (params.length < 1) {
-         player.yellowMessage("Syntax: !drop <itemid> <quantity>");
-         return;
+   @Override
+   protected void producePet(MapleClient client, int itemId, short quantity, int petId, long expiration) {
+      MapleCharacter player = client.getPlayer();
+      Item toDrop = BetterItemFactory.getInstance().create(itemId, (short) 0, quantity, petId);
+      toDrop.expiration_(expiration);
+
+      toDrop.owner_$eq("");
+      if (player.gmLevel() < 3) {
+         short f = toDrop.flag();
+         f |= ItemConstants.ACCOUNT_SHARING;
+         f |= ItemConstants.UNTRADEABLE;
+         f |= ItemConstants.SANDBOX;
+
+         ItemProcessor.getInstance().setFlag(toDrop, f);
+         toDrop.owner_$eq("TRIAL-MODE");
       }
 
-      int itemId = Integer.parseInt(params[0]);
-      MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+      client.getPlayer().getMap().spawnItemDrop(client.getPlayer(), client.getPlayer(), toDrop, client.getPlayer().position(), true, true);
+   }
 
-      if (ii.getName(itemId) == null) {
-         player.yellowMessage("Item id '" + params[0] + "' does not exist.");
-         return;
-      }
-
-      short quantity = 1;
-      if (params.length >= 2) quantity = Short.parseShort(params[1]);
-
-      if (YamlConfig.config.server.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
-         player.yellowMessage("You cannot create a cash item with this command.");
-         return;
-      }
-
-      if (ItemConstants.isPet(itemId)) {
-         if (params.length >= 2) {   // thanks to istreety & TacoBell
-            quantity = 1;
-            long days = Math.max(1, Integer.parseInt(params[1]));
-            long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
-            int petid = PetProcessor.getInstance().createPet(itemId);
-
-            Item toDrop = BetterItemFactory.getInstance().create(itemId, (short) 0, quantity, petid);
-            toDrop.expiration_(expiration);
-
-            toDrop.owner_$eq("");
-            if (player.gmLevel() < 3) {
-               short f = toDrop.flag();
-               f |= ItemConstants.ACCOUNT_SHARING;
-               f |= ItemConstants.UNTRADEABLE;
-               f |= ItemConstants.SANDBOX;
-
-               ItemProcessor.getInstance().setFlag(toDrop, f);
-               toDrop.owner_$eq("TRIAL-MODE");
-            }
-
-            c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().position(), true, true);
-
-            return;
-         } else {
-            player.yellowMessage("Pet Syntax: !drop <itemid> <expiration>");
-            return;
-         }
-      }
-
+   @Override
+   public void produceItem(MapleClient client, int itemId, short quantity) {
+      MapleCharacter player = client.getPlayer();
       Item toDrop;
       if (ItemConstants.getInventoryType(itemId) == MapleInventoryType.EQUIP) {
-         toDrop = ii.getEquipById(itemId);
+         toDrop = MapleItemInformationProvider.getInstance().getEquipById(itemId);
       } else {
          toDrop = new Item(itemId, (short) 0, quantity);
       }
@@ -113,6 +83,6 @@ public class ItemDropCommand extends Command {
          toDrop.owner_$eq("TRIAL-MODE");
       }
 
-      c.getPlayer().getMap().spawnItemDrop(c.getPlayer(), c.getPlayer(), toDrop, c.getPlayer().position(), true, true);
+      player.getMap().spawnItemDrop(player, player, toDrop, player.position(), true, true);
    }
 }

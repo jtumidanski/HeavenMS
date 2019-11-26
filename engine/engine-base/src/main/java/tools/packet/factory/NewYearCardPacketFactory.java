@@ -1,6 +1,5 @@
 package tools.packet.factory;
 
-import client.newyear.NewYearCardRecord;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.NewYearCardResolution;
 
@@ -65,19 +64,5 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
             writer.writeInt(packet.newYearCardRecord().id());
             break;
       }
-   }
-
-   protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter writer) {
-      writer.writeInt(newyear.id());
-      writer.writeInt(newyear.senderId());
-      writer.writeMapleAsciiString(newyear.senderName());
-      writer.writeBool(newyear.senderDiscardCard());
-      writer.writeLong(newyear.dateSent());
-      writer.writeInt(newyear.receiverId());
-      writer.writeMapleAsciiString(newyear.receiverName());
-      writer.writeBool(newyear.receiverDiscardCard());
-      writer.writeBool(newyear.receiverReceivedCard());
-      writer.writeLong(newyear.dateReceived());
-      writer.writeMapleAsciiString(newyear.message());
    }
 }
