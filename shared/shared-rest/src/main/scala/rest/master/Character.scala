@@ -1,21 +1,11 @@
 package rest.master
 
-class Character() {
-  private var id: Integer = _
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def getId: Integer = id
+class Character @JsonCreator()(@JsonProperty("id") _id: Integer, @JsonProperty("accountId") _accountId: Integer) {
+  @JsonGetter("id")
+  def id: Integer = _id
 
-  def setId(value: Integer): Unit = id = value
-
-  private var accountId: Integer = _
-
-  def getAccountId: Integer = accountId
-
-  def setAccountId(value: Integer): Unit = accountId = value
-
-  def this(_id: Integer, _accountId: Integer) = {
-    this()
-    id = _id
-    accountId = _accountId
-  }
+  @JsonGetter("accountId")
+  def accountId: Integer = _accountId
 }

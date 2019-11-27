@@ -3,12 +3,14 @@ package entity;
 import java.math.BigInteger;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
 @Table(name = "quick_slot_key_map")
 public class QuickSlotKeyMap {
 
+   @Id
    @Column(nullable = false)
    private Integer id;
 

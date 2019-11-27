@@ -1,12 +1,11 @@
 package rest.buddy
 
-class UpdateBuddy {
-  var pending: Integer = _
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def getPending(value: Integer): Unit = pending = value
+class UpdateBuddy @JsonCreator()(@JsonProperty("pending") _pending: Integer, @JsonProperty("responseRequired") _responseRequired: java.lang.Boolean) {
+  @JsonGetter("pending")
+  def pending: Integer = _pending
 
-  def this(_pending: Integer) = {
-    this()
-    pending = _pending
-  }
+  @JsonGetter("responseRequired")
+  def responseRequired: java.lang.Boolean = _responseRequired
 }

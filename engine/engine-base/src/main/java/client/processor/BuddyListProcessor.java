@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.ws.rs.core.UriBuilder;
 
 import client.BuddyList;
 import client.BuddyListEntry;
@@ -17,11 +18,11 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.database.data.CharNameAndIdData;
 import client.database.provider.CharacterProvider;
+import config.YamlConfig;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.channel.CharacterIdChannelPair;
 import net.server.world.World;
-import rest.URIs;
 import rest.buddy.AddBuddy;
 import rest.buddy.AddBuddyResponse;
 import rest.buddy.AddBuddyResult;
@@ -60,10 +61,10 @@ public class BuddyListProcessor {
     * @return a stream
     */
    protected Stream<Integer> getBuddies(int characterId) {
-      URI path = URIs.BUDDIES.queryParam("characterId", characterId).build();
-      return RestProvider.getInstance().get(path, GetBuddiesResponse.class)
-            .map(response -> response.getBuddies().stream().map(Buddy::getId))
-            .orElse(Stream.empty());
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("characterId", characterId).build();
+      return RestProvider.getInstance().get(path, GetBuddiesResponse.class, response -> {
+         return response.buddies().stream().map(Buddy::id);
+      }, () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddies for character " + characterId)).orElse(Stream.empty());
    }
 
    /**
@@ -85,9 +86,11 @@ public class BuddyListProcessor {
     * @param characterId the id of the character
     * @return an optional containing the capacity
     */
-   public Optional<Integer> getBuddyListCapacity(int characterId) {
-      URI path = URIs.BUDDY_CHAR.path(Integer.toString(characterId)).build();
-      return RestProvider.getInstance().get(path, Character.class).map(Character::getCapacity);
+   public Integer getBuddyListCapacity(int characterId) {
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("characters").path(Integer.toString(characterId)).build();
+      return RestProvider.getInstance().get(path, Character.class,
+            Character::capacity,
+            () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddy list capacity for character " + characterId)).orElse(0);
    }
 
    /**
@@ -97,20 +100,24 @@ public class BuddyListProcessor {
     * @param buddyList   the buddy list to populate
     */
    public void loadBuddies(int characterId, BuddyList buddyList) {
-      URI path = URIs.BUDDIES.queryParam("characterId", characterId).build();
-      RestProvider.getInstance().get(path, GetBuddiesResponse.class).ifPresent(response -> populateBuddyList(buddyList, response));
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("characterId", characterId).build();
+      RestProvider.getInstance().get(path, GetBuddiesResponse.class,
+            response -> {
+               populateBuddyList(buddyList, response);
+            },
+            () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + characterId));
    }
 
    protected void populateBuddyList(BuddyList buddyList, GetBuddiesResponse response) {
       DatabaseConnection.getInstance().withConnection(entityManager -> {
-         response.getBuddies().parallelStream().forEach(buddy -> {
-            String name = getCharacterNameFromDatabase(buddy.getId());
-            buddyList.put(new BuddyListEntry(name, buddy.getGroup(), buddy.getId(), -1, true));
+         response.buddies().parallelStream().forEach(buddy -> {
+            String name = getCharacterNameFromDatabase(buddy.id());
+            buddyList.put(new BuddyListEntry(name, buddy.group(), buddy.id(), -1, true));
          });
 
-         response.getPending().parallelStream().forEach(buddy -> {
-            String name = getCharacterNameFromDatabase(buddy.getId());
-            buddyList.addRequest(new CharacterNameAndId(buddy.getId(), name));
+         response.pending().parallelStream().forEach(buddy -> {
+            String name = getCharacterNameFromDatabase(buddy.id());
+            buddyList.addRequest(new CharacterNameAndId(buddy.id(), name));
          });
       });
    }
@@ -121,12 +128,7 @@ public class BuddyListProcessor {
     * @param character the character being created
     */
    public void syncAndInitBuddyList(MapleCharacter character) {
-      syncCharacter(character.getAccountID(), character.getId(),
-            responseCode -> getBuddyListCapacity(character.getId()).ifPresentOrElse(
-                  character::initBuddyList,
-                  () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Unable to sync character " + character.getId() + " and retrieve buddy capacity")
-            )
-      );
+      syncCharacter(character.getAccountID(), character.getId(), responseCode -> character.initBuddyList(getBuddyListCapacity(character.getId())));
    }
 
    /**
@@ -147,7 +149,7 @@ public class BuddyListProcessor {
     * @param onSuccess   a callback for a successful sync
     */
    public void syncCharacter(int accountId, int characterId, Consumer<Integer> onSuccess) {
-      URI path = URIs.BUDDY_CHAR.build();
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("characters").build();
       RestProvider.getInstance().post(path, new AddCharacter(characterId, accountId),
             onSuccess,
             responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
@@ -160,7 +162,7 @@ public class BuddyListProcessor {
     * @param characterId the id of the character to delete
     */
    public void deleteCharacter(int worldId, int characterId) {
-      URI path = URIs.BUDDY_CHAR.path(Integer.toString(characterId)).build();
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("characters").path(Integer.toString(characterId)).build();
       RestProvider.getInstance().delete(path,
             responseCode -> getBuddies(worldId, characterId).forEach(buddy -> deleteBuddySuccess(buddy, characterId)),
             responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete character " + characterId));
@@ -172,11 +174,11 @@ public class BuddyListProcessor {
     * @param characterId the id of the character to delete buddies for
     */
    public void deleteBuddies(int characterId) {
-      URI path = URIs.BUDDIES.queryParam("characterId", characterId).build();
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("characterId", characterId).build();
       RestProvider.getInstance().delete(path,
             RestProvider::doNothing,
             responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId));
-      URI buddyPath = URIs.BUDDIES.queryParam("buddyId", characterId).build();
+      URI buddyPath = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("buddyId", characterId).build();
       RestProvider.getInstance().delete(buddyPath,
             RestProvider::doNothing,
             responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId));
@@ -210,9 +212,9 @@ public class BuddyListProcessor {
 
       AddBuddy addBuddy = new AddBuddy(character.getId(), otherCharMin.id(), otherCharMin.name(), group);
 
-      URI path = URIs.BUDDIES.build();
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").build();
       RestProvider.getInstance().post(path, addBuddy, AddBuddyResponse.class, (responseCode, result) -> {
-         switch (result.getErrorCode()) {
+         switch (result.errorCode()) {
             case TARGET_CHARACTER_DOES_NOT_EXIST:
                MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
                break;
@@ -228,7 +230,7 @@ public class BuddyListProcessor {
             case OK:
             case BUDDY_ALREADY_REQUESTED:
                int displayChannel = -1;
-               if (result.getErrorCode().equals(AddBuddyResult.BUDDY_ALREADY_REQUESTED) && channel != -1) {
+               if (result.errorCode().equals(AddBuddyResult.BUDDY_ALREADY_REQUESTED) && channel != -1) {
                   displayChannel = channel;
                   notifyRemoteChannel(character.getClient(), channel, otherCharMin.id(), BuddyListOperation.ADDED);
                } else {
@@ -272,10 +274,10 @@ public class BuddyListProcessor {
                .or(() -> Optional.ofNullable(getCharacterNameFromDatabase(otherId)));
 
          if (otherName.isPresent()) {
-            RestProvider.getInstance().update(URIs.BUDDIES.queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build(), new UpdateBuddy(0),
+            RestProvider.getInstance().update(UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build(), new UpdateBuddy(0, false),
                   RestProvider::doNothing,
                   responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Unable to accept buddy " + otherId + " for character " + character.getId()));
-            RestProvider.getInstance().update(URIs.BUDDIES.queryParam("buddyId", character.getId()).queryParam("characterId", otherId).build(), new UpdateBuddy(0),
+            RestProvider.getInstance().update(UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("buddyId", character.getId()).queryParam("characterId", otherId).build(), new UpdateBuddy(0, false),
                   RestProvider::doNothing,
                   responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Unable to accept buddy " + character.getId() + " for character " + otherId));
 
@@ -305,7 +307,7 @@ public class BuddyListProcessor {
     * @param otherId   the id of the other character
     */
    public void deleteBuddy(MapleCharacter character, int otherId) {
-      URI path = URIs.BUDDIES.queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build();
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build();
       RestProvider.getInstance().delete(path,
             returnCode -> deleteBuddySuccess(character, otherId),
             returnCode -> deleteBuddyFailure(character, otherId));
@@ -335,7 +337,7 @@ public class BuddyListProcessor {
     * @param onFailure   a runnable if the update is not successful
     */
    public void updateCapacity(MapleCharacter character, int newCapacity, Runnable onSuccess, Runnable onFailure) {
-      URI path = URIs.BUDDY_CHAR.path(Integer.toString(character.getId())).build();
+      URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("characters").path(Integer.toString(character.getId())).build();
       RestProvider.getInstance().update(path, new UpdateCharacter(newCapacity),
             responseCode -> updateCapacitySuccess(character, newCapacity, onSuccess),
             responseCode -> updateCapacityFailure(character, onFailure));

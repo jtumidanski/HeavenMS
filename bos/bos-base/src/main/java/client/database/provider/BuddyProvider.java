@@ -34,6 +34,18 @@ public class BuddyProvider extends AbstractQueryExecutor {
       }
    }
 
+   public boolean buddyIsInOtherGroup(EntityManager entityManager, int characterId, int buddyId, String group) {
+      TypedQuery<Integer> query = entityManager.createQuery("SELECT 1 FROM Buddy b WHERE b.characterId = :characterId AND b.buddyId = :buddyId AND b.buddyGroup <> :group", Integer.class);
+      query.setParameter("characterId", characterId);
+      query.setParameter("buddyId", buddyId);
+      query.setParameter("group", group);
+      try {
+         return query.getSingleResult() == 1;
+      } catch (NoResultException exception) {
+         return false;
+      }
+   }
+
    public boolean atCapacity(EntityManager entityManager, int characterId) {
       TypedQuery<BuddyListStats> query = entityManager.createQuery("SELECT NEW client.BuddyListStats(COUNT(b), c.buddyCapacity) FROM Buddy b JOIN Character c ON b.characterId = c.id WHERE c.id = :characterId GROUP BY c.id", BuddyListStats.class);
       query.setParameter("characterId", characterId);
@@ -69,7 +81,7 @@ public class BuddyProvider extends AbstractQueryExecutor {
       TypedQuery<Integer> query = entityManager.createQuery(
             "SELECT b.buddyId " +
                   "FROM Buddy b JOIN Character c ON b.buddyId = c.id " +
-                  "WHERE b.characterId = :characterId AND b.pending = 1", Integer.class);
+                  "WHERE b.characterId = :characterId AND b.pending = 1 AND b.responseRequired = true", Integer.class);
       query.setParameter("characterId", characterId);
       return query.getResultList();
    }

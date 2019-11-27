@@ -212,7 +212,7 @@ import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
 import tools.packet.PacketInput;
-import tools.packet.QuickSlotKey;
+import tools.packet.ui.QuickSlotKey;
 import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.buff.CancelBuff;
 import tools.packet.buff.CancelDebuff;

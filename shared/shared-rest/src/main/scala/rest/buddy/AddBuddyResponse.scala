@@ -1,5 +1,8 @@
 package rest.buddy
 
-class AddBuddyResponse(private var _errorCode: AddBuddyResult) {
-  def getErrorCode: AddBuddyResult = _errorCode
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
+
+class AddBuddyResponse @JsonCreator()(@JsonProperty("errorCode") _errorCode: AddBuddyResult) {
+  @JsonGetter("errorCode")
+  def errorCode: AddBuddyResult = _errorCode
 }

@@ -60,7 +60,7 @@ public class CharacterResource {
    public Response getCharacter(@PathParam("id") Integer id) {
       Optional<Character> character = DatabaseConnection.getInstance().withConnectionResult(entityManager -> CharacterProvider.getInstance().getCharacter(entityManager, id).orElse(null));
       if (character.isPresent()) {
-         return Response.ok().entity(character).build();
+         return Response.ok().entity(character.get()).build();
       } else {
          return Response.status(Response.Status.NOT_FOUND).build();
       }

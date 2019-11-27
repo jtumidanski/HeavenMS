@@ -1,11 +1,8 @@
 package rest.master
 
-class CharactersResponse(private var _characters: java.util.List[Character]) {
-  def getCharacters(): java.util.List[Character] = _characters
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def setCharacters(value: java.util.List[Character]): Unit = _characters = value
-
-  def this() = {
-    this(null)
-  }
+class CharactersResponse @JsonCreator()(@JsonProperty("characters") _characters: java.util.List[Character]) {
+  @JsonGetter("characters")
+  def characters: java.util.List[Character] = _characters
 }

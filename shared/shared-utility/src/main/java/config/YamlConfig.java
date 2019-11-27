@@ -11,7 +11,9 @@ import com.esotericsoftware.yamlbeans.YamlReader;
 public class YamlConfig {
 
    public static final YamlConfig config = fromFile("config.yaml");
+
    public List<WorldConfig> worlds;
+
    public ServerConfig server;
 
    public static YamlConfig fromFile(String filename) {

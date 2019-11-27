@@ -34,6 +34,12 @@
     <dependencies>
         <dependency>
             <groupId>ms</groupId>
+            <artifactId>shared-utility</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>ms</groupId>
             <artifactId>engine-common</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>

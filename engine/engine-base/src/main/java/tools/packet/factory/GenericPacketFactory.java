@@ -9,7 +9,7 @@ import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.DojoWarpUp;
 import tools.packet.EnableReport;
 import tools.packet.GetEnergy;
-import tools.packet.QuickSlotKey;
+import tools.packet.ui.QuickSlotKey;
 import tools.packet.SetNPCScriptable;
 
 public class GenericPacketFactory extends AbstractPacketFactory {
@@ -55,7 +55,6 @@ public class GenericPacketFactory extends AbstractPacketFactory {
    }
 
    protected void initQuickSlot(MaplePacketLittleEndianWriter writer, QuickSlotKey packet) {
-      writer.writeShort(SendOpcode.QUICKSLOT_INIT.getValue());
       if (Arrays.equals(packet.keyMap(), MapleQuickSlotBinding.DEFAULT_QUICKSLOTS)) {
          writer.writeBool(false);
          return;

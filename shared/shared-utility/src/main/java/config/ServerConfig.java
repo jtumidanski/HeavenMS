@@ -37,6 +37,11 @@ public class ServerConfig {
 
     //Ip Configuration
     public String HOST;
+    public int HOST_PORT;
+
+    public String BUDDY_MS_HOST;
+    public int BUDDY_MS_PORT;
+
     public boolean LOCALSERVER;
     public boolean GMSERVER;
 

@@ -1,7 +1,11 @@
 package rest.buddy
 
-class GetBuddiesResponse(private var _buddies: java.util.List[Buddy], private var _pending: java.util.List[Buddy]) {
-  def getBuddies: java.util.List[Buddy] = _buddies
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def getPending: java.util.List[Buddy] = _pending
+class GetBuddiesResponse @JsonCreator()(@JsonProperty("buddies") _buddies: java.util.List[Buddy], @JsonProperty("pending") _pending: java.util.List[Buddy]) {
+  @JsonGetter("buddies")
+  def buddies: java.util.List[Buddy] = _buddies
+
+  @JsonGetter("pending")
+  def pending: java.util.List[Buddy] = _pending
 }

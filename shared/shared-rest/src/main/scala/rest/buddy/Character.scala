@@ -1,28 +1,14 @@
 package rest.buddy
 
-class Character() {
-  private var id: Integer = _
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def getId: Integer = id
+class Character @JsonCreator()(@JsonProperty("id") _id: Integer, @JsonProperty("accountId") _accountId: Integer, @JsonProperty("capacity") _capacity: Integer) {
+  @JsonGetter("id")
+  def id: Integer = _id
 
-  def setId(value: Integer): Unit = id = value
+  @JsonGetter("accountId")
+  def accountId: Integer = _accountId
 
-  private var accountId: Integer = _
-
-  def getAccountId: Integer = accountId
-
-  def setAccountId(value: Integer): Unit = accountId = value
-
-  private var capacity: Integer = _
-
-  def getCapacity(): Integer = capacity
-
-  def setCapacity(value: Integer): Unit = capacity = value
-
-  def this(_id: Integer, _accountId: Integer, _capacity: Integer) = {
-    this()
-    id = _id
-    accountId = _accountId
-    capacity = _capacity
-  }
+  @JsonGetter("capacity")
+  def capacity: Integer = _capacity
 }

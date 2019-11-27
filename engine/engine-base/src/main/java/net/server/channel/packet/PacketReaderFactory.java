@@ -24,6 +24,7 @@ import net.server.channel.packet.reader.CashOperationReader;
 import net.server.channel.packet.reader.ChangeChannelReader;
 import net.server.channel.packet.reader.ChangeMapReader;
 import net.server.channel.packet.reader.ChangeMapSpecialReader;
+import net.server.channel.packet.reader.ChangeQuickSlotReader;
 import net.server.channel.packet.reader.CharacterInfoRequestReader;
 import net.server.channel.packet.reader.CharacterListRequestReader;
 import net.server.channel.packet.reader.CharacterSelectedReader;
@@ -289,6 +290,7 @@ public class PacketReaderFactory {
       readers.put(MoveSummonReader.class, new MoveSummonReader());
       readers.put(MoveDragonReader.class, new MoveDragonReader());
       readers.put(SpecialMoveReader.class, new SpecialMoveReader());
+      readers.put(ChangeQuickSlotReader.class, new ChangeQuickSlotReader());
    }
 
    public <T extends MaplePacket> PacketReader<T> get(Class<? extends PacketReader<T>> readerClass) {

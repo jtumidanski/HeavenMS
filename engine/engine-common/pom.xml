@@ -13,6 +13,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>ms</groupId>
+            <artifactId>shared-utility</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-client</artifactId>
             <version>${jersey.version}</version>
@@ -31,11 +37,6 @@
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-yaml</artifactId>
             <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.esotericsoftware.yamlbeans</groupId>
-            <artifactId>yamlbeans</artifactId>
-            <version>1.13</version>
         </dependency>
     </dependencies>
 

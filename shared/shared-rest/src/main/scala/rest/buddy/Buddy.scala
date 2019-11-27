@@ -1,11 +1,11 @@
 package rest.buddy
 
-class Buddy(private var _id: Integer, private var _group: String) {
-  def getId: Integer = _id
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def getGroup: String = _group
+class Buddy @JsonCreator()(@JsonProperty("id") _id: Integer, @JsonProperty("group") _group: String) {
+  @JsonGetter("id")
+  def id: Integer = _id
 
-  def this(id: Integer) = {
-    this(id, null)
-  }
+  @JsonGetter("group")
+  def group: String = _group
 }

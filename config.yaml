@@ -193,6 +193,10 @@ server:
 
   #Ip Configuration
   HOST: 127.0.0.1
+  HOST_PORT: 8080
+  BUDDY_MS_HOST: 127.0.0.1
+  BUDDY_MS_PORT: 8081
+
   LOCALSERVER: true
   GMSERVER: false
 

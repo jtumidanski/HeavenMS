@@ -1,12 +1,8 @@
 package rest.buddy
 
-class UpdateCharacter {
-  var capacity: Integer = _
+import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 
-  def setCapacity(value: Integer): Unit = capacity = value
-
-  def this(_capacity: Integer) = {
-    this()
-    capacity = _capacity
-  }
+class UpdateCharacter @JsonCreator()(@JsonProperty("capacity") _capacity: Integer) {
+  @JsonGetter("capacity")
+  def capacity: Integer = _capacity
 }

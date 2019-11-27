@@ -1,6 +1,5 @@
 package client.processor;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -509,9 +508,10 @@ public class CharacterProcessor {
             mapleMount.active_$eq(false);
             mapleCharacter.setMount(mapleMount);
 
-            BigInteger keyMap = QuickSlotKeyMapProvider.getInstance().getForAccount(connection, characterData.accountId());
-            mapleCharacter.setQuickSlotLoaded(LongTool.LongToBytes(keyMap.longValue()));
-            mapleCharacter.setQuickSlotBinding(new MapleQuickSlotBinding(mapleCharacter.getQuickSlotLoaded()));
+            QuickSlotKeyMapProvider.getInstance().getForAccount(connection, characterData.accountId()).ifPresent(keyMap -> {
+               mapleCharacter.setQuickSlotLoaded(LongTool.LongToBytes(keyMap.longValue()));
+               mapleCharacter.setQuickSlotBinding(new MapleQuickSlotBinding(mapleCharacter.getQuickSlotLoaded()));
+            });
          }
          return mapleCharacter;
       }).orElse(null);
@@ -562,9 +562,12 @@ public class CharacterProcessor {
       mapleCharacter.setDojoStage(characterData.lastDojoStage());
       mapleCharacter.setDataString(characterData.dataString());
 
-      BuddyListProcessor.getInstance().getBuddyListCapacity(characterData.id()).ifPresentOrElse(
-            mapleCharacter::initBuddyList,
-            () -> BuddyListProcessor.getInstance().syncAndInitBuddyList(mapleCharacter));
+      int capacity = BuddyListProcessor.getInstance().getBuddyListCapacity(characterData.id());
+      if (capacity == 0) {
+         BuddyListProcessor.getInstance().syncAndInitBuddyList(mapleCharacter);
+      } else {
+         mapleCharacter.initBuddyList(capacity);
+      }
 
       mapleCharacter.setLastExpGainTime(characterData.lastExpGainTime().getTime());
       mapleCharacter.setCanRecvPartySearchInvite(characterData.partyInvite());
@@ -708,12 +711,9 @@ public class CharacterProcessor {
       if (!noChanges) {
          long value = LongTool.BytesToLong(character.getQuickSlotBinding().getQuickSlotKeyMapped());
 
-         try {
-            QuickSlotKeyMapProvider.getInstance().getForAccount(entityManager, character.getAccountID());
-            QuickSlotKeyMapAdministrator.getInstance().update(entityManager, character.getAccountID(), BigInteger.valueOf(value));
-         } catch (NoResultException exception) {
-            QuickSlotKeyMapAdministrator.getInstance().create(entityManager, character.getAccountID(), BigInteger.valueOf(value));
-         }
+         QuickSlotKeyMapProvider.getInstance().getForAccount(entityManager, character.getAccountID()).ifPresentOrElse(
+               keyMap -> QuickSlotKeyMapAdministrator.getInstance().update(entityManager, character.getAccountID(), BigInteger.valueOf(value)),
+               () -> QuickSlotKeyMapAdministrator.getInstance().create(entityManager, character.getAccountID(), BigInteger.valueOf(value)));
       }
    }
 

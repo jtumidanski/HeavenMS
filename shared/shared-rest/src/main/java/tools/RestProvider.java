@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -55,17 +56,18 @@ public class RestProvider {
       }
    }
 
-   public <T> Optional<T> get(URI path, Class<T> responseClass) {
+   public <T, U> Optional<U> get(URI path, Class<T> responseClass, Function<T, U> onSuccess, Runnable onFailure) {
       Invocation.Builder builder = getBase(path);
       Response response;
       try {
          response = builder.get();
       } catch (ProcessingException exception) {
+         onFailure.run();
          return Optional.empty();
       }
 
       if (statusIn(response.getStatus(), Response.Status.OK)) {
-         return Optional.of(response.readEntity(responseClass));
+         return Optional.of(onSuccess.apply(response.readEntity(responseClass)));
       } else {
          return Optional.empty();
       }
@@ -90,7 +92,7 @@ public class RestProvider {
 
    public void delete(URI path, Consumer<Integer> onSuccess, Consumer<Integer> onFailure) {
       Invocation.Builder builder = getBase(path);
-      Response response = builder.get();
+      Response response = builder.delete();
       if (statusIn(response.getStatus(), Response.Status.OK, Response.Status.NO_CONTENT, Response.Status.ACCEPTED)) {
          onSuccess.accept(response.getStatus());
       } else if (onFailure != null) {

@@ -43,6 +43,11 @@ import java.util.concurrent.locks.Lock;
 import javax.persistence.EntityManager;
 import javax.ws.rs.core.UriBuilder;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jaxrs.Jaxrs2TypesModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.apache.mina.core.buffer.IoBuffer;
 import org.apache.mina.core.buffer.SimpleBufferAllocator;
 import org.apache.mina.core.service.IoAcceptor;
@@ -113,7 +118,6 @@ import net.server.task.RankingLoginTask;
 import net.server.task.ReleaseLockTask;
 import net.server.task.RespawnTask;
 import net.server.world.World;
-import rest.URIs;
 import server.CashShop.CashItemFactory;
 import server.MapleSkillbookInformationProvider;
 import server.ThreadManager;
@@ -855,8 +859,16 @@ public class Server {
       TimeZone.setDefault(TimeZone.getTimeZone(YamlConfig.config.server.TIMEZONE));
 
       // Start webservice
-      URI BASE = UriBuilder.fromUri(URIs.BASE).path("master").build();
-      server = GrizzlyHttpServerFactory.createHttpServer(BASE, new ResourceConfig().packages("rest"));
+      final ResourceConfig rc = new ResourceConfig().packages("rest");
+      ObjectMapper mapper = new ObjectMapper();
+      mapper.registerModule(new Jaxrs2TypesModule());
+      mapper.registerModule(new ParameterNamesModule());
+      mapper.registerModule(new JavaTimeModule());
+      JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+      provider.setMapper(mapper);
+      rc.register(provider);
+      URI BASE = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.HOST + ":" + YamlConfig.config.server.HOST_PORT + "/ms")).path("master").build();
+      server = GrizzlyHttpServerFactory.createHttpServer(BASE, rc);
 
       DatabaseConnection.getInstance().withConnection(connection -> {
          AccountAdministrator.getInstance().logoutAllAccounts(connection);

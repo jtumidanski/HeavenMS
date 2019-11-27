@@ -14,7 +14,7 @@ public class Buddy implements Serializable {
    private static final long serialVersionUID = 1L;
 
    @Id
-   @GeneratedValue(strategy=GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Integer id;
 
    @Column(nullable = false)
@@ -25,6 +25,9 @@ public class Buddy implements Serializable {
 
    @Column(nullable = false)
    private Integer pending = 0;
+
+   @Column(nullable = false)
+   private Boolean responseRequired = false;
 
    private String buddyGroup = "0";
 
@@ -69,5 +72,13 @@ public class Buddy implements Serializable {
 
    public void setBuddyGroup(String group) {
       this.buddyGroup = group;
+   }
+
+   public Boolean getResponseRequired() {
+      return responseRequired;
+   }
+
+   public void setResponseRequired(Boolean responseRequired) {
+      this.responseRequired = responseRequired;
    }
 }

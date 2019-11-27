@@ -1,5 +1,6 @@
 package rest;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.Consumes;
@@ -35,7 +36,7 @@ public class BuddyResource {
 
          DatabaseConnection.getInstance().withConnection(entityManager -> {
             BuddyProvider.getInstance().getInfoForBuddies(entityManager, characterId).forEach(result -> buddies.add(new Buddy(result.characterId(), result.group())));
-            BuddyProvider.getInstance().getInfoForPendingBuddies(entityManager, characterId).forEach(result -> pending.add(new Buddy(result)));
+            BuddyProvider.getInstance().getInfoForPendingBuddies(entityManager, characterId).forEach(result -> pending.add(new Buddy(result, "n/a")));
             //BuddyAdministrator.getInstance().deletePendingForCharacter(entityManager, id);
          });
 
@@ -50,6 +51,7 @@ public class BuddyResource {
    public Response deleteBuddies(@QueryParam("characterId") Integer characterId, @QueryParam("buddyId") Integer buddyId) {
       if (characterId != null && buddyId != null) {
          DatabaseConnection.getInstance().withConnection(entityManager -> BuddyAdministrator.getInstance().deleteBuddy(entityManager, characterId, buddyId));
+         DatabaseConnection.getInstance().withConnection(entityManager -> BuddyAdministrator.getInstance().deleteBuddy(entityManager, buddyId, characterId));
          return Response.noContent().build();
       } else if (characterId != null) {
          DatabaseConnection.getInstance().withConnection(entityManager -> BuddyAdministrator.getInstance().deleteForCharacter(entityManager, characterId));
@@ -67,7 +69,7 @@ public class BuddyResource {
    public Response updateBuddy(@QueryParam("characterId") Integer characterId, @QueryParam("buddyId") Integer buddyId, UpdateBuddy updateBuddy) {
       if (characterId != null && buddyId != null) {
          DatabaseConnection.getInstance().withConnection(entityManager -> {
-            BuddyAdministrator.getInstance().updateBuddy(entityManager, characterId, buddyId, updateBuddy.pending());
+            BuddyAdministrator.getInstance().updateBuddy(entityManager, characterId, buddyId, updateBuddy.pending(), updateBuddy.responseRequired());
          });
          return Response.ok().build();
       }
@@ -90,7 +92,11 @@ public class BuddyResource {
             return AddBuddyResult.FULL;
          }
 
-         //TODO shortcut if group update.
+         boolean inOtherGroup = BuddyProvider.getInstance().buddyIsInOtherGroup(entityManager, addBuddy.referenceCharacterId(), addBuddy.addId(), addBuddy.group());
+         if (inOtherGroup) {
+            BuddyAdministrator.getInstance().updateBuddy(entityManager, addBuddy.referenceCharacterId(), addBuddy.addId(), addBuddy.group());
+            return AddBuddyResult.OK;
+         }
 
          boolean buddyExists = BuddyProvider.getInstance().buddyExists(entityManager, addBuddy.addId());
          if (!buddyExists) {
@@ -107,11 +113,11 @@ public class BuddyResource {
             return AddBuddyResult.BUDDY_FULL;
          }
 
-         BuddyAdministrator.getInstance().addBuddy(entityManager, addBuddy.referenceCharacterId(), addBuddy.addId());
-         BuddyAdministrator.getInstance().addBuddy(entityManager, addBuddy.addId(), addBuddy.referenceCharacterId());
+         BuddyAdministrator.getInstance().addBuddy(entityManager, addBuddy.referenceCharacterId(), addBuddy.addId(), addBuddy.group(), false);
+         BuddyAdministrator.getInstance().addBuddy(entityManager, addBuddy.addId(), addBuddy.referenceCharacterId(), addBuddy.group(), true);
 
          return AddBuddyResult.OK;
       }).orElseThrow();
-      return Response.ok().entity(new AddBuddyResponse(result)).build();
+      return Response.created(URI.create("")).entity(new AddBuddyResponse(result)).build();
    }
 }
