@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jaxrs.Jaxrs2TypesModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -25,7 +24,8 @@ import tools.FilePrinter;
 import tools.RestProvider;
 
 public class BuddyOrchestrator {
-   private static final URI BASE = UriBuilder.fromUri(URI.create("http://localhost:8080/ms")).port(8081).path("bos").build();
+
+   private static final URI BASE = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").build();
 
    public static HttpServer startServer() {
       final ResourceConfig rc = new ResourceConfig().packages("rest");
