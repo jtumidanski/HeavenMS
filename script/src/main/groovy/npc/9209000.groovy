@@ -80,28 +80,48 @@ class NPC9209000 {
                selected = selection
             }
 
-            table = (selected == 1) ? skillbook : masterybook
-            for (int i = 0; i < table.length; i++) {
-               sendStr += "  #L" + i + "# #i" + table[i] + "#  #t" + table[i] + "##l\r\n"
+            if (selected == 1) {
+               table = skillbook
+               for (int i = 0; i < table.length; i++) {
+                  if (table[i] > 0) {
+                     int itemid = table[i]
+                     sendStr += "  #L" + i + "# #i" + itemid + "#  #t" + itemid + "##l\r\n"
+                  } else {
+                     int skillid = -table[i]
+                     sendStr += "  #L" + i + "# #s" + skillid + "#  #q" + skillid + "##l\r\n"
+                  }
+               }
+            } else {
+               table = masterybook
+               for (int i = 0; i < table.length; i++) {
+                  int itemid = table[i]
+                  sendStr += "  #L" + i + "# #i" + itemid + "#  #t" + itemid + "##l\r\n"
+               }
             }
 
             cm.sendSimple(sendStr)
 
          } else if (status == 2) {
             selected = selection
-            String[] mobList = cm.getNamesWhoDropsItem(table[selected])
 
             String sendStr
-            if (mobList.length == 0) {
-               sendStr = "No mobs drop '#b#t" + table[selected] + "##k'.\r\n\r\n"
-            } else {
-               sendStr = "The following mobs drop '#b#t" + table[selected] + "##k':\r\n\r\n"
+            if (table[selected] > 0) {
+               String[] mobList = cm.getNamesWhoDropsItem(table[selected])
 
-               for (int i = 0; i < mobList.length; i++) {
-                  sendStr += "  #L" + i + "# " + mobList[i] + "#l\r\n"
+               if (mobList.length == 0) {
+                  sendStr = "No mobs drop '#b#t" + table[selected] + "##k'.\r\n\r\n"
+               } else {
+                  sendStr = "The following mobs drop '#b#t" + table[selected] + "##k':\r\n\r\n"
+
+                  for (int i = 0; i < mobList.length; i++) {
+                     sendStr += "  #L" + i + "# " + mobList[i] + "#l\r\n"
+                  }
+
+                  sendStr += "\r\n"
                }
 
-               sendStr += "\r\n"
+            } else {
+               sendStr = "\r\n\r\n"
             }
             sendStr += cm.getSkillBookInfo(table[selected])
 

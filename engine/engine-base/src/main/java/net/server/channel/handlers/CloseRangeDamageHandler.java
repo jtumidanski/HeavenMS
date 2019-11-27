@@ -93,7 +93,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          // PE hacking or maybe just lagging
          return;
       }
-      if (chr.getMap().isDojoMap() && attack.numAttacked() > 0) {
+      if (GameConstants.isDojo(chr.getMap().getId()) && attack.numAttacked() > 0) {
          chr.setDojoEnergy(chr.getDojoEnergy() + YamlConfig.config.server.DOJO_ENERGY_ATK);
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
       }

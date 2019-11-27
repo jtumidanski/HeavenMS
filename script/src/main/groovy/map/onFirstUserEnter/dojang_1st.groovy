@@ -10,15 +10,12 @@ class Mapdojang_1st {
       ms.getPlayer().resetEnteredScript()
       int stage = Math.floor(ms.getMapId() / 100) % 100
 
-      if (stage % 6 == 1) {
-         ms.getClient().getChannelServer().startDojoSchedule(ms.getMapId())
-      } else if (stage % 6 == 0) {
+      if (stage % 6 == 0) {
          ms.getClient().getChannelServer().dismissDojoSchedule(ms.getMapId(), ms.getParty().orElseThrow())
-      }
+         ms.getClient().getChannelServer().setDojoProgress(ms.getMapId())
+      } else {
+         boolean callBoss = ms.getClient().getChannelServer().setDojoProgress(ms.getMapId())
 
-      boolean callBoss = ms.getClient().getChannelServer().setDojoProgress(ms.getMapId())
-
-      if (stage % 6 > 0) {
          int realstage = stage - ((stage / 6) | 0)
          MapleMonster mob = ms.getMonsterLifeFactory(9300183 + realstage)
          if (callBoss && mob != null && ms.getPlayer().getMap().getMonsterById(9300216) == null) {

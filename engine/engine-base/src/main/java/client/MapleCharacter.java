@@ -849,7 +849,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       int pts = 0;
       if (dojoPoints < 17000) {
          pts = 1 + ((mapid - 1) / 100 % 100) / 6;
-         if (!getDojoParty()) {
+         if (!GameConstants.isDojoPartyArea(this.getMapId())) {
             pts++;
          }
          this.dojoPoints += pts;
@@ -1772,6 +1772,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       } else {
          FilePrinter.printError(FilePrinter.MAPLE_MAP, "Character " + this.getName() + " got stuck when moving to map " + map.getId() + ".");
+         client.disconnect(true, false);     // thanks BHB for noticing a player storage stuck case here
+         return;
       }
 
       notifyMapTransferToPartner(map.getId());
@@ -2460,9 +2462,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       dispelDebuff(MapleDisease.POISON);
       dispelDebuff(MapleDisease.SEAL);
       dispelDebuff(MapleDisease.WEAKEN);
-      dispelDebuff(MapleDisease.SLOW);
-      dispelDebuff(MapleDisease.ZOMBIFY);
-      dispelDebuff(MapleDisease.CONFUSE);
+      dispelDebuff(MapleDisease.SLOW);    // thanks Conrad for noticing ZOMBIFY isn't dispellable
    }
 
    public void cancelAllDebuffs() {
@@ -4032,10 +4032,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       this.dojoEnergy = Math.min(x, 10000);
    }
 
-   public boolean getDojoParty() {
-      return mapid >= 925030100 && mapid < 925040000;
-   }
-
    public int getDojoPoints() {
       return dojoPoints;
    }
@@ -4579,6 +4575,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public Ring getMarriageRing() {
       return partnerId > 0 ? marriageRing : null;
+   }
+
+   public int getMasterLevel(int skill) {
+      SkillEntry ret = skills.get(SkillFactory.getSkill(skill));
+      if (ret == null) {
+         return 0;
+      }
+      return ret.masterLevel();
    }
 
    public int getMasterLevel(Skill skill) {
@@ -7239,9 +7243,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          KeyBinding autohpPot = this.getKeymap().get(91);
          if (autohpPot != null) {
             int autohpItemid = autohpPot.action();
-            if (((float) this.getHp()) / this.getCurrentMaxHp() <= this.getAutopotHpAlert()) { // try within user settings... thanks Lame, Optimist, Stealth2800
+            float autohpAlert = this.getAutopotHpAlert();
+            if (((float) this.getHp()) / this.getCurrentMaxHp() <= autohpAlert) { // try within user settings... thanks Lame, Optimist, Stealth2800
                Item autohpItem = this.getInventory(MapleInventoryType.USE).findById(autohpItemid);
                if (autohpItem != null) {
+                  this.setAutopotHpAlert(0.9f * autohpAlert);
                   PetAutopotProcessor.getInstance().runAutopotAction(client, autohpItem.position(), autohpItemid);
                }
             }
@@ -7252,9 +7258,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          KeyBinding autompPot = this.getKeymap().get(92);
          if (autompPot != null) {
             int autompItemid = autompPot.action();
-            if (((float) this.getMp()) / this.getCurrentMaxMp() <= this.getAutopotMpAlert()) {
+            float autompAlert = this.getAutopotMpAlert();
+            if (((float) this.getMp()) / this.getCurrentMaxMp() <= autompAlert) {
                Item autompItem = this.getInventory(MapleInventoryType.USE).findById(autompItemid);
                if (autompItem != null) {
+                  this.setAutopotMpAlert(0.9f * autompAlert); // autoMP would stick to using pots at every depletion in some cases... thanks Rohenn
                   PetAutopotProcessor.getInstance().runAutopotAction(client, autompItem.position(), autompItemid);
                }
             }
@@ -7565,14 +7573,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void showDojoClock() {
-      if (map.isDojoFightMap()) {
+      if (GameConstants.isDojoBossArea(map.getId())) {
          PacketCreator.announce(client, new GetClock((int) (getDojoTimeLeft() / 1000)));
-      }
-   }
-
-   public void timeoutFromDojo() {
-      if (map.isDojoMap()) {
-         client.getPlayer().changeMap(client.getChannelServer().getMapFactory().getMap(925020002));
       }
    }
 

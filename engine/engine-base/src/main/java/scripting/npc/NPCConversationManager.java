@@ -605,7 +605,9 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    public int[] getAvailableSkillBooks() {
-      return MapleItemInformationProvider.getInstance().usableSkillBooks(this.getPlayer()).stream().mapToInt(id -> id).toArray();
+      List<Integer> ret = MapleItemInformationProvider.getInstance().usableSkillBooks(this.getPlayer());
+      ret.addAll(MapleSkillbookInformationProvider.getInstance().getTeachableSkills(this.getPlayer()));
+      return ret.stream().mapToInt(id -> id).toArray();
    }
 
    public String[] getNamesWhoDropsItem(Integer itemId) {
@@ -614,7 +616,16 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
    public String getSkillBookInfo(int itemid) {
       SkillBookEntry sbe = MapleSkillbookInformationProvider.getInstance().getSkillbookAvailability(itemid);
-      return sbe != SkillBookEntry.UNAVAILABLE ? "    Obtainable through #rquestline#k." : "";
+      switch (sbe) {
+         case UNAVAILABLE:
+            return "";
+         case QUEST_BOOK:
+            return "    Obtainable through #rquestline#k (collecting book).";
+         case QUEST_REWARD:
+            return "    Obtainable through #rquestline#k (quest reward).";
+         default:
+            return "    Obtainable through #rquestline#k.";
+      }
    }
 
    // By Drago/Dragohe4rt CPQ + WED

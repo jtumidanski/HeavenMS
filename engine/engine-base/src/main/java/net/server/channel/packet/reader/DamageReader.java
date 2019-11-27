@@ -44,6 +44,7 @@ import constants.skills.ThunderBreaker;
 import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import net.server.PacketReader;
+import net.server.PlayerBuffValueHolder;
 import net.server.channel.handlers.AbstractDealDamageHandler;
 import net.server.channel.packet.AttackPacket;
 import server.MapleStatEffect;
@@ -54,8 +55,6 @@ import tools.Randomizer;
 import tools.data.input.SeekableLittleEndianAccessor;
 
 public class DamageReader implements PacketReader<AttackPacket> {
-
-
    public AttackPacket read(SeekableLittleEndianAccessor accessor, MapleCharacter chr, boolean ranged, boolean magic) {
       //2C 00 00 01 91 A1 12 00 A5 57 62 FC E2 75 99 10 00 47 80 01 04 01 C6 CC 02 DD FF 5F 00
       AttackPacket ret = new AttackPacket();
@@ -256,6 +255,17 @@ public class DamageReader implements PacketReader<AttackPacket> {
                .map(MapleStatEffect::getDamage)
                .orElse(0);
          calcDmgMax *= (100 + effectDamage) / 100;
+      }
+
+      int bonusDmgBuff = 100;
+      for (PlayerBuffValueHolder pbvh : chr.getAllBuffs()) {
+         int bonusDmg = pbvh.effect.getDamage() - 100;
+         bonusDmgBuff += bonusDmg;
+      }
+
+      if (bonusDmgBuff != 100) {
+         float dmgBuff = bonusDmgBuff / 100.0f;
+         calcDmgMax = (long) Math.ceil(calcDmgMax * dmgBuff);
       }
 
       if (chr.getMapId() >= 914000000 && chr.getMapId() <= 914000500) {

@@ -175,14 +175,17 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                if (player.isAlive()) {
                   if (attack.skill() == Aran.BODY_PRESSURE || attack.skill() == Marauder.ENERGY_CHARGE || attack.skill() == ThunderBreaker.ENERGY_CHARGE) {  // thanks IxianMace for noticing Energy Charge skills refreshing on touch, leading to misleading buff applies
                      // prevent touch dmg skills refreshing
+                  } else if(attack.skill() == DawnWarrior.FINAL_ATTACK || attack.skill() == WindArcher.FINAL_ATTACK) {
+                     // prevent cygnus FA refreshing
+                     mobCount = 15;
                   } else if (attack.skill() == NightWalker.POISON_BOMB) {// Poison Bomb
                      attackEffect.applyTo(player, new Point(attack.position().x, attack.position().y));
                   } else {
                      attackEffect.applyTo(player);
 
-                     if (attack.skill() == DawnWarrior.FINAL_ATTACK || attack.skill() == Page.FINAL_ATTACK_BW || attack.skill() == Page.FINAL_ATTACK_SWORD || attack.skill() == Fighter.FINAL_ATTACK_SWORD
-                           || attack.skill() == Fighter.FINAL_ATTACK_AXE || attack.skill() == Spearman.FINAL_ATTACK_SPEAR || attack.skill() == Spearman.FINAL_ATTACK_POLEARM || attack.skill() == WindArcher.FINAL_ATTACK
-                           || attack.skill() == DawnWarrior.FINAL_ATTACK || attack.skill() == Hunter.FINAL_ATTACK || attack.skill() == Crossbowman.FINAL_ATTACK) {
+                     if (attack.skill() == Page.FINAL_ATTACK_BW || attack.skill() == Page.FINAL_ATTACK_SWORD || attack.skill() == Fighter.FINAL_ATTACK_SWORD
+                           || attack.skill() == Fighter.FINAL_ATTACK_AXE || attack.skill() == Spearman.FINAL_ATTACK_SPEAR || attack.skill() == Spearman.FINAL_ATTACK_POLEARM
+                           || attack.skill() == Hunter.FINAL_ATTACK || attack.skill() == Crossbowman.FINAL_ATTACK) {
 
                         mobCount = 15;//:(
                      } else if (attack.skill() == Aran.HIDDEN_FULL_DOUBLE || attack.skill() == Aran.HIDDEN_FULL_TRIPLE || attack.skill() == Aran.HIDDEN_OVER_DOUBLE || attack.skill() == Aran.HIDDEN_OVER_TRIPLE) {

@@ -1,6 +1,7 @@
 package npc
 
 import config.YamlConfig
+import constants.game.GameConstants
 import net.server.world.MapleParty
 import scripting.npc.NPCConversationManager
 import tools.MessageBroadcaster
@@ -59,7 +60,7 @@ class NPC2091005 {
          if (status == 0) {
             if (isRestingSpot(cm.getPlayer().getMap().getId())) {
                String text = "I'm surprised you made it this far! But it won't be easy from here on out. You still want the challenge?\r\n\r\n#b#L0#I want to continue#l\r\n#L1#I want to leave#l\r\n"
-               if (!cm.getPlayer().getDojoParty()) {
+               if (!GameConstants.isDojoPartyArea(cm.getPlayer().getMapId())) {
                   text += "#L2#I want to record my score up to this point#l"
                }
                cm.sendSimple(text)
@@ -89,7 +90,7 @@ class NPC2091005 {
                               cm.sendNext("Haha! Who are you trying to impress with a heart like that?\r\nGo back home where you belong!")
                               cm.dispose()
                            } else {
-                              int avDojo = cm.getClient().getChannelServer().getAvailableDojo(true)
+                              int avDojo = cm.getClient().getChannelServer().ingressDojo(true, 0)
 
                               if (avDojo < 0) {
                                  if (avDojo == -1) {
@@ -99,7 +100,6 @@ class NPC2091005 {
                                  }
                               } else {
                                  cm.getClient().getChannelServer().getMapFactory().getMap(925020010 + avDojo).resetMapObjects()
-                                 cm.getClient().getChannelServer().resetDojo(925020010 + avDojo)
 
                                  cm.resetDojoEnergy()
                                  cm.warp(925020010 + avDojo, 0)
@@ -111,9 +111,10 @@ class NPC2091005 {
                      } else if (cm.getPlayer().getDojoStage() > 0) {
                         dojoWarp = cm.getPlayer().getDojoStage()
                         cm.getPlayer().setDojoStage(0)
-                        cm.sendYesNo("The last time you took the challenge by yourself, you went up to level #b" + dojoWarp + "#k. I can take you there right now. Do you want to go there? (Select #rNo#k to erase this record.)")
+                        int stageWarp = ((dojoWarp / 6) | 0) * 5
+                        cm.sendYesNo("The last time you took the challenge by yourself, you went up to round #b" + stageWarp + "#k. I can take you there right now. Do you want to go there? (Select #rNo#k to erase this record.)")
                      } else {
-                        int avDojo = cm.getClient().getChannelServer().getAvailableDojo(false)
+                        int avDojo = cm.getClient().getChannelServer().ingressDojo(false, dojoWarp)
 
                         if (avDojo < 0) {
                            if (avDojo == -1) {
@@ -126,7 +127,6 @@ class NPC2091005 {
                         } else {
                            int warpDojoMap = 925020000 + (dojoWarp + 1) * 100 + avDojo
                            cm.getClient().getChannelServer().resetDojoMap(warpDojoMap)
-                           cm.getClient().getChannelServer().resetDojo(warpDojoMap)
 
                            cm.resetDojoEnergy()
                            cm.warp(warpDojoMap, 0)
@@ -155,7 +155,7 @@ class NPC2091005 {
                         cm.sendNext("Your partys level ranges are too broad to enter. Please make sure all of your party members are within #r30 levels#k of each other.")
                         cm.dispose()
                      } else {
-                        int avDojo = cm.getClient().getChannelServer().getAvailableDojo(true, cm.getParty().orElseThrow())
+                        int avDojo = cm.getClient().getChannelServer().ingressDojo(true, cm.getParty().get(), 0)
 
                         if (avDojo < 0) {
                            if (avDojo == -1) {
@@ -165,7 +165,6 @@ class NPC2091005 {
                            }
                         } else {
                            cm.getClient().getChannelServer().resetDojoMap(925030100 + avDojo)
-                           cm.getClient().getChannelServer().resetDojo(925030100 + avDojo)
 
                            cm.resetPartyDojoEnergy()
                            cm.warpParty(925030100 + avDojo)
@@ -292,7 +291,7 @@ class NPC2091005 {
                         }
                      }
 
-                     avDojo = cm.getClient().getChannelServer().getAvailableDojo(hasParty, cm.getParty().orElse(null))
+                     avDojo = cm.getClient().getChannelServer().ingressDojo(hasParty, cm.getParty().get(), Math.floor((cm.getPlayer().getMap().getId()) / 100) % 100)
                      firstEnter = true
                   }
 
@@ -309,7 +308,6 @@ class NPC2091005 {
                      int dojoWarpMap = baseStg + (nextStg * 100) + avDojo
                      if (firstEnter) {
                         cm.getClient().getChannelServer().resetDojoMap(dojoWarpMap)
-                        cm.getClient().getChannelServer().resetDojo(dojoWarpMap, nextStg - 1)
                      }
 
                      //non-leader party members can progress whilst having the record saved if they don't command to enter the next stage

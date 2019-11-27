@@ -148,7 +148,7 @@ public class MapleStatEffect {
    private int itemCon, itemConNo;
    private int damage, attackCount, fixdamage;
    private Point lt, rb;
-   private byte bulletCount, bulletConsume;
+   private short bulletCount, bulletConsume;
    private byte mapProtection;
    private CardItemupStats cardStats;
 
@@ -270,6 +270,7 @@ public class MapleStatEffect {
       } else if (isCureAllAbnormalStatus()) {
          applyto.dispelDebuff(MapleDisease.SEDUCE);
          applyto.dispelDebuff(MapleDisease.ZOMBIFY);
+         applyto.dispelDebuff(MapleDisease.CONFUSE);
          applyto.dispelDebuffs();
       } else if (isComboReset()) {
          applyto.setCombo((short) 0);
@@ -317,6 +318,7 @@ public class MapleStatEffect {
          }
       }
       if (isShadowClaw()) {
+         short projectileConsume = this.getBulletConsume();
          MapleInventory use = applyto.getInventory(MapleInventoryType.USE);
          use.lockInventory();
          try {
@@ -324,7 +326,7 @@ public class MapleStatEffect {
             for (int i = 1; i <= use.getSlotLimit(); i++) { // impose order...
                Item item = use.getItem((short) i);
                if (item != null) {
-                  if (ItemConstants.isThrowingStar(item.id()) && item.quantity() >= 200) {
+                  if (ItemConstants.isThrowingStar(item.id()) && item.quantity() >= projectileConsume) {
                      projectile = item;
                      break;
                   }
@@ -333,7 +335,7 @@ public class MapleStatEffect {
             if (projectile == null) {
                return false;
             } else {
-               MapleInventoryManipulator.removeFromSlot(applyto.getClient(), MapleInventoryType.USE, projectile.position(), (short) 200, false, true);
+               MapleInventoryManipulator.removeFromSlot(applyto.getClient(), MapleInventoryType.USE, projectile.position(), (short) projectileConsume, false, true);
             }
          } finally {
             use.unlockInventory();
@@ -1158,11 +1160,11 @@ public class MapleStatEffect {
       return fixdamage;
    }
 
-   public byte getBulletCount() {
+   public short getBulletCount() {
       return bulletCount;
    }
 
-   public byte getBulletConsume() {
+   public short getBulletConsume() {
       return bulletConsume;
    }
 
@@ -1526,11 +1528,11 @@ public class MapleStatEffect {
       this.rb = rb;
    }
 
-   public void setBulletCount(byte bulletCount) {
+   public void setBulletCount(short bulletCount) {
       this.bulletCount = bulletCount;
    }
 
-   public void setBulletConsume(byte bulletConsume) {
+   public void setBulletConsume(short bulletConsume) {
       this.bulletConsume = bulletConsume;
    }
 

@@ -114,7 +114,7 @@ public class MapleInventoryManipulator {
                }
             }
             boolean sandboxItem = (flag & ItemConstants.SANDBOX) == ItemConstants.SANDBOX;
-            while (quantity > 0 || ItemConstants.isRechargeable(itemId)) {
+            while (quantity > 0) {
                short newQ = (short) Math.min(quantity, slotMax);
                if (newQ != 0) {
                   quantity -= newQ;
@@ -133,9 +133,6 @@ public class MapleInventoryManipulator {
                   PacketCreator.announce(c, new ModifyInventoryPacket(true, Collections.singletonList(new ModifyInventory(0, nItem))));
                   if (sandboxItem) {
                      chr.setHasSandboxItem();
-                  }
-                  if ((ItemConstants.isRechargeable(itemId)) && quantity == 0) {
-                     break;
                   }
                } else {
                   PacketCreator.announce(c, new EnableActions());
@@ -204,7 +201,8 @@ public class MapleInventoryManipulator {
    private static boolean addFromDropInternal(MapleClient c, MapleCharacter chr, MapleInventoryType type, MapleInventory inv, Item item, boolean show, int petId) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
-      if (ii.isPickupRestricted(item.id()) && chr.haveItemWithId(item.id(), true)) {
+      int itemid = item.id();
+      if (ii.isPickupRestricted(itemid) && chr.haveItemWithId(itemid, true)) {
          PacketCreator.announce(c, new InventoryFull());
          PacketCreator.announce(c, new ShowItemUnavailable());
          return false;
@@ -212,9 +210,9 @@ public class MapleInventoryManipulator {
       short quantity = item.quantity();
 
       if (!type.equals(MapleInventoryType.EQUIP)) {
-         short slotMax = ii.getSlotMax(c, item.id());
-         List<Item> existing = inv.listById(item.id());
-         if (!ItemConstants.isRechargeable(item.id()) && petId == -1) {
+         short slotMax = ii.getSlotMax(c, itemid);
+         List<Item> existing = inv.listById(itemid);
+         if (!ItemConstants.isRechargeable(itemid) && petId == -1) {
             if (existing.size() > 0) { // first update all existing slots to slotMax
                Iterator<Item> i = existing.iterator();
                while (quantity > 0) {
@@ -236,7 +234,7 @@ public class MapleInventoryManipulator {
             while (quantity > 0) {
                short newQ = (short) Math.min(quantity, slotMax);
                quantity -= newQ;
-               Item nItem = BetterItemFactory.getInstance().create(item.id(), (short) 0, newQ, petId);
+               Item nItem = BetterItemFactory.getInstance().create(itemid, (short) 0, newQ, petId);
                nItem.expiration_(item.expiration());
                nItem.owner_$eq(item.owner());
                ItemProcessor.getInstance().setFlag(nItem, item.flag());
@@ -255,7 +253,7 @@ public class MapleInventoryManipulator {
                }
             }
          } else {
-            Item nItem = BetterItemFactory.getInstance().create(item.id(), (short) 0, quantity, petId);
+            Item nItem = BetterItemFactory.getInstance().create(itemid, (short) 0, quantity, petId);
             nItem.expiration_(item.expiration());
             ItemProcessor.getInstance().setFlag(nItem, item.flag());
 
@@ -286,13 +284,13 @@ public class MapleInventoryManipulator {
             chr.setHasSandboxItem();
          }
       } else {
-         FilePrinter.printError(FilePrinter.ITEM, "Tried to pickup Equip id " + item.id() + " containing more than 1 quantity --> " + quantity);
+         FilePrinter.printError(FilePrinter.ITEM, "Tried to pickup Equip id " + itemid + " containing more than 1 quantity --> " + quantity);
          PacketCreator.announce(c, new InventoryFull());
          PacketCreator.announce(c, new ShowItemUnavailable());
          return false;
       }
       if (show) {
-         PacketCreator.announce(c, new ShowItemGain(item.id(), item.quantity()));
+         PacketCreator.announce(c, new ShowItemGain(itemid, item.quantity()));
       }
       return true;
    }
@@ -316,10 +314,10 @@ public class MapleInventoryManipulator {
       }
 
       if (!type.equals(MapleInventoryType.EQUIP)) {
+         final int numSlotsNeeded;
          short slotMax = ii.getSlotMax(c, itemid);
          List<Item> existing = inv.listById(itemid);
 
-         final int numSlotsNeeded;
          if (ItemConstants.isRechargeable(itemid)) {
             numSlotsNeeded = 1;
          } else {

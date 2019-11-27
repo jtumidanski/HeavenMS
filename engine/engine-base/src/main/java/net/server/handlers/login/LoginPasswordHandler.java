@@ -40,9 +40,9 @@ import tools.BCrypt;
 import tools.DatabaseConnection;
 import tools.HexTool;
 import tools.PacketCreator;
-import tools.packet.login.LoginFailedReason;
 import tools.packet.login.AuthSuccess;
 import tools.packet.login.LoginFailed;
+import tools.packet.login.LoginFailedReason;
 import tools.packet.login.PermanentBan;
 import tools.packet.login.TemporaryBan;
 
@@ -82,7 +82,8 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
    public void handlePacket(LoginPasswordPacket packet, MapleClient client) {
       client.setAccountName(packet.login());
 
-      int loginStatus = client.login(packet.login(), packet.password(), HexTool.toCompressedString(packet.hwid()));
+      String nibbleHwid = HexTool.toCompressedString(packet.hwid());
+      int loginStatus = client.login(packet.login(), packet.password(), nibbleHwid);
 
       if (YamlConfig.config.server.AUTOMATIC_REGISTER && loginStatus == 5) {
          try {
@@ -93,7 +94,7 @@ public class LoginPasswordHandler extends AbstractPacketHandler<LoginPasswordPac
             e.printStackTrace();
          }
 
-         loginStatus = client.login(packet.login(), packet.password(), HexTool.toCompressedString(packet.hwid()));
+         loginStatus = client.login(packet.login(), packet.password(), nibbleHwid);
       }
 
       if (YamlConfig.config.server.BCRYPT_MIGRATION && (loginStatus <= -10)) { // -10 means migration to bcrypt, -23 means TOS wasn't accepted

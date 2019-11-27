@@ -1,6 +1,6 @@
 package portal
 
-
+import constants.game.GameConstants
 import scripting.portal.PortalPlayerInteraction
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -10,7 +10,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.goDojoUp()
       pi.getPlayer().getMap().setReactorState()
       int stage = Math.floor(pi.getPlayer().getMapId() / 100) % 100
-      if ((stage - (stage / 6) | 0) == pi.getPlayer().getVanquisherStage() && !pi.getPlayer().getDojoParty()) // we can also try 5 * stage / 6 | 0 + 1
+      if ((stage - (stage / 6) | 0) == pi.getPlayer().getVanquisherStage() && !GameConstants.isDojoPartyArea(pi.getPlayer().getMapId())) // we can also try 5 * stage / 6 | 0 + 1
       {
          pi.getPlayer().setVanquisherKills(pi.getPlayer().getVanquisherKills() + 1)
       }

@@ -185,11 +185,13 @@ public class MapleMatchCheckerCoordinator {
       }
    }
 
-   private void acceptMatchElement(MapleMatchCheckingElement mmce, int cid) {
+   private boolean acceptMatchElement(MapleMatchCheckingElement mmce, int cid) {
       if (mmce.acceptEntry(cid)) {
          unpoolMatchPlayer(cid);
          disposeMatchElement(mmce);
+         return true;
       }
+      return false;
    }
 
    private void denyMatchElement(MapleMatchCheckingElement mmce, int cid) {
@@ -221,7 +223,10 @@ public class MapleMatchCheckerCoordinator {
                               mmce = null;
                            } else {
                               if (accept) {
-                                 acceptMatchElement(mmce, cid);
+                                 if (!acceptMatchElement(mmce, cid)) {
+                                    mmce = null;
+                                 }
+                                 break;
                               } else {
                                  denyMatchElement(mmce, cid);
                                  matchEntries.remove(cid);

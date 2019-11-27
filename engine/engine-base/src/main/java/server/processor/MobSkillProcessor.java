@@ -109,7 +109,7 @@ public class MobSkillProcessor {
             break;
          case 127:
             if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
-               for (MapleCharacter character : getPlayersInRange(mobSkill, monster, player)) {
+               for (MapleCharacter character : getPlayersInRange(mobSkill, monster)) {
                   character.dispel();
                }
             } else {
@@ -121,13 +121,13 @@ public class MobSkillProcessor {
             break;
          case 129: // Banish
             if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
-               banishPlayers.addAll(getPlayersInRange(mobSkill, monster, player));
+               banishPlayers.addAll(getPlayersInRange(mobSkill, monster));
             } else {
                banishPlayers.add(player);
             }
             break;
          case 131: // Mist
-            monster.getMap().spawnMist(new MapleMist(calculateBoundingBox(mobSkill, monster.position(), monster.isFacingLeft()), monster, mobSkill), mobSkill.x() * 100, false, false, false);
+            monster.getMap().spawnMist(new MapleMist(calculateBoundingBox(mobSkill, monster.position()), monster, mobSkill), mobSkill.x() * 100, false, false, false);
             break;
          case 132:
             disease = MapleDisease.CONFUSE;
@@ -175,7 +175,7 @@ public class MobSkillProcessor {
             int skillLimit = mobSkill.limit();
             MapleMap map = monster.getMap();
 
-            if (map.isDojoMap()) {  // spawns in dojo should be unlimited
+            if (GameConstants.isDojo(map.getId())) {  // spawns in dojo should be unlimited
                skillLimit = Integer.MAX_VALUE;
             }
 
@@ -260,7 +260,7 @@ public class MobSkillProcessor {
       if (disease != null) {
          if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
             int i = 0;
-            for (MapleCharacter character : getPlayersInRange(mobSkill, monster, player)) {
+            for (MapleCharacter character : getPlayersInRange(mobSkill, monster)) {
                if (!character.hasActiveBuff(2321005)) {  // holy shield
                   if (disease.equals(MapleDisease.SEDUCE)) {
                      if (i < 10) {
@@ -278,18 +278,17 @@ public class MobSkillProcessor {
       }
    }
 
-   private List<MapleCharacter> getPlayersInRange(MobSkill mobSkill, MapleMonster monster, MapleCharacter player) {
-      return monster.getMap().getPlayersInRange(calculateBoundingBox(mobSkill, monster.position(), monster.isFacingLeft()), Collections.singletonList(player));
+   private List<MapleCharacter> getPlayersInRange(MobSkill mobSkill, MapleMonster monster) {
+      return monster.getMap().getPlayersInRange(calculateBoundingBox(mobSkill, monster.position()));
    }
 
-   private Rectangle calculateBoundingBox(MobSkill mobSkill, Point posFrom, boolean facingLeft) {
-      int multiplier = facingLeft ? 1 : -1;
-      Point mylt = new Point(mobSkill.lt().get().x * multiplier + posFrom.x, mobSkill.lt().get().y + posFrom.y);
-      Point myrb = new Point(mobSkill.rb().get().x * multiplier + posFrom.x, mobSkill.rb().get().y + posFrom.y);
+   private Rectangle calculateBoundingBox(MobSkill mobSkill, Point posFrom) {
+      Point mylt = new Point(mobSkill.lt().get().x + posFrom.x, mobSkill.lt().get().y + posFrom.y);
+      Point myrb = new Point(mobSkill.rb().get().x + posFrom.x, mobSkill.rb().get().y + posFrom.y);
       return new Rectangle(mylt.x, mylt.y, myrb.x - mylt.x, myrb.y - mylt.y);
    }
 
    private List<MapleMapObject> getObjectsInRange(MobSkill mobSkill, MapleMonster monster, MapleMapObjectType objectType) {
-      return monster.getMap().getMapObjectsInBox(calculateBoundingBox(mobSkill, monster.position(), monster.isFacingLeft()), Collections.singletonList(objectType));
+      return monster.getMap().getMapObjectsInBox(calculateBoundingBox(mobSkill, monster.position()), Collections.singletonList(objectType));
    }
 }

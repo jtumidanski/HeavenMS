@@ -135,8 +135,8 @@ class EventShowaBattle {
    def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
       if (mapid < minMapId || mapid > maxMapId) {
          if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
             eim.unregisterPlayer(player)
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
             end(eim)
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
@@ -216,8 +216,8 @@ class EventShowaBattle {
    // return x that is < 0 - Deregister player normally + Dispose instance if there x player or below, if it's leader = boot all
    def playerDisconnected(EventInstanceManager eim, MapleCharacter player) {
       if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
          eim.unregisterPlayer(player)
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
          end(eim)
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")

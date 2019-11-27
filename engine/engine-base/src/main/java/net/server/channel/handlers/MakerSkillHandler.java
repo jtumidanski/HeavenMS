@@ -312,7 +312,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
    }
 
    private short getCreateStatus(MapleClient c, MakerItemFactory.MakerItemCreateEntry recipe) {
-      if (recipe == null) {
+      if (recipe.isInvalid()) {
          return -1;
       }
 

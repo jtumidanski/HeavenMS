@@ -2045,10 +2045,10 @@ public class MapleItemInformationProvider {
          return new MakerItemCreateEntry(makerEntry);
       } else {
          makerEntry = DatabaseConnection.getInstance().withConnectionResult(connection -> {
-            int reqLevel = 0;
-            int reqMakerLevel = 0;
-            int cost = 0;
-            int toGive = 0;
+            int reqLevel = -1;
+            int reqMakerLevel = -1;
+            int cost = -1;
+            int toGive = -1;
 
             Optional<MakerCreateData> makerCreateData = MakerCreateProvider.getInstance().getMakerCreateDataForItem(connection, toCreate);
             if (makerCreateData.isPresent()) {

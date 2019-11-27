@@ -212,7 +212,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       }
 
       //in dojo player cannot use pot, so deadly attacks should be turned off as well
-      if (is_deadly && chr.getMap().isDojoMap() && !YamlConfig.config.server.USE_DEADLY_DOJO) {
+      if (is_deadly && GameConstants.isDojo(chr.getMap().getId()) && !YamlConfig.config.server.USE_DEADLY_DOJO) {
          damage = 0;
          mpattack = 0;
       }

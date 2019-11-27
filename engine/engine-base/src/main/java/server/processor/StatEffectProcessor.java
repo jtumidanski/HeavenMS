@@ -403,8 +403,8 @@ public class StatEffectProcessor {
       ret.setDamage(MapleDataTool.getIntConvert("damage", source, 100));
       ret.setFixdamage(MapleDataTool.getIntConvert("fixdamage", source, -1));
       ret.setAttackCount(MapleDataTool.getIntConvert("attackCount", source, 1));
-      ret.setBulletCount((byte) MapleDataTool.getIntConvert("bulletCount", source, 1));
-      ret.setBulletConsume((byte) MapleDataTool.getIntConvert("bulletConsume", source, 0));
+      ret.setBulletCount((short) MapleDataTool.getIntConvert("bulletCount", source, 1));
+      ret.setBulletConsume((short) MapleDataTool.getIntConvert("bulletConsume", source, 0));
       ret.setMoneyCon(MapleDataTool.getIntConvert("moneyCon", source, 0));
       ret.setItemCon(MapleDataTool.getInt("itemCon", source, 0));
       ret.setItemConNo(MapleDataTool.getInt("itemConNo", source, 0));

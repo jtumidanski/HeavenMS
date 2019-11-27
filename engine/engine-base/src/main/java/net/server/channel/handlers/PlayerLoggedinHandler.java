@@ -177,7 +177,7 @@ public final class PlayerLoggedinHandler extends AbstractPacketHandler<PlayerLog
             String remoteHwid;
 
             if (player == null) {
-               remoteHwid = MapleSessionCoordinator.getInstance().getGameSessionHwid(session);
+               remoteHwid = MapleSessionCoordinator.getInstance().pickLoginSessionHwid(session);
                if (remoteHwid == null) {
                   client.disconnect(true, false);
                   return;

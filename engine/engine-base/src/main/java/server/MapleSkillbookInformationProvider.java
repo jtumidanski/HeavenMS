@@ -32,8 +32,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import client.MapleCharacter;
 import client.database.provider.ReactorDropProvider;
 import provider.MapleData;
+import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.DatabaseConnection;
@@ -47,6 +49,7 @@ public class MapleSkillbookInformationProvider {
    private static String rootDirectory = ".";
    private static int skillbookMinItemid = 2280000;
    private static int skillbookMaxItemid = 2300000;  // exclusively
+   private static Set<Integer> questSkills = new HashSet<>();
 
    static {
       loadSkillbooks();
@@ -56,27 +59,84 @@ public class MapleSkillbookInformationProvider {
       return instance;
    }
 
+   private static boolean is4thJobSkill(int itemid) {
+      return itemid / 10000 % 10 == 2;
+   }
+
    public static boolean isSkillBook(int itemid) {
       return itemid >= skillbookMinItemid && itemid < skillbookMaxItemid;
    }
 
+   private static boolean isQuestBook(int itemid) {
+      return itemid >= 4001107 && itemid <= 4001114 || itemid >= 4161015 && itemid <= 4161023;
+   }
+
+   private static int fetchQuestbook(MapleData checkData, String quest) {
+      MapleData questStartData = checkData.getChildByPath(quest).getChildByPath("0");
+
+      MapleData startReqItemData = questStartData.getChildByPath("item");
+      if (startReqItemData != null) {
+         for (MapleData itemData : startReqItemData.getChildren()) {
+            int itemid = MapleDataTool.getInt("id", itemData, 0);
+            if (isQuestBook(itemid)) {
+               return itemid;
+            }
+         }
+      }
+
+      MapleData startReqQuestData = questStartData.getChildByPath("quest");
+      if (startReqQuestData != null) {
+         Set<Integer> reqQuests = new HashSet<>();
+
+         for (MapleData questStatusData : startReqQuestData.getChildren()) {
+            int reqQuest = MapleDataTool.getInt("id", questStatusData, 0);
+            if (reqQuest > 0) {
+               reqQuests.add(reqQuest);
+            }
+         }
+
+         for (Integer reqQuest : reqQuests) {
+            int book = fetchQuestbook(checkData, Integer.toString(reqQuest));
+            if (book > -1) {
+               return book;
+            }
+         }
+      }
+
+      return -1;
+   }
+
    private static void fetchSkillbooksFromQuests() {
-      MapleData actData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "Quest.wz")).getData("Act.img");
+      MapleDataProvider questDataProvider = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "Quest.wz"));
+      MapleData actData = questDataProvider.getData("Act.img");
+      MapleData checkData = questDataProvider.getData("Check.img");
 
       for (MapleData questData : actData.getChildren()) {
          for (MapleData questStatusData : questData.getChildren()) {
             for (MapleData questNodeData : questStatusData.getChildren()) {
-               if (questNodeData.getName().contentEquals("item")) {
+               String actNodeName = questNodeData.getName();
+               if (actNodeName.contentEquals("item")) {
                   for (MapleData questItemData : questNodeData.getChildren()) {
                      int itemid = MapleDataTool.getInt("id", questItemData, 0);
                      int itemcount = MapleDataTool.getInt("count", questItemData, 0);
 
                      if (isSkillBook(itemid) && itemcount > 0) {
-                        foundSkillbooks.put(itemid, SkillBookEntry.QUEST);
+                        int questbook = fetchQuestbook(checkData, questData.getName());
+                        if (questbook < 0) {
+                           foundSkillbooks.put(itemid, SkillBookEntry.QUEST);
+                        } else {
+                           foundSkillbooks.put(itemid, SkillBookEntry.QUEST_BOOK);
+                        }
                      }
                   }
-
-                  break;
+               } else if (actNodeName.contentEquals("skill")) {
+                  for (MapleData questSkillData : questNodeData.getChildren()) {
+                     int skillid = MapleDataTool.getInt("id", questSkillData, 0);
+                     if (is4thJobSkill(skillid)) {
+                        // negative itemids are skill rewards
+                        foundSkillbooks.put(-skillid, SkillBookEntry.QUEST_REWARD);
+                     }
+                  }
                }
             }
          }
@@ -178,8 +238,28 @@ public class MapleSkillbookInformationProvider {
    public enum SkillBookEntry {
       UNAVAILABLE,
       QUEST,
+      QUEST_BOOK,
+      QUEST_REWARD,
       REACTOR,
       SCRIPT
    }
 
+   public List<Integer> getTeachableSkills(MapleCharacter chr) {
+      List<Integer> list = new ArrayList<>();
+
+      for (Integer book : foundSkillbooks.keySet()) {
+         if (book >= 0) {
+            continue;
+         }
+
+         int skillid = -book;
+         if (skillid / 10000 == chr.getJob().getId()) {
+            if (chr.getMasterLevel(skillid) == 0) {
+               list.add(-skillid);
+            }
+         }
+      }
+
+      return list;
+   }
 }
