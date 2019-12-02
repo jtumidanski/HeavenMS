@@ -119,6 +119,7 @@ import net.server.task.RankingLoginTask;
 import net.server.task.ReleaseLockTask;
 import net.server.task.RespawnTask;
 import net.server.world.World;
+import rest.UriFactory;
 import server.CashShop.CashItemFactory;
 import server.MapleSkillbookInformationProvider;
 import server.ThreadManager;
@@ -869,7 +870,7 @@ public class Server {
       JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
       provider.setMapper(mapper);
       rc.register(provider);
-      URI BASE = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.HOST + ":" + YamlConfig.config.server.HOST_PORT + "/ms")).path("master").build();
+      URI BASE = UriFactory.create(UriFactory.Service.MASTER).build();
       server = GrizzlyHttpServerFactory.createHttpServer(BASE, rc);
 
       DatabaseConnection.getInstance().withConnection(connection -> {

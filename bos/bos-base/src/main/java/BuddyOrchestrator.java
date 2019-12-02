@@ -3,7 +3,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.ws.rs.core.UriBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jaxrs.Jaxrs2TypesModule;
@@ -14,19 +13,19 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import database.DatabaseConnection;
 import database.PersistenceManager;
 import database.administrator.CharacterAdministrator;
 import database.provider.CharacterProvider;
-import config.YamlConfig;
+import rest.UriFactory;
 import rest.master.Character;
 import rest.master.CharactersResponse;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.RestProvider;
 
 public class BuddyOrchestrator {
 
-   private static final URI BASE = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").build();
+   private static final URI BASE = UriFactory.create(UriFactory.Service.BUDDY).build();
 
    public static HttpServer startServer() {
       final ResourceConfig rc = new ResourceConfig().packages("rest");
@@ -53,7 +52,7 @@ public class BuddyOrchestrator {
    }
 
    protected static void startup() {
-      RestProvider.getInstance().get(UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.HOST + ":" + YamlConfig.config.server.HOST_PORT + "/ms")).path("master").path("characters").build(), CharactersResponse.class,
+      RestProvider.getInstance().get(UriFactory.create(UriFactory.Service.MASTER).path("characters").build(), CharactersResponse.class,
             BuddyOrchestrator::onSyncSuccess,
             () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync characters."));
    }
