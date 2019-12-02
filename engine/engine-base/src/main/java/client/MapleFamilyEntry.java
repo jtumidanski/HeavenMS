@@ -24,12 +24,12 @@ import java.util.Collection;
 import java.util.List;
 import javax.persistence.EntityManager;
 
-import client.database.administrator.CharacterAdministrator;
-import client.database.administrator.FamilyCharacterAdministrator;
-import client.database.administrator.FamilyEntitlementAdministrator;
+import database.administrator.CharacterAdministrator;
+import database.administrator.FamilyCharacterAdministrator;
+import database.administrator.FamilyEntitlementAdministrator;
 import client.processor.MapleFamilyProcessor;
 import net.server.Server;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.Pair;

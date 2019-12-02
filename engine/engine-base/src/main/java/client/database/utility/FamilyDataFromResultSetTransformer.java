@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.FamilyData;
+import database.SqlTransformer;
 import entity.family.FamilyCharacter;
 
 public class FamilyDataFromResultSetTransformer implements SqlTransformer<FamilyData, FamilyCharacter> {

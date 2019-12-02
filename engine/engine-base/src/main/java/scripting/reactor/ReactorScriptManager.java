@@ -29,11 +29,11 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
 import client.MapleClient;
-import client.database.provider.ReactorDropProvider;
+import database.provider.ReactorDropProvider;
 import scripting.AbstractScriptManager;
 import server.maps.MapleReactor;
 import server.maps.ReactorDropEntry;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.FilePrinter;
 
 /**

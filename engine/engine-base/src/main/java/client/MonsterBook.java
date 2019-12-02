@@ -31,12 +31,12 @@ import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
-import client.database.administrator.MonsterBookAdministrator;
+import database.administrator.MonsterBookAdministrator;
 import client.database.data.MonsterBookData;
-import client.database.provider.MonsterBookProvider;
+import database.provider.MonsterBookProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.packet.foreigneffect.ShowForeignCardEffect;

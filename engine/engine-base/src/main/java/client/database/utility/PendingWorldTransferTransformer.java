@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.PendingWorldTransfers;
+import database.SqlTransformer;
 import entity.WorldTransfer;
 
 public class PendingWorldTransferTransformer implements SqlTransformer<PendingWorldTransfers, WorldTransfer> {

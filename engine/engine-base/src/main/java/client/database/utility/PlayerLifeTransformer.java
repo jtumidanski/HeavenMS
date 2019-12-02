@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.PlayerLifeData;
+import database.SqlTransformer;
 import entity.PLife;
 
 public class PlayerLifeTransformer implements SqlTransformer<PlayerLifeData, PLife> {

@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.BbsThreadReplyData;
+import database.SqlTransformer;
 import entity.bbs.BBSReply;
 
 public class BbsThreadReplyTransformer implements SqlTransformer<BbsThreadReplyData, BBSReply> {

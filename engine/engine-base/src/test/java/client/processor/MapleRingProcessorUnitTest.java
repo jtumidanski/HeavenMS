@@ -11,11 +11,11 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import client.database.administrator.InventoryEquipmentAdministrator;
-import client.database.administrator.RingAdministrator;
+import database.administrator.InventoryEquipmentAdministrator;
+import database.administrator.RingAdministrator;
 import client.inventory.manipulator.MapleCashIdGenerator;
 import server.MapleItemInformationProvider;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.DatabaseTestBase;
 
 @RunWith(PowerMockRunner.class)

@@ -2,10 +2,10 @@ package client.processor;
 
 import java.util.Optional;
 
-import client.database.administrator.AccountAdministrator;
-import client.database.provider.AccountProvider;
-import client.database.provider.CharacterProvider;
-import tools.DatabaseConnection;
+import database.administrator.AccountAdministrator;
+import database.provider.AccountProvider;
+import database.provider.CharacterProvider;
+import database.DatabaseConnection;
 
 public class BanProcessor {
    private static BanProcessor ourInstance = new BanProcessor();

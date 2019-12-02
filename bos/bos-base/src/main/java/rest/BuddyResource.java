@@ -14,15 +14,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import client.database.administrator.BuddyAdministrator;
-import client.database.provider.BuddyProvider;
-import database.DatabaseConnection;
+import database.administrator.BuddyAdministrator;
+import database.provider.BuddyProvider;
 import rest.buddy.AddBuddy;
 import rest.buddy.AddBuddyResponse;
 import rest.buddy.AddBuddyResult;
 import rest.buddy.Buddy;
 import rest.buddy.GetBuddiesResponse;
 import rest.buddy.UpdateBuddy;
+import database.DatabaseConnection;
 
 @Path("buddies")
 public class BuddyResource {

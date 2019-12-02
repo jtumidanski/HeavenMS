@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.PetData;
+import database.SqlTransformer;
 import entity.Pet;
 
 public class PetTransformer implements SqlTransformer<PetData, Pet> {

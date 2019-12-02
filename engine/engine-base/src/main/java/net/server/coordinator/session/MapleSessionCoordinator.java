@@ -38,15 +38,15 @@ import javax.persistence.EntityManager;
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
-import client.database.administrator.HwidAccountAdministrator;
-import client.database.provider.HwidAccountProvider;
+import database.administrator.HwidAccountAdministrator;
+import database.provider.HwidAccountProvider;
 import client.processor.CharacterProcessor;
 import config.YamlConfig;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.coordinator.login.LoginStorage;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 
 /**

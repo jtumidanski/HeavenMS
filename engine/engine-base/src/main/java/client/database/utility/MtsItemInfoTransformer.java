@@ -3,6 +3,7 @@ package client.database.utility;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.processor.ItemProcessor;
+import database.SqlTransformer;
 import entity.mts.MtsItem;
 import server.MTSItemInfo;
 import server.MapleItemInformationProvider;

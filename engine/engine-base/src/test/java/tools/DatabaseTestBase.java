@@ -7,6 +7,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 
+import database.DatabaseConnection;
+
 public abstract class DatabaseTestBase {
 
    protected DatabaseConnection databaseConnection;

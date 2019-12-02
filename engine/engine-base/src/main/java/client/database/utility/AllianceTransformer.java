@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.AllianceData;
+import database.SqlTransformer;
 import entity.Alliance;
 
 public class AllianceTransformer implements SqlTransformer<AllianceData, Alliance> {

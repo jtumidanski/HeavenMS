@@ -26,12 +26,12 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.database.provider.NameChangeProvider;
+import database.provider.NameChangeProvider;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.TransferNamePacket;
 import net.server.channel.packet.reader.TransferNameReader;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.PacketCreator;
 import tools.packet.cashshop.CashShopMessage;
 import tools.packet.cashshop.operation.ShowCashShopMessage;

@@ -17,8 +17,8 @@ import client.CharacterNameAndId;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.database.data.CharNameAndIdData;
-import client.database.provider.CharacterProvider;
 import config.YamlConfig;
+import database.provider.CharacterProvider;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.channel.CharacterIdChannelPair;
@@ -33,7 +33,7 @@ import rest.buddy.GetBuddiesResponse;
 import rest.buddy.UpdateBuddy;
 import rest.buddy.UpdateCharacter;
 import scala.Option;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -128,7 +128,7 @@ public class BuddyListProcessor {
     * @param character the character being created
     */
    public void syncAndInitBuddyList(MapleCharacter character) {
-      syncCharacter(character.getAccountID(), character.getId(), responseCode -> character.initBuddyList(getBuddyListCapacity(character.getId())));
+      syncCharacter(character.getAccountID(), character.getId(), responseCode -> character.initBuddyList(getBuddyListCapacity(character.getId())), () -> character.initBuddyList(0));
    }
 
    /**
@@ -138,7 +138,7 @@ public class BuddyListProcessor {
     * @param characterId the id of the character
     */
    public void syncCharacter(int accountId, int characterId) {
-      syncCharacter(accountId, characterId, RestProvider::doNothing);
+      syncCharacter(accountId, characterId, RestProvider::doNothing, () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
    }
 
    /**
@@ -148,11 +148,11 @@ public class BuddyListProcessor {
     * @param characterId the id of the character
     * @param onSuccess   a callback for a successful sync
     */
-   public void syncCharacter(int accountId, int characterId, Consumer<Integer> onSuccess) {
+   public void syncCharacter(int accountId, int characterId, Consumer<Integer> onSuccess, Runnable onFailure) {
       URI path = UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("characters").build();
       RestProvider.getInstance().post(path, new AddCharacter(characterId, accountId),
             onSuccess,
-            responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
+            responseCode -> onFailure.run());
    }
 
    /**
@@ -240,7 +240,7 @@ public class BuddyListProcessor {
                PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
                break;
          }
-      }, (responseCode) -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to add buddy " + addName + " for character " + character.getId()));
+      }, (responseCode) -> operationFailure(character, "Failed to add buddy " + addName + " for character " + character.getId()));
 
    }
 
@@ -276,10 +276,10 @@ public class BuddyListProcessor {
          if (otherName.isPresent()) {
             RestProvider.getInstance().update(UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build(), new UpdateBuddy(0, false),
                   RestProvider::doNothing,
-                  responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Unable to accept buddy " + otherId + " for character " + character.getId()));
+                  responseCode -> operationFailure(character, "Unable to accept buddy " + otherId + " for character " + character.getId()));
             RestProvider.getInstance().update(UriBuilder.fromUri(URI.create("http://" + YamlConfig.config.server.BUDDY_MS_HOST + ":" + YamlConfig.config.server.BUDDY_MS_PORT + "/ms")).path("bos").path("buddies").queryParam("buddyId", character.getId()).queryParam("characterId", otherId).build(), new UpdateBuddy(0, false),
                   RestProvider::doNothing,
-                  responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Unable to accept buddy " + character.getId() + " for character " + otherId));
+                  responseCode -> operationFailure(character, "Unable to accept buddy " + character.getId() + " for character " + otherId));
 
             character.getBuddylist().put(new BuddyListEntry(otherName.get(), "Default Group", otherId, channel, true));
             PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddylist().getBuddies()));
@@ -289,10 +289,10 @@ public class BuddyListProcessor {
       nextPendingRequest(character.getClient());
    }
 
-   protected void nextPendingRequest(MapleClient c) {
-      Option<CharacterNameAndId> pendingBuddyRequest = c.getPlayer().getBuddylist().pollPendingRequest();
+   protected void nextPendingRequest(MapleClient client) {
+      Option<CharacterNameAndId> pendingBuddyRequest = client.getPlayer().getBuddylist().pollPendingRequest();
       if (pendingBuddyRequest.isDefined()) {
-         PacketCreator.announce(c, new RequestAddBuddy(pendingBuddyRequest.get().id(), c.getPlayer().getId(), pendingBuddyRequest.get().name()));
+         PacketCreator.announce(client, new RequestAddBuddy(pendingBuddyRequest.get().id(), client.getPlayer().getId(), pendingBuddyRequest.get().name()));
       }
    }
 
@@ -314,7 +314,7 @@ public class BuddyListProcessor {
    }
 
    protected void deleteBuddyFailure(MapleCharacter character, int otherCharacterId) {
-      FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddy " + otherCharacterId + " for character " + character.getId());
+      operationFailure(character, "Failed to delete buddy " + otherCharacterId + " for character " + character.getId());
    }
 
    protected void deleteBuddySuccess(MapleCharacter character, int otherCharacterId) {
@@ -344,8 +344,13 @@ public class BuddyListProcessor {
    }
 
    protected void updateCapacityFailure(MapleCharacter character, Runnable onFailure) {
-      FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to update capacity for character " + character.getId());
+      operationFailure(character, "Failed to update capacity for character " + character.getId());
       onFailure.run();
+   }
+
+   protected void operationFailure(MapleCharacter character, String debugMessage) {
+      FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, debugMessage);
+      MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, "Unable to perform operation. Buddy service is offline.");
    }
 
    protected void updateCapacitySuccess(MapleCharacter character, int capacity, Runnable onSuccess) {

@@ -3,6 +3,7 @@ package client.database.utility;
 import client.database.data.GetInventoryItems;
 import client.inventory.Equip;
 import client.processor.ItemProcessor;
+import database.SqlTransformer;
 import server.MapleItemInformationProvider;
 
 public class EquipFromResultSetTransformer implements SqlTransformer<Equip, GetInventoryItems> {

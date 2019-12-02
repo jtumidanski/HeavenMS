@@ -1,5 +1,6 @@
 package client.database.utility;
 
+import database.SqlTransformer;
 import entity.Storage;
 import server.MapleStorage;
 

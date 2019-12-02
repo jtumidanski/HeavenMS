@@ -27,14 +27,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 
-import client.database.administrator.InventoryEquipmentAdministrator;
-import client.database.administrator.InventoryItemAdministrator;
-import client.database.administrator.InventoryMerchantAdministrator;
-import client.database.provider.InventoryItemProvider;
-import client.database.provider.InventoryMerchantProvider;
+import database.administrator.InventoryEquipmentAdministrator;
+import database.administrator.InventoryItemAdministrator;
+import database.administrator.InventoryMerchantAdministrator;
+import database.provider.InventoryItemProvider;
+import database.provider.InventoryMerchantProvider;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 
 /**

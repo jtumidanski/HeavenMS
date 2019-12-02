@@ -3,7 +3,7 @@ package server.processor;
 import java.util.function.BiConsumer;
 
 import client.MapleCharacter;
-import client.database.AbstractQueryExecutor;
+import database.AbstractQueryExecutor;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;

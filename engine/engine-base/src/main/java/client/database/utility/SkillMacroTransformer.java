@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.SkillMacroData;
+import database.SqlTransformer;
 import entity.SkillMacro;
 
 public class SkillMacroTransformer implements SqlTransformer<SkillMacroData, SkillMacro> {

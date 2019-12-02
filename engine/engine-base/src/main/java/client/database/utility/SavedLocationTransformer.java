@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.SavedLocationData;
+import database.SqlTransformer;
 import entity.SavedLocation;
 
 public class SavedLocationTransformer implements SqlTransformer<SavedLocationData, SavedLocation> {

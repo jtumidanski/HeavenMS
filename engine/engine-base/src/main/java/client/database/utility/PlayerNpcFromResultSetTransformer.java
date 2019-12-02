@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import constants.game.GameConstants;
+import database.SqlTransformer;
 import entity.PlayerNpc;
 import server.life.MaplePlayerNPC;
 

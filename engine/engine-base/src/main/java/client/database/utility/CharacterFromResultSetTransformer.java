@@ -3,6 +3,7 @@ package client.database.utility;
 import client.database.GameType;
 import client.database.data.CharacterData;
 import client.database.data.GameData;
+import database.SqlTransformer;
 import entity.Character;
 
 public class CharacterFromResultSetTransformer implements SqlTransformer<CharacterData, Character> {

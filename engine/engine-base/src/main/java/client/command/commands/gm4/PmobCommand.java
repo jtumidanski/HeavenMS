@@ -28,12 +28,12 @@ import java.awt.Point;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import client.database.administrator.PlayerLifeAdministrator;
+import database.administrator.PlayerLifeAdministrator;
 import net.server.channel.Channel;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 

@@ -26,14 +26,14 @@ import java.util.Calendar;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.database.administrator.ReportAdministrator;
+import database.administrator.ReportAdministrator;
 import client.processor.CharacterProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.ReportReader;
 import net.server.channel.packet.report.BaseReportPacket;
 import net.server.channel.packet.report.ReportPacket;
 import net.server.channel.packet.report.ReportWithChatPacket;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;

@@ -2,6 +2,7 @@ package client.database.utility;
 
 import client.database.data.GetInventoryItems;
 import client.inventory.Item;
+import database.SqlTransformer;
 import tools.Pair;
 
 public class InventoryEquipTransformer implements SqlTransformer<Pair<Item, Integer>, GetInventoryItems> {

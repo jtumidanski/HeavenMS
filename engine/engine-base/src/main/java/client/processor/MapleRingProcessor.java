@@ -2,11 +2,11 @@ package client.processor;
 
 import client.MapleCharacter;
 import client.Ring;
-import client.database.administrator.InventoryEquipmentAdministrator;
-import client.database.administrator.RingAdministrator;
-import client.database.provider.RingProvider;
+import database.administrator.InventoryEquipmentAdministrator;
+import database.administrator.RingAdministrator;
+import database.provider.RingProvider;
 import client.inventory.manipulator.MapleCashIdGenerator;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 
 public class MapleRingProcessor {

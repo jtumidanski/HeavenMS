@@ -12,13 +12,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import client.database.administrator.BuddyAdministrator;
-import client.database.administrator.CharacterAdministrator;
-import client.database.provider.CharacterProvider;
-import database.DatabaseConnection;
+import database.administrator.BuddyAdministrator;
+import database.administrator.CharacterAdministrator;
+import database.provider.CharacterProvider;
 import rest.buddy.AddCharacter;
 import rest.buddy.Character;
 import rest.buddy.UpdateCharacter;
+import database.DatabaseConnection;
 
 @Path("characters")
 public class CharacterResource {

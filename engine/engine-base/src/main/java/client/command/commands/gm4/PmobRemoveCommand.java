@@ -30,8 +30,8 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import client.database.provider.PlayerLifeProvider;
-import tools.DatabaseConnection;
+import database.provider.PlayerLifeProvider;
+import database.DatabaseConnection;
 import tools.Pair;
 
 public class PmobRemoveCommand extends Command {

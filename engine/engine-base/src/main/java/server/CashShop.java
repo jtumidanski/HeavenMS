@@ -32,15 +32,15 @@ import java.util.concurrent.locks.Lock;
 
 import javax.persistence.EntityManager;
 
-import client.database.administrator.AccountAdministrator;
-import client.database.administrator.GiftAdministrator;
-import client.database.administrator.WishListAdministrator;
+import database.administrator.AccountAdministrator;
+import database.administrator.GiftAdministrator;
+import database.administrator.WishListAdministrator;
 import client.database.data.AccountCashShopData;
 import client.database.data.GiftData;
-import client.database.provider.AccountProvider;
-import client.database.provider.GiftProvider;
-import client.database.provider.SpecialCashItemProvider;
-import client.database.provider.WishListProvider;
+import database.provider.AccountProvider;
+import database.provider.GiftProvider;
+import database.provider.SpecialCashItemProvider;
+import database.provider.WishListProvider;
 import client.inventory.BetterItemFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
@@ -56,7 +56,7 @@ import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 import tools.packet.Gift;
 

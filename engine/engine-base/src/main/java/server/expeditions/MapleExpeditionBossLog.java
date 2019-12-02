@@ -24,12 +24,12 @@ import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
 
-import client.database.administrator.BossLogDailyAdministrator;
-import client.database.administrator.BossLogWeeklyAdministrator;
-import client.database.provider.BossLogDailyProvider;
-import client.database.provider.BossLogWeeklyProvider;
+import database.administrator.BossLogDailyAdministrator;
+import database.administrator.BossLogWeeklyAdministrator;
+import database.provider.BossLogDailyProvider;
+import database.provider.BossLogWeeklyProvider;
 import config.YamlConfig;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 
 /**

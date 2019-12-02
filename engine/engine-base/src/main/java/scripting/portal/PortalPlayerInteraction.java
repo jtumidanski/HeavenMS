@@ -22,11 +22,11 @@
 package scripting.portal;
 
 import client.MapleClient;
-import client.database.provider.CharacterProvider;
+import database.provider.CharacterProvider;
 import scripting.AbstractPlayerInteraction;
 import scripting.map.MapScriptManager;
 import server.maps.MaplePortal;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.PacketCreator;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
 

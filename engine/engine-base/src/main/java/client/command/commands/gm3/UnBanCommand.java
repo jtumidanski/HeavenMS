@@ -26,11 +26,11 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import client.database.administrator.AccountAdministrator;
-import client.database.provider.AccountProvider;
-import client.database.administrator.IpBanAdministrator;
-import client.database.administrator.MacBanAdministrator;
-import tools.DatabaseConnection;
+import database.administrator.AccountAdministrator;
+import database.provider.AccountProvider;
+import database.administrator.IpBanAdministrator;
+import database.administrator.MacBanAdministrator;
+import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 

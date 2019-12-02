@@ -14,12 +14,13 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 
-import client.database.administrator.CharacterAdministrator;
-import client.database.provider.CharacterProvider;
+import database.PersistenceManager;
+import database.administrator.CharacterAdministrator;
+import database.provider.CharacterProvider;
 import config.YamlConfig;
-import database.DatabaseConnection;
 import rest.master.Character;
 import rest.master.CharactersResponse;
+import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.RestProvider;
 
@@ -40,6 +41,7 @@ public class BuddyOrchestrator {
    }
 
    public static void main(String[] args) throws IOException {
+      PersistenceManager.construct("ms-buddy");
       final HttpServer server = startServer();
       System.out.println(String.format("Jersey app started with WADL available at "
             + "%s/application.wadl\nHit enter to stop it...", BASE));

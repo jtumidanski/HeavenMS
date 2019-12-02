@@ -22,9 +22,9 @@ package client.inventory.manipulator;
 import java.util.HashSet;
 import java.util.Set;
 
-import client.database.provider.PetProvider;
-import client.database.provider.RingProvider;
-import tools.DatabaseConnection;
+import database.provider.PetProvider;
+import database.provider.RingProvider;
+import database.DatabaseConnection;
 
 /**
  * @author RonanLana

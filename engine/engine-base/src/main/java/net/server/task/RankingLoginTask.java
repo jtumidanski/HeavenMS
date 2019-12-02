@@ -27,12 +27,12 @@ import java.util.function.Supplier;
 import javax.persistence.EntityManager;
 
 import client.MapleJob;
-import client.database.administrator.CharacterAdministrator;
+import database.administrator.CharacterAdministrator;
 import client.database.data.CharacterRankData;
-import client.database.provider.CharacterProvider;
+import database.provider.CharacterProvider;
 import config.YamlConfig;
 import net.server.Server;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.TriConsumer;
 
 /**

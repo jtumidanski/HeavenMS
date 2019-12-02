@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import client.database.provider.DropDataProvider;
+import database.provider.DropDataProvider;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
 import provider.MapleData;
@@ -38,7 +38,7 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 import tools.Randomizer;
 

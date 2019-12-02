@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import client.database.provider.PlayerLifeProvider;
-import client.database.provider.PlayerNpcProvider;
+import database.provider.PlayerLifeProvider;
+import database.provider.PlayerNpcProvider;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -41,7 +41,7 @@ import server.life.MapleMonster;
 import server.life.MaplePlayerNPC;
 import server.life.MaplePlayerNPCFactory;
 import server.partyquest.GuardianSpawnPoint;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.StringUtil;
 
 public class MapleMapFactory {

@@ -22,15 +22,15 @@
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.database.administrator.NoteAdministrator;
-import client.database.provider.NoteProvider;
+import database.administrator.NoteAdministrator;
+import database.provider.NoteProvider;
 import client.processor.NoteProcessor;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.BaseNoteActionPacket;
 import net.server.channel.packet.ClearNotePacket;
 import net.server.channel.packet.SendNotePacket;
 import net.server.channel.packet.reader.NoteActionReader;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.PacketCreator;
 import tools.packet.cashshop.operation.ShowCashInventory;
 

@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.SkillData;
+import database.SqlTransformer;
 import entity.Skill;
 
 public class SkillTransformer implements SqlTransformer<SkillData, Skill> {

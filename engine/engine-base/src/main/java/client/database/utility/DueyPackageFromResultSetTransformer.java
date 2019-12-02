@@ -5,6 +5,7 @@ import java.util.List;
 import client.inventory.Item;
 import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
+import database.SqlTransformer;
 import scala.Option;
 import server.DueyPackage;
 import tools.Pair;

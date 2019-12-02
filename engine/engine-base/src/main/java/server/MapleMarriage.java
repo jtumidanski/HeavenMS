@@ -33,7 +33,7 @@ import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import scripting.event.EventInstanceManager;
 import scripting.event.EventManager;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.Pair;
 
 /**

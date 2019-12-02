@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.QuestData;
+import database.SqlTransformer;
 import entity.quest.QuestStatus;
 
 public class QuestStatusTransformer implements SqlTransformer<QuestData, QuestStatus> {

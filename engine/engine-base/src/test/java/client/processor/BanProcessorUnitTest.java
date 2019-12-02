@@ -11,10 +11,10 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import client.database.administrator.AccountAdministrator;
-import client.database.provider.AccountProvider;
-import client.database.provider.CharacterProvider;
-import tools.DatabaseConnection;
+import database.administrator.AccountAdministrator;
+import database.provider.AccountProvider;
+import database.provider.CharacterProvider;
+import database.DatabaseConnection;
 import tools.DatabaseTestBase;
 
 @RunWith(PowerMockRunner.class)

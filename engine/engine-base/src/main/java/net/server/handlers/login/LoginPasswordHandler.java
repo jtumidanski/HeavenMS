@@ -29,7 +29,7 @@ import java.util.Calendar;
 import org.apache.mina.core.session.IoSession;
 
 import client.MapleClient;
-import client.database.administrator.AccountAdministrator;
+import database.administrator.AccountAdministrator;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
@@ -37,7 +37,7 @@ import net.server.channel.packet.reader.LoginPasswordReader;
 import net.server.coordinator.session.MapleSessionCoordinator;
 import net.server.login.packet.LoginPasswordPacket;
 import tools.BCrypt;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.HexTool;
 import tools.PacketCreator;
 import tools.packet.login.AuthSuccess;

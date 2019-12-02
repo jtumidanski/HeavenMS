@@ -33,12 +33,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import client.MapleCharacter;
-import client.database.provider.ReactorDropProvider;
+import database.provider.ReactorDropProvider;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 
 /**
  * @author RonanLana

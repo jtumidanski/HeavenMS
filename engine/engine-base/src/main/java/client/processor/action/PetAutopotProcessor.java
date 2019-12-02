@@ -4,7 +4,7 @@ import java.util.List;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.database.AbstractQueryExecutor;
+import database.AbstractQueryExecutor;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;

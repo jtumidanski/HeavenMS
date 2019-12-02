@@ -10,10 +10,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import client.database.provider.CharacterProvider;
+import database.provider.CharacterProvider;
 import rest.master.CharactersResponse;
 import rest.master.Character;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 
 @Path("characters")
 public class CharacterResource {

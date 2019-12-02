@@ -21,7 +21,7 @@ package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.database.provider.CharacterProvider;
+import database.provider.CharacterProvider;
 import client.inventory.Item;
 import client.newyear.NewYearCardRecord;
 import client.processor.NewYearCardProcessor;
@@ -32,7 +32,7 @@ import net.server.channel.packet.newyear.BaseNewYearCardPacket;
 import net.server.channel.packet.newyear.CardAcceptedPacket;
 import net.server.channel.packet.newyear.CardHasBeenSentPacket;
 import net.server.channel.packet.reader.NewYearCardReader;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

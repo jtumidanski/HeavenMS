@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
-import client.database.administrator.NewYearAdministrator;
-import client.database.provider.NewYearCardProvider;
+import database.administrator.NewYearAdministrator;
+import database.provider.NewYearCardProvider;
 import client.newyear.NewYearCardRecord;
 import net.server.Server;
 import server.TimerManager;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;

@@ -1,8 +1,8 @@
 package client.processor;
 
 import client.MapleCharacter;
-import client.database.administrator.PetAdministrator;
-import client.database.provider.PetProvider;
+import database.administrator.PetAdministrator;
+import database.provider.PetProvider;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.MaplePet;
@@ -10,7 +10,7 @@ import client.inventory.PetFlag;
 import client.inventory.manipulator.MapleCashIdGenerator;
 import constants.game.ExpTable;
 import server.MapleItemInformationProvider;
-import tools.DatabaseConnection;
+import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;

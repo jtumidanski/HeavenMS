@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.NxCodeData;
+import database.SqlTransformer;
 import entity.nx.NxCode;
 
 public class NxCodeTransformer implements SqlTransformer<NxCodeData, NxCode> {

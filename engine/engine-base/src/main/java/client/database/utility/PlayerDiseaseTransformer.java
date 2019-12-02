@@ -1,6 +1,7 @@
 package client.database.utility;
 
 import client.database.data.PlayerDiseaseData;
+import database.SqlTransformer;
 import entity.PlayerDisease;
 
 public class PlayerDiseaseTransformer implements SqlTransformer<PlayerDiseaseData, PlayerDisease> {

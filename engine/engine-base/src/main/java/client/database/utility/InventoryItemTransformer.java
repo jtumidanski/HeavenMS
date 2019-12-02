@@ -5,6 +5,7 @@ import client.inventory.BetterItemFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
+import database.SqlTransformer;
 import tools.Pair;
 
 public class InventoryItemTransformer implements SqlTransformer<Pair<Item, MapleInventoryType>, GetInventoryItems> {

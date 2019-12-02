@@ -48,7 +48,15 @@ public class RestProvider {
 
    public void update(URI path, Object entity, Consumer<Integer> onSuccess, Consumer<Integer> onFailure) {
       Invocation.Builder builder = getBase(path);
-      Response response = builder.put(Entity.entity(entity, MediaType.APPLICATION_JSON));
+      Response response;
+
+      try {
+         response = builder.put(Entity.entity(entity, MediaType.APPLICATION_JSON));
+      } catch (ProcessingException exception) {
+         onFailure.accept(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+         return;
+      }
+
       if (statusIn(response.getStatus(), Response.Status.OK, Response.Status.NO_CONTENT, Response.Status.ACCEPTED)) {
          onSuccess.accept(response.getStatus());
       } else if (onFailure != null) {
@@ -92,7 +100,15 @@ public class RestProvider {
 
    public void delete(URI path, Consumer<Integer> onSuccess, Consumer<Integer> onFailure) {
       Invocation.Builder builder = getBase(path);
-      Response response = builder.delete();
+      Response response;
+
+      try {
+         response = builder.delete();
+      } catch (ProcessingException exception) {
+         onFailure.accept(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+         return;
+      }
+
       if (statusIn(response.getStatus(), Response.Status.OK, Response.Status.NO_CONTENT, Response.Status.ACCEPTED)) {
          onSuccess.accept(response.getStatus());
       } else if (onFailure != null) {
@@ -102,7 +118,15 @@ public class RestProvider {
 
    public <T> void post(URI path, Object entity, Class<T> responseClass, BiConsumer<Integer, T> onSuccess, Consumer<Integer> onFailure) {
       Invocation.Builder builder = getBase(path);
-      Response response = builder.post(Entity.entity(entity, MediaType.APPLICATION_JSON));
+      Response response;
+
+      try {
+         response = builder.post(Entity.entity(entity, MediaType.APPLICATION_JSON));
+      } catch (ProcessingException exception) {
+         onFailure.accept(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+         return;
+      }
+
       if (statusIn(response.getStatus(), Response.Status.CREATED, Response.Status.ACCEPTED, Response.Status.NO_CONTENT)) {
          onSuccess.accept(response.getStatus(), response.readEntity(responseClass));
       } else {
@@ -112,7 +136,15 @@ public class RestProvider {
 
    public void post(URI path, Object entity, Consumer<Integer> onSuccess, Consumer<Integer> onFailure) {
       Invocation.Builder builder = getBase(path);
-      Response response = builder.post(Entity.entity(entity, MediaType.APPLICATION_JSON));
+      Response response;
+
+      try {
+         response = builder.post(Entity.entity(entity, MediaType.APPLICATION_JSON));
+      } catch (ProcessingException exception) {
+         onFailure.accept(Response.Status.SERVICE_UNAVAILABLE.getStatusCode());
+         return;
+      }
+
       if (statusIn(response.getStatus(), Response.Status.CREATED, Response.Status.ACCEPTED, Response.Status.NO_CONTENT)) {
          onSuccess.accept(response.getStatus());
       } else {

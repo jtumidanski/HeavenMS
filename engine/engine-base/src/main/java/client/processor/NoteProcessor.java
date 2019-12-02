@@ -1,7 +1,7 @@
 package client.processor;
 
-import client.database.administrator.NoteAdministrator;
-import tools.DatabaseConnection;
+import database.administrator.NoteAdministrator;
+import database.DatabaseConnection;
 
 public class NoteProcessor {
    private static NoteProcessor ourInstance = new NoteProcessor();
