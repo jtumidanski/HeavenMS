@@ -4,19 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jaxrs.Jaxrs2TypesModule;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
 
 import database.DatabaseConnection;
 import database.PersistenceManager;
 import database.administrator.CharacterAdministrator;
 import database.provider.CharacterProvider;
+import rest.ServerFactory;
 import rest.UriFactory;
 import rest.master.Character;
 import rest.master.CharactersResponse;
@@ -24,26 +18,12 @@ import tools.FilePrinter;
 import tools.RestProvider;
 
 public class BuddyOrchestrator {
-
-   private static final URI BASE = UriFactory.create(UriFactory.Service.BUDDY).build();
-
-   public static HttpServer startServer() {
-      final ResourceConfig rc = new ResourceConfig().packages("rest");
-      ObjectMapper mapper = new ObjectMapper();
-      mapper.registerModule(new Jaxrs2TypesModule());
-      mapper.registerModule(new ParameterNamesModule());
-      mapper.registerModule(new JavaTimeModule());
-      JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
-      provider.setMapper(mapper);
-      rc.register(provider);
-      return GrizzlyHttpServerFactory.createHttpServer(BASE, rc);
-   }
-
    public static void main(String[] args) throws IOException {
       PersistenceManager.construct("ms-buddy");
-      final HttpServer server = startServer();
+      URI uri = UriFactory.create(UriFactory.Service.BUDDY).build();
+      final HttpServer server = ServerFactory.create(uri);
       System.out.println(String.format("Jersey app started with WADL available at "
-            + "%s/application.wadl\nHit enter to stop it...", BASE));
+            + "%s/application.wadl\nHit enter to stop it...", uri));
 
       startup();
 
