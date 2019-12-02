@@ -71,7 +71,7 @@ public class EventScriptManager extends AbstractScriptManager {
       for (EventEntry entry : events.values()) {
          try {
             ((ScriptEngine) entry.iv).put("em", entry.em);
-            entry.iv.invokeFunction("init", (Object) null);
+            entry.iv.invokeFunction("init");
          } catch (Exception ex) {
             Logger.getLogger(EventScriptManager.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("Error on script: " + entry.em.getName());
