@@ -1,4 +1,4 @@
-package rest;
+package rest.master.character;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import database.provider.CharacterProvider;
-import rest.master.CharactersResponse;
-import rest.master.Character;
+import rest.master.character.CharactersResponse;
+import rest.master.character.Character;
 import database.DatabaseConnection;
 
 @Path("characters")

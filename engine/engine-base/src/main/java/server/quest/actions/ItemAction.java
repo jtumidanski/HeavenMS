@@ -45,7 +45,6 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
-import tools.packet.statusinfo.ShowItemGain;
 
 /**
  * @author Tyler (Twdtwd)

@@ -30,25 +30,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 
-import javax.persistence.EntityManager;
-
-import database.administrator.AccountAdministrator;
-import database.administrator.GiftAdministrator;
-import database.administrator.WishListAdministrator;
-import client.database.data.AccountCashShopData;
-import client.database.data.GiftData;
-import database.provider.AccountProvider;
-import database.provider.GiftProvider;
-import database.provider.SpecialCashItemProvider;
-import database.provider.WishListProvider;
 import client.inventory.BetterItemFactory;
 import client.inventory.Equip;
 import client.inventory.Item;
-import client.inventory.ItemFactory;
 import client.inventory.MapleInventoryType;
 import client.processor.PetProcessor;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
+import database.DatabaseConnection;
+import database.provider.SpecialCashItemProvider;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -56,17 +46,14 @@ import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
-import database.DatabaseConnection;
 import tools.Pair;
-import tools.packet.Gift;
 
 /*
  * @author Flav
  */
 public class CashShop {
-   private int accountId, characterId, nxCredit, maplePoint, nxPrepaid;
+   private int accountId, characterId, nxCredit, maplePoint, nxPrepaid, jobType;
    private boolean opened;
-   private ItemFactory factory;
    private List<Item> inventory = new ArrayList<>();
    private List<Integer> wishList = new ArrayList<>();
    private int notes = 0;
@@ -75,37 +62,7 @@ public class CashShop {
    public CashShop(int accountId, int characterId, int jobType) {
       this.accountId = accountId;
       this.characterId = characterId;
-
-      if (!YamlConfig.config.server.USE_JOINT_CASHSHOP_INVENTORY) {
-         if (jobType == 0) {
-            factory = ItemFactory.CASH_EXPLORER;
-         } else if (jobType == 1) {
-            factory = ItemFactory.CASH_CYGNUS;
-         } else if (jobType == 2) {
-            factory = ItemFactory.CASH_ARAN;
-         }
-      } else {
-         factory = ItemFactory.CASH_OVERALL;
-      }
-
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         AccountCashShopData cashShopData = AccountProvider.getInstance().getAccountCashShopData(connection, accountId);
-         this.nxCredit = cashShopData.nxCredit();
-         this.maplePoint = cashShopData.maplePoint();
-         this.nxPrepaid = cashShopData.nxPrepaid();
-
-         for (Pair<Item, MapleInventoryType> item : factory.loadItems(accountId, false)) {
-            inventory.add(item.getLeft());
-         }
-
-         wishList.addAll(WishListProvider.getInstance().getWishListSn(connection, characterId));
-
-      });
-   }
-
-   public static Item generateCouponItem(int itemId, short quantity) {
-      CashItem it = new CashItem(77777777, itemId, 7777, ItemConstants.isPet(itemId) ? 30 : 0, quantity, true);
-      return it.toItem();
+      this.jobType = jobType;
    }
 
    public int getCash(int type) {
@@ -208,69 +165,16 @@ public class CashShop {
       wishList.add(sn);
    }
 
-   public void gift(int recipient, String from, String message, int sn) {
-      gift(recipient, from, message, sn, -1);
-   }
-
-   public void gift(int recipient, String from, String message, int sn, int ringid) {
-      DatabaseConnection.getInstance().withConnection(connection -> GiftAdministrator.getInstance().createGift(connection, recipient, from, message, sn, ringid));
-   }
-
-   public List<Gift> loadGifts() {
-      List<Gift> gifts = new ArrayList<>();
-      DatabaseConnection.getInstance().withConnection(connection -> {
-         GiftProvider.getInstance().getGiftsForCharacter(connection, characterId).forEach(gift -> loadGift(gifts, gift));
-         GiftAdministrator.getInstance().deleteAllGiftsForCharacter(connection, characterId);
-      });
-      return gifts;
-   }
-
-   private void loadGift(List<Gift> gifts, GiftData gift) {
-      notes++;
-      CashItem cItem = CashItemFactory.getItem(gift.sn());
-      Item item = cItem.toItem();
-      Equip equip = null;
-      item.giftFrom_$eq(gift.from());
-      if (item.inventoryType().equals(MapleInventoryType.EQUIP)) {
-         equip = (Equip) item;
-         equip.ringId_$eq(gift.ringId());
-         gifts.add(new Gift(equip, gift.message()));
-      } else {
-         gifts.add(new Gift(item, gift.message()));
-      }
-
-      if (CashItemFactory.isPackage(cItem.getItemId())) { //Packages never contains a ring
-         for (Item packageItem : CashItemFactory.getPackage(cItem.getItemId())) {
-            packageItem.giftFrom_$eq(gift.from());
-            addToInventory(packageItem);
-         }
-      } else {
-         addToInventory(equip == null ? item : equip);
-      }
-   }
-
    public int getAvailableNotes() {
       return notes;
    }
 
-   public void decreaseNotes() {
-      notes--;
+   public void addNote() {
+      notes++;
    }
 
-   public void save(EntityManager entityManager) {
-      AccountAdministrator.getInstance().saveNxInformation(entityManager, accountId, nxCredit, maplePoint, nxPrepaid);
-
-      List<Pair<Item, MapleInventoryType>> itemsWithType = new ArrayList<>();
-
-      List<Item> inv = getInventory();
-      for (Item item : inv) {
-         itemsWithType.add(new Pair<>(item, item.inventoryType()));
-      }
-
-      factory.saveItems(itemsWithType, accountId, entityManager);
-
-      WishListAdministrator.getInstance().deleteForCharacter(entityManager, characterId);
-      WishListAdministrator.getInstance().addForCharacter(entityManager, characterId, wishList);
+   public void decreaseNotes() {
+      notes--;
    }
 
    private Item getCashShopItemByItemid(int itemid) {
@@ -324,7 +228,7 @@ public class CashShop {
       private short count;
       private boolean onSale;
 
-      private CashItem(int sn, int itemId, int price, long period, short count, boolean onSale) {
+      public CashItem(int sn, int itemId, int price, long period, short count, boolean onSale) {
          this.sn = sn;
          this.itemId = itemId;
          this.price = price;
@@ -487,5 +391,29 @@ public class CashShop {
          specialcashitems.clear();
          DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
       }
+   }
+
+   public int getAccountId() {
+      return accountId;
+   }
+
+   public int getCharacterId() {
+      return characterId;
+   }
+
+   public int getNxCredit() {
+      return nxCredit;
+   }
+
+   public int getMaplePoint() {
+      return maplePoint;
+   }
+
+   public int getNxPrepaid() {
+      return nxPrepaid;
+   }
+
+   public int getJobType() {
+      return jobType;
    }
 }

@@ -44,7 +44,6 @@ import constants.skills.DawnWarrior;
 import constants.skills.Magician;
 import constants.skills.ThunderBreaker;
 import constants.skills.Warrior;
-import server.ThreadManager;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;

@@ -140,8 +140,8 @@ class NPC9040006 {
 
                         for (int i = 0; i < 6; i++) {
                            //keep getting new monsters, lest we spawn the same monster five times o.o!
-                           spawnMob(9300036, randX(), 150, cm.getPlayer().getMap())
-                           spawnMob(9300037, randX(), 150, cm.getPlayer().getMap())
+                           spawnMob(9300036, (int) randX(), 150, cm.getPlayer().getMap())
+                           spawnMob(9300037, (int) randX(), 150, cm.getPlayer().getMap())
                         }
                      }
 
@@ -228,7 +228,7 @@ class NPC9040006 {
       return -350 + Math.floor(Math.random() * 750)
    }
 
-   static def spawnMob(int id, x, y, map) {
+   static def spawnMob(int id, int x, y, map) {
       MapleMonster mob = MapleLifeFactory.getMonster(id)
       map.spawnMonsterOnGroundBelow(mob, new Point(x, y))
    }

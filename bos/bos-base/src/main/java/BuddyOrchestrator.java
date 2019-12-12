@@ -10,17 +10,17 @@ import database.DatabaseConnection;
 import database.PersistenceManager;
 import database.administrator.CharacterAdministrator;
 import database.provider.CharacterProvider;
+import rest.RestService;
 import rest.ServerFactory;
-import rest.UriFactory;
-import rest.master.Character;
-import rest.master.CharactersResponse;
+import rest.UriBuilder;
+import rest.master.character.Character;
+import rest.master.character.CharactersResponse;
 import tools.FilePrinter;
-import tools.RestProvider;
 
 public class BuddyOrchestrator {
    public static void main(String[] args) throws IOException {
       PersistenceManager.construct("ms-buddy");
-      URI uri = UriFactory.create(UriFactory.Service.BUDDY).build();
+      URI uri = UriBuilder.service(RestService.BUDDY).uri();
       final HttpServer server = ServerFactory.create(uri);
       System.out.println(String.format("Jersey app started with WADL available at "
             + "%s/application.wadl\nHit enter to stop it...", uri));
@@ -32,12 +32,13 @@ public class BuddyOrchestrator {
    }
 
    protected static void startup() {
-      RestProvider.getInstance().get(UriFactory.create(UriFactory.Service.MASTER).path("characters").build(), CharactersResponse.class,
-            BuddyOrchestrator::onSyncSuccess,
-            () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync characters."));
+      UriBuilder.service(RestService.MASTER).path("characters").getRestClient(CharactersResponse.class)
+            .success(BuddyOrchestrator::onSyncSuccess)
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync characters."))
+            .get();
    }
 
-   private static void onSyncSuccess(CharactersResponse response) {
+   private static void onSyncSuccess(int returnCode, CharactersResponse response) {
       List<Character> masterCharacters = response.characters();
       List<Integer> myCharacters = new ArrayList<>();
       DatabaseConnection.getInstance().withConnection(entityManager -> myCharacters.addAll(CharacterProvider.getInstance().getAllChars(entityManager)));

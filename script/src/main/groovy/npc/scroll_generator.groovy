@@ -253,7 +253,7 @@ class ScrollGenerator {
 
          int cardid = ce.getKey()
          int ceTier = Math.floor(cardid / 1000) % 10
-         countTier[ceTier] += ce.getValue()
+         countTier.set(ceTier, countTier.get(ceTier) + ce.getValue())
 
          if (ceTier >= 8) {  // is special card
             int mobLevel = MapleLifeFactory.getMonsterLevel(MapleItemInformationProvider.getInstance().getCardMobId(cardid))

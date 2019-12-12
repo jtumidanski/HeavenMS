@@ -41,6 +41,8 @@ public class ServerConfig {
 
     public String BUDDY_MS_HOST;
     public int BUDDY_MS_PORT;
+    public String CASH_SHOP_MS_HOST;
+    public int CASH_SHOP_MS_PORT;
 
     public boolean LOCALSERVER;
     public boolean GMSERVER;

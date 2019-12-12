@@ -3,7 +3,6 @@ package tools.packet.factory;
 import java.util.Arrays;
 
 import client.keybind.MapleQuickSlotBinding;
-import net.opcodes.SendOpcode;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.DojoWarpUp;

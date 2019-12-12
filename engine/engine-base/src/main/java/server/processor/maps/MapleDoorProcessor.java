@@ -2,7 +2,6 @@ package server.processor.maps;
 
 import client.MapleCharacter;
 import net.server.services.type.ChannelServices;
-import net.server.services.type.WorldServices;
 import net.server.services.task.channel.OverallService;
 import server.maps.MapleDoor;
 import server.maps.MapleDoorObject;

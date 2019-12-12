@@ -25,6 +25,21 @@ import client.Skill;
 import client.SkillEntry;
 import client.SkillFactory;
 import client.creator.CharacterFactoryRecipe;
+import client.database.data.CharacterData;
+import client.database.data.CharacterGuildFamilyData;
+import client.database.data.CharacterIdNameAccountId;
+import client.inventory.Equip;
+import client.inventory.Item;
+import client.inventory.ItemFactory;
+import client.inventory.MapleInventory;
+import client.inventory.MapleInventoryType;
+import client.inventory.manipulator.MapleCashIdGenerator;
+import client.keybind.MapleQuickSlotBinding;
+import client.processor.npc.FredrickProcessor;
+import config.YamlConfig;
+import constants.game.GameConstants;
+import constants.inventory.ItemConstants;
+import database.DatabaseConnection;
 import database.administrator.AreaInfoAdministrator;
 import database.administrator.BbsThreadAdministrator;
 import database.administrator.CharacterAdministrator;
@@ -50,10 +65,6 @@ import database.administrator.ServerQueueAdministrator;
 import database.administrator.SkillAdministrator;
 import database.administrator.SkillMacroAdministrator;
 import database.administrator.TeleportRockLocationAdministrator;
-import database.administrator.WishListAdministrator;
-import client.database.data.CharacterData;
-import client.database.data.CharacterGuildFamilyData;
-import client.database.data.CharacterIdNameAccountId;
 import database.provider.AccountProvider;
 import database.provider.AreaInfoProvider;
 import database.provider.CharacterProvider;
@@ -74,17 +85,6 @@ import database.provider.SkillMacroProvider;
 import database.provider.SkillProvider;
 import database.provider.TeleportRockProvider;
 import database.provider.WorldTransferProvider;
-import client.inventory.Equip;
-import client.inventory.Item;
-import client.inventory.ItemFactory;
-import client.inventory.MapleInventory;
-import client.inventory.MapleInventoryType;
-import client.inventory.manipulator.MapleCashIdGenerator;
-import client.keybind.MapleQuickSlotBinding;
-import client.processor.npc.FredrickProcessor;
-import config.YamlConfig;
-import constants.game.GameConstants;
-import constants.inventory.ItemConstants;
 import net.server.Server;
 import net.server.SkillMacro;
 import net.server.guild.MapleGuildCharacter;
@@ -100,7 +100,6 @@ import server.maps.MaplePortal;
 import server.maps.SavedLocation;
 import server.maps.SavedLocationType;
 import server.quest.MapleQuest;
-import database.DatabaseConnection;
 import tools.LongTool;
 import tools.Pair;
 
@@ -197,7 +196,7 @@ public class CharacterProcessor {
          BbsThreadAdministrator.getInstance().deleteThreadsFromCharacter(entityManager, cid);
          CharacterProvider.getInstance().getGuildDataForCharacter(entityManager, cid, senderAccId).ifPresent(result -> MapleGuildProcessor.getInstance().removeGuildCharacter(
                new MapleGuildCharacter(player, cid, 0, result.name(), (byte) -1, (byte) -1, 0, result.guildRank(), result.guildId(), false, result.allianceRank())));
-         WishListAdministrator.getInstance().deleteForCharacter(entityManager, cid);
+         CashShopProcessor.getInstance().deleteWishListForCharacter(cid);
          CoolDownAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          PlayerDiseaseAdministrator.getInstance().deleteForCharacter(entityManager, cid);
          AreaInfoAdministrator.getInstance().deleteForCharacter(entityManager, cid);
@@ -561,12 +560,13 @@ public class CharacterProcessor {
       mapleCharacter.setDojoStage(characterData.lastDojoStage());
       mapleCharacter.setDataString(characterData.dataString());
 
-      int capacity = BuddyListProcessor.getInstance().getBuddyListCapacity(characterData.id());
-      if (capacity == 0) {
-         BuddyListProcessor.getInstance().syncAndInitBuddyList(mapleCharacter);
-      } else {
-         mapleCharacter.initBuddyList(capacity);
-      }
+      BuddyListProcessor.getInstance().getBuddyListCapacity(characterData.id(), capacity -> {
+         if (capacity == 0) {
+            BuddyListProcessor.getInstance().syncAndInitBuddyList(mapleCharacter);
+         } else {
+            mapleCharacter.initBuddyList(capacity);
+         }
+      });
 
       mapleCharacter.setLastExpGainTime(characterData.lastExpGainTime().getTime());
       mapleCharacter.setCanRecvPartySearchInvite(characterData.partyInvite());

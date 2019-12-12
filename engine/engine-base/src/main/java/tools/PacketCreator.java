@@ -1,21 +1,12 @@
 package tools;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import net.opcodes.SendOpcode;
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.EnableReport;
 import tools.packet.PacketInput;
-import tools.packet.SetNPCScriptable;
-import tools.packet.buddy.UpdateBuddyList;
-import tools.packet.character.SetAutoHpPot;
-import tools.packet.character.SetAutoMpPot;
-import tools.packet.character.UpdateGender;
-import tools.packet.character.UpdateSkill;
 import tools.packet.factory.AddNewCharacterPacketFactory;
 import tools.packet.factory.AfterLoginErrorPacketFactory;
 import tools.packet.factory.AllianceOperationPacketFactory;
@@ -90,15 +81,6 @@ import tools.packet.factory.UpdateCharacterBoxPacketFactory;
 import tools.packet.factory.ViewAllCharactersPacketFactory;
 import tools.packet.factory.WeddingPacketFactory;
 import tools.packet.factory.WorldTransferPacketFactory;
-import tools.packet.family.GetFamilyInfo;
-import tools.packet.family.LoadFamily;
-import tools.packet.field.effect.ForcedStatReset;
-import tools.packet.spawn.SpawnNPC;
-import tools.packet.spawn.SpawnNPCRequestController;
-import tools.packet.ui.GetKeyMap;
-import tools.packet.ui.GetMacros;
-import tools.packet.ui.QuickSlotKey;
-import tools.packet.ui.ShowNotes;
 
 public class PacketCreator {
    private PacketCreator() {

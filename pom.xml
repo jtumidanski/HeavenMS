@@ -13,6 +13,7 @@
         <module>script</module>
         <module>bos</module>
         <module>shared</module>
+        <module>cos</module>
     </modules>
 
     <name>HeavenMS</name>

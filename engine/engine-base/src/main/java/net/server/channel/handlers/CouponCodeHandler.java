@@ -31,32 +31,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-
 import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import database.administrator.NxCodeAdministrator;
 import client.database.data.NxCodeData;
 import client.database.data.NxCodeItemData;
-import database.provider.NxCodeItemProvider;
-import database.provider.NxCodeProvider;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.CashShopProcessor;
+import database.DatabaseConnection;
+import database.administrator.NxCodeAdministrator;
+import database.provider.NxCodeItemProvider;
+import database.provider.NxCodeProvider;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.CouponCodePacket;
 import net.server.channel.packet.reader.CouponCodeReader;
 import server.CashShop;
 import server.MapleItemInformationProvider;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.Pair;
+import tools.packet.cashshop.CashShopMessage;
 import tools.packet.cashshop.operation.ShowBoughtQuestItem;
 import tools.packet.cashshop.operation.ShowCashShopMessage;
 import tools.packet.cashshop.operation.ShowCouponRedeemSuccess;
-import tools.packet.cashshop.CashShopMessage;
 
 /**
  * @author Penguins (Acrylic)
@@ -227,7 +227,7 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
                         }
 
                         if (MapleItemInformationProvider.getInstance().isCash(item)) {
-                           Item it = CashShop.generateCouponItem(item, qty);
+                           Item it = CashShopProcessor.getInstance().generateCouponItem(item, qty);
 
                            cs.addToInventory(it);
                            cashItems.add(it);

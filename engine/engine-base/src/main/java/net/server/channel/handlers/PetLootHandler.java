@@ -26,7 +26,6 @@ import java.util.Set;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.inventory.MaplePet;
-import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.pet.PetLootPacket;
 import net.server.channel.packet.reader.PetLootReader;

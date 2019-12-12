@@ -1,6 +1,5 @@
 package client.processor;
 
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +21,8 @@ import net.server.Server;
 import net.server.channel.Channel;
 import net.server.channel.CharacterIdChannelPair;
 import net.server.world.World;
-import rest.UriFactory;
+import rest.RestService;
+import rest.UriBuilder;
 import rest.buddy.AddBuddy;
 import rest.buddy.AddBuddyResponse;
 import rest.buddy.AddBuddyResult;
@@ -34,9 +34,9 @@ import rest.buddy.UpdateBuddy;
 import rest.buddy.UpdateCharacter;
 import scala.Option;
 import tools.FilePrinter;
+import tools.LambdaNoOp;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
-import tools.RestProvider;
 import tools.ServerNoticeType;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
@@ -57,13 +57,12 @@ public class BuddyListProcessor {
     * Gets a stream of the ids of the buddies of the supplied character.
     *
     * @param characterId the id of the character
-    * @return a stream
     */
-   protected Stream<Integer> getBuddies(int characterId) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("characterId", characterId).build();
-      return RestProvider.getInstance().get(path, GetBuddiesResponse.class, response -> {
-         return response.buddies().stream().map(Buddy::id);
-      }, () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddies for character " + characterId)).orElse(Stream.empty());
+   protected void getBuddies(int characterId, Consumer<Stream<Integer>> consumer) {
+      UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).path("buddies").getRestClient(GetBuddiesResponse.class)
+            .success((responseCode, response) -> consumer.accept(response.buddies().stream().map(Buddy::id)))
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddies for character " + characterId))
+            .get();
    }
 
    /**
@@ -71,25 +70,21 @@ public class BuddyListProcessor {
     *
     * @param worldId     the world the character belongs to
     * @param characterId the id of the character
-    * @return a stream
     */
-   protected Stream<MapleCharacter> getBuddies(int worldId, int characterId) {
-      return getBuddies(characterId)
-            .map(buddyId -> Server.getInstance().getWorld(worldId).getPlayerStorage().getCharacterById(buddyId))
-            .flatMap(Optional::stream);
+   protected void getBuddies(int worldId, int characterId, Consumer<Stream<MapleCharacter>> consumer) {
+      getBuddies(characterId, buddyIdStream -> consumer.accept(buddyIdStream.map(id -> Server.getInstance().getWorld(worldId).getPlayerStorage().getCharacterById(id)).flatMap(Optional::stream)));
    }
 
    /**
     * Retrieves the capacity of the buddy list for the given character.
     *
     * @param characterId the id of the character
-    * @return an optional containing the capacity
     */
-   public Integer getBuddyListCapacity(int characterId) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("characters").path(Integer.toString(characterId)).build();
-      return RestProvider.getInstance().get(path, Character.class,
-            Character::capacity,
-            () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddy list capacity for character " + characterId)).orElse(0);
+   public void getBuddyListCapacity(int characterId, Consumer<Integer> consumer) {
+      UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).getRestClient(Character.class)
+            .success((responseCode, character) -> consumer.accept(character.capacity()))
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to get buddy list capacity for character " + characterId))
+            .get();
    }
 
    /**
@@ -99,12 +94,10 @@ public class BuddyListProcessor {
     * @param buddyList   the buddy list to populate
     */
    public void loadBuddies(int characterId, BuddyList buddyList) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("characterId", characterId).build();
-      RestProvider.getInstance().get(path, GetBuddiesResponse.class,
-            response -> {
-               populateBuddyList(buddyList, response);
-            },
-            () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + characterId));
+      UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).path("buddies").getRestClient(GetBuddiesResponse.class)
+            .success((responseCode, response) -> populateBuddyList(buddyList, response))
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to load buddies for character " + characterId))
+            .get();
    }
 
    protected void populateBuddyList(BuddyList buddyList, GetBuddiesResponse response) {
@@ -127,7 +120,9 @@ public class BuddyListProcessor {
     * @param character the character being created
     */
    public void syncAndInitBuddyList(MapleCharacter character) {
-      syncCharacter(character.getAccountID(), character.getId(), responseCode -> character.initBuddyList(getBuddyListCapacity(character.getId())), () -> character.initBuddyList(0));
+      syncCharacter(character.getAccountID(), character.getId(),
+            responseCode -> getBuddyListCapacity(character.getId(), character::initBuddyList),
+            () -> character.initBuddyList(0));
    }
 
    /**
@@ -137,7 +132,7 @@ public class BuddyListProcessor {
     * @param characterId the id of the character
     */
    public void syncCharacter(int accountId, int characterId) {
-      syncCharacter(accountId, characterId, RestProvider::doNothing, () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
+      syncCharacter(accountId, characterId, LambdaNoOp::doNothing, () -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync character " + characterId));
    }
 
    /**
@@ -148,10 +143,10 @@ public class BuddyListProcessor {
     * @param onSuccess   a callback for a successful sync
     */
    public void syncCharacter(int accountId, int characterId, Consumer<Integer> onSuccess, Runnable onFailure) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("characters").build();
-      RestProvider.getInstance().post(path, new AddCharacter(characterId, accountId),
-            onSuccess,
-            responseCode -> onFailure.run());
+      UriBuilder.service(RestService.BUDDY).path("characters").getRestClient()
+            .success((responseCode, result) -> onSuccess.accept(responseCode))
+            .failure((responseCode) -> onFailure.run())
+            .create(new AddCharacter(characterId, accountId));
    }
 
    /**
@@ -161,10 +156,10 @@ public class BuddyListProcessor {
     * @param characterId the id of the character to delete
     */
    public void deleteCharacter(int worldId, int characterId) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("characters").path(Integer.toString(characterId)).build();
-      RestProvider.getInstance().delete(path,
-            responseCode -> getBuddies(worldId, characterId).forEach(buddy -> deleteBuddySuccess(buddy, characterId)),
-            responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete character " + characterId));
+      UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).getRestClient()
+            .success((responseCode, result) -> getBuddies(worldId, characterId, stream -> stream.forEach(buddy -> deleteBuddySuccess(buddy, characterId))))
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete character " + characterId))
+            .delete();
    }
 
    /**
@@ -173,14 +168,9 @@ public class BuddyListProcessor {
     * @param characterId the id of the character to delete buddies for
     */
    public void deleteBuddies(int characterId) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("characterId", characterId).build();
-      RestProvider.getInstance().delete(path,
-            RestProvider::doNothing,
-            responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId));
-      URI buddyPath = UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("buddyId", characterId).build();
-      RestProvider.getInstance().delete(buddyPath,
-            RestProvider::doNothing,
-            responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId));
+      UriBuilder.service(RestService.BUDDY).path("characters").path(characterId).path("buddies").getRestClient()
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to delete buddies for character " + characterId))
+            .delete();
    }
 
    /**
@@ -209,37 +199,37 @@ public class BuddyListProcessor {
          otherCharMin = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName)).orElseThrow();
       }
 
-      AddBuddy addBuddy = new AddBuddy(character.getId(), otherCharMin.id(), otherCharMin.name(), group);
-
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("buddies").build();
-      RestProvider.getInstance().post(path, addBuddy, AddBuddyResponse.class, (responseCode, result) -> {
-         switch (result.errorCode()) {
-            case TARGET_CHARACTER_DOES_NOT_EXIST:
-               MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
-               break;
-            case FULL:
-               MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "Your buddylist is already full");
-               break;
-            case ALREADY_REQUESTED:
-               MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "You already have \"" + addName + "\" on your Buddylist");
-               break;
-            case BUDDY_FULL:
-               MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "\"" + addName + "\"'s Buddylist is full");
-               break;
-            case OK:
-            case BUDDY_ALREADY_REQUESTED:
-               int displayChannel = -1;
-               if (result.errorCode().equals(AddBuddyResult.BUDDY_ALREADY_REQUESTED) && channel != -1) {
-                  displayChannel = channel;
-                  notifyRemoteChannel(character.getClient(), channel, otherCharMin.id(), BuddyListOperation.ADDED);
-               } else {
-                  otherChar.ifPresent(otherPlayer -> addBuddyRequest(otherPlayer, character.getId(), character.getName(), channel));
+      UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").getRestClient(AddBuddyResponse.class)
+            .success((responseCode, result) -> {
+               switch (result.errorCode()) {
+                  case TARGET_CHARACTER_DOES_NOT_EXIST:
+                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
+                     break;
+                  case FULL:
+                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "Your buddylist is already full");
+                     break;
+                  case ALREADY_REQUESTED:
+                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "You already have \"" + addName + "\" on your Buddylist");
+                     break;
+                  case BUDDY_FULL:
+                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "\"" + addName + "\"'s Buddylist is full");
+                     break;
+                  case OK:
+                  case BUDDY_ALREADY_REQUESTED:
+                     int displayChannel = -1;
+                     if (result.errorCode().equals(AddBuddyResult.BUDDY_ALREADY_REQUESTED) && channel != -1) {
+                        displayChannel = channel;
+                        notifyRemoteChannel(character.getClient(), channel, otherCharMin.id(), BuddyListOperation.ADDED);
+                     } else {
+                        otherChar.ifPresent(otherPlayer -> addBuddyRequest(otherPlayer, character.getId(), character.getName(), channel));
+                     }
+                     buddyList.put(new BuddyListEntry(otherCharMin.name(), group, otherCharMin.id(), displayChannel, true));
+                     PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
+                     break;
                }
-               buddyList.put(new BuddyListEntry(otherCharMin.name(), group, otherCharMin.id(), displayChannel, true));
-               PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
-               break;
-         }
-      }, (responseCode) -> operationFailure(character, "Failed to add buddy " + addName + " for character " + character.getId()));
+            })
+            .failure(responseCode -> operationFailure(character, "Failed to add buddy " + addName + " for character " + character.getId()))
+            .create(new AddBuddy(otherCharMin.id(), otherCharMin.name(), group));
 
    }
 
@@ -273,12 +263,12 @@ public class BuddyListProcessor {
                .or(() -> Optional.ofNullable(getCharacterNameFromDatabase(otherId)));
 
          if (otherName.isPresent()) {
-            RestProvider.getInstance().update(UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build(), new UpdateBuddy(0, false),
-                  RestProvider::doNothing,
-                  responseCode -> operationFailure(character, "Unable to accept buddy " + otherId + " for character " + character.getId()));
-            RestProvider.getInstance().update(UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("buddyId", character.getId()).queryParam("characterId", otherId).build(), new UpdateBuddy(0, false),
-                  RestProvider::doNothing,
-                  responseCode -> operationFailure(character, "Unable to accept buddy " + character.getId() + " for character " + otherId));
+            UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").path(otherId).getRestClient()
+                  .failure(responseCode -> operationFailure(character, "Unable to accept buddy " + otherId + " for character " + character.getId()))
+                  .update(new UpdateBuddy(0, false));
+            UriBuilder.service(RestService.BUDDY).path("characters").path(otherId).path("buddies").path(character.getId()).getRestClient()
+                  .failure(responseCode -> operationFailure(character, "Unable to accept buddy " + character.getId() + " for character " + otherId))
+                  .update(new UpdateBuddy(0, false));
 
             character.getBuddylist().put(new BuddyListEntry(otherName.get(), "Default Group", otherId, channel, true));
             PacketCreator.announce(character.getClient(), new UpdateBuddyList(character.getBuddylist().getBuddies()));
@@ -306,10 +296,10 @@ public class BuddyListProcessor {
     * @param otherId   the id of the other character
     */
    public void deleteBuddy(MapleCharacter character, int otherId) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("buddies").queryParam("characterId", character.getId()).queryParam("buddyId", otherId).build();
-      RestProvider.getInstance().delete(path,
-            returnCode -> deleteBuddySuccess(character, otherId),
-            returnCode -> deleteBuddyFailure(character, otherId));
+      UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").path(otherId).getRestClient()
+            .success((responseCode, result) -> deleteBuddySuccess(character, otherId))
+            .failure(responseCode -> deleteBuddyFailure(character, otherId))
+            .delete();
    }
 
    protected void deleteBuddyFailure(MapleCharacter character, int otherCharacterId) {
@@ -336,10 +326,10 @@ public class BuddyListProcessor {
     * @param onFailure   a runnable if the update is not successful
     */
    public void updateCapacity(MapleCharacter character, int newCapacity, Runnable onSuccess, Runnable onFailure) {
-      URI path = UriFactory.create(UriFactory.Service.BUDDY).path("characters").path(Integer.toString(character.getId())).build();
-      RestProvider.getInstance().update(path, new UpdateCharacter(newCapacity),
-            responseCode -> updateCapacitySuccess(character, newCapacity, onSuccess),
-            responseCode -> updateCapacityFailure(character, onFailure));
+      UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).getRestClient()
+            .success((responseCode, result) -> updateCapacitySuccess(character, newCapacity, onSuccess))
+            .failure(responseCode -> updateCapacityFailure(character, onFailure))
+            .update(new UpdateCharacter(newCapacity));
    }
 
    protected void updateCapacityFailure(MapleCharacter character, Runnable onFailure) {

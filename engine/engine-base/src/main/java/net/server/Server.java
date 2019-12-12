@@ -113,7 +113,8 @@ import net.server.task.ReleaseLockTask;
 import net.server.task.RespawnTask;
 import net.server.world.World;
 import rest.ServerFactory;
-import rest.UriFactory;
+import rest.UriBuilder;
+import rest.RestService;
 import server.CashShop.CashItemFactory;
 import server.MapleSkillbookInformationProvider;
 import server.ThreadManager;
@@ -690,7 +691,7 @@ public class Server {
    }
 
    private void loadCouponRates(EntityManager entityManager) {
-      DatabaseConnection.getInstance().withConnection(session -> NxCouponProvider.getInstance().getCoupons(session).forEach(coupon -> couponRates.put(coupon.couponId(), coupon.rate())));
+      NxCouponProvider.getInstance().getCoupons(entityManager).forEach(coupon -> couponRates.put(coupon.couponId(), coupon.rate()));
    }
 
    public List<Integer> getActiveCoupons() {
@@ -855,7 +856,7 @@ public class Server {
       TimeZone.setDefault(TimeZone.getTimeZone(YamlConfig.config.server.TIMEZONE));
 
       // Start webservice
-      URI uri = UriFactory.create(UriFactory.Service.MASTER).build();
+      URI uri = UriBuilder.service(RestService.MASTER).uri();
       server = ServerFactory.create(uri);
 
       DatabaseConnection.getInstance().withConnection(connection -> {

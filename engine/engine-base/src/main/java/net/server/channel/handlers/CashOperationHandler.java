@@ -21,8 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package net.server.channel.handlers;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -33,6 +35,7 @@ import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import client.processor.CashShopProcessor;
 import client.processor.CharacterProcessor;
 import client.processor.MapleRingProcessor;
 import client.processor.NoteProcessor;
@@ -66,9 +69,8 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.packet.cashshop.CashShopMessage;
 import tools.packet.cashshop.ShowCash;
-import tools.packet.cashshop.operation.ShowWishListUpdate;
-import tools.packet.stat.EnableActions;
 import tools.packet.cashshop.operation.PutIntoCashInventory;
 import tools.packet.cashshop.operation.ShowBoughtCashItem;
 import tools.packet.cashshop.operation.ShowBoughtCashPackageSuccess;
@@ -80,9 +82,10 @@ import tools.packet.cashshop.operation.ShowBoughtStorageSlots;
 import tools.packet.cashshop.operation.ShowCashShopMessage;
 import tools.packet.cashshop.operation.ShowGiftSucceed;
 import tools.packet.cashshop.operation.ShowNameChangeSuccess;
+import tools.packet.cashshop.operation.ShowWishListUpdate;
 import tools.packet.cashshop.operation.ShowWorldTransferSuccess;
 import tools.packet.cashshop.operation.TakeFromCashInventory;
-import tools.packet.cashshop.CashShopMessage;
+import tools.packet.stat.EnableActions;
 
 public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOperationPacket> {
 
@@ -197,7 +200,8 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.CANNOT_GIFT_TO_OWN_CHARACTER));
          return;
       }
-      cs.gift(recipient.id(), chr.getName(), message, cItem.getSN());
+
+      CashShopProcessor.getInstance().gift(recipient.id(), chr.getName(), message, cItem.getSN());
       PacketCreator.announce(c, new ShowGiftSucceed(recipient.name(), cItem.getItemId(), cItem.getCount(), cItem.getPrice()));
       cs.gainCash(4, cItem, chr.getWorld());
       PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
@@ -207,13 +211,16 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
 
    private void modifyWishList(MapleClient c, MapleCharacter chr, CashShop cs, int[] sns) {
       cs.clearWishList();
-      for (byte i = 0; i < 10; i++) {
-         int sn = sns[i];
-         CashItem cItem = CashItemFactory.getItem(sn);
-         if (cItem != null && cItem.isOnSale() && sn != 0) {
-            cs.addToWishList(sn);
-         }
-      }
+
+      List<Integer> items = Arrays.stream(sns).limit(10)
+            .mapToObj(CashItemFactory::getItem)
+            .filter(cashItem -> cashItem != null && cashItem.isOnSale() && cashItem.getSN() != 0)
+            .map(CashItem::getSN)
+            .collect(Collectors.toList());
+
+      CashShopProcessor.getInstance().setWishListItems(chr.getId(), items);
+      items.forEach(cs::addToWishList);
+
       PacketCreator.announce(c, new ShowWishListUpdate(chr.getCashShop().getWishList(), true));
    }
 
@@ -474,7 +481,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
                eqp.ringId_$eq(rings.getLeft());
                cs.addToInventory(eqp);
                PacketCreator.announce(c, new ShowBoughtCashRing(eqp, partner.getName(), c.getAccID()));
-               cs.gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
+               CashShopProcessor.getInstance().gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
                cs.gainCash(payment, -itemRing.getPrice());
                chr.addFriendshipRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
@@ -498,7 +505,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
                eqp.ringId_$eq(rings.getLeft());
                cs.addToInventory(eqp);
                PacketCreator.announce(c, new ShowBoughtCashItem(eqp, c.getAccID()));
-               cs.gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
+               CashShopProcessor.getInstance().gift(partner.getId(), chr.getName(), text, eqp.sn(), rings.getRight());
                cs.gainCash(toCharge, itemRing, chr.getWorld());
                chr.addCrushRing(MapleRingProcessor.getInstance().loadFromDb(rings.getLeft()));
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);

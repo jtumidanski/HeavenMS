@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import client.MapleCharacter;
-import client.MapleQuestStatus;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;

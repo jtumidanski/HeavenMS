@@ -70,7 +70,8 @@ public class FilePrinter {
          DEADLOCK_LOCKS = "deadlocks/Locks.txt",
          DEADLOCK_STATE = "deadlocks/State.txt",
          DISPOSED_LOCKS = "deadlocks/Disposed.txt",
-         BUDDY_ORCHESTRATOR = "bos/orchestrator.txt";
+         BUDDY_ORCHESTRATOR = "bos/orchestrator.txt",
+         CASH_SHOP_ORCHESTRATOR = "bos/orchestrator.txt";
 
    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); //for file system purposes, it's nice to use yyyy-MM-dd
    private static final String FILE_PATH = "logs/" + sdf.format(Calendar.getInstance().getTime()) + "/"; // + sdf.format(Calendar.getInstance().getTime()) + "/"

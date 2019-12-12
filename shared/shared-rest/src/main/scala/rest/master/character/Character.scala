@@ -1,4 +1,4 @@
-package rest.master
+package rest.master.character
 
 import com.fasterxml.jackson.annotation.{JsonCreator, JsonGetter, JsonProperty}
 

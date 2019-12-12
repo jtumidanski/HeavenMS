@@ -54,6 +54,7 @@ import javax.persistence.EntityManager;
 import org.apache.mina.util.ConcurrentHashSet;
 
 import client.autoban.AutobanManager;
+import client.processor.CashShopProcessor;
 import database.administrator.AccountAdministrator;
 import database.administrator.AreaInfoAdministrator;
 import database.administrator.CharacterAdministrator;
@@ -560,7 +561,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
    }
 
    public void initCashShop() {
-      this.cashshop = new CashShop(accountid, id, getJobType());
+      this.cashshop = CashShopProcessor.getInstance().initializeCashShop(accountid, id, getJobType());
    }
 
    public void initAutoBanManager() {
@@ -6893,7 +6894,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          MapleFamilyProcessor.getInstance().saveCharactersFamilyReputation(entityManager, getFamilyEntry());
 
          if (cashshop != null) {
-            cashshop.save(entityManager);
+            CashShopProcessor.getInstance().save(entityManager, cashshop);
          }
 
          entityManager.getTransaction().commit();
