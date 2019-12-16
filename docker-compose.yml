@@ -1,0 +1,68 @@
+version: '3'
+services:
+  db:
+    build: database/.
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - ./database/sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: the
+      MYSQL_DATABASE: heavenms
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    container_name: ms-db
+  bos:
+    build: bos/.
+    depends_on:
+      - "db"
+      - "engine"
+    ports:
+      - '8081:8081'
+    environment:
+      WAIT_HOSTS: db:3306, engine:8080, engine:8484
+    expose:
+      - '8081'
+    volumes:
+      - ./config.yaml:/config.yaml:ro
+    container_name: ms-bos
+  cos:
+    build: cos/.
+    depends_on:
+      - "db"
+      - "engine"
+    ports:
+      - '8082:8082'
+    environment:
+      WAIT_HOSTS: db:3306, engine:8080, engine:8484
+    expose:
+      - '8082'
+    volumes:
+      - ./config.yaml:/config.yaml:ro
+    container_name: ms-cos
+  engine:
+    user: root
+    build: engine/.
+    depends_on:
+      - "db"
+    ports:
+      - '8080:8080'
+      - '8484:8484'
+      - '7575:7575'
+      - '7576:7576'
+      - '7577:7577'
+    expose:
+      - '8080'
+      - '8484'
+      - '7575'
+      - '7576'
+      - '7577'
+    environment:
+      WAIT_HOSTS: db:3306
+    volumes:
+      - ./wz:/wz:ro
+      - ./script:/script:ro
+      - ./config.yaml:/config.yaml:ro
+    container_name: ms-engine

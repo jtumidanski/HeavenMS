@@ -3,11 +3,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>parent-database</artifactId>
+        <artifactId>HeavenMS</artifactId>
         <groupId>ms</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>engine-database</artifactId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    <modules>
+        <module>parent-base</module>
+        <module>parent-database</module>
+        <module>parent-model</module>
+    </modules>
+
+
 </project>

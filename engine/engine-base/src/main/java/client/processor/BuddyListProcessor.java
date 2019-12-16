@@ -25,7 +25,7 @@ import rest.RestService;
 import rest.UriBuilder;
 import rest.buddy.AddBuddy;
 import rest.buddy.AddBuddyResponse;
-import rest.buddy.AddBuddyResult;
+import rest.buddy.AddBuddyResult$;
 import rest.buddy.AddCharacter;
 import rest.buddy.Buddy;
 import rest.buddy.Character;
@@ -201,31 +201,25 @@ public class BuddyListProcessor {
 
       UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").getRestClient(AddBuddyResponse.class)
             .success((responseCode, result) -> {
-               switch (result.errorCode()) {
-                  case TARGET_CHARACTER_DOES_NOT_EXIST:
-                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
-                     break;
-                  case FULL:
-                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "Your buddylist is already full");
-                     break;
-                  case ALREADY_REQUESTED:
-                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "You already have \"" + addName + "\" on your Buddylist");
-                     break;
-                  case BUDDY_FULL:
-                     MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "\"" + addName + "\"'s Buddylist is full");
-                     break;
-                  case OK:
-                  case BUDDY_ALREADY_REQUESTED:
-                     int displayChannel = -1;
-                     if (result.errorCode().equals(AddBuddyResult.BUDDY_ALREADY_REQUESTED) && channel != -1) {
-                        displayChannel = channel;
-                        notifyRemoteChannel(character.getClient(), channel, otherCharMin.id(), BuddyListOperation.ADDED);
-                     } else {
-                        otherChar.ifPresent(otherPlayer -> addBuddyRequest(otherPlayer, character.getId(), character.getName(), channel));
-                     }
-                     buddyList.put(new BuddyListEntry(otherCharMin.name(), group, otherCharMin.id(), displayChannel, true));
-                     PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
-                     break;
+               if (result.errorCode() == AddBuddyResult$.MODULE$.TARGET_CHARACTER_DOES_NOT_EXIST()) {
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
+               } else if (result.errorCode() == AddBuddyResult$.MODULE$.FULL()) {
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "Your buddylist is already full");
+               } else if (result.errorCode() == AddBuddyResult$.MODULE$.ALREADY_REQUESTED()) {
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "You already have \"" + addName + "\" on your Buddylist");
+               } else if (result.errorCode() == AddBuddyResult$.MODULE$.BUDDY_FULL()) {
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "\"" + addName + "\"'s Buddylist is full");
+               } else if (result.errorCode() == AddBuddyResult$.MODULE$.OK() || result.errorCode() == AddBuddyResult$.MODULE$.BUDDY_ALREADY_REQUESTED()) {
+
+                  int displayChannel = -1;
+                  if (result.errorCode().equals(AddBuddyResult$.MODULE$.BUDDY_ALREADY_REQUESTED()) && channel != -1) {
+                     displayChannel = channel;
+                     notifyRemoteChannel(character.getClient(), channel, otherCharMin.id(), BuddyListOperation.ADDED);
+                  } else {
+                     otherChar.ifPresent(otherPlayer -> addBuddyRequest(otherPlayer, character.getId(), character.getName(), channel));
+                  }
+                  buddyList.put(new BuddyListEntry(otherCharMin.name(), group, otherCharMin.id(), displayChannel, true));
+                  PacketCreator.announce(character.getClient(), new UpdateBuddyList(buddyList.getBuddies()));
                }
             })
             .failure(responseCode -> operationFailure(character, "Failed to add buddy " + addName + " for character " + character.getId()))

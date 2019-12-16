@@ -23,12 +23,14 @@ import database.provider.CharacterProvider;
 import rest.buddy.AddBuddy;
 import rest.buddy.AddBuddyResponse;
 import rest.buddy.AddBuddyResult;
+import rest.buddy.AddBuddyResult$;
 import rest.buddy.AddCharacter;
 import rest.buddy.Buddy;
 import rest.buddy.Character;
 import rest.buddy.GetBuddiesResponse;
 import rest.buddy.UpdateBuddy;
 import rest.buddy.UpdateCharacter;
+import scala.Enumeration;
 
 @Path("characters")
 public class CharacterResource {
@@ -102,42 +104,42 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response addBuddy(@PathParam("id") Integer characterId, AddBuddy addBuddy) {
-      AddBuddyResult result = DatabaseConnection.getInstance().withConnectionResult(entityManager -> {
+      Enumeration.Value result = DatabaseConnection.getInstance().withConnectionResult(entityManager -> {
          boolean alreadyRequested = BuddyProvider.getInstance().buddyIsPending(entityManager, characterId, addBuddy.addId(), addBuddy.group());
          if (alreadyRequested) {
-            return AddBuddyResult.ALREADY_REQUESTED;
+            return AddBuddyResult$.MODULE$.ALREADY_REQUESTED();
          }
 
          boolean atCapacity = BuddyProvider.getInstance().atCapacity(entityManager, characterId);
          if (atCapacity) {
-            return AddBuddyResult.FULL;
+            return AddBuddyResult$.MODULE$.FULL();
          }
 
          boolean inOtherGroup = BuddyProvider.getInstance().buddyIsInOtherGroup(entityManager, characterId, addBuddy.addId(), addBuddy.group());
          if (inOtherGroup) {
             BuddyAdministrator.getInstance().updateBuddy(entityManager, characterId, addBuddy.addId(), addBuddy.group());
-            return AddBuddyResult.OK;
+            return AddBuddyResult$.MODULE$.OK();
          }
 
          boolean buddyExists = BuddyProvider.getInstance().buddyExists(entityManager, addBuddy.addId());
          if (!buddyExists) {
-            return AddBuddyResult.TARGET_CHARACTER_DOES_NOT_EXIST;
+            return AddBuddyResult$.MODULE$.TARGET_CHARACTER_DOES_NOT_EXIST();
          }
 
          boolean buddyAlreadyRequested = BuddyProvider.getInstance().buddyIsPending(entityManager, addBuddy.addId(), characterId, addBuddy.group());
          if (buddyAlreadyRequested) {
-            return AddBuddyResult.BUDDY_ALREADY_REQUESTED;
+            return AddBuddyResult$.MODULE$.BUDDY_ALREADY_REQUESTED();
          }
 
          boolean buddyAtCapacity = BuddyProvider.getInstance().atCapacity(entityManager, addBuddy.addId());
          if (buddyAtCapacity) {
-            return AddBuddyResult.BUDDY_FULL;
+            return AddBuddyResult$.MODULE$.BUDDY_FULL();
          }
 
          BuddyAdministrator.getInstance().addBuddy(entityManager, characterId, addBuddy.addId(), addBuddy.group(), false);
          BuddyAdministrator.getInstance().addBuddy(entityManager, addBuddy.addId(), characterId, addBuddy.group(), true);
 
-         return AddBuddyResult.OK;
+         return AddBuddyResult$.MODULE$.OK();
       }).orElseThrow();
       return Response.created(URI.create("")).entity(new AddBuddyResponse(result)).build();
    }

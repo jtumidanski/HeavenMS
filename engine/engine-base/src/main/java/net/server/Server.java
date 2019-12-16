@@ -856,7 +856,7 @@ public class Server {
       TimeZone.setDefault(TimeZone.getTimeZone(YamlConfig.config.server.TIMEZONE));
 
       // Start webservice
-      URI uri = UriBuilder.service(RestService.MASTER).uri();
+      URI uri = UriBuilder.host(RestService.MASTER).uri();
       server = ServerFactory.create(uri);
 
       DatabaseConnection.getInstance().withConnection(connection -> {

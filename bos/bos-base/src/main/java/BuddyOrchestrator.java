@@ -20,21 +20,15 @@ import tools.FilePrinter;
 public class BuddyOrchestrator {
    public static void main(String[] args) throws IOException {
       PersistenceManager.construct("ms-buddy");
-      URI uri = UriBuilder.service(RestService.BUDDY).uri();
+      URI uri = UriBuilder.host(RestService.BUDDY).uri();
       final HttpServer server = ServerFactory.create(uri);
-      System.out.println(String.format("Jersey app started with WADL available at "
-            + "%s/application.wadl\nHit enter to stop it...", uri));
-
       startup();
-
-      System.in.read();
-      server.shutdownNow();
    }
 
    protected static void startup() {
       UriBuilder.service(RestService.MASTER).path("characters").getRestClient(CharactersResponse.class)
             .success(BuddyOrchestrator::onSyncSuccess)
-            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync characters."))
+            .failure(responseCode -> FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, "Failed to sync characters with error " + responseCode))
             .get();
    }
 

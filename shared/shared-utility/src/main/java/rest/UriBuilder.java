@@ -8,30 +8,57 @@ public final class UriBuilder {
 
    private javax.ws.rs.core.UriBuilder builder;
 
-   protected UriBuilder(RestService service) {
-      String host = "localhost";
-      int port = 8080;
-      String basePath = "master";
-
+   protected static String getHost(RestService service) {
       switch (service) {
          case BUDDY:
-            host = YamlConfig.config.server.BUDDY_MS_HOST;
-            port = YamlConfig.config.server.BUDDY_MS_PORT;
-            basePath = "bos";
-            break;
+            return YamlConfig.config.server.BUDDY_MS_HOST;
          case CASH_SHOP:
-            host = YamlConfig.config.server.CASH_SHOP_MS_HOST;
-            port = YamlConfig.config.server.CASH_SHOP_MS_PORT;
-            basePath = "cos";
-            break;
+            return YamlConfig.config.server.CASH_SHOP_MS_HOST;
          case MASTER:
-            host = YamlConfig.config.server.HOST;
-            port = YamlConfig.config.server.HOST_PORT;
-            basePath = "master";
-            break;
+            return YamlConfig.config.server.HOST;
       }
+      return "localhost";
+   }
 
+   protected static int getPort(RestService service) {
+      switch (service) {
+         case BUDDY:
+            return YamlConfig.config.server.BUDDY_MS_PORT;
+         case CASH_SHOP:
+            return YamlConfig.config.server.CASH_SHOP_MS_PORT;
+         case MASTER:
+            return YamlConfig.config.server.HOST_PORT;
+      }
+      return 8080;
+   }
+
+   protected static String getPath(RestService service) {
+      switch (service) {
+         case BUDDY:
+            return "bos";
+         case CASH_SHOP:
+            return "cos";
+         case MASTER:
+            return "master";
+      }
+      return "master";
+   }
+
+   protected UriBuilder(RestService service) {
+      String host = getHost(service);
+      int port = getPort(service);
+      String basePath = getPath(service);
+      createBuilder(host, port, basePath);
+   }
+
+   protected void createBuilder(String host, int port, String basePath) {
       builder = javax.ws.rs.core.UriBuilder.fromUri(URI.create("http://" + host + ":" + port + "/ms")).path(basePath);
+   }
+
+   public static UriBuilder host(RestService service) {
+      UriBuilder uriBuilder = new UriBuilder(service);
+      uriBuilder.createBuilder("0.0.0.0", getPort(service), getPath(service));
+      return uriBuilder;
    }
 
    public static UriBuilder service(RestService service) {
@@ -44,7 +71,7 @@ public final class UriBuilder {
    }
 
    public UriBuilder path(Integer path) {
-         builder.path(Integer.toString(path));
+      builder.path(Integer.toString(path));
       return this;
    }
 
