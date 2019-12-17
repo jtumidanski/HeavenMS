@@ -29,12 +29,12 @@ public class CharacterSpawnAndDestroyer implements MapObjectSpawnAndDestroyer<Ma
    }
 
    @Override
-   public void sendSpawnData(MapleCharacter object, MapleClient client) {
+   public void sendDestroyData(MapleCharacter object, MapleClient client) {
       PacketCreator.announce(client, new RemovePlayer(object.objectId()));
    }
 
    @Override
-   public void sendDestroyData(MapleCharacter object, MapleClient client) {
+   public void sendSpawnData(MapleCharacter object, MapleClient client) {
       if (!object.isHidden() || client.getPlayer().gmLevel() > 1) {
          PacketCreator.announce(client, new SpawnPlayer(client, object, false));
 

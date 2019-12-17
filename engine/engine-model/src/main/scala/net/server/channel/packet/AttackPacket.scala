@@ -9,7 +9,7 @@ class AttackPacket(var numAttacked: Int, var numDamage: Int, var numAttackedAndD
                    var skillLevel: Int, var stance: Int, var direction: Int, var rangedDirection: Int, var charge: Int,
                    var display: Int, var ranged: Boolean, var magic: Boolean, var speed: Int, var allDamage: Map[Integer, java.util.List[Integer]], var position: Point) extends MaplePacket {
   def this() {
-    this(-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, false, false, -1, Map[Integer, java.util.List[Integer]](), null)
+    this(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, 0, Map[Integer, java.util.List[Integer]](), null)
   }
 
   def clearAttacks(): Unit = {

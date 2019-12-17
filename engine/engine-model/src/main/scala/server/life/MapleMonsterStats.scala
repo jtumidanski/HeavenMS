@@ -121,23 +121,23 @@ class MapleMonsterStats() {
            level: Int, removeAfter: Int, isBoss: Boolean, isExplosiveReward: Boolean, isFFALoot: Boolean,
            isUndead: Boolean, name: String, buffToGive: Int, cp: Int, removeOnMiss: Boolean): Unit = {
     this.hp = hp
-    this._isFriendly = _isFriendly
-    this._paDamage = _paDamage
-    this._pdDamage = _pdDamage
-    this._maDamage = _maDamage
-    this._mdDamage = _mdDamage
-    this._mp = _mp
-    this._exp = _exp
-    this._level = _level
+    this._isFriendly = isFriendly
+    this._paDamage = paDamage
+    this._pdDamage = pdDamage
+    this._maDamage = maDamage
+    this._mdDamage = mdDamage
+    this._mp = mp
+    this._exp = exp
+    this._level = level
     this._removeAfter = removeAfter
     this.isBoss = isBoss
-    this._isExplosiveReward = _isExplosiveReward
-    this._isFFALoot = _isFFALoot
-    this._isUndead = _isUndead
-    this._name = _name
-    this._buffToGive = _buffToGive
-    this._cp = _cp
-    this._removeOnMiss = _removeOnMiss
+    this._isExplosiveReward = isExplosiveReward
+    this._isFFALoot = isFFALoot
+    this._isUndead = isUndead
+    this._name = name
+    this._buffToGive = buffToGive
+    this._cp = cp
+    this._removeOnMiss = removeOnMiss
   }
 
   def setAnimationTime(name: String, delay: Int): Unit = {
