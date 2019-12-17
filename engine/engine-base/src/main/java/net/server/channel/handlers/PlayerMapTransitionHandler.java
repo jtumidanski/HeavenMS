@@ -72,7 +72,7 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
                }
 
                m.aggroSwitchController(chr, false);
-               MapleMapObjectProcessor.getInstance().sendDestroyData(m, client);
+               MapleMapObjectProcessor.getInstance().sendSpawnData(m, client);
             }
          }
       }
