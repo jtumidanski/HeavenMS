@@ -25,9 +25,6 @@ import java.awt.Point;
 
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.maps.MapleGenericPortal;
-import server.maps.MapleMapPortal;
-import server.maps.MaplePortal;
 
 public class MaplePortalFactory {
    private int nextDoorPortal;
@@ -37,7 +34,7 @@ public class MaplePortalFactory {
    }
 
    public MaplePortal makePortal(int type, MapleData portal) {
-      MapleGenericPortal ret = null;
+      MapleGenericPortal ret;
       if (type == MaplePortal.MAP_PORTAL) {
          ret = new MapleMapPortal();
       } else {

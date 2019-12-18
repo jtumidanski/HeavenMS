@@ -346,11 +346,7 @@ public class MapleMapFactory {
    private static String getMapName(int mapid) {
       String mapName = StringUtil.getLeftPaddedStr(Integer.toString(mapid), '0', 9);
       int area = mapid / 100000000;
-      String builder = "Map/Map" + area +
-            "/" +
-            mapName +
-            ".img";
-      mapName = builder;
+      mapName = "Map/Map" + area + "/" + mapName + ".img";
       return mapName;
    }
 

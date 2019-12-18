@@ -154,8 +154,7 @@ public class WZTool {
    }
 
    public static String readDecodedStringAtOffsetAndReset(SeekableLittleEndianAccessor slea, int offset) {
-      long pos = 0;
-      pos = slea.getPosition();
+      long pos = slea.getPosition();
       slea.seek(offset);
       String ret = readDecodedString(slea);
       slea.seek(pos);

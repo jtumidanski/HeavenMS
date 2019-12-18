@@ -45,7 +45,9 @@ class PairedQuicksort {
    public PairedQuicksort(ArrayList<Item> A, int primarySort, int secondarySort) {
       intersect = new ArrayList<>();
 
-      if (A.size() > 0) MapleQuicksort(0, A.size() - 1, A, primarySort);
+      if (A.size() > 0) {
+         MapleQuicksort(0, A.size() - 1, A, primarySort);
+      }
 
       intersect.add(0);
       for (int ind = 1; ind < A.size(); ind++) {
@@ -56,8 +58,9 @@ class PairedQuicksort {
       intersect.add(A.size());
 
       for (int ind = 0; ind < intersect.size() - 1; ind++) {
-         if (intersect.get(ind + 1) > intersect.get(ind))
+         if (intersect.get(ind + 1) > intersect.get(ind)) {
             MapleQuicksort(intersect.get(ind), intersect.get(ind + 1) - 1, A, secondarySort);
+         }
       }
    }
 
@@ -172,14 +175,18 @@ class PairedQuicksort {
       }
 
 
-      if (Esq < j) MapleQuicksort(Esq, j, A, sort);
-      if (i < Dir) MapleQuicksort(i, Dir, A, sort);
+      if (Esq < j) {
+         MapleQuicksort(Esq, j, A, sort);
+      }
+      if (i < Dir) {
+         MapleQuicksort(i, Dir, A, sort);
+      }
    }
 }
 
 public class MapleStorageInventory {
    private MapleClient c;
-   private Map<Short, Item> inventory = new LinkedHashMap<>();
+   private Map<Short, Item> inventory;
    private byte slotLimit;
 
    public MapleStorageInventory(MapleClient c, List<Item> toSort) {
@@ -306,14 +313,22 @@ public class MapleStorageInventory {
 
       for (short dst = 1; dst <= this.getSlotLimit(); dst++) {
          dstItem = this.getItem(dst);
-         if (dstItem == null) continue;
+         if (dstItem == null) {
+            continue;
+         }
 
          for (short src = (short) (dst + 1); src <= this.getSlotLimit(); src++) {
             srcItem = this.getItem(src);
-            if (srcItem == null) continue;
+            if (srcItem == null) {
+               continue;
+            }
 
-            if (dstItem.id() != srcItem.id()) continue;
-            if (dstItem.quantity() == ii.getSlotMax(c, this.getItem(dst).id())) break;
+            if (dstItem.id() != srcItem.id()) {
+               continue;
+            }
+            if (dstItem.quantity() == ii.getSlotMax(c, this.getItem(dst).id())) {
+               break;
+            }
 
             moveItem(src, dst);
          }

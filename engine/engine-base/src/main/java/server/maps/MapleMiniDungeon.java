@@ -37,7 +37,7 @@ import tools.packet.ui.StopClock;
  */
 public class MapleMiniDungeon {
    List<MapleCharacter> players = new ArrayList<>();
-   ScheduledFuture<?> timeoutTask = null;
+   ScheduledFuture<?> timeoutTask;
    Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.MINIDUNGEON, true);
 
    int baseMap;

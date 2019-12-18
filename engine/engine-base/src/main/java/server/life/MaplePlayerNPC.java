@@ -32,16 +32,16 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import database.administrator.PlayerNpcAdministrator;
-import database.provider.PlayerNpcProvider;
 import client.inventory.MapleInventoryType;
 import config.YamlConfig;
 import constants.game.GameConstants;
+import database.DatabaseConnection;
+import database.administrator.PlayerNpcAdministrator;
+import database.provider.PlayerNpcProvider;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.World;
@@ -51,7 +51,6 @@ import server.maps.AbstractMapleMapObject;
 import server.maps.MapleMap;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
-import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.Pair;
 import tools.packet.character.npc.GetPlayerNPC;
@@ -76,7 +75,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
    private Map<Short, Integer> equips = new HashMap<>();
    private int scriptId, face, hair, gender, job;
    private byte skin;
-   private String name = "";
+   private String name;
    private int dir, FH, RX0, RX1, CY;
    private int worldRank, overallRank, worldJobRank, overallJobRank;
 
@@ -180,7 +179,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
                availables.add(i);
                j++;
 
-               if(j == 20) {
+               if (j == 20) {
                   break;
                }
             } else {

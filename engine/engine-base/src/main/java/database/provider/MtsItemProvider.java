@@ -128,12 +128,11 @@ public class MtsItemProvider extends AbstractQueryExecutor {
          query = entityManager.createQuery("FROM MtsItem m WHERE m.tab = ? " + clause + " AND m.type = ? AND m.transfer = 0 ORDER BY m.id DESC", MtsItem.class);
          query.setParameter("tab", tab);
          query.setParameter("type", type);
-         query.setMaxResults(page * 16);
       } else {
          query = entityManager.createQuery("FROM MtsItem m WHERE m.tab = ? " + clause + " AND m.transfer = 0 ORDER BY m.id DESC", MtsItem.class);
          query.setParameter("tab", tab);
-         query.setMaxResults(page * 16);
       }
+      query.setMaxResults(page * 16);
       return getResultList(query, new MtsItemInfoTransformer());
    }
 

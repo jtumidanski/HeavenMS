@@ -115,7 +115,7 @@ public class MapleClient {
    public static final String CLIENT_REMOTE_ADDRESS = "REMOTE_IP";
    public static final String CLIENT_TRANSITION = "TRANSITION";
    private static final int lockCount = 200;
-   private static final Lock loginLocks[] = new Lock[lockCount];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
+   private static final Lock[] loginLocks = new Lock[lockCount];  // thanks Masterrulax & try2hack for pointing out a bottleneck issue here
    private Calendar tempBanCalendar;
 
    static {

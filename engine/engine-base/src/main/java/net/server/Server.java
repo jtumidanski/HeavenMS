@@ -570,11 +570,10 @@ public class Server {
       Map<Integer, String> channelInfo = new HashMap<>();
       long bootTime = getCurrentTime();
       for (int j = 1; j <= YamlConfig.config.worlds.get(i).channels; j++) {
-         int channelid = j;
-         Channel channel = new Channel(i, channelid, bootTime);
+         Channel channel = new Channel(i, j, bootTime);
 
          world.addChannel(channel);
-         channelInfo.put(channelid, channel.getIP());
+         channelInfo.put(j, channel.getIP());
       }
 
       boolean canDeploy;

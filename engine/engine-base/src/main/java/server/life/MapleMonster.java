@@ -836,7 +836,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                      reviveMap.spawnMonster(mob);
 
                      if (mob.id() >= 8810010 && mob.id() <= 8810017 && reviveMap.isHorntailDefeated()) {
-                        boolean htKilled = false;
+                        boolean htKilled;
                         MapleMonster ht = reviveMap.getMonsterById(8810018);
 
                         if (ht != null) {
@@ -2257,12 +2257,11 @@ public class MapleMonster extends AbstractLoadedMapleLife {
                unlockMonster();
             }
 
-            int finalDamage = damage;
             if (type == 1) {
-               MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(MapleMonster.this.objectId(), finalDamage), MapleMonster.this.position());
+               MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(MapleMonster.this.objectId(), damage), MapleMonster.this.position());
             } else if (type == 2) {
                if (damage < dealDamage) {    // ninja ambush (type 2) is already displaying DOT to the caster
-                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(MapleMonster.this.objectId(), finalDamage), MapleMonster.this.position());
+                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(MapleMonster.this.objectId(), damage), MapleMonster.this.position());
                }
             }
          }

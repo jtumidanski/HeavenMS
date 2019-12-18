@@ -328,12 +328,11 @@ public class MonsterCarnival {
                if (win) {
                   PacketCreator.announce(character, new ShowEffect("quest/carnival/win"));
                   PacketCreator.announce(character, new PlaySound("MobCarnival/Win"));
-                  character.dispelDebuffs();
                } else {
                   PacketCreator.announce(character, new ShowEffect("quest/carnival/lose"));
                   PacketCreator.announce(character, new PlaySound("MobCarnival/Lose"));
-                  character.dispelDebuffs();
                }
+               character.dispelDebuffs();
             });
    }
 

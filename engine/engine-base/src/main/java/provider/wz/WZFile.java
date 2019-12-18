@@ -87,7 +87,7 @@ public class WZFile implements MapleDataProvider {
       int entries = WZTool.readValue(lea);
       for (int i = 0; i < entries; i++) {
          byte marker = lea.readByte();
-         String name = null;
+         String name;
          int size, checksum;
          switch (marker) {
             case 0x02:

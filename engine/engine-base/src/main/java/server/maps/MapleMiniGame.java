@@ -508,7 +508,7 @@ public class MapleMiniGame extends AbstractMapleMapObject {
 
    public enum MiniGameType {
       UNDEFINED(0), OMOK(1), MATCH_CARD(2);
-      private int value = 0;
+      private int value;
 
       MiniGameType(int value) {
          this.value = value;

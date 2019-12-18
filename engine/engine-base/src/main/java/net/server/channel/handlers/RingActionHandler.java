@@ -327,8 +327,8 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
 
             if (isMarrying) {
                StringBuilder wishlistItems = new StringBuilder();
-               for (int i = 0; i < items.length; i++) {
-                  wishlistItems.append(items[i]).append("\r\n");
+               for (String item : items) {
+                  wishlistItems.append(item).append("\r\n");
                }
 
                String wlKey;

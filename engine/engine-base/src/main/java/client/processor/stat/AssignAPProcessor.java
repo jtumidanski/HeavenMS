@@ -78,8 +78,6 @@ public class AssignAPProcessor {
          if (YamlConfig.config.server.USE_SERVER_AUTOASSIGNER) {
             // --------- Ronan Lana's AUTOASSIGNER ---------
             // This method excels for assigning APs in such a way to cover all equipments AP requirements.
-            byte opt = job;     // useful for pirate autoassigning
-
             int str = 0, dex = 0, luk = 0, int_ = 0;
             List<Short> eqpStrList = new ArrayList<>();
             List<Short> eqpDexList = new ArrayList<>();
@@ -126,7 +124,7 @@ public class AssignAPProcessor {
             //c.getPlayer().message("SDL: s" + eqpStr + " d" + eqpDex + " l" + eqpLuk + " BASE STATS --> STR: " + chr.getStr() + " DEX: " + chr.getDex() + " INT: " + chr.getInt() + " LUK: " + chr.getLuk());
             //c.getPlayer().message("SUM EQUIP STATS -> STR: " + str + " DEX: " + dex + " LUK: " + luk + " INT: " + int_);
 
-            MapleJob stance = c.getPlayer().getJobStyle(opt);
+            MapleJob stance = c.getPlayer().getJobStyle(job);
             int prStat = 0, scStat = 0, trStat = 0, temp, tempAp = remainingAp, CAP;
             if (tempAp < 1) {
                return;
@@ -313,8 +311,8 @@ public class AssignAPProcessor {
                   }
 
                   // other classes will start favoring more DEX only if a level-based threshold is reached.
+                  scStat = 0;
                   if (!highDex) {
-                     scStat = 0;
                      if (chr.getDex() < 80) {
                         scStat = (2 * chr.getLevel()) - (chr.getDex() + dex - eqpDex);
                         if (scStat < 0) {
@@ -327,14 +325,7 @@ public class AssignAPProcessor {
                      }
 
                      temp = (chr.getLevel() + 40) - Math.max(80, scStat + chr.getDex() + dex - eqpDex);
-                     if (temp < 0) {
-                        temp = 0;
-                     }
-                     temp = Math.min(tempAp, temp);
-                     scStat += temp;
-                     tempAp -= temp;
                   } else {
-                     scStat = 0;
                      if (chr.getDex() < 96) {
                         scStat = (int) (2.4 * chr.getLevel()) - (chr.getDex() + dex - eqpDex);
                         if (scStat < 0) {
@@ -347,13 +338,13 @@ public class AssignAPProcessor {
                      }
 
                      temp = 96 + (int) (1.2 * (chr.getLevel() - 40)) - Math.max(96, scStat + chr.getDex() + dex - eqpDex);
-                     if (temp < 0) {
-                        temp = 0;
-                     }
-                     temp = Math.min(tempAp, temp);
-                     scStat += temp;
-                     tempAp -= temp;
                   }
+                  if (temp < 0) {
+                     temp = 0;
+                  }
+                  temp = Math.min(tempAp, temp);
+                  scStat += temp;
+                  tempAp -= temp;
 
                   prStat = tempAp;
                   str = prStat;

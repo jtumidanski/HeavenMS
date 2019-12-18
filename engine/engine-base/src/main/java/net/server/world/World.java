@@ -48,12 +48,13 @@ import javax.persistence.EntityManager;
 import client.AbstractMapleCharacterObject;
 import client.MapleCharacter;
 import client.MapleFamily;
-import database.administrator.MarriageAdministrator;
-import database.administrator.PlayerNpcAdministrator;
 import client.database.data.MarriageData;
-import database.provider.MarriageProvider;
 import config.YamlConfig;
 import constants.game.GameConstants;
+import database.DatabaseConnection;
+import database.administrator.MarriageAdministrator;
+import database.administrator.PlayerNpcAdministrator;
+import database.provider.MarriageProvider;
 import net.server.PlayerStorage;
 import net.server.Server;
 import net.server.audit.LockCollector;
@@ -95,7 +96,6 @@ import server.maps.AbstractMapleMapObject;
 import server.maps.MapleHiredMerchant;
 import server.maps.MaplePlayerShop;
 import server.maps.MaplePlayerShopItem;
-import database.DatabaseConnection;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.message.MultiChat;
@@ -679,13 +679,10 @@ public class World {
    }
 
    public MapleGuildSummary getGuildSummary(int gid, int wid) {
-      if (gsStore.containsKey(gid)) {
-         return gsStore.get(gid);
-      } else {
-         Server.getInstance().getGuild(gid, wid, null)
-               .ifPresent(guild -> gsStore.put(gid, new MapleGuildSummary(guild)));
-         return gsStore.get(gid);
+      if (!gsStore.containsKey(gid)) {
+         Server.getInstance().getGuild(gid, wid, null).ifPresent(guild -> gsStore.put(gid, new MapleGuildSummary(guild)));
       }
+      return gsStore.get(gid);
    }
 
    public void updateGuildSummary(int gid, MapleGuildSummary mgs) {

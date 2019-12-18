@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.server.channel.handlers.SummonAttackEntry;
-import tools.data.output.LittleEndianWriter;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.attack.MagicAttack;
@@ -52,7 +51,7 @@ public class AttackPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected void addAttackBody(LittleEndianWriter lew, int characterId, int skill, int skilllevel, int stance,
+   protected void addAttackBody(MaplePacketLittleEndianWriter lew, int characterId, int skill, int skilllevel, int stance,
                                 int numAttackedAndDamage, int projectile, Map<Integer, List<Integer>> damage,
                                 int speed, int direction, int display) {
       lew.writeInt(characterId);

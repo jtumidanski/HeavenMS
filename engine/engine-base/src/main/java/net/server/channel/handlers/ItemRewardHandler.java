@@ -78,8 +78,8 @@ public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPac
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, packet.itemId(), 1, false, false);
             if (reward.worldmsg != null) {
                String msg = reward.worldmsg;
-               msg.replaceAll("/name", client.getPlayer().getName());
-               msg.replaceAll("/item", ii.getName(reward.itemid));
+               msg = msg.replaceAll("/name", client.getPlayer().getName());
+               msg = msg.replaceAll("/item", ii.getName(reward.itemid));
                MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, msg);
             }
             break;

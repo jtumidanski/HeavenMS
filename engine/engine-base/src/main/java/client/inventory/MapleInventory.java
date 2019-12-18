@@ -51,7 +51,7 @@ import tools.Pair;
  */
 public class MapleInventory implements Iterable<Item> {
    protected MapleCharacter owner;
-   protected Map<Short, Item> inventory = new LinkedHashMap<>();
+   protected Map<Short, Item> inventory;
    protected byte slotLimit;
    protected MapleInventoryType type;
    protected boolean checked = false;

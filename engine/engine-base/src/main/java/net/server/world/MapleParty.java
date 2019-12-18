@@ -198,7 +198,7 @@ public class MapleParty {
          lock.unlock();
       }
 
-      histList.sort(Comparator.comparing(Entry::getValue));
+      histList.sort(Entry.comparingByValue());
 
       List<Integer> histSort = new LinkedList<>();
       for (Entry<Integer, Integer> e : histList) {

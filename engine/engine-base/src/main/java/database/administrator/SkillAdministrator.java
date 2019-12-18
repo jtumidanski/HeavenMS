@@ -12,8 +12,8 @@ import javax.persistence.TypedQuery;
 import client.Skill;
 import client.SkillEntry;
 import database.AbstractQueryExecutor;
-import database.DeleteForCharacter;
 import database.DatabaseConnection;
+import database.DeleteForCharacter;
 
 public class SkillAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
    private static SkillAdministrator instance;
@@ -56,25 +56,24 @@ public class SkillAdministrator extends AbstractQueryExecutor implements DeleteF
    }
 
    public void replace(EntityManager entityManager, int characterId, Set<Map.Entry<Skill, SkillEntry>> skills) {
-      DatabaseConnection.getInstance().thing(entityManager, em -> {
-         skills.forEach(skillEntry -> {
-            entity.Skill skill;
-            TypedQuery<entity.Skill> skillQuery = em.createQuery("FROM Skill WHERE characterId = :characterId AND skillId = :skillId", entity.Skill.class);
-            skillQuery.setParameter("characterId", characterId);
-            skillQuery.setParameter("skillId", skillEntry.getKey().getId());
-            try {
-               skill = skillQuery.getSingleResult();
-            } catch (NoResultException exception) {
-               skill = new entity.Skill();
-               skill.setCharacterId(characterId);
-               skill.setSkillId(skillEntry.getKey().getId());
-            }
+      DatabaseConnection.getInstance().thing(entityManager, em ->
+            skills.forEach(skillEntry -> {
+               entity.Skill skill;
+               TypedQuery<entity.Skill> skillQuery = em.createQuery("FROM Skill WHERE characterId = :characterId AND skillId = :skillId", entity.Skill.class);
+               skillQuery.setParameter("characterId", characterId);
+               skillQuery.setParameter("skillId", skillEntry.getKey().getId());
+               try {
+                  skill = skillQuery.getSingleResult();
+               } catch (NoResultException exception) {
+                  skill = new entity.Skill();
+                  skill.setCharacterId(characterId);
+                  skill.setSkillId(skillEntry.getKey().getId());
+               }
 
-            skill.setSkillLevel((int) skillEntry.getValue().skillLevel());
-            skill.setMasterLevel(skillEntry.getValue().masterLevel());
-            skill.setExpiration(skillEntry.getValue().expiration());
-            em.persist(skill);
-         });
-      });
+               skill.setSkillLevel((int) skillEntry.getValue().skillLevel());
+               skill.setMasterLevel(skillEntry.getValue().masterLevel());
+               skill.setExpiration(skillEntry.getValue().expiration());
+               em.persist(skill);
+            }));
    }
 }

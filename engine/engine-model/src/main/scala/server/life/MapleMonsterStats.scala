@@ -94,7 +94,7 @@ class MapleMonsterStats() {
 
   def banish: Option[BanishInfo] = _banish
 
-  def banish_=(banishInfo: BanishInfo) = Option.apply(banishInfo)
+  def banish_=(banishInfo: BanishInfo): Unit = _banish = Option.apply(banishInfo)
 
   def paDamage: Int = _paDamage
 

@@ -561,8 +561,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                   }
                } else {
                   if (attack.skill() == Aran.BODY_PRESSURE) {
-                     int finalTotDamageToOneMonster = totDamageToOneMonster;
-                     MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(monster.objectId(), finalTotDamageToOneMonster));
+                     MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(monster.objectId(), totDamageToOneMonster));
                   }
 
                   map.damageMonster(player, monster, totDamageToOneMonster);

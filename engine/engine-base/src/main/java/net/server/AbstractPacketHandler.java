@@ -20,6 +20,7 @@ public abstract class AbstractPacketHandler<T extends MaplePacket> implements Ma
          FilePrinter.printError(FilePrinter.PACKET_HANDLER, "Cannot find reader for packet: " + getReaderClass());
          return;
       }
+
       handlePacket(packet.get(), client);
    }
 

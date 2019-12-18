@@ -203,7 +203,8 @@ public enum RecvOpcode {
    MTS_OPERATION(0xFD),
    USE_MAPLELIFE(0x100),
    USE_HAMMER(0x104);
-   private int code = -2;
+
+   private int code;
 
    RecvOpcode(int code) {
       this.code = code;

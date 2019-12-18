@@ -48,7 +48,7 @@ public class PeCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      String packet = "";
+      String packet;
       try {
          InputStreamReader is = new FileReader("pe.txt");
          Properties packetProps = new Properties();

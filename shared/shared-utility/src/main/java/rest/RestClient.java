@@ -148,6 +148,7 @@ public final class RestClient<T> {
     * @param successResponseCodes a set of response codes which indicate a successful call
     */
    private void invokeMethod(URI path, String method, Object entity, Response.Status[] successResponseCodes) {
+      System.out.println("Calling " + method + " on " + path.toString());
       Response response;
 
       try {

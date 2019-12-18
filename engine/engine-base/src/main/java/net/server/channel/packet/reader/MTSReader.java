@@ -141,10 +141,8 @@ public class MTSReader implements PacketReader<BaseMTSPacket> {
          if (itemId / 10000 == 207 || itemId / 10000 == 233) {
             accessor.skip(8);
          }
-         slot = (short) accessor.readInt();
-      } else {
-         slot = (short) accessor.readInt();
       }
+      slot = (short) accessor.readInt();
       if (itemType != 1) {
          if (itemId / 10000 == 207 || itemId / 10000 == 233) {
             quantity = stars;

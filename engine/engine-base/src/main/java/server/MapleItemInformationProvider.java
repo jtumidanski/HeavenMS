@@ -643,7 +643,7 @@ public class MapleItemInformationProvider {
          return equipmentSlotCache.get(itemId);
       }
 
-      String ret = "";
+      String ret;
 
       MapleData item = getItemData(itemId);
 

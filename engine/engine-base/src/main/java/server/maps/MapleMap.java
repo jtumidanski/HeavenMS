@@ -29,6 +29,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -211,7 +212,7 @@ public class MapleMap {
    private int fieldType;
    private int fieldLimit = 0;
    private int mobCapacity = -1;
-   private MapleMonsterAggroCoordinator aggroMonitor = null;   // aggroMonitor activity in sync with itemMonitor
+   private MapleMonsterAggroCoordinator aggroMonitor;   // aggroMonitor activity in sync with itemMonitor
    private ScheduledFuture<?> itemMonitor = null;
    private ScheduledFuture<?> expireItemsTask = null;
    private ScheduledFuture<?> mobSpawnLootTask = null;
@@ -2941,7 +2942,7 @@ public class MapleMap {
    private String getSpawnPointMessage(SpawnPoint spawnPoint) {
       return String.format("  id: %d canSpawn: %b numSpawned: %d x: %d y: %d time: %t team: %d",
             spawnPoint.getMonsterId(), !spawnPoint.getDenySpawn(), spawnPoint.getSpawned(), spawnPoint.getPosition().getX(),
-            spawnPoint.getPosition().getY(), spawnPoint.getMobTime(), spawnPoint.getTeam());
+            spawnPoint.getPosition().getY(), new Date(spawnPoint.getMobTime()), spawnPoint.getTeam());
    }
 
    public void reportMonsterSpawnPoints(MapleCharacter chr) {

@@ -38,7 +38,7 @@ public class MapleFitness {
    private MapleCharacter chr;
    private long time = 0;
    private long timeStarted = 0;
-   private ScheduledFuture<?> schedule = null;
+   private ScheduledFuture<?> schedule;
    private ScheduledFuture<?> schedulemsg = null;
 
    public MapleFitness(final MapleCharacter chr) {

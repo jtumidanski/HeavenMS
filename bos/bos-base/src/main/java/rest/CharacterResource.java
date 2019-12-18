@@ -22,7 +22,6 @@ import database.provider.BuddyProvider;
 import database.provider.CharacterProvider;
 import rest.buddy.AddBuddy;
 import rest.buddy.AddBuddyResponse;
-import rest.buddy.AddBuddyResult;
 import rest.buddy.AddBuddyResult$;
 import rest.buddy.AddCharacter;
 import rest.buddy.Buddy;
@@ -149,9 +148,7 @@ public class CharacterResource {
    @Consumes(MediaType.APPLICATION_JSON)
    @Produces(MediaType.APPLICATION_JSON)
    public Response updateBuddy(@PathParam("id") Integer characterId, @PathParam("buddyId") Integer buddyId, UpdateBuddy updateBuddy) {
-      DatabaseConnection.getInstance().withConnection(entityManager -> {
-         BuddyAdministrator.getInstance().updateBuddy(entityManager, characterId, buddyId, updateBuddy.pending(), updateBuddy.responseRequired());
-      });
+      DatabaseConnection.getInstance().withConnection(entityManager -> BuddyAdministrator.getInstance().updateBuddy(entityManager, characterId, buddyId, updateBuddy.pending(), updateBuddy.responseRequired()));
       return Response.ok().build();
    }
 

@@ -439,17 +439,11 @@ public class MapleInventoryManipulator {
                chr.unequipPet(pet, true);
             }
 
-            inv.removeItem(slot, quantity, allowZero);
-            if (type != MapleInventoryType.CANHOLD) {
-               announceModifyInventory(c, item, fromDrop, allowZero);
-            }
-
             // thanks Robin Schulz for noticing pet issues when moving pets out of inventory
-         } else {
-            inv.removeItem(slot, quantity, allowZero);
-            if (type != MapleInventoryType.CANHOLD) {
-               announceModifyInventory(c, item, fromDrop, allowZero);
-            }
+         }
+         inv.removeItem(slot, quantity, allowZero);
+         if (type != MapleInventoryType.CANHOLD) {
+            announceModifyInventory(c, item, fromDrop, allowZero);
          }
       }
    }
@@ -517,11 +511,10 @@ public class MapleInventoryManipulator {
       if (!(type.equals(MapleInventoryType.EQUIP) || type.equals(MapleInventoryType.CASH)) && initialTarget != null && initialTarget.id() == source.id() && !ItemConstants.isRechargeable(source.id()) && isSameOwner(source, initialTarget)) {
          if ((olddstQ + oldsrcQ) > slotMax) {
             mods.add(new ModifyInventory(1, source));
-            mods.add(new ModifyInventory(1, initialTarget));
          } else {
             mods.add(new ModifyInventory(3, source));
-            mods.add(new ModifyInventory(1, initialTarget));
          }
+         mods.add(new ModifyInventory(1, initialTarget));
       } else {
          mods.add(new ModifyInventory(2, source, src));
       }

@@ -581,11 +581,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
          Item newItem = shopItem.item();
          short newBundle = shopItem.bundles();
 
-         if (shutdown) { //is "shutdown" really necessary?
-            newItem.quantity_$eq(shopItem.item().quantity());
-         } else {
-            newItem.quantity_$eq(shopItem.item().quantity());
-         }
+         newItem.quantity_$eq(shopItem.item().quantity());
          if (newBundle > 0) {
             itemsWithType.add(new Pair<>(newItem, newItem.inventoryType()));
             bundles.add(newBundle);

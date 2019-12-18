@@ -70,12 +70,9 @@ public class PNGMapleCanvas implements MapleCanvas {
    @Override
    public BufferedImage getImage() {
       int sizeUncompressed = 0;
-      int size8888 = 0;
+      int size8888;
       int maxWriteBuf = 2;
-      int maxHeight = 3;
       byte[] writeBuf = new byte[maxWriteBuf];
-      @SuppressWarnings("unused")
-      byte[] rowPointers = new byte[maxHeight];
       switch (getFormat()) {
          case 1:
          case 513:
@@ -93,13 +90,9 @@ public class PNGMapleCanvas implements MapleCanvas {
          maxWriteBuf = size8888;
          writeBuf = new byte[maxWriteBuf];
       }
-      if (getHeight() > maxHeight) {
-         maxHeight = getHeight();
-         rowPointers = new byte[maxHeight];
-      }
       Inflater dec = new Inflater();
       dec.setInput(getData(), 0, dataLength);
-      int declen = 0;
+      int declen;
       byte[] uc = new byte[sizeUncompressed];
       try {
          declen = dec.inflate(uc);
@@ -127,8 +120,8 @@ public class PNGMapleCanvas implements MapleCanvas {
             writeBuf[(i << 1) + 3] = (byte) 0xFF;
          }
       } else if (getFormat() == 517) {
-         byte b = 0x00;
-         int pixelIndex = 0;
+         byte b;
+         int pixelIndex;
          for (int i = 0; i < declen; i++) {
             for (int j = 0; j < 8; j++) {
                b = (byte) (((uc[i] & (0x01 << (7 - j))) >> (7 - j)) * 255);

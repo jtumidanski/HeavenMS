@@ -89,8 +89,7 @@ public class NPCScriptManager extends AbstractScriptManager {
             return;
          }
          cms.put(c, cm);
-         ScriptEngine iv = null;
-         iv = getScriptEngine("npc/" + filename, c);
+         ScriptEngine iv = getScriptEngine("npc/" + filename, c);
 
          if (iv == null) {
             MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, npc + "");

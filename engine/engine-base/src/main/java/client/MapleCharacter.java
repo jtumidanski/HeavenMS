@@ -1130,9 +1130,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private void setMasteries(int jobId) {
       int[] skills = new int[4];
-      for (int i = 0; i > skills.length; i++) {
-         skills[i] = 0; //that initialization meng
-      }
+
       if (jobId == 112) {
          skills[0] = Hero.ACHILLES;
          skills[1] = Hero.MONSTER_MAGNET;
@@ -4578,12 +4576,12 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return partnerId > 0 ? marriageRing : null;
    }
 
-   public int getMasterLevel(int skill) {
-      SkillEntry ret = skills.get(SkillFactory.getSkill(skill));
-      if (ret == null) {
+   public int getMasterLevel(int skillId) {
+      Optional<Skill> skill = SkillFactory.getSkill(skillId);
+      if (skill.isEmpty() || skills.get(skill.get()) == null) {
          return 0;
       }
-      return ret.masterLevel();
+      return skills.get(skill.get()).masterLevel();
    }
 
    public int getMasterLevel(Skill skill) {
@@ -6343,11 +6341,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             int curExp = getExp();
-            if (curExp > XPdummy) {
-               loseExp(XPdummy, false, false);
-            } else {
-               loseExp(curExp, false, false);
-            }
+            loseExp(Math.min(curExp, XPdummy), false, false);
          }
       }
 

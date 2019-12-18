@@ -83,8 +83,7 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
             }
 
             if (mountLevelup != null) {
-               Boolean finalMountLevelup = mountLevelup;
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.level(), mount.exp(), mount.tiredness(), finalMountLevelup));
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.level(), mount.exp(), mount.tiredness(), mountLevelup));
             }
          } finally {
             client.releaseClient();

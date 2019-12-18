@@ -15,8 +15,8 @@ import tools.packet.character.FacialExpression;
 
 public class FaceExpressionService extends BaseService {
 
-   private FaceExpressionScheduler faceExpressionSchedulers[] = new FaceExpressionScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
-   private MonitoredReentrantLock faceLock[] = new MonitoredReentrantLock[YamlConfig.config.server.CHANNEL_LOCKS];
+   private FaceExpressionScheduler[] faceExpressionSchedulers = new FaceExpressionScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
+   private MonitoredReentrantLock[] faceLock = new MonitoredReentrantLock[YamlConfig.config.server.CHANNEL_LOCKS];
 
    public FaceExpressionService() {
       for (int i = 0; i < YamlConfig.config.server.CHANNEL_LOCKS; i++) {
@@ -32,12 +32,7 @@ public class FaceExpressionService extends BaseService {
    }
 
    private void disposeLocks() {
-      LockCollector.getInstance().registerDisposeAction(new Runnable() {
-         @Override
-         public void run() {
-            emptyLocks();
-         }
-      });
+      LockCollector.getInstance().registerDisposeAction(this::emptyLocks);
    }
 
    public void dispose() {

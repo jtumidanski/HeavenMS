@@ -48,8 +48,8 @@ public class MovementPacketFactory extends AbstractPacketFactory {
    protected void rebroadcastMovementList(LittleEndianWriter lew, List<Byte> movementDataList) {
       //movement command length is sent by client, probably not a big issue? (could be calculated on server)
       //if multiple write/reads are slow, could use a (cached?) byte[] buffer
-      for (int i = 0; i < movementDataList.size(); i++) {
-         lew.write(movementDataList.get(i));
+      for (Byte aByte : movementDataList) {
+         lew.write(aByte);
       }
    }
 

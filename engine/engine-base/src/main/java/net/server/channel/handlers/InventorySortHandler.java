@@ -227,7 +227,7 @@ class PairedQuicksort {
    private int[] BinarySearchElement(ArrayList<Item> A, int rangeId) {
       int st = 0, en = A.size() - 1;
 
-      int mid = -1, idx = -1;
+      int mid, idx = -1;
       while (en >= st) {
          idx = (st + en) / 2;
          mid = getItemSubtype(A.get(idx));

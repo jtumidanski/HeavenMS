@@ -1,6 +1,5 @@
 package server.partyquest;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import client.MapleCharacter;
@@ -13,7 +12,7 @@ import tools.packet.field.effect.ShowEffect;
  */
 public class MonsterCarnivalParty {
 
-   private List<MapleCharacter> members = new LinkedList<>();
+   private List<MapleCharacter> members;
    private MapleCharacter leader;
    private byte team;
    private short availableCP = 0, totalCP = 0;
@@ -78,10 +77,11 @@ public class MonsterCarnivalParty {
    }
 
    public void warpOut() {
-      if (winner)
+      if (winner) {
          warpOut(980000003 + (leader.getMonsterCarnival().getRoom() * 100));
-      else
+      } else {
          warpOut(980000004 + (leader.getMonsterCarnival().getRoom() * 100));
+      }
    }
 
    public boolean allInMap(MapleMap map) {

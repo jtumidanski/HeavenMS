@@ -9,7 +9,7 @@ import entity.Character;
 public class CharacterFromResultSetTransformer implements SqlTransformer<CharacterData, Character> {
    @Override
    public CharacterData transform(Character resultSet) {
-      CharacterData mapleCharacter = new CharacterData(
+      return new CharacterData(
             resultSet.getAccountId(),
             resultSet.getId(),
             resultSet.getName(),
@@ -74,6 +74,5 @@ public class CharacterFromResultSetTransformer implements SqlTransformer<Charact
             resultSet.getParty(),
             resultSet.getMessengerId(),
             resultSet.getMessengerPosition());
-      return mapleCharacter;
    }
 }

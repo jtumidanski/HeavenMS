@@ -17,8 +17,8 @@ public class ServicesManager {
    }
 
    public void shutdown() {
-      for (int i = 0; i < services.length; i++) {
-         services[i].dispose();
+      for (Service service : services) {
+         service.dispose();
       }
       services = null;
    }

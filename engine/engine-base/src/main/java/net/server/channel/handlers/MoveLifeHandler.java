@@ -97,7 +97,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
       boolean isAttack = inRangeInclusive(rawActivity, 24, 41);
       boolean isSkill = inRangeInclusive(rawActivity, 42, 59);
 
-      MobSkill toUse = null;
+      MobSkill toUse;
       int useSkillId = 0, useSkillLevel = 0;
 
       MobSkill nextUse = null;

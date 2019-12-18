@@ -45,7 +45,7 @@ public enum ChannelServices implements ServiceType {
 
    private Class<? extends BaseService> s;
 
-   private ChannelServices(Class<? extends BaseService> service) {
+   ChannelServices(Class<? extends BaseService> service) {
       s = service;
    }
 

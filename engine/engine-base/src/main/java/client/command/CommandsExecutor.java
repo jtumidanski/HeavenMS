@@ -23,6 +23,7 @@
 */
 package client.command;
 
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -217,6 +218,7 @@ public class CommandsExecutor {
    private HashMap<String, Command> registeredCommands = new HashMap<>();
    private Pair<List<String>, List<String>> levelCommandsCursor;
    private List<Pair<List<String>, List<String>>> commandsNameDesc = new ArrayList<>();
+
    private CommandsExecutor() {
       registerLv0Commands();
       registerLv1Commands();
@@ -298,7 +300,7 @@ public class CommandsExecutor {
 
    private void addCommandInfo(String name, Class<? extends Command> commandClass) {
       try {
-         levelCommandsCursor.getRight().add(commandClass.newInstance().getDescription());
+         levelCommandsCursor.getRight().add(commandClass.getDeclaredConstructor().newInstance().getDescription());
          levelCommandsCursor.getLeft().add(name);
       } catch (Exception e) {
          e.printStackTrace();
@@ -333,11 +335,11 @@ public class CommandsExecutor {
       addCommandInfo(commandName, commandClass);
 
       try {
-         Command commandInstance = commandClass.newInstance();     // thanks Halcyon for noticing commands getting reinstanced every call
+         Command commandInstance = commandClass.getDeclaredConstructor().newInstance();     // thanks Halcyon for noticing commands getting reinstanced every call
          commandInstance.setRank(rank);
 
          registeredCommands.put(commandName, commandInstance);
-      } catch (InstantiationException | IllegalAccessException e) {
+      } catch (InstantiationException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
          e.printStackTrace();
       }
    }

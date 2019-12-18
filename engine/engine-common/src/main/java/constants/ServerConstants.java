@@ -5,5 +5,5 @@ public class ServerConstants {
    public static short VERSION = 83;
 
    //Debug Variables
-   public static int DEBUG_VALUES[] = new int[10];             // Field designed for packet testing purposes
+   public static int[] DEBUG_VALUES = new int[10];             // Field designed for packet testing purposes
 }

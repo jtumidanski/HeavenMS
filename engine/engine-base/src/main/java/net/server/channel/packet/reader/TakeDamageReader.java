@@ -13,13 +13,12 @@ public class TakeDamageReader implements PacketReader<TakeDamagePacket> {
       int damage = accessor.readInt();
       int oid = 0;
       int monsterIdFrom = 0;
-      byte direction = 0;
       if (damageFrom != -3 && damageFrom != -4) {
          monsterIdFrom = accessor.readInt();
          oid = accessor.readInt();
       }
 
-      direction = accessor.readByte();
+      byte direction = accessor.readByte();
       return new TakeDamagePacket(damageFrom, element, damage, monsterIdFrom, oid, direction);
    }
 }

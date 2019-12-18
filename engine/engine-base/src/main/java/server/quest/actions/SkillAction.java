@@ -89,7 +89,7 @@ public class SkillAction extends MapleQuestAction {
 
    private class SkillData {
       protected int id, level, masterLevel;
-      List<Integer> jobs = new ArrayList<>();
+      List<Integer> jobs;
 
       public SkillData(int id, int level, int masterLevel, List<Integer> jobs) {
          this.id = id;

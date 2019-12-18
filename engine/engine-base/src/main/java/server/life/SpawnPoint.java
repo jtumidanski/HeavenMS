@@ -31,7 +31,7 @@ public class SpawnPoint {
    private int monster, mobTime, team, fh, f;
    private Point pos;
    private long nextPossibleSpawn;
-   private int mobInterval = 5000;
+   private int mobInterval;
    private AtomicInteger spawnedMonsters = new AtomicInteger(0);
    private boolean immobile, denySpawn = false;
 

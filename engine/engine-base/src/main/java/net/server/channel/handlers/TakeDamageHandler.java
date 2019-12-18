@@ -295,9 +295,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
          }
       }
       if (!chr.isHidden()) {
-         int finalDamage = damage;
-         int finalFake = fake;
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), finalDamage, finalFake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
       } else {
          map.broadcastGMMessage(chr, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
       }
