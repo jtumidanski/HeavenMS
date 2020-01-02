@@ -36,7 +36,7 @@ class Quest2293 {
       }
 
       if (status == 0) {
-         qm.sendSimple("Here, I'll give you some samples. Please listen to them and choose one. Please listen carefully before making your choide.\r\n\
+         qm.sendSimple("Here, I'll give you some samples. Please listen to them and choose one. Please listen carefully before making your choice.\r\n\
             \t#b#L1# Listen to song No. 1#l \r\n\
             \t#L2# Listen to Song No. 2#l \r\n\
             \t#L3# Listen to Song No. 3#l \r\n\

@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server;
 
 import java.util.ArrayList;
@@ -30,25 +9,22 @@ import config.YamlConfig;
 import constants.inventory.EquipType;
 import tools.Pair;
 
-/**
- * @author Jay Estrella, Ronan
- */
 public class MakerItemFactory {
    private static MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
-   public static MakerItemCreateEntry getItemCreateEntry(int toCreate, int stimulantid, Map<Integer, Short> reagentids) {
+   public static MakerItemCreateEntry getItemCreateEntry(int toCreate, int stimulantId, Map<Integer, Short> reagentIds) {
       MakerItemCreateEntry makerEntry = ii.getMakerItemEntry(toCreate);
       if (makerEntry.isInvalid()) {
          return makerEntry;
       }
 
       // THEY DECIDED FOR SOME BIZARRE PATTERN ON THE FEE THING, ALMOST RANDOMIZED.
-      if (stimulantid != -1) {
+      if (stimulantId != -1) {
          makerEntry.addCost(getMakerStimulantFee(toCreate));
       }
 
-      if (!reagentids.isEmpty()) {
-         for (Entry<Integer, Short> r : reagentids.entrySet()) {
+      if (!reagentIds.isEmpty()) {
+         for (Entry<Integer, Short> r : reagentIds.entrySet()) {
             makerEntry.addCost((getMakerReagentFee(toCreate, ((r.getKey() % 10) + 1))) * r.getValue());
          }
       }
@@ -57,32 +33,32 @@ public class MakerItemFactory {
       return makerEntry;
    }
 
-   public static MakerItemCreateEntry generateLeftoverCrystalEntry(int fromLeftoverid, int crystalId) {
+   public static MakerItemCreateEntry generateLeftoverCrystalEntry(int fromLeftOverId, int crystalId) {
       MakerItemCreateEntry ret = new MakerItemCreateEntry(0, 0, 1);
-      ret.addReqItem(fromLeftoverid, 100);
+      ret.addReqItem(fromLeftOverId, 100);
       ret.addGainItem(crystalId, 1);
       return ret;
    }
 
-   public static MakerItemCreateEntry generateDisassemblyCrystalEntry(int fromEquipid, int cost, List<Pair<Integer, Integer>> gains) {     // equipment at specific position already taken
+   public static MakerItemCreateEntry generateDisassemblyCrystalEntry(int fromEquipId, int cost, List<Pair<Integer, Integer>> gains) {     // equipment at specific position already taken
       MakerItemCreateEntry ret = new MakerItemCreateEntry(cost, 0, 1);
-      ret.addReqItem(fromEquipid, 1);
+      ret.addReqItem(fromEquipId, 1);
       for (Pair<Integer, Integer> p : gains) {
          ret.addGainItem(p.getLeft(), p.getRight());
       }
       return ret;
    }
 
-   private static double getMakerStimulantFee(int itemid) {
+   private static double getMakerStimulantFee(int itemId) {
       if (YamlConfig.config.server.USE_MAKER_FEE_HEURISTICS) {
-         EquipType et = EquipType.getEquipTypeById(itemid);
-         int eqpLevel = ii.getEquipLevelReq(itemid);
+         EquipType et = EquipType.getEquipTypeById(itemId);
+         int eqpLevel = ii.getEquipLevelReq(itemId);
 
          switch (et) {
             case CAP:
                return 1145.736246 * Math.exp(0.03336832546 * eqpLevel);
 
-            case LONGCOAT:
+            case LONG_COAT:
                return 2117.469118 * Math.exp(0.03355349137 * eqpLevel);
 
             case SHOES:
@@ -108,16 +84,16 @@ public class MakerItemFactory {
       }
    }
 
-   private static double getMakerReagentFee(int itemid, int reagentLevel) {
+   private static double getMakerReagentFee(int itemId, int reagentLevel) {
       if (YamlConfig.config.server.USE_MAKER_FEE_HEURISTICS) {
-         EquipType et = EquipType.getEquipTypeById(itemid);
-         int eqpLevel = ii.getEquipLevelReq(itemid);
+         EquipType et = EquipType.getEquipTypeById(itemId);
+         int eqpLevel = ii.getEquipLevelReq(itemId);
 
          switch (et) {
             case CAP:
                return 5592.01613 * Math.exp(0.02914576018 * eqpLevel) * reagentLevel;
 
-            case LONGCOAT:
+            case LONG_COAT:
                return 3405.23441 * Math.exp(0.03413001038 * eqpLevel) * reagentLevel;
 
             case SHOES:
@@ -201,7 +177,7 @@ public class MakerItemFactory {
          reqCost *= 1000;
       }
 
-      public boolean isInvalid() {    // thanks Rohenn, Wh1SK3Y for noticing some items not getting checked properly
+      public boolean isInvalid() {
          return reqLevel < 0;
       }
    }

@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +15,7 @@ import client.command.commands.gm0.DisposeCommand;
 import client.command.commands.gm0.DropLimitCommand;
 import client.command.commands.gm0.EnableAuthCommand;
 import client.command.commands.gm0.EquipLvCommand;
-import client.command.commands.gm0.GachaCommand;
+import client.command.commands.gm0.GachaponCommand;
 import client.command.commands.gm0.GmCommand;
 import client.command.commands.gm0.HelpCommand;
 import client.command.commands.gm0.JoinEventCommand;
@@ -73,7 +50,7 @@ import client.command.commands.gm2.ClearSavedLocationsCommand;
 import client.command.commands.gm2.ClearSlotCommand;
 import client.command.commands.gm2.DcCommand;
 import client.command.commands.gm2.EmpowerMeCommand;
-import client.command.commands.gm2.GachaListCommand;
+import client.command.commands.gm2.GachaponListCommand;
 import client.command.commands.gm2.GmShopCommand;
 import client.command.commands.gm2.HealCommand;
 import client.command.commands.gm2.HideCommand;
@@ -101,14 +78,14 @@ import client.command.commands.gm2.UnJailCommand;
 import client.command.commands.gm2.WarpAreaCommand;
 import client.command.commands.gm2.WarpCommand;
 import client.command.commands.gm2.WarpMapCommand;
-import client.command.commands.gm2.WhereaMiCommand;
+import client.command.commands.gm2.WhereAmICommand;
 import client.command.commands.gm3.BanCommand;
 import client.command.commands.gm3.ChatCommand;
 import client.command.commands.gm3.CheckDmgCommand;
 import client.command.commands.gm3.ClosePortalCommand;
-import client.command.commands.gm3.DebuffCommand;
+import client.command.commands.gm3.AbnormalStatusCommand;
 import client.command.commands.gm3.EndEventCommand;
-import client.command.commands.gm3.ExpedsCommand;
+import client.command.commands.gm3.ExpeditionsCommand;
 import client.command.commands.gm3.FaceCommand;
 import client.command.commands.gm3.FameCommand;
 import client.command.commands.gm3.FlyCommand;
@@ -170,13 +147,13 @@ import client.command.commands.gm4.ItemVacCommand;
 import client.command.commands.gm4.MesoRateCommand;
 import client.command.commands.gm4.PapCommand;
 import client.command.commands.gm4.PianusCommand;
-import client.command.commands.gm4.PinkbeanCommand;
+import client.command.commands.gm4.PinkBeanCommand;
 import client.command.commands.gm4.PlayerNpcCommand;
 import client.command.commands.gm4.PlayerNpcRemoveCommand;
-import client.command.commands.gm4.PmobCommand;
-import client.command.commands.gm4.PmobRemoveCommand;
+import client.command.commands.gm4.PlayerMobCommand;
+import client.command.commands.gm4.PlayerMobRemoveCommand;
 import client.command.commands.gm4.PnpcCommand;
-import client.command.commands.gm4.PnpcRemoveCommand;
+import client.command.commands.gm4.RemovePlayerNpcCommand;
 import client.command.commands.gm4.ProItemCommand;
 import client.command.commands.gm4.QuestRateCommand;
 import client.command.commands.gm4.ServerMessageCommand;
@@ -192,7 +169,7 @@ import client.command.commands.gm5.ShowSessionsCommand;
 import client.command.commands.gm6.ClearQuestCacheCommand;
 import client.command.commands.gm6.ClearQuestCommand;
 import client.command.commands.gm6.DCAllCommand;
-import client.command.commands.gm6.EraseAllPNpcsCommand;
+import client.command.commands.gm6.EraseAllPNpcCommand;
 import client.command.commands.gm6.GetAccCommand;
 import client.command.commands.gm6.MapPlayersCommand;
 import client.command.commands.gm6.SaveAllCommand;
@@ -202,7 +179,7 @@ import client.command.commands.gm6.ServerRemoveChannelCommand;
 import client.command.commands.gm6.ServerRemoveWorldCommand;
 import client.command.commands.gm6.SetGmLevelCommand;
 import client.command.commands.gm6.ShutdownCommand;
-import client.command.commands.gm6.SpawnAllPNpcsCommand;
+import client.command.commands.gm6.SpawnAllPlayerNpcCommand;
 import client.command.commands.gm6.SupplyRateCouponCommand;
 import client.command.commands.gm6.WarpWorldCommand;
 import tools.FilePrinter;
@@ -211,7 +188,6 @@ import tools.Pair;
 import tools.ServerNoticeType;
 
 public class CommandsExecutor {
-
    private static final char USER_HEADING = '@';
    private static final char GM_HEADING = '!';
    public static CommandsExecutor instance = new CommandsExecutor();
@@ -263,14 +239,14 @@ public class CommandsExecutor {
          return;
       }
       final String splitRegex = "[ ]";
-      String[] splitedMessage = message.substring(1).split(splitRegex, 2);
-      if (splitedMessage.length < 2) {
-         splitedMessage = new String[]{splitedMessage[0], ""};
+      String[] splitMessage = message.substring(1).split(splitRegex, 2);
+      if (splitMessage.length < 2) {
+         splitMessage = new String[]{splitMessage[0], ""};
       }
 
-      client.getPlayer().setLastCommandMessage(splitedMessage[1]);    // thanks Tochi & Nulliphite for noticing string messages being marshalled lowercase
-      final String commandName = splitedMessage[0].toLowerCase();
-      final String[] lowercaseParams = splitedMessage[1].toLowerCase().split(splitRegex);
+      client.getPlayer().setLastCommandMessage(splitMessage[1]);
+      final String commandName = splitMessage[0].toLowerCase();
+      final String[] lowercaseParams = splitMessage[1].toLowerCase().split(splitRegex);
 
       final Command command = registeredCommands.get(commandName);
       if (command == null) {
@@ -307,14 +283,14 @@ public class CommandsExecutor {
       }
    }
 
-   private void addCommand(String[] syntaxs, Class<? extends Command> commandClass) {
-      for (String syntax : syntaxs) {
+   private void addCommand(String[] syntaxList, Class<? extends Command> commandClass) {
+      for (String syntax : syntaxList) {
          addCommand(syntax, 0, commandClass);
       }
    }
 
    private void addCommand(String syntax, Class<? extends Command> commandClass) {
-      //for (String syntax : syntaxs){
+      //for (String syntax : syntaxList){
       addCommand(syntax, 0, commandClass);
       //}
    }
@@ -335,7 +311,7 @@ public class CommandsExecutor {
       addCommandInfo(commandName, commandClass);
 
       try {
-         Command commandInstance = commandClass.getDeclaredConstructor().newInstance();     // thanks Halcyon for noticing commands getting reinstanced every call
+         Command commandInstance = commandClass.getDeclaredConstructor().newInstance();
          commandInstance.setRank(rank);
 
          registeredCommands.put(commandName, commandInstance);
@@ -353,7 +329,7 @@ public class CommandsExecutor {
       addCommand("credits", StaffCommand.class);
       addCommand("buyback", BuyBackCommand.class);
       addCommand("uptime", UptimeCommand.class);
-      addCommand("gacha", GachaCommand.class);
+      addCommand("gacha", GachaponCommand.class);
       addCommand("dispose", DisposeCommand.class);
       addCommand("changel", ChangeLanguageCommand.class);
       addCommand("equiplv", EquipLvCommand.class);
@@ -377,7 +353,7 @@ public class CommandsExecutor {
       addCommand("mobhp", MobHpCommand.class);
       addCommand("whatdropsfrom", WhatDropsFromCommand.class);
       addCommand("whodrops", WhoDropsCommand.class);
-      addCommand("gachalist", GachaListCommand.class);
+      addCommand("gachalist", GachaponListCommand.class);
 
       commandsNameDesc.add(levelCommandsCursor);
    }
@@ -397,7 +373,7 @@ public class CommandsExecutor {
       levelCommandsCursor = new Pair<>(new ArrayList<>(), new ArrayList<>());
 
       addCommand("recharge", 2, RechargeCommand.class);
-      addCommand("whereami", 2, WhereaMiCommand.class);
+      addCommand("whereami", 2, WhereAmICommand.class);
       addCommand("hide", 2, HideCommand.class);
       addCommand("unhide", 2, UnHideCommand.class);
       addCommand("sp", 2, SpCommand.class);
@@ -438,7 +414,7 @@ public class CommandsExecutor {
    private void registerLv3Commands() {
       levelCommandsCursor = new Pair<>(new ArrayList<>(), new ArrayList<>());
 
-      addCommand("debuff", 3, DebuffCommand.class);
+      addCommand("debuff", 3, AbnormalStatusCommand.class);
       addCommand("fly", 3, FlyCommand.class);
       addCommand("spawn", 3, SpawnCommand.class);
       addCommand("mutemap", 3, MuteMapCommand.class);
@@ -464,7 +440,7 @@ public class CommandsExecutor {
       addCommand("givevp", 3, GiveVpCommand.class);
       addCommand("givems", 3, GiveMesosCommand.class);
       addCommand("giverp", 3, GiveRpCommand.class);
-      addCommand("expeds", 3, ExpedsCommand.class);
+      addCommand("expeds", 3, ExpeditionsCommand.class);
       addCommand("kill", 3, KillCommand.class);
       addCommand("seed", 3, SeedCommand.class);
       addCommand("maxenergy", 3, MaxEnergyCommand.class);
@@ -518,16 +494,16 @@ public class CommandsExecutor {
       addCommand("forcevac", 4, ForceVacCommand.class);
       addCommand("zakum", 4, ZakumCommand.class);
       addCommand("horntail", 4, HorntailCommand.class);
-      addCommand("pinkbean", 4, PinkbeanCommand.class);
+      addCommand("pinkbean", 4, PinkBeanCommand.class);
       addCommand("pap", 4, PapCommand.class);
       addCommand("pianus", 4, PianusCommand.class);
       addCommand("cake", 4, CakeCommand.class);
       addCommand("playernpc", 4, PlayerNpcCommand.class);
       addCommand("playernpcremove", 4, PlayerNpcRemoveCommand.class);
       addCommand("pnpc", 4, PnpcCommand.class);
-      addCommand("pnpcremove", 4, PnpcRemoveCommand.class);
-      addCommand("pmob", 4, PmobCommand.class);
-      addCommand("pmobremove", 4, PmobRemoveCommand.class);
+      addCommand("pnpcremove", 4, RemovePlayerNpcCommand.class);
+      addCommand("pmob", 4, PlayerMobCommand.class);
+      addCommand("pmobremove", 4, PlayerMobRemoveCommand.class);
 
       commandsNameDesc.add(levelCommandsCursor);
    }
@@ -558,8 +534,8 @@ public class CommandsExecutor {
       addCommand("clearquestcache", 6, ClearQuestCacheCommand.class);
       addCommand("clearquest", 6, ClearQuestCommand.class);
       addCommand("supplyratecoupon", 6, SupplyRateCouponCommand.class);
-      addCommand("spawnallpnpcs", 6, SpawnAllPNpcsCommand.class);
-      addCommand("eraseallpnpcs", 6, EraseAllPNpcsCommand.class);
+      addCommand("spawnallpnpcs", 6, SpawnAllPlayerNpcCommand.class);
+      addCommand("eraseallpnpcs", 6, EraseAllPNpcCommand.class);
       addCommand("addchannel", 6, ServerAddChannelCommand.class);
       addCommand("addworld", 6, ServerAddWorldCommand.class);
       addCommand("removechannel", 6, ServerRemoveChannelCommand.class);

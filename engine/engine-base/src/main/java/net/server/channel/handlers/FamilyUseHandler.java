@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.util.Optional;
@@ -40,10 +19,6 @@ import tools.packet.family.FamilyMessage;
 import tools.packet.family.FamilySummonRequest;
 import tools.packet.family.GetFamilyInfo;
 
-/**
- * @author Moogra
- * @author Ubaware
- */
 public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacket> {
    @Override
    public Class<FamilyUseReader> getReaderClass() {
@@ -63,15 +38,15 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
       }
       PacketCreator.announce(client, new GetFamilyInfo(entry));
       Optional<MapleCharacter> victim;
-      if (type == MapleFamilyEntitlement.FAMILY_REUINION || type == MapleFamilyEntitlement.SUMMON_FAMILY) {
+      if (type == MapleFamilyEntitlement.FAMILY_REUNION || type == MapleFamilyEntitlement.SUMMON_FAMILY) {
          victim = client.getChannelServer().getPlayerStorage().getCharacterByName(packet.characterName());
          if (victim.isPresent() && victim.get() != client.getPlayer()) {
             if (victim.get().getFamily() == client.getPlayer().getFamily()) {
                MapleMap targetMap = victim.get().getMap();
                MapleMap ownMap = client.getPlayer().getMap();
                if (targetMap != null) {
-                  if (type == MapleFamilyEntitlement.FAMILY_REUINION) {
-                     if (!FieldLimit.CANNOTMIGRATE.check(ownMap.getFieldLimit()) && !FieldLimit.CANNOTVIPROCK.check(targetMap.getFieldLimit())
+                  if (type == MapleFamilyEntitlement.FAMILY_REUNION) {
+                     if (!FieldLimit.CANNOT_MIGRATE.check(ownMap.getFieldLimit()) && !FieldLimit.CANNOT_VIP_ROCK.check(targetMap.getFieldLimit())
                            && (targetMap.getForcedReturnId() == 999999999 || targetMap.getId() < 100000000) && targetMap.getEventInstance() == null) {
 
                         client.getPlayer().changeMap(victim.get().getMap(), victim.get().getMap().getPortal(0));
@@ -80,7 +55,7 @@ public final class FamilyUseHandler extends AbstractPacketHandler<FamilyUsePacke
                         PacketCreator.announce(client, new FamilyMessage(75, 0)); // wrong message, but close enough. (client should check this first anyway)
                      }
                   } else {
-                     if (!FieldLimit.CANNOTMIGRATE.check(targetMap.getFieldLimit()) && !FieldLimit.CANNOTVIPROCK.check(ownMap.getFieldLimit())
+                     if (!FieldLimit.CANNOT_MIGRATE.check(targetMap.getFieldLimit()) && !FieldLimit.CANNOT_VIP_ROCK.check(ownMap.getFieldLimit())
                            && (ownMap.getForcedReturnId() == 999999999 || ownMap.getId() < 100000000) && ownMap.getEventInstance() == null) {
 
                         if (MapleInviteCoordinator.hasInvite(InviteType.FAMILY_SUMMON, victim.get().getId())) {

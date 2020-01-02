@@ -1,25 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package server.expeditions;
 
 import java.text.SimpleDateFormat;
@@ -52,9 +30,6 @@ import tools.ServerNoticeType;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;
 
-/**
- * @author Alan (SharpAceX)
- */
 public class MapleExpedition {
 
    private static final int[] EXPEDITION_BOSSES = {
@@ -133,26 +108,23 @@ public class MapleExpedition {
    }
 
    private void scheduleRegistrationEnd() {
-      final MapleExpedition exped = this;
+      final MapleExpedition expedition = this;
       startTime = System.currentTimeMillis() + type.getRegistrationTime() * 60 * 1000;
 
-      schedule = TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            if (registering) {
-               exped.removeChannelExpedition(startMap.getChannelServer());
-               if (!silent) {
-                  MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, "[Expedition] The time limit has been reached. Expedition has been disbanded.");
-               }
-
-               dispose(false);
+      schedule = TimerManager.getInstance().schedule(() -> {
+         if (registering) {
+            expedition.removeChannelExpedition(startMap.getChannelServer());
+            if (!silent) {
+               MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, "[Expedition] The time limit has been reached. Expedition has been disbanded.");
             }
+
+            dispose(false);
          }
       }, type.getRegistrationTime() * 60 * 1000);
    }
 
    public void dispose(boolean log) {
-      broadcastExped(PacketCreator.create(new StopClock()));
+      broadcastToExpedition(PacketCreator.create(new StopClock()));
 
       if (schedule != null) {
          schedule.cancel(false);
@@ -169,7 +141,7 @@ public class MapleExpedition {
    public void start() {
       finishRegistration();
       registerExpeditionAttempt();
-      broadcastExped(PacketCreator.create(new StopClock()));
+      broadcastToExpedition(PacketCreator.create(new StopClock()));
       if (!silent) {
          MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] The expedition has started! Good luck, brave heroes!");
       }
@@ -189,7 +161,7 @@ public class MapleExpedition {
       }
 
       int channel = this.getRecruitingMap().getChannelServer().getId();
-      if (!MapleExpeditionBossLog.attemptBoss(player.getId(), channel, this, false)) {    // thanks Conrad, Cato for noticing some expeditions have entry limit
+      if (!MapleExpeditionBossLog.attemptBoss(player.getId(), channel, this, false)) {
          return "Sorry, you've already reached the quota of attempts for this expedition! Try again another day...";
       }
 
@@ -228,7 +200,7 @@ public class MapleExpedition {
       }
    }
 
-   private void broadcastExped(byte[] packet) {
+   private void broadcastToExpedition(byte[] packet) {
       for (MapleCharacter chr : getActiveMembers()) {
          chr.announce(packet);
       }
@@ -258,7 +230,7 @@ public class MapleExpedition {
          }
 
          startMap.getWorldServer().getPlayerStorage().getCharacterById(cid)
-               .filter(MapleCharacter::isLoggedinWorld).ifPresent(character -> {
+               .filter(MapleCharacter::isLoggedInWorld).ifPresent(character -> {
             PacketCreator.announce(character, new StopClock());
             if (!silent) {
                MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have been banned from this expedition.");
@@ -303,11 +275,11 @@ public class MapleExpedition {
       return type;
    }
 
-   public List<MapleCharacter> getActiveMembers() {    // thanks MedicOP for figuring out an issue with broadcasting packets to offline members
+   public List<MapleCharacter> getActiveMembers() {
       return getMembers().keySet().stream()
             .map(id -> startMap.getWorldServer().getPlayerStorage().getCharacterById(id))
             .flatMap(Optional::stream)
-            .filter(MapleCharacter::isLoggedinWorld)
+            .filter(MapleCharacter::isLoggedInWorld)
             .collect(Collectors.toList());
    }
 
@@ -414,8 +386,8 @@ public class MapleExpedition {
       return isLeader(player.getId());
    }
 
-   public boolean isLeader(int playerid) {
-      return leader.getId() == playerid;
+   public boolean isLeader(int playerId) {
+      return leader.getId() == playerId;
    }
 
    public boolean isRegistering() {

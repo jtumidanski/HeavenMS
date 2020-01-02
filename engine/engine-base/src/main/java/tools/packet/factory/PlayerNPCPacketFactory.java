@@ -23,7 +23,7 @@ public class PlayerNPCPacketFactory extends AbstractPacketFactory {
       Handler.handle(RemovePlayerNPC.class).decorate(this::removePlayerNPC).register(registry);
    }
 
-   protected void getPlayerNPC(MaplePacketLittleEndianWriter writer, GetPlayerNPC packet) {     // thanks to Arnah
+   protected void getPlayerNPC(MaplePacketLittleEndianWriter writer, GetPlayerNPC packet) {
       writer.write(0x01);
       writer.writeInt(packet.getPlayerNPC().getScriptId());
       writer.writeMapleAsciiString(packet.getPlayerNPC().getName());

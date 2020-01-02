@@ -23,8 +23,6 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets character info for a character.
-    *
-    * @return The character info packet.
     */
    protected void getCharInfo(MaplePacketLittleEndianWriter writer, GetCharacterInfo packet) {
       writer.writeInt(packet.getCharacter().getClient().getChannel() - 1);
@@ -40,8 +38,6 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client to change maps.
-    *
-    * @return The map change packet.
     */
    protected void getWarpToMap(MaplePacketLittleEndianWriter writer, WarpToMap packet) {
       writer.writeInt(packet.channelId() - 1);
@@ -52,7 +48,7 @@ public class SetFieldPacketFactory extends AbstractPacketFactory {
       writer.writeShort(packet.characterHp());
       if (packet.spawnPosition().isDefined()) {
          writer.writeBool(true);
-         writer.writeInt(packet.spawnPosition().get().x);    // spawn position placement thanks to Arnah (Vertisy)
+         writer.writeInt(packet.spawnPosition().get().x);
          writer.writeInt(packet.spawnPosition().get().y);
       } else {
          writer.writeBool(false);

@@ -10,5 +10,5 @@ class RemoveSummon(private var _ownerId: Int, private var _objectId: Int, privat
 
   def animated: Boolean = _animated
 
-  override def opcode(): SendOpcode = SendOpcode.REMOVE_SPECIAL_MAPOBJECT
+  override def opcode(): SendOpcode = SendOpcode.REMOVE_SPECIAL_MAP_OBJECT
 }

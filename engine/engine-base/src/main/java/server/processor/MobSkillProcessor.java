@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import client.MapleCharacter;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import client.status.MonsterStatus;
 import constants.game.GameConstants;
 import net.server.services.task.channel.OverallService;
@@ -37,12 +37,9 @@ public class MobSkillProcessor {
    }
 
    public void applyDelayedEffect(final MapleCharacter player, final MapleMonster monster, MobSkill mobSkill, final boolean skill, int animationTime) {
-      Runnable toRun = new Runnable() {
-         @Override
-         public void run() {
-            if (monster.isAlive()) {
-               applyEffect(player, monster, mobSkill, skill, null);
-            }
+      Runnable toRun = () -> {
+         if (monster.isAlive()) {
+            applyEffect(player, monster, mobSkill, skill, null);
          }
       };
 
@@ -51,7 +48,7 @@ public class MobSkillProcessor {
    }
 
    public void applyEffect(MapleCharacter player, MapleMonster monster, MobSkill mobSkill, boolean skill, List<MapleCharacter> banishPlayers) {
-      MapleDisease disease = null;
+      MapleAbnormalStatus disease = null;
       Map<MonsterStatus, Integer> stats = new ArrayMap<>();
       List<Integer> reflection = new LinkedList<>();
       switch (mobSkill.skillId()) {
@@ -87,25 +84,25 @@ public class MobSkillProcessor {
             }
             break;
          case 120:
-            disease = MapleDisease.SEAL;
+            disease = MapleAbnormalStatus.SEAL;
             break;
          case 121:
-            disease = MapleDisease.DARKNESS;
+            disease = MapleAbnormalStatus.DARKNESS;
             break;
          case 122:
-            disease = MapleDisease.WEAKEN;
+            disease = MapleAbnormalStatus.WEAKEN;
             break;
          case 123:
-            disease = MapleDisease.STUN;
+            disease = MapleAbnormalStatus.STUN;
             break;
          case 124:
-            disease = MapleDisease.CURSE;
+            disease = MapleAbnormalStatus.CURSE;
             break;
          case 125:
-            disease = MapleDisease.POISON;
+            disease = MapleAbnormalStatus.POISON;
             break;
          case 126: // Slow
-            disease = MapleDisease.SLOW;
+            disease = MapleAbnormalStatus.SLOW;
             break;
          case 127:
             if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
@@ -117,7 +114,7 @@ public class MobSkillProcessor {
             }
             break;
          case 128: // Seduce
-            disease = MapleDisease.SEDUCE;
+            disease = MapleAbnormalStatus.SEDUCE;
             break;
          case 129: // Banish
             if (mobSkill.lt().isDefined() && mobSkill.rb().isDefined() && skill) {
@@ -130,10 +127,10 @@ public class MobSkillProcessor {
             monster.getMap().spawnMist(new MapleMist(calculateBoundingBox(mobSkill, monster.position()), monster, mobSkill), mobSkill.x() * 100, false, false, false);
             break;
          case 132:
-            disease = MapleDisease.CONFUSE;
+            disease = MapleAbnormalStatus.CONFUSE;
             break;
          case 133: // zombify
-            disease = MapleDisease.ZOMBIFY;
+            disease = MapleAbnormalStatus.ZOMBIFY;
             break;
          case 140:
             if (mobSkill.makeChanceResult() && !monster.isBuffed(MonsterStatus.MAGIC_IMMUNITY)) {
@@ -187,59 +184,58 @@ public class MobSkillProcessor {
 
                   Collections.shuffle(summons);
                   for (Integer mobId : summons.subList(0, summonLimit)) {
-                     MapleMonster toSpawn = MapleLifeFactory.getMonster(mobId);
-                     if (toSpawn != null) {
+                     MapleLifeFactory.getMonster(mobId).ifPresent(toSpawn -> {
                         if (bossRushMap) {
-                           toSpawn.disableDrops();  // no littering on BRPQ pls
+                           toSpawn.disableDrops();
                         }
                         toSpawn.position_$eq(monster.position());
-                        int ypos, xpos;
-                        xpos = (int) monster.position().getX();
-                        ypos = (int) monster.position().getY();
+                        int yPosition, xPosition;
+                        xPosition = (int) monster.position().getX();
+                        yPosition = (int) monster.position().getY();
                         switch (mobId) {
                            case 8500003: // Pap bomb high
                               toSpawn.fh_$eq((int) Math.ceil(Math.random() * 19.0));
-                              ypos = -590;
+                              yPosition = -590;
                               break;
                            case 8500004: // Pap bomb
-                              xpos = (int) (monster.position().getX() + Randomizer.nextInt(1000) - 500);
-                              if (ypos != -590) {
-                                 ypos = (int) monster.position().getY();
+                              xPosition = (int) (monster.position().getX() + Randomizer.nextInt(1000) - 500);
+                              if (yPosition != -590) {
+                                 yPosition = (int) monster.position().getY();
                               }
                               break;
                            case 8510100: //Pianus bomb
                               if (Math.ceil(Math.random() * 5) == 1) {
-                                 ypos = 78;
-                                 xpos = Randomizer.nextInt(5) + (Randomizer.nextInt(2) == 1 ? 180 : 0);
+                                 yPosition = 78;
+                                 xPosition = Randomizer.nextInt(5) + (Randomizer.nextInt(2) == 1 ? 180 : 0);
                               } else {
-                                 xpos = (int) (monster.position().getX() + Randomizer.nextInt(1000) - 500);
+                                 xPosition = (int) (monster.position().getX() + Randomizer.nextInt(1000) - 500);
                               }
                               break;
                         }
                         switch (map.getId()) {
                            case 220080001: //Pap map
-                              if (xpos < -890) {
-                                 xpos = (int) (Math.ceil(Math.random() * 150) - 890);
-                              } else if (xpos > 230) {
-                                 xpos = (int) (230 - Math.ceil(Math.random() * 150));
+                              if (xPosition < -890) {
+                                 xPosition = (int) (Math.ceil(Math.random() * 150) - 890);
+                              } else if (xPosition > 230) {
+                                 xPosition = (int) (230 - Math.ceil(Math.random() * 150));
                               }
                               break;
                            case 230040420: // Pianus map
-                              if (xpos < -239) {
-                                 xpos = (int) (Math.ceil(Math.random() * 150) - 239);
-                              } else if (xpos > 371) {
-                                 xpos = (int) (371 - Math.ceil(Math.random() * 150));
+                              if (xPosition < -239) {
+                                 xPosition = (int) (Math.ceil(Math.random() * 150) - 239);
+                              } else if (xPosition > 371) {
+                                 xPosition = (int) (371 - Math.ceil(Math.random() * 150));
                               }
                               break;
                         }
-                        toSpawn.position_$eq(new Point(xpos, ypos));
+                        toSpawn.position_$eq(new Point(xPosition, yPosition));
                         if (toSpawn.id() == 8500004) {
                            map.spawnFakeMonster(toSpawn);
                         } else {
                            map.spawnMonsterWithEffect(toSpawn, mobSkill.spawnEffect(), toSpawn.position());
                         }
                         monster.addSummonedMob(toSpawn);
-                     }
+                     });
                   }
                }
             }
@@ -262,18 +258,18 @@ public class MobSkillProcessor {
             int i = 0;
             for (MapleCharacter character : getPlayersInRange(mobSkill, monster)) {
                if (!character.hasActiveBuff(2321005)) {  // holy shield
-                  if (disease.equals(MapleDisease.SEDUCE)) {
+                  if (disease.equals(MapleAbnormalStatus.SEDUCE)) {
                      if (i < 10) {
-                        character.giveDebuff(MapleDisease.SEDUCE, mobSkill);
+                        character.giveAbnormalStatus(MapleAbnormalStatus.SEDUCE, mobSkill);
                         i++;
                      }
                   } else {
-                     character.giveDebuff(disease, mobSkill);
+                     character.giveAbnormalStatus(disease, mobSkill);
                   }
                }
             }
          } else {
-            player.giveDebuff(disease, mobSkill);
+            player.giveAbnormalStatus(disease, mobSkill);
          }
       }
    }

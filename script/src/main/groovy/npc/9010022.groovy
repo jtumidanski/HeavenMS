@@ -47,7 +47,7 @@ class NPC9010022 {
                   selStr += "#1# Mu Lung Dojo"
                }
 
-               if (cm.getLevel() >= 30 && cm.getLevel() <= 50) {   // MC 1 & 2 recalled thanks to ---
+               if (cm.getLevel() >= 30 && cm.getLevel() <= 50) {
                   selStr += "#2# Monster Carnival 1"
                }
 

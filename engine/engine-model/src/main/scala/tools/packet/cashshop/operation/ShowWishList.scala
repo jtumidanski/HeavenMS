@@ -8,5 +8,5 @@ class ShowWishList(private var _sns: java.util.List[Integer], private var _updat
 
   def update: Boolean = _update
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

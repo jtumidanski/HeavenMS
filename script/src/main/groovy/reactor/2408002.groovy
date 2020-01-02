@@ -15,14 +15,14 @@ class Reactor2408002 {
 
    def act() {
       EventInstanceManager eim = rm.getPlayer().getEventInstance()
-      MapleMap womanfred = eim.getMapFactory().getMap(240050100)
-      int vvpMap = rm.getPlayer().getMapId()
+      MapleMap map = eim.getMapFactory().getMap(240050100)
+      int mapId = rm.getPlayer().getMapId()
       int vvpKey
       int vvpOrig = 4001088
       int vvpStage = -1
-      eim.showClearEffect(false, vvpMap)
+      eim.showClearEffect(false, mapId)
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "The key has been teleported somewhere...")
-      switch (vvpMap) {
+      switch (mapId) {
          case 240050101:
             vvpKey = vvpOrig
             vvpStage = 1
@@ -46,10 +46,10 @@ class Reactor2408002 {
 
       eim.setIntProperty(vvpStage + "stageclear", 1)
 
-      Item tehWomanfred = new Item(vvpKey, (short) 0, (short) 1)
-      MapleReactor theWomanfred = womanfred.getReactorByName("keyDrop1")
+      Item item = new Item(vvpKey, (short) 0, (short) 1)
+      MapleReactor reactor = map.getReactorByName("keyDrop1")
       MapleCharacter dropper = eim.getPlayers().get(0)
-      womanfred.spawnItemDrop(theWomanfred, dropper, tehWomanfred, theWomanfred.position(), true, true)
+      map.spawnItemDrop(reactor, dropper, item, reactor.position(), true, true)
       MessageBroadcaster.getInstance().sendMapServerNotice(eim.getMapInstance(240050100), ServerNoticeType.LIGHT_BLUE, "A bright flash of light, then a key suddenly appears somewhere in the map.")
    }
 
@@ -61,7 +61,7 @@ class Reactor2408002 {
 
    }
 
-   def untouch() {
+   def release() {
 
    }
 }
@@ -84,6 +84,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

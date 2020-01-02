@@ -1,14 +1,6 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub & pirate equipment
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class KerningCity extends GachaponItems {
-
    @Override
    public int[] getCommonItems() {
       return new int[]{
@@ -16,7 +8,7 @@ public class KerningCity extends GachaponItems {
             /* Scroll */
             2041016, 2043302, 2040902, 2044804, 2044906,
 
-            /* Useable drop */
+            /* Use-able drop */
             2000004, 2000005, 2022025, 2022027,
 
             /* Common equipment */

@@ -84,7 +84,7 @@ class NPC9201007 {
             cm.sendOk("You can't leave yet! You need to click High Priest John and get married before I can let you leave.")
             cm.dispose()
          } else if (hasGoldenLeaf && hasRing) {
-            String[] choice = ["Go to the Afterparty", "What should I be doing"]
+            String[] choice = ["Go to the after party", "What should I be doing"]
             String msg = "What can I help you with?#b"
             for (int i = 0; i < choice.length; i++) {
                msg += "\r\n#L" + i + "#" + choice[i] + "#l"
@@ -116,7 +116,7 @@ class NPC9201007 {
                break
 
             case 1:
-               cm.sendOk("The Bride and Groom must receive the blessings of High Priest John to be wed. When you are ready you can click me to go to the Afterparty.")
+               cm.sendOk("The Bride and Groom must receive the blessings of High Priest John to be wed. When you are ready you can click me to go to the after party.")
                cm.dispose()
                break
 

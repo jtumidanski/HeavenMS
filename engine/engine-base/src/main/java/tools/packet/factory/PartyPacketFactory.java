@@ -95,8 +95,6 @@ public class PartyPacketFactory extends AbstractPacketFactory {
     * only on same channel.
     * 21: Player is blocking any party invitations, 22: Player is taking care of
     * another invitation, 23: Player have denied request to the party.
-    *
-    * @return
     */
    protected void partyStatusMessage(MaplePacketLittleEndianWriter writer, PartyStatusMessage packet) {
       writer.write(packet.message());
@@ -113,43 +111,43 @@ public class PartyPacketFactory extends AbstractPacketFactory {
    }
 
    protected void addPartyStatus(int forChannel, MapleParty party, LittleEndianWriter lew, boolean leaving) {
-      List<MaplePartyCharacter> partymembers = new ArrayList<>(party.getMembers());
-      while (partymembers.size() < 6) {
-         partymembers.add(new MaplePartyCharacter());
+      List<MaplePartyCharacter> partyCharacters = new ArrayList<>(party.getMembers());
+      while (partyCharacters.size() < 6) {
+         partyCharacters.add(new MaplePartyCharacter());
       }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeInt(partychar.getId());
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         lew.writeInt(partyCharacter.getId());
       }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeAsciiString(StringUtil.getRightPaddedStr(partychar.getName(), '\0', 13));
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         lew.writeAsciiString(StringUtil.getRightPaddedStr(partyCharacter.getName(), '\0', 13));
       }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeInt(partychar.getJobId());
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         lew.writeInt(partyCharacter.getJobId());
       }
-      for (MaplePartyCharacter partychar : partymembers) {
-         lew.writeInt(partychar.getLevel());
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         lew.writeInt(partyCharacter.getLevel());
       }
-      for (MaplePartyCharacter partychar : partymembers) {
-         if (partychar.isOnline()) {
-            lew.writeInt(partychar.getChannel() - 1);
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         if (partyCharacter.isOnline()) {
+            lew.writeInt(partyCharacter.getChannel() - 1);
          } else {
             lew.writeInt(-2);
          }
       }
       lew.writeInt(party.getLeader().getId());
-      for (MaplePartyCharacter partychar : partymembers) {
-         if (partychar.getChannel() == forChannel) {
-            lew.writeInt(partychar.getMapId());
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         if (partyCharacter.getChannel() == forChannel) {
+            lew.writeInt(partyCharacter.getMapId());
          } else {
             lew.writeInt(0);
          }
       }
 
       Map<Integer, MapleDoor> partyDoors = party.getDoors();
-      for (MaplePartyCharacter partychar : partymembers) {
-         if (partychar.getChannel() == forChannel && !leaving) {
+      for (MaplePartyCharacter partyCharacter : partyCharacters) {
+         if (partyCharacter.getChannel() == forChannel && !leaving) {
             if (partyDoors.size() > 0) {
-               MapleDoor door = partyDoors.get(partychar.getId());
+               MapleDoor door = partyDoors.get(partyCharacter.getId());
                if (door != null) {
                   MapleDoorObject mdo = door.getTownDoor();
                   lew.writeInt(mdo.getTown());
@@ -206,7 +204,7 @@ public class PartyPacketFactory extends AbstractPacketFactory {
             addPartyStatus(packet.getForChannel(), packet.getParty(), writer, false);
             break;
          case SILENT_UPDATE:
-         case LOG_ONOFF:
+         case LOG_ON_OFF:
             writer.write(0x7);
             writer.writeInt(packet.getParty().getId());
             addPartyStatus(packet.getForChannel(), packet.getParty(), writer, false);

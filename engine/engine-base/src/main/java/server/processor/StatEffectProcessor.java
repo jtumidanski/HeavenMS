@@ -7,7 +7,7 @@ import java.util.Map;
 
 import client.MapleBuffStat;
 import client.MapleCharacter;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import client.SkillFactory;
 import client.status.MonsterStatus;
 import config.YamlConfig;
@@ -17,7 +17,7 @@ import constants.skills.Bandit;
 import constants.skills.Beginner;
 import constants.skills.Bishop;
 import constants.skills.BlazeWizard;
-import constants.skills.Bowmaster;
+import constants.skills.BowMaster;
 import constants.skills.Brawler;
 import constants.skills.Buccaneer;
 import constants.skills.ChiefBandit;
@@ -29,8 +29,8 @@ import constants.skills.DarkKnight;
 import constants.skills.DawnWarrior;
 import constants.skills.DragonKnight;
 import constants.skills.Evan;
-import constants.skills.FPArchMage;
-import constants.skills.FPMage;
+import constants.skills.FirePoisonArchMage;
+import constants.skills.FirePoisonMagician;
 import constants.skills.FPWizard;
 import constants.skills.Fighter;
 import constants.skills.GM;
@@ -38,8 +38,8 @@ import constants.skills.Gunslinger;
 import constants.skills.Hermit;
 import constants.skills.Hero;
 import constants.skills.Hunter;
-import constants.skills.ILArchMage;
-import constants.skills.ILMage;
+import constants.skills.IceLighteningArchMagician;
+import constants.skills.IceLighteningMagician;
 import constants.skills.ILWizard;
 import constants.skills.Legend;
 import constants.skills.Magician;
@@ -63,7 +63,7 @@ import constants.skills.WhiteKnight;
 import constants.skills.WindArcher;
 import provider.MapleData;
 import provider.MapleDataTool;
-import server.CardItemupStats;
+import server.CardItemUpStats;
 import server.MapleStatEffect;
 import tools.ArrayMap;
 import tools.Pair;
@@ -78,73 +78,73 @@ public class StatEffectProcessor {
    private StatEffectProcessor() {
    }
 
-   public MapleStatEffect loadSkillEffectFromData(MapleData source, int skillid, boolean overtime) {
-      return loadFromData(source, skillid, true, overtime);
+   public MapleStatEffect loadSkillEffectFromData(MapleData source, int skillId, boolean overtime) {
+      return loadFromData(source, skillId, true, overtime);
    }
 
-   public MapleStatEffect loadItemEffectFromData(MapleData source, int itemid) {
-      return loadFromData(source, itemid, false, false);
+   public MapleStatEffect loadItemEffectFromData(MapleData source, int itemId) {
+      return loadFromData(source, itemId, false, false);
    }
 
-   private void addBuffStatPairToListIfNotZero(List<Pair<MapleBuffStat, Integer>> list, MapleBuffStat buffstat, Integer val) {
+   private void addBuffStatPairToListIfNotZero(List<Pair<MapleBuffStat, Integer>> list, MapleBuffStat buffStat, Integer val) {
       if (val != 0) {
-         list.add(new Pair<>(buffstat, val));
+         list.add(new Pair<>(buffStat, val));
       }
    }
 
-   private byte mapProtection(int sourceid) {
-      if (sourceid == 2022001 || sourceid == 2022186) {
+   private byte mapProtection(int sourceId) {
+      if (sourceId == 2022001 || sourceId == 2022186) {
          return 1;   //elnath cold
-      } else if (sourceid == 2022040) {
+      } else if (sourceId == 2022040) {
          return 2;   //aqua road underwater
       } else {
          return 0;
       }
    }
 
-   public boolean isMapChair(int sourceid) {
-      return sourceid == Beginner.MAP_CHAIR || sourceid == Noblesse.MAP_CHAIR || sourceid == Legend.MAP_CHAIR;
+   public boolean isMapChair(int sourceId) {
+      return sourceId == Beginner.MAP_CHAIR || sourceId == Noblesse.MAP_CHAIR || sourceId == Legend.MAP_CHAIR;
    }
 
-   public boolean isDojoBuff(int sourceid) {
-      return sourceid >= 2022359 && sourceid <= 2022421;
+   public boolean isDojoBuff(int sourceId) {
+      return sourceId >= 2022359 && sourceId <= 2022421;
    }
 
-   public boolean isHpMpRecovery(int sourceid) {
-      return sourceid == 2022198 || sourceid == 2022337;
+   public boolean isHpMpRecovery(int sourceId) {
+      return sourceId == 2022198 || sourceId == 2022337;
    }
 
-   public boolean isPyramidBuff(int sourceid) {
-      return sourceid >= 2022585 && sourceid <= 2022617;
+   public boolean isPyramidBuff(int sourceId) {
+      return sourceId >= 2022585 && sourceId <= 2022617;
    }
 
-   public boolean isRateCoupon(int sourceid) {
-      int itemType = sourceid / 1000;
+   public boolean isRateCoupon(int sourceId) {
+      int itemType = sourceId / 1000;
       return itemType == 5211 || itemType == 5360;
    }
 
-   public boolean isExpIncrease(int sourceid) {
-      return sourceid >= 2022450 && sourceid <= 2022452;
+   public boolean isExpIncrease(int sourceId) {
+      return sourceId >= 2022450 && sourceId <= 2022452;
    }
 
-   public boolean isAriantShield(int sourceid) {
-      return sourceid == 2022269;
+   public boolean isAriantShield(int sourceId) {
+      return sourceId == 2022269;
    }
 
-   public boolean isMonsterCard(int sourceid) {
-      int itemType = sourceid / 10000;
+   public boolean isMonsterCard(int sourceId) {
+      int itemType = sourceId / 10000;
       return itemType == 238;
    }
 
-   public boolean isHerosWill(int skillid) {
-      switch (skillid) {
+   public boolean isHerosWill(int skillId) {
+      switch (skillId) {
          case Hero.HEROS_WILL:
          case Paladin.HEROS_WILL:
          case DarkKnight.HEROS_WILL:
-         case FPArchMage.HEROS_WILL:
-         case ILArchMage.HEROS_WILL:
+         case FirePoisonArchMage.HEROS_WILL:
+         case IceLighteningArchMagician.HEROS_WILL:
          case Bishop.HEROS_WILL:
-         case Bowmaster.HEROS_WILL:
+         case BowMaster.HEROS_WILL:
          case Marksman.HEROS_WILL:
          case NightLord.HEROS_WILL:
          case Shadower.HEROS_WILL:
@@ -157,7 +157,7 @@ public class StatEffectProcessor {
       }
    }
 
-   private MapleStatEffect loadFromData(MapleData source, int sourceid, boolean skill, boolean overTime) {
+   private MapleStatEffect loadFromData(MapleData source, int sourceId, boolean skill, boolean overTime) {
       MapleStatEffect ret = new MapleStatEffect();
       ret.setDuration(MapleDataTool.getIntConvert("time", source, -1));
       ret.setHp((short) MapleDataTool.getInt("hp", source, 0));
@@ -170,27 +170,27 @@ public class StatEffectProcessor {
       ret.setProp(iprop / 100.0);
 
       ret.setCp(MapleDataTool.getInt("cp", source, 0));
-      List<MapleDisease> cure = new ArrayList<>(5);
+      List<MapleAbnormalStatus> cure = new ArrayList<>(5);
       if (MapleDataTool.getInt("poison", source, 0) > 0) {
-         cure.add(MapleDisease.POISON);
+         cure.add(MapleAbnormalStatus.POISON);
       }
       if (MapleDataTool.getInt("seal", source, 0) > 0) {
-         cure.add(MapleDisease.SEAL);
+         cure.add(MapleAbnormalStatus.SEAL);
       }
       if (MapleDataTool.getInt("darkness", source, 0) > 0) {
-         cure.add(MapleDisease.DARKNESS);
+         cure.add(MapleAbnormalStatus.DARKNESS);
       }
       if (MapleDataTool.getInt("weakness", source, 0) > 0) {
-         cure.add(MapleDisease.WEAKEN);
-         cure.add(MapleDisease.SLOW);
+         cure.add(MapleAbnormalStatus.WEAKEN);
+         cure.add(MapleAbnormalStatus.SLOW);
       }
       if (MapleDataTool.getInt("curse", source, 0) > 0) {
-         cure.add(MapleDisease.CURSE);
+         cure.add(MapleAbnormalStatus.CURSE);
       }
-      ret.setCureDebuffs(cure);
+      ret.setCureAbnormalStatuses(cure);
       ret.setNuffSkill(MapleDataTool.getInt("nuffSkill", source, 0));
       ret.setMobCount(MapleDataTool.getInt("mobCount", source, 1));
-      ret.setCooldown(MapleDataTool.getInt("cooltime", source, 0));
+      ret.setCoolDown(MapleDataTool.getInt("cooltime", source, 0));
       ret.setMorphId(MapleDataTool.getInt("morph", source, 0));
       ret.setGhost(MapleDataTool.getInt("ghost", source, 0));
       ret.setFatigue(MapleDataTool.getInt("incFatigue", source, 0));
@@ -213,7 +213,7 @@ public class StatEffectProcessor {
             ret.setMob(MapleDataTool.getInt("mob", mdds, 0));
          }
       }
-      ret.setSourceid(sourceid);
+      ret.setSourceId(sourceId);
       ret.setSkill(skill);
       if (!ret.isSkill() && ret.getDuration() > -1) {
          ret.setOverTime(true);
@@ -223,10 +223,10 @@ public class StatEffectProcessor {
       }
 
       ArrayList<Pair<MapleBuffStat, Integer>> statups = new ArrayList<>();
-      ret.setWatk((short) MapleDataTool.getInt("pad", source, 0));
-      ret.setWdef((short) MapleDataTool.getInt("pdd", source, 0));
-      ret.setMatk((short) MapleDataTool.getInt("mad", source, 0));
-      ret.setMdef((short) MapleDataTool.getInt("mdd", source, 0));
+      ret.setWeaponAttack((short) MapleDataTool.getInt("pad", source, 0));
+      ret.setWeaponDefense((short) MapleDataTool.getInt("pdd", source, 0));
+      ret.setMagicAttack((short) MapleDataTool.getInt("mad", source, 0));
+      ret.setMagicDefense((short) MapleDataTool.getInt("mdd", source, 0));
       ret.setAcc((short) MapleDataTool.getIntConvert("acc", source, 0));
       ret.setAvoid((short) MapleDataTool.getInt("eva", source, 0));
 
@@ -236,28 +236,28 @@ public class StatEffectProcessor {
       ret.setBarrier(MapleDataTool.getInt("barrier", source, 0));
       addBuffStatPairToListIfNotZero(statups, MapleBuffStat.AURA, ret.getBarrier());
 
-      ret.setMapProtection(mapProtection(sourceid));
+      ret.setMapProtection(mapProtection(sourceId));
       addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MAP_PROTECTION, (int) ret.getMapProtection());
 
       if (ret.isOverTime() && ret.getSummonMovementType() == null) {
          if (!skill) {
-            if (isPyramidBuff(sourceid)) {
+            if (isPyramidBuff(sourceId)) {
                ret.setBerserk(MapleDataTool.getInt("berserk", source, 0));
                ret.setBooster(MapleDataTool.getInt("booster", source, 0));
 
                addBuffStatPairToListIfNotZero(statups, MapleBuffStat.BERSERK, ret.getBerserk());
                addBuffStatPairToListIfNotZero(statups, MapleBuffStat.BOOSTER, ret.getBooster());
 
-            } else if (isDojoBuff(sourceid) || isHpMpRecovery(sourceid)) {
+            } else if (isDojoBuff(sourceId) || isHpMpRecovery(sourceId)) {
                ret.setMhpR((byte) MapleDataTool.getInt("mhpR", source, 0));
                ret.setMhpRRate((short) (MapleDataTool.getInt("mhpRRate", source, 0) * 100));
                ret.setMmpR((byte) MapleDataTool.getInt("mmpR", source, 0));
                ret.setMmpRRate((short) (MapleDataTool.getInt("mmpRRate", source, 0) * 100));
 
-               addBuffStatPairToListIfNotZero(statups, MapleBuffStat.HPREC, (int) ret.getMhpR());
-               addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MPREC, (int) ret.getMmpR());
+               addBuffStatPairToListIfNotZero(statups, MapleBuffStat.HP_RECOVERY, (int) ret.getMhpR());
+               addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MP_RECOVERY, (int) ret.getMmpR());
 
-            } else if (isRateCoupon(sourceid)) {
+            } else if (isRateCoupon(sourceId)) {
                switch (MapleDataTool.getInt("expR", source, 0)) {
                   case 1:
                      addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_EXP1, 1);
@@ -289,8 +289,8 @@ public class StatEffectProcessor {
                      addBuffStatPairToListIfNotZero(statups, MapleBuffStat.COUPON_DRP3, 1);
                      break;
                }
-            } else if (isMonsterCard(sourceid)) {
-               int prob = 0, itemupCode = Integer.MAX_VALUE;
+            } else if (isMonsterCard(sourceId)) {
+               int prob = 0, itemUpCode = Integer.MAX_VALUE;
                List<Pair<Integer, Integer>> areas = null;
                boolean inParty = false;
 
@@ -321,28 +321,28 @@ public class StatEffectProcessor {
                   prob = MapleDataTool.getInt("prob", source, 1);
                }
 
-               int itemupType = MapleDataTool.getInt("itemupbyitem", source, 0);
-               if (itemupType != 0) {
+               int itemUpType = MapleDataTool.getInt("itemupbyitem", source, 0);
+               if (itemUpType != 0) {
                   addBuffStatPairToListIfNotZero(statups, MapleBuffStat.ITEM_UP_BY_ITEM, 4);
                   prob = MapleDataTool.getInt("prob", source, 1);
 
-                  switch (itemupType) {
+                  switch (itemUpType) {
                      case 2:
-                        itemupCode = MapleDataTool.getInt("itemCode", source, 1);
+                        itemUpCode = MapleDataTool.getInt("itemCode", source, 1);
                         break;
 
                      case 3:
-                        itemupCode = MapleDataTool.getInt("itemRange", source, 1);    // 3 digits
+                        itemUpCode = MapleDataTool.getInt("itemRange", source, 1);    // 3 digits
                         break;
                   }
                }
 
                if (MapleDataTool.getInt("respectPimmune", source, 0) != 0) {
-                  addBuffStatPairToListIfNotZero(statups, MapleBuffStat.RESPECT_PIMMUNE, 4);
+                  addBuffStatPairToListIfNotZero(statups, MapleBuffStat.RESPECT_PLAYER_IMMUNE, 4);
                }
 
                if (MapleDataTool.getInt("respectMimmune", source, 0) != 0) {
-                  addBuffStatPairToListIfNotZero(statups, MapleBuffStat.RESPECT_MIMMUNE, 4);
+                  addBuffStatPairToListIfNotZero(statups, MapleBuffStat.RESPECT_MONSTER_IMMUNE, 4);
                }
 
                if (MapleDataTool.getString("defenseAtt", source, null) != null) {
@@ -358,23 +358,23 @@ public class StatEffectProcessor {
                   addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MAP_PROTECTION, thaw > 0 ? 1 : 2);
                }
 
-               ret.setCardStats(new CardItemupStats(itemupCode, prob, areas, inParty));
-            } else if (isExpIncrease(sourceid)) {
+               ret.setCardStats(new CardItemUpStats(itemUpCode, prob, areas, inParty));
+            } else if (isExpIncrease(sourceId)) {
                addBuffStatPairToListIfNotZero(statups, MapleBuffStat.EXP_INCREASE, MapleDataTool.getInt("expinc", source, 0));
             }
          } else {
-            if (isMapChair(sourceid)) {
+            if (isMapChair(sourceId)) {
                addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MAP_CHAIR, 1);
-            } else if ((sourceid == Beginner.NIMBLE_FEET || sourceid == Noblesse.NIMBLE_FEET || sourceid == Evan.NIMBLE_FEET || sourceid == Legend.AGILE_BODY) && YamlConfig.config.server.USE_ULTRA_NIMBLE_FEET) {
+            } else if ((sourceId == Beginner.NIMBLE_FEET || sourceId == Noblesse.NIMBLE_FEET || sourceId == Evan.NIMBLE_FEET || sourceId == Legend.AGILE_BODY) && YamlConfig.config.server.USE_ULTRA_NIMBLE_FEET) {
                ret.setJump((short) (ret.getSpeed() * 4));
                ret.setSpeed((short) (ret.getSpeed() * 15));
             }
          }
 
-         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.WATK, (int) ret.getWatk());
-         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.WDEF, (int) ret.getWdef());
-         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MATK, (int) ret.getMatk());
-         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MDEF, (int) ret.getMdef());
+         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.WEAPON_ATTACK, (int) ret.getWeaponAttack());
+         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.WEAPON_DEFENSE, (int) ret.getWeaponDefense());
+         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MAGIC_ATTACK, (int) ret.getMagicAttack());
+         addBuffStatPairToListIfNotZero(statups, MapleBuffStat.MAGIC_DEFENSE, (int) ret.getMagicDefense());
          addBuffStatPairToListIfNotZero(statups, MapleBuffStat.ACC, (int) ret.getAcc());
          addBuffStatPairToListIfNotZero(statups, MapleBuffStat.AVOID, (int) ret.getAvoid());
          addBuffStatPairToListIfNotZero(statups, MapleBuffStat.SPEED, (int) ret.getSpeed());
@@ -386,7 +386,7 @@ public class StatEffectProcessor {
          ret.setLt((Point) ltd.getData());
          ret.setRb((Point) source.getChildByPath("rb").getData());
 
-         if (YamlConfig.config.server.USE_MAXRANGE_ECHO_OF_HERO && (sourceid == Beginner.ECHO_OF_HERO || sourceid == Noblesse.ECHO_OF_HERO || sourceid == Legend.ECHO_OF_HERO || sourceid == Evan.ECHO_OF_HERO)) {
+         if (YamlConfig.config.server.USE_MAXRANGE_ECHO_OF_HERO && (sourceId == Beginner.ECHO_OF_HERO || sourceId == Noblesse.ECHO_OF_HERO || sourceId == Legend.ECHO_OF_HERO || sourceId == Evan.ECHO_OF_HERO)) {
             ret.setLt(new Point(Integer.MIN_VALUE, Integer.MIN_VALUE));
             ret.setRb(new Point(Integer.MAX_VALUE, Integer.MAX_VALUE));
          }
@@ -394,14 +394,14 @@ public class StatEffectProcessor {
 
       int x = MapleDataTool.getInt("x", source, 0);
 
-      if ((sourceid == Beginner.RECOVERY || sourceid == Noblesse.RECOVERY || sourceid == Evan.RECOVERY || sourceid == Legend.RECOVERY) && YamlConfig.config.server.USE_ULTRA_RECOVERY) {
+      if ((sourceId == Beginner.RECOVERY || sourceId == Noblesse.RECOVERY || sourceId == Evan.RECOVERY || sourceId == Legend.RECOVERY) && YamlConfig.config.server.USE_ULTRA_RECOVERY) {
          x *= 10;
       }
       ret.setX(x);
       ret.setY(MapleDataTool.getInt("y", source, 0));
 
       ret.setDamage(MapleDataTool.getIntConvert("damage", source, 100));
-      ret.setFixdamage(MapleDataTool.getIntConvert("fixdamage", source, -1));
+      ret.setFixDamage(MapleDataTool.getIntConvert("fixdamage", source, -1));
       ret.setAttackCount(MapleDataTool.getIntConvert("attackCount", source, 1));
       ret.setBulletCount((short) MapleDataTool.getIntConvert("bulletCount", source, 1));
       ret.setBulletConsume((short) MapleDataTool.getIntConvert("bulletConsume", source, 0));
@@ -411,7 +411,7 @@ public class StatEffectProcessor {
       ret.setMoveTo(MapleDataTool.getInt("moveTo", source, -1));
       Map<MonsterStatus, Integer> monsterStatus = new ArrayMap<>();
       if (skill) {
-         switch (sourceid) {
+         switch (sourceId) {
             // BEGINNER
             case Beginner.RECOVERY:
             case Noblesse.RECOVERY:
@@ -443,23 +443,23 @@ public class StatEffectProcessor {
             case Beginner.BALROG_MOUNT:
             case Noblesse.BALROG_MOUNT:
             case Legend.BALROG_MOUNT:
-               statups.add(new Pair<>(MapleBuffStat.MONSTER_RIDING, sourceid));
+               statups.add(new Pair<>(MapleBuffStat.MONSTER_RIDING, sourceId));
                break;
             case Beginner.INVINCIBLE_BARRIER:
             case Noblesse.INVINCIBLE_BARRIER:
-            case Legend.INVICIBLE_BARRIER:
+            case Legend.INVISIBLE_BARRIER:
             case Evan.INVINCIBLE_BARRIER:
                statups.add(new Pair<>(MapleBuffStat.DIVINE_BODY, 1));
                break;
             case Fighter.POWER_GUARD:
             case Page.POWER_GUARD:
-               statups.add(new Pair<>(MapleBuffStat.POWERGUARD, x));
+               statups.add(new Pair<>(MapleBuffStat.POWER_GUARD, x));
                break;
             case Spearman.HYPER_BODY:
             case GM.HYPER_BODY:
             case SuperGM.HYPER_BODY:
-               statups.add(new Pair<>(MapleBuffStat.HYPERBODYHP, x));
-               statups.add(new Pair<>(MapleBuffStat.HYPERBODYMP, ret.getY()));
+               statups.add(new Pair<>(MapleBuffStat.HYPER_BODY_HP, x));
+               statups.add(new Pair<>(MapleBuffStat.HYPER_BODY_MP, ret.getY()));
                break;
             case Crusader.COMBO:
             case DawnWarrior.COMBO:
@@ -478,7 +478,7 @@ public class StatEffectProcessor {
                statups.add(new Pair<>(MapleBuffStat.WK_CHARGE, x));
                break;
             case DragonKnight.DRAGON_BLOOD:
-               statups.add(new Pair<>(MapleBuffStat.DRAGONBLOOD, ret.getX()));
+               statups.add(new Pair<>(MapleBuffStat.DRAGON_BLOOD, ret.getX()));
                break;
             case Hero.STANCE:
             case Paladin.STANCE:
@@ -488,7 +488,7 @@ public class StatEffectProcessor {
                break;
             case DawnWarrior.FINAL_ATTACK:
             case WindArcher.FINAL_ATTACK:
-               statups.add(new Pair<>(MapleBuffStat.FINALATTACK, x));
+               statups.add(new Pair<>(MapleBuffStat.FINAL_ATTACK, x));
                break;
             // MAGICIAN
             case Magician.MAGIC_GUARD:
@@ -503,13 +503,13 @@ public class StatEffectProcessor {
             case SuperGM.HOLY_SYMBOL:
                statups.add(new Pair<>(MapleBuffStat.HOLY_SYMBOL, x));
                break;
-            case FPArchMage.INFINITY:
-            case ILArchMage.INFINITY:
+            case FirePoisonArchMage.INFINITY:
+            case IceLighteningArchMagician.INFINITY:
             case Bishop.INFINITY:
                statups.add(new Pair<>(MapleBuffStat.INFINITY, x));
                break;
-            case FPArchMage.MANA_REFLECTION:
-            case ILArchMage.MANA_REFLECTION:
+            case FirePoisonArchMage.MANA_REFLECTION:
+            case IceLighteningArchMagician.MANA_REFLECTION:
             case Bishop.MANA_REFLECTION:
                statups.add(new Pair<>(MapleBuffStat.MANA_REFLECTION, 1));
                break;
@@ -533,7 +533,7 @@ public class StatEffectProcessor {
             case Hunter.SOUL_ARROW:
             case Crossbowman.SOUL_ARROW:
             case WindArcher.SOUL_ARROW:
-               statups.add(new Pair<>(MapleBuffStat.SOULARROW, x));
+               statups.add(new Pair<>(MapleBuffStat.SOUL_ARROW, x));
                break;
             case Ranger.PUPPET:
             case Sniper.PUPPET:
@@ -542,10 +542,10 @@ public class StatEffectProcessor {
             case Corsair.WRATH_OF_THE_OCTOPI:
                statups.add(new Pair<>(MapleBuffStat.PUPPET, 1));
                break;
-            case Bowmaster.CONCENTRATE:
+            case BowMaster.CONCENTRATE:
                statups.add(new Pair<>(MapleBuffStat.CONCENTRATE, x));
                break;
-            case Bowmaster.HAMSTRING:
+            case BowMaster.HAMSTRING:
                statups.add(new Pair<>(MapleBuffStat.HAMSTRING, x));
                monsterStatus.put(MonsterStatus.SPEED, x);
                break;
@@ -553,7 +553,7 @@ public class StatEffectProcessor {
                statups.add(new Pair<>(MapleBuffStat.BLIND, x));
                monsterStatus.put(MonsterStatus.ACC, x);
                break;
-            case Bowmaster.SHARP_EYES:
+            case BowMaster.SHARP_EYES:
             case Marksman.SHARP_EYES:
                statups.add(new Pair<>(MapleBuffStat.SHARP_EYES, ret.getX() << 8 | ret.getY()));
                break;
@@ -562,17 +562,17 @@ public class StatEffectProcessor {
                break;
             case Rogue.DARK_SIGHT:
             case NightWalker.DARK_SIGHT:
-               statups.add(new Pair<>(MapleBuffStat.DARKSIGHT, x));
+               statups.add(new Pair<>(MapleBuffStat.DARK_SIGHT, x));
                break;
             case Hermit.MESO_UP:
                statups.add(new Pair<>(MapleBuffStat.MESOUP, x));
                break;
             case Hermit.SHADOW_PARTNER:
             case NightWalker.SHADOW_PARTNER:
-               statups.add(new Pair<>(MapleBuffStat.SHADOWPARTNER, x));
+               statups.add(new Pair<>(MapleBuffStat.SHADOW_PARTNER, x));
                break;
             case ChiefBandit.MESO_GUARD:
-               statups.add(new Pair<>(MapleBuffStat.MESOGUARD, x));
+               statups.add(new Pair<>(MapleBuffStat.MESO_GUARD, x));
                break;
             case ChiefBandit.PICKPOCKET:
                statups.add(new Pair<>(MapleBuffStat.PICKPOCKET, x));
@@ -594,14 +594,14 @@ public class StatEffectProcessor {
                statups.add(new Pair<>(MapleBuffStat.SPEED_INFUSION, x));
                break;
             case Outlaw.HOMING_BEACON:
-            case Corsair.BULLSEYE:
+            case Corsair.BULLS_EYE:
                statups.add(new Pair<>(MapleBuffStat.HOMING_BEACON, x));
                break;
             case ThunderBreaker.SPARK:
                statups.add(new Pair<>(MapleBuffStat.SPARK, x));
                break;
             // MULTIPLE
-            case Aran.POLEARM_BOOSTER:
+            case Aran.POLE_ARM_BOOSTER:
             case Fighter.AXE_BOOSTER:
             case Fighter.SWORD_BOOSTER:
             case Page.BW_BOOSTER:
@@ -612,8 +612,8 @@ public class StatEffectProcessor {
             case Crossbowman.CROSSBOW_BOOSTER:
             case Assassin.CLAW_BOOSTER:
             case Bandit.DAGGER_BOOSTER:
-            case FPMage.SPELL_BOOSTER:
-            case ILMage.SPELL_BOOSTER:
+            case FirePoisonMagician.SPELL_BOOSTER:
+            case IceLighteningMagician.SPELL_BOOSTER:
             case Brawler.KNUCKLER_BOOSTER:
             case Gunslinger.GUN_BOOSTER:
             case DawnWarrior.SWORD_BOOSTER:
@@ -630,10 +630,10 @@ public class StatEffectProcessor {
             case Hero.MAPLE_WARRIOR:
             case Paladin.MAPLE_WARRIOR:
             case DarkKnight.MAPLE_WARRIOR:
-            case FPArchMage.MAPLE_WARRIOR:
-            case ILArchMage.MAPLE_WARRIOR:
+            case FirePoisonArchMage.MAPLE_WARRIOR:
+            case IceLighteningArchMagician.MAPLE_WARRIOR:
             case Bishop.MAPLE_WARRIOR:
-            case Bowmaster.MAPLE_WARRIOR:
+            case BowMaster.MAPLE_WARRIOR:
             case Marksman.MAPLE_WARRIOR:
             case NightLord.MAPLE_WARRIOR:
             case Shadower.MAPLE_WARRIOR:
@@ -649,14 +649,14 @@ public class StatEffectProcessor {
                statups.add(new Pair<>(MapleBuffStat.SUMMON, 1));
                monsterStatus.put(MonsterStatus.STUN, 1);
                break;
-            case FPArchMage.ELQUINES:
+            case FirePoisonArchMage.ELQUINES:
             case Marksman.FROST_PREY:
                statups.add(new Pair<>(MapleBuffStat.SUMMON, 1));
                monsterStatus.put(MonsterStatus.FREEZE, 1);
                break;
             case Priest.SUMMON_DRAGON:
-            case Bowmaster.PHOENIX:
-            case ILArchMage.IFRIT:
+            case BowMaster.PHOENIX:
+            case IceLighteningArchMagician.IFRIT:
             case Bishop.BAHAMUT:
             case DarkKnight.BEHOLDER:
             case Outlaw.GAVIOTA:
@@ -675,19 +675,19 @@ public class StatEffectProcessor {
                monsterStatus.put(MonsterStatus.SEAL_SKILL, 1);
                break;
             case Rogue.DISORDER:
-               monsterStatus.put(MonsterStatus.WATK, ret.getX());
-               monsterStatus.put(MonsterStatus.WDEF, ret.getY());
+               monsterStatus.put(MonsterStatus.WEAPON_ATTACK, ret.getX());
+               monsterStatus.put(MonsterStatus.WEAPON_DEFENSE, ret.getY());
                break;
             case Corsair.HYPNOTIZE:
-               monsterStatus.put(MonsterStatus.INERTMOB, 1);
+               monsterStatus.put(MonsterStatus.INERT_MOB, 1);
                break;
             case NightLord.NINJA_AMBUSH:
             case Shadower.NINJA_AMBUSH:
                monsterStatus.put(MonsterStatus.NINJA_AMBUSH, ret.getDamage());
                break;
             case Page.THREATEN:
-               monsterStatus.put(MonsterStatus.WATK, ret.getX());
-               monsterStatus.put(MonsterStatus.WDEF, ret.getY());
+               monsterStatus.put(MonsterStatus.WEAPON_ATTACK, ret.getX());
+               monsterStatus.put(MonsterStatus.WEAPON_DEFENSE, ret.getY());
                break;
             case DragonKnight.DRAGON_ROAR:
                ret.setHpR(-x / 100.0);
@@ -716,16 +716,16 @@ public class StatEffectProcessor {
             case NightLord.TAUNT:
             case Shadower.TAUNT:
                monsterStatus.put(MonsterStatus.SHOWDOWN, ret.getX());
-               monsterStatus.put(MonsterStatus.MDEF, ret.getX());
-               monsterStatus.put(MonsterStatus.WDEF, ret.getX());
+               monsterStatus.put(MonsterStatus.MAGIC_DEFENSE, ret.getX());
+               monsterStatus.put(MonsterStatus.WEAPON_DEFENSE, ret.getX());
                break;
             case ILWizard.COLD_BEAM:
-            case ILMage.ICE_STRIKE:
-            case ILArchMage.BLIZZARD:
-            case ILMage.ELEMENT_COMPOSITION:
+            case IceLighteningMagician.ICE_STRIKE:
+            case IceLighteningArchMagician.BLIZZARD:
+            case IceLighteningMagician.ELEMENT_COMPOSITION:
             case Sniper.BLIZZARD:
             case Outlaw.ICE_SPLITTER:
-            case FPArchMage.PARALYZE:
+            case FirePoisonArchMage.PARALYZE:
             case Aran.COMBO_TEMPEST:
             case Evan.ICE_BREATH:
                monsterStatus.put(MonsterStatus.FREEZE, 1);
@@ -737,14 +737,14 @@ public class StatEffectProcessor {
                monsterStatus.put(MonsterStatus.SPEED, ret.getX());
                break;
             case FPWizard.POISON_BREATH:
-            case FPMage.ELEMENT_COMPOSITION:
+            case FirePoisonMagician.ELEMENT_COMPOSITION:
                monsterStatus.put(MonsterStatus.POISON, 1);
                break;
             case Priest.DOOM:
                monsterStatus.put(MonsterStatus.DOOM, 1);
                break;
-            case ILMage.SEAL:
-            case FPMage.SEAL:
+            case IceLighteningMagician.SEAL:
+            case FirePoisonMagician.SEAL:
             case BlazeWizard.SEAL:
                monsterStatus.put(MonsterStatus.SEAL, 1);
                break;
@@ -752,14 +752,13 @@ public class StatEffectProcessor {
             case NightWalker.SHADOW_WEB:
                monsterStatus.put(MonsterStatus.SHADOW_WEB, 1);
                break;
-            case FPArchMage.FIRE_DEMON:
-            case ILArchMage.ICE_DEMON:
+            case FirePoisonArchMage.FIRE_DEMON:
+            case IceLighteningArchMagician.ICE_DEMON:
                monsterStatus.put(MonsterStatus.POISON, 1);
                monsterStatus.put(MonsterStatus.FREEZE, 1);
                break;
             case Evan.PHANTOM_IMPRINT:
                monsterStatus.put(MonsterStatus.PHANTOM_IMPRINT, x);
-               //ARAN
             case Aran.COMBO_ABILITY:
                statups.add(new Pair<>(MapleBuffStat.ARAN_COMBO, 100));
                break;
@@ -769,8 +768,8 @@ public class StatEffectProcessor {
             case Aran.COMBO_DRAIN:
                statups.add(new Pair<>(MapleBuffStat.COMBO_DRAIN, ret.getX()));
                break;
-            case Aran.SMART_KNOCKBACK:
-               statups.add(new Pair<>(MapleBuffStat.SMART_KNOCKBACK, ret.getX()));
+            case Aran.SMART_KNOCK_BACK:
+               statups.add(new Pair<>(MapleBuffStat.SMART_KNOCK_BACK, ret.getX()));
                break;
             case Aran.BODY_PRESSURE:
                statups.add(new Pair<>(MapleBuffStat.BODY_PRESSURE, ret.getX()));

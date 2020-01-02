@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Small Tree Stump
-	Map(s): 		Victoria Road - Top of the Tree That Grew
-	Description: 	Maybe it's Arwen!
-*/
-
-
 class NPC1032111 {
    NPCConversationManager cm
    int status = -1

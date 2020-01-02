@@ -7,11 +7,7 @@ import server.maps.MapleMap;
 import tools.PacketCreator;
 import tools.packet.field.effect.ShowEffect;
 
-/**
- * @author Rob
- */
 public class MonsterCarnivalParty {
-
    private List<MapleCharacter> members;
    private MapleCharacter leader;
    private byte team;
@@ -34,10 +30,10 @@ public class MonsterCarnivalParty {
       return leader;
    }
 
-   public void addCP(MapleCharacter player, int ammount) {
-      totalCP += ammount;
-      availableCP += ammount;
-      player.addCP(ammount);
+   public void addCP(MapleCharacter player, int amount) {
+      totalCP += amount;
+      availableCP += amount;
+      player.addCP(amount);
    }
 
    public int getTotalCP() {
@@ -48,9 +44,9 @@ public class MonsterCarnivalParty {
       return availableCP;
    }
 
-   public void useCP(MapleCharacter player, int ammount) {
-      availableCP -= ammount;
-      player.useCP(ammount);
+   public void useCP(MapleCharacter player, int amount) {
+      availableCP -= amount;
+      player.useCP(amount);
    }
 
    public List<MapleCharacter> getMembers() {
@@ -70,9 +66,9 @@ public class MonsterCarnivalParty {
       members.clear();
    }
 
-   public void warp(final MapleMap map, final int portalid) {
+   public void warp(final MapleMap map, final int portalId) {
       for (MapleCharacter chr : members) {
-         chr.changeMap(map, map.getPortal(portalid));
+         chr.changeMap(map, map.getPortal(portalId));
       }
    }
 

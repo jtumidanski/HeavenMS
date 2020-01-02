@@ -5,7 +5,6 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -109,7 +108,7 @@ class NPC9105004 {
       int difficulty = eim.getIntProperty("level")
       int stg = eim.getIntProperty("statusStg1")
 
-      MapleMap mapobj = eim.getInstanceMap(889100001 + 10 * (difficulty - 1))
+      MapleMap map = eim.getInstanceMap(889100001 + 10 * (difficulty - 1))
 
       if (status == 0) {
          if (stg == -1) {
@@ -137,13 +136,14 @@ class NPC9105004 {
                return
             }
 
-            mapobj.allowSummonState(true)
-            MapleMonster snowman = MapleLifeFactory.getMonster(9400317 + (5 * difficulty))
-            mapobj.spawnMonsterOnGroundBelow(snowman, new Point(-180, 15))
-            eim.setIntProperty("snowmanLevel", 1)
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The snowman appeared on the field! Protect it using all means necessary!")
+            MapleLifeFactory.getMonster(9400317 + (5 * difficulty)).ifPresent({ snowman ->
+               map.allowSummonState(true)
+               map.spawnMonsterOnGroundBelow(snowman, new Point(-180, 15))
+               eim.setIntProperty("snowmanLevel", 1)
+               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The snowman appeared on the field! Protect it using all means necessary!")
+               eim.setIntProperty("statusStg1", 0)
+            })
 
-            eim.setIntProperty("statusStg1", 0)
             cm.dispose()
          } else if (stg == 0) {
             if (!cm.isEventLeader()) {
@@ -152,14 +152,14 @@ class NPC9105004 {
                return
             }
 
-            MessageBroadcaster.getInstance().sendMapServerNotice(mapobj, ServerNoticeType.PINK_TEXT, "As the snowman grows to it's prime, the Scrooge appears!")
-            eim.getEm().getIv().invokeFunction("snowmanHeal", eim)
+            MapleLifeFactory.getMonster(9400318 + difficulty).ifPresent({ boss ->
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, "As the snowman grows to it's prime, the Scrooge appears!")
+               eim.getEm().getIv().invokeFunction("snowmanHeal", eim)
+               map.spawnMonsterOnGroundBelow(boss, new Point(-180, 15))
+               eim.setProperty("spawnedBoss", "true")
+               eim.setIntProperty("statusStg1", 1)
+            })
 
-            MapleMonster boss = MapleLifeFactory.getMonster(9400318 + difficulty)
-            mapobj.spawnMonsterOnGroundBelow(boss, new Point(-180, 15))
-            eim.setProperty("spawnedBoss", "true")
-
-            eim.setIntProperty("statusStg1", 1)
             cm.dispose()
          } else {
             gift = cm.haveItem(4032092, 1)

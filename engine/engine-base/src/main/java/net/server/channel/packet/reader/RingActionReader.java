@@ -48,8 +48,8 @@ public class RingActionReader implements PacketReader<BaseRingPacket> {
 
    private BaseRingPacket readOpenWeddingInvitation(SeekableLittleEndianAccessor accessor, byte mode) {
       byte slot = (byte) accessor.readInt();
-      int invitationid = accessor.readInt();
-      return new OpenWeddingInvitationPacket(mode, slot, invitationid);
+      int invitationId = accessor.readInt();
+      return new OpenWeddingInvitationPacket(mode, slot, invitationId);
    }
 
    private BaseRingPacket readInviteToWedding(SeekableLittleEndianAccessor accessor, byte mode) {

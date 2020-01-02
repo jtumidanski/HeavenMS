@@ -15,5 +15,5 @@ class ServerList(private var _serverId: Int, private var _serverName: String, pr
 
   def channelLoad: java.util.List[ChannelLoad] = _channelLoad
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERLIST
+  override def opcode(): SendOpcode = SendOpcode.SERVER_LIST
 }

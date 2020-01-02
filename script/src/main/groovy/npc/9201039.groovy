@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -15,9 +15,9 @@ class NPC9201039 {
    int status = 0
    int sel = -1
 
-   int[] mhair_q = [30270, 30240, 30020, 30000, 30132, 30192, 30032, 30112, 30162]
-   int[] fhair_q = [31150, 31250, 31310, 31050, 31050, 31030, 31070, 31091, 31001]
-   int[] hairnew = []
+   int[] maleHair = [30270, 30240, 30020, 30000, 30132, 30192, 30032, 30112, 30162]
+   int[] femaleHair = [31150, 31250, 31310, 31050, 31050, 31030, 31070, 31091, 31001]
+   int[] hairNew = []
 
    def start() {
       if (cm.isQuestCompleted(8860) && !cm.haveItem(4031528)) {
@@ -28,14 +28,8 @@ class NPC9201039 {
       }
    }
 
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          if (type == 7) {
             cm.sendNext("Ok, I'll give you a minute.")
          }
@@ -44,21 +38,21 @@ class NPC9201039 {
       }
       status++
       if (status == 1) {
-         hairnew = []
+         hairNew = []
          if (cm.getPlayer().getGender() == 0) {
-            for (int i = 0; i < mhair_q.length; i++) {
-               pushIfItemExists(hairnew, mhair_q[i])
+            for (int i = 0; i < maleHair.length; i++) {
+               hairNew = ScriptUtils.pushItemIfTrue(hairNew, maleHair[i], { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
             }
          } else {
-            for (int j = 0; j < fhair_q.length; j++) {
-               pushIfItemExists(hairnew, fhair_q[j])
+            for (int j = 0; j < femaleHair.length; j++) {
+               hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[j], { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
             }
          }
          cm.sendNext("Here we go!")
       } else {
          if (cm.haveItem(4031528)) {
             cm.gainItem(4031528, (short) -1)
-            cm.setHair(hairnew[Math.floor(Math.random() * hairnew.length).intValue()])
+            cm.setHair(hairNew[Math.floor(Math.random() * hairNew.length).intValue()])
             cm.sendNextPrev("Not bad, if I do say so myself! I knew those books I studied would come in handy...")
             cm.dispose()
          } else {

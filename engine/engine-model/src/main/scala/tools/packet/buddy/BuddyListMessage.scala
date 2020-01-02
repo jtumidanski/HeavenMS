@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class BuddyListMessage(private var _message: Byte) extends PacketInput {
   def message: Byte = _message
 
-  override def opcode(): SendOpcode = SendOpcode.BUDDYLIST
+  override def opcode(): SendOpcode = SendOpcode.BUDDY_LIST
 }

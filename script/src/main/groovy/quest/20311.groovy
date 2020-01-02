@@ -22,7 +22,7 @@ class Quest20311 {
             status--
          }
          if (status == 0) {
-            qm.sendNext("The jewel you brought back from the Master of Disguise is Shinsoo's Teardrop. It is the crystalization of Shinsoo's powers. If the Black Mage gets his hands on this, then this spells doom for all of us.")
+            qm.sendNext("The jewel you brought back from the Master of Disguise is Shinsoo's Teardrop. It is the crystallization of Shinsoo's powers. If the Black Magician gets his hands on this, then this spells doom for all of us.")
          } else if (status == 1) {
             qm.sendYesNo("For your effort in preventing a potentially serious disaster, the Empress has decided to present you with a new title. Are you ready to accept it?")
          } else if (status == 2) {
@@ -35,7 +35,7 @@ class Quest20311 {
                } else {
                   qm.completeQuest()
                   qm.gainItem(1142068, (short) 1)
-                  qm.getPlayer().changeJob(MapleJob.DAWNWARRIOR3)
+                  qm.getPlayer().changeJob(MapleJob.DAWN_WARRIOR_3)
                   qm.sendOk("#h #, as of this moment, you are an Advanced Knight. From this moment on, you shall carry yourself with dignity and respect befitting your new title, an Advanced Knight of Cygnus Knights. May your glory continue to shine as bright as this moment.")
                }
             }

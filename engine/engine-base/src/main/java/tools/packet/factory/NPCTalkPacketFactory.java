@@ -87,7 +87,6 @@ public class NPCTalkPacketFactory extends AbstractPacketFactory {
       writer.writeInt(0);
    }
 
-   // thanks NPC Quiz packets thanks to Eric
    protected void onAskQuiz(MaplePacketLittleEndianWriter writer, AskQuiz packet) {
       writer.write(packet.speakerTypeId());
       writer.writeInt(packet.speakerTemplateId());

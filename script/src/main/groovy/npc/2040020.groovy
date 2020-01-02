@@ -24,7 +24,7 @@ class NPC2040020 {
    boolean equip
 
    boolean stimulator = false
-   int stimID = 4130000
+   int stimulatorId = 4130000
 
    def start() {
       cm.getPlayer().setCS(true)
@@ -48,7 +48,7 @@ class NPC2040020 {
       if (status == 1) {
          selectedType = selection
          stimulator = selectedType > 4
-         if (selectedType == 0) { //What's a stim?
+         if (selectedType == 0) { //What's a stimulator?
             cm.sendNext("A stimulator is a special potion that I can add into the process of creating certain items. It gives it stats as though it had dropped from a monster. However, it is possible to have no change, and it is also possible for the item to be below average. There's also a 10% chance of not getting any item when using a stimulator, so please choose wisely.")
             cm.dispose()
          } else if (selectedType == 1) { //warrior glove
@@ -102,7 +102,7 @@ class NPC2040020 {
                selStr += "\r\n#L" + i + "# " + items[i] + "#l"
             }
             cm.sendSimple(selStr)
-         } else if (selectedType == 8) { //thief glove w/ stim
+         } else if (selectedType == 8) { //thief glove w/ stimulator
             String selStr = "Thief glove with a stimulator? Sure thing, which kind?#b"
             String[] gloves = ["Silver Sylvia#k - Thief Lv. 30#b", "Gold Sylvia#k - Thief Lv. 30#b", "Orihalcon Arbion#k - Thief Lv. 35#b", "Gold Arbion#k - Thief Lv. 35#b", "Gold Cleave#k - Thief Lv. 40#b",
                                "Dark Cleave#k - Thief Lv. 40#b", "Red Moon Glove#k - Thief Lv. 50#b", "Brown Moon Glove#k - Thief Lv. 50#b"]
@@ -149,7 +149,7 @@ class NPC2040020 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         } else if (selectedType == 5) { //warrior glove w/stim
+         } else if (selectedType == 5) { //warrior glove w/stimulator
             int[] itemSet = [1082005, 1082006, 1082035, 1082036, 1082024, 1082025, 1082010, 1082011]
             List matSet = [[1082007, 4011001], [1082007, 4011005], [1082008, 4021006], [1082008, 4021008], [1082023, 4011003], [1082023, 4021008],
                            [1082009, 4011002], [1082009, 4011006]]
@@ -159,7 +159,7 @@ class NPC2040020 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         } else if (selectedType == 6) { //bowman glove w/stim
+         } else if (selectedType == 6) { //bowman glove w/stimulator
             int[] itemSet = [1082049, 1082050, 1082069, 1082070, 1082072, 1082073, 1082085, 1082083]
             List matSet = [[1082048, 4021003], [1082048, 4021008], [1082068, 4011002], [1082068, 4011006], [1082071, 4011006], [1082071, 4021008], [1082084, 4011000, 4021000], [1082084, 4011006, 4021008]]
             List matQtySet = [[1, 3], [1, 1], [1, 4], [1, 2], [1, 4], [1, 2], [1, 1, 5], [1, 2, 2]]
@@ -168,7 +168,7 @@ class NPC2040020 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         } else if (selectedType == 7) { //magician glove w/ stim
+         } else if (selectedType == 7) { //magician glove w/ stimulator
             int[] itemSet = [1082052, 1082053, 1082055, 1082056, 1082063, 1082064, 1082082, 1082080]
             List matSet = [[1082051, 4021005], [1082051, 4021008], [1082054, 4021005], [1082054, 4021008], [1082062, 4021002], [1082062, 4021008],
                            [1082081, 4021002], [1082081, 4021008]]
@@ -178,7 +178,7 @@ class NPC2040020 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         } else if (selectedType == 8) { //thief glove w/ stim
+         } else if (selectedType == 8) { //thief glove w/ stimulator
             int[] itemSet = [1082043, 1082044, 1082047, 1082045, 1082076, 1082074, 1082067, 1082066]
             List matSet = [[1082042, 4011004], [1082042, 4011006], [1082046, 4011005], [1082046, 4011006], [1082075, 4011006], [1082075, 4021008], [1082065, 4021000], [1082065, 4011006, 4021008]]
             List matQtySet = [[1, 2], [1, 1], [1, 3], [1, 2], [1, 4], [1, 2], [1, 5], [1, 2, 1]]
@@ -190,7 +190,7 @@ class NPC2040020 {
          }
          String prompt = "You want me to make a #t" + item + "#? In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
          if (stimulator) {
-            prompt += "\r\n#i" + stimID + "# 1 #t" + stimID + "#"
+            prompt += "\r\n#i" + stimulatorId + "# 1 #t" + stimulatorId + "#"
          }
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
             for (int i = 0; i < mats.size(); i++) {
@@ -226,7 +226,7 @@ class NPC2040020 {
             }
          }
          if (stimulator) { //check for stimulator
-            if (!cm.haveItem(stimID)) {
+            if (!cm.haveItem(stimulatorId)) {
                complete = false
             }
          }
@@ -242,14 +242,14 @@ class NPC2040020 {
             }
             cm.gainMeso(-cost)
             if (stimulator) { //check for stimulator
-               cm.gainItem(stimID, (short) -1)
+               cm.gainItem(stimulatorId, (short) -1)
                int deleted = Math.floor(Math.random() * 10).intValue()
                if (deleted != 0) {
                   //TODO
                   cm.gainRandomItem(newItem)
                   cm.sendOk("There, the gloves are ready. Be careful, they're still hot.")
                } else {
-                  cm.sendOk("Eek! I think I accidently added too much stimulator and, well, the whole thing is unusable now... Sorry, but I can't offer a refund.")
+                  cm.sendOk("Eek! I think I accidentally added too much stimulator and, well, the whole thing is unusable now... Sorry, but I can't offer a refund.")
                }
             } else {
                cm.gainItem(item, (short) 1)

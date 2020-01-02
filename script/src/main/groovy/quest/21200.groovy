@@ -11,7 +11,7 @@ class Quest21200 {
       status++
       if (mode != 1) {
          if (mode == 0 && type == 12) {
-            qm.sendNext("Come back again when you have took your desition wisely.")
+            qm.sendNext("Come back again when you have took your decision wisely.")
          }
          qm.dispose()
          return
@@ -43,7 +43,7 @@ class Quest21200 {
       } else if (status == 2) {
          qm.sendNextPrev("#b(You've never seen him before. He doesn't look human.)", (byte) 2)
       } else if (status == 3) {
-         qm.sendNextPrev("Yo, Aran! Do you not hear me? I said, do you not hear me! Ugh, how frustating!")
+         qm.sendNextPrev("Yo, Aran! Do you not hear me? I said, do you not hear me! Ugh, how frustrating!")
       } else if (status == 4) {
          qm.sendNextPrev("#b(Hm? Who's voice was that? It sounds like an angry boy...)", (byte) 2)
       } else if (status == 5) {

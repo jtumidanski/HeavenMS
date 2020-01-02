@@ -36,7 +36,7 @@ class NPC9000037 {
       }
       midLevel = Math.floor(midLevel / team.size()).intValue()
 
-      int lobby  // teams low level can be allocated at higher leveled lobbys
+      int lobby  // teams low level can be allocated at higher leveled lobbies
       if (midLevel <= 20) {
          lobby = 0
       } else if (midLevel <= 40) {
@@ -130,7 +130,7 @@ class NPC9000037 {
             } else if (state == 2) {
                int restSpot = ((cm.getMapId() - 1) % 5) + 1
                cm.getPlayer().getEventInstance().restartEventTimer(restSpot * 4 * 60000)
-               // adds (restspot number * 4) minutes
+               // adds (restSpot number * 4) minutes
                cm.getPlayer().getEventInstance().warpEventTeam(970030100 + cm.getEventInstance().getIntProperty("lobby") + (500 * restSpot))
 
                cm.dispose()

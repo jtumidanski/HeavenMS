@@ -17,10 +17,6 @@ import server.quest.MapleQuest;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author Xari
- * @author Ronan - added concurrency protection and quest progress limit
- */
 public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
    @Override
    public Class<UseItemUIReader> getReaderClass() {
@@ -37,7 +33,7 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
                return;
             }
 
-            int infoNumber = consItem.questid;
+            int infoNumber = consItem.questId;
             Map<Integer, Integer> consumables = consItem.items;
 
             MapleCharacter chr = client.getPlayer();

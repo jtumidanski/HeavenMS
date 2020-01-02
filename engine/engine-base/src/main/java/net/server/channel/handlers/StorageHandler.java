@@ -1,29 +1,8 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
@@ -48,9 +27,6 @@ import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
 import tools.packet.storage.StorageError;
 
-/**
- * @author Matze
- */
 public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacket> {
    @Override
    public Class<StorageReader> getReaderClass() {
@@ -135,7 +111,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       MapleInventoryType invType = ItemConstants.getInventoryType(itemId);
       MapleInventory inv = chr.getInventory(invType);
       if (slot < 1 || slot > inv.getSlotLimit()) { //player inv starts at one
-         AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
+         AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
          FilePrinter.print(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to store item at slot " + slot);
          c.disconnect(true, false);
          return;
@@ -155,7 +131,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
       } else {
          Item item;
 
-         inv.lockInventory();    // thanks imbee for pointing a dupe within storage
+         inv.lockInventory();
          try {
             item = inv.getItem(slot);
             if (item != null && item.id() == itemId && (item.quantity() >= quantity || ItemConstants.isRechargeable(itemId))) {
@@ -174,7 +150,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
                return;
             }
 
-            item = item.copy();     // thanks Robin Schulz & BHB88 for noticing a inventory glitch when storing items
+            item = item.copy();
          } finally {
             inv.unlockInventory();
          }
@@ -193,7 +169,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
 
    private void takeOut(MapleClient c, MapleItemInformationProvider ii, MapleCharacter chr, MapleStorage storage, byte type, byte slot) {
       if (slot < 0 || slot > storage.getSlots()) { // removal starts at zero
-         AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
+         AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with storage.");
          FilePrinter.print(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to work with storage slot " + slot);
          c.disconnect(true, false);
          return;

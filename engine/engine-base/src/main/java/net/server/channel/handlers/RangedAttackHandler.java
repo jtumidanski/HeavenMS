@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import client.MapleBuffStat;
@@ -52,7 +31,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.GetEnergy;
 import tools.packet.PacketInput;
 import tools.packet.attack.RangedAttack;
-import tools.packet.character.SkillCooldown;
+import tools.packet.character.SkillCoolDown;
 
 public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -118,8 +97,8 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
          if (attack.skill() != 0) {
             effect = getAttackEffect(attack, chr, null);
             bulletCount = effect.getBulletCount();
-            if (effect.getCooldown() > 0) {
-               PacketCreator.announce(c, new SkillCooldown(attack.skill(), effect.getCooldown()));
+            if (effect.getCoolDown() > 0) {
+               PacketCreator.announce(c, new SkillCoolDown(attack.skill(), effect.getCoolDown()));
             }
 
             if (attack.skill() == 4111004) {   // shadow meso
@@ -136,7 +115,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                }
             }
          }
-         boolean hasShadowPartner = chr.getBuffedValue(MapleBuffStat.SHADOWPARTNER) != null;
+         boolean hasShadowPartner = chr.getBuffedValue(MapleBuffStat.SHADOW_PARTNER) != null;
          if (hasShadowPartner) {
             bulletCount *= 2;
          }
@@ -148,7 +127,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                slot = item.position();
 
                boolean bow = ItemConstants.isArrowForBow(id);
-               boolean cbow = ItemConstants.isArrowForCrossBow(id);
+               boolean crossBow = ItemConstants.isArrowForCrossBow(id);
                if (item.quantity() >= bulletCount) { //Fixes the bug where you can't use your last arrow.
                   if (type == MapleWeaponType.CLAW && ItemConstants.isThrowingStar(id) && weapon.id() != 1472063) {
                      if (((id == 2070007 || id == 2070018) && chr.getLevel() < 70) || (id == 2070016 && chr.getLevel() < 50)) {
@@ -166,14 +145,14 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
                         projectile = id;
                         break;
                      }
-                  } else if ((type == MapleWeaponType.BOW && bow) || (type == MapleWeaponType.CROSSBOW && cbow) || (weapon.id() == 1472063 && (bow || cbow))) {
+                  } else if ((type == MapleWeaponType.BOW && bow) || (type == MapleWeaponType.CROSSBOW && crossBow) || (weapon.id() == 1472063 && (bow || crossBow))) {
                      projectile = id;
                      break;
                   }
                }
             }
          }
-         boolean soulArrow = chr.getBuffedValue(MapleBuffStat.SOULARROW) != null;
+         boolean soulArrow = chr.getBuffedValue(MapleBuffStat.SOUL_ARROW) != null;
          boolean shadowClaw = chr.getBuffedValue(MapleBuffStat.SHADOW_CLAW) != null;
          if (projectile != 0) {
             if (!soulArrow && !shadowClaw && attack.skill() != 11101004 && attack.skill() != 15111007 && attack.skill() != 14101006) {
@@ -223,22 +202,22 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
             MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), packet, false, chr, true);
 
             if (attack.skill() != 0) {
-               int cooldown = SkillFactory.getSkill(attack.skill())
+               int coolDown = SkillFactory.getSkill(attack.skill())
                      .map(skill -> skill.getEffect(chr.getSkillLevel(skill)))
-                     .map(MapleStatEffect::getCooldown)
+                     .map(MapleStatEffect::getCoolDown)
                      .orElse(0);
-               if (cooldown > 0) {
+               if (coolDown > 0) {
                   if (chr.skillIsCooling(attack.skill())) {
                      return;
                   } else {
-                     PacketCreator.announce(c, new SkillCooldown(attack.skill(), cooldown));
-                     chr.addCooldown(attack.skill(), currentServerTime(), cooldown * 1000);
+                     PacketCreator.announce(c, new SkillCoolDown(attack.skill(), coolDown));
+                     chr.addCoolDown(attack.skill(), currentServerTime(), coolDown * 1000);
                   }
                }
             }
 
             //TODO - Investigate why this is inconsistent with the CloseRangeAttackHandler
-            if (chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null && attack.numAttacked() > 0 && chr.getBuffSource(MapleBuffStat.DARKSIGHT) != 9101004) {
+            if (chr.getBuffedValue(MapleBuffStat.DARK_SIGHT) != null && attack.numAttacked() > 0 && chr.getBuffSource(MapleBuffStat.DARK_SIGHT) != 9101004) {
                SkillFactory.executeIfHasSkill(chr, NightWalker.VANISH, (skill, skillLevel) -> cancelDarkSight(chr));
             } else if (chr.getBuffedValue(MapleBuffStat.WIND_WALK) != null && attack.numAttacked() > 0) {
                SkillFactory.executeIfHasSkill(chr, WindArcher.WIND_WALK, (skill, skillLevel) -> cancelWindWalk(chr));
@@ -255,7 +234,7 @@ public final class RangedAttackHandler extends AbstractDealDamageHandler<AttackP
    }
 
    private void cancelDarkSight(MapleCharacter chr) {
-      chr.cancelEffectFromBuffStat(MapleBuffStat.DARKSIGHT);
-      chr.cancelBuffStats(MapleBuffStat.DARKSIGHT);
+      chr.cancelEffectFromBuffStat(MapleBuffStat.DARK_SIGHT);
+      chr.cancelBuffStats(MapleBuffStat.DARK_SIGHT);
    }
 }

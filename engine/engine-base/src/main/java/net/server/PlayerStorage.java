@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server;
 
 import java.util.ArrayList;
@@ -41,21 +20,21 @@ public class PlayerStorage {
    private final MonitoredReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.PLAYER_STORAGE, true);
    private final Map<Integer, MapleCharacter> storage = new LinkedHashMap<>();
    private final Map<String, MapleCharacter> nameStorage = new LinkedHashMap<>();
-   private MonitoredReadLock rlock = MonitoredReadLockFactory.createLock(locks);
-   private MonitoredWriteLock wlock = MonitoredWriteLockFactory.createLock(locks);
+   private MonitoredReadLock readLock = MonitoredReadLockFactory.createLock(locks);
+   private MonitoredWriteLock writeLock = MonitoredWriteLockFactory.createLock(locks);
 
    public void addPlayer(MapleCharacter chr) {
-      wlock.lock();
+      writeLock.lock();
       try {
          storage.put(chr.getId(), chr);
          nameStorage.put(chr.getName().toLowerCase(), chr);
       } finally {
-         wlock.unlock();
+         writeLock.unlock();
       }
    }
 
    public MapleCharacter removePlayer(int chr) {
-      wlock.lock();
+      writeLock.lock();
       try {
          MapleCharacter mc = storage.remove(chr);
          if (mc != null) {
@@ -64,44 +43,44 @@ public class PlayerStorage {
 
          return mc;
       } finally {
-         wlock.unlock();
+         writeLock.unlock();
       }
    }
 
    public Optional<MapleCharacter> getCharacterByName(String name) {
-      rlock.lock();
+      readLock.lock();
       try {
          return Optional.ofNullable(nameStorage.get(name.toLowerCase()));
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
    }
 
    public Optional<MapleCharacter> getCharacterById(int id) {
-      rlock.lock();
+      readLock.lock();
       try {
          return Optional.ofNullable(storage.get(id));
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
    }
 
    public Collection<MapleCharacter> getAllCharacters() {
-      rlock.lock();
+      readLock.lock();
       try {
          return new ArrayList<>(storage.values());
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
    }
 
    public final void disconnectAll() {
       List<MapleCharacter> chrList;
-      rlock.lock();
+      readLock.lock();
       try {
          chrList = new ArrayList<>(storage.values());
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
 
       for (MapleCharacter mc : chrList) {
@@ -111,20 +90,20 @@ public class PlayerStorage {
          }
       }
 
-      wlock.lock();
+      writeLock.lock();
       try {
          storage.clear();
       } finally {
-         wlock.unlock();
+         writeLock.unlock();
       }
    }
 
    public int getSize() {
-      rlock.lock();
+      readLock.lock();
       try {
          return storage.size();
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
    }
 }

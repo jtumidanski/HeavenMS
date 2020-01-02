@@ -54,7 +54,7 @@ class NPC2101015 {
                   cm.sendOk("Your Battle Arena score: #b" + apqPoints + "#k points. You need to surpass #b100 points#k so that I can give you the #bPalm Tree Beach Chair#k. Talk to me again when you have enough points.")
                   cm.dispose()
                } else if (apqPoints + arena.getAriantRewardTier(cm.getPlayer()) >= 100) {
-                  cm.sendOk("Your Battle Arena score: #b" + apqPoints + "#k points and you pratically already have that score! Talk to my wife, #p2101016#to get them and then re-chat with me!")
+                  cm.sendOk("Your Battle Arena score: #b" + apqPoints + "#k points and you practically already have that score! Talk to my wife, #p2101016#to get them and then re-chat with me!")
                   cm.dispose()
                } else {
                   cm.sendNext("Wow, it looks like you got the #b100#k points ready to trade, let's trade?!")

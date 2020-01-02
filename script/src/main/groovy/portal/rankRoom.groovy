@@ -25,7 +25,7 @@ boolean enter(PortalPlayerInteraction pi) {
       case 100000201:
          pi.warp(100000204, 2) //or 100000205
          break
-      case 101000003: // portal warp fix thanks to Vcoc
+      case 101000003:
          pi.warp(101000004, 2) //or 101000005
          break
       default:

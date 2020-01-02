@@ -19,7 +19,7 @@ class NPC2040043 {
    int status = 0
    int curMap, stage
    int sel = -1
-   int[] objset
+   int[] boxSet
 
    def start() {
       curMap = cm.getMapId()
@@ -93,7 +93,7 @@ class NPC2040043 {
                      return
                   }
 
-                  objset = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                  boxSet = [0, 0, 0, 0, 0, 0, 0, 0, 0]
                   int playersOnCombo = 0
                   MapleMap map = cm.getPlayer().getMap()
                   MapleCharacter[] party = cm.getEventInstance().getPlayers()
@@ -101,7 +101,7 @@ class NPC2040043 {
                      for (int y = 0; y < map.getAreas().size(); y++ ) {
                         if (map.getArea(y).contains(party[i].position())) {
                            playersOnCombo++
-                           objset[y] = 1
+                           boxSet[y] = 1
                            //cm.mapMessage(5, "Player found on " + (y + 1));
                            break
                         }
@@ -117,8 +117,8 @@ class NPC2040043 {
 
                      String[] combo = comboStr.split(',')
                      boolean correctCombo = true
-                     for (int i = 0; i < objset.length && correctCombo; i++) {
-                        if ((combo[i]).toInteger() != objset[i]) {
+                     for (int i = 0; i < boxSet.length && correctCombo; i++) {
+                        if ((combo[i]).toInteger() != boxSet[i]) {
                            //cm.mapMessage(5, "Combo failed on " + (i + 1));
                            correctCombo = false
                         }

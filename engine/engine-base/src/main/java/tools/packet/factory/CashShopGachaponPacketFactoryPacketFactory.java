@@ -33,7 +33,7 @@ public class CashShopGachaponPacketFactoryPacketFactory extends AbstractCashShop
       decorator.accept(writer, packet);
    }
 
-   // Cash Shop Surprise packets found thanks to Arnah (Vertisy)
+   // Cash Shop Surprise packets
    protected void onCashItemGachaponOpenFailed(MaplePacketLittleEndianWriter writer, CashShopGachaponFailed packet) {
    }
 
@@ -41,7 +41,7 @@ public class CashShopGachaponPacketFactoryPacketFactory extends AbstractCashShop
       writer.writeLong(packet.sn());// sn of the box used
       writer.writeInt(packet.remainingBoxes());
       addCashItemInformation(writer, packet.item(), packet.accountId());
-      writer.writeInt(packet.itemId());// the itemid of the liSN?
+      writer.writeInt(packet.itemId());// the item id of the liSN?
       writer.write(packet.selectedItemCount());// the total count now? o.O
       writer.writeBool(packet.jackpot());// "CashGachaponJackpot"
    }

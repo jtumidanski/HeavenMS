@@ -74,7 +74,7 @@ class NPC9201048 {
                cm.sendOk("Your Party Search status is now: #b" + (psState ? "enabled" : "disabled") + "#k. Talk to me whenever you want to change it back.")
                cm.dispose()
             } else {
-               cm.sendOk("#e#b<Party Quest: Amorian Challenge>#k#n\r\nI am Amos, hoster of the well-round famed Amorian Challenge. The instance consist of many team puzzles, where cooperation is the fundamental key for progress. Team up with other players to attempt for the bonus stage, where many goodies can be obtained at the end of the instance. If an all-couple party is formed, they can get even better prizes on the extra bonus stage.")
+               cm.sendOk("#e#b<Party Quest: Amorian Challenge>#k#n\r\nI am Amos, the host of the well-round famed Amorian Challenge. The instance consist of many team puzzles, where cooperation is the fundamental key for progress. Team up with other players to attempt for the bonus stage, where many goodies can be obtained at the end of the instance. If an all-couple party is formed, they can get even better prizes on the extra bonus stage.")
                cm.dispose()
             }
          }

@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.quest;
 
 import java.io.File;
@@ -79,10 +58,6 @@ import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.quest.info.RemoveQuestTimeLimit;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
 
-/**
- * @author Matze
- * @author Ronan - support for medal quests
- */
 public class MapleQuest {
 
    private static final Set<Short> exploitableQuests = new HashSet<>();
@@ -133,9 +108,9 @@ public class MapleQuest {
             autoPreComplete = MapleDataTool.getInt("autoPreComplete", reqInfo, 0) == 1;
             autoComplete = MapleDataTool.getInt("autoComplete", reqInfo, 0) == 1;
 
-            int medalid = MapleDataTool.getInt("viewMedalItem", reqInfo, 0);
-            if (medalid != 0) {
-               medals.put(this.id, medalid);
+            int medalId = MapleDataTool.getInt("viewMedalItem", reqInfo, 0);
+            if (medalId != 0) {
+               medals.put(this.id, medalId);
             }
          } else {
             System.out.println("no data " + id);
@@ -230,8 +205,8 @@ public class MapleQuest {
       quests.clear();
    }
 
-   public static boolean isExploitableQuest(short questid) {
-      return exploitableQuests.contains(questid);
+   public static boolean isExploitableQuest(short questId) {
+      return exploitableQuests.contains(questId);
    }
 
    public static List<MapleQuest> getMatchedQuests(String search) {
@@ -306,10 +281,10 @@ public class MapleQuest {
       MapleQuestStatus mqs = chr.getQuest(this);
       List<String> ix = mqs.getInfoEx();
       if (!ix.isEmpty()) {
-         short questid = mqs.getQuestID();
+         short questId = mqs.getQuestID();
          short infoNumber = mqs.getInfoNumber();
          if (infoNumber <= 0) {
-            infoNumber = questid;  // on default infoNumber mimics questid
+            infoNumber = questId;  // on default infoNumber mimics quest id
          }
 
          int ixSize = ix.size();
@@ -326,41 +301,33 @@ public class MapleQuest {
       return true;
    }
 
-   public boolean canStart(MapleCharacter chr, int npcid) {
+   public boolean canStart(MapleCharacter chr, int npcId) {
       if (!canStartQuestByStatus(chr)) {
          return false;
       }
 
       for (MapleQuestRequirement r : startReqs.values()) {
-         if (!r.check(chr, npcid)) {
+         if (!r.check(chr, npcId)) {
             return false;
          }
       }
 
-      if (!canQuestByInfoProgress(chr)) {
-         return false;
-      }
-
-      return true;
+      return canQuestByInfoProgress(chr);
    }
 
-   public boolean canComplete(MapleCharacter chr, Integer npcid) {
+   public boolean canComplete(MapleCharacter chr, Integer npcId) {
       MapleQuestStatus mqs = chr.getQuest(this);
       if (!mqs.getStatus().equals(Status.STARTED)) {
          return false;
       }
 
       for (MapleQuestRequirement r : completeReqs.values()) {
-         if (!r.check(chr, npcid)) {
+         if (!r.check(chr, npcId)) {
             return false;
          }
       }
 
-      if (!canQuestByInfoProgress(chr)) {
-         return false;
-      }
-
-      return true;
+      return canQuestByInfoProgress(chr);
    }
 
    public void start(MapleCharacter chr, int npc) {
@@ -427,11 +394,11 @@ public class MapleQuest {
       }
 
       if (id / 100 == 35 && YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT > 0) {
-         int setProg = 999 - Math.min(999, YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT);
+         int setProgress = 999 - Math.min(999, YamlConfig.config.server.TOT_MOB_QUEST_REQUIREMENT);
 
          for (Integer pid : newStatus.getProgress().keySet()) {
             if (pid >= 8200000 && pid <= 8200012) {
-               String pr = StringUtil.getLeftPaddedStr(Integer.toString(setProg), '0', 3);
+               String pr = StringUtil.getLeftPaddedStr(Integer.toString(setProgress), '0', 3);
                newStatus.setProgress(pid, pr);
             }
          }
@@ -478,24 +445,24 @@ public class MapleQuest {
       return relevantMobs;
    }
 
-   public int getStartItemAmountNeeded(int itemid) {
+   public int getStartItemAmountNeeded(int itemId) {
       MapleQuestRequirement req = startReqs.get(MapleQuestRequirementType.ITEM);
       if (req == null) {
          return Integer.MIN_VALUE;
       }
 
-      ItemRequirement ireq = (ItemRequirement) req;
-      return ireq.getItemAmountNeeded(itemid, false);
+      ItemRequirement itemRequirement = (ItemRequirement) req;
+      return itemRequirement.getItemAmountNeeded(itemId, false);
    }
 
-   public int getCompleteItemAmountNeeded(int itemid) {
+   public int getCompleteItemAmountNeeded(int itemId) {
       MapleQuestRequirement req = completeReqs.get(MapleQuestRequirementType.ITEM);
       if (req == null) {
          return 0;
       }
 
-      ItemRequirement ireq = (ItemRequirement) req;
-      return ireq.getItemAmountNeeded(itemid, false);
+      ItemRequirement itemRequirement = (ItemRequirement) req;
+      return itemRequirement.getItemAmountNeeded(itemId, false);
    }
 
    public int getMobAmountNeeded(int mid) {
@@ -504,9 +471,9 @@ public class MapleQuest {
          return 0;
       }
 
-      MobRequirement mreq = (MobRequirement) req;
+      MobRequirement mobRequirement = (MobRequirement) req;
 
-      return mreq.getRequiredMobCount(mid);
+      return mobRequirement.getRequiredMobCount(mid);
    }
 
    public short getInfoNumber(Status qs) {
@@ -642,10 +609,10 @@ public class MapleQuest {
          case MESO:
             ret = new MesoAction(this, data);
             break;
-         case NEXTQUEST:
+         case NEXT_QUEST:
             ret = new NextQuestAction(this, data);
             break;
-         case PETSKILL:
+         case PET_SKILL:
             ret = new PetSkillAction(this, data);
             break;
          case QUEST:
@@ -654,10 +621,10 @@ public class MapleQuest {
          case SKILL:
             ret = new SkillAction(this, data);
             break;
-         case PETTAMENESS:
+         case PET_TAMENESS:
             ret = new PetTamenessAction(this, data);
             break;
-         case PETSPEED:
+         case PET_SPEED:
             ret = new PetSpeedAction(this, data);
             break;
          case INFO:
@@ -670,11 +637,11 @@ public class MapleQuest {
       return ret;
    }
 
-   public boolean restoreLostItem(MapleCharacter chr, int itemid) {
+   public boolean restoreLostItem(MapleCharacter chr, int itemId) {
       if (chr.getQuest(this).getStatus().equals(MapleQuestStatus.Status.STARTED)) {
          ItemAction itemAct = (ItemAction) startActs.get(MapleQuestActionType.ITEM);
          if (itemAct != null) {
-            return itemAct.restoreLostItem(chr, itemid);
+            return itemAct.restoreLostItem(chr, itemId);
          }
       }
 
@@ -682,8 +649,8 @@ public class MapleQuest {
    }
 
    public int getMedalRequirement() {
-      Integer medalid = medals.get(id);
-      return medalid != null ? medalid : -1;
+      Integer medalId = medals.get(id);
+      return medalId != null ? medalId : -1;
    }
 
    public int getNpcRequirement(boolean checkEnd) {
@@ -710,7 +677,7 @@ public class MapleQuest {
 
    public boolean hasNextQuestAction() {
       Map<MapleQuestActionType, MapleQuestAction> acts = completeActs;
-      MapleQuestAction mqa = acts.get(MapleQuestActionType.NEXTQUEST);
+      MapleQuestAction mqa = acts.get(MapleQuestActionType.NEXT_QUEST);
 
       return mqa != null;
    }

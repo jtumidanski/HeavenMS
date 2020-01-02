@@ -121,7 +121,7 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
             .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.UPDATE_MERCHANT, this::getPlayerShopItemUpdate))
             .register(registry);
       Handler.handle(PlayerShopOwnerUpdate.class)
-            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.UPDATE_PLAYERSHOP, this::getPlayerShopOwnerUpdate))
+            .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.UPDATE_PLAYER_SHOP, this::getPlayerShopOwnerUpdate))
             .register(registry);
       Handler.handle(GetPlayerShop.class)
             .decorate((writer, packet) -> decorate(writer, packet, PlayerInteractionAction.ROOM, this::getPlayerShop))
@@ -213,10 +213,10 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
     * Possible things for ENTRUSTED_SHOP_CHECK_RESULT
     * 0x0E = 00 = Renaming Failed - Can't find the merchant, 01 = Renaming successful
     * 0x10 = Changes channel to the store (Store is open at Channel 1, do you want to change channels?)
-    * 0x11 = You cannot sell any items when managing.. blabla
-    * 0x12 = FKING POPUP LOL
+    * 0x11 = You cannot sell any items when managing..
+    * 0x12 = POPUP LOL
     */
-   protected void getHiredMerchant(MaplePacketLittleEndianWriter writer, GetHiredMerchant packet) {//Thanks Dustin
+   protected void getHiredMerchant(MaplePacketLittleEndianWriter writer, GetHiredMerchant packet) {
       writer.write(0x05);
       writer.write(0x04);
       writer.writeShort(packet.getHiredMerchant().getVisitorSlotThreadsafe(packet.getCharacter()) + 1);
@@ -436,8 +436,6 @@ public class PlayerInteractionPacketFactory extends AbstractPacketFactory {
     * other character<br> 7: Trade successful<br> 8: Trade unsuccessful<br>
     * 9: Cannot carry more one-of-a-kind items<br> 12: Cannot trade on different maps<br>
     * 13: Cannot trade, game files damaged<br>
-    *
-    * @return
     */
    protected void getTradeResult(MaplePacketLittleEndianWriter writer, GetTradeResult packet) {
       writer.write(packet.number());

@@ -7,13 +7,13 @@ import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 boolean enter(PortalPlayerInteraction pi) {
-   long currwarp = System.currentTimeMillis()
+   long currentTime = System.currentTimeMillis()
 
-   if (currwarp - pi.getPlayer().getNpcCooldown() < 3000) {
+   if (currentTime - pi.getPlayer().getNpcCoolDown() < 3000) {
       return false
    }
    // this script can be ran twice when passing the dojo portal... strange.
-   pi.getPlayer().setNpcCooldown(currwarp)
+   pi.getPlayer().setNpcCoolDown(currentTime)
 
    MapleReactor gate = pi.getPlayer().getMap().getReactorByName("door")
    if (gate != null) {
@@ -25,9 +25,9 @@ boolean enter(PortalPlayerInteraction pi) {
                   int mapId = pi.getPlayer().getMap().getId()
 
                   for (int i = 0; i < 5; i++) {
-                     MapleCharacter[] chrlist = pi.getMap(mapId - 100 * i).getAllPlayers()
+                     MapleCharacter[] characters = pi.getMap(mapId - 100 * i).getAllPlayers()
 
-                     Iterator<MapleCharacter> pIter = chrlist.iterator()
+                     Iterator<MapleCharacter> pIter = characters.iterator()
                      while (pIter.hasNext()) {
                         MapleCharacter chr = pIter.next()
 

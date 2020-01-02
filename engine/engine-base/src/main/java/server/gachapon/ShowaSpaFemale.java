@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots src: http://maplesecrets.blogspot.com/2011/06/gachapon-showa-towns-sauna-female-spa.html
- */
-
 public class ShowaSpaFemale extends GachaponItems {
 
    @Override
@@ -17,7 +10,7 @@ public class ShowaSpaFemale extends GachaponItems {
             2048005, 2048002, 2043202, 2044602, 2043214, 2041307, 2041035, 2044104, 2044505, 2044305, 2043304, 2041309,
             2044010, 2044803, 2044814, 2044904, 2044902, 2044901,
 
-            /* Useable drop */
+            /* Use-able drop */
             2022016, 2000005, 2022025, 2022027,
 
             /* Common equipment */

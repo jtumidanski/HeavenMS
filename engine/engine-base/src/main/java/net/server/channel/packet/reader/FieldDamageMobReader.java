@@ -7,7 +7,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public class FieldDamageMobReader implements PacketReader<FieldDamageMobPacket> {
    @Override
    public FieldDamageMobPacket read(SeekableLittleEndianAccessor accessor) {
-      int mobOid = accessor.readInt();    // packet structure found thanks to Darter (Rajan)
+      int mobOid = accessor.readInt();
       int dmg = accessor.readInt();
       return new FieldDamageMobPacket(mobOid, dmg);
    }

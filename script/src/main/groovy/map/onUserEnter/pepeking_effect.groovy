@@ -7,20 +7,20 @@ import server.maps.MapleMap
 
 import java.awt.*
 
-class Mappepeking_effect {
+class MapPepeKingEffect {
 
    static def start(MapScriptMethods ms) {
       int mobId = 3300000 + (Math.floor(Math.random() * 3).intValue() + 5)
       MapleCharacter player = ms.getPlayer()
       MapleMap map = player.getMap()
 
-      map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), new Point(-28, -67))
+      MapleLifeFactory.getMonster(mobId).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-28, -67)) })
    }
 }
 
-Mappepeking_effect getMap() {
-   getBinding().setVariable("map", new Mappepeking_effect())
-   return (Mappepeking_effect) getBinding().getVariable("map")
+MapPepeKingEffect getMap() {
+   getBinding().setVariable("map", new MapPepeKingEffect())
+   return (MapPepeKingEffect) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

@@ -104,10 +104,10 @@ public class CashShopOperationPacketFactory extends AbstractCashShopPacketFactor
       Handler.handle(SendMapleNameLifeError.class).decorate(this::sendMapleLifeNameError).register(registry);
       Handler.handle(SendMapleLifeError.class).decorate(this::sendMapleLifeError).register(registry);
       Handler.handle(ShowWishList.class)
-            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.SHOW_WISHLIST, this::showWishList))
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.SHOW_WISH_LIST, this::showWishList))
             .register(registry);
       Handler.handle(ShowWishListUpdate.class)
-            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.SHOW_WISHLIST_UPDATE, this::showWishList))
+            .decorate((writer, packet) -> decorate(writer, packet, CashShopOperationSubOp.SHOW_WISH_LIST_UPDATE, this::showWishList))
             .register(registry);
    }
 

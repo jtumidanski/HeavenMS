@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package tools.data.input;
 
 import java.awt.Point;
@@ -26,10 +5,6 @@ import java.io.ByteArrayOutputStream;
 
 /**
  * Provides a generic interface to a Little Endian stream of bytes.
- *
- * @author Frz
- * @version 1.0
- * @since Revision 323
  */
 public class GenericLittleEndianAccessor implements LittleEndianAccessor {
    private ByteInputStream bs;
@@ -142,16 +117,16 @@ public class GenericLittleEndianAccessor implements LittleEndianAccessor {
     * @return The string read.
     */
    public final String readNullTerminatedAsciiString() {
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
       byte b;
       while (true) {
          b = readByte();
          if (b == 0) {
             break;
          }
-         baos.write(b);
+         byteArrayOutputStream.write(b);
       }
-      byte[] buf = baos.toByteArray();
+      byte[] buf = byteArrayOutputStream.toByteArray();
       char[] chrBuf = new char[buf.length];
       for (int x = 0; x < buf.length; x++) {
          chrBuf[x] = (char) buf[x];
@@ -170,7 +145,7 @@ public class GenericLittleEndianAccessor implements LittleEndianAccessor {
    }
 
    /**
-    * Reads a MapleStory convention lengthed ASCII string.
+    * Reads a MapleStory convention lengthened ASCII string.
     * This consists of a short integer telling the length of the string,
     * then the string itself.
     *

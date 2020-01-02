@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub & pirate equipment
- * @author Ronan - parsed MapleSEA loots, thanks Vcoc for noticing somewhat unbalanced loots in NLC
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class NewLeafCity extends GachaponItems {
 
    @Override
@@ -26,7 +19,7 @@ public class NewLeafCity extends GachaponItems {
             /* Warrior equipment */
             1312002, 1432013, 1060030, 1422008, 1050022, 1050011, 1402013, 1402017, 1302012,
 
-            /* Mage equipment */
+            /* Magician equipment */
             1002074, 1050029, 1040093, 1050056, 1050039, 1382008,
 
             /* Bowman equipment */

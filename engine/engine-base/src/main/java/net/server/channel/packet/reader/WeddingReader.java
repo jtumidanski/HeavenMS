@@ -33,8 +33,8 @@ public class WeddingReader implements PacketReader<BaseWeddingPacket> {
 
    private BaseWeddingPacket readAddItem(SeekableLittleEndianAccessor accessor, byte mode) {
       short slot = accessor.readShort();
-      int itemid = accessor.readInt();
+      int itemId = accessor.readInt();
       short quantity = accessor.readShort();
-      return new AddRegistryItemPacket(mode, slot, itemid, quantity);
+      return new AddRegistryItemPacket(mode, slot, itemId, quantity);
    }
 }

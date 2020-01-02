@@ -36,7 +36,7 @@ class Quest20203 {
                   }
                   qm.gainItem(4032098, (short) -30)
                   qm.gainItem(1142067, (short) 1)
-                  qm.getPlayer().changeJob(MapleJob.WINDARCHER2)
+                  qm.getPlayer().changeJob(MapleJob.WIND_ARCHER_2)
                   qm.completeQuest()
                }
                qm.sendNext("You are no longer a Knight-in-Training. You are now officially a Cygnus Knight.")

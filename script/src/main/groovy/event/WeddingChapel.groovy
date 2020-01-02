@@ -73,9 +73,7 @@ class EventWeddingChapel {
 
    static def spawnCakeBoss(EventInstanceManager eim) {
       MapleMap mapObj = eim.getMapInstance(680000400)
-      MapleMonster mobObj = MapleLifeFactory.getMonster(9400606)
-
-      mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(777, -177))
+      MapleLifeFactory.getMonster(9400606).ifPresent({ monster -> mapObj.spawnMonsterOnGroundBelow(monster, new Point(777, -177)) })
    }
 
    // selects, from the given party, the team that is allowed to attempt this event
@@ -83,8 +81,8 @@ class EventWeddingChapel {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
-      EventInstanceManager eim = em.newMarriage("Wedding" + lobbyid)
+   def setup(int level, int lobbyId) {
+      EventInstanceManager eim = em.newMarriage("Wedding" + lobbyId)
       eim.setProperty("weddingId", "0")
       eim.setProperty("weddingStage", "0")
       // 0: gathering time, 1: wedding time, 2: ready to fulfill the wedding, 3: just married
@@ -110,7 +108,7 @@ class EventWeddingChapel {
       return eim
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
    }
 
@@ -131,8 +129,8 @@ class EventWeddingChapel {
    }
 
    def stopBlessings(EventInstanceManager eim) {
-      MapleMap mapobj = eim.getMapInstance(entryMap + 10)
-      MessageBroadcaster.getInstance().sendMapServerNotice(mapobj, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: Alright people, our couple are preparing their vows to each other right now.")
+      MapleMap map = eim.getMapInstance(entryMap + 10)
+      MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: Alright people, our couple are preparing their vows to each other right now.")
 
       eim.setIntProperty("weddingStage", 2)
    }
@@ -186,13 +184,13 @@ class EventWeddingChapel {
    }
 
    static def isMarrying(EventInstanceManager eim, MapleCharacter player) {
-      int playerid = player.getId()
-      return playerid == eim.getIntProperty("groomId") || playerid == eim.getIntProperty("brideId")
+      int playerId = player.getId()
+      return playerId == eim.getIntProperty("groomId") || playerId == eim.getIntProperty("brideId")
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the map id.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (isMarrying(eim, player)) {
             eim.unregisterPlayer(player)
             end(eim)
@@ -212,18 +210,18 @@ class EventWeddingChapel {
          em.getChannelServer().closeOngoingWedding(isCathedral)
          eim.setIntProperty("canJoin", 0)
 
-         MapleMap mapobj = eim.getMapInstance(entryMap)
-         MapleCharacter chr = mapobj.getCharacterById(eim.getIntProperty("groomId"))
+         MapleMap map = eim.getMapInstance(entryMap)
+         MapleCharacter chr = map.getCharacterById(eim.getIntProperty("groomId"))
          if (chr != null) {
             chr.changeMap(entryMap + 10, "we00")
          }
 
-         chr = mapobj.getCharacterById(eim.getIntProperty("brideId"))
+         chr = map.getCharacterById(eim.getIntProperty("brideId"))
          if (chr != null) {
             chr.changeMap(entryMap + 10, "we00")
          }
 
-         MessageBroadcaster.getInstance().sendMapServerNotice(mapobj, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: The couple are heading to the altar, hurry hurry talk to me to arrange your seat.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: The couple are heading to the altar, hurry hurry talk to me to arrange your seat.")
 
          eim.setIntProperty("weddingStage", 1)
          eim.schedule("showStartMsg", startMsgTime * 60 * 1000)
@@ -257,7 +255,7 @@ class EventWeddingChapel {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -334,12 +332,12 @@ class EventWeddingChapel {
    def disbandParty(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -387,8 +385,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -415,8 +413,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -435,8 +433,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -487,8 +485,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

@@ -23,8 +23,10 @@ class Map677000001 {
          return
       }
 
-      map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), pos)
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, mobName + " has appeared!")
+      MapleLifeFactory.getMonster(mobId).ifPresent({ monster ->
+         map.spawnMonsterOnGroundBelow(monster, pos)
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, mobName + " has appeared!")
+      })
    }
 }
 

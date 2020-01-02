@@ -32,7 +32,7 @@ class Quest20514 {
             diffExp += ExpTable.getExpNeededForLevel(i)
          }
 
-         if (diffExp > 0) {  // thanks IxianMace for noticing Mimiana egg not following progress by EXP
+         if (diffExp > 0) {
             MapleItemInformationProvider.QuestConsItem consItem = MapleItemInformationProvider.getInstance().getQuestConsumablesInfo(4220137)
             int exp = consItem.exp
             int grade = consItem.grade

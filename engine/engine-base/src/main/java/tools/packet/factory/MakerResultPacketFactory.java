@@ -5,7 +5,7 @@ import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.maker.MakerCrystalResult;
 import tools.packet.maker.MakerEnableActions;
 import tools.packet.maker.MakerResult;
-import tools.packet.maker.MakerResultDesynth;
+import tools.packet.maker.MakerResultDestroy;
 
 public class MakerResultPacketFactory extends AbstractPacketFactory {
    private static MakerResultPacketFactory instance;
@@ -20,11 +20,10 @@ public class MakerResultPacketFactory extends AbstractPacketFactory {
    private MakerResultPacketFactory() {
       Handler.handle(MakerResult.class).decorate(this::makerResult).register(registry);
       Handler.handle(MakerCrystalResult.class).decorate(this::makerResultCrystal).register(registry);
-      Handler.handle(MakerResultDesynth.class).decorate(this::makerResultDesynth).register(registry);
+      Handler.handle(MakerResultDestroy.class).decorate(this::makerResultDestroy).register(registry);
       Handler.handle(MakerEnableActions.class).decorate(this::makerEnableActions).register(registry);
    }
 
-   // MAKER_RESULT packets thanks to Arnah (Vertisy)
    protected void makerResult(MaplePacketLittleEndianWriter writer, MakerResult packet) {
       writer.writeInt(packet.success() ? 0 : 1); // 0 = success, 1 = fail
       writer.writeInt(1); // 1 or 2 doesn't matter, same methods
@@ -59,10 +58,10 @@ public class MakerResultPacketFactory extends AbstractPacketFactory {
       writer.writeInt(packet.itemIdLost());
    }
 
-   protected void makerResultDesynth(MaplePacketLittleEndianWriter writer, MakerResultDesynth packet) {
+   protected void makerResultDestroy(MaplePacketLittleEndianWriter writer, MakerResultDestroy packet) {
       writer.writeInt(0); // Always successful!
-      writer.writeInt(4); // Mode Desynth
-      writer.writeInt(packet.itemId()); // Item desynthed
+      writer.writeInt(4);
+      writer.writeInt(packet.itemId());
       writer.writeInt(packet.itemsGained().size()); // Loop of items gained, (int, int)
       for (Pair<Integer, Integer> item : packet.itemsGained()) {
          writer.writeInt(item.getLeft());

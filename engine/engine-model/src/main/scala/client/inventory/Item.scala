@@ -36,7 +36,7 @@ class Item(var _id: Int, var _position: Short, var _quantity: Short, var _pet: O
     _quantity = quantity
   }
 
-  // pets & rings shares cashid values
+  // pets & rings shares cash id values
   private var _runningCashId: AtomicInteger = new AtomicInteger(777000000)
 
   private var _cashId: Int = 0

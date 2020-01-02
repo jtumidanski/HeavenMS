@@ -4,13 +4,6 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Tory
-	Map(s): 		
-	Description: 	
-*/
-
-
 class NPC1012112 {
    NPCConversationManager cm
    int status = -1
@@ -95,7 +88,7 @@ class NPC1012112 {
             }
          } else if (cm.getMapId() == 910010100) {
             if (status == 0) {
-               cm.sendYesNo("Thank you for aiding in the effort of feeding the Growlie. As a matter of fact, your team has already been rewarded for reaching this far. With this problem now solved, there is another issue happening right now, if you are interessed check #bTommy#k there for the info. So, are you returning straight to Henesys now?")
+               cm.sendYesNo("Thank you for aiding in the effort of feeding the Growlie. As a matter of fact, your team has already been rewarded for reaching this far. With this problem now solved, there is another issue happening right now, if you are interested check #bTommy#k there for the info. So, are you returning straight to Henesys now?")
             } else if (status == 1) {
                if (cm.getEventInstance().giveEventReward(cm.getPlayer())) {
                   cm.warp(100000200)

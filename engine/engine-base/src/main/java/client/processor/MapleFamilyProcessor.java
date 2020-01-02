@@ -38,30 +38,30 @@ public class MapleFamilyProcessor {
    }
 
    public void loadAllFamilies() {
-      List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<>(200); // <<world, seniorid> familyEntry>
+      List<Pair<Pair<Integer, Integer>, MapleFamilyEntry>> unmatchedJuniors = new ArrayList<>(200);
       DatabaseConnection.getInstance().withConnection(connection -> FamilyCharacterProvider.getInstance().getAllFamilies(connection).forEach(familyData -> {
          int cid = familyData.characterId();
          String name = null;
          int level = -1;
          int jobID = -1;
-         int world = -1;
+         int worldId = -1;
 
          Optional<CharacterData> characterData = CharacterProvider.getInstance().getById(connection, familyData.characterId());
          if (characterData.isPresent()) {
             name = characterData.get().name();
             level = characterData.get().level();
             jobID = characterData.get().job();
-            world = characterData.get().world();
+            worldId = characterData.get().world();
          }
 
-         World wserv = Server.getInstance().getWorld(world);
-         if (wserv == null) {
+         World world = Server.getInstance().getWorld(worldId);
+         if (world == null) {
             return;
          }
-         MapleFamily family = wserv.getFamily(familyData.familyId());
+         MapleFamily family = world.getFamily(familyData.familyId());
          if (family == null) {
-            family = new MapleFamily(familyData.familyId(), world);
-            Server.getInstance().getWorld(world).addFamily(familyData.familyId(), family);
+            family = new MapleFamily(familyData.familyId(), worldId);
+            Server.getInstance().getWorld(worldId).addFamily(familyData.familyId(), family);
          }
 
          MapleFamilyEntry familyEntry = new MapleFamilyEntry(family, cid, name, level, MapleJob.getById(jobID));
@@ -76,7 +76,7 @@ public class MapleFamilyProcessor {
             familyEntry.setSenior(family.getEntryByID(familyData.seniorId()), false);
          } else {
             if (familyData.seniorId() > 0) {
-               unmatchedJuniors.add(new Pair<>(new Pair<>(world, familyData.seniorId()), familyEntry));
+               unmatchedJuniors.add(new Pair<>(new Pair<>(worldId, familyData.seniorId()), familyEntry));
             }
          }
          familyEntry.setReputation(familyData.reputation());
@@ -89,9 +89,9 @@ public class MapleFamilyProcessor {
 
       for (Pair<Pair<Integer, Integer>, MapleFamilyEntry> unmatchedJunior : unmatchedJuniors) {
          int world = unmatchedJunior.getLeft().getLeft();
-         int seniorid = unmatchedJunior.getLeft().getRight();
+         int seniorId = unmatchedJunior.getLeft().getRight();
          MapleFamilyEntry junior = unmatchedJunior.getRight();
-         MapleFamilyEntry senior = Server.getInstance().getWorld(world).getFamily(junior.getFamily().getID()).getEntryByID(seniorid);
+         MapleFamilyEntry senior = Server.getInstance().getWorld(world).getFamily(junior.getFamily().getID()).getEntryByID(seniorId);
          if (senior != null) {
             junior.setSenior(senior, false);
          } else {
@@ -124,7 +124,7 @@ public class MapleFamilyProcessor {
       return false;
    }
 
-   public void saveAllMembersRep(MapleFamily mapleFamily) { //was used for autosave worker, but character autosave should be enough
+   public void saveAllMembersRep(MapleFamily mapleFamily) {
       DatabaseConnection.getInstance().withConnection(entityManager -> {
          entityManager.getTransaction().begin();
          boolean success = true;
@@ -136,7 +136,7 @@ public class MapleFamilyProcessor {
          }
          if (!success) {
             entityManager.getTransaction().rollback();
-            FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Family rep autosave failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime().toString() + ".");
+            FilePrinter.printError(FilePrinter.FAMILY_ERROR, "Family rep auto save failed for family " + mapleFamily.getID() + " on " + Calendar.getInstance().getTime().toString() + ".");
          } else {
             entityManager.getTransaction().commit();
          }

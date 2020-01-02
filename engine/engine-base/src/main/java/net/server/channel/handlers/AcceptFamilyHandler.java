@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
@@ -41,10 +20,6 @@ import tools.packet.family.FamilyMessage;
 import tools.packet.family.GetFamilyInfo;
 import tools.packet.family.SeniorMessage;
 
-/**
- * @author Jay Estrella
- * @author Ubaware
- */
 public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamilyPacket> {
    @Override
    public Class<AcceptFamilyReader> getReaderClass() {
@@ -59,7 +34,7 @@ public final class AcceptFamilyHandler extends AbstractPacketHandler<AcceptFamil
    @Override
    public void handlePacket(AcceptFamilyPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-      // String inviterName = slea.readMapleAsciiString();
+      // String inviterName = accessor.readMapleAsciiString();
       client.getWorldServer().getPlayerStorage().getCharacterById(packet.inviterId()).ifPresent(inviter -> {
          MapleInviteResult inviteResult = MapleInviteCoordinator.answerInvite(InviteType.FAMILY, client.getPlayer().getId(), client.getPlayer(), packet.accept());
          if (inviteResult.result == InviteResult.NOT_FOUND) {

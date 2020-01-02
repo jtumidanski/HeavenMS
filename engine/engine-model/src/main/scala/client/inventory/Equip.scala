@@ -128,66 +128,66 @@ class Equip(_id: Int, _position: Short, private var _slots: Int, _elemental: Boo
 
     stats.forEach((stat: Pair[StatUpgrade, Integer]) => {
       stat.getLeft match {
-        case incDEX =>
+        case StatUpgrade.incDEX =>
           statUp = Math.min(stat.getRight, maxStat - dex)
           dex += statUp
           lvupStr.append("+").append(statUp).append("DEX ")
-        case incSTR =>
+        case StatUpgrade.incSTR =>
           statUp = Math.min(stat.getRight, maxStat - str)
           str += statUp
           lvupStr.append("+").append(statUp).append("STR ")
-        case incINT =>
+        case StatUpgrade.incINT =>
           statUp = Math.min(stat.getRight, maxStat - _int)
           _int += statUp
           lvupStr.append("+").append(statUp).append("INT ")
-        case incLUK =>
+        case StatUpgrade.incLUK =>
           statUp = Math.min(stat.getRight, maxStat - luk)
           luk += statUp
           lvupStr.append("+").append(statUp).append("LUK ")
-        case incMHP =>
+        case StatUpgrade.incMHP =>
           statUp = Math.min(stat.getRight, maxStat - hp)
           hp += statUp
           lvupStr.append("+").append(statUp).append("HP ")
-        case incMMP =>
+        case StatUpgrade.incMMP =>
           statUp = Math.min(stat.getRight, maxStat - mp)
           mp += statUp
           lvupStr.append("+").append(statUp).append("MP ")
-        case incPAD =>
+        case StatUpgrade.incPAD =>
           statUp = Math.min(stat.getRight, maxStat - watk)
           watk += statUp
           lvupStr.append("+").append(statUp).append("WATK ")
-        case incMAD =>
+        case StatUpgrade.incMAD =>
           statUp = Math.min(stat.getRight, maxStat - matk)
           matk += statUp
           lvupStr.append("+").append(statUp).append("MATK ")
-        case incPDD =>
+        case StatUpgrade.incPDD =>
           statUp = Math.min(stat.getRight, maxStat - wdef)
           wdef += statUp
           lvupStr.append("+").append(statUp).append("WDEF ")
-        case incMDD =>
+        case StatUpgrade.incMDD =>
           statUp = Math.min(stat.getRight, maxStat - mdef)
           mdef += statUp
           lvupStr.append("+").append(statUp).append("MDEF ")
-        case incEVA =>
+        case StatUpgrade.incEVA =>
           statUp = Math.min(stat.getRight, maxStat - avoid)
           avoid += statUp
           lvupStr.append("+").append(statUp).append("AVOID ")
-        case incACC =>
+        case StatUpgrade.incACC =>
           statUp = Math.min(stat.getRight, maxStat - acc)
           acc += statUp
           lvupStr.append("+").append(statUp).append("ACC ")
-        case incSpeed =>
+        case StatUpgrade.incSpeed =>
           statUp = Math.min(stat.getRight, maxStat - speed)
           speed += statUp
           lvupStr.append("+").append(statUp).append("SPEED ")
-        case incJump =>
+        case StatUpgrade.incJump =>
           statUp = Math.min(stat.getRight, maxStat - jump)
           jump += statUp
           lvupStr.append("+").append(statUp).append("JUMP ")
-        case incVicious =>
+        case StatUpgrade.incVicious =>
           vicious -= stat.getRight
           gotVicious = true
-        case incSlot =>
+        case StatUpgrade.incSlot =>
           _slots += stat.getRight
           gotSlot = true
       }

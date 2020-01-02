@@ -44,41 +44,41 @@ public class PartyProcessor {
       if (!partyMembers.isEmpty()) {
          partyDoors = party.getDoors();
 
-         for (MapleCharacter pchr : partyMembers) {
-            MapleDoor door = partyDoors.get(pchr.getId());
+         for (MapleCharacter character : partyMembers) {
+            MapleDoor door = partyDoors.get(character.getId());
             if (door != null) {
-               door.updateDoorPortal(pchr);
+               door.updateDoorPortal(character);
             }
          }
 
          for (MapleDoor door : partyDoors.values()) {
-            for (MapleCharacter pchar : partyMembers) {
+            for (MapleCharacter character : partyMembers) {
                MapleDoorObject mdo = door.getTownDoor();
-               DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, pchar.getClient(), true);
-               pchar.removeVisibleMapObject(mdo);
+               DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, character.getClient(), true);
+               character.removeVisibleMapObject(mdo);
             }
          }
 
          if (partyLeaver != null) {
             Collection<MapleDoor> leaverDoors = partyLeaver.getDoors();
             for (MapleDoor door : leaverDoors) {
-               for (MapleCharacter pchar : partyMembers) {
+               for (MapleCharacter character : partyMembers) {
                   MapleDoorObject mdo = door.getTownDoor();
-                  DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, pchar.getClient(), true);
-                  pchar.removeVisibleMapObject(mdo);
+                  DoorObjectSpawnAndDestroyer.getInstance().sendDestroyData(mdo, character.getClient(), true);
+                  character.removeVisibleMapObject(mdo);
                }
             }
          }
 
          List<Integer> histMembers = party.getMembersSortedByHistory();
-         for (Integer chrid : histMembers) {
-            MapleDoor door = partyDoors.get(chrid);
+         for (Integer characterId : histMembers) {
+            MapleDoor door = partyDoors.get(characterId);
 
             if (door != null) {
-               for (MapleCharacter pchar : partyMembers) {
+               for (MapleCharacter character : partyMembers) {
                   MapleDoorObject mdo = door.getTownDoor();
-                  MapleMapObjectProcessor.getInstance().sendSpawnData(mdo, pchar.getClient());
-                  pchar.addVisibleMapObject(mdo);
+                  MapleMapObjectProcessor.getInstance().sendSpawnData(mdo, character.getClient());
+                  character.addVisibleMapObject(mdo);
                }
             }
          }

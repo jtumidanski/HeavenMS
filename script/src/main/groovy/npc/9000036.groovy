@@ -33,7 +33,7 @@ class NPC9000036 {
       }
 
       cm.getPlayer().setCS(true)
-      String selStr = "Hello, I am the #bAccessory NPC Crafter#k! My works are widely recognized to be too fine, up to the point at which all my items mimic not only the appearance but too the attributes of them! Everything I charge is some 'ingredients' to make them and, of course, a fee for my services. On what kind of equipment are you interessed?#b"
+      String selStr = "Hello, I am the #bAccessory NPC Crafter#k! My works are widely recognized to be too fine, up to the point at which all my items mimic not only the appearance but too the attributes of them! Everything I charge is some 'ingredients' to make them and, of course, a fee for my services. On what kind of equipment are you interested?#b"
       String[] options = ["Pendants", "Face accessories", "Eye accessories", "Belts & medals", "Rings"/*,"#t4032496#"*/]
       for (int i = 0; i < options.length; i++) {
          selStr += "\r\n#L" + i + "# " + options[i] + "#l"

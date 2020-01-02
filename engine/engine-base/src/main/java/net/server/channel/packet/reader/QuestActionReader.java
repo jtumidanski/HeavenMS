@@ -8,14 +8,14 @@ public class QuestActionReader implements PacketReader<QuestActionPacket> {
    @Override
    public QuestActionPacket read(SeekableLittleEndianAccessor accessor) {
       byte action = accessor.readByte();
-      short questid = accessor.readShort();
+      short questId = accessor.readShort();
       int itemId = -1;
       int npc = -1;
       int selection = -1;
       int x = -1;
       int y = -1;
 
-      if (action == 0) { // Restore lost item, Credits Darter ( Rajan )
+      if (action == 0) {
          accessor.readInt();
          itemId = accessor.readInt();
       } else if (action == 1) { //Start Quest
@@ -48,6 +48,6 @@ public class QuestActionReader implements PacketReader<QuestActionPacket> {
          }
       }
 
-      return new QuestActionPacket(action, questid, itemId, npc, selection, x, y);
+      return new QuestActionPacket(action, questId, itemId, npc, selection, x, y);
    }
 }

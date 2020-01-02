@@ -224,12 +224,12 @@ class ScrollGenerator {
 
       for (int i = 0; i < baseScrolls.size(); i++) {
          for (int j = 0; j < 100; j++) {
-            int scrollid = baseScrolls[i] + j
-            Map<String, Integer> scrollStats = ii.getEquipStats(scrollid)
-            if (scrollStats != null && ii.getScrollReqs(scrollid).isEmpty()) {
+            int scrollId = baseScrolls[i] + j
+            Map<String, Integer> scrollStats = ii.getEquipStats(scrollId)
+            if (scrollStats != null && ii.getScrollReqs(scrollId).isEmpty()) {
                int scrollTier = getScrollTier(scrollStats)
                if (scrollTier == rewardTier && successTier == getScrollSuccessTier(scrollStats)) {
-                  scrolls.add(scrollid)
+                  scrolls.add(scrollId)
                }
             }
          }
@@ -245,18 +245,18 @@ class ScrollGenerator {
    }
 
    def getPlayerCardTierPower() {
-      Set<Map.Entry<Integer, Integer>> cardset = cm.getPlayer().getMonsterBook().getCardSet()
+      Set<Map.Entry<Integer, Integer>> cardSet = cm.getPlayer().getMonsterBook().getCardSet()
       List<Integer> countTier = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-      for (Iterator<Map.Entry<Integer, Integer>> iterator = cardset.iterator(); iterator.hasNext();) {
+      for (Iterator<Map.Entry<Integer, Integer>> iterator = cardSet.iterator(); iterator.hasNext();) {
          Map.Entry<Integer, Integer> ce = iterator.next()
 
-         int cardid = ce.getKey()
-         int ceTier = Math.floor(cardid / 1000) % 10
+         int cardId = ce.getKey()
+         int ceTier = Math.floor(cardId / 1000) % 10
          countTier.set(ceTier, countTier.get(ceTier) + ce.getValue())
 
          if (ceTier >= 8) {  // is special card
-            int mobLevel = MapleLifeFactory.getMonsterLevel(MapleItemInformationProvider.getInstance().getCardMobId(cardid))
+            int mobLevel = MapleLifeFactory.getMonsterLevel(MapleItemInformationProvider.getInstance().getCardMobId(cardId))
             int mobTier = (getLevelTier(mobLevel) - 1).intValue()
 
             countTier.set(mobTier, (countTier.get(mobTier) + (ce.getValue() * 1.2)).intValue())
@@ -282,7 +282,7 @@ class ScrollGenerator {
 
    def calculateMobBookBuckets() {
       MonsterBook book = cm.getPlayer().getMonsterBook()
-      double bookLevelMult = 0.9 + (0.1 * book.getBookLevel())
+      double bookLevelMultiplier = 0.9 + (0.1 * book.getBookLevel())
 
       int playerLevelTier = getLevelTier(cm.getPlayer().getLevel()).intValue()
       if (playerLevelTier > 8) {
@@ -295,10 +295,10 @@ class ScrollGenerator {
       double prevBuckets = calculateMobBookTierBuckets(tierSize, playerCards, playerLevelTier - 1)
       double currBuckets = calculateMobBookTierBuckets(tierSize, playerCards, playerLevelTier)
 
-      return (prevBuckets + currBuckets) * bookLevelMult
+      return (prevBuckets + currBuckets) * bookLevelMultiplier
    }
 
-   def recalcBuckets() {
+   def recalculateBuckets() {
       sgBookBuckets = calculateMobBookBuckets()
       sgItemBuckets = calculateSuppliesBuckets()
 
@@ -315,14 +315,14 @@ class ScrollGenerator {
    def sgApplyItem(int idx, int amount) {
       if (sgAppliedItems.get(idx) != amount) {
          sgAppliedItems.set(idx, amount)
-         recalcBuckets()
+         recalculateBuckets()
       }
    }
 
    def sgApplyMeso(int amount) {
       if (sgAppliedMeso != amount) {
          sgAppliedMeso = amount
-         recalcBuckets()
+         recalculateBuckets()
       }
    }
 
@@ -380,9 +380,9 @@ class ScrollGenerator {
       }
 
       for (int i = 0; i < sgItems.size(); i++) {
-         int itemid = sgItems.get(i)
+         int itemId = sgItems.get(i)
          int count = sgAppliedItems.get(i)
-         if (count > 0 && !cm.haveItem(itemid, count)) {
+         if (count > 0 && !cm.haveItem(itemId, count)) {
             return false
          }
       }
@@ -390,9 +390,9 @@ class ScrollGenerator {
       cm.gainMeso(-sgAppliedMeso)
 
       for (int i = 0; i < sgItems.size(); i++) {
-         int itemid = sgItems.get(i)
+         int itemId = sgItems.get(i)
          int count = sgAppliedItems.get(i)
-         cm.gainItem(itemid, (short) -count)
+         cm.gainItem(itemId, (short) -count)
       }
 
       cm.gainItem(sgItemid, (short) sgCount)
@@ -401,10 +401,10 @@ class ScrollGenerator {
 
    def generateRandomScroll() {
       if (cm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() >= 1) {
-         int itemid = getRandomScroll(calculateScrollTiers())
-         if (itemid != -1) {
-            if (performExchange(itemid, 1)) {
-               cm.sendNext("Transaction accepted! You have received a #r#t" + itemid + "##k.")
+         int itemId = getRandomScroll(calculateScrollTiers())
+         if (itemId != -1) {
+            if (performExchange(itemId, 1)) {
+               cm.sendNext("Transaction accepted! You have received a #r#t" + itemId + "##k.")
             } else {
                cm.sendOk("Oh, it looks like some items are missing... Please double-check provided items in your inventory before trying to exchange.")
             }

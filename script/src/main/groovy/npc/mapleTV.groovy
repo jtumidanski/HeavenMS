@@ -9,7 +9,7 @@ import scripting.npc.NPCConversationManager
 	Description: 	
 */
 
-class NPCmapleTV {
+class NpcMapleTV {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -46,12 +46,12 @@ class NPCmapleTV {
    }
 }
 
-NPCmapleTV getNPC() {
+NpcMapleTV getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCmapleTV(cm: cm))
+      getBinding().setVariable("npc", new NpcMapleTV(cm: cm))
    }
-   return (NPCmapleTV) getBinding().getVariable("npc")
+   return (NpcMapleTV) getBinding().getVariable("npc")
 }
 
 def start() {

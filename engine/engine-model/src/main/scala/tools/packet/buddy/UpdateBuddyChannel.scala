@@ -8,5 +8,5 @@ class UpdateBuddyChannel(private var _characterId: Int, private var _channel: In
 
   def channel: Int = _channel
 
-  override def opcode(): SendOpcode = SendOpcode.BUDDYLIST
+  override def opcode(): SendOpcode = SendOpcode.BUDDY_LIST
 }

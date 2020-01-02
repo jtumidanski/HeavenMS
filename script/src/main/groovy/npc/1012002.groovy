@@ -47,7 +47,7 @@ class NPC1012002 {
             for (int i = 0; i < items.length; i++) {
                selStr += "\r\n#L" + i + "##t" + items[i] + "##k - Bowman Lv. " + (10 + (i * 5)) + "#l#b"
             }
-         } else if (selection == 1) { //xbow refine
+         } else if (selection == 1) { //crossbow refine
             selStr = "I was a Sniper. Crossbows are my specialty. Which would you like me to make for you?#b"
             items = [1462001, 1462002, 1462003, 1462000, 1462004, 1462005, 1462006, 1462007]
             for (int i = 0; i < items.length; i++) {
@@ -101,7 +101,7 @@ class NPC1012002 {
          } else {
             qty = (selection > 0) ? selection : (selection < 0 ? -selection : 1)
          }
-         // thanks br1337 for showing such a simple exploit with quantity on NPC crafters
+
          List matSet = []
          List matQtySet = []
          int[] costSet = []
@@ -109,7 +109,7 @@ class NPC1012002 {
             matSet = [[4003001, 4000000], [4011001, 4003000], [4003001, 4000016], [4011001, 4021006, 4003000], [4011001, 4011006, 4021003, 4021006, 4003000], [4011004, 4021000, 4021004, 4003000], [4021008, 4011001, 4011006, 4003000, 4000014]]
             matQtySet = [[5, 30], [1, 3], [30, 50], [2, 2, 8], [5, 5, 3, 3, 30], [7, 6, 3, 35], [1, 10, 3, 40, 50]]
             costSet = [800, 2000, 3000, 5000, 30000, 40000, 80000]
-         } else if (selectedType == 1) { //xbow refine
+         } else if (selectedType == 1) { //crossbow refine
             matSet = [[4003001, 4003000], [4011001, 4003001, 4003000], [4011001, 4003001, 4003000], [4011001, 4021006, 4021002, 4003000], [4011001, 4011005, 4021006, 4003001, 4003000], [4021008, 4011001, 4011006, 4021006, 4003000], [4021008, 4011004, 4003001, 4003000], [4021008, 4011006, 4021006, 4003001, 4003000]]
             matQtySet = [[7, 2], [1, 20, 5], [1, 50, 8], [2, 1, 1, 10], [5, 5, 3, 50, 15], [1, 8, 4, 2, 30], [2, 6, 30, 30], [2, 5, 3, 40, 40]]
             costSet = [1000, 2000, 3000, 10000, 30000, 50000, 80000, 200000]
@@ -176,7 +176,7 @@ class NPC1012002 {
             if (item >= 2060000 && item <= 2060002) //bow arrows
             {
                recvQty = 1000 - (item - 2060000) * 100
-            } else if (item >= 2061000 && item <= 2061002) //xbow arrows
+            } else if (item >= 2061000 && item <= 2061002) //crossbow arrows
             {
                recvQty = 1000 - (item - 2061000) * 100
             } else if (item == 4003000)//screws

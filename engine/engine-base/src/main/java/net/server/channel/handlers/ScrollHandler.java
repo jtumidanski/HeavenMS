@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.ArrayList;
@@ -48,10 +27,6 @@ import tools.packet.foreigneffect.ShowScrollEffect;
 import tools.packet.inventory.InventoryFull;
 import tools.packet.inventory.ModifyInventoryPacket;
 
-/**
- * @author Matze
- * @author Frz
- */
 public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
    @Override
    public Class<ScrollReader> getReaderClass() {
@@ -66,13 +41,13 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
       }
    }
 
-   private static boolean canScroll(int scrollid, int itemid) {
-      int sid = scrollid / 100;
+   private static boolean canScroll(int scrollId, int itemId) {
+      int sid = scrollId / 100;
 
       if (sid == 20492) { //scroll for accessory (pendant, belt, ring)
-         return canScroll(2041100, itemid) || canScroll(2041200, itemid) || canScroll(2041300, itemid);
+         return canScroll(2041100, itemId) || canScroll(2041200, itemId) || canScroll(2041300, itemId);
       }
-      return (scrollid / 100) % 100 == (itemid / 10000) % 100;
+      return (scrollId / 100) % 100 == (itemId / 10000) % 100;
    }
 
    @Override
@@ -99,16 +74,16 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
             byte oldSlots = (byte) toScroll.slots();
             MapleInventory useInventory = chr.getInventory(MapleInventoryType.USE);
             Item scroll = useInventory.getItem(packet.slot());
-            Item wscroll = null;
+            Item whiteScroll = null;
 
             if (ItemConstants.isCleanSlate(scroll.id())) {
-               Map<String, Integer> eqStats = ii.getEquipStats(toScroll.id());  // clean slate issue found thanks to Masterrulax
+               Map<String, Integer> eqStats = ii.getEquipStats(toScroll.id());
                if (eqStats == null || eqStats.get("tuc") == 0) {
                   announceCannotScroll(client, hasLegendarySpirit);
                   return;
                }
             } else if (!ItemConstants.isModifierScroll(scroll.id()) && toScroll.slots() < 1) {
-               announceCannotScroll(client, hasLegendarySpirit);   // thanks onechord for noticing zero upgrade slots freezing Legendary Scroll UI
+               announceCannotScroll(client, hasLegendarySpirit);
                return;
             }
 
@@ -118,8 +93,8 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                return;
             }
             if (isWhiteScroll) {
-               wscroll = useInventory.findById(2340000);
-               if (wscroll == null) {
+               whiteScroll = useInventory.findById(2340000);
+               if (whiteScroll == null) {
                   isWhiteScroll = false;
                }
             }
@@ -152,12 +127,12 @@ public final class ScrollHandler extends AbstractPacketHandler<ScrollPacket> {
                }
 
                if (isWhiteScroll && !ItemConstants.isCleanSlate(scroll.id())) {
-                  if (wscroll.quantity() < 1) {
+                  if (whiteScroll.quantity() < 1) {
                      announceCannotScroll(client, hasLegendarySpirit);
                      return;
                   }
 
-                  MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, wscroll.position(), (short) 1, false, false);
+                  MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, whiteScroll.position(), (short) 1, false, false);
                }
 
                MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, scroll.position(), (short) 1, false);

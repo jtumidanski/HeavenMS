@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -16,18 +16,12 @@ class NPC1052100 {
    int sel = -1
 
    int beauty = 0
-   int hairprice = 1000000
-   int haircolorprice = 1000000
-   int[] mhair_v = [30040, 30130, 30780, 30850, 30860, 30920, 33040]
-   int[] fhair_v = [31090, 31140, 31330, 31440, 31760, 31880, 34050]
-   int[] hairnew = []
-   int[] haircolor
-
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
+   int hairPrice = 1000000
+   int hairColorPrice = 1000000
+   int[] maleHair = [30040, 30130, 30780, 30850, 30860, 30920, 33040]
+   int[] femaleHair = [31090, 31140, 31330, 31440, 31760, 31880, 34050]
+   int[] hairNew = []
+   int[] hairColor
 
    def start() {
       status = -1
@@ -35,8 +29,7 @@ class NPC1052100 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1)  // disposing issue with stylishs found thanks to Vcoc
-      {
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -49,36 +42,36 @@ class NPC1052100 {
          } else if (status == 1) {
             if (selection == 1) {
                beauty = 1
-               hairnew = []
+               hairNew = []
                if (cm.getPlayer().getGender() == 0) {
-                  for (int i = 0; i < mhair_v.length; i++) {
-                     pushIfItemExists(hairnew, mhair_v[i] + (cm.getPlayer().getHair() % 10).toInteger())
+                  for (int i = 0; i < maleHair.length; i++) {
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10).toInteger(), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                if (cm.getPlayer().getGender() == 1) {
-                  for (int i = 0; i < fhair_v.length; i++) {
-                     pushIfItemExists(hairnew, fhair_v[i] + (cm.getPlayer().getHair() % 10).toInteger())
+                  for (int i = 0; i < femaleHair.length; i++) {
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10).toInteger(), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendStyle("I can totally change up your hairstyle and make it look so good. Why don't you change it up a bit? If you have #b#t5150003##k I'll change it for you. Choose the one to your liking~.", hairnew)
+               cm.sendStyle("I can totally change up your hairstyle and make it look so good. Why don't you change it up a bit? If you have #b#t5150003##k I'll change it for you. Choose the one to your liking~.", hairNew)
             } else if (selection == 2) {
                beauty = 2
-               haircolor = []
+               hairColor = []
                int current = (cm.getPlayer().getHair() / 10).intValue() * 10
                for (int i = 0; i < 8; i++) {
-                  pushIfItemExists(haircolor, current + i)
+                  hairColor = ScriptUtils.pushItemIfTrue(hairColor, current + i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                }
-               cm.sendStyle("I can totally change your haircolor and make it look so good. Why don't you change it up a bit? With #b#t5151003##k I'll change it for you. Choose the one to your liking.", haircolor)
+               cm.sendStyle("I can totally change your hair color and make it look so good. Why don't you change it up a bit? With #b#t5151003##k I'll change it for you. Choose the one to your liking.", hairColor)
             }
          } else if (status == 2) {
             cm.dispose()
             if (beauty == 1) {
                if (cm.haveItem(5420003)) {
-                  cm.setHair(hairnew[selection])
+                  cm.setHair(hairNew[selection])
                   cm.sendOk("Enjoy your new and improved hairstyle!")
                } else if (cm.haveItem(5150003)) {
                   cm.gainItem(5150003, (short) -1)
-                  cm.setHair(hairnew[selection])
+                  cm.setHair(hairNew[selection])
                   cm.sendOk("Enjoy your new and improved hairstyle!")
                } else {
                   cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
@@ -87,19 +80,19 @@ class NPC1052100 {
             if (beauty == 2) {
                if (cm.haveItem(5151003)) {
                   cm.gainItem(5151003, (short) -1)
-                  cm.setHair(haircolor[selection])
-                  cm.sendOk("Enjoy your new and improved haircolor!")
+                  cm.setHair(hairColor[selection])
+                  cm.sendOk("Enjoy your new and improved hair color!")
                } else {
                   cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
                }
             }
             if (beauty == 0) {
-               if (selection == 0 && cm.getMeso() >= hairprice) {
-                  cm.gainMeso(-hairprice)
+               if (selection == 0 && cm.getMeso() >= hairPrice) {
+                  cm.gainMeso(-hairPrice)
                   cm.gainItem(5150003, (short) 1)
                   cm.sendOk("Enjoy!")
-               } else if (selection == 1 && cm.getMeso() >= haircolorprice) {
-                  cm.gainMeso(-haircolorprice)
+               } else if (selection == 1 && cm.getMeso() >= hairColorPrice) {
+                  cm.gainMeso(-hairColorPrice)
                   cm.gainItem(5151003, (short) 1)
                   cm.sendOk("Enjoy!")
                } else {

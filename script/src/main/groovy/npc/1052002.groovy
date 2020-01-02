@@ -36,7 +36,7 @@ class NPC1052002 {
          cm.dispose()
       }
       if (status == 0 && mode == 1) {
-         String selStr = "Pst... If you have the right goods, I can turn it into something niice...#b"
+         String selStr = "Pst... If you have the right goods, I can turn it into something nice...#b"
          String[] options = ["Create a glove", "Upgrade a glove", "Create a claw", "Upgrade a claw", "Create materials"]
          for (int i = 0; i < options.length; i++) {
             selStr += "\r\n#L" + i + "# " + options[i] + "#l"

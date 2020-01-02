@@ -21,7 +21,7 @@ class NPC2012027 {
    int sel = -1
 
    String harpNote = 'C'
-   String[] harpSounds = ["do", "re", "mi", "pa", "sol", "la", "si"]   // musical order detected thanks to Arufonsu
+   String[] harpSounds = ["do", "re", "mi", "pa", "sol", "la", "si"]
    String harpSong = "CCGGAAGFFEEDDC|GGFFEED|GGFFEED|CCGGAAGFFEEDDC|"
 
    def start() {

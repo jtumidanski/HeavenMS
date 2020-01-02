@@ -6,13 +6,6 @@
 
 package constants.string;
 
-/*
- * Thanks to GabrielSin (EllinMS) - gabrielsin@playellin.net
- * Ellin
- * MapleStory Server
- * CharsetConstants
- */
-
 public class CharsetConstants {
 
    public static MapleLanguageType MAPLE_TYPE = MapleLanguageType.LANGUAGE_US;

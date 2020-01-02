@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.maps;
 
 import java.io.File;
@@ -113,7 +92,7 @@ public class MapleReactorFactory {
             reactorData = data.getData(StringUtil.getLeftPaddedStr(infoId + ".img", '0', 11));
             MapleData reactorInfoData = reactorData.getChildByPath("0");
             stats = new MapleReactorStats();
-            List<StateData> statedatas = new ArrayList<>();
+            List<StateData> stateDataList = new ArrayList<>();
             if (reactorInfoData != null) {
                boolean areaSet = false;
                byte i = 0;
@@ -122,42 +101,42 @@ public class MapleReactorFactory {
                   if (eventData != null) {
                      int timeOut = -1;
 
-                     for (MapleData fknexon : eventData.getChildren()) {
-                        if (fknexon.getName().equalsIgnoreCase("timeOut")) {
-                           timeOut = MapleDataTool.getInt(fknexon);
+                     for (MapleData mapleData : eventData.getChildren()) {
+                        if (mapleData.getName().equalsIgnoreCase("timeOut")) {
+                           timeOut = MapleDataTool.getInt(mapleData);
                         } else {
                            Pair<Integer, Integer> reactItem = null;
-                           int type = MapleDataTool.getIntConvert("type", fknexon);
+                           int type = MapleDataTool.getIntConvert("type", mapleData);
                            if (type == 100) { //reactor waits for item
-                              reactItem = new Pair<>(MapleDataTool.getIntConvert("0", fknexon), MapleDataTool.getIntConvert("1", fknexon));
+                              reactItem = new Pair<>(MapleDataTool.getIntConvert("0", mapleData), MapleDataTool.getIntConvert("1", mapleData));
                               if (!areaSet || loadArea) { //only set area of effect for item-triggered reactors once
-                                 stats.setTL(MapleDataTool.getPoint("lt", fknexon));
-                                 stats.setBR(MapleDataTool.getPoint("rb", fknexon));
+                                 stats.setTL(MapleDataTool.getPoint("lt", mapleData));
+                                 stats.setBR(MapleDataTool.getPoint("rb", mapleData));
                                  areaSet = true;
                               }
                            }
-                           MapleData activeSkillID = fknexon.getChildByPath("activeSkillID");
-                           List<Integer> skillids = null;
+                           MapleData activeSkillID = mapleData.getChildByPath("activeSkillID");
+                           List<Integer> skillIds = null;
                            if (activeSkillID != null) {
-                              skillids = new ArrayList<>();
+                              skillIds = new ArrayList<>();
                               for (MapleData skill : activeSkillID.getChildren()) {
-                                 skillids.add(MapleDataTool.getInt(skill));
+                                 skillIds.add(MapleDataTool.getInt(skill));
                               }
                            }
-                           byte nextState = (byte) MapleDataTool.getIntConvert("state", fknexon);
-                           statedatas.add(new StateData(type, reactItem, skillids, nextState));
+                           byte nextState = (byte) MapleDataTool.getIntConvert("state", mapleData);
+                           stateDataList.add(new StateData(type, reactItem, skillIds, nextState));
                         }
                      }
-                     stats.addState(i, statedatas, timeOut);
+                     stats.addState(i, stateDataList, timeOut);
                   }
                   i++;
                   reactorInfoData = reactorData.getChildByPath(Byte.toString(i));
-                  statedatas = new ArrayList<>();
+                  stateDataList = new ArrayList<>();
                }
             } else //sit there and look pretty; likely a reactor such as Zakum/Papulatus doors that shows if player can enter
             {
-               statedatas.add(new StateData(999, null, null, (byte) 0));
-               stats.addState((byte) 0, statedatas, -1);
+               stateDataList.add(new StateData(999, null, null, (byte) 0));
+               stats.addState((byte) 0, stateDataList, -1);
             }
             reactorStats.put(infoId, stats);
             if (rid != infoId) {

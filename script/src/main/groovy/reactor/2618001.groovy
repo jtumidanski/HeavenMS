@@ -15,17 +15,17 @@ class Reactor2618001 {
       EventInstanceManager eim = rm.getEventInstance()
 
       int isAlcadno = eim.getIntProperty("isAlcadno")
-      String reactname = (isAlcadno == 0) ? "rnj32_out" : "jnr32_out"
-      int reactmap = (isAlcadno == 0) ? 926100202 : 926110202
+      String reactorName = (isAlcadno == 0) ? "rnj32_out" : "jnr32_out"
+      int reactorMap = (isAlcadno == 0) ? 926100202 : 926110202
 
-      eim.getMapInstance(reactmap).getReactorByName(reactname).hitReactor(rm.getClient())
+      eim.getMapInstance(reactorMap).getReactorByName(reactorName).hitReactor(rm.getClient())
    }
 
    def touch() {
 
    }
 
-   def untouch() {
+   def release() {
 
    }
 }
@@ -48,6 +48,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

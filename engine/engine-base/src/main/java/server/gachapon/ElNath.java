@@ -1,13 +1,6 @@
 package server.gachapon;
 
-/**
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class ElNath extends GachaponItems {
-
    @Override
    public int[] getCommonItems() {
       return new int[]{
@@ -17,7 +10,7 @@ public class ElNath extends GachaponItems {
             2041011, 2041014, 2044602, 2043302, 2043202, 2043002, 2048005, 2044402, 2044302, 2043802, 2044102, 2044202, 2043702,
             2044812,
 
-            /* Useable drop */
+            /* Use-able drop */
             2000004, 2000005,
 
             /* Common equipment */

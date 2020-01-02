@@ -41,7 +41,7 @@ class NPC2103000 {
                if (cm.canHold(2210005)) {
                   if (!cm.haveItem(2210005) && !isTigunMorphed(cm.getPlayer())) {
                      cm.gainItem(2210005, (short) 1)
-                     cm.sendOk("You found a lock of hair (probably Tigun's) floating by the water and catched it. Remembering how #bJano#k made it last time, you crafted a new #t2210005#", (byte) 2)
+                     cm.sendOk("You found a lock of hair (probably Tigun's) floating by the water and caught it. Remembering how #bJano#k made it last time, you crafted a new #t2210005#", (byte) 2)
                   }
                } else {
                   cm.sendOk("You don't have a USE slot available.", (byte) 2)

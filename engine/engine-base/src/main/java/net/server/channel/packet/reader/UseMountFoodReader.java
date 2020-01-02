@@ -9,7 +9,7 @@ public class UseMountFoodReader implements PacketReader<UseMountFoodPacket> {
    public UseMountFoodPacket read(SeekableLittleEndianAccessor accessor) {
       accessor.skip(4);
       short pos = accessor.readShort();
-      int itemid = accessor.readInt();
-      return new UseMountFoodPacket(pos, itemid);
+      int itemId = accessor.readInt();
+      return new UseMountFoodPacket(pos, itemId);
    }
 }

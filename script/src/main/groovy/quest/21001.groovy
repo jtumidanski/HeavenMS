@@ -47,15 +47,15 @@ class Quest21001 {
       } else if (status == 2) {
          qm.sendNextPrev("Hurry and board the ship! We don't have much time!", (byte) 3)
       } else if (status == 3) {
-         qm.sendNextPrev("We don't have any time to waste. The Black Mage's forces are getting closer and closer! We're doomed if we don't leave right right this moment!", (byte) 9)
+         qm.sendNextPrev("We don't have any time to waste. The Black Magician's forces are getting closer and closer! We're doomed if we don't leave right right this moment!", (byte) 9)
       } else if (status == 4) {
          qm.sendNextPrev("Leave, now!", (byte) 3)
       } else if (status == 5) {
-         qm.sendNextPrev("Aran, please! I know you want to stay and fight the Black Mage, but it's too late! Leave it to the others and come to Victoria Island with us!", (byte) 9)
+         qm.sendNextPrev("Aran, please! I know you want to stay and fight the Black Magician, but it's too late! Leave it to the others and come to Victoria Island with us!", (byte) 9)
       } else if (status == 6) {
          qm.sendNextPrev("No, I can't!", (byte) 3)
       } else if (status == 7) {
-         qm.sendNextPrev("Athena Pierce, why don't you leave for Victoria Island first? I promise I'll come for you later. I'll be alright. I must fight the Black Mage with the other heroes!", (byte) 3)
+         qm.sendNextPrev("Athena Pierce, why don't you leave for Victoria Island first? I promise I'll come for you later. I'll be alright. I must fight the Black Magician with the other heroes!", (byte) 3)
       } else if (status == 8) {
          qm.gainItem(4001271, (short) -1)
          qm.removeEquipFromSlot((short) -11)

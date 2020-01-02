@@ -2,9 +2,9 @@ package client.processor;
 
 import constants.skills.Bishop;
 import constants.skills.DarkKnight;
-import constants.skills.FPArchMage;
+import constants.skills.FirePoisonArchMage;
 import constants.skills.Hermit;
-import constants.skills.ILArchMage;
+import constants.skills.IceLighteningArchMagician;
 import constants.skills.Priest;
 import constants.skills.Ranger;
 import constants.skills.Sniper;
@@ -19,11 +19,11 @@ public class SkillProcessor {
    private SkillProcessor() {
    }
 
-   public boolean dispelSkills(int skillid) {
-      switch (skillid) {
+   public boolean dispelSkills(int skillId) {
+      switch (skillId) {
          case DarkKnight.BEHOLDER:
-         case FPArchMage.ELQUINES:
-         case ILArchMage.IFRIT:
+         case FirePoisonArchMage.ELQUINES:
+         case IceLighteningArchMagician.IFRIT:
          case Priest.SUMMON_DRAGON:
          case Bishop.BAHAMUT:
          case Ranger.PUPPET:

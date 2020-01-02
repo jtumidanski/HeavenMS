@@ -36,15 +36,15 @@ class NPCrank_user {
          }
 
          if (status == 0) {
-            MaplePlayerNPC pnpc = cm.getPlayerNPCByScriptid(cm.getNpc())
+            MaplePlayerNPC playerNPC = cm.getPlayerNPCByScriptId(cm.getNpc())
 
-            if (pnpc != null) {
-               String branchJobName = GameConstants.getJobName(pnpc.getJob())
+            if (playerNPC != null) {
+               String branchJobName = GameConstants.getJobName(playerNPC.getJob())
 
-               String rankStr = "Hi, I am #b" + pnpc.getName() + "#k, #r" + GameConstants.ordinal(pnpc.getWorldJobRank()) + "#k in the #r" + branchJobName + "#k class to reach the max level and obtain a statue on " + GameConstants.WORLD_NAMES[cm.getPlayer().getWorld()] + ".\r\n"
-               rankStr += "\r\n    World rank: #e#b" + GameConstants.ordinal(pnpc.getWorldRank()) + "#k#n"
-               rankStr += "\r\n    Overall " + branchJobName + " rank: #e#b" + GameConstants.ordinal(pnpc.getOverallJobRank()) + "#k#n"
-               rankStr += "\r\n    Overall rank: #e#b" + GameConstants.ordinal(pnpc.getOverallRank()) + "#k#n"
+               String rankStr = "Hi, I am #b" + playerNPC.getName() + "#k, #r" + GameConstants.ordinal(playerNPC.getWorldJobRank()) + "#k in the #r" + branchJobName + "#k class to reach the max level and obtain a statue on " + GameConstants.WORLD_NAMES[cm.getPlayer().getWorld()] + ".\r\n"
+               rankStr += "\r\n    World rank: #e#b" + GameConstants.ordinal(playerNPC.getWorldRank()) + "#k#n"
+               rankStr += "\r\n    Overall " + branchJobName + " rank: #e#b" + GameConstants.ordinal(playerNPC.getOverallJobRank()) + "#k#n"
+               rankStr += "\r\n    Overall rank: #e#b" + GameConstants.ordinal(playerNPC.getOverallRank()) + "#k#n"
 
                cm.sendOk(rankStr)
             } else {

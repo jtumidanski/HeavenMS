@@ -22,7 +22,7 @@ import tools.packet.character.FacialExpression;
 import tools.packet.character.GetCharacterInfo;
 import tools.packet.character.SetAutoHpPot;
 import tools.packet.character.SetAutoMpPot;
-import tools.packet.character.SkillCooldown;
+import tools.packet.character.SkillCoolDown;
 import tools.packet.character.SummonSkill;
 import tools.packet.character.UpdateGender;
 import tools.packet.character.UpdateMount;
@@ -47,7 +47,7 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       Handler.handle(SetAutoHpPot.class).decorate(this::sendAutoHpPot).register(registry);
       Handler.handle(UpdateSkill.class).decorate(this::updateSkill).register(registry);
       Handler.handle(SummonSkill.class).decorate(this::summonSkill).register(registry);
-      Handler.handle(SkillCooldown.class).decorate(this::skillCooldown).register(registry);
+      Handler.handle(SkillCoolDown.class).decorate(this::skillCoolDown).register(registry);
       Handler.handle(DamageCharacter.class).decorate(this::damagePlayer).register(registry);
       Handler.handle(UpdateMount.class).decorate(this::updateMount).register(registry);
       Handler.handle(CharacterKnockBack.class).decorate(this::leftKnockBack).size(2).register(registry);
@@ -72,14 +72,14 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       writer.writeShort(chr.getFame());
       writer.write(chr.getMarriageRing() != null ? 1 : 0);
       writeGuildInfo(chr, writer);
-      writer.write(0); // pMedalInfo, thanks to Arnah (Vertisy)
+      writer.write(0);
 
       MaplePet[] pets = chr.getPets();
       Item inv = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -114);
       for (int i = 0; i < 3; i++) {
          if (pets[i] != null) {
             writer.write(pets[i].uniqueId());
-            writer.writeInt(pets[i].id()); // petid
+            writer.writeInt(pets[i].id()); // pet id
             writer.writeMapleAsciiString(pets[i].name());
             writer.write(pets[i].level()); // pet level
             writer.writeShort(pets[i].closeness()); // pet closeness
@@ -90,13 +90,13 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       }
       writer.write(0); //end of pets
 
-      Item mount;     //mounts can potentially crash the client if the player's level is not properly checked
-      if (chr.getMount() != null && (mount = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18)) != null && MapleItemInformationProvider.getInstance().getEquipLevelReq(mount.id()) <= chr.getLevel()) {
-         MapleMount mmount = chr.getMount();
-         writer.write(mmount.id()); //mount
-         writer.writeInt(mmount.level()); //level
-         writer.writeInt(mmount.exp()); //exp
-         writer.writeInt(mmount.tiredness()); //tiredness
+      Item mountItem;     //mounts can potentially crash the client if the player's level is not properly checked
+      if (chr.getMount() != null && (mountItem = chr.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18)) != null && MapleItemInformationProvider.getInstance().getEquipLevelReq(mountItem.id()) <= chr.getLevel()) {
+         MapleMount mount = chr.getMount();
+         writer.write(mount.id()); //mount
+         writer.writeInt(mount.level()); //level
+         writer.writeInt(mount.exp()); //exp
+         writer.writeInt(mount.tiredness()); //tiredness
       } else {
          writer.write(0);
       }
@@ -181,7 +181,7 @@ public class CharacterPacketFactory extends AbstractPacketFactory {
       writer.write(packet.newStance());
    }
 
-   protected void skillCooldown(MaplePacketLittleEndianWriter writer, SkillCooldown packet) {
+   protected void skillCoolDown(MaplePacketLittleEndianWriter writer, SkillCoolDown packet) {
       writer.writeInt(packet.skillId());
       writer.writeShort(packet.time());//Int in v97
    }

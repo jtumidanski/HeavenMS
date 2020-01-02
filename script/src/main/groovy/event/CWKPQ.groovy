@@ -205,9 +205,10 @@ class EventCWKPQ {
       int[] pos_y = [-204, -384, -504, -384, -204]
       map = eim.getInstanceMap(610030540)
       for (int z = 0; z < pos_x.length; z++) {
-         MapleMonster mob = em.getMonster(9400594)
-         eim.registerMonster(mob)
-         map.spawnMonsterOnGroundBelow(mob, new Point(pos_x[z], pos_y[z]))
+         em.getMonster(9400594).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            map.spawnMonsterOnGroundBelow(mob, new Point(pos_x[z], pos_y[z]))
+         })
       }
 
       eim.startEventTimer(eventTime * 60000)
@@ -218,7 +219,7 @@ class EventCWKPQ {
       return eim
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
    }
 
@@ -240,9 +241,10 @@ class EventCWKPQ {
       }
       MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, "The Master Guardians have detected you.")
       for (int i = 0; i < 20; i++) { //spawn 20 guardians
-         MapleMonster mob = eim.getMonster(9400594)
-         eim.registerMonster(mob)
-         map.spawnMonsterOnGroundBelow(mob, new Point(1000, 336))
+         eim.getMonster(9400594).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1000, 336))
+         })
       }
    }
 
@@ -260,9 +262,9 @@ class EventCWKPQ {
    def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
             MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
@@ -272,7 +274,7 @@ class EventCWKPQ {
             eim.unregisterPlayer(player)
          }
       } else {
-         switch (mapid) {
+         switch (mapId) {
             case 610030200:
                if (eim.getIntProperty("current_instance") == 0) {
                   eim.restartEventTimer(600000) //10 mins
@@ -340,7 +342,7 @@ class EventCWKPQ {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -416,12 +418,12 @@ class EventCWKPQ {
    def disbandParty(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -497,8 +499,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -517,8 +519,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -569,8 +571,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

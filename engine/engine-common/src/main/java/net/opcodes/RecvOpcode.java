@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.opcodes;
 
 public enum RecvOpcode {
@@ -26,21 +5,21 @@ public enum RecvOpcode {
 
    LOGIN_PASSWORD(0x01),
    GUEST_LOGIN(0x02),
-   SERVERLIST_REREQUEST(0x04),
-   CHARLIST_REQUEST(0x05),
-   SERVERSTATUS_REQUEST(0x06),
+   SERVER_LIST_REREQUEST(0x04),
+   CHARACTER_LIST_REQUEST(0x05),
+   SERVER_STATUS_REQUEST(0x06),
    ACCEPT_TOS(0x07),
    SET_GENDER(0x08),
    AFTER_LOGIN(0x09),
    REGISTER_PIN(0x0A),
-   SERVERLIST_REQUEST(0x0B),
+   SERVER_LIST_REQUEST(0x0B),
    PLAYER_DC(0x0C),
    VIEW_ALL_CHAR(0x0D),
    PICK_ALL_CHAR(0x0E),
    NAME_TRANSFER(0x10),
    WORLD_TRANSFER(0x12),
    CHAR_SELECT(0x13),
-   PLAYER_LOGGEDIN(0x14),
+   PLAYER_LOGGED_IN(0x14),
    CHECK_CHAR_NAME(0x15),
    CREATE_CHAR(0x16),
    DELETE_CHAR(0x17),
@@ -55,7 +34,7 @@ public enum RecvOpcode {
    VIEW_ALL_WITH_PIC(0x20),
    CHANGE_MAP(0x26),
    CHANGE_CHANNEL(0x27),
-   ENTER_CASHSHOP(0x28),
+   ENTER_CASH_SHOP(0x28),
    MOVE_PLAYER(0x29),
    CANCEL_CHAIR(0x2A),
    USE_CHAIR(0x2B),
@@ -67,8 +46,8 @@ public enum RecvOpcode {
    GENERAL_CHAT(0x31),
    CLOSE_CHALKBOARD(0x32),
    FACE_EXPRESSION(0x33),
-   USE_ITEMEFFECT(0x34),
-   USE_DEATHITEM(0x35),
+   USE_ITEM_EFFECT(0x34),
+   USE_DEATH_ITEM(0x35),
    MOB_BANISH_PLAYER(0x38),
    MONSTER_BOOK_COVER(0x39),
    NPC_TALK(0x3A),
@@ -109,10 +88,10 @@ public enum RecvOpcode {
    GIVE_FAME(0x5F),
    CHAR_INFO_REQUEST(0x61),
    SPAWN_PET(0x62),
-   CANCEL_DEBUFF(0x63),
+   CANCEL_ABNORMAL_STATUS(0x63),
    CHANGE_MAP_SPECIAL(0x64),
    USE_INNER_PORTAL(0x65),
-   TROCK_ADD_MAP(0x66),
+   TELEPORT_ROCK_ADD_MAP(0x66),
    REPORT(0x6A),
    QUEST_ACTION(0x6B),
    //USER_CALC_DAMAGE_STAT_SET_REQUEST(0x6C),
@@ -134,7 +113,7 @@ public enum RecvOpcode {
    DENY_GUILD_REQUEST(0x7F),
    ADMIN_COMMAND(0x80),
    ADMIN_LOG(0x81),
-   BUDDYLIST_MODIFY(0x82),
+   BUDDY_LIST_MODIFY(0x82),
    NOTE_ACTION(0x83),
    USE_DOOR(0x85),
    CHANGE_KEYMAP(0x87),
@@ -157,9 +136,9 @@ public enum RecvOpcode {
    BBS_OPERATION(0x9B),
    ENTER_MTS(0x9C),
    USE_SOLOMON_ITEM(0x9D),
-   USE_GACHA_EXP(0x9E),
+   USE_GACHAPON_EXP(0x9E),
    NEW_YEAR_CARD_REQUEST(0x9F),
-   CASHSHOP_SURPRISE(0xA1),
+   CASH_SHOP_SURPRISE(0xA1),
    CLICK_GUIDE(0xA2),
    ARAN_COMBO_COUNTER(0xA3),
    MOVE_PET(0xA7),
@@ -173,7 +152,7 @@ public enum RecvOpcode {
    DAMAGE_SUMMON(0xB1),
    BEHOLDER(0xB2),
    MOVE_DRAGON(0xB5),
-   CHANGE_QUICKSLOT(0xB7),
+   CHANGE_QUICK_SLOT(0xB7),
    MOVE_LIFE(0xBC),
    AUTO_AGGRO(0xBD),
    FIELD_DAMAGE_MOB(0xBF),
@@ -185,9 +164,9 @@ public enum RecvOpcode {
    DAMAGE_REACTOR(0xCD),
    TOUCHING_REACTOR(0xCE),
    PLAYER_MAP_TRANSFER(0xCF),
-   MAPLETV(0xFFFE),//Don't know
+   MAPLE_TV(0xFFFE),//Don't know
    SNOWBALL(0xD3),
-   LEFT_KNOCKBACK(0xD4),
+   LEFT_KNOCK_BACK(0xD4),
    COCONUT(0xD5),
    MATCH_TABLE(0xD6),//Would be cool if I ever get it to work :)
    MONSTER_CARNIVAL(0xDA),
@@ -195,13 +174,13 @@ public enum RecvOpcode {
    PARTY_SEARCH_START(0xDE),
    PARTY_SEARCH_UPDATE(0xDF),
    CHECK_CASH(0xE4),
-   CASHSHOP_OPERATION(0xE5),
+   CASH_SHOP_OPERATION(0xE5),
    COUPON_CODE(0xE6),
-   OPEN_ITEMUI(0xEC),
-   CLOSE_ITEMUI(0xED),
-   USE_ITEMUI(0xEE),
+   OPEN_ITEM_UI(0xEC),
+   CLOSE_ITEM_UI(0xED),
+   USE_ITEM_UI(0xEE),
    MTS_OPERATION(0xFD),
-   USE_MAPLELIFE(0x100),
+   USE_MAPLE_LIFE(0x100),
    USE_HAMMER(0x104);
 
    private int code;

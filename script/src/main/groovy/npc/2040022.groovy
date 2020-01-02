@@ -2,8 +2,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-import java.sql.Array
-
 /*
 	NPC Name: 		
 	Map(s): 		
@@ -25,7 +23,7 @@ class NPC2040022 {
    int qty
    boolean equip
    boolean stimulator = false
-   int stimID
+   int stimulatorId
 
    def start() {
       status = -1
@@ -57,7 +55,7 @@ class NPC2040022 {
          } else {
             stimulator = false
          }
-         if (selectedType == 0) { //What's a stim?
+         if (selectedType == 0) { //What's a stimulator?
             cm.sendNext("A stimulator is a special potion that I can add into the process of creating certain items. It gives it stats as though it had dropped from a monster. However, it is possible to have no change, and it is also possible for the item to be below average. There's also a 10% chance of not getting any item when using a stimulator, so please choose wisely.")
             cm.dispose()
          } else if (selectedType == 1) { //warrior weapon
@@ -164,8 +162,8 @@ class NPC2040022 {
          String prompt = "You want me to make a #t" + item + "#? In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
 
          if (stimulator) {
-            stimID = mats[0] - 998 //stim ID for a weapon = manual ID for weapon - 998
-            prompt += "\r\n#i" + stimID + "# 1 #t" + stimID + "#"
+            stimulatorId = mats[0] - 998 //stimulator Id for a weapon = manual Id for weapon - 998
+            prompt += "\r\n#i" + stimulatorId + "# 1 #t" + stimulatorId + "#"
          }
 
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
@@ -213,7 +211,7 @@ class NPC2040022 {
          }
 
          if (stimulator) { //check for stimulator
-            if (!cm.haveItem(stimID)) {
+            if (!cm.haveItem(stimulatorId)) {
                complete = false
             }
          }
@@ -231,7 +229,7 @@ class NPC2040022 {
 
             cm.gainMeso(-cost)
             if (stimulator) { //check for stimulator
-               cm.gainItem(stimID, (short) -1)
+               cm.gainItem(stimulatorId, (short) -1)
                int deleted = Math.floor(Math.random() * 10).intValue()
                if (deleted != 0) {
                   cm.gainItem(item, (short) 1, true, true)

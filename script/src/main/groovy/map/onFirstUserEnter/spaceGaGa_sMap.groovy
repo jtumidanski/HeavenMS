@@ -3,7 +3,7 @@ package map.onFirstUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MapspaceGaGa_sMap {
+class MapSpaceGaGasMap {
 
    static def start(MapScriptMethods ms) {
       ms.getPlayer().resetEnteredScript()
@@ -11,9 +11,9 @@ class MapspaceGaGa_sMap {
    }
 }
 
-MapspaceGaGa_sMap getMap() {
-   getBinding().setVariable("map", new MapspaceGaGa_sMap())
-   return (MapspaceGaGa_sMap) getBinding().getVariable("map")
+MapSpaceGaGasMap getMap() {
+   getBinding().setVariable("map", new MapSpaceGaGasMap())
+   return (MapSpaceGaGasMap) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

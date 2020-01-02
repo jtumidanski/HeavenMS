@@ -21,7 +21,7 @@ class NPC1209003 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendOk("We are departing to #bVictoria Island#k briefly. I've heard the #rBlack Mage#k himself cannot take that place on his grasp yet, thanks to #bthe seal that has been casted on that area#k. We pray for their safety, but if fortune does not favor the Heroes, at least we will be safe once we reach the continent.")
+      cm.sendOk("We are departing to #bVictoria Island#k briefly. I've heard the #rBlack Magician#k himself cannot take that place on his grasp yet, thanks to #bthe seal that has been casted on that area#k. We pray for their safety, but if fortune does not favor the Heroes, at least we will be safe once we reach the continent.")
       cm.dispose()
    }
 }

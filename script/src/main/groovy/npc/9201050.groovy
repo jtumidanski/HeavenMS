@@ -41,7 +41,6 @@ class NPC9201050 {
                cm.sendNext("Good job! You've solved all of my questions about NLC. Enjoy your trip!")
                cm.dispose()
             } else if (cm.isQuestCompleted(4900) || cm.isQuestStarted(4900)) {
-               // thanks imbee for pointing out the quiz leak
                cm.sendNext("Hey, pay attention, I'm trying to quiz you on another question, fam!")
                cm.dispose()
             } else {

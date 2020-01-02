@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.handlers.login;
 
 import java.net.InetAddress;
@@ -31,7 +10,7 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.ViewAllCharactersSelectedReader;
 import net.server.coordinator.session.MapleSessionCoordinator;
-import net.server.coordinator.session.MapleSessionCoordinator.AntiMulticlientResult;
+import net.server.coordinator.session.MapleSessionCoordinator.AntiMultiClientResult;
 import net.server.login.packet.ViewAllCharactersSelectedPacket;
 import net.server.world.World;
 import tools.PacketCreator;
@@ -61,9 +40,9 @@ public final class ViewAllCharSelectedHandler extends AbstractPacketHandler<View
       }
 
       IoSession session = client.getSession();
-      AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
-      if (res != AntiMulticlientResult.SUCCESS) {
-         PacketCreator.announce(client, new AfterLoginError(parseAntiMulticlientError(res)));
+      AntiMultiClientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
+      if (res != AntiMultiClientResult.SUCCESS) {
+         PacketCreator.announce(client, new AfterLoginError(parseAntiMultiClientError(res)));
          return;
       }
 
@@ -75,14 +54,14 @@ public final class ViewAllCharSelectedHandler extends AbstractPacketHandler<View
 
       client.setWorld(server.getCharacterWorld(packet.characterId()));
 
-      World wserv = client.getWorldServer();
-      if (wserv == null || wserv.isWorldCapacityFull()) {
+      World world = client.getWorldServer();
+      if (world == null || world.isWorldCapacityFull()) {
          PacketCreator.announce(client, new AfterLoginError(10));
          return;
       }
 
       try {
-         int channel = Randomizer.rand(1, wserv.getChannelsSize());
+         int channel = Randomizer.rand(1, world.getChannelsSize());
          client.setChannel(channel);
       } catch (Exception e) {
          e.printStackTrace();
@@ -105,7 +84,7 @@ public final class ViewAllCharSelectedHandler extends AbstractPacketHandler<View
       }
    }
 
-   private int parseAntiMulticlientError(AntiMulticlientResult res) {
+   private int parseAntiMultiClientError(AntiMultiClientResult res) {
       switch (res) {
          case REMOTE_PROCESSING:
             return 10;

@@ -60,7 +60,7 @@ public class PetMovementReader implements PacketReader<PetMovementPacket> {
                relativeLifeMovement(accessor, results, command);
                break;
             case 3:
-            case 4: // tele... -.-
+            case 4: // teleport... -.-
             case 7: // assaulter
             case 8: // assassinate
             case 9: // rush

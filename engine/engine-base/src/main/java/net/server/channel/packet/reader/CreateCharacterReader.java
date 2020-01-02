@@ -11,14 +11,14 @@ public class CreateCharacterReader implements PacketReader<CreateCharacterPacket
       int job = accessor.readInt();
       int face = accessor.readInt();
       int hair = accessor.readInt();
-      int haircolor = accessor.readInt();
-      int skincolor = accessor.readInt();
+      int hairColor = accessor.readInt();
+      int skinColor = accessor.readInt();
       int top = accessor.readInt();
       int bottom = accessor.readInt();
       int shoes = accessor.readInt();
       int weapon = accessor.readInt();
       int gender = accessor.readByte();
 
-      return new CreateCharacterPacket(name, job, face, hair, haircolor, skincolor, top, bottom, shoes, weapon, gender);
+      return new CreateCharacterPacket(name, job, face, hair, hairColor, skinColor, top, bottom, shoes, weapon, gender);
    }
 }

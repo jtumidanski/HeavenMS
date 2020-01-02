@@ -11,5 +11,5 @@ class GachaponMessage(private var _item: Item, private var _town: String, privat
 
   def characterName: String = _characterName
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERMESSAGE
+  override def opcode(): SendOpcode = SendOpcode.SERVER_MESSAGE
 }

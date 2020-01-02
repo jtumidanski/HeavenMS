@@ -4,7 +4,6 @@ import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 import server.maps.MapleMapItem
 
@@ -229,8 +228,7 @@ class NPC9040006 {
    }
 
    static def spawnMob(int id, int x, y, map) {
-      MapleMonster mob = MapleLifeFactory.getMonster(id)
-      map.spawnMonsterOnGroundBelow(mob, new Point(x, y))
+      MapleLifeFactory.getMonster(id).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point(x, y)) })
    }
 
    def action(Byte mode, Byte type, Integer selection) {

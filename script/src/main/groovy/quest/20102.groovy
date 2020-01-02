@@ -46,7 +46,7 @@ class Quest20102 {
 
                qm.gainItem(1372043, (short) 1)
                qm.gainItem(1142066, (short) 1)
-               qm.changeJob(MapleJob.BLAZEWIZARD1)
+               qm.changeJob(MapleJob.BLAZE_WIZARD_1)
                qm.getPlayer().resetStats()
             }
             qm.forceCompleteQuest()

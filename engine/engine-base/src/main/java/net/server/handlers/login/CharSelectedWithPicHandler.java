@@ -10,7 +10,7 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.CharacterSelectedWithPicReader;
 import net.server.coordinator.session.MapleSessionCoordinator;
-import net.server.coordinator.session.MapleSessionCoordinator.AntiMulticlientResult;
+import net.server.coordinator.session.MapleSessionCoordinator.AntiMultiClientResult;
 import net.server.login.packet.CharacterSelectedWithPicPacket;
 import net.server.world.World;
 import tools.PacketCreator;
@@ -49,8 +49,8 @@ public class CharSelectedWithPicHandler extends AbstractPacketHandler<CharacterS
 
       if (client.checkPic(packet.pic())) {
          client.setWorld(server.getCharacterWorld(packet.characterId()));
-         World wserv = client.getWorldServer();
-         if (wserv == null || wserv.isWorldCapacityFull()) {
+         World world = client.getWorldServer();
+         if (world == null || world.isWorldCapacityFull()) {
             PacketCreator.announce(client, new AfterLoginError(10));
             return;
          }
@@ -61,9 +61,9 @@ public class CharSelectedWithPicHandler extends AbstractPacketHandler<CharacterS
             return;
          }
 
-         AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
-         if (res != AntiMulticlientResult.SUCCESS) {
-            PacketCreator.announce(client, new AfterLoginError(parseAntiMulticlientError(res)));
+         AntiMultiClientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
+         if (res != AntiMultiClientResult.SUCCESS) {
+            PacketCreator.announce(client, new AfterLoginError(parseAntiMultiClientError(res)));
             return;
          }
 
@@ -80,7 +80,7 @@ public class CharSelectedWithPicHandler extends AbstractPacketHandler<CharacterS
       }
    }
 
-   private static int parseAntiMulticlientError(AntiMulticlientResult res) {
+   private static int parseAntiMultiClientError(AntiMultiClientResult res) {
       switch (res) {
          case REMOTE_PROCESSING:
             return 10;

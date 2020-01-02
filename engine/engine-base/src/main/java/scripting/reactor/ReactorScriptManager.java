@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package scripting.reactor;
 
 import java.util.HashMap;
@@ -36,9 +15,6 @@ import server.maps.ReactorDropEntry;
 import database.DatabaseConnection;
 import tools.FilePrinter;
 
-/**
- * @author Lerk
- */
 public class ReactorScriptManager extends AbstractScriptManager {
 
    private static ReactorScriptManager instance = new ReactorScriptManager();
@@ -98,7 +74,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
       touching(c, reactor, true);
    }
 
-   public void untouch(MapleClient c, MapleReactor reactor) {
+   public void release(MapleClient c, MapleReactor reactor) {
       touching(c, reactor, false);
    }
 
@@ -114,7 +90,7 @@ public class ReactorScriptManager extends AbstractScriptManager {
          if (touching) {
             ((Invocable) iv).invokeFunction("touch");
          } else {
-            ((Invocable) iv).invokeFunction("untouch");
+            ((Invocable) iv).invokeFunction("release");
          }
       } catch (final ScriptException | NoSuchMethodException | NullPointerException ute) {
          FilePrinter.printError(FilePrinter.REACTOR + reactor.getId() + ".txt", ute);

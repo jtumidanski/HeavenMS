@@ -10,5 +10,5 @@ class MultiChat(private var _name: String, private var _text: String, private va
 
   def mode: Int = _mode
 
-  override def opcode(): SendOpcode = SendOpcode.MULTICHAT
+  override def opcode(): SendOpcode = SendOpcode.MULTI_CHAT
 }

@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.Arrays;
@@ -55,13 +34,13 @@ public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapC
                client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
-            client.getPlayer().changeKeybinding(91, new KeyBinding(7, ((AutoHPKeymapChangePacket) packet).itemId()));
+            client.getPlayer().changeKeyBinding(91, new KeyBinding(7, ((AutoHPKeymapChangePacket) packet).itemId()));
          } else if (packet instanceof AutoMPKeymapChangePacket) {
             if (((AutoMPKeymapChangePacket) packet).itemId() != 0 && client.getPlayer().getInventory(MapleInventoryType.USE).findById(((AutoMPKeymapChangePacket) packet).itemId()) == null) {
                client.disconnect(false, false); // Don't let them send a packet with a use item they dont have.
                return;
             }
-            client.getPlayer().changeKeybinding(92, new KeyBinding(7, ((AutoMPKeymapChangePacket) packet).itemId()));
+            client.getPlayer().changeKeyBinding(92, new KeyBinding(7, ((AutoMPKeymapChangePacket) packet).itemId()));
          }
       }
    }
@@ -80,11 +59,11 @@ public final class KeymapChangeHandler extends AbstractPacketHandler<BaseKeymapC
             boolean isBannedSkill = GameConstants.bannedBindSkills(skillId);
             boolean notAGMWithGMSkills = !character.isGM() && GameConstants.isGMSkills(skillId);
             boolean hasSkillsNotInTree = (!GameConstants.isInJobTree(skillId, character.getJob().getId()) && !character.isGM());
-            if (isBannedSkill || notAGMWithGMSkills || hasSkillsNotInTree) { //for those skills are are "technically" in the beginner tab, like bamboo rain in Dojo or skills you find in PYPQ
+            if (isBannedSkill || notAGMWithGMSkills || hasSkillsNotInTree) {
                return;
             }
          }
       }
-      character.changeKeybinding(keyTypeAction.key(), new KeyBinding(keyTypeAction.theType(), keyTypeAction.action()));
+      character.changeKeyBinding(keyTypeAction.key(), new KeyBinding(keyTypeAction.theType(), keyTypeAction.action()));
    }
 }

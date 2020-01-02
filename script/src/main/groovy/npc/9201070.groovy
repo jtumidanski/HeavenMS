@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -17,22 +17,16 @@ class NPC9201070 {
 
    int beauty = 0
    int price = 1000000
-   int[] mface_r = [20001, 20008, 20011, 20013, 20024, 20029, 20032]
-   int[] fface_r = [21000, 21007, 21011, 21012, 21017, 21020, 21022]
-   int[] facenew = []
+   int[] maleFace = [20001, 20008, 20011, 20013, 20024, 20029, 20032]
+   int[] femaleFace = [21000, 21007, 21011, 21012, 21017, 21020, 21022]
+   int[] faceNew = []
 
    def start() {
       cm.sendSimple("Hi, I pretty much shouldn't be doing this, but with a #b#t5152033##k, I will do it anyways for you. But don't forget, it will be random!\r\n#L2#Plastic Surgery: #i5152033##t5152033##l")
    }
 
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -42,19 +36,23 @@ class NPC9201070 {
          }
          if (status == 1) {
             if (selection == 2) {
-               facenew = []
-               if (cm.getPlayer().getGender() == 0)
-                  for (int i = 0; i < mface_r.length; i++ )
-               pushIfItemExists(facenew, mface_r[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
-               if (cm.getPlayer().getGender() == 1)
-                  for (int i = 0; i < fface_r.length; i++ )
-               pushIfItemExists(facenew, fface_r[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+               faceNew = []
+               if (cm.getPlayer().getGender() == 0) {
+                  for (int i = 0; i < maleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, maleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
+                  }
+               }
+               if (cm.getPlayer().getGender() == 1) {
+                  for (int i = 0; i < femaleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
+                  }
+               }
                cm.sendYesNo("If you use the regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152033##k?")
             }
          } else if (status == 2) {
             if (cm.haveItem(5152033)) {
                cm.gainItem(5152033, (short) -1)
-               cm.setFace(facenew[Math.floor(Math.random() * facenew.length).intValue()])
+               cm.setFace(faceNew[Math.floor(Math.random() * faceNew.length).intValue()])
                cm.sendOk("Enjoy your new and improved face!")
             } else {
                cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")

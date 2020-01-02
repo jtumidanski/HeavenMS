@@ -16,5 +16,5 @@ class ServerNotice(private var _type: Int, private var _channel: Int, private va
     this(_type, 0, _message, false)
   }
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERMESSAGE
+  override def opcode(): SendOpcode = SendOpcode.SERVER_MESSAGE
 }

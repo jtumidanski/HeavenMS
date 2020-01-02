@@ -23,8 +23,6 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet with a list of characters.
-    *
-    * @return The character list packet.
     */
    protected void getCharList(MaplePacketLittleEndianWriter writer, CharacterList packet) {
       writer.write(packet.getStatus());

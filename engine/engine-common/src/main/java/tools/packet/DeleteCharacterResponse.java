@@ -5,7 +5,7 @@ public enum DeleteCharacterResponse {
    TROUBLE_LOGGING_IN(0X06), //Trouble logging into the game?
    UNKNOWN_ERROR(0X09), //Unknown error
    TOO_MANY_REQUESTS(0X0A), //Could not be processed due to too many connection requests to the server.
-   INVALID_BIRTHDAY(0X12), //invalid bday
+   INVALID_BIRTHDAY(0X12), //invalid birthday
    INCORRECT_PIC(0X14), //incorrect pic
    CANNOT_DELETE_GUILD_MASTER(0X16), //Cannot delete a guild master.
    CANNOT_DELETE_PENDING_WEDDING(0X18), //Cannot delete a character with a pending wedding.

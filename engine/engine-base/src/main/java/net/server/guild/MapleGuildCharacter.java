@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.guild;
 
 import java.util.Optional;
@@ -30,9 +9,9 @@ public class MapleGuildCharacter {
    private int level;
    private int id;
    private int world, channel;
-   private int jobid;
-   private int guildrank;
-   private int guildid;
+   private int jobId;
+   private int guildRank;
+   private int guildId;
    private int allianceRank;
    private boolean online;
    private String name;
@@ -44,9 +23,9 @@ public class MapleGuildCharacter {
       this.id = c.getId();
       this.channel = c.getClient().getChannel();
       this.world = c.getWorld();
-      this.jobid = c.getJob().getId();
-      this.guildrank = c.getGuildRank();
-      this.guildid = c.getGuildId();
+      this.jobId = c.getJob().getId();
+      this.guildRank = c.getGuildRank();
+      this.guildId = c.getGuildId();
       this.online = true;
       this.allianceRank = c.getAllianceRank();
    }
@@ -60,10 +39,10 @@ public class MapleGuildCharacter {
          this.channel = _channel;
          this.world = _world;
       }
-      this.jobid = _job;
+      this.jobId = _job;
       this.online = _on;
-      this.guildrank = _rank;
-      this.guildid = _gid;
+      this.guildRank = _rank;
+      this.guildId = _gid;
       this.allianceRank = _allianceRank;
    }
 
@@ -104,33 +83,33 @@ public class MapleGuildCharacter {
    }
 
    public int getJobId() {
-      return jobid;
+      return jobId;
    }
 
    public void setJobId(int job) {
-      jobid = job;
+      jobId = job;
    }
 
    public int getGuildId() {
-      return guildid;
+      return guildId;
    }
 
    public void setGuildId(int gid) {
-      guildid = gid;
+      guildId = gid;
       character.ifPresent(reference -> setGuildId(gid));
    }
 
    public int getGuildRank() {
-      return guildrank;
+      return guildRank;
    }
 
    public void setGuildRank(int rank) {
-      guildrank = rank;
+      guildRank = rank;
       character.ifPresent(reference -> reference.setGuildRank(rank));
    }
 
    public void setOfflineGuildRank(int rank) {
-      guildrank = rank;
+      guildRank = rank;
    }
 
    public int getAllianceRank() {

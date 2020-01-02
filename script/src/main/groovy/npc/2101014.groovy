@@ -22,9 +22,9 @@ class NPC2101014 {
 
    int arenaType
    int map
-   MapleExpeditionType exped = MapleExpeditionType.ARIANT
-   MapleExpeditionType exped1 = MapleExpeditionType.ARIANT1
-   MapleExpeditionType exped2 = MapleExpeditionType.ARIANT2
+   MapleExpeditionType expeditionType = MapleExpeditionType.ARIANT
+   MapleExpeditionType expeditionType1 = MapleExpeditionType.ARIANT1
+   MapleExpeditionType expeditionType2 = MapleExpeditionType.ARIANT2
 
    def start() {
       status = -1
@@ -52,28 +52,28 @@ class NPC2101014 {
             }
 
             if (status == 0) {
-               MapleExpedition expedicao = cm.getExpedition(exped)
-               MapleExpedition expedicao1 = cm.getExpedition(exped1)
-               MapleExpedition expedicao2 = cm.getExpedition(exped2)
+               MapleExpedition expedition = cm.getExpedition(expeditionType)
+               MapleExpedition expedition1 = cm.getExpedition(expeditionType1)
+               MapleExpedition expedition2 = cm.getExpedition(expeditionType2)
 
                MapleMapManager channelMaps = cm.getClient().getChannelServer().getMapFactory()
                String startSnd = "What would you like to do? \r\n\r\n\t#e#r(Choose a Battle Arena)#n#k\r\n#b"
                String toSnd = startSnd
 
-               if (expedicao == null) {
+               if (expedition == null) {
                   toSnd += "#L0#Battle Arena (1) (Empty)#l\r\n"
                } else if (channelMaps.getMap(980010101).getCharacters().isEmpty()) {
-                  toSnd += "#L0#Join Battle Arena (1)  Owner (" + expedicao.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(exped) + "\r\n"
+                  toSnd += "#L0#Join Battle Arena (1)  Owner (" + expedition.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(expeditionType) + "\r\n"
                }
-               if (expedicao1 == null) {
+               if (expedition1 == null) {
                   toSnd += "#L1#Battle Arena (2) (Empty)#l\r\n"
                } else if (channelMaps.getMap(980010201).getCharacters().isEmpty()) {
-                  toSnd += "#L1#Join Battle Arena (2)  Owner (" + expedicao1.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(exped1) + "\r\n"
+                  toSnd += "#L1#Join Battle Arena (2)  Owner (" + expedition1.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(expeditionType1) + "\r\n"
                }
-               if (expedicao2 == null) {
+               if (expedition2 == null) {
                   toSnd += "#L2#Battle Arena (3) (Empty)#l\r\n"
                } else if (channelMaps.getMap(980010301).getCharacters().isEmpty()) {
-                  toSnd += "#L2#Join Battle Arena (3)  Owner (" + expedicao2.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(exped2) + "\r\n"
+                  toSnd += "#L2#Join Battle Arena (3)  Owner (" + expedition2.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(expeditionType2) + "\r\n"
                }
                if (toSnd == startSnd) {
                   cm.sendOk("All the Battle Arena is currently occupied. I suggest you to come back later or change channels.")
@@ -83,20 +83,19 @@ class NPC2101014 {
                }
             } else if (status == 1) {
                arenaType = selection
-               MapleExpedition expedicao = fetchArenaType()
-               if (expedicao == null) {
+               MapleExpedition expedition = fetchArenaType()
+               if (expedition == null) {
                   cm.dispose()
                   return
                }
 
-               if (expedicao != null) {
+               if (expedition != null) {
                   enterArena(-1)
                } else {
-                  cm.sendGetText("Up to how many partipants can join in this match? (2~5 people)")
+                  cm.sendGetText("Up to how many participants can join in this match? (2~5 people)")
                }
             } else if (status == 2) {
                Integer players = (cm.getText()).toInteger()
-               // AriantPQ option limit found thanks to NarutoFury (iMrSiN)
                if (players == null) {
                   cm.sendNext("Please enter a numeric limit value of allowed players in your instance.")
                   status = 0
@@ -113,39 +112,39 @@ class NPC2101014 {
 
 
    def fetchArenaType() {
-      MapleExpedition expedicao
+      MapleExpedition expedition
       switch (arenaType) {
          case 0:
-            exped = MapleExpeditionType.ARIANT
-            expedicao = cm.getExpedition(exped)
+            expeditionType = MapleExpeditionType.ARIANT
+            expedition = cm.getExpedition(expeditionType)
             map = 980010100
             break
          case 1:
-            exped = MapleExpeditionType.ARIANT1
-            expedicao = cm.getExpedition(exped)
+            expeditionType = MapleExpeditionType.ARIANT1
+            expedition = cm.getExpedition(expeditionType)
             map = 980010200
             break
          case 2:
-            exped = MapleExpeditionType.ARIANT2
-            expedicao = cm.getExpedition(exped)
+            expeditionType = MapleExpeditionType.ARIANT2
+            expedition = cm.getExpedition(expeditionType)
             map = 980010300
             break
          default:
-            exped = null
+            expeditionType = null
             map = 0
-            expedicao = null
+            expedition = null
       }
 
-      return expedicao
+      return expedition
    }
 
    def enterArena(int arenaPlayers) {
-      MapleExpedition expedicao = fetchArenaType()
-      if (expedicao == null) {
+      MapleExpedition expedition = fetchArenaType()
+      if (expedition == null) {
          cm.dispose()
-      } else if (expedicao == null) {
+      } else if (expedition == null) {
          if (arenaPlayers != -1) {
-            int res = cm.createExpedition(exped, true, 0, arenaPlayers)
+            int res = cm.createExpedition(expeditionType, true, 0, arenaPlayers)
             if (res == 0) {
                cm.warp(map, 0)
                MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.NOTICE, "Your arena was created successfully. Wait for people to join the battle.")
@@ -166,7 +165,7 @@ class NPC2101014 {
             return
          }
 
-         int playerAdd = expedicao.addMemberInt(cm.getPlayer())
+         int playerAdd = expedition.addMemberInt(cm.getPlayer())
          if (playerAdd == 3) {
             cm.sendOk("Sorry, the lobby is full now")
             cm.dispose()

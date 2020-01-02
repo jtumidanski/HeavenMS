@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.awt.Point;
@@ -76,23 +55,23 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       List<MapleCharacter> banishPlayers = new ArrayList<>();
 
       MapleCharacter chr = client.getPlayer();
-      int damagefrom = packet.damageFrom();
-      int monsteridfrom = packet.monsterIdFrom();
+      int damageFrom = packet.damageFrom();
+      int monsterIdFrom = packet.monsterIdFrom();
       int damage = packet.damage();
       byte direction = packet.direction();
 
       int oid = 0, pgmr = 0;
       int pos_x = 0, pos_y = 0, fake = 0;
       boolean is_pgmr = false, is_pg = true, is_deadly = false;
-      int mpattack = 0;
+      int mpAttack = 0;
       MapleMonster attacker = null;
       final MapleMap map = chr.getMap();
-      if (damagefrom != -3 && damagefrom != -4) {
+      if (damageFrom != -3 && damageFrom != -4) {
          try {
             MapleMapObject mmo = map.getMapObject(oid);
             if (mmo instanceof MapleMonster) {
                attacker = (MapleMonster) mmo;
-               if (attacker.id() != monsteridfrom) {
+               if (attacker.id() != monsterIdFrom) {
                   attacker = null;
                }
             }
@@ -108,7 +87,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                   if (loseItems != null) {
                      if (chr.getBuffEffect(MapleBuffStat.AURA) == null) {
                         MapleInventoryType type;
-                        final int playerpos = chr.position().x;
+                        final int playerXPosition = chr.position().x;
                         byte d = 1;
                         Point pos = new Point(0, chr.position().y);
                         for (LoseItem loseItem : loseItems) {
@@ -138,7 +117,7 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                               }
 
                               for (byte b = 0; b < qty; b++) {
-                                 pos.x = playerpos + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
+                                 pos.x = playerXPosition + ((d % 2 == 0) ? (25 * (d + 1) / 2) : -(25 * (d / 2)));
                                  map.spawnItemDrop(chr, chr, new Item(loseItem.id(), (short) 0, (short) 1), map.calcDropPos(pos, chr.position()), true, true);
                                  d++;
                               }
@@ -148,26 +127,24 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                      map.removeMapObject(attacker);
                   }
                }
-            } else if (damagefrom != 0 || !map.removeSelfDestructive(oid)) {    // thanks inhyuk for noticing self-destruct damage not being handled properly
+            } else if (damageFrom != 0 || !map.removeSelfDestructive(oid)) {
                return;
             }
          } catch (ClassCastException e) {
             //this happens due to mob on last map damaging player just before changing maps
-
             e.printStackTrace();
             FilePrinter.printError(FilePrinter.EXCEPTION_CAUGHT, "Attacker is not a mob-type, rather is a " + map.getMapObject(oid).getClass().getName() + " entity.");
-
             return;
          }
       }
-      if (damagefrom != -1 && damagefrom != -2 && attacker != null) {
-         MobAttackInfo attackInfo = MobAttackInfoFactory.getMobAttackInfo(attacker, damagefrom);
+      if (damageFrom != -1 && damageFrom != -2 && attacker != null) {
+         MobAttackInfo attackInfo = MobAttackInfoFactory.getMobAttackInfo(attacker, damageFrom);
          if (attackInfo != null) {
             if (attackInfo.deadlyAttack()) {
-               mpattack = chr.getMp() - 1;
+               mpAttack = chr.getMp() - 1;
                is_deadly = true;
             }
-            mpattack += attackInfo.mpBurn();
+            mpAttack += attackInfo.mpBurn();
             MobSkill mobSkill = MobSkillFactory.getMobSkill(attackInfo.diseaseSkill(), attackInfo.diseaseLevel());
             if (mobSkill != null && damage > 0) {
                MobSkillProcessor.getInstance().applyEffect(chr, attacker, mobSkill, false, banishPlayers);
@@ -175,9 +152,9 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
 
             attacker.setMp(attacker.getMp() - attackInfo.mpCon());
             if (chr.getBuffedValue(MapleBuffStat.MANA_REFLECTION) != null && damage > 0 && !attacker.isBoss()) {
-               int jobid = chr.getJob().getId();
-               if (jobid == 212 || jobid == 222 || jobid == 232) {
-                  int id = jobid * 10000 + 1002;
+               int jobId = chr.getJob().getId();
+               if (jobId == 212 || jobId == 222 || jobId == 232) {
+                  int id = jobId * 10000 + 1002;
                   Optional<Skill> manaReflectSkill = SkillFactory.getSkill(id);
                   if (manaReflectSkill.isPresent()) {
                      Skill skill = manaReflectSkill.get();
@@ -185,13 +162,13 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
 
                      if (chr.isBuffFrom(MapleBuffStat.MANA_REFLECTION, skill) && skillLevel > 0
                            && skill.getEffect(skillLevel).makeChanceResult()) {
-                        int bouncedamage = (damage * manaReflectSkill.get().getEffect(skillLevel).getX() / 100);
-                        if (bouncedamage > attacker.getMaxHp() / 5) {
-                           bouncedamage = attacker.getMaxHp() / 5;
+                        int bounceDamage = (damage * manaReflectSkill.get().getEffect(skillLevel).getX() / 100);
+                        if (bounceDamage > attacker.getMaxHp() / 5) {
+                           bounceDamage = attacker.getMaxHp() / 5;
                         }
-                        map.damageMonster(chr, attacker, bouncedamage);
-                        int finalBouncedamage = bouncedamage;
-                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(oid, finalBouncedamage), true, chr);
+                        map.damageMonster(chr, attacker, bounceDamage);
+                        int finalBounceDamage = bounceDamage;
+                        MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(oid, finalBounceDamage), true, chr);
                         PacketCreator.announce(chr, new ShowOwnBuffEffect(id, 5));
                         MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowBuffEffect(chr.getId(), id, 5, (byte) 3), false, chr);
                      }
@@ -206,28 +183,28 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
       }
 
       if (damage > 0) {
-         chr.getAutobanManager().resetMisses();
+         chr.getAutoBanManager().resetMisses();
       } else {
-         chr.getAutobanManager().addMiss();
+         chr.getAutoBanManager().addMiss();
       }
 
       //in dojo player cannot use pot, so deadly attacks should be turned off as well
       if (is_deadly && GameConstants.isDojo(chr.getMap().getId()) && !YamlConfig.config.server.USE_DEADLY_DOJO) {
          damage = 0;
-         mpattack = 0;
+         mpAttack = 0;
       }
 
       if (damage > 0 && !chr.isHidden()) {
          if (attacker != null) {
-            if (damagefrom == -1) {
-               if (chr.getBuffedValue(MapleBuffStat.POWERGUARD) != null) { // PG works on bosses, but only at half of the rate.
-                  int bouncedamage = (int) (damage * (chr.getBuffedValue(MapleBuffStat.POWERGUARD).doubleValue() / (attacker.isBoss() ? 200 : 100)));
-                  bouncedamage = Math.min(bouncedamage, attacker.getMaxHp() / 10);
-                  damage -= bouncedamage;
-                  map.damageMonster(chr, attacker, bouncedamage);
-                  int finalBouncedamage = bouncedamage;
-                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(oid, finalBouncedamage), false, chr, true);
-                  attacker.aggroMonsterDamage(chr, bouncedamage);
+            if (damageFrom == -1) {
+               if (chr.getBuffedValue(MapleBuffStat.POWER_GUARD) != null) { // PG works on bosses, but only at half of the rate.
+                  int bounceDamage = (int) (damage * (chr.getBuffedValue(MapleBuffStat.POWER_GUARD).doubleValue() / (attacker.isBoss() ? 200 : 100)));
+                  bounceDamage = Math.min(bounceDamage, attacker.getMaxHp() / 10);
+                  damage -= bounceDamage;
+                  map.damageMonster(chr, attacker, bounceDamage);
+                  int finalBounceDamage = bounceDamage;
+                  MasterBroadcaster.getInstance().sendToAllInMapRange(map, new DamageMonster(oid, finalBounceDamage), false, chr, true);
+                  attacker.aggroMonsterDamage(chr, bounceDamage);
                }
                MapleStatEffect bPressure = chr.getBuffEffect(MapleBuffStat.BODY_PRESSURE);
                if (bPressure != null) {
@@ -242,15 +219,15 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                }
             }
 
-            MapleStatEffect cBarrier = chr.getBuffEffect(MapleBuffStat.COMBO_BARRIER);  // thanks BHB for noticing Combo Barrier buff not working
+            MapleStatEffect cBarrier = chr.getBuffEffect(MapleBuffStat.COMBO_BARRIER);
             if (cBarrier != null) {
                damage *= (cBarrier.getX() / 1000.0);
             }
          }
-         if (damagefrom != -3 && damagefrom != -4) {
-            int jobid = chr.getJob().getId();
-            if (jobid < 200 && jobid % 10 == 2) {
-               Optional<Skill> skill = SkillFactory.getSkill(jobid * 10000 + (jobid == 112 ? 4 : 5));
+         if (damageFrom != -3 && damageFrom != -4) {
+            int jobId = chr.getJob().getId();
+            if (jobId < 200 && jobId % 10 == 2) {
+               Optional<Skill> skill = SkillFactory.getSkill(jobId * 10000 + (jobId == 112 ? 4 : 5));
                if (skill.isPresent()) {
                   int skillLevel = chr.getSkillLevel(skill.get());
                   damage *= (skill.get().getEffect(skillLevel).getX() / 1000.0);
@@ -265,39 +242,39 @@ public final class TakeDamageHandler extends AbstractPacketHandler<TakeDamagePac
                }
             }
          }
-         Integer mesoguard = chr.getBuffedValue(MapleBuffStat.MESOGUARD);
-         if (chr.getBuffedValue(MapleBuffStat.MAGIC_GUARD) != null && mpattack == 0) {
-            int mploss = (int) (damage * (chr.getBuffedValue(MapleBuffStat.MAGIC_GUARD).doubleValue() / 100.0));
-            int hploss = damage - mploss;
+         Integer mesoGuard = chr.getBuffedValue(MapleBuffStat.MESO_GUARD);
+         if (chr.getBuffedValue(MapleBuffStat.MAGIC_GUARD) != null && mpAttack == 0) {
+            int mpLoss = (int) (damage * (chr.getBuffedValue(MapleBuffStat.MAGIC_GUARD).doubleValue() / 100.0));
+            int hpLoss = damage - mpLoss;
 
-            int curmp = chr.getMp();
-            if (mploss > curmp) {
-               hploss += mploss - curmp;
-               mploss = curmp;
+            int currentMp = chr.getMp();
+            if (mpLoss > currentMp) {
+               hpLoss += mpLoss - currentMp;
+               mpLoss = currentMp;
             }
 
-            chr.addMPHP(-hploss, -mploss);
-         } else if (mesoguard != null) {
+            chr.addHpMp(-hpLoss, -mpLoss);
+         } else if (mesoGuard != null) {
             damage = Math.round(damage / 2);
-            int mesoloss = (int) (damage * (mesoguard.doubleValue() / 100.0));
-            if (chr.getMeso() < mesoloss) {
+            int mesoLoss = (int) (damage * (mesoGuard.doubleValue() / 100.0));
+            if (chr.getMeso() < mesoLoss) {
                chr.gainMeso(-chr.getMeso(), false);
-               chr.cancelBuffStats(MapleBuffStat.MESOGUARD);
+               chr.cancelBuffStats(MapleBuffStat.MESO_GUARD);
             } else {
-               chr.gainMeso(-mesoloss, false);
+               chr.gainMeso(-mesoLoss, false);
             }
-            chr.addMPHP(-damage, -mpattack);
+            chr.addHpMp(-damage, -mpAttack);
          } else {
             if (chr.isRidingBattleship()) {
                chr.decreaseBattleshipHp(damage);
             }
-            chr.addMPHP(-damage, -mpattack);
+            chr.addHpMp(-damage, -mpAttack);
          }
       }
       if (!chr.isHidden()) {
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageCharacter(damageFrom, monsterIdFrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false, chr);
       } else {
-         map.broadcastGMMessage(chr, new DamageCharacter(damagefrom, monsteridfrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
+         map.broadcastGMMessage(chr, new DamageCharacter(damageFrom, monsterIdFrom, chr.getId(), damage, fake, direction, is_pgmr, pgmr, is_pg, oid, pos_x, pos_y), false);
       }
       if (GameConstants.isDojo(map.getId())) {
          chr.setDojoEnergy(chr.getDojoEnergy() + YamlConfig.config.server.DOJO_ENERGY_DMG);

@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
@@ -44,7 +25,7 @@ public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobP
       MapleMap map = chr.getMap();
 
       if (map.getEnvironment().isEmpty()) {   // no environment objects activated to actually hit the mob
-         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on map id " + map.getId() + " to attack.");
          return;
       }
 
@@ -53,7 +34,7 @@ public class FieldDamageMobHandler extends AbstractPacketHandler<FieldDamageMobP
 
          if (packet.damage() < 0 || packet.damage() > GameConstants.MAX_FIELD_MOB_DAMAGE) {
             MasterBroadcaster.getInstance().sendToAllInMap(map, new DamageMonster(packet.mobId(), packet.damage()), true, chr);
-            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on mapid " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.id()) + " with damage " + packet.damage());
+            FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to use an obstacle on map id " + map.getId() + " to attack " + MapleMonsterInformationProvider.getInstance().getMobNameFromId(mob.id()) + " with damage " + packet.damage());
             return;
          }
       }

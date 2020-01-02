@@ -44,22 +44,22 @@ class NPC2101016 {
             status--
          }
          if (status == 0) {
-            int copns = arena.getAriantScore(cm.getPlayer())
-            if (copns < 1 && !cm.getPlayer().isGM()) {
+            int ariantScore = arena.getAriantScore(cm.getPlayer())
+            if (ariantScore < 1 && !cm.getPlayer().isGM()) {
                cm.sendOk("Too bad, you did not get any jewelry!")
                cm.dispose()
             } else {
-               cm.sendNext("Ok, let's see... You did very well and you brought #b" + copns + "#k jewelry that I love. Since you have completed the match, I will reward you with a Battle Arena score of #b" + arena.getAriantRewardTier(cm.getPlayer()) + " points#k. If you want to know more about the Battle Arena score, then talk to #b#p2101015##k.")
+               cm.sendNext("Ok, let's see... You did very well and you brought #b" + ariantScore + "#k jewelry that I love. Since you have completed the match, I will reward you with a Battle Arena score of #b" + arena.getAriantRewardTier(cm.getPlayer()) + " points#k. If you want to know more about the Battle Arena score, then talk to #b#p2101015##k.")
             }
          } else if (status == 1) {
             //cm.warp(980010020, 0);
-            int copns = arena.getAriantRewardTier(cm.getPlayer())
+            int rewardTier = arena.getAriantRewardTier(cm.getPlayer())
             arena.clearAriantRewardTier(cm.getPlayer())
             arena.clearAriantScore(cm.getPlayer())
             cm.removeAll(4031868)
 
-            cm.getPlayer().gainExp((int) (92.7 * cm.getPlayer().getExpRate() * copns), true, true)
-            cm.getPlayer().gainAriantPoints(copns)
+            cm.getPlayer().gainExp((int) (92.7 * cm.getPlayer().getExpRate() * rewardTier), true, true)
+            cm.getPlayer().gainAriantPoints(rewardTier)
             cm.sendOk("Alright! Make me more jewels next time! Ahahahahah!")
             cm.dispose()
          }

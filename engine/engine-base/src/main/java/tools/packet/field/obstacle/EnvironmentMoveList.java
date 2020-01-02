@@ -15,7 +15,7 @@ public class EnvironmentMoveList implements PacketInput {
 
    @Override
    public SendOpcode opcode() {
-      return SendOpcode.FIELD_OBSTACLE_ONOFF_LIST;
+      return SendOpcode.FIELD_OBSTACLE_ON_OFF_LIST;
    }
 
    public Set<Map.Entry<String, Integer>> getEnvironmentMoveList() {

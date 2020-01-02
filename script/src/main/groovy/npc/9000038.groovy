@@ -55,7 +55,7 @@ class NPC9000038 {
          }
 
          if (status == 0) {
-            String sendStr = "The #bBoss Rush Party Quest#k rewards players accordingly to how far the team went on the boss huntings. Take note that each player #bcan only claim a reward if they leave through a portal inside a Resting Spot#k. Challenging stronger bosses will require the team to commit to more fightings until the next Resting Spot is reached, or until the final boss is defeated.\r\n\r\nThe possible rewards for those leaving in the selected Resting Spot are depicted here:\r\n\r\n#b"
+            String sendStr = "The #bBoss Rush Party Quest#k rewards players accordingly to how far the team went on boss hunting. Take note that each player #bcan only claim a reward if they leave through a portal inside a Resting Spot#k. Challenging stronger bosses will require the team to commit to more fighting until the next Resting Spot is reached, or until the final boss is defeated.\r\n\r\nThe possible rewards for those leaving in the selected Resting Spot are depicted here:\r\n\r\n#b"
             for (int i = 0; i < 6; i++) {
                sendStr += "#L" + i + "#" + levels[i] + "#l\r\n"
             }

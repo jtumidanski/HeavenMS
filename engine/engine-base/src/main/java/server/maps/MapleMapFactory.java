@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.maps;
 
 import java.awt.Point;
@@ -104,18 +83,18 @@ public class MapleMapFactory {
             map.addMonsterSpawn(monster, mobTime, team);
          }
 
-         //should the map be reseted, use allMonsterSpawn list of monsters to spawn them again
+         //should the map be reset, use allMonsterSpawn list of monsters to spawn them again
          map.addAllMonsterSpawn(monster, mobTime, team);
       } else {
          map.addMapObject(myLife);
       }
    }
 
-   public static MapleMap loadMapFromWz(int mapid, int world, int channel, EventInstanceManager event) {
+   public static MapleMap loadMapFromWz(int mapId, int world, int channel, EventInstanceManager event) {
       MapleMap map;
 
-      String mapName = getMapName(mapid);
-      MapleData mapData = mapSource.getData(mapName);    // source.getData issue with giving nulls in rare ocasions found thanks to MedicOP
+      String mapName = getMapName(mapId);
+      MapleData mapData = mapSource.getData(mapName);
       MapleData infoData = mapData.getChildByPath("info");
 
       String link = MapleDataTool.getString(infoData.getChildByPath("link"), "");
@@ -128,14 +107,14 @@ public class MapleMapFactory {
       if (mobRate != null) {
          monsterRate = (Float) mobRate.getData();
       }
-      map = new MapleMap(mapid, world, channel, MapleDataTool.getInt("returnMap", infoData), monsterRate);
+      map = new MapleMap(mapId, world, channel, MapleDataTool.getInt("returnMap", infoData), monsterRate);
       map.setEventInstance(event);
 
-      String onFirstEnter = MapleDataTool.getString(infoData.getChildByPath("onFirstUserEnter"), String.valueOf(mapid));
-      map.setOnFirstUserEnter(onFirstEnter.equals("") ? String.valueOf(mapid) : onFirstEnter);
+      String onFirstEnter = MapleDataTool.getString(infoData.getChildByPath("onFirstUserEnter"), String.valueOf(mapId));
+      map.setOnFirstUserEnter(onFirstEnter.equals("") ? String.valueOf(mapId) : onFirstEnter);
 
-      String onEnter = MapleDataTool.getString(infoData.getChildByPath("onUserEnter"), String.valueOf(mapid));
-      map.setOnUserEnter(onEnter.equals("") ? String.valueOf(mapid) : onEnter);
+      String onEnter = MapleDataTool.getString(infoData.getChildByPath("onUserEnter"), String.valueOf(mapId));
+      map.setOnUserEnter(onEnter.equals("") ? String.valueOf(mapId) : onEnter);
 
       map.setFieldLimit(MapleDataTool.getInt(infoData.getChildByPath("fieldLimit"), 0));
       map.setMobInterval((short) MapleDataTool.getInt(infoData.getChildByPath("createMobInterval"), 5000));
@@ -153,23 +132,23 @@ public class MapleMapFactory {
       bounds[1] = MapleDataTool.getInt(infoData.getChildByPath("VRBottom"));
 
       if (bounds[0] == bounds[1]) {    // old-style baked map
-         MapleData minimapData = mapData.getChildByPath("miniMap");
-         if (minimapData != null) {
-            bounds[0] = MapleDataTool.getInt(minimapData.getChildByPath("centerX")) * -1;
-            bounds[1] = MapleDataTool.getInt(minimapData.getChildByPath("centerY")) * -1;
-            bounds[2] = MapleDataTool.getInt(minimapData.getChildByPath("height"));
-            bounds[3] = MapleDataTool.getInt(minimapData.getChildByPath("width"));
+         MapleData miniMap = mapData.getChildByPath("miniMap");
+         if (miniMap != null) {
+            bounds[0] = MapleDataTool.getInt(miniMap.getChildByPath("centerX")) * -1;
+            bounds[1] = MapleDataTool.getInt(miniMap.getChildByPath("centerY")) * -1;
+            bounds[2] = MapleDataTool.getInt(miniMap.getChildByPath("height"));
+            bounds[3] = MapleDataTool.getInt(miniMap.getChildByPath("width"));
 
-            map.setMapPointBoundings(bounds[0], bounds[1], bounds[2], bounds[3]);
+            map.setMapPointBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
          } else {
             int dist = (1 << 18);
-            map.setMapPointBoundings(-dist / 2, -dist / 2, dist, dist);
+            map.setMapPointBounds(-dist / 2, -dist / 2, dist, dist);
          }
       } else {
          bounds[2] = MapleDataTool.getInt(infoData.getChildByPath("VRLeft"));
          bounds[3] = MapleDataTool.getInt(infoData.getChildByPath("VRRight"));
 
-         map.setMapLineBoundings(bounds[0], bounds[1], bounds[2], bounds[3]);
+         map.setMapLineBounds(bounds[0], bounds[1], bounds[2], bounds[3]);
       }
 
       List<MapleFoothold> allFootholds = new LinkedList<>();
@@ -218,11 +197,11 @@ public class MapleMapFactory {
          map.setSeats(seats);
       }
       if (event == null) {
-         DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcProvider.getInstance().getForMapAndWorld(connection, mapid, world).forEach(map::addPlayerNPCMapObject));
-         List<MaplePlayerNPC> dnpcs = MaplePlayerNPCFactory.getDeveloperNpcsFromMapid(mapid);
-         if (dnpcs != null) {
-            for (MaplePlayerNPC dnpc : dnpcs) {
-               map.addPlayerNPCMapObject(dnpc);
+         DatabaseConnection.getInstance().withConnection(connection -> PlayerNpcProvider.getInstance().getForMapAndWorld(connection, mapId, world).forEach(map::addPlayerNPCMapObject));
+         List<MaplePlayerNPC> developerNpcList = MaplePlayerNPCFactory.getDeveloperNpcListFromMapId(mapId);
+         if (developerNpcList != null) {
+            for (MaplePlayerNPC developerNpc : developerNpcList) {
+               map.addPlayerNPCMapObject(developerNpc);
             }
          }
       }
@@ -234,7 +213,7 @@ public class MapleMapFactory {
          MapleData mcData = mapData.getChildByPath("monsterCarnival");
          if (mcData != null) {
             map.setDeathCP(MapleDataTool.getIntConvert("deathCP", mcData, 0));
-            map.setMaxMobs(MapleDataTool.getIntConvert("mobGenMax", mcData, 20));    // thanks Atoot for noticing CPQ1 bf. 3 & 4 not accepting spawns due to undefined limits
+            map.setMaxMobs(MapleDataTool.getIntConvert("mobGenMax", mcData, 20));
             map.setTimeDefault(MapleDataTool.getIntConvert("timeDefault", mcData, 0));
             map.setTimeExpand(MapleDataTool.getIntConvert("timeExpand", mcData, 0));
             map.setMaxReactors(MapleDataTool.getIntConvert("guardianGenMax", mcData, 16));
@@ -270,12 +249,12 @@ public class MapleMapFactory {
          }
       }
       try {
-         map.setMapName(loadPlaceName(mapid));
-         map.setStreetName(loadStreetName(mapid));
+         map.setMapName(loadPlaceName(mapId));
+         map.setStreetName(loadStreetName(mapId));
       } catch (Exception e) {
-         if (mapid / 1000 != 1020) {     // explorer job introduction scenes
+         if (mapId / 1000 != 1020) {     // explorer job introduction scenes
             e.printStackTrace();
-            System.err.println("Not found mapid " + mapid);
+            System.err.println("Not found map " + mapId);
          }
 
          map.setMapName("");
@@ -283,7 +262,7 @@ public class MapleMapFactory {
       }
 
       map.setClock(mapData.getChildByPath("clock") != null);
-      map.setEverlast(MapleDataTool.getIntConvert("everlast", infoData, 0) != 0); // thanks davidlafriniere for noticing value 0 accounting as true
+      map.setEverLast(MapleDataTool.getIntConvert("everlast", infoData, 0) != 0);
       map.setTown(MapleDataTool.getIntConvert("town", infoData, 0) != 0);
       map.setHPDec(MapleDataTool.getIntConvert("decHP", infoData, 0));
       map.setHPDecProtect(MapleDataTool.getIntConvert("protectItem", infoData, 0));
@@ -300,7 +279,7 @@ public class MapleMapFactory {
 
       HashMap<Integer, Integer> backTypes = new HashMap<>();
       try {
-         for (MapleData layer : mapData.getChildByPath("back")) { // yolo
+         for (MapleData layer : mapData.getChildByPath("back")) {
             int layerNum = Integer.parseInt(layer.getName());
             int btype = MapleDataTool.getInt(layer.getChildByPath("type"), 0);
 
@@ -343,41 +322,41 @@ public class MapleMapFactory {
       return myReactor;
    }
 
-   private static String getMapName(int mapid) {
-      String mapName = StringUtil.getLeftPaddedStr(Integer.toString(mapid), '0', 9);
-      int area = mapid / 100000000;
+   private static String getMapName(int mapId) {
+      String mapName = StringUtil.getLeftPaddedStr(Integer.toString(mapId), '0', 9);
+      int area = mapId / 100000000;
       mapName = "Map/Map" + area + "/" + mapName + ".img";
       return mapName;
    }
 
-   private static String getMapStringName(int mapid) {
+   private static String getMapStringName(int mapId) {
       StringBuilder builder = new StringBuilder();
-      if (mapid < 100000000) {
+      if (mapId < 100000000) {
          builder.append("maple");
-      } else if (mapid >= 100000000 && mapid < 200000000) {
+      } else if (mapId >= 100000000 && mapId < 200000000) {
          builder.append("victoria");
-      } else if (mapid >= 200000000 && mapid < 300000000) {
+      } else if (mapId >= 200000000 && mapId < 300000000) {
          builder.append("ossyria");
-      } else if (mapid >= 300000000 && mapid < 400000000) {
+      } else if (mapId >= 300000000 && mapId < 400000000) {
          builder.append("elin");
-      } else if (mapid >= 540000000 && mapid < 560000000) {
+      } else if (mapId >= 540000000 && mapId < 560000000) {
          builder.append("singapore");
-      } else if (mapid >= 600000000 && mapid < 620000000) {
+      } else if (mapId >= 600000000 && mapId < 620000000) {
          builder.append("MasteriaGL");
-      } else if (mapid >= 677000000 && mapid < 677100000) {
+      } else if (mapId >= 677000000 && mapId < 677100000) {
          builder.append("Episode1GL");
-      } else if (mapid >= 670000000 && mapid < 682000000) {
-         if ((mapid >= 674030000 && mapid < 674040000) || (mapid >= 680100000 && mapid < 680200000)) {
+      } else if (mapId >= 670000000 && mapId < 682000000) {
+         if ((mapId >= 674030000 && mapId < 674040000) || (mapId >= 680100000 && mapId < 680200000)) {
             builder.append("etc");
          } else {
             builder.append("weddingGL");
          }
-      } else if (mapid >= 682000000 && mapid < 683000000) {
+      } else if (mapId >= 682000000 && mapId < 683000000) {
          builder.append("HalloweenGL");
-      } else if (mapid >= 683000000 && mapid < 684000000) {
+      } else if (mapId >= 683000000 && mapId < 684000000) {
          builder.append("event");
-      } else if (mapid >= 800000000 && mapid < 900000000) {
-         if ((mapid >= 889100000 && mapid < 889200000)) {
+      } else if (mapId >= 800000000 && mapId < 900000000) {
+         if ((mapId >= 889100000 && mapId < 889200000)) {
             builder.append("etc");
          } else {
             builder.append("jp");
@@ -385,21 +364,21 @@ public class MapleMapFactory {
       } else {
          builder.append("etc");
       }
-      builder.append("/").append(mapid);
+      builder.append("/").append(mapId);
       return builder.toString();
    }
 
-   public static String loadPlaceName(int mapid) throws Exception {
+   public static String loadPlaceName(int mapId) {
       try {
-         return MapleDataTool.getString("mapName", nameData.getChildByPath(getMapStringName(mapid)), "");
+         return MapleDataTool.getString("mapName", nameData.getChildByPath(getMapStringName(mapId)), "");
       } catch (Exception e) {
          return "";
       }
    }
 
-   public static String loadStreetName(int mapid) throws Exception {
+   public static String loadStreetName(int mapId) {
       try {
-         return MapleDataTool.getString("streetName", nameData.getChildByPath(getMapStringName(mapid)), "");
+         return MapleDataTool.getString("streetName", nameData.getChildByPath(getMapStringName(mapId)), "");
       } catch (Exception e) {
          return "";
       }

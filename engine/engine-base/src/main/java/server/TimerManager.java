@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server;
 
 import java.lang.management.ManagementFactory;
@@ -54,7 +33,7 @@ public class TimerManager implements TimerManagerMBean {
       if (ses != null && !ses.isShutdown() && !ses.isTerminated()) {
          return;
       }
-      ScheduledThreadPoolExecutor stpe = new ScheduledThreadPoolExecutor(4, new ThreadFactory() {
+      ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(4, new ThreadFactory() {
          private final AtomicInteger threadNumber = new AtomicInteger(1);
 
          @Override
@@ -65,26 +44,23 @@ public class TimerManager implements TimerManagerMBean {
          }
       });
       //this is a no-no, it actually does nothing..then why the fuck are you doing it?
-      stpe.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
-      stpe.setRemoveOnCancelPolicy(true);
+      executor.setContinueExistingPeriodicTasksAfterShutdownPolicy(false);
+      executor.setRemoveOnCancelPolicy(true);
 
-      stpe.setKeepAliveTime(5, TimeUnit.MINUTES);
-      stpe.allowCoreThreadTimeOut(true);
+      executor.setKeepAliveTime(5, TimeUnit.MINUTES);
+      executor.allowCoreThreadTimeOut(true);
 
-      ses = stpe;
+      ses = executor;
    }
 
    public void stop() {
       ses.shutdownNow();
    }
 
-   public Runnable purge() {//Yay?
-      return new Runnable() {
-         @Override
-         public void run() {
-            Server.getInstance().forceUpdateCurrentTime();
-            ses.purge();
-         }
+   public Runnable purge() {
+      return () -> {
+         Server.getInstance().forceUpdateCurrentTime();
+         ses.purge();
       };
    }
 

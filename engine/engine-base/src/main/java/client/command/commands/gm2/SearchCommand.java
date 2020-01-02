@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command.commands.gm2;
 
 import java.io.File;
@@ -62,7 +39,7 @@ public class SearchCommand extends Command {
       StringBuilder sb = new StringBuilder();
 
       String search = joinStringFrom(params, 1);
-      long start = System.currentTimeMillis();//for the lulz
+      long start = System.currentTimeMillis();
       MapleData data = null;
       if (!params[0].equalsIgnoreCase("ITEM")) {
          int searchType = 0;
@@ -119,7 +96,7 @@ public class SearchCommand extends Command {
          }
       } else {
          for (Pair<Integer, String> itemPair : MapleItemInformationProvider.getInstance().getAllItems()) {
-            if (sb.length() < 32654) {//ohlol
+            if (sb.length() < 32654) {
                if (itemPair.getRight().toLowerCase().contains(search.toLowerCase())) {
                   sb.append("#b").append(itemPair.getLeft()).append("#k - #r").append(itemPair.getRight()).append("\r\n");
                }

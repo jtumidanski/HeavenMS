@@ -53,11 +53,9 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client to show an EXP increase.
-    *
-    * @return The exp gained packet.
     */
    protected void getShowExpGain(MaplePacketLittleEndianWriter writer, ShowEXPGain packet) {
-      writer.write(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guildpoints
+      writer.write(3); // 3 = exp, 4 = fame, 5 = mesos, 6 = guild points
       writer.writeBool(packet.white());
       writer.writeInt(packet.gain());
       writer.writeBool(packet.inChat());
@@ -78,8 +76,6 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client to show a fame gain.
-    *
-    * @return The meso gain packet.
     */
    protected void getShowFameGain(MaplePacketLittleEndianWriter writer, ShowFameGain packet) {
       writer.write(4);
@@ -88,8 +84,6 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client to show a meso gain.
-    *
-    * @return The meso gain packet.
     */
    protected void getShowMesoGain(MaplePacketLittleEndianWriter writer, ShowMesoGain packet) {
       if (!packet.inChat()) {
@@ -180,7 +174,7 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
    protected void updateDojoStats(MaplePacketLittleEndianWriter writer, UpdateDojoStats packet) {
       writer.write(10);
       writer.write(new byte[]{(byte) 0xB7, 4}); //?
-      writer.writeMapleAsciiString("pt=" + packet.dojoPoints() + ";belt=" + packet.belt() + ";tuto=" + (packet.finishedDojoTutorial() ? "1" : "0"));
+      writer.writeMapleAsciiString("pt=" + packet.dojoPoints() + ";belt=" + packet.belt() + ";tutorial=" + (packet.finishedDojoTutorial() ? "1" : "0"));
    }
 
    protected void itemExpired(MaplePacketLittleEndianWriter writer, ShowItemExpired packet) {
@@ -195,8 +189,6 @@ public class StatusInfoPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client to show an item gain.
-    *
-    * @return The item gain packet.
     */
    protected void getShowItemGain(MaplePacketLittleEndianWriter writer, ShowItemGain packet) {
       writer.writeShort(0);

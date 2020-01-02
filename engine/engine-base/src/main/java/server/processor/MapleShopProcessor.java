@@ -161,12 +161,12 @@ public class MapleShopProcessor {
          int value = amount * shop.tokenValue();
          int cost = item.price() * quantity;
          if (c.getPlayer().getMeso() + value >= cost) {
-            int cardreduce = value - cost;
-            int diff = cardreduce + c.getPlayer().getMeso();
+            int cardReduce = value - cost;
+            int diff = cardReduce + c.getPlayer().getMeso();
             if (MapleInventoryManipulator.checkSpace(c, itemId, quantity, "")) {
                if (ItemConstants.isPet(itemId)) {
-                  int petid = PetProcessor.getInstance().createPet(itemId);
-                  MapleInventoryManipulator.addById(c, itemId, quantity, "", petid, -1);
+                  int petId = PetProcessor.getInstance().createPet(itemId);
+                  MapleInventoryManipulator.addById(c, itemId, quantity, "", petId, -1);
                } else {
                   MapleInventoryManipulator.addById(c, itemId, quantity, "", -1, -1);
                }

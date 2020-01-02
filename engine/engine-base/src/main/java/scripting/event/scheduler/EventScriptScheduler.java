@@ -1,22 +1,3 @@
-/*
- This file is part of the HeavenMS MapleStory Server
- Copyleft (L) 2016 - 2018 RonanLana
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package scripting.event.scheduler;
 
 import java.util.HashMap;
@@ -35,13 +16,10 @@ import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.ThreadManager;
 import server.TimerManager;
 
-/**
- * @author Ronan
- */
 public class EventScriptScheduler {
 
    private boolean disposed = false;
-   private int idleProcs = 0;
+   private int idleProcesses = 0;
    private Map<Runnable, Long> registeredEntries = new HashMap<>();
 
    private ScheduledFuture<?> schedulerTask = null;
@@ -49,7 +27,7 @@ public class EventScriptScheduler {
    private Runnable monitorTask = this::runBaseSchedule;
 
    public EventScriptScheduler() {
-      schedulerLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.EM_SCHDL, true);
+      schedulerLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.EM_SCHEDULE, true);
    }
 
    private void runBaseSchedule() {
@@ -59,9 +37,9 @@ public class EventScriptScheduler {
       schedulerLock.lock();
       try {
          if (registeredEntries.isEmpty()) {
-            idleProcs++;
+            idleProcesses++;
 
-            if (idleProcs >= YamlConfig.config.server.MOB_STATUS_MONITOR_LIFE) {
+            if (idleProcesses >= YamlConfig.config.server.MOB_STATUS_MONITOR_LIFE) {
                if (schedulerTask != null) {
                   schedulerTask.cancel(false);
                   schedulerTask = null;
@@ -71,7 +49,7 @@ public class EventScriptScheduler {
             return;
          }
 
-         idleProcs = 0;
+         idleProcesses = 0;
          registeredEntriesCopy = new HashMap<>(registeredEntries);
       } finally {
          schedulerLock.unlock();
@@ -102,63 +80,54 @@ public class EventScriptScheduler {
 
    public void registerEntry(final Runnable scheduledAction, final long duration) {
 
-      ThreadManager.getInstance().newTask(new Runnable() {
-         @Override
-         public void run() {
-            schedulerLock.lock();
-            try {
-               idleProcs = 0;
-               if (schedulerTask == null) {
-                  if (disposed) {
-                     return;
-                  }
-
-                  schedulerTask = TimerManager.getInstance().register(monitorTask, YamlConfig.config.server.MOB_STATUS_MONITOR_PROC, YamlConfig.config.server.MOB_STATUS_MONITOR_PROC);
+      ThreadManager.getInstance().newTask(() -> {
+         schedulerLock.lock();
+         try {
+            idleProcesses = 0;
+            if (schedulerTask == null) {
+               if (disposed) {
+                  return;
                }
 
-               registeredEntries.put(scheduledAction, Server.getInstance().getCurrentTime() + duration);
-            } finally {
-               schedulerLock.unlock();
+               schedulerTask = TimerManager.getInstance().register(monitorTask, YamlConfig.config.server.MOB_STATUS_MONITOR_PROC, YamlConfig.config.server.MOB_STATUS_MONITOR_PROC);
             }
+
+            registeredEntries.put(scheduledAction, Server.getInstance().getCurrentTime() + duration);
+         } finally {
+            schedulerLock.unlock();
          }
       });
    }
 
    public void cancelEntry(final Runnable scheduledAction) {
 
-      ThreadManager.getInstance().newTask(new Runnable() {
-         @Override
-         public void run() {
-            schedulerLock.lock();
-            try {
-               registeredEntries.remove(scheduledAction);
-            } finally {
-               schedulerLock.unlock();
-            }
+      ThreadManager.getInstance().newTask(() -> {
+         schedulerLock.lock();
+         try {
+            registeredEntries.remove(scheduledAction);
+         } finally {
+            schedulerLock.unlock();
          }
       });
    }
 
    public void dispose() {
 
-      ThreadManager.getInstance().newTask(new Runnable() {
-         @Override
-         public void run() {
-            schedulerLock.lock();
-            try {
-               if (schedulerTask != null) {
-                  schedulerTask.cancel(false);
-                  schedulerTask = null;
-               }
-
-               registeredEntries.clear();
-               disposed = true;
-            } finally {
-               schedulerLock.unlock();
+      ThreadManager.getInstance().newTask(() -> {
+         schedulerLock.lock();
+         try {
+            if (schedulerTask != null) {
+               schedulerTask.cancel(false);
+               schedulerTask = null;
             }
 
-            disposeLocks();
+            registeredEntries.clear();
+            disposed = true;
+         } finally {
+            schedulerLock.unlock();
          }
+
+         disposeLocks();
       });
    }
 

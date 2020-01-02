@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.world;
 
 import java.util.Optional;
@@ -31,23 +10,23 @@ public class MaplePartyCharacter {
    private int id;
    private int level;
    private int channel, world;
-   private int jobid;
-   private int mapid;
+   private int jobId;
+   private int mapId;
    private boolean online;
    private MapleJob job;
    private Optional<MapleCharacter> character;
 
-   public MaplePartyCharacter(MapleCharacter maplechar) {
-      this.character = Optional.of(maplechar);
-      this.name = maplechar.getName();
-      this.level = maplechar.getLevel();
-      this.channel = maplechar.getClient().getChannel();
-      this.world = maplechar.getWorld();
-      this.id = maplechar.getId();
-      this.jobid = maplechar.getJob().getId();
-      this.mapid = maplechar.getMapId();
+   public MaplePartyCharacter(MapleCharacter character) {
+      this.character = Optional.of(character);
+      this.name = character.getName();
+      this.level = character.getLevel();
+      this.channel = character.getClient().getChannel();
+      this.world = character.getWorld();
+      this.id = character.getId();
+      this.jobId = character.getJob().getId();
+      this.mapId = character.getMapId();
       this.online = true;
-      this.job = maplechar.getJob();
+      this.job = character.getJob();
    }
 
    public MaplePartyCharacter() {
@@ -92,16 +71,16 @@ public class MaplePartyCharacter {
    public void setOnline(boolean online) {
       this.online = online;
       if (!online) {
-         this.character = Optional.empty();  // thanks Feras for noticing offline party members retaining whole character object unnecessarily
+         this.character = Optional.empty();
       }
    }
 
    public int getMapId() {
-      return mapid;
+      return mapId;
    }
 
-   public void setMapId(int mapid) {
-      this.mapid = mapid;
+   public void setMapId(int mapId) {
+      this.mapId = mapId;
    }
 
    public String getName() {
@@ -113,7 +92,7 @@ public class MaplePartyCharacter {
    }
 
    public int getJobId() {
-      return jobid;
+      return jobId;
    }
 
    public int getGuildId() {

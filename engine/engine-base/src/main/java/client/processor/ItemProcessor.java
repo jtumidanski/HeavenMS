@@ -36,7 +36,7 @@ public class ItemProcessor {
    public void setFlag(Item item, short b) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       if (ii.isAccountRestricted(item.id())) {
-         b |= ItemConstants.ACCOUNT_SHARING; // thanks Shinigami15 for noticing ACCOUNT_SHARING flag not being applied properly to items server-side
+         b |= ItemConstants.ACCOUNT_SHARING;
       }
       item.flag_$eq(b);
    }
@@ -52,7 +52,7 @@ public class ItemProcessor {
       return (item.flag() & ItemConstants.MERGE_UNTRADEABLE) == ItemConstants.MERGE_UNTRADEABLE;
    }
 
-   public boolean isUntradeable(Item item) {
+   public boolean isUnableToBeTraded(Item item) {
       return ((item.flag() & ItemConstants.UNTRADEABLE) == ItemConstants.UNTRADEABLE) || (MapleItemInformationProvider.getInstance().isDropRestricted(item.id()) && !MapleKarmaManipulator.hasKarmaFlag(item));
    }
 
@@ -96,7 +96,7 @@ public class ItemProcessor {
    }
 
    public double normalizedMasteryExp(int reqLevel) {
-      // Conversion factor between mob exp and equip exp gain. Through many calculations, the expected for equipment levelup
+      // Conversion factor between mob exp and equip exp gain. Through many calculations, the expected for equipment level up
       // from level 1 to 2 is killing about 100~200 mobs of the same level range, on a 1x EXP rate scenario.
 
       if (reqLevel < 5) {
@@ -112,7 +112,7 @@ public class ItemProcessor {
       }
    }
 
-   public void showLevelupMessage(String msg, MapleClient c) {
+   public void showLevelUpMessage(String msg, MapleClient c) {
       c.getPlayer().showHint(msg, 300);
    }
 
@@ -139,7 +139,7 @@ public class ItemProcessor {
    }
 
 
-   public synchronized void gainItemExp(Equip equip, MapleClient c, int gain) {  // Ronan's Equip Exp gain method
+   public synchronized void gainItemExp(Equip equip, MapleClient c, int gain) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       if (!ii.isUpgradeable(equip.id())) {
          return;
@@ -186,7 +186,7 @@ public class ItemProcessor {
       List<Pair<StatUpgrade, Integer>> stats = new LinkedList<>();
 
       if (equip.elemental()) {
-         List<Pair<String, Integer>> elementalStats = MapleItemInformationProvider.getInstance().getItemLevelupStats(equip.id(), equip.itemLevel());
+         List<Pair<String, Integer>> elementalStats = MapleItemInformationProvider.getInstance().getItemLevelUpStats(equip.id(), equip.itemLevel());
 
          for (Pair<String, Integer> p : elementalStats) {
             if (p.getRight() > 0) {
@@ -228,27 +228,27 @@ public class ItemProcessor {
 
       equip.itemLevel_$eq((byte) (equip.itemLevel() + 1));
 
-      String lvupStr = "'" + MapleItemInformationProvider.getInstance().getName(equip.id()) + "' is now level " + equip.itemLevel() + "! ";
+      String levelUpString = "'" + MapleItemInformationProvider.getInstance().getName(equip.id()) + "' is now level " + equip.itemLevel() + "! ";
       String showStr = "#e'" + MapleItemInformationProvider.getInstance().getName(equip.id()) + "'#b is now #elevel #r" + equip.itemLevel() + "#k#b!";
 
       Pair<String, Pair<Boolean, Boolean>> res = equip.gainStats(stats);
-      lvupStr += res.getLeft();
+      levelUpString += res.getLeft();
       boolean gotSlot = res.getRight().getLeft();
       boolean gotVicious = res.getRight().getRight();
 
       if (gotVicious) {
          //c.getPlayer().dropMessage(6, "A new Vicious Hammer opportunity has been found on the '" + MapleItemInformationProvider.getInstance().getName(getItemId()) + "'!");
-         lvupStr += "+VICIOUS ";
+         levelUpString += "+VICIOUS ";
       }
       if (gotSlot) {
          //c.getPlayer().dropMessage(6, "A new upgrade slot has been found on the '" + MapleItemInformationProvider.getInstance().getName(getItemId()) + "'!");
-         lvupStr += "+UPGSLOT ";
+         levelUpString += "+UPGSLOT ";
       }
 
       c.getPlayer().equipChanged();
 
-      showLevelupMessage(showStr, c); // thanks to Polaris dev team !
-      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, lvupStr);
+      showLevelUpMessage(showStr, c);
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, levelUpString);
 
       PacketCreator.announce(c, new ShowSpecialEffect(15));
       c.getPlayer().getMap().broadcastMessage(c.getPlayer(), new ShowForeignEffect(c.getPlayer().getId(), 15));
@@ -312,8 +312,6 @@ public class ItemProcessor {
    }
 
    private boolean isNotWeaponAffinity(Equip equip, StatUpgrade name) {
-      // WATK/MATK expected gains lessens outside of weapon affinity (physical/magic): Vcoc's idea
-
       if (ItemConstants.isWeapon(equip.id())) {
          if (name.equals(StatUpgrade.incPAD)) {
             return !isPhysicalWeapon(equip.id());
@@ -325,8 +323,8 @@ public class ItemProcessor {
       return false;
    }
 
-   private boolean isPhysicalWeapon(int itemid) {
-      Equip eqp = (Equip) MapleItemInformationProvider.getInstance().getEquipById(itemid);
+   private boolean isPhysicalWeapon(int itemId) {
+      Equip eqp = (Equip) MapleItemInformationProvider.getInstance().getEquipById(itemId);
       return eqp.watk() >= eqp.matk();
    }
 }

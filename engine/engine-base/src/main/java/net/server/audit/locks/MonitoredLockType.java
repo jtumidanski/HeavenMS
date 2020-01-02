@@ -1,27 +1,4 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.audit.locks;
-
-/**
- * @author RonanLana
- */
 
 public enum MonitoredLockType {
    UNDEFINED,
@@ -41,8 +18,8 @@ public enum MonitoredLockType {
    BOOK,
    ITEM,
    INVENTORY,
-   SRVHANDLER_IDLE,
-   SRVHANDLER_TEMP,
+   SERVER_HANDLER_IDLE,
+   SERVER_HANDLER_TEMP,
    BUFF_STORAGE,
    PLAYER_STORAGE,
    PLAYER_DOOR,
@@ -56,11 +33,11 @@ public enum MonitoredLockType {
    CHANNEL_EVENTS,
    CHANNEL_FACEEXPRS,
    CHANNEL_FACESCHDL,
-   CHANNEL_MOBACTION,
-   CHANNEL_MOBANIMAT,
-   CHANNEL_MOBMIST,
-   CHANNEL_MOBSKILL,
-   CHANNEL_MOBSTATUS,
+   CHANNEL_MOB_ACTION,
+   CHANNEL_MOB_ANIMATION,
+   CHANNEL_MOB_MIST,
+   CHANNEL_MOB_SKILL,
+   CHANNEL_MOB_STATUS,
    CHANNEL_OVTSTATUS,
    CHANNEL_OVERALL,
    GUILD,
@@ -69,35 +46,35 @@ public enum MonitoredLockType {
    WORLD_PARTY_SEARCH_ECHELON,
    WORLD_PARTY_SEARCH_QUEUE,
    WORLD_PARTY_SEARCH_STORAGE,
-   WORLD_SRVMESSAGES,
+   WORLD_SERVER_MESSAGES,
    WORLD_PETS,
    WORLD_CHARS,
    WORLD_CHANNELS,
    WORLD_MOUNTS,
-   WORLD_PSHOPS,
-   WORLD_MERCHS,
-   WORLD_MAPOBJS,
-   WORLD_SAVECHARS,
+   WORLD_PLAYER_SHOPS,
+   WORLD_MERCHANTS,
+   WORLD_MAP_OBJECTS,
+   WORLD_SAVE_CHARACTERS,
    WORLD_SUGGEST,
    EIM,
    EIM_PARTY,
    EIM_SCRIPT,
    EM_LOBBY,
    EM_QUEUE,
-   EM_SCHDL,
+   EM_SCHEDULE,
    EM_START,
-   CASHSHOP,
-   VISITOR_PSHOP,
+   CASH_SHOP,
+   VISITOR_PLAYER_SHOP,
    STORAGE,
    MOB,
    MOB_AGGRO,
    MOB_ANI,
    MOB_EXT,
-   MOB_STATI,
-   MOBSKILL_FACTORY,
+   MOB_STATUS,
+   MOB_SKILL_FACTORY,
    PORTAL,
-   VISITOR_MERCH,
-   MAP_CHRS,
+   VISITOR_MERCHANT,
+   MAP_CHARACTERS,
    MAP_OBJS,
    MAP_MANAGER,
    MAP_ITEM,
@@ -105,7 +82,7 @@ public enum MonitoredLockType {
    MAP_BOUNDS,
    MAP_AGGRO,
    MAP_AGGRO_IDLE,
-   MINIDUNGEON,
+   MINI_DUNGEON,
    REACTOR,
    REACTOR_HIT
 }

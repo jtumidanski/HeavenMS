@@ -23,7 +23,7 @@ public class AriantPacketFactory extends AbstractPacketFactory {
       Handler.handle(UpdateAriantRanking.class).decorate(this::updateRanking).register(registry);
    }
 
-   protected void showScoreBoard(MaplePacketLittleEndianWriter writer, ShowAriantScoreboard packet) {   // thanks lrenex for pointing match's end scoreboard packet
+   protected void showScoreBoard(MaplePacketLittleEndianWriter writer, ShowAriantScoreboard packet) {
    }
 
    protected void updateIndividualRanking(MaplePacketLittleEndianWriter writer, final MapleCharacter chr, final int score) {

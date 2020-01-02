@@ -8,8 +8,8 @@ public class ChangeMapSpecialReader implements PacketReader<ChangeMapSpecialPack
    @Override
    public ChangeMapSpecialPacket read(SeekableLittleEndianAccessor accessor) {
       accessor.readByte();
-      String startwp = accessor.readMapleAsciiString();
+      String startWarp = accessor.readMapleAsciiString();
       accessor.readShort();
-      return new ChangeMapSpecialPacket(startwp);
+      return new ChangeMapSpecialPacket(startWarp);
    }
 }

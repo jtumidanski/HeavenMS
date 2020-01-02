@@ -10,5 +10,5 @@ class GetServerStatus(private var _status: ServerStatus) extends PacketInput {
     this(ServerStatus.fromValue(serverStatusId))
   }
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERSTATUS
+  override def opcode(): SendOpcode = SendOpcode.SERVER_STATUS
 }

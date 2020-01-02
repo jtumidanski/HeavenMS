@@ -5,5 +5,5 @@ import tools.packet.PacketInput
 
 class SendMapleLife() extends PacketInput {
 
-  override def opcode(): SendOpcode = SendOpcode.MAPLELIFE_RESULT
+  override def opcode(): SendOpcode = SendOpcode.MAPLE_LIFE_RESULT
 }

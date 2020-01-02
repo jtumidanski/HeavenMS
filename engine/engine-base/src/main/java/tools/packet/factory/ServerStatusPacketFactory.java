@@ -22,8 +22,6 @@ public class ServerStatusPacketFactory extends AbstractPacketFactory {
     * <p>
     * Possible values for <code>status</code>:<br> 0 - Normal<br> 1 - Highly
     * populated<br> 2 - Full
-    *
-    * @return The server status packet.
     */
    protected void getServerStatus(MaplePacketLittleEndianWriter writer, GetServerStatus packet) {
       writer.writeShort(packet.status().getValue());

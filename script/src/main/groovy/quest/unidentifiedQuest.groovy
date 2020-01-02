@@ -5,7 +5,7 @@ import scripting.quest.QuestActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-class QuestunidentifiedQuest {
+class UnidentifiedQuest {
    QuestActionManager qm
    int status = -1
 
@@ -19,12 +19,12 @@ class QuestunidentifiedQuest {
    }
 }
 
-QuestunidentifiedQuest getQuest() {
+UnidentifiedQuest getQuest() {
    if (!getBinding().hasVariable("quest")) {
       QuestActionManager qm = (QuestActionManager) getBinding().getVariable("qm")
-      getBinding().setVariable("quest", new QuestunidentifiedQuest(qm: qm))
+      getBinding().setVariable("quest", new UnidentifiedQuest(qm: qm))
    }
-   return (QuestunidentifiedQuest) getBinding().getVariable("quest")
+   return (UnidentifiedQuest) getBinding().getVariable("quest")
 }
 
 def start(Byte mode, Byte type, Integer selection) {

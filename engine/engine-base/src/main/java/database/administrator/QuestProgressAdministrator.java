@@ -30,8 +30,8 @@ public class QuestProgressAdministrator extends AbstractQueryExecutor implements
       execute(entityManager, query);
    }
 
-   public void create(EntityManager entityManager, int characterId, int questId, List<Pair<Integer, String>> progessData) {
-      List<QuestProgress> questProgressList = progessData.stream().map(data -> {
+   public void create(EntityManager entityManager, int characterId, int questId, List<Pair<Integer, String>> progressData) {
+      List<QuestProgress> questProgressList = progressData.stream().map(data -> {
          QuestProgress questProgress = new QuestProgress();
          questProgress.setCharacterId(characterId);
          questProgress.setQuestStatusId(questId);

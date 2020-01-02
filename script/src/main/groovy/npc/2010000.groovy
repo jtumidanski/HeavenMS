@@ -104,7 +104,7 @@ class NPC2010000 {
           [4010001, 7],   // Steel Ore
           [4010000, 7],   // Bronze Ore
           [4010006, 2],   // Gold Ore
-          [4003000, 5],   // Screwa
+          [4003000, 5],   // Screw
           [2040702, 1]],   // 10% Shoe Dex
 
          [[2000006, 20],   // Mana Elixir

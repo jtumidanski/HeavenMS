@@ -31,7 +31,7 @@ class NPC9201005 {
    int weddingEntryTicketPremium = 5251003
    int weddingSendTicket = 4031395
    int weddingGuestTicket = 4031407
-   int weddingAltarMapid = 680000210
+   int weddingAltarMapId = 680000210
    boolean weddingIndoors
 
    def start() {
@@ -40,15 +40,15 @@ class NPC9201005 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   static def isWeddingIndoors(mapid) {
-      return mapid >= 680000100 && mapid <= 680000500
+   static def isWeddingIndoors(mapId) {
+      return mapId >= 680000100 && mapId <= 680000500
    }
 
    static def hasSuitForWedding(MapleCharacter player) {
-      int baseid = (player.getGender() == 0) ? 1050131 : 1051150
+      int baseId = (player.getGender() == 0) ? 1050131 : 1051150
 
       for (int i = 0; i < 4; i++) {
-         if (player.haveItemWithId(baseid + i, true)) {
+         if (player.haveItemWithId(baseId + i, true)) {
             return true
          }
       }
@@ -117,24 +117,22 @@ class NPC9201005 {
 
                cm.sendSimple(text)
             } else if (status == 1) {
+               World world = cm.getClient().getWorldServer()
+               Channel channel = cm.getClient().getChannelServer()
                switch (selection) {
                   case 0:
                      cm.sendOk("Firstly you need to be #bengaged#k to someone. #p9201000# makes the engagement ring. Once attained the engagement status, purchase a #b#t" + weddingEntryTicketCommon + "##k.\r\nShow me your engagement ring and a wedding ticket, and I will book a reservation for you along with #r15 Wedding Tickets#k. Use them to invite your guests into the wedding. They need 1 each to enter.")
                      cm.dispose()
                      break
-
                   case 1:
                      if (hasEngagement) {
-                        World wserv = cm.getClient().getWorldServer()
-                        Channel cserv = cm.getClient().getChannelServer()
-                        int weddingId = wserv.getRelationshipId(cm.getPlayer().getId())
-
+                        int weddingId = world.getRelationshipId(cm.getPlayer().getId())
                         if (weddingId > 0) {
-                           if (cserv.isWeddingReserved(weddingId)) {    // registration check
-                              String placeTime = cserv.getWeddingReservationTimeLeft(weddingId)
+                           if (channel.isWeddingReserved(weddingId)) {    // registration check
+                              String placeTime = channel.getWeddingReservationTimeLeft(weddingId)
                               cm.sendOk("Your wedding is set to start at the #r" + placeTime + "#k. Get formally dressed and don't be late!")
                            } else {
-                              MapleCharacter partner = wserv.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
+                              MapleCharacter partner = world.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                               if (partner == null) {
                                  cm.sendOk("Your partner seems to be offline right now... Make sure to get both gathered here when the time comes!")
                                  cm.dispose()
@@ -172,7 +170,7 @@ class NPC9201005 {
                                  boolean weddingType = hasPremium
 
                                  MapleCharacter player = cm.getPlayer()
-                                 int resStatus = cserv.pushWeddingReservation(weddingId, cathedralWedding, weddingType, player.getId(), player.getPartnerId())
+                                 int resStatus = channel.pushWeddingReservation(weddingId, cathedralWedding, weddingType, player.getId(), player.getPartnerId())
                                  if (resStatus > 0) {
                                     cm.gainItem((weddingType) ? weddingEntryTicketPremium : weddingEntryTicketCommon, (short) -1)
 
@@ -180,7 +178,7 @@ class NPC9201005 {
                                     cm.gainItem(weddingSendTicket, (short) 15, false, true, expirationTime)
                                     partner.getAbstractPlayerInteraction().gainItem(weddingSendTicket, (short) 15, false, true, expirationTime)
 
-                                    String placeTime = cserv.getWeddingReservationTimeLeft(weddingId)
+                                    String placeTime = channel.getWeddingReservationTimeLeft(weddingId)
 
                                     String wedType = weddingType ? "Premium" : "Regular"
                                     cm.sendOk("You both have received 15 Wedding Tickets, to be given to your guests. #bDouble-click the ticket#k to send it to someone. Invitations can only be sent #rbefore the wedding start time#k. Your #b" + wedType + " wedding#k is set to start at the #r" + placeTime + "#k. Get formally dressed and don't be late!")
@@ -215,11 +213,9 @@ class NPC9201005 {
 
                   case 2:
                      if (cm.haveItem(weddingGuestTicket)) {
-                        Channel cserv = cm.getClient().getChannelServer()
-
-                        wid = cserv.getOngoingWedding(cathedralWedding)
+                        wid = channel.getOngoingWedding(cathedralWedding)
                         if (wid > 0) {
-                           if (cserv.isOngoingWeddingGuest(cathedralWedding, cm.getPlayer().getId())) {
+                           if (channel.isOngoingWeddingGuest(cathedralWedding, cm.getPlayer().getId())) {
                               EventInstanceManager eim = getMarriageInstance(wid)
                               if (eim != null) {
                                  cm.sendOk("Enjoy the wedding. Don't drop your Gold Maple Leaf or you won't be able to finish the whole wedding.")
@@ -240,13 +236,9 @@ class NPC9201005 {
                         cm.dispose()
                      }
                      break
-
                   default:
-                     World wserv = cm.getClient().getWorldServer()
-                     Channel cserv = cm.getClient().getChannelServer()
-                     int weddingId = wserv.getRelationshipId(cm.getPlayer().getId())
-
-                     int resStatus = cserv.getWeddingReservationStatus(weddingId, cathedralWedding)
+                     int weddingId = world.getRelationshipId(cm.getPlayer().getId())
+                     int resStatus = channel.getWeddingReservationStatus(weddingId, cathedralWedding)
                      if (resStatus > 0) {
                         if (cm.canHold(weddingSendTicket, 3)) {
                            cm.gainItem(5251100, (short) -1)
@@ -297,7 +289,7 @@ class NPC9201005 {
                   cm.sendYesNo("The #bbride and groom#k are already on their way to the altar. Would you like to join them now?")
                }
             } else if (status == 1) {
-               cm.warp(weddingAltarMapid, "sp")
+               cm.warp(weddingAltarMapId, "sp")
                cm.dispose()
             }
          }

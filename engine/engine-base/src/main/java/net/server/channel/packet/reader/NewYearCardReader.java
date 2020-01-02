@@ -12,10 +12,10 @@ public class NewYearCardReader implements PacketReader<BaseNewYearCardPacket> {
       byte reqMode = accessor.readByte();                 //[00] -> NewYearReq (0 = Send)
       if (reqMode == 0) {
          short slot = accessor.readShort();                      //[00 2C] -> nPOS (Item Slot Pos)
-         int itemid = accessor.readInt();                        //[00 20 F5 E5] -> nItemID (item id)
+         int itemId = accessor.readInt();                        //[00 20 F5 E5] -> nItemID (item id)
          String receiver = accessor.readMapleAsciiString();  //[04 00 54 65 73 74] -> sReceiverName (person to send to)
          String message = accessor.readMapleAsciiString();   //[06 00 4C 65 74 74 65 72] -> sContent (message)
-         return new CardHasBeenSentPacket(reqMode, slot, itemid, receiver, message);
+         return new CardHasBeenSentPacket(reqMode, slot, itemId, receiver, message);
       } else {
          int cardId = accessor.readInt();
          return new CardAcceptedPacket(reqMode, cardId);

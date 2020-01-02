@@ -15,10 +15,10 @@ class NPC2133001 {
    int status = -1
    int sel = -1
 
-   int mapid
+   int mapId
 
    def start() {
-      mapid = cm.getPlayer().getMapId()
+      mapId = cm.getPlayer().getMapId()
 
       status = -1
       action((byte) 1, (byte) 0, 0)
@@ -39,11 +39,11 @@ class NPC2133001 {
          }
 
          if (status == 0) {
-            String ellinStr = ellinMapMessage(mapid)
+            String ellinStr = ellinMapMessage(mapId)
 
-            if (mapid == 930000000) {
+            if (mapId == 930000000) {
                cm.sendNext(ellinStr)
-            } else if (mapid == 930000300) {
+            } else if (mapId == 930000300) {
                EventInstanceManager eim = cm.getEventInstance()
 
                if (eim.getIntProperty("statusStg4") == 0) {
@@ -52,7 +52,7 @@ class NPC2133001 {
                }
 
                cm.sendNext(ellinStr)
-            } else if (mapid == 930000400) {
+            } else if (mapId == 930000400) {
                if (cm.haveItem(4001169, 20)) {
                   if (cm.isEventLeader()) {
                      cm.sendNext("Oh you have brought them! We can now continue, shall we proceed?")
@@ -91,10 +91,10 @@ class NPC2133001 {
                cm.sendYesNo(ellinStr + "\r\n\r\nIt may be you are #rwilling to quit#k? Please double-think it, maybe your partners are still trying this instance.")
             }
          } else if (status == 1) {
-            if (!(mapid == 930000000)) {
-               if (mapid == 930000300) {
+            if (!(mapId == 930000000)) {
+               if (mapId == 930000300) {
                   cm.getEventInstance().warpEventTeam(930000400)
-               } else if (mapid == 930000400) {
+               } else if (mapId == 930000400) {
                   if (cm.haveItem(4001169, 20) && cm.isEventLeader()) {
                      cm.gainItem(4001169, (short) -20)
                      cm.getEventInstance().warpEventTeam(930000500)
@@ -111,8 +111,8 @@ class NPC2133001 {
       }
    }
 
-   static def ellinMapMessage(mapid) {
-      switch (mapid) {
+   static def ellinMapMessage(mapId) {
+      switch (mapId) {
          case 930000000:
             return "Welcome to the Forest of Poison Haze. Proceed by entering the portal."
 

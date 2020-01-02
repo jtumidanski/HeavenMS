@@ -1,34 +1,6 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.maps;
 
-/**
- * @author Alan (SharpAceX)
- */
-
 public enum MapleMiniDungeonInfo {
-
-   //http://bbb.hidden-street.net/search_finder/mini%20dungeon
-
    CAVE_OF_MUSHROOMS(105050100, 105050101, 30),
    GOLEM_CASTLE_RUINS(105040304, 105040320, 34),
    HILL_OF_SANDSTORMS(260020600, 260020630, 30),
@@ -40,7 +12,7 @@ public enum MapleMiniDungeonInfo {
    NEWT_SECURED_ZONE(240040520, 240040900, 19),
    PILLAGE_OF_TREASURE_ISLAND(251010402, 251010410, 30),
    CRITICAL_ERROR(261020300, 261020301, 30),
-   LONGEST_RIDE_ON_BYEBYE_STATION(551030000, 551030001, 19);
+   LONGEST_RIDE_ON_BYE_BYE_STATION(551030000, 551030001, 19);
 
    private int baseId;
    private int dungeonId;

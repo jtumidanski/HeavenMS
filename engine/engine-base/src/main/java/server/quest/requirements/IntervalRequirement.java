@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.quest.requirements;
 
 import client.MapleCharacter;
@@ -30,9 +9,6 @@ import server.quest.MapleQuestRequirementType;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-/**
- * @author Tyler (Twdtwd)
- */
 public class IntervalRequirement extends MapleQuestRequirement {
    private int interval = -1;
    private int questID;
@@ -71,22 +47,22 @@ public class IntervalRequirement extends MapleQuestRequirement {
       switch (mode) {
          case 2:
             int hours = (int) ((leftTime / (1000 * 60 * 60)));
-            str.append(hours + " hours, ");
+            str.append(hours).append(" hours, ");
 
          case 1:
             int minutes = (int) ((leftTime / (1000 * 60)) % 60);
-            str.append(minutes + " minutes, ");
+            str.append(minutes).append(" minutes, ");
 
          default:
             int seconds = (int) (leftTime / 1000) % 60;
-            str.append(seconds + " seconds");
+            str.append(seconds).append(" seconds");
       }
 
       return str.toString();
    }
 
    @Override
-   public boolean check(MapleCharacter chr, Integer npcid) {
+   public boolean check(MapleCharacter chr, Integer npcId) {
       boolean check = !chr.getQuest(MapleQuest.getInstance(questID)).getStatus().equals(MapleQuestStatus.Status.COMPLETED);
       boolean check2 = chr.getQuest(MapleQuest.getInstance(questID)).getCompletionTime() <= System.currentTimeMillis() - interval;
       if (check || check2) {

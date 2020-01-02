@@ -12,7 +12,6 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.services.BaseScheduler;
-import net.server.services.SchedulerListener;
 import net.server.services.BaseService;
 
 public class MobStatusService extends BaseService {
@@ -34,16 +33,16 @@ public class MobStatusService extends BaseService {
       }
    }
 
-   public void registerMobStatus(int mapid, MonsterStatusEffect mse, Runnable cancelAction, long duration) {
-      registerMobStatus(mapid, mse, cancelAction, duration, null, -1);
+   public void registerMobStatus(int mapId, MonsterStatusEffect mse, Runnable cancelAction, long duration) {
+      registerMobStatus(mapId, mse, cancelAction, duration, null, -1);
    }
 
-   public void registerMobStatus(int mapid, MonsterStatusEffect mse, Runnable cancelAction, long duration, Runnable overtimeAction, int overtimeDelay) {
-      mobStatusSchedulers[getChannelSchedulerIndex(mapid)].registerMobStatus(mse, cancelAction, duration, overtimeAction, overtimeDelay);
+   public void registerMobStatus(int mapId, MonsterStatusEffect mse, Runnable cancelAction, long duration, Runnable overtimeAction, int overtimeDelay) {
+      mobStatusSchedulers[getChannelSchedulerIndex(mapId)].registerMobStatus(mse, cancelAction, duration, overtimeAction, overtimeDelay);
    }
 
-   public void interruptMobStatus(int mapid, MonsterStatusEffect mse) {
-      mobStatusSchedulers[getChannelSchedulerIndex(mapid)].interruptMobStatus(mse);
+   public void interruptMobStatus(int mapId, MonsterStatusEffect mse) {
+      mobStatusSchedulers[getChannelSchedulerIndex(mapId)].interruptMobStatus(mse);
    }
 
    private class MobStatusScheduler extends BaseScheduler {
@@ -72,45 +71,42 @@ public class MobStatusService extends BaseService {
       }
 
       public MobStatusScheduler() {
-         super(MonitoredLockType.CHANNEL_MOBSTATUS);
+         super(MonitoredLockType.CHANNEL_MOB_STATUS);
 
-         super.addListener(new SchedulerListener() {
-            @Override
-            public void removedScheduledEntries(List<Object> toRemove, boolean update) {
-               List<Runnable> toRun = new ArrayList<>();
+         super.addListener((toRemove, update) -> {
+            List<Runnable> toRun = new ArrayList<>();
 
-               overtimeStatusLock.lock();
-               try {
-                  for (Object mseo : toRemove) {
-                     MonsterStatusEffect mse = (MonsterStatusEffect) mseo;
-                     registeredMobStatusOvertime.remove(mse);
-                  }
-
-                  if (update) {
-                     // it's probably ok to use one thread for both management & overtime actions
-                     List<MobStatusOvertimeEntry> mdoeList = new ArrayList<>(registeredMobStatusOvertime.values());
-                     for (MobStatusOvertimeEntry mdoe : mdoeList) {
-                        mdoe.update(toRun);
-                     }
-                  }
-               } finally {
-                  overtimeStatusLock.unlock();
+            overtimeStatusLock.lock();
+            try {
+               for (Object monsterStatusEffect : toRemove) {
+                  MonsterStatusEffect mse = (MonsterStatusEffect) monsterStatusEffect;
+                  registeredMobStatusOvertime.remove(mse);
                }
 
-               for (Runnable r : toRun) {
-                  r.run();
+               if (update) {
+                  // it's probably ok to use one thread for both management & overtime actions
+                  List<MobStatusOvertimeEntry> mobStatusOvertimeEntries = new ArrayList<>(registeredMobStatusOvertime.values());
+                  for (MobStatusOvertimeEntry mobStatusOvertimeEntry : mobStatusOvertimeEntries) {
+                     mobStatusOvertimeEntry.update(toRun);
+                  }
                }
+            } finally {
+               overtimeStatusLock.unlock();
+            }
+
+            for (Runnable r : toRun) {
+               r.run();
             }
          });
       }
 
       public void registerMobStatus(MonsterStatusEffect mse, Runnable cancelStatus, long duration, Runnable overtimeStatus, int overtimeDelay) {
          if (overtimeStatus != null) {
-            MobStatusOvertimeEntry mdoe = new MobStatusOvertimeEntry(overtimeDelay, overtimeStatus);
+            MobStatusOvertimeEntry mobStatusOvertimeEntry = new MobStatusOvertimeEntry(overtimeDelay, overtimeStatus);
 
             overtimeStatusLock.lock();
             try {
-               registeredMobStatusOvertime.put(mse, mdoe);
+               registeredMobStatusOvertime.put(mse, mobStatusOvertimeEntry);
             } finally {
                overtimeStatusLock.unlock();
             }

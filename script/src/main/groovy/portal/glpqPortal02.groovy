@@ -10,7 +10,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(610030521, 0)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Only mages may enter this portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Only magicians may enter this portal.")
       return false
    }
 }

@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -16,8 +16,8 @@ class NPC9200100 {
    int sel = -1
 
    int beauty = 0
-   int regprice = 1000000
-   int vipprice = 1000000
+   int regularPrice = 1000000
+   int vipPrice = 1000000
    int[] colors = []
 
    def start() {
@@ -25,25 +25,8 @@ class NPC9200100 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
-   def pushIfItemsExists(int[] array, int[] itemidList) {
-      for (int i = 0; i < itemidList.length; i++) {
-         int itemid = itemidList[i]
-
-         if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-            array << itemid
-         }
-      }
-   }
-
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1)  // disposing issue with stylishs found thanks to Vcoc
-      {
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -64,9 +47,8 @@ class NPC9200100 {
                if (cm.getPlayer().getGender() == 1) {
                   current = cm.getPlayer().getFace() % 100 + 21000
                }
-               colors = []
                int[] temp = [current, current + 100, current + 200, current + 400, current + 600, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendYesNo("If you use the regular coupon, you'll be awarded a random pair of cosmetic lenses. Are you going to use a #b#t5152010##k and really make the change to your eyes?")
             } else if (selection == 2) {
                beauty = 2
@@ -77,9 +59,8 @@ class NPC9200100 {
                if (cm.getPlayer().getGender() == 1) {
                   current = cm.getPlayer().getFace() % 100 + 21000
                }
-               colors = []
                int[] temp = [current, current + 100, current + 200, current + 400, current + 600, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendStyle("With our specialized machine, you can see yourself after the treatment in advance. What kind of lens would you like to wear? Choose the style of your liking.", colors)
             } else if (selection == 3) {
                beauty = 3
@@ -94,7 +75,7 @@ class NPC9200100 {
                colors = []
                for (int i = 0; i < 8; i++) {
                   if (cm.haveItem(5152100 + i)) {
-                     pushIfItemExists(colors, current + 100 * i)
+                     colors = ScriptUtils.pushItemIfTrue(colors, current + 100 * i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
 
@@ -135,12 +116,12 @@ class NPC9200100 {
                   cm.sendOk("I'm sorry, but I don't think you have our cosmetic lens coupon with you right now. Without the coupon, I'm afraid I can't do it for you..")
                }
             } else if (beauty == 0) {
-               if (selection == 0 && cm.getMeso() >= regprice) {
-                  cm.gainMeso(-regprice)
+               if (selection == 0 && cm.getMeso() >= regularPrice) {
+                  cm.gainMeso(-regularPrice)
                   cm.gainItem(5152010, (short) 1)
                   cm.sendOk("Enjoy!")
-               } else if (selection == 1 && cm.getMeso() >= vipprice) {
-                  cm.gainMeso(-vipprice)
+               } else if (selection == 1 && cm.getMeso() >= vipPrice) {
+                  cm.gainMeso(-vipPrice)
                   cm.gainItem(5152013, (short) 1)
                   cm.sendOk("Enjoy!")
                } else {

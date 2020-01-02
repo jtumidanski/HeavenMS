@@ -7,5 +7,5 @@ import tools.packet.cashshop.CashShopMessage
 class ShowCashShopMessage(private var _message: CashShopMessage) extends PacketInput {
   def message: CashShopMessage = _message
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

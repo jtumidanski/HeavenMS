@@ -18,5 +18,5 @@ class ShowCouponRedeemSuccess(private var _accountId: Int, private var _maplePoi
 
   def items: java.util.List[Pair[Integer, Integer]] = _items
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

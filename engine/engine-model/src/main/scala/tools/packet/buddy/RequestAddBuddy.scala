@@ -11,5 +11,5 @@ class RequestAddBuddy(private var _characterIdFrom: Int, private var _characterI
 
   def characterNameFrom: String = _characterNameFrom
 
-  override def opcode(): SendOpcode = SendOpcode.BUDDYLIST
+  override def opcode(): SendOpcode = SendOpcode.BUDDY_LIST
 }

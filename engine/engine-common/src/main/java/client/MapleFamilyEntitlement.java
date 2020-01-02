@@ -1,7 +1,7 @@
 package client;
 
 public enum MapleFamilyEntitlement {
-   FAMILY_REUINION(1, 300, "Family Reunion", "[Target] Me\\n[Effect] Teleport directly to the Family member of your choice."),
+   FAMILY_REUNION(1, 300, "Family Reunion", "[Target] Me\\n[Effect] Teleport directly to the Family member of your choice."),
    SUMMON_FAMILY(1, 500, "Summon Family", "[Target] 1 Family member\\n[Effect] Summon a Family member of choice to the map you're in."),
    SELF_DROP_1_5(1, 700, "My Drop Rate 1.5x (15 min)", "[Target] Me\\n[Time] 15 min.\\n[Effect] Monster drop rate will be increased #c1.5x#.\\n*  If the Drop Rate event is in progress, this will be nullified."),
    SELF_EXP_1_5(1, 800, "My EXP 1.5x (15 min)", "[Target] Me\\n[Time] 15 min.\\n[Effect] EXP earned from hunting will be increased #c1.5x#.\\n* If the EXP event is in progress, this will be nullified."),

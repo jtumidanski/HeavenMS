@@ -14,7 +14,7 @@ import javax.persistence.EntityManager;
 import client.KeyBinding;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import client.MapleFamily;
 import client.MapleJob;
 import client.MapleMount;
@@ -118,9 +118,9 @@ public class CharacterProcessor {
    }
 
    public boolean canCreateChar(String name) {
-      String lname = name.toLowerCase();
+      String lowerCaseName = name.toLowerCase();
       for (String nameTest : BLOCKED_NAMES) {
-         if (lname.contains(nameTest)) {
+         if (lowerCaseName.contains(nameTest)) {
             return false;
          }
       }
@@ -186,7 +186,7 @@ public class CharacterProcessor {
 
    public boolean deleteCharFromDB(MapleCharacter player, int senderAccId) {
       int cid = player.getId();
-      if (!Server.getInstance().haveCharacterEntry(senderAccId, cid)) {    // thanks zera (EpiphanyMS) for pointing a critical exploit with non-authored character deletion request
+      if (!Server.getInstance().haveCharacterEntry(senderAccId, cid)) {
          return false;
       }
 
@@ -245,10 +245,10 @@ public class CharacterProcessor {
    }
 
    private void loadPlayerDiseases(EntityManager entityManager, CharacterData characterData, MapleCharacter mapleCharacter) {
-      Map<MapleDisease, Pair<Long, MobSkill>> loadedDiseases = new LinkedHashMap<>();
+      Map<MapleAbnormalStatus, Pair<Long, MobSkill>> loadedDiseases = new LinkedHashMap<>();
       PlayerDiseaseProvider.getInstance().getForCharacter(entityManager, characterData.id()).forEach(playerDiseaseData -> {
-         final MapleDisease disease = MapleDisease.ordinal(playerDiseaseData.disease());
-         if (disease != MapleDisease.NULL) {
+         final MapleAbnormalStatus disease = MapleAbnormalStatus.ordinal(playerDiseaseData.disease());
+         if (disease != MapleAbnormalStatus.NULL) {
             MobSkill ms = MobSkillFactory.getMobSkill(playerDiseaseData.mobSkillId(), playerDiseaseData.mobSkillLevel());
             if (ms != null) {
                loadedDiseases.put(disease, new Pair<>((long) playerDiseaseData.length(), ms));
@@ -385,26 +385,26 @@ public class CharacterProcessor {
       }
    }
 
-   private void loadInventory(int characterId, boolean channelserver, MapleCharacter mapleCharacter) {
+   private void loadInventory(int characterId, boolean channelServer, MapleCharacter mapleCharacter) {
       short sandboxCheck = 0x0;
-      for (Pair<Item, MapleInventoryType> item : ItemFactory.INVENTORY.loadItems(characterId, !channelserver)) {
-         sandboxCheck |= item.getLeft().flag();
+      for (Pair<Item, MapleInventoryType> itemPair : ItemFactory.INVENTORY.loadItems(characterId, !channelServer)) {
+         sandboxCheck |= itemPair.getLeft().flag();
 
-         mapleCharacter.getInventory(item.getRight()).addItemFromDB(item.getLeft());
-         Item itemz = item.getLeft();
-         if (itemz.petId() > -1) {
-            if (itemz.pet().isDefined() && itemz.pet().get().summoned()) {
-               mapleCharacter.addPet(itemz.pet().get());
+         mapleCharacter.getInventory(itemPair.getRight()).addItemFromDB(itemPair.getLeft());
+         Item item = itemPair.getLeft();
+         if (item.petId() > -1) {
+            if (item.pet().isDefined() && item.pet().get().summoned()) {
+               mapleCharacter.addPet(item.pet().get());
             }
             continue;
          }
 
-         MapleInventoryType mit = item.getRight();
+         MapleInventoryType mit = itemPair.getRight();
          if (mit.equals(MapleInventoryType.EQUIP) || mit.equals(MapleInventoryType.EQUIPPED)) {
-            Equip equip = (Equip) item.getLeft();
+            Equip equip = (Equip) itemPair.getLeft();
             if (equip.ringId() > -1) {
                Ring ring = MapleRingProcessor.getInstance().loadFromDb(equip.ringId());
-               if (item.getRight().equals(MapleInventoryType.EQUIPPED)) {
+               if (itemPair.getRight().equals(MapleInventoryType.EQUIPPED)) {
                   ring.equip();
                }
 
@@ -417,7 +417,7 @@ public class CharacterProcessor {
       }
    }
 
-   public MapleCharacter loadCharFromDB(int characterId, MapleClient client, boolean channelserver) {
+   public MapleCharacter loadCharFromDB(int characterId, MapleClient client, boolean channelServer) {
       return DatabaseConnection.getInstance().withConnectionResult(connection -> {
          Optional<CharacterData> characterDataOptional = CharacterProvider.getInstance().getById(connection, characterId);
          if (characterDataOptional.isEmpty()) {
@@ -428,13 +428,13 @@ public class CharacterProcessor {
          MapleCharacter mapleCharacter = loadFromCharacterData(characterData);
          mapleCharacter.setClient(client);
          mapleCharacter.setMGC(new MapleGuildCharacter(mapleCharacter));
-         CharacterProcessor.getInstance().loadInventory(characterData.id(), channelserver, mapleCharacter);
+         CharacterProcessor.getInstance().loadInventory(characterData.id(), channelServer, mapleCharacter);
          World world = Server.getInstance().getWorld(characterData.world());
          CharacterProcessor.getInstance().correctMarriageDatabaseData(characterData, mapleCharacter, world);
          NewYearCardProcessor.getInstance().loadPlayerNewYearCards(mapleCharacter);
          CharacterProcessor.getInstance().loadPetIgnores(connection, characterData, mapleCharacter);
 
-         if (channelserver) {
+         if (channelServer) {
             CharacterProcessor.getInstance().loadMapData(client, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadPartyData(characterData, mapleCharacter, world);
             CharacterProcessor.getInstance().loadMessengerData(characterData, mapleCharacter, world);
@@ -464,7 +464,7 @@ public class CharacterProcessor {
          CharacterProvider.getInstance().getHighestLevelOtherCharacterData(connection, characterData.accountId(), characterData.id())
                .ifPresent(otherCharacterData -> mapleCharacter.setLinkedCharacterInformation(otherCharacterData.name(), otherCharacterData.level()));
 
-         if (channelserver) {
+         if (channelServer) {
             CharacterProcessor.getInstance().loadQuests(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadSkills(connection, characterData, mapleCharacter);
             CharacterProcessor.getInstance().loadCoolDowns(connection, characterData, mapleCharacter);
@@ -486,19 +486,19 @@ public class CharacterProcessor {
 
             FameLogProvider.getInstance().getForCharacter(connection, characterData.id()).forEach(fameLogData -> mapleCharacter.giveFame(fameLogData.getLeft(), fameLogData.getRight().getTime()));
 
-            BuddyListProcessor.getInstance().loadBuddies(characterData.id(), mapleCharacter.getBuddylist());
+            BuddyListProcessor.getInstance().loadBuddies(characterData.id(), mapleCharacter.getBuddyList());
             mapleCharacter.setStorage(world.getAccountStorage(characterData.accountId()));
 
             mapleCharacter.reapplyLocalStats();
             mapleCharacter.changeHpMp(mapleCharacter.getHp(), mapleCharacter.getMp(), true);
 
-            int mountid = mapleCharacter.getJobType() * 10000000 + 1004;
+            int mountId = mapleCharacter.getJobType() * 10000000 + 1004;
 
             MapleMount mapleMount;
             if (mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18) != null) {
-               mapleMount = new MapleMount(mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id(), mountid);
+               mapleMount = new MapleMount(mapleCharacter.getInventory(MapleInventoryType.EQUIPPED).getItem((short) -18).id(), mountId);
             } else {
-               mapleMount = new MapleMount(0, mountid);
+               mapleMount = new MapleMount(0, mountId);
             }
             mapleMount.exp_$eq(characterData.mountExp());
             mapleMount.level_$eq(characterData.mountLevel());
@@ -524,7 +524,7 @@ public class CharacterProcessor {
       mapleCharacter.setFame(characterData.fame());
       mapleCharacter.setQuestFame(characterData.questFame());
       mapleCharacter.setExp(characterData.exp());
-      mapleCharacter.setGachaExp(characterData.gachaponExp());
+      mapleCharacter.setGachaponExperience(characterData.gachaponExp());
       mapleCharacter.setMaxHp(characterData.maxHp());
       mapleCharacter.setMaxMp(characterData.maxMp());
       mapleCharacter.setHpMpApUsed(characterData.hpMpUsed());
@@ -607,7 +607,7 @@ public class CharacterProcessor {
       ret.getInventory(MapleInventoryType.SETUP).setSlotLimit(24);
       ret.getInventory(MapleInventoryType.ETC).setSlotLimit(24);
 
-      // Select a keybinding method
+      // Select a key binding method
       int[] selectedKey;
       int[] selectedType;
       int[] selectedAction;
@@ -662,7 +662,7 @@ public class CharacterProcessor {
                character.getMaxHp(), character.getMaxMp(), character.getLevel(), character.getRemainingAp(), character.getRemainingSps());
          character.setId(key);
 
-         // Select a keybinding method
+         // Select a key binding method
          int[] selectedKey;
          int[] selectedType;
          int[] selectedAction;

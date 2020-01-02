@@ -20,7 +20,7 @@ class NPC9000004 {
 
    MaplePartyCharacter[] party
    String preamble
-   String mobcount
+   String mobCount
 
    def start() {
       status = -1
@@ -39,17 +39,17 @@ class NPC9000004 {
             status--
          }
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
-         String nthtext = "last"
+         String nthText = "last"
          if (status == 0) {
             party = eim.getPlayers() as MaplePartyCharacter[]
-            preamble = eim.getProperty("leader" + nthtext + "preamble")
-            mobcount = eim.getProperty("leader" + nthtext + "mobcount")
+            preamble = eim.getProperty("leader" + nthText + "preamble")
+            mobCount = eim.getProperty("leader" + nthText + "mobcount")
             if (preamble == null) {
-               cm.sendOk("Hi. Welcome to the " + nthtext + " stage. This is where you fight the #bboss#k. Shall we get started?")
+               cm.sendOk("Hi. Welcome to the " + nthText + " stage. This is where you fight the #bboss#k. Shall we get started?")
                status = 9
             } else {
                if (!isLeader()) {
-                  if (mobcount == null) {
+                  if (mobCount == null) {
                      cm.sendOk("Please tell your #bParty-Leader#k to come talk to me")
                      cm.dispose()
                   } else {
@@ -57,7 +57,7 @@ class NPC9000004 {
                      cm.dispose()
                   }
                }
-               if (mobcount == null) {
+               if (mobCount == null) {
                   cm.sendYesNo("You're finished?!")
                }
             }
@@ -73,14 +73,14 @@ class NPC9000004 {
             cm.sendOk("You may continue to the next stage!")
          } else if (status == 3) {
             cm.getMap().clearMapObjects()
-            eim.setProperty("leader" + nthtext + "mobcount", "done")
+            eim.setProperty("leader" + nthText + "mobcount", "done")
             MapleMap map = eim.getMapInstance(109020001)
             MapleCharacter[] members = eim.getPlayers()
             cm.warpMembers(map, members)
             cm.givePartyExp(2500, eim.getPlayers())
             cm.dispose()
          } else if (status == 10) {
-            eim.setProperty("leader" + nthtext + "preamble", "done")
+            eim.setProperty("leader" + nthText + "preamble", "done")
 //            cm.summonMobAtPosition(8220000,25000000,1500000,1,-762,-1307);
 //            cm.summonMobAtPosition(8220001,15000000,750000,1,-788,-851);
 //            cm.summonMobAtPosition(9410015,15000000,750000,1,128,-851);

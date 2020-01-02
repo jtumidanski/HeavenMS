@@ -5,11 +5,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import javax.persistence.EntityManager;
 
-/**
- * @author Frz - Big Daddy
- * @author The Real Spookster - some modifications to this beautiful code
- * @author Ronan - some connection pool to this beautiful code
- */
 public class DatabaseConnection {
 
    private static DatabaseConnection ourInstance = new DatabaseConnection();

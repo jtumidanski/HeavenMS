@@ -8,7 +8,7 @@ public class RemoteGachaponReader implements PacketReader<RemoteGachaponPacket> 
    @Override
    public RemoteGachaponPacket read(SeekableLittleEndianAccessor accessor) {
       int ticket = accessor.readInt();
-      int gacha = accessor.readInt();
-      return new RemoteGachaponPacket(ticket, gacha);
+      int gachapon = accessor.readInt();
+      return new RemoteGachaponPacket(ticket, gachapon);
    }
 }

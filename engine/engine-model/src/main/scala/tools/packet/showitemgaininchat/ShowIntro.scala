@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class ShowIntro(private var _path: String) extends PacketInput {
   def path: String = _path
 
-  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_INCHAT
+  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_IN_CHAT
 }

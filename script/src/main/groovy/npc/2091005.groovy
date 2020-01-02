@@ -152,7 +152,7 @@ class NPC2091005 {
                      //}
 
                      else if (!isBetween(party.get(), 30)) {
-                        cm.sendNext("Your partys level ranges are too broad to enter. Please make sure all of your party members are within #r30 levels#k of each other.")
+                        cm.sendNext("Your parties level ranges are too broad to enter. Please make sure all of your party members are within #r30 levels#k of each other.")
                         cm.dispose()
                      } else {
                         int avDojo = cm.getClient().getChannelServer().ingressDojo(true, cm.getParty().get(), 0)
@@ -198,26 +198,26 @@ class NPC2091005 {
                         int level = belt_level[selection]
                         int points = belt_points[selection]
 
-                        int oldbelt = (selection > 0) ? belts[selection - 1] : -1
-                        boolean haveOldbelt = (oldbelt == -1 || cm.haveItemWithId(oldbelt, false))
+                        int oldBelt = (selection > 0) ? belts[selection - 1] : -1
+                        boolean hasOldBelt = (oldBelt == -1 || cm.haveItemWithId(oldBelt, false))
 
                         if (selection > 0 && !belt_on_inventory[selection - 1]) {
-                           sendBeltRequirements(belt, oldbelt, haveOldbelt, level, points)
+                           sendBeltRequirements(belt, oldBelt, hasOldBelt, level, points)
                         } else if (cm.getPlayer().getDojoPoints() >= points) {
-                           if (selection > 0 && !haveOldbelt) {
-                              sendBeltRequirements(belt, oldbelt, haveOldbelt, level, points)
+                           if (selection > 0 && !hasOldBelt) {
+                              sendBeltRequirements(belt, oldBelt, hasOldBelt, level, points)
                            } else if (cm.getPlayer().getLevel() > level) {
                               if (selection > 0) {
-                                 cm.gainItem(oldbelt, (short) -1)
+                                 cm.gainItem(oldBelt, (short) -1)
                               }
                               cm.gainItem(belt, (short) 1)
                               cm.getPlayer().setDojoPoints(cm.getPlayer().getDojoPoints() - points)
                               cm.sendNext("There is the #i" + belt + "# #b#t" + belt + "##k. You have proven your valor to ascend on the Dojo ranks. Well done!")
                            } else {
-                              sendBeltRequirements(belt, oldbelt, haveOldbelt, level, points)
+                              sendBeltRequirements(belt, oldBelt, hasOldBelt, level, points)
                            }
                         } else {
-                           sendBeltRequirements(belt, oldbelt, haveOldbelt, level, points)
+                           sendBeltRequirements(belt, oldBelt, hasOldBelt, level, points)
                         }
 
                         cm.dispose()
@@ -244,7 +244,7 @@ class NPC2091005 {
                            if (cm.getPlayer().getDojoStage() > 37) {
                               cm.sendNext("You have completed all medals challenges.")
                            } else if (cm.getPlayer().getVanquisherKills() < 100 && cm.getPlayer().getVanquisherStage() > 0) {
-                              cm.sendNext("You still need #b" + (100 - cm.getPlayer().getVanquisherKills()) + "#k in order to obtain the #b#t" + (1142032 + cm.getPlayer().getVanquisherStage()) + "##k. Please try a little harder. As a reminder, only the mosnters that have been summoned by our Master in Mu Lung Dojo are considered. Oh, and make sure you're not hunting the monsters and exiting!#r If you don't go to the next level after defeating the monster, it doesn't count as a win#k.")
+                              cm.sendNext("You still need #b" + (100 - cm.getPlayer().getVanquisherKills()) + "#k in order to obtain the #b#t" + (1142032 + cm.getPlayer().getVanquisherStage()) + "##k. Please try a little harder. As a reminder, only the monsters that have been summoned by our Master in Mu Lung Dojo are considered. Oh, and make sure you're not hunting the monsters and exiting!#r If you don't go to the next level after defeating the monster, it doesn't count as a win#k.")
                            } else if (cm.getPlayer().getVanquisherStage() <= 0) {
                               cm.getPlayer().setVanquisherStage(1)
                            } else {
@@ -285,7 +285,7 @@ class NPC2091005 {
                         }
 
                         if (!isBetween(cm.getParty().get(), 35)) {
-                           cm.sendOk("Your partys level ranges are too broad to enter. Please make sure all of your party members are within #r35 levels#k of each other.")
+                           cm.sendOk("Your parties level ranges are too broad to enter. Please make sure all of your party members are within #r35 levels#k of each other.")
                            cm.dispose()
                            return
                         }
@@ -363,11 +363,11 @@ class NPC2091005 {
    }
 
 
-   def sendBeltRequirements(int belt, int oldbelt, boolean haveOldbelt, int level, int points) {
-      String beltReqStr = (oldbelt != -1) ? " you must have the #i" + oldbelt + "# belt in your inventory," : ""
+   def sendBeltRequirements(int belt, int oldBelt, boolean hasOldBelt, int level, int points) {
+      String beltReqStr = (oldBelt != -1) ? " you must have the #i" + oldBelt + "# belt in your inventory," : ""
 
       String pointsLeftStr = (points - cm.getPlayer().getDojoPoints() > 0) ? " you need #r" + (points - cm.getPlayer().getDojoPoints()) + "#k more training points" : ""
-      String beltLeftStr = (!haveOldbelt) ? " you must have the needed belt unequipped and available in your EQP inventory" : ""
+      String beltLeftStr = (!hasOldBelt) ? " you must have the needed belt unequipped and available in your EQP inventory" : ""
       String conjStr = (pointsLeftStr.length() > 0 && beltLeftStr.length() > 0) ? " and" : ""
 
       cm.sendNext("In order to receive #i" + belt + "# #b#t" + belt + "##k," + beltReqStr + " you have to be at least over level #b" + level + "#k and you need to have earned at least #b" + points + " training points#k.\r\n\r\nIf you want to obtain this belt," + beltLeftStr + conjStr + pointsLeftStr + ".")

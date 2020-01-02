@@ -46,7 +46,7 @@ class Quest20105 {
 
                qm.gainItem(1482014, (short) 1)
                qm.gainItem(1142066, (short) 1)
-               qm.getPlayer().changeJob(MapleJob.THUNDERBREAKER1)
+               qm.getPlayer().changeJob(MapleJob.THUNDER_BREAKER_1)
                qm.getPlayer().resetStats()
             }
             qm.forceCompleteQuest()

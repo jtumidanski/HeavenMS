@@ -20,9 +20,9 @@ class Quest29924 {
             }
          }
 
-         String medalname = qm.getMedalName()
-         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalname + "> has been awarded.")
-         qm.earnTitle("<" + medalname + "> has been awarded.")
+         String medalName = qm.getMedalName()
+         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalName + "> has been awarded.")
+         qm.earnTitle("<" + medalName + "> has been awarded.")
 
          qm.forceStartQuest()
          qm.forceCompleteQuest()
@@ -42,9 +42,9 @@ class Quest29924 {
             }
          }
 
-         String medalname = qm.getMedalName()
-         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalname + "> has been awarded.")
-         qm.earnTitle("<" + medalname + "> has been awarded.")
+         String medalName = qm.getMedalName()
+         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalName + "> has been awarded.")
+         qm.earnTitle("<" + medalName + "> has been awarded.")
 
          qm.forceStartQuest()
          qm.forceCompleteQuest()

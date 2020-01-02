@@ -9,5 +9,5 @@ class ShowBoughtCashPackageSuccess(private var _cashPacket: java.util.List[Item]
 
   def accountId: Int = _accountId
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

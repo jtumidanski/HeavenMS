@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.life.positioner;
 
 import java.awt.Point;
@@ -40,9 +21,6 @@ import tools.packet.character.npc.RemovePlayerNPC;
 import tools.packet.spawn.RemoveNPCController;
 import tools.packet.spawn.SpawnPlayerNPC;
 
-/**
- * @author RonanLana
- */
 public class MaplePlayerNPCPositioner {
 
    private static boolean isPlayerNpcNearby(List<Point> otherPos, Point searchPos, int xLimit, int yLimit) {
@@ -68,25 +46,25 @@ public class MaplePlayerNPCPositioner {
       return (YamlConfig.config.server.PLAYERNPC_AREA_Y / 2) + (YamlConfig.config.server.PLAYERNPC_AREA_Y / (1 << (newStep + 1)));
    }
 
-   private static List<Point> rearrangePlayerNpcPositions(MapleMap map, int newStep, int pnpcsSize) {
+   private static List<Point> rearrangePlayerNpcPositions(MapleMap map, int newStep, int playerNpcSize) {
       Rectangle mapArea = map.getMapArea();
 
       int leftPx = mapArea.x + YamlConfig.config.server.PLAYERNPC_INITIAL_X, px, py = mapArea.y + YamlConfig.config.server.PLAYERNPC_INITIAL_Y;
-      int outx = mapArea.x + mapArea.width - YamlConfig.config.server.PLAYERNPC_INITIAL_X, outy = mapArea.y + mapArea.height;
+      int outX = mapArea.x + mapArea.width - YamlConfig.config.server.PLAYERNPC_INITIAL_X, outY = mapArea.y + mapArea.height;
       int cx = calcDx(newStep), cy = calcDy(newStep);
 
-      List<Point> otherPlayerNpcs = new LinkedList<>();
-      while (py < outy) {
+      List<Point> otherPlayerNpc = new LinkedList<>();
+      while (py < outY) {
          px = leftPx;
 
-         while (px < outx) {
+         while (px < outX) {
             Point searchPos = map.getPointBelow(new Point(px, py));
             if (searchPos != null) {
-               if (!isPlayerNpcNearby(otherPlayerNpcs, searchPos, cx, cy)) {
-                  otherPlayerNpcs.add(searchPos);
+               if (!isPlayerNpcNearby(otherPlayerNpc, searchPos, cx, cy)) {
+                  otherPlayerNpc.add(searchPos);
 
-                  if (otherPlayerNpcs.size() == pnpcsSize) {
-                     return otherPlayerNpcs;
+                  if (otherPlayerNpc.size() == playerNpcSize) {
+                     return otherPlayerNpc;
                   }
                }
             }
@@ -100,32 +78,32 @@ public class MaplePlayerNPCPositioner {
       return null;
    }
 
-   private static Point rearrangePlayerNpcs(MapleMap map, int newStep, List<MaplePlayerNPC> pnpcs) {
+   private static Point rearrangePlayerNpc(MapleMap map, int newStep, List<MaplePlayerNPC> playerNpcList) {
       Rectangle mapArea = map.getMapArea();
 
       int leftPx = mapArea.x + YamlConfig.config.server.PLAYERNPC_INITIAL_X, px, py = mapArea.y + YamlConfig.config.server.PLAYERNPC_INITIAL_Y;
-      int outx = mapArea.x + mapArea.width - YamlConfig.config.server.PLAYERNPC_INITIAL_X, outy = mapArea.y + mapArea.height;
+      int outX = mapArea.x + mapArea.width - YamlConfig.config.server.PLAYERNPC_INITIAL_X, outY = mapArea.y + mapArea.height;
       int cx = calcDx(newStep), cy = calcDy(newStep);
 
-      List<Point> otherPlayerNpcs = new LinkedList<>();
+      List<Point> otherPlayerNpcList = new LinkedList<>();
       int i = 0;
 
-      while (py < outy) {
+      while (py < outY) {
          px = leftPx;
 
-         while (px < outx) {
+         while (px < outX) {
             Point searchPos = map.getPointBelow(new Point(px, py));
             if (searchPos != null) {
-               if (!isPlayerNpcNearby(otherPlayerNpcs, searchPos, cx, cy)) {
-                  if (i == pnpcs.size()) {
+               if (!isPlayerNpcNearby(otherPlayerNpcList, searchPos, cx, cy)) {
+                  if (i == playerNpcList.size()) {
                      return searchPos;
                   }
 
-                  MaplePlayerNPC pn = pnpcs.get(i);
+                  MaplePlayerNPC pn = playerNpcList.get(i);
                   i++;
 
                   pn.updatePlayerNPCPosition(map, searchPos);
-                  otherPlayerNpcs.add(searchPos);
+                  otherPlayerNpcList.add(searchPos);
                }
             }
 
@@ -138,40 +116,35 @@ public class MaplePlayerNPCPositioner {
       return null;    // this area should not be reached under any scenario
    }
 
-   private static Point reorganizePlayerNpcs(MapleMap map, int newStep, List<MapleMapObject> mmoList) {
+   private static Point reorganizePlayerNpc(MapleMap map, int newStep, List<MapleMapObject> mmoList) {
       if (!mmoList.isEmpty()) {
          if (YamlConfig.config.server.USE_DEBUG) {
-            System.out.println("Reorganizing pnpc map, step " + newStep);
+            System.out.println("Reorganizing player npc map, step " + newStep);
          }
 
-         List<MaplePlayerNPC> playerNpcs = new ArrayList<>(mmoList.size());
+         List<MaplePlayerNPC> playerNpcList = new ArrayList<>(mmoList.size());
          for (MapleMapObject mmo : mmoList) {
-            playerNpcs.add((MaplePlayerNPC) mmo);
+            playerNpcList.add((MaplePlayerNPC) mmo);
          }
 
-         playerNpcs.sort(new Comparator<>() {
-            @Override
-            public int compare(MaplePlayerNPC p1, MaplePlayerNPC p2) {
-               return p1.getScriptId() - p2.getScriptId(); // scriptid as playernpc history
-            }
-         });
+         playerNpcList.sort(Comparator.comparingInt(MaplePlayerNPC::getScriptId));
 
          for (Channel ch : Server.getInstance().getChannelsFromWorld(map.getWorld())) {
             MapleMap m = ch.getMapFactory().getMap(map.getId());
 
-            for (MaplePlayerNPC pn : playerNpcs) {
+            for (MaplePlayerNPC pn : playerNpcList) {
                m.removeMapObject(pn);
                MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
                MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.objectId()));
             }
          }
 
-         Point ret = rearrangePlayerNpcs(map, newStep, playerNpcs);
+         Point ret = rearrangePlayerNpc(map, newStep, playerNpcList);
 
          for (Channel ch : Server.getInstance().getChannelsFromWorld(map.getWorld())) {
             MapleMap m = ch.getMapFactory().getMap(map.getId());
 
-            for (MaplePlayerNPC pn : playerNpcs) {
+            for (MaplePlayerNPC pn : playerNpcList) {
                m.addPlayerNPCMapObject(pn);
                MasterBroadcaster.getInstance().sendToAllInMap(m, new SpawnPlayerNPC(pn));
                MasterBroadcaster.getInstance().sendToAllInMap(m, new GetPlayerNPC(pn));
@@ -184,35 +157,35 @@ public class MaplePlayerNPCPositioner {
       return null;
    }
 
-   private static Point getNextPlayerNpcPosition(MapleMap map, int initStep) {   // automated playernpc position thanks to Ronan
+   private static Point getNextPlayerNpcPosition(MapleMap map, int initStep) {
       List<MapleMapObject> mmoList = map.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC));
-      List<Point> otherPlayerNpcs = new LinkedList<>();
+      List<Point> otherPlayerNpc = new LinkedList<>();
       for (MapleMapObject mmo : mmoList) {
-         otherPlayerNpcs.add(mmo.position());
+         otherPlayerNpc.add(mmo.position());
       }
 
       int cx = calcDx(initStep), cy = calcDy(initStep);
       Rectangle mapArea = map.getMapArea();
-      int outx = mapArea.x + mapArea.width - YamlConfig.config.server.PLAYERNPC_INITIAL_X, outy = mapArea.y + mapArea.height;
+      int outX = mapArea.x + mapArea.width - YamlConfig.config.server.PLAYERNPC_INITIAL_X, outY = mapArea.y + mapArea.height;
       boolean reorganize = false;
 
       int i = initStep;
       while (i < YamlConfig.config.server.PLAYERNPC_AREA_STEPS) {
          int leftPx = mapArea.x + YamlConfig.config.server.PLAYERNPC_INITIAL_X, px, py = mapArea.y + YamlConfig.config.server.PLAYERNPC_INITIAL_Y;
 
-         while (py < outy) {
+         while (py < outY) {
             px = leftPx;
 
-            while (px < outx) {
+            while (px < outX) {
                Point searchPos = map.getPointBelow(new Point(px, py));
                if (searchPos != null) {
-                  if (!isPlayerNpcNearby(otherPlayerNpcs, searchPos, cx, cy)) {
+                  if (!isPlayerNpcNearby(otherPlayerNpc, searchPos, cx, cy)) {
                      if (i > initStep) {
                         map.getWorldServer().setPlayerNpcMapStep(map.getId(), i);
                      }
 
                      if (reorganize && YamlConfig.config.server.PLAYERNPC_ORGANIZE_AREA) {
-                        return reorganizePlayerNpcs(map, i, mmoList);
+                        return reorganizePlayerNpc(map, i, mmoList);
                      }
 
                      return searchPos;
@@ -231,7 +204,7 @@ public class MaplePlayerNPCPositioner {
          cx = calcDx(i);
          cy = calcDy(i);
          if (YamlConfig.config.server.PLAYERNPC_ORGANIZE_AREA) {
-            otherPlayerNpcs = rearrangePlayerNpcPositions(map, i, mmoList.size());
+            otherPlayerNpc = rearrangePlayerNpcPositions(map, i, mmoList.size());
          }
       }
 

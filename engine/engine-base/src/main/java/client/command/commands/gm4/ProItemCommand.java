@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command.commands.gm4;
 
 import client.MapleCharacter;
@@ -41,7 +18,7 @@ public class ProItemCommand extends Command {
       setDescription("");
    }
 
-   private static void hardsetItemStats(Equip equip, short stat, short spdjmp) {
+   private static void hardSetItemStats(Equip equip, short stat, short speedJump) {
       equip.str_$eq(stat);
       equip.dex_$eq(stat);
       equip._int_$eq(stat);
@@ -50,8 +27,8 @@ public class ProItemCommand extends Command {
       equip.watk_$eq(stat);
       equip.acc_$eq(stat);
       equip.avoid_$eq(stat);
-      equip.jump_$eq(spdjmp);
-      equip.speed_$eq(spdjmp);
+      equip.jump_$eq(speedJump);
+      equip.speed_$eq(speedJump);
       equip.wdef_$eq(stat);
       equip.mdef_$eq(stat);
       equip.hp_$eq(stat);
@@ -66,30 +43,30 @@ public class ProItemCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !proitem <itemid> <stat value> [<spdjmp value>]");
+         player.yellowMessage("Syntax: !proitem <item id> <stat value> [<speed jump value>]");
          return;
       }
 
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-      int itemid = Integer.parseInt(params[0]);
+      int itemId = Integer.parseInt(params[0]);
 
-      if (ii.getName(itemid) == null) {
+      if (ii.getName(itemId) == null) {
          player.yellowMessage("Item id '" + params[0] + "' does not exist.");
          return;
       }
 
       short stat = (short) Math.max(0, Short.parseShort(params[1]));
-      short spdjmp = params.length >= 3 ? (short) Math.max(0, Short.parseShort(params[2])) : 0;
+      short speedJump = params.length >= 3 ? (short) Math.max(0, Short.parseShort(params[2])) : 0;
 
-      MapleInventoryType type = ItemConstants.getInventoryType(itemid);
+      MapleInventoryType type = ItemConstants.getInventoryType(itemId);
       if (type.equals(MapleInventoryType.EQUIP)) {
-         Item it = ii.getEquipById(itemid);
+         Item it = ii.getEquipById(itemId);
          it.owner_$eq(player.getName());
 
-         hardsetItemStats((Equip) it, stat, spdjmp);
+         hardSetItemStats((Equip) it, stat, speedJump);
          MapleInventoryManipulator.addFromDrop(c, it);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Make sure it's an equippable item.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Make sure it's an item able to be equipped.");
       }
    }
 }

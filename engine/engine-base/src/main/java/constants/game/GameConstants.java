@@ -22,10 +22,6 @@ import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.quest.MapleQuest;
 
-/*
- * @author kevintjuh93
- * @author Ronan
- */
 public class GameConstants {
    public static final int[] OWL_DATA = new int[]{1082002, 2070005, 2070006, 1022047, 1102041, 2044705, 2340000, 2040017, 1092030, 2040804};
    public static final String[] stats = {"tuc", "reqLevel", "reqJob", "reqSTR", "reqDEX", "reqINT", "reqLUK", "reqPOP", "cash", "cursed", "success", "setItemID", "equipTradeBlock", "durability", "randOption", "randStat", "masterLevel", "reqSkillLevel", "elemDefault", "incRMAS", "incRMAF", "incRMAI", "incRMAL", "canLevel", "skill", "charmEXP"};
@@ -245,7 +241,7 @@ public class GameConstants {
       add("BgmUI/ShopBgm");
       add("BgmUI/Title");
    }};
-   // Ronan's rates upgrade system
+
    private static final int[] DROP_RATE_GAIN = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14};
    private static final int[] MESO_RATE_GAIN = {1, 3, 6, 10, 15, 21, 28, 36, 45, 55, 66, 78, 91, 105};
    private static final int[] EXP_RATE_GAIN = {1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610};    //fibonacci :3
@@ -278,23 +274,23 @@ public class GameConstants {
       return (EXP_RATE_GAIN[slot]);
    }
 
-   public static int[] getCustomKey(boolean customKeyset) {
-      return (customKeyset ? CUSTOM_KEY : DEFAULT_KEY);
+   public static int[] getCustomKey(boolean customKeySet) {
+      return (customKeySet ? CUSTOM_KEY : DEFAULT_KEY);
    }
 
-   public static int[] getCustomType(boolean customKeyset) {
-      return (customKeyset ? CUSTOM_TYPE : DEFAULT_TYPE);
+   public static int[] getCustomType(boolean customKeySet) {
+      return (customKeySet ? CUSTOM_TYPE : DEFAULT_TYPE);
    }
 
-   public static int[] getCustomAction(boolean customKeyset) {
-      return (customKeyset ? CUSTOM_ACTION : DEFAULT_ACTION);
+   public static int[] getCustomAction(boolean customKeySet) {
+      return (customKeySet ? CUSTOM_ACTION : DEFAULT_ACTION);
    }
 
-   public static String getJobName(int jobid) {
-      String name = jobNames.get(jobid);
+   public static String getJobName(int jobId) {
+      String name = jobNames.get(jobId);
 
       if (name == null) {
-         MapleJob job = MapleJob.getById(jobid);
+         MapleJob job = MapleJob.getById(jobId);
 
          if (job != null) {
             name = job.name().toLowerCase();
@@ -304,22 +300,22 @@ public class GameConstants {
             name = "";
          }
 
-         jobNames.put(jobid, name);
+         jobNames.put(jobId, name);
       }
 
       return name;
    }
 
-   public static int getJobUpgradeLevelRange(int jobbranch) {
-      return jobUpgradeBlob[jobbranch];
+   public static int getJobUpgradeLevelRange(int jobBranch) {
+      return jobUpgradeBlob[jobBranch];
    }
 
-   public static int getChangeJobSpUpgrade(int jobbranch) {
-      return jobUpgradeSpUp[jobbranch];
+   public static int getChangeJobSpUpgrade(int jobBranch) {
+      return jobUpgradeSpUp[jobBranch];
    }
 
-   public static boolean isHallOfFameMap(int mapid) {
-      switch (mapid) {
+   public static boolean isHallOfFameMap(int mapId) {
+      switch (mapId) {
          case 102000004:     // warrior
          case 101000004:     // magician
          case 100000204:     // bowman
@@ -337,8 +333,8 @@ public class GameConstants {
       }
    }
 
-   public static boolean isPodiumHallOfFameMap(int mapid) {
-      switch (mapid) {
+   public static boolean isPodiumHallOfFameMap(int mapId) {
+      switch (mapId) {
          case 102000004:     // warrior
          case 101000004:     // magician
          case 100000204:     // bowman
@@ -351,9 +347,9 @@ public class GameConstants {
       }
    }
 
-   public static byte getHallOfFameBranch(MapleJob job, int mapid) {
-      if (!isHallOfFameMap(mapid)) {
-         return (byte) (26 + 4 * (mapid / 100000000));   // custom, 400 pnpcs available per continent
+   public static byte getHallOfFameBranch(MapleJob job, int mapId) {
+      if (!isHallOfFameMap(mapId)) {
+         return (byte) (26 + 4 * (mapId / 100000000));   // custom, 400 player npcs available per continent
       }
 
       if (job.isA(MapleJob.WARRIOR)) {
@@ -366,15 +362,15 @@ public class GameConstants {
          return 13;
       } else if (job.isA(MapleJob.PIRATE)) {
          return 14;
-      } else if (job.isA(MapleJob.DAWNWARRIOR1)) {
+      } else if (job.isA(MapleJob.DAWN_WARRIOR_1)) {
          return 15;
-      } else if (job.isA(MapleJob.BLAZEWIZARD1)) {
+      } else if (job.isA(MapleJob.BLAZE_WIZARD_1)) {
          return 16;
-      } else if (job.isA(MapleJob.WINDARCHER1)) {
+      } else if (job.isA(MapleJob.WIND_ARCHER_1)) {
          return 17;
-      } else if (job.isA(MapleJob.NIGHTWALKER1)) {
+      } else if (job.isA(MapleJob.NIGHT_WALKER_1)) {
          return 18;
-      } else if (job.isA(MapleJob.THUNDERBREAKER1)) {
+      } else if (job.isA(MapleJob.THUNDER_BREAKER_1)) {
          return 19;
       } else if (job.isA(MapleJob.ARAN1)) {
          return 20;
@@ -401,7 +397,7 @@ public class GameConstants {
       }
    }
 
-   public static boolean canPnpcBranchUseScriptId(byte branch, int scriptId) {
+   public static boolean canPlayerNpcBranchUseScriptId(byte branch, int scriptId) {
       scriptId /= 100;
       scriptId %= 100;
 
@@ -412,12 +408,12 @@ public class GameConstants {
       }
    }
 
-   public static int getHallOfFameMapid(MapleJob job) {
-      int jobid = job.getId();
+   public static int getHallOfFameMapId(MapleJob job) {
+      int jobId = job.getId();
 
-      if (isCygnus(jobid)) {
+      if (isCygnus(jobId)) {
          return 130000100;
-      } else if (isAran(jobid)) {
+      } else if (isAran(jobId)) {
          return 140010110;
       } else {
          if (job.isA(MapleJob.WARRIOR)) {
@@ -437,14 +433,14 @@ public class GameConstants {
    }
 
    public static int getJobBranch(MapleJob job) {
-      int jobid = job.getId();
+      int jobId = job.getId();
 
-      if (jobid % 1000 == 0) {
+      if (jobId % 1000 == 0) {
          return 0;
-      } else if (jobid % 100 == 0) {
+      } else if (jobId % 100 == 0) {
          return 1;
       } else {
-         return 2 + (jobid % 10);
+         return 2 + (jobId % 10);
       }
    }
 
@@ -543,12 +539,12 @@ public class GameConstants {
       return skill >= 9001000 && skill <= 9101008 || skill >= 8001000 && skill <= 8001001;
    }
 
-   public static boolean isFreeMarketRoom(int mapid) {
-      return mapid / 1000000 == 910 && mapid > 910000000; // FM rooms subset, thanks to shavit
+   public static boolean isFreeMarketRoom(int mapId) {
+      return mapId / 1000000 == 910 && mapId > 910000000;
    }
 
    public static boolean isMerchantLocked(MapleMap map) {
-      if (FieldLimit.CANNOTMIGRATE.check(map.getFieldLimit())) {   // maps that cannot access cash shop cannot access merchants too (except FM rooms).
+      if (FieldLimit.CANNOT_MIGRATE.check(map.getFieldLimit())) {   // maps that cannot access cash shop cannot access merchants too (except FM rooms).
          return true;
       }
 
@@ -560,50 +556,50 @@ public class GameConstants {
       return false;
    }
 
-   public static boolean isBossRush(int mapid) {
-      return mapid >= 970030100 && mapid <= 970042711;
+   public static boolean isBossRush(int mapId) {
+      return mapId >= 970030100 && mapId <= 970042711;
    }
 
-   public static boolean isDojo(int mapid) {
-      return mapid >= 925020000 && mapid < 925040000;
+   public static boolean isDojo(int mapId) {
+      return mapId >= 925020000 && mapId < 925040000;
    }
 
-   public static boolean isDojoPartyArea(int mapid) {
-      return mapid >= 925030100 && mapid < 925040000;
+   public static boolean isDojoPartyArea(int mapId) {
+      return mapId >= 925030100 && mapId < 925040000;
    }
 
-   public static boolean isDojoBossArea(int mapid) {
-      return isDojo(mapid) && (((mapid / 100) % 100) % 6) > 0;
+   public static boolean isDojoBossArea(int mapId) {
+      return isDojo(mapId) && (((mapId / 100) % 100) % 6) > 0;
    }
 
-   public static boolean isPyramid(int mapid) {
-      return mapid >= 926010010 & mapid <= 930010000;
+   public static boolean isPyramid(int mapId) {
+      return mapId >= 926010010 & mapId <= 930010000;
    }
 
-   public static boolean isAriantColiseumLobby(int mapid) {
-      int mapbranch = mapid / 1000;
-      return mapbranch == 980010 && mapid % 10 == 0;
+   public static boolean isAriantColiseumLobby(int mapId) {
+      int mapBranch = mapId / 1000;
+      return mapBranch == 980010 && mapId % 10 == 0;
    }
 
-   public static boolean isAriantColiseumArena(int mapid) {
-      int mapbranch = mapid / 1000;
-      return mapbranch == 980010 && mapid % 10 == 1;
+   public static boolean isAriantColiseumArena(int mapId) {
+      int mapBranch = mapId / 1000;
+      return mapBranch == 980010 && mapId % 10 == 1;
    }
 
-   public static boolean isPqSkillMap(int mapid) {
-      return isDojo(mapid) || isPyramid(mapid);
+   public static boolean isPqSkillMap(int mapId) {
+      return isDojo(mapId) || isPyramid(mapId);
    }
 
-   public static boolean isFishingArea(int mapid) {
-      return mapid == 120010000 || mapid == 251000100 || mapid == 541010110;
+   public static boolean isFishingArea(int mapId) {
+      return mapId == 120010000 || mapId == 251000100 || mapId == 541010110;
    }
 
    public static boolean isFinisherSkill(int skillId) {
       return skillId > 1111002 && skillId < 1111007 || skillId == 11111002 || skillId == 11111003;
    }
 
-   public static boolean isMedalQuest(short questid) {
-      return MapleQuest.getInstance(questid).getMedalRequirement() != -1;
+   public static boolean isMedalQuest(short questId) {
+      return MapleQuest.getInstance(questId).getMedalRequirement() != -1;
    }
 
    public static boolean hasSPTable(MapleJob job) {
@@ -626,7 +622,7 @@ public class GameConstants {
    }
 
    public static String ordinal(int i) {
-      String[] sufixes = new String[]{"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
+      String[] suffixes = new String[]{"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
       switch (i % 100) {
          case 11:
          case 12:
@@ -634,7 +630,7 @@ public class GameConstants {
             return i + "th";
 
          default:
-            return i + sufixes[i % 10];
+            return i + suffixes[i % 10];
       }
    }
 

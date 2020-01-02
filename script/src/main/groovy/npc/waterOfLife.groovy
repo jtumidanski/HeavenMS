@@ -14,7 +14,7 @@ import tools.ServerNoticeType
 */
 
 
-class NPCwaterOfLife {
+class NPCWaterOfLife {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -89,12 +89,12 @@ class NPCwaterOfLife {
    }
 }
 
-NPCwaterOfLife getNPC() {
+NPCWaterOfLife getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCwaterOfLife(cm: cm))
+      getBinding().setVariable("npc", new NPCWaterOfLife(cm: cm))
    }
-   return (NPCwaterOfLife) getBinding().getVariable("npc")
+   return (NPCWaterOfLife) getBinding().getVariable("npc")
 }
 
 def start() {

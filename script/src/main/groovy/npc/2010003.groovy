@@ -61,7 +61,7 @@ class NPC2010003 {
                selStr += "\r\n#L" + i + "# " + gloves[i] + "#l"
             }
             cm.sendSimple(selStr)
-         } else if (selectedType == 2) { //mage glove
+         } else if (selectedType == 2) { //magician glove
             String selStr = "Magician glove? Okay, then which one?#b"
             String[] gloves = ["Brown Lorin#k - Magician Lv. 70#b", "Blue Lorin#k - Magician Lv. 70#b", "Dark Lorin#k - Magician Lv. 70#b",
                                "Green Clarity#k - Magician Lv. 80#b", "Blue Clarity#k - Magician Lv. 80#b", "Dark Clarity#k - Magician Lv. 80#b"]
@@ -99,7 +99,7 @@ class NPC2010003 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         } else if (selectedType == 2) { //mage glove
+         } else if (selectedType == 2) { //magician glove
             int[] itemSet = [1082098, 1082099, 1082100, 1082121, 1082122, 1082123]
             List matSet = [[4005001, 4011000, 4011004, 4000030, 4003000], [1082098, 4021002, 4021007], [1082098, 4021008, 4011006], [4005001, 4005003, 4021003, 4000030, 4003000], [1082121, 4005001, 4005003, 4021005], [1082121, 4005001, 4005003, 4021008]]
             List matQtySet = [[2, 6, 6, 70, 55], [1, 6, 2], [1, 3, 3], [2, 1, 8, 90, 60], [1, 1, 1, 7], [1, 2, 1, 4]]

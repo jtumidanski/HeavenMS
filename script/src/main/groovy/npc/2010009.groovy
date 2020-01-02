@@ -48,7 +48,7 @@ class NPC2010009 {
             cm.sendNext("Guild Union is just as it says, a union of a number of guilds to form a super group. I am in charge of managing these Guild Unions.")
             cm.dispose()
          } else if (selection == 1) {
-            cm.sendNext("To make a Guild Union, two and only #btwo Guild Masters need to be in a party#k and #bboth must be present on this room#k on the same channel. The leader of this party will be assigned as the Guild Union Master.\r\n\r\nInitially, #bonly two guilds#k can make part of the new Union, but over the time you can #rexpand#k the Union capacity by talking to me when the time comes and investing in an estipulated fee.")
+            cm.sendNext("To make a Guild Union, two and only #btwo Guild Masters need to be in a party#k and #bboth must be present on this room#k on the same channel. The leader of this party will be assigned as the Guild Union Master.\r\n\r\nInitially, #bonly two guilds#k can make part of the new Union, but over the time you can #rexpand#k the Union capacity by talking to me when the time comes and investing in an stipulated fee.")
             cm.dispose()
          } else if (selection == 2) {
             if (!cm.isLeader()) {
@@ -118,7 +118,7 @@ class NPC2010009 {
             cm.dispose()
          } else if (choice == 4) {
             if (cm.getPlayer().getGuild() == null || cm.getPlayer().getGuild().get().getAllianceId() <= 0) {
-               cm.sendNext("You cannot disband a non-existant Guild Union.")
+               cm.sendNext("You cannot disband a non-existent Guild Union.")
                cm.dispose()
             } else {
                cm.disbandAlliance(cm.getClient(), cm.getPlayer().getGuild().get().getAllianceId())

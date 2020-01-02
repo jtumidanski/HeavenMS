@@ -31,47 +31,46 @@ class Quest8189 {
          } else if (status == 1) {
             qm.sendNextPrev("Then here we go...! #rHYAHH!#k")
          } else if (status == 2) {
-            int petidx = -1
-            int petItemid
+            int petId = -1
+            int petItemId
             MaplePet pet
             int id
             for (int i = 0; i < 3; i++) {
-               pet = qm.getPlayer().getPet(petidx)
+               pet = qm.getPlayer().getPet(petId)
                if (pet != null) {
                   id = pet.id()
                   if (id >= 5000029 && id <= 5000033) {
-                     petItemid = 5000030
-                     petidx = i
+                     petItemId = 5000030
+                     petId = i
                      break
                   } else if (id >= 5000048 && id <= 5000053) {
-                     // thanks Conrad for noticing Robo pets not being able to re-evolve
-                     petItemid = 5000049
-                     petidx = i
+                     petItemId = 5000049
+                     petId = i
                      break
                   }
                }
             }
 
-            if (petidx == -1) {
+            if (petId == -1) {
                qm.sendOk("Something wrong, try again.")
                qm.dispose()
                return
             }
 
-            int pool = (petItemid == 5000030) ? 10 : 11
+            int pool = (petItemId == 5000030) ? 10 : 11
             int after = 0
             while ({
                double rand = 1 + Math.floor(Math.random() * pool)
                if (rand >= 1 && rand <= 3) {
-                  after = petItemid
+                  after = petItemId
                } else if (rand >= 4 && rand <= 6) {
-                  after = petItemid + 1
+                  after = petItemId + 1
                } else if (rand >= 7 && rand <= 9) {
-                  after = petItemid + 2
+                  after = petItemId + 2
                } else if (rand == 10) {
-                  after = petItemid + 3
+                  after = petItemId + 3
                } else {
-                  after = petItemid + 4
+                  after = petItemId + 4
                }
                after == pet.id()
             }())
@@ -83,7 +82,7 @@ name = MapleItemInformationProvider.getInstance().getName(after)
 
             qm.gainMeso(-10000)
             qm.gainItem(5380000, (short) -1)
-            qm.evolvePet((byte) petidx, after)
+            qm.evolvePet((byte) petId, after)
 
             qm.sendOk("Woo! It worked again! #rYou may find your new pet under your 'CASH' inventory.\r #kIt used to be a #b#i" + id + "##t" + id + "##k, and now it's \r a#b #i" + after + "##t" + after + "##k! \r\n Come back with 10,000 mesos and another Rock of Evolution if you don't like it!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v" + after + "# #t" + after + "#")
          } else if (status == 3) {

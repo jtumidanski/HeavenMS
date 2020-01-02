@@ -28,7 +28,7 @@ public class SpecialMoveReader implements PacketReader<BaseSpecialMovePacket> {
             byte success = accessor.readByte();
             magnetData[i] = new MonsterMagnetData(mobOid, success);
          }
-         byte direction = accessor.readByte();   // thanks MedicOP for pointing some 3rd-party related issues with Magnet
+         byte direction = accessor.readByte();
          return new MonsterMagnetPacket(skillId, skillLevel, null, magnetData, direction);
       } else if (skillId == SuperGM.HEAL_PLUS_DISPEL) {
          accessor.skip(11);

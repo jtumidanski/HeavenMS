@@ -43,7 +43,7 @@ class Quest20408 {
             qm.forceStartQuest()
             qm.forceCompleteQuest()
 
-            qm.sendOk("#h0#. For courageously battling the Black Mage, I will appoint you as the new Chief Knight of Cygnus Knights from this moment onwards. Please use your power and authority wisely to help protect the citizens of Maple World.")
+            qm.sendOk("#h0#. For courageously battling the Black Magician, I will appoint you as the new Chief Knight of Cygnus Knights from this moment onwards. Please use your power and authority wisely to help protect the citizens of Maple World.")
          } else if (status == 4) {
             qm.dispose()
          }

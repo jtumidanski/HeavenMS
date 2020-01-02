@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client.processor.action;
 
 import java.awt.Point;
@@ -41,9 +22,6 @@ import tools.packet.spawn.ShowPet;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
 
-/**
- * @author RonanLana - just added locking on OdinMS' SpawnPetHandler method body
- */
 public class SpawnPetProcessor {
    private static MapleDataProvider dataRoot = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Item.wz"));
 
@@ -58,21 +36,20 @@ public class SpawnPetProcessor {
 
             MaplePet pet = item.pet().get();
             int petid = pet.id();
-            if (petid == 5000028 || petid == 5000047) //Handles Dragon AND Robos
-            {
+            if (petid == 5000028 || petid == 5000047) {
                if (chr.haveItem(petid + 1)) {
                   MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You can't hatch your " + (petid == 5000028 ? "Dragon egg" : "Robo egg") + " if you already have a Baby " + (petid == 5000028 ? "Dragon." : "Robo."));
                   PacketCreator.announce(c, new EnableActions());
                   return;
                } else {
-                  int evolveid = MapleDataTool.getInt("info/evol1", dataRoot.getData("Pet/" + petid + ".img"));
-                  int petId = PetProcessor.getInstance().createPet(evolveid);
+                  int evolveId = MapleDataTool.getInt("info/evol1", dataRoot.getData("Pet/" + petid + ".img"));
+                  int petId = PetProcessor.getInstance().createPet(evolveId);
                   if (petId == -1) {
                      return;
                   }
                   long expiration = chr.getInventory(MapleInventoryType.CASH).getItem(slot).expiration();
                   MapleInventoryManipulator.removeById(c, MapleInventoryType.CASH, petid, (short) 1, false, false);
-                  MapleInventoryManipulator.addById(c, evolveid, (short) 1, null, petId, expiration);
+                  MapleInventoryManipulator.addById(c, evolveId, (short) 1, null, petId, expiration);
                   PacketCreator.announce(c, new EnableActions());
                   return;
                }

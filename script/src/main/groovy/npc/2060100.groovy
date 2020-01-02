@@ -21,7 +21,7 @@ class NPC2060100 {
             cm.gainItem(4000175, (short) -1)
             cm.warp(923000000, 0)
          } else {
-            cm.sendOk("In order to open the crack of dimension you will have to posess one piece of Miniature Pianus. Those could be gained by defeating a Pianus.")
+            cm.sendOk("In order to open the crack of dimension you will have to possess one piece of Miniature Pianus. Those could be gained by defeating a Pianus.")
          }
       } else {
          cm.sendOk("I'm #bCarta the sea-witch.#k Don't fool around with me, as I'm known for my habit of turning people into worms.")

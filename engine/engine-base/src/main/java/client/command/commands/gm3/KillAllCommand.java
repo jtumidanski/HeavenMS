@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command.commands.gm3;
 
 import java.util.Collections;
@@ -47,8 +24,9 @@ public class KillAllCommand extends Command {
       MapleMap map = player.getMap();
       List<MapleMapObject> monsters = map.getMapObjectsInRange(player.position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
       int count = 0;
-      for (MapleMapObject monstermo : monsters) {
-         MapleMonster monster = (MapleMonster) monstermo;
+
+      for (MapleMapObject mapObject : monsters) {
+         MapleMonster monster = (MapleMonster) mapObject;
          if (!monster.getStats().isFriendly() && !(monster.id() >= 8810010 && monster.id() <= 8810018)) {
             map.damageMonster(player, monster, Integer.MAX_VALUE);
             count++;

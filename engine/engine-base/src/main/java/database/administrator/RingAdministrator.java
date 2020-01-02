@@ -32,11 +32,11 @@ public class RingAdministrator extends AbstractQueryExecutor {
       execute(entityManager, query);
    }
 
-   public void addRing(EntityManager entityManager, int ringId, int itemId, int parnterRingId, int partnerCharacterId, String partnerName) {
+   public void addRing(EntityManager entityManager, int ringId, int itemId, int partnerRingId, int partnerCharacterId, String partnerName) {
       Ring ring = new Ring();
       ring.setId(ringId);
       ring.setItemId(itemId);
-      ring.setPartnerRingId(parnterRingId);
+      ring.setPartnerRingId(partnerRingId);
       ring.setPartnerCharacterId(partnerCharacterId);
       ring.setPartnerName(partnerName);
       insert(entityManager, ring);

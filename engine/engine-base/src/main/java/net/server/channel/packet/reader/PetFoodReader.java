@@ -7,7 +7,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public class PetFoodReader implements PacketReader<PetFoodPacket> {
    @Override
    public PetFoodPacket read(SeekableLittleEndianAccessor accessor) {
-      int timestamp = accessor.readInt(); // timestamp issue detected thanks to Masterrulax
+      int timestamp = accessor.readInt();
       short pos = accessor.readShort();
       int itemId = accessor.readInt();
       return new PetFoodPacket(timestamp, pos, itemId);

@@ -2,7 +2,6 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -47,6 +46,5 @@ static def spawnMob(x, y, int id, MapleMap map) {
       return
    }
 
-   MapleMonster mob = MapleLifeFactory.getMonster(id)
-   map.spawnMonsterOnGroundBelow(mob, new Point(x, y))
+   MapleLifeFactory.getMonster(id).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point(x, y)) })
 }

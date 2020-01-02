@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Kiriru
-	Map(s): 		Skyferry Between Victoria Island, Ereve and Orbis
-	Description: 	
-*/
-
-
 class NPC1100005 {
    NPCConversationManager cm
    int status = -1

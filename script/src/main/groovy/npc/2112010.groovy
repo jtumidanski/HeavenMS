@@ -3,7 +3,6 @@ package npc
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 import server.maps.MapleMapObject
 import tools.MessageBroadcaster
@@ -29,14 +28,14 @@ class NPC2112010 {
    }
 
    def playersTooClose() {
-      Point npcpos = cm.getMap().getMapObject(cm.getNpcObjectId()).position()
-      MapleMapObject[] listchr = cm.getMap().getPlayers()
+      Point npcPosition = cm.getMap().getMapObject(cm.getNpcObjectId()).position()
+      MapleMapObject[] characterList = cm.getMap().getPlayers()
 
-      for (Iterator<MapleMapObject> iterator = listchr.iterator(); iterator.hasNext();) {
+      for (Iterator<MapleMapObject> iterator = characterList.iterator(); iterator.hasNext();) {
          MapleMapObject chr = iterator.next()
 
-         Point chrpos = chr.position()
-         if (Math.sqrt(Math.pow((npcpos.getX() - chrpos.getX()), 2) + Math.pow((npcpos.getY() - chrpos.getY()), 2)) < 310) {
+         Point characterPosition = chr.position()
+         if (Math.sqrt(Math.pow((npcPosition.getX() - characterPosition.getX()), 2) + Math.pow((npcPosition.getY() - characterPosition.getY()), 2)) < 310) {
             return true
          }
       }
@@ -86,7 +85,7 @@ class NPC2112010 {
          } else {
             if (status == 0) {
                if (eim.isEventCleared()) {
-                  cm.sendOk("Nooooo... I have been beated? But how? Everything I did was for the sake of the development of a greater alchemy! You can't jail me, I did what everybody standing in a place like mine would do! But no, they simply decided to damp up the progress of the science JUST BECAUSE it was deemed dangerous??? Oh, come on!")
+                  cm.sendOk("Nooooo... I have been beaten? But how? Everything I did was for the sake of the development of a greater alchemy! You can't jail me, I did what everybody standing in a place like mine would do! But no, they simply decided to damp up the progress of the science JUST BECAUSE it was deemed dangerous??? Oh, come on!")
                } else {
                   int state = eim.getIntProperty("yuletePassed")
 
@@ -96,22 +95,22 @@ class NPC2112010 {
                      cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest alchemy, #rFrankenroid#k.")
                      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: I present you my newest weapon, brought by the finest alchemy, Frankenroid!")
 
-                     MapleMap mapobj = eim.getMapInstance(926110401)
-                     MapleMonster bossobj = MapleLifeFactory.getMonster(9300151)
-                     mapobj.spawnMonsterOnGroundBelow(bossobj, new Point(250, 100))
-
-                     eim.setIntProperty("statusStg7", 1)
-                     eim.setIntProperty("yuletePassed", -1)
+                     MapleMap map = eim.getMapInstance(926110401)
+                     MapleLifeFactory.getMonster(9300151).ifPresent({ monster ->
+                        map.spawnMonsterOnGroundBelow(monster, new Point(250, 100))
+                        eim.setIntProperty("statusStg7", 1)
+                        eim.setIntProperty("yuletePassed", -1)
+                     })
                   } else {
                      cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the #rmighty Frankenroid#k!")
                      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the mighty Frankenroid!!")
 
-                     MapleMap mapobj = eim.getMapInstance(926110401)
-                     MapleMonster bossobj = MapleLifeFactory.getMonster(9300152)
-                     mapobj.spawnMonsterOnGroundBelow(bossobj, new Point(250, 100))
-
-                     eim.setIntProperty("statusStg7", 2)
-                     eim.setIntProperty("yuletePassed", -1)
+                     MapleMap map = eim.getMapInstance(926110401)
+                     MapleLifeFactory.getMonster(9300152).ifPresent({ monster ->
+                        map.spawnMonsterOnGroundBelow(monster, new Point(250, 100))
+                        eim.setIntProperty("statusStg7", 2)
+                        eim.setIntProperty("yuletePassed", -1)
+                     })
                   }
                }
             }

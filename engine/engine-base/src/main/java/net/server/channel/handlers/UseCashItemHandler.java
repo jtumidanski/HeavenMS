@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.ArrayList;
@@ -49,7 +28,7 @@ import client.processor.stat.AssignSPProcessor;
 import config.YamlConfig;
 import constants.game.GameConstants;
 import constants.inventory.ItemConstants;
-import constants.items.UseableCashItems;
+import constants.items.ConsumableCashItems;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.SkillMacro;
@@ -145,11 +124,11 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
    private boolean getIncubatedItem(MapleClient client, int id) {
       final int[] ids = {1012070, 1302049, 1302063, 1322027, 2000004, 2000005, 2020013, 2020015, 2040307, 2040509, 2040519, 2040521, 2040533, 2040715, 2040717, 2040810, 2040811, 2070005, 2070006, 4020009,};
-      final int[] quantitys = {1, 1, 1, 1, 240, 200, 200, 200, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3};
+      final int[] quantities = {1, 1, 1, 1, 240, 200, 200, 200, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3};
       int amount = 0;
       for (int i = 0; i < ids.length; i++) {
          if (i == id) {
-            amount = quantitys[i];
+            amount = quantities[i];
          }
       }
       if (client.getPlayer().getInventory(MapleInventoryType.getByType((byte) (id / 1000000))).isFull()) {
@@ -301,18 +280,18 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          return;
       }
 
-      final Item eitem = player.getInventory(MapleInventoryType.EQUIP).getItem(eSlot);
+      final Item equip = player.getInventory(MapleInventoryType.EQUIP).getItem(eSlot);
 
       if (second1) {
          return;
       }
 
-      final Item uitem = player.getInventory(MapleInventoryType.USE).getItem(uSlot);
-      if (eitem == null || uitem == null) {
+      final Item use = player.getInventory(MapleInventoryType.USE).getItem(uSlot);
+      if (equip == null || use == null) {
          return;
       }
 
-      Equip toScroll = (Equip) eitem;
+      Equip toScroll = (Equip) equip;
       if (toScroll.slots() < 1) {
          PacketCreator.announce(c, new InventoryFull());
          return;
@@ -328,35 +307,32 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       final int currentLevel = toScroll.level();
       PacketCreator.announce(c, new SendVegaScroll(MaplePacketOpCodes.VegaScroll.FORTY));
 
-      final Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, uitem.id(), false, itemId, player.isGM());
+      final Equip scrolled = (Equip) ii.scrollEquipWithId(toScroll, use.id(), false, itemId, player.isGM());
       PacketCreator.announce(c, new SendVegaScroll(scrolled.level() > currentLevel ? MaplePacketOpCodes.VegaScroll.FORTY_ONE : MaplePacketOpCodes.VegaScroll.FORTY_THREE));
 
       MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.USE, uSlot, (short) 1, false);
       remove(c, position, itemId);
 
       final MapleClient client = c;
-      TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            if (!player.isLoggedin()) {
-               return;
-            }
-
-            player.toggleBlockCashShop();
-
-            final List<ModifyInventory> mods = new ArrayList<>();
-            mods.add(new ModifyInventory(3, scrolled));
-            mods.add(new ModifyInventory(0, scrolled));
-            PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
-
-            ScrollResult scrollResult = scrolled.level() > currentLevel ? ScrollResult.SUCCESS : ScrollResult.FAIL;
-            MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new ShowScrollEffect(player.getId(), scrollResult, false, false));
-            if (eSlot < 0 && (scrollResult == ScrollResult.SUCCESS)) {
-               player.equipChanged();
-            }
-
-            PacketCreator.announce(client, new EnableActions());
+      TimerManager.getInstance().schedule(() -> {
+         if (!player.isLoggedIn()) {
+            return;
          }
+
+         player.toggleBlockCashShop();
+
+         final List<ModifyInventory> mods = new ArrayList<>();
+         mods.add(new ModifyInventory(3, scrolled));
+         mods.add(new ModifyInventory(0, scrolled));
+         PacketCreator.announce(client, new ModifyInventoryPacket(true, mods));
+
+         ScrollResult scrollResult = scrolled.level() > currentLevel ? ScrollResult.SUCCESS : ScrollResult.FAIL;
+         MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new ShowScrollEffect(player.getId(), scrollResult, false, false));
+         if (eSlot < 0 && (scrollResult == ScrollResult.SUCCESS)) {
+            player.equipChanged();
+         }
+
+         PacketCreator.announce(client, new EnableActions());
       }, 1000 * 3);
    }
 
@@ -410,7 +386,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void characterCreator(MapleClient c, MapleCharacter player, short position, int itemId, String name, int face, int hair, int hairColor, int skin, int gender, int jobId, int improveSp) {
-      if (UseableCashItems.CharacterCreators.MAPLE_LIFE_B.is(itemId) && !c.gainCharacterSlot()) {
+      if (ConsumableCashItems.CharacterCreators.MAPLE_LIFE_B.is(itemId) && !c.gainCharacterSlot()) {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You have already used up all 12 extra character slots.");
          PacketCreator.announce(c, new EnableActions());
          return;
@@ -455,7 +431,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void worldChange(MapleClient c, MapleCharacter player, short position, int itemId) {
-      PacketCreator.announce(c, new WorldTransferCancel(player.cancelPendingWorldTranfer()));
+      PacketCreator.announce(c, new WorldTransferCancel(player.cancelPendingWorldTransfer()));
       remove(c, position, itemId);
       PacketCreator.announce(c, new EnableActions());
    }
@@ -655,18 +631,18 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       short flag = eq.flag();
       flag |= ItemConstants.LOCK;
       if (eq.expiration() > -1) {
-         return; //No perma items pls
+         return; //No permanent items pls
       }
       ItemProcessor.getInstance().setFlag(eq, flag);
 
       long period = 0;
-      if (UseableCashItems.ItemAugmenters.ITEM_GUARD_7.is(itemId)) {
+      if (ConsumableCashItems.ItemAugmenters.ITEM_GUARD_7.is(itemId)) {
          period = 7;
-      } else if (UseableCashItems.ItemAugmenters.ITEM_GUARD_30.is(itemId)) {
+      } else if (ConsumableCashItems.ItemAugmenters.ITEM_GUARD_30.is(itemId)) {
          period = 30;
-      } else if (UseableCashItems.ItemAugmenters.ITEM_GUARD_90.is(itemId)) {
+      } else if (ConsumableCashItems.ItemAugmenters.ITEM_GUARD_90.is(itemId)) {
          period = 90;
-      } else if (UseableCashItems.ItemAugmenters.ITEM_GUARD_365.is(itemId)) {
+      } else if (ConsumableCashItems.ItemAugmenters.ITEM_GUARD_365.is(itemId)) {
          period = 365;
       }
 
@@ -708,7 +684,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          return;
       }
 
-      if (!AssignSPProcessor.canSPAssign(c, to)) {  // exploit found thanks to Arnah
+      if (!AssignSPProcessor.canSPAssign(c, to)) {
          return;
       }
 
@@ -722,7 +698,6 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
             player.changeSkillLevel(skillSPFrom.get(), (byte) (curLevelSPFrom - 1), player.getMasterLevel(skillSPFrom.get()), -1);
             player.changeSkillLevel(skillSPTo.get(), (byte) (curLevel + 1), player.getMasterLevel(skillSPTo.get()), -1);
 
-            // update macros, thanks to Arnah
             if ((curLevelSPFrom - 1) == 0) {
                boolean updated = false;
                for (SkillMacro macro : player.getMacros()) {
@@ -764,8 +739,8 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       if (!vip) {
          if (itemId / 1000 >= 5041 || mapId / 100000000 == player.getMapId() / 100000000) { //check vip or same continent
             MapleMap targetMap = c.getChannelServer().getMapFactory().getMap(mapId);
-            if (!FieldLimit.CANNOTVIPROCK.check(targetMap.getFieldLimit()) && (targetMap.getForcedReturnId() == 999999999 || mapId < 100000000)) {
-               player.forceChangeMap(targetMap, targetMap.getRandomPlayerSpawnpoint());
+            if (!FieldLimit.CANNOT_VIP_ROCK.check(targetMap.getFieldLimit()) && (targetMap.getForcedReturnId() == 999999999 || mapId < 100000000)) {
+               player.forceChangeMap(targetMap, targetMap.getRandomPlayerSpawnPoint());
                success = true;
             } else {
                MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);
@@ -777,9 +752,9 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
          Optional<MapleCharacter> victim = c.getChannelServer().getPlayerStorage().getCharacterByName(name);
          if (victim.isPresent()) {
             MapleMap targetMap = victim.get().getMap();
-            if (!FieldLimit.CANNOTVIPROCK.check(targetMap.getFieldLimit()) && (targetMap.getForcedReturnId() == 999999999 || targetMap.getId() < 100000000)) {
-               if (!victim.get().isGM() || victim.get().gmLevel() <= player.gmLevel()) {   // thanks Yoboes for noticing non-GM's being unreachable through rocks
-                  player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnpoint(victim.get().position()));
+            if (!FieldLimit.CANNOT_VIP_ROCK.check(targetMap.getFieldLimit()) && (targetMap.getForcedReturnId() == 999999999 || targetMap.getId() < 100000000)) {
+               if (!victim.get().isGM() || victim.get().gmLevel() <= player.gmLevel()) {
+                  player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnPoint(victim.get().position()));
                   success = true;
                } else {
                   MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);

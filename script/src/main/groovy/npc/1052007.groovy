@@ -22,7 +22,7 @@ class NPC1052007 {
    EventManager em
 
    def start() {
-      cm.sendSimple("Pick your destination.\n\r\n#L0##bKerning Square Shopping Center#l\n\n\r\n#L1#Enter Contruction Site#l\r\n#L2#New Leaf City#l")
+      cm.sendSimple("Pick your destination.\n\r\n#L0##bKerning Square Shopping Center#l\n\n\r\n#L1#Enter Construction Site#l\r\n#L2#New Leaf City#l")
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -76,7 +76,6 @@ class NPC1052007 {
             ticketSelection = selection
             if (ticketSelection > -1) {
                cm.gainItem(4031035 + ticketSelection, (short) -1)
-               // thanks IxianMace for noticing a few scripts having misplaced warp SP's
                cm.warp(103000897 + (ticketSelection * 3), "st00")
                hasTicket = false
                cm.dispose()

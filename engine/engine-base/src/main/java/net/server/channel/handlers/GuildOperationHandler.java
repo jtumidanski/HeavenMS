@@ -1,28 +1,8 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -115,13 +95,13 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      int leaderId = world.getMatchCheckerCoordinator().getMatchConfirmationLeaderid(mapleCharacter.getId());
+      int leaderId = world.getMatchCheckerCoordinator().getMatchConfirmationLeaderId(mapleCharacter.getId());
       if (leaderId != -1) {
          if (packet.result() && world.getMatchCheckerCoordinator().isMatchConfirmationActive(mapleCharacter.getId())) {
             world.getPlayerStorage().getCharacterById(leaderId).ifPresent(leader -> {
                int partyId = leader.getPartyId();
                if (partyId != -1) {
-                  MaplePartyProcessor.getInstance().joinParty(mapleCharacter, partyId, true);    // GMS gimmick "party to form guild" recalled thanks to Vcoc
+                  MaplePartyProcessor.getInstance().joinParty(mapleCharacter, partyId, true);
                }
             });
          }
@@ -253,7 +233,6 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
       mapleCharacter.saveGuildStatus(); // update database
       mapleCharacter.getGuild().ifPresent(guild -> {
-         // thanks Vcoc for pointing out an issue with updating guild tooltip to players in the map
          mapleCharacter.getMap().broadcastMessage(mapleCharacter, new GuildNameChange(mapleCharacter.getId(), guild.getName()));
          mapleCharacter.getMap().broadcastMessage(mapleCharacter, new GuildMarkChanged(mapleCharacter.getId(), guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor()));
       });
@@ -288,10 +267,8 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
       Set<MapleCharacter> eligibleMembers = new HashSet<>(MapleGuildProcessor.getInstance().getEligiblePlayersForGuild(mapleCharacter));
       if (eligibleMembers.size() < YamlConfig.config.server.CREATE_GUILD_MIN_PARTNERS) {
          if (mapleCharacter.getMap().getAllPlayers().size() < YamlConfig.config.server.CREATE_GUILD_MIN_PARTNERS) {
-            // thanks NovaStory for noticing message in need of smoother info
-            MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "Your Guild doesn't have enough cofounders present here and therefore cannot be created at this time.");
+            MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "Your Guild doesn't have enough co-founders present here and therefore cannot be created at this time.");
          } else {
-            // players may be unaware of not belonging on a party in order to become eligible, thanks Hair (Legalize) for pointing this out
             MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "Please make sure everyone you are trying to invite is neither on a guild nor on a party.");
          }
 
@@ -303,11 +280,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
 
-      Set<Integer> eligibleCids = new HashSet<>();
-      for (MapleCharacter chr : eligibleMembers) {
-         eligibleCids.add(chr.getId());
-      }
-
-      client.getWorldServer().getMatchCheckerCoordinator().createMatchConfirmation(MatchCheckerType.GUILD_CREATION, client.getWorld(), mapleCharacter.getId(), eligibleCids, packet.name());
+      Set<Integer> eligibleCharacterIds = eligibleMembers.stream().map(MapleCharacter::getId).collect(Collectors.toSet());
+      client.getWorldServer().getMatchCheckerCoordinator().createMatchConfirmation(MatchCheckerType.GUILD_CREATION, client.getWorld(), mapleCharacter.getId(), eligibleCharacterIds, packet.name());
    }
 }

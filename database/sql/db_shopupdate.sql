@@ -159,14 +159,13 @@ INSERT IGNORE INTO `shopitems` (`shopid`, `itemid`, `price`, `pitch`, `position`
 (2130000, 2030100, 450, 0, 126),
 (9201060, 2030100, 450, 0, 114),
 (9270021, 2030100, 450, 0, 118),
-(9270022, 2030100, 450, 0, 114),  -- Thanks Rednor for finding duplicate item on NPC
+(9270022, 2030100, 450, 0, 114),
 (1338, 2030100, 450, 0, 114),
 (9270057, 2030100, 450, 0, 4),
 (9270065, 2030100, 450, 0, 3);
 
--- Thanks to Vcoc
 -- GMShop: Sacks, GmEquip, Cheese & Onyx, Utils, 
---        Arrows, Bullets, Throwings and Capsules,
+--        Arrows, Bullets, Throwing stars and Capsules,
 --        Others, Equips, Mounts, Scrolls.
 
 DELETE FROM `shopitems` WHERE `shopid`=1337;
@@ -258,7 +257,6 @@ INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `position`) VALUES
 (1337, 2210032, 1, 85),
 (1337, 2050004, 1, 86);
 
--- Thanks to DietStory v1.02 dev team
 INSERT INTO `shopitems` ( `shopid`, `itemid`, `price`, `pitch`, `position`) VALUES
  (1200001, 3010001, 1000, 0, 1),
  (1200001, 1092003, 2000, 0, 2),

@@ -10,5 +10,5 @@ class PetNameChange(private var _characterId: Int, private var _newName: String,
 
   def slot: Int = _slot
 
-  override def opcode(): SendOpcode = SendOpcode.PET_NAMECHANGE
+  override def opcode(): SendOpcode = SendOpcode.PET_NAME_CHANGE
 }

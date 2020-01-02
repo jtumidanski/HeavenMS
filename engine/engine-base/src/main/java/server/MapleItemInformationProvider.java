@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server;
 
 import java.io.File;
@@ -40,13 +19,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleJob;
 import client.SkillFactory;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import client.database.data.MakerCreateData;
-import database.provider.DropDataProvider;
-import database.provider.MakerCreateProvider;
-import database.provider.MakerReagentProvider;
-import database.provider.MakerRecipeProvider;
-import database.provider.MonsterCardProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
@@ -59,6 +33,12 @@ import constants.inventory.ItemConstants;
 import constants.skills.Assassin;
 import constants.skills.Gunslinger;
 import constants.skills.NightWalker;
+import database.DatabaseConnection;
+import database.provider.DropDataProvider;
+import database.provider.MakerCreateProvider;
+import database.provider.MakerReagentProvider;
+import database.provider.MakerRecipeProvider;
+import database.provider.MonsterCardProvider;
 import net.server.Server;
 import provider.MapleData;
 import provider.MapleDataDirectoryEntry;
@@ -70,7 +50,6 @@ import server.MakerItemFactory.MakerItemCreateEntry;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonsterInformationProvider;
 import server.processor.StatEffectProcessor;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -80,9 +59,6 @@ import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.packet.message.YellowTip;
 
-/**
- * @author Matze
- */
 public class MapleItemInformationProvider {
    private final static MapleItemInformationProvider instance = new MapleItemInformationProvider();
    protected MapleDataProvider itemData;
@@ -105,7 +81,7 @@ public class MapleItemInformationProvider {
    protected Map<Integer, List<Integer>> scrollReqsCache = new HashMap<>();
    protected Map<Integer, Integer> wholePriceCache = new HashMap<>();
    protected Map<Integer, Double> unitPriceCache = new HashMap<>();
-   protected Map<Integer, Integer> projectileWatkCache = new HashMap<>();
+   protected Map<Integer, Integer> projectileWeaponAttackCache = new HashMap<>();
    protected Map<Integer, String> nameCache = new HashMap<>();
    protected Map<Integer, String> descCache = new HashMap<>();
    protected Map<Integer, String> msgCache = new HashMap<>();
@@ -165,10 +141,8 @@ public class MapleItemInformationProvider {
 
    private static short getExtraSlotMaxFromPlayer(MapleClient c, int itemId) {
       short ret = 0;
-
-      // thanks GMChuck for detecting player sensitive data being cached into getSlotMax
       if (ItemConstants.isThrowingStar(itemId)) {
-         if (c.getPlayer().getJob().isA(MapleJob.NIGHTWALKER1)) {
+         if (c.getPlayer().getJob().isA(MapleJob.NIGHT_WALKER_1)) {
             ret += SkillFactory.getSkillLevel(c.getPlayer(), NightWalker.CLAW_MASTERY) * 10;
          } else {
             ret += SkillFactory.getSkillLevel(c.getPlayer(), Assassin.CLAW_MASTERY) * 10;
@@ -182,38 +156,38 @@ public class MapleItemInformationProvider {
 
    private static double getRoundedUnitPrice(double unitPrice, int max) {
       double intPart = Math.floor(unitPrice);
-      double fractPart = unitPrice - intPart;
-      if (fractPart == 0.0) {
+      double fractionPart = unitPrice - intPart;
+      if (fractionPart == 0.0) {
          return intPart;
       }
 
-      double fractMask = 0.0;
-      double lastFract, curFract = 1.0;
+      double fractionMask = 0.0;
+      double lastFraction, currentFraction = 1.0;
       int i = 1;
 
       do {
-         lastFract = curFract;
-         curFract /= 2;
+         lastFraction = currentFraction;
+         currentFraction /= 2;
 
-         if (fractPart == curFract) {
+         if (fractionPart == currentFraction) {
             break;
-         } else if (fractPart > curFract) {
-            fractMask += curFract;
-            fractPart -= curFract;
+         } else if (fractionPart > currentFraction) {
+            fractionMask += currentFraction;
+            fractionPart -= currentFraction;
          }
 
          i++;
       } while (i <= max);
 
       if (i > max) {
-         lastFract = curFract;
-         curFract = 0.0;
+         lastFraction = currentFraction;
+         currentFraction = 0.0;
       }
 
-      if (Math.abs(fractPart - curFract) < Math.abs(fractPart - lastFract)) {
-         return intPart + fractMask + curFract;
+      if (Math.abs(fractionPart - currentFraction) < Math.abs(fractionPart - lastFraction)) {
+         return intPart + fractionMask + currentFraction;
       } else {
-         return intPart + fractMask + lastFract;
+         return intPart + fractionMask + lastFraction;
       }
    }
 
@@ -233,7 +207,7 @@ public class MapleItemInformationProvider {
       return (short) Math.min(Short.MAX_VALUE, value);
    }
 
-   private static short chscrollRandomizedStat(int range) {
+   private static short chaosScrollRandomizedStat(int range) {
       return (short) Randomizer.rand(-range, range);
    }
 
@@ -623,7 +597,7 @@ public class MapleItemInformationProvider {
       return retPrice;
    }
 
-   public Pair<Integer, String> getReplaceOnExpire(int itemId) {   // thanks to GabrielSin
+   public Pair<Integer, String> getReplaceOnExpire(int itemId) {
       if (replaceOnExpireCache.containsKey(itemId)) {
          return replaceOnExpireCache.get(itemId);
       }
@@ -744,109 +718,106 @@ public class MapleItemInformationProvider {
       return type[cat - 30];
    }
 
-   public void scrollOptionEquipWithChaos(Equip nEquip, int range, boolean option) {
-      // option: watk, matk, wdef, mdef, spd, jump, hp, mp
-      //   stat: dex, luk, str, int, avoid, acc
-
+   public void scrollOptionEquipWithChaos(Equip equip, int range, boolean option) {
       if (!option) {
-         if (nEquip.str() > 0) {
+         if (equip.str() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.str_$eq(getMaximumShortMaxIfOverflow(nEquip.str(), (nEquip.str() + chscrollRandomizedStat(range))));
+               equip.str_$eq(getMaximumShortMaxIfOverflow(equip.str(), (equip.str() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.str_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.str() + chscrollRandomizedStat(range))));
+               equip.str_$eq(getMaximumShortMaxIfOverflow(0, (equip.str() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.dex() > 0) {
+         if (equip.dex() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(nEquip.dex(), (nEquip.dex() + chscrollRandomizedStat(range))));
+               equip.dex_$eq(getMaximumShortMaxIfOverflow(equip.dex(), (equip.dex() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.dex() + chscrollRandomizedStat(range))));
+               equip.dex_$eq(getMaximumShortMaxIfOverflow(0, (equip.dex() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip._int() > 0) {
+         if (equip._int() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip._int_$eq(getMaximumShortMaxIfOverflow(nEquip._int(), (nEquip._int() + chscrollRandomizedStat(range))));
+               equip._int_$eq(getMaximumShortMaxIfOverflow(equip._int(), (equip._int() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip._int_$eq(getMaximumShortMaxIfOverflow(0, (nEquip._int() + chscrollRandomizedStat(range))));
+               equip._int_$eq(getMaximumShortMaxIfOverflow(0, (equip._int() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.luk() > 0) {
+         if (equip.luk() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(nEquip.luk(), (nEquip.luk() + chscrollRandomizedStat(range))));
+               equip.luk_$eq(getMaximumShortMaxIfOverflow(equip.luk(), (equip.luk() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.luk() + chscrollRandomizedStat(range))));
+               equip.luk_$eq(getMaximumShortMaxIfOverflow(0, (equip.luk() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.acc() > 0) {
+         if (equip.acc() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(nEquip.acc(), (nEquip.acc() + chscrollRandomizedStat(range))));
+               equip.acc_$eq(getMaximumShortMaxIfOverflow(equip.acc(), (equip.acc() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.acc() + chscrollRandomizedStat(range))));
+               equip.acc_$eq(getMaximumShortMaxIfOverflow(0, (equip.acc() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.avoid() > 0) {
+         if (equip.avoid() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(nEquip.avoid(), (nEquip.avoid() + chscrollRandomizedStat(range))));
+               equip.avoid_$eq(getMaximumShortMaxIfOverflow(equip.avoid(), (equip.avoid() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.avoid() + chscrollRandomizedStat(range))));
+               equip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (equip.avoid() + chaosScrollRandomizedStat(range))));
             }
          }
       } else {
-         if (nEquip.watk() > 0) {
+         if (equip.watk() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(nEquip.watk(), (nEquip.watk() + chscrollRandomizedStat(range))));
+               equip.watk_$eq(getMaximumShortMaxIfOverflow(equip.watk(), (equip.watk() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.watk() + chscrollRandomizedStat(range))));
+               equip.watk_$eq(getMaximumShortMaxIfOverflow(0, (equip.watk() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.wdef() > 0) {
+         if (equip.wdef() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(nEquip.wdef(), (nEquip.wdef() + chscrollRandomizedStat(range))));
+               equip.wdef_$eq(getMaximumShortMaxIfOverflow(equip.wdef(), (equip.wdef() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.wdef() + chscrollRandomizedStat(range))));
+               equip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (equip.wdef() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.matk() > 0) {
+         if (equip.matk() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(nEquip.matk(), (nEquip.matk() + chscrollRandomizedStat(range))));
+               equip.matk_$eq(getMaximumShortMaxIfOverflow(equip.matk(), (equip.matk() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.matk() + chscrollRandomizedStat(range))));
+               equip.matk_$eq(getMaximumShortMaxIfOverflow(0, (equip.matk() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.mdef() > 0) {
+         if (equip.mdef() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(nEquip.mdef(), (nEquip.mdef() + chscrollRandomizedStat(range))));
+               equip.mdef_$eq(getMaximumShortMaxIfOverflow(equip.mdef(), (equip.mdef() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mdef() + chscrollRandomizedStat(range))));
+               equip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (equip.mdef() + chaosScrollRandomizedStat(range))));
             }
          }
 
-         if (nEquip.speed() > 0) {
+         if (equip.speed() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(nEquip.speed(), (nEquip.speed() + chscrollRandomizedStat(range))));
+               equip.speed_$eq(getMaximumShortMaxIfOverflow(equip.speed(), (equip.speed() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.speed() + chscrollRandomizedStat(range))));
+               equip.speed_$eq(getMaximumShortMaxIfOverflow(0, (equip.speed() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.jump() > 0) {
+         if (equip.jump() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(nEquip.jump(), (nEquip.jump() + chscrollRandomizedStat(range))));
+               equip.jump_$eq(getMaximumShortMaxIfOverflow(equip.jump(), (equip.jump() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.jump() + chscrollRandomizedStat(range))));
+               equip.jump_$eq(getMaximumShortMaxIfOverflow(0, (equip.jump() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.hp() > 0) {
+         if (equip.hp() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(nEquip.hp(), (nEquip.hp() + chscrollRandomizedStat(range))));
+               equip.hp_$eq(getMaximumShortMaxIfOverflow(equip.hp(), (equip.hp() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.hp() + chscrollRandomizedStat(range))));
+               equip.hp_$eq(getMaximumShortMaxIfOverflow(0, (equip.hp() + chaosScrollRandomizedStat(range))));
             }
          }
-         if (nEquip.mp() > 0) {
+         if (equip.mp() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(nEquip.mp(), (nEquip.mp() + chscrollRandomizedStat(range))));
+               equip.mp_$eq(getMaximumShortMaxIfOverflow(equip.mp(), (equip.mp() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mp() + chscrollRandomizedStat(range))));
+               equip.mp_$eq(getMaximumShortMaxIfOverflow(0, (equip.mp() + chaosScrollRandomizedStat(range))));
             }
          }
       }
@@ -855,301 +826,303 @@ public class MapleItemInformationProvider {
    private void scrollEquipWithChaos(Equip nEquip, int range) {
       if (YamlConfig.config.server.CHSCROLL_STAT_RATE > 0) {
          int temp;
-         int curStr, curDex, curInt, curLuk, curWatk, curWdef, curMatk, curMdef, curAcc, curAvoid, curSpeed, curJump, curHp, curMp;
+         int currentStrength, currentDexterity, currentIntelligence, currentLuck, currentWeaponAttack, currentWeaponDefense,
+               currentMagicAttack, currentMagicDefense, currentAccuracy, currentAvoidability, currentSpeed, currentJump,
+               currentHp, currentMp;
 
          if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-            curStr = nEquip.str();
-            curDex = nEquip.dex();
-            curInt = nEquip._int();
-            curLuk = nEquip.luk();
-            curWatk = nEquip.watk();
-            curWdef = nEquip.wdef();
-            curMatk = nEquip.matk();
-            curMdef = nEquip.mdef();
-            curAcc = nEquip.acc();
-            curAvoid = nEquip.avoid();
-            curSpeed = nEquip.speed();
-            curJump = nEquip.jump();
-            curHp = nEquip.hp();
-            curMp = nEquip.mp();
+            currentStrength = nEquip.str();
+            currentDexterity = nEquip.dex();
+            currentIntelligence = nEquip._int();
+            currentLuck = nEquip.luk();
+            currentWeaponAttack = nEquip.watk();
+            currentWeaponDefense = nEquip.wdef();
+            currentMagicAttack = nEquip.matk();
+            currentMagicDefense = nEquip.mdef();
+            currentAccuracy = nEquip.acc();
+            currentAvoidability = nEquip.avoid();
+            currentSpeed = nEquip.speed();
+            currentJump = nEquip.jump();
+            currentHp = nEquip.hp();
+            currentMp = nEquip.mp();
          } else {
-            curStr = Short.MIN_VALUE;
-            curDex = Short.MIN_VALUE;
-            curInt = Short.MIN_VALUE;
-            curLuk = Short.MIN_VALUE;
-            curWatk = Short.MIN_VALUE;
-            curWdef = Short.MIN_VALUE;
-            curMatk = Short.MIN_VALUE;
-            curMdef = Short.MIN_VALUE;
-            curAcc = Short.MIN_VALUE;
-            curAvoid = Short.MIN_VALUE;
-            curSpeed = Short.MIN_VALUE;
-            curJump = Short.MIN_VALUE;
-            curHp = Short.MIN_VALUE;
-            curMp = Short.MIN_VALUE;
+            currentStrength = Short.MIN_VALUE;
+            currentDexterity = Short.MIN_VALUE;
+            currentIntelligence = Short.MIN_VALUE;
+            currentLuck = Short.MIN_VALUE;
+            currentWeaponAttack = Short.MIN_VALUE;
+            currentWeaponDefense = Short.MIN_VALUE;
+            currentMagicAttack = Short.MIN_VALUE;
+            currentMagicDefense = Short.MIN_VALUE;
+            currentAccuracy = Short.MIN_VALUE;
+            currentAvoidability = Short.MIN_VALUE;
+            currentSpeed = Short.MIN_VALUE;
+            currentJump = Short.MIN_VALUE;
+            currentHp = Short.MIN_VALUE;
+            currentMp = Short.MIN_VALUE;
          }
 
          for (int i = 0; i < YamlConfig.config.server.CHSCROLL_STAT_RATE; i++) {
             if (nEquip.str() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curStr + chscrollRandomizedStat(range);
+                  temp = currentStrength + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.str() + chscrollRandomizedStat(range);
+                  temp = nEquip.str() + chaosScrollRandomizedStat(range);
                }
 
-               curStr = getMaximumShortMaxIfOverflow(temp, curStr);
+               currentStrength = getMaximumShortMaxIfOverflow(temp, currentStrength);
             }
 
             if (nEquip.dex() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curDex + chscrollRandomizedStat(range);
+                  temp = currentDexterity + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.dex() + chscrollRandomizedStat(range);
+                  temp = nEquip.dex() + chaosScrollRandomizedStat(range);
                }
 
-               curDex = getMaximumShortMaxIfOverflow(temp, curDex);
+               currentDexterity = getMaximumShortMaxIfOverflow(temp, currentDexterity);
             }
 
             if (nEquip._int() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curInt + chscrollRandomizedStat(range);
+                  temp = currentIntelligence + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip._int() + chscrollRandomizedStat(range);
+                  temp = nEquip._int() + chaosScrollRandomizedStat(range);
                }
 
-               curInt = getMaximumShortMaxIfOverflow(temp, curInt);
+               currentIntelligence = getMaximumShortMaxIfOverflow(temp, currentIntelligence);
             }
 
             if (nEquip.luk() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curLuk + chscrollRandomizedStat(range);
+                  temp = currentLuck + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.luk() + chscrollRandomizedStat(range);
+                  temp = nEquip.luk() + chaosScrollRandomizedStat(range);
                }
 
-               curLuk = getMaximumShortMaxIfOverflow(temp, curLuk);
+               currentLuck = getMaximumShortMaxIfOverflow(temp, currentLuck);
             }
 
             if (nEquip.watk() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curWatk + chscrollRandomizedStat(range);
+                  temp = currentWeaponAttack + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.watk() + chscrollRandomizedStat(range);
+                  temp = nEquip.watk() + chaosScrollRandomizedStat(range);
                }
 
-               curWatk = getMaximumShortMaxIfOverflow(temp, curWatk);
+               currentWeaponAttack = getMaximumShortMaxIfOverflow(temp, currentWeaponAttack);
             }
 
             if (nEquip.wdef() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curWdef + chscrollRandomizedStat(range);
+                  temp = currentWeaponDefense + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.wdef() + chscrollRandomizedStat(range);
+                  temp = nEquip.wdef() + chaosScrollRandomizedStat(range);
                }
 
-               curWdef = getMaximumShortMaxIfOverflow(temp, curWdef);
+               currentWeaponDefense = getMaximumShortMaxIfOverflow(temp, currentWeaponDefense);
             }
 
             if (nEquip.matk() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curMatk + chscrollRandomizedStat(range);
+                  temp = currentMagicAttack + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.matk() + chscrollRandomizedStat(range);
+                  temp = nEquip.matk() + chaosScrollRandomizedStat(range);
                }
 
-               curMatk = getMaximumShortMaxIfOverflow(temp, curMatk);
+               currentMagicAttack = getMaximumShortMaxIfOverflow(temp, currentMagicAttack);
             }
 
             if (nEquip.mdef() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curMdef + chscrollRandomizedStat(range);
+                  temp = currentMagicDefense + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.mdef() + chscrollRandomizedStat(range);
+                  temp = nEquip.mdef() + chaosScrollRandomizedStat(range);
                }
 
-               curMdef = getMaximumShortMaxIfOverflow(temp, curMdef);
+               currentMagicDefense = getMaximumShortMaxIfOverflow(temp, currentMagicDefense);
             }
 
             if (nEquip.acc() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curAcc + chscrollRandomizedStat(range);
+                  temp = currentAccuracy + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.acc() + chscrollRandomizedStat(range);
+                  temp = nEquip.acc() + chaosScrollRandomizedStat(range);
                }
 
-               curAcc = getMaximumShortMaxIfOverflow(temp, curAcc);
+               currentAccuracy = getMaximumShortMaxIfOverflow(temp, currentAccuracy);
             }
 
             if (nEquip.avoid() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curAvoid + chscrollRandomizedStat(range);
+                  temp = currentAvoidability + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.avoid() + chscrollRandomizedStat(range);
+                  temp = nEquip.avoid() + chaosScrollRandomizedStat(range);
                }
 
-               curAvoid = getMaximumShortMaxIfOverflow(temp, curAvoid);
+               currentAvoidability = getMaximumShortMaxIfOverflow(temp, currentAvoidability);
             }
 
             if (nEquip.speed() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curSpeed + chscrollRandomizedStat(range);
+                  temp = currentSpeed + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.speed() + chscrollRandomizedStat(range);
+                  temp = nEquip.speed() + chaosScrollRandomizedStat(range);
                }
 
-               curSpeed = getMaximumShortMaxIfOverflow(temp, curSpeed);
+               currentSpeed = getMaximumShortMaxIfOverflow(temp, currentSpeed);
             }
 
             if (nEquip.jump() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curJump + chscrollRandomizedStat(range);
+                  temp = currentJump + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.jump() + chscrollRandomizedStat(range);
+                  temp = nEquip.jump() + chaosScrollRandomizedStat(range);
                }
 
-               curJump = getMaximumShortMaxIfOverflow(temp, curJump);
+               currentJump = getMaximumShortMaxIfOverflow(temp, currentJump);
             }
 
             if (nEquip.hp() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curHp + chscrollRandomizedStat(range);
+                  temp = currentHp + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.hp() + chscrollRandomizedStat(range);
+                  temp = nEquip.hp() + chaosScrollRandomizedStat(range);
                }
 
-               curHp = getMaximumShortMaxIfOverflow(temp, curHp);
+               currentHp = getMaximumShortMaxIfOverflow(temp, currentHp);
             }
 
             if (nEquip.mp() > 0) {
                if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = curMp + chscrollRandomizedStat(range);
+                  temp = currentMp + chaosScrollRandomizedStat(range);
                } else {
-                  temp = nEquip.mp() + chscrollRandomizedStat(range);
+                  temp = nEquip.mp() + chaosScrollRandomizedStat(range);
                }
 
-               curMp = getMaximumShortMaxIfOverflow(temp, curMp);
+               currentMp = getMaximumShortMaxIfOverflow(temp, currentMp);
             }
          }
 
-         nEquip.str_$eq((short) Math.max(0, curStr));
-         nEquip.dex_$eq((short) Math.max(0, curDex));
-         nEquip._int_$eq((short) Math.max(0, curInt));
-         nEquip.luk_$eq((short) Math.max(0, curLuk));
-         nEquip.watk_$eq((short) Math.max(0, curWatk));
-         nEquip.wdef_$eq((short) Math.max(0, curWdef));
-         nEquip.matk_$eq((short) Math.max(0, curMatk));
-         nEquip.mdef_$eq((short) Math.max(0, curMdef));
-         nEquip.acc_$eq((short) Math.max(0, curAcc));
-         nEquip.avoid_$eq((short) Math.max(0, curAvoid));
-         nEquip.speed_$eq((short) Math.max(0, curSpeed));
-         nEquip.jump_$eq((short) Math.max(0, curJump));
-         nEquip.hp_$eq((short) Math.max(0, curHp));
-         nEquip.mp_$eq((short) Math.max(0, curMp));
+         nEquip.str_$eq((short) Math.max(0, currentStrength));
+         nEquip.dex_$eq((short) Math.max(0, currentDexterity));
+         nEquip._int_$eq((short) Math.max(0, currentIntelligence));
+         nEquip.luk_$eq((short) Math.max(0, currentLuck));
+         nEquip.watk_$eq((short) Math.max(0, currentWeaponAttack));
+         nEquip.wdef_$eq((short) Math.max(0, currentWeaponDefense));
+         nEquip.matk_$eq((short) Math.max(0, currentMagicAttack));
+         nEquip.mdef_$eq((short) Math.max(0, currentMagicDefense));
+         nEquip.acc_$eq((short) Math.max(0, currentAccuracy));
+         nEquip.avoid_$eq((short) Math.max(0, currentAvoidability));
+         nEquip.speed_$eq((short) Math.max(0, currentSpeed));
+         nEquip.jump_$eq((short) Math.max(0, currentJump));
+         nEquip.hp_$eq((short) Math.max(0, currentHp));
+         nEquip.mp_$eq((short) Math.max(0, currentMp));
       } else {
          if (nEquip.str() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.str_$eq(getMaximumShortMaxIfOverflow(nEquip.str(), (nEquip.str() + chscrollRandomizedStat(range))));
+               nEquip.str_$eq(getMaximumShortMaxIfOverflow(nEquip.str(), (nEquip.str() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.str_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.str() + chscrollRandomizedStat(range))));
+               nEquip.str_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.str() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.dex() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(nEquip.dex(), (nEquip.dex() + chscrollRandomizedStat(range))));
+               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(nEquip.dex(), (nEquip.dex() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.dex() + chscrollRandomizedStat(range))));
+               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.dex() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip._int() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip._int_$eq(getMaximumShortMaxIfOverflow(nEquip._int(), (nEquip._int() + chscrollRandomizedStat(range))));
+               nEquip._int_$eq(getMaximumShortMaxIfOverflow(nEquip._int(), (nEquip._int() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip._int_$eq(getMaximumShortMaxIfOverflow(0, (nEquip._int() + chscrollRandomizedStat(range))));
+               nEquip._int_$eq(getMaximumShortMaxIfOverflow(0, (nEquip._int() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.luk() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(nEquip.luk(), (nEquip.luk() + chscrollRandomizedStat(range))));
+               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(nEquip.luk(), (nEquip.luk() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.luk() + chscrollRandomizedStat(range))));
+               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.luk() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.watk() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(nEquip.watk(), (nEquip.watk() + chscrollRandomizedStat(range))));
+               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(nEquip.watk(), (nEquip.watk() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.watk() + chscrollRandomizedStat(range))));
+               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.watk() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.wdef() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(nEquip.wdef(), (nEquip.wdef() + chscrollRandomizedStat(range))));
+               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(nEquip.wdef(), (nEquip.wdef() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.wdef() + chscrollRandomizedStat(range))));
+               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.wdef() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.matk() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(nEquip.matk(), (nEquip.matk() + chscrollRandomizedStat(range))));
+               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(nEquip.matk(), (nEquip.matk() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.matk() + chscrollRandomizedStat(range))));
+               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.matk() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.mdef() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(nEquip.mdef(), (nEquip.mdef() + chscrollRandomizedStat(range))));
+               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(nEquip.mdef(), (nEquip.mdef() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mdef() + chscrollRandomizedStat(range))));
+               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mdef() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.acc() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(nEquip.acc(), (nEquip.acc() + chscrollRandomizedStat(range))));
+               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(nEquip.acc(), (nEquip.acc() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.acc() + chscrollRandomizedStat(range))));
+               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.acc() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.avoid() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(nEquip.avoid(), (nEquip.avoid() + chscrollRandomizedStat(range))));
+               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(nEquip.avoid(), (nEquip.avoid() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.avoid() + chscrollRandomizedStat(range))));
+               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.avoid() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.speed() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(nEquip.speed(), (nEquip.speed() + chscrollRandomizedStat(range))));
+               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(nEquip.speed(), (nEquip.speed() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.speed() + chscrollRandomizedStat(range))));
+               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.speed() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.jump() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(nEquip.jump(), (nEquip.jump() + chscrollRandomizedStat(range))));
+               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(nEquip.jump(), (nEquip.jump() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.jump() + chscrollRandomizedStat(range))));
+               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.jump() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.hp() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(nEquip.hp(), (nEquip.hp() + chscrollRandomizedStat(range))));
+               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(nEquip.hp(), (nEquip.hp() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.hp() + chscrollRandomizedStat(range))));
+               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.hp() + chaosScrollRandomizedStat(range))));
             }
          }
          if (nEquip.mp() > 0) {
             if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(nEquip.mp(), (nEquip.mp() + chscrollRandomizedStat(range))));
+               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(nEquip.mp(), (nEquip.mp() + chaosScrollRandomizedStat(range))));
             } else {
-               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mp() + chscrollRandomizedStat(range))));
+               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mp() + chaosScrollRandomizedStat(range))));
             }
          }
       }
    }
 
-   public boolean canUseCleanSlate(Equip nEquip) {
-      Map<String, Integer> eqstats = this.getEquipStats(nEquip.id());
-      return YamlConfig.config.server.USE_ENHANCED_CLNSLATE || nEquip.slots() < (byte) (eqstats.get("tuc") + nEquip.vicious());  // issue with clean slate found thanks to Masterrulax, vicious added in the check thanks to Crypter (CrypterDEV)
+   public boolean canUseCleanSlate(Equip equip) {
+      Map<String, Integer> equipmentStats = this.getEquipStats(equip.id());
+      return YamlConfig.config.server.USE_ENHANCED_CLNSLATE || equip.slots() < (byte) (equipmentStats.get("tuc") + equip.vicious());
    }
 
    public Item scrollEquipWithId(Item equip, int scrollId, boolean usingWhiteScroll, int vegaItemId, boolean isGM) {
@@ -1208,7 +1181,7 @@ public class MapleItemInformationProvider {
                      break;
                }
                if (!ItemConstants.isCleanSlate(scrollId)) {
-                  if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {   // issue with modifier scrolls taking slots found thanks to Masterrulax, justin, BakaKnyx
+                  if (!assertGM && !ItemConstants.isModifierScroll(scrollId)) {
                      nEquip.slots_$eq((byte) (nEquip.slots() - 1));
                   }
                   nEquip.level_$eq((byte) (nEquip.level() + 1));
@@ -1267,7 +1240,7 @@ public class MapleItemInformationProvider {
                nEquip.mp_$eq((short) stat.getValue().intValue());
             } else if (stat.getKey().equals("tuc")) {
                nEquip.slots_$eq((byte) stat.getValue().intValue());
-            } else if (isUntradeableRestricted(equipId)) {  // thanks Hyun & Thora for showing an issue with more than only "Untradeable" items being flagged as such here
+            } else if (isUntradeableRestricted(equipId)) {
                short flag = nEquip.flag();
                flag |= ItemConstants.UNTRADEABLE;
                ItemProcessor.getInstance().setFlag(nEquip, flag);
@@ -1345,14 +1318,14 @@ public class MapleItemInformationProvider {
       return mobs2spawn;
    }
 
-   public int getWatkForProjectile(int itemId) {
-      Integer atk = projectileWatkCache.get(itemId);
+   public int getWeaponAttackForProjectile(int itemId) {
+      Integer atk = projectileWeaponAttackCache.get(itemId);
       if (atk != null) {
          return atk;
       }
       MapleData data = getItemData(itemId);
       atk = MapleDataTool.getInt("info/incPAD", data, 0);
-      projectileWatkCache.put(itemId, atk);
+      projectileWeaponAttackCache.put(itemId, atk);
       return atk;
    }
 
@@ -1497,14 +1470,14 @@ public class MapleItemInformationProvider {
 
       Map<String, Integer> ret = new LinkedHashMap<>(retData.getLeft());
       MapleData skill = retData.getRight();
-      int curskill;
+      int currentSkill;
       for (int i = 0; i < skill.getChildren().size(); i++) {
-         curskill = MapleDataTool.getInt(Integer.toString(i), skill, 0);
-         if (curskill == 0) {
+         currentSkill = MapleDataTool.getInt(Integer.toString(i), skill, 0);
+         if (currentSkill == 0) {
             break;
          }
-         if (curskill / 10000 == playerJob) {
-            ret.put("skillid", curskill);
+         if (currentSkill / 10000 == playerJob) {
+            ret.put("skillid", currentSkill);
             break;
          }
       }
@@ -1526,7 +1499,7 @@ public class MapleItemInformationProvider {
                String itemName = specItem.getName();
 
                try {
-                  Integer.parseInt(itemName); // check if it's a petid node
+                  Integer.parseInt(itemName); // check if it's a pet id node
 
                   Integer petid = MapleDataTool.getInt(specItem, 0);
                   pets.add(petid);
@@ -1560,9 +1533,9 @@ public class MapleItemInformationProvider {
          return isPartyQuestItemCache.get(itemId);
       }
       MapleData data = getItemData(itemId);
-      boolean partyquestItem = (data != null && MapleDataTool.getIntConvert("info/pquest", data, 0) == 1);
-      isPartyQuestItemCache.put(itemId, partyquestItem);
-      return partyquestItem;
+      boolean partyQuestItem = (data != null && MapleDataTool.getIntConvert("info/pquest", data, 0) == 1);
+      isPartyQuestItemCache.put(itemId, partyQuestItem);
+      return partyQuestItem;
    }
 
    private void loadCardIdData() {
@@ -1676,26 +1649,26 @@ public class MapleItemInformationProvider {
       }
    }
 
-   public Pair<Integer, List<RewardItem>> getItemReward(int itemId) {//Thanks Celino, used some stuffs :)
+   public Pair<Integer, List<RewardItem>> getItemReward(int itemId) {
       if (rewardCache.containsKey(itemId)) {
          return rewardCache.get(itemId);
       }
-      int totalprob = 0;
+      int totalProbability = 0;
       List<RewardItem> rewards = new ArrayList<>();
       for (MapleData child : getItemData(itemId).getChildByPath("reward").getChildren()) {
          RewardItem reward = new RewardItem();
-         reward.itemid = MapleDataTool.getInt("item", child, 0);
+         reward.itemId = MapleDataTool.getInt("item", child, 0);
          reward.prob = (byte) MapleDataTool.getInt("prob", child, 0);
          reward.quantity = (short) MapleDataTool.getInt("count", child, 0);
          reward.effect = MapleDataTool.getString("Effect", child, "");
-         reward.worldmsg = MapleDataTool.getString("worldMsg", child, null);
+         reward.worldMessage = MapleDataTool.getString("worldMsg", child, null);
          reward.period = MapleDataTool.getInt("period", child, -1);
 
-         totalprob += reward.prob;
+         totalProbability += reward.prob;
 
          rewards.add(reward);
       }
-      Pair<Integer, List<RewardItem>> hmm = new Pair<>(totalprob, rewards);
+      Pair<Integer, List<RewardItem>> hmm = new Pair<>(totalProbability, rewards);
       rewardCache.put(itemId, hmm);
       return hmm;
    }
@@ -1763,7 +1736,7 @@ public class MapleItemInformationProvider {
          return items;
       }
       Collection<Item> itemz = new LinkedList<>();
-      if (chr.getJob() == MapleJob.SUPERGM || chr.getJob() == MapleJob.GM) {
+      if (chr.getJob() == MapleJob.SUPER_GM || chr.getJob() == MapleJob.GM) {
          for (Item item : items) {
             Equip equip = (Equip) item;
             equip.wearing_$eq(true);
@@ -1771,21 +1744,9 @@ public class MapleItemInformationProvider {
          }
          return itemz;
       }
-      boolean highfivestamp = false;
-        /* Removed because players shouldn't even get this, and gm's should just be gm job.
-         try {
-         for (Pair<Item, MapleInventoryType> ii : ItemFactory.INVENTORY.loadItems(chr.getId(), false)) {
-         if (ii.getRight() == MapleInventoryType.CASH) {
-         if (ii.getLeft().getItemId() == 5590000) {
-         highfivestamp = true;
-         }
-         }
-         }
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }*/
+      boolean highFiveStamp = false;
       int tdex = chr.getDex(), tstr = chr.getStr(), tint = chr.getInt(), tluk = chr.getLuk(), fame = chr.getFame();
-      if (chr.getJob() != MapleJob.SUPERGM || chr.getJob() != MapleJob.GM) {
+      if (chr.getJob() != MapleJob.SUPER_GM || chr.getJob() != MapleJob.GM) {
          for (Item item : inv.list()) {
             Equip equip = (Equip) item;
             tdex += equip.dex();
@@ -1797,7 +1758,7 @@ public class MapleItemInformationProvider {
       for (Item item : items) {
          Equip equip = (Equip) item;
          int reqLevel = getEquipLevelReq(equip.id());
-         if (highfivestamp) {
+         if (highFiveStamp) {
             reqLevel -= 5;
             if (reqLevel < 0) {
                reqLevel = 0;
@@ -1841,29 +1802,29 @@ public class MapleItemInformationProvider {
          return false;
       }
 
-      String islot = getEquipmentSlot(id);
-      if (!EquipSlot.getFromTextSlot(islot).isAllowed(dst, isCash(id))) {
+      String equipmentSlot = getEquipmentSlot(id);
+      if (!EquipSlot.getFromTextSlot(equipmentSlot).isAllowed(dst, isCash(id))) {
          equip.wearing_$eq(false);
          String itemName = MapleItemInformationProvider.getInstance().getName(equip.id());
          Server.getInstance().broadcastGMMessage(chr.getWorld(), PacketCreator.create(new YellowTip("[Warning]: " + chr.getName() + " tried to equip " + itemName + " into slot " + dst + ".")));
-         AutobanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to forcibly equip an item.");
+         AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to forcibly equip an item.");
          FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to equip " + itemName + " into " + dst + " slot.");
          return false;
       }
 
-      if (chr.getJob() == MapleJob.SUPERGM || chr.getJob() == MapleJob.GM) {
+      if (chr.getJob() == MapleJob.SUPER_GM || chr.getJob() == MapleJob.GM) {
          equip.wearing_$eq(true);
          return true;
       }
 
 
-      boolean highfivestamp = false;
+      boolean highFiveStamp = false;
         /* Removed check above for message ><
          try {
          for (Pair<Item, MapleInventoryType> ii : ItemFactory.INVENTORY.loadItems(chr.getId(), false)) {
          if (ii.getRight() == MapleInventoryType.CASH) {
          if (ii.getLeft().getItemId() == 5590000) {
-         highfivestamp = true;
+         highFiveStamp = true;
          }
          }
          }
@@ -1872,7 +1833,7 @@ public class MapleItemInformationProvider {
          }*/
 
       int reqLevel = getEquipLevelReq(equip.id());
-      if (highfivestamp) {
+      if (highFiveStamp) {
          reqLevel -= 5;
       }
       int i = 0; //lol xD
@@ -1937,7 +1898,7 @@ public class MapleItemInformationProvider {
    public int getEquipLevel(int itemId, boolean getMaxLevel) {
       Integer eqLevel = equipMaxLevelCache.get(itemId);
       if (eqLevel == null) {
-         eqLevel = 1;    // greater than 1 means that it was supposed to levelup on GMS
+         eqLevel = 1;
 
          MapleData data = getEquipLevelInfo(itemId);
          if (data != null) {
@@ -1966,7 +1927,7 @@ public class MapleItemInformationProvider {
       return eqLevel;
    }
 
-   public List<Pair<String, Integer>> getItemLevelupStats(int itemId, int level) {
+   public List<Pair<String, Integer>> getItemLevelUpStats(int itemId, int level) {
       List<Pair<String, Integer>> list = new LinkedList<>();
       MapleData data = getEquipLevelInfo(itemId);
       if (data != null) {
@@ -2012,16 +1973,16 @@ public class MapleItemInformationProvider {
    }
 
    public Pair<String, Integer> getMakerReagentStatUpgrade(int itemId) {
-      Pair<String, Integer> statUpgd = statUpgradeMakerCache.get(itemId);
-      if (statUpgd != null) {
-         return statUpgd;
+      Pair<String, Integer> statUpgrade = statUpgradeMakerCache.get(itemId);
+      if (statUpgrade != null) {
+         return statUpgrade;
       } else if (statUpgradeMakerCache.containsKey(itemId)) {
          return null;
       }
 
-      statUpgd = DatabaseConnection.getInstance().withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.stat(), data.value())).get()).orElse(null);
-      statUpgradeMakerCache.put(itemId, statUpgd);
-      return statUpgd;
+      statUpgrade = DatabaseConnection.getInstance().withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.stat(), data.value())).get()).orElse(null);
+      statUpgradeMakerCache.put(itemId, statUpgrade);
+      return statUpgrade;
    }
 
    public int getMakerCrystalFromLeftover(Integer leftoverId) {
@@ -2109,24 +2070,24 @@ public class MapleItemInformationProvider {
       }).orElse(-1);
    }
 
-   public int getMakerStimulant(int itemId) {  // thanks to Arnah
-      Integer itemid = makerCatalystCache.get(itemId);
-      if (itemid != null) {
-         return itemid;
+   public int getMakerStimulant(int itemId) {
+      Integer cachedItemId = makerCatalystCache.get(itemId);
+      if (cachedItemId != null) {
+         return cachedItemId;
       }
 
-      itemid = -1;
+      cachedItemId = -1;
       for (MapleData md : etcData.getData("ItemMake.img").getChildren()) {
          MapleData me = md.getChildByPath(StringUtil.getLeftPaddedStr(Integer.toString(itemId), '0', 8));
 
          if (me != null) {
-            itemid = MapleDataTool.getInt(me.getChildByPath("catalyst"), -1);
+            cachedItemId = MapleDataTool.getInt(me.getChildByPath("catalyst"), -1);
             break;
          }
       }
 
-      makerCatalystCache.put(itemId, itemid);
-      return itemid;
+      makerCatalystCache.put(itemId, cachedItemId);
+      return cachedItemId;
    }
 
    public Set<String> getWhoDrops(Integer itemId) {
@@ -2138,36 +2099,36 @@ public class MapleItemInformationProvider {
    }
 
    private boolean canUseSkillBook(MapleCharacter player, Integer skillBookId) {
-      Map<String, Integer> skilldata = getSkillStats(skillBookId, player.getJob().getId());
-      if (skilldata == null || skilldata.get("skillid") == 0) {
+      Map<String, Integer> skillData = getSkillStats(skillBookId, player.getJob().getId());
+      if (skillData == null || skillData.get("skillid") == 0) {
          return false;
       }
 
-      return SkillFactory.getSkill(skilldata.get("skillid"))
-            .map(skill -> (skilldata.get("skillid") != 0 && ((player.getSkillLevel(skill) >= skilldata.get("reqSkillLevel") || skilldata.get("reqSkillLevel") == 0) && player.getMasterLevel(skill) < skilldata.get("masterLevel"))))
+      return SkillFactory.getSkill(skillData.get("skillid"))
+            .map(skill -> (skillData.get("skillid") != 0 && ((player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0) && player.getMasterLevel(skill) < skillData.get("masterLevel"))))
             .orElse(false);
    }
 
    public List<Integer> usableMasteryBooks(MapleCharacter player) {
-      List<Integer> masterybook = new LinkedList<>();
+      List<Integer> masteryBooks = new LinkedList<>();
       for (Integer i = 2290000; i <= 2290139; i++) {
          if (canUseSkillBook(player, i)) {
-            masterybook.add(i);
+            masteryBooks.add(i);
          }
       }
 
-      return masterybook;
+      return masteryBooks;
    }
 
    public List<Integer> usableSkillBooks(MapleCharacter player) {
-      List<Integer> skillbook = new LinkedList<>();
+      List<Integer> skillBook = new LinkedList<>();
       for (Integer i = 2280000; i <= 2280019; i++) {
          if (canUseSkillBook(player, i)) {
-            skillbook.add(i);
+            skillBook.add(i);
          }
       }
 
-      return skillbook;
+      return skillBook;
    }
 
    public final QuestConsItem getQuestConsumablesInfo(final int itemId) {
@@ -2182,17 +2143,17 @@ public class MapleItemInformationProvider {
          qcItem = new QuestConsItem();
          qcItem.exp = MapleDataTool.getInt("exp", infoData);
          qcItem.grade = MapleDataTool.getInt("grade", infoData);
-         qcItem.questid = MapleDataTool.getInt("questId", infoData);
+         qcItem.questId = MapleDataTool.getInt("questId", infoData);
          qcItem.items = new HashMap<>(2);
 
          Map<Integer, Integer> cItems = qcItem.items;
          MapleData ciData = infoData.getChildByPath("consumeItem");
          if (ciData != null) {
             for (MapleData ciItem : ciData.getChildren()) {
-               int itemid = MapleDataTool.getInt("0", ciItem);
+               int consumeItemId = MapleDataTool.getInt("0", ciItem);
                int qty = MapleDataTool.getInt("1", ciItem);
 
-               cItems.put(itemid, qty);
+               cItems.put(consumeItemId, qty);
             }
          }
       }
@@ -2203,44 +2164,19 @@ public class MapleItemInformationProvider {
 
    public static final class RewardItem {
 
-      public int itemid, period;
+      public int itemId, period;
       public short prob, quantity;
-      public String effect, worldmsg;
+      public String effect, worldMessage;
    }
 
    public static final class QuestConsItem {
 
-      public int questid, exp, grade;
+      public int questId, exp, grade;
       public Map<Integer, Integer> items;
 
-      public Integer getItemRequirement(int itemid) {
-         return items.get(itemid);
+      public Integer getItemRequirement(int itemId) {
+         return items.get(itemId);
       }
 
-   }
-
-   public class ScriptedItem {
-
-      private boolean runOnPickup;
-      private int npc;
-      private String script;
-
-      public ScriptedItem(int npc, String script, boolean rop) {
-         this.npc = npc;
-         this.script = script;
-         this.runOnPickup = rop;
-      }
-
-      public int getNpc() {
-         return npc;
-      }
-
-      public String getScript() {
-         return script;
-      }
-
-      public boolean runOnPickup() {
-         return runOnPickup;
-      }
    }
 }

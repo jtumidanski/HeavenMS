@@ -32,7 +32,7 @@ class NPC9201011 {
    boolean weddingIndoors
    int weddingBlessingExp = YamlConfig.config.server.WEDDING_BLESS_EXP
 
-   static def detectPlayerItemid(MapleCharacter player) {
+   static def detectPlayerItemId(MapleCharacter player) {
       for (int x = 4031357; x <= 4031364; x++) {
          if (player.haveItem(x)) {
             return x
@@ -47,17 +47,17 @@ class NPC9201011 {
    }
 
    static def isSuitedForWedding(MapleCharacter player, equipped) {
-      int baseid = (player.getGender() == 0) ? 1050131 : 1051150
+      int baseId = (player.getGender() == 0) ? 1050131 : 1051150
 
       if (equipped) {
          for (int i = 0; i < 4; i++) {
-            if (player.haveItemEquipped(baseid + i)) {
+            if (player.haveItemEquipped(baseId + i)) {
                return true
             }
          }
       } else {
          for (int i = 0; i < 4; i++) {
-            if (player.haveItemWithId(baseid + i, true)) {
+            if (player.haveItemWithId(baseId + i, true)) {
                return true
             }
          }
@@ -149,21 +149,21 @@ class NPC9201011 {
 
             int playerId = cm.getPlayer().getId()
             if (playerId == eim.getIntProperty("groomId") || playerId == eim.getIntProperty("brideId")) {
-               int wstg = eim.getIntProperty("weddingStage")
+               int weddingStage = eim.getIntProperty("weddingStage")
 
-               if (wstg == 2) {
+               if (weddingStage == 2) {
                   cm.sendYesNo("Awhoooooooooosh~, the guests have proclaimed their love to y'all. The time has come baby~, #rshould I make you Husband and Wife#k?")
                   state = 1
-               } else if (wstg == 1) {
+               } else if (weddingStage == 1) {
                   cm.sendOk("W-whoah wait a bit alright? Your guests are currently giving their love to y'all. Let's shake this place up, baby~~.")
                   cm.dispose()
                } else {
-                  cm.sendOk("Wheeeeeeeeeeeeeew! Our festival here is now complete, give a sweet talk to #b#p9201009##k, she will lead you and your folks to the afterparty. Cheers for your love!")
+                  cm.sendOk("Wheeeeeeeeeeeeeew! Our festival here is now complete, give a sweet talk to #b#p9201009##k, she will lead you and your folks to the after party. Cheers for your love!")
                   cm.dispose()
                }
             } else {
-               int wstg = eim.getIntProperty("weddingStage")
-               if (wstg == 1) {
+               int weddingStage = eim.getIntProperty("weddingStage")
+               if (weddingStage == 1) {
                   if (eim.gridCheck(cm.getPlayer()) != -1) {
                      cm.sendOk("Everyone let's shake this place up! Let's rock 'n' roll!!")
                      cm.dispose()
@@ -176,8 +176,8 @@ class NPC9201011 {
                         cm.dispose()
                      }
                   }
-               } else if (wstg == 3) {
-                  cm.sendOk("Whooooooo-hoo! The couple's love now are like one super big shiny heart right now! And it shall go on ever after this festival. Please #rget ready for the afterparty#k, baby~. Follow the married couple's lead!")
+               } else if (weddingStage == 3) {
+                  cm.sendOk("Whooooooo-hoo! The couple's love now are like one super big shiny heart right now! And it shall go on ever after this festival. Please #rget ready for the after party#k, baby~. Follow the married couple's lead!")
                   cm.dispose()
                } else {
                   cm.sendOk("It's now guys... Stay with your eyes and ears keened up! They are about to smooch it all over the place!!!")
@@ -205,9 +205,9 @@ class NPC9201011 {
                cm.sendOk("Way to go, my friend! Your LOVE has been added to theirs, now in one bigger heart-shaped sentiment that will remain lively in our hearts forever! Who-hoo~!")
                cm.dispose()
             } else {            // couple wants to complete the wedding
-               int wstg = eim.getIntProperty("weddingStage")
+               int weddingStage = eim.getIntProperty("weddingStage")
 
-               if (wstg == 2) {
+               if (weddingStage == 2) {
                   int pid = cm.getPlayer().getPartnerId()
                   if (pid <= 0) {
                      cm.sendOk("Huh~.... Wait wait, did you just break that thing you had right now?? Oh my, what happened?")
@@ -230,7 +230,7 @@ class NPC9201011 {
                                  eim.setIntProperty("weddingStage", 3)
                                  AbstractPlayerInteraction cmPartner = partner.getAbstractPlayerInteraction()
 
-                                 int playerItemId = detectPlayerItemid(player)
+                                 int playerItemId = detectPlayerItemId(player)
                                  int partnerItemId = (playerItemId % 2 == 1) ? playerItemId + 1 : playerItemId - 1
 
                                  int marriageRingId = getRingId((playerItemId % 2 == 1) ? playerItemId : partnerItemId)

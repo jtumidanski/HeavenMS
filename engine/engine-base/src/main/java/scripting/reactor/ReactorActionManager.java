@@ -1,33 +1,15 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package scripting.reactor;
 
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ScheduledFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
@@ -55,10 +37,6 @@ import server.partyquest.MapleCarnivalFactory.MCSkill;
 import tools.MasterBroadcaster;
 import tools.packet.monster.DamageMonster;
 
-/**
- * @author Lerk
- * @author Ronan
- */
 public class ReactorActionManager extends AbstractPlayerInteraction {
    private MapleReactor reactor;
    private ScriptEngine iv;
@@ -155,7 +133,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void dropItems(int posX, int posY, boolean meso, int mesoChance, int minMeso, int maxMeso, int minItems) {
-      dropItems(true, posX, posY, meso, mesoChance, minMeso, maxMeso, minItems);  // all reactors actually drop items sequentially... thanks inhyuk for pointing this out!
+      dropItems(true, posX, posY, meso, mesoChance, minMeso, maxMeso, minItems);
    }
 
    public void dropItems(boolean delayed, int posX, int posY, boolean meso, int mesoChance, final int minMeso, final int maxMeso, int minItems) {
@@ -203,35 +181,32 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
 
          dropPos.x -= (12 * items.size());
 
-         sprayTask = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               if (dropItems.isEmpty()) {
-                  sprayTask.cancel(false);
-                  return;
-               }
-
-               ReactorDropEntry d = dropItems.remove(0);
-               if (d.itemId() == 0) {
-                  int range = maxMeso - minMeso;
-                  int displayDrop = (int) (Math.random() * range) + minMeso;
-                  int mesoDrop = (displayDrop * worldMesoRate);
-                  r.getMap().spawnMesoDrop(mesoDrop, r.getMap().calcDropPos(dropPos, r.position()), r, chr, false, (byte) 2);
-               } else {
-                  Item drop;
-
-                  if (ItemConstants.getInventoryType(d.itemId()) != MapleInventoryType.EQUIP) {
-                     drop = new Item(d.itemId(), (short) 0, (short) 1);
-                  } else {
-                     MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-                     drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId()));
-                  }
-
-                  r.getMap().dropFromReactor(getPlayer(), r, drop, dropPos, (short) d.questId());
-               }
-
-               dropPos.x += 25;
+         sprayTask = TimerManager.getInstance().register(() -> {
+            if (dropItems.isEmpty()) {
+               sprayTask.cancel(false);
+               return;
             }
+
+            ReactorDropEntry d = dropItems.remove(0);
+            if (d.itemId() == 0) {
+               int range = maxMeso - minMeso;
+               int displayDrop = (int) (Math.random() * range) + minMeso;
+               int mesoDrop = (displayDrop * worldMesoRate);
+               r.getMap().spawnMesoDrop(mesoDrop, r.getMap().calcDropPos(dropPos, r.position()), r, chr, false, (byte) 2);
+            } else {
+               Item drop;
+
+               if (ItemConstants.getInventoryType(d.itemId()) != MapleInventoryType.EQUIP) {
+                  drop = new Item(d.itemId(), (short) 0, (short) 1);
+               } else {
+                  MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
+                  drop = ii.randomizeStats((Equip) ii.getEquipById(d.itemId()));
+               }
+
+               r.getMap().dropFromReactor(getPlayer(), r, drop, dropPos, (short) d.questId());
+            }
+
+            dropPos.x += 25;
          }, 200);
       }
    }
@@ -276,9 +251,11 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void spawnMonster(int id, int qty, Point pos) {
-      for (int i = 0; i < qty; i++) {
-         reactor.getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(id), pos);
-      }
+      IntStream.range(0, qty)
+            .mapToObj(index -> MapleLifeFactory.getMonster(id))
+            .flatMap(Optional::stream)
+            .filter(Objects::nonNull)
+            .forEach(monster -> reactor.getMap().spawnMonsterOnGroundBelow(monster, pos));
    }
 
    public Point getPosition() {
@@ -319,7 +296,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void spawnFakeMonster(int id) {
-      reactor.getMap().spawnFakeMonsterOnGroundBelow(MapleLifeFactory.getMonster(id), getPosition());
+      MapleLifeFactory.getMonster(id).ifPresent(monster -> reactor.getMap().spawnMonsterOnGroundBelow(monster, getPosition()));
    }
 
    public ScheduledFuture<?> schedule(String methodName, long delay) {
@@ -327,44 +304,38 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public ScheduledFuture<?> schedule(final String methodName, final EventInstanceManager eim, long delay) {
-      return TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               ((Invocable) iv).invokeFunction(methodName, eim);
-            } catch (ScriptException | NoSuchMethodException ex) {
-               Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+      return TimerManager.getInstance().schedule(() -> {
+         try {
+            ((Invocable) iv).invokeFunction(methodName, eim);
+         } catch (ScriptException | NoSuchMethodException ex) {
+            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
          }
       }, delay);
    }
 
    public ScheduledFuture<?> scheduleAtTimestamp(final String methodName, long timestamp) {
-      return TimerManager.getInstance().scheduleAtTimestamp(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               ((Invocable) iv).invokeFunction(methodName, (Object) null);
-            } catch (ScriptException | NoSuchMethodException ex) {
-               Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
-            }
+      return TimerManager.getInstance().scheduleAtTimestamp(() -> {
+         try {
+            ((Invocable) iv).invokeFunction(methodName, (Object) null);
+         } catch (ScriptException | NoSuchMethodException ex) {
+            Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
          }
       }, timestamp);
    }
 
    public void dispelAllMonsters(int num, int team) { //dispels all mobs, cpq
-      final MCSkill skil = MapleCarnivalFactory.getInstance().getGuardian(num);
-      if (skil != null) {
+      final MCSkill skill = MapleCarnivalFactory.getInstance().getGuardian(num);
+      if (skill != null) {
          for (MapleMonster mons : getMap().getAllMonsters()) {
             if (mons.getTeam() == team) {
-               mons.dispelSkill(skil.getSkill());
+               mons.dispelSkill(skill.getSkill());
             }
          }
       }
       if (team == 0) {
-         getPlayer().getMap().getRedTeamBuffs().remove(skil);
+         getPlayer().getMap().getRedTeamBuffs().remove(skill);
       } else {
-         getPlayer().getMap().getBlueTeamBuffs().remove(skil);
+         getPlayer().getMap().getBlueTeamBuffs().remove(skill);
       }
    }
 }

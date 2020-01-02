@@ -33,7 +33,7 @@ class Reactor6109023 {
       eim.setIntProperty(fid, eim.getIntProperty(fid) + 1)
    }
 
-   def untouch() {
+   def release() {
       EventInstanceManager eim = rm.getEventInstance()
 
       if (eim.getIntProperty(fid) == 1) {
@@ -61,6 +61,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

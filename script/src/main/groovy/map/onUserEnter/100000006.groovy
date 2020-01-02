@@ -19,7 +19,7 @@ class Map100000006 {
             return
          }
 
-         map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), new Point(-1027, 216))
+         MapleLifeFactory.getMonster(mobId).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point(-1027, 216)) })
       }
    }
 }

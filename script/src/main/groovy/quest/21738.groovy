@@ -23,7 +23,6 @@ class Quest21738 {
          }
 
          if (status == 0) {
-            // thanks ZERO傑洛 for noticing this quest shouldn't need a pw -- GMS-like string data thanks to skycombat
             qm.sendNext("What is it? I usually don't welcome uninvited guests, but you have a mysterious aura that makes me curious about what you have to say.", (byte) 9)
          } else if (status == 1) {
             qm.sendNext("(You tell her about Giant Nependeath.)", (byte) 3)

@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.maps;
 
 import java.awt.Rectangle;
@@ -43,10 +22,6 @@ import tools.ServerNoticeType;
 import tools.packet.reactor.DestroyReactor;
 import tools.packet.reactor.TriggerReactor;
 
-/**
- * @author Lerk
- * @author Ronan
- */
 public class MapleReactor extends AbstractMapleMapObject {
 
    private int rid;
@@ -214,30 +189,22 @@ public class MapleReactor extends AbstractMapleMapObject {
       if (timeOut > -1) {
          final byte nextState = stats.getTimeoutState(state);
 
-         timeoutTask = TimerManager.getInstance().schedule(new Runnable() {
-            @Override
-            public void run() {
-               timeoutTask = null;
-               tryForceHitReactor(nextState);
-            }
+         timeoutTask = TimerManager.getInstance().schedule(() -> {
+            timeoutTask = null;
+            tryForceHitReactor(nextState);
          }, timeOut);
       }
    }
 
    public void delayedHitReactor(final MapleClient c, long delay) {
-      TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            hitReactor(c);
-         }
-      }, delay);
+      TimerManager.getInstance().schedule(() -> hitReactor(c), delay);
    }
 
    public void hitReactor(MapleClient c) {
       hitReactor(false, 0, (short) 0, 0, c);
    }
 
-   public void hitReactor(boolean wHit, int charPos, short stance, int skillid, MapleClient c) {
+   public void hitReactor(boolean wHit, int charPos, short stance, int skillId, MapleClient c) {
       try {
          if (!this.isActive()) {
             return;
@@ -250,7 +217,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                attackHit = wHit;
 
                if (YamlConfig.config.server.USE_DEBUG) {
-                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Hitted REACTOR " + this.getId() + " with POS " + charPos + " , STANCE " + stance + " , SkillID " + skillid + " , STATE " + stats.getType(state) + " STATESIZE " + stats.getStateSize(state));
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Hit REACTOR " + this.getId() + " with POS " + charPos + " , STANCE " + stance + " , SkillID " + skillId + " , STATE " + stats.getType(state) + " STATESIZE " + stats.getStateSize(state));
                }
                ReactorScriptManager.getInstance().onHit(c, this);
 
@@ -260,7 +227,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                      for (byte b = 0; b < stats.getStateSize(state); b++) {//YAY?
                         List<Integer> activeSkills = stats.getActiveSkills(state, b);
                         if (activeSkills != null) {
-                           if (!activeSkills.contains(skillid)) {
+                           if (!activeSkills.contains(skillId)) {
                               continue;
                            }
                         }
@@ -307,7 +274,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                }
             } finally {
                this.unlockReactor();
-               hitLock.unlock();   // non-encapsulated unlock found thanks to MiLin
+               hitLock.unlock();
             }
          }
       } catch (Exception e) {
@@ -352,12 +319,9 @@ public class MapleReactor extends AbstractMapleMapObject {
    }
 
    public void delayedRespawn() {
-      Runnable r = new Runnable() {
-         @Override
-         public void run() {
-            delayedRespawnRun = null;
-            respawn();
-         }
+      Runnable r = () -> {
+         delayedRespawnRun = null;
+         respawn();
       };
 
       delayedRespawnRun = r;

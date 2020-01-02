@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.life;
 
 import java.awt.Point;
@@ -58,10 +37,6 @@ import tools.packet.character.npc.RemovePlayerNPC;
 import tools.packet.spawn.RemoveNPCController;
 import tools.packet.spawn.SpawnPlayerNPC;
 
-/**
- * @author XoticStory
- * @author Ronan
- */
 public class MaplePlayerNPC extends AbstractMapleMapObject {
    private static final Map<Byte, List<Integer>> availablePlayerNpcScriptIds = new HashMap<>();
    private static final AtomicInteger runningOverallRank = new AtomicInteger();
@@ -158,8 +133,8 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       return wjr.getAndIncrement();
    }
 
-   public static boolean canSpawnPlayerNpc(String name, int mapid) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> PlayerNpcProvider.getInstance().getLikeNameAndMap(connection, name, mapid).stream().findFirst().isPresent()).orElse(false);
+   public static boolean canSpawnPlayerNpc(String name, int mapId) {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> PlayerNpcProvider.getInstance().getLikeNameAndMap(connection, name, mapId).stream().findFirst().isPresent()).orElse(false);
    }
 
    private static void fetchAvailableScriptIdsFromDb(byte branch, List<Integer> list) {
@@ -175,7 +150,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       int j = 0;
       for (int i = branchSid; i < nextBranchSid; i++) {
          if (!usedScriptIds.contains(i)) {
-            if (MaplePlayerNPCFactory.isExistentScriptid(i)) {  // thanks Ark, Zein, geno, Ariel, JrCl0wn for noticing client crashes due to use of missing scriptids
+            if (MaplePlayerNPCFactory.isExistentScriptId(i)) {
                availables.add(i);
                j++;
 
@@ -183,7 +158,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
                   break;
                }
             } else {
-               break;  // after this point no more scriptids expected...
+               break;  // after this point no more script ids expected...
             }
          }
       }
@@ -243,7 +218,7 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
          Optional<MaplePlayerNPC> playerNPC = PlayerNpcProvider.getInstance().getByScriptId(connection, scriptId);
          if (playerNPC.isPresent()) {
             return playerNPC.get();
-         } else {   // creates new playernpc if scriptid doesn't exist
+         } else {   // creates new player npc if script id doesn't exist
             int worldRank = runningWorldRank.get(chr.getWorld()).getAndIncrement();
             int overallRank = runningOverallRank.getAndIncrement();
             int worldJobRank = getAndIncrementRunningWorldJobRanks(chr.getWorld(), jobId);
@@ -279,19 +254,19 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       }
    }
 
-   public static boolean spawnPlayerNPC(int mapid, MapleCharacter chr) {
-      return spawnPlayerNPC(mapid, null, chr);
+   public static boolean spawnPlayerNPC(int mapId, MapleCharacter chr) {
+      return spawnPlayerNPC(mapId, null, chr);
    }
 
-   public static boolean spawnPlayerNPC(int mapid, Point pos, MapleCharacter chr) {
+   public static boolean spawnPlayerNPC(int mapId, Point pos, MapleCharacter chr) {
       if (chr == null) {
          return false;
       }
 
-      MaplePlayerNPC pn = processPlayerNPCInternal(chr.getClient().getChannelServer().getMapFactory().getMap(mapid), pos, chr, true).getLeft();
+      MaplePlayerNPC pn = processPlayerNPCInternal(chr.getClient().getChannelServer().getMapFactory().getMap(mapId), pos, chr, true).getLeft();
       if (pn != null) {
          for (Channel channel : Server.getInstance().getChannelsFromWorld(chr.getWorld())) {
-            MapleMap m = channel.getMapFactory().getMap(mapid);
+            MapleMap m = channel.getMapFactory().getMap(mapId);
 
             m.addPlayerNPCMapObject(pn);
             MasterBroadcaster.getInstance().sendToAllInMap(m, new SpawnPlayerNPC(pn));
@@ -304,10 +279,10 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       }
    }
 
-   private static MaplePlayerNPC getPlayerNPCFromWorldMap(String name, int world, int map) {
-      World wserv = Server.getInstance().getWorld(world);
-      for (MapleMapObject pnpcObj : wserv.getChannel(1).getMapFactory().getMap(map).getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
-         MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
+   private static MaplePlayerNPC getPlayerNPCFromWorldMap(String name, int worldId, int map) {
+      World world = Server.getInstance().getWorld(worldId);
+      for (MapleMapObject mapObject : world.getChannel(1).getMapFactory().getMap(map).getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
+         MaplePlayerNPC pn = (MaplePlayerNPC) mapObject;
 
          if (name.contentEquals(pn.getName()) && pn.getScriptId() < 9977777) {
             return pn;
@@ -322,15 +297,15 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
          return;
       }
 
-      List<Integer> updateMapids = processPlayerNPCInternal(null, null, chr, false).getRight();
-      int worldid = updateMapids.remove(0);
+      List<Integer> updateMapIds = processPlayerNPCInternal(null, null, chr, false).getRight();
+      int worldId = updateMapIds.remove(0);
 
-      for (Integer mapid : updateMapids) {
-         MaplePlayerNPC pn = getPlayerNPCFromWorldMap(chr.getName(), worldid, mapid);
+      for (Integer mapId : updateMapIds) {
+         MaplePlayerNPC pn = getPlayerNPCFromWorldMap(chr.getName(), worldId, mapId);
 
          if (pn != null) {
-            for (Channel channel : Server.getInstance().getChannelsFromWorld(worldid)) {
-               MapleMap m = channel.getMapFactory().getMap(mapid);
+            for (Channel channel : Server.getInstance().getChannelsFromWorld(worldId)) {
+               MapleMap m = channel.getMapFactory().getMap(mapId);
                m.removeMapObject(pn);
 
                MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
@@ -340,40 +315,40 @@ public class MaplePlayerNPC extends AbstractMapleMapObject {
       }
    }
 
-   public static void multicastSpawnPlayerNPC(int mapid, int world) {
-      World wserv = Server.getInstance().getWorld(world);
-      if (wserv == null) {
+   public static void multicastSpawnPlayerNPC(int mapId, int worldId) {
+      World world = Server.getInstance().getWorld(worldId);
+      if (world == null) {
          return;
       }
 
       MapleClient c = new MapleClient(null, null, null);  // mock client
-      c.setWorld(world);
+      c.setWorld(worldId);
       c.setChannel(1);
 
-      for (MapleCharacter mc : wserv.loadAndGetAllCharactersView()) {
+      for (MapleCharacter mc : world.loadAndGetAllCharactersView()) {
          mc.setClient(c);
-         spawnPlayerNPC(mapid, mc);
+         spawnPlayerNPC(mapId, mc);
       }
    }
 
    public static void removeAllPlayerNPC() {
       int worldSize = Server.getInstance().getWorldsSize();
       DatabaseConnection.getInstance().withConnection(connection -> {
-         PlayerNpcProvider.getInstance().getWorldMapsWithPlayerNpcs(connection).stream()
+         PlayerNpcProvider.getInstance().getWorldMapsWithPlayerNpc(connection).stream()
                .filter(result -> result.getLeft() >= worldSize)
                .forEach(result -> {
                   for (Channel channel : Server.getInstance().getChannelsFromWorld(result.getLeft())) {
                      MapleMap m = channel.getMapFactory().getMap(result.getRight());
 
-                     for (MapleMapObject pnpcObj : m.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
-                        MaplePlayerNPC pn = (MaplePlayerNPC) pnpcObj;
-                        m.removeMapObject(pnpcObj);
+                     for (MapleMapObject mapObject : m.getMapObjectsInRange(new Point(0, 0), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.PLAYER_NPC))) {
+                        MaplePlayerNPC pn = (MaplePlayerNPC) mapObject;
+                        m.removeMapObject(mapObject);
                         MasterBroadcaster.getInstance().sendToAllInMap(m, new RemoveNPCController(pn.objectId()));
                         MasterBroadcaster.getInstance().sendToAllInMap(m, new RemovePlayerNPC(pn.objectId()));
                      }
                   }
                });
-         PlayerNpcAdministrator.getInstance().deleteAllNpcs(connection);
+         PlayerNpcAdministrator.getInstance().deleteAllPlayerNpc(connection);
       });
       Server.getInstance().getWorlds().parallelStream().forEach(World::resetPlayerNpcMapData);
    }

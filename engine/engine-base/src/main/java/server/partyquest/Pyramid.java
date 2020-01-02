@@ -1,25 +1,3 @@
-/*
-    This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-               Matthias Butz <matze@odinms.de>
-               Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package server.partyquest;
 
 import java.util.concurrent.ScheduledFuture;
@@ -30,25 +8,22 @@ import server.MapleItemInformationProvider;
 import server.TimerManager;
 import tools.PacketCreator;
 import tools.packet.GetEnergy;
-import tools.packet.pyramid.PyramidGuage;
+import tools.packet.pyramid.PyramidGauge;
 import tools.packet.pyramid.PyramidScore;
 
-/**
- * @author kevintjuh93
- */
 public class Pyramid extends PartyQuest {
    int kill = 0, miss = 0, cool = 0, exp = 0, map, count;
-   byte coolAdd = 5, missSub = 4, decrease = 1;//hmmm
+   byte coolAdd = 5, missSub = 4, decrease = 1;
    short gauge;
-   byte rank, skill = 0, stage = 0, buffcount = 0;//buffcount includes buffs + skills
+   byte rank, skill = 0, stage = 0, buffCount = 0;//buffCount includes buffs + skills
    PyramidMode mode;
    ScheduledFuture<?> timer = null;
    ScheduledFuture<?> gaugeSchedule = null;
 
-   public Pyramid(MapleParty party, PyramidMode mode, int mapid) {
+   public Pyramid(MapleParty party, PyramidMode mode, int mapId) {
       super(party);
       this.mode = mode;
-      this.map = mapid;
+      this.map = mapId;
 
       byte plus = (byte) mode.getMode();
       coolAdd += plus;
@@ -68,14 +43,10 @@ public class Pyramid extends PartyQuest {
       if (gaugeSchedule == null) {
          gauge = 100;
          count = 0;
-         gaugeSchedule = TimerManager.getInstance().register(new Runnable() {
-            @Override
-            public void run() {
-               gauge -= decrease;
-               if (gauge <= 0) {
-                  warp(926010001);
-               }
-
+         gaugeSchedule = TimerManager.getInstance().register(() -> {
+            gauge -= decrease;
+            if (gauge <= 0) {
+               warp(926010001);
             }
          }, 1000);
       }
@@ -125,12 +96,9 @@ public class Pyramid extends PartyQuest {
          value = 120;
       }
 
-      timer = TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            stage++;
-            warp(map + (stage * 100));//Should work :D
-         }
+      timer = TimerManager.getInstance().schedule(() -> {
+         stage++;
+         warp(map + (stage * 100));//Should work :D
       }, value * 1000);//, 4000
       broadcastInfo("party", getParticipants().size() > 1 ? 1 : 0);
       broadcastInfo("hit", kill);
@@ -142,9 +110,9 @@ public class Pyramid extends PartyQuest {
       return value;
    }
 
-   public void warp(int mapid) {
+   public void warp(int mapId) {
       for (MapleCharacter chr : getParticipants()) {
-         chr.changeMap(mapid, 0);
+         chr.changeMap(mapId, 0);
       }
       if (stage > -1) {
          gaugeSchedule.cancel(false);
@@ -159,7 +127,7 @@ public class Pyramid extends PartyQuest {
    public void broadcastInfo(String info, int amount) {
       for (MapleCharacter chr : getParticipants()) {
          PacketCreator.announce(chr, new GetEnergy("massacre_" + info, amount));
-         PacketCreator.announce(chr, new PyramidGuage(count));
+         PacketCreator.announce(chr, new PyramidGauge(count));
       }
    }
 
@@ -175,43 +143,44 @@ public class Pyramid extends PartyQuest {
 
    public void checkBuffs() {
       int total = (kill + cool);
-      if (buffcount == 0 && total >= 250) {
-         buffcount++;
+      if (buffCount == 0 && total >= 250) {
+         buffCount++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
-         for (MapleCharacter chr : getParticipants())
+         for (MapleCharacter chr : getParticipants()) {
             ii.getItemEffect(2022585).applyTo(chr);
+         }
 
-      } else if (buffcount == 1 && total >= 500) {
-         buffcount++;
+      } else if (buffCount == 1 && total >= 500) {
+         buffCount++;
          skill++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          for (MapleCharacter chr : getParticipants()) {
             PacketCreator.announce(chr, new GetEnergy("massacre_skill", skill));
             ii.getItemEffect(2022586).applyTo(chr);
          }
-      } else if (buffcount == 2 && total >= 1000) {
-         buffcount++;
+      } else if (buffCount == 2 && total >= 1000) {
+         buffCount++;
          skill++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          for (MapleCharacter chr : getParticipants()) {
             PacketCreator.announce(chr, new GetEnergy("massacre_skill", skill));
             ii.getItemEffect(2022587).applyTo(chr);
          }
-      } else if (buffcount == 3 && total >= 1500) {
+      } else if (buffCount == 3 && total >= 1500) {
          skill++;
          broadcastInfo("skill", skill);
-      } else if (buffcount == 4 && total >= 2000) {
-         buffcount++;
+      } else if (buffCount == 4 && total >= 2000) {
+         buffCount++;
          skill++;
          MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
          for (MapleCharacter chr : getParticipants()) {
             PacketCreator.announce(chr, new GetEnergy("massacre_skill", skill));
             ii.getItemEffect(2022588).applyTo(chr);
          }
-      } else if (buffcount == 5 && total >= 2500) {
+      } else if (buffCount == 5 && total >= 2500) {
          skill++;
          broadcastInfo("skill", skill);
-      } else if (buffcount == 6 && total >= 3000) {
+      } else if (buffCount == 6 && total >= 3000) {
          skill++;
          broadcastInfo("skill", skill);
       }
@@ -219,21 +188,21 @@ public class Pyramid extends PartyQuest {
 
    public void sendScore(MapleCharacter chr) {
       if (exp == 0) {
-         int totalkills = (kill + cool);
+         int totalKills = (kill + cool);
          if (stage == 5) {
-            if (totalkills >= 3000) {
+            if (totalKills >= 3000) {
                rank = 0;
-            } else if (totalkills >= 2000) {
+            } else if (totalKills >= 2000) {
                rank = 1;
-            } else if (totalkills >= 1500) {
+            } else if (totalKills >= 1500) {
                rank = 2;
-            } else if (totalkills >= 500) {
+            } else if (totalKills >= 500) {
                rank = 3;
             } else {
                rank = 4;
             }
          } else {
-            if (totalkills >= 2000) {
+            if (totalKills >= 2000) {
                rank = 3;
             } else {
                rank = 4;

@@ -21,5 +21,5 @@ class CashShopGachaponSuccess(private var _accountId: Int, private var _sn: Long
 
   def jackpot: Boolean = _jackpot
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_CASH_ITEM_GACHAPON_RESULT
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_CASH_ITEM_GACHAPON_RESULT
 }

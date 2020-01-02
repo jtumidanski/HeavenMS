@@ -20,7 +20,7 @@ class NPC2090004 {
    Object mats
    Object matQty
    int matMeso
-   List rewdSet
+   List rewardSet
    int makeQty = 1
 
    Object[] itemSet
@@ -167,7 +167,7 @@ class NPC2090004 {
             selectedItem = selection
 
             itemSet = [4000276, 4000277, 4000278, 4000279, 4000280, 4000291, 4000292, 4000286, 4000287, 4000293, 4000294, 4000298, 4000284, 4000288, 4000285, 4000282, 4000295, 4000289, 4000296, 4000297]
-            rewdSet = [7, 7, [7, 8], 10, 11, 8, [7, 8], [7, 9], [7, 8], 9, 10, [10, 11], 11, [11, 12], 13, 13, 14, 15, [15, 16], 17]
+            rewardSet = [7, 7, [7, 8], 10, 11, 8, [7, 8], [7, 9], [7, 8], 9, 10, [10, 11], 11, [11, 12], 13, 13, 14, 15, [15, 16], 17]
 
             item = itemSet[selectedItem]
             String prompt = "Are you sure you want to donate #b100 #t " + item + "##k?"
@@ -258,12 +258,12 @@ class NPC2090004 {
             }
 
             int reward
-            if (rewdSet[selectedItem] instanceof ArrayList) {
-               List selectedReward = (List) rewdSet[selectedItem]
+            if (rewardSet[selectedItem] instanceof ArrayList) {
+               List selectedReward = (List) rewardSet[selectedItem]
                int length = (selectedReward[1] as Integer) - (selectedReward[0] as Integer)
                reward = (selectedReward[0] as Integer) + Math.round(Math.random() * length).intValue()
             } else {
-               reward = rewdSet[selectedItem] as Integer
+               reward = rewardSet[selectedItem] as Integer
             }
 
             if (!cm.canHold(4001124, reward)) {

@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -18,23 +18,13 @@ class NPC9201061 {
    int price = 1000000
    int[] colors = []
 
-   def pushIfItemsExists(int[] array, int[] itemidList) {
-      for (int i = 0; i < itemidList.length; i++) {
-         int itemid = itemidList[i]
-
-         if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-            array << itemid
-         }
-      }
-   }
-
    def start() {
       status = -1
       action((byte) 1, (byte) 0, 0)
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -52,9 +42,8 @@ class NPC9201061 {
                } else if (cm.getPlayer().getGender() == 1) {
                   current = cm.getPlayer().getFace() % 100 + 21000
                }
-               colors = []
                int[] temp = [current + 100, current + 200, current + 300, current + 400, current + 500, current + 600, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendYesNo("If you use the regular coupon, you'll be awarded a random pair of cosmetic lenses. Are you going to use #b#t5152035##k and really make the change to your eyes?")
             }
          } else if (status == 2) {

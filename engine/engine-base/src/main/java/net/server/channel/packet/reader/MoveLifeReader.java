@@ -18,7 +18,7 @@ public class MoveLifeReader extends AbstractMovementReader<MoveLifePacket> {
 
       accessor.readByte();
       accessor.readInt(); // whatever
-      short startX = accessor.readShort(); // hmm.. startpos?
+      short startX = accessor.readShort(); // hmm.. start position?
       short startY = accessor.readShort(); // hmm...
       return producePacket(accessor, -2, (hasMovement, movementDataList, movementList) ->
             new MoveLifePacket(objectId, moveId, pNibbles, rawActivity, skillId, skillLv, pOption, startX, startY, hasMovement, movementDataList, movementList));

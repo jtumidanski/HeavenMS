@@ -119,8 +119,8 @@ class EventHolidayPQ_3 {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
-      EventInstanceManager eim = em.newInstance("Holiday3_" + lobbyid)
+   def setup(int level, int lobbyId) {
+      EventInstanceManager eim = em.newInstance("Holiday3_" + lobbyId)
       eim.setProperty("level", level)
       eim.setProperty("stage", "0")
       eim.setProperty("statusStg1", "-1")
@@ -129,9 +129,9 @@ class EventHolidayPQ_3 {
       eim.setProperty("snowmanStep", "0")
       eim.setProperty("spawnedBoss", "0")
 
-      MapleMap mapobj = eim.getInstanceMap(entryMap)
-      mapobj.resetPQ(level)
-      mapobj.allowSummonState(false)
+      MapleMap map = eim.getInstanceMap(entryMap)
+      map.resetPQ(level)
+      map.allowSummonState(false)
 
       respawnStages(eim)
       eim.startEventTimer(eventTime * 60000)
@@ -140,7 +140,7 @@ class EventHolidayPQ_3 {
       return eim
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
    }
 
@@ -181,9 +181,9 @@ class EventHolidayPQ_3 {
       }
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
             end(eim)
@@ -195,8 +195,8 @@ class EventHolidayPQ_3 {
 
    // Do something if the party leader has been changed.
    def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
-      int mapid = leader.getMapId()
-      if (!eim.isEventCleared() && (mapid < minMapId || mapid > maxMapId)) {
+      int mapId = leader.getMapId()
+      if (!eim.isEventCleared() && (mapId < minMapId || mapId > maxMapId)) {
          end(eim)
       }
    }
@@ -252,7 +252,7 @@ class EventHolidayPQ_3 {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -269,20 +269,19 @@ class EventHolidayPQ_3 {
    }
 
    def snowmanEvolve(EventInstanceManager eim, int curLevel) {
-      MapleMap mapobj = eim.getInstanceMap(entryMap)
+      MapleMap map = eim.getInstanceMap(entryMap)
       int difficulty = eim.getIntProperty("level")
-      MapleMonster snowman = mapobj.getMonsterById(9400317 + (5 * difficulty) + (curLevel - 1))
+      MapleMonster snowman = map.getMonsterById(9400317 + (5 * difficulty) + (curLevel - 1))
 
       eim.setIntProperty("snowmanLevel", curLevel + 2)   // increment by 2 to decrement by 1 on friendlyKilled
-      mapobj.killMonster(snowman, null, false, 2)
+      map.killMonster(snowman, null, false, 2)
 
-      snowman = MapleLifeFactory.getMonster(9400317 + (5 * difficulty) + curLevel)
-      mapobj.spawnMonsterOnGroundBelow(snowman, new Point(-180, 15))
+      MapleLifeFactory.getMonster(9400317 + (5 * difficulty) + curLevel).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-180, 15)) })
 
       if (curLevel >= 4) {
-         mapobj.allowSummonState(false)
-         mapobj.killAllMonstersNotFriendly()
-         mapobj.setReactorState()
+         map.allowSummonState(false)
+         map.killAllMonstersNotFriendly()
+         map.setReactorState()
 
          eim.giveEventPlayersStageReward(2 * difficulty - 1)
          eim.showClearEffect()
@@ -301,9 +300,9 @@ class EventHolidayPQ_3 {
          step = 0
          snowmanEvolve(eim, snowmanLevel)
       } else {
-         MapleMap mapobj = eim.getInstanceMap(entryMap)
+         MapleMap map = eim.getInstanceMap(entryMap)
          int difficulty = eim.getIntProperty("level")
-         MapleMonster snowman = mapobj.getMonsterById(9400316 + (5 * difficulty) + snowmanLevel)
+         MapleMonster snowman = map.getMonsterById(9400316 + (5 * difficulty) + snowmanLevel)
 
          snowman.heal(200 + (200 * snowmanLevel), 0)
          step += 1
@@ -384,8 +383,8 @@ class EventHolidayPQ_3 {
    }
 
    static def isScrooge(MapleMonster mob) {
-      int mobid = mob.id()
-      return mobid >= 9400319 && mobid <= 9400321
+      int mobId = mob.id()
+      return mobId >= 9400319 && mobId <= 9400321
    }
 
    // Happens when a player left the party
@@ -404,12 +403,12 @@ class EventHolidayPQ_3 {
       }
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -457,8 +456,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -485,8 +484,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -505,8 +504,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -557,8 +556,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

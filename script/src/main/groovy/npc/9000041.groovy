@@ -3,13 +3,6 @@ package npc
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		
-	Map(s): 		
-	Description: 	
-*/
-
-
 class NPC9000041 {
    NPCConversationManager cm
    int status = -1

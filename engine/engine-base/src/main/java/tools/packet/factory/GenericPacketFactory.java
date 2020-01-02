@@ -29,7 +29,7 @@ public class GenericPacketFactory extends AbstractPacketFactory {
       Handler.handle(QuickSlotKey.class).decorate(this::initQuickSlot).register(registry);
    }
 
-   protected void enableReport(MaplePacketLittleEndianWriter writer, EnableReport packet) { // thanks to snow
+   protected void enableReport(MaplePacketLittleEndianWriter writer, EnableReport packet) {
       writer.write(1);
    }
 
@@ -43,7 +43,7 @@ public class GenericPacketFactory extends AbstractPacketFactory {
       writer.write(6);
    }
 
-   protected void setNPCScriptable(MaplePacketLittleEndianWriter writer, SetNPCScriptable packet) {  // thanks to GabrielSin
+   protected void setNPCScriptable(MaplePacketLittleEndianWriter writer, SetNPCScriptable packet) {
       writer.write(packet.descriptions().size());
       for (Pair<Integer, String> p : packet.descriptions()) {
          writer.writeInt(p.getLeft());
@@ -54,7 +54,7 @@ public class GenericPacketFactory extends AbstractPacketFactory {
    }
 
    protected void initQuickSlot(MaplePacketLittleEndianWriter writer, QuickSlotKey packet) {
-      if (Arrays.equals(packet.keyMap(), MapleQuickSlotBinding.DEFAULT_QUICKSLOTS)) {
+      if (Arrays.equals(packet.keyMap(), MapleQuickSlotBinding.DEFAULT_QUICK_SLOTS)) {
          writer.writeBool(false);
          return;
       }

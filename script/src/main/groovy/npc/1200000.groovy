@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Pusla
-	Map(s): 		Snow Island: Rien
-	Description: 	Open Storage
-*/
-
-
 class NPC1200000 {
    NPCConversationManager cm
    int status = -1

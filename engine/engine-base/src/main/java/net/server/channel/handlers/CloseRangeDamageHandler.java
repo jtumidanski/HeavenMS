@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.util.Collections;
@@ -63,7 +42,7 @@ import tools.packet.GetEnergy;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveForeignBuff;
-import tools.packet.character.SkillCooldown;
+import tools.packet.character.SkillCoolDown;
 
 public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -107,7 +86,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          if (comboBuff != null) {
             numFinisherOrbs = comboBuff - 1;
          }
-         chr.handleOrbconsume();
+         chr.handleOrbConsume();
       } else if (attack.numAttacked() > 0) {
          if (attack.skill() != Crusader.SHOUT && comboBuff != null) {
             int orbCount = chr.getBuffedValue(MapleBuffStat.COMBO);
@@ -146,14 +125,14 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
 
                   List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.COMBO, newOrbCount));
                   chr.setBuffedValue(MapleBuffStat.COMBO, newOrbCount);
-                  duration -= (int) (currentServerTime() - chr.getBuffedStarttime(MapleBuffStat.COMBO));
+                  duration -= (int) (currentServerTime() - chr.getBuffedStartTime(MapleBuffStat.COMBO));
                   PacketCreator.announce(c, new GiveBuff(comboId, duration, stat));
                   MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new GiveForeignBuff(chr.getId(), stat), false, chr);
                }
             }
          } else if (chr.getJob().isA(MapleJob.MARAUDER)) {
             SkillFactory.executeIfHasSkill(chr, Marauder.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
-         } else if (chr.getJob().isA(MapleJob.THUNDERBREAKER2)) {
+         } else if (chr.getJob().isA(MapleJob.THUNDER_BREAKER_2)) {
             SkillFactory.executeIfHasSkill(chr, ThunderBreaker.ENERGY_CHARGE, (skill, skillLevel) -> chargeNEnergy(chr, attack.numAttacked()));
          }
       }
@@ -195,15 +174,15 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
       } else if (attack.skill() > 0) {
          SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> {
             MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-            if (effect_.getCooldown() > 0) {
+            if (effect_.getCoolDown() > 0) {
                if (!chr.skillIsCooling(attack.skill())) {
-                  PacketCreator.announce(c, new SkillCooldown(attack.skill(), effect_.getCooldown()));
-                  chr.addCooldown(attack.skill(), currentServerTime(), effect_.getCooldown() * 1000);
+                  PacketCreator.announce(c, new SkillCoolDown(attack.skill(), effect_.getCoolDown()));
+                  chr.addCoolDown(attack.skill(), currentServerTime(), effect_.getCoolDown() * 1000);
                }
             }
          }));
       }
-      if (chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null) {
+      if (chr.getBuffedValue(MapleBuffStat.DARK_SIGHT) != null) {
          SkillFactory.executeIfHasSkill(chr, NightWalker.VANISH, (skill, skillLevel) -> cancelDarkSight(chr));
          SkillFactory.executeIfHasSkill(chr, Rogue.DARK_SIGHT, (skill, skillLevel) -> cancelDarkSight(chr));
       } else if (chr.getBuffedValue(MapleBuffStat.WIND_WALK) != null) {
@@ -222,7 +201,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
    }
 
    private void cancelDarkSight(MapleCharacter chr) {
-      chr.cancelEffectFromBuffStat(MapleBuffStat.DARKSIGHT);
-      chr.cancelBuffStats(MapleBuffStat.DARKSIGHT);
+      chr.cancelEffectFromBuffStat(MapleBuffStat.DARK_SIGHT);
+      chr.cancelBuffStats(MapleBuffStat.DARK_SIGHT);
    }
 }

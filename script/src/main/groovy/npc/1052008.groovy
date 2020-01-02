@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Shumi
-	Map(s): 		
-	Description: 	JQ Chest #1
-*/
-
-
 class NPC1052008 {
    NPCConversationManager cm
    int status = -1

@@ -42,8 +42,10 @@ class NPC1063017 {
             if (cm.getClient().getChannelServer().getMapFactory().getMap(925020010).getCharacters().size() > 0) {
                cm.sendOk("Someone is already challenging the Master. Try again later.")
             } else {
-               cm.getWarpMap(910510202).spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9300346), new Point(95, 200))
-               cm.warp(910510202, 0)
+               MapleLifeFactory.getMonster(9300346).ifPresent({ monster ->
+                  cm.getWarpMap(910510202).spawnMonsterOnGroundBelow(monster, new Point(95, 200))
+                  cm.warp(910510202, 0)
+               })
             }
 
             cm.dispose()

@@ -3,7 +3,7 @@ package entity.boss;
 public enum BossType {
    ZAKUM,
    HORNTAIL,
-   PINKBEAN,
+   PINK_BEAN,
    SCARGA,
    PAPULATUS
 }

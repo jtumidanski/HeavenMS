@@ -38,9 +38,9 @@ public class DueyPackageAdministrator extends AbstractQueryExecutor {
       execute(entityManager, query);
    }
 
-   public int create(EntityManager entityManager, int receipientId, String senderName, int mesos, String message, boolean quick) {
+   public int create(EntityManager entityManager, int recipientId, String senderName, int mesos, String message, boolean quick) {
       DueyPackage dueyPackage = new DueyPackage();
-      dueyPackage.setReceiverId(receipientId);
+      dueyPackage.setReceiverId(recipientId);
       dueyPackage.setSenderName(senderName);
       dueyPackage.setMesos(mesos);
       dueyPackage.setTimestamp(new Timestamp(System.currentTimeMillis()));

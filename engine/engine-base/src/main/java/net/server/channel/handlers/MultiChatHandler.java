@@ -1,29 +1,8 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
@@ -44,7 +23,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
    @Override
    public boolean successfulProcess(MapleClient client) {
       MapleCharacter player = client.getPlayer();
-      return player.getAutobanManager().getLastSpam(7) + 200 <= currentServerTime();
+      return player.getAutoBanManager().getLastSpam(7) + 200 <= currentServerTime();
    }
 
    @Override
@@ -52,7 +31,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
       MapleCharacter player = client.getPlayer();
 
       if (packet.message().length() > Byte.MAX_VALUE && !player.isGM()) {
-         AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit chats.");
+         AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit chats.");
          FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
          client.disconnect(true, false);
          return;
@@ -67,7 +46,7 @@ public final class MultiChatHandler extends AbstractPacketHandler<MultiChatPacke
       } else if (packet.theType() == 3) {
          allianceChat(packet, client, player);
       }
-      player.getAutobanManager().spam(7);
+      player.getAutoBanManager().spam(7);
    }
 
    private void allianceChat(MultiChatPacket packet, MapleClient client, MapleCharacter player) {

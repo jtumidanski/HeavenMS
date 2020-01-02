@@ -10,14 +10,14 @@ import java.awt.*
 
 boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestActive(21739)) {
-      MapleMap mapobj1 = pi.getWarpMap(920030000)
-      MapleMap mapobj2 = pi.getWarpMap(920030001)
+      MapleMap map1 = pi.getWarpMap(920030000)
+      MapleMap map2 = pi.getWarpMap(920030001)
 
-      if (mapobj1.countPlayers() == 0 && mapobj2.countPlayers() == 0) {
-         mapobj1.resetPQ(1)
-         mapobj2.resetPQ(1)
+      if (map1.countPlayers() == 0 && map2.countPlayers() == 0) {
+         map1.resetPQ(1)
+         map2.resetPQ(1)
 
-         mapobj2.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9300348), new Point(591, -34))
+         MapleLifeFactory.getMonster(9300348).ifPresent({ monster -> map2.spawnMonsterOnGroundBelow(monster, new Point(591, -34)) })
 
          pi.playPortalSound(); pi.warp(920030000, 2)
          return true

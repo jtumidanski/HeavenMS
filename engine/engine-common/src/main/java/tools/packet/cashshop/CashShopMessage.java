@@ -3,9 +3,9 @@ package tools.packet.cashshop;
 public enum CashShopMessage {
    UNKNOWN_ERROR(0x00), //Due to an unknown error, failed
    REQUEST_TIMED_OUT(0xA3), //Request timed out. Please try again.
-   UNKNOWN_ERROR_AND_WARP(0xA4), //Due to an unknown error, failed + warpout
+   UNKNOWN_ERROR_AND_WARP(0xA4), //Due to an unknown error, failed + warp out
    NOT_ENOUGH_CASH(0xA5), //You don't have enough cash.
-   LONG_MESSAGE(0xA6), //long as shet msg
+   LONG_MESSAGE(0xA6), //long as shit msg
    EXCEEDED_ALLOTTED_GIFT_PRICE_LIMIT(0xA7), //You have exceeded the allotted limit of price for gifts.
    CANNOT_GIFT_TO_OWN_CHARACTER(0xA8), //You cannot send a gift to your own account. Log in on the char and purchase
    INCORRECT_CHARACTER_NAME(0xA9), // Please confirm whether the character's name is correct.
@@ -17,10 +17,10 @@ public enum CashShopMessage {
    WRONG_COUPON_CODE_X3(0xB1), // Disconnect from CS because of 3 wrong coupon codes < lol
    EXPIRED_COUPON(0xB2), // Expired Coupon
    COUPON_ALREADY_USED(0xB3), // Coupon has been used already
-   INTERNET_CAFE(0xB4), // Nexon internet cafes? lolfk
+   INTERNET_CAFE(0xB4), // Nexon internet cafes?
    CANNOT_USE_COUPON_DUE_TO_GENDER(0xB8), // Due to gender restrictions, the coupon cannot be used.
    INVENTORY_FULL(0xBB), // inv full
-   LONG_MESSAGE_2(0xBC), // long as shet "(not?) available to purchase by a use at the premium" msg
+   LONG_MESSAGE_2(0xBC), // long as shit "(not?) available to purchase by a use at the premium" msg
    INVALID_GIFT_RECIPIENT(0xBD), // invalid gift recipient
    INVALID_RECEIVER_NAME(0xBE), // invalid receiver name
    UNAVAILABLE_TO_PURCHASE_AT_THIS_HOUR(0xBF), // item unavailable to purchase at this hour
@@ -38,7 +38,7 @@ public enum CashShopMessage {
    NOT_ENOUGH_GIFT_TOKENS(0xD4), // not enough gift tokens
    NEW_PEOPLE_CANNOT_GIFT(0xD6), // fresh people cannot gift items lul
    BAD_PEOPLE_CANNOT_GIFT(0xD7), // bad people cannot gift items >:(
-   CANNNOT_GIFT(0xD8), // cannot gift due to limitations
+   CANNOT_GIFT(0xD8), // cannot gift due to limitations
    REACHED_GIFT_LIMIT(0xD9), // cannot gift due to amount of gifted times
    CANNOT_GIFT_DUE_TO_TECHNICAL_DIFFICULTIES(0xDA), // cannot be gifted due to technical difficulties
    CANNOT_TRANSFER_TO_BELOW_LEVEL_20(0xDB), // cannot transfer to char below level 20

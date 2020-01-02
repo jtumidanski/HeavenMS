@@ -153,7 +153,7 @@ class NPC2100001 {
          if (item >= 2060000 && item <= 2060002) //bow arrows
          {
             recvQty = 1000 - (item - 2060000) * 100
-         } else if (item >= 2061000 && item <= 2061002) //xbow arrows
+         } else if (item >= 2061000 && item <= 2061002) //crossbow arrows
          {
             recvQty = 1000 - (item - 2061000) * 100
          } else if (item == 4003000)//screws

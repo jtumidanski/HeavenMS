@@ -9,9 +9,6 @@ import tools.packet.login.LoginFailedReason;
 import tools.packet.login.AuthSuccess;
 import tools.packet.login.LoginFailed;
 
-/**
- * @author kevintjuh93
- */
 public final class AcceptToSHandler extends AbstractPacketHandler<AcceptToSPacket> {
    @Override
    public Class<AcceptToSReader> getReaderClass() {

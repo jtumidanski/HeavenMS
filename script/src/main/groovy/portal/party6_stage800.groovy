@@ -14,7 +14,6 @@ boolean enter(PortalPlayerInteraction pi) {
    pi.removeAll(2270004)
 
    MapleReactor spring = pi.getMap().getReactorById(3008000)
-   // thanks Chloek3, seth1 for noticing fragments not being awarded properly
    if (spring != null && spring.getState() > 0) {
       if (!pi.canHold(4001198, 1)) {
          MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Check for a free space on your ETC inventory before entering this portal.")

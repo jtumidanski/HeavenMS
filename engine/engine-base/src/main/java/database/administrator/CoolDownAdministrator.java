@@ -7,7 +7,7 @@ import javax.persistence.Query;
 
 import database.AbstractQueryExecutor;
 import database.DeleteForCharacter;
-import entity.Cooldown;
+import entity.CoolDown;
 import net.server.PlayerCoolDownValueHolder;
 
 public class CoolDownAdministrator extends AbstractQueryExecutor implements DeleteForCharacter {
@@ -24,20 +24,20 @@ public class CoolDownAdministrator extends AbstractQueryExecutor implements Dele
    }
 
    public void addCoolDownsForCharacter(EntityManager entityManager, int characterId, List<PlayerCoolDownValueHolder> coolDowns) {
-      List<Cooldown> cooldownList = coolDowns.stream().map(playerCoolDownValueHolder -> {
-         Cooldown cooldown = new Cooldown();
+      List<CoolDown> coolDownList = coolDowns.stream().map(playerCoolDownValueHolder -> {
+         CoolDown cooldown = new CoolDown();
          cooldown.setCharacterId(characterId);
          cooldown.setSkillId(playerCoolDownValueHolder.skillId);
          cooldown.setStartTime(playerCoolDownValueHolder.startTime);
          cooldown.setLength(playerCoolDownValueHolder.length);
          return cooldown;
       }).collect(Collectors.toList());
-      insertBulk(entityManager, cooldownList);
+      insertBulk(entityManager, coolDownList);
    }
 
    @Override
    public void deleteForCharacter(EntityManager entityManager, int characterId) {
-      Query query = entityManager.createQuery("DELETE FROM Cooldown WHERE characterId = :characterId");
+      Query query = entityManager.createQuery("DELETE FROM CoolDown WHERE characterId = :characterId");
       query.setParameter("characterId", characterId);
       execute(entityManager, query);
    }

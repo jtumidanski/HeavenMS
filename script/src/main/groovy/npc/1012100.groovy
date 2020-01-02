@@ -15,29 +15,28 @@ class NPC1012100 {
    NPCConversationManager cm
    int status = -1
    int sel = -1
-   def actionx = ["1stJob": false, "2ndjob": false, "3thJobI": false, "3thJobC": false]
+   def action = ["1stJob": false, "2ndjob": false, "3thJobI": false, "3thJobC": false]
    int job = 310
-   boolean spawnPnpc = false
-   int spawnPnpcFee = 7000000
+   boolean spawnPlayerNpc = false
+   int spawnPlayerNpcFee = 7000000
    int jobType = 3
 
    def start() {
-      if ((cm.getJobId() / 100).intValue() == jobType && cm.canSpawnPlayerNpc(GameConstants.getHallOfFameMapid(cm.getJob()))) {
-         spawnPnpc = true
+      if ((cm.getJobId() / 100).intValue() == jobType && cm.canSpawnPlayerNpc(GameConstants.getHallOfFameMapId(cm.getJob()))) {
+         spawnPlayerNpc = true
 
          String sendStr = "You have walked a long way to reach the power, wisdom and courage you hold today, haven't you? What do you say about having right now #ra NPC on the Hall of Fame holding the current image of your character#k? Do you like it?"
-         if (spawnPnpcFee > 0) {
-            sendStr += " I can do it for you, for the fee of #b " + cm.numberWithCommas(spawnPnpcFee) + " mesos.#k"
+         if (spawnPlayerNpcFee > 0) {
+            sendStr += " I can do it for you, for the fee of #b " + cm.numberWithCommas(spawnPlayerNpcFee) + " mesos.#k"
          }
 
          cm.sendYesNo(sendStr)
       } else {
          if (cm.getJobId() == 0) {
-            actionx["1stJob"] = true
+            action["1stJob"] = true
             cm.sendNext("So you decided to become a #rbowman#k? There are some standards to meet, y'know... #bYour level should be at least 10, with at least " + cm.getFirstJobStatRequirement(jobType) + "#k. Let's see.")
-            // thanks Vcoc for noticing a need to state and check requirements on first job adv starting message
          } else if (cm.getLevel() >= 30 && cm.getJobId() == 300) {
-            actionx["2ndJob"] = true
+            action["2ndJob"] = true
             if (cm.haveItem(4031012)) {
                cm.sendNext("Haha...I knew you'd breeze through that test. I'll admit, you are a great bowman. I'll make you much stronger than you're right now. before that, however... you;ll need to choose one of two paths given to you. It'll be a difficult decision for you to make, but... if there's any question to ask, please do so.")
             } else if (cm.haveItem(4031011)) {
@@ -46,14 +45,14 @@ class NPC1012100 {
             } else {
                cm.sendYesNo("Hmmm... you have grown a lot since I last saw you. I don't see the weakling I saw before, and instead, look much more like a bowman now. Well, what do you think? Don't you want to get even more powerful than that? Pass a simple test and I'll do just that for you. Do you want to do it?")
             }
-         } else if (actionx["3thJobI"] || (cm.getPlayer().gotPartyQuestItem("JB3") && cm.getLevel() >= 70 && cm.getJobId() % 10 == 0 && (cm.getJobId() / 100).intValue() == 3 && !cm.getPlayer().gotPartyQuestItem("JBP"))) {
-            actionx["3thJobI"] = true
+         } else if (action["3thJobI"] || (cm.getPlayer().gotPartyQuestItem("JB3") && cm.getLevel() >= 70 && cm.getJobId() % 10 == 0 && (cm.getJobId() / 100).intValue() == 3 && !cm.getPlayer().gotPartyQuestItem("JBP"))) {
+            action["3thJobI"] = true
             cm.sendNext("There you are. A few days ago, #b#p2020010##k of Ossyria talked to me about you. I see that you are interested in making the leap to the amazing world of the third job advancement for archers. To achieve that goal, I will have to test your strength in order to see whether you are worthy of the advancement. There is an opening in the middle of a deep forest in Victoria Island, where it'll lead you to a secret passage. Once inside, you'll face a clone of myself. Your task is to defeat her and bring #b#t4031059##k back with you.")
          } else if (cm.getPlayer().gotPartyQuestItem("JBP") && !cm.haveItem(4031059)) {
             cm.sendNext("Please, bring me the #b#t4031059##k.")
             cm.dispose()
          } else if (cm.haveItem(4031059) && cm.getPlayer().gotPartyQuestItem("JBP")) {
-            actionx["3thJobC"] = true
+            action["3thJobC"] = true
             cm.sendNext("Nice work. You have defeated my clone and brought #b#t4031059##k back safely. You have now proven yourself worthy of the 3rd job advancement from the physical standpoint. Now you should give this necklace to #b#p2020011##k in Ossyria to take on the second part of the test. Good luck. You'll need it.")
          } else {
             cm.sendOk("You have chosen wisely.")
@@ -75,17 +74,17 @@ class NPC1012100 {
          start()
          return
       } else {
-         if (spawnPnpc) {
+         if (spawnPlayerNpc) {
             if (mode > 0) {
-               if (cm.getMeso() < spawnPnpcFee) {
+               if (cm.getMeso() < spawnPlayerNpcFee) {
                   cm.sendOk("Sorry, you don't have enough mesos to purchase your place on the Hall of Fame.")
                   cm.dispose()
                   return
                }
 
-               if (MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapid(cm.getJob()), cm.getPlayer())) {
+               if (MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapId(cm.getJob()), cm.getPlayer())) {
                   cm.sendOk("There you go! Hope you will like it.")
-                  cm.gainMeso(-spawnPnpcFee)
+                  cm.gainMeso(-spawnPlayerNpcFee)
                } else {
                   cm.sendOk("Sorry, the Hall of Fame is currently full...")
                }
@@ -94,7 +93,7 @@ class NPC1012100 {
             cm.dispose()
             return
          } else {
-            if (mode != 1 || status == 7 && type != 1 || (actionx["1stJob"] && status == 4) || (cm.haveItem(4031008) && status == 2) || (actionx["3thJobI"] && status == 1)) {
+            if (mode != 1 || status == 7 && type != 1 || (action["1stJob"] && status == 4) || (cm.haveItem(4031008) && status == 2) || (action["3thJobI"] && status == 1)) {
                if (mode == 0 && status == 2 && type == 1) {
                   cm.sendOk("You know there is no other choice...")
                }
@@ -106,7 +105,7 @@ class NPC1012100 {
          }
       }
 
-      if (actionx["1stJob"]) {
+      if (action["1stJob"]) {
          if (status == 0) {
             if (cm.getLevel() >= 10 && cm.canGetFirstJob(jobType)) {
                cm.sendNextPrev("It is an important and final choice. You will not be able to turn back.")
@@ -134,7 +133,7 @@ class NPC1012100 {
          } else {
             cm.dispose()
          }
-      } else if (actionx["2ndJob"]) {
+      } else if (action["2ndJob"]) {
          if (status == 0) {
             if (cm.haveItem(4031012)) {
                cm.sendSimple("Alright, when you have made your decision, click on [I'll choose my occupation] at the bottom.#b\r\n#L0#Please explain to me what being the Hunter is all about.\r\n#L1#Please explain to me what being the Crossbowman is all about.\r\n#L3#I'll choose my occupation!")
@@ -171,7 +170,7 @@ class NPC1012100 {
             }
          } else if (status == 2) {
             job += selection * 10
-            cm.sendYesNo("So you want to make the second job advancement as the " + (job == 310 ? "#bHunter#k" : "#bCrossbowman#k") + "? You know you won't be able to choose a different job for the 2nd job advancement once you make your desicion here, right?")
+            cm.sendYesNo("So you want to make the second job advancement as the " + (job == 310 ? "#bHunter#k" : "#bCrossbowman#k") + "? You know you won't be able to choose a different job for the 2nd job advancement once you make your decision here, right?")
          } else if (status == 3) {
             if (cm.haveItem(4031012)) {
                cm.gainItem(4031012, (short) -1)
@@ -184,11 +183,11 @@ class NPC1012100 {
          } else if (status == 4) {
             cm.sendNextPrev("I have just given you a book that gives you the list of skills you can acquire as a " + (job == 310 ? "hunter" : "crossbowman") + ". Also your etc inventory has expanded by adding another row to it. Your max HP and MP have increased, too. Go check and see for it yourself.")
          } else if (status == 5) {
-            cm.sendNextPrev("I have also given you a little bit of #bSP#k. Open the #bSkill Menu#k located at the bottomleft corner. you'll be able to boost up the newer acquired 2nd level skills. A word of warning, though. You can't boost them up all at once. Some of the skills are only available after you have learned other skills. Make sure yo remember that.")
+            cm.sendNextPrev("I have also given you a little bit of #bSP#k. Open the #bSkill Menu#k located at the bottom left corner. you'll be able to boost up the newer acquired 2nd level skills. A word of warning, though. You can't boost them up all at once. Some of the skills are only available after you have learned other skills. Make sure yo remember that.")
          } else if (status == 6) {
             cm.sendNextPrev((job == 310 ? "Hunter" : "Crossbowman") + " need to be strong. But remember that you can't abuse that power and use it on a weakling. Please use your enormous power the right way, because... for you to use that the right way, that is much harden than just getting stronger. Please find me after you have advanced much further. I'll be waiting for you.")
          }
-      } else if (actionx["3thJobI"]) {
+      } else if (action["3thJobI"]) {
          if (status == 0) {
             if (cm.getPlayer().gotPartyQuestItem("JB3")) {
                cm.getPlayer().removePartyQuestItem("JB3")
@@ -196,7 +195,7 @@ class NPC1012100 {
             }
             cm.sendNextPrev("Since she is a clone of myself, you can expect a tough battle ahead. He uses a number of special attacking skills unlike any you have ever seen, and it is your task to successfully take him one on one. There is a time limit in the secret passage, so it is crucial that you defeat him within the time limit. I wish you the best of luck, and I hope you bring the #b#t4031059##k with you.")
          }
-      } else if (actionx["3thJobC"]) {
+      } else if (action["3thJobC"]) {
          cm.getPlayer().removePartyQuestItem("JBP")
          cm.gainItem(4031059, (short) -1)
          cm.gainItem(4031057, (short) 1)

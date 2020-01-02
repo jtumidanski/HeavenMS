@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client;
 
 import java.util.ArrayList;
@@ -24,21 +5,17 @@ import java.util.Collection;
 import java.util.List;
 import javax.persistence.EntityManager;
 
+import client.processor.MapleFamilyProcessor;
+import database.DatabaseConnection;
 import database.administrator.CharacterAdministrator;
 import database.administrator.FamilyCharacterAdministrator;
 import database.administrator.FamilyEntitlementAdministrator;
-import client.processor.MapleFamilyProcessor;
 import net.server.Server;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.packet.family.FamilyGainReputation;
 import tools.packet.family.GetFamilyInfo;
-
-/**
- * @author Ubaware
- */
 
 public class MapleFamilyEntry {
    private final int characterID;
@@ -185,8 +162,8 @@ public class MapleFamilyEntry {
       return true;
    }
 
-   private static boolean updateFamilyEntryDB(EntityManager con, int cid, int familyid) {
-      FamilyCharacterAdministrator.getInstance().setFamilyForCharacter(con, cid, familyid);
+   private static boolean updateFamilyEntryDB(EntityManager con, int cid, int familyId) {
+      FamilyCharacterAdministrator.getInstance().setFamilyForCharacter(con, cid, familyId);
       return true;
    }
 
@@ -361,17 +338,17 @@ public class MapleFamilyEntry {
       return false;
    }
 
-   private boolean updateDBChangeFamily(int cid, int familyid, int seniorid) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyid, seniorid)).orElse(false);
+   private boolean updateDBChangeFamily(int cid, int familyId, int seniorId) {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> updateDBChangeFamily(connection, cid, familyId, seniorId)).orElse(false);
    }
 
-   private boolean updateDBChangeFamily(EntityManager con, int cid, int familyid, int seniorid) {
-      FamilyCharacterAdministrator.getInstance().changeFamily(con, cid, familyid, seniorid);
-      return updateCharacterFamilyDB(con, cid, familyid, false);
+   private boolean updateDBChangeFamily(EntityManager con, int cid, int familyId, int seniorId) {
+      FamilyCharacterAdministrator.getInstance().changeFamily(con, cid, familyId, seniorId);
+      return updateCharacterFamilyDB(con, cid, familyId, false);
    }
 
-   private boolean updateCharacterFamilyDB(EntityManager con, int charid, int familyid, boolean fork) {
-      CharacterAdministrator.getInstance().setFamilyId(con, charid, familyid);
+   private boolean updateCharacterFamilyDB(EntityManager con, int characterId, int familyId, boolean fork) {
+      CharacterAdministrator.getInstance().setFamilyId(con, characterId, familyId);
       return true;
    }
 
@@ -412,12 +389,7 @@ public class MapleFamilyEntry {
    }
 
    public synchronized boolean isJunior(MapleFamilyEntry entry) { //require locking since result accuracy is vital
-      if (juniors[0] == entry) {
-         return true;
-      } else if (juniors[1] == entry) {
-         return true;
-      }
-      return false;
+      return juniors[0] == entry || juniors[1] == entry;
    }
 
    public synchronized boolean removeJunior(MapleFamilyEntry junior) {

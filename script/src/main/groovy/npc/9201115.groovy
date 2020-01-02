@@ -2,7 +2,6 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
-import server.life.MapleMonster
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -54,12 +53,10 @@ class NPC9201115 {
                cm.sendNext("Let our specially trained Master Guardians escort you!")
                MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Engarde! Master Guardians approach!")
                for (int i = 0; i < 10; i++) {
-                  MapleMonster mob = eim.getMonster(9400594)
-                  cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276))
+                  eim.getMonster(9400594).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276)) })
                }
                for (int i = 0; i < 20; i++) {
-                  MapleMonster mob = eim.getMonster(9400582)
-                  cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276))
+                  eim.getMonster(9400582).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276)) })
                }
                eim.setIntProperty("glpq6", 1)
                cm.dispose()
@@ -73,20 +70,16 @@ class NPC9201115 {
                   MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Twisted Masters approach!")
 
                   //Margana
-                  MapleMonster mob = eim.getMonster(9400590)
-                  cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-22, 1))
+                  eim.getMonster(9400590).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-22, 1)) })
 
                   //Red Nirg
-                  MapleMonster mob2 = eim.getMonster(9400591)
-                  cm.getMap().spawnMonsterOnGroundBelow(mob2, new Point(-22, 276))
+                  eim.getMonster(9400591).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-22, 276)) })
 
                   //Hsalf
-                  MapleMonster mob4 = eim.getMonster(9400593)
-                  cm.getMap().spawnMonsterOnGroundBelow(mob4, new Point(496, 276))
+                  eim.getMonster(9400593).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(496, 276)) })
 
                   //Rellik
-                  MapleMonster mob3 = eim.getMonster(9400592)
-                  cm.getMap().spawnMonsterOnGroundBelow(mob3, new Point(-496, 276))
+                  eim.getMonster(9400592).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-496, 276)) })
 
                   eim.setIntProperty("glpq6", 2)
                   cm.dispose()

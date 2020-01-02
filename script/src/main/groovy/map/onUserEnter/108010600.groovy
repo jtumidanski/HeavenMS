@@ -6,14 +6,13 @@ import server.maps.MapleMap
 import java.awt.*
 
 class Map108010600 {
-   int npcid = 1104100
+   int npcId = 1104100
    Point spawnPos = new Point(2830, 78)
 
    def start(MapScriptMethods ms) {
-      MapleMap mapobj = ms.getMap()
-
-      if (!mapobj.containsNPC(npcid)) {
-         ms.spawnNpc(npcid, spawnPos, mapobj)
+      MapleMap map = ms.getMap()
+      if (!map.containsNPC(npcId)) {
+         ms.spawnNpc(npcId, spawnPos, map)
       }
    }
 }

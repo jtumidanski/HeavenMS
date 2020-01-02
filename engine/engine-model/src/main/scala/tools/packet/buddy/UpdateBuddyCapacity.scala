@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class UpdateBuddyCapacity(private var _capacity: Int) extends PacketInput {
   def capacity: Int = _capacity
 
-  override def opcode(): SendOpcode = SendOpcode.BUDDYLIST
+  override def opcode(): SendOpcode = SendOpcode.BUDDY_LIST
 }

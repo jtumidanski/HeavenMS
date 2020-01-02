@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
@@ -14,9 +14,6 @@ import provider.MapleDataTool;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
 
-/**
- * @author Drago/Dragohe4rt
- */
 public class MapleCarnivalFactory {
 
    private final static MapleCarnivalFactory instance = new MapleCarnivalFactory();
@@ -66,7 +63,7 @@ public class MapleCarnivalFactory {
 
    public MCSkill getSkill(final int id) {
       MCSkill skill = skills.get(id);
-      if (skill != null && skill.skillid <= 0) {
+      if (skill != null && skill.skillId <= 0) {
          return randomizeSkill(skill.targetsAll);
       } else {
          return skill;
@@ -79,26 +76,26 @@ public class MapleCarnivalFactory {
 
    public static class MCSkill {
 
-      public int cpLoss, skillid, level;
+      public int cpLoss, skillId, level;
       public boolean targetsAll;
 
-      public MCSkill(int _cpLoss, int _skillid, int _level, boolean _targetsAll) {
+      public MCSkill(int _cpLoss, int _skillId, int _level, boolean _targetsAll) {
          cpLoss = _cpLoss;
-         skillid = _skillid;
+         skillId = _skillId;
          level = _level;
          targetsAll = _targetsAll;
       }
 
-      public static MobSkill getMobSkill(int skillid, int level) {
-         return MobSkillFactory.getMobSkill(skillid, level);
+      public static MobSkill getMobSkill(int skillId, int level) {
+         return MobSkillFactory.getMobSkill(skillId, level);
       }
 
       public MobSkill getSkill() {
-         return getMobSkill(skillid, level);
+         return getMobSkill(skillId, level);
       }
 
-      public MapleDisease getDisease() {
-         return MapleDisease.getBySkill(skillid);
+      public MapleAbnormalStatus getDisease() {
+         return MapleAbnormalStatus.getBySkill(skillId);
       }
    }
 }

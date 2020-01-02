@@ -73,7 +73,7 @@ class NPC9201004 {
          } else if (status == 1) {
             switch (selection) {
                case 0:
-                  cm.sendOk("The #bengagement process#k is as straightforward as it can be. Starting from a prequest from the #bring maker, #p9201000##k, gather #b#t4031367#'s#k thoughout the Maple world.\r\n\r\nCompleting it, you will be able to craft an engagement ring. With one in hands, declare yourself to someone you become fond of, and hope that person feels the same way.")
+                  cm.sendOk("The #bengagement process#k is as straightforward as it can be. Starting from a pre-quest from the #bring maker, #p9201000##k, gather #b#t4031367#'s#k throughout the Maple world.\r\n\r\nCompleting it, you will be able to craft an engagement ring. With one in hands, declare yourself to someone you become fond of, and hope that person feels the same way.")
                   cm.dispose()
                   break
 
@@ -90,13 +90,13 @@ class NPC9201004 {
                case 3:
                   ringObj = cm.getPlayer().getMarriageRing()
                   if (ringObj == null) {
-                     Object itemid = getWeddingRingItemId(cm.getPlayer())
+                     Object itemId = getWeddingRingItemId(cm.getPlayer())
 
-                     if (itemid != null) {
+                     if (itemId != null) {
                         cm.sendOk("There you go, I've removed your old wedding ring.")
-                        cm.gainItem((int) itemid, (short) -1)
+                        cm.gainItem((int) itemId, (short) -1)
                      } else if (hasEquippedWeddingRing(cm.getPlayer())) {
-                        cm.sendOk("If you want your old wedding ring removed, please unequip it before talking to me.")
+                        cm.sendOk("If you want your old wedding ring removed, please take off the ring before talking to me.")
                      } else {
                         cm.sendOk("You're not married to require a divorce from it.")
                      }
@@ -105,7 +105,7 @@ class NPC9201004 {
                      return
                   }
 
-                  cm.sendYesNo("So, you want to divorce from your partner? Be sure, this process #bcannot be rollbacked#k by any means, it's supposed to be an ultimatum from which your ring will be destroyed as consequence. That said, do you #rreally want to divorce#k?")
+                  cm.sendYesNo("So, you want to divorce from your partner? Be sure, this process #bcannot be rolled back#k by any means, it's supposed to be an ultimatum from which your ring will be destroyed as consequence. That said, do you #rreally want to divorce#k?")
                   break
             }
          } else if (status == 2) {
@@ -114,7 +114,7 @@ class NPC9201004 {
                cm.dispose()
                return
             } else if (ringObj.isEquipped()) {
-               cm.sendOk("Please unequip your ring before trying to divorce.")
+               cm.sendOk("Please take off your ring before trying to divorce.")
                cm.dispose()
                return
             }

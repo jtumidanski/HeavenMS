@@ -10,7 +10,7 @@ import scripting.npc.NPCConversationManager
 */
 
 
-class NPCchangeName {
+class NpcChangeName {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -55,12 +55,12 @@ class NPCchangeName {
    }
 }
 
-NPCchangeName getNPC() {
+NpcChangeName getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCchangeName(cm: cm))
+      getBinding().setVariable("npc", new NpcChangeName(cm: cm))
    }
-   return (NPCchangeName) getBinding().getVariable("npc")
+   return (NpcChangeName) getBinding().getVariable("npc")
 }
 
 def start() {

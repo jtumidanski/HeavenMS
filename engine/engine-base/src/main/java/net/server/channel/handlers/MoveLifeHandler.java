@@ -1,24 +1,3 @@
-/*
-    This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-               Matthias Butz <matze@odinms.de>
-               Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.awt.Point;
@@ -47,14 +26,6 @@ import tools.packet.PacketInput;
 import tools.packet.movement.MoveMonster;
 import tools.packet.movement.MoveMonsterResponse;
 
-//import server.life.MobAttackInfo;
-//import server.life.MobAttackInfoFactory;
-
-/**
- * @author Danny (Leifde)
- * @author ExtremeDevilz
- * @author Ronan (HeavenMS)
- */
 public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
    @Override
    public Class<? extends PacketReader<MoveLifePacket>> getReaderClass() {
@@ -75,7 +46,6 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
       MapleMap map = player.getMap();
 
       if (player.isChangingMaps()) {
-         // thanks Lame for noticing mob movement shuffle (mob OID on different maps) happening on map transitions
          return;
       }
 
@@ -146,8 +116,6 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
             nextUse = MobSkillFactory.getMobSkill(nextSkillId, nextSkillLevel);
 
             if (!(nextUse != null && monster.canUseSkill(nextUse, false) && nextUse.hp() >= (int) (((float) monster.getHp() / monster.getMaxHp()) * 100) && mobMp >= nextUse.mpCon())) {
-               // thanks OishiiKawaiiDesu for noticing mobs trying to cast skills they are not supposed to be able
-
                nextSkillId = 0;
                nextSkillLevel = 0;
                nextUse = null;
@@ -173,7 +141,7 @@ public final class MoveLifeHandler extends AbstractMoveHandler<MoveLifePacket> {
 
       if (packet.hasMovement()) {
          if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_MVLIFE) {
-            System.out.println((isSkill ? "SKILL " : (isAttack ? "ATTCK " : " ")) + "castPos: " + castPos + " rawAct: " + rawActivity + " opt: " + pOption + " skillID: " + useSkillId + " skillLV: " + useSkillLevel + " " + "allowSkill: " + nextMovementCouldBeSkill + " mobMp: " + mobMp);
+            System.out.println((isSkill ? "SKILL " : (isAttack ? "ATTACK " : " ")) + "castPos: " + castPos + " rawAct: " + rawActivity + " opt: " + pOption + " skillID: " + useSkillId + " skillLV: " + useSkillLevel + " " + "allowSkill: " + nextMovementCouldBeSkill + " mobMp: " + mobMp);
          }
          PacketInput movePacket = new MoveMonster(packet.objectId(), nextMovementCouldBeSkill, rawActivity, useSkillId, useSkillLevel, pOption, startPos, packet.movementList());
          MasterBroadcaster.getInstance().sendToAllInMapRange(map, movePacket, player, serverStartPos);

@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command.commands.gm3;
 
 import client.MapleBuffStat;
@@ -39,16 +16,16 @@ public class CheckDmgCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
-         int maxBase = victim.calculateMaxBaseDamage(victim.getTotalWatk());
-         Integer watkBuff = victim.getBuffedValue(MapleBuffStat.WATK);
-         Integer matkBuff = victim.getBuffedValue(MapleBuffStat.MATK);
+         int maxBase = victim.calculateMaxBaseDamage(victim.getTotalWeaponAttack());
+         Integer weaponAttackBuff = victim.getBuffedValue(MapleBuffStat.WEAPON_ATTACK);
+         Integer magicAttackBuff = victim.getBuffedValue(MapleBuffStat.MAGIC_ATTACK);
          int blessing = victim.getSkillLevel(10000000 * player.getJobType() + 12);
-         if (watkBuff == null) watkBuff = 0;
-         if (matkBuff == null) matkBuff = 0;
+         if (weaponAttackBuff == null) weaponAttackBuff = 0;
+         if (magicAttackBuff == null) magicAttackBuff = 0;
 
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Cur Str: " + victim.getTotalStr() + " Cur Dex: " + victim.getTotalDex() + " Cur Int: " + victim.getTotalInt() + " Cur Luk: " + victim.getTotalLuk());
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Cur WATK: " + victim.getTotalWatk() + " Cur MATK: " + victim.getTotalMagic());
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Cur WATK Buff: " + watkBuff + " Cur MATK Buff: " + matkBuff + " Cur Blessing Level: " + blessing);
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Cur WATK: " + victim.getTotalWeaponAttack() + " Cur MATK: " + victim.getTotalMagic());
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Cur WATK Buff: " + weaponAttackBuff + " Cur MATK Buff: " + magicAttackBuff + " Cur Blessing Level: " + blessing);
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + "'s maximum base damage (before skills) is " + maxBase);
       }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world."));
    }

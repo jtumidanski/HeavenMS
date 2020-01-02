@@ -26,9 +26,9 @@ class Quest21746 {
          if (status == 0) {
             qm.sendNext("If you want to know more about the Seal Rock of Mu Lung, you will need to pass my test. Prove your valor overpowering me in melee combat, only then I shall recognize you as a worthy knight.")
          } else {
-            MapleMap mapobj = qm.getWarpMap(925040001)
-            if (mapobj.countPlayers() == 0) {
-               mapobj.resetPQ(1)
+            MapleMap map = qm.getWarpMap(925040001)
+            if (map.countPlayers() == 0) {
+               map.resetPQ(1)
 
                qm.warp(925040001, 0)
                qm.forceStartQuest()

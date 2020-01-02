@@ -24,7 +24,7 @@ class NPC9000020 {
    String[] travelAgent = ["I", "#r#p9201135##k"]
    String[] travelDescription = ["If you desire to feel the essence of Japan, there's nothing like visiting the Shrine, a Japanese cultural melting pot. Mushroom Shrine is a mythical place that serves the incomparable Mushroom God from ancient times.",
                                  "If you desire to feel the heat of the tropics on an upbeat environment, the residents of Malaysia are eager to welcome you. Also, the metropolis itself is the heart of the local economy, that place is known to always offer something to do or to visit around."]
-   String[] travelDescription2 = ["Check out the female shaman serving the Mushroom God, and I strongly recommend trying Takoyaki, Yakisoba, and other delocious food sold in the streets of Japan. Now, let's head over to #bMushroom Shrine#k, a mythical place if there ever was one.",
+   String[] travelDescription2 = ["Check out the female shaman serving the Mushroom God, and I strongly recommend trying Takoyaki, Yakisoba, and other delicious food sold in the streets of Japan. Now, let's head over to #bMushroom Shrine#k, a mythical place if there ever was one.",
                                   "Once there, I strongly suggest you to schedule a visit to Kampung Village. Why? Surely you've come to know about the fantasy theme park Spooky World? No? It's simply put the greatest theme park around there, it's worth a visit! Now, let's head over to the #bTrend Zone of Malaysia#k."]
    int travelType
    int travelStatus
@@ -34,9 +34,9 @@ class NPC9000020 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   def getTravelingStatus(int mapid) {
+   def getTravelingStatus(int mapId) {
       for (int i = 0; i < travelMap.length; i++) {
-         if (mapid == travelMap[i]) {
+         if (mapId == travelMap[i]) {
             return i
          }
       }
@@ -44,9 +44,9 @@ class NPC9000020 {
       return -1
    }
 
-   def getTravelType(int mapid) {
+   def getTravelType(int mapId) {
       for (int i = 0; i < travelFrom.length; i++) {
-         if (mapid == travelFrom[i]) {
+         if (mapId == travelFrom[i]) {
             return i
          }
       }

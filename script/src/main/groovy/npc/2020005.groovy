@@ -16,7 +16,7 @@ class NPC2020005 {
    int selected = -1
 
    int amount
-   int totalcost
+   int totalCost
    int[] item = [2050003, 2050004, 4006000, 4006001]
    int[] cost = [300, 400, 5000, 5000]
    String[] msg = ["that cures the state of being sealed and cursed", "that cures all", ", possessing magical power, that is used for high-quality skills", ", possessing the power of summoning that is used for high-quality skills"]
@@ -54,19 +54,19 @@ class NPC2020005 {
          cm.sendGetNumber("Is #b#t" + item[selected] + "##k really the item that you need? It's the item " + msg[selected] + ". It may not be the easiest item to acquire, but I'll give you a good deal on it. It'll cost you #b" + cost[selected] + " mesos#k per item. How many would you like to purchase?", 0, 1, 100)
       } else if (status == 2) {
          amount = selection
-         totalcost = cost[selected] * amount
+         totalCost = cost[selected] * amount
          if (amount == 0) {
             cm.sendOk("If you're not going to buy anything, then I've got nothing to sell neither.")
             cm.dispose()
          }
-         cm.sendYesNo("Are you sure you want to buy #r" + amount + " #t" + item[selected] + "(s)##k? It'll cost you " + cost[selected] + " mesos per #t" + item[selected] + "#, which will cost you #r" + totalcost + " mesos#k in total.")
+         cm.sendYesNo("Are you sure you want to buy #r" + amount + " #t" + item[selected] + "(s)##k? It'll cost you " + cost[selected] + " mesos per #t" + item[selected] + "#, which will cost you #r" + totalCost + " mesos#k in total.")
       } else if (status == 3) {
-         if (cm.getMeso() < totalcost || !cm.canHold(item[selected])) {
-            cm.sendNext("Are you sure you have enough mesos? Please check and see if your etc. or use inventory is full, or if you have at least #r" + totalcost + "#k mesos.")
+         if (cm.getMeso() < totalCost || !cm.canHold(item[selected])) {
+            cm.sendNext("Are you sure you have enough mesos? Please check and see if your etc. or use inventory is full, or if you have at least #r" + totalCost + "#k mesos.")
             cm.dispose()
          }
          cm.sendNext("Thank you. If you ever find yourself needing items down the road, make sure to drop by here. I may have gotten old over the years, but I can still make magic items with ease.")
-         cm.gainMeso(-totalcost)
+         cm.gainMeso(-totalCost)
          cm.gainItem(item[selected], (short) amount)
          cm.dispose()
       }

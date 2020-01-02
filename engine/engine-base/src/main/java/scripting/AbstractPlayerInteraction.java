@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package scripting;
 
 import java.awt.Point;
@@ -28,6 +7,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -148,11 +128,11 @@ public class AbstractPlayerInteraction {
    }
 
    private int getMarketPortalId(MapleMap map) {
-      return (map.findMarketPortal() != null) ? map.findMarketPortal().getId() : map.getRandomPlayerSpawnpoint().getId();
+      return (map.findMarketPortal() != null) ? map.findMarketPortal().getId() : map.getRandomPlayerSpawnPoint().getId();
    }
 
-   public void warp(int mapid) {
-      getPlayer().changeMap(mapid);
+   public void warp(int mapId) {
+      getPlayer().changeMap(mapId);
    }
 
    public void warp(int map, int portal) {
@@ -172,8 +152,8 @@ public class AbstractPlayerInteraction {
    }
 
    public void warpParty(int id, int portalId) {
-      int mapid = getMapId();
-      warpParty(id, portalId, mapid, mapid);
+      int mapId = getMapId();
+      warpParty(id, portalId, mapId, mapId);
    }
 
    public void warpParty(int id, int fromMinId, int fromMaxId) {
@@ -182,7 +162,7 @@ public class AbstractPlayerInteraction {
 
    public void warpParty(int id, int portalId, int fromMinId, int fromMaxId) {
       for (MapleCharacter mc : this.getPlayer().getPartyMembersOnline()) {
-         if (mc.isLoggedinWorld()) {
+         if (mc.isLoggedInWorld()) {
             if (mc.getMapId() >= fromMinId && mc.getMapId() <= fromMaxId) {
                mc.changeMap(id, portalId);
             }
@@ -206,8 +186,8 @@ public class AbstractPlayerInteraction {
       return getPlayer().getMap().countMonsters();
    }
 
-   public void resetMapObjects(int mapid) {
-      getWarpMap(mapid).resetMapObjects();
+   public void resetMapObjects(int mapId) {
+      getWarpMap(mapId).resetMapObjects();
    }
 
    public EventManager getEventManager(String event) {
@@ -226,79 +206,73 @@ public class AbstractPlayerInteraction {
       return getPlayer().getInventory(type);
    }
 
-   public boolean hasItem(int itemid) {
-      return haveItem(itemid, 1);
+   public boolean hasItem(int itemId) {
+      return haveItem(itemId, 1);
    }
 
-   public boolean hasItem(int itemid, int quantity) {
-      return haveItem(itemid, quantity);
+   public boolean hasItem(int itemId, int quantity) {
+      return haveItem(itemId, quantity);
    }
 
-   public boolean haveItem(int itemid) {
-      return haveItem(itemid, 1);
+   public boolean haveItem(int itemId) {
+      return haveItem(itemId, 1);
    }
 
-   public boolean haveItem(int itemid, int quantity) {
-      return getPlayer().getItemQuantity(itemid, false) >= quantity;
+   public boolean haveItem(int itemId, int quantity) {
+      return getPlayer().getItemQuantity(itemId, false) >= quantity;
    }
 
-   public int getItemQuantity(int itemid) {
-      return getPlayer().getItemQuantity(itemid, false);
+   public int getItemQuantity(int itemId) {
+      return getPlayer().getItemQuantity(itemId, false);
    }
 
-   public boolean haveItemWithId(int itemid) {
-      return haveItemWithId(itemid, false);
+   public boolean haveItemWithId(int itemId) {
+      return haveItemWithId(itemId, false);
    }
 
-   public boolean haveItemWithId(int itemid, boolean checkEquipped) {
-      return getPlayer().haveItemWithId(itemid, checkEquipped);
+   public boolean haveItemWithId(int itemId, boolean checkEquipped) {
+      return getPlayer().haveItemWithId(itemId, checkEquipped);
    }
 
-   public boolean canHold(int itemid) {
-      return canHold(itemid, 1);
+   public boolean canHold(int itemId) {
+      return canHold(itemId, 1);
    }
 
-   public boolean canHold(int itemid, int quantity) {
-      return canHoldAll(Collections.singletonList(itemid), Collections.singletonList(quantity), true);
+   public boolean canHold(int itemId, int quantity) {
+      return canHoldAll(Collections.singletonList(itemId), Collections.singletonList(quantity), true);
    }
 
-   public boolean canHold(int itemid, int quantity, int removeItemid, int removeQuantity) {
-      return canHoldAllAfterRemoving(Collections.singletonList(itemid), Collections.singletonList(quantity), Collections.singletonList(removeItemid), Collections.singletonList(removeQuantity));
+   public boolean canHold(int itemId, int quantity, int removeItemId, int removeQuantity) {
+      return canHoldAllAfterRemoving(Collections.singletonList(itemId), Collections.singletonList(quantity), Collections.singletonList(removeItemId), Collections.singletonList(removeQuantity));
    }
 
    private List<Integer> convertToIntegerArray(List<Object> list) {
-      List<Integer> intList = new ArrayList<>();      // JAVA 7 Rhino script engine. Thanks Bruno, felipepm10 for noticing a typecast issue here.
-
-      for (Object d : list) {
-         intList.add((Integer) d);
-      }
-
-      return intList;
+      return list.stream().map(object -> (Integer)object).collect(Collectors.toList());
    }
 
-   public boolean canHoldAll(List<Object> itemids) {
+   public boolean canHoldAll(List<Object> itemIds) {
       List<Object> quantity = new LinkedList<>();
 
       Integer intOne = 1;
 
-      for (int i = 0; i < itemids.size(); i++) {
+      for (int i = 0; i < itemIds.size(); i++) {
          quantity.add(intOne);
       }
 
-      return canHoldAll(itemids, quantity);
+      return canHoldAll(itemIds, quantity);
    }
 
-   public boolean canHoldAll(List<Object> itemids, List<Object> quantity) {
-      return canHoldAll(convertToIntegerArray(itemids), convertToIntegerArray(quantity), true);
+   public boolean canHoldAll(List<Object> itemIds, List<Object> quantity) {
+      return canHoldAll(convertToIntegerArray(itemIds), convertToIntegerArray(quantity), true);
    }
 
-   private boolean canHoldAll(List<Integer> itemids, List<Integer> quantity, boolean isInteger) {
-      int size = Math.min(itemids.size(), quantity.size());
+   private boolean canHoldAll(List<Integer> itemIds, List<Integer> quantity, boolean isInteger) {
+      int size = Math.min(itemIds.size(), quantity.size());
 
       List<Pair<Item, MapleInventoryType>> addedItems = new LinkedList<>();
       for (int i = 0; i < size; i++) {
-         Item it = new Item(itemids.get(i), (short) 0, quantity.get(i).shortValue());
-         addedItems.add(new Pair<>(it, ItemConstants.getInventoryType(itemids.get(i))));
+         Item it = new Item(itemIds.get(i), (short) 0, quantity.get(i).shortValue());
+         addedItems.add(new Pair<>(it, ItemConstants.getInventoryType(itemIds.get(i))));
       }
 
       return MapleInventory.checkSpots(c.getPlayer(), addedItems, false);
@@ -308,14 +282,14 @@ public class AbstractPlayerInteraction {
       List<Pair<Item, MapleInventoryType>> addedItems = new LinkedList<>();
       for (Pair<Integer, Integer> p : items) {
          Item it = new Item(p.getLeft(), (short) 0, p.getRight().shortValue());
-         addedItems.add(new Pair<>(it, MapleInventoryType.CANHOLD));
+         addedItems.add(new Pair<>(it, MapleInventoryType.CAN_HOLD));
       }
 
       return addedItems;
    }
 
-   private List<List<Pair<Integer, Integer>>> prepareInventoryItemList(List<Integer> itemids, List<Integer> quantity) {
-      int size = Math.min(itemids.size(), quantity.size());
+   private List<List<Pair<Integer, Integer>>> prepareInventoryItemList(List<Integer> itemIds, List<Integer> quantity) {
+      int size = Math.min(itemIds.size(), quantity.size());
 
       List<List<Pair<Integer, Integer>>> invList = new ArrayList<>(6);
       for (int i = MapleInventoryType.UNDEFINED.getType(); i < MapleInventoryType.CASH.getType(); i++) {
@@ -323,18 +297,18 @@ public class AbstractPlayerInteraction {
       }
 
       for (int i = 0; i < size; i++) {
-         int itemid = itemids.get(i);
-         invList.get(ItemConstants.getInventoryType(itemid).getType()).add(new Pair<>(itemid, quantity.get(i)));
+         int itemId = itemIds.get(i);
+         invList.get(ItemConstants.getInventoryType(itemId).getType()).add(new Pair<>(itemId, quantity.get(i)));
       }
 
       return invList;
    }
 
-   public boolean canHoldAllAfterRemoving(List<Integer> toAddItemids, List<Integer> toAddQuantity, List<Integer> toRemoveItemids, List<Integer> toRemoveQuantity) {
-      List<List<Pair<Integer, Integer>>> toAddItemList = prepareInventoryItemList(toAddItemids, toAddQuantity);
-      List<List<Pair<Integer, Integer>>> toRemoveItemList = prepareInventoryItemList(toRemoveItemids, toRemoveQuantity);
+   public boolean canHoldAllAfterRemoving(List<Integer> toAddItemIds, List<Integer> toAddQuantity, List<Integer> toRemoveItemIds, List<Integer> toRemoveQuantity) {
+      List<List<Pair<Integer, Integer>>> toAddItemList = prepareInventoryItemList(toAddItemIds, toAddQuantity);
+      List<List<Pair<Integer, Integer>>> toRemoveItemList = prepareInventoryItemList(toRemoveItemIds, toRemoveQuantity);
 
-      MapleInventoryProof prfInv = (MapleInventoryProof) this.getInventory(MapleInventoryType.CANHOLD);
+      MapleInventoryProof prfInv = (MapleInventoryProof) this.getInventory(MapleInventoryType.CAN_HOLD);
       prfInv.lockInventory();
       try {
          for (int i = MapleInventoryType.EQUIP.getType(); i < MapleInventoryType.CASH.getType(); i++) {
@@ -347,7 +321,7 @@ public class AbstractPlayerInteraction {
                prfInv.cloneContents(inv);
 
                for (Pair<Integer, Integer> p : toRemove) {
-                  MapleInventoryManipulator.removeById(c, MapleInventoryType.CANHOLD, p.getLeft(), p.getRight(), false, false);
+                  MapleInventoryManipulator.removeById(c, MapleInventoryType.CAN_HOLD, p.getLeft(), p.getRight(), false, false);
                }
 
                List<Pair<Item, MapleInventoryType>> addItems = prepareProofInventoryItems(toAdd);
@@ -378,18 +352,18 @@ public class AbstractPlayerInteraction {
 
    //---- /\ /\ /\ /\ /\ /\ /\  NOT TESTED  /\ /\ /\ /\ /\ /\ /\ /\ /\ ----
 
-   public void openNpc(int npcid) {
-      openNpc(npcid, null);
+   public void openNpc(int npcId) {
+      openNpc(npcId, null);
    }
 
-   public void openNpc(int npcid, String script) {
+   public void openNpc(int npcId, String script) {
       if (c.getCM() != null) {
          return;
       }
 
       c.removeClickedNPC();
       NPCScriptManager.getInstance().dispose(c);
-      NPCScriptManager.getInstance().start(c, npcid, script, null);
+      NPCScriptManager.getInstance().start(c, npcId, script, null);
    }
 
    public int getQuestStatus(int id) {
@@ -868,10 +842,10 @@ public class AbstractPlayerInteraction {
       for (MapleCharacter chr : party) {
          MapleInventoryType type = ItemConstants.getInventoryType(id);
          MapleInventory iv = chr.getInventory(type);
-         int possesed = iv.countById(id);
-         if (possesed > 0) {
-            MapleInventoryManipulator.removeById(c, ItemConstants.getInventoryType(id), id, possesed, true, false);
-            PacketCreator.announce(chr, new ShowItemGainInChat(id, (short) -possesed));
+         int possessed = iv.countById(id);
+         if (possessed > 0) {
+            MapleInventoryManipulator.removeById(c, ItemConstants.getInventoryType(id), id, possessed, true, false);
+            PacketCreator.announce(chr, new ShowItemGainInChat(id, (short) -possessed));
          }
       }
    }
@@ -900,8 +874,8 @@ public class AbstractPlayerInteraction {
       return c.getPlayer().getMap().getId();
    }
 
-   public int getPlayerCount(int mapid) {
-      return c.getChannelServer().getMapFactory().getMap(mapid).getCharacters().size();
+   public int getPlayerCount(int mapId) {
+      return c.getChannelServer().getMapFactory().getMap(mapId).getCharacters().size();
    }
 
    public void showInstruction(String msg, int width, int height) {
@@ -909,7 +883,7 @@ public class AbstractPlayerInteraction {
       PacketCreator.announce(c, new EnableActions());
    }
 
-   public void disableMinimap() {
+   public void disableMiniMap() {
       PacketCreator.announce(c, new DisableMiniMap());
    }
 
@@ -917,11 +891,11 @@ public class AbstractPlayerInteraction {
       return c.getPlayer().getMap().isAllReactorState(reactorId, state);
    }
 
-   public void resetMap(int mapid) {
-      getMap(mapid).resetReactors();
-      getMap(mapid).killAllMonsters();
-      for (MapleMapObject i : getMap(mapid).getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
-         getMap(mapid).removeMapObject(i);
+   public void resetMap(int mapId) {
+      getMap(mapId).resetReactors();
+      getMap(mapId).killAllMonsters();
+      for (MapleMapObject i : getMap(mapId).getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.ITEM))) {
+         getMap(mapId).removeMapObject(i);
          MasterBroadcaster.getInstance().sendToAllInMap(getMap(), new RemoveItem(i.objectId(), 0, c.getPlayer().getId()));
       }
    }
@@ -935,19 +909,19 @@ public class AbstractPlayerInteraction {
       getPlayer().cancelEffect(MapleItemInformationProvider.getInstance().getItemEffect(id), false, -1);
    }
 
-   public void teachSkill(int skillid, byte level, byte masterLevel, long expiration) {
-      teachSkill(skillid, level, masterLevel, expiration, false);
+   public void teachSkill(int skillId, byte level, byte masterLevel, long expiration) {
+      teachSkill(skillId, level, masterLevel, expiration, false);
    }
 
-   public void teachSkill(int skillid, byte level, byte masterLevel, long expiration, boolean force) {
-      SkillFactory.getSkill(skillid).ifPresent(skill -> {
+   public void teachSkill(int skillId, byte level, byte masterLevel, long expiration, boolean force) {
+      SkillFactory.getSkill(skillId).ifPresent(skill -> {
          SkillEntry skillEntry = getPlayer().getSkills().get(skill);
          if (skillEntry != null) {
             if (!force && level > -1) {
                getPlayer().changeSkillLevel(skill, (byte) Math.max(skillEntry.skillLevel(), level), Math.max(skillEntry.masterLevel(), masterLevel), expiration == -1 ? -1 : Math.max(skillEntry.expiration(), expiration));
                return;
             }
-         } else if (GameConstants.isAranSkills(skillid)) {
+         } else if (GameConstants.isAranSkills(skillId)) {
             PacketCreator.announce(c, new ShowInfo("Effect/BasicEff.img/AranGetSkill"));
          }
 
@@ -960,12 +934,12 @@ public class AbstractPlayerInteraction {
       MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, tempItem.quantity(), false, false);
    }
 
-   public void gainAndEquip(int itemid, short slot) {
+   public void gainAndEquip(int itemId, short slot) {
       final Item old = c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).getItem(slot);
       if (old != null) {
          MapleInventoryManipulator.removeFromSlot(c, MapleInventoryType.EQUIPPED, slot, old.quantity(), false, false);
       }
-      final Item newItem = MapleItemInformationProvider.getInstance().getEquipById(itemid);
+      final Item newItem = MapleItemInformationProvider.getInstance().getEquipById(itemId);
       newItem.position_(slot);
       c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).addItemFromDB(newItem);
       PacketCreator.announce(c, new ModifyInventoryPacket(false, Collections.singletonList(new ModifyInventory(0, newItem))));
@@ -985,12 +959,13 @@ public class AbstractPlayerInteraction {
    }
 
    public void spawnMonster(int id, int x, int y) {
-      MapleMonster monster = MapleLifeFactory.getMonster(id);
-      monster.position_$eq(new Point(x, y));
-      getPlayer().getMap().spawnMonster(monster);
+      MapleLifeFactory.getMonster(id).ifPresent(monster -> {
+         monster.position_$eq(new Point(x, y));
+         getPlayer().getMap().spawnMonster(monster);
+      });
    }
 
-   public MapleMonster getMonsterLifeFactory(int mid) {
+   public Optional<MapleMonster> getMonsterLifeFactory(int mid) {
       return MapleLifeFactory.getMonster(mid);
    }
 
@@ -1019,9 +994,7 @@ public class AbstractPlayerInteraction {
    }
 
    public void resetPartyDojoEnergy() {
-      for (MapleCharacter pchr : c.getPlayer().getPartyMembersOnSameMap()) {
-         pchr.setDojoEnergy(0);
-      }
+      c.getPlayer().getPartyMembersOnSameMap().forEach(character -> character.setDojoEnergy(0));
    }
 
    public void enableActions() {
@@ -1097,23 +1070,23 @@ public class AbstractPlayerInteraction {
 
    public int createExpedition(MapleExpeditionType type, boolean silent, int minPlayers, int maxPlayers) {
       MapleCharacter player = getPlayer();
-      MapleExpedition exped = new MapleExpedition(player, type, silent, minPlayers, maxPlayers);
+      MapleExpedition expedition = new MapleExpedition(player, type, silent, minPlayers, maxPlayers);
 
       int channel = player.getMap().getChannelServer().getId();
-      if (!MapleExpeditionBossLog.attemptBoss(player.getId(), channel, exped, false)) {    // thanks Conrad for noticing missing expeditions entry limit
+      if (!MapleExpeditionBossLog.attemptBoss(player.getId(), channel, expedition, false)) {
          return 1;
       }
 
-      if (exped.addChannelExpedition(player.getClient().getChannelServer())) {
+      if (expedition.addChannelExpedition(player.getClient().getChannelServer())) {
          return 0;
       } else {
          return -1;
       }
    }
 
-   public void endExpedition(MapleExpedition exped) {
-      exped.dispose(true);
-      exped.removeChannelExpedition(getPlayer().getClient().getChannelServer());
+   public void endExpedition(MapleExpedition expedition) {
+      expedition.dispose(true);
+      expedition.removeChannelExpedition(getPlayer().getClient().getChannelServer());
    }
 
    public MapleExpedition getExpedition(MapleExpeditionType type) {
@@ -1122,16 +1095,16 @@ public class AbstractPlayerInteraction {
 
    public String getExpeditionMemberNames(MapleExpeditionType type) {
       StringBuilder members = new StringBuilder();
-      MapleExpedition exped = getExpedition(type);
-      for (String memberName : exped.getMembers().values()) {
+      MapleExpedition expedition = getExpedition(type);
+      for (String memberName : expedition.getMembers().values()) {
          members.append(memberName).append(", ");
       }
       return members.toString();
    }
 
    public boolean isLeaderExpedition(MapleExpeditionType type) {
-      MapleExpedition exped = getExpedition(type);
-      return exped.isLeader(getPlayer());
+      MapleExpedition expedition = getExpedition(type);
+      return expedition.isLeader(getPlayer());
    }
 
    public long getJailTimeLeft() {
@@ -1157,8 +1130,8 @@ public class AbstractPlayerInteraction {
       return MapleMarriage.loadGiftItemsFromDb(this.getClient(), this.getPlayer().getId());
    }
 
-   public boolean startDungeonInstance(int dungeonid) {
-      return c.getChannelServer().addMiniDungeon(dungeonid);
+   public boolean startDungeonInstance(int dungeonId) {
+      return c.getChannelServer().addMiniDungeon(dungeonId);
    }
 
    public boolean canGetFirstJob(int jobType) {
@@ -1206,8 +1179,8 @@ public class AbstractPlayerInteraction {
       return null;
    }
 
-   public void npcTalk(int npcid, String message) {
-      PacketCreator.announce(c, new GetNPCTalk(npcid, (byte) 0, message, "00 00", (byte) 0));
+   public void npcTalk(int npcId, String message) {
+      PacketCreator.announce(c, new GetNPCTalk(npcId, (byte) 0, message, "00 00", (byte) 0));
    }
 
    public long getCurrentTime() {

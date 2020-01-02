@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.coordinator.matchchecker.listener;
 
 import java.util.Collections;
@@ -35,19 +16,16 @@ import scripting.npc.NPCScriptManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-/**
- * @author Ronan
- */
 public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
 
    public static AbstractMatchCheckerListener loadListener() {
       return (new MatchCheckerCPQChallenge()).getListener();
    }
 
-   private static MapleCharacter getChallenger(int leaderid, Set<MapleCharacter> matchPlayers) {
+   private static MapleCharacter getChallenger(int leaderId, Set<MapleCharacter> matchPlayers) {
       MapleCharacter leader = null;
       for (MapleCharacter chr : matchPlayers) {
-         if (chr.getId() == leaderid && chr.getClient() != null) {
+         if (chr.getId() == leaderId && chr.getClient() != null) {
             leader = chr;
             break;
          }
@@ -63,7 +41,7 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
          @Override
          public void onMatchCreated(MapleCharacter leader, Set<MapleCharacter> nonLeaderMatchPlayers, String message) {
             NPCConversationManager cm = leader.getClient().getCM();
-            int npcid = cm.getNpc();
+            int npcId = cm.getNpc();
 
             MapleCharacter ldr = null;
             for (MapleCharacter chr : nonLeaderMatchPlayers) {
@@ -77,17 +55,17 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                   .collect(Collectors.toList());
 
             if (message.contentEquals("cpq1")) {
-               NPCScriptManager.getInstance().start("cpqchallenge", ldr.getClient(), npcid, chrMembers);
+               NPCScriptManager.getInstance().start("cpqchallenge", ldr.getClient(), npcId, chrMembers);
             } else {
-               NPCScriptManager.getInstance().start("cpqchallenge2", ldr.getClient(), npcid, chrMembers);
+               NPCScriptManager.getInstance().start("cpqchallenge2", ldr.getClient(), npcId, chrMembers);
             }
 
             cm.sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomSent));
          }
 
          @Override
-         public void onMatchAccepted(int leaderid, Set<MapleCharacter> matchPlayers, String message) {
-            MapleCharacter chr = getChallenger(leaderid, matchPlayers);
+         public void onMatchAccepted(int leaderId, Set<MapleCharacter> matchPlayers, String message) {
+            MapleCharacter chr = getChallenger(leaderId, matchPlayers);
 
             MapleCharacter ldr = null;
             for (MapleCharacter ch : matchPlayers) {
@@ -111,13 +89,13 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
          }
 
          @Override
-         public void onMatchDeclined(int leaderid, Set<MapleCharacter> matchPlayers, String message) {
-            MapleCharacter chr = getChallenger(leaderid, matchPlayers);
+         public void onMatchDeclined(int leaderId, Set<MapleCharacter> matchPlayers, String message) {
+            MapleCharacter chr = getChallenger(leaderId, matchPlayers);
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQChallengeRoomDenied));
          }
 
          @Override
-         public void onMatchDismissed(int leaderid, Set<MapleCharacter> matchPlayers, String message) {
+         public void onMatchDismissed(int leaderId, Set<MapleCharacter> matchPlayers, String message) {
          }
       };
    }

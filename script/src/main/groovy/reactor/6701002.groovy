@@ -1,23 +1,19 @@
 package reactor
 
-
 import scripting.reactor.ReactorActionManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
-
 
 class Reactor6701002 {
    ReactorActionManager rm
 
    def act() {
       int startId = 9400523
-      MapleMonster mobObj
       MapleMap mapObj = rm.getMap()
 
-      for (int i = 0; i < 7; i++ ) {
-         mobObj = MapleLifeFactory.getMonster(startId + Math.floor(Math.random() * 3).intValue())
-         mapObj.spawnMonsterOnGroundBelow(mobObj, rm.getReactor().position())
+      for (int i = 0; i < 7; i++) {
+         int monsterId = startId + Math.floor(Math.random() * 3).intValue()
+         MapleLifeFactory.getMonster(monsterId).ifPresent({ monster -> mapObj.spawnMonsterOnGroundBelow(monster, rm.getReactor().position()) })
       }
    }
 
@@ -29,7 +25,7 @@ class Reactor6701002 {
 
    }
 
-   def untouch() {
+   def release() {
 
    }
 }
@@ -52,6 +48,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

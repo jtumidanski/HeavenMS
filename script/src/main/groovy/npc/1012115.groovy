@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		
-	Map(s): 		
-	Description: 	
-*/
-
-
 class NPC1012115 {
    NPCConversationManager cm
    int status = -1

@@ -38,8 +38,8 @@ class Quest6036 {
          } else if (status == 2) {
             qm.forceCompleteQuest()
             qm.gainItem(4031980, (short) -1)
-            int skillid = Math.floor(qm.getPlayer().getJob().getId() / 1000).intValue() * 10000000 + 1007
-            qm.teachSkill(skillid, (byte) 3, (byte) 3, -1)
+            int skillId = Math.floor(qm.getPlayer().getJob().getId() / 1000).intValue() * 10000000 + 1007
+            qm.teachSkill(skillId, (byte) 3, (byte) 3, -1)
             qm.gainExp(300000)
             qm.dispose()
          }

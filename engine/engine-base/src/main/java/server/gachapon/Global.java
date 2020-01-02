@@ -1,10 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX)
- * @author Ronan - added ores, reworked global loots
- */
-
 public class Global extends GachaponItems {
 
    @Override

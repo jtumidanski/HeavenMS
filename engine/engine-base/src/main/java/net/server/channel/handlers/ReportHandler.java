@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.sql.Timestamp;
@@ -39,10 +18,6 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.report.ReportResponse;
 
-/*
- *
- * @author BubblesDev
- */
 public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket> {
    @Override
    public Class<ReportReader> getReaderClass() {
@@ -86,10 +61,10 @@ public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket>
       }
    }
 
-   private void addReport(int reporterid, int victimid, int reason, String description, String chatlog) {
+   private void addReport(int reporterId, int victimId, int reason, String description, String chatLog) {
       Calendar calendar = Calendar.getInstance();
       Timestamp currentTimestamp = new java.sql.Timestamp(calendar.getTime().getTime());
 
-      DatabaseConnection.getInstance().withConnection(connection -> ReportAdministrator.getInstance().create(connection, currentTimestamp.toGMTString(), reporterid, victimid, reason, chatlog, description));
+      DatabaseConnection.getInstance().withConnection(connection -> ReportAdministrator.getInstance().create(connection, currentTimestamp.toGMTString(), reporterId, victimId, reason, chatLog, description));
    }
 }

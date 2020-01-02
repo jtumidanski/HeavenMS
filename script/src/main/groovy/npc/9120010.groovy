@@ -81,7 +81,7 @@ class NPC9120010 {
    }
 
    static def makeChoices(int[] a) {
-      String result = "The items I'm looking for are 1,2,3 ... phew, too many to\r\nmention. Anyhow, if you gather up 100 of the same items,\r\nthen i may trade it with something similiar. What? You may\r\nnot know this, but i keep my end of the promise, so you\r\nneed not worry. Now, shall we trade?\r\n"
+      String result = "The items I'm looking for are 1,2,3 ... phew, too many to\r\nmention. Anyhow, if you gather up 100 of the same items,\r\nthen i may trade it with something similar. What? You may\r\nnot know this, but i keep my end of the promise, so you\r\nneed not worry. Now, shall we trade?\r\n"
       for (int x = 0; x < a.length; x++) {
          result += " #L" + x + "##v" + a[x] + "##t" + a[x] + "##l\r\n"
       }

@@ -57,7 +57,7 @@ class NPC2020002 {
             shoes = ["Red Gore Boots#k - Bowman Lv. 60#b", "Blue Gore Boots#k - Bowman Lv. 60#b", "Green Gore Boots#k - Bowman Lv. 60#b",
                      "Blue Elf Boots#k - Bowman Lv. 70#b", "Beige Elf Boots#k - Bowman Lv. 70#b", "Green Elf Boots#k - Bowman Lv. 70#b", "Dark Elf Boots#k - Bowman Lv. 70#b",
                      "Blue Wing Boots#k - Bowman Lv. 80#b", "Red Wing Boots#k - Bowman Lv. 80#b", "Green Wing Boots#k - Bowman Lv. 80#b", "Dark Wing Boots#k - Bowman Lv. 80#b"]
-         } else if (selectedType == 2) { //mage shoes
+         } else if (selectedType == 2) { //magician shoes
             selStr = "Magician shoes? Okay, then which set?#b"
             shoes = ["Pink Goldrunners#k - Magician Lv. 60#b", "Green Goldrunners#k - Magician Lv. 60#b", "Orange Goldrunners#k - Magician Lv. 60#b", "Blue Goldrunners#k - Magician Lv. 60#b",
                      "Blue Lapiz Sandals#k - Magician Lv. 70#b", "Red Lapiz Sandals#k - Magician Lv. 70#b", "Brown Lapiz Sandals#k - Magician Lv. 70#b", "Gold Lapiz Sandals#k - Magician Lv. 70#b",
@@ -99,7 +99,7 @@ class NPC2020002 {
             mats = matSet[selectedItem]
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
-         } else if (selectedType == 2) { //mage shoes
+         } else if (selectedType == 2) { //magician shoes
             int[] itemSet = [1072136, 1072137, 1072138, 1072139, 1072157, 1072158, 1072159, 1072160, 1072177, 1072178, 1072179]
             List matSet = [[4021009, 4011006, 4011005, 4000030, 4003000], [4021009, 4011006, 4021003, 4000030, 4003000], [4021009, 4011006, 4011003, 4000030, 4003000], [4021009, 4011006, 4021002, 4000030, 4003000],
                            [4005001, 4005003, 4021002, 4000051, 4003000], [4005001, 4005003, 4021000, 4000051, 4003000], [4005001, 4005003, 4011003, 4000051, 4003000], [4005001, 4005003, 4011006, 4000051, 4003000],

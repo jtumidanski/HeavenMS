@@ -9,9 +9,6 @@ import tools.LogHelper;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
-/**
- * @author kevintjuh93
- */
 public class AdminChatHandler extends AbstractPacketHandler<AdminChatPacket> {
    @Override
    public Class<AdminChatReader> getReaderClass() {
@@ -27,25 +24,24 @@ public class AdminChatHandler extends AbstractPacketHandler<AdminChatPacket> {
    @Override
    public void handlePacket(AdminChatPacket packet, MapleClient client) {
       switch (packet.mode()) {
-         case 0:// /alertall, /noticeall, /slideall
+         case 0:// /alert all, /notice all, /slide all
             MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.get(packet.noticeType()), packet.message());
             if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert All", packet.message());
             }
             break;
-         case 1:// /alertch, /noticech, /slidech
+         case 1:// /alert channel, /notice channel, /slide channel
             MessageBroadcaster.getInstance().sendChannelServerNotice(client.getWorld(), client.getChannel(), ServerNoticeType.get(packet.noticeType()), packet.message());
             if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert Ch", packet.message());
             }
             break;
-         case 2:// /alertm /alertmap, /noticem /noticemap, /slidem /slidemap
+         case 2:// /alert map /alert map, /notice map /notice map, /slide map /slide map
             MessageBroadcaster.getInstance().sendMapServerNotice(client.getPlayer().getMap(), ServerNoticeType.get(packet.noticeType()), packet.message());
             if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert Map", packet.message());
             }
             break;
-
       }
    }
 }

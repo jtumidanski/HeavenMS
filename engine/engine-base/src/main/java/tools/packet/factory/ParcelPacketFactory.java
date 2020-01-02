@@ -30,7 +30,7 @@ public class ParcelPacketFactory extends AbstractPacketFactory {
       writer.write(packet.remove() ? 3 : 4);
    }
 
-   protected void sendDueyParcelReceived(MaplePacketLittleEndianWriter writer, DueyParcelReceived packet) {    // thanks inhyuk
+   protected void sendDueyParcelReceived(MaplePacketLittleEndianWriter writer, DueyParcelReceived packet) {
       writer.write(0x19);
       writer.writeMapleAsciiString(packet.from());
       writer.writeBool(packet.quick());

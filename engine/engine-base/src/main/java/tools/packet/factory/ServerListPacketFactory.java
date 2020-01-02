@@ -22,8 +22,6 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet detailing a server and its channels.
-    *
-    * @return The server info packet.
     */
    protected void getServerList(MaplePacketLittleEndianWriter writer, ServerList packet) {
       writer.write(packet.serverId());
@@ -39,8 +37,6 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
       for (ChannelLoad ch : packet.channelLoad()) {
          writer.writeMapleAsciiString(packet.serverName() + "-" + ch.id());
          writer.writeInt(ch.capacity());
-
-         // thanks GabrielSin for this channel packet structure part
          writer.write(1);// nWorldID
          writer.write(ch.id() - 1);// nChannelID
          writer.writeBool(false);// bAdultChannel
@@ -50,8 +46,6 @@ public class ServerListPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet saying that the server list is over.
-    *
-    * @return The end of server list packet.
     */
    protected void getEndOfServerList(MaplePacketLittleEndianWriter writer, ServerListEnd packet) {
       writer.write(0xFF);

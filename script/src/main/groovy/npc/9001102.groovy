@@ -24,10 +24,10 @@ class NPC9001102 {
    def action(Byte mode, Byte type, Integer selection) {
       if (mode > 0) {
          status++
-         if (cm.getPlayer().getMapId() == 100000000) { // warper completed
+         if (cm.getPlayer().getMapId() == 100000000) {
             if (status == 1) {
                if (cm.getPlayer().getLevel() >= 12) {
-                  cm.sendYesNo("What do we do now? It's just a rumor yet, but... I've heard that scary things happen to you if you get kidnapped by aliens... may be that's what happenning to Gaga right now! Please, please rescue Gaga! \r\n #bGaga may be a bit indetermined and clueless, but#k he has a really good heart. I can't let something terrible happen to him. Right! Grandpa from the moon might know how to rescue him! I will send you to the moon, so please go meet Grandpa and rescue Gaga!!!")
+                  cm.sendYesNo("What do we do now? It's just a rumor yet, but... I've heard that scary things happen to you if you get kidnapped by aliens... may be that's what happening to Gaga right now! Please, please rescue Gaga! \r\n #bGaga may be a bit undetermined and clueless, but#k he has a really good heart. I can't let something terrible happen to him. Right! Grandpa from the moon might know how to rescue him! I will send you to the moon, so please go meet Grandpa and rescue Gaga!!!")
                } else {
                   cm.sendOk("Oh! It seems you don't reach the level requirements to save Gaga. Please come back when you are level 12 or higher.")
                }

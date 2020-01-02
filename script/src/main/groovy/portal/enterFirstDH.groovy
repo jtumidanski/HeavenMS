@@ -8,22 +8,22 @@ import tools.ServerNoticeType
 
 
 boolean enter(PortalPlayerInteraction pi) {
-   int map = 0
+   int mapId = 0
 
    if (pi.getQuestStatus(20701) == 1) {
-      map = 913000000
+      mapId = 913000000
    } else if (pi.getQuestStatus(20702) == 1) {
-      map = 913000100
+      mapId = 913000100
    } else if (pi.getQuestStatus(20703) == 1) {
-      map = 913000200
+      mapId = 913000200
    }
-   if (map > 0) {
-      if (pi.getPlayerCount(map) == 0) {
-         MapleMap mapp = pi.getMap(map)
-         mapp.resetPQ()
+   if (mapId > 0) {
+      if (pi.getPlayerCount(mapId) == 0) {
+         MapleMap map = pi.getMap(mapId)
+         map.resetPQ()
 
          pi.playPortalSound()
-         pi.warp(map, 0)
+         pi.warp(mapId, 0)
          return true
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Someone is already in this map.")

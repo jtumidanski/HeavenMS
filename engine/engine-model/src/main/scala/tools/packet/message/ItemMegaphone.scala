@@ -14,5 +14,5 @@ class ItemMegaphone(private var _message: String, private var _whisper: Boolean,
 
   def item: Item = _item
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERMESSAGE
+  override def opcode(): SendOpcode = SendOpcode.SERVER_MESSAGE
 }

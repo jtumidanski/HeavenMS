@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server;
 
 import java.io.File;
@@ -48,16 +27,13 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.Pair;
 
-/*
- * @author Flav
- */
 public class CashShop {
    private int accountId, characterId, nxCredit, maplePoint, nxPrepaid, jobType;
    private boolean opened;
    private List<Item> inventory = new ArrayList<>();
    private List<Integer> wishList = new ArrayList<>();
    private int notes = 0;
-   private Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CASHSHOP);
+   private Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CASH_SHOP);
 
    public CashShop(int accountId, int characterId, int jobType) {
       this.accountId = accountId;
@@ -177,11 +153,11 @@ public class CashShop {
       notes--;
    }
 
-   private Item getCashShopItemByItemid(int itemid) {
+   private Item getCashShopItemByItemId(int itemId) {
       lock.lock();
       try {
          for (Item it : inventory) {
-            if (it.id() == itemid) {
+            if (it.id() == itemId) {
                return it;
             }
          }
@@ -193,7 +169,7 @@ public class CashShop {
    }
 
    public synchronized Pair<Item, Item> openCashShopSurprise() {
-      Item css = getCashShopItemByItemid(5222000);
+      Item css = getCashShopItemByItemId(5222000);
 
       if (css != null) {
          CashItem cItem = CashItemFactory.getRandomCashItem();
@@ -260,15 +236,15 @@ public class CashShop {
       public Item toItem() {
          Item item;
 
-         int petid = -1;
+         int petId = -1;
          if (ItemConstants.isPet(itemId)) {
-            petid = PetProcessor.getInstance().createPet(itemId);
+            petId = PetProcessor.getInstance().createPet(itemId);
          }
 
          if (ItemConstants.getInventoryType(itemId).equals(MapleInventoryType.EQUIP)) {
             item = MapleItemInformationProvider.getInstance().getEquipById(itemId);
          } else {
-            item = BetterItemFactory.getInstance().create(itemId, (byte) 0, count, petid);
+            item = BetterItemFactory.getInstance().create(itemId, (byte) 0, count, petId);
          }
 
          if (ItemConstants.EXPIRING_ITEMS) {
@@ -319,10 +295,10 @@ public class CashShop {
 
    public static class CashItemFactory {
 
-      private static final Map<Integer, CashItem> items = new HashMap<>();
-      private static final Map<Integer, List<Integer>> packages = new HashMap<>();
-      private static final List<SpecialCashItem> specialcashitems = new ArrayList<>();
-      private static final List<Integer> randomitemsns = new ArrayList<>();
+      private static final Map<Integer, CashItem> ITEMS = new HashMap<>();
+      private static final Map<Integer, List<Integer>> PACKAGES = new HashMap<>();
+      private static final List<SpecialCashItem> SPECIAL_CASH_ITEMS = new ArrayList<>();
+      private static final List<Integer> RANDOM_ITEM_SNS = new ArrayList<>();
 
       static {
          MapleDataProvider etc = MapleDataProviderFactory.getDataProvider(new File("wz/Etc.wz"));
@@ -334,7 +310,7 @@ public class CashShop {
             long period = MapleDataTool.getIntConvert("Period", item, 1);
             short count = (short) MapleDataTool.getIntConvert("Count", item, 1);
             boolean onSale = MapleDataTool.getIntConvert("OnSale", item, 0) == 1;
-            items.put(sn, new CashItem(sn, itemId, price, period, count, onSale));
+            ITEMS.put(sn, new CashItem(sn, itemId, price, period, count, onSale));
          }
 
          for (MapleData cashPackage : etc.getData("CashPackage.img").getChildren()) {
@@ -344,35 +320,35 @@ public class CashShop {
                cPackage.add(Integer.parseInt(item.getData().toString()));
             }
 
-            packages.put(Integer.parseInt(cashPackage.getName()), cPackage);
+            PACKAGES.put(Integer.parseInt(cashPackage.getName()), cPackage);
          }
 
-         for (Entry<Integer, CashItem> e : items.entrySet()) {
+         for (Entry<Integer, CashItem> e : ITEMS.entrySet()) {
             if (e.getValue().isOnSale()) {
-               randomitemsns.add(e.getKey());
+               RANDOM_ITEM_SNS.add(e.getKey());
             }
          }
 
-         DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
+         DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(SPECIAL_CASH_ITEMS::addAll);
       }
 
       public static CashItem getRandomCashItem() {
-         if (randomitemsns.isEmpty()) {
+         if (RANDOM_ITEM_SNS.isEmpty()) {
             return null;
          }
 
-         int rnd = (int) (Math.random() * randomitemsns.size());
-         return items.get(randomitemsns.get(rnd));
+         int rnd = (int) (Math.random() * RANDOM_ITEM_SNS.size());
+         return ITEMS.get(RANDOM_ITEM_SNS.get(rnd));
       }
 
       public static CashItem getItem(int sn) {
-         return items.get(sn);
+         return ITEMS.get(sn);
       }
 
       public static List<Item> getPackage(int itemId) {
          List<Item> cashPackage = new ArrayList<>();
 
-         for (int sn : packages.get(itemId)) {
+         for (int sn : PACKAGES.get(itemId)) {
             cashPackage.add(getItem(sn).toItem());
          }
 
@@ -380,16 +356,16 @@ public class CashShop {
       }
 
       public static boolean isPackage(int itemId) {
-         return packages.containsKey(itemId);
+         return PACKAGES.containsKey(itemId);
       }
 
       public static List<SpecialCashItem> getSpecialCashItems() {
-         return specialcashitems;
+         return SPECIAL_CASH_ITEMS;
       }
 
       public static void reloadSpecialCashItems() {//Yay?
-         specialcashitems.clear();
-         DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(specialcashitems::addAll);
+         SPECIAL_CASH_ITEMS.clear();
+         DatabaseConnection.getInstance().withConnectionResult(connection -> SpecialCashItemProvider.getInstance().getSpecialCashItems(connection)).ifPresent(SPECIAL_CASH_ITEMS::addAll);
       }
    }
 

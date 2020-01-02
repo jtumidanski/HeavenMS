@@ -24,14 +24,14 @@ public class MobClearSkillService extends BaseService {
       }
    }
 
-   public void registerMobClearSkillAction(int mapid, Runnable runAction, long delay) {
-      mobClearSkillSchedulers[getChannelSchedulerIndex(mapid)].registerClearSkillAction(runAction, delay);
+   public void registerMobClearSkillAction(int mapId, Runnable runAction, long delay) {
+      mobClearSkillSchedulers[getChannelSchedulerIndex(mapId)].registerClearSkillAction(runAction, delay);
    }
 
    private class MobClearSkillScheduler extends BaseScheduler {
 
       public MobClearSkillScheduler() {
-         super(MonitoredLockType.CHANNEL_MOBSKILL);
+         super(MonitoredLockType.CHANNEL_MOB_SKILL);
       }
 
       public void registerClearSkillAction(Runnable runAction, long delay) {

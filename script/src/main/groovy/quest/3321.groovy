@@ -23,7 +23,7 @@ class Quest3321 {
          }
 
          if (status == 0) {
-            qm.sendNext("As you may know by now, I am Dr. De Lang. Once an influent alchemist amongst the ranks of the Alcadno society, I have been disconnected from their society due to the disaster of the aftermatch of my failed experiments, that can be seen now all over Magatia.")
+            qm.sendNext("As you may know by now, I am Dr. De Lang. Once an affluent alchemist amongst the ranks of the Alcadno society, I have been disconnected from their society due to the disaster of the aftermatch of my failed experiments, that can be seen now all over Magatia.")
          } else if (status == 1) {
             qm.sendNextPrev("Huroids, my creation, were originally engineered to fulfill both domestic, scientific and military affairs, however a critical malfunction on their main processing unit chips rendered them unstable and violent, rapidly causing upheavals and havoc all over the place. Due to that, I've been stripped of my status as Alcadno's alchemist and researcher and got myself an arrest warrant.")
          } else if (status == 2) {

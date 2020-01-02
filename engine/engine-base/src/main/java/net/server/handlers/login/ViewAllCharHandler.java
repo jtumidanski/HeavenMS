@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.handlers.login;
 
 import java.util.List;
@@ -43,26 +22,26 @@ public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> 
 
    @Override
    public void handlePacket(NoOpPacket packet, MapleClient client) {
-      if (!client.canRequestCharacterlist()) {   // client breaks if the charlist request pops too soon
+      if (!client.canRequestCharacterList()) {
          PacketCreator.announce(client, new ShowAllCharacter(0, 0));
          return;
       }
 
       int accountId = client.getAccID();
-      Pair<Pair<Integer, List<MapleCharacter>>, List<Pair<Integer, List<MapleCharacter>>>> loginBlob = Server.getInstance().loadAccountCharlist(accountId, client.getVisibleWorlds());
+      Pair<Pair<Integer, List<MapleCharacter>>, List<Pair<Integer, List<MapleCharacter>>>> loginBlob = Server.getInstance().loadAccountCharacterList(accountId, client.getVisibleWorlds());
 
-      List<Pair<Integer, List<MapleCharacter>>> worldChars = loginBlob.getRight();
+      List<Pair<Integer, List<MapleCharacter>>> worldCharacters = loginBlob.getRight();
       int chrTotal = loginBlob.getLeft().getLeft();
-      List<MapleCharacter> lastwchars = loginBlob.getLeft().getRight();
+      List<MapleCharacter> lastWorldCharacters = loginBlob.getLeft().getRight();
 
       if (chrTotal > 9) {
          int padRight = chrTotal % 3;
-         if (padRight > 0 && lastwchars != null) {
-            MapleCharacter chr = lastwchars.get(lastwchars.size() - 1);
+         if (padRight > 0 && lastWorldCharacters != null) {
+            MapleCharacter chr = lastWorldCharacters.get(lastWorldCharacters.size() - 1);
 
             for (int i = padRight; i < 3; i++) { // filling the remaining slots with the last character loaded
                chrTotal++;
-               lastwchars.add(chr);
+               lastWorldCharacters.add(chr);
             }
          }
       }
@@ -71,8 +50,8 @@ public final class ViewAllCharHandler extends AbstractPacketHandler<NoOpPacket> 
       int unk = charsSize + (3 - charsSize % 3); //rowSize?
       PacketCreator.announce(client, new ShowAllCharacter(charsSize, unk));
 
-      for (Pair<Integer, List<MapleCharacter>> wchars : worldChars) {
-         PacketCreator.announce(client, new ShowAllCharacterInfo(wchars.getLeft(), wchars.getRight(), YamlConfig.config.server.ENABLE_PIC && client.cannotBypassPic()));
+      for (Pair<Integer, List<MapleCharacter>> worldCharacter : worldCharacters) {
+         PacketCreator.announce(client, new ShowAllCharacterInfo(worldCharacter.getLeft(), worldCharacter.getRight(), YamlConfig.config.server.ENABLE_PIC && client.cannotBypassPic()));
       }
    }
 }

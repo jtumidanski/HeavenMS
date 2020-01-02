@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -42,12 +42,12 @@ class NPC1012103 {
                hairNew = []
                if (cm.getPlayer().getGender() == 0) {
                   for (def i = 0; i < maleHair.length; i++) {
-                     pushIfItemExists(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                if (cm.getPlayer().getGender() == 1) {
                   for (def i = 0; i < femaleHair.length; i++) {
-                     pushIfItemExists(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                cm.sendStyle("I can totally change up your hairstyle and make it look so good. Why don't you change it up a bit? If you have #b#t5150001##k I'll change it for you. Choose the one to your liking~.", hairNew)
@@ -56,9 +56,9 @@ class NPC1012103 {
                hairColor = []
                int current = (cm.getPlayer().getHair() / 10).intValue() * 10
                for (def i = 0; i < 8; i++) {
-                  pushIfItemExists(hairColor, current + i)
+                  hairColor = ScriptUtils.pushItemIfTrue(hairColor, current + i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                }
-               cm.sendStyle("I can totally change your haircolor and make it look so good. Why don't you change it up a bit? With #b#t51051001##k I'll change it for you. Choose the one to your liking.", hairColor)
+               cm.sendStyle("I can totally change your hair color and make it look so good. Why don't you change it up a bit? With #b#t51051001##k I'll change it for you. Choose the one to your liking.", hairColor)
             }
          } else if (status == 2) {
             cm.dispose()
@@ -78,7 +78,7 @@ class NPC1012103 {
                if (cm.haveItem(5151001)) {
                   cm.gainItem(5151001, (short) -1)
                   cm.setHair(hairColor[selection])
-                  cm.sendOk("Enjoy your new and improved haircolor!")
+                  cm.sendOk("Enjoy your new and improved hair color!")
                } else {
                   cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
                }
@@ -97,12 +97,6 @@ class NPC1012103 {
                }
             }
          }
-      }
-   }
-
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
       }
    }
 }

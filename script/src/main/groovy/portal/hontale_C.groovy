@@ -15,7 +15,7 @@ boolean enter(PortalPlayerInteraction pi) {
       } else if (theWay == (byte) 3) {
          target = 240050310 //dark
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Hit the Lightbulb to determine your fate!")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Hit the light bulb to determine your fate!")
          return false
       }
 

@@ -17,7 +17,7 @@ public class BBSOperationReader implements PacketReader<BaseBBSOperationPacket> 
       byte mode = accessor.readByte();
       switch (mode) {
          case 0:
-            return readUpsert(accessor, mode);
+            return readUpdateOrInsert(accessor, mode);
          case 1:
             return readDelete(accessor, mode);
          case 2:
@@ -60,7 +60,7 @@ public class BBSOperationReader implements PacketReader<BaseBBSOperationPacket> 
       return new DeleteThreadPacket(mode, localThreadId);
    }
 
-   private BaseBBSOperationPacket readUpsert(SeekableLittleEndianAccessor accessor, byte mode) {
+   private BaseBBSOperationPacket readUpdateOrInsert(SeekableLittleEndianAccessor accessor, byte mode) {
       boolean edit = accessor.readByte() == 1;
       if (edit) {
          return readEdit(accessor, mode);

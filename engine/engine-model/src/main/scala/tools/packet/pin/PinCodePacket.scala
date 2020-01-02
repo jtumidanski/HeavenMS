@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class PinCodePacket(private var _operation: PinOperation) extends PacketInput {
   def operation: PinOperation = _operation
 
-  override def opcode(): SendOpcode = SendOpcode.CHECK_PINCODE
+  override def opcode(): SendOpcode = SendOpcode.CHECK_PIN_CODE
 }

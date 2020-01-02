@@ -1,51 +1,30 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package tools;
 
 public class StringUtil {
    /**
     * Gets a string padded from the left to <code>length</code> by
-    * <code>padchar</code>.
+    * <code>padCharacter</code>.
     *
     * @param in      The input string to be padded.
-    * @param padchar The character to pad with.
+    * @param padCharacter The character to pad with.
     * @param length  The length to pad to.
     * @return The padded string.
     */
-   public static String getLeftPaddedStr(String in, char padchar, int length) {
-      return String.valueOf(padchar).repeat(Math.max(0, length - in.length())) + in;
+   public static String getLeftPaddedStr(String in, char padCharacter, int length) {
+      return String.valueOf(padCharacter).repeat(Math.max(0, length - in.length())) + in;
    }
 
    /**
     * Gets a string padded from the right to <code>length</code> by
-    * <code>padchar</code>.
+    * <code>padCharacter</code>.
     *
     * @param in      The input string to be padded.
-    * @param padchar The character to pad with.
+    * @param padCharacter The character to pad with.
     * @param length  The length to pad to.
     * @return The padded string.
     */
-   public static String getRightPaddedStr(String in, char padchar, int length) {
-      return in + String.valueOf(padchar).repeat(Math.max(0, length - in.length()));
+   public static String getRightPaddedStr(String in, char padCharacter, int length) {
+      return in + String.valueOf(padCharacter).repeat(Math.max(0, length - in.length()));
    }
 
    /**
@@ -62,7 +41,7 @@ public class StringUtil {
 
    /**
     * Joins an array of strings starting from string <code>start</code> with
-    * <code>sep</code> as a seperator.
+    * <code>sep</code> as a separator.
     *
     * @param arr   The array of strings to join.
     * @param start Starting from which string.
@@ -90,7 +69,7 @@ public class StringUtil {
       String[] words = enumName.split("_");
       for (String word : words) {
          if (word.length() <= 2) {
-            builder.append(word); // assume that it's an abbrevation
+            builder.append(word); // assume that it's an abbreviation
          } else {
             builder.append(word.charAt(0));
             builder.append(word.substring(1).toLowerCase());

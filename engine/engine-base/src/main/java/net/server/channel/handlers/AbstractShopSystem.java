@@ -71,15 +71,15 @@ public abstract class AbstractShopSystem<T extends MaplePacket> extends Abstract
       character.closePartySearchInteractions();
       character.unregisterChairBuff();
       Server.getInstance().getPlayerBuffStorage().addBuffsToStorage(character.getId(), character.getAllBuffs());
-      Server.getInstance().getPlayerBuffStorage().addDiseasesToStorage(character.getId(), character.getAllDiseases());
+      Server.getInstance().getPlayerBuffStorage().addDiseasesToStorage(character.getId(), character.getAlAbnormalStatuses());
       character.setAwayFromChannelWorld();
       character.notifyMapTransferToPartner(-1);
       character.removeIncomingInvites();
       character.cancelAllBuffs(true);
-      character.cancelAllDebuffs();
+      character.cancelAllAbnormalStatuses();
       character.cancelBuffExpireTask();
       character.cancelDiseaseExpireTask();
-      character.cancelSkillCooldownTask();
+      character.cancelSkillCoolDownTask();
       character.cancelExpirationTask();
 
       character.forfeitExpirableQuests();

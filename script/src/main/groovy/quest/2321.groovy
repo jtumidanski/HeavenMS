@@ -39,7 +39,7 @@ class Quest2321 {
          }
       }
       if (status == 0) {
-         qm.sendOk("I have been keeping up on your fabulour work. I am aware that you have successfully created the #bKiller Mushroom Spores#k, which penetrates through the unpenetrable barrier of the forest. Congratulations!")
+         qm.sendOk("I have been keeping up on your fabulous work. I am aware that you have successfully created the #bKiller Mushroom Spores#k, which penetrates through the impenetrable barrier of the forest. Congratulations!")
       } else if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainExp(2500)

@@ -63,8 +63,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * Possible values for <code>type</code>:<br> 0: [Notice]<br> 1: Popup<br>
     * 2: Megaphone<br> 3: Super Megaphone<br> 4: Scrolling message at top<br>
     * 5: Pink Text<br> 6: Lightblue Text
-    *
-    * @return The server notice packet.
     */
    protected void serverNotice(MaplePacketLittleEndianWriter writer, ServerNotice packet) {
       serverMessageInternal(writer, packet.theType(), packet.channel(), packet.message(), false, packet.smegaEar(), 0);
@@ -72,8 +70,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a server message packet.
-    *
-    * @return The server message packet.
     */
    protected void serverMessage(MaplePacketLittleEndianWriter writer, ServerMessage packet) {
       serverMessageInternal(writer, 4, (byte) 0, packet.message(), true, false, 0);
@@ -89,12 +85,11 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * @param type          The type of the notice.
     * @param channel       The channel this notice was sent on.
     * @param message       The message to convey.
-    * @param servermessage Is this a scrolling ticker?
-    * @return The server notice packet.
+    * @param serverMessage Is this a scrolling ticker?
     */
-   protected void serverMessageInternal(MaplePacketLittleEndianWriter writer, int type, int channel, String message, boolean servermessage, boolean megaEar, int npc) {
+   protected void serverMessageInternal(MaplePacketLittleEndianWriter writer, int type, int channel, String message, boolean serverMessage, boolean megaEar, int npc) {
       writer.write(type);
-      if (servermessage) {
+      if (serverMessage) {
          writer.write(1);
       }
       writer.writeMapleAsciiString(message);
@@ -110,8 +105,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
 
    /**
     * Sends a Avatar Super Megaphone packet.
-    *
-    * @return
     */
    protected void getAvatarMega(MaplePacketLittleEndianWriter writer, GetAvatarMegaphone packet) {
       writer.writeInt(packet.getItemId());
@@ -134,8 +127,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
 
    /**
     * Sends the Gachapon green message when a user uses a gachapon ticket.
-    *
-    * @return
     */
    protected void gachaponMessage(MaplePacketLittleEndianWriter writer, GachaponMessage packet) {
       writer.write(0x0B);
@@ -147,8 +138,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a general chat packet.
-    *
-    * @return The general chat packet.
     */
    protected void getChatText(MaplePacketLittleEndianWriter writer, ChatText packet) {
       writer.writeInt(packet.characterIdFrom());
@@ -164,9 +153,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
       writer.writeMapleAsciiString(packet.text());
    }
 
-   /**
-    * @return the MaplePacket
-    */
    protected void getWhisperReply(MaplePacketLittleEndianWriter writer, WhisperReply packet) {
       writer.write(0x0A); // whisper?
       writer.writeMapleAsciiString(packet.target());
@@ -188,8 +174,6 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     * or drop fame for this character for this month anymore.<br> 5: received
     * fame, use receiveFame()<br> 6: level of fame neither has been raised nor
     * dropped due to an unexpected error
-    *
-    * @return
     */
    protected void giveFameErrorResponse(MaplePacketLittleEndianWriter writer, GiveFameErrorResponse packet) {
       writer.write(packet.status());
@@ -202,9 +186,7 @@ public class MessagePacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * mode: 0 buddychat; 1 partychat; 2 guildchat
-    *
-    * @return
+    * mode: 0 buddy chat; 1 party chat; 2 guild chat
     */
    protected void multiChat(MaplePacketLittleEndianWriter writer, MultiChat packet) {
       writer.write(packet.mode());
@@ -264,7 +246,7 @@ public class MessagePacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Sends a "levelup" packet to the guild or family.
+    * Sends a "level up" packet to the guild or family.
     * <p>
     * Possible values for <code>type</code>:<br> 0: <Family> ? has reached Lv.
     * ?.<br> - The Reps you have received from ? will be reduced in half. 1:
@@ -296,7 +278,7 @@ public class MessagePacketFactory extends AbstractPacketFactory {
     */
    protected void jobMessage(MaplePacketLittleEndianWriter writer, NotifyJobAdvance packet) {
       writer.write(packet.theType());
-      writer.writeInt(packet.job()); //Why fking int?
+      writer.writeInt(packet.job());
       writer.writeMapleAsciiString("> " + packet.characterName()); //To fix the stupid packet lol
    }
 

@@ -11,16 +11,16 @@ public class SummonDamageReader implements PacketReader<SummonDamagePacket> {
       accessor.skip(4);
       byte direction = accessor.readByte();
       int numAttacked = accessor.readByte();
-      accessor.skip(8); //Thanks Gerald :D, I failed lol (mob x,y and summon x,y)
+      accessor.skip(8);
 
-      int[] monsterOids = new int[numAttacked];
+      int[] monsterObjectIds = new int[numAttacked];
       int[] damage = new int[numAttacked];
 
       for (int x = 0; x < numAttacked; x++) {
-         monsterOids[x] = accessor.readInt(); // attacked oid
+         monsterObjectIds[x] = accessor.readInt(); // attacked oid
          damage[x] = accessor.readInt();
       }
 
-      return new SummonDamagePacket(objectId, direction, numAttacked, monsterOids, damage);
+      return new SummonDamagePacket(objectId, direction, numAttacked, monsterObjectIds, damage);
    }
 }

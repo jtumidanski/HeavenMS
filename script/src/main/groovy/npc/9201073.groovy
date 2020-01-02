@@ -16,7 +16,7 @@ class NPC9201073 {
    int sel = -1
 
    def start() {
-      cm.sendOk("(This enigmatic tombstone keeps emmiting strange forces... Better look another way.)")
+      cm.sendOk("(This enigmatic tombstone keeps emitting strange forces... Better look another way.)")
       cm.dispose()
    }
 

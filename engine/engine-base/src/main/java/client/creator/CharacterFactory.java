@@ -200,12 +200,12 @@ public class CharacterFactory {
          recipe.remainingSp_$eq(recipe.remainingSp() - improveSp);
 
          int toUseSp = 5;
-         Skill improveHpRec = SkillFactory.getSkill(Warrior.IMPROVED_HPREC).orElseThrow();
+         Skill improveHpRec = SkillFactory.getSkill(Warrior.IMPROVED_HP_RECOVERY).orElseThrow();
          recipe.addStartingSkillLevel(improveHpRec.getId(), toUseSp);
          improveSp -= toUseSp;
 
          if (improveSp > 0) {
-            Skill improveMaxHp = SkillFactory.getSkill(Warrior.IMPROVED_MAXHP).orElseThrow();
+            Skill improveMaxHp = SkillFactory.getSkill(Warrior.IMPROVED_MAX_HP).orElseThrow();
             recipe.addStartingSkillLevel(improveMaxHp.getId(), improveSp);
          }
       }
@@ -216,12 +216,12 @@ public class CharacterFactory {
       return createNewCharacter(c, name, face, hair, skin, gender, recipe);
    }
 
-   protected void giveItem(CharacterFactoryRecipe recipe, int itemid, int quantity, MapleInventoryType itemType) {
-      recipe.addStartingItem(itemid, quantity, itemType);
+   protected void giveItem(CharacterFactoryRecipe recipe, int itemId, int quantity, MapleInventoryType itemType) {
+      recipe.addStartingItem(itemId, quantity, itemType);
    }
 
-   protected void giveEquipment(CharacterFactoryRecipe recipe, int equipid) {
-      Item nEquip = MapleItemInformationProvider.getInstance().getEquipById(equipid);
+   protected void giveEquipment(CharacterFactoryRecipe recipe, int equipmentId) {
+      Item nEquip = MapleItemInformationProvider.getInstance().getEquipById(equipmentId);
       recipe.addStartingEquipment(nEquip);
    }
 
@@ -234,19 +234,19 @@ public class CharacterFactory {
          return -1;
       }
 
-      MapleCharacter newchar = CharacterProcessor.getInstance().getDefault(c);
-      newchar.setWorld(c.getWorld());
-      newchar.setSkinColor(MapleSkinColor.getById(skin));
-      newchar.setGender(gender);
-      newchar.setName(name);
-      newchar.setHair(hair);
-      newchar.setFace(face);
+      MapleCharacter newCharacter = CharacterProcessor.getInstance().getDefault(c);
+      newCharacter.setWorld(c.getWorld());
+      newCharacter.setSkinColor(MapleSkinColor.getById(skin));
+      newCharacter.setGender(gender);
+      newCharacter.setName(name);
+      newCharacter.setHair(hair);
+      newCharacter.setFace(face);
 
-      newchar.setLevel(recipe.level());
-      newchar.setJob(recipe.job());
-      newchar.setMapId(recipe.map());
+      newCharacter.setLevel(recipe.level());
+      newCharacter.setJob(recipe.job());
+      newCharacter.setMapId(recipe.map());
 
-      MapleInventory equipped = newchar.getInventory(MapleInventoryType.EQUIPPED);
+      MapleInventory equipped = newCharacter.getInventory(MapleInventoryType.EQUIPPED);
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       int top = recipe.top(), bottom = recipe.bottom(), shoes = recipe.shoes(), weapon = recipe.weapon();
@@ -275,12 +275,12 @@ public class CharacterFactory {
          equipped.addItemFromDB(eq_weapon.copy());
       }
 
-      if (!CharacterProcessor.getInstance().insertNewChar(newchar, recipe)) {
+      if (!CharacterProcessor.getInstance().insertNewChar(newCharacter, recipe)) {
          return -2;
       }
-      PacketCreator.announce(c, new AddNewCharacter(newchar));
+      PacketCreator.announce(c, new AddNewCharacter(newCharacter));
 
-      Server.getInstance().createCharacterEntry(newchar);
+      Server.getInstance().createCharacterEntry(newCharacter);
       Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[New Char]: " + c.getAccountName() + " has created a new character with IGN " + name)));
       FilePrinter.print(FilePrinter.CREATED_CHAR + c.getAccountName() + ".txt", c.getAccountName() + " created character with IGN " + name);
 

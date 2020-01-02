@@ -6,7 +6,7 @@ import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 boolean enter(PortalPlayerInteraction pi) {
-   if (pi.isQuestCompleted(20730) || pi.isQuestCompleted(21734)) {  // puppeteer defeated, newfound secret path
+   if (pi.isQuestCompleted(20730) || pi.isQuestCompleted(21734)) {  // puppeteer defeated, new found secret path
       pi.playPortalSound(); pi.warp(105070300, 3)
       return true
    } else if (pi.isQuestStarted(21734)) {

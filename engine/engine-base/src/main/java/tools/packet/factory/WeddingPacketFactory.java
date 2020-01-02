@@ -17,30 +17,6 @@ import tools.packet.wedding.WeddingPartnerTransfer;
 import tools.packet.wedding.WeddingProgress;
 
 public class WeddingPacketFactory extends AbstractPacketFactory {
-   /*
-       00000000 CWeddingMan     struc ; (sizeof=0x104)
-       00000000 vfptr           dd ?                    ; offset
-       00000004 ___u1           $01CBC6800BD386B8A8FD818EAD990BEC ?
-       0000000C m_mCharIDToMarriageNo ZMap<unsigned long,unsigned long,unsigned long> ?
-       00000024 m_mReservationPending ZMap<unsigned long,ZRef<GW_WeddingReservation>,unsigned long> ?
-       0000003C m_mReservationPendingGroom ZMap<unsigned long,ZRef<CUser>,unsigned long> ?
-       00000054 m_mReservationPendingBride ZMap<unsigned long,ZRef<CUser>,unsigned long> ?
-       0000006C m_mReservationStartUser ZMap<unsigned long,unsigned long,unsigned long> ?
-       00000084 m_mReservationCompleted ZMap<unsigned long,ZRef<GW_WeddingReservation>,unsigned long> ?
-       0000009C m_mGroomWishList ZMap<unsigned long,ZRef<ZArray<ZXString<char> > >,unsigned long> ?
-       000000B4 m_mBrideWishList ZMap<unsigned long,ZRef<ZArray<ZXString<char> > >,unsigned long> ?
-       000000CC m_mEngagementPending ZMap<unsigned long,ZRef<GW_MarriageRecord>,unsigned long> ?
-       000000E4 m_nCurrentWeddingState dd ?
-       000000E8 m_dwCurrentWeddingNo dd ?
-       000000EC m_dwCurrentWeddingMap dd ?
-       000000F0 m_bIsReservationLoaded dd ?
-       000000F4 m_dwNumGuestBless dd ?
-       000000F8 m_bPhotoSuccess dd ?
-       000000FC m_tLastUpdate   dd ?
-       00000100 m_bStartWeddingCeremony dd ?
-       00000104 CWeddingMan     ends
-   */
-
    private static WeddingPacketFactory instance;
 
    public static WeddingPacketFactory getInstance() {
@@ -65,13 +41,11 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
 
    /**
     * <name> has requested engagement. Will you accept this proposal?
-    *
-    * @return writer
     */
    protected void marriageRequest(MaplePacketLittleEndianWriter writer, MarriageRequest packet) {
       writer.write(0); //mode, 0 = engage, 1 = cancel, 2 = answer.. etc
       writer.writeMapleAsciiString(packet.name()); // name
-      writer.writeInt(packet.characterId()); // playerid
+      writer.writeInt(packet.characterId());
    }
 
    /**
@@ -86,8 +60,6 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
     * - The result after converting into a JPG will then be remotely uploaded to /weddings/ with ReservedGroomName_ReservedBrideName to be displayed on the web server.
     * <p>
     * - Will no longer continue Wedding Photos, needs a WvsMapGen :(
-    *
-    * @return writer (MaplePacket) Byte array to be converted and read for byte[]->ImageIO
     */
    protected void takePhoto(MaplePacketLittleEndianWriter writer, TakePhoto packet) { // OnIFailedAtWeddingPhotos
       writer.writeMapleAsciiString(packet.getReservedGroomName());
@@ -115,23 +87,19 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             writer.writeShort(0);
             writer.write(0);
          });
-         writer.writeShort(guest.position().x); // v18 = *(_DWORD *)(v13 + 3204);
-         writer.writeShort(guest.position().y); // v20 = *(_DWORD *)(v13 + 3208);
-         // Begin Screenshot Encoding
-         writer.write(1); // // if ( *(_DWORD *)(v13 + 288) ) { COutPacket::Encode1(&thisa, v20);
-         // CPet::EncodeScreenShotPacket(*(CPet **)(v13 + 288), &thisa);
-         writer.writeInt(1); // dwTemplateID
-         writer.writeMapleAsciiString(guest.getName()); // m_sName
-         writer.writeShort(guest.position().x); // m_ptCurPos.x
-         writer.writeShort(guest.position().y); // m_ptCurPos.y
-         writer.write(guest.stance()); // guest.m_bMoveAction
+         writer.writeShort(guest.position().x);
+         writer.writeShort(guest.position().y);
+         writer.write(1);
+         writer.writeInt(1);
+         writer.writeMapleAsciiString(guest.getName());
+         writer.writeShort(guest.position().x);
+         writer.writeShort(guest.position().y);
+         writer.write(guest.stance());
       }
    }
 
    /**
     * Enable spouse chat and their engagement ring without @relog
-    *
-    * @return writer
     */
    protected void marriageResult(MaplePacketLittleEndianWriter writer, MarriageResult packet) {
       writer.write(11);
@@ -152,8 +120,6 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
 
    /**
     * To exit the Engagement Window (Waiting for her response...), we send a GMS-like pop-up.
-    *
-    * @return writer
     */
    protected void marriageResultError(MaplePacketLittleEndianWriter writer, MarriageResultError packet) {
       writer.write(packet.message());
@@ -165,8 +131,6 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
 
    /**
     * The World Map includes 'loverPos' in which this packet controls
-    *
-    * @return writer
     */
    protected void weddingPartnerTransfer(MaplePacketLittleEndianWriter writer, WeddingPartnerTransfer packet) {
       writer.writeInt(packet.mapId());
@@ -177,8 +141,6 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
     * The wedding packet to display Pelvis Bebop and enable the Wedding Ceremony Effect between two characters
     * CField_Wedding::OnWeddingProgress - Stages
     * CField_Wedding::OnWeddingCeremonyEnd - Wedding Ceremony Effect
-    *
-    * @return writer
     */
    protected void weddingProgress(MaplePacketLittleEndianWriter writer, WeddingProgress packet) {
       if (!packet.blessEffect()) { // in order for ceremony packet to send, byte step = 2 must be sent first
@@ -198,8 +160,6 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
 
    /**
     * When we open a Wedding Invitation, we display the Bride & Groom
-    *
-    * @return writer
     */
    protected void sendWeddingInvitation(MaplePacketLittleEndianWriter writer, WeddingInvitation packet) {
       writer.write(15);
@@ -213,14 +173,12 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Handles all of WeddingWishlist packets
-    *
-    * @return writer
+    * Handles all of WeddingWishList packets
     */
    protected void weddingGiftResult(MaplePacketLittleEndianWriter writer, WeddingGiftResult packet) {
       writer.write(packet.mode());
       switch (packet.mode()) {
-         case 0xC: // 12 : You cannot give more than one present for each wishlist
+         case 0xC: // 12 : You cannot give more than one present for each wish list
          case 0xE: // 14 : Failed to send the gift.
             break;
 
@@ -231,7 +189,7 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             }
             break;
          }
-         case 0xA: // Load Bride's Wishlist
+         case 0xA: // Load Bride's Wish list
          case 0xF: // 10, 15, 16 = CWishListRecvDlg::OnPacket
          case 0xB: { // Add Item to Wedding Registry
             // 11 : You have sent a gift | | 13 : Failed to send the gift. |
@@ -249,7 +207,7 @@ public class WeddingPacketFactory extends AbstractPacketFactory {
             break;
          }
          default: {
-            System.out.println("Unknown Wishlist Mode: " + packet.mode());
+            System.out.println("Unknown WishList Mode: " + packet.mode());
             break;
          }
       }

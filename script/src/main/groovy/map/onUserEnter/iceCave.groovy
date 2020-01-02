@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MapiceCave {
+class MapIceCave {
 
    static def start(MapScriptMethods ms) {
       ms.teachSkill(20000014, (byte) -1, (byte) 0, -1)
@@ -16,9 +16,9 @@ class MapiceCave {
    }
 }
 
-MapiceCave getMap() {
-   getBinding().setVariable("map", new MapiceCave())
-   return (MapiceCave) getBinding().getVariable("map")
+MapIceCave getMap() {
+   getBinding().setVariable("map", new MapIceCave())
+   return (MapIceCave) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

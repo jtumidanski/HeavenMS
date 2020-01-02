@@ -11,5 +11,5 @@ class ShowBoughtCashRing(private var _ring: Item, private var _recipient: String
 
   def accountId: Int = _accountId
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

@@ -11,7 +11,7 @@ import tools.Pair
 */
 
 
-class NPCcommands {
+class NpcCommands {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -75,12 +75,12 @@ class NPCcommands {
    }
 }
 
-NPCcommands getNPC() {
+NpcCommands getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCcommands(cm: cm))
+      getBinding().setVariable("npc", new NpcCommands(cm: cm))
    }
-   return (NPCcommands) getBinding().getVariable("npc")
+   return (NpcCommands) getBinding().getVariable("npc")
 }
 
 def start() {

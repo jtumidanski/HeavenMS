@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.ArrayList;
@@ -42,24 +21,19 @@ import tools.packet.inventory.ModifyInventoryPacket;
 import tools.packet.stat.EnableActions;
 import tools.packet.ui.FinishedSort2;
 
-/**
- * @author BubblesDev
- * @author Ronan
- */
-
-class PairedQuicksort {
+class PairedQuickSort {
    private final ArrayList<Integer> intersect;
    MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
    private int i = 0;
    private int j = 0;
 
-   public PairedQuicksort(ArrayList<Item> A, int primarySort, int secondarySort) {
+   public PairedQuickSort(ArrayList<Item> A, int primarySort, int secondarySort) {
       intersect = new ArrayList<>();
 
       if (A.size() > 0) {
-         MapleQuicksort(0, A.size() - 1, A, primarySort);
+         MapleQuickSort(0, A.size() - 1, A, primarySort);
 
-         if (A.get(0).inventoryType().equals(MapleInventoryType.USE)) {   // thanks KDA & Vcoc for suggesting stronger projectiles coming before weaker ones
+         if (A.get(0).inventoryType().equals(MapleInventoryType.USE)) {
             reverseSortSublist(A, BinarySearchElement(A, 206));  // arrows
             reverseSortSublist(A, BinarySearchElement(A, 207));  // stars
             reverseSortSublist(A, BinarySearchElement(A, 233));  // bullets
@@ -76,7 +50,7 @@ class PairedQuicksort {
 
       for (int ind = 0; ind < intersect.size() - 1; ind++) {
          if (intersect.get(ind + 1) > intersect.get(ind)) {
-            MapleQuicksort(intersect.get(ind), intersect.get(ind + 1) - 1, A, secondarySort);
+            MapleQuickSort(intersect.get(ind), intersect.get(ind + 1) - 1, A, secondarySort);
          }
       }
    }
@@ -197,7 +171,7 @@ class PairedQuicksort {
       } while (i <= j);
    }
 
-   void MapleQuicksort(int Esq, int Dir, ArrayList<Item> A, int sort) {
+   void MapleQuickSort(int Esq, int Dir, ArrayList<Item> A, int sort) {
       switch (sort) {
          case 3:
             PartitionByLevel(Esq, Dir, A);
@@ -217,10 +191,10 @@ class PairedQuicksort {
 
 
       if (Esq < j) {
-         MapleQuicksort(Esq, j, A, sort);
+         MapleQuickSort(Esq, j, A, sort);
       }
       if (i < Dir) {
-         MapleQuicksort(i, Dir, A, sort);
+         MapleQuickSort(i, Dir, A, sort);
       }
    }
 
@@ -276,7 +250,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
    @Override
    public void handlePacket(InventorySortPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-      chr.getAutobanManager().setTimestamp(3, Server.getInstance().getCurrentTimestamp(), 4);
+      chr.getAutoBanManager().setTimestamp(3, Server.getInstance().getCurrentTimestamp(), 4);
 
       if (!YamlConfig.config.server.USE_ITEM_SORT) {
          PacketCreator.announce(client, new EnableActions());
@@ -288,7 +262,7 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
          return;
       }
 
-      ArrayList<Item> itemarray = new ArrayList<>();
+      ArrayList<Item> itemArray = new ArrayList<>();
       List<ModifyInventory> mods = new ArrayList<>();
 
       MapleInventory inventory = chr.getInventory(MapleInventoryType.getByType(packet.inventoryType()));
@@ -297,24 +271,24 @@ public final class InventorySortHandler extends AbstractPacketHandler<InventoryS
          for (short i = 1; i <= inventory.getSlotLimit(); i++) {
             Item item = inventory.getItem(i);
             if (item != null) {
-               itemarray.add(item.copy());
+               itemArray.add(item.copy());
             }
          }
 
-         for (Item item : itemarray) {
+         for (Item item : itemArray) {
             inventory.removeSlot(item.position());
             mods.add(new ModifyInventory(3, item));
          }
 
          int invTypeCriteria = (MapleInventoryType.getByType(packet.inventoryType()) == MapleInventoryType.EQUIP) ? 3 : 1;
          int sortCriteria = (YamlConfig.config.server.USE_ITEM_SORT_BY_NAME) ? 2 : 0;
-         PairedQuicksort pq = new PairedQuicksort(itemarray, sortCriteria, invTypeCriteria);
+         PairedQuickSort pq = new PairedQuickSort(itemArray, sortCriteria, invTypeCriteria);
 
-         for (Item item : itemarray) {
+         for (Item item : itemArray) {
             inventory.addItem(item);
             mods.add(new ModifyInventory(0, item.copy()));//to prevent crashes
          }
-         itemarray.clear();
+         itemArray.clear();
       } finally {
          inventory.unlockInventory();
       }

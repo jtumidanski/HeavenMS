@@ -25,7 +25,7 @@ class Quest21747 {
          if (status == 0) {
             qm.sendAcceptDecline("Who would have thought that the hero's successor would reappear after hundred of years...? Will you bring prosperity to Maple World or will you end its existence? I suppose it really doesn't matter. Alright, I'll tell you what I know about the Seal Stone of Mu Lung.")
          } else if (status == 1) {
-            qm.sendNext("The Seal Stone of Mu Lung is located at the Sealed Temple. You will find the entrance deep inside the Mu Lung Temple. You can enter the Sealed Temple if you find the pillar with the word 'Entrance' wtritten on it. The password is: #bActions speak better than words#k. Maybe you will find the Shadow Knight there, as he probably is waiting for me there. I think the Hero's sucessor is more able to face him than myself, so prepare yourself.")
+            qm.sendNext("The Seal Stone of Mu Lung is located at the Sealed Temple. You will find the entrance deep inside the Mu Lung Temple. You can enter the Sealed Temple if you find the pillar with the word 'Entrance' written on it. The password is: #bActions speak better than words#k. Maybe you will find the Shadow Knight there, as he probably is waiting for me there. I think the Hero's successor is more able to face him than myself, so prepare yourself.")
          } else {
             qm.forceStartQuest()
             qm.dispose()

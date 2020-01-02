@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.audit;
 
 import java.text.DateFormat;
@@ -40,8 +21,6 @@ import server.TimerManager;
 import tools.FilePrinter;
 
 /**
- * @author RonanLana
- * <p>
  * This tool has the main purpose of auditing deadlocks throughout the server and must be used only for debugging. The flag is USE_THREAD_TRACKER.
  */
 public class ThreadTracker {
@@ -112,8 +91,8 @@ public class ThreadTracker {
 
       for (Long tid : executingThreads) {
          s.append("\r\n");
-         for (MonitoredLockType lockid : threadTracker.get(tid)) {
-            s.append(lockid.name()).append(" ");
+         for (MonitoredLockType lockId : threadTracker.get(tid)) {
+            s.append(lockId.name()).append(" ");
          }
          s.append("|");
       }
@@ -186,7 +165,6 @@ public class ThreadTracker {
                dateFormat.setTimeZone(TimeZone.getDefault());
 
                FilePrinter.printError(FilePrinter.DEADLOCK_STATE, printThreadTrackerState(dateFormat.format(new Date())));
-               //FilePrinter.printError(FilePrinter.DEADLOCK_STATE, "[" + dateFormat.format(new Date()) + "] Presenting current lock path for lockid " + lockId.name() + ".\r\n" + printLockStatus(lockId) + "\r\n-------------------------------");
             }
          } else {
             long tid = Thread.currentThread().getId();
@@ -217,7 +195,7 @@ public class ThreadTracker {
                threadLock.merge(tid, 1, Integer::sum);
             } else {
                AtomicInteger c = lockCount.get(lockOid);
-               if (c != null) {    // thanks BHB for detecting an NPE here
+               if (c != null) {
                   c.decrementAndGet();
                }
 
@@ -243,9 +221,9 @@ public class ThreadTracker {
    private String printLockStatus(MonitoredLockType lockId) {
       StringBuilder s = new StringBuilder();
 
-      for (Long threadid : locks.get(lockId).keySet()) {
-         for (MonitoredLockType lockid : threadTracker.get(threadid)) {
-            s.append("  ").append(lockid.name());
+      for (Long threadId : locks.get(lockId).keySet()) {
+         for (MonitoredLockType lockType : threadTracker.get(threadId)) {
+            s.append("  ").append(lockType.name());
          }
 
          s.append(" |\r\n");
@@ -255,12 +233,7 @@ public class ThreadTracker {
    }
 
    public void registerThreadTrackerTask() {
-      threadTrackerSchedule = TimerManager.getInstance().register(new Runnable() {
-         @Override
-         public void run() {
-            accessThreadTracker(true, false, MonitoredLockType.UNDEFINED, -1);
-         }
-      }, 10000, 10000);
+      threadTrackerSchedule = TimerManager.getInstance().register(() -> accessThreadTracker(true, false, MonitoredLockType.UNDEFINED, -1), 10000, 10000);
    }
 
    public void cancelThreadTrackerTask() {

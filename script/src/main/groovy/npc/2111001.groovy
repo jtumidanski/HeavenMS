@@ -16,7 +16,7 @@ class NPC2111001 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Zenumist......I know what they say. They don't like combination the of life with machine. But it is about being fearful of machine only. Seeking Pure Alchemy won't achieve anyting.")
+      cm.sendOk("Zenumist......I know what they say. They don't like combination the of life with machine. But it is about being fearful of machine only. Seeking Pure Alchemy won't achieve anything.")
       cm.dispose()
    }
 

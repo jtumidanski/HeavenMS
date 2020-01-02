@@ -63,10 +63,10 @@ public class LogHelper {
       FilePrinter.print(FilePrinter.LOG_LEAF, log);
    }
 
-   public static void logGacha(MapleCharacter player, int itemid, String map) {
-      String itemName = MapleItemInformationProvider.getInstance().getName(itemid);
+   public static void logGachapon(MapleCharacter player, int itemId, String map) {
+      String itemName = MapleItemInformationProvider.getInstance().getName(itemId);
       String timeStamp = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss").format(new Date());
-      String log = player.getName() + " got a " + itemName + "(" + itemid + ") from the " + map + " gachapon. - " + timeStamp;
+      String log = player.getName() + " got a " + itemName + "(" + itemId + ") from the " + map + " gachapon. - " + timeStamp;
       FilePrinter.print(FilePrinter.LOG_GACHAPON, log);
    }
 

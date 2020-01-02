@@ -29,13 +29,14 @@ class NPC1104002 {
       if (mode == -1) {
          cm.dispose()
       } else {
-         MapleMap mapobj = cm.getMap()
+         MapleMap map = cm.getMap()
 
          if (mode == 0 && type > 0) {
-            MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Eleanor: Oh, lost the Empress and still challenging us? Now you've done it! Prepare yourself!!!")
-
-            mapobj.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9001010), new Point(850, 0))
-            mapobj.destroyNPC(1104002)
+            MapleLifeFactory.getMonster(9001010).ifPresent({ monster ->
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Eleanor: Oh, lost the Empress and still challenging us? Now you've done it! Prepare yourself!!!")
+               map.spawnMonsterOnGroundBelow(monster, new Point(850, 0))
+               map.destroyNPC(1104002)
+            })
 
             cm.dispose()
             return
@@ -55,7 +56,7 @@ class NPC1104002 {
 
             cm.sendAcceptDecline("Hahahahaha! This place's Empress is already under my domain, that's surely a great advance on the #bBlack Wings#k' overthrow towards Maple World... And you, there? Still wants to face us? Or, better yet, since you seem strong enough to be quite a supplementary reinforcement at our service, #rwill you meet our expectations and fancy joining us#k since there's nothing more you can do?")
          } else if (status == 1) {
-            cm.sendOk("Heh, cowards have no place on the #rBlack Mage's#k army. Begone!")
+            cm.sendOk("Heh, cowards have no place on the #rBlack Magician's#k army. Begone!")
             cm.dispose()
          }
       }

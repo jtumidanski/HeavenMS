@@ -127,15 +127,15 @@ class NPC9020001 {
                }
             } else if (curMap == 103000800) {   // stage 1
                if (cm.isEventLeader()) {
-                  int numpasses = eim.getPlayerCount() - 1     // minus leader
+                  int numberOfPasses = eim.getPlayerCount() - 1     // minus leader
 
-                  if (cm.hasItem(4001008, numpasses)) {
-                     cm.sendNext("You gathered up " + numpasses + " passes! Congratulations on clearing the stage! I'll make the portal that sends you to the next stage. There's a time limit on getting there, so please hurry. Best of luck to you all!")
+                  if (cm.hasItem(4001008, numberOfPasses)) {
+                     cm.sendNext("You gathered up " + numberOfPasses + " passes! Congratulations on clearing the stage! I'll make the portal that sends you to the next stage. There's a time limit on getting there, so please hurry. Best of luck to you all!")
                      clearStage(stage, eim, curMap)
                      eim.gridClear()
-                     cm.gainItem(4001008, (short) -numpasses)
+                     cm.gainItem(4001008, (short) -numberOfPasses)
                   } else {
-                     cm.sendNext("I'm sorry, but you are short on the number of passes. You need to give me the right number of passes; it should be the number of members of your party minus the leader, in this case the total of " + numpasses + " to clear the stage. Tell your party members to solve the questions, gather up the passes, and give them to you.")
+                     cm.sendNext("I'm sorry, but you are short on the number of passes. You need to give me the right number of passes; it should be the number of members of your party minus the leader, in this case the total of " + numberOfPasses + " to clear the stage. Tell your party members to solve the questions, gather up the passes, and give them to you.")
                   }
                } else {
                   int data = eim.gridCheck(cm.getPlayer())
@@ -170,12 +170,12 @@ class NPC9020001 {
                int[][] stgCombos = stage2Combos
                Rectangle[] stgAreas = stage2Rects
 
-               String nthtext = "2nd", nthobj = "ropes", nthverb = "hang", nthpos = "hang on the ropes too low"
+               String nthText = "2nd", nthObject = "ropes", nthVerb = "hang", nthPosition = "hang on the ropes too low"
 
                if (!eim.isEventLeader(cm.getPlayer())) {
                   cm.sendOk("Follow the instructions given by your party leader to proceed through this stage.")
                } else if (eim.getProperty(stgProperty) == null) {
-                  cm.sendNext("Hi. Welcome to the " + nthtext + " stage. Next to me, you'll see a number of " + nthobj + ". Out of these " + nthobj + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthobj + " and " + nthverb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthpos + "; please be near the middle of the " + nthobj + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthobj + ". Once they are " + nthverb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthobj + " to " + nthverb + " on!")
+                  cm.sendNext("Hi. Welcome to the " + nthText + " stage. Next to me, you'll see a number of " + nthObject + ". Out of these " + nthObject + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthObject + " and " + nthVerb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthPosition + "; please be near the middle of the " + nthObject + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthObject + ". Once they are " + nthVerb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthObject + " to " + nthVerb + " on!")
                   int c = Math.floor(Math.random() * stgCombos.length).intValue()
                   eim.setProperty(stgProperty, c.toString())
                } else {
@@ -186,7 +186,7 @@ class NPC9020001 {
                      cm.sendNext("Please hurry on to the next stage, the portal opened!")
                   } else {
                      eim.showWrongEffect()
-                     cm.sendNext("It looks like you haven't found the 3 " + nthobj + " just yet. Please think of a different combination of " + nthobj + ". Only 3 are allowed to " + nthverb + " on " + nthobj + ", and if you " + nthpos + " it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext("It looks like you haven't found the 3 " + nthObject + " just yet. Please think of a different combination of " + nthObject + ". Only 3 are allowed to " + nthVerb + " on " + nthObject + ", and if you " + nthPosition + " it may not count as an answer, so please keep that in mind. Keep going!")
                   }
                }
 
@@ -196,12 +196,12 @@ class NPC9020001 {
                int[][] stgCombos = stage3Combos
                Rectangle[] stgAreas = stage3Rects
 
-               String nthtext = "3rd", nthobj = "platforms", nthverb = "stand", nthpos = "stand too close to the edges"
+               String nthText = "3rd", nthObject = "platforms", nthVerb = "stand", nthPosition = "stand too close to the edges"
 
                if (!eim.isEventLeader(cm.getPlayer())) {
                   cm.sendOk("Follow the instructions given by your party leader to proceed through this stage.")
                } else if (eim.getProperty(stgProperty) == null) {
-                  cm.sendNext("Hi. Welcome to the " + nthtext + " stage. Next to me, you'll see a number of " + nthobj + ". Out of these " + nthobj + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthobj + " and " + nthverb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthpos + "; please be near the middle of the " + nthobj + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthobj + ". Once they are " + nthverb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthobj + " to " + nthverb + " on!")
+                  cm.sendNext("Hi. Welcome to the " + nthText + " stage. Next to me, you'll see a number of " + nthObject + ". Out of these " + nthObject + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthObject + " and " + nthVerb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthPosition + "; please be near the middle of the " + nthObject + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthObject + ". Once they are " + nthVerb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthObject + " to " + nthVerb + " on!")
                   int c = Math.floor(Math.random() * stgCombos.length).toInteger()
                   eim.setProperty(stgProperty, c.toString())
                } else {
@@ -212,7 +212,7 @@ class NPC9020001 {
                      cm.sendNext("Please hurry on to the next stage, the portal opened!")
                   } else {
                      eim.showWrongEffect()
-                     cm.sendNext("It looks like you haven't found the 3 " + nthobj + " just yet. Please think of a different combination of " + nthobj + ". Only 3 are allowed to " + nthverb + " on " + nthobj + ", and if you " + nthpos + " it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext("It looks like you haven't found the 3 " + nthObject + " just yet. Please think of a different combination of " + nthObject + ". Only 3 are allowed to " + nthVerb + " on " + nthObject + ", and if you " + nthPosition + " it may not count as an answer, so please keep that in mind. Keep going!")
                   }
                }
 
@@ -222,12 +222,12 @@ class NPC9020001 {
                int[][] stgCombos = stage4Combos
                Rectangle[] stgAreas = stage4Rects
 
-               String nthtext = "4th", nthobj = "barrels", nthverb = "stand", nthpos = "stand too close to the edges"
+               String nthText = "4th", nthObject = "barrels", nthVerb = "stand", nthPosition = "stand too close to the edges"
 
                if (!eim.isEventLeader(cm.getPlayer())) {
                   cm.sendOk("Follow the instructions given by your party leader to proceed through this stage.")
                } else if (eim.getProperty(stgProperty) == null) {
-                  cm.sendNext("Hi. Welcome to the " + nthtext + " stage. Next to me, you'll see a number of " + nthobj + ". Out of these " + nthobj + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthobj + " and " + nthverb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthpos + "; please be near the middle of the " + nthobj + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthobj + ". Once they are " + nthverb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthobj + " to " + nthverb + " on!")
+                  cm.sendNext("Hi. Welcome to the " + nthText + " stage. Next to me, you'll see a number of " + nthObject + ". Out of these " + nthObject + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthObject + " and " + nthVerb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthPosition + "; please be near the middle of the " + nthObject + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthObject + ". Once they are " + nthVerb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthObject + " to " + nthVerb + " on!")
                   int c = Math.floor(Math.random() * stgCombos.length).toInteger()
                   eim.setProperty(stgProperty, c.toString())
                } else {
@@ -238,7 +238,7 @@ class NPC9020001 {
                      cm.sendNext("Please hurry on to the next stage, the portal opened!")
                   } else {
                      eim.showWrongEffect()
-                     cm.sendNext("It looks like you haven't found the 3 " + nthobj + " just yet. Please think of a different combination of " + nthobj + ". Only 3 are allowed to " + nthverb + " on " + nthobj + ", and if you " + nthpos + " it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext("It looks like you haven't found the 3 " + nthObject + " just yet. Please think of a different combination of " + nthObject + ". Only 3 are allowed to " + nthVerb + " on " + nthObject + ", and if you " + nthPosition + " it may not count as an answer, so please keep that in mind. Keep going!")
                   }
                }
 

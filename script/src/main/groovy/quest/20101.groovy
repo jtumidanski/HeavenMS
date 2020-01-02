@@ -46,7 +46,7 @@ class Quest20101 {
 
                qm.gainItem(1302077, (short) 1)
                qm.gainItem(1142066, (short) 1)
-               qm.changeJob(MapleJob.DAWNWARRIOR1)
+               qm.changeJob(MapleJob.DAWN_WARRIOR_1)
                qm.getPlayer().resetStats()
             }
             qm.forceCompleteQuest()

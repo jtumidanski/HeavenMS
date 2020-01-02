@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net;
 
 import java.io.IOException;
@@ -63,8 +42,8 @@ public class MapleServerHandler extends IoHandlerAdapter {
    private static AtomicLong sessionId = new AtomicLong(7777);
    private PacketProcessor processor;
    private int world = -1, channel = -1;
-   private MonitoredReentrantLock idleLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SRVHANDLER_IDLE, true);
-   private MonitoredReentrantLock tempLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SRVHANDLER_TEMP, true);
+   private MonitoredReentrantLock idleLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_HANDLER_IDLE, true);
+   private MonitoredReentrantLock tempLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.SERVER_HANDLER_TEMP, true);
    private Map<MapleClient, Long> idleSessions = new HashMap<>(100);
    private Map<MapleClient, Long> tempIdleSessions = new HashMap<>();
    private ScheduledFuture<?> idleManager = null;
@@ -109,7 +88,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          if (remoteHost == null) {
             remoteHost = "null";
          }
-      } catch (NullPointerException npe) {    // thanks Agassy, Alchemist for pointing out possibility of remoteHost = null.
+      } catch (NullPointerException npe) {
          remoteHost = "null";
       }
 
@@ -157,7 +136,6 @@ public class MapleServerHandler extends IoHandlerAdapter {
       MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
       if (client != null) {
          try {
-            // client freeze issues on session transition states found thanks to yolinlin, Omo Oppa, Nozphex
             if (!session.containsAttribute(MapleClient.CLIENT_TRANSITION)) {
                client.disconnect(false, false);
             }
@@ -179,8 +157,8 @@ public class MapleServerHandler extends IoHandlerAdapter {
    @Override
    public void messageReceived(IoSession session, Object message) {
       byte[] content = (byte[]) message;
-      SeekableLittleEndianAccessor slea = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(content));
-      short packetId = slea.readShort();
+      SeekableLittleEndianAccessor accessor = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(content));
+      short packetId = accessor.readShort();
       MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
       if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId)) {
@@ -190,9 +168,9 @@ public class MapleServerHandler extends IoHandlerAdapter {
       if (packetHandler != null && packetHandler.validateState(client)) {
          try {
             MapleLogger.logRecv(client, packetId, message);
-            packetHandler.handlePacket(slea, client);
+            packetHandler.handlePacket(accessor, client);
          } catch (final Throwable t) {
-            FilePrinter.printError(FilePrinter.PACKET_HANDLER + packetHandler.getClass().getName() + ".txt", t, "Error for " + (client.getPlayer() == null ? "" : "player ; " + client.getPlayer() + " on map ; " + client.getPlayer().getMapId() + " - ") + "account ; " + client.getAccountName() + "\r\n" + slea.toString());
+            FilePrinter.printError(FilePrinter.PACKET_HANDLER + packetHandler.getClass().getName() + ".txt", t, "Error for " + (client.getPlayer() == null ? "" : "player ; " + client.getPlayer() + " on map ; " + client.getPlayer().getMapId() + " - ") + "account ; " + client.getAccountName() + "\r\n" + accessor.toString());
             //client.announce(MaplePacketCreator.enableActions());//bugs sometimes
          }
          client.updateLastPacket();
@@ -202,8 +180,8 @@ public class MapleServerHandler extends IoHandlerAdapter {
    @Override
    public void messageSent(IoSession session, Object message) {
       byte[] content = (byte[]) message;
-      SeekableLittleEndianAccessor slea = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(content));
-      slea.readShort(); //packetId
+      SeekableLittleEndianAccessor accessor = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(content));
+      accessor.readShort(); //packetId
    }
 
    @Override

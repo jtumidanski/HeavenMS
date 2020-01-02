@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -17,29 +17,13 @@ class NPC9120103 {
 
    int beauty = 0
    int price = 1000000
-   int[] mface_r = [20000, 20016, 20019, 20020, 20021, 20024, 20026]
-   int[] fface_r = [21000, 21002, 21009, 21016, 21022, 21025, 21027]
-   int[] facenew = []
+   int[] maleFace = [20000, 20016, 20019, 20020, 20021, 20024, 20026]
+   int[] femaleFace = [21000, 21002, 21009, 21016, 21022, 21025, 21027]
+   int[] faceNew = []
    int[] colors = []
 
    def start() {
       cm.sendSimple("Hi, I pretty much shouldn't be doing this, but with a #b#t5152008##k or a #b#t5152046##k, I will do it anyways for you. But don't forget, it will be random!\r\n#L1#Plastic Surgery: #i5152008##t5152008##l\r\n#L2#Cosmetic Lens: #i5152046##t5152046##l")
-   }
-
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
-   def pushIfItemsExists(int[] array, int[] itemidList) {
-      for (int i = 0; i < itemidList.length; i++) {
-         int itemid = itemidList[i]
-
-         if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-            array << itemid
-         }
-      }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -50,14 +34,14 @@ class NPC9120103 {
          if (status == 1) {
             if (selection == 1) {
                beauty = 0
-               facenew = []
+               faceNew = []
                if (cm.getPlayer().getGender() == 0) {
-                  for (int i = 0; i < mface_r.length; i++) {
-                     pushIfItemExists(facenew, mface_r[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+                  for (int i = 0; i < maleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, maleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                } else {
-                  for (int i = 0; i < fface_r.length; i++) {
-                     pushIfItemExists(facenew, fface_r[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+                  for (int i = 0; i < femaleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                cm.sendYesNo("If you use the regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152008##k?")
@@ -70,16 +54,15 @@ class NPC9120103 {
                if (cm.getPlayer().getGender() == 1) {
                   current = cm.getPlayer().getFace() % 100 + 21000
                }
-               colors = []
                int[] temp = [current, current + 100, current + 200, current + 300, current + 400, current + 500, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendYesNo("If you use the regular coupon, you'll be awarded a random pair of cosmetic lenses. Are you going to use a #b#t5152046##k and really make the change to your eyes?")
             }
          } else if (status == 2) {
             if (beauty == 0) {
                if (cm.haveItem(5152008)) {
                   cm.gainItem(5152008, (short) -1)
-                  cm.setFace(facenew[Math.floor(Math.random() * facenew.length).intValue()])
+                  cm.setFace(faceNew[Math.floor(Math.random() * faceNew.length).intValue()])
                   cm.sendOk("Enjoy your new and improved face!")
                } else {
                   cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")

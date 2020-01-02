@@ -1,23 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License version 3
- as published by the Free Software Foundation. You may not use, modify
- or distribute this program under any other version of the
- GNU Affero General Public License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.life;
 
 import java.io.File;
@@ -30,15 +10,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import database.provider.DropDataProvider;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
+import database.DatabaseConnection;
+import database.provider.DropDataProvider;
 import provider.MapleData;
 import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
-import database.DatabaseConnection;
 import tools.Pair;
 import tools.Randomizer;
 
@@ -78,7 +58,7 @@ public class MapleMonsterInformationProvider {
       int continentId = mapId / 100000000;
 
       List<MonsterGlobalDropEntry> continentItems = continentDrops.get(continentId);
-      if (continentItems == null) {   // continent separated global drops found thanks to marcuswoon
+      if (continentItems == null) {
          continentItems = globalDrops.stream()
                .filter(entry -> entry.continentId() < 0 || entry.continentId() == continentId)
                .collect(Collectors.toList());
@@ -203,39 +183,18 @@ public class MapleMonsterInformationProvider {
    public boolean isBoss(int id) {
       Boolean boss = mobBossCache.get(id);
       if (boss == null) {
-         try {
-            boss = MapleLifeFactory.getMonster(id).isBoss();
-         } catch (NullPointerException npe) {
-            boss = false;
-         } catch (Exception e) {   //nonexistant mob
-            boss = false;
-
-            e.printStackTrace();
-            System.err.println("Nonexistant mob id " + id);
-         }
-
+         boss = MapleLifeFactory.getMonster(id).map(MapleMonster::isBoss).orElseThrow();
          mobBossCache.put(id, boss);
       }
-
       return boss;
    }
 
    public String getMobNameFromId(int id) {
       String mobName = mobNameCache.get(id);
       if (mobName == null) {
-         try {
-            mobName = MapleLifeFactory.getMonster(id).getName();
-         } catch (NullPointerException npe) {
-            mobName = ""; //nonexistant mob
-         } catch (Exception e) {
-            e.printStackTrace();
-            System.err.println("Nonexistant mob id " + id);
-            mobName = ""; //nonexistant mob
-         }
-
+         mobName = MapleLifeFactory.getMonster(id).map(MapleMonster::getName).orElseThrow();
          mobNameCache.put(id, mobName);
       }
-
       return mobName;
    }
 

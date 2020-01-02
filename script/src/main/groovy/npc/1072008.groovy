@@ -53,7 +53,7 @@ class NPC1072008 {
                cm.sendNext("Error. Please report this.")
                cm.dispose()
             }
-         } else if (status == 1) {   // thanks Lame for noticing players getting stuck in area in certain scenarios
+         } else if (status == 1) {
             cm.removeAll(4031856)
             cm.removeAll(4031857)
             cm.warp(120000101, 0)

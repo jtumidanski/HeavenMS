@@ -20,7 +20,7 @@ public class PlayerLifeAdministrator extends AbstractQueryExecutor {
    }
 
    public void create(EntityManager entityManager, int lifeId, int f, int fh, int cy, int rx0, int rx1, String type,
-                      int xpos, int ypos, int worldId, int mapId, int mobTime, int hide) {
+                      int xPosition, int yPosition, int worldId, int mapId, int mobTime, int hide) {
       PLife pLife = new PLife();
       pLife.setLife(lifeId);
       pLife.setF(f);
@@ -29,8 +29,8 @@ public class PlayerLifeAdministrator extends AbstractQueryExecutor {
       pLife.setRx0(rx0);
       pLife.setRx1(rx1);
       pLife.setType(type);
-      pLife.setX(xpos);
-      pLife.setY(ypos);
+      pLife.setX(xPosition);
+      pLife.setY(yPosition);
       pLife.setWorld(worldId);
       pLife.setMap(mapId);
       pLife.setMobTime(mobTime);

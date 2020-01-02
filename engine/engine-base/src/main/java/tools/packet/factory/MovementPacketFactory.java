@@ -33,8 +33,6 @@ public class MovementPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a response to a move monster packet.
-    *
-    * @return The move response packet.
     */
    protected void moveMonsterResponse(MaplePacketLittleEndianWriter writer, MoveMonsterResponse packet) {
       writer.writeInt(packet.objectId());

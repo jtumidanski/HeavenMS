@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package scripting.event;
 
 import java.awt.Point;
@@ -29,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
@@ -76,10 +56,6 @@ import tools.packet.spawn.SpawnNPC;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;
 
-/**
- * @author Matze
- * @author Ronan
- */
 public class EventInstanceManager {
    private final MonitoredReentrantReadWriteLock lock = new MonitoredReentrantReadWriteLock(MonitoredLockType.EIM, true);
    private Map<Integer, MapleCharacter> chars = new HashMap<>();
@@ -242,7 +218,7 @@ public class EventInstanceManager {
    }
 
    public synchronized void registerPlayer(final MapleCharacter chr, boolean runEntryScript) {
-      if (chr == null || !chr.isLoggedinWorld() || disposed) {
+      if (chr == null || !chr.isLoggedInWorld() || disposed) {
          return;
       }
 
@@ -268,7 +244,7 @@ public class EventInstanceManager {
    }
 
    public void exitPlayer(final MapleCharacter chr) {
-      if (chr == null || !chr.isLoggedin()) {
+      if (chr == null || !chr.isLoggedIn()) {
          return;
       }
 
@@ -356,7 +332,7 @@ public class EventInstanceManager {
 
    public void registerParty(MapleParty party, MapleMap map) {
       for (MaplePartyCharacter mpc : party.getEligibleMembers()) {
-         if (mpc.isOnline()) {   // thanks resinate
+         if (mpc.isOnline()) {
             MapleCharacter chr = map.getCharacterById(mpc.getId());
             if (chr != null) {
                registerPlayer(chr);
@@ -365,15 +341,15 @@ public class EventInstanceManager {
       }
    }
 
-   public void registerExpedition(MapleExpedition exped) {
-      expedition = exped;
-      registerExpeditionTeam(exped, exped.getRecruitingMap().getId());
+   public void registerExpedition(MapleExpedition expedition) {
+      this.expedition = expedition;
+      registerExpeditionTeam(expedition, expedition.getRecruitingMap().getId());
    }
 
-   private void registerExpeditionTeam(MapleExpedition exped, int recruitMap) {
-      expedition = exped;
+   private void registerExpeditionTeam(MapleExpedition expedition, int recruitMap) {
+      this.expedition = expedition;
 
-      for (MapleCharacter chr : exped.getActiveMembers()) {
+      for (MapleCharacter chr : expedition.getActiveMembers()) {
          if (chr.getMapId() == recruitMap) {
             registerPlayer(chr);
          }
@@ -530,14 +506,11 @@ public class EventInstanceManager {
    }
 
    public void playerKilled(final MapleCharacter chr) {
-      ThreadManager.getInstance().newTask(new Runnable() {
-         @Override
-         public void run() {
-            try {
-               invokeScriptFunction("playerDead", EventInstanceManager.this, chr);
-            } catch (ScriptException | NoSuchMethodException ignored) {
-            } // optional
-         }
+      ThreadManager.getInstance().newTask(() -> {
+         try {
+            invokeScriptFunction("playerDead", EventInstanceManager.this, chr);
+         } catch (ScriptException | NoSuchMethodException ignored) {
+         } // optional
       });
    }
 
@@ -659,20 +632,17 @@ public class EventInstanceManager {
          sL.unlock();
       }
 
-      TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            mapManager.dispose();   // issues from instantly disposing some event objects found thanks to MedicOP
-            wL.lock();
-            try {
-               mapManager = null;
-               em = null;
-            } finally {
-               wL.unlock();
-            }
-
-            disposeLocks();
+      TimerManager.getInstance().schedule(() -> {
+         mapManager.dispose();
+         wL.lock();
+         try {
+            mapManager = null;
+            em = null;
+         } finally {
+            wL.unlock();
          }
+
+         disposeLocks();
       }, 60 * 1000);
    }
 
@@ -693,14 +663,11 @@ public class EventInstanceManager {
       rL.lock();
       try {
          if (ess != null) {
-            Runnable r = new Runnable() {
-               @Override
-               public void run() {
-                  try {
-                     invokeScriptFunction(methodName, EventInstanceManager.this);
-                  } catch (ScriptException | NoSuchMethodException ex) {
-                     ex.printStackTrace();
-                  }
+            Runnable r = () -> {
+               try {
+                  invokeScriptFunction(methodName, EventInstanceManager.this);
+               } catch (ScriptException | NoSuchMethodException ex) {
+                  ex.printStackTrace();
                }
             };
 
@@ -838,15 +805,15 @@ public class EventInstanceManager {
       return (chr.getId() == getLeaderId());
    }
 
-   public final MapleMap getInstanceMap(final int mapid) {
+   public final MapleMap getInstanceMap(final int mapId) {
       if (disposed) {
          return null;
       }
-      mapIds.add(mapid);
-      return getMapFactory().getMap(mapid);
+      mapIds.add(mapId);
+      return getMapFactory().getMap(mapId);
    }
 
-   public final boolean disposeIfPlayerBelow(final byte size, final int towarp) {
+   public final boolean disposeIfPlayerBelow(final byte size, final int toWarp) {
       if (disposed) {
          return true;
       }
@@ -855,8 +822,8 @@ public class EventInstanceManager {
       }
 
       MapleMap map = null;
-      if (towarp > 0) {
-         map = this.getMapFactory().getMap(towarp);
+      if (toWarp > 0) {
+         map = this.getMapFactory().getMap(toWarp);
       }
 
       List<MapleCharacter> players = getPlayerList();
@@ -869,7 +836,7 @@ public class EventInstanceManager {
                }
 
                unregisterPlayer(chr);
-               if (towarp > 0) {
+               if (toWarp > 0) {
                   chr.changeMap(map, map.getPortal(0));
                }
             }
@@ -897,22 +864,22 @@ public class EventInstanceManager {
       }
    }
 
-   public void dispatchRaiseQuestMobCount(int mobid, int mapid) {
-      Map<Integer, MapleCharacter> mapChars = getInstanceMap(mapid).getMapPlayers();
+   public void dispatchRaiseQuestMobCount(int mobId, int mapId) {
+      Map<Integer, MapleCharacter> mapChars = getInstanceMap(mapId).getMapPlayers();
       if (!mapChars.isEmpty()) {
          List<MapleCharacter> eventMembers = getPlayers();
 
          for (MapleCharacter evChr : eventMembers) {
             MapleCharacter chr = mapChars.get(evChr.getId());
 
-            if (chr != null && chr.isLoggedinWorld()) {
-               chr.raiseQuestMobCount(mobid);
+            if (chr != null && chr.isLoggedInWorld()) {
+               chr.raiseQuestMobCount(mobId);
             }
          }
       }
    }
 
-   public MapleMonster getMonster(int mid) {
+   public Optional<MapleMonster> getMonster(int mid) {
       return (MapleLifeFactory.getMonster(mid));
    }
 
@@ -977,19 +944,19 @@ public class EventInstanceManager {
       }
    }
 
-   public final void setEventRewards(List<Object> rwds, List<Object> qtys, int expGiven) {
-      setEventRewards(1, rwds, qtys, expGiven);
+   public final void setEventRewards(List<Object> rewards, List<Object> quantities, int expGiven) {
+      setEventRewards(1, rewards, quantities, expGiven);
    }
 
-   public final void setEventRewards(List<Object> rwds, List<Object> qtys) {
-      setEventRewards(1, rwds, qtys);
+   public final void setEventRewards(List<Object> rewards, List<Object> quantities) {
+      setEventRewards(1, rewards, quantities);
    }
 
-   public final void setEventRewards(int eventLevel, List<Object> rwds, List<Object> qtys) {
-      setEventRewards(eventLevel, rwds, qtys, 0);
+   public final void setEventRewards(int eventLevel, List<Object> rewards, List<Object> quantities) {
+      setEventRewards(eventLevel, rewards, quantities, 0);
    }
 
-   public final void setEventRewards(int eventLevel, List<Object> rwds, List<Object> qtys, int expGiven) {
+   public final void setEventRewards(int eventLevel, List<Object> rewards, List<Object> quantities, int expGiven) {
       // fixed EXP will be rewarded at the same time the random item is given
 
       if (eventLevel <= 0 || eventLevel > YamlConfig.config.server.MAX_EVENT_LEVELS) {
@@ -997,14 +964,14 @@ public class EventInstanceManager {
       }
       eventLevel--;    //event level starts from 1
 
-      List<Integer> rewardIds = convertToIntegerArray(rwds);
-      List<Integer> rewardQtys = convertToIntegerArray(qtys);
+      List<Integer> rewardIds = convertToIntegerArray(rewards);
+      List<Integer> rewardQuantities = convertToIntegerArray(quantities);
 
       //rewardsSet and rewardsQty hold temporary values
       wL.lock();
       try {
          collectionSet.put(eventLevel, rewardIds);
-         collectionQty.put(eventLevel, rewardQtys);
+         collectionQty.put(eventLevel, rewardQuantities);
          collectionExp.put(eventLevel, expGiven);
       } finally {
          wL.unlock();
@@ -1163,10 +1130,8 @@ public class EventInstanceManager {
       if (eventCleared) {
          return leavingEventMap && getPlayerCount() <= 1;
       } else {
-         // thanks Conrad for noticing expeditions don't need to have neither the leader nor meet the minimum requirement inside the event
          return getPlayerCount() <= 1;
       }
-
    }
 
    public final boolean isEventTeamLackingNow(boolean leavingEventMap, int minPlayers, MapleCharacter quitter) {
@@ -1178,7 +1143,6 @@ public class EventInstanceManager {
          }
          return getPlayerCount() <= minPlayers;
       }
-
    }
 
    public final boolean isEventTeamTogether() {

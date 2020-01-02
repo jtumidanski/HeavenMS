@@ -1,29 +1,5 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package constants.skills;
 
-/**
- * @author kevintjuh93
- */
 public class Legend {
    public static final int THREE_SNAILS = 20001000;
    public static final int RECOVERY = 20001001;
@@ -34,9 +10,9 @@ public class Legend {
    public static final int JUMP_DOWN = 20001006;
    public static final int MAKER = 20001007;
    public static final int BAMBOO_THRUST = 20001009;
-   public static final int INVICIBLE_BARRIER = 20001010;
+   public static final int INVISIBLE_BARRIER = 20001010;
    public static final int POWER_EXPLOSION = 20001011;
-   public static final int METEO_SHOWER = 20001011;
+   public static final int METEOR_SHOWER = 20001011;
    public static final int BLESSING_OF_THE_FAIRY = 20000012;
    public static final int TUTORIAL_SKILL1 = 20000014;
    public static final int TUTORIAL_SKILL2 = 20000015;

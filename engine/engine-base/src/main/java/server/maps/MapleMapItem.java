@@ -1,23 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 ~ 2010 Patrick Huy <patrick.huy@frz.cc>
-                       Matthias Butz <matze@odinms.de>
-                       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License version 3
-    as published by the Free Software Foundation. You may not use, modify
-    or distribute this program under any other version of the
-    GNU Affero General Public License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.maps;
 
 import java.awt.Point;
@@ -33,7 +13,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    protected MapleClient ownerClient;
    protected Item item;
    protected MapleMapObject dropper;
-   protected int character_ownerid, party_ownerid, meso, questid = -1;
+   protected int characterOwnerId, partyOwnerId, meso, questId = -1;
    protected byte type;
    protected boolean pickedUp = false, playerDrop, partyDrop;
    protected long dropTime;
@@ -43,36 +23,36 @@ public class MapleMapItem extends AbstractMapleMapObject {
       position_$eq(position);
       this.item = item;
       this.dropper = dropper;
-      this.character_ownerid = owner.getId();
-      this.party_ownerid = owner.getPartyId();
-      this.partyDrop = this.party_ownerid != -1;
+      this.characterOwnerId = owner.getId();
+      this.partyOwnerId = owner.getPartyId();
+      this.partyDrop = this.partyOwnerId != -1;
       this.ownerClient = owner.getClient();
       this.meso = 0;
       this.type = type;
       this.playerDrop = playerDrop;
    }
 
-   public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop, int questid) {
+   public MapleMapItem(Item item, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop, int questId) {
       position_$eq(position);
       this.item = item;
       this.dropper = dropper;
-      this.character_ownerid = owner.getId();
-      this.party_ownerid = owner.getPartyId();
-      this.partyDrop = this.party_ownerid != -1;
+      this.characterOwnerId = owner.getId();
+      this.partyOwnerId = owner.getPartyId();
+      this.partyDrop = this.partyOwnerId != -1;
       this.ownerClient = owner.getClient();
       this.meso = 0;
       this.type = type;
       this.playerDrop = playerDrop;
-      this.questid = questid;
+      this.questId = questId;
    }
 
    public MapleMapItem(int meso, Point position, MapleMapObject dropper, MapleCharacter owner, MapleClient ownerClient, byte type, boolean playerDrop) {
       position_$eq(position);
       this.item = null;
       this.dropper = dropper;
-      this.character_ownerid = owner.getId();
-      this.party_ownerid = owner.getPartyId();
-      this.partyDrop = this.party_ownerid != -1;
+      this.characterOwnerId = owner.getId();
+      this.partyOwnerId = owner.getPartyId();
+      this.partyDrop = this.partyOwnerId != -1;
       this.ownerClient = owner.getClient();
       this.meso = meso;
       this.type = type;
@@ -84,7 +64,7 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public final int getQuest() {
-      return questid;
+      return questId;
    }
 
    public final int getItemId() {
@@ -99,27 +79,27 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public final int getOwnerId() {
-      return character_ownerid;
+      return characterOwnerId;
    }
 
    public final int getPartyOwnerId() {
-      return party_ownerid;
+      return partyOwnerId;
    }
 
-   public final void setPartyOwnerId(int partyid) {
-      party_ownerid = partyid;
+   public final void setPartyOwnerId(int partyId) {
+      partyOwnerId = partyId;
    }
 
-   public final int getClientsideOwnerId() {   // thanks nozphex (RedHat) for noting an issue with collecting party items
-      if (this.party_ownerid == -1) {
-         return this.character_ownerid;
+   public final int getClientSideOwnerId() {
+      if (this.partyOwnerId == -1) {
+         return this.characterOwnerId;
       } else {
-         return this.party_ownerid;
+         return this.partyOwnerId;
       }
    }
 
-   public final boolean hasClientsideOwnership(MapleCharacter player) {
-      return this.character_ownerid == player.getId() || this.party_ownerid == player.getPartyId() || hasExpiredOwnershipTime();
+   public final boolean hasClientSideOwnership(MapleCharacter player) {
+      return this.characterOwnerId == player.getId() || this.partyOwnerId == player.getPartyId() || hasExpiredOwnershipTime();
    }
 
    public final boolean isFFADrop() {
@@ -131,22 +111,22 @@ public class MapleMapItem extends AbstractMapleMapObject {
    }
 
    public final boolean canBePickedBy(MapleCharacter chr) {
-      if (character_ownerid <= 0 || isFFADrop()) {
+      if (characterOwnerId <= 0 || isFFADrop()) {
          return true;
       }
 
-      if (party_ownerid == -1) {
-         if (chr.getId() == character_ownerid) {
+      if (partyOwnerId == -1) {
+         if (chr.getId() == characterOwnerId) {
             return true;
-         } else if (chr.isPartyMember(character_ownerid)) {
-            party_ownerid = chr.getPartyId();
+         } else if (chr.isPartyMember(characterOwnerId)) {
+            partyOwnerId = chr.getPartyId();
             return true;
          }
       } else {
-         if (chr.getPartyId() == party_ownerid) {
+         if (chr.getPartyId() == partyOwnerId) {
             return true;
-         } else if (chr.getId() == character_ownerid) {
-            party_ownerid = chr.getPartyId();
+         } else if (chr.getId() == characterOwnerId) {
+            partyOwnerId = chr.getPartyId();
             return true;
          }
       }

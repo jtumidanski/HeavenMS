@@ -43,12 +43,10 @@ class NPC2030008 {
          }
 
          if (!(cm.isQuestStarted(100200) || cm.isQuestCompleted(100200))) {
-            // thanks Vcoc for finding out a need of reapproval from the masters for Zakum expeditions
             if (cm.getPlayer().getLevel() >= 50) {
-               // thanks Z1peR for noticing not-so-clear unmet requirements message here.
-               cm.sendOk("Beware, for the power of olde has not been forgotten... If you seek to defeat #rZakum#k someday, earn the #bChief's Residence Council#k approval foremost and then #bface the trials#k, only then you will become eligible to fight.")
+               cm.sendOk("Beware, for the power of old has not been forgotten... If you seek to defeat #rZakum#k someday, earn the #bChief's Residence Council#k approval foremost and then #bface the trials#k, only then you will become eligible to fight.")
             } else {
-               cm.sendOk("Beware, for the power of olde has not been forgotten...")
+               cm.sendOk("Beware, for the power of old has not been forgotten...")
             }
 
             cm.dispose()
@@ -63,7 +61,7 @@ class NPC2030008 {
          }
 
          if (status == 0) {
-            cm.sendSimple("#e#b<Party Quest: Zakum Campaign>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nBeware, for the power of olde has not been forgotten... #b\r\n#L0#Enter the Unknown Dead Mine (Stage 1)#l\r\n#L1#Face the Breath of Lava (Stage 2)#l\r\n#L2#Forging the Eyes of Fire (Stage 3)#l")
+            cm.sendSimple("#e#b<Party Quest: Zakum Campaign>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nBeware, for the power of old has not been forgotten... #b\r\n#L0#Enter the Unknown Dead Mine (Stage 1)#l\r\n#L1#Face the Breath of Lava (Stage 2)#l\r\n#L2#Forging the Eyes of Fire (Stage 3)#l")
          } else if (status == 1) {
             if (selection == 0) {
                if (cm.getParty().isEmpty()) {

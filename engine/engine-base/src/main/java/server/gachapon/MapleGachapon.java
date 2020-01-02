@@ -1,33 +1,9 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.gachapon;
 
 import server.MapleGachaponItem;
 import server.MapleItemInformationProvider;
 import tools.Randomizer;
 
-/**
- * @author Alan (SharpAceX)
- */
 public class MapleGachapon {
 
    private static final MapleGachapon instance = new MapleGachapon();
@@ -37,9 +13,9 @@ public class MapleGachapon {
    }
 
    public MapleGachaponItem process(int npcId) {
-      Gachapon gacha = Gachapon.getByNpcId(npcId);
-      int tier = gacha.getTier();
-      int item = gacha.getItem(tier);
+      Gachapon gachapon = Gachapon.getByNpcId(npcId);
+      int tier = gachapon.getTier();
+      int item = gachapon.getItem(tier);
       return new MapleGachaponItem(tier, item);
    }
 
@@ -67,8 +43,8 @@ public class MapleGachapon {
       private int uncommon;
       private int rare;
 
-      Gachapon(int npcid, int c, int u, int r, GachaponItems g) {
-         this.npcId = npcid;
+      Gachapon(int npcId, int c, int u, int r, GachaponItems g) {
+         this.npcId = npcId;
          this.gachapon = g;
          this.common = c;
          this.uncommon = u;
@@ -76,9 +52,9 @@ public class MapleGachapon {
       }
 
       public static Gachapon getByNpcId(int npcId) {
-         for (Gachapon gacha : values) {
-            if (npcId == gacha.npcId) {
-               return gacha;
+         for (Gachapon gachapon : values) {
+            if (npcId == gachapon.npcId) {
+               return gachapon;
             }
          }
          return null;
@@ -91,18 +67,18 @@ public class MapleGachapon {
 
          StringBuilder menuStr = new StringBuilder();
          int j = 0;
-         for (Gachapon gacha : values) {
-            menuStr.append("#L").append(j).append("#").append(gacha.name()).append("#l\r\n");
+         for (Gachapon gachapon : values) {
+            menuStr.append("#L").append(j).append("#").append(gachapon.name()).append("#l\r\n");
             j++;
 
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < 3; i++) {
-               int[] gachaItems = gacha.getItems(i);
+               int[] gachaponItems = gachapon.getItems(i);
 
-               if (gachaItems.length > 0) {
+               if (gachaponItems.length > 0) {
                   str.append("  #rTier ").append(i).append("#k:\r\n");
-                  for (int itemid : gachaItems) {
-                     str.append("   #i").append(itemid).append("#");
+                  for (int itemId : gachaponItems) {
+                     str.append("   #i").append(itemId).append("#");
                   }
 
                   str.append("\r\n");
@@ -133,10 +109,10 @@ public class MapleGachapon {
       }
 
       public int getItem(int tier) {
-         int[] gacha = getItems(tier);
+         int[] gachaponItems = getItems(tier);
          int[] global = GLOBAL.getItems(tier);
-         int chance = Randomizer.nextInt(gacha.length + global.length);
-         return chance < gacha.length ? gacha[chance] : global[chance - gacha.length];
+         int chance = Randomizer.nextInt(gachaponItems.length + global.length);
+         return chance < gachaponItems.length ? gachaponItems[chance] : global[chance - gachaponItems.length];
       }
    }
 }

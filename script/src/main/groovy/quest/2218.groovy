@@ -23,12 +23,12 @@ class Quest2218 {
          }
 
          if (status == 0) {
-            qm.sendNext("Hey did you see how strange #rLakelis#k has been acting these days? We should see what's going on aabout her, her actions have been so weird lately...")
+            qm.sendNext("Hey did you see how strange #rLakelis#k has been acting these days? We should see what's going on about her, her actions have been so weird lately...")
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(7000)
 
-            if (isAllSubquestsDone() && qm.haveItem(4031894)) {
+            if (areAllSubQuestsDone() && qm.haveItem(4031894)) {
                qm.gainItem(4031894, (short) -1)
             }
 
@@ -37,7 +37,7 @@ class Quest2218 {
       }
    }
 
-   def isAllSubquestsDone() {
+   def areAllSubQuestsDone() {
       for (int i = 2216; i <= 2219; i++) {
          if (!qm.isQuestCompleted(i)) {
             return false

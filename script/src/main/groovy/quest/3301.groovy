@@ -63,14 +63,14 @@ class Quest3301 {
    }
 
    static def getOreString(int[] ids) { // Parameter 'ids' is just the array of getOreArray()
-      String thestring = "#b"
+      String theString = "#b"
       String extra
       for (int x = 0; x < ids.length; x++) {
          extra = "#L" + x + "##t" + ids[x] + "##l\r\n"
-         thestring += extra
+         theString += extra
       }
-      thestring += "#k"
-      return thestring
+      theString += "#k"
+      return theString
    }
 }
 

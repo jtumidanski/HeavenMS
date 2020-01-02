@@ -61,7 +61,7 @@ class Quest3514 {
    }
 
    static def usedPotion(MapleCharacter ch) {
-      return ch.getBuffSource(MapleBuffStat.HPREC) == 2022337
+      return ch.getBuffSource(MapleBuffStat.HP_RECOVERY) == 2022337
    }
 }
 

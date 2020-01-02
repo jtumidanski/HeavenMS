@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Kiru
-	Map(s): 		Skyferry Between Victoria Island, Ereve and Orbis
-	Description: 	
-*/
-
-
 class NPC1100006 {
    NPCConversationManager cm
    int status = -1

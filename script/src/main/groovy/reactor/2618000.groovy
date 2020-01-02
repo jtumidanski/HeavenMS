@@ -23,8 +23,8 @@ class Reactor2618000 {
             eim.giveEventPlayersStageReward(3)
             rm.getMap().killAllMonsters()
 
-            String reactname = (eim.getIntProperty("isAlcadno") == 0) ? "rnj2_door" : "jnr2_door"
-            rm.getMap().getReactorByName(reactname).hitReactor(rm.getClient())
+            String reactorName = (eim.getIntProperty("isAlcadno") == 0) ? "rnj2_door" : "jnr2_door"
+            rm.getMap().getReactorByName(reactorName).hitReactor(rm.getClient())
          }
       }
    }
@@ -33,7 +33,7 @@ class Reactor2618000 {
 
    }
 
-   def untouch() {
+   def release() {
 
    }
 }
@@ -56,6 +56,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

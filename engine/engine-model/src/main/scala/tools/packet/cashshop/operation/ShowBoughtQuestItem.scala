@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class ShowBoughtQuestItem(private var _itemId: Int) extends PacketInput {
   def itemId: Int = _itemId
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

@@ -1,29 +1,10 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -114,7 +95,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       int[][] toSpawn = MapleItemInformationProvider.getInstance().getSummonMobs(summonItemId);
       for (int[] toSpawnChild : toSpawn) {
          if (Randomizer.nextInt(100) < toSpawnChild[1]) {
-            client.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(toSpawnChild[0]), client.getPlayer().position());
+            MapleLifeFactory.getMonster(toSpawnChild[0]).ifPresent(monster -> client.getPlayer().getMap().spawnMonsterOnGroundBelow(monster, client.getPlayer().position()));
          }
       }
       PacketCreator.announce(client, new EnableActions());
@@ -152,15 +133,15 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
             }
             MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, sb.toString());
             break;
-         case 12:// /uclip and entering a map
+         case 12:
             break;
       }
    }
 
    private void killMonster(MapleClient c, int mobToKill, int amount) {
-      List<MapleMapObject> monsterx = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
+      List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
       for (int x = 0; x < amount; x++) {
-         MapleMonster monster = (MapleMonster) monsterx.get(x);
+         MapleMonster monster = (MapleMonster) monsters.get(x);
          if (monster.id() == mobToKill) {
             c.getPlayer().getMap().killMonster(monster, c.getPlayer(), true);
          }
@@ -171,10 +152,12 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
       MapleQuest.getInstance(questId).reset(c.getPlayer());
    }
 
-   private void summon(MapleClient c, int mobId, int quantity) {
-      for (int i = 0; i < quantity; i++) {
-         c.getPlayer().getMap().spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), c.getPlayer().position());
-      }
+   private void summon(MapleClient client, int mobId, int quantity) {
+      IntStream.range(0, quantity)
+            .mapToObj(index -> MapleLifeFactory.getMonster(mobId))
+            .flatMap(Optional::stream)
+            .filter(Objects::nonNull)
+            .forEach(monster -> client.getPlayer().getMap().spawnMonsterOnGroundBelow(monster, client.getPlayer().position()));
    }
 
    private void monsterHpBroadcast(MapleClient c, int mobHp) {

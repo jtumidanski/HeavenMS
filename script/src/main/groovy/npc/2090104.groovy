@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -16,9 +16,9 @@ class NPC2090104 {
    int sel = -1
 
    int beauty = 0
-   int[] mface_r = [20002, 20005, 20007, 20011, 20014, 20017, 20029]
-   int[] fface_r = [21001, 21010, 21013, 21018, 21020, 21021, 21030]
-   int[] facenew = []
+   int[] maleFace = [20002, 20005, 20007, 20011, 20014, 20017, 20029]
+   int[] femaleFace = [21001, 21010, 21013, 21018, 21020, 21021, 21030]
+   int[] faceNew = []
    int[] colors = []
 
    def start() {
@@ -26,24 +26,8 @@ class NPC2090104 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
-   def pushIfItemsExists(int[] array, int[] itemidList) {
-      for (int i = 0; i < itemidList.length; i++) {
-         int itemid = itemidList[i]
-
-         if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-            array << itemid
-         }
-      }
-   }
-
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -56,15 +40,15 @@ class NPC2090104 {
          } else if (status == 1) {
             if (selection == 1) {
                beauty = 1
-               facenew = []
+               faceNew = []
                if (cm.getPlayer().getGender() == 0) {
-                  for (int i = 0; i < mface_r.length; i++) {
-                     pushIfItemExists(facenew, mface_r[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+                  for (int i = 0; i < maleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, maleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                if (cm.getPlayer().getGender() == 1) {
-                  for (int i = 0; i < fface_r.length; i++) {
-                     pushIfItemExists(facenew, fface_r[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+                  for (int i = 0; i < femaleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                cm.sendYesNo("If you use the regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152027##k?")
@@ -77,9 +61,8 @@ class NPC2090104 {
                if (cm.getPlayer().getGender() == 1) {
                   current = cm.getPlayer().getFace() % 100 + 21000
                }
-               colors = []
                int[] temp = [current, current + 100, current + 300, current + 500, current + 600, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendYesNo("If you use the regular coupon, you'll be awarded a random pair of cosmetic lenses. Are you going to use a #b#t5152042##k and really make the change to your eyes?")
             }
          } else if (status == 2) {
@@ -87,7 +70,7 @@ class NPC2090104 {
             if (beauty == 1) {
                if (cm.haveItem(5152027)) {
                   cm.gainItem(5152027, (short) -1)
-                  cm.setFace(facenew[Math.floor(Math.random() * facenew.length).intValue()])
+                  cm.setFace(faceNew[Math.floor(Math.random() * faceNew.length).intValue()])
                   cm.sendOk("Enjoy your new and improved face!")
                } else {
                   cm.sendOk("I'm sorry, but I don't think you have our plastic surgery coupon with you right now. Without the coupon, I'm afraid I can't do it for you..")

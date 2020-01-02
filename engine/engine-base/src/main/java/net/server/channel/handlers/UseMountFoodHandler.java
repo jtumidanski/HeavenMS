@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
@@ -35,10 +14,6 @@ import net.server.channel.packet.reader.UseMountFoodReader;
 import tools.MasterBroadcaster;
 import tools.packet.character.UpdateMount;
 
-/**
- * @author PurpleMadness
- * @author Ronan
- */
 public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoodPacket> {
    @Override
    public Class<UseMountFoodReader> getReaderClass() {
@@ -53,7 +28,7 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
 
       if (client.tryAcquireClient()) {
          try {
-            Boolean mountLevelup = null;
+            Boolean mountLevelUp = null;
 
             useInv.lockInventory();
             try {
@@ -68,12 +43,12 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
                   if (healedFactor > 0.0f) {
                      mount.exp_$eq(mount.exp() + (int) Math.ceil(healedFactor * (2 * mount.level() + 6)));
                      int level = mount.level();
-                     boolean levelup = mount.exp() >= ExpTable.getMountExpNeededForLevel(level) && level < 31;
-                     if (levelup) {
+                     boolean levelUp = mount.exp() >= ExpTable.getMountExpNeededForLevel(level) && level < 31;
+                     if (levelUp) {
                         mount.level_$eq(level + 1);
                      }
 
-                     mountLevelup = levelup;
+                     mountLevelUp = levelUp;
                   }
 
                   MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, packet.itemId(), 1, true, false);
@@ -82,8 +57,8 @@ public final class UseMountFoodHandler extends AbstractPacketHandler<UseMountFoo
                useInv.unlockInventory();
             }
 
-            if (mountLevelup != null) {
-               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.level(), mount.exp(), mount.tiredness(), mountLevelup));
+            if (mountLevelUp != null) {
+               MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new UpdateMount(chr.getId(), mount.level(), mount.exp(), mount.tiredness(), mountLevelUp));
             }
          } finally {
             client.releaseClient();

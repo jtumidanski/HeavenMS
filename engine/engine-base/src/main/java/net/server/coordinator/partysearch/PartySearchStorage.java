@@ -1,27 +1,7 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.coordinator.partysearch;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,9 +15,6 @@ import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 import tools.IntervalBuilder;
 
-/**
- * @author Ronan
- */
 public class PartySearchStorage {
 
    private final MonitoredReentrantReadWriteLock psLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.WORLD_PARTY_SEARCH_STORAGE, true);
@@ -105,12 +82,9 @@ public class PartySearchStorage {
          pscList.add(new PartySearchCharacter(chr));
       }
 
-      pscList.sort(new Comparator<>() {
-         @Override
-         public int compare(PartySearchCharacter c1, PartySearchCharacter c2) {
-            int levelP1 = c1.getLevel(), levelP2 = c2.getLevel();
-            return levelP1 > levelP2 ? 1 : (levelP1 == levelP2 ? 0 : -1);
-         }
+      pscList.sort((c1, c2) -> {
+         int levelP1 = c1.getLevel(), levelP2 = c2.getLevel();
+         return Integer.compare(levelP1, levelP2);
       });
 
       psWLock.lock();
@@ -124,7 +98,7 @@ public class PartySearchStorage {
       emptyIntervals.clear();
    }
 
-   public MapleCharacter callPlayer(int callerCid, int callerMapid, int minLevel, int maxLevel) {
+   public MapleCharacter callPlayer(int callerCid, int callerMapId, int minLevel, int maxLevel) {
       if (emptyIntervals.inInterval(minLevel, maxLevel)) {
          return null;
       }
@@ -142,7 +116,7 @@ public class PartySearchStorage {
             break;
          }
 
-         MapleCharacter chr = psc.callPlayer(callerCid, callerMapid);
+         MapleCharacter chr = psc.callPlayer(callerCid, callerMapId);
          if (chr != null) {
             return chr;
          }

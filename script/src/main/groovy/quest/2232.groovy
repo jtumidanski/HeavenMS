@@ -21,7 +21,7 @@ class Quest2232 {
 
    def end(Byte mode, Byte type, Integer selection) {
       MapleFamilyEntry familyEntry = qm.getPlayer().getFamilyEntry()
-      if (familyEntry != null && familyEntry.getJuniorCount() > 0) {  // script found thanks to kvmba
+      if (familyEntry != null && familyEntry.getJuniorCount() > 0) {
          qm.forceCompleteQuest()
          qm.gainExp(3000)
          qm.sendNext("Good job!")

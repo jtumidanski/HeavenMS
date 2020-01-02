@@ -16,22 +16,24 @@ boolean enter(PortalPlayerInteraction pi) {
       if (eim.getProperty("spawnedBoss") == null) {
          int level = (eim.getProperty("level")).toInteger()
          int chests = (eim.getProperty("openedChests")).toInteger()
-         MapleMonster boss
 
+         Optional<MapleMonster> boss
          if (chests == 0) {
+            //lord pirate
             boss = MapleLifeFactory.getMonster(9300119)
-         }        //lord pirate
-         else if (chests == 1) {
+         } else if (chests == 1) {
+            //angry lord pirate
             boss = MapleLifeFactory.getMonster(9300105)
-         }   //angry lord pirate
-         else {
+         } else {
+            //enraged lord pirate
             boss = MapleLifeFactory.getMonster(9300106)
-         }                   //enraged lord pirate
+         }
 
-         boss.changeDifficulty(level, true)
-
-         pi.getMap(925100500).spawnMonsterOnGroundBelow(boss, new Point(777, 140))
-         eim.setProperty("spawnedBoss", "true")
+         boss.ifPresent({ monster ->
+            monster.changeDifficulty(level, true)
+            pi.getMap(925100500).spawnMonsterOnGroundBelow(monster, new Point(777, 140))
+            eim.setProperty("spawnedBoss", "true")
+         })
       }
 
       pi.playPortalSound(); pi.warp(925100500, 0)

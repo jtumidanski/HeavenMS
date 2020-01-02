@@ -16,7 +16,7 @@ class Reactor6109014 {
 
    }
 
-   def action() { //flame0, im assuming this is topleft
+   def action() { //flame0, im assuming this is top left
       String[] flames = ["a1", "a2", "b1", "b2", "c1", "c2"]
       for (int i = 0; i < flames.length; i++) {
          rm.getMap().toggleEnvironment(flames[i])
@@ -32,7 +32,7 @@ class Reactor6109014 {
       eim.setIntProperty(fid, eim.getIntProperty(fid) + 1)
    }
 
-   def untouch() {
+   def release() {
       EventInstanceManager eim = rm.getEventInstance()
 
       if (eim.getIntProperty(fid) == 1) {
@@ -60,6 +60,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

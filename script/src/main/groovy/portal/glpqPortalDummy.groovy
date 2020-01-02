@@ -23,6 +23,6 @@ boolean enter(PortalPlayerInteraction pi) {
       return true
    }
 
-   MessageBroadcaster.getInstance().sendServerNotice(pi.getEventInstance().getPlayers(), ServerNoticeType.PINK_TEXT, "The portal apparatus is malfunctional, due to the last transportation. The finding another way through.")
+   MessageBroadcaster.getInstance().sendServerNotice(pi.getEventInstance().getPlayers(), ServerNoticeType.PINK_TEXT, "The portal apparatus is malfunctioning, due to the last transportation. The finding another way through.")
    return false
 }

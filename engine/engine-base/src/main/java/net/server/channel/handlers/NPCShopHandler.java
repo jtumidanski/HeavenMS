@@ -1,28 +1,7 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleClient;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import constants.inventory.ItemConstants;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.NPCShopPacket;
@@ -30,9 +9,6 @@ import net.server.channel.packet.reader.NPCShopReader;
 import server.processor.MapleShopProcessor;
 import tools.FilePrinter;
 
-/**
- * @author Matze
- */
 public final class NPCShopHandler extends AbstractPacketHandler<NPCShopPacket> {
    @Override
    public Class<NPCShopReader> getReaderClass() {
@@ -43,7 +19,7 @@ public final class NPCShopHandler extends AbstractPacketHandler<NPCShopPacket> {
    public void handlePacket(NPCShopPacket packet, MapleClient client) {
       if (packet.mode() == 0) { // mode 0 = buy :)
          if (packet.quantity() < 1) {
-            AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit a npc shop.");
+            AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit a npc shop.");
             FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to buy quantity " + packet.quantity() + " of item id " + packet.itemId());
             client.disconnect(true, false);
             return;

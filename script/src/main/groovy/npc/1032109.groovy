@@ -22,7 +22,7 @@ class NPC1032109 {
    int mobId = 2220100 //Blue Mushroom
 
    def start() {
-      if (!cm.isQuestStarted(20718)) {    // thanks Stray, Ari
+      if (!cm.isQuestStarted(20718)) {
          cm.dispose()
          return
       }
@@ -49,13 +49,13 @@ class NPC1032109 {
          MapleMap map = player.getMap()
 
          for (def i = 0; i < 10; i++) {
-            map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), new Point(117, 183))
+            MapleLifeFactory.getMonster(mobId).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(117, 183)) })
          }
          for (def i = 0; i < 10; i++) {
-            map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), new Point(4, 183))
+            MapleLifeFactory.getMonster(mobId).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(4, 183)) })
          }
          for (def i = 0; i < 10; i++) {
-            map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(mobId), new Point(-109, 183))
+            MapleLifeFactory.getMonster(mobId).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-109, 183)) })
          }
 
          cm.completeQuest(20718, 1103003)

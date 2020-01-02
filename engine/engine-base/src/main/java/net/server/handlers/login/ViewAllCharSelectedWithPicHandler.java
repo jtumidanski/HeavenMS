@@ -10,7 +10,7 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.ViewAllCharactersSelectedWithPicReader;
 import net.server.coordinator.session.MapleSessionCoordinator;
-import net.server.coordinator.session.MapleSessionCoordinator.AntiMulticlientResult;
+import net.server.coordinator.session.MapleSessionCoordinator.AntiMultiClientResult;
 import net.server.login.packet.ViewAllCharactersSelectedWithPicPacket;
 import net.server.world.World;
 import tools.PacketCreator;
@@ -49,13 +49,13 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
       }
 
       client.setWorld(server.getCharacterWorld(packet.characterId()));
-      World wserv = client.getWorldServer();
-      if (wserv == null || wserv.isWorldCapacityFull()) {
+      World world = client.getWorldServer();
+      if (world == null || world.isWorldCapacityFull()) {
          PacketCreator.announce(client, new AfterLoginError(10));
          return;
       }
 
-      int channel = Randomizer.rand(1, wserv.getChannelsSize());
+      int channel = Randomizer.rand(1, world.getChannelsSize());
       client.setChannel(channel);
 
       if (client.checkPic(packet.pic())) {
@@ -65,9 +65,9 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
             return;
          }
 
-         AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
-         if (res != AntiMulticlientResult.SUCCESS) {
-            PacketCreator.announce(client, new AfterLoginError(parseAntiMulticlientError(res)));
+         AntiMultiClientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
+         if (res != AntiMultiClientResult.SUCCESS) {
+            PacketCreator.announce(client, new AfterLoginError(parseAntiMultiClientError(res)));
             return;
          }
 
@@ -84,7 +84,7 @@ public class ViewAllCharSelectedWithPicHandler extends AbstractPacketHandler<Vie
       }
    }
 
-   private int parseAntiMulticlientError(AntiMulticlientResult res) {
+   private int parseAntiMultiClientError(AntiMultiClientResult res) {
       switch (res) {
          case REMOTE_PROCESSING:
             return 10;

@@ -16,19 +16,19 @@ public class DueyPackageFromResultSetTransformer implements SqlTransformer<DueyP
       int packageId = resultSet.getPackageId();
 
       List<Pair<Item, MapleInventoryType>> dueyItems = ItemFactory.DUEY.loadItems(packageId, false);
-      DueyPackage dueypack;
+      DueyPackage dueyPackage;
 
       if (!dueyItems.isEmpty()) {     // in a duey package there's only one item
-         dueypack = new DueyPackage(packageId, Option.apply(dueyItems.get(0).getLeft()));
+         dueyPackage = new DueyPackage(packageId, Option.apply(dueyItems.get(0).getLeft()));
       } else {
-         dueypack = new DueyPackage(packageId);
+         dueyPackage = new DueyPackage(packageId);
       }
 
-      dueypack.sender_$eq(resultSet.getSenderName());
-      dueypack.mesos_$eq(resultSet.getMesos());
-      dueypack.setSentTime(resultSet.getTimestamp(), resultSet.getType() == 1);
-      dueypack.message_$eq(resultSet.getMessage());
+      dueyPackage.sender_$eq(resultSet.getSenderName());
+      dueyPackage.mesos_$eq(resultSet.getMesos());
+      dueyPackage.setSentTime(resultSet.getTimestamp(), resultSet.getType() == 1);
+      dueyPackage.message_$eq(resultSet.getMessage());
 
-      return dueypack;
+      return dueyPackage;
    }
 }

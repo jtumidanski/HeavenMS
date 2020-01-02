@@ -1,7 +1,7 @@
 package tools.packet.factory;
 
 import tools.data.output.MaplePacketLittleEndianWriter;
-import tools.packet.pyramid.PyramidGuage;
+import tools.packet.pyramid.PyramidGauge;
 import tools.packet.pyramid.PyramidScore;
 
 public class PyramidPacketFactory extends AbstractPacketFactory {
@@ -16,7 +16,7 @@ public class PyramidPacketFactory extends AbstractPacketFactory {
 
    private PyramidPacketFactory() {
       Handler.handle(PyramidScore.class).decorate(this::pyramidScore).size(7).register(registry);
-      Handler.handle(PyramidGuage.class).decorate(this::pyramidGauge).size(6).register(registry);
+      Handler.handle(PyramidGauge.class).decorate(this::pyramidGauge).size(6).register(registry);
    }
 
    protected void pyramidScore(MaplePacketLittleEndianWriter writer, PyramidScore packet) {//Type cannot be higher than 4 (MaplePacketLittleEndianWriter writer, Rank D), otherwise you'll crash
@@ -24,14 +24,14 @@ public class PyramidPacketFactory extends AbstractPacketFactory {
       writer.writeInt(packet.exp());
    }
 
-   protected void pyramidGauge(MaplePacketLittleEndianWriter writer, PyramidGuage packet) {
-      writer.writeInt(packet.guage());
+   protected void pyramidGauge(MaplePacketLittleEndianWriter writer, PyramidGauge packet) {
+      writer.writeInt(packet.gauge());
    }
 
    protected void MassacreResult(MaplePacketLittleEndianWriter writer, byte nRank, int nIncExp) {
 //      //CField_MassacreResult__OnMassacreResult @ 0x005617C5
 //      final MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
-//      writer.writeShort(SendOpcode.PYRAMID_SCORE.getValue()); //MASSACRERESULT | 0x009E
+//      writer.writeShort(SendOpcode.PYRAMID_SCORE.getValue()); //MASSACRE RESULT | 0x009E
 //      writer.write(nRank); //(0 - S) (1 - A) (2 - B) (3 - C) (4 - D) ( Else - Crash )
 //      writer.writeInt(nIncExp);
 //      return writer.getPacket();
@@ -88,7 +88,7 @@ public class PyramidPacketFactory extends AbstractPacketFactory {
 //      final MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
 //      writer.writeShort(SendOpcode.TOURNAMENT_UEW.getValue());
 //
-//      //Is this a bitflag o.o ?
+//      //Is this a bit flag o.o ?
 //      //2 = "You have reached the finals by default."
 //      //4 = "You have reached the semifinals by default."
 //      //8 or 16 = "You have reached the round of %n by default." | Encodes nState as %n ?!

@@ -8,11 +8,6 @@ import tools.Randomizer;
 import tools.packet.rps.RPSMode;
 import tools.packet.rps.RPSSelection;
 
-/**
- * @Author Arnah
- * @Website http://Vertisy.ca/
- * @since Aug 15, 2016
- */
 public class MapleRockPaperScissor {
 
    private int round = 0;

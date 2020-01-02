@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server;
 
 import java.util.ArrayList;
@@ -32,21 +13,17 @@ import client.inventory.Item;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
 
-/**
- * @author RonanLana
- */
-
-class PairedQuicksort {
+class PairedQuickSort {
    private final ArrayList<Integer> intersect;
    MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
    private int i = 0;
    private int j = 0;
 
-   public PairedQuicksort(ArrayList<Item> A, int primarySort, int secondarySort) {
+   public PairedQuickSort(ArrayList<Item> A, int primarySort, int secondarySort) {
       intersect = new ArrayList<>();
 
       if (A.size() > 0) {
-         MapleQuicksort(0, A.size() - 1, A, primarySort);
+         MapleQuickSort(0, A.size() - 1, A, primarySort);
       }
 
       intersect.add(0);
@@ -59,7 +36,7 @@ class PairedQuicksort {
 
       for (int ind = 0; ind < intersect.size() - 1; ind++) {
          if (intersect.get(ind + 1) > intersect.get(ind)) {
-            MapleQuicksort(intersect.get(ind), intersect.get(ind + 1) - 1, A, secondarySort);
+            MapleQuickSort(intersect.get(ind), intersect.get(ind + 1) - 1, A, secondarySort);
          }
       }
    }
@@ -156,7 +133,7 @@ class PairedQuicksort {
       } while (i <= j);
    }
 
-   void MapleQuicksort(int Esq, int Dir, ArrayList<Item> A, int sort) {
+   void MapleQuickSort(int Esq, int Dir, ArrayList<Item> A, int sort) {
       switch (sort) {
          case 3:
             PartitionByLevel(Esq, Dir, A);
@@ -176,10 +153,10 @@ class PairedQuicksort {
 
 
       if (Esq < j) {
-         MapleQuicksort(Esq, j, A, sort);
+         MapleQuickSort(Esq, j, A, sort);
       }
       if (i < Dir) {
-         MapleQuicksort(i, Dir, A, sort);
+         MapleQuickSort(i, Dir, A, sort);
       }
    }
 }
@@ -359,24 +336,24 @@ public class MapleStorageInventory {
    }
 
    public List<Item> sortItems() {
-      ArrayList<Item> itemarray = new ArrayList<>();
+      ArrayList<Item> itemArray = new ArrayList<>();
 
       for (short i = 1; i <= this.getSlotLimit(); i++) {
          Item item = this.getItem(i);
          if (item != null) {
-            itemarray.add(item.copy());
+            itemArray.add(item.copy());
          }
       }
 
-      for (Item item : itemarray) {
+      for (Item item : itemArray) {
          this.removeSlot(item.position());
       }
 
       int invTypeCriteria = 1;
       int sortCriteria = (YamlConfig.config.server.USE_ITEM_SORT_BY_NAME) ? 2 : 0;
-      PairedQuicksort pq = new PairedQuicksort(itemarray, sortCriteria, invTypeCriteria);
+      PairedQuickSort pq = new PairedQuickSort(itemArray, sortCriteria, invTypeCriteria);
 
       inventory.clear();
-      return itemarray;
+      return itemArray;
    }
 }

@@ -1,23 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 package net.server.channel.handlers;
 
 import java.util.Collections;
@@ -37,9 +17,6 @@ import tools.Pair;
 import tools.packet.buff.GiveBuff;
 import tools.packet.spawn.StopMonsterControl;
 
-/**
- * @author Ronan
- */
 public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
@@ -51,16 +28,16 @@ public final class PlayerMapTransitionHandler extends AbstractPacketHandler<NoOp
       MapleCharacter chr = client.getPlayer();
       chr.setMapTransitionComplete();
 
-      int beaconid = chr.getBuffSource(MapleBuffStat.HOMING_BEACON);
-      if (beaconid != -1) {
+      int beaconId = chr.getBuffSource(MapleBuffStat.HOMING_BEACON);
+      if (beaconId != -1) {
          chr.cancelBuffStats(MapleBuffStat.HOMING_BEACON);
 
          final List<Pair<MapleBuffStat, Integer>> stat = Collections.singletonList(new Pair<>(MapleBuffStat.HOMING_BEACON, 0));
-         PacketCreator.announce(chr, new GiveBuff(1, beaconid, stat));
+         PacketCreator.announce(chr, new GiveBuff(1, beaconId, stat));
       }
 
-      if (!chr.isHidden()) {  // thanks Lame for noticing hidden characters controlling mobs
-         for (MapleMapObject mo : chr.getMap().getMonsters()) {    // thanks BHB, IxianMace, Jefe for noticing several issues regarding mob statuses (such as freeze)
+      if (!chr.isHidden()) {
+         for (MapleMapObject mo : chr.getMap().getMonsters()) {
             MapleMonster m = (MapleMonster) mo;
             if (m.getSpawnEffect() == 0 || m.getHp() < m.getMaxHp()) {     // avoid effect-spawning mobs
                if (m.getController() == chr) {

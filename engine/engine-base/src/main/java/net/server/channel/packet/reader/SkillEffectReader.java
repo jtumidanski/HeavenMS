@@ -11,7 +11,7 @@ public class SkillEffectReader implements PacketReader<SkillEffectPacket> {
       int level = accessor.readByte();
       byte flags = accessor.readByte();
       int speed = accessor.readByte();
-      byte aids = accessor.readByte();//Mmmk
+      byte aids = accessor.readByte();
       return new SkillEffectPacket(skillId, level, flags, speed, aids);
    }
 }

@@ -24,7 +24,7 @@ class NPC2080000 {
    boolean equip
 
    boolean stimulator = false
-   int stimID
+   int stimulatorId
 
    int cd_item = 4001078
    int[] cd_mats = [4011001, 4011002, 4001079]
@@ -62,7 +62,7 @@ class NPC2080000 {
          } else {
             stimulator = false
          }
-         if (selectedType == 0) { //What's a stim?
+         if (selectedType == 0) { //What's a stimulator?
             cm.sendNext("A stimulator is a special potion that I can add into the process of creating certain items. It gives it stats as though it had dropped from a monster. However, it is possible to have no change, and it is also possible for the item to be below average. There's also a 10% chance of not getting any item when using a stimulator, so please choose wisely.")
             cm.dispose()
          } else if (selectedType == 1) { //warrior weapon
@@ -163,8 +163,8 @@ class NPC2080000 {
 
          String prompt = "You want me to make a #t" + item + "#? In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
          if (stimulator) {
-            stimID = getStimID(item)
-            prompt += "\r\n#i" + stimID + "# 1 #t" + stimID + "#"
+            stimulatorId = getStimulatorId(item)
+            prompt += "\r\n#i" + stimulatorId + "# 1 #t" + stimulatorId + "#"
          }
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
             for (int i = 0; i < mats.size(); i++) {
@@ -200,7 +200,7 @@ class NPC2080000 {
             }
          }
          if (stimulator) { //check for stimulator
-            if (!cm.haveItem(stimID)) {
+            if (!cm.haveItem(stimulatorId)) {
                complete = false
             }
          }
@@ -216,7 +216,7 @@ class NPC2080000 {
             }
             cm.gainMeso(-cost)
             if (stimulator) { //check for stimulator
-               cm.gainItem(stimID, (short) -1)
+               cm.gainItem(stimulatorId, (short) -1)
                int deleted = Math.floor(Math.random() * 10).intValue()
                if (deleted != 0) {
                   cm.gainItem(item, (short) 1, true, true)
@@ -233,7 +233,7 @@ class NPC2080000 {
       }
    }
 
-   static def getStimID(int equipID) {
+   static def getStimulatorId(int equipID) {
       int cat = Math.floor(equipID / 10000).intValue()
       switch (cat) {
          case 130: //1h sword
@@ -250,7 +250,7 @@ class NPC2080000 {
             return 4130007
          case 143: //spear
             return 4130008
-         case 144: //polearm
+         case 144: //pole arm
             return 4130009
          case 137: //wand
             return 4130010
@@ -258,7 +258,7 @@ class NPC2080000 {
             return 4130011
          case 145: //bow
             return 4130012
-         case 146: //xbow
+         case 146: //crossbow
             return 4130013
          case 148: //knuckle
             return 4130016

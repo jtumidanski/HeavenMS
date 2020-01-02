@@ -39,12 +39,12 @@ class NPC9201014 {
       }
       if (marriageRoom) {
          if (status == 0) {
-            String talk = "Hi there, welcome to the wedding's Gift Registry. From which spouse's wishlist would you like to take a look?"
+            String talk = "Hi there, welcome to the wedding's Gift Registry. From which spouse's wish list would you like to take a look?"
             String[] options = ["Groom", "Bride"]
 
             cm.sendSimple(talk + "\r\n\r\n#b" + generateSelectionMenu(options) + "#k")
          } else {
-            cm.sendMarriageWishlist(selection == 0)
+            cm.sendMarriageWishList(selection == 0)
             cm.dispose()
          }
       } else {
@@ -67,7 +67,7 @@ class NPC9201014 {
             } else if (status == 1) {
                if (selection == 0) {
                   if (cm.haveItem(4031424)) {
-                     if (cm.getPlayer().isMarried()) {   // thanks MedicOP for solving an issue here
+                     if (cm.getPlayer().isMarried()) {
                         if (cm.getInventory(2).getNextFreeSlot() >= 0) {
                            int rand = Math.floor(Math.random() * 4).intValue()
                            if (rand == 0) {

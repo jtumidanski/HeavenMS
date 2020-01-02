@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -31,7 +31,7 @@ class NPC1012104 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -47,12 +47,12 @@ class NPC1012104 {
                hairNew = []
                if (cm.getPlayer().getGender() == 0) {
                   for (def i = 0; i < maleHair.length; i++) {
-                     pushIfItemExists(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                if (cm.getPlayer().getGender() == 1) {
                   for (def i = 0; i < femaleHair.length; i++) {
-                     pushIfItemExists(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                cm.sendYesNo("If you use the REG coupon your hair will change RANDOMLY with a chance to obtain a new experimental style that even you didn't think was possible. Are you going to use #b#t5150000##k and really change your hairstyle?")
@@ -61,12 +61,12 @@ class NPC1012104 {
                hairNew = []
                if (cm.getPlayer().getGender() == 0) {
                   for (def i = 0; i < maleHairExperimental.length; i++) {
-                     pushIfItemExists(hairNew, maleHairExperimental[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, maleHairExperimental[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                if (cm.getPlayer().getGender() == 1) {
                   for (def i = 0; i < femaleHairExperimental.length; i++) {
-                     pushIfItemExists(hairNew, femaleHairExperimental[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHairExperimental[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                cm.sendYesNo("If you use the EXP coupon your hair will change RANDOMLY with a chance to obtain a new experimental style that even you didn't think was possible. Are you going to use #b#t5150010##k and really change your hairstyle?")
@@ -75,7 +75,7 @@ class NPC1012104 {
                hairColor = []
                int current = (cm.getPlayer().getHair() / 10).intValue() * 10
                for (def i = 0; i < 8; i++) {
-                  pushIfItemExists(hairColor, current + i)
+                  hairColor = ScriptUtils.pushItemIfTrue(hairColor, current + i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                }
                cm.sendYesNo("If you use a regular coupon your hair will change RANDOMLY. Do you still want to use #b#t5151000##k and change it up?")
             }
@@ -93,7 +93,7 @@ class NPC1012104 {
                if (cm.haveItem(5151000)) {
                   cm.gainItem(5151000, (short) -1)
                   cm.setHair(hairColor[Math.floor(Math.random() * hairColor.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved haircolor!")
+                  cm.sendOk("Enjoy your new and improved hair color!")
                } else {
                   cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
                }
@@ -119,12 +119,6 @@ class NPC1012104 {
                }
             }
          }
-      }
-   }
-
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
       }
    }
 }

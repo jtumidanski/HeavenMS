@@ -52,7 +52,7 @@ class NPC2081005 {
          if (cm.getLevel() > 99) {
             cm.warp(240050000, 0)
          } else {
-            cm.sendOk("I'm sorry. You need to be atleast level 100 or above to enter.")
+            cm.sendOk("I'm sorry. You need to be at least level 100 or above to enter.")
          }
          cm.dispose()
       }

@@ -22,7 +22,7 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
    private UpdateCharacterBoxPacketFactory() {
       Handler.handle(AddOmokBox.class).decorate(this::addOmokBox).register(registry);
       Handler.handle(AddMatchCard.class).decorate(this::addMatchCardBox).register(registry);
-      Handler.handle(RemoveMiniGameBox.class).decorate(this::removeMinigameBox).size(7).register(registry);
+      Handler.handle(RemoveMiniGameBox.class).decorate(this::removeMiniGameBox).size(7).register(registry);
       Handler.handle(UpdatePlayerShopBox.class).decorate(this::updatePlayerShopBox).register(registry);
       Handler.handle(RemovePlayerShop.class).decorate(this::removePlayerShopBox).size(7).register(registry);
       Handler.handle(UseChalkboard.class).decorate(this::useChalkboard).register(registry);
@@ -38,7 +38,7 @@ public class UpdateCharacterBoxPacketFactory extends AbstractPacketFactory {
       addAnnounceBox(writer, packet.getCharacter().getMiniGame(), packet.getAmount(), packet.getType());
    }
 
-   protected void removeMinigameBox(MaplePacketLittleEndianWriter writer, RemoveMiniGameBox packet) {
+   protected void removeMiniGameBox(MaplePacketLittleEndianWriter writer, RemoveMiniGameBox packet) {
       writer.writeInt(packet.characterId());
       writer.write(0);
    }

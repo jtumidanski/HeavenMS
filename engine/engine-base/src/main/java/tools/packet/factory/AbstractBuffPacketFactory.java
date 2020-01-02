@@ -3,62 +3,62 @@ package tools.packet.factory;
 import java.util.List;
 
 import client.MapleBuffStat;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 
 public abstract class AbstractBuffPacketFactory extends AbstractPacketFactory {
-   protected void writeLongMaskD(final MaplePacketLittleEndianWriter mplew, List<Pair<MapleDisease, Integer>> statups) {
-      long firstmask = 0;
-      long secondmask = 0;
-      for (Pair<MapleDisease, Integer> statup : statups) {
-         if (statup.getLeft().isFirst()) {
-            firstmask |= statup.getLeft().getValue();
+   protected void writeLongMaskD(final MaplePacketLittleEndianWriter writer, List<Pair<MapleAbnormalStatus, Integer>> statIncreases) {
+      long firstMask = 0;
+      long secondMask = 0;
+      for (Pair<MapleAbnormalStatus, Integer> statIncrease : statIncreases) {
+         if (statIncrease.getLeft().isFirst()) {
+            firstMask |= statIncrease.getLeft().getValue();
          } else {
-            secondmask |= statup.getLeft().getValue();
+            secondMask |= statIncrease.getLeft().getValue();
          }
       }
-      mplew.writeLong(firstmask);
-      mplew.writeLong(secondmask);
+      writer.writeLong(firstMask);
+      writer.writeLong(secondMask);
    }
 
-   protected void writeLongMask(final MaplePacketLittleEndianWriter mplew, List<Pair<MapleBuffStat, Integer>> statups) {
-      long firstmask = 0;
-      long secondmask = 0;
+   protected void writeLongMask(final MaplePacketLittleEndianWriter writer, List<Pair<MapleBuffStat, Integer>> statups) {
+      long firstMask = 0;
+      long secondMask = 0;
       for (Pair<MapleBuffStat, Integer> statup : statups) {
          if (statup.getLeft().isFirst()) {
-            firstmask |= statup.getLeft().getValue();
+            firstMask |= statup.getLeft().getValue();
          } else {
-            secondmask |= statup.getLeft().getValue();
+            secondMask |= statup.getLeft().getValue();
          }
       }
-      mplew.writeLong(firstmask);
-      mplew.writeLong(secondmask);
+      writer.writeLong(firstMask);
+      writer.writeLong(secondMask);
    }
 
-   protected void writeLongMaskSlowD(final MaplePacketLittleEndianWriter mplew) {
-      mplew.writeInt(0);
-      mplew.writeInt(2048);
-      mplew.writeLong(0);
+   protected void writeLongMaskSlowD(final MaplePacketLittleEndianWriter writer) {
+      writer.writeInt(0);
+      writer.writeInt(2048);
+      writer.writeLong(0);
    }
 
-   protected void writeLongMaskChair(final MaplePacketLittleEndianWriter mplew) {
-      mplew.writeInt(0);
-      mplew.writeInt(262144);
-      mplew.writeLong(0);
+   protected void writeLongMaskChair(final MaplePacketLittleEndianWriter writer) {
+      writer.writeInt(0);
+      writer.writeInt(262144);
+      writer.writeLong(0);
    }
 
-   protected void writeLongMaskFromList(final MaplePacketLittleEndianWriter mplew, List<MapleBuffStat> statups) {
-      long firstmask = 0;
-      long secondmask = 0;
+   protected void writeLongMaskFromList(final MaplePacketLittleEndianWriter writer, List<MapleBuffStat> statups) {
+      long firstMask = 0;
+      long secondMask = 0;
       for (MapleBuffStat statup : statups) {
          if (statup.isFirst()) {
-            firstmask |= statup.getValue();
+            firstMask |= statup.getValue();
          } else {
-            secondmask |= statup.getValue();
+            secondMask |= statup.getValue();
          }
       }
-      mplew.writeLong(firstmask);
-      mplew.writeLong(secondmask);
+      writer.writeLong(firstMask);
+      writer.writeLong(secondMask);
    }
 }

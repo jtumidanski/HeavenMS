@@ -10,5 +10,5 @@ class MultiMegaphone(private var _messages: Array[String], private var _channel:
 
   def showEar: Boolean = _showEar
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERMESSAGE
+  override def opcode(): SendOpcode = SendOpcode.SERVER_MESSAGE
 }

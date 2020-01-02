@@ -15,7 +15,7 @@ public class GiveRpCommand extends Command {
    public void execute(MapleClient client, String[] params) {
       MapleCharacter player = client.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !giverp <playername> <gainrewardpoint>");
+         player.yellowMessage("Syntax: !giverp <player name> <gain reward point>");
          return;
       }
 

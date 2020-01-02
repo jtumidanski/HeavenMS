@@ -2,7 +2,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 
 import java.awt.*
@@ -19,7 +18,7 @@ class NPC1104101 {
    int status = -1
    int sel = -1
 
-   int npcid = 1104101
+   int npcId = 1104101
    int baseJob = 12
 
    def start() {
@@ -50,11 +49,11 @@ class NPC1104101 {
 
             cm.sendOk("Darn, you found me! Then, there's only one way out! Let's fight, like #rBlack Wings#k should!")
          } else if (status == 1) {
-            MapleMap mapobj = cm.getMap()
-            Point npcpos = mapobj.getMapObject(cm.getNpcObjectId()).position()
+            MapleMap map = cm.getMap()
+            Point npcPosition = map.getMapObject(cm.getNpcObjectId()).position()
 
-            spawnMob(npcpos.x, npcpos.y, 9001009, mapobj)
-            mapobj.destroyNPC(npcid)
+            spawnMob(npcPosition.x, npcPosition.y, 9001009, map)
+            map.destroyNPC(npcId)
             cm.dispose()
          }
       }
@@ -65,8 +64,7 @@ class NPC1104101 {
          return
       }
 
-      MapleMonster mob = MapleLifeFactory.getMonster(id)
-      map.spawnMonsterOnGroundBelow(mob, new Point((int) x, (int) y))
+      MapleLifeFactory.getMonster(id).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point((int) x, (int) y)) })
    }
 }
 

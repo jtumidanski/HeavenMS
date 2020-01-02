@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.world;
 
 import client.MapleCharacter;
@@ -29,10 +8,10 @@ public class MapleMessengerCharacter {
    private int channel;
    private boolean online;
 
-   public MapleMessengerCharacter(MapleCharacter maplechar, int position) {
-      this.name = maplechar.getName();
-      this.channel = maplechar.getClient().getChannel();
-      this.id = maplechar.getId();
+   public MapleMessengerCharacter(MapleCharacter character, int position) {
+      this.name = character.getName();
+      this.channel = character.getClient().getChannel();
+      this.id = character.getId();
       this.online = true;
       this.position = position;
    }

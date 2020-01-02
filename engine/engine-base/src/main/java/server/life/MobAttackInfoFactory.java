@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.life;
 
 import java.io.File;
@@ -31,9 +10,6 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import tools.StringUtil;
 
-/**
- * @author Danny (Leifde)
- */
 public class MobAttackInfoFactory {
    private static Map<String, MobAttackInfo> mobAttacks = new HashMap<>();
    private static MapleDataProvider dataSource = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Mob.wz"));
@@ -49,9 +25,9 @@ public class MobAttackInfoFactory {
             MapleData mobData = dataSource.getData(StringUtil.getLeftPaddedStr(mob.id() + ".img", '0', 11));
             if (mobData != null) {
 //					MapleData infoData = mobData.getChildByPath("info");
-               String linkedmob = MapleDataTool.getString("link", mobData, "");
-               if (!linkedmob.equals("")) {
-                  mobData = dataSource.getData(StringUtil.getLeftPaddedStr(linkedmob + ".img", '0', 11));
+               String linkedMob = MapleDataTool.getString("link", mobData, "");
+               if (!linkedMob.equals("")) {
+                  mobData = dataSource.getData(StringUtil.getLeftPaddedStr(linkedMob + ".img", '0', 11));
                }
                MapleData attackData = mobData.getChildByPath("attack" + (attack + 1) + "/info");
 

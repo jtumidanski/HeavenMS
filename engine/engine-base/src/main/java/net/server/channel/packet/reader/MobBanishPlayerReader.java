@@ -7,7 +7,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public class MobBanishPlayerReader implements PacketReader<MobBanishPlayerPacket> {
    @Override
    public MobBanishPlayerPacket read(SeekableLittleEndianAccessor accessor) {
-      int mobid = accessor.readInt();     // mob banish handling detected thanks to MedicOP
-      return new MobBanishPlayerPacket(mobid);
+      int mobId = accessor.readInt();
+      return new MobBanishPlayerPacket(mobId);
    }
 }

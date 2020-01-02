@@ -13,5 +13,5 @@ class ShowCashInventory(private var _accountId: Int, private var _items: java.ut
 
   def characterSlots: Short = _characterSlots
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

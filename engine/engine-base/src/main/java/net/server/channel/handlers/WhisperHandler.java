@@ -1,31 +1,10 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import database.provider.CharacterProvider;
 import config.YamlConfig;
 import net.server.AbstractPacketHandler;
@@ -41,9 +20,6 @@ import tools.packet.message.FindReply;
 import tools.packet.message.Whisper;
 import tools.packet.message.WhisperReply;
 
-/**
- * @author Matze
- */
 public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
    @Override
    public Class<WhisperReader> getReaderClass() {
@@ -66,7 +42,6 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
    }
 
    private void buddyFind(WhisperPacket packet, MapleClient client) {
-      //Buddy find, thanks to Atoot
       client.getWorldServer().getPlayerStorage().getCharacterByName(packet.recipient()).filter(player -> client.getPlayer().gmLevel() >= player.gmLevel()).ifPresent(player -> {
          if (player.getCashShop().isOpened()) {  // in CashShop
             PacketCreator.announce(client, new BuddyFindReply(player.getName(), -1, 2));
@@ -86,7 +61,7 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
             PacketCreator.announce(client, new FindReply(victim.getName(), -1, 2));
          } else if (victim.isAwayFromWorld()) {  // in MTS
             PacketCreator.announce(client, new FindReply(victim.getName(), -1, 0));
-         } else if (victim.getClient().getChannel() != client.getChannel()) { // in another channel, issue detected thanks to MedicOP
+         } else if (victim.getClient().getChannel() != client.getChannel()) {
             PacketCreator.announce(client, new FindReply(victim.getName(), victim.getClient().getChannel() - 1, 3));
          } else {
             PacketCreator.announce(client, new FindReply(victim.getName(), victim.getMap().getId(), 1));
@@ -113,11 +88,11 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
 
    private void whisper(WhisperPacket packet, MapleClient client) {
       Optional<MapleCharacter> player = client.getChannelServer().getPlayerStorage().getCharacterByName(packet.recipient());
-      if (client.getPlayer().getAutobanManager().getLastSpam(7) + 200 > currentServerTime()) {
+      if (client.getPlayer().getAutoBanManager().getLastSpam(7) + 200 > currentServerTime()) {
          return;
       }
       if (packet.message().length() > Byte.MAX_VALUE) {
-         AutobanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit with whispers.");
+         AutoBanFactory.PACKET_EDIT.alert(client.getPlayer(), client.getPlayer().getName() + " tried to packet edit with whispers.");
          FilePrinter.printError(FilePrinter.EXPLOITS + client.getPlayer().getName() + ".txt", client.getPlayer().getName() + " tried to send text with length of " + packet.message().length());
          client.disconnect(true, false);
          return;
@@ -151,6 +126,6 @@ public final class WhisperHandler extends AbstractPacketHandler<WhisperPacket> {
             PacketCreator.announce(client, new WhisperReply(packet.recipient(), (byte) 0));
          }
       }
-      client.getPlayer().getAutobanManager().spam(7);
+      client.getPlayer().getAutoBanManager().spam(7);
    }
 }

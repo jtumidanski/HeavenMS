@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client.inventory;
 
 import java.util.ArrayList;
@@ -46,9 +25,6 @@ import server.ThreadManager;
 import tools.FilePrinter;
 import tools.Pair;
 
-/**
- * @author Matze, Ronan
- */
 public class MapleInventory implements Iterable<Item> {
    protected MapleCharacter owner;
    protected Map<Short, Item> inventory;
@@ -71,10 +47,10 @@ public class MapleInventory implements Iterable<Item> {
    private static boolean checkItemRestricted(List<Pair<Item, MapleInventoryType>> items) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
-      Set<Integer> itemids = new HashSet<>();
+      Set<Integer> itemIds = new HashSet<>();
       for (Pair<Item, MapleInventoryType> p : items) {
-         int itemid = p.getLeft().id();
-         if (ii.isPickupRestricted(itemid) && (p.getLeft().quantity() > 1 || !itemids.add(itemid))) {
+         int itemId = p.getLeft().id();
+         if (ii.isPickupRestricted(itemId) && (p.getLeft().quantity() > 1 || !itemIds.add(itemId))) {
             return false;
          }
       }
@@ -82,7 +58,7 @@ public class MapleInventory implements Iterable<Item> {
       return true;
    }
 
-   public static boolean checkSpot(MapleCharacter chr, Item item) {    // thanks Vcoc for noticing pshops not checking item stacks when taking item back
+   public static boolean checkSpot(MapleCharacter chr, Item item) {
       return checkSpot(chr, Collections.singletonList(item));
    }
 
@@ -208,7 +184,6 @@ public class MapleInventory implements Iterable<Item> {
             rcvTypes.put(itemHash, item.right.getType());
             rcvOwners.put(itemHash, item.left.owner());
          } else {
-            // thanks BHB88 for pointing out an issue with rechargeable items being stacked on inventory check
             if (!ItemConstants.isEquipment(item.left.id()) && !ItemConstants.isRechargeable(item.left.id())) {
                qty.set(0, qty.get(0) + item.left.quantity());
             } else {
@@ -376,12 +351,7 @@ public class MapleInventory implements Iterable<Item> {
       }
 
       if (ret.size() > 1) {
-         ret.sort(new Comparator<>() {
-            @Override
-            public int compare(Item i1, Item i2) {
-               return i1.position() - i2.position();
-            }
-         });
+         ret.sort(Comparator.comparingInt(Item::position));
       }
 
       return ret;
@@ -396,12 +366,7 @@ public class MapleInventory implements Iterable<Item> {
       }
 
       if (ret.size() > 1) {
-         ret.sort(new Comparator<>() {
-            @Override
-            public int compare(Item i1, Item i2) {
-               return i1.position() - i2.position();
-            }
-         });
+         ret.sort(Comparator.comparingInt(Item::position));
       }
 
       return ret;
@@ -510,12 +475,7 @@ public class MapleInventory implements Iterable<Item> {
       }
 
       if (ItemConstants.isRateCoupon(item.id())) {
-         ThreadManager.getInstance().newTask(new Runnable() {    // deadlocks with coupons rates found thanks to GabrielSin & Masterrulax
-            @Override
-            public void run() {
-               owner.updateCouponRates();
-            }
-         });
+         ThreadManager.getInstance().newTask(() -> owner.updateCouponRates());
       }
 
       return slotId;
@@ -530,12 +490,7 @@ public class MapleInventory implements Iterable<Item> {
       }
 
       if (ItemConstants.isRateCoupon(item.id())) {
-         ThreadManager.getInstance().newTask(new Runnable() {
-            @Override
-            public void run() {
-               owner.updateCouponRates();
-            }
-         });
+         ThreadManager.getInstance().newTask(() -> owner.updateCouponRates());
       }
    }
 
@@ -549,12 +504,7 @@ public class MapleInventory implements Iterable<Item> {
       }
 
       if (item != null && ItemConstants.isRateCoupon(item.id())) {
-         ThreadManager.getInstance().newTask(new Runnable() {
-            @Override
-            public void run() {
-               owner.updateCouponRates();
-            }
-         });
+         ThreadManager.getInstance().newTask(() -> owner.updateCouponRates());
       }
    }
 

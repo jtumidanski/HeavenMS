@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package scripting.npc;
 
 import java.util.HashMap;
@@ -32,16 +11,13 @@ import client.MapleCharacter;
 import client.MapleClient;
 import net.server.world.MaplePartyCharacter;
 import scripting.AbstractScriptManager;
-import server.MapleItemInformationProvider.ScriptedItem;
+import server.ScriptedItem;
 import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author Matze
- */
 public class NPCScriptManager extends AbstractScriptManager {
 
    private static NPCScriptManager instance = new NPCScriptManager();
@@ -78,12 +54,12 @@ public class NPCScriptManager extends AbstractScriptManager {
    }
 
    public boolean start(MapleClient c, ScriptedItem scriptItem, MapleCharacter chr) {
-      return start(c, scriptItem.getNpc(), -1, scriptItem.getScript(), chr, true, "im");
+      return start(c, scriptItem.npc(), -1, scriptItem.script(), chr, true, "im");
    }
 
-   public void start(String filename, MapleClient c, int npc, List<MaplePartyCharacter> chrs) {
+   public void start(String filename, MapleClient c, int npc, List<MaplePartyCharacter> partyCharacters) {
       try {
-         NPCConversationManager cm = new NPCConversationManager(c, npc, chrs, true);
+         NPCConversationManager cm = new NPCConversationManager(c, npc, partyCharacters, true);
          cm.dispose();
          if (cms.containsKey(c)) {
             return;
@@ -99,12 +75,12 @@ public class NPCScriptManager extends AbstractScriptManager {
          iv.put("cm", cm);
          scripts.put(c, iv);
          try {
-            ((Invocable) iv).invokeFunction("start", chrs);
-         } catch (final NoSuchMethodException nsme) {
+            ((Invocable) iv).invokeFunction("start", partyCharacters);
+         } catch (final NoSuchMethodException e) {
             try {
-               ((Invocable) iv).invokeFunction("start", chrs);
-            } catch (final NoSuchMethodException nsma) {
-               nsma.printStackTrace();
+               ((Invocable) iv).invokeFunction("start", partyCharacters);
+            } catch (final NoSuchMethodException e1) {
+               e1.printStackTrace();
             }
          }
 
@@ -128,7 +104,7 @@ public class NPCScriptManager extends AbstractScriptManager {
                   iv = getScriptEngine("npc/" + fileName, c);
                }
             } else {
-               if (fileName != null) {     // thanks MiLin for drafting NPC-based item scripts
+               if (fileName != null) {
                   iv = getScriptEngine("item/" + fileName, c);
                }
             }
@@ -145,12 +121,12 @@ public class NPCScriptManager extends AbstractScriptManager {
             c.setClickedNPC();
             try {
                ((Invocable) iv).invokeFunction("start");
-            } catch (final NoSuchMethodException nsme) {
-               nsme.printStackTrace();
+            } catch (final NoSuchMethodException e) {
+               e.printStackTrace();
                try {
                   ((Invocable) iv).invokeFunction("start", chr);
-               } catch (final NoSuchMethodException nsma) {
-                  nsma.printStackTrace();
+               } catch (final NoSuchMethodException e1) {
+                  e1.printStackTrace();
                }
             }
          } else {
@@ -183,7 +159,7 @@ public class NPCScriptManager extends AbstractScriptManager {
    public void dispose(NPCConversationManager cm) {
       MapleClient c = cm.getClient();
       c.getPlayer().setCS(false);
-      c.getPlayer().setNpcCooldown(System.currentTimeMillis());
+      c.getPlayer().setNpcCoolDown(System.currentTimeMillis());
       cms.remove(c);
       scripts.remove(c);
 

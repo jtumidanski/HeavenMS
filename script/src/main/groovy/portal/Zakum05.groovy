@@ -17,7 +17,7 @@ boolean enter(PortalPlayerInteraction pi) {
       return false
    }
 
-   if (!pi.haveItem(4001017)) {    // thanks Conrad for pointing out missing checks for token item and unused reactor
+   if (!pi.haveItem(4001017)) {
       MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You do not have the Eye of Fire. You may not face the boss.")
       return false
    }

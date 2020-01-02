@@ -26,8 +26,6 @@ public class TVPacketFactory extends AbstractPacketFactory {
 
    /**
     * Sends MapleTV
-    *
-    * @return the SEND_TV packet
     */
    protected void sendTV(MaplePacketLittleEndianWriter writer, SendTV packet) {
       writer.write(packet.getPartner() != null ? 3 : 1);

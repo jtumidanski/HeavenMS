@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.quest.requirements;
 
 import java.util.HashMap;
@@ -32,9 +11,6 @@ import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 import tools.FilePrinter;
 
-/**
- * @author Tyler (Twdtwd)
- */
 public class MobRequirement extends MapleQuestRequirement {
    Map<Integer, Integer> mobs = new HashMap<>();
    private int questID;
@@ -45,9 +21,6 @@ public class MobRequirement extends MapleQuestRequirement {
       processData(data);
    }
 
-   /**
-    * @param data
-    */
    @Override
    public void processData(MapleData data) {
       for (MapleData questEntry : data.getChildren()) {
@@ -57,9 +30,8 @@ public class MobRequirement extends MapleQuestRequirement {
       }
    }
 
-
    @Override
-   public boolean check(MapleCharacter chr, Integer npcid) {
+   public boolean check(MapleCharacter chr, Integer npcId) {
       MapleQuestStatus status = chr.getQuest(MapleQuest.getInstance(questID));
       for (Integer mobID : mobs.keySet()) {
          int countReq = mobs.get(mobID);
@@ -78,9 +50,9 @@ public class MobRequirement extends MapleQuestRequirement {
       return true;
    }
 
-   public int getRequiredMobCount(int mobid) {
-      if (mobs.containsKey(mobid)) {
-         return mobs.get(mobid);
+   public int getRequiredMobCount(int mobId) {
+      if (mobs.containsKey(mobId)) {
+         return mobs.get(mobId);
       }
       return 0;
    }

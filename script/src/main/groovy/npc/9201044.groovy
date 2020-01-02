@@ -4,7 +4,6 @@ import client.MapleCharacter
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -24,7 +23,7 @@ class NPC9201044 {
    int sel = -1
 
    boolean debug = false
-   boolean autopass = false
+   boolean autoPass = false
 
    def spawnMobs(maxSpawn) {
       int[] spawnPosX
@@ -37,13 +36,9 @@ class NPC9201044 {
 
          for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 2; j++) {
-               MapleMonster mobObj1 = MapleLifeFactory.getMonster(9400515)
-               MapleMonster mobObj2 = MapleLifeFactory.getMonster(9400516)
-               MapleMonster mobObj3 = MapleLifeFactory.getMonster(9400517)
-
-               mapObj.spawnMonsterOnGroundBelow(mobObj1, new Point(spawnPosX[i], spawnPosY[i]))
-               mapObj.spawnMonsterOnGroundBelow(mobObj2, new Point(spawnPosX[i], spawnPosY[i]))
-               mapObj.spawnMonsterOnGroundBelow(mobObj3, new Point(spawnPosX[i], spawnPosY[i]))
+               MapleLifeFactory.getMonster(9400515).ifPresent({ mobObj1 -> mapObj.spawnMonsterOnGroundBelow(mobObj1, new Point(spawnPosX[i], spawnPosY[i])) })
+               MapleLifeFactory.getMonster(9400516).ifPresent({ mobObj2 -> mapObj.spawnMonsterOnGroundBelow(mobObj2, new Point(spawnPosX[i], spawnPosY[i])) })
+               MapleLifeFactory.getMonster(9400517).ifPresent({ mobObj3 -> mapObj.spawnMonsterOnGroundBelow(mobObj3, new Point(spawnPosX[i], spawnPosY[i])) })
             }
          }
       } else {
@@ -54,8 +49,7 @@ class NPC9201044 {
             int rndMob = 9400519 + Math.floor(Math.random() * 4).intValue()
             int rndPos = Math.floor(Math.random() * 5).intValue()
 
-            MapleMonster mobObj = MapleLifeFactory.getMonster(rndMob)
-            mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(spawnPosX[rndPos], spawnPosY[rndPos]))
+            MapleLifeFactory.getMonster(rndMob).ifPresent({ mobObj -> mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(spawnPosX[rndPos], spawnPosY[rndPos])) })
          }
       }
    }
@@ -158,7 +152,7 @@ class NPC9201044 {
                      cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k of the Amorian Challenge. In this stage, let 5 of your party members climb up the platforms, one on each, in such a way to try for a combination to unlock the portal to the next level. When you feel ready, talk to me and I'll let you know the situation. Take hint: upon failing, count the number of slimes appearing on the scene, that will tell how many of you had their position right.")
                   }
 
-                  int st = (autopass) ? 2 : 0
+                  int st = (autoPass) ? 2 : 0
                   eim.setProperty("statusStg" + stage, st)
                } else {       // check stage completion
                   if (state == 2) {
@@ -177,14 +171,14 @@ class NPC9201044 {
                      }
                   } else if (stage == 2 || stage == 3) {
                      if (map.countMonsters() == 0) {
-                        int[] objset = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+                        int[] objectSet = [0, 0, 0, 0, 0, 0, 0, 0, 0]
                         int playersOnCombo = 0
                         MapleCharacter[] party = cm.getEventInstance().getPlayers()
                         for (int i = 0; i < party.size(); i++) {
                            for (int y = 0; y < map.getAreas().size(); y++) {
                               if (map.getArea(y).contains(party[i].position())) {
                                  playersOnCombo++
-                                 objset[y] += 1
+                                 objectSet[y] += 1
                                  break
                               }
                            }
@@ -207,22 +201,22 @@ class NPC9201044 {
 
                            String[] combo = comboStr.split(',')
                            boolean correctCombo = true
-                           int guessedRight = objset.length
+                           int guessedRight = objectSet.length
                            int playersRight = 0
 
                            if (!debug) {
-                              for (int i = 0; i < objset.length; i++) {
-                                 if ((combo[i]).toInteger() != objset[i]) {
+                              for (int i = 0; i < objectSet.length; i++) {
+                                 if ((combo[i]).toInteger() != objectSet[i]) {
                                     correctCombo = false
                                     guessedRight--
                                  } else {
-                                    if (objset[i] > 0) {
+                                    if (objectSet[i] > 0) {
                                        playersRight++
                                     }
                                  }
                               }
                            } else {
-                              for (int i = 0; i < objset.length; i++) {
+                              for (int i = 0; i < objectSet.length; i++) {
                                  int ci = cm.getPlayer().countItem(4000000 + i)
 
                                  if (ci != (combo[i]).toInteger()) {

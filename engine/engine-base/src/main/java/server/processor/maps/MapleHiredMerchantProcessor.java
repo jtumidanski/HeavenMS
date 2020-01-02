@@ -22,7 +22,7 @@ public class MapleHiredMerchantProcessor {
    private MapleHiredMerchantProcessor() {
    }
 
-   public boolean canBuy(MapleClient c, Item newItem) {    // thanks xiaokelvin (Conrad) for noticing a leaked test code here
+   public boolean canBuy(MapleClient c, Item newItem) {
       return MapleInventoryManipulator.checkSpace(c, newItem.id(), newItem.quantity(), newItem.owner()) && MapleInventoryManipulator.addFromDrop(c, newItem, false);
    }
 

@@ -32,7 +32,7 @@ class NPC1012113 {
                if (cm.isEventLeader()) {
                   cm.sendYesNo("What do you think about making your way there with your party members and teach those rowdy pigs a lesson?")
                } else {
-                  cm.sendOk("Interessed? Tell your party leader to talk to me to head there!")
+                  cm.sendOk("Interested? Tell your party leader to talk to me to head there!")
                   cm.dispose()
                }
             } else if (status == 2) {

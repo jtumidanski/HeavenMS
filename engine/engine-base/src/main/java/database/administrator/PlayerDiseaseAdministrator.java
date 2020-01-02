@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import database.AbstractQueryExecutor;
 import database.DeleteForCharacter;
 import entity.PlayerDisease;
@@ -27,7 +27,7 @@ public class PlayerDiseaseAdministrator extends AbstractQueryExecutor implements
    private PlayerDiseaseAdministrator() {
    }
 
-   public void addPlayerDiseasesForCharacter(EntityManager entityManager, int characterId, Set<Map.Entry<MapleDisease, Pair<Long, MobSkill>>> playerDiseases) {
+   public void addPlayerDiseasesForCharacter(EntityManager entityManager, int characterId, Set<Map.Entry<MapleAbnormalStatus, Pair<Long, MobSkill>>> playerDiseases) {
       List<PlayerDisease> playerDiseaseList = playerDiseases.stream().map(disease -> {
          PlayerDisease playerDisease = new PlayerDisease();
          playerDisease.setCharacterId(characterId);

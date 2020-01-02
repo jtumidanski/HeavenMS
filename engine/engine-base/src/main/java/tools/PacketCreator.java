@@ -108,18 +108,18 @@ public class PacketCreator {
             return Optional.of(LoginStatusPacketFactory.getInstance());
          case GUEST_ID_LOGIN:
             return Optional.of(GuestLoginPacketFactory.getInstance());
-         case SERVERSTATUS:
+         case SERVER_STATUS:
             return Optional.of(ServerStatusPacketFactory.getInstance());
-         case CHECK_PINCODE:
-         case UPDATE_PINCODE:
+         case CHECK_PIN_CODE:
+         case UPDATE_PIN_CODE:
             return Optional.of(PinPacketFactory.getInstance());
          case VIEW_ALL_CHAR:
             return Optional.of(ViewAllCharactersPacketFactory.getInstance());
          case SELECT_CHARACTER_BY_VAC:
             return Optional.of(AfterLoginErrorPacketFactory.getInstance());
-         case SERVERLIST:
+         case SERVER_LIST:
             return Optional.of(ServerListPacketFactory.getInstance());
-         case CHARLIST:
+         case CHARACTER_LIST:
             return Optional.of(CharacterListPacketFactory.getInstance());
          case SERVER_IP:
             return Optional.of(ServerIPPacketFactory.getInstance());
@@ -146,11 +146,11 @@ public class PacketCreator {
             return Optional.of(InventoryPacketFactory.getInstance());
          case STAT_CHANGED:
             return Optional.of(StatUpdatePacketFactory.getInstance());
-         case CASHSHOP_OPERATION:
+         case CASH_SHOP_OPERATION:
          case QUERY_CASH_RESULT:
-         case MAPLELIFE_RESULT:
+         case MAPLE_LIFE_RESULT:
             return Optional.of(CashShopOperationPacketFactory.getInstance());
-         case CASHSHOP_CASH_ITEM_GACHAPON_RESULT:
+         case CASH_SHOP_CASH_ITEM_GACHAPON_RESULT:
             return Optional.of(CashShopGachaponPacketFactoryPacketFactory.getInstance());
          case PLAYER_INTERACTION:
             return Optional.of(PlayerInteractionPacketFactory.getInstance());
@@ -159,7 +159,7 @@ public class PacketCreator {
          case ALLIANCE_OPERATION:
             return Optional.of(AllianceOperationPacketFactory.getInstance());
          case PARTY_OPERATION:
-         case UPDATE_PARTYMEMBER_HP:
+         case UPDATE_PARTY_MEMBER_HP:
             return Optional.of(PartyPacketFactory.getInstance());
          case STORAGE:
             return Optional.of(StoragePacketFactory.getInstance());
@@ -187,7 +187,7 @@ public class PacketCreator {
             return Optional.of(MTSOperationPacketFactory.getInstance());
          case SHOW_STATUS_INFO:
             return Optional.of(StatusInfoPacketFactory.getInstance());
-         case SHOW_ITEM_GAIN_INCHAT:
+         case SHOW_ITEM_GAIN_IN_CHAT:
             return Optional.of(ItemGainInChatPacketFactory.getInstance());
          case GUILD_OPERATION:
          case GUILD_NAME_CHANGED:
@@ -217,7 +217,7 @@ public class PacketCreator {
          case SPAWN_PORTAL:
          case SPAWN_DOOR:
          case REMOVE_DOOR:
-         case SPAWN_SPECIAL_MAPOBJECT:
+         case SPAWN_SPECIAL_MAP_OBJECT:
          case SPAWN_NPC:
          case SPAWN_NPC_REQUEST_CONTROLLER:
          case SPAWN_MONSTER_CONTROL:
@@ -232,7 +232,7 @@ public class PacketCreator {
          case CANNOT_SPAWN_KITE:
             return Optional.of(SpawnPacketFactory.getInstance());
          case REMOVE_TV:
-         case REMOVE_SPECIAL_MAPOBJECT:
+         case REMOVE_SPECIAL_MAP_OBJECT:
          case REMOVE_KITE:
          case REMOVE_PLAYER_FROM_MAP:
          case REMOVE_ITEM_FROM_MAP:
@@ -241,8 +241,8 @@ public class PacketCreator {
          case REMOVE_DRAGON:
             return Optional.of(RemovePacketFactory.getInstance());
          case FIELD_EFFECT:
-         case FIELD_OBSTACLE_ONOFF:
-         case FIELD_OBSTACLE_ONOFF_LIST:
+         case FIELD_OBSTACLE_ON_OFF:
+         case FIELD_OBSTACLE_ON_OFF_LIST:
          case FIELD_OBSTACLE_ALL_RESET:
          case BLOW_WEATHER:
          case SET_BACK_EFFECT:
@@ -274,26 +274,26 @@ public class PacketCreator {
          case ENABLE_TV:
          case SEND_TV:
             return Optional.of(TVPacketFactory.getInstance());
-         case SERVERMESSAGE:
+         case SERVER_MESSAGE:
          case SET_AVATAR_MEGAPHONE:
          case CLEAR_AVATAR_MEGAPHONE:
-         case CHATTEXT:
+         case CHAT_TEXT:
          case WHISPER:
          case FAME_RESPONSE:
-         case MULTICHAT:
-         case NOTIFY_LEVELUP:
+         case MULTI_CHAT:
+         case NOTIFY_LEVEL_UP:
          case NOTIFY_MARRIAGE:
          case NOTIFY_JOB_CHANGE:
          case SPOUSE_CHAT:
          case SET_WEEK_EVENT_MESSAGE:
             return Optional.of(MessagePacketFactory.getInstance());
-         case BUDDYLIST:
+         case BUDDY_LIST:
             return Optional.of(BuddyPacketFactory.getInstance());
          case MESSENGER:
             return Optional.of(MessengerPacketFactory.getInstance());
          case PET_CHAT:
          case PET_COMMAND:
-         case PET_NAMECHANGE:
+         case PET_NAME_CHANGE:
             return Optional.of(PetPacketFactory.getInstance());
          case UPDATE_CHAR_LOOK:
          case CHAR_INFO:
@@ -303,7 +303,7 @@ public class PacketCreator {
          case AUTO_HP_POT:
          case UPDATE_SKILLS:
          case SUMMON_SKILL:
-         case COOLDOWN:
+         case COOL_DOWN:
          case DAMAGE_PLAYER:
          case SET_TAMING_MOB_INFO:
          case LEFT_KNOCK_BACK:
@@ -390,22 +390,22 @@ public class PacketCreator {
             return Optional.of(ReportPacketFactory.getInstance());
          case RPS_GAME:
             return Optional.of(RPSPacketFactory.getInstance());
-         case CASHSHOP_CHECK_NAME_CHANGE_POSSIBLE_RESULT:
-         case CASHSHOP_CHECK_NAME_CHANGE:
+         case CASH_SHOP_CHECK_NAME_CHANGE_POSSIBLE_RESULT:
+         case CASH_SHOP_CHECK_NAME_CHANGE:
          case CANCEL_NAME_CHANGE_RESULT:
             return Optional.of(NameChangePacketFactory.getInstance());
-         case CASHSHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT:
+         case CASH_SHOP_CHECK_TRANSFER_WORLD_POSSIBLE_RESULT:
          case CANCEL_TRANSFER_WORLD_RESULT:
             return Optional.of(WorldTransferPacketFactory.getInstance());
          case IMITATED_NPC_DATA:
             return Optional.of(PlayerNPCPacketFactory.getInstance());
-         case DROP_ITEM_FROM_MAPOBJECT:
+         case DROP_ITEM_FROM_MAP_OBJECT:
             return Optional.of(ItemDropPacketFactory.getInstance());
          case CLAIM_STATUS_CHANGED:
          case SESSION_VALUE:
          case DOJO_WARP_UP:
          case SET_NPC_SCRIPTABLE:
-         case QUICKSLOT_INIT:
+         case QUICK_SLOT_INIT:
             return Optional.of(GenericPacketFactory.getInstance());
       }
       FilePrinter.printError(FilePrinter.PACKET_LOGS + "generic.txt", "Trying to get an unhandled PacketFactory " + opcode.getValue());
@@ -418,23 +418,22 @@ public class PacketCreator {
     * @param mapleVersion The maple client version.
     * @param sendIv       the IV used by the server for sending
     * @param recvIv       the IV used by the server for receiving
-    * @return
     */
    public static byte[] getHello(short mapleVersion, byte[] sendIv, byte[] recvIv) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(8);
-      mplew.writeShort(0x0E);
-      mplew.writeShort(mapleVersion);
-      mplew.writeShort(1);
-      mplew.write(49);
-      mplew.write(recvIv);
-      mplew.write(sendIv);
-      mplew.write(8);
-      return mplew.getPacket();
+      final MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter(8);
+      writer.writeShort(0x0E);
+      writer.writeShort(mapleVersion);
+      writer.writeShort(1);
+      writer.write(49);
+      writer.write(recvIv);
+      writer.write(sendIv);
+      writer.write(8);
+      return writer.getPacket();
    }
 
    public static byte[] customPacket(byte[] packet) {
-      final MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter(packet.length);
-      mplew.write(packet);
-      return mplew.getPacket();
+      final MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter(packet.length);
+      writer.write(packet);
+      return writer.getPacket();
    }
 }

@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package tools;
 
 import java.awt.geom.Line2D;
@@ -30,19 +11,16 @@ import net.server.audit.locks.MonitoredWriteLock;
 import net.server.audit.locks.factory.MonitoredReadLockFactory;
 import net.server.audit.locks.factory.MonitoredWriteLockFactory;
 
-/**
- * @author Ronan
- */
 public class IntervalBuilder {
 
-   protected MonitoredReadLock intervalRlock;
-   protected MonitoredWriteLock intervalWlock;
+   protected MonitoredReadLock monitoredReadLock;
+   protected MonitoredWriteLock monitoredWriteLock;
    private List<Line2D> intervalLimits = new ArrayList<>();
 
    public IntervalBuilder() {
       MonitoredReentrantReadWriteLock locks = new MonitoredReentrantReadWriteLock(MonitoredLockType.INTERVAL, true);
-      intervalRlock = MonitoredReadLockFactory.createLock(locks);
-      intervalWlock = MonitoredWriteLockFactory.createLock(locks);
+      monitoredReadLock = MonitoredReadLockFactory.createLock(locks);
+      monitoredWriteLock = MonitoredWriteLockFactory.createLock(locks);
    }
 
    private void refitOverlappedIntervals(int st, int en, int newFrom, int newTo) {
@@ -88,7 +66,7 @@ public class IntervalBuilder {
    }
 
    public void addInterval(int from, int to) {
-      intervalWlock.lock();
+      monitoredWriteLock.lock();
       try {
          int st = bsearchInterval(from);
          if (st < 0) {
@@ -104,7 +82,7 @@ public class IntervalBuilder {
 
          refitOverlappedIntervals(st, en + 1, from, to);
       } finally {
-         intervalWlock.unlock();
+         monitoredWriteLock.unlock();
       }
    }
 
@@ -113,21 +91,21 @@ public class IntervalBuilder {
    }
 
    public boolean inInterval(int from, int to) {
-      intervalRlock.lock();
+      monitoredReadLock.lock();
       try {
          int idx = bsearchInterval(from);
          return idx >= 0 && to <= intervalLimits.get(idx).getX2();
       } finally {
-         intervalRlock.unlock();
+         monitoredReadLock.unlock();
       }
    }
 
    public void clear() {
-      intervalWlock.lock();
+      monitoredWriteLock.lock();
       try {
          intervalLimits.clear();
       } finally {
-         intervalWlock.unlock();
+         monitoredWriteLock.unlock();
       }
    }
 

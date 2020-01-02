@@ -2,9 +2,6 @@ package constants.string;
 
 import client.MapleCharacter;
 
-/**
- * @author Drago - Dragohe4rt
- */
 public class LanguageConstants {
 
    public static String[] CPQBlue = new String[3];

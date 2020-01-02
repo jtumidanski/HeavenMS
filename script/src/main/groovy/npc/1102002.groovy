@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Kiridu
-	Map(s): 		Cygnus
-	Description: 	
-*/
-
-
 class NPC1102002 {
    NPCConversationManager cm
    int status = -1

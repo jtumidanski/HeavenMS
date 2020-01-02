@@ -68,12 +68,12 @@ public class MaplePartyProcessor {
       }
    }
 
-   public boolean joinParty(MapleCharacter player, int partyid, boolean silentCheck) {
+   public boolean joinParty(MapleCharacter player, int partyId, boolean silentCheck) {
       World world = player.getWorldServer();
 
       Optional<MapleParty> party = player.getParty();
       if (party.isEmpty()) {
-         party = world.getParty(partyid);
+         party = world.getParty(partyId);
          if (party.isPresent()) {
             if (party.get().getMembers().size() < 6) {
                MaplePartyCharacter partyCharacter = new MaplePartyCharacter(player);
@@ -144,7 +144,7 @@ public class MaplePartyProcessor {
          player.setParty(null);
 
          MapleMatchCheckerCoordinator matchCheckerCoordinator = player.getClient().getWorldServer().getMatchCheckerCoordinator();
-         if (matchCheckerCoordinator.getMatchConfirmationLeaderid(player.getId()) == player.getId() && matchCheckerCoordinator.getMatchConfirmationType(player.getId()) == MatchCheckerListenerFactory.MatchCheckerType.GUILD_CREATION) {
+         if (matchCheckerCoordinator.getMatchConfirmationLeaderId(player.getId()) == player.getId() && matchCheckerCoordinator.getMatchConfirmationType(player.getId()) == MatchCheckerListenerFactory.MatchCheckerType.GUILD_CREATION) {
             matchCheckerCoordinator.dismissMatchConfirmation(player.getId());
          }
       }
@@ -189,7 +189,7 @@ public class MaplePartyProcessor {
 
    public void updateParty(MapleParty party, PartyOperation operation, MaplePartyCharacter target) {
       if (party == null) {
-         throw new IllegalArgumentException("no party with the specified partyid exists");
+         throw new IllegalArgumentException("no party with the specified party id exists");
       }
 
       switch (operation) {
@@ -204,7 +204,7 @@ public class MaplePartyProcessor {
             Server.getInstance().getWorld(party.getWorldId()).disbandParty(party.getId());
             break;
          case SILENT_UPDATE:
-         case LOG_ONOFF:
+         case LOG_ON_OFF:
             party.updateMember(target);
             break;
          case CHANGE_LEADER:
@@ -213,11 +213,11 @@ public class MaplePartyProcessor {
                if (eim != null && eim.isEventLeader(leader)) {
                   eim.changedLeader(target);
                } else {
-                  int oldLeaderMapid = leader.getMapId();
+                  int oldLeaderMapId = leader.getMapId();
 
-                  if (MapleMiniDungeonInfo.isDungeonMap(oldLeaderMapid)) {
-                     if (oldLeaderMapid != target.getMapId()) {
-                        MapleMiniDungeon mmd = leader.getClient().getChannelServer().getMiniDungeon(oldLeaderMapid);
+                  if (MapleMiniDungeonInfo.isDungeonMap(oldLeaderMapId)) {
+                     if (oldLeaderMapId != target.getMapId()) {
+                        MapleMiniDungeon mmd = leader.getClient().getChannelServer().getMiniDungeon(oldLeaderMapId);
                         if (mmd != null) {
                            mmd.close();
                         }
@@ -234,14 +234,14 @@ public class MaplePartyProcessor {
       Collection<MaplePartyCharacter> partyMembers = party.getMembers();
       updateCharacterParty(party, operation, target, partyMembers);
 
-      for (MaplePartyCharacter partychar : partyMembers) {
-         Server.getInstance().getWorld(party.getWorldId()).getPlayerStorage().getCharacterById(partychar.getId()).ifPresent(character -> {
+      for (MaplePartyCharacter partyCharacter : partyMembers) {
+         Server.getInstance().getWorld(party.getWorldId()).getPlayerStorage().getCharacterById(partyCharacter.getId()).ifPresent(character -> {
             if (operation == PartyOperation.DISBAND) {
                character.setParty(null);
                character.setMPC(null);
             } else {
                character.setParty(party);
-               character.setMPC(partychar);
+               character.setMPC(partyCharacter);
             }
             PacketCreator.announce(character, new UpdateParty(character.getClient().getChannel(), party, operation, target));
          });

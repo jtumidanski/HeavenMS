@@ -10,7 +10,7 @@ import scripting.npc.NPCConversationManager
 */
 
 
-class NPCcredits {
+class NpcCredits {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -190,12 +190,12 @@ function writeServerStaff_MapleNext() {
    }
 }
 
-NPCcredits getNPC() {
+NpcCredits getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCcredits(cm: cm))
+      getBinding().setVariable("npc", new NpcCredits(cm: cm))
    }
-   return (NPCcredits) getBinding().getVariable("npc")
+   return (NpcCredits) getBinding().getVariable("npc")
 }
 
 def start() {

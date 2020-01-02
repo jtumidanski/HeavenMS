@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class SendMapleLifeError(private var _code: Int) extends PacketInput {
   def code: Int = _code
 
-  override def opcode(): SendOpcode = SendOpcode.MAPLELIFE_ERROR
+  override def opcode(): SendOpcode = SendOpcode.MAPLE_LIFE_ERROR
 }

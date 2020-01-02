@@ -7,9 +7,9 @@ public class PointUtil {
     * Fetches angle relative between spawn and door points where 3 O'Clock is 0
     * and 12 O'Clock is 270 degrees
     *
-    * @param spawnPoint
-    * @param doorPoint
-    * @return angle in degress from 0-360.
+    * @param spawnPoint the spawn point
+    * @param doorPoint  the door point
+    * @return angle in degrees from 0-360.
     */
    public static double getAngle(Point doorPoint, Point spawnPoint) {
       double dx = doorPoint.getX() - spawnPoint.getX();
@@ -31,7 +31,7 @@ public class PointUtil {
    /**
     * Converts angle in degrees to rounded cardinal coordinate.
     *
-    * @param angle
+    * @param angle the angle
     * @return correspondent coordinate.
     */
    public static String getRoundedCoordinate(double angle) {

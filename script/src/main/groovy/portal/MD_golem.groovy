@@ -7,17 +7,17 @@ import tools.ServerNoticeType
 
 boolean enter(PortalPlayerInteraction pi) {
 
-   int baseid = 105040304
-   int dungeonid = 105040320
+   int baseId = 105040304
+   int dungeonId = 105040320
    int dungeons = 30
 
-   if (pi.getMapId() == baseid) {
+   if (pi.getMapId() == baseId) {
       if (pi.getParty() != null) {
          if (pi.isLeader()) {
             for (int i = 0; i < dungeons; i++) {
-               if (pi.startDungeonInstance(dungeonid + i)) {
+               if (pi.startDungeonInstance(dungeonId + i)) {
                   pi.playPortalSound()
-                  pi.warpParty(dungeonid + i, "out00")
+                  pi.warpParty(dungeonId + i, "out00")
                   return true
                }
             }
@@ -27,9 +27,9 @@ boolean enter(PortalPlayerInteraction pi) {
          }
       } else {
          for (int i = 0; i < dungeons; i++) {
-            if (pi.startDungeonInstance(dungeonid + i)) {
+            if (pi.startDungeonInstance(dungeonId + i)) {
                pi.playPortalSound()
-               pi.warp(dungeonid + i, "out00")
+               pi.warp(dungeonId + i, "out00")
                return true
             }
          }
@@ -38,7 +38,7 @@ boolean enter(PortalPlayerInteraction pi) {
       return false
    } else {
       pi.playPortalSound()
-      pi.warp(baseid, "MD00")
+      pi.warp(baseId, "MD00")
       return true
    }
 }

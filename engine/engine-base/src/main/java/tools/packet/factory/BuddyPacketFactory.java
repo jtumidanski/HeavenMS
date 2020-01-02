@@ -20,14 +20,14 @@ public class BuddyPacketFactory extends AbstractPacketFactory {
    }
 
    private BuddyPacketFactory() {
-      Handler.handle(UpdateBuddyList.class).decorate(this::updateBuddylist).register(registry);
-      Handler.handle(BuddyListMessage.class).decorate(this::buddylistMessage).register(registry);
-      Handler.handle(RequestAddBuddy.class).decorate(this::requestBuddylistAdd).register(registry);
+      Handler.handle(UpdateBuddyList.class).decorate(this::updateBuddyList).register(registry);
+      Handler.handle(BuddyListMessage.class).decorate(this::buddyListMessage).register(registry);
+      Handler.handle(RequestAddBuddy.class).decorate(this::requestBuddyListAdd).register(registry);
       Handler.handle(UpdateBuddyChannel.class).decorate(this::updateBuddyChannel).register(registry);
       Handler.handle(UpdateBuddyCapacity.class).decorate(this::updateBuddyCapacity).register(registry);
    }
 
-   protected void updateBuddylist(MaplePacketLittleEndianWriter writer, UpdateBuddyList packet) {
+   protected void updateBuddyList(MaplePacketLittleEndianWriter writer, UpdateBuddyList packet) {
       writer.write(7);
       writer.write(packet.buddies().size());
       for (BuddyListEntry buddy : packet.buddies()) {
@@ -37,19 +37,19 @@ public class BuddyPacketFactory extends AbstractPacketFactory {
             writer.write(0); // opposite status
             writer.writeInt(buddy.channel() - 1);
             writer.writeAsciiString(StringUtil.getRightPaddedStr(buddy.group(), '\0', 13));
-            writer.writeInt(0);//mapid?
+            writer.writeInt(0);//map id?
          }
       }
       for (int x = 0; x < packet.buddies().size(); x++) {
-         writer.writeInt(0);//mapid?
+         writer.writeInt(0);//map id?
       }
    }
 
-   protected void buddylistMessage(MaplePacketLittleEndianWriter writer, BuddyListMessage packet) {
+   protected void buddyListMessage(MaplePacketLittleEndianWriter writer, BuddyListMessage packet) {
       writer.write(packet.message());
    }
 
-   protected void requestBuddylistAdd(MaplePacketLittleEndianWriter writer, RequestAddBuddy packet) {
+   protected void requestBuddyListAdd(MaplePacketLittleEndianWriter writer, RequestAddBuddy packet) {
       writer.write(9);
       writer.writeInt(packet.characterIdFrom());
       writer.writeMapleAsciiString(packet.characterNameFrom());

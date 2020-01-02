@@ -29,7 +29,7 @@ class Quest6032 {
          if (status == 0) {
             qm.sendNext("So you've come to attend my class, huh? Right, I'll make it fast.")
          } else if (status == 1) {
-            qm.sendNextPrev("I will teach you the actual application of the #bMaker#k method. All you need to do is have an item in mind to make, gather all the ingredients from the receipt and mix them in a #rscientifically alchemisty way#k. Easy, isn't it?")
+            qm.sendNextPrev("I will teach you the actual application of the #bMaker#k method. All you need to do is have an item in mind to make, gather all the ingredients from the receipt and mix them in a #ralchemistic way#k. Easy, isn't it?")
          } else if (status == 2) {
             qm.sendNextPrev("Let's take producing the #bWeight Earrings#k as an example. There is a rather specific #rductility theory#k to generate it, as any other 'unique' items have, the name going around the #rmain physical force#k acting over the thing we are working on: on that case, the #bDuctility Theory of Gravity#k (as it is a 'Weighted Earrings', got it?).")
          } else if (status == 3) {

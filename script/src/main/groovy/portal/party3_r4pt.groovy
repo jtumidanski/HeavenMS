@@ -12,7 +12,7 @@ boolean enter(PortalPlayerInteraction pi) {
       eim.setProperty("stage4_comb", "" + r + s)
    }
 
-   int pname = (pi.getPortal().getName().substring(4, 6)).toInteger()
+   int portalName = (pi.getPortal().getName().substring(4, 6)).toInteger()
    int cname = (eim.getProperty("stage4_comb")).toInteger()
 
    boolean secondPt = true
@@ -21,7 +21,7 @@ boolean enter(PortalPlayerInteraction pi) {
       secondPt = false
    }
 
-   if ((pname % 10) == (cname % 10)) {    //climb
+   if ((portalName % 10) == (cname % 10)) {    //climb
       int nextPortal
       if (secondPt) {
          nextPortal = 1

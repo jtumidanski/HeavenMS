@@ -19,8 +19,6 @@ public class ServerIPPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client the IP of the channel server.
-    *
-    * @return The server IP packet.
     */
    protected void getServerIP(MaplePacketLittleEndianWriter writer, ServerIP packet) {
       writer.writeShort(0);

@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class Mapcrash_Dragon {
+class MapCrashDragon {
 
    static def start(MapScriptMethods ms) {
       ms.lockUI()
@@ -11,9 +11,9 @@ class Mapcrash_Dragon {
    }
 }
 
-Mapcrash_Dragon getMap() {
-   getBinding().setVariable("map", new Mapcrash_Dragon())
-   return (Mapcrash_Dragon) getBinding().getVariable("map")
+MapCrashDragon getMap() {
+   getBinding().setVariable("map", new MapCrashDragon())
+   return (MapCrashDragon) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

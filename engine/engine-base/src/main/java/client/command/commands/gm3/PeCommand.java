@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command.commands.gm3;
 
 import java.io.FileReader;
@@ -61,17 +38,17 @@ public class PeCommand extends Command {
          return;
 
       }
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter();
-      mplew.write(HexTool.getByteArrayFromHexString(packet));
-      SeekableLittleEndianAccessor slea = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(mplew.getPacket()));
-      short packetId = slea.readShort();
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter();
+      writer.write(HexTool.getByteArrayFromHexString(packet));
+      SeekableLittleEndianAccessor accessor = new GenericSeekableLittleEndianAccessor(new ByteArrayByteStream(writer.getPacket()));
+      short packetId = accessor.readShort();
       final MaplePacketHandler packetHandler = PacketProcessor.getProcessor(0, c.getChannel()).getHandler(packetId);
       if (packetHandler != null && packetHandler.validateState(c)) {
          try {
             player.yellowMessage("Receiving: " + packet);
-            packetHandler.handlePacket(slea, c);
+            packetHandler.handlePacket(accessor, c);
          } catch (final Throwable t) {
-            FilePrinter.printError(FilePrinter.PACKET_HANDLER + packetHandler.getClass().getName() + ".txt", t, "Error for " + (c.getPlayer() == null ? "" : "player ; " + c.getPlayer() + " on map ; " + c.getPlayer().getMapId() + " - ") + "account ; " + c.getAccountName() + "\r\n" + slea.toString());
+            FilePrinter.printError(FilePrinter.PACKET_HANDLER + packetHandler.getClass().getName() + ".txt", t, "Error for " + (c.getPlayer() == null ? "" : "player ; " + c.getPlayer() + " on map ; " + c.getPlayer().getMapId() + " - ") + "account ; " + c.getAccountName() + "\r\n" + accessor.toString());
          }
       }
    }

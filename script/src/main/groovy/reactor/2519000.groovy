@@ -30,7 +30,7 @@ class Reactor2519000 {
 
    }
 
-   def untouch() {
+   def release() {
 
    }
 }
@@ -53,6 +53,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }

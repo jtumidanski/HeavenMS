@@ -1,7 +1,6 @@
 package tools.packet.factory;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import client.MapleStat;
@@ -33,8 +32,6 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets an empty stat update.
-    *
-    * @return The empty stat update packet.
     */
    protected void enableActions(MaplePacketLittleEndianWriter writer, EnableActions packet) {
       updatePlayerStats(writer, new UpdatePlayerStats(EMPTY_STATUPDATE, true, null));
@@ -42,8 +39,6 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets an update for specified stats.
-    *
-    * @return The stat update packet.
     */
    protected void updatePlayerStats(MaplePacketLittleEndianWriter writer, UpdatePlayerStats packet) {
       writer.write(packet.isEnableActions() ? 1 : 0);
@@ -53,13 +48,10 @@ public class StatUpdatePacketFactory extends AbstractPacketFactory {
       }
       List<Pair<MapleStat, Integer>> mystats = packet.getStatup();
       if (mystats.size() > 1) {
-         mystats.sort(new Comparator<>() {
-            @Override
-            public int compare(Pair<MapleStat, Integer> o1, Pair<MapleStat, Integer> o2) {
-               int val1 = o1.getLeft().getValue();
-               int val2 = o2.getLeft().getValue();
-               return (val1 < val2 ? -1 : (val1 == val2 ? 0 : 1));
-            }
+         mystats.sort((o1, o2) -> {
+            int val1 = o1.getLeft().getValue();
+            int val2 = o2.getLeft().getValue();
+            return (Integer.compare(val1, val2));
          });
       }
       writer.writeInt(updateMask);

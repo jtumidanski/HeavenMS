@@ -1,14 +1,6 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class Henesys extends GachaponItems {
-
    @Override
    public int[] getCommonItems() {
       return new int[]{
@@ -16,7 +8,7 @@ public class Henesys extends GachaponItems {
             /* Scroll */
             2040001, 2041002, 2040702, 2043802, 2040402, 2043702, 2044813,
 
-            /* Useable Drops */
+            /* Use-able Drops */
             2000004, 2000005, 2020012, 2030007,
 
             /* Common equipment */

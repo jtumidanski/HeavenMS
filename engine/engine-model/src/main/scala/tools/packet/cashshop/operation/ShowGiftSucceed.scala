@@ -13,5 +13,5 @@ class ShowGiftSucceed(private var _to: String, private var _itemId: Int, private
 
   def price: Int = _price
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

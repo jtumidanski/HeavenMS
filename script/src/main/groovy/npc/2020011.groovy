@@ -15,7 +15,7 @@ class NPC2020011 {
    int status = -1
    int sel = -1
    int job
-   def actionx = ["Mental": false, "Physical": false]
+   def action = ["Mental": false, "Physical": false]
 
    def start() {
       int jobBase = (cm.getJobId() / 100).intValue()
@@ -32,9 +32,9 @@ class NPC2020011 {
          return
       }
       if (cm.haveItem(4031058)) {
-         actionx["Mental"] = true
+         action["Mental"] = true
       } else if (cm.haveItem(4031057)) {
-         actionx["Physical"] = true
+         action["Physical"] = true
       }
       cm.sendSimple("Anything you want from me?#b" + (cm.getJobId() % 10 == 0 ? "\r\n#L0#I want to make the 3th job advancement." : "") + "\r\n#L1#Please allow me to do the Zakum Dungeon Quest.")
    }
@@ -43,16 +43,16 @@ class NPC2020011 {
       status++
       if (mode == 0 && type == 0) {
          status -= 2
-      } else if (mode != 1 || (status > 2 && !actionx["Mental"]) || status > 3) {
+      } else if (mode != 1 || (status > 2 && !action["Mental"]) || status > 3) {
          if (mode == 0 && type == 1) {
             cm.sendNext("Make up your mind.")
          }
          cm.dispose()
          return
       }
-      if (actionx["Mental"]) {
+      if (action["Mental"]) {
          if (status == 0) {
-            cm.sendNext("Great job completing the mental part of the test. You have wisely answered all the questions correctly. I must say, I am quite impressed with the level of wisdom you have displayed there. Please hand me the necklace first, before we takeon the next step.")
+            cm.sendNext("Great job completing the mental part of the test. You have wisely answered all the questions correctly. I must say, I am quite impressed with the level of wisdom you have displayed there. Please hand me the necklace first, before we take on the next step.")
          } else if (status == 1) {
             cm.sendYesNo("Okay! Now, you'll be transformed into a much more powerful adventurer through me. Before doing that, though, please make sure your SP has been thoroughly used, You'll need to use up at least all of SP's gained until level 70 to make the 3rd job advancement. Oh, and since you have already chosen your path of the occupation by the 2nd job adv., you won't have to choose again for the 3rd job adv. Do you want to do it right now?")
          } else if (status == 2) {
@@ -78,7 +78,7 @@ class NPC2020011 {
          } else if (status == 3) {
             cm.sendNextPrev("I've also given you some SP and AP; this should get you started. You have now become a powerful, powerful thief, indeed. Remember, though, that the real world will be awaiting your arrival with even tougher obstacles to overcome. Once you feel like you cannot train yourself to reach a higher place, then, and only then, come see me. I'll be here waiting.")
          }
-      } else if (actionx["Physical"]) {
+      } else if (action["Physical"]) {
          if (status == 0) {
             cm.sendNext("Great job completing the physical part of the test. I knew you could do it. Now that you have passed the first half of the test, here's the second half. Please give me the necklace first.")
          } else if (status == 1) {

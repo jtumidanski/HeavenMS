@@ -22,7 +22,7 @@ class Quest20315 {
             status--
          }
          if (status == 0) {
-            qm.sendNext("The jewel you brought back from the Master of Disguise is Shinsoo's Teardrop. It is the crystalization of Shinsoo's powers. If the Black Mage gets his hands on this, then this spells doom for all of us.")
+            qm.sendNext("The jewel you brought back from the Master of Disguise is Shinsoo's Teardrop. It is the crystallization of Shinsoo's powers. If the Black Magician gets his hands on this, then this spells doom for all of us.")
          } else if (status == 1) {
             qm.sendYesNo("Because of that, the Empress gave you a new title! Can you believe that? Do you want the title?")
          } else if (status == 2) {
@@ -34,7 +34,7 @@ class Quest20315 {
                   qm.sendNext("If you wish to receive the medal befitting the title, you may want to make some room in your equipment inventory.")
                } else {
                   qm.gainItem(1142068, (short) 1)
-                  qm.getPlayer().changeJob(MapleJob.THUNDERBREAKER3)
+                  qm.getPlayer().changeJob(MapleJob.THUNDER_BREAKER_3)
                   qm.completeQuest()
                   qm.sendOk("#h #, from here on out, you will become an Advanced Knight of the Knights of Cygnus! As your standing rises, so does the difficulty of the tasks you will be receiving. But challenge is good, right? You have to enjoy life. Enjoy what's given to you!")
                }

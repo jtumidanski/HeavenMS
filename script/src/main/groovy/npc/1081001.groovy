@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Pison
-	Map(s): 		Florina Beach
-	Description: 	
-*/
-
-
 class NPC1081001 {
    NPCConversationManager cm
    int status = 0

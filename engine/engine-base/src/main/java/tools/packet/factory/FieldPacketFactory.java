@@ -48,7 +48,7 @@ public class FieldPacketFactory extends AbstractPacketFactory {
       Handler.handle(ForcedEquip.class).decorate(this::showForcedEquip).register(registry);
       Handler.handle(ForcedStatReset.class).decorate(this::resetForcedStats).size(2).register(registry);
       Handler.handle(ForcedStatSet.class).decorate(this::aranGodlyStats).register(registry);
-      Handler.handle(CrimsonBalrogBoat.class).decorate(this::crogBoatPacket).register(registry);
+      Handler.handle(CrimsonBalrogBoat.class).decorate(this::crimsonBalrogBoatPacket).register(registry);
       Handler.handle(Boat.class).decorate(this::boatPacket).register(registry);
    }
 
@@ -143,8 +143,6 @@ public class FieldPacketFactory extends AbstractPacketFactory {
     * Changes the current background effect to either being rendered or not.
     * Data is still missing, so this is pretty binary at the moment in how it
     * behaves.
-    *
-    * @return a packet to change the background effect of a specified layer.
     */
    protected void changeBackgroundEffect(MaplePacketLittleEndianWriter writer, ChangeBackgroundEffect packet) {
       writer.writeBool(packet.remove());
@@ -166,7 +164,7 @@ public class FieldPacketFactory extends AbstractPacketFactory {
       writer.write(new byte[]{(byte) 0x1F, (byte) 0x0F, 0, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0xFF, 0, (byte) 0xE7, 3, (byte) 0xE7, 3, (byte) 0x78, (byte) 0x8C});
    }
 
-   protected void crogBoatPacket(MaplePacketLittleEndianWriter writer, CrimsonBalrogBoat packet) {
+   protected void crimsonBalrogBoatPacket(MaplePacketLittleEndianWriter writer, CrimsonBalrogBoat packet) {
       writer.write(10);
       writer.write(packet.theType() ? 4 : 5);
    }

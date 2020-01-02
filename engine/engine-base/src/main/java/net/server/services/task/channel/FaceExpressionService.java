@@ -47,39 +47,36 @@ public class FaceExpressionService extends BaseService {
    }
 
    public void registerFaceExpression(final MapleMap map, final MapleCharacter chr, int emote) {
-      int lockid = getChannelSchedulerIndex(map.getId());
+      int lockId = getChannelSchedulerIndex(map.getId());
 
-      Runnable cancelAction = new Runnable() {
-         @Override
-         public void run() {
-            if (chr.isLoggedinWorld()) {
-               map.broadcastMessage(chr, new FacialExpression(chr.getId(), 0));
-            }
+      Runnable cancelAction = () -> {
+         if (chr.isLoggedInWorld()) {
+            map.broadcastMessage(chr, new FacialExpression(chr.getId(), 0));
          }
       };
 
-      faceLock[lockid].lock();
+      faceLock[lockId].lock();
       try {
-         if (!chr.isLoggedinWorld()) {
+         if (!chr.isLoggedInWorld()) {
             return;
          }
 
-         faceExpressionSchedulers[lockid].registerFaceExpression(chr.getId(), cancelAction);
+         faceExpressionSchedulers[lockId].registerFaceExpression(chr.getId(), cancelAction);
       } finally {
-         faceLock[lockid].unlock();
+         faceLock[lockId].unlock();
       }
 
       map.broadcastMessage(chr, new FacialExpression(chr.getId(), emote));
    }
 
-   public void unregisterFaceExpression(int mapid, MapleCharacter chr) {
-      int lockid = getChannelSchedulerIndex(mapid);
+   public void unregisterFaceExpression(int mapId, MapleCharacter chr) {
+      int lockId = getChannelSchedulerIndex(mapId);
 
-      faceLock[lockid].lock();
+      faceLock[lockId].lock();
       try {
-         faceExpressionSchedulers[lockid].unregisterFaceExpression(chr.getId());
+         faceExpressionSchedulers[lockId].unregisterFaceExpression(chr.getId());
       } finally {
-         faceLock[lockid].unlock();
+         faceLock[lockId].unlock();
       }
    }
 

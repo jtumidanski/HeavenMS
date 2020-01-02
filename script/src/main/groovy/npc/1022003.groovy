@@ -191,7 +191,7 @@ class NPC1022003 {
             }
             cm.gainMeso(-cost * qty)
             cm.gainItem(item, (short) qty)
-            cm.sendOk("There, finished. What do you think, a piece of art, isn't it? Well, if you need anything else, you nkow where to find me.")
+            cm.sendOk("There, finished. What do you think, a piece of art, isn't it? Well, if you need anything else, you know where to find me.")
          }
          cm.dispose()
       }

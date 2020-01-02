@@ -33,7 +33,7 @@ class NPC2040048 {
             return
          }
          if (mode == 0 && status == 1) {
-            cm.sendNext("You must have some buiness to take care of here. You must be tired from all that traveling and hunting. Go take some rest, and if you feel like changing your mind, then come talk to me.")
+            cm.sendNext("You must have some business to take care of here. You must be tired from all that traveling and hunting. Go take some rest, and if you feel like changing your mind, then come talk to me.")
             cm.dispose()
             return
          }
@@ -50,7 +50,7 @@ class NPC2040048 {
                } else if (selection == 1) {
                   msg = "So you have #b#t" + ticket + "##k? You can always head over to #m110000000# with that."
                }
-               cm.sendYesNo(msg + " Okay!! Please beware that you may be running into some monsters around there though, so make sure not to get caught off-guard. Okat, would you like to head over to #m110000000# right now?")
+               cm.sendYesNo(msg + " Okay!! Please beware that you may be running into some monsters around there though, so make sure not to get caught off-guard. Okay, would you like to head over to #m110000000# right now?")
             } else if (selection == 2) {
                cm.sendNext("You must be curious about #b#t" + ticket + "##k. Yeah, I can see that. #t" + ticket + "# is an item where as long as you have in possession, you may make your way to #m110000000# for free. It's such a rare item that even we had to buy those, but unfortunately I lost mine a few weeks ago during a long weekend.")
                status = 3

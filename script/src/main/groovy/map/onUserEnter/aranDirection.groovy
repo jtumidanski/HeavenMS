@@ -3,16 +3,16 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MaparanDirection {
+class MapAranDirection {
 
    static def start(MapScriptMethods ms) {
       ms.displayAranIntro()
    }
 }
 
-MaparanDirection getMap() {
-   getBinding().setVariable("map", new MaparanDirection())
-   return (MaparanDirection) getBinding().getVariable("map")
+MapAranDirection getMap() {
+   getBinding().setVariable("map", new MapAranDirection())
+   return (MapAranDirection) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

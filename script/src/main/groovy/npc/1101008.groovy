@@ -78,7 +78,7 @@ class NPC1101008 {
                cm.guideHint(13)
                cm.dispose()
             } else if (selection == 14) {
-               cm.sendOk("The Black Mage is trying to revive and conquer our peaceful Maple World. As a response to this threat, Empress Cygnus has formed a knighthood, now known as Cygnus Knights. You can become a Knight when you reach Lv. 10.")
+               cm.sendOk("The Black Magician is trying to revive and conquer our peaceful Maple World. As a response to this threat, Empress Cygnus has formed a knighthood, now known as Cygnus Knights. You can become a Knight when you reach Lv. 10.")
                cm.dispose()
             }
          } else if (status == 2) {

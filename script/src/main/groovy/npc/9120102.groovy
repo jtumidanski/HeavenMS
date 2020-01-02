@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -17,9 +17,9 @@ class NPC9120102 {
 
    int beauty = 0
    int price = 1000000
-   int[] mface_v = [20000, 20004, 20005, 20012, 20020, 20031]
-   int[] fface_v = [21000, 21003, 21006, 21012, 21021, 21024]
-   int[] facenew = []
+   int[] maleFace = [20000, 20004, 20005, 20012, 20020, 20031]
+   int[] femaleFace = [21000, 21003, 21006, 21012, 21021, 21024]
+   int[] faceNew = []
    int[] colors = []
 
    def start() {
@@ -27,24 +27,8 @@ class NPC9120102 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
-   def pushIfItemsExists(int[] array, int[] itemidList) {
-      for (int i = 0; i < itemidList.length; i++) {
-         int itemid = itemidList[i]
-
-         if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-            array << itemid
-         }
-      }
-   }
-
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -57,18 +41,18 @@ class NPC9120102 {
          } else if (status == 1) {
             if (selection == 1) {
                beauty = 0
-               facenew = []
+               faceNew = []
                if (cm.getPlayer().getGender() == 0) {
-                  for (int i = 0; i < mface_v.length; i++) {
-                     pushIfItemExists(facenew, mface_v[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+                  for (int i = 0; i < maleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, maleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
                if (cm.getPlayer().getGender() == 1) {
-                  for (int i = 0; i < fface_v.length; i++) {
-                     pushIfItemExists(facenew, fface_v[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100))
+                  for (int i = 0; i < femaleFace.length; i++) {
+                     faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendStyle("I can totally transform your face into something new... how about giving us a try? For #b#t5152009##k, you can get the face of your liking...take your time in choosing the face of your preference.", facenew)
+               cm.sendStyle("I can totally transform your face into something new... how about giving us a try? For #b#t5152009##k, you can get the face of your liking...take your time in choosing the face of your preference.", faceNew)
             } else if (selection == 2) {
                beauty = 1
                int current = 0
@@ -78,9 +62,8 @@ class NPC9120102 {
                if (cm.getPlayer().getGender() == 1) {
                   current = cm.getPlayer().getFace() % 100 + 21000
                }
-               colors = []
                int[] temp = [current, current + 100, current + 200, current + 300, current + 400, current + 500, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendStyle("With our new computer program, you can see yourself after the treatment in advance. What kind of lens would you like to wear? Please choose the style of your liking.", colors)
             } else if (selection == 3) {
                beauty = 3
@@ -95,7 +78,7 @@ class NPC9120102 {
                colors = []
                for (int i = 0; i < 8; i++) {
                   if (cm.haveItem(5152100 + i)) {
-                     pushIfItemExists(colors, current + 100 * i)
+                     colors = ScriptUtils.pushItemIfTrue(colors, current + 100 * i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
 
@@ -113,7 +96,7 @@ class NPC9120102 {
             if (beauty == 0) {
                if (cm.haveItem(5152009)) {
                   cm.gainItem(5152009, (short) -1)
-                  cm.setFace(facenew[selection])
+                  cm.setFace(faceNew[selection])
                   cm.sendOk("Enjoy your new and improved face!")
                } else {
                   cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")

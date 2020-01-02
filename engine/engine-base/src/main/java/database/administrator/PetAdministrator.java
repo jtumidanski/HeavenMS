@@ -24,7 +24,7 @@ public class PetAdministrator extends AbstractQueryExecutor {
    private PetAdministrator() {
    }
 
-   public void unreferenceMissingPetsFromInventory(EntityManager entityManager) {
+   public void removeMissingPetReferencesFromInventory(EntityManager entityManager) {
       entityManager.getTransaction().begin();
 
       TypedQuery<Integer> petIdQuery = entityManager.createQuery("SELECT p.petId FROM Pet p", Integer.class);

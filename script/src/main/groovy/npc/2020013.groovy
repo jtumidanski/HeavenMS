@@ -15,7 +15,7 @@ class NPC2020013 {
    int status = -1
    int sel = -1
    int job
-   def actionx = ["Mental": false, "Physical": false]
+   def action = ["Mental": false, "Physical": false]
 
    def start() {
       int jobBase = (cm.getJobId() / 100).intValue()
@@ -32,9 +32,9 @@ class NPC2020013 {
          return
       }
       if (cm.haveItem(4031058)) {
-         actionx["Mental"] = true
+         action["Mental"] = true
       } else if (cm.haveItem(4031057)) {
-         actionx["Physical"] = true
+         action["Physical"] = true
       }
       cm.sendSimple("Can I help you?#b" + (cm.getJobId() % 10 == 0 ? "\r\n#L0#I want to make the 3th job advancement." : "") + "\r\n#L1#Please allow me to do the Zakum Dungeon Quest.")
    }
@@ -43,14 +43,14 @@ class NPC2020013 {
       status++
       if (mode == 0 && type == 0) {
          status -= 2
-      } else if (mode != 1 || (status > 2 && !actionx["Mental"]) || status > 3) {
+      } else if (mode != 1 || (status > 2 && !action["Mental"]) || status > 3) {
          if (mode == 0 && type == 1) {
             cm.sendNext("Make up your mind.")
          }
          cm.dispose()
          return
       }
-      if (actionx["Mental"]) {
+      if (action["Mental"]) {
          if (status == 0) {
             cm.sendNext("Great job completing the mental part of the test. You have wisely answered all the questions correctly. I must say, I am quite impressed with the level of wisdom you have displayed there. Please hand me the necklace first, before we take on the next step.")
          } else if (status == 1) {
@@ -72,12 +72,12 @@ class NPC2020013 {
             if (Math.floor(cm.getJobId() / 10) == 51) {
                cm.sendNext("Great! You are now a #bMarauder#k. As a Marauder, you will learn some of the most sophisticated skills related to melee-based attacks. #bEnergy Charge#k is a skill that allows you to store your power and the damage you receive into a special form of energy. Once this ball of energy is charged, you may use #bEnergy Blast#k to apply maximum damage against your enemies, and also use #bEnergy Drain#k to steal your enemy's HP to recover your own. #bTransformation#k will allow you to transform into a superhuman being with devastating melee attacks, and while transformed, you can use #bShockwave#k to cause a mini-earthquake and inflict massive damage to your enemies.")
             } else {
-               cm.sendNext("Great! You have now become an #bOutlaw#k. As an Outlaw, you will become a true pistolero, a master of every known Gun attack, as well as a few other skills to help you vanquish evil. #bBurst Fire#k is a more powerful version of Double Shot, shooting more bullets and causing more damage at the same time. You also now have the ability to summon a loyal #bOctopus#k and the swooping #bGaviota#k as your trusty allies, while attacking your enemies using #bBullseye#k. You can also use element-based attacks using #bFlamethrower#k and #bIce Splitter#k.")
+               cm.sendNext("Great! You have now become an #bOutlaw#k. As an Outlaw, you will become a true gunfighter, a master of every known Gun attack, as well as a few other skills to help you vanquish evil. #bBurst Fire#k is a more powerful version of Double Shot, shooting more bullets and causing more damage at the same time. You also now have the ability to summon a loyal #bOctopus#k and the swooping #bGaviota#k as your trusty allies, while attacking your enemies using #bBullseye#k. You can also use element-based attacks using #bFlamethrower#k and #bIce Splitter#k.")
             }
          } else if (status == 3) {
             cm.sendNextPrev("I've also given you some SP and AP, which will help you get started. You have now become a powerful, powerful pirate, indeed. Remember, though, that the real world will be awaiting your arrival with even tougher obstacles to overcome. Once you feel like you cannot train yourself to reach a higher place, then, and only then, come see me. I'll be here waiting.")
          }
-      } else if (actionx["Physical"]) {
+      } else if (action["Physical"]) {
          if (status == 0) {
             cm.sendNext("Great job completing the physical part of the test. I knew you could do it. Now that you have passed the first half of the test, here's the second half. Please give me the necklace first.")
          } else if (status == 1) {

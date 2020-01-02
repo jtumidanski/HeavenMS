@@ -22,7 +22,7 @@ public class ReportPacketFactory extends AbstractPacketFactory {
    /**
     * Sends a report response
     * <p>
-    * Possible values for <code>mode</code>:<br> 0: You have succesfully
+    * Possible values for <code>mode</code>:<br> 0: You have successfully
     * reported the user.<br> 1: Unable to locate the user.<br> 2: You may only
     * report users 10 times a day.<br> 3: You have been reported to the GM's by
     * a user.<br> 4: Your request did not go through for unknown reasons.

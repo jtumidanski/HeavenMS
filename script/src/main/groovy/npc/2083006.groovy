@@ -60,34 +60,34 @@ class NPC2083006 {
             String menuSel = generateSelectionMenu(array, limit)
             cm.sendSimple(menuSel)
          } else if (status == 1) {
-            int mapid = 0
+            int mapId = 0
 
             switch (selection) {
                case 0:
-                  mapid = 240070100
+                  mapId = 240070100
                   break
                case 1:
-                  mapid = 240070200
+                  mapId = 240070200
                   break
                case 2:
-                  mapid = 240070300
+                  mapId = 240070300
                   break
                case 3:
-                  mapid = 240070400
+                  mapId = 240070400
                   break
                case 4:
-                  mapid = 240070500
+                  mapId = 240070500
                   break
                case 5:
-                  mapid = 240070600
+                  mapId = 240070600
                   break
             /*case 6:
-                mapid = 683070400;
+                mapId = 683070400;
                 break;*/
             }
 
-            if (mapid > 0) {
-               cm.warp(mapid, 1)
+            if (mapId > 0) {
+               cm.warp(mapId, 1)
             } else {
                cm.sendOk("Complete your mission first.")
             }

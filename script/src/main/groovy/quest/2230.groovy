@@ -22,7 +22,7 @@ class Quest2230 {
          } else if (status == 1) {
             qm.sendYesNo("Looking after another life...That is the inevitable mission given to you...Follow the force that leads you to me.")
          } else if (status == 2) {
-            qm.sendOk("Put your hand in your pocket. I think your friend has already found you.\r\nThe purple bellflower that soaks in the sun in between the skyscraping trees...Follow the path to the unknown that leads you to the bellflower. I will wait for you here.")
+            qm.sendOk("Put your hand in your pocket. I think your friend has already found you.\r\nThe purple bellflower that soaks in the sun in between the sky scraping trees...Follow the path to the unknown that leads you to the bellflower. I will wait for you here.")
             qm.forceStartQuest()
             qm.gainItem(4032086, (short) 1) // Mysterious Egg * 1
          } else if (status == 3) {
@@ -70,7 +70,6 @@ class Quest2230 {
                qm.gainItem(4032086, (short) -1) // Mysterious Egg * -1
                qm.forceCompleteQuest()
                qm.gainItem(5000054, (short) 1, false, true, 5 * 60 * 60 * 1000)
-               // rune snail (5hrs), missing expiration time detected thanks to cljnilsson
             }
 
             qm.dispose()

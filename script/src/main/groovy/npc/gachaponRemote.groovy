@@ -10,7 +10,7 @@ import scripting.npc.NPCConversationManager
 */
 
 
-class NPCgachaponRemote {
+class NpcGachaponRemote {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -49,12 +49,12 @@ class NPCgachaponRemote {
    }
 }
 
-NPCgachaponRemote getNPC() {
+NpcGachaponRemote getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCgachaponRemote(cm: cm))
+      getBinding().setVariable("npc", new NpcGachaponRemote(cm: cm))
    }
-   return (NPCgachaponRemote) getBinding().getVariable("npc")
+   return (NpcGachaponRemote) getBinding().getVariable("npc")
 }
 
 def start() {

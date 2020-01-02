@@ -22,9 +22,6 @@ import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
 import tools.packet.ui.GetClock;
 
-/**
- * @author Drago/Dragohe4rt
- */
 public class MonsterCarnival {
 
    public static int D = 3;
@@ -38,10 +35,10 @@ public class MonsterCarnival {
    private long startTime = 0;
    private int summonsR = 0, summonsB = 0, room = 0;
    private MapleCharacter leader1, leader2, team1, team2;
-   private int redCP, blueCP, redTotalCP, blueTotalCP, redTimeupCP, blueTimeupCP;
+   private int redCP, blueCP, redTotalCP, blueTotalCP, redTimeUpCP, blueTimeUpCP;
    private boolean cpq1;
 
-   public MonsterCarnival(MapleParty p1, MapleParty p2, int mapid, boolean cpq1, int room) {
+   public MonsterCarnival(MapleParty p1, MapleParty p2, int mapId, boolean cpq1, int room) {
       try {
          this.cpq1 = cpq1;
          this.room = room;
@@ -50,7 +47,7 @@ public class MonsterCarnival {
          Channel cs = Server.getInstance().getWorld(p2.getLeader().getWorld()).getChannel(p2.getLeader().getChannel());
          p1.setEnemy(p2);
          p2.setEnemy(p1);
-         map = cs.getMapFactory().getDisposableMap(mapid);
+         map = cs.getMapFactory().getDisposableMap(mapId);
          startTime = System.currentTimeMillis() + 10 * 60 * 1000;
          final int redPortal = map.isPurpleCPQMap() ? 2 : 0;
          final int bluePortal = map.isPurpleCPQMap() ? 1 : 0;
@@ -94,9 +91,7 @@ public class MonsterCarnival {
             return;
          }
 
-         // thanks Atoot, Vcoc for noting double CPQ functional being sent to players in CPQ start
-
-         timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeDefault() * 1000); // thanks Atoot for noticing an irregular "event extended" issue here
+         timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeDefault() * 1000);
          effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeDefault() * 1000 - 10 * 1000);
          respawnTask = TimerManager.getInstance().register(this::respawn, YamlConfig.config.server.RESPAWN_INTERVAL);
 
@@ -110,16 +105,16 @@ public class MonsterCarnival {
       map.respawn();
    }
 
-   public void playerDisconnected(int charid) {
+   public void playerDisconnected(int characterId) {
       int team = -1;
       for (MaplePartyCharacter mpc : leader1.getParty().map(MapleParty::getMembers).orElse(Collections.emptyList())) {
-         if (mpc.getId() == charid) {
+         if (mpc.getId() == characterId) {
             team = 0;
             break;
          }
       }
       for (MaplePartyCharacter mpc : leader2.getParty().map(MapleParty::getMembers).orElse(Collections.emptyList())) {
-         if (mpc.getId() == charid) {
+         if (mpc.getId() == characterId) {
             team = 1;
             break;
          }
@@ -146,8 +141,8 @@ public class MonsterCarnival {
       dispose(true);
    }
 
-   public void leftParty(int charid) {
-      playerDisconnected(charid);
+   public void leftParty(int characterId) {
+      playerDisconnected(characterId);
    }
 
    protected void dispose() {
@@ -266,7 +261,7 @@ public class MonsterCarnival {
                   character.changeMap(cs.getMapFactory().getMap(map.getId() + mapOffset), cs.getMapFactory().getMap(map.getId() + mapOffset).getPortal(0));
                }
                character.setTeam(-1);
-               character.dispelDebuffs();
+               character.dispelAbnormalStatuses();
             });
    }
 
@@ -286,8 +281,8 @@ public class MonsterCarnival {
    }
 
    private void timeUp() {
-      int cp1 = this.redTimeupCP;
-      int cp2 = this.blueTimeupCP;
+      int cp1 = this.redTimeUpCP;
+      int cp2 = this.blueTimeUpCP;
       if (cp1 == cp2) {
          extendTime();
          return;
@@ -316,7 +311,7 @@ public class MonsterCarnival {
       MasterBroadcaster.getInstance().sendToAllInMap(map, new GetClock(3 * 60));
 
       timer = TimerManager.getInstance().schedule(this::timeUp, map.getTimeExpand() * 1000);
-      effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeExpand() * 1000 - 10 * 1000); // thanks Vcoc for noticing a time set issue here
+      effectTimer = TimerManager.getInstance().schedule(this::complete, map.getTimeExpand() * 1000 - 10 * 1000);
    }
 
    private void completeForParty(Channel channel, MapleCharacter leader, boolean win) {
@@ -332,7 +327,7 @@ public class MonsterCarnival {
                   PacketCreator.announce(character, new ShowEffect("quest/carnival/lose"));
                   PacketCreator.announce(character, new PlaySound("MobCarnival/Lose"));
                }
-               character.dispelDebuffs();
+               character.dispelAbnormalStatuses();
             });
    }
 
@@ -340,17 +335,17 @@ public class MonsterCarnival {
       int cp1 = this.redTotalCP;
       int cp2 = this.blueTotalCP;
 
-      this.redTimeupCP = cp1;
-      this.blueTimeupCP = cp2;
+      this.redTimeUpCP = cp1;
+      this.blueTimeUpCP = cp2;
 
       if (cp1 == cp2) {
          return;
       }
       boolean redWin = cp1 > cp2;
-      int chnl = leader1.getClient().getChannel();
-      int chnl1 = leader2.getClient().getChannel();
-      if (chnl != chnl1) {
-         throw new RuntimeException("Os lideres estao em canais diferentes.");
+      int leader1Channel = leader1.getClient().getChannel();
+      int leader2Channel = leader2.getClient().getChannel();
+      if (leader1Channel != leader2Channel) {
+         throw new RuntimeException("The leader channels are different.");
       }
 
       Channel cs = map.getChannelServer();

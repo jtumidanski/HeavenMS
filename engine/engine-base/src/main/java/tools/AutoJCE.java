@@ -6,12 +6,7 @@ import java.security.Permission;
 import java.security.PermissionCollection;
 import java.util.Map;
 
-public class AutoJCE {   // AutoJCE into server source thanks to Acernis dev team
-
-   /**
-    * Credits: ntoskrnl of StackOverflow
-    * http://stackoverflow.com/questions/1179672/
-    */
+public class AutoJCE {
    public static byte removeCryptographyRestrictions() {
       if (!isRestrictedCryptography()) {
          //System.out.println("Cryptography restrictions removal not needed");

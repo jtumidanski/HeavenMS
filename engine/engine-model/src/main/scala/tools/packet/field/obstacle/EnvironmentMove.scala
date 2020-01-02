@@ -8,5 +8,5 @@ class EnvironmentMove(private var _environment: String, private var _mode: Int) 
 
   def mode: Int = _mode
 
-  override def opcode(): SendOpcode = SendOpcode.FIELD_OBSTACLE_ONOFF
+  override def opcode(): SendOpcode = SendOpcode.FIELD_OBSTACLE_ON_OFF
 }

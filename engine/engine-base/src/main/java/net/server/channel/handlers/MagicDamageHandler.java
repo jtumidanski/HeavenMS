@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import client.MapleBuffStat;
@@ -29,8 +8,8 @@ import config.YamlConfig;
 import constants.game.GameConstants;
 import constants.skills.Bishop;
 import constants.skills.Evan;
-import constants.skills.FPArchMage;
-import constants.skills.ILArchMage;
+import constants.skills.FirePoisonArchMage;
+import constants.skills.IceLighteningArchMagician;
 import net.server.channel.packet.AttackPacket;
 import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.packet.PacketReaderFactory;
@@ -41,7 +20,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.GetEnergy;
 import tools.packet.PacketInput;
 import tools.packet.attack.MagicAttack;
-import tools.packet.character.SkillCooldown;
+import tools.packet.character.SkillCoolDown;
 
 public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -72,7 +51,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
       }
 
       PacketInput packet;
-      int charge = (attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FPArchMage.BIG_BANG || attack.skill() == ILArchMage.BIG_BANG || attack.skill() == Bishop.BIG_BANG) ? attack.charge() : -1;
+      int charge = (attack.skill() == Evan.FIRE_BREATH || attack.skill() == Evan.ICE_BREATH || attack.skill() == FirePoisonArchMage.BIG_BANG || attack.skill() == IceLighteningArchMagician.BIG_BANG || attack.skill() == Bishop.BIG_BANG) ? attack.charge() : -1;
       packet = new MagicAttack(chr.getId(), attack.skill(), attack.skillLevel(), attack.stance(), attack.numAttackedAndDamage(), attack.getDamage(), charge, attack.speed(), attack.direction(), attack.display());
 
 
@@ -81,10 +60,10 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
 
       SkillFactory.getSkill(attack.skill()).ifPresent(skill -> {
          MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-         if (effect_.getCooldown() > 0) {
+         if (effect_.getCoolDown() > 0) {
             if (!chr.skillIsCooling(attack.skill())) {
-               PacketCreator.announce(c, new SkillCooldown(attack.skill(), effect_.getCooldown()));
-               chr.addCooldown(attack.skill(), currentServerTime(), effect_.getCooldown() * 1000);
+               PacketCreator.announce(c, new SkillCoolDown(attack.skill(), effect_.getCoolDown()));
+               chr.addCoolDown(attack.skill(), currentServerTime(), effect_.getCoolDown() * 1000);
             }
          }
       });

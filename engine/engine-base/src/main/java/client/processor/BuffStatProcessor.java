@@ -134,12 +134,7 @@ public class BuffStatProcessor {
          }
       }
 
-      Comparator<Pair<MapleStatEffect, Integer>> cmp = new Comparator<>() {
-         @Override
-         public int compare(Pair<MapleStatEffect, Integer> o1, Pair<MapleStatEffect, Integer> o2) {
-            return o2.getRight().compareTo(o1.getRight());
-         }
-      };
+      Comparator<Pair<MapleStatEffect, Integer>> cmp = (o1, o2) -> o2.getRight().compareTo(o1.getRight());
 
       for (Map.Entry<MapleBuffStat, List<Pair<MapleStatEffect, Integer>>> statBuffs : buffEffects.entrySet()) {
          statBuffs.getValue().sort(cmp);
@@ -149,13 +144,11 @@ public class BuffStatProcessor {
    }
 
    public MapleBuffStat getSingletonStatupFromEffect(MapleStatEffect mse) {
-      for (Pair<MapleBuffStat, Integer> mbs : mse.getStatups()) {
-         if (isSingletonStatup(mbs.getLeft())) {
-            return mbs.getLeft();
-         }
-      }
-
-      return null;
+      return mse.getStatups().stream()
+            .filter(pair -> isSingletonStatup(pair.getLeft()))
+            .findFirst()
+            .map(Pair::getLeft)
+            .orElse(null);
    }
 
    public boolean isSingletonStatup(MapleBuffStat mbs) {
@@ -169,14 +162,14 @@ public class BuffStatProcessor {
          case COUPON_DRP3:
          case MESO_UP_BY_ITEM:
          case ITEM_UP_BY_ITEM:
-         case RESPECT_PIMMUNE:
-         case RESPECT_MIMMUNE:
+         case RESPECT_PLAYER_IMMUNE:
+         case RESPECT_MONSTER_IMMUNE:
          case DEFENSE_ATT:
          case DEFENSE_STATE:
-         case WATK:
-         case WDEF:
-         case MATK:
-         case MDEF:
+         case WEAPON_ATTACK:
+         case WEAPON_DEFENSE:
+         case MAGIC_ATTACK:
+         case MAGIC_DEFENSE:
          case ACC:
          case AVOID:
          case SPEED:
@@ -188,8 +181,8 @@ public class BuffStatProcessor {
       }
    }
 
-   public boolean isPriorityBuffSourceid(int sourceid) {
-      switch(sourceid) {
+   public boolean isPriorityBuffSourceId(int sourceId) {
+      switch(sourceId) {
          case -2022631:
          case -2022632:
          case -2022633:

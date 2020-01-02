@@ -5,9 +5,6 @@ import net.server.Server;
 import net.server.channel.Channel;
 import server.maps.MapleMapManager;
 
-/**
- * @author Resinate
- */
 public class RespawnTask implements Runnable {
 
    @Override

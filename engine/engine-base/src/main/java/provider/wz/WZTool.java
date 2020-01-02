@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package provider.wz;
 
 import java.security.InvalidKeyException;
@@ -53,14 +32,14 @@ public class WZTool {
             (byte) 0x52, 0x00, 0x00, 0x00
       };
       Cipher cipher = null;
-      SecretKeySpec skeySpec = new SecretKeySpec(key, "AES");
+      SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
       try {
          cipher = Cipher.getInstance("AES");
       } catch (NoSuchAlgorithmException | NoSuchPaddingException e) {
          e.printStackTrace();
       }
       try {
-         cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+         cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
       } catch (InvalidKeyException e) {
          e.printStackTrace();
       }
@@ -88,15 +67,15 @@ public class WZTool {
       return str;
    }
 
-   public static String readDecodedString(LittleEndianAccessor llea) {
+   public static String readDecodedString(LittleEndianAccessor accessor) {
       int strLength;
-      byte b = llea.readByte();
+      byte b = accessor.readByte();
       if (b == 0x00) {
          return "";
       }
       if (b >= 0) {
          if (b == 0x7F) {
-            strLength = llea.readInt();
+            strLength = accessor.readInt();
          } else {
             strLength = b;
          }
@@ -105,12 +84,12 @@ public class WZTool {
          }
          byte[] str = new byte[strLength * 2];
          for (int i = 0; i < strLength * 2; i++) {
-            str[i] = llea.readByte();
+            str[i] = accessor.readByte();
          }
          return DecryptUnicodeStr(str);
       } else {
          if (b == -128) {
-            strLength = llea.readInt();
+            strLength = accessor.readInt();
          } else {
             strLength = -b;
          }
@@ -119,7 +98,7 @@ public class WZTool {
          }
          byte[] str = new byte[strLength];
          for (int i = 0; i < strLength; i++) {
-            str[i] = llea.readByte();
+            str[i] = accessor.readByte();
          }
          return DecryptAsciiStr(str);
       }
@@ -148,16 +127,16 @@ public class WZTool {
       return String.valueOf(charRet);
    }
 
-   public static String readDecodedStringAtOffset(SeekableLittleEndianAccessor slea, int offset) {
-      slea.seek(offset);
-      return readDecodedString(slea);
+   public static String readDecodedStringAtOffset(SeekableLittleEndianAccessor accessor, int offset) {
+      accessor.seek(offset);
+      return readDecodedString(accessor);
    }
 
-   public static String readDecodedStringAtOffsetAndReset(SeekableLittleEndianAccessor slea, int offset) {
-      long pos = slea.getPosition();
-      slea.seek(offset);
-      String ret = readDecodedString(slea);
-      slea.seek(pos);
+   public static String readDecodedStringAtOffsetAndReset(SeekableLittleEndianAccessor accessor, int offset) {
+      long pos = accessor.getPosition();
+      accessor.seek(offset);
+      String ret = readDecodedString(accessor);
+      accessor.seek(pos);
       return ret;
    }
 

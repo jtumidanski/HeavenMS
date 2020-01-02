@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub & pirate equipment
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class Perion extends GachaponItems {
 
    @Override
@@ -16,7 +9,7 @@ public class Perion extends GachaponItems {
             /* Scrolls */
             2044907, 2044802,
 
-            /* Useable drop */
+            /* Use-able drop */
             2000004, 2000005,
 
             /* Common equipment */

@@ -10,7 +10,7 @@ import scripting.npc.NPCConversationManager
 */
 
 
-class NPCunidentifiedNpc {
+class UnidentifiedNpc {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -24,12 +24,12 @@ class NPCunidentifiedNpc {
    }
 }
 
-NPCunidentifiedNpc getNPC() {
+UnidentifiedNpc getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCunidentifiedNpc(cm: cm))
+      getBinding().setVariable("npc", new UnidentifiedNpc(cm: cm))
    }
-   return (NPCunidentifiedNpc) getBinding().getVariable("npc")
+   return (UnidentifiedNpc) getBinding().getVariable("npc")
 }
 
 def start() {

@@ -23,8 +23,7 @@ class NPC9201065 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1)  // disposing issue with stylishs found thanks to Vcoc
-      {
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {

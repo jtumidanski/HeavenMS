@@ -5,7 +5,7 @@ import scripting.quest.QuestActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-class QuestmedalQuest {
+class MedalQuest {
    QuestActionManager qm
    int status = -1
 
@@ -13,28 +13,28 @@ class QuestmedalQuest {
       qm.forceStartQuest()
       qm.forceCompleteQuest()
 
-      String medalname = qm.getMedalName()
-      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalname + "> is not coded.")
-      qm.earnTitle("<" + medalname + "> has been awarded.")
+      String medalName = qm.getMedalName()
+      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalName + "> is not coded.")
+      qm.earnTitle("<" + medalName + "> has been awarded.")
       qm.dispose()
    }
 
    def end(Byte mode, Byte type, Integer selection) {
       qm.forceCompleteQuest()
 
-      String medalname = qm.getMedalName()
-      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalname + "> is not coded.")
-      qm.earnTitle("<" + medalname + "> has been awarded.")
+      String medalName = qm.getMedalName()
+      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalName + "> is not coded.")
+      qm.earnTitle("<" + medalName + "> has been awarded.")
       qm.dispose()
    }
 }
 
-QuestmedalQuest getQuest() {
+MedalQuest getQuest() {
    if (!getBinding().hasVariable("quest")) {
       QuestActionManager qm = (QuestActionManager) getBinding().getVariable("qm")
-      getBinding().setVariable("quest", new QuestmedalQuest(qm: qm))
+      getBinding().setVariable("quest", new MedalQuest(qm: qm))
    }
-   return (QuestmedalQuest) getBinding().getVariable("quest")
+   return (MedalQuest) getBinding().getVariable("quest")
 }
 
 def start(Byte mode, Byte type, Integer selection) {

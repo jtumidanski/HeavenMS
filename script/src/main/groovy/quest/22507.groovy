@@ -33,7 +33,7 @@ class Quest22507 {
       } else if (status == 7) {
          qm.sendNextPrev("#bOne in...spirit?", (byte) 2)
       } else if (status == 8) {
-         qm.sendNextPrev("Yes! The Spirit Pact! You and I have seperate bodies, but we share one spirit. That's why you get stronger when I get stronger, and vice versa! Awesome, right? At least, I think so.")
+         qm.sendNextPrev("Yes! The Spirit Pact! You and I have separate bodies, but we share one spirit. That's why you get stronger when I get stronger, and vice versa! Awesome, right? At least, I think so.")
       } else if (status == 9) {
          qm.sendNextPrev("#bI have no idea what you're talking about, but it sounds like a pretty big deal.", (byte) 2)
       } else if (status == 10) {

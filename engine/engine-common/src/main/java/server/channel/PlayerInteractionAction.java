@@ -18,7 +18,7 @@ public enum PlayerInteractionAction {
    ADD_ITEM(0x16),
    BUY(0x17),
    UPDATE_MERCHANT(0x19),
-   UPDATE_PLAYERSHOP(0x1A),
+   UPDATE_PLAYER_SHOP(0x1A),
    REMOVE_ITEM(0x1B),
    BAN_PLAYER(0x1C),
    MERCHANT_THING(0x1D),

@@ -22,7 +22,7 @@ class NPC9201027 {
    int cost
    int options
    int nanaLoc
-   int[] mapids = [100000000, 103000000, 102000000, 101000000, 200000000, 220000000]
+   int[] mapIds = [100000000, 103000000, 102000000, 101000000, 200000000, 220000000]
    int[] questItems = [4000001, 4000037, 4000215, 4000026, 4000070, 4000128]
    int[] questExp = [2000, 5000, 10000, 17000, 22000, 30000]
 
@@ -39,10 +39,10 @@ class NPC9201027 {
    }
 
    def getNanaLocation(MapleCharacter player) {
-      int mapid = player.getMap().getId()
+      int mapId = player.getMap().getId()
 
-      for (int i = 0; i < mapids.length; i++) {
-         if (mapid == mapids[i]) {
+      for (int i = 0; i < mapIds.length; i++) {
+         if (mapId == mapIds[i]) {
             return i
          }
       }

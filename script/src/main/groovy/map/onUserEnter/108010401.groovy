@@ -2,7 +2,6 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 
 import java.awt.*
@@ -14,7 +13,7 @@ class Map108010401 {
          spawnMob(188, 20, 9001002, ms.getPlayer().getMap())
       } else if (ms.getMapId() == 108010301) { // Warrior
          spawnMob(188, 20, 9001000, ms.getPlayer().getMap())
-      } else if (ms.getMapId() == 108010201) { // Mage
+      } else if (ms.getMapId() == 108010201) { // Magician
          spawnMob(188, 20, 9001001, ms.getPlayer().getMap())
       } else if (ms.getMapId() == 108010401) { // Thief
          spawnMob(188, 20, 9001003, ms.getPlayer().getMap())
@@ -28,8 +27,7 @@ class Map108010401 {
          return
       }
 
-      MapleMonster mob = MapleLifeFactory.getMonster(id)
-      map.spawnMonsterOnGroundBelow(mob, new Point(x, y))
+      MapleLifeFactory.getMonster(id).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point(x, y)) })
    }
 }
 

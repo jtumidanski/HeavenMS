@@ -18,7 +18,7 @@ class NPC1012008 {
    int[] omok =       [4080000, 4080001, 4080002, 4080003, 4080004, 4080005]
    int[] omok1piece = [4030000, 4030000, 4030000, 4030010, 4030011, 4030011]
    int[] omok2piece = [4030001, 4030010, 4030011, 4030001, 4030010, 4030001]
-   int omokamount = 99
+   int omokAmount = 99
    String text = "The set also differs based on what kind of pieces you want to use for the game. Which set would you like to make?"
 
    def start() {
@@ -40,13 +40,13 @@ class NPC1012008 {
       }
 
       if (status == 0) {
-         cm.sendSimple("Hey, you look like you need a breather. You should be enjoying the life, just like I am. Well, if you have a couple of items, I can trade you for an item you can play minigames with. Now... what can I do for you?#b\r\n#L0#Create a minigame item#l\r\n#L1#Explain to me what the minigames are about#l#k")
+         cm.sendSimple("Hey, you look like you need a breather. You should be enjoying the life, just like I am. Well, if you have a couple of items, I can trade you for an item you can play mini games with. Now... what can I do for you?#b\r\n#L0#Create a mini game item#l\r\n#L1#Explain to me what the mini games are about#l#k")
 
       } else if (status == 1) {
          if (selection == 0) {
-            cm.sendSimple("You want to make the minigame item? Minigames aren't something you can just go ahead and play right off the bat. For each minigame, you'll need a specific set of items. Which minigame it em do you want to make?#b\r\n#L4#Omok Set#l\r\n#L5#A Set of Match Cards#l#k")
+            cm.sendSimple("You want to make the mini game item? Mini games aren't something you can just go ahead and play right off the bat. For each mini game, you'll need a specific set of items. Which minigame it em do you want to make?#b\r\n#L4#Omok Set#l\r\n#L5#A Set of Match Cards#l#k")
          } else if (selection == 1) {
-            cm.sendSimple("You want to learn more about the minigames? Awesome! Ask me anything. Which minigame do you want to know more about?#b\r\n#L2#Omok#l\r\n#L3#Match Cards#l#k")
+            cm.sendSimple("You want to learn more about the mini games? Awesome! Ask me anything. Which mini game do you want to know more about?#b\r\n#L2#Omok#l\r\n#L3#Match Cards#l#k")
          }
 
       } else if (status == 2) {
@@ -67,7 +67,7 @@ class NPC1012008 {
                cm.gainItem(4030012, (short) -15)
                cm.gainItem(4080100, (short) 1)
             } else {
-               cm.sendNext("You want #bA set of Match Cards#k? Hmm...to make A set of Match Cards, you'll need some #bMonster Cards#k. Monster Card can be obtained by taking out the monsters all around the island. Collect 15 Monster Cards and you can make a set of A set of Match Cards.") //Lmfao a set of A set xD
+               cm.sendNext("You want #bA set of Match Cards#k? Hmm...to make A set of Match Cards, you'll need some #bMonster Cards#k. Monster Card can be obtained by taking out the monsters all around the island. Collect 15 Monster Cards and you can make a set of A set of Match Cards.")
                cm.dispose()
             }
          }
@@ -91,22 +91,22 @@ class NPC1012008 {
          }
          else if (current == 3) {
             if (cm.haveItem(omok1piece[selection], 99) && cm.haveItem(omok2piece[selection], 99) && cm.haveItem(4030009, 1)) {
-               cm.gainItem(omok1piece[selection], (short) -omokamount)
-               cm.gainItem(omok2piece[selection], (short) -omokamount)
+               cm.gainItem(omok1piece[selection], (short) -omokAmount)
+               cm.gainItem(omok2piece[selection], (short) -omokAmount)
                cm.gainItem(4030009, (short) -1)
                cm.gainItem(omok[selection], (short) 1)
                cm.dispose()
             } else {
-               cm.sendNext("#bYou want to make #t" + omok[selection] + "##k? Hmm...get me the materials, and I can do just that. Listen carefully, the materials you need will be: #r" + omokamount + " #t" + omok1piece[selection] + "#, " + omokamount + " #t" + omok2piece[selection] + "#, 1 #t" + 4030009 + "##k. The monsters will probrably drop those every once in a while...")
+               cm.sendNext("#bYou want to make #t" + omok[selection] + "##k? Hmm...get me the materials, and I can do just that. Listen carefully, the materials you need will be: #r" + omokAmount + " #t" + omok1piece[selection] + "#, " + omokAmount + " #t" + omok2piece[selection] + "#, 1 #t" + 4030009 + "##k. The monsters will probably drop those every once in a while...")
                cm.dispose()
             }
          }
 
       } else if (status == 5) {
          if (current == 1) {
-            cm.sendNextPrev("When the first fame starts, #bthe room owner goes first#k. Beward that you'll be given a time limit, and you may lose your turn if you don't make your move on time. Normally, 3 x 3 is not allowed, but if there comes a point that it's absolutely necessary to put your piece there or face ending the game, then you can put it there. 3 x 3 is allowed as the last line of defense! Oh, and it won't count if it's #r6 or 7 straight#k. Only 5!")
+            cm.sendNextPrev("When the first fame starts, #bthe room owner goes first#k. Be warned that you'll be given a time limit, and you may lose your turn if you don't make your move on time. Normally, 3 x 3 is not allowed, but if there comes a point that it's absolutely necessary to put your piece there or face ending the game, then you can put it there. 3 x 3 is allowed as the last line of defense! Oh, and it won't count if it's #r6 or 7 straight#k. Only 5!")
          } else if (current == 2)  {
-            cm.sendNextPrev("Oh, and unlike Omok, when you create the game room for Match Cards, you'll need to set your game on the number of cards you'll use for the game. There are 3 modes avaliable, 3x4, 4x5, and 5x6, which will require 12, 20, and 30 cards respectively. Remember that you won't beable to change it up once the room is open, so if you really wish to change it up, you may have to close the room and open another one.")
+            cm.sendNextPrev("Oh, and unlike Omok, when you create the game room for Match Cards, you'll need to set your game on the number of cards you'll use for the game. There are 3 modes available, 3x4, 4x5, and 5x6, which will require 12, 20, and 30 cards respectively. Remember that you won't be able to change it up once the room is open, so if you really wish to change it up, you may have to close the room and open another one.")
          }
 
       } else if (status == 6) {

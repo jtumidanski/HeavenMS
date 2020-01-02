@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class Mapcannon_tuto_direction1 {
+class MapCannonTutorialDirection1 {
 
    static def start(MapScriptMethods ms) {
       ms.playSound("cannonshooter/flying")
@@ -13,9 +13,9 @@ class Mapcannon_tuto_direction1 {
    }
 }
 
-Mapcannon_tuto_direction1 getMap() {
-   getBinding().setVariable("map", new Mapcannon_tuto_direction1())
-   return (Mapcannon_tuto_direction1) getBinding().getVariable("map")
+MapCannonTutorialDirection1 getMap() {
+   getBinding().setVariable("map", new MapCannonTutorialDirection1())
+   return (MapCannonTutorialDirection1) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

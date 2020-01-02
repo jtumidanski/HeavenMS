@@ -9,5 +9,5 @@ class RefundCashItem(private var _item: Item, private var _maplePoints: Int) ext
 
   def maplePoints: Int = _maplePoints
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

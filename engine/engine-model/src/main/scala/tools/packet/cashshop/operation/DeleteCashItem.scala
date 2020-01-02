@@ -7,5 +7,5 @@ import tools.packet.PacketInput
 class DeleteCashItem(private var _item: Item) extends PacketInput {
   def item: Item = _item
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

@@ -1,29 +1,8 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanManager;
+import client.autoban.AutoBanManager;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
@@ -46,7 +25,7 @@ public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
    @Override
    public void handlePacket(PetFoodPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-      AutobanManager abm = chr.getAutobanManager();
+      AutoBanManager abm = chr.getAutoBanManager();
       if (abm.getLastSpam(2) + 500 > currentServerTime()) {
          PacketCreator.announce(client, new EnableActions());
          return;
@@ -84,7 +63,7 @@ public final class PetFoodHandler extends AbstractPacketHandler<PetFoodPacket> {
                   return;
                }
 
-               PetProcessor.getInstance().gainClosenessFullness(pet, chr, (pet.fullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptyness" to get +1 closeness
+               PetProcessor.getInstance().gainClosenessFullness(pet, chr, (pet.fullness() <= 75) ? 1 : 0, 30, 1);   // 25+ "emptiness" to get +1 closeness
                MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.USE, packet.position(), (short) 1, false);
             } finally {
                useInv.unlockInventory();

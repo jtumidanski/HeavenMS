@@ -10,7 +10,7 @@ public enum WorldServices implements ServiceType {
 
    private Class<? extends BaseService> s;
 
-   private WorldServices(Class<? extends BaseService> service) {
+   WorldServices(Class<? extends BaseService> service) {
       s = service;
    }
 

@@ -1,26 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Ronan
-*/
 package client.command.commands.gm4;
 
 import java.awt.Point;
@@ -48,11 +25,10 @@ public class PnpcCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !pnpc <npcid>");
+         player.yellowMessage("Syntax: !pnpc <npc id>");
          return;
       }
 
-      // command suggestion thanks to HighKey21, none, bibiko94 (TAYAMO), asafgb
       int mapId = player.getMapId();
       int npcId = Integer.parseInt(params[0]);
       if (player.getMap().containsNPC(npcId)) {
@@ -62,23 +38,23 @@ public class PnpcCommand extends Command {
 
       MapleNPC npc = MapleLifeFactory.getNPC(npcId);
 
-      Point checkpos = player.getMap().getGroundBelow(player.position());
-      int xpos = checkpos.x;
-      int ypos = checkpos.y;
-      int fh = player.getMap().getFootholds().findBelow(checkpos).id();
+      Point checkPosition = player.getMap().getGroundBelow(player.position());
+      int xPosition = checkPosition.x;
+      int yPosition = checkPosition.y;
+      int fh = player.getMap().getFootholds().findBelow(checkPosition).id();
 
       if (npc != null && !npc.getName().equals("MISSINGNO")) {
 
          DatabaseConnection.getInstance().withConnection(connection ->
-               PlayerLifeAdministrator.getInstance().create(connection, npcId, 0, fh, ypos, xpos + 50,
-                     xpos - 50, "n", xpos, ypos, player.getWorld(), mapId, -1, 0));
+               PlayerLifeAdministrator.getInstance().create(connection, npcId, 0, fh, yPosition, xPosition + 50,
+                     xPosition - 50, "n", xPosition, yPosition, player.getWorld(), mapId, -1, 0));
 
          for (Channel ch : player.getWorldServer().getChannels()) {
             npc = MapleLifeFactory.getNPC(npcId);
-            npc.position_$eq(checkpos);
-            npc.cy_$eq(ypos);
-            npc.rx0_$eq(xpos + 50);
-            npc.rx1_$eq(xpos - 50);
+            npc.position_$eq(checkPosition);
+            npc.cy_$eq(yPosition);
+            npc.rx0_$eq(xPosition + 50);
+            npc.rx1_$eq(xPosition - 50);
             npc.fh_$eq(fh);
 
             MapleMap map = ch.getMapFactory().getMap(mapId);
@@ -86,7 +62,7 @@ public class PnpcCommand extends Command {
             MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
          }
 
-         player.yellowMessage("Pnpc created.");
+         player.yellowMessage("Player NPC created.");
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have entered an invalid NPC id.");
       }

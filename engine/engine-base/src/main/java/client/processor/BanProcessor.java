@@ -26,7 +26,7 @@ public class BanProcessor {
       }
 
       if (theAccountId.isPresent()) {
-         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setPermaBan(connection, theAccountId.get(), reason));
+         DatabaseConnection.getInstance().withConnection(connection -> AccountAdministrator.getInstance().setPermanentBan(connection, theAccountId.get(), reason));
          return true;
       }
       return false;

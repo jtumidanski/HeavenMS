@@ -8,7 +8,7 @@ public class DistributeSPReader implements PacketReader<DistributeSPPacket> {
    @Override
    public DistributeSPPacket read(SeekableLittleEndianAccessor accessor) {
       accessor.readInt();
-      int skillid = accessor.readInt();
-      return new DistributeSPPacket(skillid);
+      int skillId = accessor.readInt();
+      return new DistributeSPPacket(skillId);
    }
 }

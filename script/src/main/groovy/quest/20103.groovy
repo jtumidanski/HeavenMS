@@ -47,7 +47,7 @@ class Quest20103 {
                qm.gainItem(2060000, (short) 2000)
                qm.gainItem(1452051, (short) 1)
                qm.gainItem(1142066, (short) 1)
-               qm.changeJob(MapleJob.WINDARCHER1)
+               qm.changeJob(MapleJob.WIND_ARCHER_1)
                qm.getPlayer().resetStats()
             }
             qm.forceCompleteQuest()

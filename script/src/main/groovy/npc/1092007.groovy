@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Muirhat
-	Map(s): 		Nautilus' Port
-	Description: 	When on the quest, he warps player to Black Magician's Disciple
-*/
-
-
 class NPC1092007 {
    NPCConversationManager cm
    int status = -1

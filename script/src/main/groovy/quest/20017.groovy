@@ -28,7 +28,7 @@ class Quest20017 {
       } else if (status == 1) {
          qm.sendNextPrev("We are called Piyos. You've seen #p1101001# who is at the Empress's side all the time, haven't you? Piyos are of the same family as #p1101001#, but we belong to different types. Of course, you haven't seen any of us since we only live in Ereve. You'll get used to Piyos in no time.")
       } else if (status == 2) {
-         qm.sendNextPrev("Oh, and did you know that there are no monsters in Ereve? Not even a smidgeon of evil dare enter Ereve. But don't you worry. You'll be able to train with illusory monsters created by #p1101001# called Mimis.")
+         qm.sendNextPrev("Oh, and did you know that there are no monsters in Ereve? Not even a smidgen of evil dare enter Ereve. But don't you worry. You'll be able to train with illusory monsters created by #p1101001# called Mimis.")
       } else if (status == 3) {
          qm.sendAcceptDecline("You seem prepared! Looking at what you've accomplished, I think you should jump right into hunting more advanced Mimis. How about you hunt #b15 #r#o100122#s in #m130010100##k#k? Use the portal on the left to reach the #bTraining Forest II#k.")
       } else if (status == 4) {

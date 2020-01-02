@@ -22,7 +22,7 @@ class NPC1032000 {
    boolean hasCoupon = false
 
    def start() {
-      cm.sendNext("Hello, I drive the Regular Cab. If you want to go from town to town safely and fast, then ride our cab. We'll glady take you to your destination with an affordable price.")
+      cm.sendNext("Hello, I drive the Regular Cab. If you want to go from town to town safely and fast, then ride our cab. We'll gladly take you to your destination with an affordable price.")
    }
 
    def action(Byte mode, Byte type, Integer selection) {

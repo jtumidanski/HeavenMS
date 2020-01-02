@@ -27,8 +27,8 @@ public class MessageBroadcaster {
    private MessageBroadcaster() {
    }
 
-   public void sendWorldServerNotice(int worldId, int originChannel, ServerNoticeType noticeType, String message, boolean smegaEar) {
-      sendWorldNotice(worldId, character -> PacketCreator.create(new ServerNotice(noticeType.getValue(), originChannel, message, smegaEar)));
+   public void sendWorldServerNotice(int worldId, int originChannel, ServerNoticeType noticeType, String message, boolean superMegaphone) {
+      sendWorldNotice(worldId, character -> PacketCreator.create(new ServerNotice(noticeType.getValue(), originChannel, message, superMegaphone)));
    }
 
    public void sendWorldServerNotice(int worldId, ServerNoticeType noticeType, String message) {
@@ -86,10 +86,10 @@ public class MessageBroadcaster {
    public void sendServerNoticeToAcquaintances(MapleCharacter originator, ServerNoticeType noticeType, String message) {
       {
          PlayerStorage playerStorage = originator.getClient().getChannelServer().getPlayerStorage();
-         Collection<MapleCharacter> buddies = Arrays.stream(originator.getBuddylist().getBuddyIds())
+         Collection<MapleCharacter> buddies = Arrays.stream(originator.getBuddyList().getBuddyIds())
                .mapToObj(playerStorage::getCharacterById)
                .flatMap(Optional::stream)
-               .filter(MapleCharacter::isLoggedinWorld)
+               .filter(MapleCharacter::isLoggedInWorld)
                .collect(Collectors.toList());
          MasterBroadcaster.getInstance().send(buddies, recipient -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
       }

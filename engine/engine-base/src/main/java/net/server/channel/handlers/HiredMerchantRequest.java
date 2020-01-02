@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.awt.Point;
@@ -43,9 +22,6 @@ import tools.packet.character.interaction.GetMiniRoomError;
 import tools.packet.shop.RetrieveFirstMessage;
 import tools.packet.shop.ShowHiredMerchantBox;
 
-/**
- * @author XoticStory
- */
 public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket> {
    @Override
    public Class<NoOpReader> getReaderClass() {
@@ -71,9 +47,9 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
             }
          }
 
-         Point cpos = chr.position();
-         MaplePortal portal = chr.getMap().findClosestTeleportPortal(cpos);
-         if (portal != null && portal.getPosition().distance(cpos) < 120.0) {
+         Point characterPosition = chr.position();
+         MaplePortal portal = chr.getMap().findClosestTeleportPortal(characterPosition);
+         if (portal != null && portal.getPosition().distance(characterPosition) < 120.0) {
             PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.NOT_NEAR_PORTAL));
             return;
          }

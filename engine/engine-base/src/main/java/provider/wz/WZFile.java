@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package provider.wz;
 
 import java.io.BufferedInputStream;
@@ -29,7 +8,6 @@ import java.io.RandomAccessFile;
 
 import provider.MapleData;
 import provider.MapleDataDirectoryEntry;
-import provider.MapleDataFileEntry;
 import provider.MapleDataProvider;
 import tools.data.input.GenericLittleEndianAccessor;
 import tools.data.input.GenericSeekableLittleEndianAccessor;
@@ -43,25 +21,25 @@ public class WZFile implements MapleDataProvider {
       ListWZFile.init();
    }
 
-   private File wzfile;
+   private File wzFile;
    private LittleEndianAccessor lea;
-   private SeekableLittleEndianAccessor slea;
+   private SeekableLittleEndianAccessor accessor;
    private int headerSize;
    private WZDirectoryEntry root;
    private boolean provideImages;
    private int cOffset;
 
-   public WZFile(File wzfile, boolean provideImages) throws IOException {
-      this.wzfile = wzfile;
-      lea = new GenericLittleEndianAccessor(new InputStreamByteStream(new BufferedInputStream(new FileInputStream(wzfile))));
-      RandomAccessFile raf = new RandomAccessFile(wzfile, "r");
-      slea = new GenericSeekableLittleEndianAccessor(new RandomAccessByteStream(raf));
-      root = new WZDirectoryEntry(wzfile.getName(), 0, 0, null);
+   public WZFile(File wzFile, boolean provideImages) throws IOException {
+      this.wzFile = wzFile;
+      lea = new GenericLittleEndianAccessor(new InputStreamByteStream(new BufferedInputStream(new FileInputStream(wzFile))));
+      RandomAccessFile raf = new RandomAccessFile(wzFile, "r");
+      accessor = new GenericSeekableLittleEndianAccessor(new RandomAccessByteStream(raf));
+      root = new WZDirectoryEntry(wzFile.getName(), 0, 0, null);
       this.provideImages = provideImages;
       load();
    }
 
-   private void load() throws IOException {
+   private void load() {
       lea.readAsciiString(4);
       lea.readInt();
       lea.readInt();
@@ -73,17 +51,15 @@ public class WZFile implements MapleDataProvider {
       getOffsets(root);
    }
 
-   private void getOffsets(MapleDataDirectoryEntry dir) {
-      for (MapleDataFileEntry file : dir.getFiles()) {
+   private void getOffsets(MapleDataDirectoryEntry directoryEntry) {
+      directoryEntry.getFiles().forEach(file -> {
          file.setOffset(cOffset);
          cOffset += file.getSize();
-      }
-      for (MapleDataDirectoryEntry sdir : dir.getSubdirectories()) {
-         getOffsets(sdir);
-      }
+      });
+      directoryEntry.getSubdirectories().forEach(this::getOffsets);
    }
 
-   private void parseDirectory(WZDirectoryEntry dir) {
+   private void parseDirectory(WZDirectoryEntry directoryEntry) {
       int entries = WZTool.readValue(lea);
       for (int i = 0; i < entries; i++) {
          byte marker = lea.readByte();
@@ -91,11 +67,11 @@ public class WZFile implements MapleDataProvider {
          int size, checksum;
          switch (marker) {
             case 0x02:
-               name = WZTool.readDecodedStringAtOffsetAndReset(slea, lea.readInt() + this.headerSize + 1);
+               name = WZTool.readDecodedStringAtOffsetAndReset(accessor, lea.readInt() + this.headerSize + 1);
                size = WZTool.readValue(lea);
                checksum = WZTool.readValue(lea);
                lea.readInt(); //dummy int
-               dir.addFile(new WZFileEntry(name, size, checksum, dir));
+               directoryEntry.addFile(new WZFileEntry(name, size, checksum, directoryEntry));
                break;
             case 0x03:
             case 0x04:
@@ -104,17 +80,15 @@ public class WZFile implements MapleDataProvider {
                checksum = WZTool.readValue(lea);
                lea.readInt(); //dummy int
                if (marker == 3) {
-                  dir.addDirectory(new WZDirectoryEntry(name, size, checksum, dir));
+                  directoryEntry.addDirectory(new WZDirectoryEntry(name, size, checksum, directoryEntry));
                } else {
-                  dir.addFile(new WZFileEntry(name, size, checksum, dir));
+                  directoryEntry.addFile(new WZFileEntry(name, size, checksum, directoryEntry));
                }
                break;
             default:
          }
       }
-      for (MapleDataDirectoryEntry idir : dir.getSubdirectories()) {
-         parseDirectory((WZDirectoryEntry) idir);
-      }
+      directoryEntry.getSubdirectories().forEach(subDirectoryEntry -> parseDirectory((WZDirectoryEntry) subDirectoryEntry));
    }
 
    public WZIMGFile getImgFile(String path) throws IOException {
@@ -130,8 +104,8 @@ public class WZFile implements MapleDataProvider {
       if (entry == null) {
          return null;
       }
-      String fullPath = wzfile.getName().substring(0, wzfile.getName().length() - 3).toLowerCase() + "/" + path;
-      return new WZIMGFile(this.wzfile, entry, provideImages, ListWZFile.isModernImgFile(fullPath));
+      String fullPath = wzFile.getName().substring(0, wzFile.getName().length() - 3).toLowerCase() + "/" + path;
+      return new WZIMGFile(this.wzFile, entry, provideImages, ListWZFile.isModernImgFile(fullPath));
    }
 
    @Override

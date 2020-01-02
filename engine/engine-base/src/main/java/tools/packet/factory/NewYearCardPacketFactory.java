@@ -31,13 +31,13 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
          case 7:
          case 9:
          case 0xB:
-            // 0x10: You have no free slot to store card.\r\ntry later on please.
+            // 0x10: You have no free slot to store card.\r\n try later on please.
             // 0x11: You have no card to send.
             // 0x12: Wrong inventory information !
             // 0x13: Cannot find such character !
             // 0x14: Incoherent Data !
-            // 0x15: An error occured during DB operation.
-            // 0x16: An unknown error occured !
+            // 0x15: An error occurred during DB operation.
+            // 0x16: An unknown error occurred !
             // 0xF: You cannot send a card to yourself !
             writer.write(packet.message());
             break;
@@ -52,7 +52,7 @@ public class NewYearCardPacketFactory extends AbstractPacketFactory {
                }
             }
             break;
-         case 0xC:   // NotiArrived
+         case 0xC:   // Notification Arrived
             writer.writeInt(packet.newYearCardRecord().id());
             writer.writeMapleAsciiString(packet.newYearCardRecord().senderName());
             break;

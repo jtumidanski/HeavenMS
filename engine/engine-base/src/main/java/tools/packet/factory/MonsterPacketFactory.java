@@ -43,8 +43,6 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client that a monster was killed.
-    *
-    * @return The kill monster packet.
     */
    protected void killMonster(MaplePacketLittleEndianWriter writer, KillMonster packet) {
       writer.writeInt(packet.objectId());
@@ -79,11 +77,11 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
    }
 
    protected void applyMonsterStatus(MaplePacketLittleEndianWriter writer, ApplyMonsterStatus packet) {
-      Map<MonsterStatus, Integer> stati = packet.getStatusEffect().getStati();
+      Map<MonsterStatus, Integer> statuses = packet.getStatusEffect().getStatuses();
       writer.writeInt(packet.getObjectId());
       writer.writeLong(0);
-      writeIntMask(writer, stati);
-      for (Map.Entry<MonsterStatus, Integer> stat : stati.entrySet()) {
+      writeIntMask(writer, statuses);
+      for (Map.Entry<MonsterStatus, Integer> stat : statuses.entrySet()) {
          writer.writeShort(stat.getValue());
          if (packet.getStatusEffect().isMonsterSkill()) {
             writer.writeShort(packet.getStatusEffect().getMobSkill().skillId());
@@ -93,7 +91,7 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
          }
          writer.writeShort(-1); // might actually be the buffTime but it's not displayed anywhere
       }
-      int size = stati.size(); // size
+      int size = statuses.size(); // size
       if (packet.getReflection() != null) {
          for (Integer ref : packet.getReflection()) {
             writer.writeInt(ref);
@@ -107,17 +105,17 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
    }
 
    protected void writeIntMask(final MaplePacketLittleEndianWriter writer, Map<MonsterStatus, Integer> stats) {
-      int firstmask = 0;
-      int secondmask = 0;
+      int firstMask = 0;
+      int secondMask = 0;
       for (MonsterStatus stat : stats.keySet()) {
          if (stat.isFirst()) {
-            firstmask |= stat.getValue();
+            firstMask |= stat.getValue();
          } else {
-            secondmask |= stat.getValue();
+            secondMask |= stat.getValue();
          }
       }
-      writer.writeInt(firstmask);
-      writer.writeInt(secondmask);
+      writer.writeInt(firstMask);
+      writer.writeInt(secondMask);
    }
 
    protected void cancelMonsterStatus(MaplePacketLittleEndianWriter writer, CancelMonsterStatus packet) {
@@ -135,16 +133,15 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
       damageMonsterIntern(writer, packet.objectId(), -packet.heal(), packet.currentHp(), packet.maximumHp());
    }
 
-   protected void damageMonsterIntern(MaplePacketLittleEndianWriter writer, int oid, int damage, int curhp, int maxhp) {
+   protected void damageMonsterIntern(MaplePacketLittleEndianWriter writer, int oid, int damage, int currentHp, int maxHp) {
       writer.writeInt(oid);
       writer.write(0);
       writer.writeInt(damage);
-      writer.writeInt(curhp);
-      writer.writeInt(maxhp);
+      writer.writeInt(currentHp);
+      writer.writeInt(maxHp);
    }
 
    protected void catchMonster(MaplePacketLittleEndianWriter writer, CatchMonster packet) {
-      // updated packet structure found thanks to Rien dev team
       writer.writeInt(packet.objectId());
       writer.write(packet.success());
    }
@@ -165,7 +162,7 @@ public class MonsterPacketFactory extends AbstractPacketFactory {
 
    protected void catchMessage(MaplePacketLittleEndianWriter writer, CatchMonsterFailure packet) { // not done, I guess
       writer.write(packet.message()); // 1 = too strong, 2 = Elemental Rock
-      writer.writeInt(0);//Maybe itemid?
+      writer.writeInt(0);//Maybe item id?
       writer.writeInt(0);
    }
 

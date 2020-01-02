@@ -15,8 +15,8 @@ class NPC2040052 {
    int status = 0
    int sel = -1
 
-   int[] questid = [3615, 3616, 3617, 3618, 3630, 3633, 3639, 3920]
-   int[] questitem = [4031235, 4031236, 4031237, 4031238, 4031270, 4031280, 4031298, 4031591]
+   int[] questId = [3615, 3616, 3617, 3618, 3630, 3633, 3639, 3920]
+   int[] questItem = [4031235, 4031236, 4031237, 4031238, 4031270, 4031280, 4031298, 4031591]
    int counter = 0
    String books
    int i
@@ -38,10 +38,10 @@ class NPC2040052 {
          if (status == 0) {
             if (counter == 0) {
                books = ""
-               for (i = 0; i < questid.length; i++) {
-                  if (cm.isQuestCompleted(questid[i])) {
+               for (i = 0; i < questId.length; i++) {
+                  if (cm.isQuestCompleted(questId[i])) {
                      counter += 1
-                     books += "\r\n#v" + questitem[i] + "# #b#t" + questitem[i] + "##k"
+                     books += "\r\n#v" + questItem[i] + "# #b#t" + questItem[i] + "##k"
                   }
                }
                if (counter == 0) {

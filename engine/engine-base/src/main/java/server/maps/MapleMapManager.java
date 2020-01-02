@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.maps;
 
 import java.util.HashMap;
@@ -45,29 +26,29 @@ public class MapleMapManager {
       this.channel = channel;
       this.event = eim;
 
-      MonitoredReentrantReadWriteLock rrwl = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_MANAGER);
-      this.mapsRLock = MonitoredReadLockFactory.createLock(rrwl);
-      this.mapsWLock = MonitoredWriteLockFactory.createLock(rrwl);
+      MonitoredReentrantReadWriteLock readWriteLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MAP_MANAGER);
+      this.mapsRLock = MonitoredReadLockFactory.createLock(readWriteLock);
+      this.mapsWLock = MonitoredWriteLockFactory.createLock(readWriteLock);
    }
 
-   public MapleMap resetMap(int mapid) {
+   public MapleMap resetMap(int mapId) {
       mapsWLock.lock();
       try {
-         maps.remove(mapid);
+         maps.remove(mapId);
       } finally {
          mapsWLock.unlock();
       }
 
-      return getMap(mapid);
+      return getMap(mapId);
    }
 
-   private synchronized MapleMap loadMapFromWz(int mapid, boolean cache) {
+   private synchronized MapleMap loadMapFromWz(int mapId, boolean cache) {
       MapleMap map;
 
       if (cache) {
          mapsRLock.lock();
          try {
-            map = maps.get(mapid);
+            map = maps.get(mapId);
          } finally {
             mapsRLock.unlock();
          }
@@ -77,12 +58,12 @@ public class MapleMapManager {
          }
       }
 
-      map = MapleMapFactory.loadMapFromWz(mapid, world, channel, event);
+      map = MapleMapFactory.loadMapFromWz(mapId, world, channel, event);
 
       if (cache) {
          mapsWLock.lock();
          try {
-            maps.put(mapid, map);
+            maps.put(mapId, map);
          } finally {
             mapsWLock.unlock();
          }
@@ -91,21 +72,21 @@ public class MapleMapManager {
       return map;
    }
 
-   public MapleMap getMap(int mapid) {
+   public MapleMap getMap(int mapId) {
       MapleMap map;
 
       mapsRLock.lock();
       try {
-         map = maps.get(mapid);
+         map = maps.get(mapId);
       } finally {
          mapsRLock.unlock();
       }
 
-      return (map != null) ? map : loadMapFromWz(mapid, true);
+      return (map != null) ? map : loadMapFromWz(mapId, true);
    }
 
-   public MapleMap getDisposableMap(int mapid) {
-      return loadMapFromWz(mapid, false);
+   public MapleMap getDisposableMap(int mapId) {
+      return loadMapFromWz(mapId, false);
    }
 
    public boolean isMapLoaded(int mapId) {

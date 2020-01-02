@@ -4,10 +4,10 @@ import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 
 boolean enter(PortalPlayerInteraction pi) {
-   String mapplayer = "stage6_comb" + (pi.getMapId() % 10)
+   String mapPlayer = "stage6_comb" + (pi.getMapId() % 10)
    EventInstanceManager eim = pi.getEventInstance()
 
-   String comb = eim.getProperty(mapplayer)
+   String comb = eim.getProperty(mapPlayer)
 
    String name = pi.getPortal().getName().substring(2, 4)
    int portalId = (name).toInteger()

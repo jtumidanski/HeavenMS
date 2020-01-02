@@ -1,14 +1,7 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
-
-/*
-	NPC Name: 		Big Headward
-	Map(s): 		Victoria Road : Henesys Hair Salon
-	Description: 	
-*/
-
 
 class NPC1012117 {
    NPCConversationManager cm
@@ -28,7 +21,7 @@ class NPC1012117 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1) {  // disposing issue with stylishs found thanks to Vcoc
+      if (mode < 1) {
          cm.dispose()
       } else {
          if (mode == 1) {
@@ -49,11 +42,11 @@ class NPC1012117 {
                hairNew = []
                if (cm.getPlayer().getGender() == 0) {
                   for (def i = 0; i < maleHairVip.length; i++) {
-                     pushIfItemExists(hairNew, maleHairVip[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew  = ScriptUtils.pushItemIfTrue(hairNew, maleHairVip[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                } else {
                   for (def i = 0; i < femaleHairVip.length; i++) {
-                     pushIfItemExists(hairNew, femaleHairVip[i] + (cm.getPlayer().getHair() % 10))
+                     hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHairVip[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
 
@@ -65,11 +58,11 @@ class NPC1012117 {
                   hairNew = []
                   if (cm.getPlayer().getGender() == 0) {
                      for (def i = 0; i < maleHair.length; i++) {
-                        pushIfItemExists(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10))
+                        hairNew = ScriptUtils.pushItemIfTrue(hairNew, maleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                      }
                   } else {
                      for (def i = 0; i < femaleHair.length; i++) {
-                        pushIfItemExists(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10))
+                        hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                      }
                   }
 
@@ -91,12 +84,6 @@ class NPC1012117 {
 
             cm.dispose()
          }
-      }
-   }
-
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
       }
    }
 }

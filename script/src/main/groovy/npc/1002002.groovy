@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Pison
-	Map(s): 		Victoria Road : Lith Harbor (104000000)
-	Description: 		Florina Beach Tour Guide
-*/
-
-
 class NPC1002002 {
    NPCConversationManager cm
    int status = 0

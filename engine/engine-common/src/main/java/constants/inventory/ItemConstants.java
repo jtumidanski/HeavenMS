@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package constants.inventory;
 
 import java.util.HashMap;
@@ -29,10 +8,6 @@ import java.util.Set;
 import client.inventory.MapleInventoryType;
 import config.YamlConfig;
 
-/**
- * @author Jay Estrella
- * @author Ronan
- */
 public final class ItemConstants {
    public final static short LOCK = 0x01;
    public final static short SPIKES = 0x02;
@@ -45,13 +20,13 @@ public final class ItemConstants {
    public final static short ACCOUNT_SHARING = 0x100;
    public final static short MERGE_UNTRADEABLE = 0x200;
    public final static boolean EXPIRING_ITEMS = true;
-   public final static Set<Integer> permanentItemids = new HashSet<>();
+   public final static Set<Integer> permanentItemIds = new HashSet<>();
    protected static Map<Integer, MapleInventoryType> inventoryTypeCache = new HashMap<>();
 
    static {
-      int[] pi = {5000060, 5000100, 5000101, 5000102};    // i ain't going to open one gigantic itemid cache just for 4 perma itemids, no way!
+      int[] pi = {5000060, 5000100, 5000101, 5000102};    // i ain't going to open one gigantic item id cache just for 4 permanent item ids, no way!
       for (int i : pi) {
-         permanentItemids.add(i);
+         permanentItemIds.add(i);
       }
    }
 
@@ -110,7 +85,7 @@ public final class ItemConstants {
    }
 
    public static boolean isPermanentItem(int itemId) {
-      return permanentItemids.contains(itemId);
+      return permanentItemIds.contains(itemId);
    }
 
    public static boolean isNewYearCardEtc(int itemId) {
@@ -134,7 +109,7 @@ public final class ItemConstants {
       return itemId >= 2030000 && itemId < 2030100;
    }
 
-   public static boolean isAntibanishScroll(int itemId) {
+   public static boolean isAntiBanishScroll(int itemId) {
       return itemId == 2030100;
    }
 
@@ -168,7 +143,7 @@ public final class ItemConstants {
       return itemId >= 2022430 && itemId <= 2022433 || itemId >= 2022160 && itemId <= 2022163;
    }
 
-   public static boolean isPartyAllcure(int itemId) {
+   public static boolean isPartyAllCure(int itemId) {
       return itemId == 2022433 || itemId == 2022163;
    }
 

@@ -21,8 +21,8 @@ class NPC9209100 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   static def playerNearby(Point chrpos, Point portalpos) {
-      return Math.sqrt(Math.pow((portalpos.getX() - chrpos.getX()), 2) + Math.pow((portalpos.getY() - chrpos.getY()), 2)) < 77
+   static def playerNearby(Point characterPosition, Point portalPoint) {
+      return Math.sqrt(Math.pow((portalPoint.getX() - characterPosition.getX()), 2) + Math.pow((portalPoint.getY() - characterPosition.getY()), 2)) < 77
    }
 
    def action(Byte mode, Byte type, Integer selection) {

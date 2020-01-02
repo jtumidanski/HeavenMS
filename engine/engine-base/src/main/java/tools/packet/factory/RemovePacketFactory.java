@@ -33,16 +33,12 @@ public class RemovePacketFactory extends AbstractPacketFactory {
 
    /**
     * Removes TV
-    *
-    * @return The Remove TV Packet
     */
    protected void removeTV(MaplePacketLittleEndianWriter writer, RemoveTV packet) {
    }
 
    /**
     * Gets a packet to remove a special map object.
-    *
-    * @return The packet removing the object.
     */
    protected void removeSummon(MaplePacketLittleEndianWriter writer, RemoveSummon packet) {
       writer.writeInt(packet.ownerId());
@@ -51,7 +47,6 @@ public class RemovePacketFactory extends AbstractPacketFactory {
    }
 
    protected void removeKite(MaplePacketLittleEndianWriter writer, RemoveKite packet) {
-      // thanks to Arnah (MaplePacketLittleEndianWriter writer, Vertisy)
       writer.write(packet.animationType()); // 0 is 10/10, 1 just vanishes
       writer.writeInt(packet.objectId());
    }
@@ -64,8 +59,6 @@ public class RemovePacketFactory extends AbstractPacketFactory {
     * animation: 0 - expire<br/> 1 - without animation<br/> 2 - pickup<br/> 4 -
     * explode<br/> cid is ignored for 0 and 1.<br /><br />Flagging pet as true
     * will make a pet pick up the item.
-    *
-    * @return
     */
    protected void removeItemFromMap(MaplePacketLittleEndianWriter writer, RemoveItem packet) {
       writer.write(packet.animation()); // expire
@@ -88,8 +81,6 @@ public class RemovePacketFactory extends AbstractPacketFactory {
 
    /**
     * Sends a request to remove Mir<br>
-    *
-    * @return The packet
     */
    protected void removeDragon(MaplePacketLittleEndianWriter writer, RemoveDragon packet) {
       writer.writeInt(packet.characterId());

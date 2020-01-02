@@ -116,9 +116,9 @@ public class MapleGuildProcessor {
       Set<MapleCharacter> guildMembers = new HashSet<>();
       guildMembers.add(guildLeader);
 
-      MapleMatchCheckerCoordinator mmce = guildLeader.getWorldServer().getMatchCheckerCoordinator();
+      MapleMatchCheckerCoordinator matchCheckerCoordinator = guildLeader.getWorldServer().getMatchCheckerCoordinator();
       for (MapleCharacter chr : guildLeader.getMap().getAllPlayers()) {
-         if (chr.getParty().isEmpty() && chr.getGuild().isEmpty() && mmce.getMatchConfirmationLeaderid(chr.getId()) == -1) {
+         if (chr.getParty().isEmpty() && chr.getGuild().isEmpty() && matchCheckerCoordinator.getMatchConfirmationLeaderId(chr.getId()) == -1) {
             guildMembers.add(chr);
          }
       }
@@ -126,8 +126,8 @@ public class MapleGuildProcessor {
       return guildMembers;
    }
 
-   public void displayGuildRanks(MapleClient c, int npcid) {
-      DatabaseConnection.getInstance().withConnection(connection -> c.announce(PacketCreator.create(new ShowGuildRanks(npcid, GuildProvider.getInstance().getGuildRankData(connection)))));
+   public void displayGuildRanks(MapleClient c, int npcId) {
+      DatabaseConnection.getInstance().withConnection(connection -> c.announce(PacketCreator.create(new ShowGuildRanks(npcId, GuildProvider.getInstance().getGuildRankData(connection)))));
    }
 
    public int getIncreaseGuildCost(int size) {
@@ -148,7 +148,7 @@ public class MapleGuildProcessor {
    }
 
    protected Stream<MapleCharacter> getLoggedInMemberStream(MapleGuild guild) {
-      return getGuildMemberStream(guild).filter(MapleCharacter::isLoggedinWorld);
+      return getGuildMemberStream(guild).filter(MapleCharacter::isLoggedInWorld);
    }
 
    public void broadcastInfoChanged(MapleGuild guild) {
@@ -178,14 +178,14 @@ public class MapleGuildProcessor {
          }
 
          guild.increaseCapacity(5);
-         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildCapacityChange(guild.getId(), guild.getCapacity()), false, -1);
+         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedInWorld, new GuildCapacityChange(guild.getId(), guild.getCapacity()), false, -1);
          writeToDB(guild, false);
       });
 
    }
 
    public void guildChat(MapleCharacter character, String message) {
-      character.getGuild().ifPresent(guild -> MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new MultiChat(character.getName(), message, 2), false, character.getId()));
+      character.getGuild().ifPresent(guild -> MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedInWorld, new MultiChat(character.getName(), message, 2), false, character.getId()));
    }
 
    public boolean addGuildMember(MapleGuildCharacter guildCharacterToAdd, MapleCharacter characterToAdd) {
@@ -202,7 +202,7 @@ public class MapleGuildProcessor {
       referenceGuild.addGuildMember(guildCharacterToAdd, characterToAdd);
 
       PacketInput packetInput = new NewGuildMember(guildCharacterToAdd.getGuildId(), guildCharacterToAdd.getId(), guildCharacterToAdd.getName(), guildCharacterToAdd.getJobId(), guildCharacterToAdd.getLevel(), guildCharacterToAdd.getGuildRank(), guildCharacterToAdd.isOnline());
-      MasterBroadcaster.getInstance().sendToGuild(referenceGuild, MapleCharacter::isLoggedinWorld, packetInput, false, -1);
+      MasterBroadcaster.getInstance().sendToGuild(referenceGuild, MapleCharacter::isLoggedInWorld, packetInput, false, -1);
       return true;
    }
 
@@ -210,13 +210,13 @@ public class MapleGuildProcessor {
       World world = character.getWorldServer();
       world.getGuild(character.getMGC()).ifPresent(guild -> {
          guild.leaveGuild(character.getMGC());
-         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildMemberLeft(character.getGuildId(), character.getId(), character.getName(), false), false, -1);
+         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedInWorld, new GuildMemberLeft(character.getGuildId(), character.getId(), character.getName(), false), false, -1);
       });
    }
 
    public void setGuildNotice(MapleGuild guild, String notice) {
       guild.setGuildNotice(notice);
-      MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildNotice(guild.getId(), notice), false, -1);
+      MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedInWorld, new GuildNotice(guild.getId(), notice), false, -1);
       writeToDB(guild, false);
    }
 
@@ -384,12 +384,12 @@ public class MapleGuildProcessor {
       });
    }
 
-   public void setGuildEmblem(int guildId, short bg, byte bgcolor, short logo, byte logocolor) {
+   public void setGuildEmblem(int guildId, short bg, byte backgroundColor, short logo, byte logoColor) {
       ifGuildPresent(guildId, guild -> {
-         guild.setGuildEmblem(bg, bgcolor, logo, logocolor);
+         guild.setGuildEmblem(bg, backgroundColor, logo, logoColor);
          writeToDB(guild, false);
          MapleGuildSummary summary = new MapleGuildSummary(guild);
-         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedinWorld, new GuildEmblemChange(guildId, summary.getLogoBG(), summary.getLogoBGColor(), summary.getLogo(), summary.getLogoColor()), true, -1);
+         MasterBroadcaster.getInstance().sendToGuild(guild, MapleCharacter::isLoggedInWorld, new GuildEmblemChange(guildId, summary.getLogoBG(), summary.getLogoBGColor(), summary.getLogo(), summary.getLogoColor()), true, -1);
          Server.getInstance().getWorld(guild.getWorldId()).updateGuildSummary(guildId, summary);
          getLoggedInMemberStream(guild).forEach(character -> setGuildAndRank(guild.getWorldId(), character.getId(), -1, -1));
       });
@@ -407,14 +407,14 @@ public class MapleGuildProcessor {
       });
    }
 
-   protected void setGuildAndRank(int worldId, int cid, int guildid, int rank) {
+   protected void setGuildAndRank(int worldId, int cid, int guildId, int rank) {
       Server.getInstance().getWorld(worldId).getPlayerStorage().getCharacterById(cid).ifPresent(character -> {
          boolean bDifferentGuild;
-         if (guildid == -1 && rank == -1) {
+         if (guildId == -1 && rank == -1) {
             bDifferentGuild = true;
          } else {
-            bDifferentGuild = guildid != character.getGuildId();
-            character.getMGC().setGuildId(guildid);
+            bDifferentGuild = guildId != character.getGuildId();
+            character.getMGC().setGuildId(guildId);
             character.getMGC().setGuildRank(rank);
 
             if (bDifferentGuild) {
@@ -424,8 +424,8 @@ public class MapleGuildProcessor {
             character.saveGuildStatus();
          }
          if (bDifferentGuild) {
-            if (character.isLoggedinWorld()) {
-               Server.getInstance().getGuild(guildid).ifPresentOrElse(guild -> {
+            if (character.isLoggedInWorld()) {
+               Server.getInstance().getGuild(guildId).ifPresentOrElse(guild -> {
                   character.getMap().broadcastMessage(character, new GuildNameChange(cid, guild.getName()));
                   character.getMap().broadcastMessage(character, new GuildMarkChanged(cid, guild.getLogoBG(), guild.getLogoBGColor(), guild.getLogo(), guild.getLogoColor()));
                }, () -> character.getMap().broadcastMessage(character, new GuildNameChange(cid, "")));

@@ -44,14 +44,14 @@ class Quest3360 {
    }
 
    static def generateString() {
-      String thestring = ""
+      String theString = ""
       String chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      int rnum
+      int randomNumber
       for (int i = 0; i < 10; i++) {
-         rnum = Math.floor(Math.random() * chars.length()).intValue()
-         thestring += chars.substring(rnum, rnum + 1)
+         randomNumber = Math.floor(Math.random() * chars.length()).intValue()
+         theString += chars.substring(randomNumber, randomNumber + 1)
       }
-      return thestring
+      return theString
    }
 }
 

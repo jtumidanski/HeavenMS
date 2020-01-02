@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub & pirate items
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class NautilusHarbor extends GachaponItems {
 
    @Override
@@ -19,7 +12,7 @@ public class NautilusHarbor extends GachaponItems {
             2044705, 2044605, 2043305, 2043105, 2043205, 2043005, 2043007, 2044405, 2044305, 2043805, 2044105, 2044205,
             2044005, 2043705, 2044901,
 
-            /* Useable drop */
+            /* Use-able drop */
             2012000, 2000004, 2020008, 2000005, 2012002, 2101004, 2101005, 2101002, 2101003, 4006000,
 
             /* Warrior equipment */

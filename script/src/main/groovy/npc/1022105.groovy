@@ -17,7 +17,7 @@ class NPC1022105 {
 
    int map = 910220000
    int num = 5
-   int maxp = 5
+   int maxPlayerCount = 5
 
    def start() {
       action((byte) 1, (byte) 0, 0)
@@ -42,13 +42,13 @@ class NPC1022105 {
 
          String selStr = "Would you like to go into the Training Center?"
          for (def i = 0; i < num; i++) {
-            selStr += "\r\n#b#L" + i + "#Training Center " + i + " (" + cm.getPlayerCount(map + i) + "/" + maxp + ")#l#k"
+            selStr += "\r\n#b#L" + i + "#Training Center " + i + " (" + cm.getPlayerCount(map + i) + "/" + maxPlayerCount + ")#l#k"
          }
          cm.sendSimple(selStr)
       } else if (status == 1) {
          if (selection < 0 || selection >= num) {
             cm.dispose()
-         } else if (cm.getPlayerCount(map + selection) >= maxp) {
+         } else if (cm.getPlayerCount(map + selection) >= maxPlayerCount) {
             cm.sendNext("This training center is full.")
             status = -1
          } else {

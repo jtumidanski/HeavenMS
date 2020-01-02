@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub & pirate equipment
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class Ellinia extends GachaponItems {
 
    @Override
@@ -16,7 +9,7 @@ public class Ellinia extends GachaponItems {
             /* Scroll */
             2043302, 2040002, 2043102, 2043002, 2044402, 2044302, 2043802, 2044002, 2041017, 2044902,
 
-            /* Useable drop */
+            /* Use-able drop */
             2000004, 2000005, 2022025, 2022026,
 
             /* Common equipment */

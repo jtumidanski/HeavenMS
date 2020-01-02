@@ -17212,7 +17212,7 @@ USE `heavenms`;
 (9400014, 2040719, 1, 4, 0, 10000), 
 (9400014, 1102030, 1, 1, 0, 40000), 
 (9400014, 1032027, 1, 1, 0, 40000), 
-(9400014, 1402037, 1, 1, 0, 40000), # thanks Feras & Kitty for noticing issues with Stonetooth Sword layout
+(9400014, 1402037, 1, 1, 0, 40000),
 (9400014, 1372011, 1, 1, 0, 40000), 
 (8200008, 4000453, 1, 1, 0, 200000),
 (8200008, 4000459, 1, 1, 0, 200000), 
@@ -17945,7 +17945,7 @@ USE `heavenms`;
 (8800002, 2280013, 1, 4, 0, 20000), 
 (8800002, 2280015, 1, 4, 0, 20000), 
 (8800002, 2280016, 1, 4, 0, 20000), 
-(8800002, 2280014, 1, 4, 0, 20000), #-- thanks Tochi for noting item description not following pattern
+(8800002, 2280014, 1, 4, 0, 20000),
 (8800002, 2290084, 1, 4, 0, 40000), 
 (8800002, 2290016, 1, 4, 0, 40000), 
 (8800002, 2290022, 1, 4, 0, 40000), 
@@ -20503,7 +20503,6 @@ USE `heavenms`;
   DELETE FROM temp_data WHERE dropperid=9300090;
   DELETE FROM temp_data WHERE dropperid=9420501;
 
-  -- missing content for Bob found thanks to drmdsr & Thora
   # normalize item drops for Bob the Snail
   INSERT INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
   SELECT  9400551, temp_data.itemid, temp_data.minimumQuantity, temp_data.maximumQuantity, temp_data.questid, LEAST(temp_data.chance * 80, 999999)
@@ -20768,8 +20767,7 @@ USE `heavenms`;
 DELETE FROM temp_data WHERE dropperid >= 9300127 AND dropperid <= 9300136;
 DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 
-# add CPQ items, CPQ specific items found thanks to Dragohe4rt
-# thanks Vcoc for pointing out inexistent itemids among those listed here
+# add CPQ items, CPQ specific items
   INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300127, 2022157, 1, 1, 0, 200000),
 (9300127, 2022158, 1, 1, 0, 200000),
@@ -21092,7 +21090,7 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
 (9300324, 2022178, 1, 1, 0, 200000),
 (9300324, 4001129, 1, 1, 0, 12987);
 
-# add AriantPQ items, AriantPQ specific items found thanks to Dragohe4rt
+# add AriantPQ items, AriantPQ specific items
   INSERT IGNORE INTO temp_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (9300157, 2100067, 1, 1, 0, 100000),
 (9300157, 2022266, 1, 1, 0, 200000),
@@ -21880,7 +21878,6 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
  SELECT 3000004, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance` FROM drop_data WHERE dropperid = 3000001;
 
- -- Thanks to DietStory v1.02 dev team
  -- There are two Jr. Boogies mob ids for some unknown reason. 3230301 had no drops, but 3230300 had all the correct drops.
  -- Just copying the drops from the one with the correct drop data.
  INSERT IGNORE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`)
@@ -22584,7 +22581,6 @@ DELETE FROM temp_data WHERE dropperid >= 9300315 AND dropperid <= 9300324;
     (2112010, 2022441, 15, -1),
     (2112015, 2022441, 15, -1);
 
-  -- thanks donny (Croosade forums) for showing a lack on GPQ rewards
   # adding more rewards into GPQ bonus boxes
   INSERT INTO `reactordrops` (`reactorid`, `itemid`, `chance`, `questid`) VALUES
     (9202012, 1002379, 45, -1),
@@ -23922,7 +23918,6 @@ SET minimumQuantity = CASE
   UPDATE drop_data SET `chance`=1287 WHERE `chance`=1500;
 
   # MapleSkillbookChanceFetcher! Tuning up some skillbook drop chances in order to fit their dropper's availability (whether's a boss or not) and level.
-  # thanks unnqca for reporting some skillbooks having unusually high drop chances.
   REPLACE INTO drop_data (`dropperid`, `itemid`, `minimumQuantity`, `maximumQuantity`, `questid`, `chance`) VALUES
 (851000, 2290132, 1, 1, 0, 3861),
 (7090000, 2290087, 1, 1, 0, 10000),

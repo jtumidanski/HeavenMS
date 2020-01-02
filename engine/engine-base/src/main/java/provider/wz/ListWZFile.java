@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package provider.wz;
 
 import java.io.BufferedInputStream;
@@ -37,19 +16,19 @@ import tools.data.input.InputStreamByteStream;
 import tools.data.input.LittleEndianAccessor;
 
 public class ListWZFile {
-   private static Collection<String> modernImgs = new HashSet<>();
-   private LittleEndianAccessor lea;
+   private static Collection<String> modernImages = new HashSet<>();
+   private LittleEndianAccessor accessor;
    private List<String> entries = new ArrayList<>();
 
-   public ListWZFile(File listwz) throws FileNotFoundException {
-      lea = new GenericLittleEndianAccessor(new InputStreamByteStream(new BufferedInputStream(new FileInputStream(listwz))));
-      while (lea.available() > 0) {
-         int l = lea.readInt() * 2;
+   public ListWZFile(File listWz) throws FileNotFoundException {
+      accessor = new GenericLittleEndianAccessor(new InputStreamByteStream(new BufferedInputStream(new FileInputStream(listWz))));
+      while (accessor.available() > 0) {
+         int l = accessor.readInt() * 2;
          byte[] chunk = new byte[l];
          for (int i = 0; i < chunk.length; i++) {
-            chunk[i] = lea.readByte();
+            chunk[i] = accessor.readByte();
          }
-         lea.readChar();
+         accessor.readChar();
          final String value = String.valueOf(WZTool.readListString(chunk));
          entries.add(value);
       }
@@ -70,7 +49,7 @@ public class ListWZFile {
          ListWZFile listwz;
          try {
             listwz = new ListWZFile(MapleDataProviderFactory.fileInWZPath("List.wz"));
-            modernImgs = new HashSet<>(listwz.getEntries());
+            modernImages = new HashSet<>(listwz.getEntries());
          } catch (FileNotFoundException e) {
             e.printStackTrace();
          }
@@ -78,7 +57,7 @@ public class ListWZFile {
    }
 
    public static boolean isModernImgFile(String path) {
-      return modernImgs.contains(path);
+      return modernImages.contains(path);
    }
 
    public List<String> getEntries() {

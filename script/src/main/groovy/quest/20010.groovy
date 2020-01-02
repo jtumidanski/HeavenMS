@@ -28,7 +28,7 @@ class Quest20010 {
          if (status == 0) {
             qm.sendNext("Welcome to Ereve! And you are? Oh, you're #b#h ##k! \r\nGood to meet you. I've been waiting. You've come to become a Cygnus Knight, right? My name is Kimu, and I'm currently guiding Noblesses like you at the request of Empress Cygnus.")
          } else if (status == 1) {
-            qm.sendNextPrev("If you want to officially become a part of Cygnus Knights, you must first meet the Empress. She's at the center of this island, accompained by Shinsoo. My brothers and I would like to share with you a few things that are considered #bBasic Knowledge#k in Maple World before you go. Would that be okay?")
+            qm.sendNextPrev("If you want to officially become a part of Cygnus Knights, you must first meet the Empress. She's at the center of this island, accompanied by Shinsoo. My brothers and I would like to share with you a few things that are considered #bBasic Knowledge#k in Maple World before you go. Would that be okay?")
          } else if (status == 2) {
             qm.sendNextPrev("Oh, let me warn you that this is a Quest. You may have noticed that NPCs around Maple World occasionally ask you for various favors. A favor of that sort is called a #bQuest#k. You will receive reward items or EXP upon completing Quests, so I strongly suggest you diligently fulfill the favors of Maple NPCs.")
          } else if (status == 3) {

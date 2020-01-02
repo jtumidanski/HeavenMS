@@ -98,8 +98,8 @@ class EventPiratePQ {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
-      EventInstanceManager eim = em.newInstance("Pirate" + lobbyid)
+   def setup(int level, int lobbyId) {
+      EventInstanceManager eim = em.newInstance("Pirate" + lobbyId)
       eim.setProperty("level", level)
 
       eim.setProperty("stage2", "0")
@@ -123,68 +123,80 @@ class EventPiratePQ {
       map.resetPQ(level)
       map.shuffleReactors()
       for (int i = 0; i < 5; i++) {
-         MapleMonster mob = em.getMonster(9300124)
-         MapleMonster mob2 = em.getMonster(9300125)
-         MapleMonster mob3 = em.getMonster(9300124)
-         MapleMonster mob4 = em.getMonster(9300125)
-         eim.registerMonster(mob)
-         eim.registerMonster(mob2)
-         eim.registerMonster(mob3)
-         eim.registerMonster(mob4)
-         mob.changeDifficulty(level, isPq)
-         mob2.changeDifficulty(level, isPq)
-         mob3.changeDifficulty(level, isPq)
-         mob4.changeDifficulty(level, isPq)
-         map.spawnMonsterOnGroundBelow(mob, new Point(430, 75))
-         map.spawnMonsterOnGroundBelow(mob2, new Point(1600, 75))
-         map.spawnMonsterOnGroundBelow(mob3, new Point(430, 238))
-         map.spawnMonsterOnGroundBelow(mob4, new Point(1600, 238))
+         em.getMonster(9300124).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(430, 75))
+         })
+         em.getMonster(9300125).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1600, 75))
+         })
+         em.getMonster(9300124).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(430, 238))
+         })
+         em.getMonster(9300125).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1600, 238))
+         })
       }
       map = eim.getInstanceMap(925100201)
       map.resetPQ(level)
       for (int i = 0; i < 10; i++) {
-         MapleMonster mob = em.getMonster(9300112)
-         MapleMonster mob2 = em.getMonster(9300113)
-         eim.registerMonster(mob)
-         eim.registerMonster(mob2)
-         mob.changeDifficulty(level, isPq)
-         mob2.changeDifficulty(level, isPq)
-         map.spawnMonsterOnGroundBelow(mob, new Point(0, 238))
-         map.spawnMonsterOnGroundBelow(mob2, new Point(1700, 238))
+         em.getMonster(9300112).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(0, 238))
+         })
+         em.getMonster(9300113).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1700, 238))
+         })
       }
       eim.getInstanceMap(925100202).resetPQ(level)
       map = eim.getInstanceMap(925100300)
       map.resetPQ(level)
       map.shuffleReactors()
       for (int i = 0; i < 5; i++) {
-         MapleMonster mob = em.getMonster(9300124)
-         MapleMonster mob2 = em.getMonster(9300125)
-         MapleMonster mob3 = em.getMonster(9300124)
-         MapleMonster mob4 = em.getMonster(9300125)
-         eim.registerMonster(mob)
-         eim.registerMonster(mob2)
-         eim.registerMonster(mob3)
-         eim.registerMonster(mob4)
-         mob.changeDifficulty(level, isPq)
-         mob2.changeDifficulty(level, isPq)
-         mob3.changeDifficulty(level, isPq)
-         mob4.changeDifficulty(level, isPq)
-         map.spawnMonsterOnGroundBelow(mob, new Point(430, 75))
-         map.spawnMonsterOnGroundBelow(mob2, new Point(1600, 75))
-         map.spawnMonsterOnGroundBelow(mob3, new Point(430, 238))
-         map.spawnMonsterOnGroundBelow(mob4, new Point(1600, 238))
+         em.getMonster(9300124).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(430, 75))
+         })
+         em.getMonster(9300125).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1600, 75))
+         })
+         em.getMonster(9300124).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(430, 238))
+         })
+         em.getMonster(9300125).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1600, 238))
+         })
       }
       map = eim.getInstanceMap(925100301)
       map.resetPQ(level)
       for (int i = 0; i < 10; i++) {
-         MapleMonster mob = em.getMonster(9300112)
-         MapleMonster mob2 = em.getMonster(9300113)
-         eim.registerMonster(mob)
-         eim.registerMonster(mob2)
-         mob.changeDifficulty(level, isPq)
-         mob2.changeDifficulty(level, isPq)
-         map.spawnMonsterOnGroundBelow(mob, new Point(0, 238))
-         map.spawnMonsterOnGroundBelow(mob2, new Point(1700, 238))
+         em.getMonster(9300112).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(0, 238))
+         })
+         em.getMonster(9300113).ifPresent({ mob ->
+            eim.registerMonster(mob)
+            mob.changeDifficulty(level, isPq)
+            map.spawnMonsterOnGroundBelow(mob, new Point(1700, 238))
+         })
       }
       eim.getInstanceMap(925100302).resetPQ(level)
       eim.getInstanceMap(925100400).resetPQ(level)
@@ -198,14 +210,14 @@ class EventPiratePQ {
       return eim
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
    }
 
    // Defines which maps inside the event are allowed to respawn. This function should create a new task at the end of it's body calling itself at a given respawn rate.
    static def respawnStages(EventInstanceManager eim) {
       int stg = eim.getIntProperty("stage2")
-      if (stg < 3) {  // thanks Chloek3, seth1, BHB for suggesting map respawn rather than waves on stg2
+      if (stg < 3) {
          eim.getMapInstance(925100100).spawnAllMonsterIdFromMapSpawnList(9300114 + stg, eim.getIntProperty("level"), true)
       }
 
@@ -236,40 +248,40 @@ class EventPiratePQ {
       }
    }
 
-   static def changedMapInside(EventInstanceManager eim, int mapid) {
+   static def changedMapInside(EventInstanceManager eim, int mapId) {
       int stage = eim.getIntProperty("curStage")
 
       if (stage == 1) {
-         if (mapid == 925100100) {
+         if (mapId == 925100100) {
             eim.restartEventTimer(6 * 60 * 1000)
             eim.setIntProperty("curStage", 2)
          }
       } else if (stage == 2) {
-         if (mapid == 925100200) {
+         if (mapId == 925100200) {
             eim.restartEventTimer(6 * 60 * 1000)
             eim.setIntProperty("curStage", 3)
          }
       } else if (stage == 3) {
-         if (mapid == 925100300) {
+         if (mapId == 925100300) {
             eim.restartEventTimer(6 * 60 * 1000)
             eim.setIntProperty("curStage", 4)
          }
       } else if (stage == 4) {
-         if (mapid == 925100400) {
+         if (mapId == 925100400) {
             eim.restartEventTimer(6 * 60 * 1000)
             eim.setIntProperty("curStage", 5)
          }
       } else if (stage == 5) {
-         if (mapid == 925100500) {
+         if (mapId == 925100500) {
             eim.restartEventTimer(8 * 60 * 1000)
             eim.setIntProperty("curStage", 6)
          }
       }
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
             end(eim)
@@ -277,14 +289,14 @@ class EventPiratePQ {
             eim.unregisterPlayer(player)
          }
       } else {
-         changedMapInside(eim, mapid)
+         changedMapInside(eim, mapId)
       }
    }
 
    // Do something if the party leader has been changed.
    def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
-      int mapid = leader.getMapId()
-      if (!eim.isEventCleared() && (mapid < minMapId || mapid > maxMapId)) {
+      int mapId = leader.getMapId()
+      if (!eim.isEventCleared() && (mapId < minMapId || mapId > maxMapId)) {
          end(eim)
       }
    }
@@ -330,7 +342,7 @@ class EventPiratePQ {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -399,8 +411,8 @@ class EventPiratePQ {
    }
 
    static def isLordPirate(MapleMonster mob) {
-      int mobid = mob.id()
-      return (mobid == 9300105) || (mobid == 9300106) || (mobid == 9300107) || (mobid == 9300119)
+      int mobId = mob.id()
+      return (mobId == 9300105) || (mobId == 9300106) || (mobId == 9300107) || (mobId == 9300119)
    }
 
    static def passedGrindMode(MapleMap map, EventInstanceManager eim) {
@@ -426,12 +438,12 @@ class EventPiratePQ {
       }
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -479,8 +491,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -507,8 +519,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -527,8 +539,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -579,8 +591,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

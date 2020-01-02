@@ -79,8 +79,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet to spawn a portal.
-    *
-    * @return The portal spawn packet.
     */
    protected void spawnPortal(MaplePacketLittleEndianWriter writer, SpawnPortal packet) {
       writer.writeInt(packet.townId());
@@ -90,8 +88,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet to spawn a door.
-    *
-    * @return The remove door packet.
     */
    protected void spawnDoor(MaplePacketLittleEndianWriter writer, SpawnDoor packet) {
       writer.writeBool(packet.launched());
@@ -102,8 +98,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet to remove a door.
-    *
-    * @return The remove door packet.
     */
    protected void removeDoor(MaplePacketLittleEndianWriter writer, RemoveDoor packet) {
       if (packet.town()) {
@@ -117,8 +111,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet to spawn a special map object.
-    *
-    * @return The spawn packet for the map object.
     */
    protected void spawnSummon(MaplePacketLittleEndianWriter writer, SpawnSummon packet) {
       writer.writeInt(packet.ownerId());
@@ -127,9 +119,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       writer.write(0x0A); //v83
       writer.write(packet.skillLevel());
       writer.writePos(packet.position());
-      writer.write(packet.stance());    //bMoveAction & foothold, found thanks to Rien dev team
+      writer.write(packet.stance());
       writer.writeShort(0);
-      writer.write(packet.movementType()); // 0 = don't move, 1 = follow (4th mage summons?), 2/4 = only tele follow, 3 = bird follow
+      writer.write(packet.movementType()); // 0 = don't move, 1 = follow (4th magician summons?), 2/4 = only teleport follow, 3 = bird follow
       writer.write(packet.puppet() ? 0 : 1); // 0 and the summon can't attack - but puppets don't attack with 1 either ^.-
       writer.write(packet.animated() ? 0 : 1);
    }
@@ -169,8 +161,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Removes a monster invisibility.
-    *
-    * @return
     */
    protected void removeMonsterInvisibility(MaplePacketLittleEndianWriter writer, RemoveMonsterInvisibility packet) {
       writer.write(1);
@@ -178,9 +168,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Handles monsters not being targettable, such as Zakum's first body.
-    *
-    * @return The packet to spawn the mob as non-targettable.
+    * Handles monsters not being target-able, such as Zakum's first body.
     */
    protected void spawnFakeMonster(MaplePacketLittleEndianWriter writer, SpawnFakeMonster packet) {
       writer.write(1);
@@ -205,9 +193,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Makes a monster previously spawned as non-targettable, targettable.
-    *
-    * @return The packet to make the mob targettable.
+    * Makes a monster previously spawned as non-target-able, target-able.
     */
    protected void makeMonsterReal(MaplePacketLittleEndianWriter writer, MakeMonsterReal packet) {
       writer.writeInt(packet.getMonster().objectId());
@@ -226,8 +212,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a stop control monster packet.
-    *
-    * @return The stop control monster packet.
     */
    protected void stopControllingMonster(MaplePacketLittleEndianWriter writer, StopMonsterControl packet) {
       writer.write(0);
@@ -235,9 +219,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Gets a packet spawning a player as a mapobject to other clients.
-    *
-    * @return The spawn player packet.
+    * Gets a packet spawning a player as a map object to other clients.
     */
    protected void spawnPlayerMapObject(MaplePacketLittleEndianWriter writer, SpawnPlayer packet) {
       MapleCharacter chr = packet.getCharacter();
@@ -353,37 +335,37 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       } else {
          writer.writeInt(0);
       }
-      long buffmask = 0;
-      Integer buffvalue = null;
-      if (chr.getBuffedValue(MapleBuffStat.DARKSIGHT) != null && !chr.isHidden()) {
-         buffmask |= MapleBuffStat.DARKSIGHT.getValue();
+      long buffMask = 0;
+      Integer buffValue = null;
+      if (chr.getBuffedValue(MapleBuffStat.DARK_SIGHT) != null && !chr.isHidden()) {
+         buffMask |= MapleBuffStat.DARK_SIGHT.getValue();
       }
       if (chr.getBuffedValue(MapleBuffStat.COMBO) != null) {
-         buffmask |= MapleBuffStat.COMBO.getValue();
-         buffvalue = chr.getBuffedValue(MapleBuffStat.COMBO);
+         buffMask |= MapleBuffStat.COMBO.getValue();
+         buffValue = chr.getBuffedValue(MapleBuffStat.COMBO);
       }
-      if (chr.getBuffedValue(MapleBuffStat.SHADOWPARTNER) != null) {
-         buffmask |= MapleBuffStat.SHADOWPARTNER.getValue();
+      if (chr.getBuffedValue(MapleBuffStat.SHADOW_PARTNER) != null) {
+         buffMask |= MapleBuffStat.SHADOW_PARTNER.getValue();
       }
-      if (chr.getBuffedValue(MapleBuffStat.SOULARROW) != null) {
-         buffmask |= MapleBuffStat.SOULARROW.getValue();
+      if (chr.getBuffedValue(MapleBuffStat.SOUL_ARROW) != null) {
+         buffMask |= MapleBuffStat.SOUL_ARROW.getValue();
       }
       if (chr.getBuffedValue(MapleBuffStat.MORPH) != null) {
-         buffvalue = chr.getBuffedValue(MapleBuffStat.MORPH);
+         buffValue = chr.getBuffedValue(MapleBuffStat.MORPH);
       }
       if (chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE) != null) {
-         buffmask |= MapleBuffStat.ENERGY_CHARGE.getValue();
-         buffvalue = chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE);
+         buffMask |= MapleBuffStat.ENERGY_CHARGE.getValue();
+         buffValue = chr.getBuffedValue(MapleBuffStat.ENERGY_CHARGE);
       }//AREN'T THESE
-      writer.writeInt((int) ((buffmask >> 32) & 0xffffffffL));
-      if (buffvalue != null) {
+      writer.writeInt((int) ((buffMask >> 32) & 0xffffffffL));
+      if (buffValue != null) {
          if (chr.getBuffedValue(MapleBuffStat.MORPH) != null) { //TEST
-            writer.writeShort(buffvalue);
+            writer.writeShort(buffValue);
          } else {
-            writer.write(buffvalue.byteValue());
+            writer.write(buffValue.byteValue());
          }
       }
-      writer.writeInt((int) (buffmask & 0xffffffffL));
+      writer.writeInt((int) (buffMask & 0xffffffffL));
       int CHAR_MAGIC_SPAWN = Randomizer.nextInt();
       writer.skip(6);
       writer.writeInt(CHAR_MAGIC_SPAWN);
@@ -420,9 +402,9 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
       writer.write(0);
    }
 
-   protected void addPetInfo(final MaplePacketLittleEndianWriter writer, MaplePet pet, boolean showpet) {
+   protected void addPetInfo(final MaplePacketLittleEndianWriter writer, MaplePet pet, boolean showPet) {
       writer.write(1);
-      if (showpet) {
+      if (showPet) {
          writer.write(0);
       }
 
@@ -452,12 +434,12 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    protected void encodeNewYearCardInfo(MaplePacketLittleEndianWriter writer, MapleCharacter chr) {
-      Set<NewYearCardRecord> newyears = chr.getReceivedNewYearRecords();
-      if (!newyears.isEmpty()) {
+      Set<NewYearCardRecord> newYearRecords = chr.getReceivedNewYearRecords();
+      if (!newYearRecords.isEmpty()) {
          writer.write(1);
 
-         writer.writeInt(newyears.size());
-         for (NewYearCardRecord nyc : newyears) {
+         writer.writeInt(newYearRecords.size());
+         for (NewYearCardRecord nyc : newYearRecords) {
             writer.writeInt(nyc.id());
          }
       } else {
@@ -540,7 +522,7 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
    }
 
    protected void spawnDragon(MaplePacketLittleEndianWriter writer, SpawnDragon packet) {
-      writer.writeInt(packet.getDragon().ownerId());//objectid = owner id
+      writer.writeInt(packet.getDragon().ownerId());
       writer.writeShort(packet.getDragon().position().x);
       writer.writeShort(0);
       writer.writeShort(packet.getDragon().position().y);
@@ -552,8 +534,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Internal function to handler monster spawning and controlling.
-    *
-    * @return The spawn/control packet.
     */
    protected void spawnMonster(MaplePacketLittleEndianWriter writer, SpawnMonster packet) {
       MapleMonster life = packet.getMonster();
@@ -606,8 +586,6 @@ public class SpawnPacketFactory extends AbstractPacketFactory {
 
    /**
     * Internal function to handler monster spawning and controlling.
-    *
-    * @return The spawn/control packet.
     */
    protected void controlMonster(MaplePacketLittleEndianWriter writer, ControlMonster packet) {
       writer.write(packet.isAggro() ? 2 : 1);

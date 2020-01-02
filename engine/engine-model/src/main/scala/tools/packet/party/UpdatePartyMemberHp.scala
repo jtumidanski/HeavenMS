@@ -10,5 +10,5 @@ class UpdatePartyMemberHp(private var _characterId: Int, private var _currentHp:
 
   def maximumHp: Int = _maximumHp
 
-  override def opcode(): SendOpcode = SendOpcode.UPDATE_PARTYMEMBER_HP
+  override def opcode(): SendOpcode = SendOpcode.UPDATE_PARTY_MEMBER_HP
 }

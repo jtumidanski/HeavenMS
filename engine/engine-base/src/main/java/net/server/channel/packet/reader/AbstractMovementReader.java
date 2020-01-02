@@ -57,12 +57,12 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
             case 5:
             case 17: { // Float
                //Absolute movement - only this is important for the server, other movement can be passed to the client
-               short xpos = accessor.readShort(); //is signed fine here?
-               short ypos = accessor.readShort();
-               accessor.skip(6); //xwobble = lea.readShort(); ywobble = lea.readShort(); fh = lea.readShort();
-               byte newstate = accessor.readByte();
+               short xPosition = accessor.readShort(); //is signed fine here?
+               short yPosition = accessor.readShort();
+               accessor.skip(6); //x wobble = lea.readShort(); y wobble = lea.readShort(); fh = lea.readShort();
+               byte newState = accessor.readByte();
                accessor.readShort(); //duration
-               movementDataList.add(new AbsoluteMovementData(new Point(xpos, ypos + yOffset), newstate));
+               movementDataList.add(new AbsoluteMovementData(new Point(xPosition, yPosition + yOffset), newState));
                break;
             }
             case 1:
@@ -76,14 +76,14 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
             case 20: // Aran Combat Step
             case 22: {
                //Relative movement - server only cares about stance
-               accessor.skip(4); //xpos = lea.readShort(); ypos = lea.readShort();
-               byte newstate = accessor.readByte();
+               accessor.skip(4); //x pos = lea.readShort(); y pos = lea.readShort();
+               byte newState = accessor.readByte();
                accessor.readShort(); //duration
-               movementDataList.add(new RelativeMovementData(newstate));
+               movementDataList.add(new RelativeMovementData(newState));
                break;
             }
             case 3:
-            case 4: // tele... -.-
+            case 4: // teleport... -.-
             case 7: // assaulter
             case 8: // assassinate
             case 9: // rush
@@ -91,9 +91,9 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
             {
 //                case 14: {
                //Teleport movement - same as above
-               accessor.skip(8); //xpos = lea.readShort(); ypos = lea.readShort(); xwobble = lea.readShort(); ywobble = lea.readShort();
-               byte newstate = accessor.readByte();
-               movementDataList.add(new RelativeMovementData(newstate));
+               accessor.skip(8); //x pos = lea.readShort(); y pos = lea.readShort(); x wobble = lea.readShort(); y wobble = lea.readShort();
+               byte newState = accessor.readByte();
+               movementDataList.add(new RelativeMovementData(newState));
                break;
             }
             case 14:
@@ -104,10 +104,10 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
                accessor.readByte();
                break;
                 /*case 11: { // Chair
-                    short xpos = lea.readShort();
-                    short ypos = lea.readShort();
+                    short xPosition = lea.readShort();
+                    short yPosition = lea.readShort();
                     short fh = lea.readShort();
-                    byte newstate = lea.readByte();
+                    byte newState = lea.readByte();
                     short duration = lea.readShort();
                     ChairMovement cm = new ChairMovement(command, new Point(xpos, ypos), duration, newstate);
                     cm.setFh(fh);
@@ -116,14 +116,14 @@ public abstract class AbstractMovementReader<T extends BaseMovementPacket> imple
                 }*/
             case 15: {
                //Jump down movement - stance only
-               accessor.skip(12); //short xpos = lea.readShort(); ypos = lea.readShort(); xwobble = lea.readShort(); ywobble = lea.readShort(); fh = lea.readShort(); ofh = lea.readShort();
-               byte newstate = accessor.readByte();
-               movementDataList.add(new RelativeMovementData(newstate));
+               accessor.skip(12); //short xPosition = lea.readShort(); yPosition = lea.readShort(); xWobble = lea.readShort(); yWobble = lea.readShort(); fh = lea.readShort(); ofh = lea.readShort();
+               byte newState = accessor.readByte();
+               movementDataList.add(new RelativeMovementData(newState));
                accessor.readShort(); // duration
                break;
             }
             case 21: {//Causes aran to do weird stuff when attacking o.o
-                    /*byte newstate = lea.readByte();
+                    /*byte newState = lea.readByte();
                      short unk = lea.readShort();
                      AranMovement am = new AranMovement(command, null, unk, newstate);
                      res.add(am);*/

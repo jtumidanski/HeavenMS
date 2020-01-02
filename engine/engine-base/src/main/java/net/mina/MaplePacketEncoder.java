@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.mina;
 
 import org.apache.mina.core.buffer.IoBuffer;
@@ -39,7 +18,7 @@ import tools.data.input.GenericLittleEndianAccessor;
 public class MaplePacketEncoder implements ProtocolEncoder {
 
    @Override
-   public void encode(final IoSession session, final Object message, final ProtocolEncoderOutput out) throws Exception {
+   public void encode(final IoSession session, final Object message, final ProtocolEncoderOutput out) {
       final MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
       try {
@@ -95,6 +74,6 @@ public class MaplePacketEncoder implements ProtocolEncoder {
    }
 
    @Override
-   public void dispose(IoSession session) throws Exception {
+   public void dispose(IoSession session) {
    }
 }

@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class Maprien {
+class MapRien {
 
    static def start(MapScriptMethods ms) {
       if (ms.isQuestCompleted(21101) && ms.containsAreaInfo((short) 21019, "miss=o;arr=o;helper=clear")) {
@@ -13,9 +13,9 @@ class Maprien {
    }
 }
 
-Maprien getMap() {
-   getBinding().setVariable("map", new Maprien())
-   return (Maprien) getBinding().getVariable("map")
+MapRien getMap() {
+   getBinding().setVariable("map", new MapRien())
+   return (MapRien) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

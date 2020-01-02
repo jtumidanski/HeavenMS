@@ -16,7 +16,7 @@ class NPC9201093 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Have you heard the fantasic Jack Masque appeared around the city these days? That is sooooo nice!")
+      cm.sendOk("Have you heard the fantastic Jack Masque appeared around the city these days? That is sooooo nice!")
       cm.dispose()
    }
 

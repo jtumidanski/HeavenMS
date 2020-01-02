@@ -5,9 +5,6 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.services.BaseScheduler;
 import net.server.services.BaseService;
 
-/**
- * @author Ronan
- */
 public class EventService extends BaseService {
 
    private EventScheduler[] eventSchedulers = new EventScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
@@ -27,8 +24,8 @@ public class EventService extends BaseService {
       }
    }
 
-   public void registerEventAction(int mapid, Runnable runAction, long delay) {
-      eventSchedulers[getChannelSchedulerIndex(mapid)].registerDelayedAction(runAction, delay);
+   public void registerEventAction(int mapId, Runnable runAction, long delay) {
+      eventSchedulers[getChannelSchedulerIndex(mapId)].registerDelayedAction(runAction, delay);
    }
 
    private class EventScheduler extends BaseScheduler {

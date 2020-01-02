@@ -18,7 +18,7 @@ class NPC2020008 {
    int sel = -1
 
    int job
-   def actionx = ["Mental": false, "Physical": false]
+   def action = ["Mental": false, "Physical": false]
 
    def start() {
       if (cm.isQuestStarted(6192)) {
@@ -62,9 +62,9 @@ class NPC2020008 {
          return
       }
       if (cm.haveItem(4031058)) {
-         actionx["Mental"] = true
+         action["Mental"] = true
       } else if (cm.haveItem(4031057)) {
-         actionx["Physical"] = true
+         action["Physical"] = true
       }
       cm.sendSimple("Can I help you?#b" + (cm.getJobId() % 10 == 0 ? "\r\n#L0#I want to make the 3th job advancement." : "") + "\r\n#L1#Please allow me to do the Zakum Dungeon Quest.")
    }
@@ -73,16 +73,16 @@ class NPC2020008 {
       status++
       if (mode == 0 && type == 0) {
          status -= 2
-      } else if (mode != 1 || (status > 2 && !actionx["Mental"]) || status > 3) {
+      } else if (mode != 1 || (status > 2 && !action["Mental"]) || status > 3) {
          if (mode == 0 && type == 1) {
             cm.sendNext("Make up your mind.")
          }
          cm.dispose()
          return
       }
-      if (actionx["Mental"]) {
+      if (action["Mental"]) {
          if (status == 0) {
-            cm.sendNext("Great job completing the mental part of the test. You have wisely answered all the questions correctly. I must say, I am quite impressed with the level of wisdom you have displayed there. Please hand me the necklace first, before we takeon the next step.")
+            cm.sendNext("Great job completing the mental part of the test. You have wisely answered all the questions correctly. I must say, I am quite impressed with the level of wisdom you have displayed there. Please hand me the necklace first, before we take on the next step.")
          } else if (status == 1) {
             cm.sendYesNo("Okay! Now, you'll be transformed into a much more powerful warrior through me. Before doing that, though, please make sure your SP has been thoroughly used, You'll need to use up at least all of SP's gained until level 70 to make the 3rd job advancement. Oh, and since you have already chosen your path of the occupation by the 2nd job adv., you won't have to choose again for the 3rd job adv. Do you want to do it right now?")
          } else if (status == 2) {
@@ -104,12 +104,12 @@ class NPC2020008 {
             } else if (Math.floor(cm.getJobId() / 10) == 12) {
                cm.sendNext("You have just become the #bWhite Knight#k. You'll be introduced to a new skill book featuring various new attacking skills as well as element-based attacks. It's recommended that the type of weapon complementary to the Page, whether it be a sword or a blunt weapon, should be continued as the White Knight. There's a skill called #bCharge#k, which adds an element of ice, fire and lightning to the weapon, making White Knight the only warrior that can perform element-based attacks. Charge up your weapon with an element that weakens the monster, and then apply massive damage with the #bCharged Blow#k. This will definitely make you a devastating force around here.")
             } else {
-               cm.sendNext("You're #bDragon Knight#k from here on out. You'll be introduced to a range of new attacking skills for spears and pole arms, and whatever weapon was chosen as the Spearman should be continued as the Dragon Knigth. Skills such as #bCrusher#k (maximum damage to one monster) and #bDragon Fury#k (damage to multiple monsters) are recommended as main attacking skills of choice, while a skill called #bDragon Roar#k will damage everything on screen with devasting force. The downside is the fact that the skill uses up over half of the available HP.")
+               cm.sendNext("You're #bDragon Knight#k from here on out. You'll be introduced to a range of new attacking skills for spears and pole arms, and whatever weapon was chosen as the Spearman should be continued as the Dragon Knight. Skills such as #bCrusher#k (maximum damage to one monster) and #bDragon Fury#k (damage to multiple monsters) are recommended as main attacking skills of choice, while a skill called #bDragon Roar#k will damage everything on screen with devastating force. The downside is the fact that the skill uses up over half of the available HP.")
             }
          } else if (status == 3) {
             cm.sendNextPrev("I've also given you some SP and AP, which will help you get started. You have now become a powerful, powerful warrior, indeed. Remember, though, that the real world will be awaiting your arrival with even tougher obstacles to overcome. Once you feel like you cannot train yourself to reach a higher place, then, and only then, come see me. I'll be here waiting.")
          }
-      } else if (actionx["Physical"]) {
+      } else if (action["Physical"]) {
          if (status == 0) {
             cm.sendNext("Great job completing the physical part of the test. I knew you could do it. Now that you have passed the first half of the test, here's the second half. Please give me the necklace first.")
          } else if (status == 1) {

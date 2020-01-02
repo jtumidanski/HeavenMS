@@ -26,5 +26,5 @@ class SpawnSummon(private var _ownerId: Int, private var _objectId: Int, private
 
   def animated: Boolean = _animated
 
-  override def opcode(): SendOpcode = SendOpcode.SPAWN_SPECIAL_MAPOBJECT
+  override def opcode(): SendOpcode = SendOpcode.SPAWN_SPECIAL_MAP_OBJECT
 }

@@ -8,5 +8,5 @@ class CheckNameChange(private var _availableName: String, private var _canUseNam
 
   def canUseName: Boolean = _canUseName
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_CHECK_NAME_CHANGE
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_CHECK_NAME_CHANGE
 }

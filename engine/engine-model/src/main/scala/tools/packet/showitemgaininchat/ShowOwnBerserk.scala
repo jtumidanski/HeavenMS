@@ -8,5 +8,5 @@ class ShowOwnBerserk(private var _skillLevel: Int, private var _berserk: Boolean
 
   def berserk: Boolean = _berserk
 
-  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_INCHAT
+  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_IN_CHAT
 }

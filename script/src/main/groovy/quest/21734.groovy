@@ -49,7 +49,7 @@ class Quest21734 {
          if (status == 0) {
             qm.sendNext("You made it, Aran! The Puppeteer now will not disturb the peace at Victoria Island any longer. Furthermore, now we could clearly investigate the doings of the Black Wing here, at Victoria.")
          } else if (status == 1) {
-            qm.sendNext("They were after the #bcrystal seal of Victoria#k. These seals are what repels the Black Mage to further taking the continents into his grasp at once. Each continent has one, Victoria's now is safe and sound.")
+            qm.sendNext("They were after the #bcrystal seal of Victoria#k. These seals are what repels the Black Magician to further taking the continents into his grasp at once. Each continent has one, Victoria's now is safe and sound.")
          } else if (status == 2) {
             qm.sendNext("For your bravery inputted on these series of missions, I will now reward you properly. Behold, the #rCombo Drain#k Skill: that let's you heal back a portion of damage dealt to the monsters.")
          } else if (status == 3) {

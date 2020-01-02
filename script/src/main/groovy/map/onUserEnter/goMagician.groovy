@@ -3,16 +3,16 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MapgoMagician {
+class MapGoMagician {
 
    static def start(MapScriptMethods ms) {
       ms.startExplorerExperience()
    }
 }
 
-MapgoMagician getMap() {
-   getBinding().setVariable("map", new MapgoMagician())
-   return (MapgoMagician) getBinding().getVariable("map")
+MapGoMagician getMap() {
+   getBinding().setVariable("map", new MapGoMagician())
+   return (MapGoMagician) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

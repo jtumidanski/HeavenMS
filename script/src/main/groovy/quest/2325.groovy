@@ -24,7 +24,7 @@ class Quest2325 {
       if (status == 0) {
          qm.sendNext("I... I am scared... Please... please help me...")
       } else if (status == 1) {
-         qm.sendNextPrev("Don't be afriad, #b#p1300005##k sent me here.",  (byte) 2)
+         qm.sendNextPrev("Don't be afraid, #b#p1300005##k sent me here.",  (byte) 2)
       } else if (status == 2) {
          qm.forceCompleteQuest()
          qm.gainExp(6000)

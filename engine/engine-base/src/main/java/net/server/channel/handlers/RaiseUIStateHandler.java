@@ -8,9 +8,6 @@ import net.server.channel.packet.RaiseUIStatePacket;
 import net.server.channel.packet.reader.RaiseUIStateReader;
 import server.quest.MapleQuest;
 
-/**
- * @author Xari
- */
 public class RaiseUIStateHandler extends AbstractPacketHandler<RaiseUIStatePacket> {
    @Override
    public Class<RaiseUIStateReader> getReaderClass() {

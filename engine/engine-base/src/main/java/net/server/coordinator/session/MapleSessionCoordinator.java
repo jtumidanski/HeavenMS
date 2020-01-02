@@ -1,27 +1,7 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.coordinator.session;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -49,9 +29,6 @@ import net.server.coordinator.login.LoginStorage;
 import database.DatabaseConnection;
 import tools.Pair;
 
-/**
- * @author Ronan
- */
 public class MapleSessionCoordinator {
 
    private final static MapleSessionCoordinator instance = new MapleSessionCoordinator();
@@ -162,7 +139,7 @@ public class MapleSessionCoordinator {
    }
 
    public static String getSessionRemoteHost(IoSession session) {
-      String nibbleHwid = (String) session.getAttribute(MapleClient.CLIENT_NIBBLEHWID);
+      String nibbleHwid = (String) session.getAttribute(MapleClient.CLIENT_NIBBLE_HWID);
 
       if (nibbleHwid != null) {
          return getSessionRemoteAddress(session) + "-" + nibbleHwid;
@@ -181,14 +158,14 @@ public class MapleSessionCoordinator {
       if (remoteHwid != null) {   // maybe this session was currently in-transition?
          int hwidLen = remoteHwid.length();
          if (hwidLen <= 8) {
-            session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, remoteHwid);
+            session.setAttribute(MapleClient.CLIENT_NIBBLE_HWID, remoteHwid);
          } else {
             session.setAttribute(MapleClient.CLIENT_HWID, remoteHwid);
-            session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, remoteHwid.substring(hwidLen - 8, hwidLen));
+            session.setAttribute(MapleClient.CLIENT_NIBBLE_HWID, remoteHwid.substring(hwidLen - 8, hwidLen));
          }
 
          MapleClient client = new MapleClient(null, null, session);
-         Integer cid = Server.getInstance().freeCharacteridInTransition(client);
+         Integer cid = Server.getInstance().freeCharacterIdInTransition(client);
          if (cid != null) {
             client.setAccID(CharacterProcessor.getInstance().loadCharFromDB(cid, client, false).getAccountID());
          }
@@ -200,7 +177,7 @@ public class MapleSessionCoordinator {
       return null;
    }
 
-   private Lock getCoodinatorLock(String remoteHost) {
+   private Lock getCoordinatorLock(String remoteHost) {
       return poolLock.get(Math.abs(remoteHost.hashCode()) % 100);
    }
 
@@ -209,9 +186,9 @@ public class MapleSessionCoordinator {
 
       if (client != null) {
          int accountId = client.getAccID();
-         MapleClient ingameClient = onlineClients.get(accountId);
-         if (ingameClient != null) {     // thanks MedicOP for finding out a loss of loggedin account uniqueness when using the CMS "Unstuck" feature
-            ingameClient.forceDisconnect();
+         MapleClient inGameClient = onlineClients.get(accountId);
+         if (inGameClient != null) {
+            inGameClient.forceDisconnect();
          }
 
          onlineClients.put(accountId, client);
@@ -224,7 +201,7 @@ public class MapleSessionCoordinator {
       }
 
       String remoteHost = getSessionRemoteHost(session);
-      Lock lock = getCoodinatorLock(remoteHost);
+      Lock lock = getCoordinatorLock(remoteHost);
 
       try {
          int tries = 0;
@@ -283,7 +260,7 @@ public class MapleSessionCoordinator {
    }
 
    public void closeLoginSession(IoSession session) {
-      String nibbleHwid = (String) session.removeAttribute(MapleClient.CLIENT_NIBBLEHWID);
+      String nibbleHwid = (String) session.removeAttribute(MapleClient.CLIENT_NIBBLE_HWID);
       String remoteHost = getSessionRemoteHost(session);
       Set<IoSession> lrh = loginRemoteHosts.get(remoteHost);
       if (lrh != null) {
@@ -308,14 +285,14 @@ public class MapleSessionCoordinator {
       }
    }
 
-   public AntiMulticlientResult attemptLoginSession(IoSession session, String nibbleHwid, int accountId, boolean routineCheck) {
+   public AntiMultiClientResult attemptLoginSession(IoSession session, String nibbleHwid, int accountId, boolean routineCheck) {
       if (!YamlConfig.config.server.DETERRED_MULTICLIENT) {
-         session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, nibbleHwid);
-         return AntiMulticlientResult.SUCCESS;
+         session.setAttribute(MapleClient.CLIENT_NIBBLE_HWID, nibbleHwid);
+         return AntiMultiClientResult.SUCCESS;
       }
 
       String remoteHost = getSessionRemoteHost(session);
-      Lock lock = getCoodinatorLock(remoteHost);
+      Lock lock = getCoordinatorLock(remoteHost);
 
       try {
          int tries = 0;
@@ -323,7 +300,7 @@ public class MapleSessionCoordinator {
             if (lock.tryLock()) {
                try {
                   if (pooledRemoteHosts.contains(remoteHost)) {
-                     return AntiMulticlientResult.REMOTE_PROCESSING;
+                     return AntiMultiClientResult.REMOTE_PROCESSING;
                   }
 
                   pooledRemoteHosts.add(remoteHost);
@@ -334,7 +311,7 @@ public class MapleSessionCoordinator {
                break;
             } else {
                if (tries == 2) {
-                  return AntiMulticlientResult.COORDINATOR_ERROR;
+                  return AntiMultiClientResult.COORDINATOR_ERROR;
                }
                tries++;
 
@@ -343,32 +320,32 @@ public class MapleSessionCoordinator {
          }
       } catch (Exception e) {
          e.printStackTrace();
-         return AntiMulticlientResult.COORDINATOR_ERROR;
+         return AntiMultiClientResult.COORDINATOR_ERROR;
       }
 
       try {
          if (!loginStorage.registerLogin(accountId)) {
-            return AntiMulticlientResult.MANY_ACCOUNT_ATTEMPTS;
+            return AntiMultiClientResult.MANY_ACCOUNT_ATTEMPTS;
          }
 
          if (!routineCheck) {
             if (onlineRemoteHwids.contains(nibbleHwid)) {
-               return AntiMulticlientResult.REMOTE_LOGGEDIN;
+               return AntiMultiClientResult.REMOTE_LOGGEDIN;
             }
 
             if (!attemptAccessAccount(nibbleHwid, accountId, routineCheck)) {
-               return AntiMulticlientResult.REMOTE_REACHED_LIMIT;
+               return AntiMultiClientResult.REMOTE_REACHED_LIMIT;
             }
 
-            session.setAttribute(MapleClient.CLIENT_NIBBLEHWID, nibbleHwid);
+            session.setAttribute(MapleClient.CLIENT_NIBBLE_HWID, nibbleHwid);
             onlineRemoteHwids.add(nibbleHwid);
          } else {
             if (!attemptAccessAccount(nibbleHwid, accountId, routineCheck)) {
-               return AntiMulticlientResult.REMOTE_REACHED_LIMIT;
+               return AntiMultiClientResult.REMOTE_REACHED_LIMIT;
             }
          }
 
-         return AntiMulticlientResult.SUCCESS;
+         return AntiMultiClientResult.SUCCESS;
       } finally {
          lock.lock();
          try {
@@ -379,22 +356,22 @@ public class MapleSessionCoordinator {
       }
    }
 
-   public AntiMulticlientResult attemptGameSession(IoSession session, int accountId, String remoteHwid) {
+   public AntiMultiClientResult attemptGameSession(IoSession session, int accountId, String remoteHwid) {
       String remoteHost = getSessionRemoteHost(session);
       if (!YamlConfig.config.server.DETERRED_MULTICLIENT) {
          associateRemoteHostHwid(remoteHost, remoteHwid);
-         associateRemoteHostHwid(getSessionRemoteAddress(session), remoteHwid);  // no HWID information on the loggedin newcomer session...
-         return AntiMulticlientResult.SUCCESS;
+         associateRemoteHostHwid(getSessionRemoteAddress(session), remoteHwid);  // no HWID information on the logged in newcomer session...
+         return AntiMultiClientResult.SUCCESS;
       }
 
-      Lock lock = getCoodinatorLock(remoteHost);
+      Lock lock = getCoordinatorLock(remoteHost);
       try {
          int tries = 0;
          while (true) {
             if (lock.tryLock()) {
                try {
                   if (pooledRemoteHosts.contains(remoteHost)) {
-                     return AntiMulticlientResult.REMOTE_PROCESSING;
+                     return AntiMultiClientResult.REMOTE_PROCESSING;
                   }
 
                   pooledRemoteHosts.add(remoteHost);
@@ -405,7 +382,7 @@ public class MapleSessionCoordinator {
                break;
             } else {
                if (tries == 2) {
-                  return AntiMulticlientResult.COORDINATOR_ERROR;
+                  return AntiMultiClientResult.COORDINATOR_ERROR;
                }
                tries++;
 
@@ -414,11 +391,11 @@ public class MapleSessionCoordinator {
          }
       } catch (Exception e) {
          e.printStackTrace();
-         return AntiMulticlientResult.COORDINATOR_ERROR;
+         return AntiMultiClientResult.COORDINATOR_ERROR;
       }
 
       try {
-         String nibbleHwid = (String) session.getAttribute(MapleClient.CLIENT_NIBBLEHWID);   // thanks Paxum for noticing account stuck after PIC failure
+         String nibbleHwid = (String) session.getAttribute(MapleClient.CLIENT_NIBBLE_HWID);
          if (nibbleHwid != null) {
             onlineRemoteHwids.remove(nibbleHwid);
 
@@ -432,15 +409,15 @@ public class MapleSessionCoordinator {
                   associateRemoteHostHwid(getSessionRemoteAddress(session), remoteHwid);
                   associateHwidAccountIfAbsent(remoteHwid, accountId);
 
-                  return AntiMulticlientResult.SUCCESS;
+                  return AntiMultiClientResult.SUCCESS;
                } else {
-                  return AntiMulticlientResult.REMOTE_LOGGEDIN;
+                  return AntiMultiClientResult.REMOTE_LOGGEDIN;
                }
             } else {
-               return AntiMulticlientResult.REMOTE_NO_MATCH;
+               return AntiMultiClientResult.REMOTE_NO_MATCH;
             }
          } else {
-            return AntiMulticlientResult.REMOTE_NO_MATCH;
+            return AntiMultiClientResult.REMOTE_NO_MATCH;
          }
       } finally {
          lock.lock();
@@ -458,7 +435,7 @@ public class MapleSessionCoordinator {
          client = fetchInTransitionSessionClient(session);
       }
 
-      String hwid = (String) session.removeAttribute(MapleClient.CLIENT_NIBBLEHWID); // making sure to clean up calls to this function on login phase
+      String hwid = (String) session.removeAttribute(MapleClient.CLIENT_NIBBLE_HWID); // making sure to clean up calls to this function on login phase
       onlineRemoteHwids.remove(hwid);
 
       hwid = (String) session.removeAttribute(MapleClient.CLIENT_HWID);
@@ -490,7 +467,7 @@ public class MapleSessionCoordinator {
 
    public String pickLoginSessionHwid(IoSession session) {
       String remoteHost = getSessionRemoteAddress(session);
-      return cachedHostHwids.remove(remoteHost);    // thanks BHB, resinate for noticing players from same network not being able to login
+      return cachedHostHwids.remove(remoteHost);
    }
 
    public String getGameSessionHwid(IoSession session) {
@@ -529,12 +506,7 @@ public class MapleSessionCoordinator {
    public void printSessionTrace() {
       if (!onlineClients.isEmpty()) {
          List<Entry<Integer, MapleClient>> elist = new ArrayList<>(onlineClients.entrySet());
-         elist.sort(new Comparator<>() {
-            @Override
-            public int compare(Entry<Integer, MapleClient> e1, Entry<Integer, MapleClient> e2) {
-               return e1.getKey().compareTo(e2.getKey());
-            }
-         });
+         elist.sort(Entry.comparingByKey());
 
          System.out.println("Current online clients: ");
          for (Entry<Integer, MapleClient> e : elist) {
@@ -555,12 +527,7 @@ public class MapleSessionCoordinator {
       if (!loginRemoteHosts.isEmpty()) {
          List<Entry<String, Set<IoSession>>> elist = new ArrayList<>(loginRemoteHosts.entrySet());
 
-         elist.sort(new Comparator<>() {
-            @Override
-            public int compare(Entry<String, Set<IoSession>> e1, Entry<String, Set<IoSession>> e2) {
-               return e1.getKey().compareTo(e2.getKey());
-            }
-         });
+         elist.sort(Entry.comparingByKey());
 
          System.out.println("Current login sessions: ");
          for (Entry<String, Set<IoSession>> e : elist) {
@@ -574,12 +541,7 @@ public class MapleSessionCoordinator {
 
       if (!onlineClients.isEmpty()) {
          List<Entry<Integer, MapleClient>> elist = new ArrayList<>(onlineClients.entrySet());
-         elist.sort(new Comparator<>() {
-            @Override
-            public int compare(Entry<Integer, MapleClient> e1, Entry<Integer, MapleClient> e2) {
-               return e1.getKey().compareTo(e2.getKey());
-            }
-         });
+         elist.sort(Entry.comparingByKey());
 
          str.append("Current online clients:\r\n");
          for (Entry<Integer, MapleClient> e : elist) {
@@ -600,12 +562,7 @@ public class MapleSessionCoordinator {
       if (!loginRemoteHosts.isEmpty()) {
          List<Entry<String, Set<IoSession>>> elist = new ArrayList<>(loginRemoteHosts.entrySet());
 
-         elist.sort(new Comparator<>() {
-            @Override
-            public int compare(Entry<String, Set<IoSession>> e1, Entry<String, Set<IoSession>> e2) {
-               return e1.getKey().compareTo(e2.getKey());
-            }
-         });
+         elist.sort(Entry.comparingByKey());
 
          str.append("Current login sessions:\r\n");
          for (Entry<String, Set<IoSession>> e : elist) {
@@ -616,7 +573,7 @@ public class MapleSessionCoordinator {
       c.getAbstractPlayerInteraction().npcTalk(2140000, str.toString());
    }
 
-   public enum AntiMulticlientResult {
+   public enum AntiMultiClientResult {
       SUCCESS,
       REMOTE_LOGGEDIN,
       REMOTE_REACHED_LIMIT,

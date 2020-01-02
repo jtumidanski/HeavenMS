@@ -24,13 +24,13 @@ class NPC2112007 {
          eim.setIntProperty(book, -1)
 
          if (res == 0) {  // mesos
-            int mgain = 500 * cm.getPlayer().getMesoRate()
-            cm.sendNext("Earned " + mgain + " mesos!")
-            cm.gainMeso(mgain)
+            int mesoGain = 500 * cm.getPlayer().getMesoRate()
+            cm.sendNext("Earned " + mesoGain + " mesos!")
+            cm.gainMeso(mesoGain)
          } else if (res == 1) {  // exp
-            int egain = 500 * cm.getPlayer().getExpRate()
-            cm.sendNext("Earned " + egain + " exp!")
-            cm.gainExp(egain)
+            int expGain = 500 * cm.getPlayer().getExpRate()
+            cm.sendNext("Earned " + expGain + " exp!")
+            cm.gainExp(expGain)
          } else if (res == 2) {  // letter
             int letter = 4001131
             if (!cm.canHold(letter)) {

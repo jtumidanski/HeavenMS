@@ -3,7 +3,6 @@ package npc
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 
 import java.awt.*
@@ -63,10 +62,10 @@ class NPC9201047 {
                      MapleMap mapObj = cm.getMap()
                      mapObj.toggleDrops()
 
-                     MapleMonster mobObj = MapleLifeFactory.getMonster(9400518)
-                     mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(-245, 810))
-
-                     cm.sendOk("The fierry appeared! Defeat it to get the #b#t4031596##k!")
+                     MapleLifeFactory.getMonster(9400518).ifPresent({ mobObj ->
+                        mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(-245, 810))
+                        cm.sendOk("The fierry appeared! Defeat it to get the #b#t4031596##k!")
+                     })
                   } else {
                      if (st < 1) {
                         cm.sendOk("Your task is to recover a shard of the Magik Mirror. To do so, you will need a #b#t4031596##k, that drops on a fierry that appears when all other mobs are killed. To access the rooms the mobs are, pick the portal corresponding to your gender and kill all mobs there. Ladies take the left side, gentlemen the right side.")

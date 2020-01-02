@@ -78,7 +78,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       if (!viewAll) {
          writer.write(0);
       }
-      if (character.isGM() || character.isGmJob()) {  // thanks Egg Daddy (Ubaware), resinate for noticing GM jobs crashing on non-GM players account
+      if (character.isGM() || character.isGmJob()) {
          writer.write(0);
          return;
       }
@@ -114,9 +114,9 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       writer.writeShort(character.getInt()); // int
       writer.writeShort(character.getLuk()); // luk
       writer.writeShort(character.getHp()); // hp (?)
-      writer.writeShort(character.getClientMaxHp()); // maxhp
+      writer.writeShort(character.getClientMaxHp()); // max hp
       writer.writeShort(character.getMp()); // mp (?)
-      writer.writeShort(character.getClientMaxMp()); // maxmp
+      writer.writeShort(character.getClientMaxMp()); // max mp
       writer.writeShort(character.getRemainingAp()); // remaining ap
       if (GameConstants.hasSPTable(character.getJob())) {
          addRemainingSkillInfo(writer, character);
@@ -125,9 +125,9 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
       writer.writeInt(character.getExp()); // current exp
       writer.writeShort(character.getFame()); // fame
-      writer.writeInt(character.getGachaExp()); //Gacha Exp
+      writer.writeInt(character.getGachaponExperience()); //Gachapon Exp
       writer.writeInt(character.getMapId()); // current map id
-      writer.write(character.getInitialSpawnPoint()); // spawnpoint
+      writer.write(character.getInitialSpawnPoint()); // spawn point
       writer.writeInt(0);
    }
 
@@ -203,7 +203,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    }
 
    protected void addExpirationTime(final MaplePacketLittleEndianWriter writer, long time) {
-      writer.writeLong(getTime(time)); // offset expiration time issue found thanks to Thora
+      writer.writeLong(getTime(time));
    }
 
    protected void addItemInfo(final MaplePacketLittleEndianWriter writer, Item item) {
@@ -246,7 +246,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
          writer.writeShort(pet.closeness());
          writer.write(pet.fullness());
          addExpirationTime(writer, item.expiration());
-         writer.writeInt(pet.petFlag());  /* pet flags found by -- lrenex & Spoon */
+         writer.writeInt(pet.petFlag());
 
          writer.write(new byte[]{(byte) 0x50, (byte) 0x46}); //wonder what this is
          writer.writeInt(0);
@@ -271,10 +271,10 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       writer.writeShort(equip.luk()); // luk
       writer.writeShort(equip.hp()); // hp
       writer.writeShort(equip.mp()); // mp
-      writer.writeShort(equip.watk()); // watk
-      writer.writeShort(equip.matk()); // matk
-      writer.writeShort(equip.wdef()); // wdef
-      writer.writeShort(equip.mdef()); // mdef
+      writer.writeShort(equip.watk()); // weapon attack
+      writer.writeShort(equip.matk()); // magic attack
+      writer.writeShort(equip.wdef()); // weapon defense
+      writer.writeShort(equip.mdef()); // magic defense
       writer.writeShort(equip.acc()); // accuracy
       writer.writeShort(equip.avoid()); // avoid
       writer.writeShort(equip.hands()); // hands
@@ -305,9 +305,9 @@ public abstract class AbstractPacketFactory implements PacketFactory {
 
    protected void addAnnounceBox(final MaplePacketLittleEndianWriter writer, MapleMiniGame game, int amount, int joinable) {
       writer.write(game.getGameType().getValue());
-      writer.writeInt(game.objectId()); // gameid/shopid
+      writer.writeInt(game.objectId()); // game id / shop id
       writer.writeMapleAsciiString(game.getDescription()); // desc
-      writer.writeBool(!game.getPassword().isEmpty());    // password here, thanks GabrielSin!
+      writer.writeBool(!game.getPassword().isEmpty());
       writer.write(game.getPieceType());
       writer.write(amount);
       writer.write(2);         //player capacity
@@ -348,8 +348,8 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       } else {
          writer.write(1);
 
-         MapleCharacter targetcharacter = target.getPlayer();
-         if (targetcharacter != null && targetcharacter.getPartnerId() == character.getId()) {
+         MapleCharacter targetPlayer = target.getPlayer();
+         if (targetPlayer != null && targetPlayer.getPartnerId() == character.getId()) {
             writer.writeInt(0);
             writer.writeInt(0);
          } else {
@@ -365,7 +365,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       writer.writeLong(-1);
       writer.write(0);
       addCharStats(writer, character);
-      writer.write(character.getBuddylist().capacity());
+      writer.write(character.getBuddyList().capacity());
 
       if (character.getLinkedName() == null) {
          writer.write(0);
@@ -403,7 +403,7 @@ public abstract class AbstractPacketFactory implements PacketFactory {
             equipped.add(item);
          }
       }
-      for (Item item : equipped) {    // equipped doesn't actually need sorting, thanks Pllsz
+      for (Item item : equipped) {
          addItemInfo(writer, item);
       }
       writer.writeShort(0); // start of equip cash
@@ -454,8 +454,8 @@ public abstract class AbstractPacketFactory implements PacketFactory {
             writer.writeInt(skill.getValue().masterLevel());
          }
       }
-      writer.writeShort(character.getAllCooldowns().size());
-      for (PlayerCoolDownValueHolder cooling : character.getAllCooldowns()) {
+      writer.writeShort(character.getAllCoolDowns().size());
+      for (PlayerCoolDownValueHolder cooling : character.getAllCoolDowns()) {
          writer.writeInt(cooling.skillId);
          int timeLeft = (int) (cooling.length + cooling.startTime - System.currentTimeMillis());
          writer.writeShort(timeLeft / 1000);
@@ -546,13 +546,13 @@ public abstract class AbstractPacketFactory implements PacketFactory {
    }
 
    protected void addTeleportInfo(final MaplePacketLittleEndianWriter writer, MapleCharacter character) {
-      final List<Integer> tele = character.getTrockMaps();
-      final List<Integer> viptele = character.getVipTrockMaps();
+      final List<Integer> teleportRockMaps = character.getTeleportRockMaps();
+      final List<Integer> vipTeleportRockMaps = character.getVipTeleportRockMaps();
       for (int i = 0; i < 5; i++) {
-         writer.writeInt(tele.get(i));
+         writer.writeInt(teleportRockMaps.get(i));
       }
       for (int i = 0; i < 10; i++) {
-         writer.writeInt(viptele.get(i));
+         writer.writeInt(vipTeleportRockMaps.get(i));
       }
    }
 
@@ -576,18 +576,18 @@ public abstract class AbstractPacketFactory implements PacketFactory {
       }
    }
 
-   protected void encodeNewYearCard(NewYearCardRecord newyear, MaplePacketLittleEndianWriter writer) {
-      writer.writeInt(newyear.id());
-      writer.writeInt(newyear.senderId());
-      writer.writeMapleAsciiString(newyear.senderName());
-      writer.writeBool(newyear.senderDiscardCard());
-      writer.writeLong(newyear.dateSent());
-      writer.writeInt(newyear.receiverId());
-      writer.writeMapleAsciiString(newyear.receiverName());
-      writer.writeBool(newyear.receiverDiscardCard());
-      writer.writeBool(newyear.receiverReceivedCard());
-      writer.writeLong(newyear.dateReceived());
-      writer.writeMapleAsciiString(newyear.message());
+   protected void encodeNewYearCard(NewYearCardRecord newYearCardRecord, MaplePacketLittleEndianWriter writer) {
+      writer.writeInt(newYearCardRecord.id());
+      writer.writeInt(newYearCardRecord.senderId());
+      writer.writeMapleAsciiString(newYearCardRecord.senderName());
+      writer.writeBool(newYearCardRecord.senderDiscardCard());
+      writer.writeLong(newYearCardRecord.dateSent());
+      writer.writeInt(newYearCardRecord.receiverId());
+      writer.writeMapleAsciiString(newYearCardRecord.receiverName());
+      writer.writeBool(newYearCardRecord.receiverDiscardCard());
+      writer.writeBool(newYearCardRecord.receiverReceivedCard());
+      writer.writeLong(newYearCardRecord.dateReceived());
+      writer.writeMapleAsciiString(newYearCardRecord.message());
    }
 
    protected void addAreaInfo(final MaplePacketLittleEndianWriter writer, MapleCharacter character) {

@@ -38,7 +38,7 @@ public class ShopPacketFactory extends AbstractPacketFactory {
       writer.writeInt(packet.objectId());
       writer.writeMapleAsciiString(packet.description());
       writer.write(packet.itemId() % 100);
-      writer.write(packet.roomInto());    // visitor capacity here, thanks GabrielSin!
+      writer.write(packet.roomInto());
    }
 
    // someone thought it was a good idea to handle floating point representation through packets ROFL
@@ -57,7 +57,7 @@ public class ShopPacketFactory extends AbstractPacketFactory {
          writer.writeInt(0); //Can be used x minutes after purchase
          writer.writeInt(0); //Hmm
          if (!ItemConstants.isRechargeable(item.itemId())) {
-            writer.writeShort(1); // stacksize o.o
+            writer.writeShort(1);
             writer.writeShort(item.buyable());
          } else {
             writer.writeShort(0);

@@ -107,7 +107,7 @@ public class PlayerNpcAdministrator extends AbstractQueryExecutor {
       execute(entityManager, query);
    }
 
-   public void deleteAllNpcs(EntityManager entityManager) {
+   public void deleteAllPlayerNpc(EntityManager entityManager) {
       entityManager.getTransaction().begin();
       Query deleteFromPlayerNpc = entityManager.createQuery("DELETE FROM PlayerNpc");
       deleteFromPlayerNpc.executeUpdate();

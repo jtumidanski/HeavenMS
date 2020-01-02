@@ -1,18 +1,16 @@
 package portal
 
-
 import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-import java.awt.Point
+import java.awt.*
 
 boolean enter(PortalPlayerInteraction pi) {
-   if(pi.isQuestStarted(21301) && pi.getQuestProgressInt(21301, 9001013) == 0) {
-      if(pi.getPlayerCount(108010700) != 0) {
+   if (pi.isQuestStarted(21301) && pi.getQuestProgressInt(21301, 9001013) == 0) {
+      if (pi.getPlayerCount(108010700) != 0) {
          MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal is blocked from the other side. I wonder if someone is already fighting the Thief Crow?")
          return false
       } else {
@@ -29,9 +27,9 @@ boolean enter(PortalPlayerInteraction pi) {
 }
 
 static def spawnMob(x, y, int id, MapleMap map) {
-   if(map.getMonsterById(id) != null)
+   if (map.getMonsterById(id) != null) {
       return
+   }
 
-   MapleMonster mob = MapleLifeFactory.getMonster(id)
-   map.spawnMonsterOnGroundBelow(mob, new Point(x, y))
+   MapleLifeFactory.getMonster(id).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point(x, y)) })
 }

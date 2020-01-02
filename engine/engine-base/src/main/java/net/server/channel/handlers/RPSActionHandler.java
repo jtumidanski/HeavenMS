@@ -16,11 +16,6 @@ import tools.PacketCreator;
 import tools.packet.rps.RPSMesoError;
 import tools.packet.rps.RPSMode;
 
-/**
- * @Author Arnah
- * @Website http://Vertisy.ca/
- * @since Aug 15, 2016
- */
 public final class RPSActionHandler extends AbstractPacketHandler<BaseRPSActionPacket> {
    @Override
    public Class<RPSActionReader> getReaderClass() {

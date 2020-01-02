@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client;
 
 import java.util.Collections;
@@ -61,23 +40,23 @@ public final class MonsterBook {
       }
    }
 
-   public void addCard(final MapleClient c, final int cardid) {
+   public void addCard(final MapleClient c, final int cardId) {
       MasterBroadcaster.getInstance().sendToAllInMap(c.getPlayer().getMap(), new ShowForeignCardEffect(c.getPlayer().getId()), false, c.getPlayer());
 
       Integer qty;
       lock.lock();
       try {
-         qty = cards.get(cardid);
+         qty = cards.get(cardId);
 
          if (qty != null) {
             if (qty < 5) {
-               cards.put(cardid, qty + 1);
+               cards.put(cardId, qty + 1);
             }
          } else {
-            cards.put(cardid, 1);
+            cards.put(cardId, 1);
             qty = 0;
 
-            if (cardid / 1000 >= 2388) {
+            if (cardId / 1000 >= 2388) {
                specialCard++;
             } else {
                normalCard++;
@@ -91,10 +70,10 @@ public final class MonsterBook {
          if (qty == 0) {     // leveling system only accounts unique cards
             calculateLevel();
          }
-         PacketCreator.announce(c, new SetCard(false, cardid, qty + 1));
+         PacketCreator.announce(c, new SetCard(false, cardId, qty + 1));
          PacketCreator.announce(c, new ShowGainCard());
       } else {
-         PacketCreator.announce(c, new SetCard(true, cardid, 5));
+         PacketCreator.announce(c, new SetCard(true, cardId, 5));
       }
    }
 
@@ -103,13 +82,13 @@ public final class MonsterBook {
       try {
          int collectionExp = (normalCard + specialCard);
 
-         int level = 0, expToNextlevel = 1;
+         int level = 0, expToNextLevel = 1;
          do {
             level++;
-            expToNextlevel += level * 10;
-         } while (collectionExp >= expToNextlevel);
+            expToNextLevel += level * 10;
+         } while (collectionExp >= expToNextLevel);
 
-         bookLevel = level;  // thanks IxianMace for noticing book level differing between book UI and character info UI
+         bookLevel = level;
       } finally {
          lock.unlock();
       }
@@ -160,10 +139,10 @@ public final class MonsterBook {
       }
    }
 
-   public void loadCards(final int charid) {
+   public void loadCards(final int characterId) {
       lock.lock();
       try {
-         List<MonsterBookData> monsterBookData = DatabaseConnection.getInstance().withConnectionResult(connection -> MonsterBookProvider.getInstance().getDataForCharacter(connection, charid)).orElse(Collections.emptyList());
+         List<MonsterBookData> monsterBookData = DatabaseConnection.getInstance().withConnectionResult(connection -> MonsterBookProvider.getInstance().getDataForCharacter(connection, characterId)).orElse(Collections.emptyList());
          for (MonsterBookData bookData : monsterBookData) {
             if (bookData.cardId() / 1000 >= 2388) {
                specialCard++;
@@ -179,18 +158,18 @@ public final class MonsterBook {
       calculateLevel();
    }
 
-   public void saveCards(final int charid) {
+   public void saveCards(final int characterId) {
       Set<Entry<Integer, Integer>> cardSet = getCardSet();
 
       if (cardSet.isEmpty()) {
          return;
       }
       DatabaseConnection.getInstance().withConnection(connection -> {
-         MonsterBookAdministrator.getInstance().deleteForCharacter(connection, charid);
+         MonsterBookAdministrator.getInstance().deleteForCharacter(connection, characterId);
 
          try {
             semaphore.acquireUninterruptibly();
-            MonsterBookAdministrator.getInstance().save(connection, charid, cardSet);
+            MonsterBookAdministrator.getInstance().save(connection, characterId, cardSet);
          } finally {
             semaphore.release();
          }

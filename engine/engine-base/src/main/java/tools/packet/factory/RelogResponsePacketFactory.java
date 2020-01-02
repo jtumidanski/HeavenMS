@@ -19,8 +19,6 @@ public class RelogResponsePacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets the response to a relog request.
-    *
-    * @return The relog response packet.
     */
    protected void getRelogResponse(MaplePacketLittleEndianWriter writer, RelogResponse packet) {
       writer.write(1);//1 O.O Must be more types ):

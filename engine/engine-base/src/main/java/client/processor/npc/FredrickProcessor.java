@@ -1,26 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    Copyleft (L) 2016 - 2018 RonanLana (HeavenMS)
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client.processor.npc;
 
 import java.sql.Timestamp;
@@ -60,21 +37,14 @@ import tools.Pair;
 import tools.ServerNoticeType;
 import tools.packet.fredrick.FredrickMessage;
 
-/**
- * @author RonanLana - synchronization of Fredrick modules & operation results
- */
 public class FredrickProcessor {
 
    private static int[] dailyReminders = new int[]{2, 5, 10, 15, 30, 60, 90, Integer.MAX_VALUE};
 
    private static byte canRetrieveFromFredrick(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> items) {
       if (!MapleInventory.checkSpotsAndOwnership(chr, items)) {
-         List<Integer> itemids = new LinkedList<>();
-         for (Pair<Item, MapleInventoryType> it : items) {
-            itemids.add(it.getLeft().id());
-         }
-
-         if (chr.canHoldUniques(itemids)) {
+         List<Integer> itemIds = items.stream().map(pair -> pair.getLeft().id()).collect(Collectors.toList());
+         if (chr.canHoldUniques(itemIds)) {
             return 0x22;
          } else {
             return 0x20;
@@ -99,13 +69,13 @@ public class FredrickProcessor {
       return (int) ((timeNow - then.getTime()) / (1000 * 60 * 60 * 24));
    }
 
-   private static String fredrickReminderMessage(int daynotes) {
+   private static String fredrickReminderMessage(int dayNotes) {
       String msg;
 
-      if (daynotes < 4) {
-         msg = "Hi customer! I am Fredrick, the Union Chief of the Hired Merchant Union. A reminder that " + dailyReminders[daynotes] + " days have passed since you used our service. Please reclaim your stored goods at FM Entrance.";
+      if (dayNotes < 4) {
+         msg = "Hi customer! I am Fredrick, the Union Chief of the Hired Merchant Union. A reminder that " + dailyReminders[dayNotes] + " days have passed since you used our service. Please reclaim your stored goods at FM Entrance.";
       } else {
-         msg = "Hi customer! I am Fredrick, the Union Chief of the Hired Merchant Union. " + dailyReminders[daynotes] + " days have passed since you used our service. Consider claiming back the items before we move them away for refund.";
+         msg = "Hi customer! I am Fredrick, the Union Chief of the Hired Merchant Union. " + dailyReminders[dayNotes] + " days have passed since you used our service. Consider claiming back the items before we move them away for refund.";
       }
 
       return msg;
@@ -130,9 +100,9 @@ public class FredrickProcessor {
       removeFredrickReminders(Collections.singletonList(new CharacterWorldData(cid, 0)));
    }
 
-   private static void removeFredrickReminders(List<CharacterWorldData> expiredCids) {
+   private static void removeFredrickReminders(List<CharacterWorldData> expiredCharacterIds) {
       DatabaseConnection.getInstance().withConnection(connection ->
-            expiredCids.stream()
+            expiredCharacterIds.stream()
                   .map(pair -> CharacterProcessor.getInstance().getNameById(pair.characterId()))
                   .filter(Objects::nonNull)
                   .forEach(name -> NoteAdministrator.getInstance().deleteWhereNamesLike(connection, "FREDRICK", name)));
@@ -200,7 +170,7 @@ public class FredrickProcessor {
       return true;
    }
 
-   public static void fredrickRetrieveItems(MapleClient c) {     // thanks Gustav for pointing out the dupe on Fredrick handling
+   public static void fredrickRetrieveItems(MapleClient c) {
       if (c.tryAcquireClient()) {
          try {
             MapleCharacter chr = c.getPlayer();

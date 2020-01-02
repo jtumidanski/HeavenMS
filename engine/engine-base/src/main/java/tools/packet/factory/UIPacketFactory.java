@@ -38,7 +38,7 @@ public class UIPacketFactory extends AbstractPacketFactory {
       Handler.handle(DisableUI.class).decorate(this::disableUI).register(registry);
       Handler.handle(GetKeyMap.class).decorate(this::getKeymap).register(registry);
       Handler.handle(GetMacros.class).decorate(this::getMacros).register(registry);
-      Handler.handle(DisableMiniMap.class).decorate(this::disableMinimap).register(registry);
+      Handler.handle(DisableMiniMap.class).decorate(this::disableMiniMap).register(registry);
       Handler.handle(FinishedSort.class).decorate(this::finishedSort).size(4).register(registry);
       Handler.handle(FinishedSort2.class).decorate(this::finishedSort2).size(4).register(registry);
       Handler.handle(GetClock.class).decorate(this::getClock).register(registry);
@@ -48,17 +48,17 @@ public class UIPacketFactory extends AbstractPacketFactory {
       Handler.handle(ShowBlockedUI.class).decorate(this::blockedMessage2).register(registry);
       Handler.handle(ShowNotes.class).decorate(this::showNotes).register(registry);
       Handler.handle(ShowOXQuiz.class).decorate(this::showOXQuiz).size(6).register(registry);
-      Handler.handle(RefreshTeleportRockMapList.class).decorate(this::trockRefreshMapList).register(registry);
+      Handler.handle(RefreshTeleportRockMapList.class).decorate(this::refreshTeleportRockMapList).register(registry);
    }
 
    /**
     * Sends a UI utility. 0x01 - Equipment Inventory. 0x02 - Stat Window. 0x03
     * - Skill Window. 0x05 - Keyboard Settings. 0x06 - Quest window. 0x09 -
-    * Monsterbook Window. 0x0A - Char Info 0x0B - Guild BBS 0x12 - Monster
+    * Monster book Window. 0x0A - Char Info 0x0B - Guild BBS 0x12 - Monster
     * Carnival Window 0x16 - Party Search. 0x17 - Item Creation Window. 0x1A -
     * My Ranking O.O 0x1B - Family Window 0x1C - Family Pedigree 0x1D - GM
-    * Story Board /funny shet 0x1E - Envelop saying you got mail from an admin.
-    * lmfao 0x1F - Medal Window 0x20 - Maple Event (???) 0x21 - Invalid Pointer
+    * Story Board /funny shit 0x1E - Envelop saying you got mail from an admin.
+    * 0x1F - Medal Window 0x20 - Maple Event (???) 0x21 - Invalid Pointer
     * Crash
     */
    protected void openUI(MaplePacketLittleEndianWriter writer, OpenUI packet) {
@@ -107,7 +107,7 @@ public class UIPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected void disableMinimap(MaplePacketLittleEndianWriter writer, DisableMiniMap packet) {
+   protected void disableMiniMap(MaplePacketLittleEndianWriter writer, DisableMiniMap packet) {
       writer.writeShort(0x1C);
    }
 
@@ -146,7 +146,7 @@ public class UIPacketFactory extends AbstractPacketFactory {
     * successfully removed the name from the ranks.<br> 0x06 with Mode 1: You
     * have entered an invalid character name.<br> 0x10: GM Hide, mode
     * determines whether or not it is on.<br> 0x1E: Mode 0: Failed to send
-    * warning Mode 1: Sent warning<br> 0x13 with Mode 0: + mapid 0x13 with Mode
+    * warning Mode 1: Sent warning<br> 0x13 with Mode 0: + map id 0x13 with Mode
     * 1: + ch (FF = Unable to find merchant)
     */
    protected void getGMEffect(MaplePacketLittleEndianWriter writer, GMEffect packet) {
@@ -173,10 +173,10 @@ public class UIPacketFactory extends AbstractPacketFactory {
       writer.write(packet.notes().size());
       packet.notes().forEach(note -> {
          writer.writeInt(note.id());
-         writer.writeMapleAsciiString(note.from() + " "); //Stupid nexon forgot space lol
+         writer.writeMapleAsciiString(note.from() + " ");
          writer.writeMapleAsciiString(note.message());
          writer.writeLong(getTime(note.timestamp()));
-         writer.write(note.fame()); //FAME :D
+         writer.write(note.fame());
       });
    }
 
@@ -186,7 +186,7 @@ public class UIPacketFactory extends AbstractPacketFactory {
       writer.writeShort(packet.questionId());
    }
 
-   protected void trockRefreshMapList(MaplePacketLittleEndianWriter writer, RefreshTeleportRockMapList packet) {
+   protected void refreshTeleportRockMapList(MaplePacketLittleEndianWriter writer, RefreshTeleportRockMapList packet) {
       writer.write(packet.delete() ? 2 : 3);
       if (packet.vip()) {
          writer.write(1);

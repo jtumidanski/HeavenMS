@@ -116,8 +116,8 @@ class EventGuildQuest {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
-      EventInstanceManager eim = em.newInstance("Guild" + lobbyid)
+   def setup(int level, int lobbyId) {
+      EventInstanceManager eim = em.newInstance("Guild" + lobbyId)
       eim.setProperty("level", level)
 
       eim.setProperty("guild", 0)
@@ -175,7 +175,7 @@ class EventGuildQuest {
       return ((eventJobs & rangeJobs) == rangeJobs)
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
       MapleCharacter leader = em.getChannelServer().getPlayerStorage().getCharacterById(eim.getLeaderId()).get()
       if (leader != null) {
@@ -211,9 +211,9 @@ class EventGuildQuest {
    def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isEventTeamLackingNow(true, minPlayers, player) && eim.getIntProperty("canJoin") == 0) {
             eim.unregisterPlayer(player)
             end(eim)
@@ -223,10 +223,10 @@ class EventGuildQuest {
       }
    }
 
-   static def afterChangedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid == 990000100) {
-         String texttt = "So, here is the brief. You guys should be warned that, once out on the fortress outskirts, anyone that would not be equipping the #b#t1032033##k will die instantly due to the deteriorated state of the air around there. That being said, once your team moves out, make sure to #bhit the glowing rocks#k in that region and #bequip the dropped item#k before advancing stages. That will protect you thoroughly from the air sickness. Good luck!"
-         player.getAbstractPlayerInteraction().npcTalk(9040000, texttt)
+   static def afterChangedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId == 990000100) {
+         String text = "So, here is the brief. You guys should be warned that, once out on the fortress outskirts, anyone that would not be equipping the #b#t1032033##k will die instantly due to the deteriorated state of the air around there. That being said, once your team moves out, make sure to #bhit the glowing rocks#k in that region and #bequip the dropped item#k before advancing stages. That will protect you thoroughly from the air sickness. Good luck!"
+         player.getAbstractPlayerInteraction().npcTalk(9040000, text)
       }
    }
 
@@ -276,7 +276,7 @@ class EventGuildQuest {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -362,12 +362,12 @@ class EventGuildQuest {
    def disbandParty(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -421,8 +421,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -449,8 +449,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -469,8 +469,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -521,8 +521,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

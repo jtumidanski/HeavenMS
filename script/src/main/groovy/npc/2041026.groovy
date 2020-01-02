@@ -36,8 +36,6 @@ class NPC2041026 {
 
          if (status == 0) {
             if (cm.haveItem(4220046, 1)) {
-               // quest completing here when "forfeiting Timer's Egg", as well as reporting missing quests on M. Shrine are thanks to drmdsr & Thora
-
                cm.gainItem(4220046, (short) -1)
                cm.sendOk("You want to hand the #r#t4220046##k to me, right? Alright, I'll take it for you.")
             } else {

@@ -42,19 +42,19 @@ class EventAreaBossTimer2 {
 
    def start() {
       MapleMap lostTime1 = em.getChannelServer().getMapFactory().getMap(220050000)
-      MapleMonster timer2 = MapleLifeFactory.getMonster(5220003)
-
       if (lostTime1.getMonsterById(5220003) != null) {
          em.schedule("start", 3 * 60 * 60 * 1000)
          return
       }
 
-      int posX
-      int posY = 1030
-      posX = Math.floor((Math.random() * 1400) - 1000).intValue()
-      lostTime1.spawnMonsterOnGroundBelow(timer2, new Point(posX, posY))
-      MessageBroadcaster.getInstance().sendMapServerNotice(lostTime1, ServerNoticeType.LIGHT_BLUE, "Tick-Tock Tick-Tock! Timer makes it's presence known.")
-      em.schedule("start", 3 * 60 * 60 * 1000)
+      MapleLifeFactory.getMonster(5220003).ifPresent({ timer2 ->
+         int posX
+         int posY = 1030
+         posX = Math.floor((Math.random() * 1400) - 1000).intValue()
+         lostTime1.spawnMonsterOnGroundBelow(timer2, new Point(posX, posY))
+         MessageBroadcaster.getInstance().sendMapServerNotice(lostTime1, ServerNoticeType.LIGHT_BLUE, "Tick-Tock Tick-Tock! Timer makes it's presence known.")
+         em.schedule("start", 3 * 60 * 60 * 1000)
+      })
    }
 
    def setLobbyRange() {
@@ -78,10 +78,10 @@ class EventAreaBossTimer2 {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
+   def setup(int level, int lobbyId) {
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
    }
 
@@ -105,8 +105,8 @@ class EventAreaBossTimer2 {
    def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
    }
 
    // Do something if the party leader has been changed.
@@ -135,7 +135,7 @@ class EventAreaBossTimer2 {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 0
    }
 
@@ -187,12 +187,12 @@ class EventAreaBossTimer2 {
    def disbandParty(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -243,8 +243,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -271,8 +271,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -291,8 +291,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -343,8 +343,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

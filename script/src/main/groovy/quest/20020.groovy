@@ -25,7 +25,7 @@ class Quest20020 {
          }
 
          if (status == 0) {
-            qm.sendNext("I can tell you've worked really hard by seeing that you're already at Level 10. I think it's time now for you to break out as a Noblesse and officially become the Knight-in-Training. Before doing that, however, I want to ask you one thing. Have you decided which Knight you'd want to beome?")
+            qm.sendNext("I can tell you've worked really hard by seeing that you're already at Level 10. I think it's time now for you to break out as a Noblesse and officially become the Knight-in-Training. Before doing that, however, I want to ask you one thing. Have you decided which Knight you'd want to become?")
          } else if (status == 1) {
             qm.sendNextPrev("There isn't a single path to becoming a Knight. In fact, there are five of them laid out for you. It's up to you to choose which path you'd like to take, but it should definitely be something you will not regret. That's why... I am offering to show you what you'll look like once you become a Knight.")
          } else if (status == 2) {

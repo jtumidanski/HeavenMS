@@ -51,7 +51,7 @@ class NPC2040040 {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
-                  cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k. This is the 2nd stage, but everyone has to cooperate. There are 6 portals here. One is guarded by undefeatable monsters, and one is very high. I'd like you and your party to go in each one and break the boxes inside. Bring back the drops -- there should be 24.")
+                  cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k. This is the 2nd stage, but everyone has to cooperate. There are 6 portals here. One is guarded by monsters which can not be defeated, and one is very high. I'd like you and your party to go in each one and break the boxes inside. Bring back the drops -- there should be 24.")
                   eim.setProperty("statusStg" + stage, 0)
                } else {       // check stage completion
                   if (cm.haveItem(4001022, 24)) {

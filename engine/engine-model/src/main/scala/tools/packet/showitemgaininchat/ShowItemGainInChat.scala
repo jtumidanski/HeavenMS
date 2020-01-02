@@ -8,5 +8,5 @@ class ShowItemGainInChat(private var _itemId: Int, private var _quantity: Short)
 
   def quantity: Short = _quantity
 
-  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_INCHAT
+  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_IN_CHAT
 }

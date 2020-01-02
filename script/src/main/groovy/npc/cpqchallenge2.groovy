@@ -11,7 +11,7 @@ import scripting.npc.NPCConversationManager
 */
 
 
-class NPCcpqchallenge2 {
+class NpcCpqChallenge2 {
    NPCConversationManager cm
    int status = 0
    int sel = -1
@@ -77,12 +77,12 @@ class NPCcpqchallenge2 {
    }
 }
 
-NPCcpqchallenge2 getNPC() {
+NpcCpqChallenge2 getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCcpqchallenge2(cm: cm))
+      getBinding().setVariable("npc", new NpcCpqChallenge2(cm: cm))
    }
-   return (NPCcpqchallenge2) getBinding().getVariable("npc")
+   return (NpcCpqChallenge2) getBinding().getVariable("npc")
 }
 
 def start() {

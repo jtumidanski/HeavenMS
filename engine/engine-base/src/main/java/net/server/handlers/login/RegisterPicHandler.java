@@ -10,7 +10,7 @@ import net.server.AbstractPacketHandler;
 import net.server.Server;
 import net.server.channel.packet.reader.RegisterPicReader;
 import net.server.coordinator.session.MapleSessionCoordinator;
-import net.server.coordinator.session.MapleSessionCoordinator.AntiMulticlientResult;
+import net.server.coordinator.session.MapleSessionCoordinator.AntiMultiClientResult;
 import net.server.login.packet.RegisterPicPacket;
 import net.server.world.World;
 import tools.PacketCreator;
@@ -34,9 +34,9 @@ public final class RegisterPicHandler extends AbstractPacketHandler<RegisterPicP
       client.updateHWID(packet.hwid());
 
       IoSession session = client.getSession();
-      AntiMulticlientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
-      if (res != AntiMulticlientResult.SUCCESS) {
-         PacketCreator.announce(client, new AfterLoginError(parseAntiMulticlientError(res)));
+      AntiMultiClientResult res = MapleSessionCoordinator.getInstance().attemptGameSession(session, client.getAccID(), packet.hwid());
+      if (res != AntiMultiClientResult.SUCCESS) {
+         PacketCreator.announce(client, new AfterLoginError(parseAntiMultiClientError(res)));
          return;
       }
 
@@ -55,8 +55,8 @@ public final class RegisterPicHandler extends AbstractPacketHandler<RegisterPicP
          client.setPic(packet.pic());
 
          client.setWorld(server.getCharacterWorld(packet.characterId()));
-         World wserv = client.getWorldServer();
-         if (wserv == null || wserv.isWorldCapacityFull()) {
+         World world = client.getWorldServer();
+         if (world == null || world.isWorldCapacityFull()) {
             PacketCreator.announce(client, new AfterLoginError(10));
             return;
          }
@@ -80,7 +80,7 @@ public final class RegisterPicHandler extends AbstractPacketHandler<RegisterPicP
       }
    }
 
-   private int parseAntiMulticlientError(AntiMulticlientResult res) {
+   private int parseAntiMultiClientError(AntiMultiClientResult res) {
       switch (res) {
          case REMOTE_PROCESSING:
             return 10;

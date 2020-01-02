@@ -12,7 +12,7 @@ import tools.ServerNoticeType
 */
 
 
-class NPCPupeteerPassword {
+class NpcPuppeteerPassword {
    NPCConversationManager cm
    int status = -1
    int sel = -1
@@ -63,12 +63,12 @@ class NPCPupeteerPassword {
    }
 }
 
-NPCPupeteerPassword getNPC() {
+NpcPuppeteerPassword getNPC() {
    if (!getBinding().hasVariable("npc")) {
       NPCConversationManager cm = (NPCConversationManager) getBinding().getVariable("cm")
-      getBinding().setVariable("npc", new NPCPupeteerPassword(cm: cm))
+      getBinding().setVariable("npc", new NpcPuppeteerPassword(cm: cm))
    }
-   return (NPCPupeteerPassword) getBinding().getVariable("npc")
+   return (NpcPuppeteerPassword) getBinding().getVariable("npc")
 }
 
 def start() {

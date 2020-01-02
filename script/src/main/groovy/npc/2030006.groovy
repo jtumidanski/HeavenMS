@@ -32,7 +32,7 @@ class NPC2030006 {
          //Questions Related to MONSTERS
          ["Green Mushroom, Tree Stump, Bubbling, Axe Stump, Octopus, which is highest level of all?", ["Tree Stump", "Bubbling", "Axe Stump", "Octopus", "Green Mushroom"], 2],
          ["Which monster will be seen during the ship trip to Orbis/Ellinia?", ["Werewolf", "Slime", "Crimson Balrog", "Zakum", "Star Pixie"], 2],
-         ["Maple Island doesn't have which following monsters?", ["Shroom", "Blue Snail", "Slime", "Red Snail", "Pig"], 4],    // to get conformant with website answers, thanks to Vcoc
+         ["Maple Island doesn't have which following monsters?", ["Shroom", "Blue Snail", "Slime", "Red Snail", "Pig"], 4],
          ["Which monster is not at Victoria Island and Sleepywood?", ["Evil Eye", "Sentinel", "Jr. Balrog", "Ghost Stump", "Snail"], 1],
          ["El Nath doesn't have which following monsters?", ["Dark Yeti", "Dark Ligator", "Yeti & Pepe", "Bain", "Coolie Zombie"], 1],
          ["Which of following monsters can fly?", ["Malady", "Ligator", "Cold Eye", "Meerkat", "Alishar"], 0],

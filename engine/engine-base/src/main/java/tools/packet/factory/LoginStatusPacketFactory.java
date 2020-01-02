@@ -28,8 +28,6 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a login failed packet.
-    *
-    * @return The login failed packet.
     */
    protected void getLoginFailed(MaplePacketLittleEndianWriter writer, LoginFailed packet) {
       writer.write(packet.reason().getValue());
@@ -50,24 +48,22 @@ public class LoginStatusPacketFactory extends AbstractPacketFactory {
       writer.write(0);
       writer.writeInt(0);
       writer.write(packet.reason());
-      writer.writeLong(getTime(packet.timestampUntil())); // Tempban date is handled as a 64-bit long, number of 100NS intervals since 1/1/1601. Lulz.
+      writer.writeLong(getTime(packet.timestampUntil())); // Temp ban date is handled as a 64-bit long, number of 100NS intervals since 1/1/1601.
    }
 
    /**
     * Gets a successful authentication packet.
-    *
-    * @return the successful authentication packet
     */
    protected void getAuthSuccess(MaplePacketLittleEndianWriter writer, AuthSuccess packet) {
       MapleClient client = packet.getClient();
       Server.getInstance().loadAccountCharacters(client);    // locks the login session until data is recovered from the cache or the DB.
-      Server.getInstance().loadAccountStorages(client);
+      Server.getInstance().loadAccountStorage(client);
       writer.writeInt(0);
       writer.writeShort(0);
       writer.writeInt(client.getAccID());
       writer.write(client.getGender());
       boolean canFly = Server.getInstance().canFly(client.getAccID());
-      writer.writeBool((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1);    // thanks Steve(kaito1410) for pointing the GM account boolean here
+      writer.writeBool((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1);    // GM account boolean
       writer.write(((YamlConfig.config.server.USE_ENFORCE_ADMIN_ACCOUNT || canFly) && client.getGMLevel() > 1) ? 0x80 : 0);  // Admin Byte. 0x80,0x40,0x20.. Rubbish.
       writer.write(0); // Country Code.
       writer.writeMapleAsciiString(client.getAccountName());

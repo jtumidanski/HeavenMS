@@ -12,7 +12,7 @@ public class MapleCharacterScheduler {
       BEHODLER_HEAL,
       BEHOLDER_BUFF,
       BERSERK,
-      SKILL_COOLDOWN,
+      SKILL_COOL_DOWN,
       BUFF_EXPIRE,
       ITEM_EXPIRE,
       DISEASE_EXPIRE,
@@ -98,7 +98,7 @@ public class MapleCharacterScheduler {
             return beholderBuffSchedule;
          case BERSERK:
             return berserkSchedule;
-         case SKILL_COOLDOWN:
+         case SKILL_COOL_DOWN:
             return skillCoolDownTask;
          case BUFF_EXPIRE:
             return buffExpireTask;
@@ -134,7 +134,7 @@ public class MapleCharacterScheduler {
             beholderBuffSchedule = future;
          case BERSERK:
             berserkSchedule = future;
-         case SKILL_COOLDOWN:
+         case SKILL_COOL_DOWN:
             skillCoolDownTask = future;
          case BUFF_EXPIRE:
             buffExpireTask = future;

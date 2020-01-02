@@ -1,6 +1,6 @@
 package npc
 
-
+import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
 
 /*
@@ -18,22 +18,6 @@ class NPC9270026 {
    int beauty = 0
    int current
    int[] colors = []
-
-   def pushIfItemExists(int[] array, int itemid) {
-      if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-         array << itemid
-      }
-   }
-
-   def pushIfItemsExists(int[] array, int[] itemidList) {
-      for (int i = 0; i < itemidList.length; i++) {
-         int itemid = itemidList[i]
-
-         if ((itemid = cm.getCosmeticItem(itemid)) != -1 && !cm.isCosmeticEquipped(itemid)) {
-            array << itemid
-         }
-      }
-   }
 
    def start() {
       cm.sendSimple("Hi, there! I'm Sixx, in charge of Da Yan Jing Lens Shop here at CBD! With #b#t5152039##k or #b#t5152040##k, you can let us take care of the rest and have the kind of beautiful look you've always craved! Remember, the first thing everyone notices about you are the eyes, and we can help you find the cosmetic lens that most fits you! Now, what would you like to use?\r\n#L1#Cosmetic Lenses: #i5152039##t5152039##l\r\n#L2#Cosmetic Lenses: #i5152040##t5152040##l\r\n#L3#One-time Cosmetic Lenses: #i5152107# (any color)#l")
@@ -53,7 +37,7 @@ class NPC9270026 {
                beauty = 2
                current = cm.getPlayer().getFace() % 100 + 20000 + cm.getPlayer().getGender() * 1000
                int[] temp = [current + 200, current + 300, current + 400, current + 700]
-               pushIfItemsExists(colors, temp)
+               colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                cm.sendStyle("With our specialized machine, you can see yourself after the treatment in advance. What kind of lens would you like to wear? Choose the style of your liking.", colors)
             } else if (selection == 3) {
                beauty = 3
@@ -67,7 +51,7 @@ class NPC9270026 {
                colors = []
                for (int i = 0; i < 8; i++) {
                   if (cm.haveItem(5152100 + i)) {
-                     pushIfItemExists(colors, current + 100 * i)
+                     colors = ScriptUtils.pushItemIfTrue(colors, current + 100 * i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
 

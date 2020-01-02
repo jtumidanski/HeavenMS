@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MapbabyPigMap {
+class MapBabyPigMap {
 
    static def start(MapScriptMethods ms) {
       ms.unlockUI()
@@ -11,9 +11,9 @@ class MapbabyPigMap {
    }
 }
 
-MapbabyPigMap getMap() {
-   getBinding().setVariable("map", new MapbabyPigMap())
-   return (MapbabyPigMap) getBinding().getVariable("map")
+MapBabyPigMap getMap() {
+   getBinding().setVariable("map", new MapBabyPigMap())
+   return (MapBabyPigMap) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

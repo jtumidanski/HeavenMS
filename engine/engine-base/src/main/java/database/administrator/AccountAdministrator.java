@@ -67,14 +67,14 @@ public class AccountAdministrator extends AbstractQueryExecutor {
       update(entityManager, accountId, account -> account.setPin(pin));
    }
 
-   public void setPermaBan(EntityManager entityManager, int accountId, String reason) {
+   public void setPermanentBan(EntityManager entityManager, int accountId, String reason) {
       update(entityManager, accountId, account -> {
          account.setBanned(true);
          account.setBanReason(reason);
       });
    }
 
-   public void removePermaBan(EntityManager entityManager, int accountId) {
+   public void removePermanentBan(EntityManager entityManager, int accountId) {
       update(entityManager, accountId, account -> account.setBanned(false));
    }
 

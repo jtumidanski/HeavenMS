@@ -2,13 +2,13 @@ package entity;
 
 public enum LocationType {
    FREE_MARKET,
-   WORLDTOUR,
+   WORLD_TOUR,
    FLORINA,
    INTRO,
    SUNDAY_MARKET,
    MIRROR,
    EVENT,
-   BOSSPQ,
+   BOSS_PQ,
    HAPPYVILLE,
    DEVELOPER,
    MONSTER_CARNIVAL

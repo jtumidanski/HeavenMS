@@ -39,7 +39,7 @@ class NPC1092019 {
             status--
          }
 
-         if (status == 0) {    // missing script for skill test found thanks to Lost(tm)
+         if (status == 0) {
             if (!cm.isQuestStarted(6400)) {
                cm.sendOk("Who are you talking to me? If you're just bored, go bother somebody else.")
                cm.dispose()
@@ -48,8 +48,6 @@ class NPC1092019 {
 
                if (seagullProgress == 0) {
                   seagullIdx = Math.floor(Math.random() * seagullQuestion.length).intValue()
-
-                  // string visibility thanks to ProXAIMeRx & Glvelturall
                   cm.sendNext("Ok then! I'll give you the first question now! You better be ready because this one's a hard one. Even the seagulls here think this one's pretty tough. It's a pretty difficult problem.")
                } else if (seagullProgress == 1) {
                   cm.sendNext("Now~ Let's go onto the next question. This one is really difficult. I am going to have Bart help me on this one. You know Bart, right?")
@@ -69,7 +67,7 @@ class NPC1092019 {
             if (seagullIdx > -1) {
                String answer = cm.getText()
                if (answer == seagullAnswer[seagullIdx]) {
-                  cm.sendNext("What! I can't believe how incredibly smart you are! Incredible! In the seagull world, that kind of intellingence would give you a Ph.D. and then some. You're really amazing... I can't believe it... I simply can't believe it!")
+                  cm.sendNext("What! I can't believe how incredibly smart you are! Incredible! In the seagull world, that kind of intelligence would give you a Ph.D. and then some. You're really amazing... I can't believe it... I simply can't believe it!")
                   cm.setQuestProgress(6400, 1, 1)
                   cm.dispose()
                } else {

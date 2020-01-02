@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class ServerMessage(private var _message: String) extends PacketInput {
   def message: String = _message
 
-  override def opcode(): SendOpcode = SendOpcode.SERVERMESSAGE
+  override def opcode(): SendOpcode = SendOpcode.SERVER_MESSAGE
 }

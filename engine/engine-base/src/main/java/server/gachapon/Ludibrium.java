@@ -1,13 +1,6 @@
 package server.gachapon;
 
-/**
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class Ludibrium extends GachaponItems {
-
    @Override
    public int[] getCommonItems() {
       return new int[]{
@@ -15,7 +8,7 @@ public class Ludibrium extends GachaponItems {
             /* Scroll */
             2048000, 2040601, 2041019, 2041007, 2041016, 2041022, 2041001, 2041010, 2041013, 2041004, 2044701, 2043301, 2040301, 2048004, 2048001, 2040901, 2040701, 2040704, 2040707, 2040602, 2041020, 2041008, 2041017, 2041023, 2041002, 2041011, 2041014, 2041005, 2044702, 2043302, 2040302, 2040002, 2044402, 2048005, 2048002, 2040702, 2040705, 2040708, 2044302, 2043802, 2040402, 2043702, 2044811,
 
-            /* Useable drop */
+            /* Use-able drop */
             2000004, 2000005, 4006000, 4006001,
 
             /* Common equipment */

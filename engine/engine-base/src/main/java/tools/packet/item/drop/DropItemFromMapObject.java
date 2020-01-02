@@ -28,7 +28,7 @@ public class DropItemFromMapObject implements PacketInput {
 
    @Override
    public SendOpcode opcode() {
-      return SendOpcode.DROP_ITEM_FROM_MAPOBJECT;
+      return SendOpcode.DROP_ITEM_FROM_MAP_OBJECT;
    }
 
    public MapleCharacter getCharacter() {

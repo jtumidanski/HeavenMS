@@ -51,7 +51,7 @@ class NPC9000011 {
          if (status == 0) {
             cm.sendNext("Hey, I'm #p" + cm.getNpc() + "#k, if you're not busy and all ... then can I hang out with you? I heard there are people gathering up around here for an #revent#k but I don't want to go there by myself ... Well, do you want to go check it out with me?")
          } else if (status == 1) {
-            cm.sendSimple("Huh? What kind of an event? Well, that's...\r\n#L0##e1.#n#b What kind of an event is it?#k#l\r\n#L1##e2.#n#b Explain the event game to me.#k#l\r\n#L2##e3.#n#b Alright, let's go!#k#l\r\n#L3##e4.#n#bPlease exchance Certificate of straight Win to reward item.#k#l")
+            cm.sendSimple("Huh? What kind of an event? Well, that's...\r\n#L0##e1.#n#b What kind of an event is it?#k#l\r\n#L1##e2.#n#b Explain the event game to me.#k#l\r\n#L2##e3.#n#b Alright, let's go!#k#l\r\n#L3##e4.#n#bPlease exchange certificate of straight win to reward item.#k#l")
          } else if (status == 2) {
             if (selection == 0) {
                cm.sendNext("All this month, MapleStory Global is celebrating its 3rd anniversary! The GM's will be holding surprise GM Events throughout the event, so stay on your toes and make sure to participate in at least one of the events for great prizes!")
@@ -59,11 +59,11 @@ class NPC9000011 {
             } else if (selection == 1) {
                cm.sendSimple("There are many games for this event. It will help you a lot to know how to play the game before you play it. Choose the one you want to know more of! #b\r\n#L0# Ola Ola#l\r\n#L1# MapleStory Maple Physical Fitness Test#l\r\n#L2# Snow Ball#l\r\n#L3# Coconut Harvest#l\r\n#L4# OX Quiz#l\r\n#L5# Treasure Hunt#l#k")
             } else if (selection == 2) {
-               MapleQuestStatus marr = cm.getQuestRecord(100295)
-               if (marr.getCustomData() == null) {
-                  marr.setCustomData("0")
+               MapleQuestStatus questStatus = cm.getQuestRecord(100295)
+               if (questStatus.getCustomData() == null) {
+                  questStatus.setCustomData("0")
                }
-               int dat = (marr.getCustomData()).toInteger()
+               int dat = (questStatus.getCustomData()).toInteger()
                if (dat + 3600000 >= cm.getCurrentTime()) {
                   cm.sendNext("You've entered the event already in the past hour.")
                } else if (!cm.canHold(4031019)) {
@@ -71,7 +71,7 @@ class NPC9000011 {
                } else if (cm.getClient().getChannelServer().getEvent() > -1 && !cm.haveItem(4031019)) {
                   cm.getPlayer().saveLocation("EVENT")
                   cm.getPlayer().setChalkboard(null)
-                  marr.setCustomData("" + cm.getCurrentTime())
+                  questStatus.setCustomData("" + cm.getCurrentTime())
 
                   int eventMapId = cm.getClient().getChannelServer().getEvent().getMapId()
                   if (eventMapId == 109080000 || eventMapId == 109080010) {
@@ -105,7 +105,7 @@ class NPC9000011 {
                cm.sendNext("#b[Coconut Harvest]#k consists of two teams, Maple Team and Story Team, and the two teams duke it out to see #bwhich team gathers up the most coconuts#k. The time limit is #b5 MINUTES#k. If the game ends in a tie, an additional 2 minutes will be awarded to determine the winner. If, for some reason, the score stays tied, then the game will end in a draw. \r\n\r\nAll long-range attacks and skill-based attacks will not work here, #bonly the close-range attacks will work#k. If you don't have a weapon for the close-range attacks, you can purchase them through an NPC within the event map. No matter the level of character, the weapon, or skills, all damages applied will be the same.\r\n\r\nBeware of the obstacles and traps within the map. If the character dies during the game, the character will be eliminated from the game. The player who strikes last before the coconut drops wins. Only the coconuts that hit the ground counts, which means the ones that do not fall off the tree, or the occasional explosion of the coconuts WILL NOT COUNT. There's also a hidden portal at one of the shells at the bottom of the map, so use that wisely!")
                cm.dispose()
             } else if (selection == 4) {
-               cm.sendNext("#b[OX Quiz]#k is a game of MapleStory smarts through X's and O's. Once you join the game, turn on the minimap by pressing #bM#k to see where the X and O are. A total of #r10 questions#k will be given, and the character that answers them all correctly wins the game. \r\n\r\nOnce the question is given, use the ladder to enter the area where the correct answer may be, be it X or O. If the character does not choose an answer or is hanging on the ladder past the time limit, the character will be eliminated. Please hold your position until [CORRECT] is off the screen before moving on. To prevent cheating of any kind, all types of chatting will be turned off during the OX Quiz.")
+               cm.sendNext("#b[OX Quiz]#k is a game of MapleStory smarts through X's and O's. Once you join the game, turn on the mini map by pressing #bM#k to see where the X and O are. A total of #r10 questions#k will be given, and the character that answers them all correctly wins the game. \r\n\r\nOnce the question is given, use the ladder to enter the area where the correct answer may be, be it X or O. If the character does not choose an answer or is hanging on the ladder past the time limit, the character will be eliminated. Please hold your position until [CORRECT] is off the screen before moving on. To prevent cheating of any kind, all types of chatting will be turned off during the OX Quiz.")
                cm.dispose()
             } else if (selection == 5) {
                cm.sendNext("#b[Treasure Hunt]#k is a game in which your goal is to find the #btreasure scrolls#k that are hidden all over the map #rin 10 minutes#k. There will be a number of mysterious treasure chests hidden away, and once you break them apart, many items will surface from the chest. Your job is to pick out the treasure scroll from those items. \r\nTreasure chests can be destroyed using #bregular attacks#k, and once you have the treasure scroll in possession, you can trade it for the Scroll of Secrets through an NPC that's in charge of trading items. The trading NPC can be found on the Treasure Hunt map, but you can also trade your scroll through #bVikin#k of Lith Harbor.\r\n\r\nThis game has its share of hidden portals and hidden teleporting spots. To use them, press the #bup arrow#k at a certain spot, and you'll be teleported to a different place. Try jumping around, for you may also run into hidden stairs or ropes. There will also be a treasure chest that'll take you to a hidden spot, and a hidden chest that can only be found through the hidden portal, so try looking around.\r\n\r\nDuring the game of Treasure Hunt, all attack skills will be #rdisabled#k, so please break the treasure chest with the regular attack.")
@@ -116,7 +116,7 @@ class NPC9000011 {
                return
             }
             int ite = 4031332 + selection
-            int quan = quantities[selection]
+            int quantity = quantities[selection]
             int[] pri
             switch (selection) {
                case 0:
@@ -154,14 +154,14 @@ class NPC9000011 {
                   return
             }
             int rand = Math.floor(Math.random() * pri.length).intValue()
-            if (!cm.haveItem(ite, quan)) {
-               cm.sendOk("You need #b" + quan + " #t" + ite + "##k to exchange it with item.")
+            if (!cm.haveItem(ite, quantity)) {
+               cm.sendOk("You need #b" + quantity + " #t" + ite + "##k to exchange it with item.")
             } else if (cm.getInventory(1).getNextFreeSlot() <= -1 || cm.getInventory(2).getNextFreeSlot() <= -1 || cm.getInventory(3).getNextFreeSlot() <= -1 || cm.getInventory(4).getNextFreeSlot() <= -1) {
                cm.sendOk("You need space for this item.")
             } else {
                cm.gainItem(pri[rand], (short) 1)
-               cm.gainItem(ite, (short) -quan)
-               cm.gainMeso(100000 * selection) //temporary prize lolol
+               cm.gainItem(ite, (short) -quantity)
+               cm.gainMeso(100000 * selection)
             }
             cm.dispose()
          }

@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.coordinator.world;
 
 import java.util.HashSet;
@@ -28,12 +9,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import client.MapleCharacter;
 import tools.Pair;
 
-/**
- * @author Ronan
- */
 public class MapleInviteCoordinator {
 
-   // note: referenceFrom is a specific value that represents the "common association" created between the sender/recver parties
+   // note: referenceFrom is a specific value that represents the "common association" created between the sender/receiver parties
    public static boolean createInvite(InviteType type, MapleCharacter from, Object referenceFrom, int targetCid, Object... params) {
       return type.addRequest(from, referenceFrom, targetCid, params);
    }
@@ -53,7 +31,7 @@ public class MapleInviteCoordinator {
       if (referenceFrom.equals(reference)) {
          inviteInfo = type.removeRequest(targetCid);
          from = inviteInfo.getLeft();
-         if (from != null && !from.isLoggedinWorld()) {
+         if (from != null && !from.isLoggedInWorld()) {
             from = null;
          }
 

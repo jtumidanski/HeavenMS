@@ -19,8 +19,6 @@ public class ChangeChannelPacketFactory extends AbstractPacketFactory {
 
    /**
     * Gets a packet telling the client the IP of the new channel.
-    *
-    * @return The server IP packet.
     */
    protected void getChannelChange(MaplePacketLittleEndianWriter writer, ChangeChannel packet) {
       writer.write(1);

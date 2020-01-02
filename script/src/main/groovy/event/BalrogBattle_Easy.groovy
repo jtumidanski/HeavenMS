@@ -110,8 +110,8 @@ class EventBalrogBattle_Easy {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
-      EventInstanceManager eim = em.newInstance("Balrog" + lobbyid)
+   def setup(int level, int lobbyId) {
+      EventInstanceManager eim = em.newInstance("Balrog" + lobbyId)
       eim.setProperty("level", level)
       eim.setProperty("boss", "0")
 
@@ -126,7 +126,7 @@ class EventBalrogBattle_Easy {
       return eim
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    def afterSetup(EventInstanceManager eim) {
       spawnBalrog(eim)
    }
@@ -138,13 +138,13 @@ class EventBalrogBattle_Easy {
    def spawnBalrog(EventInstanceManager eim) {
       MapleMap mapObj = eim.getInstanceMap(entryMap)
 
-      mapObj.spawnFakeMonsterOnGroundBelow(MapleLifeFactory.getMonster(8830007), new Point(412, 258))
-      mapObj.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(8830009), new Point(412, 258))
-      mapObj.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(8830013), new Point(412, 258))
+      MapleLifeFactory.getMonster(8830007).ifPresent({ monster -> mapObj.spawnFakeMonsterOnGroundBelow(monster, new Point(412, 258)) })
+      MapleLifeFactory.getMonster(8830009).ifPresent({ monster -> mapObj.spawnMonsterOnGroundBelow(monster, new Point(412, 258)) })
+      MapleLifeFactory.getMonster(8830013).ifPresent({ monster -> mapObj.spawnMonsterOnGroundBelow(monster, new Point(412, 258)) })
    }
 
    def spawnSealedBalrog(EventInstanceManager eim) {
-      eim.getInstanceMap(entryMap).spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(bossMobId), new Point(412, 258))
+      MapleLifeFactory.getMonster(bossMobId).ifPresent({ monster -> eim.getInstanceMap(entryMap).spawnMonsterOnGroundBelow(monster, new Point(412, 258)) })
    }
 
    // Defines which maps inside the event are allowed to respawn. This function should create a new task at the end of it's body calling itself at a given respawn rate.
@@ -174,9 +174,9 @@ class EventBalrogBattle_Easy {
       }
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
             end(eim)
@@ -220,8 +220,8 @@ class EventBalrogBattle_Easy {
             mob.getMap().broadcastBalrogVictory(eim.getLeader().getName())
          } else {
             if (count == 1) {
-               MapleMap mapobj = eim.getInstanceMap(entryMap)
-               mapobj.makeMonsterReal(mapobj.getMonsterById(8830007))
+               MapleMap map = eim.getInstanceMap(entryMap)
+               map.makeMonsterReal(map.getMonsterById(8830007))
             }
             eim.setIntProperty("boss", count + 1)
          }
@@ -234,7 +234,7 @@ class EventBalrogBattle_Easy {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -300,8 +300,8 @@ class EventBalrogBattle_Easy {
    }
 
    static def isUnsealedBalrog(MapleMonster mob) {
-      int balrogid = mob.id() - 8830007
-      return balrogid >= 0 && balrogid <= 2
+      int balrogId = mob.id() - 8830007
+      return balrogId >= 0 && balrogId <= 2
    }
 
    def isBalrogBody(MapleMonster mob) {
@@ -316,12 +316,12 @@ class EventBalrogBattle_Easy {
    def disbandParty(EventInstanceManager eim, MapleCharacter player) {
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -369,8 +369,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -397,8 +397,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -417,8 +417,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -469,8 +469,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

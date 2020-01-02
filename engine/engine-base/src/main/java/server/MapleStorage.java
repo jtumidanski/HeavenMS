@@ -1,27 +1,8 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,15 +36,12 @@ import tools.packet.storage.MesoStorage;
 import tools.packet.storage.StoreInStorage;
 import tools.packet.storage.TakeOutOfStorage;
 
-/**
- * @author Matze
- */
 public class MapleStorage {
    private static Map<Integer, Integer> trunkGetCache = new HashMap<>();
    private static Map<Integer, Integer> trunkPutCache = new HashMap<>();
 
    private int id;
-   private int currentNpcid;
+   private int currentNpcId;
    private int meso;
    private byte slots;
    private Map<MapleInventoryType, List<Item>> typeItems = new HashMap<>();
@@ -155,7 +133,7 @@ public class MapleStorage {
    public boolean store(Item item) {
       lock.lock();
       try {
-         if (isFull()) { // thanks Optimist for noticing unrestricted amount of insertions here
+         if (isFull()) {
             return false;
          }
 
@@ -217,16 +195,13 @@ public class MapleStorage {
 
       lock.lock();
       try {
-         items.sort(new Comparator<>() {
-            @Override
-            public int compare(Item o1, Item o2) {
-               if (o1.inventoryType().getType() < o2.inventoryType().getType()) {
-                  return -1;
-               } else if (o1.inventoryType() == o2.inventoryType()) {
-                  return 0;
-               }
-               return 1;
+         items.sort((o1, o2) -> {
+            if (o1.inventoryType().getType() < o2.inventoryType().getType()) {
+               return -1;
+            } else if (o1.inventoryType() == o2.inventoryType()) {
+               return 0;
             }
+            return 1;
          });
 
          List<Item> storageItems = getItems();
@@ -234,7 +209,7 @@ public class MapleStorage {
             typeItems.put(type, new ArrayList<>(storageItems));
          }
 
-         currentNpcid = npcId;
+         currentNpcId = npcId;
          PacketCreator.announce(c, new GetStorage(npcId, slots, storageItems, meso));
       } finally {
          lock.unlock();
@@ -291,8 +266,8 @@ public class MapleStorage {
       PacketCreator.announce(c, new MesoStorage(slots, meso));
    }
 
-   public int getStoreFee() {  // thanks to GabrielSin
-      int npcId = currentNpcid;
+   public int getStoreFee() {
+      int npcId = currentNpcId;
       Integer fee = trunkPutCache.get(npcId);
       if (fee == null) {
          fee = 100;
@@ -310,7 +285,7 @@ public class MapleStorage {
    }
 
    public int getTakeOutFee() {
-      int npcId = currentNpcid;
+      int npcId = currentNpcId;
       Integer fee = trunkGetCache.get(npcId);
       if (fee == null) {
          fee = 0;

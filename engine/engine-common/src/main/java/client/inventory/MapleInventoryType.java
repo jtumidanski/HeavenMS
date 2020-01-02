@@ -1,29 +1,5 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client.inventory;
 
-/**
- * @author Matze
- */
 public enum MapleInventoryType {
    UNDEFINED(0),
    EQUIP(1),
@@ -31,7 +7,7 @@ public enum MapleInventoryType {
    SETUP(3),
    ETC(4),
    CASH(5),
-   CANHOLD(6),   //Proof-guard for inserting after removal checks
+   CAN_HOLD(6),   //Proof-guard for inserting after removal checks
    EQUIPPED(-1); //Seems nexon screwed something when removing an item T_T
    final byte type;
 

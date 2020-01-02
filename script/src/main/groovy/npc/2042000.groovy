@@ -31,7 +31,6 @@ class NPC2042000 {
    int cpqMinAmt = 2
    int cpqMaxAmt = 6
 
-// Ronan's custom ore refiner NPC
    boolean refineRocks = true     // enables moon rock, star rock
    boolean refineCrystals = true  // enables common crystals
    boolean refineSpecials = true  // enables lithium, special crystals
@@ -274,7 +273,7 @@ class NPC2042000 {
                   cm.warp(980030000, 0)
                   cm.dispose()
                } else if (selection == 4) {
-                  String selStr = "Very well, instead I offer a steadfast #bore refining#k service for you, taxing #r" + ((feeMultiplier * 100) | 0) + "%#k over the usual fee to synthetize them. What will you do?#b"
+                  String selStr = "Very well, instead I offer a steadfast #bore refining#k service for you, taxing #r" + ((feeMultiplier * 100) | 0) + "%#k over the usual fee to synthesize them. What will you do?#b"
 
                   String[] options = ["Refine mineral ores", "Refine jewel ores"]
                   if (refineCrystals) {
@@ -465,7 +464,7 @@ class NPC2042000 {
                if (allDone) {
                   cm.sendOk("Done. Thanks for showing up~.")
                } else {
-                  cm.sendOk("Done. Be aware some of the items #rcould not be synthetized#k because either you have a lack of space on your ETC inventory or there's not enough mesos to cover the fee.")
+                  cm.sendOk("Done. Be aware some of the items #rcould not be synthesized#k because either you have a lack of space on your ETC inventory or there's not enough mesos to cover the fee.")
                }
                cm.dispose()
             }
@@ -478,22 +477,22 @@ class NPC2042000 {
       return ((feeMultiplier * fee) | 0)
    }
 
-   def isRefineTarget(refineType, refineItemid) {
+   def isRefineTarget(refineType, refineItemId) {
       if (refineType == 0) { //mineral refine
-         return refineItemid >= 4010000 && refineItemid <= 4010007 && !(refineItemid == 4010007 && !refineSpecials)
+         return refineItemId >= 4010000 && refineItemId <= 4010007 && !(refineItemId == 4010007 && !refineSpecials)
       } else if (refineType == 1) { //jewel refine
-         return refineItemid >= 4020000 && refineItemid <= 4020008 && !(refineItemid == 4020008 && !refineSpecials)
+         return refineItemId >= 4020000 && refineItemId <= 4020008 && !(refineItemId == 4020008 && !refineSpecials)
       } else if (refineType == 2) { //crystal refine
-         return refineItemid >= 4004000 && refineItemid <= 4004004 && !(refineItemid == 4004004 && !refineSpecials)
+         return refineItemId >= 4004000 && refineItemId <= 4004004 && !(refineItemId == 4004004 && !refineSpecials)
       }
 
       return false
    }
 
-   static def getRockRefineTarget(refineItemid) {
-      if (refineItemid >= 4011000 && refineItemid <= 4011006) {
+   static def getRockRefineTarget(refineItemId) {
+      if (refineItemId >= 4011000 && refineItemId <= 4011006) {
          return 0
-      } else if (refineItemid >= 4021000 && refineItemid <= 4021008) {
+      } else if (refineItemId >= 4021000 && refineItemId <= 4021008) {
          return 1
       }
 
@@ -509,36 +508,36 @@ class NPC2042000 {
       Iterator<Item> iter = cm.getPlayer().getInventory(MapleInventoryType.ETC).iterator()
       while (iter.hasNext()) {
          Item it = iter.next()
-         String itemid = it.id().toString()
+         String itemId = it.id().toString()
 
-         if (isRefineTarget(refineType, itemid)) {
-            Object ic = itemCount[itemid]
+         if (isRefineTarget(refineType, itemId)) {
+            Object ic = itemCount[itemId]
 
             if (ic != null) {
-               itemCount[itemid] += it.quantity()
+               itemCount[itemId] += it.quantity()
             } else {
-               itemCount[itemid] = it.quantity()
+               itemCount[itemId] = it.quantity()
             }
          }
       }
 
       for (String key in itemCount) {
-         int itemqty = itemCount[key]
-         int itemid = (key).toInteger()
+         int itemQuantity = itemCount[key]
+         int itemId = (key).toInteger()
 
-         int refineQty = ((itemqty / 10) | 0)
+         int refineQty = ((itemQuantity / 10) | 0)
          if (refineQty <= 0) {
             continue
          }
 
          while (true) {
-            itemqty = refineQty * 10
-            int refineIndex = (itemid % 100) | 0
+            itemQuantity = refineQty * 10
+            int refineIndex = (itemId % 100) | 0
             int fee = getRefineFee((refineFees[refineType][refineIndex] * refineQty) as Integer)
-            if (cm.canHold(itemid + 1000, refineQty, itemid, itemqty) && cm.getMeso() >= fee) {
+            if (cm.canHold(itemId + 1000, refineQty, itemId, itemQuantity) && cm.getMeso() >= fee) {
                cm.gainMeso(-fee)
-               cm.gainItem(itemid, (short) -itemqty)
-               cm.gainItem(itemid + (itemid != 4010007 ? 1000 : 1001), (short) refineQty)
+               cm.gainItem(itemId, (short) -itemQuantity)
+               cm.gainItem(itemId + (itemId != 4010007 ? 1000 : 1001), (short) refineQty)
 
                break
             } else if (refineQty <= 1) {
@@ -564,13 +563,13 @@ class NPC2042000 {
       Iterator<Item> iter = cm.getPlayer().getInventory(MapleInventoryType.ETC).iterator()
       while (iter.hasNext()) {
          Item it = iter.next()
-         int itemid = it.id()
-         int rockRefine = getRockRefineTarget(itemid)
+         int itemId = it.id()
+         int rockRefine = getRockRefineTarget(itemId)
          if (rockRefine >= 0) {
-            int rockItem = ((itemid % 100) | 0)
-            int itemqty = it.quantity()
+            int rockItem = ((itemId % 100) | 0)
+            int itemQuantity = it.quantity()
 
-            minItems[rockRefine][rockItem] += itemqty
+            minItems[rockRefine][rockItem] += itemQuantity
          }
       }
 

@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.Optional;
@@ -59,9 +38,6 @@ import tools.packet.alliance.RemoveGuildFromAlliance;
 import tools.packet.alliance.UpdateAllianceInfo;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author XoticStory, Ronan
- */
 public final class AllianceOperationHandler extends AbstractPacketHandler<AllianceOperationPacket> {
    @Override
    public Class<? extends PacketReader<AllianceOperationPacket>> getReaderClass(MapleClient client) {
@@ -161,7 +137,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       Server.getInstance().getWorld(c.getWorld()).getPlayerStorage().getCharacterById(newLeaderId)
             .filter(character -> character.getAllianceRank() == 2)
             .ifPresent(character -> {
-               //Server.getInstance().allianceMessage(alliance.getId(), sendChangeLeader(allianceId, chr.getId(), slea.readInt()), -1, -1);
+               //Server.getInstance().allianceMessage(alliance.getId(), sendChangeLeader(allianceId, chr.getId(), accessor.readInt()), -1, -1);
                changeLeaderAllianceRank(alliance, character);
                MapleAllianceProcessor.getInstance().saveToDB(alliance);
             });
@@ -204,7 +180,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
 
             int guildId = chr.getGuildId();
 
-            Server.getInstance().addGuildtoAlliance(alliance.id(), guildId);
+            Server.getInstance().addGuildToAlliance(alliance.id(), guildId);
             MapleGuildProcessor.getInstance().resetAllianceGuildPlayersRank(guildId);
 
             chr.getMGC().setAllianceRank(2);

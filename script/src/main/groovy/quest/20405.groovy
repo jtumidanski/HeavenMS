@@ -25,7 +25,7 @@ class Quest20405 {
          if (status == 0) {
             qm.sendNext("There's a note on the wall: 'The source of the curse still goes missing, but a strange device, that I suppose has been used by #rthem#k was found here.'", (byte) 3)
          } else if (status == 1) {
-            qm.sendNextPrev("'The machine was sent to #rEreve#k for avaliation, I'll now set out to continue my mission. Let the Empress bless me on my journey.'", (byte) 3)
+            qm.sendNextPrev("'The machine was sent to #rEreve#k for evaluation, I'll now set out to continue my mission. Let the Empress bless me on my journey.'", (byte) 3)
          } else if (status == 2) {
             qm.forceCompleteQuest()
             qm.dispose()

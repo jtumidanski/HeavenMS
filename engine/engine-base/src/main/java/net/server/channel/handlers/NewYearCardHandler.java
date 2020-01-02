@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
@@ -39,11 +20,6 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.NewYearCardResolution;
 
-/**
- * @author Ronan
- * <p>
- * Header layout thanks to Eric
- */
 public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearCardPacket> {
    @Override
    public Class<NewYearCardReader> getReaderClass() {
@@ -68,13 +44,13 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
             .orElse(-1);
    }
 
-   private int getValidNewYearCardStatus(int itemid, MapleCharacter player, short slot) {
-      if (!ItemConstants.isNewYearCardUse(itemid)) {
+   private int getValidNewYearCardStatus(int itemId, MapleCharacter player, short slot) {
+      if (!ItemConstants.isNewYearCardUse(itemId)) {
          return 0x14;
       }
 
-      Item it = player.getInventory(ItemConstants.getInventoryType(itemid)).getItem(slot);
-      return (it != null && it.id() == itemid) ? 0 : 0x12;
+      Item it = player.getInventory(ItemConstants.getInventoryType(itemId)).getItem(slot);
+      return (it != null && it.id() == itemId) ? 0 : 0x12;
    }
 
    private void cardAccepted(MapleClient c, MapleCharacter player, int cardId) {
@@ -92,11 +68,11 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
                }
 
                player.addNewYearRecord(newYear);
-               PacketCreator.announce(player, new NewYearCardResolution(player.getId(), newYear, 6, 0));    // successfully rcvd
+               PacketCreator.announce(player, new NewYearCardResolution(player.getId(), newYear, 6, 0));    // successfully received
 
                MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new NewYearCardResolution(player.getId(), newYear, 0xD, 0));
 
-               c.getWorldServer().getPlayerStorage().getCharacterById(newYear.senderId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(sender -> {
+               c.getWorldServer().getPlayerStorage().getCharacterById(newYear.senderId()).filter(MapleCharacter::isLoggedInWorld).ifPresent(sender -> {
                   MasterBroadcaster.getInstance().sendToAllInMap(sender.getMap(), new NewYearCardResolution(sender.getId(), newYear, 0xD, 0));
                   MessageBroadcaster.getInstance().sendServerNotice(sender, ServerNoticeType.LIGHT_BLUE, "[New Year] Your addressee successfully received the New Year card.");
                });
@@ -113,26 +89,26 @@ public final class NewYearCardHandler extends AbstractPacketHandler<BaseNewYearC
       }
    }
 
-   private void cardHasBeenSent(MapleClient c, MapleCharacter player, short slot, int itemid, String receiver, String message) {
+   private void cardHasBeenSent(MapleClient c, MapleCharacter player, short slot, int itemId, String receiver, String message) {
       if (player.haveItem(2160101)) {  // new year's card
-         int status = getValidNewYearCardStatus(itemid, player, slot);
+         int status = getValidNewYearCardStatus(itemId, player, slot);
          if (status == 0) {
             if (player.canHold(4300000, 1)) {
 
-               int receiverid = getReceiverId(receiver, c.getWorld());
-               if (receiverid != -1) {
-                  if (receiverid != c.getPlayer().getId()) {
+               int receiverId = getReceiverId(receiver, c.getWorld());
+               if (receiverId != -1) {
+                  if (receiverId != c.getPlayer().getId()) {
 
-                     NewYearCardRecord newyear = new NewYearCardRecord(player.getId(), player.getName(), receiverid, receiver, message);
-                     NewYearCardProcessor.getInstance().saveNewYearCard(newyear);
-                     player.addNewYearRecord(newyear);
+                     NewYearCardRecord newYearCardRecord = new NewYearCardRecord(player.getId(), player.getName(), receiverId, receiver, message);
+                     NewYearCardProcessor.getInstance().saveNewYearCard(newYearCardRecord);
+                     player.addNewYearRecord(newYearCardRecord);
 
                      player.getAbstractPlayerInteraction().gainItem(2160101, (short) -1);
                      player.getAbstractPlayerInteraction().gainItem(4300000, (short) 1);
 
-                     Server.getInstance().setNewYearCard(newyear);
-                     NewYearCardProcessor.getInstance().startNewYearCardTask(newyear);
-                     PacketCreator.announce(player, new NewYearCardResolution(player.getId(), newyear, 4, 0));    // successfully sent
+                     Server.getInstance().setNewYearCard(newYearCardRecord);
+                     NewYearCardProcessor.getInstance().startNewYearCardTask(newYearCardRecord);
+                     PacketCreator.announce(player, new NewYearCardResolution(player.getId(), newYearCardRecord, 4, 0));    // successfully sent
                   } else {
                      PacketCreator.announce(player, new NewYearCardResolution(player.getId(), player.getNewYearRecord(-1), 5, 0xF));   // cannot send to yourself
                   }

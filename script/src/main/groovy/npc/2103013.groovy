@@ -96,24 +96,24 @@ class NPC2103013 {
             } else if (selected == 1) {
                String pqMode = "EASY"
                //Finish this
-               Optional<MapleParty> pqparty = cm.getPlayer().getParty()
+               Optional<MapleParty> optionalParty = cm.getPlayer().getParty()
                if (party == 1) {
-                  if (pqparty.isEmpty()) {
+                  if (optionalParty.isEmpty()) {
                      cm.sendOk("Create a fucking party faggot.")//BE NICE
                      cm.dispose()
                      return
                   } else {
-                     if (pqparty.get().getMembers().size() < 2) {
+                     if (optionalParty.get().getMembers().size() < 2) {
                         cm.sendOk("Get more members...")
                         cm.dispose()
                         return
                      } else {
                         int i = 0
-                        for (MaplePartyCharacter pqchar : pqparty.get().getMembers()) {
+                        for (MaplePartyCharacter partyCharacter : optionalParty.get().getMembers()) {
                            if (i > 1) {
                               break
                            }
-                           if (pqchar != null && pqchar.getMapId() == 926010000) {
+                           if (partyCharacter != null && partyCharacter.getMapId() == 926010000) {
                               i++
                            }
                         }
@@ -132,7 +132,7 @@ class NPC2103013 {
                   return
                }
                if (selection < 3 && cm.getPlayer().getLevel() > 60) {
-                  cm.sendOk("Only Hell mode is avaible for players that are over Lv. 60.")
+                  cm.sendOk("Only Hell mode is available for players that are over Lv. 60.")
                   cm.dispose()
                   return
                }
@@ -162,12 +162,12 @@ class NPC2103013 {
             }
 
          } else if (status == 1) {
-            int itemid = 4001325
+            int itemId = 4001325
             if (cm.getPlayer().getLevel() >= 60) {
-               itemid = 4001325
+               itemId = 4001325
             }
-            if (cm.canHold(itemid)) {
-               cm.gainItem(itemid)
+            if (cm.canHold(itemId)) {
+               cm.gainItem(itemId)
                cm.warp(926010000)
             } else {
                cm.showInfoText("You must have at least 1 empty slot in your Etc window to receive the reward.")

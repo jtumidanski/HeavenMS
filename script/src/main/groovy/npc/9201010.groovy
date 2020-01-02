@@ -54,11 +54,11 @@ class NPC9201010 {
 
                if (cm.haveItem(4000313) && isMarrying) {
                   if (eim.getIntProperty("weddingStage") == 3) {
-                     cm.sendOk("You guys totally rocked the stage!!! Go go, talk to #b#p9201007##k to start the afterparty.")
+                     cm.sendOk("You guys totally rocked the stage!!! Go go, talk to #b#p9201007##k to start the after party.")
                      cm.dispose()
                   } else if (hasEngagement) {
-                     if (!cm.createMarriageWishlist()) {
-                        cm.sendOk("You have already sent your wishlist...")
+                     if (!cm.createMarriageWishList()) {
+                        cm.sendOk("You have already sent your wish list...")
                      }
                      cm.dispose()
                   } else {
@@ -67,9 +67,9 @@ class NPC9201010 {
                } else {
                   if (eim.getIntProperty("weddingStage") == 3) {
                      if (!isMarrying) {
-                        cm.sendYesNo("You guys didn't miss them right? Our superstars #rworked so good together#k, and soon #bthey will start the afterparty#k. Are you really going to #rdrop out of the show#k and return to #bAmoria#k?")
+                        cm.sendYesNo("You guys didn't miss them right? Our superstars #rworked so good together#k, and soon #bthey will start the after party#k. Are you really going to #rdrop out of the show#k and return to #bAmoria#k?")
                      } else {
-                        cm.sendOk("You guys totally rocked the stage!!! Go go, talk to #b#p9201007##k to start the afterparty.")
+                        cm.sendOk("You guys totally rocked the stage!!! Go go, talk to #b#p9201007##k to start the after party.")
                         cm.dispose()
                      }
                   } else {

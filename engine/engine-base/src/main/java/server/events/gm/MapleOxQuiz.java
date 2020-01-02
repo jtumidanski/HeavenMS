@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.events.gm;
 
 import java.io.File;
@@ -37,9 +16,6 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.ui.ShowOXQuiz;
 
-/**
- * @author FloppyDisk
- */
 public final class MapleOxQuiz {
    private static MapleDataProvider stringData = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Etc.wz"));
    private int round;
@@ -53,8 +29,8 @@ public final class MapleOxQuiz {
       this.question = 1;
    }
 
-   private static int getOXAnswer(int imgdir, int id) {
-      return MapleDataTool.getInt(stringData.getData("OXQuiz.img").getChildByPath("" + imgdir + "").getChildByPath("" + id + "").getChildByPath("a"));
+   private static int getOXAnswer(int imageDirectory, int id) {
+      return MapleDataTool.getInt(stringData.getData("OXQuiz.img").getChildByPath("" + imageDirectory + "").getChildByPath("" + id + "").getChildByPath("a"));
    }
 
    private boolean isCorrectAnswer(MapleCharacter chr, int answer) {
@@ -76,39 +52,36 @@ public final class MapleOxQuiz {
       }
       final int number = gm;
       MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowOXQuiz(round, question, true));
-      TimerManager.getInstance().schedule(new Runnable() {
-         @Override
-         public void run() {
-            MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowOXQuiz(round, question, true));
-            List<MapleCharacter> chars = new ArrayList<>(map.getCharacters());
+      TimerManager.getInstance().schedule(() -> {
+         MasterBroadcaster.getInstance().sendToAllInMap(map, new ShowOXQuiz(round, question, true));
+         List<MapleCharacter> chars = new ArrayList<>(map.getCharacters());
 
-            for (MapleCharacter chr : chars) {
-               if (chr != null) // make sure they aren't null... maybe something can happen in 12 seconds.
-               {
-                  if (!isCorrectAnswer(chr, getOXAnswer(round, question)) && !chr.isGM()) {
-                     chr.changeMap(chr.getMap().getReturnMap());
-                  } else {
-                     chr.gainExp(expGain, true, true);
-                  }
+         for (MapleCharacter chr : chars) {
+            if (chr != null) // make sure they aren't null... maybe something can happen in 12 seconds.
+            {
+               if (!isCorrectAnswer(chr, getOXAnswer(round, question)) && !chr.isGM()) {
+                  chr.changeMap(chr.getMap().getReturnMap());
+               } else {
+                  chr.gainExp(expGain, true, true);
                }
             }
-            //do question
-            if ((round == 1 && question == 29) || ((round == 2 || round == 3) && question == 17) || ((round == 4 || round == 8) && question == 12) || (round == 5 && question == 26) || (round == 9 && question == 44) || ((round == 6 || round == 7) && question == 16)) {
-               question = 100;
-            } else {
-               question++;
-            }
-            //send question
-            if (map.getCharacters().size() - number <= 2) {
-               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The event has ended");
-               map.getPortal("join00").setPortalStatus(true);
-               map.setOx(null);
-               map.setOxQuiz(false);
-               //prizes here
-               return;
-            }
-            sendQuestion();
          }
+         //do question
+         if ((round == 1 && question == 29) || ((round == 2 || round == 3) && question == 17) || ((round == 4 || round == 8) && question == 12) || (round == 5 && question == 26) || (round == 9 && question == 44) || ((round == 6 || round == 7) && question == 16)) {
+            question = 100;
+         } else {
+            question++;
+         }
+         //send question
+         if (map.getCharacters().size() - number <= 2) {
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The event has ended");
+            map.getPortal("join00").setPortalStatus(true);
+            map.setOx(null);
+            map.setOxQuiz(false);
+            //prizes here
+            return;
+         }
+         sendQuestion();
       }, 30000); // Time to answer = 30 seconds ( Ox Quiz packet shows a 30 second timer.
    }
 }

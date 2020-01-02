@@ -95,7 +95,7 @@ public class PlayerNpcProvider extends AbstractQueryExecutor {
       return results.stream().map(result -> new Pair<>((int) result[0], (int) result[1])).collect(Collectors.toList());
    }
 
-   public List<Pair<Integer, Integer>> getWorldMapsWithPlayerNpcs(EntityManager entityManager) {
+   public List<Pair<Integer, Integer>> getWorldMapsWithPlayerNpc(EntityManager entityManager) {
       Query query = entityManager.createQuery("SELECT DISTINCT p.world, p.map FROM PlayerNpc p");
       List<Object[]> results = (List<Object[]>) query.getResultList();
       return results.stream().map(result -> new Pair<>((int) result[0], (int) result[1])).collect(Collectors.toList());

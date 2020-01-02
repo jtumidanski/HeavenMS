@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MapexplorationPoint {
+class MapExplorationPoint {
 
    static def start(MapScriptMethods ms) {
       if (ms.getPlayer().getMapId() == 110000000 || (ms.getPlayer().getMapId() >= 100000000 && ms.getPlayer().getMapId() < 105040300)) {
@@ -29,9 +29,9 @@ class MapexplorationPoint {
    }
 }
 
-MapexplorationPoint getMap() {
-   getBinding().setVariable("map", new MapexplorationPoint())
-   return (MapexplorationPoint) getBinding().getVariable("map")
+MapExplorationPoint getMap() {
+   getBinding().setVariable("map", new MapExplorationPoint())
+   return (MapExplorationPoint) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

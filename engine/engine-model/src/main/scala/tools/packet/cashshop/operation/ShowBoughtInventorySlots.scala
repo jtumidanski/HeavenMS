@@ -8,5 +8,5 @@ class ShowBoughtInventorySlots(private var _inventoryType: Int, private var _slo
 
   def slots: Short = _slots
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

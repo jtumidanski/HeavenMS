@@ -6,20 +6,20 @@ import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 boolean enter(PortalPlayerInteraction pi) {
-   int mapid = pi.getPlayer().getMapId()
+   int mapId = pi.getPlayer().getMapId()
    pi.playPortalSound()
-   int map = ((mapid - 270010000) / 100).intValue()
+   int map = ((mapId - 270010000) / 100).intValue()
    //pi.getPlayer().dropMessage(5, map + " " + pi.isQuestCompleted(3534));
    if (map < 5 && pi.isQuestCompleted(3500 + map)) {
-      pi.warp(mapid + 10, "out00")
+      pi.warp(mapId + 10, "out00")
    } else if (map == 5 && pi.isQuestCompleted(3502 + map)) {
       pi.warp(270020000, "out00")
    } else if (map > 100 && map < 105 && pi.isQuestCompleted(3407 + map)) {
-      pi.warp(mapid + 10, "out00")
+      pi.warp(mapId + 10, "out00")
    } else if (map == 105 && pi.isQuestCompleted(3514)) {
       pi.warp(270030000, "out00")
    } else if (map > 200 && map < 205 && pi.isQuestCompleted(3314 + map)) {
-      pi.warp(mapid + 10, "out00")
+      pi.warp(mapId + 10, "out00")
    } else if (map == 205 && pi.isQuestCompleted(3519)) {
       pi.warp(270040000, "out00")
    } else if (map == 300 && (pi.haveItem(4032002) || pi.isQuestCompleted(3522))) {

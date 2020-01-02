@@ -14,7 +14,7 @@ class Map925040100 {
       MapleMap map = player.getMap()
 
       if (ms.isQuestStarted(21747) && ms.getQuestProgressInt(21747, 9300351) == 0) {
-         map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9300351), new Point(897, 51))
+         MapleLifeFactory.getMonster(9300351).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(897, 51)) })
       }
    }
 }

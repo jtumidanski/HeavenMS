@@ -137,7 +137,7 @@ class NPC9201097 {
 
    static def makeChoices(int[] a) {
       String result = "Ok! First you need to choose the item that you'll trade with. The better the item, the more likely the chance that I'll give you something much nicer in return.\r\n"
-      int[] qnty = [50, 25]
+      int[] quantities = [50, 25]
 
       for (int x = 0; x < a.length; x++) {
          result += " #L"
@@ -146,7 +146,7 @@ class NPC9201097 {
          result += a[x]
          result += "#  #b#t"
          result += a[x] + "# #kx "
-         result += qnty[Math.floor(x / 4).intValue()]
+         result += quantities[Math.floor(x / 4).intValue()]
          result += "#l\r\n"
       }
       return result

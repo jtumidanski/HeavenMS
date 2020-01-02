@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Puro
-	Map(s): 		Whale Between Lith harbor and Rien
-	Description: 	
-*/
-
-
 class NPC1200005 {
    NPCConversationManager cm
    int status = -1

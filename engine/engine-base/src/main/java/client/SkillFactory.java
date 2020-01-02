@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client;
 
 import java.io.File;
@@ -35,7 +14,7 @@ import constants.skills.Bandit;
 import constants.skills.Beginner;
 import constants.skills.Bishop;
 import constants.skills.BlazeWizard;
-import constants.skills.Bowmaster;
+import constants.skills.BowMaster;
 import constants.skills.Buccaneer;
 import constants.skills.ChiefBandit;
 import constants.skills.Cleric;
@@ -46,8 +25,8 @@ import constants.skills.DarkKnight;
 import constants.skills.DawnWarrior;
 import constants.skills.DragonKnight;
 import constants.skills.Evan;
-import constants.skills.FPArchMage;
-import constants.skills.FPMage;
+import constants.skills.FirePoisonArchMage;
+import constants.skills.FirePoisonMagician;
 import constants.skills.FPWizard;
 import constants.skills.Fighter;
 import constants.skills.GM;
@@ -55,8 +34,8 @@ import constants.skills.Gunslinger;
 import constants.skills.Hermit;
 import constants.skills.Hero;
 import constants.skills.Hunter;
-import constants.skills.ILArchMage;
-import constants.skills.ILMage;
+import constants.skills.IceLighteningArchMagician;
+import constants.skills.IceLighteningMagician;
 import constants.skills.ILWizard;
 import constants.skills.Legend;
 import constants.skills.Magician;
@@ -182,15 +161,15 @@ public class SkillFactory {
 
    public static void loadAllSkills() {
       final MapleDataDirectoryEntry root = datasource.getRoot();
-      int skillid;
+      int skillId;
       for (MapleDataFileEntry topDir : root.getFiles()) { // Loop thru jobs
          if (topDir.getName().length() <= 8) {
             for (MapleData data : datasource.getData(topDir.getName())) { // Loop thru each jobs
                if (data.getName().equals("skill")) {
                   for (MapleData data2 : data) { // Loop thru each jobs
                      if (data2 != null) {
-                        skillid = Integer.parseInt(data2.getName());
-                        skills.put(skillid, loadFromData(skillid, data2));
+                        skillId = Integer.parseInt(data2.getName());
+                        skills.put(skillId, loadFromData(skillId, data2));
                      }
                   }
                }
@@ -241,8 +220,8 @@ public class SkillFactory {
             case Paladin.RUSH:
             case DarkKnight.RUSH:
             case DragonKnight.SACRIFICE:
-            case FPMage.EXPLOSION:
-            case FPMage.POISON_MIST:
+            case FirePoisonMagician.EXPLOSION:
+            case FirePoisonMagician.POISON_MIST:
             case Cleric.HEAL:
             case Ranger.MORTAL_BLOW:
             case Sniper.MORTAL_BLOW:
@@ -315,20 +294,20 @@ public class SkillFactory {
             case Magician.MAGIC_ARMOR:
             case FPWizard.MEDITATION:
             case FPWizard.SLOW:
-            case FPMage.SEAL:
-            case FPMage.SPELL_BOOSTER:
-            case FPArchMage.HEROS_WILL:
-            case FPArchMage.INFINITY:
-            case FPArchMage.MANA_REFLECTION:
-            case FPArchMage.MAPLE_WARRIOR:
+            case FirePoisonMagician.SEAL:
+            case FirePoisonMagician.SPELL_BOOSTER:
+            case FirePoisonArchMage.HEROS_WILL:
+            case FirePoisonArchMage.INFINITY:
+            case FirePoisonArchMage.MANA_REFLECTION:
+            case FirePoisonArchMage.MAPLE_WARRIOR:
             case ILWizard.MEDITATION:
-            case ILMage.SEAL:
+            case IceLighteningMagician.SEAL:
             case ILWizard.SLOW:
-            case ILMage.SPELL_BOOSTER:
-            case ILArchMage.HEROS_WILL:
-            case ILArchMage.INFINITY:
-            case ILArchMage.MANA_REFLECTION:
-            case ILArchMage.MAPLE_WARRIOR:
+            case IceLighteningMagician.SPELL_BOOSTER:
+            case IceLighteningArchMagician.HEROS_WILL:
+            case IceLighteningArchMagician.INFINITY:
+            case IceLighteningArchMagician.MANA_REFLECTION:
+            case IceLighteningArchMagician.MAPLE_WARRIOR:
             case Cleric.INVINCIBLE:
             case Cleric.BLESS:
             case Priest.DISPEL:
@@ -344,10 +323,10 @@ public class SkillFactory {
             case Hunter.BOW_BOOSTER:
             case Hunter.SOUL_ARROW:
             case Ranger.PUPPET:
-            case Bowmaster.CONCENTRATE:
-            case Bowmaster.HEROS_WILL:
-            case Bowmaster.MAPLE_WARRIOR:
-            case Bowmaster.SHARP_EYES:
+            case BowMaster.CONCENTRATE:
+            case BowMaster.HEROS_WILL:
+            case BowMaster.MAPLE_WARRIOR:
+            case BowMaster.SHARP_EYES:
             case Crossbowman.CROSSBOW_BOOSTER:
             case Crossbowman.SOUL_ARROW:
             case Sniper.PUPPET:
@@ -433,11 +412,11 @@ public class SkillFactory {
             case Legend.MAP_CHAIR:
             case Aran.MAPLE_WARRIOR:
             case Aran.HEROS_WILL:
-            case Aran.POLEARM_BOOSTER:
+            case Aran.POLE_ARM_BOOSTER:
             case Aran.COMBO_DRAIN:
             case Aran.SNOW_CHARGE:
             case Aran.BODY_PRESSURE:
-            case Aran.SMART_KNOCKBACK:
+            case Aran.SMART_KNOCK_BACK:
             case Aran.COMBO_BARRIER:
             case Aran.COMBO_ABILITY:
             case Evan.BLESSING_OF_THE_FAIRY:
@@ -469,18 +448,18 @@ public class SkillFactory {
       return ret;
    }
 
-   public static String getSkillName(int skillid) {
+   public static String getSkillName(int skillId) {
       MapleData data = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/" + "String.wz")).getData("Skill.img");
       StringBuilder skill = new StringBuilder();
-      skill.append(skillid);
+      skill.append(skillId);
       if (skill.length() == 4) {
          skill.delete(0, 4);
-         skill.append("000").append(skillid);
+         skill.append("000").append(skillId);
       }
       if (data.getChildByPath(skill.toString()) != null) {
-         for (MapleData skilldata : data.getChildByPath(skill.toString()).getChildren()) {
-            if (skilldata.getName().equals("name")) {
-               return MapleDataTool.getString(skilldata, null);
+         for (MapleData skillData : data.getChildByPath(skill.toString()).getChildren()) {
+            if (skillData.getName().equals("name")) {
+               return MapleDataTool.getString(skillData, null);
             }
          }
       }

@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.Arrays;
@@ -124,7 +103,6 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
       }
 
       if (client.tryAcquireClient()) {
-         // thanks Thora for finding out an exploit within cash operations
          try {
             final int action = packet.action();
             if (packet instanceof MakePurchasePacket) {
@@ -225,7 +203,6 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
    }
 
    private void purchaseMesoCashItem(MapleClient c, MapleCharacter chr, int serialNumber) {
-      // thanks GabrielSin for detecting a potential exploit with 1 meso cash items.
       if (serialNumber / 10000000 != 8) {
          PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.NOT_ENOUGH_ITEMS_IN_STOCK));
          return;
@@ -257,7 +234,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
    private void makePurchase(MapleClient c, MapleCharacter chr, CashShop cs, int action, int useNX, int snCS) {
       CashItem cItem = CashItemFactory.getItem(snCS);
       if (!canBuy(chr, cItem, cs.getCash(useNX))) {
-         FilePrinter.printError(FilePrinter.ITEM, "Denied to sell cash item with SN " + snCS);   // preventing NPE here thanks to MedicOP
+         FilePrinter.printError(FilePrinter.ITEM, "Denied to sell cash item with SN " + snCS);
          c.enableCSActions();
          return;
       }
@@ -374,7 +351,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       }
-      if (chr.getStorage().gainSlots(8)) {    // thanks ABaldParrot & Thora for detecting storage issues here
+      if (chr.getStorage().gainSlots(8)) {
          FilePrinter.print(FilePrinter.STORAGE + c.getAccountName() + ".txt", c.getPlayer().getName() + " bought 8 slots to their account storage.");
          chr.setUsedStorage();
 

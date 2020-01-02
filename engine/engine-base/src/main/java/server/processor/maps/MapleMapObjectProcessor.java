@@ -55,17 +55,17 @@ public class MapleMapObjectProcessor {
    }
 
    static {
-      MaplePacketLittleEndianWriter mplew = new MaplePacketLittleEndianWriter((int) getIdleMovementDataLength());
-      mplew.write(1); //movement command count
-      mplew.write(0);
-      mplew.writeShort(-1); //x
-      mplew.writeShort(-1); //y
-      mplew.writeShort(0); //xwobble
-      mplew.writeShort(0); //ywobble
-      mplew.writeShort(0); //fh
-      mplew.write(-1); //stance
-      mplew.writeShort(0); //duration
-      idleMovementPacketData = mplew.getPacket();
+      MaplePacketLittleEndianWriter writer = new MaplePacketLittleEndianWriter((int) getIdleMovementDataLength());
+      writer.write(1); //movement command count
+      writer.write(0);
+      writer.writeShort(-1); //x
+      writer.writeShort(-1); //y
+      writer.writeShort(0); //x wobble
+      writer.writeShort(0); //y wobble
+      writer.writeShort(0); //fh
+      writer.write(-1); //stance
+      writer.writeShort(0); //duration
+      idleMovementPacketData = writer.getPacket();
    }
 
    private MapleMapObjectProcessor() {

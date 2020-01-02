@@ -13,7 +13,7 @@ class Quest3314 {
    }
 
    static def isPillUsed(MapleCharacter ch) {
-      return ch.getBuffSource(MapleBuffStat.HPREC) == 2022198
+      return ch.getBuffSource(MapleBuffStat.HP_RECOVERY) == 2022198
    }
 
    def end(Byte mode, Byte type, Integer selection) {

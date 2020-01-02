@@ -57,9 +57,9 @@ def enterLeverSequence(PortalPlayerInteraction pi) {
 
 def enterNoMobs(PortalPlayerInteraction pi) {
    MapleMap map = pi.getMap()
-   int mobcount = map.countMonster(9300044)
+   int mobCount = map.countMonster(9300044)
 
-   if (mobcount > 0) {
+   if (mobCount > 0) {
       MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please use the levers to defeat all the threats before you proceed.")
       return false
    } else {

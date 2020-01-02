@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.partyquest;
 
 import java.util.ArrayList;
@@ -39,12 +20,9 @@ import tools.packet.pq.ariant.AriantScore;
 import tools.packet.pq.ariant.ShowAriantScoreboard;
 import tools.packet.pq.ariant.UpdateAriantRanking;
 
-/**
- * @author Ronan
- */
 public class AriantColiseum {
 
-   private MapleExpedition exped;
+   private MapleExpedition expedition;
    private MapleMap map;
 
    private Map<MapleCharacter, Integer> score;
@@ -60,8 +38,8 @@ public class AriantColiseum {
    private boolean eventClear = false;
 
    public AriantColiseum(MapleMap eventMap, MapleExpedition expedition) {
-      exped = expedition;
-      exped.finishRegistration();
+      this.expedition = expedition;
+      this.expedition.finishRegistration();
 
       map = eventMap;
       map.resetFully();
@@ -69,7 +47,7 @@ public class AriantColiseum {
       int pqTimer = 10 * 60 * 1000;
       int pqTimerBoard = (9 * 60 * 1000) + 50 * 1000;
 
-      List<MapleCharacter> players = exped.getActiveMembers();
+      List<MapleCharacter> players = this.expedition.getActiveMembers();
       score = new HashMap<>();
       rewardTier = new HashMap<>();
       for (MapleCharacter mc : players) {
@@ -91,23 +69,23 @@ public class AriantColiseum {
       setArenaUpdate(TimerManager.getInstance().register(this::broadcastAriantScoreUpdate, 500, 500));
    }
 
-   private static boolean isUnfairMatch(Integer winnerScore, Integer secondScore, Integer lostShardsScore, List<Integer> runnerupsScore) {
+   private static boolean isUnfairMatch(Integer winnerScore, Integer secondScore, Integer lostShardsScore, List<Integer> runnersUpScore) {
       if (winnerScore <= 0) {
          return false;
       }
 
-      double runnerupsScoreCount = 0;
-      for (Integer i : runnerupsScore) {
-         runnerupsScoreCount += i;
+      double runnersUpScoreCount = 0;
+      for (Integer i : runnersUpScore) {
+         runnersUpScoreCount += i;
       }
 
-      runnerupsScoreCount += lostShardsScore;
+      runnersUpScoreCount += lostShardsScore;
       secondScore += lostShardsScore;
 
-      double matchRes = runnerupsScoreCount / winnerScore;
-      double runnerupRes = ((double) secondScore) / winnerScore;
+      double matchRes = runnersUpScoreCount / winnerScore;
+      double runnersUp = ((double) secondScore) / winnerScore;
 
-      return matchRes < 0.81770726891980117713114871015349 && (runnerupsScoreCount < 7 || runnerupRes < 0.5929);
+      return matchRes < 0.81770726891980117713114871015349 && (runnersUpScoreCount < 7 || runnersUp < 0.5929);
    }
 
    private void setArenaUpdate(ScheduledFuture<?> ariantUpdate) {
@@ -195,10 +173,10 @@ public class AriantColiseum {
    }
 
    private synchronized void leaveArenaInternal(MapleCharacter chr) {
-      if (exped != null) {
-         if (exped.removeMember(chr)) {
+      if (expedition != null) {
+         if (expedition.removeMember(chr)) {
             int minSize = eventClear ? 1 : 2;
-            if (exped.getActiveMembers().size() < minSize) {
+            if (expedition.getActiveMembers().size() < minSize) {
                dispose();
             }
             chr.setAriantColiseum(null);
@@ -226,9 +204,9 @@ public class AriantColiseum {
    }
 
    public void distributeAriantPoints() {
-      Integer firstTop = -1, secondTop = -1;
+      int firstTop = -1, secondTop = -1;
       MapleCharacter winner = null;
-      List<Integer> runnerups = new ArrayList<>();
+      List<Integer> runnersUp = new ArrayList<>();
 
       for (Entry<MapleCharacter, Integer> e : score.entrySet()) {
          Integer s = e.getValue();
@@ -240,12 +218,12 @@ public class AriantColiseum {
             secondTop = s;
          }
 
-         runnerups.add(s);
+         runnersUp.add(s);
          rewardTier.put(e.getKey(), (int) Math.floor(s / 10));
       }
 
-      runnerups.remove(firstTop);
-      if (isUnfairMatch(firstTop, secondTop, map.getDroppedItemsCountById(4031868) + lostShards, runnerups)) {
+      runnersUp.remove(firstTop);
+      if (isUnfairMatch(firstTop, secondTop, map.getDroppedItemsCountById(4031868) + lostShards, runnersUp)) {
          rewardTier.put(winner, 1);
       }
    }
@@ -264,7 +242,7 @@ public class AriantColiseum {
    }
 
    private void enterKingsRoom() {
-      exped.removeChannelExpedition(map.getChannelServer());
+      expedition.removeChannelExpedition(map.getChannelServer());
       cancelAriantSchedules();
 
       for (MapleCharacter chr : map.getAllPlayers()) {
@@ -273,21 +251,18 @@ public class AriantColiseum {
    }
 
    private synchronized void dispose() {
-      if (exped != null) {
-         exped.dispose(false);
+      if (expedition != null) {
+         expedition.dispose(false);
 
-         for (MapleCharacter chr : exped.getActiveMembers()) {
+         for (MapleCharacter chr : expedition.getActiveMembers()) {
             chr.setAriantColiseum(null);
             chr.changeMap(980010000, 0);
          }
 
-         map.getWorldServer().registerTimedMapObject(new Runnable() {
-            @Override
-            public void run() {
-               score.clear();
-               exped = null;
-               map = null;
-            }
+         map.getWorldServer().registerTimedMapObject(() -> {
+            score.clear();
+            expedition = null;
+            map = null;
          }, 5 * 60 * 1000);
       }
    }

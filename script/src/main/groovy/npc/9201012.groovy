@@ -29,17 +29,17 @@ class NPC9201012 {
    }
 
    static def isSuitedForWedding(MapleCharacter player, equipped) {
-      int baseid = (player.getGender() == 0) ? 1050131 : 1051150
+      int baseId = (player.getGender() == 0) ? 1050131 : 1051150
 
       if (equipped) {
          for (int i = 0; i < 4; i++) {
-            if (player.haveItemEquipped(baseid + i)) {
+            if (player.haveItemEquipped(baseId + i)) {
                return true
             }
          }
       } else {
          for (int i = 0; i < 4; i++) {
-            if (player.haveItemWithId(baseid + i, true)) {
+            if (player.haveItemWithId(baseId + i, true)) {
                return true
             }
          }
@@ -97,11 +97,11 @@ class NPC9201012 {
             }
          } else if (status == 1) {
             int wid = cm.getClient().getWorldServer().getRelationshipId(cm.getPlayer().getId())
-            Channel cserv = cm.getClient().getChannelServer()
+            Channel channel = cm.getClient().getChannelServer()
 
-            if (cserv.isWeddingReserved(wid)) {
-               if (wid == cserv.getOngoingWedding(cathedralWedding)) {
-                  MapleCharacter partner = cserv.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
+            if (channel.isWeddingReserved(wid)) {
+               if (wid == channel.getOngoingWedding(cathedralWedding)) {
+                  MapleCharacter partner = channel.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                   if (!(partner == null || cm.getMap() != partner.getMap())) {
                      if (!cm.canHold(4000313)) {
                         cm.sendOk("Please have a free ETC slot available to get the #b#t4000313##k.")
@@ -127,7 +127,7 @@ class NPC9201012 {
                      cm.dispose()
                   }
                } else {
-                  String placeTime = cserv.getWeddingReservationTimeLeft(wid)
+                  String placeTime = channel.getWeddingReservationTimeLeft(wid)
 
                   cm.sendOk("Yo. Your wedding is set to happen at the #r" + placeTime + "#k, get a decent apparel don't be late will you?")
                   cm.dispose()
@@ -137,12 +137,12 @@ class NPC9201012 {
                cm.dispose()
             }
          } else if (status == 2) {
-            Channel cserv = cm.getClient().getChannelServer()
-            boolean wtype = cserv.getOngoingWeddingType(cathedralWedding)
+            Channel channel = cm.getClient().getChannelServer()
+            boolean weddingIsOnGoing = channel.getOngoingWeddingType(cathedralWedding)
 
-            MapleCharacter partner = cserv.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
+            MapleCharacter partner = channel.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
             if (!(partner == null || cm.getMap() != partner.getMap())) {
-               if (cserv.acceptOngoingWedding(cathedralWedding)) {
+               if (channel.acceptOngoingWedding(cathedralWedding)) {
                   int wid = cm.getClient().getWorldServer().getRelationshipId(cm.getPlayer().getId())
                   if (wid > 0) {
                      EventManager em = cm.getEventManager(weddingEventName)
@@ -152,7 +152,7 @@ class NPC9201012 {
                            eim.setIntProperty("weddingId", wid)
                            eim.setIntProperty("groomId", cm.getPlayer().getId())
                            eim.setIntProperty("brideId", cm.getPlayer().getPartnerId())
-                           eim.setIntProperty("isPremium", wtype ? 1 : 0)
+                           eim.setIntProperty("isPremium", weddingIsOnGoing ? 1 : 0)
 
                            eim.registerPlayer(partner)
                         } else {

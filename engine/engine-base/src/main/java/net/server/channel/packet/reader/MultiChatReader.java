@@ -7,7 +7,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public class MultiChatReader implements PacketReader<MultiChatPacket> {
    @Override
    public MultiChatPacket read(SeekableLittleEndianAccessor accessor) {
-      int type = accessor.readByte(); // 0 for buddys, 1 for partys
+      int type = accessor.readByte(); // 0 for buddies, 1 for parties
       int numRecipients = accessor.readByte();
       int[] recipients = new int[numRecipients];
       for (int i = 0; i < numRecipients; i++) {

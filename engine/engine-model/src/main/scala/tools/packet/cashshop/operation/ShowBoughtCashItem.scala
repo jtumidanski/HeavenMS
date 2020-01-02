@@ -9,5 +9,5 @@ class ShowBoughtCashItem(private var _item: Item, private var _accountId: Int) e
 
   def accountId: Int = _accountId
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

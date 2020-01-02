@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package server.maps;
 
 import java.awt.Point;
@@ -35,9 +16,6 @@ import tools.packet.foreigneffect.ShowBlockedMessage;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author Ronan
- */
 public class MapleDoorObject extends AbstractMapleMapObject {
    private final int ownerId;
    private int destinationMapId;
@@ -46,8 +24,8 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    private int pairOid;
    private int linkedPortalId;
    private Point linkedPos;
-   private MonitoredReadLock rlock = MonitoredReadLockFactory.createLock(locks);
-   private MonitoredWriteLock wlock = MonitoredWriteLockFactory.createLock(locks);
+   private MonitoredReadLock readLock = MonitoredReadLockFactory.createLock(locks);
+   private MonitoredWriteLock writeLock = MonitoredWriteLockFactory.createLock(locks);
 
    public MapleDoorObject(int owner, int destinationMapId, int originMapId, int townPortalId, Point targetPosition, Point toPosition) {
       super();
@@ -61,30 +39,30 @@ public class MapleDoorObject extends AbstractMapleMapObject {
    }
 
    public void update(int townPortalId, Point toPosition) {
-      wlock.lock();
+      writeLock.lock();
       try {
          linkedPortalId = townPortalId;
          linkedPos = toPosition;
       } finally {
-         wlock.unlock();
+         writeLock.unlock();
       }
    }
 
    private int getLinkedPortalId() {
-      rlock.lock();
+      readLock.lock();
       try {
          return linkedPortalId;
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
    }
 
    private Point getLinkedPortalPosition() {
-      rlock.lock();
+      readLock.lock();
       try {
          return linkedPos;
       } finally {
-         rlock.unlock();
+         readLock.unlock();
       }
    }
 

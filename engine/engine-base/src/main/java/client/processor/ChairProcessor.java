@@ -17,8 +17,8 @@ public class ChairProcessor {
    private ChairProcessor() {
    }
 
-   public Pair<Integer, Pair<Integer, Integer>> getChairTaskIntervalRate(int maxhp, int maxmp) {
-      float toHeal = Math.max(maxhp, maxmp);
+   public Pair<Integer, Pair<Integer, Integer>> getChairTaskIntervalRate(int maxHp, int maxMp) {
+      float toHeal = Math.max(maxHp, maxMp);
       float maxDuration = YamlConfig.config.server.CHAIR_EXTRA_HEAL_MAX_DELAY * 1000;
 
       int rate = 0;
@@ -41,11 +41,11 @@ public class ChairProcessor {
 
       float procs = maxDuration / rate;
       int hpRegen, mpRegen;
-      if (maxhp > maxmp) {
+      if (maxHp > maxMp) {
          hpRegen = midRegen;
-         mpRegen = (int) Math.ceil(maxmp / procs);
+         mpRegen = (int) Math.ceil(maxMp / procs);
       } else {
-         hpRegen = (int) Math.ceil(maxhp / procs);
+         hpRegen = (int) Math.ceil(maxHp / procs);
          mpRegen = midRegen;
       }
 

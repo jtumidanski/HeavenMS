@@ -1,7 +1,6 @@
 package net.server.services.task.channel;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import config.YamlConfig;
@@ -10,7 +9,6 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.MonitoredReentrantLock;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import net.server.services.BaseScheduler;
-import net.server.services.SchedulerListener;
 import net.server.services.BaseService;
 
 public class MobAnimationService extends BaseService {
@@ -32,35 +30,30 @@ public class MobAnimationService extends BaseService {
       }
    }
 
-   public boolean registerMobOnAnimationEffect(int mapid, int mobHash, long delay) {
-      return mobAnimationSchedulers[getChannelSchedulerIndex(mapid)].registerAnimationMode(mobHash, delay);
+   public boolean registerMobOnAnimationEffect(int mapId, int mobHash, long delay) {
+      return mobAnimationSchedulers[getChannelSchedulerIndex(mapId)].registerAnimationMode(mobHash, delay);
    }
 
-   private static Runnable r = new Runnable() {
-      @Override
-      public void run() {
-      }    // do nothing
+   // do nothing
+   private static Runnable r = () -> {
    };
 
    private class MobAnimationScheduler extends BaseScheduler {
       Set<Integer> onAnimationMobs = new HashSet<>(1000);
-      private MonitoredReentrantLock animationLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHANNEL_MOBANIMAT, true);
+      private MonitoredReentrantLock animationLock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.CHANNEL_MOB_ANIMATION, true);
 
       public MobAnimationScheduler() {
-         super(MonitoredLockType.CHANNEL_MOBACTION);
+         super(MonitoredLockType.CHANNEL_MOB_ACTION);
 
-         super.addListener(new SchedulerListener() {
-            @Override
-            public void removedScheduledEntries(List<Object> toRemove, boolean update) {
-               animationLock.lock();
-               try {
-                  for (Object hashObj : toRemove) {
-                     Integer mobHash = (Integer) hashObj;
-                     onAnimationMobs.remove(mobHash);
-                  }
-               } finally {
-                  animationLock.unlock();
+         super.addListener((toRemove, update) -> {
+            animationLock.lock();
+            try {
+               for (Object hashObj : toRemove) {
+                  Integer mobHash = (Integer) hashObj;
+                  onAnimationMobs.remove(mobHash);
                }
+            } finally {
+               animationLock.unlock();
             }
          });
       }

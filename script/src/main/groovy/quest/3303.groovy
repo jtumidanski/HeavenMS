@@ -35,11 +35,10 @@ class Quest3303 {
                qm.sendSimple("Oh, looks like someone's ready to make a deal. You want to join Zenumist so badly, huh? I really don't understand you, but that's just fine. What will you give me in return?\r\n" + getOreString(oreArray))
             } else {
                qm.sendOk("What is this, you don't have the #rjewel ores#k with you. No ore, no deal.")
-               // script would loop undefinitely at completion, thanks IxianMace for noticing
                qm.dispose()
             }
          } else if (status == 1) {
-            if (!qm.haveItem(oreArray[selection], 2)) {     // thanks resinate for noticing a function missing here
+            if (!qm.haveItem(oreArray[selection], 2)) {
                qm.sendNext("What's this, you haven't got the #rjewel ores#k. No ores no deal!")
                qm.dispose()
                return
@@ -66,14 +65,14 @@ class Quest3303 {
    }
 
    static def getOreString(int[] ids) { // Parameter 'ids' is just the array of getOreArray()
-      String thestring = "#b"
+      String theString = "#b"
       String extra
       for (int x = 0; x < ids.length; x++) {
          extra = "#L" + x + "##t" + ids[x] + "##l\r\n"
-         thestring += extra
+         theString += extra
       }
-      thestring += "#k"
-      return thestring
+      theString += "#k"
+      return theString
    }
 }
 

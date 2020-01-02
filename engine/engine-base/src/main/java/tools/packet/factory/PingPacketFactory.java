@@ -19,8 +19,6 @@ public class PingPacketFactory extends AbstractPacketFactory {
 
    /**
     * Sends a ping packet.
-    *
-    * @return The packet.
     */
    protected void getPing(MaplePacketLittleEndianWriter writer, Ping packet) {
    }

@@ -3,7 +3,7 @@ package net.server.channel.packet.reader;
 import java.util.LinkedList;
 import java.util.List;
 
-import constants.items.UseableCashItems;
+import constants.items.ConsumableCashItems;
 import net.server.PacketReader;
 import net.server.channel.packet.cash.use.AbstractUseCashItemPacket;
 import net.server.channel.packet.cash.use.UseApResetPacket;
@@ -46,7 +46,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
       short position = accessor.readShort();
       int itemId = accessor.readInt();
 
-      switch (UseableCashItems.Types.getByItemId(itemId)) {
+      switch (ConsumableCashItems.Types.getByItemId(itemId)) {
          case TELEPORTERS:
             return readTeleportRock(accessor, position, itemId);
          case STAT_MODIFIERS:
@@ -122,7 +122,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    private AbstractUseCashItemPacket readNameOrWorldChange(SeekableLittleEndianAccessor accessor, short position, int itemId) {
       accessor.readByte();
       accessor.readInt();
-      switch (UseableCashItems.CharacterModifiers.getByItemId(itemId)) {
+      switch (ConsumableCashItems.CharacterModifiers.getByItemId(itemId)) {
          case NAME_CHANGE:
             return new UseNameChangePacket(position, itemId);
          case WORLD_CHANGE:
@@ -160,7 +160,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    }
 
    private AbstractUseCashItemPacket readBroadcastTool(SeekableLittleEndianAccessor accessor, short position, int itemId) {
-      switch (UseableCashItems.BroadcasterCategories.getByItemId(itemId)) {
+      switch (ConsumableCashItems.BroadcasterCategories.getByItemId(itemId)) {
          case CHEAP_MEGAPHONE:
             System.out.println("Unhandled Item: " + itemId + "\n");
             return null;
@@ -183,7 +183,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    }
 
    private AbstractUseCashItemPacket readItemAugmenter(SeekableLittleEndianAccessor accessor, short position, int itemId) {
-      switch (UseableCashItems.ItemAugmenters.getByItemId(itemId)) {
+      switch (ConsumableCashItems.ItemAugmenters.getByItemId(itemId)) {
          case ITEM_TAG:
             return readItemTag(accessor, position, itemId);
          case ITEM_GUARD:
@@ -220,7 +220,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
 
    private AbstractUseCashItemPacket readMapleTv(SeekableLittleEndianAccessor accessor, short position, int itemId) {
       int tvType = itemId % 10;
-      boolean megaMessenger = UseableCashItems.Broadcasters.isMapleTvMegaMessenger(itemId);
+      boolean megaMessenger = ConsumableCashItems.Broadcasters.isMapleTvMegaMessenger(itemId);
       boolean ear = false;
       String victim = "";
       if (tvType != 1) {
@@ -265,7 +265,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    }
 
    private AbstractUseCashItemPacket readApOrSpResetPacket(SeekableLittleEndianAccessor accessor, short position, int itemId) {
-      if (UseableCashItems.CharacterStatModifiers.isAPReset(itemId)) {
+      if (ConsumableCashItems.CharacterStatModifiers.isAPReset(itemId)) {
          int to = accessor.readInt();
          int from = accessor.readInt();
          return new UseApResetPacket(position, itemId, to, from);
@@ -277,7 +277,7 @@ public class UseCashItemReader implements PacketReader<AbstractUseCashItemPacket
    }
 
    private AbstractUseCashItemPacket readTeleportRock(SeekableLittleEndianAccessor accessor, short position, int itemId) {
-      boolean vip = accessor.readByte() == 1 && UseableCashItems.CharacterTeleporters.isVip(itemId);
+      boolean vip = accessor.readByte() == 1 && ConsumableCashItems.CharacterTeleporters.isVip(itemId);
       int mapId = -1;
       String name = "";
       if (!vip) {

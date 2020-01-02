@@ -85,7 +85,7 @@ public class GuildPacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Gets a Heracle/guild message packet.
+    * Gets a guild message packet.
     * <p>
     * Possible values for <code>code</code>:<br> 28: guild name already in use<br>
     * 31: problem in locating players during agreement<br> 33/40: already joined a guild<br>
@@ -93,8 +93,6 @@ public class GuildPacketFactory extends AbstractPacketFactory {
     * 41: max number of players in joining guild<br> 42: character can't be found this channel<br>
     * 45/48: character not in guild<br> 52: problem in disbanding guild<br> 56: admin cannot make guild<br>
     * 57: problem in increasing guild size<br>
-    *
-    * @return The guild message packet.
     */
    protected void genericGuildMessage(MaplePacketLittleEndianWriter writer, GenericGuildMessage packet) {
       writer.write(packet.code());
@@ -105,8 +103,6 @@ public class GuildPacketFactory extends AbstractPacketFactory {
     * <p>
     * 53: player not accepting guild invites<br>
     * 54: player already managing an invite<br> 55: player denied an invite<br>
-    *
-    * @return The guild message packet.
     */
    protected void responseGuildMessage(MaplePacketLittleEndianWriter writer, ResponseGuildMessage packet) {
       writer.write(packet.code());
@@ -120,8 +116,8 @@ public class GuildPacketFactory extends AbstractPacketFactory {
       writer.writeAsciiString(StringUtil.getRightPaddedStr(packet.name(), '\0', 13));
       writer.writeInt(packet.jobId());
       writer.writeInt(packet.level());
-      writer.writeInt(packet.guildRank()); //should be always 5 but whatevs
-      writer.writeInt(packet.online() ? 1 : 0); //should always be 1 too
+      writer.writeInt(packet.guildRank()); //should be always 5
+      writer.writeInt(packet.online() ? 1 : 0); //should always be 1
       writer.writeInt(1); //? could be guild signature, but doesn't seem to matter
       writer.writeInt(3);
    }
@@ -278,7 +274,7 @@ public class GuildPacketFactory extends AbstractPacketFactory {
    }
 
    /**
-    * Guild Name & Mark update packet, thanks to Arnah (Vertisy)
+    * Guild Name & Mark update packet
     */
    protected void guildNameChanged(MaplePacketLittleEndianWriter writer, GuildNameChange packet) {
       writer.writeInt(packet.characterId());

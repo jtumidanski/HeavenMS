@@ -3,10 +3,9 @@ package quest
 import scripting.event.EventManager
 import scripting.quest.QuestActionManager
 import server.life.MapleLifeFactory
-import server.life.MapleMonster
 import server.maps.MapleMap
 
-import java.awt.Point
+import java.awt.*
 
 class Quest21401 {
    QuestActionManager qm
@@ -14,9 +13,9 @@ class Quest21401 {
 
    def start(Byte mode, Byte type, Integer selection) {
       status++
-      if(mode == 0 && type == 0)
+      if (mode == 0 && type == 0) {
          status -= 2
-      else if (mode != 1) {
+      } else if (mode != 1) {
          //if (mode == 0)
          qm.sendNext("#b(You need to think about this for a second...)#k")
          qm.dispose()
@@ -45,9 +44,9 @@ class Quest21401 {
 
    def end(Byte mode, Byte type, Integer selection) {
       status++
-      if(mode == 0 && type == 0)
+      if (mode == 0 && type == 0) {
          status -= 2
-      else if (mode != 1) {
+      } else if (mode != 1) {
          //if (mode == 0)
          qm.sendNext("#b(You need to think about this for a second...)#k")
          qm.dispose()
@@ -56,9 +55,9 @@ class Quest21401 {
 
       if (status == 0) {
          qm.sendNext("Thank you, Aran. If it weren't for you, I would have become enraged and who knows what could have happened. Thank you, NOT! It's only your duty as my master...")
-      } else if(status == 1) {
+      } else if (status == 1) {
          qm.sendYesNo("Anyway, I just noticed how high of a level you've reached. If you were able to control me in my state of rage, I think you're ready to handle more abilities.")
-      } else if(status == 2) {
+      } else if (status == 2) {
          if (!qm.isQuestCompleted(21401)) {
             if (!qm.canHold(1142132)) {
                qm.sendOk("Wow, your #bequip#k inventory is full. I need you to make at least 1 empty slot to complete this quest.")
@@ -84,11 +83,11 @@ class Quest21401 {
    }
 
    static def spawnMob(x, y, int id, MapleMap map) {
-      if(map.getMonsterById(id) != null)
+      if (map.getMonsterById(id) != null) {
          return
+      }
 
-      MapleMonster mob = MapleLifeFactory.getMonster(id)
-      map.spawnMonsterOnGroundBelow(mob, new Point(x, y))
+      MapleLifeFactory.getMonster(id).ifPresent({ mob -> map.spawnMonsterOnGroundBelow(mob, new Point(x, y)) })
    }
 }
 

@@ -8,5 +8,5 @@ class ShowOwnBuffEffect(private var _skillId: Int, private var _effectId: Int) e
 
   def effectId: Int = _effectId
 
-  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_INCHAT
+  override def opcode(): SendOpcode = SendOpcode.SHOW_ITEM_GAIN_IN_CHAT
 }

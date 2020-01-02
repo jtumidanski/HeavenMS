@@ -2,11 +2,11 @@ package tools.packet.factory;
 
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.buff.CancelBuff;
-import tools.packet.buff.CancelDebuff;
+import tools.packet.buff.CancelAbnormalStatus;
 import tools.packet.buff.CancelForeignBuff;
 import tools.packet.buff.CancelForeignChairSkillEffect;
-import tools.packet.buff.CancelForeignDebuff;
-import tools.packet.buff.CancelForeignSlowDebuff;
+import tools.packet.buff.CancelForeignAbnormalStatus;
+import tools.packet.buff.CancelForeignAbnormalStatusSlow;
 
 public class CancelBuffPacketFactory extends AbstractBuffPacketFactory {
    private static CancelBuffPacketFactory instance;
@@ -19,15 +19,15 @@ public class CancelBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    private CancelBuffPacketFactory() {
-      Handler.handle(CancelForeignDebuff.class).decorate(this::cancelForeignDebuff).register(registry);
+      Handler.handle(CancelForeignAbnormalStatus.class).decorate(this::cancelForeignAbnormalStatus).register(registry);
       Handler.handle(CancelForeignBuff.class).decorate(this::cancelForeignBuff).register(registry);
       Handler.handle(CancelBuff.class).decorate(this::cancelBuff).register(registry);
-      Handler.handle(CancelDebuff.class).decorate(this::cancelDebuff).size(19).register(registry);
-      Handler.handle(CancelForeignSlowDebuff.class).decorate(this::cancelForeignSlowDebuff).register(registry);
+      Handler.handle(CancelAbnormalStatus.class).decorate(this::cancelAbnormalStatus).size(19).register(registry);
+      Handler.handle(CancelForeignAbnormalStatusSlow.class).decorate(this::cancelForeignAbnormalStatusSlow).register(registry);
       Handler.handle(CancelForeignChairSkillEffect.class).decorate(this::cancelForeignChairSkillEffect).size(19).register(registry);
    }
 
-   protected void cancelForeignDebuff(MaplePacketLittleEndianWriter writer, CancelForeignDebuff packet) {
+   protected void cancelForeignAbnormalStatus(MaplePacketLittleEndianWriter writer, CancelForeignAbnormalStatus packet) {
       writer.writeInt(packet.characterId());
       writer.writeLong(0);
       writer.writeLong(packet.mask());
@@ -35,21 +35,21 @@ public class CancelBuffPacketFactory extends AbstractBuffPacketFactory {
 
    protected void cancelForeignBuff(MaplePacketLittleEndianWriter writer, CancelForeignBuff packet) {
       writer.writeInt(packet.characterId());
-      writeLongMaskFromList(writer, packet.statups());
+      writeLongMaskFromList(writer, packet.statIncreases());
    }
 
    protected void cancelBuff(MaplePacketLittleEndianWriter writer, CancelBuff packet) {
-      writeLongMaskFromList(writer, packet.statups());
+      writeLongMaskFromList(writer, packet.statIncreases());
       writer.write(1);//?
    }
 
-   protected void cancelDebuff(MaplePacketLittleEndianWriter writer, CancelDebuff packet) {
+   protected void cancelAbnormalStatus(MaplePacketLittleEndianWriter writer, CancelAbnormalStatus packet) {
       writer.writeLong(0);
       writer.writeLong(packet.mask());
       writer.write(0);
    }
 
-   protected void cancelForeignSlowDebuff(MaplePacketLittleEndianWriter writer, CancelForeignSlowDebuff packet) {
+   protected void cancelForeignAbnormalStatusSlow(MaplePacketLittleEndianWriter writer, CancelForeignAbnormalStatusSlow packet) {
       writer.writeInt(packet.characterId());
       writeLongMaskSlowD(writer);
    }

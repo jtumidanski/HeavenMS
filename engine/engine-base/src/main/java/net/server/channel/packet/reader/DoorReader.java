@@ -8,7 +8,7 @@ public class DoorReader implements PacketReader<DoorPacket> {
    @Override
    public DoorPacket read(SeekableLittleEndianAccessor accessor) {
       int ownerId = accessor.readInt();
-      boolean backWarp = accessor.readByte() == 1; // specifies if backwarp or not, 1 town to target, 0 target to town
+      boolean backWarp = accessor.readByte() == 1; // specifies if back warp or not, 1 town to target, 0 target to town
       return new DoorPacket(ownerId, backWarp);
    }
 }

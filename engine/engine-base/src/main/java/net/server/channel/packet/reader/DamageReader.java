@@ -8,13 +8,13 @@ import client.MapleCharacter;
 import client.MapleJob;
 import client.Skill;
 import client.SkillFactory;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import constants.game.GameConstants;
 import constants.skills.Aran;
 import constants.skills.Beginner;
 import constants.skills.Bishop;
 import constants.skills.BlazeWizard;
-import constants.skills.Bowmaster;
+import constants.skills.BowMaster;
 import constants.skills.Brawler;
 import constants.skills.Buccaneer;
 import constants.skills.ChiefBandit;
@@ -24,14 +24,14 @@ import constants.skills.Crusader;
 import constants.skills.DawnWarrior;
 import constants.skills.DragonKnight;
 import constants.skills.Evan;
-import constants.skills.FPArchMage;
-import constants.skills.FPMage;
+import constants.skills.FirePoisonArchMage;
+import constants.skills.FirePoisonMagician;
 import constants.skills.FPWizard;
 import constants.skills.Gunslinger;
 import constants.skills.Hermit;
 import constants.skills.Hero;
-import constants.skills.ILArchMage;
-import constants.skills.ILMage;
+import constants.skills.IceLighteningArchMagician;
+import constants.skills.IceLighteningMagician;
 import constants.skills.Legend;
 import constants.skills.Marauder;
 import constants.skills.Marksman;
@@ -74,7 +74,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
          }
       }
 
-      if (ret.skill() == Evan.ICE_BREATH || ret.skill() == Evan.FIRE_BREATH || ret.skill() == FPArchMage.BIG_BANG || ret.skill() == ILArchMage.BIG_BANG || ret.skill() == Bishop.BIG_BANG || ret.skill() == Gunslinger.GRENADE || ret.skill() == Brawler.CORKSCREW_BLOW || ret.skill() == ThunderBreaker.CORKSCREW_BLOW || ret.skill() == NightWalker.POISON_BOMB) {
+      if (ret.skill() == Evan.ICE_BREATH || ret.skill() == Evan.FIRE_BREATH || ret.skill() == FirePoisonArchMage.BIG_BANG || ret.skill() == IceLighteningArchMagician.BIG_BANG || ret.skill() == Bishop.BIG_BANG || ret.skill() == Gunslinger.GRENADE || ret.skill() == Brawler.CORKSCREW_BLOW || ret.skill() == ThunderBreaker.CORKSCREW_BLOW || ret.skill() == NightWalker.POISON_BOMB) {
          ret.charge_$eq(accessor.readInt());
       } else {
          ret.charge_$eq(0);
@@ -89,9 +89,9 @@ public class DamageReader implements PacketReader<AttackPacket> {
             accessor.skip(10);
             int bullets = accessor.readByte();
             for (int j = 0; j < bullets; j++) {
-               int mesoid = accessor.readInt();
+               int mesoId = accessor.readInt();
                accessor.skip(1);
-               ret.addDamage(mesoid, null);
+               ret.addDamage(mesoId, null);
             }
             return ret;
          } else {
@@ -112,9 +112,9 @@ public class DamageReader implements PacketReader<AttackPacket> {
             } else {
                int bullets = accessor.readByte();
                for (int j = 0; j < bullets; j++) {
-                  int mesoid = accessor.readInt();
+                  int mesoId = accessor.readInt();
                   accessor.skip(1);
-                  ret.addDamage(mesoid, null);
+                  ret.addDamage(mesoId, null);
                }
             }
          }
@@ -126,7 +126,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
          accessor.readByte();
          ret.rangedDirection_$eq(accessor.readByte());
          accessor.skip(7);
-         if (ret.skill() == Bowmaster.HURRICANE || ret.skill() == Marksman.PIERCING_ARROW || ret.skill() == Corsair.RAPID_FIRE || ret.skill() == WindArcher.HURRICANE) {
+         if (ret.skill() == BowMaster.HURRICANE || ret.skill() == Marksman.PIERCING_ARROW || ret.skill() == Corsair.RAPID_FIRE || ret.skill() == WindArcher.HURRICANE) {
             accessor.skip(4);
          }
       } else {
@@ -135,20 +135,20 @@ public class DamageReader implements PacketReader<AttackPacket> {
          accessor.skip(4);
       }
 
-      // Find the base damage to base futher calculations on.
+      // Find the base damage to base further calculations on.
       // Several skills have their own formula in this section.
       long calcDmgMax;
 
       if (magic && ret.skill() != 0) {
          calcDmgMax = (long) (Math.ceil((chr.getTotalMagic() * Math.ceil(chr.getTotalMagic() / 1000.0) + chr.getTotalMagic()) / 30.0) + Math.ceil(chr.getTotalInt() / 200.0));
       } else if (ret.skill() == 4001344 || ret.skill() == NightWalker.LUCKY_SEVEN || ret.skill() == NightLord.TRIPLE_THROW) {
-         calcDmgMax = (long) ((chr.getTotalLuk() * 5) * Math.ceil(chr.getTotalWatk() / 100.0));
+         calcDmgMax = (long) ((chr.getTotalLuk() * 5) * Math.ceil(chr.getTotalWeaponAttack() / 100.0));
       } else if (ret.skill() == DragonKnight.DRAGON_ROAR) {
-         calcDmgMax = (long) ((chr.getTotalStr() * 4 + chr.getTotalDex()) * Math.ceil(chr.getTotalWatk() / 100.0));
+         calcDmgMax = (long) ((chr.getTotalStr() * 4 + chr.getTotalDex()) * Math.ceil(chr.getTotalWeaponAttack() / 100.0));
       } else if (ret.skill() == NightLord.VENOMOUS_STAR || ret.skill() == Shadower.VENOMOUS_STAB) {
-         calcDmgMax = (long) (Math.ceil((18.5 * (chr.getTotalStr() + chr.getTotalLuk()) + chr.getTotalDex() * 2) / 100.0) * chr.calculateMaxBaseDamage(chr.getTotalWatk()));
+         calcDmgMax = (long) (Math.ceil((18.5 * (chr.getTotalStr() + chr.getTotalLuk()) + chr.getTotalDex() * 2) / 100.0) * chr.calculateMaxBaseDamage(chr.getTotalWeaponAttack()));
       } else {
-         calcDmgMax = chr.calculateMaxBaseDamage(chr.getTotalWatk());
+         calcDmgMax = chr.calculateMaxBaseDamage(chr.getTotalWeaponAttack());
       }
 
       if (ret.skill() != 0) {
@@ -156,19 +156,19 @@ public class DamageReader implements PacketReader<AttackPacket> {
 
          if (magic) {
             // Since the skill is magic based, use the magic formula
-            if (chr.getJob() == MapleJob.IL_ARCHMAGE || chr.getJob() == MapleJob.IL_MAGE) {
-               int skillLvl = chr.getSkillLevel(ILMage.ELEMENT_AMPLIFICATION);
+            if (chr.getJob() == MapleJob.ICE_LIGHTENING_ARCH_MAGICIAN || chr.getJob() == MapleJob.ICE_LIGHTENING_MAGICIAN) {
+               int skillLvl = chr.getSkillLevel(IceLighteningMagician.ELEMENT_AMPLIFICATION);
                if (skillLvl > 0) {
-                  int y = SkillFactory.getSkill(ILMage.ELEMENT_AMPLIFICATION).map(skill -> skill.getEffect(skillLvl)).map(MapleStatEffect::getY).orElse(100);
+                  int y = SkillFactory.getSkill(IceLighteningMagician.ELEMENT_AMPLIFICATION).map(skill -> skill.getEffect(skillLvl)).map(MapleStatEffect::getY).orElse(100);
                   calcDmgMax = calcDmgMax * y / 100;
                }
-            } else if (chr.getJob() == MapleJob.FP_ARCHMAGE || chr.getJob() == MapleJob.FP_MAGE) {
-               int skillLvl = chr.getSkillLevel(FPMage.ELEMENT_AMPLIFICATION);
+            } else if (chr.getJob() == MapleJob.FIRE_POISON_ARCH_MAGICIAN || chr.getJob() == MapleJob.FIRE_POISON_MAGICIAN) {
+               int skillLvl = chr.getSkillLevel(FirePoisonMagician.ELEMENT_AMPLIFICATION);
                if (skillLvl > 0) {
-                  int y = SkillFactory.getSkill(FPMage.ELEMENT_AMPLIFICATION).map(skill -> skill.getEffect(skillLvl)).map(MapleStatEffect::getY).orElse(100);
+                  int y = SkillFactory.getSkill(FirePoisonMagician.ELEMENT_AMPLIFICATION).map(skill -> skill.getEffect(skillLvl)).map(MapleStatEffect::getY).orElse(100);
                   calcDmgMax = calcDmgMax * y / 100;
                }
-            } else if (chr.getJob() == MapleJob.BLAZEWIZARD3 || chr.getJob() == MapleJob.BLAZEWIZARD4) {
+            } else if (chr.getJob() == MapleJob.BLAZE_WIZARD_3 || chr.getJob() == MapleJob.BLAZE_WIZARD_4) {
                int skillLvl = chr.getSkillLevel(BlazeWizard.ELEMENT_AMPLIFICATION);
                if (skillLvl > 0) {
                   int y = SkillFactory.getSkill(BlazeWizard.ELEMENT_AMPLIFICATION).map(skill -> skill.getEffect(skillLvl)).map(MapleStatEffect::getY).orElse(100);
@@ -182,7 +182,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
                }
             }
 
-            calcDmgMax *= effect.getMatk();
+            calcDmgMax *= effect.getMagicAttack();
             if (ret.skill() == Cleric.HEAL) {
                // This formula is still a bit wonky, but it is fairly accurate.
                calcDmgMax = (int) Math.round((chr.getTotalInt() * 4.8 + chr.getTotalLuk() * 4) * chr.getTotalMagic() / 1000);
@@ -203,12 +203,12 @@ public class DamageReader implements PacketReader<AttackPacket> {
       Integer comboBuff = chr.getBuffedValue(MapleBuffStat.COMBO);
       if (comboBuff != null && comboBuff > 0) {
          int oid = chr.isCygnus() ? DawnWarrior.COMBO : Crusader.COMBO;
-         int advcomboid = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
+         int advancedComboId = chr.isCygnus() ? DawnWarrior.ADVANCED_COMBO : Hero.ADVANCED_COMBO;
 
          if (comboBuff > 6) {
             // Advanced Combo
-            int effectDamage = SkillFactory.getSkill(advcomboid)
-                  .map(skill -> skill.getEffect(chr.getSkillLevel(advcomboid)))
+            int effectDamage = SkillFactory.getSkill(advancedComboId)
+                  .map(skill -> skill.getEffect(chr.getSkillLevel(advancedComboId)))
                   .map(MapleStatEffect::getDamage)
                   .orElse(0);
             calcDmgMax = (long) Math.floor(calcDmgMax * (effectDamage + 50.0) / 100 + 0.20 + (comboBuff - 5) * 0.04);
@@ -258,8 +258,8 @@ public class DamageReader implements PacketReader<AttackPacket> {
       }
 
       int bonusDmgBuff = 100;
-      for (PlayerBuffValueHolder pbvh : chr.getAllBuffs()) {
-         int bonusDmg = pbvh.effect.getDamage() - 100;
+      for (PlayerBuffValueHolder buffValueHolder : chr.getAllBuffs()) {
+         int bonusDmg = buffValueHolder.effect.getDamage() - 100;
          bonusDmgBuff += bonusDmg;
       }
 
@@ -272,21 +272,21 @@ public class DamageReader implements PacketReader<AttackPacket> {
          calcDmgMax += 80000; // Aran Tutorial.
       }
 
-      boolean canCrit = false;
-      if (chr.getJob().isA((MapleJob.BOWMAN)) || chr.getJob().isA(MapleJob.THIEF) || chr.getJob().isA(MapleJob.NIGHTWALKER1) || chr.getJob().isA(MapleJob.WINDARCHER1) || chr.getJob() == MapleJob.ARAN3 || chr.getJob() == MapleJob.ARAN4 || chr.getJob() == MapleJob.MARAUDER || chr.getJob() == MapleJob.BUCCANEER) {
-         canCrit = true;
+      boolean canCritical = false;
+      if (chr.getJob().isA((MapleJob.BOWMAN)) || chr.getJob().isA(MapleJob.THIEF) || chr.getJob().isA(MapleJob.NIGHT_WALKER_1) || chr.getJob().isA(MapleJob.WIND_ARCHER_1) || chr.getJob() == MapleJob.ARAN3 || chr.getJob() == MapleJob.ARAN4 || chr.getJob() == MapleJob.MARAUDER || chr.getJob() == MapleJob.BUCCANEER) {
+         canCritical = true;
       }
 
       if (chr.getBuffEffect(MapleBuffStat.SHARP_EYES) != null) {
-         // Any class that has sharp eyes can crit. Also, since it stacks with normal crit go ahead
+         // Any class that has sharp eyes can critical. Also, since it stacks with normal critical go ahead
          // and calc it in.
 
-         canCrit = true;
+         canCritical = true;
          calcDmgMax *= 1.4;
       }
 
       boolean shadowPartner = false;
-      if (chr.getBuffEffect(MapleBuffStat.SHADOWPARTNER) != null) {
+      if (chr.getBuffEffect(MapleBuffStat.SHADOW_PARTNER) != null) {
          shadowPartner = true;
       }
 
@@ -351,7 +351,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
                   calcDmgMax *= 1.5;
                }
             }
-            if (ret.skill() == FPWizard.POISON_BREATH || ret.skill() == FPMage.POISON_MIST || ret.skill() == FPArchMage.FIRE_DEMON || ret.skill() == ILArchMage.ICE_DEMON) {
+            if (ret.skill() == FPWizard.POISON_BREATH || ret.skill() == FirePoisonMagician.POISON_MIST || ret.skill() == FirePoisonArchMage.FIRE_DEMON || ret.skill() == IceLighteningArchMagician.ICE_DEMON) {
                if (monster != null) {
                   // Turns out poison is completely server side, so I don't know why I added this. >.<
                   //calcDmgMax = monster.getHp() / (70 - chr.getSkillLevel(skill));
@@ -362,7 +362,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
                }
             } else if (ret.skill() == Hermit.SHADOW_MESO) {
                if (monster != null) {
-                  monster.debuffMob(Hermit.SHADOW_MESO);
+                  monster.removeMobStatus(Hermit.SHADOW_MESO);
                }
             } else if (ret.skill() == Aran.BODY_PRESSURE) {
                if (monster != null) {
@@ -389,7 +389,7 @@ public class DamageReader implements PacketReader<AttackPacket> {
             }
             if (shadowPartner) {
                // For shadow partner, the second half of the hits only do 50% damage. So calc that
-               // in for the crit effects.
+               // in for the critical effects.
                if (j >= ret.numDamage() / 2) {
                   hitDmgMax *= 0.5;
                }
@@ -402,24 +402,24 @@ public class DamageReader implements PacketReader<AttackPacket> {
                hitDmgMax = 82569000; // 30% of Max HP of strongest Dojo boss
             }
 
-            long maxWithCrit = hitDmgMax;
-            if (canCrit) // They can crit, so up the max.
+            long maxWithCritical = hitDmgMax;
+            if (canCritical) // They can critical, so up the max.
             {
-               maxWithCrit *= 2;
+               maxWithCritical *= 2;
             }
 
             // Warn if the damage is over 1.5x what we calculated above.
-            if (damage > maxWithCrit * 1.5) {
-               AutobanFactory.DAMAGE_HACK.alert(chr, "DMG: " + damage + " MaxDMG: " + maxWithCrit + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.id() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
+            if (damage > maxWithCritical * 1.5) {
+               AutoBanFactory.DAMAGE_HACK.alert(chr, "DMG: " + damage + " MaxDMG: " + maxWithCritical + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.id() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
             }
 
             // Add a ab point if its over 5x what we calculated.
-            if (damage > maxWithCrit * 5) {
-               AutobanFactory.DAMAGE_HACK.addPoint(chr.getAutobanManager(), "DMG: " + damage + " MaxDMG: " + maxWithCrit + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.id() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
+            if (damage > maxWithCritical * 5) {
+               AutoBanFactory.DAMAGE_HACK.addPoint(chr.getAutoBanManager(), "DMG: " + damage + " MaxDMG: " + maxWithCritical + " SID: " + ret.skill() + " MobID: " + (monster != null ? monster.id() : "null") + " Map: " + chr.getMap().getMapName() + " (" + chr.getMapId() + ")");
             }
 
-            if (ret.skill() == Marksman.SNIPE || (canCrit && damage > hitDmgMax)) {
-               // If the skill is a crit, inverse the damage to make it show up on clients.
+            if (ret.skill() == Marksman.SNIPE || (canCritical && damage > hitDmgMax)) {
+               // If the skill is a critical, inverse the damage to make it show up on clients.
                damage = -Integer.MAX_VALUE + damage - 1;
             }
 

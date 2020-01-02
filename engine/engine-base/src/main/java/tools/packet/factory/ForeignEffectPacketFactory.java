@@ -71,7 +71,7 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
       writer.writeLong(0);
    }
 
-   protected void showBuffEffectWithLevel(MaplePacketLittleEndianWriter writer, ShowBuffEffectWithLevel packet) {   // updated packet structure found thanks to Rien dev team
+   protected void showBuffEffectWithLevel(MaplePacketLittleEndianWriter writer, ShowBuffEffectWithLevel packet) {
       writer.writeInt(packet.characterId());
       writer.write(packet.effectId());
       writer.writeInt(packet.skillId());
@@ -131,7 +131,7 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
       writer.write(packet.amount());
    }
 
-   protected void getScrollEffect(MaplePacketLittleEndianWriter writer, ShowScrollEffect packet) {   // thanks to Rien dev team
+   protected void getScrollEffect(MaplePacketLittleEndianWriter writer, ShowScrollEffect packet) {
       writer.writeInt(packet.characterId());
       writer.writeBool(packet.success() == ScrollResult.SUCCESS);
       writer.writeBool(packet.success() == ScrollResult.CURSE);
@@ -154,8 +154,6 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
 
    /**
     * Sends a player hint.
-    *
-    * @return The player hint packet.
     */
    protected void sendHint(MaplePacketLittleEndianWriter writer, ShowHint packet) {
       int width = packet.width();
@@ -182,7 +180,7 @@ public class ForeignEffectPacketFactory extends AbstractPacketFactory {
       writer.write(packet.level());
       writer.write(packet.flags());
       writer.write(packet.speed());
-      writer.write(packet.direction()); //Mmmk
+      writer.write(packet.direction());
    }
 
    protected void itemEffect(MaplePacketLittleEndianWriter writer, ShowItemEffect packet) {

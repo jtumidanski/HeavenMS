@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.life;
 
 import java.awt.Point;
@@ -29,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import provider.MapleData;
@@ -46,7 +26,7 @@ public class MapleLifeFactory {
    private static MapleData mobStringData = stringDataWZ.getData("Mob.img");
    private static MapleData npcStringData = stringDataWZ.getData("Npc.img");
    private static Map<Integer, MapleMonsterStats> monsterStats = new HashMap<>();
-   private static Set<Integer> hpbarBosses = getHpBarBosses();
+   private static Set<Integer> hpBarBosses = getHpBarBosses();
 
    private static Set<Integer> getHpBarBosses() {
       Set<Integer> ret = new HashSet<>();
@@ -63,7 +43,7 @@ public class MapleLifeFactory {
       if (type.equalsIgnoreCase("n")) {
          return getNPC(id);
       } else if (type.equalsIgnoreCase("m")) {
-         return getMonster(id);
+         return getMonster(id).orElseThrow();
       } else {
          System.out.println("Unknown Life type: " + type);
          return null;
@@ -150,18 +130,17 @@ public class MapleLifeFactory {
       stats.isFirstAttack_$eq(firstAttack > 0);
       stats.dropPeriod_$eq(MapleDataTool.getIntConvert("dropItemPeriod", monsterInfoData, stats.dropPeriod() / 10000) * 10000);
 
-      // thanks yuxaij, Riizade, Z1peR, Anesthetic for noticing some bosses crashing players due to missing requirements
-      boolean hpbarBoss = stats.isBoss() && hpbarBosses.contains(mid);
-      stats.tagColor_$eq((byte) (hpbarBoss ? MapleDataTool.getIntConvert("hpTagColor", monsterInfoData, 0) : 0));
-      stats.tagBackgroundColor_$eq((byte) (hpbarBoss ? MapleDataTool.getIntConvert("hpTagBgcolor", monsterInfoData, 0) : 0));
+      boolean hpBarBoss = stats.isBoss() && hpBarBosses.contains(mid);
+      stats.tagColor_$eq((byte) (hpBarBoss ? MapleDataTool.getIntConvert("hpTagColor", monsterInfoData, 0) : 0));
+      stats.tagBackgroundColor_$eq((byte) (hpBarBoss ? MapleDataTool.getIntConvert("hpTagBgcolor", monsterInfoData, 0) : 0));
 
-      for (MapleData idata : monsterData) {
-         if (!idata.getName().equals("info")) {
+      for (MapleData data : monsterData) {
+         if (!data.getName().equals("info")) {
             int delay = 0;
-            for (MapleData pic : idata.getChildren()) {
+            for (MapleData pic : data.getChildren()) {
                delay += MapleDataTool.getIntConvert("delay", pic, 0);
             }
-            stats.setAnimationTime(idata.getName(), delay);
+            stats.setAnimationTime(data.getName(), delay);
          }
       }
       MapleData reviveInfo = monsterInfoData.getChildByPath("revive");
@@ -230,22 +209,25 @@ public class MapleLifeFactory {
       return new Pair<>(stats, attackInfos);
    }
 
-   public static MapleMonster getMonster(int mid) {
+   public static Optional<MapleMonster> getMonster(int monsterId) {
       try {
-         MapleMonsterStats stats = monsterStats.get(mid);
+         MapleMonsterStats stats = monsterStats.get(monsterId);
          if (stats == null) {
-            Pair<MapleMonsterStats, List<MobAttackInfoHolder>> mobStats = getMonsterStats(mid);
+            Pair<MapleMonsterStats, List<MobAttackInfoHolder>> mobStats = getMonsterStats(monsterId);
+            if (mobStats == null) {
+               return Optional.empty();
+            }
+
             stats = mobStats.getLeft();
-            setMonsterAttackInfo(mid, mobStats.getRight());
+            setMonsterAttackInfo(monsterId, mobStats.getRight());
 
-            monsterStats.put(mid, stats);
+            monsterStats.put(monsterId, stats);
          }
-         return new MapleMonster(mid, stats);
+         return Optional.of(new MapleMonster(monsterId, stats));
       } catch (NullPointerException npe) {
-         System.out.println("[SEVERE] MOB " + mid + " failed to load. Issue: " + npe.getMessage() + "\n\n");
+         System.out.println("[SEVERE] MOB " + monsterId + " failed to load. Issue: " + npe.getMessage() + "\n\n");
          npe.printStackTrace();
-
-         return null;
+         return Optional.empty();
       }
    }
 

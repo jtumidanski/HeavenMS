@@ -4,11 +4,7 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.services.BaseScheduler;
 import net.server.services.BaseService;
 
-/**
- * @author Ronan
- */
 public class CharacterSaveService extends BaseService {
-
    CharacterSaveScheduler chrSaveScheduler = new CharacterSaveScheduler();
 
    @Override
@@ -26,7 +22,7 @@ public class CharacterSaveService extends BaseService {
    private class CharacterSaveScheduler extends BaseScheduler {
 
       public CharacterSaveScheduler() {
-         super(MonitoredLockType.WORLD_SAVECHARS);
+         super(MonitoredLockType.WORLD_SAVE_CHARACTERS);
       }
 
       public void registerSaveCharacter(Integer characterId, Runnable runAction) {

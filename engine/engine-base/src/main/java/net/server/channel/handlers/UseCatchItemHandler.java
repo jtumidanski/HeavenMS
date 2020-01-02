@@ -1,29 +1,8 @@
-/*
-    This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-               Matthias Butz <matze@odinms.de>
-               Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanManager;
+import client.autoban.AutoBanManager;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import constants.inventory.ItemConstants;
@@ -41,9 +20,6 @@ import tools.packet.monster.CatchMonsterFailure;
 import tools.packet.monster.CatchMonsterWithItem;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author kevintjuh93
- */
 public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchItemPacket> {
    @Override
    public Class<UseCatchItemReader> getReaderClass() {
@@ -53,7 +29,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
    @Override
    public void handlePacket(UseCatchItemPacket packet, MapleClient client) {
       MapleCharacter chr = client.getPlayer();
-      AutobanManager abm = chr.getAutobanManager();
+      AutoBanManager abm = chr.getAutoBanManager();
       abm.setTimestamp(5, Server.getInstance().getCurrentTimestamp(), 4);
       int monsterId = packet.monsterId();
       int itemId = packet.itemId();
@@ -94,12 +70,11 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             useFishNet(client, chr, abm, monsterId, itemId, mob);
             break;
          default:
-            // proper Fish catch, thanks to Dragohe4rt
             defaultCatchItem(client, chr, abm, monsterId, itemId, mob);
       }
    }
 
-   private void defaultCatchItem(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
+   private void defaultCatchItem(MapleClient client, MapleCharacter chr, AutoBanManager abm, int monsterId, int itemId, MapleMonster mob) {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
       int itemGanho = ii.getCreateItem(itemId);
       int mobItem = ii.getMobItem(itemId);
@@ -127,7 +102,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
       PacketCreator.announce(client, new EnableActions());
    }
 
-   private void useFishNet(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
+   private void useFishNet(MapleClient client, MapleCharacter chr, AutoBanManager abm, int monsterId, int itemId, MapleMonster mob) {
       if (mob.id() == 9500336) {
          if ((abm.getLastSpam(10) + 3000) < currentServerTime()) {
             abm.spam(10);
@@ -212,7 +187,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
       PacketCreator.announce(client, new EnableActions());
    }
 
-   private void useElementRock(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
+   private void useElementRock(MapleClient client, MapleCharacter chr, AutoBanManager abm, int monsterId, int itemId, MapleMonster mob) {
       if (mob.id() == 9300157) {
          if ((abm.getLastSpam(10) + 800) < currentServerTime()) {
             if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {
@@ -238,7 +213,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
       }
    }
 
-   private void usePouch(MapleClient client, MapleCharacter chr, AutobanManager abm, int monsterId, int itemId, MapleMonster mob) {
+   private void usePouch(MapleClient client, MapleCharacter chr, AutoBanManager abm, int monsterId, int itemId, MapleMonster mob) {
       if (mob.id() == 9500197) {
          if ((abm.getLastSpam(10) + 1000) < currentServerTime()) {
             if (mob.getHp() < ((mob.getMaxHp() / 10) * 4)) {

@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MaprienArrow {
+class MapRienArrow {
 
    static def start(MapScriptMethods ms) {
       if (ms.containsAreaInfo((short) 21019, "miss=o;helper=clear")) {
@@ -13,9 +13,9 @@ class MaprienArrow {
    }
 }
 
-MaprienArrow getMap() {
-   getBinding().setVariable("map", new MaprienArrow())
-   return (MaprienArrow) getBinding().getVariable("map")
+MapRienArrow getMap() {
+   getBinding().setVariable("map", new MapRienArrow())
+   return (MapRienArrow) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

@@ -1,22 +1,3 @@
-/*
-    This file is part of the HeavenMS MapleStory Server
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package tools.packets;
 
 import java.util.Calendar;
@@ -33,10 +14,6 @@ import tools.ServerNoticeType;
 import tools.packet.foreigneffect.ShowForeignInfo;
 import tools.packet.showitemgaininchat.ShowInfo;
 
-/**
- * @author FateJiki (RaGeZONE)
- * @author Ronan - timing pattern
- */
 public class Fishing {
 
    private static double getFishingLikelihood(int x) {
@@ -70,9 +47,7 @@ public class Fishing {
    }
 
    public static void doFishing(MapleCharacter chr, int baitLevel, double yearLikelihood, double timeLikelihood) {
-      // thanks Fadi, Vcoc for suggesting a custom fishing system
-
-      if (!chr.isLoggedinWorld() || !chr.isAlive()) {
+      if (!chr.isLoggedInWorld() || !chr.isAlive()) {
          return;
       }
 
@@ -108,13 +83,13 @@ public class Fishing {
                rewardStr = expAward + " EXP.";
                break;
             case 2:
-               int itemid = getRandomItem();
-               rewardStr = "a(n) " + MapleItemInformationProvider.getInstance().getName(itemid) + ".";
+               int itemId = getRandomItem();
+               rewardStr = "a(n) " + MapleItemInformationProvider.getInstance().getName(itemId) + ".";
 
-               if (chr.canHold(itemid)) {
-                  chr.getAbstractPlayerInteraction().gainItem(itemid, true);
+               if (chr.canHold(itemId)) {
+                  chr.getAbstractPlayerInteraction().gainItem(itemId, true);
                } else {
-                  chr.showHint("Couldn't catch a(n) #r" + MapleItemInformationProvider.getInstance().getName(itemid) + "#k due to #e#b" + ItemConstants.getInventoryType(itemid) + "#k#n inventory limit.");
+                  chr.showHint("Couldn't catch a(n) #r" + MapleItemInformationProvider.getInstance().getName(itemId) + "#k due to #e#b" + ItemConstants.getInventoryType(itemId) + "#k#n inventory limit.");
                   rewardStr += ".. but has goofed up due to full inventory.";
                }
                break;
@@ -130,8 +105,8 @@ public class Fishing {
    public static int getRandomItem() {
       int rand = (int) (100.0 * Math.random());
       int[] commons = {1002851, 2002020, 2002020, 2000006, 2000018, 2002018, 2002024, 2002027, 2002027, 2000018, 2000018, 2000018, 2000018, 2002030, 2002018, 2000016}; // filler' up
-      int[] uncommons = {1000025, 1002662, 1002812, 1002850, 1002881, 1002880, 1012072, 4020009, 2043220, 2043022, 2040543, 2044420, 2040943, 2043713, 2044220, 2044120, 2040429, 2043220, 2040943}; // filler' uptoo
-      int[] rares = {1002859, 1002553, 1002762, 1002763, 1002764, 1002765, 1002766, 1002663, 1002788, 1002949, 2049100, 2340000, 2040822, 2040822, 2040822, 2040822}; // filler' uplast
+      int[] uncommons = {1000025, 1002662, 1002812, 1002850, 1002881, 1002880, 1012072, 4020009, 2043220, 2043022, 2040543, 2044420, 2040943, 2043713, 2044220, 2044120, 2040429, 2043220, 2040943}; // filler' up too
+      int[] rares = {1002859, 1002553, 1002762, 1002763, 1002764, 1002765, 1002766, 1002663, 1002788, 1002949, 2049100, 2340000, 2040822, 2040822, 2040822, 2040822}; // filler' up last
 
       if (rand >= 25) {
          return commons[(int) (commons.length * Math.random())];
@@ -175,30 +150,30 @@ public class Fishing {
          b[i] = dayHits10;
       }
 
-      long maxhit = 0, minhit = Long.MAX_VALUE;
+      long maxHit = 0, minHit = Long.MAX_VALUE;
       for (int i = 0; i < 365; i++) {
-         if (maxhit < a[i]) {
-            maxhit = a[i];
+         if (maxHit < a[i]) {
+            maxHit = a[i];
          }
 
-         if (minhit > a[i]) {
-            minhit = a[i];
+         if (minHit > a[i]) {
+            minHit = a[i];
          }
       }
 
-      long maxhit10 = 0, minhit10 = Long.MAX_VALUE;
+      long maxHit10 = 0, minHit10 = Long.MAX_VALUE;
       for (int i = 0; i < 365; i++) {
-         if (maxhit10 < b[i]) {
-            maxhit10 = b[i];
+         if (maxHit10 < b[i]) {
+            maxHit10 = b[i];
          }
 
-         if (minhit10 > b[i]) {
-            minhit10 = b[i];
+         if (minHit10 > b[i]) {
+            minHit10 = b[i];
          }
       }
 
-      System.out.println("Diary   min " + minhit + " max " + maxhit);
-      System.out.println("Diary10 min " + minhit10 + " max " + maxhit10);
+      System.out.println("Diary   min " + minHit + " max " + maxHit);
+      System.out.println("Diary10 min " + minHit10 + " max " + maxHit10);
       System.out.println("Hits: " + hits + "Hits10: " + hits10 + " Total: " + total + "   --  %1000: " + (hits * 1000 / total) + ", +10 %1000: " + (hits10 * 1000 / total));
    }
 } 

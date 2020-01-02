@@ -25,11 +25,11 @@ class Quest2570 {
       } else if (status == 1) {
          qm.sendNextPrev("Cutter told you that he wants you to become a #bCannoneer#k, right? I agree with him, but I'm worried that your heart might not be in it. Maybe if you knew more about the pirates, you would be more interested. Let me tell you a little about us.")
       } else if (status == 2) {
-         qm.sendNextPrev("I brought the pirates together to start working against the Black Mage, the great evil that threatens all of Maple World. Turns out the hero business is more profitable than looting and pillaging!")
+         qm.sendNextPrev("I brought the pirates together to start working against the Black Magician, the great evil that threatens all of Maple World. Turns out the hero business is more profitable than looting and pillaging!")
       } else if (status == 3) {
-         qm.sendNextPrev("If you become a Pirate, you can help investigate the Black Mage's plots, and assist in the defense of Maple World. Keep in mind that I won't make you do anything...I'm primarily a Job Instructor, and just guide the pirates in a general sense.")
+         qm.sendNextPrev("If you become a Pirate, you can help investigate the Black Magician's plots, and assist in the defense of Maple World. Keep in mind that I won't make you do anything...I'm primarily a Job Instructor, and just guide the pirates in a general sense.")
       } else if (status == 4) {
-         qm.sendNextPrev("But, I know you would help us fight the Black Mage. You have that gleam in your eye that all heroes do. Anyway, I've said my piece.")
+         qm.sendNextPrev("But, I know you would help us fight the Black Magician. You have that gleam in your eye that all heroes do. Anyway, I've said my piece.")
       } else if (status == 5) {
          qm.sendAcceptDecline("Now, it's all up to you. Do you wish to join the pirates? I would be quite pleased if you became a Cannoneer. ")
       } else if (status == 6) {
@@ -58,7 +58,7 @@ class Quest2570 {
       } else if (status == 9) {
          qm.sendNextPrev("Now, there is one last thing that you need to remember. More than anything else, you need to keep your HP up. If you fall in battle, you'll lose some of your EXP. And I'm SURE you don't want that, right?")
       } else if (status == 10) {
-         qm.sendNextPrev("Well, that's it! I have taught you everything you need to know. I also gave you a few decent weapons, so make good use of them. Now, go forth, grow stronger, and kick around the Black Mage's minions, if you get the chance!")
+         qm.sendNextPrev("Well, that's it! I have taught you everything you need to know. I also gave you a few decent weapons, so make good use of them. Now, go forth, grow stronger, and kick around the Black Magician's minions, if you get the chance!")
          qm.forceStartQuest(2945, 1)
       } else if (status == 11) {
          qm.dispose()//let them go back :P

@@ -11,7 +11,7 @@ import java.util.Calendar;
 public class FilePrinter {
 
    public static final String
-         AUTOBAN_WARNING = "game/AutoBanWarning.txt",    // log naming version by Vcoc
+         AUTOBAN_WARNING = "game/AutoBanWarning.txt",
          AUTOBAN_DC = "game/AutoBanDC.txt",
          ACCOUNT_STUCK = "players/AccountStuck.txt",
          COMMAND_GM = "reports/Gm.txt",
@@ -93,7 +93,7 @@ public class FilePrinter {
          out = new FileOutputStream(file, true);
          out.write(stringT.getBytes());
          out.write("\r\n---------------------------------\r\n".getBytes());
-         out.write("\r\n".getBytes()); // thanks Vcoc for suggesting review body log structure
+         out.write("\r\n".getBytes());
       } catch (IOException ess) {
          ess.printStackTrace();
       } finally {
@@ -101,8 +101,8 @@ public class FilePrinter {
             if (out != null) {
                out.close();
             }
-         } catch (IOException ignore) {
-            ignore.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
       }
    }
@@ -132,8 +132,8 @@ public class FilePrinter {
             if (out != null) {
                out.close();
             }
-         } catch (IOException ignore) {
-            ignore.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
       }
    }
@@ -160,8 +160,8 @@ public class FilePrinter {
             if (out != null) {
                out.close();
             }
-         } catch (IOException ignore) {
-            ignore.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
       }
    }
@@ -194,20 +194,20 @@ public class FilePrinter {
             if (out != null) {
                out.close();
             }
-         } catch (IOException ignore) {
-            ignore.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
       }
    }
 
-   private static String getString(final Throwable e) {
+   private static String getString(final Throwable throwable) {
       String retValue;
       StringWriter sw = null;
       PrintWriter pw = null;
       try {
          sw = new StringWriter();
          pw = new PrintWriter(sw);
-         e.printStackTrace(pw);
+         throwable.printStackTrace(pw);
          retValue = sw.toString();
       } finally {
          try {
@@ -217,8 +217,8 @@ public class FilePrinter {
             if (sw != null) {
                sw.close();
             }
-         } catch (IOException ignore) {
-            ignore.printStackTrace();
+         } catch (IOException e) {
+            e.printStackTrace();
          }
       }
       return retValue;

@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.util.List;
@@ -196,17 +175,17 @@ public final class BBSOperationHandler extends AbstractPacketHandler<BaseBBSOper
       });
    }
 
-   private void displayThread(MapleClient client, int threadid) {
-      displayThread(client, threadid, true);
+   private void displayThread(MapleClient client, int threadId) {
+      displayThread(client, threadId, true);
    }
 
-   private void displayThread(MapleClient client, int threadid, boolean bIsThreadIdLocal) {
+   private void displayThread(MapleClient client, int threadId, boolean bIsThreadIdLocal) {
       MapleCharacter mc = client.getPlayer();
       if (mc.getGuildId() <= 0) {
          return;
       }
 
-      DatabaseConnection.getInstance().withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadid, mc.getGuildId(), bIsThreadIdLocal)
-            .ifPresent(threadData -> PacketCreator.announce(client, new ShowThread(bIsThreadIdLocal ? threadid : threadData.threadId(), threadData))));
+      DatabaseConnection.getInstance().withConnection(connection -> BbsThreadProvider.getInstance().getByThreadAndGuildId(connection, threadId, mc.getGuildId(), bIsThreadIdLocal)
+            .ifPresent(threadData -> PacketCreator.announce(client, new ShowThread(bIsThreadIdLocal ? threadId : threadData.threadId(), threadData))));
    }
 }

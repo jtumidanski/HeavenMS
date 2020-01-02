@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.quest.actions;
 
 import java.util.ArrayList;
@@ -27,18 +6,13 @@ import java.util.List;
 import java.util.Map;
 
 import client.MapleCharacter;
-import client.MapleJob;
 import client.SkillFactory;
 import provider.MapleData;
 import provider.MapleDataTool;
 import server.quest.MapleQuest;
 import server.quest.MapleQuestActionType;
 
-/**
- * @author Tyler (Twdtwd)
- */
 public class SkillAction extends MapleQuestAction {
-   int itemEffect;
    Map<Integer, SkillData> skillData = new HashMap<>();
 
    public SkillAction(MapleQuest quest, MapleData data) {
@@ -46,15 +20,15 @@ public class SkillAction extends MapleQuestAction {
       processData(data);
    }
 
-
    @Override
    public void processData(MapleData data) {
       for (MapleData sEntry : data) {
          byte skillLevel = 0;
-         int skillid = MapleDataTool.getInt(sEntry.getChildByPath("id"));
+         int skillId = MapleDataTool.getInt(sEntry.getChildByPath("id"));
          MapleData skillLevelData = sEntry.getChildByPath("skillLevel");
-         if (skillLevelData != null)
+         if (skillLevelData != null) {
             skillLevel = (byte) MapleDataTool.getInt(skillLevelData);
+         }
          int masterLevel = MapleDataTool.getInt(sEntry.getChildByPath("masterLevel"));
          List<Integer> jobs = new ArrayList<>();
 
@@ -65,55 +39,26 @@ public class SkillAction extends MapleQuestAction {
             }
          }
 
-         skillData.put(skillid, new SkillData(skillid, skillLevel, masterLevel, jobs));
+         skillData.put(skillId, new SkillData(skillId, skillLevel, masterLevel, jobs));
       }
    }
 
    @Override
    public void run(MapleCharacter chr, Integer extSelection) {
       for (SkillData skill : skillData.values()) {
-         SkillFactory.getSkill(skill.getId()).ifPresent(skill1 -> {
+         SkillFactory.getSkill(skill.id()).ifPresent(skill1 -> {
             boolean shouldLearn = false;
 
-            if (skill.jobsContains(chr.getJob()) || skill1.isBeginnerSkill())
+            if (skill.jobsContains(chr.getJob()) || skill1.isBeginnerSkill()) {
                shouldLearn = true;
+            }
 
-            byte skillLevel = (byte) Math.max(skill.getLevel(), chr.getSkillLevel(skill1));
-            int masterLevel = Math.max(skill.getMasterLevel(), chr.getMasterLevel(skill1));
+            byte skillLevel = (byte) Math.max(skill.level(), chr.getSkillLevel(skill1));
+            int masterLevel = Math.max(skill.masterLevel(), chr.getMasterLevel(skill1));
             if (shouldLearn) {
                chr.changeSkillLevel(skill1, skillLevel, masterLevel, -1);
             }
          });
       }
-   }
-
-   private class SkillData {
-      protected int id, level, masterLevel;
-      List<Integer> jobs;
-
-      public SkillData(int id, int level, int masterLevel, List<Integer> jobs) {
-         this.id = id;
-         this.level = level;
-         this.masterLevel = masterLevel;
-         this.jobs = jobs;
-      }
-
-      public int getId() {
-         return id;
-      }
-
-      public int getLevel() {
-         return level;
-      }
-
-      public int getMasterLevel() {
-         return masterLevel;
-      }
-
-      public boolean jobsContains(MapleJob job) {
-         return jobs.contains(job.getId());
-      }
-
-
    }
 } 

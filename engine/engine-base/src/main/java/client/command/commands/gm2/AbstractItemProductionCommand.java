@@ -43,18 +43,16 @@ public abstract class AbstractItemProductionCommand extends Command {
       }
 
       if (ItemConstants.isPet(itemId)) {
-         if (params.length >= 2) {   // thanks to istreety & TacoBell
+         if (params.length >= 2) {
             quantity = 1;
             long days = Math.max(1, Integer.parseInt(params[1]));
             long expiration = System.currentTimeMillis() + (days * 24 * 60 * 60 * 1000);
             int petId = PetProcessor.getInstance().createPet(itemId);
-
             producePet(client, itemId, quantity, petId, expiration);
-            return;
          } else {
-            player.yellowMessage("Pet Syntax: !item <itemid> <expiration>");
-            return;
+            player.yellowMessage("Pet Syntax: !item <item id> <expiration>");
          }
+         return;
       }
 
       produceItem(client, itemId, quantity);

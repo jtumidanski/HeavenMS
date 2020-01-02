@@ -16,7 +16,7 @@ class NPC1200006 {
    int sel = -1
 
    def start() {
-      cm.sendOk("The current is serene, wich means we may arive in lith harbor earlier than expected.")
+      cm.sendOk("The current is serene, which means we may arrive in lith harbor earlier than expected.")
       cm.dispose()
    }
 

@@ -21,7 +21,7 @@ class NPC9201113 {
    int sel = -1
 
    MapleExpedition expedition
-   List<Map.Entry<Integer, String>> expedMembers
+   List<Map.Entry<Integer, String>> expeditionMembers
    MapleCharacter player
    EventManager em
    MapleExpeditionType cwkpq = MapleExpeditionType.CWKPQ
@@ -46,13 +46,12 @@ class NPC9201113 {
 
          if (status == 0) {
             if (player.getLevel() < cwkpq.getMinLevel() || player.getLevel() > cwkpq.getMaxLevel()) {
-               //Don't fit requirement, thanks Conrad
                cm.sendOk("You do not meet the criteria to take attempt Crimsonwood Keep Party Quest!")
                cm.dispose()
             } else if (expedition == null) { //Start an expedition
                cm.sendSimple("#e#b<Party Quest: Crimsonwood Keep>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nWould you like to assemble a team to attempt the #rCrimsonwood Keep Party Quest#k?\r\n#b#L1#Lets get this going!#l\r\n#L2#No, I think I'll wait a bit...#l")
                status = 1
-            } else if (expedition.isLeader(player)) { //If you're the leader, manage the exped
+            } else if (expedition.isLeader(player)) { //If you're the leader, manage the expedition
                if (expedition.isInProgress()) {
                   cm.sendOk("Your expedition is already in progress, for those who remain battling lets pray for those brave souls.")
                   cm.dispose()
@@ -107,8 +106,8 @@ class NPC9201113 {
                   cm.dispose()
                   return
                }
-               expedMembers = expedition.getMemberList()
-               int size = expedMembers.size()
+               expeditionMembers = expedition.getMemberList()
+               int size = expeditionMembers.size()
                if (size == 1) {
                   cm.sendOk("You are the only member of the expedition.")
                   cm.dispose()
@@ -117,7 +116,7 @@ class NPC9201113 {
                String text = "The following members make up your expedition (Click on them to expel them):\r\n"
                text += "\r\n\t\t1." + expedition.getLeader().getName()
                for (int i = 1; i < size; i++) {
-                  text += "\r\n#b#L" + (i + 1) + "#" + (i + 1) + ". " + expedMembers.get(i).getValue() + "#l\n"
+                  text += "\r\n#b#L" + (i + 1) + "#" + (i + 1) + ". " + expeditionMembers.get(i).getValue() + "#l\n"
                }
                cm.sendSimple(text)
                status = 6
@@ -156,7 +155,7 @@ class NPC9201113 {
             cm.dispose()
          } else if (status == 6) {
             if (selection > 0) {
-               Map.Entry<Integer, String> banned = expedMembers.get(selection - 1)
+               Map.Entry<Integer, String> banned = expeditionMembers.get(selection - 1)
                expedition.ban(banned)
                cm.sendOk("You have banned " + banned.getValue() + " from the expedition.")
                cm.dispose()

@@ -43,9 +43,9 @@ public class SpecialShopPacketFactory extends AbstractPacketFactory {
          writer.write(new byte[]{(byte) 0x88, 19, 0, 0, 7, 0, 0, 0, (byte) 0xF4, 1, 0, 0, (byte) 0x18, 0, 0, 0, (byte) 0xA8, 0, 0, 0, (byte) 0x70, (byte) 0xAA, (byte) 0xA7, (byte) 0xC5, (byte) 0x4E, (byte) 0xC1, (byte) 0xCA, 1});
       } else {
          writer.writeInt(0);
-         List<CashShop.SpecialCashItem> lsci = CashShop.CashItemFactory.getSpecialCashItems();
-         writer.writeShort(lsci.size());//Guess what
-         for (CashShop.SpecialCashItem sci : lsci) {
+         List<CashShop.SpecialCashItem> specialCashItems = CashShop.CashItemFactory.getSpecialCashItems();
+         writer.writeShort(specialCashItems.size());//Guess what
+         for (CashShop.SpecialCashItem sci : specialCashItems) {
             writer.writeInt(sci.getSN());
             writer.writeInt(sci.getModifier());
             writer.write(sci.getInfo());
@@ -57,10 +57,10 @@ public class SpecialShopPacketFactory extends AbstractPacketFactory {
             List<Integer> mostSellersTab = mostSellers.get(i);
 
             for (int j = 0; j < 2; j++) {
-               for (Integer snid : mostSellersTab) {
+               for (Integer snId : mostSellersTab) {
                   writer.writeInt(i);
                   writer.writeInt(j);
-                  writer.writeInt(snid);
+                  writer.writeInt(snId);
                }
             }
          }

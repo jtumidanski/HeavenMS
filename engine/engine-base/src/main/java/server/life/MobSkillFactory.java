@@ -1,24 +1,3 @@
-/*
-This file is part of the OdinMS Maple Story Server
-Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-Matthias Butz <matze@odinms.de>
-Jan Christian Meyer <vimes@odinms.de>
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation version 3 as published by
-the Free Software Foundation. You may not use, modify or distribute
-this program under any other version of the GNU Affero General Public
-License.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package server.life;
 
 import java.awt.Point;
@@ -39,13 +18,9 @@ import provider.MapleDataProvider;
 import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 
-/**
- * @author Danny (Leifde)
- */
 public class MobSkillFactory {
-
    private final static MapleDataProvider dataSource = MapleDataProviderFactory.getDataProvider(new File(System.getProperty("wzpath") + "/Skill.wz"));
-   private final static MonitoredReentrantReadWriteLock dataLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MOBSKILL_FACTORY);
+   private final static MonitoredReentrantReadWriteLock dataLock = new MonitoredReentrantReadWriteLock(MonitoredLockType.MOB_SKILL_FACTORY);
    private final static MonitoredReadLock rL = MonitoredReadLockFactory.createLock(dataLock);
    private final static MonitoredWriteLock wL = MonitoredWriteLockFactory.createLock(dataLock);
    private static Map<String, MobSkill> mobSkills = new HashMap<>();
@@ -82,7 +57,7 @@ public class MobSkillFactory {
                int x = MapleDataTool.getInt("x", skillData, 1);
                int y = MapleDataTool.getInt("y", skillData, 1);
                long duration = MapleDataTool.getInt("time", skillData, 0) * 1000;
-               long cooltime = MapleDataTool.getInt("interval", skillData, 0) * 1000;
+               long coolDownTime = MapleDataTool.getInt("interval", skillData, 0) * 1000;
                int iprop = MapleDataTool.getInt("prop", skillData, 100);
                float prop = iprop / 100;
                int limit = MapleDataTool.getInt("limit", skillData, 0);
@@ -93,7 +68,7 @@ public class MobSkillFactory {
                   lt = (Point) ltd.getData();
                   rb = (Point) skillData.getChildByPath("rb").getData();
                }
-               ret = new MobSkill(skillId, level, toSummon, cooltime, duration, hp, mpCon, effect, x, y, prop, limit, lt, rb);
+               ret = new MobSkill(skillId, level, toSummon, coolDownTime, duration, hp, mpCon, effect, x, y, prop, limit, lt, rb);
             }
             mobSkills.put(skillId + "" + level, ret);
          }

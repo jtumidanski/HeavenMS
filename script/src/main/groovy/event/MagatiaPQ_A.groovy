@@ -105,8 +105,8 @@ class EventMagatiaPQ_A {
    }
 
    // Setup the instance when invoked, EG : start PQ
-   def setup(int level, int lobbyid) {
-      EventInstanceManager eim = em.newInstance("MagatiaA" + lobbyid)
+   def setup(int level, int lobbyId) {
+      EventInstanceManager eim = em.newInstance("MagatiaA" + lobbyId)
       eim.setProperty("level", level)
 
       eim.setIntProperty("isAlcadno", 1)
@@ -179,7 +179,6 @@ class EventMagatiaPQ_A {
    }
 
    static def generateStg6Combo(EventInstanceManager eim) {
-      // thanks Chloek3, seth1 for stating generated sequences are supposed to be linked
       List<List<Integer>> matrix = []
 
       for (int i = 0; i < 4; i++) {
@@ -206,7 +205,7 @@ class EventMagatiaPQ_A {
       }
    }
 
-   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entrying players.
+   // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    static def afterSetup(EventInstanceManager eim) {
       eim.setIntProperty("escortFail", 0)    // refresh friendly status
 
@@ -247,18 +246,13 @@ class EventMagatiaPQ_A {
       eim.getMapInstance(926110200).instanceMapRespawn()
 
       if (!eim.isEventCleared()) {
-         MapleMap mapobj = eim.getMapInstance(926110401)
-         int mobcount = mapobj.countMonster(9300150)
-         MapleMonster mobobj
-         if (mobcount == 0) {
-            mobobj = MapleLifeFactory.getMonster(9300150)
-            mapobj.spawnMonsterOnGroundBelow(mobobj, new Point(-278, -126))
-
-            mobobj = MapleLifeFactory.getMonster(9300150)
-            mapobj.spawnMonsterOnGroundBelow(mobobj, new Point(-542, -126))
-         } else if (mobcount == 1) {
-            mobobj = MapleLifeFactory.getMonster(9300150)
-            mapobj.spawnMonsterOnGroundBelow(mobobj, new Point(-542, -126))
+         MapleMap map = eim.getMapInstance(926110401)
+         int mobCount = map.countMonster(9300150)
+         if (mobCount == 0) {
+            MapleLifeFactory.getMonster(9300150).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-278, -126)) })
+            MapleLifeFactory.getMonster(9300150).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-542, -126)) })
+         } else if (mobCount == 1) {
+            MapleLifeFactory.getMonster(9300150).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-542, -126)) })
          }
       }
 
@@ -288,9 +282,9 @@ class EventMagatiaPQ_A {
       }
    }
 
-   // What to do when player've changed map, based on the mapid.
-   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-      if (mapid < minMapId || mapid > maxMapId) {
+   // What to do when player've changed map, based on the mapId.
+   def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+      if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isEventTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
             end(eim)
@@ -298,7 +292,7 @@ class EventMagatiaPQ_A {
             eim.unregisterPlayer(player)
          }
 
-      } else if (mapid == 926110203 && eim.getIntProperty("yuleteTimeout") == 0) {
+      } else if (mapId == 926110203 && eim.getIntProperty("yuleteTimeout") == 0) {
          eim.setIntProperty("yuleteTimeout", 1)
          eim.schedule("yuleteAction", 10 * 1000)
       }
@@ -310,47 +304,35 @@ class EventMagatiaPQ_A {
 
          MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: Ugh, you guys disgust me. All I desired was to make this nation the greatest alchemy powerhouse of the entire world. If they won't accept this, I will make it true by myself, at any costs!!!")
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: Hahaha... Did you really think I was going to be so disprepared knowing that the Magatia societies' dogs would be coming in my pursuit after my actions? Fools!")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: Hahaha... Did you really think I was going to be so unprepared knowing that the Magatia societies' dogs would be coming in my pursuit after my actions? Fools!")
       }
       eim.setIntProperty("yuleteTalked", -1)
 
-      MapleMap mapobj = eim.getMapInstance(926110203)
+      MapleMap map = eim.getMapInstance(926110203)
       int mob1 = 9300143, mob2 = 9300144
 
-      mapobj.destroyNPC(2112010)
+      map.destroyNPC(2112010)
 
-      MapleMonster mobobj1, mobobj2
       for (int i = 0; i < 5; i++) {
-         mobobj1 = MapleLifeFactory.getMonster(mob1)
-         mobobj2 = MapleLifeFactory.getMonster(mob2)
-
-         mapobj.spawnMonsterOnGroundBelow(mobobj1, new Point(-455, 135))
-         mapobj.spawnMonsterOnGroundBelow(mobobj2, new Point(-455, 135))
+         MapleLifeFactory.getMonster(mob1).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-455, 135)) })
+         MapleLifeFactory.getMonster(mob2).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(-455, 135)) })
       }
 
-
       for (int i = 0; i < 5; i++) {
-         mobobj1 = MapleLifeFactory.getMonster(mob1)
-         mobobj2 = MapleLifeFactory.getMonster(mob2)
-
-         mapobj.spawnMonsterOnGroundBelow(mobobj1, new Point(0, 135))
-         mapobj.spawnMonsterOnGroundBelow(mobobj2, new Point(0, 135))
+         MapleLifeFactory.getMonster(mob1).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(0, 135)) })
+         MapleLifeFactory.getMonster(mob2).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(0, 135)) })
       }
 
-
       for (int i = 0; i < 5; i++) {
-         mobobj1 = MapleLifeFactory.getMonster(mob1)
-         mobobj2 = MapleLifeFactory.getMonster(mob2)
-
-         mapobj.spawnMonsterOnGroundBelow(mobobj1, new Point(360, 135))
-         mapobj.spawnMonsterOnGroundBelow(mobobj2, new Point(360, 135))
+         MapleLifeFactory.getMonster(mob1).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(360, 135)) })
+         MapleLifeFactory.getMonster(mob2).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(360, 135)) })
       }
    }
 
    // Do something if the party leader has been changed.
    def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
-      int mapid = leader.getMapId()
-      if (!eim.isEventCleared() && (mapid < minMapId || mapid > maxMapId)) {
+      int mapId = leader.getMapId()
+      if (!eim.isEventCleared() && (mapId < minMapId || mapId > maxMapId)) {
          end(eim)
       }
    }
@@ -411,7 +393,7 @@ class EventMagatiaPQ_A {
 
    // Invoked when a monster that's registered has been killed
    // return x amount for this player - "Saved Points"
-   static def monsterValue(EventInstanceManager eim, int mobid) {
+   static def monsterValue(EventInstanceManager eim, int mobId) {
       return 1
    }
 
@@ -492,12 +474,12 @@ class EventMagatiaPQ_A {
       }
    }
 
-   // Happens when the funtion NPCConversationManager.removePlayerFromInstance() is invoked
+   // Happens when the function NPCConversationManager.removePlayerFromInstance() is invoked
    def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    }
 
    // Happens when carnival PQ is started. - Unused for now.
-   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
+   def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
    }
 
    // Happens when player change map - Unused for now.
@@ -545,8 +527,8 @@ def getEligibleParty(MaplePartyCharacter[] party) {
    getEvent().getEligibleParty(party)
 }
 
-def setup(int level, int lobbyid) {
-   getEvent().setup(level, lobbyid)
+def setup(int level, int lobbyId) {
+   getEvent().setup(level, lobbyId)
 }
 
 def afterSetup(EventInstanceManager eim) {
@@ -573,8 +555,8 @@ def playerLeft(EventInstanceManager eim, MapleCharacter player) {
    getEvent().playerLeft(eim, player)
 }
 
-def changedMap(EventInstanceManager eim, MapleCharacter player, int mapid) {
-   getEvent().changedMap(eim, player, mapid)
+def changedMap(EventInstanceManager eim, MapleCharacter player, int mapId) {
+   getEvent().changedMap(eim, player, mapId)
 }
 
 def changedLeader(EventInstanceManager eim, MapleCharacter leader) {
@@ -593,8 +575,8 @@ def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
    getEvent().monsterKilled(mob, eim)
 }
 
-def monsterValue(EventInstanceManager eim, int mobid) {
-   getEvent().monsterValue(eim, mobid)
+def monsterValue(EventInstanceManager eim, int mobId) {
+   getEvent().monsterValue(eim, mobId)
 }
 
 def friendlyKilled(MapleMonster mob, EventInstanceManager eim) {
@@ -645,8 +627,8 @@ def removePlayer(EventInstanceManager eim, MapleCharacter player) {
    getEvent().removePlayer(eim, player)
 }
 
-def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalparty) {
-   getEvent().registerCarnivalParty(eim, carnivalparty)
+def registerCarnivalParty(EventInstanceManager eim, MapleParty carnivalParty) {
+   getEvent().registerCarnivalParty(eim, carnivalParty)
 }
 
 def onMapLoad(EventInstanceManager eim, MapleCharacter player) {

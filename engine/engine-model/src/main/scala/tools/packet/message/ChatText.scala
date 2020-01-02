@@ -13,5 +13,5 @@ class ChatText(private var _characterIdFrom: Int, private var _text: String, pri
 
   def show: Int = _show
 
-  override def opcode(): SendOpcode = SendOpcode.CHATTEXT
+  override def opcode(): SendOpcode = SendOpcode.CHAT_TEXT
 }

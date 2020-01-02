@@ -81,7 +81,7 @@ public class MapleAllianceProcessor {
 
             int worldId = guildMasters.get(0).getWorld();
             Server.getInstance().allianceMessage(id, new UpdateAllianceInfo(alliance, worldId), -1, -1);
-            Server.getInstance().allianceMessage(id, new GetGuildAlliances(alliance, worldId), -1, -1);  // thanks Vcoc for noticing guilds from other alliances being visually stacked here due to this not being updated
+            Server.getInstance().allianceMessage(id, new GetGuildAlliances(alliance, worldId), -1, -1);
          } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -113,7 +113,6 @@ public class MapleAllianceProcessor {
    }
 
    private MapleAlliance createAllianceOnDb(List<Integer> guilds, String name) {
-      // will create an alliance, where the first guild listed is the leader and the alliance name MUST BE already checked for unicity.
       int id = DatabaseConnection.getInstance().withConnectionResult(connection -> {
          int allianceId = AllianceAdministrator.getInstance().createAlliance(connection, name);
          AllianceGuildAdministrator.getInstance().addGuilds(connection, allianceId, guilds);

@@ -7,7 +7,7 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public class RaiseUIStateReader implements PacketReader<RaiseUIStatePacket> {
    @Override
    public RaiseUIStatePacket read(SeekableLittleEndianAccessor accessor) {
-      int questid = accessor.readShort();
-      return new RaiseUIStatePacket(questid);
+      int questId = accessor.readShort();
+      return new RaiseUIStatePacket(questId);
    }
 }

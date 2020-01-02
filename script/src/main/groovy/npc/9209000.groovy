@@ -15,7 +15,7 @@ class NPC9209000 {
    int status = -1
    int selected = -1
 
-   int[] skillbook = [], masterybook = [], table = []
+   int[] skillBooks = [], masteryBooks = [], table = []
 
    def start() {
       status = -1
@@ -46,27 +46,27 @@ class NPC9209000 {
                return
             }
 
-            int jobrank = cm.getJob().getId() % 10
-            if (jobrank < 2) {
+            int jobRank = cm.getJob().getId() % 10
+            if (jobRank < 2) {
                cm.sendOk(greeting + "Keep training yourself until you reach the #r4th job#k of your class. New opportunities for improvement will arrive when you reach that feat!")
                cm.dispose()
                return
             }
 
-            skillbook = cm.getAvailableSkillBooks()
-            masterybook = cm.getAvailableMasteryBooks()
+            skillBooks = cm.getAvailableSkillBooks()
+            masteryBooks = cm.getAvailableMasteryBooks()
 
-            if (skillbook.length == 0 && masterybook.length == 0) {
+            if (skillBooks.length == 0 && masteryBooks.length == 0) {
                cm.sendOk(greeting + "There are no books available to further improve your job skills for now. Either you #bmaxed out everything#k or #byou didn't reach the minimum requisites to use some skill books#k yet.")
                cm.dispose()
-            } else if (skillbook.length > 0 && masterybook.length > 0) {
+            } else if (skillBooks.length > 0 && masteryBooks.length > 0) {
                String sendStr = greeting + "New opportunities for skill improvement have been located for you to improve your skills! Pick a type to take a look onto.\r\n\r\n#b"
 
                sendStr += "#L1# Skill Book#l\r\n"
                sendStr += "#L2# Mastery Book#l\r\n"
 
                cm.sendSimple(sendStr)
-            } else if (skillbook.length > 0) {
+            } else if (skillBooks.length > 0) {
                selected = 1
                cm.sendNext(greeting + "New opportunities for skill improvement have been located for you to improve your skills! Only skill learns available for now.")
             } else {
@@ -81,21 +81,21 @@ class NPC9209000 {
             }
 
             if (selected == 1) {
-               table = skillbook
+               table = skillBooks
                for (int i = 0; i < table.length; i++) {
                   if (table[i] > 0) {
-                     int itemid = table[i]
-                     sendStr += "  #L" + i + "# #i" + itemid + "#  #t" + itemid + "##l\r\n"
+                     int itemId = table[i]
+                     sendStr += "  #L" + i + "# #i" + itemId + "#  #t" + itemId + "##l\r\n"
                   } else {
-                     int skillid = -table[i]
-                     sendStr += "  #L" + i + "# #s" + skillid + "#  #q" + skillid + "##l\r\n"
+                     int skillId = -table[i]
+                     sendStr += "  #L" + i + "# #s" + skillId + "#  #q" + skillId + "##l\r\n"
                   }
                }
             } else {
-               table = masterybook
+               table = masteryBooks
                for (int i = 0; i < table.length; i++) {
-                  int itemid = table[i]
-                  sendStr += "  #L" + i + "# #i" + itemid + "#  #t" + itemid + "##l\r\n"
+                  int itemId = table[i]
+                  sendStr += "  #L" + i + "# #i" + itemId + "#  #t" + itemId + "##l\r\n"
                }
             }
 

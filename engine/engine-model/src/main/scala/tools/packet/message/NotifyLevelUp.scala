@@ -10,5 +10,5 @@ class NotifyLevelUp(private var _type: Int, private var _level: Int, private var
 
   def characterName: String = _characterName
 
-  override def opcode(): SendOpcode = SendOpcode.NOTIFY_LEVELUP
+  override def opcode(): SendOpcode = SendOpcode.NOTIFY_LEVEL_UP
 }

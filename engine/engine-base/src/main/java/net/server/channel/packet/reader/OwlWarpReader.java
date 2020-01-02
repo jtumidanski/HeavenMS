@@ -7,8 +7,8 @@ import tools.data.input.SeekableLittleEndianAccessor;
 public class OwlWarpReader implements PacketReader<OwlWarpPacket> {
    @Override
    public OwlWarpPacket read(SeekableLittleEndianAccessor accessor) {
-      int ownerid = accessor.readInt();
-      int mapid = accessor.readInt();
-      return new OwlWarpPacket(ownerid, mapid);
+      int ownerId = accessor.readInt();
+      int mapId = accessor.readInt();
+      return new OwlWarpPacket(ownerId, mapId);
    }
 }

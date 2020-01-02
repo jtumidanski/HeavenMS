@@ -6,5 +6,5 @@ import tools.packet.PacketInput
 class ShowBoughtCharacterSlots(private var _slots: Short) extends PacketInput {
   def slots: Short = _slots
 
-  override def opcode(): SendOpcode = SendOpcode.CASHSHOP_OPERATION
+  override def opcode(): SendOpcode = SendOpcode.CASH_SHOP_OPERATION
 }

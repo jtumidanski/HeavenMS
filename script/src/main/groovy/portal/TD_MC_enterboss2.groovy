@@ -35,7 +35,6 @@ boolean enter(PortalPlayerInteraction pi) {
       Optional<MapleParty> party = pi.getPlayer().getParty()
       if (party.isPresent()) {
          MaplePartyCharacter[] eli = em.getEligibleParty(pi.getParty().orElseThrow())
-         // thanks Conrad for pointing out missing eligible party declaration here
          if (eli.size() > 0) {
             if (em.startInstance(party.get(), pi.getMap(), 1)) {
                pi.playPortalSound()
@@ -46,7 +45,7 @@ boolean enter(PortalPlayerInteraction pi) {
             }
          }
       } else {
-         if (em.startInstance(pi.getPlayer())) { // thanks RedHat for noticing an issue here
+         if (em.startInstance(pi.getPlayer())) {
             pi.playPortalSound()
             return true
          } else {

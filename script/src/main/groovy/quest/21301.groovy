@@ -25,7 +25,7 @@ class Quest21301 {
       if (status == 0) {
          qm.sendNext("Did you manage to slay #o9001013#? Hahaha... you're my master, indeed. Okay, now give me the Red Jade that you found there. I'll have to put it back on the body, and... wait, why aren't you saying a word? Don't tell me... that you didn't bring that back!")
       } else if (status == 1) {
-         qm.sendNextPrev("What?! You really didn't bring back the Red Jade? Why? Did you just completely forget it? Ahh... even with the curse of the Black Mage, and the amount of time that has passed and all, never did I think my master would turn out to be stupid...")
+         qm.sendNextPrev("What?! You really didn't bring back the Red Jade? Why? Did you just completely forget it? Ahh... even with the curse of the Black Magican, and the amount of time that has passed and all, never did I think my master would turn out to be stupid...")
       } else if (status == 2) {
          qm.sendNextPrev("No, no, I can't let this put me in despair. This is when I should remain calm and in control, unlike my master...\r\noosah...")
       } else if (status == 3) {

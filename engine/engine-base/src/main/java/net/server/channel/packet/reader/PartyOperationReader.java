@@ -22,8 +22,8 @@ public class PartyOperationReader implements PacketReader<BasePartyOperationPack
             return new LeavePartyPacket(operation);
          }
          case 3: { // join
-            int partyid = accessor.readInt();
-            return new JoinPartyPacket(operation, partyid);
+            int partyId = accessor.readInt();
+            return new JoinPartyPacket(operation, partyId);
          }
          case 4: { // invite
             String name = accessor.readMapleAsciiString();

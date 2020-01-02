@@ -17,11 +17,11 @@ class Quest21100 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("There isn't much record left of the heroes that fought against the Black Mage. Even in the Book of Prophecy, the only information available is that there were five of them. There is nothing about who they were or what they looked like. Is there anything you remember? Anything at all?", (byte) 8)
+         qm.sendNext("There isn't much record left of the heroes that fought against the Black Magician. Even in the Book of Prophecy, the only information available is that there were five of them. There is nothing about who they were or what they looked like. Is there anything you remember? Anything at all?", (byte) 8)
       } else if (status == 1) {
          qm.sendNextPrev("I don't remember a thing...", (byte) 2)
       } else if (status == 2) {
-         qm.sendNextPrev("As I expected. Of course, the curse of the Black Mage was strong enough to wipe out all of your memory. But even if that's the case, there has got to be a point where the past will uncover, especially now that we are certain you are one of the heroes. I know you've lost your armor and weapon during the battle but... Oh, yes, yes. I almost forgot! Your #bweapon#k!", (byte) 8)
+         qm.sendNextPrev("As I expected. Of course, the curse of the Black Magician was strong enough to wipe out all of your memory. But even if that's the case, there has got to be a point where the past will uncover, especially now that we are certain you are one of the heroes. I know you've lost your armor and weapon during the battle but... Oh, yes, yes. I almost forgot! Your #bweapon#k!", (byte) 8)
       } else if (status == 3) {
          qm.sendNextPrev("My weapon?", (byte) 2)
       } else if (status == 4) {

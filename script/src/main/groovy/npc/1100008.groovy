@@ -40,7 +40,7 @@ class NPC1100008 {
             for (def i = 0; i < menu.length; i++) {
                display += "\r\n#L" + i + "##b Ereve (1000 mesos)#k"
             }
-            cm.sendSimple("This ship will head towards #bEreve#k, an island where you'll find crimson leaves soaking up the sun, the gentle breeze that glides past the stream, and the Empress of Maple Cygnus. If you're interested in joining the Cygnus Knights, Then you should definitly pay a visit here. Are you interested in visiting Ereve?, The Trip will cost you #b1000#k Mesos\r\n" + display)
+            cm.sendSimple("This ship will head towards #bEreve#k, an island where you'll find crimson leaves soaking up the sun, the gentle breeze that glides past the stream, and the Empress of Maple Cygnus. If you're interested in joining the Cygnus Knights, Then you should definitely pay a visit here. Are you interested in visiting Ereve?, The Trip will cost you #b1000#k Mesos\r\n" + display)
 
          } else if (status == 1) {
             if (cm.getMeso() < 1000) {

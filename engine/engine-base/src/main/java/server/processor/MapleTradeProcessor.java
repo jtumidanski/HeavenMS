@@ -36,7 +36,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
    private MapleTradeProcessor() {
    }
 
-   protected boolean checkCompleteHandshake(MapleTrade trade) {  // handshake checkout thanks to Ronan
+   protected boolean checkCompleteHandshake(MapleTrade trade) {
       if (trade.getPartnerTrade().isEmpty() || trade.getOwner().getId() < trade.getPartnerTrade().get().getOwner().getId()) {
          return trade.checkTradeCompleteHandshake(true);
       } else {
@@ -151,7 +151,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
       referenceCharacter.getTrade().ifPresent(trade -> cancelHandshake(trade, result.getValue()));
    }
 
-   protected void cancelHandshake(MapleTrade referenceTrade, byte result) {  // handshake checkout thanks to Ronan
+   protected void cancelHandshake(MapleTrade referenceTrade, byte result) {
       if (referenceTrade.getPartnerTrade().isEmpty() || referenceTrade.getOwner().getId() < referenceTrade.getPartnerTrade().get().getOwner().getId()) {
          referenceTrade.tradeCancelHandshake(true, result);
       } else {

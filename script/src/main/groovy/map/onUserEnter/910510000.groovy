@@ -15,11 +15,11 @@ class Map910510000 {
 
       if (player.isCygnus()) {
          if (ms.isQuestStarted(20730) && ms.getQuestProgressInt(20730, 9300285) == 0) {
-            map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9300285), new Point(680, 258))
+            MapleLifeFactory.getMonster(9300285).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(680, 258)) })
          }
       } else {
          if (ms.isQuestStarted(21731) && ms.getQuestProgressInt(21731, 9300344) == 0) {
-            map.spawnMonsterOnGroundBelow(MapleLifeFactory.getMonster(9300344), new Point(680, 258))
+            MapleLifeFactory.getMonster(9300344).ifPresent({ monster -> map.spawnMonsterOnGroundBelow(monster, new Point(680, 258)) })
          }
       }
    }

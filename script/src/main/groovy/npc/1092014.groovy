@@ -20,7 +20,7 @@ class NPC1092014 {
    int selectedMap = -1
 
    def start() {
-      cm.sendNext("Hello, I drive the Nautilus' Mid-Sized Taxi. If you want to go from town to town safely and fast, then ride our cab. We'll glady take you to your destination with an affordable price.")
+      cm.sendNext("Hello, I drive the Nautilus' Mid-Sized Taxi. If you want to go from town to town safely and fast, then ride our cab. We'll gladly take you to your destination with an affordable price.")
    }
 
    def action(Byte mode, Byte type, Integer selection) {

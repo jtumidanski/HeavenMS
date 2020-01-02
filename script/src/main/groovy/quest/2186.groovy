@@ -40,7 +40,6 @@ class Quest2186 {
                      qm.sendOk("I need you to have an USE slot available to reward you properly!")
                   }
                } else if (qm.haveItem(4031854) || qm.haveItem(4031855)) {
-                  //When I figure out how to make a completance with just a pickup xD
                   if (qm.canHold(2030019)) {
                      if (qm.haveItem(4031854)) {
                         qm.gainItem(4031854, (short) -1)

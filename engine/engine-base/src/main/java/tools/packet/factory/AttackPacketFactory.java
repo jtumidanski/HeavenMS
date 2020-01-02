@@ -51,14 +51,14 @@ public class AttackPacketFactory extends AbstractPacketFactory {
       }
    }
 
-   protected void addAttackBody(MaplePacketLittleEndianWriter lew, int characterId, int skill, int skilllevel, int stance,
+   protected void addAttackBody(MaplePacketLittleEndianWriter lew, int characterId, int skill, int skillLevel, int stance,
                                 int numAttackedAndDamage, int projectile, Map<Integer, List<Integer>> damage,
                                 int speed, int direction, int display) {
       lew.writeInt(characterId);
       lew.write(numAttackedAndDamage);
       lew.write(0x5B);//?
-      lew.write(skilllevel);
-      if (skilllevel > 0) {
+      lew.write(skillLevel);
+      if (skillLevel > 0) {
          lew.writeInt(skill);
       }
       lew.write(display);
@@ -115,7 +115,7 @@ public class AttackPacketFactory extends AbstractPacketFactory {
         }
         */
 
-   protected void throwGrenade(MaplePacketLittleEndianWriter writer, ThrowGrenade packet) { // packets found thanks to GabrielSin
+   protected void throwGrenade(MaplePacketLittleEndianWriter writer, ThrowGrenade packet) {
       writer.writeInt(packet.characterId());
       writer.writeInt(packet.position().x);
       writer.writeInt(packet.position().y);

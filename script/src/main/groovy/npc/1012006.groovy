@@ -3,13 +3,6 @@ package npc
 
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Trainer Bartos
-	Map(s): 		Victoria Road : Pet-Walking Road (100000202)
-	Description: 		Pet Trainer
-*/
-
-
 class NPC1012006 {
    NPCConversationManager cm
    int status = -1

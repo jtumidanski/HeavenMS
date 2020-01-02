@@ -1,24 +1,3 @@
-/*
- This file is part of the OdinMS Maple Story Server
- Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
- Matthias Butz <matze@odinms.de>
- Jan Christian Meyer <vimes@odinms.de>
-
- This program is free software: you can redistribute it and/or modify
- it under the terms of the GNU Affero General Public License as
- published by the Free Software Foundation version 3 as published by
- the Free Software Foundation. You may not use, modify or distribute
- this program under any other version of the GNU Affero General Public
- License.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU Affero General Public License for more details.
-
- You should have received a copy of the GNU Affero General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.server.channel.handlers;
 
 import java.awt.Point;
@@ -27,7 +6,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.MonsterCarnivalPacket;
 import net.server.channel.packet.reader.MonsterCarnivalReader;
@@ -46,11 +25,6 @@ import tools.ServerNoticeType;
 import tools.packet.monster.carnival.MonsterCarnivalMessage;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerSummoned;
 import tools.packet.stat.EnableActions;
-
-
-/**
- * @author Drago/Dragohe4rt
- */
 
 public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterCarnivalPacket> {
    @Override
@@ -74,19 +48,19 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      return;
                   }
 
-                  final MapleMonster mob = MapleLifeFactory.getMonster(mobs.get(num).left);
-                  MonsterCarnival mcpq = client.getPlayer().getMonsterCarnival();
-                  if (mcpq != null) {
-                     if (!mcpq.canSummonR() && client.getPlayer().getTeam() == 0 || !mcpq.canSummonB() && client.getPlayer().getTeam() == 1) {
+                  final MapleMonster mob = MapleLifeFactory.getMonster(mobs.get(num).left).orElseThrow();
+                  MonsterCarnival monsterCarnival = client.getPlayer().getMonsterCarnival();
+                  if (monsterCarnival != null) {
+                     if (!monsterCarnival.canSummonR() && client.getPlayer().getTeam() == 0 || !monsterCarnival.canSummonB() && client.getPlayer().getTeam() == 1) {
                         PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 2));
                         PacketCreator.announce(client, new EnableActions());
                         return;
                      }
 
                      if (client.getPlayer().getTeam() == 0) {
-                        mcpq.summonR();
+                        monsterCarnival.summonR();
                      } else {
-                        mcpq.summonB();
+                        monsterCarnival.summonB();
                      }
 
                      Point spawnPos = client.getPlayer().getMap().getRandomSP(client.getPlayer().getTeam());
@@ -98,20 +72,20 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                   }
 
                   neededCP = mobs.get(num).right;
-               } else if (tab == 1) { //debuffs
-                  final List<Integer> skillid = client.getPlayer().getMap().getSkillIds();
-                  if (num >= skillid.size()) {
+               } else if (tab == 1) { //abnormal statuses
+                  final List<Integer> skillIds = client.getPlayer().getMap().getSkillIds();
+                  if (num >= skillIds.size()) {
                      MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "An unexpected error has occurred.");
                      PacketCreator.announce(client, new EnableActions());
                      return;
                   }
-                  final MCSkill skill = MapleCarnivalFactory.getInstance().getSkill(skillid.get(num)); //ugh wtf
+                  final MCSkill skill = MapleCarnivalFactory.getInstance().getSkill(skillIds.get(num)); //ugh wtf
                   if (skill == null || client.getPlayer().getCP() < skill.cpLoss) {
                      PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 1));
                      PacketCreator.announce(client, new EnableActions());
                      return;
                   }
-                  final MapleDisease dis = skill.getDisease();
+                  final MapleAbnormalStatus dis = skill.getDisease();
                   MapleParty enemies = client.getPlayer().getParty().orElseThrow().getEnemy();
                   if (skill.targetsAll) {
                      int hitChance = 0;
@@ -126,19 +100,19 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                                  if (dis == null) {
                                     character.dispel();
                                  } else {
-                                    character.giveDebuff(dis, skill.getSkill());
+                                    character.giveAbnormalStatus(dis, skill.getSkill());
                                  }
                               });
                      }
                   } else {
                      int amount = enemies.getMembers().size() - 1;
-                     int randd = (int) Math.floor(Math.random() * amount);
-                     MapleCharacter chrApp = client.getPlayer().getMap().getCharacterById(enemies.getMemberByPos(randd).getId());
+                     int random = (int) Math.floor(Math.random() * amount);
+                     MapleCharacter chrApp = client.getPlayer().getMap().getCharacterById(enemies.getMemberByPos(random).getId());
                      if (chrApp != null && chrApp.getMap().isCPQMap()) {
                         if (dis == null) {
                            chrApp.dispel();
                         } else {
-                           chrApp.giveDebuff(dis, skill.getSkill());
+                           chrApp.giveAbnormalStatus(dis, skill.getSkill());
                         }
                      }
                   }
@@ -152,9 +126,9 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                      return;
                   }
 
-                  MonsterCarnival mcpq = client.getPlayer().getMonsterCarnival();
-                  if (mcpq != null) {
-                     if (!mcpq.canGuardianR() && client.getPlayer().getTeam() == 0 || !mcpq.canGuardianB() && client.getPlayer().getTeam() == 1) {
+                  MonsterCarnival monsterCarnival = client.getPlayer().getMonsterCarnival();
+                  if (monsterCarnival != null) {
+                     if (!monsterCarnival.canGuardianR() && client.getPlayer().getTeam() == 0 || !monsterCarnival.canGuardianB() && client.getPlayer().getTeam() == 1) {
                         PacketCreator.announce(client, new MonsterCarnivalMessage((byte) 2));
                         PacketCreator.announce(client, new EnableActions());
                         return;

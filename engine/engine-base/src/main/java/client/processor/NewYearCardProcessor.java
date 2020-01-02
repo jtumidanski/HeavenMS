@@ -31,18 +31,18 @@ public class NewYearCardProcessor {
    private NewYearCardProcessor() {
    }
 
-   public void saveNewYearCard(NewYearCardRecord newyear) {
-      DatabaseConnection.getInstance().withConnection(connection -> newyear.id_$eq(NewYearAdministrator.getInstance().create(connection, newyear.senderId(), newyear.senderName(),
-            newyear.receiverId(), newyear.receiverName(), newyear.message(),
-            newyear.senderDiscardCard(), newyear.receiverDiscardCard(), newyear.receiverReceivedCard(),
-            newyear.dateSent(), newyear.dateReceived())));
+   public void saveNewYearCard(NewYearCardRecord newYearCardRecord) {
+      DatabaseConnection.getInstance().withConnection(connection -> newYearCardRecord.id_$eq(NewYearAdministrator.getInstance().create(connection, newYearCardRecord.senderId(), newYearCardRecord.senderName(),
+            newYearCardRecord.receiverId(), newYearCardRecord.receiverName(), newYearCardRecord.message(),
+            newYearCardRecord.senderDiscardCard(), newYearCardRecord.receiverDiscardCard(), newYearCardRecord.receiverReceivedCard(),
+            newYearCardRecord.dateSent(), newYearCardRecord.dateReceived())));
    }
 
-   public void updateNewYearCard(NewYearCardRecord newyear) {
-      newyear.receiverReceivedCard_$eq(true);
-      newyear.dateReceived_$eq(System.currentTimeMillis());
+   public void updateNewYearCard(NewYearCardRecord newYearCardRecord) {
+      newYearCardRecord.receiverReceivedCard_$eq(true);
+      newYearCardRecord.dateReceived_$eq(System.currentTimeMillis());
       DatabaseConnection.getInstance().withConnection(connection -> NewYearAdministrator.getInstance().setReceived(connection,
-            newyear.id(), newyear.dateReceived()));
+            newYearCardRecord.id(), newYearCardRecord.dateReceived()));
    }
 
    public NewYearCardRecord loadNewYearCard(int cardId) {
@@ -109,7 +109,7 @@ public class NewYearCardProcessor {
 
                MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new NewYearCardResolution(chr.getId(), nyc, 0xE, 0));
 
-               chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.receiverId()).filter(MapleCharacter::isLoggedinWorld).ifPresent(other -> {
+               chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.receiverId()).filter(MapleCharacter::isLoggedInWorld).ifPresent(other -> {
                   other.removeNewYearRecord(nyc);
                   MasterBroadcaster.getInstance().sendToAllInMap(other.getMap(), new NewYearCardResolution(other.getId(), nyc, 0xE, 0));
                   MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
@@ -126,7 +126,7 @@ public class NewYearCardProcessor {
                MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new NewYearCardResolution(chr.getId(), nyc, 0xE, 0));
 
                chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.senderId())
-                     .filter(MapleCharacter::isLoggedinWorld)
+                     .filter(MapleCharacter::isLoggedInWorld)
                      .ifPresent(other -> {
                         other.removeNewYearRecord(nyc);
                         MasterBroadcaster.getInstance().sendToAllInMap(other.getMap(), new NewYearCardResolution(other.getId(), nyc, 0xE, 0));
@@ -156,7 +156,7 @@ public class NewYearCardProcessor {
          }
 
          server.getWorld(world).getPlayerStorage().getCharacterById(newYearCardRecord.receiverId())
-               .filter(MapleCharacter::isLoggedinWorld)
+               .filter(MapleCharacter::isLoggedInWorld)
                .ifPresent(target -> PacketCreator.announce(target, new NewYearCardResolution(target.getId(), newYearCardRecord, 0xC, 0)));
       }, 1000 * 60 * 60); //1 Hour
       newYearCardRecord.setNewYearCardTask(sendTask);

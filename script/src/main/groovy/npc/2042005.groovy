@@ -47,7 +47,7 @@ class NPC2042005 {
                status = 10
                cm.sendOk("If you want to start the battle, let the #bleader#k come and speak to me.")
             } else {
-               int leaderMapid = cm.getMapId()
+               int leaderMapId = cm.getMapId()
                MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                int inMap = cm.partyMembersInMap()
                int lvlOk = 0
@@ -56,7 +56,7 @@ class NPC2042005 {
                   if (party[i].getLevel() >= cpqMinLvl && party[i].getLevel() <= cpqMaxLvl) {
                      lvlOk++
 
-                     if (!party[i].inMap(leaderMapid)) {
+                     if (!party[i].inMap(leaderMapId)) {
                         isOutMap++
                      }
                   }

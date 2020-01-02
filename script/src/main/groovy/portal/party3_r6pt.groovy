@@ -30,7 +30,6 @@ boolean enter(PortalPlayerInteraction pi) {
    } else {    //fail
       pRow--
       pi.playPortalSound(); pi.warp(pi.getMapId(), (pRow / 4) > 1 ? (pRow / 4).toInteger() : 5)
-      // thanks Chloek3, seth1 for noticing next plaform issues
    }
 
    return true

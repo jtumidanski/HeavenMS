@@ -1,26 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    Copyleft (L) 2016 - 2018 RonanLana (HeavenMS)
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client.processor.npc;
 
 import java.sql.Timestamp;
@@ -35,7 +12,7 @@ import javax.persistence.EntityManager;
 import client.DueyAction;
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import database.administrator.DueyPackageAdministrator;
 import database.provider.CharacterProvider;
 import database.provider.DueyPackageProvider;
@@ -62,9 +39,6 @@ import tools.packet.parcel.RemoveDueyItem;
 import tools.packet.parcel.SendDuey;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author RonanLana - synchronization of Duey modules
- */
 public class DueyProcessor {
 
    private static Pair<Integer, Integer> getAccountCharacterIdFromCNAME(String name) {
@@ -122,7 +96,7 @@ public class DueyProcessor {
          try {
             item = inv.getItem(itemPos);
             if (item != null && item.quantity() >= amount) {
-               if (ItemProcessor.getInstance().isUntradeable(item) || ii.isUnmerchable(item.id())) {
+               if (ItemProcessor.getInstance().isUnableToBeTraded(item) || ii.isUnmerchable(item.id())) {
                   return -1;
                }
 
@@ -158,41 +132,41 @@ public class DueyProcessor {
             if (!quick) {
                fee += 5000;
             } else if (!c.getPlayer().haveItem(5330000)) {
-               AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with Quick Delivery on duey.");
+               AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with Quick Delivery on duey.");
                FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use duey with Quick Delivery, mesos " + sendMesos + " and amount " + amount);
                c.disconnect(true, false);
                return;
             }
 
-            long finalcost = (long) sendMesos + fee;
-            if (finalcost < 0 || finalcost > Integer.MAX_VALUE || (amount < 1 && sendMesos == 0)) {
-               AutobanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with duey.");
+            long finalCost = (long) sendMesos + fee;
+            if (finalCost < 0 || finalCost > Integer.MAX_VALUE || (amount < 1 && sendMesos == 0)) {
+               AutoBanFactory.PACKET_EDIT.alert(c.getPlayer(), c.getPlayer().getName() + " tried to packet edit with duey.");
                FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to use duey with mesos " + sendMesos + " and amount " + amount);
                c.disconnect(true, false);
                return;
             }
 
             Pair<Integer, Integer> accIdCid;
-            if (c.getPlayer().getMeso() >= finalcost) {
+            if (c.getPlayer().getMeso() >= finalCost) {
                accIdCid = getAccountCharacterIdFromCNAME(recipient);
                int recipientAccId = accIdCid.getLeft();
                if (recipientAccId != -1) {
                   if (recipientAccId == c.getAccID()) {
-                     PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_SAMEACC_ERROR));
+                     PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_SAME_ACC_ERROR));
                      return;
                   }
                } else {
-                  PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_NAME_DOES_NOT_EXIST));
+                  PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_NAME_DOES_NOT_EXIST));
                   return;
                }
             } else {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_NOT_ENOUGH_MESOS));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_NOT_ENOUGH_MESOS));
                return;
             }
 
             int recipientCid = accIdCid.getRight();
             if (recipientCid == -1) {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_NAME_DOES_NOT_EXIST));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_NAME_DOES_NOT_EXIST));
                return;
             }
 
@@ -202,26 +176,26 @@ public class DueyProcessor {
 
             int packageId = createPackage(sendMesos, sendMessage, c.getPlayer().getName(), recipientCid, quick);
             if (packageId == -1) {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_ENABLE_ACTIONS));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_ENABLE_ACTIONS));
                return;
             }
-            c.getPlayer().gainMeso((int) -finalcost, false);
+            c.getPlayer().gainMeso((int) -finalCost, false);
 
             int res = addPackageItemFromInventory(packageId, c, invTypeId, itemPos, amount);
             if (res == 0) {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_SUCCESSFULLY_SENT));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_SUCCESSFULLY_SENT));
             } else if (res > 0) {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_ENABLE_ACTIONS));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_ENABLE_ACTIONS));
             } else {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_SEND_INCORRECT_REQUEST));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_SEND_INCORRECT_REQUEST));
             }
 
             MapleClient rClient = null;
             int channel = c.getWorldServer().find(recipient);
             if (channel > -1) {
-               Channel rcserv = c.getWorldServer().getChannel(channel);
-               if (rcserv != null) {
-                  rClient = rcserv.getPlayerStorage().getCharacterByName(recipient).map(MapleCharacter::getClient).orElse(null);
+               Channel receiverChannel = c.getWorldServer().getChannel(channel);
+               if (receiverChannel != null) {
+                  rClient = receiverChannel.getPlayerStorage().getCharacterByName(recipient).map(MapleCharacter::getClient).orElse(null);
                }
             }
 
@@ -234,11 +208,11 @@ public class DueyProcessor {
       }
    }
 
-   public static void dueyRemovePackage(MapleClient c, int packageid, boolean playerRemove) {
+   public static void dueyRemovePackage(MapleClient c, int packageId, boolean playerRemove) {
       if (c.tryAcquireClient()) {
          try {
-            removePackageFromDB(packageid);
-            PacketCreator.announce(c, new RemoveDueyItem(playerRemove, packageid));
+            removePackageFromDB(packageId);
+            PacketCreator.announce(c, new RemoveDueyItem(playerRemove, packageId));
          } finally {
             c.releaseClient();
          }
@@ -252,7 +226,7 @@ public class DueyProcessor {
                   DueyPackageProvider.getInstance().getById(connection, packageId).orElse(null));
 
             if (dueyPackage.isEmpty()) {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_RECV_UNKNOWN_ERROR));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_UNKNOWN_ERROR));
                FilePrinter.printError(FilePrinter.EXPLOITS + c.getPlayer().getName() + ".txt", c.getPlayer().getName() + " tried to receive package from duey with id " + packageId);
                return;
             }
@@ -260,23 +234,23 @@ public class DueyProcessor {
             DueyPackage dp = dueyPackage.get();
 
             if (dp.isDeliveringTime()) {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_RECV_UNKNOWN_ERROR));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_UNKNOWN_ERROR));
                return;
             }
 
             if (dp.item().isDefined()) {
                Item dpItem = dp.item().get();
                if (!c.getPlayer().canHoldMeso(dp.mesos())) {
-                  PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_RECV_UNKNOWN_ERROR));
+                  PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_UNKNOWN_ERROR));
                   return;
                }
 
                if (!MapleInventoryManipulator.checkSpace(c, dpItem.id(), dpItem.quantity(), dpItem.owner())) {
-                  int itemid = dpItem.id();
-                  if (MapleItemInformationProvider.getInstance().isPickupRestricted(itemid) && c.getPlayer().getInventory(ItemConstants.getInventoryType(itemid)).findById(itemid) != null) {
-                     PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_RECV_RECEIVER_WITH_UNIQUE));
+                  int itemId = dpItem.id();
+                  if (MapleItemInformationProvider.getInstance().isPickupRestricted(itemId) && c.getPlayer().getInventory(ItemConstants.getInventoryType(itemId)).findById(itemId) != null) {
+                     PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_RECEIVER_WITH_UNIQUE));
                   } else {
-                     PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_RECV_NO_FREE_SLOTS));
+                     PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_RECV_NO_FREE_SLOTS));
                   }
 
                   return;
@@ -298,16 +272,16 @@ public class DueyProcessor {
       if (c.tryAcquireClient()) {
          try {
             long timeNow = System.currentTimeMillis();
-            if (timeNow - c.getPlayer().getNpcCooldown() < YamlConfig.config.server.BLOCK_NPC_RACE_CONDT) {
+            if (timeNow - c.getPlayer().getNpcCoolDown() < YamlConfig.config.server.BLOCK_NPC_RACE_CONDT) {
                PacketCreator.announce(c, new EnableActions());
                return;
             }
-            c.getPlayer().setNpcCooldown(timeNow);
+            c.getPlayer().setNpcCoolDown(timeNow);
 
             if (quickDelivery) {
                PacketCreator.announce(c, new SendDuey(DueyAction.SOMETHING));
             } else {
-               PacketCreator.announce(c, new SendDuey(DueyAction.TOCLIENT_OPEN_DUEY, Option.apply(loadPackages(c.getPlayer()))));
+               PacketCreator.announce(c, new SendDuey(DueyAction.TO_CLIENT_OPEN_DUEY, Option.apply(loadPackages(c.getPlayer()))));
             }
          } finally {
             c.releaseClient();

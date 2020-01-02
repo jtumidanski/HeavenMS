@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class MapgetDragonEgg {
+class MapGetDragonEgg {
 
    static def start(MapScriptMethods ms) {
       ms.lockUI()
@@ -11,9 +11,9 @@ class MapgetDragonEgg {
    }
 }
 
-MapgetDragonEgg getMap() {
-   getBinding().setVariable("map", new MapgetDragonEgg())
-   return (MapgetDragonEgg) getBinding().getVariable("map")
+MapGetDragonEgg getMap() {
+   getBinding().setVariable("map", new MapGetDragonEgg())
+   return (MapGetDragonEgg) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

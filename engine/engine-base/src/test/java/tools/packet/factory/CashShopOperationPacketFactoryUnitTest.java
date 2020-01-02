@@ -53,8 +53,8 @@ public class CashShopOperationPacketFactoryUnitTest {
 
       //Assert
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
-      Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
-      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST_UPDATE.getValue());
+      Assert.assertEquals(accessor.readShort(), SendOpcode.CASH_SHOP_OPERATION.getValue());
+      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISH_LIST_UPDATE.getValue());
       sns.forEach(sn -> Assert.assertEquals(accessor.readInt(), (int) sn));
       IntStream.range(0, 10 - sns.size()).forEach(i -> Assert.assertEquals(accessor.readInt(), 0));
    }
@@ -70,8 +70,8 @@ public class CashShopOperationPacketFactoryUnitTest {
 
       //Assert
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
-      Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
-      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST_UPDATE.getValue());
+      Assert.assertEquals(accessor.readShort(), SendOpcode.CASH_SHOP_OPERATION.getValue());
+      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISH_LIST_UPDATE.getValue());
       sns.forEach(sn -> Assert.assertEquals(accessor.readInt(), (int) sn));
       IntStream.range(0, 10 - sns.size()).forEach(i -> Assert.assertEquals(accessor.readInt(), 0));
    }
@@ -87,8 +87,8 @@ public class CashShopOperationPacketFactoryUnitTest {
 
       //Assert
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
-      Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
-      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST_UPDATE.getValue());
+      Assert.assertEquals(accessor.readShort(), SendOpcode.CASH_SHOP_OPERATION.getValue());
+      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISH_LIST_UPDATE.getValue());
       IntStream.range(0, 10 - sns.size()).forEach(i -> Assert.assertEquals(accessor.readInt(), 0));
    }
 
@@ -103,8 +103,8 @@ public class CashShopOperationPacketFactoryUnitTest {
 
       //Assert
       LittleEndianAccessor accessor = new GenericLittleEndianAccessor(new ByteArrayByteStream(packet));
-      Assert.assertEquals(accessor.readShort(), SendOpcode.CASHSHOP_OPERATION.getValue());
-      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISHLIST.getValue());
+      Assert.assertEquals(accessor.readShort(), SendOpcode.CASH_SHOP_OPERATION.getValue());
+      Assert.assertEquals(accessor.readByte(), CashShopOperationSubOp.SHOW_WISH_LIST.getValue());
       sns.forEach(sn -> Assert.assertEquals(accessor.readInt(), (int) sn));
       IntStream.range(0, 10 - sns.size()).forEach(i -> Assert.assertEquals(accessor.readInt(), 0));
    }

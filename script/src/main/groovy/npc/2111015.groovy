@@ -16,7 +16,7 @@ class NPC2111015 {
    int sel = -1
 
    static def isPillUsed(ch) {
-      return ch.getBuffSource(MapleBuffStat.HPREC) == 2022198
+      return ch.getBuffSource(MapleBuffStat.HP_RECOVERY) == 2022198
    }
 
    def start() {

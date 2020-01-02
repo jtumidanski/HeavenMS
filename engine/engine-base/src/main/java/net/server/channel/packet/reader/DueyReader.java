@@ -13,13 +13,13 @@ public class DueyReader implements PacketReader<BaseDueyPacket> {
    @Override
    public BaseDueyPacket read(SeekableLittleEndianAccessor accessor) {
       byte operation = accessor.readByte();
-      if (operation == DueyAction.TOSERVER_RECV_ITEM.getValue()) {
+      if (operation == DueyAction.TO_SERVER_RECV_ITEM.getValue()) {
          return readReceiveItem(operation);
-      } else if (operation == DueyAction.TOSERVER_SEND_ITEM.getValue()) {
+      } else if (operation == DueyAction.TO_SERVER_SEND_ITEM.getValue()) {
          return readSendItem(accessor, operation);
-      } else if (operation == DueyAction.TOSERVER_REMOVE_PACKAGE.getValue()) {
+      } else if (operation == DueyAction.TO_SERVER_REMOVE_PACKAGE.getValue()) {
          return readRemovePackage(accessor, operation);
-      } else if (operation == DueyAction.TOSERVER_CLAIM_PACKAGE.getValue()) {
+      } else if (operation == DueyAction.TO_SERVER_CLAIM_PACKAGE.getValue()) {
          return readClaimPackage(accessor, operation);
       }
       return new BaseDueyPacket(operation);

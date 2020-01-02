@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package client;
 
 public enum MapleJob {
@@ -26,35 +5,35 @@ public enum MapleJob {
 
    WARRIOR(100),
    FIGHTER(110), CRUSADER(111), HERO(112),
-   PAGE(120), WHITEKNIGHT(121), PALADIN(122),
-   SPEARMAN(130), DRAGONKNIGHT(131), DARKKNIGHT(132),
+   PAGE(120), WHITE_KNIGHT(121), PALADIN(122),
+   SPEARMAN(130), DRAGON_KNIGHT(131), DARK_KNIGHT(132),
 
    MAGICIAN(200),
-   FP_WIZARD(210), FP_MAGE(211), FP_ARCHMAGE(212),
-   IL_WIZARD(220), IL_MAGE(221), IL_ARCHMAGE(222),
+   FP_WIZARD(210), FIRE_POISON_MAGICIAN(211), FIRE_POISON_ARCH_MAGICIAN(212),
+   IL_WIZARD(220), ICE_LIGHTENING_MAGICIAN(221), ICE_LIGHTENING_ARCH_MAGICIAN(222),
    CLERIC(230), PRIEST(231), BISHOP(232),
 
    BOWMAN(300),
-   HUNTER(310), RANGER(311), BOWMASTER(312),
+   HUNTER(310), RANGER(311), BOW_MASTER(312),
    CROSSBOWMAN(320), SNIPER(321), MARKSMAN(322),
 
    THIEF(400),
-   ASSASSIN(410), HERMIT(411), NIGHTLORD(412),
-   BANDIT(420), CHIEFBANDIT(421), SHADOWER(422),
+   ASSASSIN(410), HERMIT(411), NIGHT_LORD(412),
+   BANDIT(420), CHIEF_BANDIT(421), SHADOWER(422),
 
    PIRATE(500),
    BRAWLER(510), MARAUDER(511), BUCCANEER(512),
    GUNSLINGER(520), OUTLAW(521), CORSAIR(522),
 
-   MAPLELEAF_BRIGADIER(800),
-   GM(900), SUPERGM(910),
+   MAPLE_LEAF_BRIGADIER(800),
+   GM(900), SUPER_GM(910),
 
    NOBLESSE(1000),
-   DAWNWARRIOR1(1100), DAWNWARRIOR2(1110), DAWNWARRIOR3(1111), DAWNWARRIOR4(1112),
-   BLAZEWIZARD1(1200), BLAZEWIZARD2(1210), BLAZEWIZARD3(1211), BLAZEWIZARD4(1212),
-   WINDARCHER1(1300), WINDARCHER2(1310), WINDARCHER3(1311), WINDARCHER4(1312),
-   NIGHTWALKER1(1400), NIGHTWALKER2(1410), NIGHTWALKER3(1411), NIGHTWALKER4(1412),
-   THUNDERBREAKER1(1500), THUNDERBREAKER2(1510), THUNDERBREAKER3(1511), THUNDERBREAKER4(1512),
+   DAWN_WARRIOR_1(1100), DAWN_WARRIOR_2(1110), DAWN_WARRIOR_3(1111), DAWN_WARRIOR_4(1112),
+   BLAZE_WIZARD_1(1200), BLAZE_WIZARD_2(1210), BLAZE_WIZARD_3(1211), BLAZE_WIZARD_4(1212),
+   WIND_ARCHER_1(1300), WIND_ARCHER_2(1310), WIND_ARCHER_3(1311), WIND_ARCHER_4(1312),
+   NIGHT_WALKER_1(1400), NIGHT_WALKER_2(1410), NIGHT_WALKER_3(1411), NIGHT_WALKER_4(1412),
+   THUNDER_BREAKER_1(1500), THUNDER_BREAKER_2(1510), THUNDER_BREAKER_3(1511), THUNDER_BREAKER_4(1512),
 
    LEGEND(2000), EVAN(2001),
    ARAN1(2100), ARAN2(2110), ARAN3(2111), ARAN4(2112),
@@ -63,10 +42,10 @@ public enum MapleJob {
    EVAN7(2215), EVAN8(2216), EVAN9(2217), EVAN10(2218);
 
    final static int maxId = 22;    // maxId = (EVAN / 100);
-   final int jobid;
+   final int jobId;
 
    MapleJob(int id) {
-      jobid = id;
+      jobId = id;
    }
 
    public static int getMax() {
@@ -97,31 +76,31 @@ public enum MapleJob {
          case 1024:
             return NOBLESSE;
          case 2048:
-            return DAWNWARRIOR1;
+            return DAWN_WARRIOR_1;
          case 4096:
-            return BLAZEWIZARD1;
+            return BLAZE_WIZARD_1;
          case 8192:
-            return WINDARCHER1;
+            return WIND_ARCHER_1;
          case 16384:
-            return NIGHTWALKER1;
+            return NIGHT_WALKER_1;
          case 32768:
-            return THUNDERBREAKER1;
+            return THUNDER_BREAKER_1;
          default:
             return BEGINNER;
       }
    }
 
    public int getId() {
-      return jobid;
+      return jobId;
    }
 
-   public boolean isA(MapleJob basejob) {  // thanks Steve (kaito1410) for pointing out an improvement here
-      int basebranch = basejob.getId() / 10;
-      return (getId() / 10 == basebranch && getId() >= basejob.getId()) || (basebranch % 10 == 0 && getId() / 100 == basejob.getId() / 100);
+   public boolean isA(MapleJob baseJob) {
+      int baseBranch = baseJob.getId() / 10;
+      return (getId() / 10 == baseBranch && getId() >= baseJob.getId()) || (baseBranch % 10 == 0 && getId() / 100 == baseJob.getId() / 100);
    }
 
    public int getJobNiche() {
-      return (jobid / 100) % 10;
+      return (jobId / 100) % 10;
         
         /*
         case 0: BEGINNER;

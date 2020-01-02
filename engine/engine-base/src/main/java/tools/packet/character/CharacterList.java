@@ -19,7 +19,7 @@ public class CharacterList implements PacketInput {
 
    @Override
    public SendOpcode opcode() {
-      return SendOpcode.CHARLIST;
+      return SendOpcode.CHARACTER_LIST;
    }
 
    public MapleClient getClient() {

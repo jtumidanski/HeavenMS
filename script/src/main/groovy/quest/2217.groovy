@@ -28,7 +28,7 @@ class Quest2217 {
             qm.forceCompleteQuest()
             qm.gainExp(7000)
 
-            if (isAllSubquestsDone() && qm.haveItem(4031894)) {
+            if (areAllSubQuestsDone() && qm.haveItem(4031894)) {
                qm.gainItem(4031894, (short) -1)
             }
 
@@ -37,7 +37,7 @@ class Quest2217 {
       }
    }
 
-   def isAllSubquestsDone() {
+   def areAllSubQuestsDone() {
       for (int i = 2216; i <= 2219; i++) {
          if (!qm.isQuestCompleted(i)) {
             return false

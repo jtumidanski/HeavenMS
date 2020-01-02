@@ -1,26 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    Copyleft (L) 2016 - 2018 RonanLana (HeavenMS)
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.util.ArrayList;
@@ -58,17 +35,13 @@ import tools.packet.cashshop.operation.ShowBoughtQuestItem;
 import tools.packet.cashshop.operation.ShowCashShopMessage;
 import tools.packet.cashshop.operation.ShowCouponRedeemSuccess;
 
-/**
- * @author Penguins (Acrylic)
- * @author Ronan (HeavenMS)
- */
 public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePacket> {
 
-   private List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, EntityManager entityManager, int codeid) {
+   private List<NxCodeItemData> getNXCodeItems(MapleCharacter chr, EntityManager entityManager, int codeId) {
       Map<Integer, Integer> couponItems = new HashMap<>();
       Map<Integer, Integer> couponPoints = new HashMap<>(5);
 
-      NxCodeItemProvider.getInstance().get(entityManager, codeid).forEach(item -> {
+      NxCodeItemProvider.getInstance().get(entityManager, codeId).forEach(item -> {
          if (item.theType() < 5) {
             couponPoints.merge(item.theType(), item.quantity(), Integer::sum);
          } else {
@@ -85,7 +58,7 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
                item = 4000000;
                qty = 1;
 
-               FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "Error trying to redeem itemid " + item + " from codeid " + codeid + ".");
+               FilePrinter.printError(FilePrinter.UNHANDLED_EVENT, "Error trying to redeem item id " + item + " from code id " + codeId + ".");
             }
 
             if (!chr.canHold(item, qty)) {
@@ -130,15 +103,15 @@ public final class CouponCodeHandler extends AbstractPacketHandler<CouponCodePac
             return retVal;
          }
 
-         int codeid = nxCode.get().id();
+         int codeId = nxCode.get().id();
 
-         List<NxCodeItemData> ret = getNXCodeItems(chr, connection, codeid);
+         List<NxCodeItemData> ret = getNXCodeItems(chr, connection, codeId);
          if (ret == null) {
             retVal = new Pair<>(-4, new ArrayList<>());
             return retVal;
          }
 
-         NxCodeAdministrator.getInstance().setRetriever(connection, codeid, chr.getName());
+         NxCodeAdministrator.getInstance().setRetriever(connection, codeId, chr.getName());
          c.resetCsCoupon();
          retVal = new Pair<>(0, ret);
          return retVal;

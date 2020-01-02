@@ -20,7 +20,7 @@ public class BetterItemFactory {
       int adjustedPetId = petId;
       MaplePet pet = null;
 
-      if (petId > -1) {   // issue with null "pet" having petid > -1 found thanks to MedicOP
+      if (petId > -1) {
          pet = PetProcessor.getInstance().loadFromDb(id, position, petId);
          if (pet == null) {
             adjustedPetId = -1;

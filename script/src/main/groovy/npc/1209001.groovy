@@ -21,7 +21,7 @@ class NPC1209001 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendOk("The #rBlack Mage#k's forces approaches here in an unstoppable pace... We have no other way than to flee this area now, leaving our home behind. Oh, the tragedy!")
+      cm.sendOk("The #rBlack Magician#k's forces approaches here in an unstoppable pace... We have no other way than to flee this area now, leaving our home behind. Oh, the tragedy!")
       cm.dispose()
    }
 }

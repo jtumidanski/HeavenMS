@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub & pirate equipment
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class Sleepywood extends GachaponItems {
 
    @Override
@@ -20,7 +13,7 @@ public class Sleepywood extends GachaponItems {
             2044602, 2043302, 2040302, 2040802, 2040005, 2043202, 2043002, 2040505, 2040502, 2048005, 2048002, 2044402, 2040902,
             2040702, 2040705, 2040708, 2044302, 2043802, 2044202, 2044002, 2044801, 2044903, 2044814,
 
-            /* Useable drop */
+            /* Use-able drop */
             2012000, 2012003, 2020007, 2000004, 2012001, 2020008, 2070006, 2020012, 2000005, 2030007, 2012002, 2002001, 2070005,
 
             /* Common equipment */

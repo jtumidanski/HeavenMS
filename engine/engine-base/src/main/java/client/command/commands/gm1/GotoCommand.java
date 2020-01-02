@@ -1,30 +1,6 @@
-/*
-    This file is part of the HeavenMS MapleStory Server, commands OdinMS-based
-    Copyleft (L) 2016 - 2018 RonanLana
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
-/*
-   @Author: Arthur L - Refactored command content into modules
-*/
 package client.command.commands.gm1;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +10,18 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import constants.game.GameConstants;
-import server.maps.MapleMapFactory;
-import server.maps.MaplePortal;
 import server.maps.FieldLimit;
 import server.maps.MapleMap;
+import server.maps.MapleMapFactory;
 import server.maps.MapleMiniDungeonInfo;
+import server.maps.MaplePortal;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
 public class GotoCommand extends Command {
 
-   public static String GOTO_TOWNS_INFO = "";
-   public static String GOTO_AREAS_INFO = "";
+   public static StringBuilder GOTO_TOWNS_INFO = new StringBuilder();
+   public static StringBuilder GOTO_AREAS_INFO = new StringBuilder();
 
    {
       setDescription("");
@@ -54,32 +30,34 @@ public class GotoCommand extends Command {
       sortGotoEntries(towns);
 
       try {
-         // thanks shavit for noticing goto areas getting loaded from wz needlessly, only for the name retrieval
-
          for (Map.Entry<String, Integer> e : towns) {
-            GOTO_TOWNS_INFO += ("'" + e.getKey() + "' - #b" + (MapleMapFactory.loadPlaceName(e.getValue())) + "#k\r\n");
+            GOTO_TOWNS_INFO
+                  .append("'")
+                  .append(e.getKey())
+                  .append("' - #b")
+                  .append(MapleMapFactory.loadPlaceName(e.getValue()))
+                  .append("#k\r\n");
          }
 
          List<Entry<String, Integer>> areas = new ArrayList<>(GameConstants.GOTO_AREAS.entrySet());
          sortGotoEntries(areas);
          for (Map.Entry<String, Integer> e : areas) {
-            GOTO_AREAS_INFO += ("'" + e.getKey() + "' - #b" + (MapleMapFactory.loadPlaceName(e.getValue())) + "#k\r\n");
+            GOTO_AREAS_INFO
+                  .append("'")
+                  .append(e.getKey())
+                  .append("' - #b")
+                  .append(MapleMapFactory.loadPlaceName(e.getValue()))
+                  .append("#k\r\n");
          }
       } catch (Exception e) {
          e.printStackTrace();
-
-         GOTO_TOWNS_INFO = "(none)";
-         GOTO_AREAS_INFO = "(none)";
+         GOTO_TOWNS_INFO = new StringBuilder("(none)");
+         GOTO_AREAS_INFO = new StringBuilder("(none)");
       }
    }
 
    private static void sortGotoEntries(List<Entry<String, Integer>> listEntries) {
-      listEntries.sort(new Comparator<>() {
-         @Override
-         public int compare(Entry<String, Integer> e1, Entry<String, Integer> e2) {
-            return e1.getValue().compareTo(e2.getValue());
-         }
-      });
+      listEntries.sort(Entry.comparingByValue());
    }
 
    @Override
@@ -101,29 +79,26 @@ public class GotoCommand extends Command {
       }
 
       if (!player.isGM()) {
-         if (player.getEventInstance() != null || MapleMiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOTMIGRATE.check(player.getMap().getFieldLimit())) {
+         if (player.getEventInstance() != null || MapleMiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOT_MIGRATE.check(player.getMap().getFieldLimit())) {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command can not be used in this map.");
             return;
          }
       }
 
-      HashMap<String, Integer> gotomaps;
+      HashMap<String, Integer> gotoMaps;
       if (player.isGM()) {
-         gotomaps = new HashMap<>(GameConstants.GOTO_AREAS);     // distinct map registry for GM/users suggested thanks to Vcoc
-         gotomaps.putAll(GameConstants.GOTO_TOWNS);  // thanks Halcyon for pointing out duplicates on listed entries functionality
+         gotoMaps = new HashMap<>(GameConstants.GOTO_AREAS);
+         gotoMaps.putAll(GameConstants.GOTO_TOWNS);
       } else {
-         gotomaps = GameConstants.GOTO_TOWNS;
+         gotoMaps = GameConstants.GOTO_TOWNS;
       }
 
-      if (gotomaps.containsKey(params[0])) {
-         MapleMap target = c.getChannelServer().getMapFactory().getMap(gotomaps.get(params[0]));
-
-         // expedition issue with this command detected thanks to Masterrulax
-         MaplePortal targetPortal = target.getRandomPlayerSpawnpoint();
+      if (gotoMaps.containsKey(params[0])) {
+         MapleMap target = c.getChannelServer().getMapFactory().getMap(gotoMaps.get(params[0]));
+         MaplePortal targetPortal = target.getRandomPlayerSpawnPoint();
          player.saveLocationOnWarp();
          player.changeMap(target, targetPortal);
       } else {
-         // detailed info on goto available areas suggested thanks to Vcoc
          String sendStr = "Area '#r" + params[0] + "#k' is not available. Available areas:\r\n\r\n#rTowns:#k" + GOTO_TOWNS_INFO;
          if (player.isGM()) {
             sendStr += ("\r\n#rAreas:#k\r\n" + GOTO_AREAS_INFO);

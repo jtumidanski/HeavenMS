@@ -33,8 +33,8 @@ class NPC9201002 {
    boolean weddingIndoors
    int weddingBlessingExp = YamlConfig.config.server.WEDDING_BLESS_EXP
 
-   static def isWeddingIndoors(int mapid) {
-      return mapid >= 680000100 && mapid <= 680000500
+   static def isWeddingIndoors(int mapId) {
+      return mapId >= 680000100 && mapId <= 680000500
    }
 
    def getMarriageInstance(MapleCharacter player) {
@@ -50,7 +50,7 @@ class NPC9201002 {
       return null
    }
 
-   static def detectPlayerItemid(MapleCharacter player) {
+   static def detectPlayerItemId(MapleCharacter player) {
       for (int x = 4031357; x <= 4031364; x++) {
          if (player.haveItem(x)) {
             return x
@@ -65,17 +65,17 @@ class NPC9201002 {
    }
 
    static def isSuitedForWedding(MapleCharacter player, boolean equipped) {
-      int baseid = (player.getGender() == 0) ? 1050131 : 1051150
+      int baseId = (player.getGender() == 0) ? 1050131 : 1051150
 
       if (equipped) {
          for (int i = 0; i < 4; i++) {
-            if (player.haveItemEquipped(baseid + i)) {
+            if (player.haveItemEquipped(baseId + i)) {
                return true
             }
          }
       } else {
          for (int i = 0; i < 4; i++) {
-            if (player.haveItemWithId(baseid + i, true)) {
+            if (player.haveItemWithId(baseId + i, true)) {
                return true
             }
          }
@@ -185,11 +185,11 @@ class NPC9201002 {
                }
             } else if (status == 1) {
                int wid = cm.getClient().getWorldServer().getRelationshipId(cm.getPlayer().getId())
-               Channel cserv = cm.getClient().getChannelServer()
+               Channel channel = cm.getClient().getChannelServer()
 
-               if (cserv.isWeddingReserved(wid)) {
-                  if (wid == cserv.getOngoingWedding(cathedralWedding)) {
-                     MapleCharacter partner = cserv.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
+               if (channel.isWeddingReserved(wid)) {
+                  if (wid == channel.getOngoingWedding(cathedralWedding)) {
+                     MapleCharacter partner = channel.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                      if (!(partner == null || cm.getMap() != partner.getMap())) {
                         if (!cm.canHold(4000313)) {
                            cm.sendOk("Please have a free ETC slot available to get the #b#t4000313##k.")
@@ -209,13 +209,13 @@ class NPC9201002 {
                            return
                         }
 
-                        cm.sendOk("Very well, the preparatives here are finished too. This indeed is a beautiful day, you two are truly blessed to marry on such a day. Let us begin the marriage!!")
+                        cm.sendOk("Very well, the preparations here are finished too. This indeed is a beautiful day, you two are truly blessed to marry on such a day. Let us begin the marriage!!")
                      } else {
                         cm.sendOk("Hmm, it seems your partner is elsewhere... Please let them come here before starting the ceremony.")
                         cm.dispose()
                      }
                   } else {
-                     String placeTime = cserv.getWeddingReservationTimeLeft(wid)
+                     String placeTime = channel.getWeddingReservationTimeLeft(wid)
 
                      cm.sendOk("Have patience. Your wedding is set to happen at the #r" + placeTime + "#k. Don't forget the wedding garment.")
                      cm.dispose()
@@ -225,12 +225,12 @@ class NPC9201002 {
                   cm.dispose()
                }
             } else if (status == 2) {
-               Channel cserv = cm.getClient().getChannelServer()
-               boolean wtype = cserv.getOngoingWeddingType(cathedralWedding)
+               Channel channel = cm.getClient().getChannelServer()
+               boolean weddingType = channel.getOngoingWeddingType(cathedralWedding)
 
-               MapleCharacter partner = cserv.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
+               MapleCharacter partner = channel.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                if (!(partner == null || cm.getMap() != partner.getMap())) {
-                  if (cserv.acceptOngoingWedding(cathedralWedding)) {
+                  if (channel.acceptOngoingWedding(cathedralWedding)) {
                      int wid = cm.getClient().getWorldServer().getRelationshipId(cm.getPlayer().getId())
                      if (wid > 0) {
                         EventManager em = cm.getEventManager(weddingEventName)
@@ -240,7 +240,7 @@ class NPC9201002 {
                               eim.setIntProperty("weddingId", wid)
                               eim.setIntProperty("groomId", cm.getPlayer().getId())
                               eim.setIntProperty("brideId", cm.getPlayer().getPartnerId())
-                              eim.setIntProperty("isPremium", wtype ? 1 : 0)
+                              eim.setIntProperty("isPremium", weddingType ? 1 : 0)
 
                               eim.registerPlayer(partner)
                            } else {
@@ -274,21 +274,21 @@ class NPC9201002 {
 
                int playerId = cm.getPlayer().getId()
                if (playerId == eim.getIntProperty("groomId") || playerId == eim.getIntProperty("brideId")) {
-                  int wstg = eim.getIntProperty("weddingStage")
+                  int weddingStage = eim.getIntProperty("weddingStage")
 
-                  if (wstg == 2) {
+                  if (weddingStage == 2) {
                      cm.sendYesNo("Very well, the guests has bestowed all their blessings to you now. The time has come, #rshould I make you Husband and Wife#k?")
                      state = 1
-                  } else if (wstg == 1) {
+                  } else if (weddingStage == 1) {
                      cm.sendOk("While you two are making your wedding vows to each other, your guests are currently giving their blessings to you. This is a time of happiness for both of you, please rejoice the ceremony.")
                      cm.dispose()
                   } else {
-                     cm.sendOk("Congratulations on your wedding! Our ceremony is complete, you can head to #b#p9201007##k now, she will lead you and your guests to the afterparty. Cheers for your love!")
+                     cm.sendOk("Congratulations on your wedding! Our ceremony is complete, you can head to #b#p9201007##k now, she will lead you and your guests to the after party. Cheers for your love!")
                      cm.dispose()
                   }
                } else {
-                  int wstg = eim.getIntProperty("weddingStage")
-                  if (wstg == 1) {
+                  int weddingStage = eim.getIntProperty("weddingStage")
+                  if (weddingStage == 1) {
                      if (eim.gridCheck(cm.getPlayer()) != -1) {
                         cm.sendOk("Everyone give your blessings to this lovely couple!")
                         cm.dispose()
@@ -301,8 +301,8 @@ class NPC9201002 {
                            cm.dispose()
                         }
                      }
-                  } else if (wstg == 3) {
-                     cm.sendOk("The two loving birds are now married. What a lively day! Please #rget ready for the afterparty#k, it should start soon. Follow the married couple's lead.")
+                  } else if (weddingStage == 3) {
+                     cm.sendOk("The two loving birds are now married. What a lively day! Please #rget ready for the after party#k, it should start soon. Follow the married couple's lead.")
                      cm.dispose()
                   } else {
                      cm.sendOk("The guest's blessing time has ended. Hang on, the couple will renew their vows very soon now. What a sight to see!")
@@ -330,9 +330,9 @@ class NPC9201002 {
                   cm.sendOk("Your blessings have been added to their love. What a noble act for a lovely couple!")
                   cm.dispose()
                } else {            // couple wants to complete the wedding
-                  int wstg = eim.getIntProperty("weddingStage")
+                  int weddingStage = eim.getIntProperty("weddingStage")
 
-                  if (wstg == 2) {
+                  if (weddingStage == 2) {
                      int pid = cm.getPlayer().getPartnerId()
                      if (pid <= 0) {
                         cm.sendOk("It seems you are no longer engaged to your partner, just before the altar... Where did all that happiness you two had sported a while ago went?")
@@ -355,7 +355,7 @@ class NPC9201002 {
                                     eim.setIntProperty("weddingStage", 3)
                                     AbstractPlayerInteraction cmPartner = partner.getAbstractPlayerInteraction()
 
-                                    int playerItemId = detectPlayerItemid(player)
+                                    int playerItemId = detectPlayerItemId(player)
                                     int partnerItemId = (playerItemId % 2 == 1) ? playerItemId + 1 : playerItemId - 1
 
                                     int marriageRingId = getRingId((playerItemId % 2 == 1) ? playerItemId : partnerItemId)
@@ -396,7 +396,7 @@ class NPC9201002 {
                               break
 
                            case -4:
-                              cm.sendOk("Pardon my rudiness, but the garments are a essential part of the ceremony. Please #rsuit yourself properly#k for a wedding.")
+                              cm.sendOk("Pardon my rudeness, but the garments are a essential part of the ceremony. Please #rsuit yourself properly#k for a wedding.")
                               break
 
                            case 1:
@@ -412,7 +412,7 @@ class NPC9201002 {
                               break
 
                            case 4:
-                              cm.sendOk("It seems your partner is not properly dressed for the wedding... Pardon my rudiness, but the garments are a essential part of the ceremony.")
+                              cm.sendOk("It seems your partner is not properly dressed for the wedding... Pardon my rudeness, but the garments are a essential part of the ceremony.")
                               break
                         }
 

@@ -1,4 +1,3 @@
-import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +17,7 @@ import rest.master.character.CharactersResponse;
 import tools.FilePrinter;
 
 public class BuddyOrchestrator {
-   public static void main(String[] args) throws IOException {
+   public static void main(String[] args) {
       PersistenceManager.construct("ms-buddy");
       URI uri = UriBuilder.host(RestService.BUDDY).uri();
       final HttpServer server = ServerFactory.create(uri);

@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server;
 
 import java.util.HashMap;
@@ -26,53 +5,49 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
 import server.life.MobSkill;
 import tools.Pair;
 
-/**
- * @author Danny//changed to map :3
- * @author Ronan//debuffs to storage as well
- */
 public class PlayerBuffStorage {
    private final Lock lock = MonitoredReentrantLockFactory.createLock(MonitoredLockType.BUFF_STORAGE, true);
    private int id = (int) (Math.random() * 100);
    private Map<Integer, List<PlayerBuffValueHolder>> buffs = new HashMap<>();
-   private Map<Integer, Map<MapleDisease, Pair<Long, MobSkill>>> diseases = new HashMap<>();
+   private Map<Integer, Map<MapleAbnormalStatus, Pair<Long, MobSkill>>> diseases = new HashMap<>();
 
-   public void addBuffsToStorage(int chrid, List<PlayerBuffValueHolder> toStore) {
+   public void addBuffsToStorage(int characterId, List<PlayerBuffValueHolder> toStore) {
       lock.lock();
       try {
-         buffs.put(chrid, toStore);//Old one will be replaced if it's in here.
+         buffs.put(characterId, toStore);//Old one will be replaced if it's in here.
       } finally {
          lock.unlock();
       }
    }
 
-   public List<PlayerBuffValueHolder> getBuffsFromStorage(int chrid) {
+   public List<PlayerBuffValueHolder> getBuffsFromStorage(int characterId) {
       lock.lock();
       try {
-         return buffs.remove(chrid);
+         return buffs.remove(characterId);
       } finally {
          lock.unlock();
       }
    }
 
-   public void addDiseasesToStorage(int chrid, Map<MapleDisease, Pair<Long, MobSkill>> toStore) {
+   public void addDiseasesToStorage(int characterId, Map<MapleAbnormalStatus, Pair<Long, MobSkill>> toStore) {
       lock.lock();
       try {
-         diseases.put(chrid, toStore);
+         diseases.put(characterId, toStore);
       } finally {
          lock.unlock();
       }
    }
 
-   public Map<MapleDisease, Pair<Long, MobSkill>> getDiseasesFromStorage(int chrid) {
+   public Map<MapleAbnormalStatus, Pair<Long, MobSkill>> getDiseasesFromStorage(int characterId) {
       lock.lock();
       try {
-         return diseases.remove(chrid);
+         return diseases.remove(characterId);
       } finally {
          lock.unlock();
       }

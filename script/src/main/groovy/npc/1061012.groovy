@@ -5,13 +5,6 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 
-/*
-	NPC Name: 		Insiginificant Being
-	Map(s): 		Dungeon : Another Entrance
-	Description: 	Takes you to another Dimension
-*/
-
-
 class NPC1061012 {
    NPCConversationManager cm
    int status = -1

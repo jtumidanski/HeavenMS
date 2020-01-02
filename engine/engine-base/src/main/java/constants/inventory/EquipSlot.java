@@ -1,8 +1,5 @@
 package constants.inventory;
 
-/**
- * @author The Spookster
- */
 public enum EquipSlot {
 
    HAT("Cp", -1),

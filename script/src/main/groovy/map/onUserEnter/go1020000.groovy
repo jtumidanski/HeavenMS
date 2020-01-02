@@ -3,7 +3,7 @@ package map.onUserEnter
 
 import scripting.map.MapScriptMethods
 
-class Mapgo1020000 {
+class MapGo1020000 {
 
    static def start(MapScriptMethods ms) {
       ms.unlockUI()
@@ -11,9 +11,9 @@ class Mapgo1020000 {
    }
 }
 
-Mapgo1020000 getMap() {
-   getBinding().setVariable("map", new Mapgo1020000())
-   return (Mapgo1020000) getBinding().getVariable("map")
+MapGo1020000 getMap() {
+   getBinding().setVariable("map", new MapGo1020000())
+   return (MapGo1020000) getBinding().getVariable("map")
 }
 
 def start(MapScriptMethods ms) {

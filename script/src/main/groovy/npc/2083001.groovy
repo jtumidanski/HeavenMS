@@ -25,8 +25,8 @@ class NPC2083001 {
       action((byte) 1, (byte) 0, 0)
    }
 
-   static def isRecruitingMap(mapid) {
-      return mapid == 240050000
+   static def isRecruitingMap(mapId) {
+      return mapId == 240050000
    }
 
    def action(Byte mode, Byte type, Integer selection) {

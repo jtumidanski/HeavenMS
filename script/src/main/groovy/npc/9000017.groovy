@@ -49,7 +49,7 @@ class NPC9000017 {
          String selStr = "Hey traveler! Come, come closer... We offer a #bhuge opportunity of business#k to you. If you want to know what it is, keep listening..."
          cm.sendNext(selStr)
       } else if (status == 1) {
-         String selStr = "We've got here the knowledge to synthetize the mighty #b#t2049100##k! Of course, making one is not an easy task... But worry not! Just gather some material to me and a fee of #b1,200,000 mesos#k for our services to #bobtain it#k. You still want to do it?"
+         String selStr = "We've got here the knowledge to synthesize the mighty #b#t2049100##k! Of course, making one is not an easy task... But worry not! Just gather some material to me and a fee of #b1,200,000 mesos#k for our services to #bobtain it#k. You still want to do it?"
          cm.sendYesNo(selStr)
       } else if (status == 2) {
          //selectedItem = selection;

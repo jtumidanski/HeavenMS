@@ -5,7 +5,7 @@ import net.server.audit.locks.MonitoredLockType;
 import net.server.services.BaseScheduler;
 import net.server.services.BaseService;
 
-public class OverallService extends BaseService {   // thanks Alex for suggesting a refactor over the several channel schedulers unnecessarily populating the Channel class
+public class OverallService extends BaseService {
 
    private OverallScheduler[] channelSchedulers = new OverallScheduler[YamlConfig.config.server.CHANNEL_LOCKS];
 
@@ -24,12 +24,12 @@ public class OverallService extends BaseService {   // thanks Alex for suggestin
       }
    }
 
-   public void registerOverallAction(int mapid, Runnable runAction, long delay) {
-      channelSchedulers[getChannelSchedulerIndex(mapid)].registerDelayedAction(runAction, delay);
+   public void registerOverallAction(int mapId, Runnable runAction, long delay) {
+      channelSchedulers[getChannelSchedulerIndex(mapId)].registerDelayedAction(runAction, delay);
    }
 
-   public void forceRunOverallAction(int mapid, Runnable runAction) {
-      channelSchedulers[getChannelSchedulerIndex(mapid)].forceRunDelayedAction(runAction);
+   public void forceRunOverallAction(int mapId, Runnable runAction) {
+      channelSchedulers[getChannelSchedulerIndex(mapId)].forceRunDelayedAction(runAction);
    }
 
 

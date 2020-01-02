@@ -24,14 +24,14 @@ public class MobMistService extends BaseService {
       }
    }
 
-   public void registerMobMistCancelAction(int mapid, Runnable runAction, long delay) {
-      mobMistSchedulers[getChannelSchedulerIndex(mapid)].registerMistCancelAction(runAction, delay);
+   public void registerMobMistCancelAction(int mapId, Runnable runAction, long delay) {
+      mobMistSchedulers[getChannelSchedulerIndex(mapId)].registerMistCancelAction(runAction, delay);
    }
 
    private class MobMistScheduler extends BaseScheduler {
 
       public MobMistScheduler() {
-         super(MonitoredLockType.CHANNEL_MOBMIST);
+         super(MonitoredLockType.CHANNEL_MOB_MIST);
       }
 
       public void registerMistCancelAction(Runnable runAction, long delay) {

@@ -21,7 +21,7 @@ public class CoolDownProvider extends AbstractQueryExecutor {
    }
 
    public List<CoolDownData> getForCharacter(EntityManager entityManager, int characterId) {
-      TypedQuery<CoolDownData> query = entityManager.createQuery("SELECT NEW client.database.data.CoolDownData(c.skillId, c.startTime, c.length) FROM Cooldown c WHERE c.characterId = :characterId", CoolDownData.class);
+      TypedQuery<CoolDownData> query = entityManager.createQuery("SELECT NEW client.database.data.CoolDownData(c.skillId, c.startTime, c.length) FROM CoolDown c WHERE c.characterId = :characterId", CoolDownData.class);
       query.setParameter("characterId", characterId);
       return query.getResultList();
    }

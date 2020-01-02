@@ -23,13 +23,13 @@ public class WishListAdministrator extends AbstractQueryExecutor implements Dele
    }
 
    public void addForCharacter(EntityManager entityManager, int characterId, List<Integer> snList) {
-      List<Wishlist> wishlists = snList.stream().map(id -> {
+      List<Wishlist> wishLists = snList.stream().map(id -> {
          Wishlist wishlist = new Wishlist();
          wishlist.setCharacterId(characterId);
          wishlist.setSn(id);
          return wishlist;
       }).collect(Collectors.toList());
-      insertBulk(entityManager, wishlists);
+      insertBulk(entityManager, wishLists);
    }
 
    @Override

@@ -1,29 +1,8 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
@@ -39,9 +18,6 @@ import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author Matze
- */
 public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
    @Override
    public Class<UseItemReader> getReaderClass() {
@@ -67,26 +43,26 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
       Item toUse = chr.getInventory(MapleInventoryType.USE).getItem(packet.slot());
       if (toUse != null && toUse.quantity() > 0 && toUse.id() == packet.itemId()) {
          if (packet.itemId() == 2050004) {
-            chr.dispelDebuffs();
+            chr.dispelAbnormalStatuses();
             remove(client, packet.slot());
             return;
          } else if (packet.itemId() == 2050001) {
-            chr.dispelDebuff(MapleDisease.DARKNESS);
+            chr.dispelAbnormalStatus(MapleAbnormalStatus.DARKNESS);
             remove(client, packet.slot());
             return;
          } else if (packet.itemId() == 2050002) {
-            chr.dispelDebuff(MapleDisease.WEAKEN);
-            chr.dispelDebuff(MapleDisease.SLOW);
+            chr.dispelAbnormalStatus(MapleAbnormalStatus.WEAKEN);
+            chr.dispelAbnormalStatus(MapleAbnormalStatus.SLOW);
             remove(client, packet.slot());
             return;
          } else if (packet.itemId() == 2050003) {
-            chr.dispelDebuff(MapleDisease.SEAL);
-            chr.dispelDebuff(MapleDisease.CURSE);
+            chr.dispelAbnormalStatus(MapleAbnormalStatus.SEAL);
+            chr.dispelAbnormalStatus(MapleAbnormalStatus.CURSE);
             remove(client, packet.slot());
             return;
          } else if (ItemConstants.isTownScroll(packet.itemId())) {
             int banMap = chr.getMapId();
-            int banSp = chr.getMap().findClosestPlayerSpawnpoint(chr.position()).getId();
+            int banSp = chr.getMap().findClosestPlayerSpawnPoint(chr.position()).getId();
             long banTime = currentServerTime();
 
             if (ii.getItemEffect(toUse.id()).applyTo(chr)) {
@@ -97,7 +73,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
                remove(client, packet.slot());
             }
             return;
-         } else if (ItemConstants.isAntibanishScroll(packet.itemId())) {
+         } else if (ItemConstants.isAntiBanishScroll(packet.itemId())) {
             if (ii.getItemEffect(toUse.id()).applyTo(chr)) {
                remove(client, packet.slot());
             } else {

@@ -31,9 +31,9 @@ public class PetProcessor {
    private PetProcessor() {
    }
 
-   public MaplePet loadFromDb(int itemid, short position, int petid) {
-      MaplePet ret = new MaplePet(itemid, position, petid);
-      DatabaseConnection.getInstance().withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petid)).ifPresent(petData -> {
+   public MaplePet loadFromDb(int itemId, short position, int petId) {
+      MaplePet ret = new MaplePet(itemId, position, petId);
+      DatabaseConnection.getInstance().withConnectionResult(connection -> PetProvider.getInstance().loadPet(connection, petId)).ifPresent(petData -> {
          ret.name_$eq(petData.name());
          ret.closeness_$eq(petData.closeness());
          ret.level_$eq(petData.level());
@@ -45,18 +45,18 @@ public class PetProcessor {
       return ret;
    }
 
-   public void deleteFromDb(MapleCharacter owner, int petid) {
-      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petid));
-      owner.resetExcluded(petid);
-      MapleCashIdGenerator.getInstance().freeCashId(petid);
+   public void deleteFromDb(MapleCharacter owner, int petId) {
+      DatabaseConnection.getInstance().withConnection(connection -> PetAdministrator.getInstance().deleteAllPetData(connection, petId));
+      owner.resetExcluded(petId);
+      MapleCashIdGenerator.getInstance().freeCashId(petId);
    }
 
-   public int createPet(int itemid) {
-      return createPet(itemid, Byte.parseByte("1"), 0, 100);
+   public int createPet(int itemId) {
+      return createPet(itemId, Byte.parseByte("1"), 0, 100);
    }
 
-   public int createPet(int itemid, byte level, int closeness, int fullness) {
-      return DatabaseConnection.getInstance().withConnectionResult(connection -> PetAdministrator.getInstance().createPet(connection, itemid, level, closeness, fullness)).orElse(-1);
+   public int createPet(int itemId, byte level, int closeness, int fullness) {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> PetAdministrator.getInstance().createPet(connection, itemId, level, closeness, fullness)).orElse(-1);
    }
 
    public void saveToDb(MaplePet pet) {
@@ -107,9 +107,9 @@ public class PetProcessor {
       MasterBroadcaster.getInstance().sendToAllInMap(owner.getMap(), new PetFoodResponse(owner.getId(), slot, enjoyed, false));
       PetProcessor.getInstance().saveToDb(pet);
 
-      Item petz = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());
-      if (petz != null) {
-         owner.forceUpdateItem(petz);
+      Item petItem = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());
+      if (petItem != null) {
+         owner.forceUpdateItem(petItem);
       }
    }
 
@@ -117,19 +117,19 @@ public class PetProcessor {
       pet.petFlag_$eq(pet.petFlag() | flag.getValue());
       PetProcessor.getInstance().saveToDb(pet);
 
-      Item petz = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());
-      if (petz != null) {
-         owner.forceUpdateItem(petz);
+      Item petItem = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());
+      if (petItem != null) {
+         owner.forceUpdateItem(petItem);
       }
    }
 
    public void removePetFlag(MaplePet pet, MapleCharacter owner, PetFlag flag) {
-      pet.petFlag_$eq(pet.petFlag() & 0xFFFFFFFF ^ flag.getValue());
+      pet.petFlag_$eq(pet.petFlag() ^ flag.getValue());
       PetProcessor.getInstance().saveToDb(pet);
 
-      Item petz = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());
-      if (petz != null) {
-         owner.forceUpdateItem(petz);
+      Item petItem = owner.getInventory(MapleInventoryType.CASH).getItem(pet.position());
+      if (petItem != null) {
+         owner.forceUpdateItem(petItem);
       }
    }
 

@@ -1,24 +1,3 @@
-/*
-	This file is part of the OdinMS Maple Story Server
-    Copyright (C) 2008 Patrick Huy <patrick.huy@frz.cc>
-		       Matthias Butz <matze@odinms.de>
-		       Jan Christian Meyer <vimes@odinms.de>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation version 3 as published by
-    the Free Software Foundation. You may not use, modify or distribute
-    this program under any other version of the GNU Affero General Public
-    License.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
-
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.server.channel.handlers;
 
 import java.awt.Point;
@@ -27,7 +6,7 @@ import java.util.Optional;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import client.autoban.AutobanFactory;
+import client.autoban.AutoBanFactory;
 import client.inventory.Item;
 import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
@@ -118,18 +97,14 @@ import tools.packet.shop.UpdateHiredMerchantBox;
 import tools.packet.spawn.SpawnHiredMerchant;
 import tools.packet.stat.EnableActions;
 
-/**
- * @author Matze
- * @author Ronan - concurrency safety & reviewed minigames
- */
 public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePlayerInteractionPacket> {
    @Override
    public Class<PlayerInteractionReader> getReaderClass() {
       return PlayerInteractionReader.class;
    }
 
-   private int establishMiniroomStatus(MapleCharacter chr, boolean isMinigame) {
-      if (isMinigame && FieldLimit.CANNOTMINIGAME.check(chr.getMap().getFieldLimit())) {
+   private int establishMiniRoomStatus(MapleCharacter chr, boolean isMiniGame) {
+      if (isMiniGame && FieldLimit.CANNOT_MINI_GAME.check(chr.getMap().getFieldLimit())) {
          return 11;
       }
 
@@ -145,7 +120,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private boolean isTradeOpen(MapleCharacter chr) {
-      if (chr.getTrade().isPresent()) {   // thanks to Rien dev team
+      if (chr.getTrade().isPresent()) {
          //Apparently there is a dupe exploit that causes racing conditions when saving/retrieving from the db with stuff like trade open.
          PacketCreator.announce(chr, new EnableActions());
          return true;
@@ -156,7 +131,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
    @Override
    public void handlePacket(BasePlayerInteractionPacket packet, MapleClient client) {
-      if (!client.tryAcquireClient()) {    // thanks GabrielSin for pointing dupes within player interactions
+      if (!client.tryAcquireClient()) {
          PacketCreator.announce(client, new EnableActions());
          return;
       }
@@ -321,7 +296,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          }
 
          if (slot >= merchant.getItems().size() || slot < 0) {
-            AutobanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a hired merchant.");
+            AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a hired merchant.");
             FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to remove item at slot " + slot);
             c.disconnect(true, false);
             return;
@@ -331,25 +306,25 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
    }
 
-   private void buyAction(MapleClient c, MapleCharacter chr, int itemid, short quantity) {
+   private void buyAction(MapleClient c, MapleCharacter chr, int itemId, short quantity) {
       if (isTradeOpen(chr)) {
          return;
       }
 
       if (quantity < 1) {
-         AutobanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a hired merchant and or player shop.");
-         FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to buy item " + itemid + " with quantity " + quantity);
+         AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a hired merchant and or player shop.");
+         FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to buy item " + itemId + " with quantity " + quantity);
          c.disconnect(true, false);
          return;
       }
       MaplePlayerShop shop = chr.getPlayerShop();
       MapleHiredMerchant merchant = chr.getHiredMerchant();
       if (shop != null && shop.isVisitor(chr)) {
-         if (shop.buy(c, itemid, quantity)) {
+         if (shop.buy(c, itemId, quantity)) {
             MasterBroadcaster.getInstance().sendToShop(shop, new PlayerShopItemUpdate(shop));
          }
       } else if (merchant != null && !merchant.isOwner(chr)) {
-         merchant.buy(c, itemid, quantity);
+         merchant.buy(c, itemId, quantity);
          merchant.broadcastToVisitorsThreadsafe(PacketCreator.create(new UpdateHiredMerchant(chr, merchant)));
       }
    }
@@ -361,7 +336,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
 
       merchant.withdrawMesos(chr);
-      merchant.clearInexistentItems();
+      merchant.clearNonExistentItems();
 
       if (merchant.getItems().isEmpty()) {
          merchant.closeOwnerMerchant(chr);
@@ -392,7 +367,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          }
 
          if (slot >= shop.getItems().size() || slot < 0) {
-            AutobanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a player shop.");
+            AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with a player shop.");
             FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " tried to remove item at slot " + slot);
             c.disconnect(true, false);
             return;
@@ -410,7 +385,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MapleInventoryType ivType = MapleInventoryType.getByType(slotType);
       Item ivItem = chr.getInventory(ivType).getItem(slot);
 
-      if (ivItem == null || ItemProcessor.getInstance().isUntradeable(ivItem)) {
+      if (ivItem == null || ItemProcessor.getInstance().isUnableToBeTraded(ivItem)) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Could not perform shop operation with that item.");
          PacketCreator.announce(c, new EnableActions());
          return;
@@ -428,14 +403,14 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       if (ItemConstants.isRechargeable(ivItem.id())) {
          perBundle = 1;
          bundles = 1;
-      } else if (ivItem.quantity() < (bundles * perBundle)) {     // thanks GabrielSin for finding a dupe here
+      } else if (ivItem.quantity() < (bundles * perBundle)) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Could not perform shop operation with that item.");
          PacketCreator.announce(c, new EnableActions());
          return;
       }
 
       if (perBundle <= 0 || perBundle * bundles > 2000 || bundles <= 0 || price <= 0 || price > Integer.MAX_VALUE) {
-         AutobanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with hired merchants.");
+         AutoBanFactory.PACKET_EDIT.alert(chr, chr.getName() + " tried to packet edit with hired merchants.");
          FilePrinter.printError(FilePrinter.EXPLOITS + chr.getName() + ".txt", chr.getName() + " might of possibly packet edited Hired Merchants\nperBundle: " + perBundle + "\nperBundle * bundles (This multiplied cannot be greater than 2000): " + perBundle * bundles + "\nbundles: " + bundles + "\nprice: " + price);
          return;
       }
@@ -449,7 +424,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MaplePlayerShop shop = chr.getPlayerShop();
       MapleHiredMerchant merchant = chr.getHiredMerchant();
       if (shop != null && shop.isOwner(chr)) {
-         if (shop.isOpen() || !shop.addItem(shopItem)) { // thanks Vcoc for pointing an exploit with unlimited shop slots
+         if (shop.isOpen() || !shop.addItem(shopItem)) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't sell it anymore.");
             return;
          }
@@ -467,7 +442,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             return;
          }
 
-         if (merchant.isOpen() || !merchant.addItem(shopItem)) { // thanks Vcoc for pointing an exploit with unlimited shop slots
+         if (merchant.isOpen() || !merchant.addItem(shopItem)) {
             MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't sell it anymore.");
             return;
          }
@@ -484,7 +459,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             chr.saveCharToDB(false);
          }
 
-         merchant.saveItems(false);   // thanks Masterrulax for realizing yet another dupe with merchants/Fredrick
+         merchant.saveItems(false);
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't sell without owning a shop.");
       }
@@ -536,7 +511,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       if ((quantity <= item.quantity() && quantity >= 0) || ItemConstants.isRechargeable(item.id())) {
          if (ii.isDropRestricted(item.id())) { // ensure that undroppable items do not make it to the trade window
             if (!MapleKarmaManipulator.hasKarmaFlag(item)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "That item is untradeable.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "That item is not able to be traded.");
                PacketCreator.announce(c, new EnableActions());
                return;
             }
@@ -584,26 +559,26 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
    private void selectCardAction(MapleCharacter chr, int turn, int slot) {
       MapleMiniGame game = chr.getMiniGame();
-      int firstslot = game.getFirstSlot();
+      int firstSlot = game.getFirstSlot();
       if (turn == 1) {
          game.setFirstSlot(slot);
          if (game.isOwner(chr)) {
-            MasterBroadcaster.getInstance().sendToGameVisitor(game, new MatchCardSelect(turn, slot, firstslot, turn));
+            MasterBroadcaster.getInstance().sendToGameVisitor(game, new MatchCardSelect(turn, slot, firstSlot, turn));
          } else {
-            MasterBroadcaster.getInstance().sendToGameOwner(game, new MatchCardSelect(turn, slot, firstslot, turn));
+            MasterBroadcaster.getInstance().sendToGameOwner(game, new MatchCardSelect(turn, slot, firstSlot, turn));
          }
-      } else if ((game.getCardId(firstslot)) == (game.getCardId(slot))) {
+      } else if ((game.getCardId(firstSlot)) == (game.getCardId(slot))) {
          if (game.isOwner(chr)) {
-            MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstslot, 2));
+            MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstSlot, 2));
             game.setOwnerPoints();
          } else {
-            MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstslot, 3));
+            MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstSlot, 3));
             game.setVisitorPoints();
          }
       } else if (game.isOwner(chr)) {
-         MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstslot, 0));
+         MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstSlot, 0));
       } else {
-         MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstslot, 1));
+         MasterBroadcaster.getInstance().sendToGamers(game, new MatchCardSelect(turn, slot, firstSlot, 1));
       }
    }
 
@@ -623,7 +598,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    private void answerTieAction(MapleCharacter chr, boolean answer) {
       MapleMiniGame game = chr.getMiniGame();
       if (answer) {
-         game.minigameMatchDraw();
+         game.miniGameMatchDraw();
       } else {
          game.denyTie(chr);
 
@@ -650,15 +625,15 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MapleMiniGame game = chr.getMiniGame();
       if (game.getGameType().equals(MiniGameType.OMOK)) {
          if (game.isOwner(chr)) {
-            game.minigameMatchVisitorWins(true);
+            game.miniGameMatchVisitorWins(true);
          } else {
-            game.minigameMatchOwnerWins(true);
+            game.miniGameMatchOwnerWins(true);
          }
       } else if (game.getGameType().equals(MiniGameType.MATCH_CARD)) {
          if (game.isOwner(chr)) {
-            game.minigameMatchVisitorWins(true);
+            game.miniGameMatchVisitorWins(true);
          } else {
-            game.minigameMatchOwnerWins(true);
+            game.miniGameMatchOwnerWins(true);
          }
       }
    }
@@ -666,11 +641,11 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    private void startAction(MapleCharacter chr) {
       MapleMiniGame game = chr.getMiniGame();
       if (game.getGameType().equals(MiniGameType.OMOK)) {
-         game.minigameMatchStarted();
+         game.miniGameMatchStarted();
          MasterBroadcaster.getInstance().sendToGamers(game, new GetMiniGameStart(game.getLoser()));
          MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new AddOmokBox(game.getOwner(), 2, 1));
       } else if (game.getGameType().equals(MiniGameType.MATCH_CARD)) {
-         game.minigameMatchStarted();
+         game.miniGameMatchStarted();
          game.shuffleList();
          MasterBroadcaster.getInstance().sendToGamers(game, new GetMatchCardStart(game, game.getLoser()));
          MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new AddMatchCard(game.getOwner(), 2, 1));
@@ -692,7 +667,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      if (!canPlaceStore(chr)) {    // thanks Ari for noticing player shops overlapping on opening time
+      if (!canPlaceStore(chr)) {
          return;
       }
 
@@ -722,14 +697,14 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      if (!CashOperationHandler.checkBirthday(c, birthday)) { // birthday check here found thanks to lucasziron
+      if (!CashOperationHandler.checkBirthday(c, birthday)) {
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check again the birthday date.");
          return;
       }
 
       PacketCreator.announce(c, new MerchantOwnerMaintenanceLeave());
 
-      if (!canPlaceStore(chr)) {    // thanks Ari for noticing player shops overlapping on opening time
+      if (!canPlaceStore(chr)) {
          return;
       }
 
@@ -841,7 +816,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private void createAction(MapleClient c, MapleCharacter chr, BaseCreatePlayerInteractionPacket packet) {
-      if (!chr.isAlive()) {    // thanks GabrielSin for pointing this
+      if (!chr.isAlive()) {
          PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.CANT_WHILE_DEAD));
          return;
       }
@@ -854,8 +829,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
                ((CreateOmokPlayerInteractionPacket) packet).hasPassword(),
                ((CreateOmokPlayerInteractionPacket) packet).password(),
                ((CreateOmokPlayerInteractionPacket) packet).theType());
-      } else if (createType == 2 && packet instanceof CreateMatchCardPlayerInteractionPacket) { // matchcard
-         matchcard(c, chr, ((CreateMatchCardPlayerInteractionPacket) packet).description(),
+      } else if (createType == 2 && packet instanceof CreateMatchCardPlayerInteractionPacket) { // match card
+         matchCard(c, chr, ((CreateMatchCardPlayerInteractionPacket) packet).description(),
                ((CreateMatchCardPlayerInteractionPacket) packet).hasPassword(),
                ((CreateMatchCardPlayerInteractionPacket) packet).password(),
                ((CreateMatchCardPlayerInteractionPacket) packet).theType());
@@ -870,7 +845,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          return;
       }
 
-      int status = establishMiniroomStatus(chr, false);
+      int status = establishMiniRoomStatus(chr, false);
       if (status > 0) {
          PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.fromValue(status)));
          return;
@@ -901,8 +876,8 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
    }
 
-   private void matchcard(MapleClient c, MapleCharacter chr, String description, boolean hasPassword, String password, int type) {
-      int status = establishMiniroomStatus(chr, true);
+   private void matchCard(MapleClient c, MapleCharacter chr, String description, boolean hasPassword, String password, int type) {
+      int status = establishMiniRoomStatus(chr, true);
       if (status > 0) {
          PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.fromValue(status)));
          return;
@@ -935,7 +910,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
    }
 
    private void omokMiniGame(MapleClient c, MapleCharacter chr, String description, boolean hasPassword, String password, int type) {
-      int status = establishMiniroomStatus(chr, true);
+      int status = establishMiniRoomStatus(chr, true);
       if (status > 0) {
          PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.fromValue(status)));
          return;
@@ -980,9 +955,9 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
             }
          }
 
-         Point cpos = chr.position();
-         MaplePortal portal = chr.getMap().findClosestTeleportPortal(cpos);
-         if (portal != null && portal.getPosition().distance(cpos) < 120.0) {
+         Point characterPosition = chr.position();
+         MaplePortal portal = chr.getMap().findClosestTeleportPortal(characterPosition);
+         if (portal != null && portal.getPosition().distance(characterPosition) < 120.0) {
             PacketCreator.announce(chr, new GetMiniRoomError(MiniRoomError.NOT_NEAR_PORTAL));
             return false;
          }

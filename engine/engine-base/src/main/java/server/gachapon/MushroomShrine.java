@@ -1,12 +1,5 @@
 package server.gachapon;
 
-/**
- * @author Alan (SharpAceX) - gachapon source classes stub
- * @author Ronan - parsed MapleSEA loots
- * <p>
- * MapleSEA-like loots thanks to AyumiLove, src: https://ayumilovemaple.wordpress.com/maplestory-gachapon-guide/
- */
-
 public class MushroomShrine extends GachaponItems {
 
    @Override
@@ -29,7 +22,7 @@ public class MushroomShrine extends GachaponItems {
             /* Warrior equipment */
             1060074, 1322002, 1002340, 1442004, 1402037, 1422008, 1050022,
 
-            /* Mage equipment */
+            /* Magician equipment */
             1382037, 1060014, 1051026, 1050056, 1050029, 1051030, 1382036, 1372032, 1041015, 1382015, 1372008, 1382008,
 
             /* Bowman equipment */

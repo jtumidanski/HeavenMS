@@ -33,7 +33,7 @@ class Quest6030 {
          } else if (status == 2) {
             qm.sendNextPrev("In fact, to be able to 'tell the pieces' to become a whole, how should it be done? The rustic ways of the blacksmithing winds up dumbing down some latent potentials of the items.")
          } else if (status == 3) {
-            qm.sendNextPrev("Alchemy can be employed for this task. Cleanly and swiftly, #rit merges the parts that forms an item with almost no drawbacks#k, making out the most of the process with almost no scrapover, if done right. It takes a while to master it, but once it is done, everything will run out neatly.")
+            qm.sendNextPrev("Alchemy can be employed for this task. Cleanly and swiftly, #rit merges the parts that forms an item with almost no drawbacks#k, making out the most of the process with almost no scrap, if done right. It takes a while to master it, but once it is done, everything will run out neatly.")
          } else if (status == 4) {
             qm.sendNextPrev("And remember this: the maxima of #bExchange#k, the area of the fundamentals of Alchemy where the total amount of the material does not change, is that no item can be created from nothing. Understood?")
          } else if (status == 5) {

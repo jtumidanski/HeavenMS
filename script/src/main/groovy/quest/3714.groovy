@@ -45,7 +45,7 @@ class Quest3714 {
 
             qm.forceCompleteQuest()
             qm.gainItem(4001094, (short) -1)
-            qm.gainItem(2041200, (short) 1)    // quest not rewarding properly found thanks to MedicOP & Thora
+            qm.gainItem(2041200, (short) 1)
             qm.gainExp(42000)
             qm.dispose()
          }

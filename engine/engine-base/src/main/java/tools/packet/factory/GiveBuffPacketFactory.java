@@ -1,20 +1,20 @@
 package tools.packet.factory;
 
 import client.MapleBuffStat;
-import client.MapleDisease;
+import client.MapleAbnormalStatus;
 import constants.skills.Buccaneer;
 import constants.skills.Corsair;
 import constants.skills.ThunderBreaker;
 import tools.Pair;
 import tools.data.output.MaplePacketLittleEndianWriter;
 import tools.packet.buff.GiveBuff;
-import tools.packet.buff.GiveDebuff;
+import tools.packet.buff.GiveAbnormalStatus;
 import tools.packet.buff.GiveFinalAttack;
 import tools.packet.buff.GiveForeignBuff;
 import tools.packet.buff.GiveForeignChairSkillEffect;
-import tools.packet.buff.GiveForeignDebuff;
+import tools.packet.buff.GiveForeignAbnormalStatus;
 import tools.packet.buff.GiveForeignPirateBuff;
-import tools.packet.buff.GiveForeignSlowDebuff;
+import tools.packet.buff.GiveForeignAbnormalStatusSlow;
 import tools.packet.buff.GivePirateBuff;
 import tools.packet.buff.ShowMonsterRiding;
 
@@ -30,10 +30,10 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
 
    private GiveBuffPacketFactory() {
       Handler.handle(GiveBuff.class).decorate(this::giveBuff).register(registry);
-      Handler.handle(GiveDebuff.class).decorate(this::giveDebuff).register(registry);
-      Handler.handle(GiveForeignDebuff.class).decorate(this::giveForeignDebuff).register(registry);
+      Handler.handle(GiveAbnormalStatus.class).decorate(this::giveAbnormalStatus).register(registry);
+      Handler.handle(GiveForeignAbnormalStatus.class).decorate(this::giveForeignAbnormalStatus).register(registry);
       Handler.handle(GiveForeignBuff.class).decorate(this::giveForeignBuff).register(registry);
-      Handler.handle(GiveForeignSlowDebuff.class).decorate(this::giveForeignSlowDebuff).register(registry);
+      Handler.handle(GiveForeignAbnormalStatusSlow.class).decorate(this::giveForeignAbnormalStatusSlow).register(registry);
       Handler.handle(GiveForeignChairSkillEffect.class).decorate(this::giveForeignChairSkillEffect).register(registry);
       Handler.handle(GivePirateBuff.class).decorate(this::givePirateBuff).register(registry);
       Handler.handle(GiveFinalAttack.class).decorate(this::giveFinalAttack).register(registry);
@@ -42,35 +42,35 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
    }
 
    /**
-    * It is important that statups is in the correct order (see declaration
-    * order in MapleBuffStat) since this method doesn't do automagical
+    * It is important that stat increases is in the correct order (see declaration
+    * order in MapleBuffStat) since this method doesn't do auto magical
     * reordering.
     */
    //1F 00 00 00 00 00 03 00 00 40 00 00 00 E0 00 00 00 00 00 00 00 00 E0 01 8E AA 4F 00 00 C2 EB 0B E0 01 8E AA 4F 00 00 C2 EB 0B 0C 00 8E AA 4F 00 00 C2 EB 0B 44 02 8E AA 4F 00 00 C2 EB 0B 44 02 8E AA 4F 00 00 C2 EB 0B 00 00 E0 7A 1D 00 8E AA 4F 00 00 00 00 00 00 00 00 03
    protected void giveBuff(MaplePacketLittleEndianWriter writer, GiveBuff packet) {
       boolean special = false;
-      writeLongMask(writer, packet.statups());
-      for (Pair<MapleBuffStat, Integer> statup : packet.statups()) {
-         if (statup.getLeft().equals(MapleBuffStat.MONSTER_RIDING) || statup.getLeft().equals(MapleBuffStat.HOMING_BEACON)) {
+      writeLongMask(writer, packet.statIncreases());
+      for (Pair<MapleBuffStat, Integer> statIncreases : packet.statIncreases()) {
+         if (statIncreases.getLeft().equals(MapleBuffStat.MONSTER_RIDING) || statIncreases.getLeft().equals(MapleBuffStat.HOMING_BEACON)) {
             special = true;
          }
-         writer.writeShort(statup.getRight().shortValue());
+         writer.writeShort(statIncreases.getRight().shortValue());
          writer.writeInt(packet.buffId());
          writer.writeInt(packet.buffLength());
       }
       writer.writeInt(0);
       writer.write(0);
-      writer.writeInt(packet.statups().get(0).getRight()); //Homing beacon ...
+      writer.writeInt(packet.statIncreases().get(0).getRight()); //Homing beacon ...
 
       if (special) {
          writer.skip(3);
       }
    }
 
-   protected void giveDebuff(MaplePacketLittleEndianWriter writer, GiveDebuff packet) {
-      writeLongMaskD(writer, packet.statups());
-      for (Pair<MapleDisease, Integer> statup : packet.statups()) {
-         writer.writeShort(statup.getRight().shortValue());
+   protected void giveAbnormalStatus(MaplePacketLittleEndianWriter writer, GiveAbnormalStatus packet) {
+      writeLongMaskD(writer, packet.statIncreases());
+      for (Pair<MapleAbnormalStatus, Integer> statIncreases : packet.statIncreases()) {
+         writer.writeShort(statIncreases.getRight().shortValue());
          writer.writeShort(packet.mobSkill().skillId());
          writer.writeShort(packet.mobSkill().level());
          writer.writeInt((int) packet.mobSkill().duration());
@@ -80,13 +80,12 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
       writer.write(1);
    }
 
-   protected void giveForeignDebuff(MaplePacketLittleEndianWriter writer, GiveForeignDebuff packet) {
-      // Poison damage visibility and missing diseases status visibility, extended through map transitions thanks to Ronan
+   protected void giveForeignAbnormalStatus(MaplePacketLittleEndianWriter writer, GiveForeignAbnormalStatus packet) {
       writer.writeInt(packet.characterId());
-      writeLongMaskD(writer, packet.statups());
-      for (Pair<MapleDisease, Integer> statup : packet.statups()) {
-         if (statup.getLeft() == MapleDisease.POISON) {
-            writer.writeShort(statup.getRight().shortValue());
+      writeLongMaskD(writer, packet.statIncreases());
+      for (Pair<MapleAbnormalStatus, Integer> statIncreases : packet.statIncreases()) {
+         if (statIncreases.getLeft() == MapleAbnormalStatus.POISON) {
+            writer.writeShort(statIncreases.getRight().shortValue());
          }
          writer.writeShort(packet.mobSkill().skillId());
          writer.writeShort(packet.mobSkill().level());
@@ -97,20 +96,20 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
 
    protected void giveForeignBuff(MaplePacketLittleEndianWriter writer, GiveForeignBuff packet) {
       writer.writeInt(packet.characterId());
-      writeLongMask(writer, packet.statups());
-      for (Pair<MapleBuffStat, Integer> statup : packet.statups()) {
-         writer.writeShort(statup.getRight().shortValue());
+      writeLongMask(writer, packet.statIncreases());
+      for (Pair<MapleBuffStat, Integer> statIncreases : packet.statIncreases()) {
+         writer.writeShort(statIncreases.getRight().shortValue());
       }
       writer.writeInt(0);
       writer.writeShort(0);
    }
 
-   protected void giveForeignSlowDebuff(MaplePacketLittleEndianWriter writer, GiveForeignSlowDebuff packet) {
+   protected void giveForeignAbnormalStatusSlow(MaplePacketLittleEndianWriter writer, GiveForeignAbnormalStatusSlow packet) {
       writer.writeInt(packet.characterId());
       writeLongMaskSlowD(writer);
-      for (Pair<MapleDisease, Integer> statup : packet.statups()) {
-         if (statup.getLeft() == MapleDisease.POISON) {
-            writer.writeShort(statup.getRight().shortValue());
+      for (Pair<MapleAbnormalStatus, Integer> statIncreases : packet.statIncreases()) {
+         if (statIncreases.getLeft() == MapleAbnormalStatus.POISON) {
+            writer.writeShort(statIncreases.getRight().shortValue());
          }
          writer.writeShort(packet.mobSkill().skillId());
          writer.writeShort(packet.mobSkill().level());
@@ -133,9 +132,9 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
 
    protected void givePirateBuff(MaplePacketLittleEndianWriter writer, GivePirateBuff packet) {
       boolean infusion = packet.buffId() == Buccaneer.SPEED_INFUSION || packet.buffId() == ThunderBreaker.SPEED_INFUSION || packet.buffId() == Corsair.SPEED_INFUSION;
-      writeLongMask(writer, packet.statups());
+      writeLongMask(writer, packet.statIncreases());
       writer.writeShort(0);
-      for (Pair<MapleBuffStat, Integer> stat : packet.statups()) {
+      for (Pair<MapleBuffStat, Integer> stat : packet.statIncreases()) {
          writer.writeInt(stat.getRight().shortValue());
          writer.writeInt(packet.buffId());
          writer.skip(infusion ? 10 : 5);
@@ -144,7 +143,7 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
       writer.skip(3);
    }
 
-   protected void giveFinalAttack(MaplePacketLittleEndianWriter writer, GiveFinalAttack packet) { // packets found thanks to lailainoob
+   protected void giveFinalAttack(MaplePacketLittleEndianWriter writer, GiveFinalAttack packet) {
       writer.writeLong(0);
       writer.writeShort(0);
       writer.write(0);//some 80 and 0 bs DIRECTION
@@ -156,7 +155,7 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
       writer.writeInt(0);
    }
 
-   protected void showMonsterRiding(MaplePacketLittleEndianWriter writer, ShowMonsterRiding packet) { //Gtfo with this, this is just giveForeignBuff
+   protected void showMonsterRiding(MaplePacketLittleEndianWriter writer, ShowMonsterRiding packet) {
       writer.writeInt(packet.characterId());
       writer.writeLong(MapleBuffStat.MONSTER_RIDING.getValue());
       writer.writeLong(0);
@@ -171,10 +170,10 @@ public class GiveBuffPacketFactory extends AbstractBuffPacketFactory {
    protected void giveForeignPirateBuff(MaplePacketLittleEndianWriter writer, GiveForeignPirateBuff packet) {
       boolean infusion = packet.buffId() == Buccaneer.SPEED_INFUSION || packet.buffId() == ThunderBreaker.SPEED_INFUSION || packet.buffId() == Corsair.SPEED_INFUSION;
       writer.writeInt(packet.characterId());
-      writeLongMask(writer, packet.statups());
+      writeLongMask(writer, packet.statIncreases());
       writer.writeShort(0);
-      for (Pair<MapleBuffStat, Integer> statup : packet.statups()) {
-         writer.writeInt(statup.getRight().shortValue());
+      for (Pair<MapleBuffStat, Integer> statIncreases : packet.statIncreases()) {
+         writer.writeInt(statIncreases.getRight().shortValue());
          writer.writeInt(packet.buffId());
          writer.skip(infusion ? 10 : 5);
          writer.writeShort(packet.time());

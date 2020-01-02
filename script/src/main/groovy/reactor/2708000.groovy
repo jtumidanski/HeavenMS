@@ -26,17 +26,16 @@ class Reactor2708000 {
 
    static def spawnJrBoss(MapleMonster mobObj) {
       mobObj.getMap().killMonster(mobObj.id())
-      int spawnid = mobObj.id() - 17
+      int spawnId = mobObj.id() - 17
 
-      MapleMonster mob = MapleLifeFactory.getMonster(spawnid)
-      mobObj.getMap().spawnMonsterOnGroundBelow(mob, mobObj.position())
+      MapleLifeFactory.getMonster(spawnId).ifPresent({ monster -> mobObj.getMap().spawnMonsterOnGroundBelow(monster, mobObj.position()) })
    }
 
    def touch() {
 
    }
 
-   def untouch() {
+   def release() {
 
    }
 }
@@ -59,6 +58,6 @@ def touch() {
    getReactor().touch()
 }
 
-def untouch() {
-   getReactor().untouch()
+def release() {
+   getReactor().release()
 }
