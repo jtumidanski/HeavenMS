@@ -7,10 +7,7 @@ import tools.ServerNoticeType
 
 import java.awt.*
 
-
-class Reactor2401000 {
-   ReactorActionManager rm
-
+class Reactor2401000 extends SimpleReactor {
    def act() {
       rm.changeMusic("Bgm14/HonTale")
       if (rm.getReactor().getMap().getMonsterById(8810026) == null) {
@@ -20,18 +17,6 @@ class Reactor2401000 {
          eim.restartEventTimer(60 * 60000)
       }
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "From the depths of his cave, here comes Horntail!")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

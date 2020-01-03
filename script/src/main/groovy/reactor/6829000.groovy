@@ -5,25 +5,10 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor6829000 {
-   ReactorActionManager rm
-
+class Reactor6829000 extends SimpleReactor {
    def act() {
       MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Enjoy Halloween!")
       rm.spawnMonster(9400202, 10)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

@@ -7,10 +7,7 @@ import server.maps.MapleReactor
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor9108002 {
-   ReactorActionManager rm
-
+class Reactor9108002 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getEventInstance()
       if (eim != null) {
@@ -26,18 +23,6 @@ class Reactor9108002 {
             map.spawnMonsterOnGroundBelow(9300061, -183, -433)
          }
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

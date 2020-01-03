@@ -26,6 +26,11 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
       toDrop.expiration_(expiration);
 
       toDrop.owner_$eq("");
+      setFlag(player, toDrop);
+      client.getPlayer().getMap().spawnItemDrop(client.getPlayer(), client.getPlayer(), toDrop, client.getPlayer().position(), true, true);
+   }
+
+   private void setFlag(MapleCharacter player, Item toDrop) {
       if (player.gmLevel() < 3) {
          short f = toDrop.flag();
          f |= ItemConstants.ACCOUNT_SHARING;
@@ -35,8 +40,6 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
          ItemProcessor.getInstance().setFlag(toDrop, f);
          toDrop.owner_$eq("TRIAL-MODE");
       }
-
-      client.getPlayer().getMap().spawnItemDrop(client.getPlayer(), client.getPlayer(), toDrop, client.getPlayer().position(), true, true);
    }
 
    @Override
@@ -50,16 +53,7 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
       }
 
       toDrop.owner_$eq(player.getName());
-      if (player.gmLevel() < 3) {
-         short f = toDrop.flag();
-         f |= ItemConstants.ACCOUNT_SHARING;
-         f |= ItemConstants.UNTRADEABLE;
-         f |= ItemConstants.SANDBOX;
-
-         ItemProcessor.getInstance().setFlag(toDrop, f);
-         toDrop.owner_$eq("TRIAL-MODE");
-      }
-
+      setFlag(player, toDrop);
       player.getMap().spawnItemDrop(player, player, toDrop, player.position(), true, true);
    }
 }

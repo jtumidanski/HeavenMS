@@ -4,10 +4,7 @@ import scripting.reactor.ReactorActionManager
 import server.maps.MapleMap
 import tools.MasterBroadcaster
 import tools.packet.statusinfo.ShowBunny
-
-class Reactor9101000 {
-   ReactorActionManager rm
-
+class Reactor9101000 extends SimpleReactor {
    def act() {
       rm.spawnMonster(9300061, 1, 0, 0) // (0, 0) is temp position
       MapleMap map = rm.getClient().getPlayer().getMap()
@@ -17,18 +14,6 @@ class Reactor9101000 {
       //TODO
 //      rm.getClient().getPlayer().getMap().broadcastMessage(MaplePacketCreator.showHPQMoon());
 //      rm.getClient().getPlayer().getMap().showAllMonsters();
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

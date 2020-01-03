@@ -4,6 +4,7 @@ import client.MapleCharacter
 import constants.game.ExpTable
 import scripting.quest.QuestActionManager
 import server.MapleItemInformationProvider
+import server.QuestConsItem
 
 class Quest20514 {
    QuestActionManager qm
@@ -33,10 +34,9 @@ class Quest20514 {
          }
 
          if (diffExp > 0) {
-            MapleItemInformationProvider.QuestConsItem consItem = MapleItemInformationProvider.getInstance().getQuestConsumablesInfo(4220137)
-            int exp = consItem.exp
-            int grade = consItem.grade
-
+            QuestConsItem consItem = MapleItemInformationProvider.getInstance().getQuestConsumablesInfo(4220137)
+            int exp = consItem.exp()
+            int grade = consItem.grade()
             qm.setQuestProgress(20514, 0, Math.min(diffExp, exp * grade))
          }
       }

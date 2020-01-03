@@ -72,6 +72,7 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.packet.character.DamageCharacter;
+import tools.packet.character.SkillCoolDown;
 import tools.packet.monster.DamageMonster;
 import tools.packet.remove.RemoveItem;
 import tools.packet.stat.EnableActions;
@@ -560,6 +561,16 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
          }
       } catch (Exception e) {
          e.printStackTrace();
+      }
+   }
+
+   protected void applyCoolDownIfPresent(Skill skill, MapleCharacter chr) {
+      MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
+      if (effect_.getCoolDown() > 0) {
+         if (!chr.skillIsCooling(skill.getId())) {
+            PacketCreator.announce(chr, new SkillCoolDown(skill.getId(), effect_.getCoolDown()));
+            chr.addCoolDown(skill.getId(), currentServerTime(), effect_.getCoolDown() * 1000);
+         }
       }
    }
 }

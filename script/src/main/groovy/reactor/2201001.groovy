@@ -3,26 +3,11 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2201001 {
-   ReactorActionManager rm
-
+class Reactor2201001 extends SimpleReactor {
    def act() {
       for (int i = 0; i < 3; i++) {
          rm.spawnMonster(9300007)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

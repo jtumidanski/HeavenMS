@@ -3,25 +3,13 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 import server.maps.MapleMap
-
-class Reactor2008007 {
-   ReactorActionManager rm
-
+class Reactor2008007 extends SimpleReactor {
    def act() {
-
    }
 
    def hit() {
       MapleMap map = rm.getMap()
       map.moveEnvironment("trap" + rm.getReactor().getName()[5], 1)
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

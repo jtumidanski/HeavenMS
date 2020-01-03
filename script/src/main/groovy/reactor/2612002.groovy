@@ -3,24 +3,9 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2612002 {
-   ReactorActionManager rm
-
+class Reactor2612002 extends SimpleReactor {
    def act() {
       rm.sprayItems()
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

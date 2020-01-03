@@ -3,10 +3,7 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2612005 {
-   ReactorActionManager rm
-
+class Reactor2612005 extends SimpleReactor {
    def act() {
 
    }
@@ -15,14 +12,6 @@ class Reactor2612005 {
       if(rm.getReactor().getState() == ((byte) 4)) {
          rm.dropItems()
       }
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

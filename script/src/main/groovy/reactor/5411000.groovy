@@ -5,27 +5,12 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor5411000 {
-   ReactorActionManager rm
-
+class Reactor5411000 extends SimpleReactor {
    def act() {
       rm.changeMusic("Bgm09/TimeAttack")
       rm.spawnMonster(9420513, -146, 225)
       rm.getEventInstance().setIntProperty("boss", 1)
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "As you wish, here comes Capt Latanica.")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

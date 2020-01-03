@@ -6,6 +6,7 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
+import server.life.MapleNPCFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.PacketCreator
@@ -138,7 +139,7 @@ class EventBalrogQuest {
    // Happens when an opposing mob dies
    static def monsterKilled(MapleMonster mob, EventInstanceManager eim) {
       if (isBalrog(mob)) {
-         eim.spawnNpc(1061015, new Point(0, 115), mob.getMap())
+         MapleNPCFactory.spawnNpc(1061015, new Point(0, 115), mob.getMap())
       }
    }
 

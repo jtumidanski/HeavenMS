@@ -3,28 +3,13 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2512001 {
-   ReactorActionManager rm
-
+class Reactor2512001 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getPlayer().getEventInstance()
       int now = eim.getIntProperty("openedChests")
       int nextNum = now + 1
       eim.setIntProperty("openedChests", nextNum)
       rm.sprayItems(true, 1, 50, 100, 15)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

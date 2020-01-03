@@ -3,24 +3,9 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2112013 {
-   ReactorActionManager rm
-
+class Reactor2112013 extends SimpleReactor {
    def act() {
       rm.dropItems(true, 1, 125, 175)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

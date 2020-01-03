@@ -3,23 +3,8 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor9018000 {
-   ReactorActionManager rm
-
+class Reactor9018000 extends SimpleReactor {
    def act() {
-
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
 
    }
 }

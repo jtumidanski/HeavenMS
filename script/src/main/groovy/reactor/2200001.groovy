@@ -5,25 +5,10 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor2200001 {
-   ReactorActionManager rm
-
+class Reactor2200001 extends SimpleReactor {
    def act() {
       MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "You have found a secret factory!")
       rm.warp(Math.random() < 0.5 ? 922000020 : 922000021, 0)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

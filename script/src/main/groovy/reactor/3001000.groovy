@@ -5,25 +5,10 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor3001000 {
-   ReactorActionManager rm
-
+class Reactor3001000 extends SimpleReactor {
    def act() {
       MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Poison Golem has been spawned.")
       rm.spawnMonster(9300180,1)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

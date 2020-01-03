@@ -3,26 +3,11 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor9208009 {
-   ReactorActionManager rm
-
+class Reactor9208009 extends SimpleReactor {
    def act() {
       if(rm.getEventInstance() != null) {
          rm.getEventInstance().setProperty("canRevive", "1")
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

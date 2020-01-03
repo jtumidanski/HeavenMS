@@ -7,6 +7,7 @@ import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
+import server.life.MapleNPCFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -147,10 +148,10 @@ class EventMagatiaPQ_A {
       eim.getInstanceMap(926110201).shuffleReactors(2518000, 2612004)
       eim.getInstanceMap(926110202).shuffleReactors(2518000, 2612004)
 
-      eim.spawnNpc(2112010, new Point(252, 243), eim.getInstanceMap(926110203))
-      eim.spawnNpc(2112010, new Point(200, 100), eim.getInstanceMap(926110401))
-      eim.spawnNpc(2112011, new Point(200, 100), eim.getInstanceMap(926110500))
-      eim.spawnNpc(2112018, new Point(200, 100), eim.getInstanceMap(926110600))
+      MapleNPCFactory.spawnNpc(2112010, new Point(252, 243), eim.getInstanceMap(926110203))
+      MapleNPCFactory.spawnNpc(2112010, new Point(200, 100), eim.getInstanceMap(926110401))
+      MapleNPCFactory.spawnNpc(2112011, new Point(200, 100), eim.getInstanceMap(926110500))
+      MapleNPCFactory.spawnNpc(2112018, new Point(200, 100), eim.getInstanceMap(926110600))
 
       respawnStages(eim)
       eim.startEventTimer(eventTime * 60000)
@@ -376,7 +377,7 @@ class EventMagatiaPQ_A {
          eim.showClearEffect()
          eim.giveEventPlayersStageReward(7)
 
-         eim.spawnNpc(2112005, new Point(-370, -150), map)
+         MapleNPCFactory.spawnNpc(2112005, new Point(-370, -150), map)
 
          int gain = (eim.getIntProperty("escortFail") == 1) ? 90000 : ((mob.id() == 9300139) ? 105000 : 140000)
          eim.giveEventPlayersExp(gain)

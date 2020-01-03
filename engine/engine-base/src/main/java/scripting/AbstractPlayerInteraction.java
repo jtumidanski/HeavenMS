@@ -42,7 +42,6 @@ import server.expeditions.MapleExpeditionBossLog;
 import server.expeditions.MapleExpeditionType;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
-import server.life.MapleNPC;
 import server.life.MobSkill;
 import server.life.MobSkillFactory;
 import server.maps.MapleMap;
@@ -74,7 +73,6 @@ import tools.packet.showitemgaininchat.ShowInfo;
 import tools.packet.showitemgaininchat.ShowIntro;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
 import tools.packet.spawn.SpawnGuide;
-import tools.packet.spawn.SpawnNPC;
 import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.GetItemMessage;
 import tools.packet.statusinfo.ShowInfoText;
@@ -247,7 +245,7 @@ public class AbstractPlayerInteraction {
    }
 
    private List<Integer> convertToIntegerArray(List<Object> list) {
-      return list.stream().map(object -> (Integer)object).collect(Collectors.toList());
+      return list.stream().map(object -> (Integer) object).collect(Collectors.toList());
    }
 
    public boolean canHoldAll(List<Object> itemIds) {
@@ -943,19 +941,6 @@ public class AbstractPlayerInteraction {
       newItem.position_(slot);
       c.getPlayer().getInventory(MapleInventoryType.EQUIPPED).addItemFromDB(newItem);
       PacketCreator.announce(c, new ModifyInventoryPacket(false, Collections.singletonList(new ModifyInventory(0, newItem))));
-   }
-
-   public void spawnNpc(int npcId, Point pos, MapleMap map) {
-      MapleNPC npc = MapleLifeFactory.getNPC(npcId);
-      if (npc != null) {
-         npc.position_$eq(pos);
-         npc.cy_$eq(pos.y);
-         npc.rx0_$eq(pos.x + 50);
-         npc.rx1_$eq(pos.x - 50);
-         npc.fh_$eq(map.getFootholds().findBelow(pos).id());
-         map.addMapObject(npc);
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
-      }
    }
 
    public void spawnMonster(int id, int x, int y) {

@@ -5,25 +5,10 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor1200000 {
-   ReactorActionManager rm
-
+class Reactor1200000 extends SimpleReactor {
    def act() {
       MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Failed to find Bart. Returning to the original location.")
       rm.warp(120000102)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

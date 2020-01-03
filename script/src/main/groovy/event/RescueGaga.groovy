@@ -6,6 +6,7 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
+import server.life.MapleNPCFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.PacketCreator
@@ -276,7 +277,7 @@ class EventRescueGaga {
    }
 
    def spawnGrandpaBunny(EventInstanceManager eim) {
-      eim.spawnNpc(9001105, new Point(175, -20), eim.getInstanceMap(maxMapId))
+      MapleNPCFactory.spawnNpc(9001105, new Point(175, -20), eim.getInstanceMap(maxMapId))
    }
 
    // Happens when a player left the party

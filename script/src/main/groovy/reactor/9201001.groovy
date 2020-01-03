@@ -5,25 +5,10 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor9201001 {
-   ReactorActionManager rm
-
+class Reactor9201001 extends SimpleReactor {
    def act() {
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "A bright flash of light, then someone familiar appears in front of the blocked gate.")
       rm.spawnNpc(9040003)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

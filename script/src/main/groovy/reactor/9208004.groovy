@@ -3,24 +3,9 @@ package reactor
 import net.server.processor.MapleGuildProcessor
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor9208004 {
-   ReactorActionManager rm
-
+class Reactor9208004 extends SimpleReactor {
    def act() {
       MapleGuildProcessor.getInstance().gainGP(rm.getGuild(), 20)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

@@ -5,16 +5,8 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor6109013 {
-   ReactorActionManager rm
-   String fid = "glpq_s"
-
+class Reactor6109013 extends SimpleReactor {
    def act() {
-
-   }
-
-   def hit() {
 
    }
 

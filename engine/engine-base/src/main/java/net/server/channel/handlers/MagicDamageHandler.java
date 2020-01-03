@@ -11,8 +11,8 @@ import constants.skills.Evan;
 import constants.skills.FirePoisonArchMage;
 import constants.skills.IceLighteningArchMagician;
 import net.server.channel.packet.AttackPacket;
-import net.server.channel.packet.reader.DamageReader;
 import net.server.channel.packet.PacketReaderFactory;
+import net.server.channel.packet.reader.DamageReader;
 import server.MapleStatEffect;
 import tools.MasterBroadcaster;
 import tools.PacketCreator;
@@ -20,7 +20,6 @@ import tools.data.input.SeekableLittleEndianAccessor;
 import tools.packet.GetEnergy;
 import tools.packet.PacketInput;
 import tools.packet.attack.MagicAttack;
-import tools.packet.character.SkillCoolDown;
 
 public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -57,16 +56,7 @@ public final class MagicDamageHandler extends AbstractDealDamageHandler<AttackPa
 
       MasterBroadcaster.getInstance().sendToAllInMapRange(chr.getMap(), packet, false, chr, true);
       MapleStatEffect effect = getAttackEffect(attack, chr, null);
-
-      SkillFactory.getSkill(attack.skill()).ifPresent(skill -> {
-         MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-         if (effect_.getCoolDown() > 0) {
-            if (!chr.skillIsCooling(attack.skill())) {
-               PacketCreator.announce(c, new SkillCoolDown(attack.skill(), effect_.getCoolDown()));
-               chr.addCoolDown(attack.skill(), currentServerTime(), effect_.getCoolDown() * 1000);
-            }
-         }
-      });
+      SkillFactory.getSkill(attack.skill()).ifPresent(skill -> applyCoolDownIfPresent(skill, chr));
 
       applyAttack(attack, chr, effect.getAttackCount());
 

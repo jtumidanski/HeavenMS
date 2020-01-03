@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor5511000 {
-   ReactorActionManager rm
-
+class Reactor5511000 extends SimpleReactor {
    def act() {
       if (rm.getReactor().getMap().getMonsterById(9420542) == null) {
          rm.schedule("summonBoss", 3200)
@@ -19,18 +16,6 @@ class Reactor5511000 {
       rm.spawnMonster(9420542, -527, 637)
       rm.changeMusic("Bgm09/TimeAttack")
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Beware! The furious Targa has shown himself!")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

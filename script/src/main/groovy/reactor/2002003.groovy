@@ -3,27 +3,12 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2002003 {
-   ReactorActionManager rm
-
+class Reactor2002003 extends SimpleReactor {
    def act() {
       rm.dropItems()
 
       EventInstanceManager eim = rm.getEventInstance()
       eim.setProperty("statusStg7", "1")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

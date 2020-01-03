@@ -3,10 +3,7 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2511000 {
-   ReactorActionManager rm
-
+class Reactor2511000 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getPlayer().getEventInstance()
       int now = eim.getIntProperty("openedBoxes")
@@ -15,18 +12,6 @@ class Reactor2511000 {
 
       rm.spawnMonster(9300109, 3)
       rm.spawnMonster(9300110, 5)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

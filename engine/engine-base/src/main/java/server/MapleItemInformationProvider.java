@@ -2,6 +2,7 @@ package server;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -13,11 +14,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import client.MapleCharacter;
 import client.MapleClient;
 import client.MapleJob;
+import client.Skill;
 import client.SkillFactory;
 import client.autoban.AutoBanFactory;
 import client.database.data.MakerCreateData;
@@ -57,6 +64,7 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.TriFunction;
 import tools.packet.message.YellowTip;
 
 public class MapleItemInformationProvider {
@@ -83,7 +91,6 @@ public class MapleItemInformationProvider {
    protected Map<Integer, Double> unitPriceCache = new HashMap<>();
    protected Map<Integer, Integer> projectileWeaponAttackCache = new HashMap<>();
    protected Map<Integer, String> nameCache = new HashMap<>();
-   protected Map<Integer, String> descCache = new HashMap<>();
    protected Map<Integer, String> msgCache = new HashMap<>();
    protected Map<Integer, Boolean> accountItemRestrictionCache = new HashMap<>();
    protected Map<Integer, Boolean> dropRestrictionCache = new HashMap<>();
@@ -288,25 +295,26 @@ public class MapleItemInformationProvider {
          switch (range) {
             case 5:
                return 4260001;
-
             case 6:
                return 4260002;
-
             case 7:
                return 4260003;
-
             case 8:
                return 4260004;
-
             case 9:
                return 4260005;
-
             case 10:
                return 4260006;
-
             default:
                return 4260007;
          }
+      }
+   }
+
+   protected void addItems(Supplier<MapleData> dataSupplier, Function<MapleData, Iterable<MapleData>> iterable, List<Pair<Integer, String>> itemPairs) {
+      MapleData itemsData = dataSupplier.get();
+      for (MapleData itemFolder : iterable.apply(itemsData)) {
+         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
       }
    }
 
@@ -315,33 +323,12 @@ public class MapleItemInformationProvider {
          return itemNameCache;
       }
       List<Pair<Integer, String>> itemPairs = new ArrayList<>();
-      MapleData itemsData;
-      itemsData = stringData.getData("Cash.img");
-      for (MapleData itemFolder : itemsData.getChildren()) {
-         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-      }
-      itemsData = stringData.getData("Consume.img");
-      for (MapleData itemFolder : itemsData.getChildren()) {
-         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-      }
-      itemsData = stringData.getData("Eqp.img").getChildByPath("Eqp");
-      for (MapleData eqpType : itemsData.getChildren()) {
-         for (MapleData itemFolder : eqpType.getChildren()) {
-            itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-         }
-      }
-      itemsData = stringData.getData("Etc.img").getChildByPath("Etc");
-      for (MapleData itemFolder : itemsData.getChildren()) {
-         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-      }
-      itemsData = stringData.getData("Ins.img");
-      for (MapleData itemFolder : itemsData.getChildren()) {
-         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-      }
-      itemsData = stringData.getData("Pet.img");
-      for (MapleData itemFolder : itemsData.getChildren()) {
-         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-      }
+      addItems(() -> stringData.getData("Cash.img"), MapleData::getChildren, itemPairs);
+      addItems(() -> stringData.getData("Consume.img"), MapleData::getChildren, itemPairs);
+      addItems(() -> stringData.getData("Eqp.img").getChildByPath("Eqp"), itemsData -> itemsData.getChildren().stream().map(MapleData::getChildren).flatMap(List::stream).collect(Collectors.toList()), itemPairs);
+      addItems(() -> stringData.getData("Etc.img").getChildByPath("Etc"), MapleData::getChildren, itemPairs);
+      addItems(() -> stringData.getData("Ins.img"), MapleData::getChildren, itemPairs);
+      addItems(() -> stringData.getData("Pet.img"), MapleData::getChildren, itemPairs);
       return itemPairs;
    }
 
@@ -351,12 +338,7 @@ public class MapleItemInformationProvider {
       }
 
       List<Pair<Integer, String>> itemPairs = new ArrayList<>();
-      MapleData itemsData;
-
-      itemsData = stringData.getData("Etc.img").getChildByPath("Etc");
-      for (MapleData itemFolder : itemsData.getChildren()) {
-         itemPairs.add(new Pair<>(Integer.parseInt(itemFolder.getName()), MapleDataTool.getString("name", itemFolder, "NO-NAME")));
-      }
+      addItems(() -> stringData.getData("Etc.img").getChildByPath("Etc"), MapleData::getChildren, itemPairs);
       return itemPairs;
    }
 
@@ -430,34 +412,20 @@ public class MapleItemInformationProvider {
    }
 
    public boolean noCancelMouse(int itemId) {
-      if (noCancelMouseCache.containsKey(itemId)) {
-         return noCancelMouseCache.get(itemId);
-      }
-
-      MapleData item = getItemData(itemId);
-      if (item == null) {
-         noCancelMouseCache.put(itemId, false);
-         return false;
-      }
-
-      boolean blockMouse = MapleDataTool.getIntConvert("info/noCancelMouse", item, 0) == 1;
-      noCancelMouseCache.put(itemId, blockMouse);
-      return blockMouse;
+      return getCacheableBoolean(itemId, noCancelMouseCache, "info/noCancelMouse", value -> value == 1);
    }
 
    private MapleData getItemData(int itemId) {
-      MapleData ret = null;
       String idStr = "0" + itemId;
       MapleDataDirectoryEntry root = itemData.getRoot();
       for (MapleDataDirectoryEntry topDir : root.getSubdirectories()) {
          for (MapleDataFileEntry iFile : topDir.getFiles()) {
             if (iFile.getName().equals(idStr.substring(0, 4) + ".img")) {
-               ret = itemData.getData(topDir.getName() + "/" + iFile.getName());
+               MapleData ret = itemData.getData(topDir.getName() + "/" + iFile.getName());
                if (ret == null) {
                   return null;
                }
-               ret = ret.getChildByPath(idStr);
-               return ret;
+               return ret.getChildByPath(idStr);
             } else if (iFile.getName().equals(idStr.substring(1) + ".img")) {
                return itemData.getData(topDir.getName() + "/" + iFile.getName());
             }
@@ -471,28 +439,21 @@ public class MapleItemInformationProvider {
             }
          }
       }
-      return ret;
+      return null;
    }
 
    public List<Integer> getItemIdsInRange(int minId, int maxId, boolean ignoreCashItem) {
-      List<Integer> list = new ArrayList<>();
-
       if (ignoreCashItem) {
-         for (int i = minId; i <= maxId; i++) {
-            if (getItemData(i) != null && !isCash(i)) {
-               list.add(i);
-            }
-         }
+         return IntStream.rangeClosed(minId, maxId)
+               .filter(id -> getItemData(id) != null && !isCash(id))
+               .boxed()
+               .collect(Collectors.toList());
       } else {
-         for (int i = minId; i <= maxId; i++) {
-            if (getItemData(i) != null) {
-               list.add(i);
-            }
-         }
+         return IntStream.rangeClosed(minId, maxId)
+               .filter(id -> getItemData(id) != null)
+               .boxed()
+               .collect(Collectors.toList());
       }
-
-
-      return list;
    }
 
    public short getSlotMax(MapleClient c, int itemId) {
@@ -519,22 +480,20 @@ public class MapleItemInformationProvider {
       return (short) (ret + getExtraSlotMaxFromPlayer(c, itemId));
    }
 
-   public int getMeso(int itemId) {
-      if (getMesoCache.containsKey(itemId)) {
-         return getMesoCache.get(itemId);
-      }
+   protected int supplyMeso(int itemId) {
       MapleData item = getItemData(itemId);
       if (item == null) {
          return -1;
       }
-      int pEntry;
       MapleData pData = item.getChildByPath("info/meso");
       if (pData == null) {
          return -1;
       }
-      pEntry = MapleDataTool.getInt(pData);
-      getMesoCache.put(itemId, pEntry);
-      return pEntry;
+      return MapleDataTool.getInt(pData);
+   }
+
+   public int getMeso(int itemId) {
+      return getCacheableThing(itemId, getMesoCache, this::supplyMeso);
    }
 
    private Pair<Integer, Double> getItemPriceData(int itemId) {
@@ -567,18 +526,18 @@ public class MapleItemInformationProvider {
    }
 
    public int getWholePrice(int itemId) {
-      if (wholePriceCache.containsKey(itemId)) {
-         return wholePriceCache.get(itemId);
-      }
+      return getCacheableThing(itemId, wholePriceCache, this::supplyWholePrice);
+   }
 
+   protected Integer supplyWholePrice(int itemId) {
       return getItemPriceData(itemId).getLeft();
    }
 
    public double getUnitPrice(int itemId) {
-      if (unitPriceCache.containsKey(itemId)) {
-         return unitPriceCache.get(itemId);
-      }
+      return getCacheableThing(itemId, unitPriceCache, this::supplyUnitPrice);
+   }
 
+   protected Double supplyUnitPrice(int itemId) {
       return getItemPriceData(itemId).getRight();
    }
 
@@ -598,52 +557,40 @@ public class MapleItemInformationProvider {
    }
 
    public Pair<Integer, String> getReplaceOnExpire(int itemId) {
-      if (replaceOnExpireCache.containsKey(itemId)) {
-         return replaceOnExpireCache.get(itemId);
-      }
+      return getCacheableThing(itemId, replaceOnExpireCache, this::supplyReplaceOnExpire);
+   }
 
-      MapleData data = getItemData(itemId);
+   protected Pair<Integer, String> supplyReplaceOnExpire(Integer internalItemId) {
+      MapleData data = getItemData(internalItemId);
       int itemReplacement = MapleDataTool.getInt("info/replace/itemid", data, 0);
       String msg = MapleDataTool.getString("info/replace/msg", data, "");
-
-      Pair<Integer, String> ret = new Pair<>(itemReplacement, msg);
-      replaceOnExpireCache.put(itemId, ret);
-
-      return ret;
+      return new Pair<>(itemReplacement, msg);
    }
 
    protected String getEquipmentSlot(int itemId) {
-      if (equipmentSlotCache.containsKey(itemId)) {
-         return equipmentSlotCache.get(itemId);
-      }
+      return getCacheableThing(itemId, equipmentSlotCache, this::supplyEquipmentSlot);
+   }
 
-      String ret;
-
-      MapleData item = getItemData(itemId);
-
+   protected String supplyEquipmentSlot(Integer internalItemId) {
+      MapleData item = getItemData(internalItemId);
       if (item == null) {
          return null;
       }
 
       MapleData info = item.getChildByPath("info");
-
       if (info == null) {
          return null;
       }
-
-      ret = MapleDataTool.getString("islot", info, "");
-
-      equipmentSlotCache.put(itemId, ret);
-
-      return ret;
+      return MapleDataTool.getString("islot", info, "");
    }
 
    public Map<String, Integer> getEquipStats(int itemId) {
-      if (equipStatsCache.containsKey(itemId)) {
-         return equipStatsCache.get(itemId);
-      }
+      return getCacheableThing(itemId, equipStatsCache, this::supplyEquipmentStatistics);
+   }
+
+   protected Map<String, Integer> supplyEquipmentStatistics(Integer internalItemId) {
       Map<String, Integer> ret = new LinkedHashMap<>();
-      MapleData item = getItemData(itemId);
+      MapleData item = getItemData(internalItemId);
       if (item == null) {
          return null;
       }
@@ -655,8 +602,8 @@ public class MapleItemInformationProvider {
          if (data.getName().startsWith("inc")) {
             ret.put(data.getName().substring(3), MapleDataTool.getIntConvert(data));
          }
-            /*else if (data.getName().startsWith("req"))
-             ret.put(data.getName(), MapleDataTool.getInt(data.getName(), info, 0));*/
+         /*else if (data.getName().startsWith("req"))
+          ret.put(data.getName(), MapleDataTool.getInt(data.getName(), info, 0));*/
       }
       ret.put("reqJob", MapleDataTool.getInt("reqJob", info, 0));
       ret.put("reqLevel", MapleDataTool.getInt("reqLevel", info, 0));
@@ -670,453 +617,158 @@ public class MapleItemInformationProvider {
       ret.put("cursed", MapleDataTool.getInt("cursed", info, 0));
       ret.put("success", MapleDataTool.getInt("success", info, 0));
       ret.put("fs", MapleDataTool.getInt("fs", info, 0));
-      equipStatsCache.put(itemId, ret);
       return ret;
    }
 
    public Integer getEquipLevelReq(int itemId) {
-      if (equipLevelReqCache.containsKey(itemId)) {
-         return equipLevelReqCache.get(itemId);
-      }
+      return getCacheableThing(itemId, equipLevelReqCache, this::supplyEquipLevelRequirement);
+   }
 
+   protected Integer supplyEquipLevelRequirement(Integer internalItemId) {
       int ret = 0;
-      MapleData item = getItemData(itemId);
+      MapleData item = getItemData(internalItemId);
       if (item != null) {
          MapleData info = item.getChildByPath("info");
          if (info != null) {
             ret = MapleDataTool.getInt("reqLevel", info, 0);
          }
       }
-
-      equipLevelReqCache.put(itemId, ret);
       return ret;
    }
 
    public List<Integer> getScrollReqs(int itemId) {
-      if (scrollReqsCache.containsKey(itemId)) {
-         return scrollReqsCache.get(itemId);
-      }
+      return getCacheableThing(itemId, scrollReqsCache, this::supplyScrollReqs);
+   }
 
+   protected List<Integer> supplyScrollReqs(Integer internalItemId) {
       List<Integer> ret = new ArrayList<>();
-      MapleData data = getItemData(itemId);
-      data = data.getChildByPath("req");
+      MapleData data = getItemData(internalItemId).getChildByPath("req");
       if (data != null) {
-         for (MapleData req : data.getChildren()) {
-            ret.add(MapleDataTool.getInt(req));
-         }
+         data.getChildren().forEach(req -> ret.add(MapleDataTool.getInt(req)));
       }
-      scrollReqsCache.put(itemId, ret);
       return ret;
    }
 
    public MapleWeaponType getWeaponType(int itemId) {
       int cat = (itemId / 10000) % 100;
-      MapleWeaponType[] type = {MapleWeaponType.SWORD1H, MapleWeaponType.GENERAL1H_SWING, MapleWeaponType.GENERAL1H_SWING, MapleWeaponType.DAGGER_OTHER, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.WAND, MapleWeaponType.STAFF, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.SWORD2H, MapleWeaponType.GENERAL2H_SWING, MapleWeaponType.GENERAL2H_SWING, MapleWeaponType.SPEAR_STAB, MapleWeaponType.POLE_ARM_SWING, MapleWeaponType.BOW, MapleWeaponType.CROSSBOW, MapleWeaponType.CLAW, MapleWeaponType.KNUCKLE, MapleWeaponType.GUN};
+      MapleWeaponType[] type = {MapleWeaponType.SWORD1H, MapleWeaponType.GENERAL1H_SWING, MapleWeaponType.GENERAL1H_SWING,
+            MapleWeaponType.DAGGER_OTHER, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.NOT_A_WEAPON,
+            MapleWeaponType.WAND, MapleWeaponType.STAFF, MapleWeaponType.NOT_A_WEAPON, MapleWeaponType.SWORD2H,
+            MapleWeaponType.GENERAL2H_SWING, MapleWeaponType.GENERAL2H_SWING, MapleWeaponType.SPEAR_STAB,
+            MapleWeaponType.POLE_ARM_SWING, MapleWeaponType.BOW, MapleWeaponType.CROSSBOW, MapleWeaponType.CLAW,
+            MapleWeaponType.KNUCKLE, MapleWeaponType.GUN};
       if (cat < 30 || cat > 49) {
          return MapleWeaponType.NOT_A_WEAPON;
       }
       return type[cat - 30];
    }
 
-   public void scrollOptionEquipWithChaos(Equip equip, int range, boolean option) {
-      if (!option) {
-         if (equip.str() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.str_$eq(getMaximumShortMaxIfOverflow(equip.str(), (equip.str() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.str_$eq(getMaximumShortMaxIfOverflow(0, (equip.str() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.dex() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.dex_$eq(getMaximumShortMaxIfOverflow(equip.dex(), (equip.dex() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.dex_$eq(getMaximumShortMaxIfOverflow(0, (equip.dex() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip._int() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip._int_$eq(getMaximumShortMaxIfOverflow(equip._int(), (equip._int() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip._int_$eq(getMaximumShortMaxIfOverflow(0, (equip._int() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.luk() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.luk_$eq(getMaximumShortMaxIfOverflow(equip.luk(), (equip.luk() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.luk_$eq(getMaximumShortMaxIfOverflow(0, (equip.luk() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.acc() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.acc_$eq(getMaximumShortMaxIfOverflow(equip.acc(), (equip.acc() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.acc_$eq(getMaximumShortMaxIfOverflow(0, (equip.acc() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.avoid() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.avoid_$eq(getMaximumShortMaxIfOverflow(equip.avoid(), (equip.avoid() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (equip.avoid() + chaosScrollRandomizedStat(range))));
-            }
-         }
-      } else {
-         if (equip.watk() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.watk_$eq(getMaximumShortMaxIfOverflow(equip.watk(), (equip.watk() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.watk_$eq(getMaximumShortMaxIfOverflow(0, (equip.watk() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.wdef() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.wdef_$eq(getMaximumShortMaxIfOverflow(equip.wdef(), (equip.wdef() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (equip.wdef() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.matk() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.matk_$eq(getMaximumShortMaxIfOverflow(equip.matk(), (equip.matk() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.matk_$eq(getMaximumShortMaxIfOverflow(0, (equip.matk() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.mdef() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.mdef_$eq(getMaximumShortMaxIfOverflow(equip.mdef(), (equip.mdef() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (equip.mdef() + chaosScrollRandomizedStat(range))));
-            }
-         }
-
-         if (equip.speed() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.speed_$eq(getMaximumShortMaxIfOverflow(equip.speed(), (equip.speed() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.speed_$eq(getMaximumShortMaxIfOverflow(0, (equip.speed() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.jump() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.jump_$eq(getMaximumShortMaxIfOverflow(equip.jump(), (equip.jump() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.jump_$eq(getMaximumShortMaxIfOverflow(0, (equip.jump() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.hp() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.hp_$eq(getMaximumShortMaxIfOverflow(equip.hp(), (equip.hp() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.hp_$eq(getMaximumShortMaxIfOverflow(0, (equip.hp() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (equip.mp() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               equip.mp_$eq(getMaximumShortMaxIfOverflow(equip.mp(), (equip.mp() + chaosScrollRandomizedStat(range))));
-            } else {
-               equip.mp_$eq(getMaximumShortMaxIfOverflow(0, (equip.mp() + chaosScrollRandomizedStat(range))));
-            }
+   protected void applyChaos(Supplier<Integer> getter, Consumer<Integer> setter, int range) {
+      if (getter.get() > 0) {
+         if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
+            setter.accept((int) getMaximumShortMaxIfOverflow(getter.get(), (getter.get() + chaosScrollRandomizedStat(range))));
+         } else {
+            setter.accept((int) getMaximumShortMaxIfOverflow(0, (getter.get() + chaosScrollRandomizedStat(range))));
          }
       }
    }
 
-   private void scrollEquipWithChaos(Equip nEquip, int range) {
-      if (YamlConfig.config.server.CHSCROLL_STAT_RATE > 0) {
-         int temp;
-         int currentStrength, currentDexterity, currentIntelligence, currentLuck, currentWeaponAttack, currentWeaponDefense,
-               currentMagicAttack, currentMagicDefense, currentAccuracy, currentAvoidability, currentSpeed, currentJump,
-               currentHp, currentMp;
-
+   protected int evaluateChaos(Supplier<Integer> getter, int baseValue, int range) {
+      int temp;
+      if (getter.get() > 0) {
          if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-            currentStrength = nEquip.str();
-            currentDexterity = nEquip.dex();
-            currentIntelligence = nEquip._int();
-            currentLuck = nEquip.luk();
-            currentWeaponAttack = nEquip.watk();
-            currentWeaponDefense = nEquip.wdef();
-            currentMagicAttack = nEquip.matk();
-            currentMagicDefense = nEquip.mdef();
-            currentAccuracy = nEquip.acc();
-            currentAvoidability = nEquip.avoid();
-            currentSpeed = nEquip.speed();
-            currentJump = nEquip.jump();
-            currentHp = nEquip.hp();
-            currentMp = nEquip.mp();
+            temp = baseValue + chaosScrollRandomizedStat(range);
          } else {
-            currentStrength = Short.MIN_VALUE;
-            currentDexterity = Short.MIN_VALUE;
-            currentIntelligence = Short.MIN_VALUE;
-            currentLuck = Short.MIN_VALUE;
-            currentWeaponAttack = Short.MIN_VALUE;
-            currentWeaponDefense = Short.MIN_VALUE;
-            currentMagicAttack = Short.MIN_VALUE;
-            currentMagicDefense = Short.MIN_VALUE;
-            currentAccuracy = Short.MIN_VALUE;
-            currentAvoidability = Short.MIN_VALUE;
-            currentSpeed = Short.MIN_VALUE;
-            currentJump = Short.MIN_VALUE;
-            currentHp = Short.MIN_VALUE;
-            currentMp = Short.MIN_VALUE;
+            temp = getter.get() + chaosScrollRandomizedStat(range);
+         }
+
+         baseValue = getMaximumShortMaxIfOverflow(temp, baseValue);
+      }
+      return baseValue;
+   }
+
+   public void scrollOptionEquipWithChaos(Equip equip, int range, boolean option) {
+      if (!option) {
+         applyChaos(equip::str, equip::str_$eq, range);
+         applyChaos(equip::dex, equip::dex_$eq, range);
+         applyChaos(equip::_int, equip::_int_$eq, range);
+         applyChaos(equip::luk, equip::luk_$eq, range);
+         applyChaos(equip::acc, equip::acc_$eq, range);
+         applyChaos(equip::avoid, equip::avoid_$eq, range);
+      } else {
+         applyChaos(equip::watk, equip::watk_$eq, range);
+         applyChaos(equip::wdef, equip::wdef_$eq, range);
+         applyChaos(equip::matk, equip::matk_$eq, range);
+         applyChaos(equip::mdef, equip::mdef_$eq, range);
+         applyChaos(equip::speed, equip::speed_$eq, range);
+         applyChaos(equip::jump, equip::jump_$eq, range);
+         applyChaos(equip::hp, equip::hp_$eq, range);
+         applyChaos(equip::mp, equip::mp_$eq, range);
+      }
+   }
+
+   private static class AttributePair {
+      private int currentValue;
+
+      private Supplier<Integer> getter;
+
+      private Consumer<Integer> setter;
+
+      public AttributePair(Supplier<Integer> getter, Consumer<Integer> setter) {
+         this.getter = getter;
+         this.setter = setter;
+         this.currentValue = 0;
+      }
+
+      public int getCurrentValue() {
+         return currentValue;
+      }
+
+      public void setCurrentValue(int currentValue) {
+         this.currentValue = currentValue;
+      }
+
+      public Supplier<Integer> getGetter() {
+         return getter;
+      }
+
+      public Consumer<Integer> getSetter() {
+         return setter;
+      }
+   }
+
+   private void scrollEquipWithChaos(Equip nEquip, int range) {
+         List<AttributePair> attributes = Arrays.asList(
+               new AttributePair(nEquip::str, nEquip::str_$eq),
+               new AttributePair(nEquip::dex, nEquip::dex_$eq),
+               new AttributePair(nEquip::_int, nEquip::_int_$eq),
+               new AttributePair(nEquip::luk, nEquip::luk_$eq),
+               new AttributePair(nEquip::watk, nEquip::watk_$eq),
+               new AttributePair(nEquip::wdef, nEquip::wdef_$eq),
+               new AttributePair(nEquip::matk, nEquip::matk_$eq),
+               new AttributePair(nEquip::mdef, nEquip::mdef_$eq),
+               new AttributePair(nEquip::acc, nEquip::acc_$eq),
+               new AttributePair(nEquip::avoid, nEquip::avoid_$eq),
+               new AttributePair(nEquip::speed, nEquip::speed_$eq),
+               new AttributePair(nEquip::jump, nEquip::jump_$eq),
+               new AttributePair(nEquip::hp, nEquip::hp_$eq),
+               new AttributePair(nEquip::mp, nEquip::mp_$eq)
+         );
+
+      if (YamlConfig.config.server.CHSCROLL_STAT_RATE > 0) {
+         if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
+            attributes.forEach(pair -> pair.setCurrentValue(pair.getGetter().get()));
+         } else {
+            attributes.forEach(pair -> pair.setCurrentValue(Short.MIN_VALUE));
          }
 
          for (int i = 0; i < YamlConfig.config.server.CHSCROLL_STAT_RATE; i++) {
-            if (nEquip.str() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentStrength + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.str() + chaosScrollRandomizedStat(range);
-               }
-
-               currentStrength = getMaximumShortMaxIfOverflow(temp, currentStrength);
-            }
-
-            if (nEquip.dex() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentDexterity + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.dex() + chaosScrollRandomizedStat(range);
-               }
-
-               currentDexterity = getMaximumShortMaxIfOverflow(temp, currentDexterity);
-            }
-
-            if (nEquip._int() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentIntelligence + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip._int() + chaosScrollRandomizedStat(range);
-               }
-
-               currentIntelligence = getMaximumShortMaxIfOverflow(temp, currentIntelligence);
-            }
-
-            if (nEquip.luk() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentLuck + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.luk() + chaosScrollRandomizedStat(range);
-               }
-
-               currentLuck = getMaximumShortMaxIfOverflow(temp, currentLuck);
-            }
-
-            if (nEquip.watk() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentWeaponAttack + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.watk() + chaosScrollRandomizedStat(range);
-               }
-
-               currentWeaponAttack = getMaximumShortMaxIfOverflow(temp, currentWeaponAttack);
-            }
-
-            if (nEquip.wdef() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentWeaponDefense + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.wdef() + chaosScrollRandomizedStat(range);
-               }
-
-               currentWeaponDefense = getMaximumShortMaxIfOverflow(temp, currentWeaponDefense);
-            }
-
-            if (nEquip.matk() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentMagicAttack + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.matk() + chaosScrollRandomizedStat(range);
-               }
-
-               currentMagicAttack = getMaximumShortMaxIfOverflow(temp, currentMagicAttack);
-            }
-
-            if (nEquip.mdef() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentMagicDefense + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.mdef() + chaosScrollRandomizedStat(range);
-               }
-
-               currentMagicDefense = getMaximumShortMaxIfOverflow(temp, currentMagicDefense);
-            }
-
-            if (nEquip.acc() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentAccuracy + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.acc() + chaosScrollRandomizedStat(range);
-               }
-
-               currentAccuracy = getMaximumShortMaxIfOverflow(temp, currentAccuracy);
-            }
-
-            if (nEquip.avoid() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentAvoidability + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.avoid() + chaosScrollRandomizedStat(range);
-               }
-
-               currentAvoidability = getMaximumShortMaxIfOverflow(temp, currentAvoidability);
-            }
-
-            if (nEquip.speed() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentSpeed + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.speed() + chaosScrollRandomizedStat(range);
-               }
-
-               currentSpeed = getMaximumShortMaxIfOverflow(temp, currentSpeed);
-            }
-
-            if (nEquip.jump() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentJump + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.jump() + chaosScrollRandomizedStat(range);
-               }
-
-               currentJump = getMaximumShortMaxIfOverflow(temp, currentJump);
-            }
-
-            if (nEquip.hp() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentHp + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.hp() + chaosScrollRandomizedStat(range);
-               }
-
-               currentHp = getMaximumShortMaxIfOverflow(temp, currentHp);
-            }
-
-            if (nEquip.mp() > 0) {
-               if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-                  temp = currentMp + chaosScrollRandomizedStat(range);
-               } else {
-                  temp = nEquip.mp() + chaosScrollRandomizedStat(range);
-               }
-
-               currentMp = getMaximumShortMaxIfOverflow(temp, currentMp);
-            }
+            attributes.forEach(pair -> pair.setCurrentValue(evaluateChaos(pair.getGetter(), pair.getCurrentValue(), range)));
          }
 
-         nEquip.str_$eq((short) Math.max(0, currentStrength));
-         nEquip.dex_$eq((short) Math.max(0, currentDexterity));
-         nEquip._int_$eq((short) Math.max(0, currentIntelligence));
-         nEquip.luk_$eq((short) Math.max(0, currentLuck));
-         nEquip.watk_$eq((short) Math.max(0, currentWeaponAttack));
-         nEquip.wdef_$eq((short) Math.max(0, currentWeaponDefense));
-         nEquip.matk_$eq((short) Math.max(0, currentMagicAttack));
-         nEquip.mdef_$eq((short) Math.max(0, currentMagicDefense));
-         nEquip.acc_$eq((short) Math.max(0, currentAccuracy));
-         nEquip.avoid_$eq((short) Math.max(0, currentAvoidability));
-         nEquip.speed_$eq((short) Math.max(0, currentSpeed));
-         nEquip.jump_$eq((short) Math.max(0, currentJump));
-         nEquip.hp_$eq((short) Math.max(0, currentHp));
-         nEquip.mp_$eq((short) Math.max(0, currentMp));
+         attributes.forEach(pair -> pair.getSetter().accept(Math.max(0, pair.getCurrentValue())));
       } else {
-         if (nEquip.str() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.str_$eq(getMaximumShortMaxIfOverflow(nEquip.str(), (nEquip.str() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.str_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.str() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.dex() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(nEquip.dex(), (nEquip.dex() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.dex_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.dex() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip._int() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip._int_$eq(getMaximumShortMaxIfOverflow(nEquip._int(), (nEquip._int() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip._int_$eq(getMaximumShortMaxIfOverflow(0, (nEquip._int() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.luk() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(nEquip.luk(), (nEquip.luk() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.luk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.luk() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.watk() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(nEquip.watk(), (nEquip.watk() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.watk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.watk() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.wdef() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(nEquip.wdef(), (nEquip.wdef() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.wdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.wdef() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.matk() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(nEquip.matk(), (nEquip.matk() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.matk_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.matk() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.mdef() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(nEquip.mdef(), (nEquip.mdef() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.mdef_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mdef() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.acc() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(nEquip.acc(), (nEquip.acc() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.acc_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.acc() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.avoid() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(nEquip.avoid(), (nEquip.avoid() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.avoid_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.avoid() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.speed() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(nEquip.speed(), (nEquip.speed() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.speed_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.speed() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.jump() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(nEquip.jump(), (nEquip.jump() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.jump_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.jump() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.hp() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(nEquip.hp(), (nEquip.hp() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.hp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.hp() + chaosScrollRandomizedStat(range))));
-            }
-         }
-         if (nEquip.mp() > 0) {
-            if (YamlConfig.config.server.USE_ENHANCED_CHSCROLL) {
-               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(nEquip.mp(), (nEquip.mp() + chaosScrollRandomizedStat(range))));
-            } else {
-               nEquip.mp_$eq(getMaximumShortMaxIfOverflow(0, (nEquip.mp() + chaosScrollRandomizedStat(range))));
-            }
-         }
+         attributes.forEach(pair -> applyChaos(pair.getGetter(), pair.getSetter(), range));
       }
    }
 
@@ -1319,94 +971,35 @@ public class MapleItemInformationProvider {
    }
 
    public int getWeaponAttackForProjectile(int itemId) {
-      Integer atk = projectileWeaponAttackCache.get(itemId);
-      if (atk != null) {
-         return atk;
-      }
-      MapleData data = getItemData(itemId);
-      atk = MapleDataTool.getInt("info/incPAD", data, 0);
-      projectileWeaponAttackCache.put(itemId, atk);
-      return atk;
+      return getCacheableInteger(itemId, projectileWeaponAttackCache, "info/incPAD");
    }
 
    public String getName(int itemId) {
-      if (nameCache.containsKey(itemId)) {
-         return nameCache.get(itemId);
-      }
-      MapleData strings = getStringData(itemId);
-      if (strings == null) {
-         return null;
-      }
-      String ret = MapleDataTool.getString("name", strings, null);
-      nameCache.put(itemId, ret);
-      return ret;
+      return getCacheableString(itemId, nameCache, "name");
    }
 
    public String getMsg(int itemId) {
-      if (msgCache.containsKey(itemId)) {
-         return msgCache.get(itemId);
-      }
-      MapleData strings = getStringData(itemId);
-      if (strings == null) {
-         return null;
-      }
-      String ret = MapleDataTool.getString("msg", strings, null);
-      msgCache.put(itemId, ret);
-      return ret;
+      return getCacheableString(itemId, msgCache, "msg");
    }
 
    public boolean isUntradeableRestricted(int itemId) {
-      if (untradeableCache.containsKey(itemId)) {
-         return untradeableCache.get(itemId);
-      }
-
-      boolean bRestricted = false;
-      if (itemId != 0) {
-         MapleData data = getItemData(itemId);
-         if (data != null) {
-            bRestricted = MapleDataTool.getIntConvert("info/tradeBlock", data, 0) == 1;
-         }
-      }
-
-      untradeableCache.put(itemId, bRestricted);
-      return bRestricted;
+      return getCacheableBoolean(itemId, untradeableCache, "info/tradeBlock", value -> value == 1);
    }
 
    public boolean isAccountRestricted(int itemId) {
-      if (accountItemRestrictionCache.containsKey(itemId)) {
-         return accountItemRestrictionCache.get(itemId);
-      }
-
-      boolean bRestricted = false;
-      if (itemId != 0) {
-         MapleData data = getItemData(itemId);
-         if (data != null) {
-            bRestricted = MapleDataTool.getIntConvert("info/accountSharable", data, 0) == 1;
-         }
-      }
-
-      accountItemRestrictionCache.put(itemId, bRestricted);
-      return bRestricted;
+      return getCacheableBoolean(itemId, accountItemRestrictionCache, "info/accountSharable", value -> value == 1);
    }
 
    public boolean isLootRestricted(int itemId) {
-      if (dropRestrictionCache.containsKey(itemId)) {
-         return dropRestrictionCache.get(itemId);
-      }
+      return getCacheableBoolean(itemId, dropRestrictionCache, "info/tradeBlock", value -> supplyLootRestricted(itemId, value));
+   }
 
-      boolean bRestricted = false;
-      if (itemId != 0) {
-         MapleData data = getItemData(itemId);
-         if (data != null) {
-            bRestricted = MapleDataTool.getIntConvert("info/tradeBlock", data, 0) == 1;
-            if (!bRestricted) {
-               bRestricted = isAccountRestricted(itemId);
-            }
-         }
+   protected Boolean supplyLootRestricted(int itemId, Integer value) {
+      boolean restricted = value == 1;
+      if (!restricted) {
+         restricted = isAccountRestricted(itemId);
       }
-
-      dropRestrictionCache.put(itemId, bRestricted);
-      return bRestricted;
+      return restricted;
    }
 
    public boolean isDropRestricted(int itemId) {
@@ -1414,20 +1007,7 @@ public class MapleItemInformationProvider {
    }
 
    public boolean isPickupRestricted(int itemId) {
-      if (pickupRestrictionCache.containsKey(itemId)) {
-         return pickupRestrictionCache.get(itemId);
-      }
-
-      boolean bRestricted = false;
-      if (itemId != 0) {
-         MapleData data = getItemData(itemId);
-         if (data != null) {
-            bRestricted = MapleDataTool.getIntConvert("info/only", data, 0) == 1;
-         }
-      }
-
-      pickupRestrictionCache.put(itemId, bRestricted);
-      return bRestricted;
+      return getCacheableBoolean(itemId, pickupRestrictionCache, "info/only", value -> value == 1);
    }
 
    private Pair<Map<String, Integer>, MapleData> getSkillStatsInternal(int itemId) {
@@ -1519,27 +1099,16 @@ public class MapleItemInformationProvider {
    }
 
    public boolean isQuestItem(int itemId) {
-      if (isQuestItemCache.containsKey(itemId)) {
-         return isQuestItemCache.get(itemId);
-      }
-      MapleData data = getItemData(itemId);
-      boolean questItem = (data != null && MapleDataTool.getIntConvert("info/quest", data, 0) == 1);
-      isQuestItemCache.put(itemId, questItem);
-      return questItem;
+      return getCacheableBoolean(itemId, isQuestItemCache, "info/quest", value -> value == 1);
    }
 
    public boolean isPartyQuestItem(int itemId) {
-      if (isPartyQuestItemCache.containsKey(itemId)) {
-         return isPartyQuestItemCache.get(itemId);
-      }
-      MapleData data = getItemData(itemId);
-      boolean partyQuestItem = (data != null && MapleDataTool.getIntConvert("info/pquest", data, 0) == 1);
-      isPartyQuestItemCache.put(itemId, partyQuestItem);
-      return partyQuestItem;
+      return getCacheableBoolean(itemId, isPartyQuestItemCache, "info/pquest", value -> value == 1);
    }
 
    private void loadCardIdData() {
-      DatabaseConnection.getInstance().withConnection(connection -> MonsterCardProvider.getInstance().getMonsterCardData(connection).forEach(data -> monsterBookID.put(data.cardId(), data.mobId())));
+      DatabaseConnection.getInstance().withConnection(connection ->
+            MonsterCardProvider.getInstance().getMonsterCardData(connection).forEach(data -> monsterBookID.put(data.cardId(), data.mobId())));
    }
 
    public int getCardMobId(int id) {
@@ -1547,140 +1116,146 @@ public class MapleItemInformationProvider {
    }
 
    public boolean isUntradeableOnEquip(int itemId) {
-      if (onEquipUntradeableCache.containsKey(itemId)) {
-         return onEquipUntradeableCache.get(itemId);
-      }
-      boolean untradeableOnEquip = MapleDataTool.getIntConvert("info/equipTradeBlock", getItemData(itemId), 0) > 0;
-      onEquipUntradeableCache.put(itemId, untradeableOnEquip);
-      return untradeableOnEquip;
+      return getCacheableBoolean(itemId, onEquipUntradeableCache, "info/equipTradeBlock", value -> value > 0);
    }
 
    public ScriptedItem getScriptedItemInfo(int itemId) {
-      if (scriptedItemCache.containsKey(itemId)) {
-         return scriptedItemCache.get(itemId);
-      }
-      if ((itemId / 10000) != 243) {
+      return getCacheableThing(itemId, scriptedItemCache, this::supplyScriptedItemInfo);
+   }
+
+   protected ScriptedItem supplyScriptedItemInfo(Integer internalItemId) {
+      if ((internalItemId / 10000) != 243) {
          return null;
       }
-      MapleData itemInfo = getItemData(itemId);
-      ScriptedItem script = new ScriptedItem(MapleDataTool.getInt("spec/npc", itemInfo, 0),
+      MapleData itemInfo = getItemData(internalItemId);
+      return new ScriptedItem(MapleDataTool.getInt("spec/npc", itemInfo, 0),
             MapleDataTool.getString("spec/script", itemInfo, ""),
             MapleDataTool.getInt("spec/runOnPickup", itemInfo, 0) == 1);
-      scriptedItemCache.put(itemId, script);
-      return scriptedItemCache.get(itemId);
+   }
+
+
+   protected boolean getCacheableBoolean(int itemId, Map<Integer, Boolean> cache, String path, Function<Integer, Boolean> evaluation) {
+      return getCacheableThing(itemId, cache, this::getItemData,
+            (mapleData, defaultValue) -> evaluation.apply(MapleDataTool.getIntConvert(path, mapleData, 0)), false);
+   }
+
+   protected <T> T getCacheableThing(int itemId, Map<Integer, T> cache, BiFunction<Integer, T, T> supplier, T defaultValue) {
+      if (cache.containsKey(itemId)) {
+         return cache.get(itemId);
+      }
+
+      T result = supplier.apply(itemId, defaultValue);
+      cache.put(itemId, result);
+      return result;
+   }
+
+   protected <T> T getCacheableThing(int itemId, Map<Integer, T> cache, Function<Integer, T> supplier) {
+      if (cache.containsKey(itemId)) {
+         return cache.get(itemId);
+      }
+
+      T result = supplier.apply(itemId);
+      cache.put(itemId, result);
+      return result;
+   }
+
+   protected <T> T getCacheableThing(int itemId, Map<Integer, T> cache,
+                                     Function<Integer, MapleData> supplier,
+                                     BiFunction<MapleData, T, T> converter, T defaultValue) {
+      return getCacheableThing(itemId, cache, (internalItemId, internalDefaultValue) -> {
+         MapleData mapleData = supplier.apply(itemId);
+         if (mapleData == null) {
+            return defaultValue;
+         }
+         return converter.apply(mapleData, defaultValue);
+      }, defaultValue);
+   }
+
+   protected <T> T getCacheableThing(int itemId, Map<Integer, T> cache, String path,
+                                     Function<Integer, MapleData> supplier,
+                                     TriFunction<T, String, MapleData, T> converter, T defaultValue) {
+      return getCacheableThing(itemId, cache, (internalItemId, internalDefaultValue) -> {
+         MapleData mapleData = supplier.apply(itemId);
+         if (mapleData == null) {
+            return defaultValue;
+         }
+         return converter.apply(path, mapleData, defaultValue);
+      }, defaultValue);
+   }
+
+   protected Integer getCacheableInteger(int itemId, Map<Integer, Integer> cache, String path, Integer defaultValue) {
+      return getCacheableThing(itemId, cache, path, this::getItemData, MapleDataTool::getIntConvert, defaultValue);
+   }
+
+   protected String getCacheableString(int itemId, Map<Integer, String> cache, String path) {
+      return getCacheableThing(itemId, cache, path, this::getStringData, MapleDataTool::getString, null);
+   }
+
+   protected Integer getCacheableInteger(int itemId, Map<Integer, Integer> cache, String path) {
+      return getCacheableInteger(itemId, cache, path, 0);
    }
 
    public boolean isKarmaAble(int itemId) {
-      if (karmaCache.containsKey(itemId)) {
-         return karmaCache.get(itemId);
-      }
-      boolean bRestricted = MapleDataTool.getIntConvert("info/tradeAvailable", getItemData(itemId), 0) > 0;
-      karmaCache.put(itemId, bRestricted);
-      return bRestricted;
+      return getCacheableBoolean(itemId, karmaCache, "info/tradeAvailable", value -> value > 0);
    }
 
    public int getStateChangeItem(int itemId) {
-      if (triggerItemCache.containsKey(itemId)) {
-         return triggerItemCache.get(itemId);
-      } else {
-         int triggerItem = MapleDataTool.getIntConvert("info/stateChangeItem", getItemData(itemId), 0);
-         triggerItemCache.put(itemId, triggerItem);
-         return triggerItem;
-      }
+      return getCacheableInteger(itemId, triggerItemCache, "info/stateChangeItem");
    }
 
    public int getCreateItem(int itemId) {
-      if (createItem.containsKey(itemId)) {
-         return createItem.get(itemId);
-      } else {
-         int itemFrom = MapleDataTool.getIntConvert("info/create", getItemData(itemId), 0);
-         createItem.put(itemId, itemFrom);
-         return itemFrom;
-      }
+      return getCacheableInteger(itemId, createItem, "info/create");
    }
 
    public int getMobItem(int itemId) {
-      if (mobItem.containsKey(itemId)) {
-         return mobItem.get(itemId);
-      } else {
-         int mobItemCatch = MapleDataTool.getIntConvert("info/mob", getItemData(itemId), 0);
-         mobItem.put(itemId, mobItemCatch);
-         return mobItemCatch;
-      }
+      return getCacheableInteger(itemId, mobItem, "info/mob");
    }
 
    public int getUseDelay(int itemId) {
-      if (useDelay.containsKey(itemId)) {
-         return useDelay.get(itemId);
-      } else {
-         int mobUseDelay = MapleDataTool.getIntConvert("info/useDelay", getItemData(itemId), 0);
-         useDelay.put(itemId, mobUseDelay);
-         return mobUseDelay;
-      }
+      return getCacheableInteger(itemId, useDelay, "info/useDelay");
    }
 
    public int getMobHP(int itemId) {
-      if (mobHP.containsKey(itemId)) {
-         return mobHP.get(itemId);
-      } else {
-         int mobHPItem = MapleDataTool.getIntConvert("info/mobHP", getItemData(itemId), 0);
-         mobHP.put(itemId, mobHPItem);
-         return mobHPItem;
-      }
+      return getCacheableInteger(itemId, mobHP, "info/mobHP");
    }
 
    public int getExpById(int itemId) {
-      if (expCache.containsKey(itemId)) {
-         return expCache.get(itemId);
-      } else {
-         int exp = MapleDataTool.getIntConvert("spec/exp", getItemData(itemId), 0);
-         expCache.put(itemId, exp);
-         return exp;
-      }
+      return getCacheableInteger(itemId, expCache, "spec/exp");
    }
 
    public int getMaxLevelById(int itemId) {
-      if (levelCache.containsKey(itemId)) {
-         return levelCache.get(itemId);
-      } else {
-         int level = MapleDataTool.getIntConvert("info/maxLevel", getItemData(itemId), 256);
-         levelCache.put(itemId, level);
-         return level;
-      }
+      return getCacheableInteger(itemId, levelCache, "info/maxLevel", 256);
    }
 
    public Pair<Integer, List<RewardItem>> getItemReward(int itemId) {
-      if (rewardCache.containsKey(itemId)) {
-         return rewardCache.get(itemId);
-      }
+      return getCacheableThing(itemId, rewardCache, this::supplyItemReward);
+   }
+
+   protected Pair<Integer, List<RewardItem>> supplyItemReward(Integer internalItemId) {
       int totalProbability = 0;
       List<RewardItem> rewards = new ArrayList<>();
-      for (MapleData child : getItemData(itemId).getChildByPath("reward").getChildren()) {
-         RewardItem reward = new RewardItem();
-         reward.itemId = MapleDataTool.getInt("item", child, 0);
-         reward.prob = (byte) MapleDataTool.getInt("prob", child, 0);
-         reward.quantity = (short) MapleDataTool.getInt("count", child, 0);
-         reward.effect = MapleDataTool.getString("Effect", child, "");
-         reward.worldMessage = MapleDataTool.getString("worldMsg", child, null);
-         reward.period = MapleDataTool.getInt("period", child, -1);
-
-         totalProbability += reward.prob;
-
+      for (MapleData child : getItemData(internalItemId).getChildByPath("reward").getChildren()) {
+         RewardItem reward = new RewardItem(
+               MapleDataTool.getInt("item", child, 0),
+               MapleDataTool.getInt("period", child, -1),
+               (byte) MapleDataTool.getInt("prob", child, 0),
+               (short) MapleDataTool.getInt("count", child, 0),
+               MapleDataTool.getString("Effect", child, ""),
+               MapleDataTool.getString("worldMsg", child, null));
+         totalProbability += reward.probability();
          rewards.add(reward);
       }
-      Pair<Integer, List<RewardItem>> hmm = new Pair<>(totalProbability, rewards);
-      rewardCache.put(itemId, hmm);
-      return hmm;
+      return new Pair<>(totalProbability, rewards);
    }
 
    public boolean isConsumeOnPickup(int itemId) {
-      if (consumeOnPickupCache.containsKey(itemId)) {
-         return consumeOnPickupCache.get(itemId);
-      }
+      return getCacheableThing(itemId, consumeOnPickupCache, this::supplyConsumeOnPickup);
+   }
+
+   protected Boolean supplyConsumeOnPickup(int itemId) {
       MapleData data = getItemData(itemId);
-      boolean consume = MapleDataTool.getIntConvert("spec/consumeOnPickup", data, 0) == 1 || MapleDataTool.getIntConvert("specEx/consumeOnPickup", data, 0) == 1;
-      consumeOnPickupCache.put(itemId, consume);
-      return consume;
+      return MapleDataTool.getIntConvert("spec/consumeOnPickup", data, 0) == 1
+            || MapleDataTool.getIntConvert("specEx/consumeOnPickup", data, 0) == 1;
    }
 
    public final boolean isTwoHanded(int itemId) {
@@ -1716,7 +1291,6 @@ public class MapleItemInformationProvider {
    public boolean isUpgradeable(int itemId) {
       Item it = this.getEquipById(itemId);
       Equip eq = (Equip) it;
-
       return (eq.slots() > 0 || eq.str() > 0 || eq.dex() > 0 || eq._int() > 0 || eq.luk() > 0 ||
             eq.watk() > 0 || eq.matk() > 0 || eq.wdef() > 0 || eq.mdef() > 0 || eq.acc() > 0 ||
             eq.avoid() > 0 || eq.speed() > 0 || eq.jump() > 0 || eq.hp() > 0 || eq.mp() > 0);
@@ -1726,7 +1300,6 @@ public class MapleItemInformationProvider {
       if (YamlConfig.config.server.USE_ENFORCE_UNMERCHABLE_CASH && isCash(itemId)) {
          return true;
       }
-
       return YamlConfig.config.server.USE_ENFORCE_UNMERCHABLE_PET && ItemConstants.isPet(itemId);
    }
 
@@ -1737,11 +1310,10 @@ public class MapleItemInformationProvider {
       }
       Collection<Item> itemz = new LinkedList<>();
       if (chr.getJob() == MapleJob.SUPER_GM || chr.getJob() == MapleJob.GM) {
-         for (Item item : items) {
-            Equip equip = (Equip) item;
+         items.stream().map(item -> (Equip) item).forEach(equip -> {
             equip.wearing_$eq(true);
-            itemz.add(item);
-         }
+            itemz.add(equip);
+         });
          return itemz;
       }
       boolean highFiveStamp = false;
@@ -1764,12 +1336,7 @@ public class MapleItemInformationProvider {
                reqLevel = 0;
             }
          }
-            /*
-             int reqJob = getEquipStats(equip.getItemId()).get("reqJob");
-             if (reqJob != 0) {
-             Really hard check, and not really needed in this one
-             Gm's should just be GM job, and players cannot change jobs.
-             }*/
+
          if (reqLevel > chr.getLevel()) {
             continue;
          } else if (getEquipStats(equip.id()).get("reqDEX") > tdex) {
@@ -1819,19 +1386,6 @@ public class MapleItemInformationProvider {
 
 
       boolean highFiveStamp = false;
-        /* Removed check above for message ><
-         try {
-         for (Pair<Item, MapleInventoryType> ii : ItemFactory.INVENTORY.loadItems(chr.getId(), false)) {
-         if (ii.getRight() == MapleInventoryType.CASH) {
-         if (ii.getLeft().getItemId() == 5590000) {
-         highFiveStamp = true;
-         }
-         }
-         }
-         } catch (SQLException ex) {
-            ex.printStackTrace();
-         }*/
-
       int reqLevel = getEquipLevelReq(equip.id());
       if (highFiveStamp) {
          reqLevel -= 5;
@@ -1864,66 +1418,53 @@ public class MapleItemInformationProvider {
       return true;
    }
 
-   public ArrayList<Pair<Integer, String>> getItemDataByName(String name) {
-      ArrayList<Pair<Integer, String>> ret = new ArrayList<>();
-      for (Pair<Integer, String> itemPair : MapleItemInformationProvider.getInstance().getAllItems()) {
-         if (itemPair.getRight().toLowerCase().contains(name.toLowerCase())) {
-            ret.add(itemPair);
-         }
-      }
-      return ret;
+   public List<Pair<Integer, String>> getItemDataByName(String name) {
+      return MapleItemInformationProvider.getInstance().getAllItems().stream()
+            .filter(pair -> pair.getRight().toLowerCase().contains(name.toLowerCase()))
+            .collect(Collectors.toList());
    }
 
    private MapleData getEquipLevelInfo(int itemId) {
-      MapleData equipLevelData = equipLevelInfoCache.get(itemId);
-      if (equipLevelData == null) {
-         if (equipLevelInfoCache.containsKey(itemId)) {
-            return null;
-         }
+      return getCacheableThing(itemId, equipLevelInfoCache, this::supplyEquipLevelInfo);
+   }
 
-         MapleData iData = getItemData(itemId);
-         if (iData != null) {
-            MapleData data = iData.getChildByPath("info/level");
-            if (data != null) {
-               equipLevelData = data.getChildByPath("info");
-            }
+   private MapleData supplyEquipLevelInfo(int itemId) {
+      MapleData iData = getItemData(itemId);
+      if (iData != null) {
+         MapleData data = iData.getChildByPath("info/level");
+         if (data != null) {
+            return data.getChildByPath("info");
          }
-
-         equipLevelInfoCache.put(itemId, equipLevelData);
       }
-
-      return equipLevelData;
+      return null;
    }
 
    public int getEquipLevel(int itemId, boolean getMaxLevel) {
-      Integer eqLevel = equipMaxLevelCache.get(itemId);
-      if (eqLevel == null) {
-         eqLevel = 1;
+      return getCacheableThing(itemId, equipMaxLevelCache, internalItemId -> supplyEquipLevel(itemId, getMaxLevel));
+   }
 
-         MapleData data = getEquipLevelInfo(itemId);
-         if (data != null) {
-            if (getMaxLevel) {
-               int curLevel = 1;
+   protected Integer supplyEquipLevel(int itemId, boolean getMaxLevel) {
+      int eqLevel = 1;
+      MapleData data = getEquipLevelInfo(itemId);
+      if (data != null) {
+         if (getMaxLevel) {
+            int curLevel = 1;
 
-               while (true) {
-                  MapleData data2 = data.getChildByPath(Integer.toString(curLevel));
-                  if (data2 == null || data2.getChildren().size() <= 1) {
-                     eqLevel = curLevel;
-                     equipMaxLevelCache.put(itemId, eqLevel);
-                     break;
-                  }
-
-                  curLevel++;
+            while (true) {
+               MapleData data2 = data.getChildByPath(Integer.toString(curLevel));
+               if (data2 == null || data2.getChildren().size() <= 1) {
+                  eqLevel = curLevel;
+                  break;
                }
-            } else {
-               MapleData data2 = data.getChildByPath("1");
-               if (data2 != null && data2.getChildren().size() > 1) {
-                  eqLevel = 2;
-               }
+               curLevel++;
+            }
+         } else {
+            MapleData data2 = data.getChildByPath("1");
+            if (data2 != null && data2.getChildren().size() > 1) {
+               eqLevel = 2;
             }
          }
       }
-
       return eqLevel;
    }
 
@@ -1973,81 +1514,56 @@ public class MapleItemInformationProvider {
    }
 
    public Pair<String, Integer> getMakerReagentStatUpgrade(int itemId) {
-      Pair<String, Integer> statUpgrade = statUpgradeMakerCache.get(itemId);
-      if (statUpgrade != null) {
-         return statUpgrade;
-      } else if (statUpgradeMakerCache.containsKey(itemId)) {
-         return null;
-      }
-
-      statUpgrade = DatabaseConnection.getInstance().withConnectionResult(connection -> MakerReagentProvider.getInstance().getForItem(connection, itemId).map(data -> new Pair<>(data.stat(), data.value())).get()).orElse(null);
-      statUpgradeMakerCache.put(itemId, statUpgrade);
-      return statUpgrade;
+      return getCacheableThing(itemId, statUpgradeMakerCache, internalItemId ->
+            DatabaseConnection.getInstance().withConnectionResult(connection ->
+                  MakerReagentProvider.getInstance().getForItem(connection, itemId)
+                        .map(data -> new Pair<>(data.stat(), data.value())).get())
+                  .orElse(null));
    }
 
    public int getMakerCrystalFromLeftover(Integer leftoverId) {
-      Integer itemId = mobCrystalMakerCache.get(leftoverId);
-      if (itemId != null) {
-         return itemId;
-      }
-
-      List<Integer> monsterIds = DatabaseConnection.getInstance().withConnectionResult(connection ->
-            DropDataProvider.getInstance().getMonstersWhoDrop(connection, leftoverId))
-            .orElse(Collections.singletonList(-1));
-      itemId = getCrystalForLevel(MapleLifeFactory.getMonsterLevel(monsterIds.get(0)) - 1);
-      mobCrystalMakerCache.put(leftoverId, itemId);
-      return itemId;
+      return getCacheableThing(leftoverId, mobCrystalMakerCache, itemId -> {
+         List<Integer> monsterIds = DatabaseConnection.getInstance().withConnectionResult(connection ->
+               DropDataProvider.getInstance().getMonstersWhoDrop(connection, leftoverId))
+               .orElse(Collections.singletonList(-1));
+         return getCrystalForLevel(MapleLifeFactory.getMonsterLevel(monsterIds.get(0)) - 1);
+      });
    }
 
    public MakerItemCreateEntry getMakerItemEntry(int toCreate) {
-      MakerItemCreateEntry makerEntry;
+      return getCacheableThing(toCreate, makerItemCache, this::supplyMakerItemEntry);
+   }
 
-      if ((makerEntry = makerItemCache.get(toCreate)) != null) {
-         return new MakerItemCreateEntry(makerEntry);
-      } else {
-         makerEntry = DatabaseConnection.getInstance().withConnectionResult(connection -> {
-            int reqLevel = -1;
-            int reqMakerLevel = -1;
-            int cost = -1;
-            int toGive = -1;
+   protected MakerItemCreateEntry supplyMakerItemEntry(int itemId) {
+      return DatabaseConnection.getInstance().withConnectionResult(connection -> {
+         int reqLevel = -1;
+         int reqMakerLevel = -1;
+         int cost = -1;
+         int toGive = -1;
 
-            Optional<MakerCreateData> makerCreateData = MakerCreateProvider.getInstance().getMakerCreateDataForItem(connection, toCreate);
-            if (makerCreateData.isPresent()) {
-               reqLevel = makerCreateData.get().requiredLevel();
-               reqMakerLevel = makerCreateData.get().requiredMakerLevel();
-               cost = makerCreateData.get().requiredMeso();
-               toGive = makerCreateData.get().quantity();
-            }
-            MakerItemCreateEntry result = new MakerItemCreateEntry(cost, reqLevel, reqMakerLevel);
-            result.addGainItem(toCreate, toGive);
+         Optional<MakerCreateData> makerCreateData = MakerCreateProvider.getInstance().getMakerCreateDataForItem(connection, itemId);
+         if (makerCreateData.isPresent()) {
+            reqLevel = makerCreateData.get().requiredLevel();
+            reqMakerLevel = makerCreateData.get().requiredMakerLevel();
+            cost = makerCreateData.get().requiredMeso();
+            toGive = makerCreateData.get().quantity();
+         }
+         MakerItemCreateEntry result = new MakerItemCreateEntry(cost, reqLevel, reqMakerLevel);
+         result.addGainItem(itemId, toGive);
 
-            MakerRecipeProvider.getInstance().getRecipeForItem(connection, toCreate).forEach(data -> result.addReqItem(data.requiredItem(), data.count()));
-            makerItemCache.put(toCreate, new MakerItemCreateEntry(result));
-            return result;
-         }).orElseThrow();
-      }
-
-      return makerEntry;
+         MakerRecipeProvider.getInstance().getRecipeForItem(connection, itemId)
+               .forEach(data -> result.addReqItem(data.requiredItem(), data.count()));
+         makerItemCache.put(itemId, new MakerItemCreateEntry(result));
+         return result;
+      }).orElseThrow();
    }
 
    public int getMakerCrystalFromEquip(Integer equipId) {
-      try {
-         return getCrystalForLevel(getEquipLevelReq(equipId));
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-
-      return -1;
+      return getCrystalForLevel(getEquipLevelReq(equipId));
    }
 
    public int getMakerStimulantFromEquip(Integer equipId) {
-      try {
-         return getCrystalForLevel(getEquipLevelReq(equipId));
-      } catch (Exception e) {
-         e.printStackTrace();
-      }
-
-      return -1;
+      return getCrystalForLevel(getEquipLevelReq(equipId));
    }
 
    public List<Pair<Integer, Integer>> getMakerDisassembledItems(Integer itemId) {
@@ -2071,23 +1587,17 @@ public class MapleItemInformationProvider {
    }
 
    public int getMakerStimulant(int itemId) {
-      Integer cachedItemId = makerCatalystCache.get(itemId);
-      if (cachedItemId != null) {
-         return cachedItemId;
-      }
+      return getCacheableThing(itemId, makerCatalystCache, this::supplyMakerStimulant);
+   }
 
-      cachedItemId = -1;
+   protected Integer supplyMakerStimulant(Integer itemId) {
       for (MapleData md : etcData.getData("ItemMake.img").getChildren()) {
          MapleData me = md.getChildByPath(StringUtil.getLeftPaddedStr(Integer.toString(itemId), '0', 8));
-
          if (me != null) {
-            cachedItemId = MapleDataTool.getInt(me.getChildByPath("catalyst"), -1);
-            break;
+            return MapleDataTool.getInt(me.getChildByPath("catalyst"), -1);
          }
       }
-
-      makerCatalystCache.put(itemId, cachedItemId);
-      return cachedItemId;
+      return -1;
    }
 
    public Set<String> getWhoDrops(Integer itemId) {
@@ -2105,48 +1615,35 @@ public class MapleItemInformationProvider {
       }
 
       return SkillFactory.getSkill(skillData.get("skillid"))
-            .map(skill -> (skillData.get("skillid") != 0 && ((player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0) && player.getMasterLevel(skill) < skillData.get("masterLevel"))))
+            .map(skill -> evaluateIfSkillBookCanBeUsed(player, skillData, skill))
             .orElse(false);
    }
 
-   public List<Integer> usableMasteryBooks(MapleCharacter player) {
-      List<Integer> masteryBooks = new LinkedList<>();
-      for (Integer i = 2290000; i <= 2290139; i++) {
-         if (canUseSkillBook(player, i)) {
-            masteryBooks.add(i);
-         }
-      }
+   private boolean evaluateIfSkillBookCanBeUsed(MapleCharacter player, Map<String, Integer> skillData, Skill skill) {
+      boolean skillExists = skillData.get("skilliid") != 0;
+      boolean playerSkillAboveRequirement = player.getSkillLevel(skill) >= skillData.get("reqSkillLevel") || skillData.get("reqSkillLevel") == 0;
+      boolean masterLevelBelowMax = player.getMasterLevel(skill) < skillData.get("masterLevel");
+      return skillExists && playerSkillAboveRequirement && masterLevelBelowMax;
+   }
 
-      return masteryBooks;
+   public List<Integer> usableMasteryBooks(MapleCharacter player) {
+      return IntStream.rangeClosed(2290000, 2290139)
+            .filter(id -> canUseSkillBook(player, id))
+            .boxed()
+            .collect(Collectors.toList());
    }
 
    public List<Integer> usableSkillBooks(MapleCharacter player) {
-      List<Integer> skillBook = new LinkedList<>();
-      for (Integer i = 2280000; i <= 2280019; i++) {
-         if (canUseSkillBook(player, i)) {
-            skillBook.add(i);
-         }
-      }
-
-      return skillBook;
+      return IntStream.rangeClosed(2280000, 2280019)
+            .filter(id -> canUseSkillBook(player, id))
+            .boxed()
+            .collect(Collectors.toList());
    }
 
-   public final QuestConsItem getQuestConsumablesInfo(final int itemId) {
-      if (questItemConsCache.containsKey(itemId)) {
-         return questItemConsCache.get(itemId);
-      }
-      MapleData data = getItemData(itemId);
-      QuestConsItem qcItem = null;
-
-      MapleData infoData = data.getChildByPath("info");
+   protected QuestConsItem supplyQuestConsumablesInfo(int itemId) {
+      MapleData infoData = getItemData(itemId).getChildByPath("info");
       if (infoData.getChildByPath("uiData") != null) {
-         qcItem = new QuestConsItem();
-         qcItem.exp = MapleDataTool.getInt("exp", infoData);
-         qcItem.grade = MapleDataTool.getInt("grade", infoData);
-         qcItem.questId = MapleDataTool.getInt("questId", infoData);
-         qcItem.items = new HashMap<>(2);
-
-         Map<Integer, Integer> cItems = qcItem.items;
+         Map<Integer, Integer> cItems = new HashMap<>(2);
          MapleData ciData = infoData.getChildByPath("consumeItem");
          if (ciData != null) {
             for (MapleData ciItem : ciData.getChildren()) {
@@ -2156,27 +1653,17 @@ public class MapleItemInformationProvider {
                cItems.put(consumeItemId, qty);
             }
          }
-      }
 
-      questItemConsCache.put(itemId, qcItem);
-      return qcItem;
+         return new QuestConsItem(
+               MapleDataTool.getInt("questId", infoData),
+               MapleDataTool.getInt("exp", infoData),
+               MapleDataTool.getInt("grade", infoData),
+               cItems);
+      }
+      return null;
    }
 
-   public static final class RewardItem {
-
-      public int itemId, period;
-      public short prob, quantity;
-      public String effect, worldMessage;
-   }
-
-   public static final class QuestConsItem {
-
-      public int questId, exp, grade;
-      public Map<Integer, Integer> items;
-
-      public Integer getItemRequirement(int itemId) {
-         return items.get(itemId);
-      }
-
+   public final QuestConsItem getQuestConsumablesInfo(final int itemId) {
+      return getCacheableThing(itemId, questItemConsCache, this::supplyQuestConsumablesInfo);
    }
 }

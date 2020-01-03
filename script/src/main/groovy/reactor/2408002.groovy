@@ -9,10 +9,7 @@ import server.maps.MapleReactor
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor2408002 {
-   ReactorActionManager rm
-
+class Reactor2408002 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getPlayer().getEventInstance()
       MapleMap map = eim.getMapFactory().getMap(240050100)
@@ -51,18 +48,6 @@ class Reactor2408002 {
       MapleCharacter dropper = eim.getPlayers().get(0)
       map.spawnItemDrop(reactor, dropper, item, reactor.position(), true, true)
       MessageBroadcaster.getInstance().sendMapServerNotice(eim.getMapInstance(240050100), ServerNoticeType.LIGHT_BLUE, "A bright flash of light, then a key suddenly appears somewhere in the map.")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

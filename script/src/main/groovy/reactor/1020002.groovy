@@ -3,24 +3,9 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor1020002 {
-   ReactorActionManager rm
-
+class Reactor1020002 extends SimpleReactor {
    def act() {
       rm.warp(910200000, "pt02")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

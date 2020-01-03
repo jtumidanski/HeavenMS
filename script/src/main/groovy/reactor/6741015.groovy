@@ -3,31 +3,10 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor6741015 {
-   ReactorActionManager rm
-
-   def act() {
-      rm.dropItems()
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
-   }
-}
-
-Reactor6741015 getReactor() {
+SimpleReactor getReactor() {
    ReactorActionManager rm = (ReactorActionManager) getBinding().getVariable("rm")
-   getBinding().setVariable("reactor", new Reactor6741015(rm: rm))
-   return (Reactor6741015) getBinding().getVariable("reactor")
+   getBinding().setVariable("reactor", new SimpleReactor(rm: rm))
+   return (SimpleReactor) getBinding().getVariable("reactor")
 }
 
 def act() {

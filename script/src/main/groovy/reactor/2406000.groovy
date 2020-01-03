@@ -5,18 +5,11 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor2406000 {
-   ReactorActionManager rm
-
+class Reactor2406000 extends SimpleReactor {
    def act() {
       rm.spawnNpc(2081008)
       rm.startQuest(100203)
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "In a flicker of light the egg has matured and cracked, thus born a radiant baby dragon.")
-   }
-
-   def hit() {
-
    }
 
    def touch() {
@@ -24,10 +17,6 @@ class Reactor2406000 {
          rm.hitReactor()
          rm.gainItem(4001094, (short) -1)
       }
-   }
-
-   def release() {
-
    }
 }
 

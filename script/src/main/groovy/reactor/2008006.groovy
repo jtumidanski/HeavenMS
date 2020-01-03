@@ -3,24 +3,9 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2008006 {
-   ReactorActionManager rm
-
+class Reactor2008006 extends SimpleReactor {
    def act() {
       rm.getEventInstance().setProperty("statusStg3", "0")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

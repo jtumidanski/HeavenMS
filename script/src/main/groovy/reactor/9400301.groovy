@@ -3,25 +3,10 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor9400301 {
-   ReactorActionManager rm
-
+class Reactor9400301 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getEventInstance()
       eim.getEm().getIv().invokeFunction("snowmanSnackFake", eim)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

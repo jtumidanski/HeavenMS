@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 
 import java.awt.*
 
-
-class Reactor2001007 {
-   ReactorActionManager rm
-
+class Reactor2001007 extends SimpleReactor {
    def act() {
       if (rm.getEventInstance().getIntProperty("statusStg2") == -1) {
          int rnd = Math.floor(Math.random() * 14).intValue()
@@ -36,18 +33,6 @@ class Reactor2001007 {
          Point nextPos = rm.getMap().getReactorById(2001002 + nextHashed).position()
          rm.spawnMonster(9300040, 1, nextPos)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

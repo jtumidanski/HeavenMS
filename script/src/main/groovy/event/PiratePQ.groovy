@@ -6,6 +6,7 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
+import server.life.MapleNPCFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -324,7 +325,7 @@ class EventPiratePQ {
 
       if (isLordPirate(mob)) {  // lord pirate defeated, spawn the little fella!
          MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, "As Lord Pirate dies, Wu Yang is released!")
-         eim.spawnNpc(2094001, new Point(777, 140), mob.getMap())
+         MapleNPCFactory.spawnNpc(2094001, new Point(777, 140), mob.getMap())
       }
 
       if (map.countMonsters() == 0) {

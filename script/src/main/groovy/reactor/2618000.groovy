@@ -3,10 +3,7 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2618000 {
-   ReactorActionManager rm
-
+class Reactor2618000 extends SimpleReactor {
    def act() {
 
    }
@@ -27,14 +24,6 @@ class Reactor2618000 {
             rm.getMap().getReactorByName(reactorName).hitReactor(rm.getClient())
          }
       }
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

@@ -28,6 +28,7 @@ import server.MapleItemInformationProvider;
 import server.TimerManager;
 import server.life.MapleLifeFactory;
 import server.life.MapleMonster;
+import server.life.MapleNPCFactory;
 import server.maps.MapMonitor;
 import server.maps.MapleMap;
 import server.maps.MapleReactor;
@@ -269,7 +270,7 @@ public class ReactorActionManager extends AbstractPlayerInteraction {
    }
 
    public void spawnNpc(int npcId, Point pos) {
-      spawnNpc(npcId, pos, reactor.getMap());
+      MapleNPCFactory.spawnNpc(npcId, pos, reactor.getMap());
    }
 
    public void hitMonsterWithReactor(int id, int hitsToKill) {  // until someone comes with a better solution, why not?

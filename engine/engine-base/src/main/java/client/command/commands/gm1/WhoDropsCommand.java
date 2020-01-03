@@ -1,6 +1,7 @@
 package client.command.commands.gm1;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import client.MapleCharacter;
@@ -31,7 +32,7 @@ public class WhoDropsCommand extends Command {
             String searchString = player.getLastCommandMessage();
             StringBuilder output = new StringBuilder();
 
-            ArrayList<Pair<Integer, String>> itemData = MapleItemInformationProvider.getInstance().getItemDataByName(searchString);
+            List<Pair<Integer, String>> itemData = MapleItemInformationProvider.getInstance().getItemDataByName(searchString);
             if (itemData.size() == 0) {
                MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The item you searched for doesn't exist.");
                return;

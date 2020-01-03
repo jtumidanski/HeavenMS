@@ -3,10 +3,7 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor9201002 {
-   ReactorActionManager rm
-
+class Reactor9201002 extends SimpleReactor {
    def act() {
       rm.changeMusic("Bgm10/Eregos")
       rm.spawnMonster(9300028)
@@ -14,18 +11,6 @@ class Reactor9201002 {
       rm.spawnMonster(9300032, 540, 90)
       rm.spawnMonster(9300029, 130, 150)
       rm.spawnMonster(9300030, 540, 150)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

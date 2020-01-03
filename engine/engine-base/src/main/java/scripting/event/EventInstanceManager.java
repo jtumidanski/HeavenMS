@@ -851,19 +851,6 @@ public class EventInstanceManager {
       return false;
    }
 
-   public void spawnNpc(int npcId, Point pos, MapleMap map) {
-      MapleNPC npc = MapleLifeFactory.getNPC(npcId);
-      if (npc != null) {
-         npc.position_$eq(pos);
-         npc.cy_$eq(pos.y);
-         npc.rx0_$eq(pos.x + 50);
-         npc.rx1_$eq(pos.x - 50);
-         npc.fh_$eq(map.getFootholds().findBelow(pos).id());
-         map.addMapObject(npc);
-         MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
-      }
-   }
-
    public void dispatchRaiseQuestMobCount(int mobId, int mapId) {
       Map<Integer, MapleCharacter> mapChars = getInstanceMap(mapId).getMapPlayers();
       if (!mapChars.isEmpty()) {

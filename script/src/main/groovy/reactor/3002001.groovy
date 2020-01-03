@@ -3,25 +3,10 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor3002001 {
-   ReactorActionManager rm
-
+class Reactor3002001 extends SimpleReactor {
    def act() {
       rm.getEventInstance().showClearEffect(rm.getMap().getId())
       rm.dropItems()
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

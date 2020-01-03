@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor2111001 {
-   ReactorActionManager rm
-
+class Reactor2111001 extends SimpleReactor {
    def act() {
       if (rm.getPlayer().getEventInstance() != null) {
          rm.getPlayer().getEventInstance().setProperty("summoned", "true")
@@ -21,18 +18,6 @@ class Reactor2111001 {
       }
       rm.createMapMonitor(280030000, "ps00")
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Zakum is summoned by the force of Eye of Fire.")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

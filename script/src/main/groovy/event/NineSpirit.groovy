@@ -6,6 +6,7 @@ import net.server.world.MaplePartyCharacter
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import server.life.MapleMonster
+import server.life.MapleNPCFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
@@ -74,7 +75,7 @@ class EventNineSpirit {
    def playerEntry(EventInstanceManager eim, MapleCharacter player) {
       MapleMap nest = eim.getMapInstance(eventMap)
       if (!player.haveItem(4001094)) {
-         eim.spawnNpc(2081008, nest.getReactorById(2406000).position(), nest)
+         MapleNPCFactory.spawnNpc(2081008, nest.getReactorById(2406000).position(), nest)
       }
 
       player.changeMap(nest, 1)

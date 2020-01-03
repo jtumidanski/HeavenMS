@@ -7357,10 +7357,10 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
 
             if (!extraEquipped.isEmpty()) {
-               int statIncreases = (int) Math.round((ev * extraRate) / extraEquipped.size());
-               if (statIncreases > 0) {
+               int statIncrease = (int) Math.round((ev * extraRate) / extraEquipped.size());
+               if (statIncrease > 0) {
                   for (Equip extraEq : extraEquipped) {
-                     equipUpgrades.get(extraEq).add(new Pair<>(e.getKey(), statIncreases));
+                     equipUpgrades.get(extraEq).add(new Pair<>(e.getKey(), statIncrease));
                   }
                }
             }

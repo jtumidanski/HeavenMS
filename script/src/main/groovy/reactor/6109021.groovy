@@ -4,8 +4,7 @@ import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
 
-class Reactor6109021 {
-   ReactorActionManager rm
+class Reactor6109021 extends SimpleReactor {
    String fid = "glpq_f1"
 
    def action() { //flame1, top center?
@@ -15,13 +14,7 @@ class Reactor6109021 {
       }
    }
 
-
    def act() {
-
-   }
-
-   def hit() {
-
    }
 
    def touch() {

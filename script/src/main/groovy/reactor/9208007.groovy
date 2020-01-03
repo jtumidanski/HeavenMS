@@ -5,10 +5,7 @@ import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 import server.maps.MapleReactor
 
-
-class Reactor9208007 {
-   ReactorActionManager rm
-
+class Reactor9208007 extends SimpleReactor {
    def act() {
       MapleReactor react = rm.getPlayer().getEventInstance().getMapInstance(990000400).getReactorByName("speargate")
       react.forceHitReactor((byte) (react.getState() + 1))
@@ -23,18 +20,6 @@ class Reactor9208007 {
 
          MapleGuildProcessor.getInstance().gainGP(rm.getGuild(), 20)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

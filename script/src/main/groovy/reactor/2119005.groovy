@@ -3,25 +3,13 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2119005 {
-   ReactorActionManager rm
-
+class Reactor2119005 extends SimpleReactor {
    def act() {
-
    }
 
    def hit() {
       rm.hitMonsterWithReactor(6090001, 4)
       rm.getReactor().setEventState(Math.floor(Math.random() * 3).byteValue())
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

@@ -3,10 +3,7 @@ package reactor
 import client.MapleCharacter
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor3008000 {
-   ReactorActionManager rm
-
+class Reactor3008000 extends SimpleReactor {
    def act() {
 
    }
@@ -16,14 +13,6 @@ class Reactor3008000 {
       for (int i = 0; i < players.length; i++) {
          rm.giveCharacterExp(52000, players[i])
       }
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

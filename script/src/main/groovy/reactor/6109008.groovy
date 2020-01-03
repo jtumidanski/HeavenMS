@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor6109008 {
-   ReactorActionManager rm
-
+class Reactor6109008 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getEventInstance()
       if (eim != null) {
@@ -21,18 +18,6 @@ class Reactor6109008 {
             eim.giveEventPlayersStageReward(5)
          }
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

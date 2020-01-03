@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor2201003 {
-   ReactorActionManager rm
-
+class Reactor2201003 extends SimpleReactor {
    def act() {
       if (rm.getPlayer().getMapId() == 922010900) {
          MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Alishar has been summoned.")
@@ -17,18 +14,6 @@ class Reactor2201003 {
          MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Rombard has been summoned somewhere in the map.")
          rm.spawnMonster(9300010, 1, -211)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

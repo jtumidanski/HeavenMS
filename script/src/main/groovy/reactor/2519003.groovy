@@ -5,10 +5,7 @@ import server.maps.MapleMap
 
 import java.awt.*
 
-
-class Reactor2519003 {
-   ReactorActionManager rm
-
+class Reactor2519003 extends SimpleReactor {
    def act() {
       int denyWidth = 320, denyHeight = 150
       Point denyPos = rm.getReactor().position()
@@ -20,18 +17,6 @@ class Reactor2519003 {
       if (map.getReactorByName("sMob1").getState() >= 1 && map.getReactorByName("sMob2").getState() >= 1 && map.getReactorByName("sMob3").getState() >= 1 && map.countMonsters() == 0) {
          rm.getEventInstance().showClearEffect(map.getId())
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

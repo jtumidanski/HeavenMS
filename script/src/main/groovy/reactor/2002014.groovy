@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 
 import java.awt.*
 
-
-class Reactor2002014 {
-   ReactorActionManager rm
-
+class Reactor2002014 extends SimpleReactor {
    def act() {
       rm.dropItems(true, 1, 100, 400, 15)
 
@@ -17,18 +14,6 @@ class Reactor2002014 {
          rm.spawnNpc(2013002, new Point(46, 840))
          eim.setProperty("statusStgBonus", "1")
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

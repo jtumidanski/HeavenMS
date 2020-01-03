@@ -1,6 +1,7 @@
 package map.onUserEnter
 
 import scripting.map.MapScriptMethods
+import server.life.MapleNPCFactory
 import server.maps.MapleMap
 
 import java.awt.*
@@ -12,7 +13,7 @@ class Map108010610 {
    def start(MapScriptMethods ms) {
       MapleMap map = ms.getMap()
       if (!map.containsNPC(npcId)) {
-         ms.spawnNpc(npcId, spawnPos, map)
+         MapleNPCFactory.spawnNpc(npcId, spawnPos, map)
       }
    }
 }

@@ -5,15 +5,8 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor2408003 {
-   ReactorActionManager rm
-
+class Reactor2408003 extends SimpleReactor {
    def act() {
-
-   }
-
-   def hit() {
 
    }
 
@@ -33,10 +26,6 @@ class Reactor2408003 {
             rm.spawnMonster(8810001, 0, 0) //needs correct positions
             break
       }
-   }
-
-   def release() {
-
    }
 }
 

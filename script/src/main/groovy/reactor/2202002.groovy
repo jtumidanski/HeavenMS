@@ -3,28 +3,13 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2202002 {
-   ReactorActionManager rm
-
+class Reactor2202002 extends SimpleReactor {
    def act() {
       if (rm.isQuestActive(3238)) {
          rm.warp(922000020, 0)
       } else {
          rm.warp(922000009, 0)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

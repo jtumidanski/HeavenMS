@@ -5,28 +5,13 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor1209000 {
-   ReactorActionManager rm
-
+class Reactor1209000 extends SimpleReactor {
    def act() {
       if (rm.isQuestStarted(6400)) {
          rm.setQuestProgress(6400, 1, 2)
          rm.setQuestProgress(6400, 6401, "q3")
       }
       MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Real Bart has found. Return to Jonathan through portal.")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

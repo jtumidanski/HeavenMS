@@ -3,10 +3,7 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2001001 {
-   ReactorActionManager rm
-
+class Reactor2001001 extends SimpleReactor {
    def act() {
       if (rm.getMap().getSummonState()) {
          int count = rm.getEventInstance().getIntProperty("statusStg7_c")
@@ -20,18 +17,6 @@ class Reactor2001001 {
             rm.spawnMonster(9300049)
          }
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

@@ -13,6 +13,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.script.Invocable;
@@ -377,6 +378,10 @@ public class EventManager {
 
    //Expedition method: starts an expedition
    public boolean startInstance(int lobbyId, MapleExpedition expedition, MapleCharacter leader) {
+      return startInstanceInternal(lobbyId, leader, eventInstanceManager -> expedition.start(), leader.getClient().getChannel());
+   }
+
+   public boolean startInstanceInternal(int lobbyId, MapleCharacter leader, Consumer<EventInstanceManager> success, Object... args) {
       if (this.isDisposed()) {
          return false;
       }
@@ -401,7 +406,7 @@ public class EventManager {
 
                   EventInstanceManager eim;
                   try {
-                     eim = createInstance("setup", leader.getClient().getChannel());
+                     eim = createInstance("setup", args);
                      registerEventInstance(eim.getName(), lobbyId);
                   } catch (ScriptException | NullPointerException e) {
                      String message = getInternalScriptExceptionMessage(e);
@@ -416,10 +421,7 @@ public class EventManager {
                   }
 
                   eim.setLeader(leader);
-
-                  expedition.start();
-                  eim.registerExpedition(expedition);
-
+                  success.accept(eim);
                   eim.startEvent();
                } catch (ScriptException | NoSuchMethodException ex) {
                   Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
@@ -449,66 +451,11 @@ public class EventManager {
    }
 
    public boolean startInstance(int lobbyId, MapleCharacter chr, MapleCharacter leader, int difficulty) {
-      if (this.isDisposed()) {
-         return false;
-      }
-
-      try {
-         if (!playerPermit.contains(leader.getId()) && startSemaphore.tryAcquire(7777, TimeUnit.MILLISECONDS)) {
-            playerPermit.add(leader.getId());
-
-            startLock.lock();
-            try {
-               try {
-                  if (lobbyId == -1) {
-                     lobbyId = availableLobbyInstance();
-                     if (lobbyId == -1) {
-                        return false;
-                     }
-                  } else {
-                     if (!startLobbyInstance(lobbyId)) {
-                        return false;
-                     }
-                  }
-
-                  EventInstanceManager eim;
-                  try {
-                     eim = createInstance("setup", difficulty, (lobbyId > -1) ? lobbyId : leader.getId());
-                     registerEventInstance(eim.getName(), lobbyId);
-                  } catch (ScriptException | NullPointerException e) {
-                     String message = getInternalScriptExceptionMessage(e);
-                     if (message != null && !message.startsWith(EventInstanceInProgressException.KEY)) {
-                        throw e;
-                     }
-
-                     if (lobbyId > -1) {
-                        setLockLobby(lobbyId, false);
-                     }
-                     return false;
-                  }
-                  eim.setLeader(leader);
-
-                  if (chr != null) {
-                     eim.registerPlayer(chr);
-                  }
-
-                  eim.startEvent();
-               } catch (ScriptException | NoSuchMethodException ex) {
-                  Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
-               }
-
-               return true;
-            } finally {
-               startLock.unlock();
-               playerPermit.remove(leader.getId());
-               startSemaphore.release();
-            }
+      return startInstanceInternal(lobbyId, leader, eventInstanceManager -> {
+         if (chr != null) {
+            eventInstanceManager.registerPlayer(chr);
          }
-      } catch (InterruptedException ie) {
-         playerPermit.remove(leader.getId());
-      }
-
-      return false;
+      }, difficulty, (lobbyId > -1) ? lobbyId : leader.getId());
    }
 
    //PQ method: starts a PQ
@@ -593,66 +540,10 @@ public class EventManager {
    }
 
    public boolean startInstance(int lobbyId, MapleParty party, MapleMap map, int difficulty, MapleCharacter leader) {
-      if (this.isDisposed()) {
-         return false;
-      }
-
-      try {
-         if (!playerPermit.contains(leader.getId()) && startSemaphore.tryAcquire(7777, TimeUnit.MILLISECONDS)) {
-            playerPermit.add(leader.getId());
-
-            startLock.lock();
-            try {
-               try {
-                  if (lobbyId == -1) {
-                     lobbyId = availableLobbyInstance();
-                     if (lobbyId == -1) {
-                        return false;
-                     }
-                  } else {
-                     if (!startLobbyInstance(lobbyId)) {
-                        return false;
-                     }
-                  }
-
-                  EventInstanceManager eim;
-                  try {
-                     eim = createInstance("setup", difficulty, (lobbyId > -1) ? lobbyId : party.getLeaderId());
-                     registerEventInstance(eim.getName(), lobbyId);
-                  } catch (ScriptException | NullPointerException e) {
-                     String message = getInternalScriptExceptionMessage(e);
-                     if (message != null && !message.startsWith(EventInstanceInProgressException.KEY)) {
-                        throw e;
-                     }
-
-                     if (lobbyId > -1) {
-                        setLockLobby(lobbyId, false);
-                     }
-                     return false;
-                  }
-
-                  eim.setLeader(leader);
-
-                  eim.registerParty(party, map);
-                  party.setEligibleMembers(null);
-
-                  eim.startEvent();
-               } catch (ScriptException | NoSuchMethodException ex) {
-                  Logger.getLogger(EventManager.class.getName()).log(Level.SEVERE, null, ex);
-               }
-
-               return true;
-            } finally {
-               startLock.unlock();
-               playerPermit.remove(leader.getId());
-               startSemaphore.release();
-            }
-         }
-      } catch (InterruptedException ie) {
-         playerPermit.remove(leader.getId());
-      }
-
-      return false;
+      return startInstanceInternal(lobbyId, leader, eventInstanceManager -> {
+         eventInstanceManager.registerParty(party, map);
+         party.setEligibleMembers(null);
+      }, difficulty, (lobbyId > -1) ? lobbyId : party.getLeaderId());
    }
 
    //non-PQ method for starting instance

@@ -3,26 +3,11 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor3009000 {
-   ReactorActionManager rm
-
+class Reactor3009000 extends SimpleReactor {
    def act() {
       if (rm.getReactor().getState() == ((byte) 4)) {
          rm.getEventInstance().showClearEffect(rm.getMap().getId())
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

@@ -42,7 +42,6 @@ import tools.packet.GetEnergy;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveForeignBuff;
-import tools.packet.character.SkillCoolDown;
 
 public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<AttackPacket> {
    @Override
@@ -172,15 +171,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
          MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
       } else if (attack.skill() > 0) {
-         SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> {
-            MapleStatEffect effect_ = skill.getEffect(chr.getSkillLevel(skill));
-            if (effect_.getCoolDown() > 0) {
-               if (!chr.skillIsCooling(attack.skill())) {
-                  PacketCreator.announce(c, new SkillCoolDown(attack.skill(), effect_.getCoolDown()));
-                  chr.addCoolDown(attack.skill(), currentServerTime(), effect_.getCoolDown() * 1000);
-               }
-            }
-         }));
+         SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> applyCoolDownIfPresent(skill, chr)));
       }
       if (chr.getBuffedValue(MapleBuffStat.DARK_SIGHT) != null) {
          SkillFactory.executeIfHasSkill(chr, NightWalker.VANISH, (skill, skillLevel) -> cancelDarkSight(chr));

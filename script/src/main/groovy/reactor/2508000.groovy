@@ -3,26 +3,11 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2508000 {
-   ReactorActionManager rm
-
+class Reactor2508000 extends SimpleReactor {
    def act() {
       if (rm.getPlayer().getMap().getId() / 100 % 100 != 38) {
          rm.warp(rm.getPlayer().getMap().getId() + 100)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

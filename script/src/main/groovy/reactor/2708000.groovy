@@ -6,10 +6,7 @@ import server.life.MapleLifeFactory
 import server.life.MapleMonster
 import server.maps.MapleMap
 
-
-class Reactor2708000 {
-   ReactorActionManager rm
-
+class Reactor2708000 extends SimpleReactor {
    def act() {
 
    }
@@ -29,14 +26,6 @@ class Reactor2708000 {
       int spawnId = mobObj.id() - 17
 
       MapleLifeFactory.getMonster(spawnId).ifPresent({ monster -> mobObj.getMap().spawnMonsterOnGroundBelow(monster, mobObj.position()) })
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

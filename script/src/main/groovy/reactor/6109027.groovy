@@ -3,9 +3,7 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor6109027 {
-   ReactorActionManager rm
+class Reactor6109027 extends SimpleReactor {
    String fid = "glpq_f7"
 
    def action() {
@@ -15,13 +13,7 @@ class Reactor6109027 {
       }
    }
 
-
    def act() {
-
-   }
-
-   def hit() {
-
    }
 
    def touch() {

@@ -3,10 +3,7 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2618002 {
-   ReactorActionManager rm
-
+class Reactor2618002 extends SimpleReactor {
    def act() {
 
    }
@@ -19,14 +16,6 @@ class Reactor2618002 {
       int reactorMap = (isAlcadno == 0) ? 926100201 : 926110201
 
       eim.getMapInstance(reactorMap).getReactorByName(reactorName).hitReactor(rm.getClient())
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

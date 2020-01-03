@@ -3,10 +3,7 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor6702009 {
-   ReactorActionManager rm
-
+class Reactor6702009 extends SimpleReactor {
    def act() {
       int rand = Math.floor(Math.random() * 4).intValue()
       if (rand < 1) {
@@ -16,18 +13,6 @@ class Reactor6702009 {
       for (int i = 0; i < rand; i++) {
          rm.sprayItems(true, 1, 30, 60, 15)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

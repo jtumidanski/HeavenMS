@@ -5,26 +5,11 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor8091003 {
-   ReactorActionManager rm
-
+class Reactor8091003 extends SimpleReactor {
    def act() {
       rm.spawnMonster(9400215, 2)
       rm.spawnMonster(9400216, 2)
       MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Some monsters are summoned.")
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

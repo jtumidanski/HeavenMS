@@ -3,28 +3,13 @@ package reactor
 
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor1050000 {
-   ReactorActionManager rm
-
+class Reactor1050000 extends SimpleReactor {
    def act() {
       if (Math.random() > 0.7) {
          rm.dropItems()
       } else {
          rm.warp(105090200, 0)
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

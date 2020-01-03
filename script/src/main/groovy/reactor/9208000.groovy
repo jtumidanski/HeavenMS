@@ -5,10 +5,7 @@ import scripting.reactor.ReactorActionManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
-class Reactor9208000 {
-   ReactorActionManager rm
-
+class Reactor9208000 extends SimpleReactor {
    static def padWithZeroes(String n, width) {
       while (n.length() < width) n = '0' + n
       return n
@@ -45,18 +42,6 @@ class Reactor9208000 {
             }
          }
       }
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

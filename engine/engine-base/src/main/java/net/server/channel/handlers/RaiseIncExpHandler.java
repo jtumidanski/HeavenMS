@@ -12,7 +12,7 @@ import net.server.AbstractPacketHandler;
 import net.server.channel.packet.UseItemUIPacket;
 import net.server.channel.packet.reader.UseItemUIReader;
 import server.MapleItemInformationProvider;
-import server.MapleItemInformationProvider.QuestConsItem;
+import server.QuestConsItem;
 import server.quest.MapleQuest;
 import tools.PacketCreator;
 import tools.packet.stat.EnableActions;
@@ -33,8 +33,8 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
                return;
             }
 
-            int infoNumber = consItem.questId;
-            Map<Integer, Integer> consumables = consItem.items;
+            int infoNumber = consItem.questId();
+            Map<Integer, Integer> consumables = consItem.items();
 
             MapleCharacter chr = client.getPlayer();
             MapleQuest quest = MapleQuest.getInstanceFromInfoNumber(infoNumber);
@@ -58,7 +58,7 @@ public class RaiseIncExpHandler extends AbstractPacketHandler<UseItemUIPacket> {
             }
 
             int questId = quest.getId();
-            int nextValue = Math.min(consumables.get(consId) + client.getAbstractPlayerInteraction().getQuestProgressInt(questId, infoNumber), consItem.exp * consItem.grade);
+            int nextValue = Math.min(consumables.get(consId) + client.getAbstractPlayerInteraction().getQuestProgressInt(questId, infoNumber), consItem.exp() * consItem.grade());
             client.getAbstractPlayerInteraction().setQuestProgress(questId, infoNumber, nextValue);
 
             PacketCreator.announce(client, new EnableActions());

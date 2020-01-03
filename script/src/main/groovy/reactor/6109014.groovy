@@ -3,16 +3,8 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor6109014 {
-   ReactorActionManager rm
-   String fid = "glpq_f0"
-
+class Reactor6109014 extends SimpleReactor {
    def act() {
-
-   }
-
-   def hit() {
 
    }
 

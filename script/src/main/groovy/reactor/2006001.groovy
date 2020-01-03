@@ -3,10 +3,7 @@ package reactor
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
-
-class Reactor2006001 {
-   ReactorActionManager rm
-
+class Reactor2006001 extends SimpleReactor {
    def act() {
       rm.spawnNpc(2013002)
       rm.getEventInstance().clearPQ()
@@ -18,18 +15,6 @@ class Reactor2006001 {
       eim.showClearEffect(true)
 
       rm.getEventInstance().startEventTimer(5 * 60000) //bonus time
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 

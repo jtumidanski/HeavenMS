@@ -4,10 +4,7 @@ import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 import server.maps.MapleMap
 
-
-class Reactor2512000 {
-   ReactorActionManager rm
-
+class Reactor2512000 extends SimpleReactor {
    def act() {
       EventInstanceManager eim = rm.getPlayer().getEventInstance()
       int now = eim.getIntProperty("openedBoxes")
@@ -27,18 +24,6 @@ class Reactor2512000 {
          return true
       }
       return eim.activatedAllReactorsOnMap(map, 2511000, 2517999)
-   }
-
-   def hit() {
-
-   }
-
-   def touch() {
-
-   }
-
-   def release() {
-
    }
 }
 
