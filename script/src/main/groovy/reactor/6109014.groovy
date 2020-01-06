@@ -4,6 +4,8 @@ import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 
 class Reactor6109014 extends SimpleReactor {
+   def fid = "glpq_f0"
+
    def act() {
 
    }

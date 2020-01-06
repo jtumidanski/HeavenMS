@@ -2,6 +2,7 @@ package scripting;
 
 import java.awt.Point;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -258,6 +259,10 @@ public class AbstractPlayerInteraction {
       }
 
       return canHoldAll(itemIds, quantity);
+   }
+
+   public boolean canHoldAll(int[] itemIds, int[] quantities) {
+      return canHoldAll(Arrays.stream(itemIds).boxed().collect(Collectors.toList()), Arrays.stream(quantities).boxed().collect(Collectors.toList()), true);
    }
 
    public boolean canHoldAll(List<Object> itemIds, List<Object> quantity) {

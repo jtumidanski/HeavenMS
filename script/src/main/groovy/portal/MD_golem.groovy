@@ -17,7 +17,7 @@ boolean enter(PortalPlayerInteraction pi) {
             for (int i = 0; i < dungeons; i++) {
                if (pi.startDungeonInstance(dungeonId + i)) {
                   pi.playPortalSound()
-                  pi.warpParty(dungeonId + i, "out00")
+                  pi.warp(dungeonId + i, "out00")
                   return true
                }
             }

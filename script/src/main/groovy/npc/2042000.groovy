@@ -477,7 +477,7 @@ class NPC2042000 {
       return ((feeMultiplier * fee) | 0)
    }
 
-   def isRefineTarget(refineType, refineItemId) {
+   def isRefineTarget(int refineType, int refineItemId) {
       if (refineType == 0) { //mineral refine
          return refineItemId >= 4010000 && refineItemId <= 4010007 && !(refineItemId == 4010007 && !refineSpecials)
       } else if (refineType == 1) { //jewel refine
@@ -499,31 +499,28 @@ class NPC2042000 {
       return -1
    }
 
-   def refineItems(refineType) {
+   def refineItems(int refineType) {
       boolean allDone = true
 
       int[][] refineFees = [[300, 300, 300, 500, 500, 500, 800, 270], [500, 500, 500, 500, 500, 500, 500, 1000, 3000], [5000, 5000, 5000, 5000, 1000000]]
-      def itemCount = {}
+      Map<Integer, Integer> itemCount = [:]
 
       Iterator<Item> iter = cm.getPlayer().getInventory(MapleInventoryType.ETC).iterator()
       while (iter.hasNext()) {
          Item it = iter.next()
-         String itemId = it.id().toString()
+         int itemId = it.id()
 
          if (isRefineTarget(refineType, itemId)) {
-            Object ic = itemCount[itemId]
-
-            if (ic != null) {
-               itemCount[itemId] += it.quantity()
+            if (itemCount.containsKey(itemId)) {
+               itemCount.put(itemId, itemCount.get(itemId) + it.quantity())
             } else {
-               itemCount[itemId] = it.quantity()
+               itemCount.put(itemId, it.quantity())
             }
          }
       }
 
-      for (String key in itemCount) {
-         int itemQuantity = itemCount[key]
-         int itemId = (key).toInteger()
+      for (Integer itemId in itemCount.keySet()) {
+         int itemQuantity = itemCount.get(itemId)
 
          int refineQty = ((itemQuantity / 10) | 0)
          if (refineQty <= 0) {

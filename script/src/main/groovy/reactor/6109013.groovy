@@ -6,6 +6,8 @@ import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor6109013 extends SimpleReactor {
+   def fid = "glpq_s"
+
    def act() {
 
    }

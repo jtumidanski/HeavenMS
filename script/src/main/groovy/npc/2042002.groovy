@@ -501,7 +501,7 @@ class NPC2042002 {
       boolean allDone = true
 
       int[][] refineFees = [[300, 300, 300, 500, 500, 500, 800, 270], [500, 500, 500, 500, 500, 500, 500, 1000, 3000], [5000, 5000, 5000, 5000, 1000000]]
-      def itemCount = {}
+      Map<Integer, Integer> itemCount = [:]
 
       Iterator<Item> iter = cm.getPlayer().getInventory(MapleInventoryType.ETC).iterator()
       while (iter.hasNext()) {
@@ -509,19 +509,16 @@ class NPC2042002 {
          int itemId = it.id()
 
          if (isRefineTarget(refineType, itemId)) {
-            Object ic = itemCount[itemId.toString()]
-
-            if (ic != null) {
-               itemCount[itemId.toString()] += it.quantity()
+            if (itemCount.containsKey(itemId)) {
+               itemCount.put(itemId, itemCount.get(itemId) + it.quantity())
             } else {
-               itemCount[itemId.toString()] = it.quantity()
+               itemCount.put(itemId, it.quantity())
             }
          }
       }
 
-      for (String key in itemCount) {
-         int itemQuantity = itemCount[key]
-         int itemId = (key).toInteger()
+      for (Integer itemId in itemCount.keySet()) {
+         int itemQuantity = itemCount.get(itemId)
 
          int refineQty = ((itemQuantity / 10) | 0)
          if (refineQty <= 0) {
