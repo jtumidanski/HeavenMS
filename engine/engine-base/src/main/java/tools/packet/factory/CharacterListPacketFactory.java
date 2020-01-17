@@ -28,10 +28,7 @@ public class CharacterListPacketFactory extends AbstractPacketFactory {
       writer.write(packet.getStatus());
       List<MapleCharacter> chars = packet.getCharacters();
       writer.write((byte) chars.size());
-      for (MapleCharacter chr : chars) {
-         addCharEntry(writer, chr, false);
-      }
-
+      chars.forEach(character -> addCharEntry(writer, character, false));
       writer.write(YamlConfig.config.server.ENABLE_PIC && packet.cannotBypassPic() ? (packet.getPic() == null || packet.getPic().equals("") ? 0 : 1) : 2);
       writer.writeInt(YamlConfig.config.server.COLLECTIVE_CHARSLOT ? chars.size() + packet.getAvailableCharacterSlots() : packet.getCharacterSlots());
    }

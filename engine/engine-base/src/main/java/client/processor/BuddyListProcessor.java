@@ -34,11 +34,11 @@ import rest.buddy.UpdateBuddy;
 import rest.buddy.UpdateCharacter;
 import scala.Option;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.LambdaNoOp;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
 import tools.packet.buddy.UpdateBuddyChannel;
@@ -197,7 +197,12 @@ public class BuddyListProcessor {
          otherCharMin = new CharNameAndIdData(otherChar.get().getName(), otherChar.get().getId());
       } else {
          channel = world.find(addName);
-         otherCharMin = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName)).orElseThrow();
+         otherCharMin = DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().getCharacterInfoForName(connection, addName)).orElse(null);
+      }
+
+      if (otherCharMin == null) {
+         MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("BUDDY_SERVICE_PLAYER_NOT_FOUND").with(addName));
+         return;
       }
 
       UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").getRestClient(AddBuddyResponse.class)
