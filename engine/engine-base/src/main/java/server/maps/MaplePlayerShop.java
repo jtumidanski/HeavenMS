@@ -26,6 +26,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.output.MaplePacketLittleEndianWriter;
+import tools.I18nMessage;
 import tools.packet.character.box.RemovePlayerShop;
 import tools.packet.character.box.UpdatePlayerShopBox;
 import tools.packet.character.interaction.GetPlayerShop;
@@ -237,7 +238,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                item.quantity_$eq((short) (shopItem.item().quantity() * shopItem.bundles()));
 
                if (!MapleInventory.checkSpot(chr, item)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_TAKE_ITEM_BACK"));
                   PacketCreator.announce(chr, new EnableActions());
                   return;
                }
@@ -274,7 +275,7 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
                if (c.getPlayer().getMeso() >= price) {
                   if (!owner.canHoldMeso(price)) {
-                     MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, "Transaction failed since the shop owner can't hold any more mesos.");
+                     MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ERROR_MAX_MESO"));
                      PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
@@ -298,16 +299,16 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
                            owner.setPlayerShop(null);
                            this.setOpen(false);
                            this.closeShop();
-                           MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, "Your items are sold out, and therefore your shop is closed.");
+                           MessageBroadcaster.getInstance().sendServerNotice(owner, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_SHOP_SOLD_OUT"));
                         }
                      }
                   } else {
-                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please clear a slot before buying this item.");
+                     MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM"));
                      PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos to purchase this item.");
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM_ERROR_NO_MESO"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -488,14 +489,14 @@ public class MaplePlayerShop extends AbstractMapleMapObject {
 
    public synchronized boolean visitShop(MapleCharacter chr) {
       if (this.isBanned(chr.getName())) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have been banned from this store.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_BANNED"));
          return false;
       }
 
       visitorLock.lock();
       try {
          if (!open.get()) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "This store is not yet open.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_NOT_OPEN_YET"));
             return false;
          }
 

@@ -10,6 +10,8 @@ import server.life.MobSkill;
 import server.life.MobSkillFactory;
 import server.maps.MapleMapObject;
 import server.maps.MapleMapObjectType;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class AbnormalStatusCommand extends Command {
    {
@@ -20,7 +22,7 @@ public class AbnormalStatusCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !debuff SLOW|SEDUCE|ZOMBIFY|CONFUSE|STUN|POISON|SEAL|DARKNESS|WEAKEN|CURSE");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ABNORMAL_STATUS_COMMAND_SYNTAX"));
          return;
       }
 
@@ -80,7 +82,7 @@ public class AbnormalStatusCommand extends Command {
       }
 
       if (disease == null) {
-         player.yellowMessage("Syntax: !debuff SLOW|SEDUCE|ZOMBIFY|CONFUSE|STUN|POISON|SEAL|DARKNESS|WEAKEN|CURSE");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ABNORMAL_STATUS_COMMAND_SYNTAX"));
          return;
       }
 

@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -23,23 +24,24 @@ import javax.script.ScriptEngine;
 
 import org.apache.mina.core.session.IoSession;
 
-import database.administrator.AccountAdministrator;
-import database.administrator.HwidBanAdministrator;
-import database.administrator.MacBanAdministrator;
 import client.database.data.AccountData;
 import client.database.data.AccountLoginData;
 import client.database.data.CharNameAndIdData;
+import client.inventory.MapleInventoryType;
+import client.processor.BuddyListProcessor;
+import client.processor.CharacterProcessor;
+import config.YamlConfig;
+import constants.game.GameConstants;
+import database.DatabaseConnection;
+import database.administrator.AccountAdministrator;
+import database.administrator.HwidBanAdministrator;
+import database.administrator.MacBanAdministrator;
 import database.provider.AccountProvider;
 import database.provider.CharacterProvider;
 import database.provider.HwidBanProvider;
 import database.provider.IpBanProvider;
 import database.provider.MacBanProvider;
 import database.provider.MacFilterProvider;
-import client.inventory.MapleInventoryType;
-import client.processor.BuddyListProcessor;
-import client.processor.CharacterProcessor;
-import config.YamlConfig;
-import constants.game.GameConstants;
 import net.server.Server;
 import net.server.audit.locks.MonitoredLockType;
 import net.server.audit.locks.factory.MonitoredReentrantLockFactory;
@@ -68,7 +70,6 @@ import server.maps.FieldLimit;
 import server.maps.MapleMap;
 import server.maps.MapleMiniDungeonInfo;
 import tools.BCrypt;
-import database.DatabaseConnection;
 import tools.FilePrinter;
 import tools.HexTool;
 import tools.LogHelper;
@@ -76,6 +77,7 @@ import tools.MapleAESOFB;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ChangeChannel;
 import tools.packet.cashshop.ShowCash;
 import tools.packet.foreigneffect.ShowHint;
@@ -138,7 +140,7 @@ public class MapleClient {
    private long lastNpcClick;
    private long sessionId;
    private long lastPacket = System.currentTimeMillis();
-   private int lang = 0;
+   private Locale locale;
 
    public MapleClient(MapleAESOFB send, MapleAESOFB receive, IoSession session) {
       this.send = send;
@@ -349,7 +351,7 @@ public class MapleClient {
          pic = accountData.get().pic();
          gender = accountData.get().gender().byteValue();
          characterSlots = accountData.get().characterSlots().byteValue();
-         lang = accountData.get().language();
+         locale = new Locale(accountData.get().language(), accountData.get().country());
          String passwordHash = accountData.get().password();
          boolean tos = accountData.get().tos();
 
@@ -990,14 +992,14 @@ public class MapleClient {
          PacketCreator.announce(this, new EnableActions());
          return;
       } else if (MapleMiniDungeonInfo.isDungeonMap(player.getMapId())) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_WITHIN_MINI_DUNGEON"));
          PacketCreator.announce(this, new EnableActions());
          return;
       }
 
       String[] socket = Server.getInstance().getInetSocket(getWorld(), channel);
       if (socket == null) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Channel " + channel + " is currently disabled. Try another channel.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("CHANNEL_ALREADY_DISABLED").with(channel));
          PacketCreator.announce(this, new EnableActions());
          return;
       }
@@ -1102,11 +1104,11 @@ public class MapleClient {
       return !MapleLoginBypassCoordinator.getInstance().canLoginBypass(getNibbleHWID(), accId, true);
    }
 
-   public int getLanguage() {
-      return lang;
+   public Locale getLocale() {
+      return locale;
    }
 
-   public void setLanguage(int language) {
-      this.lang = language;
+   public void setLocale(Locale locale) {
+      this.locale = locale;
    }
 }

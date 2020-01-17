@@ -28,6 +28,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.foreigneffect.ShowForeignMakerEffect;
 import tools.packet.maker.MakerCrystalResult;
 import tools.packet.maker.MakerEnableActions;
@@ -58,7 +59,8 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                int fromLeftover = toCreate;
                toCreate = MapleItemInformationProvider.getInstance().getMakerCrystalFromLeftover(toCreate);
                if (toCreate == -1) {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, MapleItemInformationProvider.getInstance().getName(fromLeftover) + " is unavailable for Monster Crystal conversion.");
+                  String itemName = MapleItemInformationProvider.getInstance().getName(fromLeftover);
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_CRYSTAL_CONVERSION_ERROR").with(itemName));
                   PacketCreator.announce(client, new MakerEnableActions());
                   return;
                }
@@ -75,12 +77,13 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                   if (p != null) {
                      recipe = MakerItemFactory.generateDisassemblyCrystalEntry(toDisassemble, p.getLeft(), p.getRight());
                   } else {
-                     MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, MapleItemInformationProvider.getInstance().getName(toCreate) + " is unavailable for Monster Crystal disassembly.");
+                     String itemName = MapleItemInformationProvider.getInstance().getName(toCreate);
+                     MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_CRYSTAL_DISASSEMBLY_ERROR").with(itemName));
                      PacketCreator.announce(client, new MakerEnableActions());
                      return;
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "An unknown error occurred when trying to apply that item for disassembly.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_UNKNOWN_DISASSEMBLY_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   return;
                }
@@ -127,7 +130,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
 
                   if (!reagentIds.isEmpty()) {
                      if (!removeOddMakerReagents(toCreate, reagentIds)) {
-                        MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You can only use weapon attack and magic attack strengthening gems on weapon items.");
+                        MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_WEAPON_ITEMS_CAN_ONLY_STRENGTHEN_BY_ATTACK"));
                         PacketCreator.announce(client, new MakerEnableActions());
                         return;
                      }
@@ -142,35 +145,29 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
             switch (createStatus) {
                case -1:// non-available for Maker item id has been tried to forge
                   FilePrinter.printError(FilePrinter.EXPLOITS, "Player " + client.getPlayer().getName() + " tried to craft item id " + toCreate + " using the Maker skill.");
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "The requested item could not be crafted on this operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_REQUESTED_ITEM_COULD_NOT_BE_CRAFTED"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
-
                case 1: // no items
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have all required items in your inventory to make " + MapleItemInformationProvider.getInstance().getName(toCreate) + ".");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MISSING_REQUIRED_ITEM").with(MapleItemInformationProvider.getInstance().getName(toCreate)));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
-
                case 2: // no meso
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos (" + GameConstants.numberWithCommas(recipe.getCost()) + ") to complete this operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_MESO_ERROR").with(GameConstants.numberWithCommas(recipe.getCost())));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
-
                case 3: // no req level
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough level to complete this operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_LEVEL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
-
                case 4: // no req skill level
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough Maker level to complete this operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_MINIMUM_MAKER_LEVEL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
-
                case 5: // inventory full
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_INVENTORY_FULL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
-
                default:
                   if (toDisassemble != -1) {
                      MapleInventoryManipulator.removeFromSlot(client, MapleInventoryType.EQUIP, (short) pos, (short) 1, false);

@@ -6,6 +6,7 @@ import client.command.Command;
 import config.YamlConfig;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ApCommand extends Command {
    {
@@ -16,7 +17,7 @@ public class ApCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !ap [<player name>] <new ap>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("AP_COMMAND_SYNTAX"));
          return;
       }
 
@@ -38,7 +39,7 @@ public class ApCommand extends Command {
                newAp = YamlConfig.config.server.MAX_AP;
             }
             victim.changeRemainingAp(newAp, false);
-         }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
+         }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0])));
       }
    }
 }

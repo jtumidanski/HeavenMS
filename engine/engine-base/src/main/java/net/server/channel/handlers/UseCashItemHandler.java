@@ -83,6 +83,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.cashshop.SendMapleLifeError;
 import tools.packet.cashshop.SendMapleNameLifeError;
 import tools.packet.character.box.UseChalkboard;
@@ -149,7 +150,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
       long timeNow = currentServerTime();
       if (timeNow - player.getLastUsedCashItem() < 3000) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You have used a cash item recently. Wait a moment, then try again.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_ITEM_USE_DELAY"));
          PacketCreator.announce(client, new EnableActions());
          return;
       }
@@ -387,7 +388,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
    private void characterCreator(MapleClient c, MapleCharacter player, short position, int itemId, String name, int face, int hair, int hairColor, int skin, int gender, int jobId, int improveSp) {
       if (ConsumableCashItems.CharacterCreators.MAPLE_LIFE_B.is(itemId) && !c.gainCharacterSlot()) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You have already used up all 12 extra character slots.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_CHARACTER_SLOT_MAX"));
          PacketCreator.announce(c, new EnableActions());
          return;
       }
@@ -445,7 +446,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
    private void chalkboard(MapleCharacter player, String message) {
       if (GameConstants.isFreeMarketRoom(player.getMapId())) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You cannot use the chalkboard here.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CASH_SHOP_CHALKBOARD_RESTRICTION"));
          PacketCreator.announce(player.getClient(), new EnableActions());
          return;
       }
@@ -551,7 +552,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       if (player.getLevel() > 9) {
          MessageBroadcaster.getInstance().sendServerNotice(player.getClient().getChannelServer().getPlayerStorage().getAllCharacters(), ServerNoticeType.MEGAPHONE, medal + player.getName() + " : " + message);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You may not use this until you're level 10.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_MEGAPHONE_LEVEL_REQUIREMENT"));
          return;
       }
       remove(c, position, itemId);
@@ -573,7 +574,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
       }
 
       if (!MapleTVEffect.broadcastMapleTVIfNotActive(player, victim, Arrays.asList(messages), tvType)) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "MapleTV is already in use.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_MAPLE_TV_IN_USE"));
          return;
       }
 
@@ -733,7 +734,6 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void teleportRock(MapleClient c, MapleCharacter player, short position, int itemId, boolean vip, int mapId, String name) {
-      String error1 = "Either the player could not be found or you were trying to teleport to an illegal location.";
       remove(c, position, itemId);
       boolean success = false;
       if (!vip) {
@@ -743,10 +743,10 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
                player.forceChangeMap(targetMap, targetMap.getRandomPlayerSpawnPoint());
                success = true;
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("TELEPORT_ROCK_GENERIC_ERROR"));
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You cannot teleport between continents with this teleport rock.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("TELEPORT_ROCK_CONTINENT_TELEPORT_ERROR"));
          }
       } else {
          Optional<MapleCharacter> victim = c.getChannelServer().getPlayerStorage().getCharacterByName(name);
@@ -757,13 +757,13 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
                   player.forceChangeMap(targetMap, targetMap.findClosestPlayerSpawnPoint(victim.get().position()));
                   success = true;
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, error1);
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("TELEPORT_ROCK_GENERIC_ERROR"));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "You cannot teleport to this map.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("TELEPORT_ROCK_CANNOT_TELEPORT_TO_MAP"));
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "Player could not be found in this channel.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("TELEPORT_ROCK_PLAYER_CANNOT_BE_FOUND"));
          }
       }
 

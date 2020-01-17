@@ -6,6 +6,8 @@ import client.command.Command;
 import server.life.MapleLifeFactory;
 import server.life.MapleNPC;
 import tools.MasterBroadcaster;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 import tools.packet.spawn.SpawnNPC;
 
 public class NpcCommand extends Command {
@@ -17,7 +19,7 @@ public class NpcCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !npc <npc id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("NPC_COMMAND_SYNTAX"));
          return;
       }
       MapleNPC npc = MapleLifeFactory.getNPC(Integer.parseInt(params[0]));

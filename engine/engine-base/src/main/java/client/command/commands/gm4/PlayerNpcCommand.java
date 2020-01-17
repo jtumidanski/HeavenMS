@@ -8,6 +8,7 @@ import client.command.Command;
 import server.life.MaplePlayerNPC;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class PlayerNpcCommand extends Command {
    {
@@ -18,7 +19,7 @@ public class PlayerNpcCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !playernpc <player name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PNPC_ADD_COMMAND_SYNTAX"));
          return;
       }
 
@@ -26,7 +27,7 @@ public class PlayerNpcCommand extends Command {
 
       if (target.isPresent()) {
          if (!MaplePlayerNPC.spawnPlayerNPC(player.getMapId(), player.position(), target.get())) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not deploy PlayerNPC. Either there's no room available here or depleted out script ids to use.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PNPC_ADD_COMMAND_FAILURE"));
          }
       }
    }

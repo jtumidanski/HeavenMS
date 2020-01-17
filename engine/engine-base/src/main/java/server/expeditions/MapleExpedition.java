@@ -27,6 +27,7 @@ import tools.LogHelper;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;
 
@@ -102,7 +103,7 @@ public class MapleExpedition {
       PacketCreator.announce(leader, new GetClock(type.getRegistrationTime() * 60));
       if (!silent) {
          MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, character -> character != leader, "[Expedition] " + leader.getName() + " has been declared the expedition captain. Please register for the expedition.");
-         MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have become the expedition captain. Gather enough people for your team then talk to the NPC to start.");
+         MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_BEGIN_REGISTRATION"));
       }
       scheduleRegistrationEnd();
    }
@@ -143,7 +144,7 @@ public class MapleExpedition {
       registerExpeditionAttempt();
       broadcastToExpedition(PacketCreator.create(new StopClock()));
       if (!silent) {
-         MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] The expedition has started! Good luck, brave heroes!");
+         MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_START"));
       }
       startTime = System.currentTimeMillis();
       MessageBroadcaster.getInstance().sendWorldServerNotice(startMap.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + type.toString() + " Expedition started with leader: " + leader.getName());
@@ -168,7 +169,7 @@ public class MapleExpedition {
       members.put(player.getId(), player.getName());
       PacketCreator.announce(player, new GetClock((int) (startTime - System.currentTimeMillis()) / 1000));
       if (!silent) {
-         MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + player.getName() + " has joined the expedition!");
+         MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_PLAYER_JOINED").with(player.getName()));
       }
       return "You have registered for the expedition successfully!";
    }
@@ -187,7 +188,7 @@ public class MapleExpedition {
       members.put(player.getId(), player.getName());
       PacketCreator.announce(player, new GetClock((int) (startTime - System.currentTimeMillis()) / 1000));
       if (!silent) {
-         MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + player.getName() + " has joined the expedition!");
+         MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_PLAYER_JOINED").with(player.getName()));
       }
       return 0; //"You have registered for the expedition successfully!";
    }
@@ -210,8 +211,8 @@ public class MapleExpedition {
       if (members.remove(chr.getId()) != null) {
          PacketCreator.announce(chr, new StopClock());
          if (!silent) {
-            MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + chr.getName() + " has left the expedition.");
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have left this expedition.");
+            MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_PLAYER_LEFT").with(chr.getName()));
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_LEFT"));
          }
          return true;
       }
@@ -226,14 +227,14 @@ public class MapleExpedition {
          members.remove(cid);
 
          if (!silent) {
-            MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + chr.getValue() + " has been banned from the expedition.");
+            MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_PLAYER_BANNED").with(chr.getValue()));
          }
 
          startMap.getWorldServer().getPlayerStorage().getCharacterById(cid)
                .filter(MapleCharacter::isLoggedInWorld).ifPresent(character -> {
             PacketCreator.announce(character, new StopClock());
             if (!silent) {
-               MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, "[Expedition] You have been banned from this expedition.");
+               MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_BANNED"));
             }
             if (MapleExpeditionType.ARIANT.equals(type) || MapleExpeditionType.ARIANT1.equals(type) || MapleExpeditionType.ARIANT2.equals(type)) {
                character.changeMap(980010000);

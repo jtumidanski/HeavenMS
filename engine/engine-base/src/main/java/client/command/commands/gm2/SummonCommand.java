@@ -9,6 +9,7 @@ import net.server.Server;
 import server.maps.MapleMap;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class SummonCommand extends Command {
    {
@@ -19,7 +20,7 @@ public class SummonCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !warphere <player name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SUMMON_COMMAND_SYNTAX"));
          return;
       }
 
@@ -29,12 +30,12 @@ public class SummonCommand extends Command {
 
       if (victim != null) {
          if (!victim.isLoggedInWorld()) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Player currently not logged in or unreachable.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PLAYER_NOT_LOGGED_IN_OR_REACHABLE"));
             return;
          }
 
          if (player.getClient().getChannel() != victim.getClient().getChannel()) {//And then change channel if needed.
-            MessageBroadcaster.getInstance().sendServerNotice(victim, ServerNoticeType.NOTICE, "Changing channel, please wait a moment.");
+            MessageBroadcaster.getInstance().sendServerNotice(victim, ServerNoticeType.NOTICE, I18nMessage.from("PLAYER_CHANGING_CHANNEL"));
             victim.getClient().changeChannel(player.getClient().getChannel());
          }
 
@@ -50,7 +51,7 @@ public class SummonCommand extends Command {
          victim.saveLocationOnWarp();
          victim.forceChangeMap(map, map.findClosestPortal(player.position()));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Unknown player.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0]));
       }
    }
 

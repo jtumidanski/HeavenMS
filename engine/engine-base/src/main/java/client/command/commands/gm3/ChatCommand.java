@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ChatCommand extends Command {
    {
@@ -15,6 +16,10 @@ public class ChatCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       player.toggleWhiteChat();
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Your chat is now " + (player.getWhiteChat() ? " white" : "normal") + ".");
+      if (player.getWhiteChat()) {
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CHAT_COMMAND_TOGGLE_WHITE"));
+      } else {
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CHAT_COMMAND_TOGGLE_NORMAL"));
+      }
    }
 }

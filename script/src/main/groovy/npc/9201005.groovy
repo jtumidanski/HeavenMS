@@ -9,6 +9,7 @@ import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -183,15 +184,15 @@ class NPC9201005 {
                                     String wedType = weddingType ? "Premium" : "Regular"
                                     cm.sendOk("You both have received 15 Wedding Tickets, to be given to your guests. #bDouble-click the ticket#k to send it to someone. Invitations can only be sent #rbefore the wedding start time#k. Your #b" + wedType + " wedding#k is set to start at the #r" + placeTime + "#k. Get formally dressed and don't be late!")
 
-                                    MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: You both have received 15 Wedding Tickets. Invitations can only be sent before the wedding start time. Your " + wedType + " wedding is set to start at the " + placeTime + ". Get dressed and don't be late!")
-                                    MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: You both have received 15 Wedding Tickets. Invitations can only be sent before the wedding start time. Your " + wedType + " wedding is set to start at the " + placeTime + ". Get dressed and don't be late!")
+                                    MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT").with(wedType, placeTime))
+                                    MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT").with(wedType, placeTime))
 
                                     if (!hasSuitForWedding(player)) {
-                                       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Wedding Assistant: Please purchase a wedding garment before showing up for the ceremony. One can be bought at the Wedding Shop left-most Amoria.")
+                                       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT_GARMENT"))
                                     }
 
                                     if (!hasSuitForWedding(partner)) {
-                                       MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, "Wedding Assistant: Please purchase a wedding garment before showing up for the ceremony. One can be bought at the Wedding Shop left-most Amoria.")
+                                       MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT_GARMENT"))
                                     }
                                  } else {
                                     cm.sendOk("Your wedding reservation must have been processed recently. Please try again later.")

@@ -12,6 +12,7 @@ import server.maps.MapleMap
 import server.maps.MapleReactor
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 import java.util.List
@@ -115,7 +116,7 @@ class EventPinkBeanBattle {
 
    // Happens after the event instance is initialized and all players have been assigned for the event instance, but before entering players.
    static def afterSetup(EventInstanceManager eim) {
-      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The first wave will start within 15 seconds, prepare yourselves.")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PINK_BEAN_FIRST_WAVE"))
       eim.schedule("startWave", 15 * 1000)
    }
 
@@ -125,7 +126,7 @@ class EventPinkBeanBattle {
 
    // Warp player in etc..
    def playerEntry(EventInstanceManager eim, MapleCharacter player) {
-      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has entered the map.")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_ENTER_MAP").with(player.getName()))
       MapleMap map = eim.getMapInstance(entryMap)
       player.changeMap(map, map.getPortal(0))
    }
@@ -149,10 +150,10 @@ class EventPinkBeanBattle {
       if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_LEADER_QUIT_OR_NOT_MINIMUM_PLAYERS"))
             end(eim)
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the expedition.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_LEFT_INSTANCE").with(player.getName()))
             eim.unregisterPlayer(player)
          }
       }
@@ -172,7 +173,7 @@ class EventPinkBeanBattle {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }
@@ -201,12 +202,12 @@ class EventPinkBeanBattle {
                MapleCharacter dropper = eim.getPlayers().get(0)
                mapObj.spawnItemDrop(dropper, dropper, itemObj, reactObj.position(), true, true)
 
-               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "With the last of its guardians fallen, Pink Bean loses its invulnerability. The real fight starts now!")
+               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PINK_BEAN_REAL_FIGHT"))
             } else {
                stage++
                eim.setIntProperty("stage", stage)
 
-               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The next wave will start within 15 seconds, prepare yourselves.")
+               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PINK_BEAN_NEXT_WAVE"))
                eim.schedule("startWave", 15 * 1000)
             }
          }
@@ -245,12 +246,12 @@ class EventPinkBeanBattle {
       eim.setIntProperty("fallenPlayers", count)
 
       if (count == 5) {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Too many players have fallen, Pink Bean was not able to be defeated; the expedition is over.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PINK_BEAN_TOO_MANY_DIED"))
          end(eim)
       } else if (count == 4) {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Pink Bean is growing stronger than ever, last stand mode everyone!")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PINK_BEAN_GROWING_STRONGER"))
       } else if (count == 3) {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Casualty count is starting to get out of control. Battle with care.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PINK_BEAN_CASUALTY_WARNING"))
       }
    }
 
@@ -273,10 +274,10 @@ class EventPinkBeanBattle {
    def playerDisconnected(EventInstanceManager eim, MapleCharacter player) {
       if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
          eim.unregisterPlayer(player)
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_LEADER_QUIT_OR_NOT_MINIMUM_PLAYERS"))
          end(eim)
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the expedition.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_LEFT_INSTANCE").with(player.getName()))
          eim.unregisterPlayer(player)
       }
    }

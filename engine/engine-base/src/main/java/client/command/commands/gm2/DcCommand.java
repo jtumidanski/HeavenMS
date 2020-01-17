@@ -3,6 +3,8 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class DcCommand extends Command {
    {
@@ -13,7 +15,7 @@ public class DcCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !dc <player name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("DC_COMMAND_SYNTAX"));
          return;
       }
 

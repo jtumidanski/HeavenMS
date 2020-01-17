@@ -5,6 +5,7 @@ import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.I18nMessage
 import tools.packet.field.effect.PlaySound
 import tools.packet.field.effect.ShowEffect
 
@@ -58,7 +59,7 @@ class NPC2012028 {
                      PacketCreator.announce(cm.getPlayer(), new ShowEffect("quest/party/wrong_kor"))
                      PacketCreator.announce(cm.getPlayer(), new PlaySound("Party1/Failed"))
 
-                     MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "You've missed the note... Start over again.")
+                     MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("2012027_MISSED_NOTE"))
                   } else {
                      nextNote = harpSong[idx + 1]
 
@@ -66,7 +67,7 @@ class NPC2012028 {
                         idx++
 
                         if (idx == 45) {     // finished lullaby
-                           MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Twinkle, twinkle, little star, how I wonder what you are.")
+                           MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("2012027_TWINKLE_TWINKLE"))
                            cm.setQuestProgress(3114, 42)
 
                            PacketCreator.announce(cm.getPlayer(), new ShowEffect("quest/party/clear"))
@@ -76,11 +77,11 @@ class NPC2012028 {
                            return
                         } else {
                            if (idx == 14) {
-                              MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Twinkle, twinkle, little star, how I wonder what you are!")
+                              MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("2012027_TWINKLE_TWINKLE"))
                            } else if (idx == 22) {
-                              MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Up above the world so high,")
+                              MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("2012027_UP_ABOVE"))
                            } else if (idx == 30) {
-                              MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "like a diamond in the sky.")
+                              MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("2012027_LIKE_A_DIAMOND"))
                            }
                         }
                      }

@@ -17,6 +17,7 @@ import server.maps.FieldLimit;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.SetITC;
 import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
 import tools.packet.mtsoperation.MTSTransferInventory;
@@ -40,7 +41,7 @@ public final class EnterMTSHandler extends AbstractShopSystem<NoOpPacket> {
    @Override
    protected boolean failsShopSpecificValidation(MapleClient client) {
       if (FieldLimit.CANNOT_MIGRATE.check(client.getPlayer().getMap().getFieldLimit())) {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You can't do it here in this map.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("CANNOT_ENTER_MTS_ON_MAP"));
          PacketCreator.announce(client, new EnableActions());
          return true;
       }

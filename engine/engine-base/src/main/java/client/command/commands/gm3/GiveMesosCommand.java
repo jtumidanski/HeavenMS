@@ -7,6 +7,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class GiveMesosCommand extends Command {
    {
@@ -17,7 +18,7 @@ public class GiveMesosCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !givems [<player name>] <gain meso>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("GIVE_MESOS_COMMAND_SYNTAX"));
          return;
       }
 
@@ -50,9 +51,9 @@ public class GiveMesosCommand extends Command {
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv_);
       if (victim.isPresent()) {
          victim.get().gainMeso((int) mesos_, true);
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "MESO given.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("GIVE_MESOS_COMMAND_SUCCESS"));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + recv_ + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(recv_));
       }
    }
 }

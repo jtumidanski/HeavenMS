@@ -7,6 +7,7 @@ import server.events.gm.MapleEvent;
 import server.maps.FieldLimit;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class JoinEventCommand extends Command {
    {
@@ -31,16 +32,16 @@ public class JoinEventCommand extends Command {
                   player.saveLocationOnWarp();
                   player.changeMap(event.getMapId());
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The limit of players for the event has already been reached.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("EVENT_PLAYER_LIMIT"));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You are already in the event.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("EVENT_ALREADY_IN"));
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "There is currently no event in progress.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("EVENT_NO_EVENT"));
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You are currently in a map where you can't join an event.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("EVENT_CANNOT_JOIN_BECAUSE_OF_MAP"));
       }
    }
 }

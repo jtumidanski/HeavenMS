@@ -6,6 +6,7 @@ import client.command.Command;
 import config.YamlConfig;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class StatDexCommand extends Command {
    {
@@ -22,14 +23,14 @@ public class StatDexCommand extends Command {
          try {
             amount = Math.min(Integer.parseInt(params[0]), remainingAp);
          } catch (NumberFormatException e) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "That is not a valid number!");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, I18nMessage.from("NUMBER_IS_INVALID"));
             return;
          }
       } else {
          amount = Math.min(remainingAp, YamlConfig.config.server.MAX_AP - player.getDex());
       }
       if (!player.assignDex(Math.max(amount, 0))) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, "Please make sure your AP is not over " + YamlConfig.config.server.MAX_AP + " and you have enough to distribute.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.NOTICE, I18nMessage.from("AP_OVER_MAX_ERROR").with(YamlConfig.config.server.MAX_AP));
       }
    }
 }

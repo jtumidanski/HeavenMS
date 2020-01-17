@@ -10,6 +10,7 @@ import database.administrator.MacBanAdministrator;
 import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class UnBanCommand extends Command {
    {
@@ -20,7 +21,7 @@ public class UnBanCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !unban <player name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("UN_BAN_COMMAND_SYNTAX"));
          return;
       }
 
@@ -30,6 +31,6 @@ public class UnBanCommand extends Command {
          IpBanAdministrator.getInstance().removeIpBan(connection, aid);
          MacBanAdministrator.getInstance().removeMacBan(connection, aid);
       });
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Unbanned " + params[0]);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("UN_BAN_COMMAND_SUCCESS").with(params[0]));
    }
 }

@@ -24,6 +24,5 @@ public class LootCommand extends Command {
             c.getPlayer().pickupItem(mapItem);
          }
       }
-
    }
 }

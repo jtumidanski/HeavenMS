@@ -108,7 +108,10 @@ public class Account implements Serializable {
    private String hwid;
 
    @Column(nullable = false)
-   private Integer language = 2;
+   private String language = "EN";
+
+   @Column(nullable = false)
+   private String country = "US";
 
    public Account() {
       createDate = new Timestamp(Calendar.getInstance().getTimeInMillis());
@@ -348,11 +351,19 @@ public class Account implements Serializable {
       this.hwid = hwid;
    }
 
-   public Integer getLanguage() {
+   public String getLanguage() {
       return language;
    }
 
-   public void setLanguage(Integer language) {
+   public void setLanguage(String language) {
       this.language = language;
+   }
+
+   public String getCountry() {
+      return country;
+   }
+
+   public void setCountry(String country) {
+      this.country = country;
    }
 }

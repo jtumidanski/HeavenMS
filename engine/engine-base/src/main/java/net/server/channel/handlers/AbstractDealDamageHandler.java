@@ -71,6 +71,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.character.DamageCharacter;
 import tools.packet.character.SkillCoolDown;
 import tools.packet.monster.DamageMonster;
@@ -490,7 +491,7 @@ public abstract class AbstractDealDamageHandler<T extends MaplePacket> extends A
                                  api.gainItem(shellId, (short) -1, false);
                                  totDamageToOneMonster *= player.getLevel();
                               } else {
-                                 MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have ran out of shells to activate the hidden power of Three Snails.");
+                                 MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RAN_OUT_OF_SHELLS"));
                               }
                            } else {
                               totDamageToOneMonster = 0;

@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -448,7 +449,7 @@ public class CharacterProcessor {
             MapleClient retClient = mapleCharacter.getClient();
             retClient.setAccountName(accountData.name());
             retClient.setCharacterSlots(accountData.characterSlots().byteValue());
-            retClient.setLanguage(accountData.language());
+            retClient.setLocale(new Locale(accountData.language(), accountData.country()));
          }));
 
          AreaInfoProvider.getInstance().getAreaInfo(connection, characterData.id())

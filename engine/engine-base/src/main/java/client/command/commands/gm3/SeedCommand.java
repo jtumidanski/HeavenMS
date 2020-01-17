@@ -6,6 +6,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import client.inventory.Item;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class SeedCommand extends Command {
    {
@@ -16,7 +18,7 @@ public class SeedCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (player.getMapId() != 910010000) {
-         player.yellowMessage("This command can only be used in HPQ.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SEED_COMMAND_FAILURE"));
          return;
       }
       Point[] pos = {new Point(7, -207), new Point(179, -447), new Point(-3, -687), new Point(-357, -687), new Point(-538, -447), new Point(-359, -207)};

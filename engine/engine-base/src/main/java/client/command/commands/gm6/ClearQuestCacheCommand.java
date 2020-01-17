@@ -6,6 +6,7 @@ import client.command.Command;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ClearQuestCacheCommand extends Command {
    {
@@ -16,6 +17,6 @@ public class ClearQuestCacheCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       MapleQuest.clearCache();
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Quest Cache Cleared.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CLEAR_QUEST_CACHE_COMMAND_SUCCESS"));
    }
 }

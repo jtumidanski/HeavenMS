@@ -9,6 +9,8 @@ import client.SkillFactory;
 import client.command.Command;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class MaxSkillCommand extends Command {
    {
@@ -35,6 +37,6 @@ public class MaxSkillCommand extends Command {
          SkillFactory.getSkill(21001001).ifPresent(skill -> player.changeSkillLevel(skill, (byte) -1, -1, -1));
       }
 
-      player.yellowMessage("Skills maxed out.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("MAX_SKILL_COMMAND_SUCCESS"));
    }
 }

@@ -14,6 +14,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.message.ChatText;
 import tools.packet.stat.EnableActions;
 
@@ -41,7 +42,7 @@ public final class GeneralChatHandler extends AbstractPacketHandler<GeneralChatP
          CommandsExecutor.getInstance().handle(client, packet.message());
       } else if (heading != '/') {
          if (chr.getMap().isMuted() && !chr.isGM()) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "The map you are in is currently muted. Please try again later.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("MUTED_MAP_ERROR"));
             return;
          }
 

@@ -10,7 +10,7 @@ import server.life.MapleNPC;
 import server.life.MaplePlayerNPC;
 import server.maps.MapleMapObject;
 import tools.MessageBroadcaster;
-import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class WhereAmICommand extends Command {
    {
@@ -44,34 +44,25 @@ public class WhereAmICommand extends Command {
          }
       }
 
-      player.yellowMessage("Map ID: " + player.getMap().getId());
-
-      player.yellowMessage("Players on this map:");
-      for (MapleCharacter chr : chars) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + chr.getName() + " - " + chr.getId() + " - Oid: " + chr.objectId());
-      }
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_MAP").with(player.getMap().getId()));
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_PLAYER_TITLE"));
+      chars.forEach(character -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_PLAYER_BODY").with(character.getName(), character.getId(), character.objectId())));
 
       if (!playerNpcSet.isEmpty()) {
-         player.yellowMessage("PlayerNPCs on this map:");
-         for (MaplePlayerNPC playerNpc : playerNpcSet) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + playerNpc.getName() + " - ScriptId: " + playerNpc.getScriptId() + " - Oid: " + playerNpc.objectId());
-         }
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_PLAYER_NPC_TITLE"));
+         playerNpcSet.forEach(playerNpc -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_PLAYER_NPC_BODY").with(playerNpc.getName(), playerNpc.getScriptId(), playerNpc.objectId())));
       }
 
       if (!npcSet.isEmpty()) {
-         player.yellowMessage("NPCs on this map:");
-         for (MapleNPC npc : npcSet) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + npc.getName() + " - " + npc.id() + " - Oid: " + npc.objectId());
-         }
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_NPC_TITLE"));
+         npcSet.forEach(npc -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_NPC_BODY").with(npc.getName(), npc.id(), npc.objectId())));
       }
 
       if (!mobs.isEmpty()) {
-         player.yellowMessage("Monsters on this map:");
-         for (MapleMonster mob : mobs) {
-            if (mob.isAlive()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, ">> " + mob.getName() + " - " + mob.id() + " - Oid: " + mob.objectId());
-            }
-         }
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_MONSTER_TITLE"));
+         mobs.stream()
+               .filter(MapleMonster::isAlive)
+               .forEach(mob -> MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WHERE_AM_I_COMMAND_MONSTER_BODY").with(mob.getName(), mob.id(), mob.objectId())));
       }
    }
 }

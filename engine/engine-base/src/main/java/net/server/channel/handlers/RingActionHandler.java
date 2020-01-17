@@ -4,17 +4,18 @@ import javax.persistence.EntityManager;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import database.administrator.CharacterAdministrator;
-import database.administrator.InventoryItemAdministrator;
-import database.provider.CharacterProvider;
 import client.inventory.Equip;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.processor.CharacterProcessor;
-import client.processor.npc.DueyProcessor;
 import client.processor.MapleRingProcessor;
 import client.processor.NoteProcessor;
+import client.processor.npc.DueyProcessor;
+import database.DatabaseConnection;
+import database.administrator.CharacterAdministrator;
+import database.administrator.InventoryItemAdministrator;
+import database.provider.CharacterProvider;
 import net.server.AbstractPacketHandler;
 import net.server.channel.Channel;
 import net.server.channel.packet.reader.RingActionReader;
@@ -29,11 +30,11 @@ import net.server.channel.packet.ring.RespondToProposalPacket;
 import net.server.world.World;
 import scripting.event.EventInstanceManager;
 import server.MapleItemInformationProvider;
-import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.wedding.MarriageRequest;
 import tools.packet.wedding.MarriageResult;
@@ -53,66 +54,66 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
 
       // TODO: get the correct packet bytes for these popups
       if (source.isMarried()) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You're already married!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_ALREADY_MARRIED"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (source.getPartnerId() > 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You're already engaged!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_ALREADY_ENGAGED"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (source.getMarriageItemId() > 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You're already engaging someone!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_ALREADY_ENGAGING"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target == null) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "Unable to find " + name + " on this channel.");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_UNABLE_TO_FIND_IN_CHANNEL"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target == source) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You can't engage yourself.");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_CANNOT_ENGAGE_YOURSELF"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target.getLevel() < 50) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You can only propose to someone level 50 or higher.");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_PARTNER_LEVEL_REQUIREMENT"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (source.getLevel() < 50) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You can only propose being level 50 or higher.");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_LEVEL_REQUIREMENT"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (!target.getMap().equals(source.getMap())) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "Make sure your partner is on the same map!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_SAME_MAP"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (!source.haveItem(itemId) || itemId < 2240000 || itemId > 2240015) {
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target.isMarried()) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "The player is already married!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_PARTNER_ALREADY_MARRIED"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target.getPartnerId() > 0 || target.getMarriageItemId() > 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "The player is already engaged!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_PARTNER_ALREADY_ENGAGED"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target.haveWeddingRing()) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "The player already holds a marriage ring...");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_PARTNER_ALREADY_HAS_RING"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (source.haveWeddingRing()) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You can't propose while holding a marriage ring!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_ALREADY_HAS_RING"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (target.getGender() == source.getGender()) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "You may only propose to a " + (source.getGender() == 1 ? "male" : "female") + "!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_ONLY_PROPOSE_TO_OPPOSITE_GENDER"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (!MapleInventoryManipulator.checkSpace(c, newBoxId, 1, "")) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.PINK_TEXT, "You don't have a ETC slot available right now!");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_NEED_ETC_SPACE"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       } else if (!MapleInventoryManipulator.checkSpace(target.getClient(), newBoxId + 1, 1, "")) {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.PINK_TEXT, "The girl you proposed doesn't have a ETC slot available right now.");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_PARTNER_NEED_ETC_SPACE"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
          return;
       }
@@ -147,7 +148,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       MapleRingProcessor.getInstance().removeRing(chr.getMarriageRing());
 
       chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerId).ifPresentOrElse(partner -> {
-         MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, chr.getName() + " has decided to break up the marriage.");
+         MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_ENDED_MARRIAGE").with(chr.getName()));
 
          //partner.announce(Wedding.OnMarriageResult((byte) 0)); ok, how to gracefully remove engagement from someone without the need to cc?
          PacketCreator.announce(partner, new WeddingPartnerTransfer(0, 0));
@@ -157,7 +158,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
          partner.addMarriageRing(null);
       }, () -> eraseEngagementOffline(partnerId));
 
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You have successfully break the marriage with " + CharacterProcessor.getInstance().getNameById(partnerId) + ".");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_ENDED_MARRIAGE_LOOPBACK").with(CharacterProcessor.getInstance().getNameById(partnerId)));
 
       //chr.announce(Wedding.OnMarriageResult((byte) 0));
       PacketCreator.announce(chr, new WeddingPartnerTransfer(0, 0));
@@ -188,7 +189,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       chr.getClient().getWorldServer().deleteRelationship(chr.getId(), partnerId);
 
       chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(partnerId).ifPresentOrElse(partner -> {
-         MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, chr.getName() + " has decided to break up the engagement.");
+         MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_ENDED_ENGAGEMENT").with(chr.getName()));
 
          int partnerMarriageItemId = marriageItemId + ((chr.getGender() == 0) ? 1 : -1);
          if (partner.haveItem(partnerMarriageItemId)) {
@@ -204,7 +205,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       if (chr.haveItem(marriageItemId)) {
          MapleInventoryManipulator.removeById(chr.getClient(), MapleInventoryType.ETC, marriageItemId, (short) 1, false, false);
       }
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You have successfully break the engagement with " + CharacterProcessor.getInstance().getNameById(partnerId) + ".");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_ENDED_ENGAGEMENT_LOOPBACK").with(CharacterProcessor.getInstance().getNameById(partnerId)));
 
       //chr.announce(Wedding.OnMarriageResult((byte) 0));
       PacketCreator.announce(chr, new WeddingPartnerTransfer(0, 0));
@@ -353,7 +354,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
       String groom = c.getPlayer().getName(), bride = CharacterProcessor.getInstance().getNameById(c.getPlayer().getPartnerId());
       int guest = CharacterProcessor.getInstance().getIdByName(name);
       if (groom == null || bride == null || groom.equals("") || bride.equals("") || guest <= 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Unable to find " + name + "!");
+         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_PARTNER_NOT_FOUND").with(name));
          return true;
       }
 
@@ -372,10 +373,10 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
 
                MapleCharacter guestChr = c.getWorldServer().getPlayerStorage().getCharacterById(guest).orElse(null);
                if (guestChr != null && MapleInventoryManipulator.checkSpace(guestChr.getClient(), newItemId, 1, "") && MapleInventoryManipulator.addById(guestChr.getClient(), newItemId, (short) 1, expiration)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(guestChr, ServerNoticeType.LIGHT_BLUE, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding!");
+                  MessageBroadcaster.getInstance().sendServerNotice(guestChr, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_MESSAGE").with(groom, bride));
                } else {
                   if (guestChr != null && guestChr.isLoggedInWorld()) {
-                     MessageBroadcaster.getInstance().sendServerNotice(guestChr, ServerNoticeType.LIGHT_BLUE, "[Wedding] You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!");
+                     MessageBroadcaster.getInstance().sendServerNotice(guestChr, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_INVITE_MESSAGE").with(groom, bride));
                   } else {
                      NoteProcessor.getInstance().sendNote(name, c.getPlayer().getName(), "You've been invited to " + groom + " and " + bride + "'s Wedding! Receive your invitation from Duey!", (byte) 0);
                   }
@@ -386,13 +387,13 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
                   DueyProcessor.dueyCreatePackage(weddingTicket, 0, groom, guest);
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Wedding is already under way. You cannot invite any more guests for the event.");
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_UNDERWAY_CANNOT_INVITE"));
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "'" + name + "' is already invited for your marriage.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_ALREADY_INVITED").with(name));
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Invitation was not sent to '" + name + "'. Either the time for your marriage reservation already came or it was not found.");
+         MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_INVITATION_FAIL").with(name));
       }
 
       c.getAbstractPlayerInteraction().gainItem(itemId, (short) -1);
@@ -443,7 +444,7 @@ public final class RingActionHandler extends AbstractPacketHandler<BaseRingPacke
             System.out.println("Error with engagement " + e.getMessage());
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, "She has politely declined your engagement request.");
+         MessageBroadcaster.getInstance().sendServerNotice(source, ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_PARTNER_DECLINED"));
          PacketCreator.announce(source, new MarriageResultError((byte) 0));
 
          source.setMarriageItemId(-1);

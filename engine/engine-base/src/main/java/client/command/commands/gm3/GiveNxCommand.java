@@ -7,6 +7,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class GiveNxCommand extends Command {
    {
@@ -17,7 +18,7 @@ public class GiveNxCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !givenx [nx, mp, np] [<player name>] <gain nx>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("GIVE_NX_COMMAND_SYNTAX"));
          return;
       }
 
@@ -56,9 +57,9 @@ public class GiveNxCommand extends Command {
       Optional<MapleCharacter> victim = c.getWorldServer().getPlayerStorage().getCharacterByName(recv);
       if (victim.isPresent()) {
          victim.get().getCashShop().gainCash(type, value);
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, typeStr.toUpperCase() + " given.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("GIVE_NX_COMMAND_SUCCESS").with(typeStr.toUpperCase()));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + recv + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0]));
       }
    }
 }

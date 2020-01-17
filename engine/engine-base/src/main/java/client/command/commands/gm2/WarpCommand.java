@@ -8,6 +8,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMiniDungeonInfo;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class WarpCommand extends Command {
    {
@@ -18,25 +19,25 @@ public class WarpCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !warp <map id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_COMMAND_SYNTAX"));
          return;
       }
 
       try {
          MapleMap target = c.getChannelServer().getMapFactory().getMap(Integer.parseInt(params[0]));
          if (target == null) {
-            player.yellowMessage("Map ID " + params[0] + " is invalid.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_COMMAND_INVALID_MAP").with(params[0]));
             return;
          }
 
          if (!player.isAlive()) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command cannot be used when you're dead.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("COMMAND_CANNOT_BE_USED_WHEN_DEAD"));
             return;
          }
 
          if (!player.isGM()) {
             if (player.getEventInstance() != null || MapleMiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOT_MIGRATE.check(player.getMap().getFieldLimit())) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command cannot be used in this map.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("COMMAND_CANNOT_BE_USED_IN_MAP"));
                return;
             }
          }
@@ -44,7 +45,7 @@ public class WarpCommand extends Command {
          player.saveLocationOnWarp();
          player.changeMap(target, target.getRandomPlayerSpawnPoint());
       } catch (Exception ex) {
-         player.yellowMessage("Map ID " + params[0] + " is invalid.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_COMMAND_INVALID_MAP").with(params[0]));
       }
    }
 }

@@ -15,6 +15,7 @@ import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ItemRequirement extends MapleQuestRequirement {
    Map<Integer, Integer> items = new HashMap<>();
@@ -60,7 +61,7 @@ public class ItemRequirement extends MapleQuestRequirement {
             } else {
                if (count < countNeeded) {
                   if (chr.getInventory(MapleInventoryType.EQUIPPED).countById(itemId) + count >= countNeeded) {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Unequip the required " + ii.getName(itemId) + " before trying this quest operation.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_ITEM_UNEQUIP_REQUIREMENT").with(ii.getName(itemId)));
                      return false;
                   }
                }

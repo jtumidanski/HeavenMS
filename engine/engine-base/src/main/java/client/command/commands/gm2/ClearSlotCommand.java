@@ -6,6 +6,8 @@ import client.command.Command;
 import client.inventory.Item;
 import client.inventory.MapleInventoryType;
 import client.inventory.manipulator.MapleInventoryManipulator;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class ClearSlotCommand extends Command {
    {
@@ -16,7 +18,7 @@ public class ClearSlotCommand extends Command {
    public void execute(MapleClient client, String[] params) {
       MapleCharacter player = client.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !clearslot <all, equip, use, setup, etc or cash.>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_SYNTAX"));
          return;
       }
       String type = params[0];
@@ -27,30 +29,30 @@ public class ClearSlotCommand extends Command {
             clearSlotsForType(client, MapleInventoryType.ETC);
             clearSlotsForType(client, MapleInventoryType.SETUP);
             clearSlotsForType(client, MapleInventoryType.CASH);
-            player.yellowMessage("All Slots Cleared.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_ALL_SUCCESS"));
             break;
          case "equip":
             clearSlotsForType(client, MapleInventoryType.EQUIP);
-            player.yellowMessage("Equipment Slot Cleared.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_EQUIP_SUCCESS"));
             break;
          case "use":
             clearSlotsForType(client, MapleInventoryType.USE);
-            player.yellowMessage("Use Slot Cleared.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_USE_SUCCESS"));
             break;
          case "setup":
             clearSlotsForType(client, MapleInventoryType.SETUP);
-            player.yellowMessage("Set-Up Slot Cleared.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_SET_UP_SUCCESS"));
             break;
          case "etc":
             clearSlotsForType(client, MapleInventoryType.ETC);
-            player.yellowMessage("ETC Slot Cleared.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_ETC_SUCCESS"));
             break;
          case "cash":
             clearSlotsForType(client, MapleInventoryType.CASH);
-            player.yellowMessage("Cash Slot Cleared.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_CASH_SUCCESS"));
             break;
          default:
-            player.yellowMessage("Slot" + type + " does not exist!");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("CLEAR_SLOT_COMMAND_ERROR"));
             break;
       }
    }

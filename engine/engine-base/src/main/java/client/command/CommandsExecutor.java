@@ -10,7 +10,7 @@ import java.util.List;
 
 import client.MapleClient;
 import client.command.commands.gm0.BuyBackCommand;
-import client.command.commands.gm0.ChangeLanguageCommand;
+import client.command.commands.gm0.ChangeLocaleCommand;
 import client.command.commands.gm0.DisposeCommand;
 import client.command.commands.gm0.DropLimitCommand;
 import client.command.commands.gm0.EnableAuthCommand;
@@ -186,6 +186,7 @@ import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class CommandsExecutor {
    private static final char USER_HEADING = '@';
@@ -229,13 +230,13 @@ public class CommandsExecutor {
             client.releaseClient();
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Try again in a while... Latest commands are currently being processed.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("TRY_COMMAND_AGAIN"));
       }
    }
 
    private void handleInternal(MapleClient client, String message) {
       if (client.getPlayer().getMapId() == 300000012) {
-         client.getPlayer().yellowMessage("You do not have permission to use commands while in jail.");
+         MessageBroadcaster.getInstance().yellowMessage(client.getPlayer(), I18nMessage.from("NO_PERMISSION_IN_JAIL"));
          return;
       }
       final String splitRegex = "[ ]";
@@ -250,11 +251,11 @@ public class CommandsExecutor {
 
       final Command command = registeredCommands.get(commandName);
       if (command == null) {
-         client.getPlayer().yellowMessage("Command '" + commandName + "' is not available. See @commands for a list of available commands.");
+         MessageBroadcaster.getInstance().yellowMessage(client.getPlayer(), I18nMessage.from("COMMAND_NOT_AVAILABLE").with(commandName));
          return;
       }
       if (client.getPlayer().gmLevel() < command.getRank()) {
-         client.getPlayer().yellowMessage("You do not have permission to use this command.");
+         MessageBroadcaster.getInstance().yellowMessage(client.getPlayer(), I18nMessage.from("NO_PERMISSION"));
          return;
       }
       String[] params;
@@ -331,7 +332,7 @@ public class CommandsExecutor {
       addCommand("uptime", UptimeCommand.class);
       addCommand("gacha", GachaponCommand.class);
       addCommand("dispose", DisposeCommand.class);
-      addCommand("changel", ChangeLanguageCommand.class);
+      addCommand("changel", ChangeLocaleCommand.class);
       addCommand("equiplv", EquipLvCommand.class);
       addCommand("showrates", ShowRatesCommand.class);
       addCommand("rates", RatesCommand.class);

@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -191,6 +192,7 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
+import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.buff.CancelAbnormalStatus;
@@ -1076,7 +1078,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             for (Item item : new ArrayList<>(inv.list())) {
                if (MapleInventoryManipulator.isSandboxItem(item)) {
                   MapleInventoryManipulator.removeFromSlot(client, invType, item.position(), item.quantity(), false);
-                  MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "[" + ii.getName(item.id()) + "] has passed its trial conditions and will be removed from your inventory.");
+                  MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("ITEM_SANDBOX_EXPIRE").with(ii.getName(item.id())));
                }
             }
          } finally {
@@ -5394,14 +5396,14 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       long timeNow = Server.getInstance().getCurrentTime();
 
       if (timeNow - lastDeathTime > YamlConfig.config.server.BUYBACK_RETURN_MINUTES * 60 * 1000) {
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "The period of time to decide has expired, therefore you are unable to buyback.");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("BUY_BACK_TIME_EXPIRE"));
          return false;
       }
 
       long nextBuyBackTime = getNextBuybackTime();
       if (timeNow < nextBuyBackTime) {
          long timeLeft = nextBuyBackTime - timeNow;
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "Next buyback available in " + MapleStringUtil.getTimeRemaining(timeLeft) + ".");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("BUY_BACK_TIME_NEXT").with(MapleStringUtil.getTimeRemaining(timeLeft)));
          return false;
       }
 
@@ -5409,7 +5411,11 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       int fee = getBuybackFee();
 
       if (!canBuyback(fee, usingMesos)) {
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "You don't have " + fee + " " + (usingMesos ? "mesos" : "NX") + " to buyback.");
+         if (usingMesos) {
+            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("BUY_BACK_NOT_ENOUGH_MESOS").with(fee));
+         } else {
+            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("BUY_BACK_NOT_ENOUGH_NX").with(fee));
+         }
          return false;
       }
 
@@ -5678,14 +5684,13 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                for (byte i = 1; i < 5; i++) {
                   gainSlots(i, 4, true);
                }
-
-               this.yellowMessage("You reached level " + level + ". Congratulations! As a token of your success, your inventory has been expanded a little bit.");
+               MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("INVENTORY_EXPANSION_ON_LEVEL").with(level));
             }
          }
          if (YamlConfig.config.server.USE_ADD_RATES_BY_LEVEL) { //For the rate upgrade
             revertLastPlayerRates();
             setPlayerRates();
-            this.yellowMessage("You managed to get level " + level + "! Getting experience and items seems a little easier now, huh?");
+            MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("USER_INCREASE_RATES_ON_LEVEL").with(level));
          }
       }
 
@@ -5797,85 +5802,85 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          return;
       }
       if (level == 5) {
-         yellowMessage("Aww, you're level 5, how cute!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_5"));
       } else if (level == 10) {
-         yellowMessage("Henesys Party Quest is now open to you! Head over to Henesys, find some friends, and try it out!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_10"));
       } else if (level == 15) {
-         yellowMessage("Half-way to your 2nd job advancement, nice work!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_15"));
       } else if (level == 20) {
-         yellowMessage("You can almost Kerning Party Quest!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_20"));
       } else if (level == 25) {
-         yellowMessage("You seem to be improving, but you are still not ready to move on to the next step.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_25"));
       } else if (level == 30) {
-         yellowMessage("You have finally reached level 30! Try job advancing, after that try the Mushroom Castle!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_30"));
       } else if (level == 35) {
-         yellowMessage("Hey did you hear about this mall that opened in Kerning? Try visiting the Kerning Mall.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_35"));
       } else if (level == 40) {
-         yellowMessage("Do @rates to see what all your rates are!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_40"));
       } else if (level == 45) {
-         yellowMessage("I heard that a rock and roll artist died during the grand opening of the Kerning Mall. People are naming him the Spirit of Rock.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_45"));
       } else if (level == 50) {
-         yellowMessage("You seem to be growing very fast, would you like to test your new found strength with the mighty Zakum?");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_50"));
       } else if (level == 55) {
-         yellowMessage("You can now try out the Ludibrium Maze Party Quest!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_55"));
       } else if (level == 60) {
-         yellowMessage("Feels good to be near the end of 2nd job, doesn't it?");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_60"));
       } else if (level == 65) {
-         yellowMessage("You're only 5 more levels away from 3rd job, not bad!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_65"));
       } else if (level == 70) {
-         yellowMessage("I see many people wearing a teddy bear helmet. I should ask someone where they got it from.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_70"));
       } else if (level == 75) {
-         yellowMessage("You have reached level 3 quarters!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_75"));
       } else if (level == 80) {
-         yellowMessage("You think you are powerful enough? Try facing horntail!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_80"));
       } else if (level == 85) {
-         yellowMessage("Did you know? The majority of people who hit level 85 in HeavenMS don't live to be 85 years old?");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_85"));
       } else if (level == 90) {
-         yellowMessage("Hey do you like the amusement park? I heard Spooky World is the best theme park around. I heard they sell cute teddy-bears.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_90"));
       } else if (level == 95) {
-         yellowMessage("100% of people who hit level 95 in HeavenMS don't live to be 95 years old.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_95"));
       } else if (level == 100) {
-         yellowMessage("Mid-journey so far... You just reached level 100! Now THAT's such a feat, however to manage the 200 you will need even more passion and determination than ever! Good hunting!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_100"));
       } else if (level == 105) {
-         yellowMessage("Have you ever been to leafre? I heard they have dragons!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_105"));
       } else if (level == 110) {
-         yellowMessage("I see many people wearing a teddy bear helmet. I should ask someone where they got it from.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_110"));
       } else if (level == 115) {
-         yellowMessage("I bet all you can think of is level 120, huh? Level 115 gets no love.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_115"));
       } else if (level == 120) {
-         yellowMessage("Are you ready to learn from the masters? Head over to your job instructor!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_120"));
       } else if (level == 125) {
-         yellowMessage("The struggle for mastery books has begun, huh?");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_125"));
       } else if (level == 130) {
-         yellowMessage("You should try Temple of Time. It should be pretty decent EXP.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_130"));
       } else if (level == 135) {
-         yellowMessage("I hope you're still not struggling for mastery books!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_135"));
       } else if (level == 140) {
-         yellowMessage("You're well into 4th job at this point, great work!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_140"));
       } else if (level == 145) {
-         yellowMessage("Level 145 is serious business!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_145"));
       } else if (level == 150) {
-         yellowMessage("You have become quite strong, but the journey is not yet over.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_150"));
       } else if (level == 155) {
-         yellowMessage("At level 155, Zakum should be a joke to you. Nice job!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_155"));
       } else if (level == 160) {
-         yellowMessage("Level 160 is pretty impressive.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_160"));
       } else if (level == 165) {
-         yellowMessage("At this level, you should start looking into doing some boss runs.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_165"));
       } else if (level == 170) {
-         yellowMessage("Level 170, huh? You have the heart of a champion.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_170"));
       } else if (level == 175) {
-         yellowMessage("You came a long way from level 1. Amazing job so far.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_175"));
       } else if (level == 180) {
-         yellowMessage("Have you ever tried taking a boss on by yourself? It is quite difficult.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_180"));
       } else if (level == 185) {
-         yellowMessage("Legend has it that you're a legend.");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_185"));
       } else if (level == 190) {
-         yellowMessage("You only have 10 more levels to go until you hit 200!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_190"));
       } else if (level == 195) {
-         yellowMessage("Nothing is stopping you at this point, level 195!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_195"));
       } else if (level == 200) {
-         yellowMessage("Very nicely done! You have reached the so-long dreamed LEVEL 200!!! You are truly a hero among men, cheers upon you!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("LEVEL_MESSAGE_200"));
       }
    }
 
@@ -6160,10 +6165,6 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             .forEach(questStatus -> questTimeLimit2(questStatus.getQuest(), questStatus.getExpirationTime()));
    }
 
-   public void yellowMessage(String m) {
-      PacketCreator.announce(this, new YellowTip(m));
-   }
-
    public void raiseQuestMobCount(int id) {
       // It seems nexon uses monsters that don't exist in the WZ (except string) to merge multiple mobs together for these 3 monsters.
       // We also want to run mobKilled for both since there are some quest that don't use the updated ID...
@@ -6234,7 +6235,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          }
       }
       if (possessed > 0 && !GameConstants.isDojo(getMapId())) {
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, "You have used a safety charm, so your EXP points have not been decreased.");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("SAFETY_CHARM_USE"));
          MapleInventoryManipulator.removeById(client, ItemConstants.getInventoryType(charmID[i]), charmID[i], 1, true, false);
          usedSafetyCharm = true;
       } else if (getJob() != MapleJob.BEGINNER) { //Hmm...
@@ -7366,7 +7367,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
             }
          }
 
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "EQUIPMENT MERGE operation results:");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EQUIPMENT_MERGE_TITLE"));
          for (Entry<Equip, List<Pair<StatUpgrade, Integer>>> eqpUpg : equipUpgrades.entrySet()) {
             List<Pair<StatUpgrade, Integer>> equipStatIncreases = eqpUpg.getValue();
             if (!equipStatIncreases.isEmpty()) {
@@ -7536,7 +7537,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          pet.fullness_$eq(15);
          PetProcessor.getInstance().saveToDb(pet);
          unequipPet(pet, true);
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your pet grew hungry! Treat it some pet food to keep it healthy!");
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PET_FULLNESS_LOW"));
       } else {
          pet.fullness_$eq(newFullness);
          PetProcessor.getInstance().saveToDb(pet);
@@ -7555,7 +7556,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
          if (tiredness > 99) {
             mount.tiredness_$eq(99);
             this.dispelSkill(this.getJobType() * 10000000 + 1004);
-            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, "Your mount grew tired! Treat it some revitalizer before riding it again!");
+            MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MOUNT_TIREDNESS_HIGH"));
             return false;
          }
       }
@@ -8032,7 +8033,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       scheduler.addIfNotExists(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT, () -> {
          if (pendantExp < 3) {
             pendantExp++;
-            MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, "Pendant of the Spirit has been equipped for " + pendantExp + " hour(s), you will now receive " + pendantExp + "0% bonus exp.");
+            MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.PINK_TEXT, I18nMessage.from("PENDANT_OF_SPIRIT_MESSAGE").with(pendantExp, pendantExp));
          } else {
             scheduler.cancel(MapleCharacterScheduler.Type.PENDANT_OF_SPIRIT);
          }
@@ -8342,7 +8343,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public int getReborns() {
       if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
-         yellowMessage("Rebirth system is not enabled!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("REBIRTH_NOT_ENABLED"));
          throw new NotEnabledException();
       }
       return DatabaseConnection.getInstance().withConnectionResult(connection -> CharacterProvider.getInstance().countReborns(connection, id)).orElse(0);
@@ -8350,7 +8351,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    private void setReborns(int value) {
       if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
-         yellowMessage("Rebirth system is not enabled!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("REBIRTH_NOT_ENABLED"));
          throw new NotEnabledException();
       }
       DatabaseConnection.getInstance().withConnection(connection -> CharacterAdministrator.getInstance().setReborns(connection, id, value));
@@ -8358,7 +8359,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
    public void executeReborn() {
       if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
-         yellowMessage("Rebirth system is not enabled!");
+         MessageBroadcaster.getInstance().yellowMessage(this, I18nMessage.from("REBIRTH_NOT_ENABLED"));
          throw new NotEnabledException();
       }
       if (getLevel() != 200) {
@@ -8508,8 +8509,8 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       return this.ariantPoints;
    }
 
-   public int getLanguage() {
-      return getClient().getLanguage();
+   public Locale getLocale() {
+      return getClient().getLocale();
    }
 
    public enum FameStatus {

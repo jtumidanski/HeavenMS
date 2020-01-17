@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class UnJailCommand extends Command {
    {
@@ -15,18 +16,18 @@ public class UnJailCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !unjail <player name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("UN_JAIL_COMMAND_SYNTAX"));
          return;
       }
 
       c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
          if (victim.getJailExpirationTimeLeft() <= 0) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "This player is already free.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("UN_JAIL_COMMAND_ALREADY_FREE"));
             return;
          }
          victim.removeJailExpirationTime();
-         MessageBroadcaster.getInstance().sendServerNotice(victim, ServerNoticeType.PINK_TEXT, "By lack of concrete proof you are now removed from jail. Enjoy freedom!");
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + " was removed from jail.");
-      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
+         MessageBroadcaster.getInstance().sendServerNotice(victim, ServerNoticeType.PINK_TEXT, I18nMessage.from("UN_JAIL_COMMAND_SUCCESS_VICTIM"));
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("UN_JAIL_COMMAND_SUCCESS").with(victim.getName()));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0])));
    }
 }

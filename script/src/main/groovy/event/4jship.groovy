@@ -9,6 +9,7 @@ import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 class Event4jship {
    EventManager em
@@ -40,9 +41,9 @@ class Event4jship {
    static def playerSurvived(EventInstanceManager eim) {
       if (eim.getLeader().isAlive()) {
          eim.setIntProperty("canLeave", 2)
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Kyrin: You have passed the test. Now for the closing part... Are you able reach the exit over there?")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("KYRIN_TEST_PASS"))
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Kyrin: You have failed the test. Aww, don't have such a sad face, just try it again later, ok?")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("KYRIN_TEST_FAIL"))
       }
    }
 
@@ -130,7 +131,7 @@ class Event4jship {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }

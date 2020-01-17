@@ -6,6 +6,7 @@ import client.command.Command;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ClearQuestCommand extends Command {
    {
@@ -16,11 +17,10 @@ public class ClearQuestCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please include a quest ID.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CLEAR_QUEST_COMMAND_LENGTH"));
          return;
       }
       MapleQuest.clearCache(Integer.parseInt(params[0]));
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Quest Cache for quest " + params[0] + " cleared.");
-
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("CLEAR_QUEST_COMMAND_SUCCESS").with(params[0]));
    }
 }

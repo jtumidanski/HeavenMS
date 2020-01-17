@@ -1,12 +1,14 @@
 package client.command.commands.gm6;
 
+import java.util.Collection;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
-import net.server.world.World;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class SaveAllCommand extends Command {
    {
@@ -16,13 +18,13 @@ public class SaveAllCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      for (World world : Server.getInstance().getWorlds()) {
-         for (MapleCharacter chr : world.getPlayerStorage().getAllCharacters()) {
-            chr.saveCharToDB();
-         }
-      }
+      Server.getInstance().getWorlds().stream()
+            .map(world -> world.getPlayerStorage().getAllCharacters())
+            .flatMap(Collection::stream)
+            .forEach(MapleCharacter::saveCharToDB);
+
       String message = player.getName() + " used !saveall.";
       MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, message);
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "All players saved successfully.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SAVE_ALL_COMMAND_SUCCESS"));
    }
 }

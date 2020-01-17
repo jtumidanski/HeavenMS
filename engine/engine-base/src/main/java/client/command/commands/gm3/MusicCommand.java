@@ -5,7 +5,9 @@ import client.MapleClient;
 import client.command.Command;
 import constants.game.GameConstants;
 import tools.MasterBroadcaster;
+import tools.MessageBroadcaster;
 import tools.PacketCreator;
+import tools.I18nMessage;
 import tools.packet.field.effect.MusicChange;
 import tools.packet.npctalk.GetNPCTalk;
 
@@ -41,7 +43,7 @@ public class MusicCommand extends Command {
       for (String s : GameConstants.GAME_SONGS) {
          if (s.equalsIgnoreCase(song)) {
             MasterBroadcaster.getInstance().sendToAllInMap(player.getMap(), new MusicChange(s));
-            player.yellowMessage("Now playing song " + s + ".");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("MUSIC_COMMAND_SYNTAX").with(s));
             return;
          }
       }

@@ -1,6 +1,5 @@
 package client.command.commands.gm1;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -13,6 +12,7 @@ import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class WhoDropsCommand extends Command {
    {
@@ -23,7 +23,7 @@ public class WhoDropsCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please do @whodrops <item name>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("WHO_DROPS_COMMAND_SYNTAX"));
          return;
       }
 
@@ -34,7 +34,7 @@ public class WhoDropsCommand extends Command {
 
             List<Pair<Integer, String>> itemData = MapleItemInformationProvider.getInstance().getItemDataByName(searchString);
             if (itemData.size() == 0) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The item you searched for doesn't exist.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ITEM_SEARCHED_DOES_NOT_EXIST"));
                return;
             }
 
@@ -54,7 +54,7 @@ public class WhoDropsCommand extends Command {
             c.releaseClient();
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a while for your request to be processed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("COMMAND_PATIENCE"));
       }
    }
 }

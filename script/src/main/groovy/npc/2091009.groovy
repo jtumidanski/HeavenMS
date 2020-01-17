@@ -4,6 +4,7 @@ package npc
 import scripting.npc.NPCConversationManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -46,7 +47,7 @@ class NPC2091009 {
             if (cm.isQuestStarted(21747) && cm.getQuestProgressInt(21747, 9300351) == 0) {
                cm.warp(925040100, 0)
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Although you said the right answer, some mysterious forces are blocking the way in.")
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("CORRECT_BUT_FORCES_BLOCKING"))
             }
 
             cm.dispose()

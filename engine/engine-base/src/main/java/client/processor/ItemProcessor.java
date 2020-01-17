@@ -17,6 +17,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.foreigneffect.ShowForeignEffect;
 import tools.packet.showitemgaininchat.ShowSpecialEffect;
 
@@ -228,27 +229,16 @@ public class ItemProcessor {
 
       equip.itemLevel_$eq((byte) (equip.itemLevel() + 1));
 
-      String levelUpString = "'" + MapleItemInformationProvider.getInstance().getName(equip.id()) + "' is now level " + equip.itemLevel() + "! ";
-      String showStr = "#e'" + MapleItemInformationProvider.getInstance().getName(equip.id()) + "'#b is now #elevel #r" + equip.itemLevel() + "#k#b!";
+      String itemName = MapleItemInformationProvider.getInstance().getName(equip.id());
+      String showStr = "#e'" + itemName + "'#b is now #elevel #r" + equip.itemLevel() + "#k#b!";
 
       Pair<String, Pair<Boolean, Boolean>> res = equip.gainStats(stats);
-      levelUpString += res.getLeft();
       boolean gotSlot = res.getRight().getLeft();
       boolean gotVicious = res.getRight().getRight();
-
-      if (gotVicious) {
-         //c.getPlayer().dropMessage(6, "A new Vicious Hammer opportunity has been found on the '" + MapleItemInformationProvider.getInstance().getName(getItemId()) + "'!");
-         levelUpString += "+VICIOUS ";
-      }
-      if (gotSlot) {
-         //c.getPlayer().dropMessage(6, "A new upgrade slot has been found on the '" + MapleItemInformationProvider.getInstance().getName(getItemId()) + "'!");
-         levelUpString += "+UPGSLOT ";
-      }
-
       c.getPlayer().equipChanged();
 
       showLevelUpMessage(showStr, c);
-      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, levelUpString);
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ITEM_LEVEL_UP_MESSAGE").with(itemName, equip.itemLevel(), res.getLeft(), (gotVicious ? "+VICIOUS" : ""), (gotSlot ? "+UPGSLOT" : "")));
 
       PacketCreator.announce(c, new ShowSpecialEffect(15));
       c.getPlayer().getMap().broadcastMessage(c.getPlayer(), new ShowForeignEffect(c.getPlayer().getId(), 15));

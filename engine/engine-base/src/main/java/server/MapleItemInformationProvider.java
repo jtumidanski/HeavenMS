@@ -65,6 +65,7 @@ import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
 import tools.TriFunction;
+import tools.I18nMessage;
 import tools.packet.message.YellowTip;
 
 public class MapleItemInformationProvider {
@@ -1365,7 +1366,7 @@ public class MapleItemInformationProvider {
       int id = equip.id();
 
       if (ItemConstants.isWeddingRing(id) && chr.hasJustMarried()) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "The Wedding Ring cannot be equipped on this map.");  // will dc everyone due to doubled couple effect
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_RING_EQUIP_ERROR"));  // will dc everyone due to doubled couple effect
          return false;
       }
 

@@ -10,6 +10,7 @@ import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.I18nMessage
 import tools.packet.ui.GetClock
 
 class EventAran_2ndmount {
@@ -121,7 +122,7 @@ class EventAran_2ndmount {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }

@@ -5,6 +5,7 @@ import server.life.MapleLifeFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 
@@ -33,7 +34,7 @@ class NPC1104002 {
 
          if (mode == 0 && type > 0) {
             MapleLifeFactory.getMonster(9001010).ifPresent({ monster ->
-               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "Eleanor: Oh, lost the Empress and still challenging us? Now you've done it! Prepare yourself!!!")
+               MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ELEANOR_STILL_CHALLENGING"))
                map.spawnMonsterOnGroundBelow(monster, new Point(850, 0))
                map.destroyNPC(1104002)
             })

@@ -38,6 +38,7 @@ import tools.LambdaNoOp;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.buddy.RequestAddBuddy;
 import tools.packet.buddy.UpdateBuddyCapacity;
 import tools.packet.buddy.UpdateBuddyChannel;
@@ -202,13 +203,13 @@ public class BuddyListProcessor {
       UriBuilder.service(RestService.BUDDY).path("characters").path(character.getId()).path("buddies").getRestClient(AddBuddyResponse.class)
             .success((responseCode, result) -> {
                if (result.errorCode() == AddBuddyResult$.MODULE$.TARGET_CHARACTER_DOES_NOT_EXIST()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "A character called \"" + addName + "\" does not exist");
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("BUDDY_SERVICE_PLAYER_NOT_FOUND").with(addName));
                } else if (result.errorCode() == AddBuddyResult$.MODULE$.FULL()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "Your buddy list is already full");
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("BUDDY_SERVICE_BUDDY_LIST_FULL"));
                } else if (result.errorCode() == AddBuddyResult$.MODULE$.ALREADY_REQUESTED()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "You already have \"" + addName + "\" on your buddy list");
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("BUDDY_SERVICE_ALREADY_REQUESTED").with(addName));
                } else if (result.errorCode() == AddBuddyResult$.MODULE$.BUDDY_FULL()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "\"" + addName + "\"'s buddy list is full");
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("BUDDY_SERVICE_BUDDIES_LIST_IS_FULL").with(addName));
                } else if (result.errorCode() == AddBuddyResult$.MODULE$.OK() || result.errorCode() == AddBuddyResult$.MODULE$.BUDDY_ALREADY_REQUESTED()) {
 
                   int displayChannel = -1;
@@ -331,9 +332,10 @@ public class BuddyListProcessor {
       onFailure.run();
    }
 
+   //TODO - handle logging locale
    protected void operationFailure(MapleCharacter character, String debugMessage) {
       FilePrinter.printError(FilePrinter.BUDDY_ORCHESTRATOR, debugMessage);
-      MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, "Unable to perform operation. Buddy service is offline.");
+      MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, I18nMessage.from("BUDDY_SERVICE_OFFLINE"));
    }
 
    protected void updateCapacitySuccess(MapleCharacter character, int capacity, Runnable onSuccess) {

@@ -11,6 +11,7 @@ import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 import java.util.List
@@ -211,7 +212,7 @@ class EventHolidayPQ_3 {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }
@@ -321,7 +322,7 @@ class EventHolidayPQ_3 {
          eim.setIntProperty("snowmanStep", step - 1)
       }
 
-      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The snowman absorbed a Fake Snow Vigor!")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("HENESYS_PQ_SNOWMAN_ABSORB"))
    }
 
    // When invoking unregisterMonster(MapleMonster mob) OR killed

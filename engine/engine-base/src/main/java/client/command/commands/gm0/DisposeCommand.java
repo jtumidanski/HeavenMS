@@ -7,6 +7,7 @@ import scripting.quest.QuestScriptManager;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public class DisposeCommand extends Command {
@@ -20,6 +21,6 @@ public class DisposeCommand extends Command {
       QuestScriptManager.getInstance().dispose(c);
       PacketCreator.announce(c, new EnableActions());
       c.removeClickedNPC();
-      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "You've been disposed.");
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DISPOSE_COMMAND_SUCCESS"));
    }
 }

@@ -16,6 +16,7 @@ import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import server.maps.MapleMap;
 import tools.packet.message.ServerNotice;
+import tools.packet.message.YellowTip;
 
 public class MessageBroadcaster {
    private static MessageBroadcaster ourInstance = new MessageBroadcaster();
@@ -79,8 +80,16 @@ public class MessageBroadcaster {
       MasterBroadcaster.getInstance().send(recipients, character -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
    }
 
+   public void sendServerNotice(Collection<MapleCharacter> recipients, ServerNoticeType noticeType, I18nMessage message) {
+      MasterBroadcaster.getInstance().send(recipients, character -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message.to(character).evaluate())));
+   }
+
    public void sendServerNotice(MapleCharacter character, ServerNoticeType noticeType, String message) {
       MasterBroadcaster.getInstance().send(Collections.singletonList(character), recipient -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
+   }
+
+   public void sendServerNotice(MapleCharacter character, ServerNoticeType noticeType, I18nMessage message) {
+      MasterBroadcaster.getInstance().send(Collections.singletonList(character), recipient -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message.to(recipient).evaluate())));
    }
 
    public void sendServerNoticeToAcquaintances(MapleCharacter originator, ServerNoticeType noticeType, String message) {
@@ -103,6 +112,13 @@ public class MessageBroadcaster {
                .orElse(Collections.emptyList());
          MasterBroadcaster.getInstance().send(guildMembers, recipient -> PacketCreator.create(new ServerNotice(noticeType.getValue(), message)));
       }
+   }
 
+   public void yellowMessage(MapleCharacter character, I18nMessage message) {
+      MasterBroadcaster.getInstance().send(Collections.singletonList(character), recipient -> PacketCreator.create(new YellowTip(message.to(recipient).evaluate())));
+   }
+
+   public void yellowMessage(MapleCharacter character, String message) {
+      MasterBroadcaster.getInstance().send(Collections.singletonList(character), recipient -> PacketCreator.create(new YellowTip(message)));
    }
 }

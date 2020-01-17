@@ -38,6 +38,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.data.input.SeekableLittleEndianAccessor;
+import tools.I18nMessage;
 import tools.packet.GetEnergy;
 import tools.packet.attack.CloseRangeAttack;
 import tools.packet.buff.GiveBuff;
@@ -169,7 +170,7 @@ public final class CloseRangeDamageHandler extends AbstractDealDamageHandler<Att
 
          chr.setDojoEnergy(0);
          PacketCreator.announce(c, new GetEnergy("energy", chr.getDojoEnergy()));
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ENERGY_RESET_DUE_TO_SECRET_SKILL"));
       } else if (attack.skill() > 0) {
          SkillFactory.executeForSkill(chr, attack.skill(), ((skill, skillLevel) -> applyCoolDownIfPresent(skill, chr)));
       }

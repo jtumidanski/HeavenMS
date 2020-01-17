@@ -9,6 +9,7 @@ import server.life.MapleMonster
 import scripting.event.EventManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 class Event0_EXAMPLE {
    EventManager em
@@ -93,7 +94,7 @@ class Event0_EXAMPLE {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }

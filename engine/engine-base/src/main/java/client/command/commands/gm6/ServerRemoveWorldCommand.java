@@ -7,6 +7,7 @@ import net.server.Server;
 import server.ThreadManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ServerRemoveWorldCommand extends Command {
    {
@@ -19,21 +20,21 @@ public class ServerRemoveWorldCommand extends Command {
 
       final int worldId = Server.getInstance().getWorldsSize() - 1;
       if (worldId <= 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Unable to remove world 0.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_WORLD_COMMAND_WORLD_0"));
          return;
       }
 
       ThreadManager.getInstance().newTask(() -> {
          if (Server.getInstance().removeWorld()) {
             if (player.isLoggedInWorld()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Successfully removed a world. Current world count: " + Server.getInstance().getWorldsSize() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_WORLD_COMMAND_SUCCESS").with(Server.getInstance().getWorldsSize()));
             }
          } else {
             if (player.isLoggedInWorld()) {
                if (worldId < 0) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "No registered worlds to remove.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_WORLD_COMMAND_NO_WORLDS_TO_REMOVE"));
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Failed to remove world " + worldId + ". Check if there are people currently playing there.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_WORLD_COMMAND_ERROR").with(worldId));
                }
             }
          }

@@ -14,6 +14,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ui.ShowOXQuiz;
 
 public final class MapleOxQuiz {
@@ -37,7 +38,7 @@ public final class MapleOxQuiz {
       double x = chr.position().getX();
       double y = chr.position().getY();
       if ((x > -234 && y > -26 && answer == 0) || (x < -234 && y > -26 && answer == 1)) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Correct!");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_OX_QUIZ_SUCCESS"));
          return true;
       }
       return false;

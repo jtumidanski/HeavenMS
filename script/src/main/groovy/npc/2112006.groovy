@@ -5,6 +5,7 @@ import scripting.npc.NPCConversationManager
 import server.maps.MapleReactor
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -46,7 +47,7 @@ class NPC2112006 {
                   eim.setIntProperty("npcShocked", 1)
 
                   cm.sendNext("Oh? You got a letter for me? On times like this, what should it be... Gasp! Something big is going on, guys. Rally yourselves, from now on things will be harder than ever!")
-                  MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "Romeo seemed very much in shock after reading Juliet's Letter.")
+                  MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ROMEO_SHOCK"))
 
                   cm.dispose()
                } else if (eim.getIntProperty("statusStg4") == 1) {

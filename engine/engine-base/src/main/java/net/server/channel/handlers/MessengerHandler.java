@@ -21,6 +21,7 @@ import net.server.world.World;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.messenger.MessengerNote;
 
 public final class MessengerHandler extends AbstractPacketHandler<BaseMessengerPacket> {
@@ -127,7 +128,7 @@ public final class MessengerHandler extends AbstractPacketHandler<BaseMessengerP
                            world.joinMessenger(messenger.getId(), messengerCharacter, player.getName(), messengerCharacter.getChannel());
                         }
                      } else {
-                        MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not verify your Maple Messenger accept since the invitation rescinded.");
+                        MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("MESSENGER_ERROR_INVITATION_RESCINDED"));
                      }
                   });
                }

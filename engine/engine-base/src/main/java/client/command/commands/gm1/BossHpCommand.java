@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.life.MapleMonster;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class BossHpCommand extends Command {
    {
@@ -21,8 +23,8 @@ public class BossHpCommand extends Command {
                bar.append(i < percent ? "|" : ".");
             }
             bar.append("]");
-            player.yellowMessage(monster.getName() + " (" + monster.id() + ") has " + percent + "% HP left.");
-            player.yellowMessage("HP: " + bar);
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("BOSS_HP_COMMAND_PART").with(monster.getName(), monster.id(), percent));
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("BOSS_HP_COMMAND_TOTAL_HP").with(bar));
          }
       }
    }

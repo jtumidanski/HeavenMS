@@ -7,9 +7,11 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import database.provider.PlayerLifeProvider;
 import database.DatabaseConnection;
+import database.provider.PlayerLifeProvider;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.I18nMessage;
 
 public class PlayerMobRemoveCommand extends Command {
    {
@@ -44,6 +46,6 @@ public class PlayerMobRemoveCommand extends Command {
                }));
       }
 
-      player.yellowMessage("Cleared " + toRemove.size() + " player mob placements.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PLAYER_MOB_REMOVE_COMMAND_SUCCESS").with(toRemove.size()));
    }
 }

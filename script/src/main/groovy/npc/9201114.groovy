@@ -4,6 +4,7 @@ package npc
 import scripting.npc.NPCConversationManager
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -21,7 +22,7 @@ class NPC9201114 {
       if (cm.haveItem(3992041, 1)) {
          cm.warp(610030020, "out00")
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, "The giant gate of iron will not budge no matter what, however there is a visible key-shaped socket.")
+         MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GIANT_GATE_NO_BUDGE"))
       }
 
       cm.dispose()

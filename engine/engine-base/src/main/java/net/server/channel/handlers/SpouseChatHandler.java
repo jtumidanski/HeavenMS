@@ -12,6 +12,7 @@ import tools.LogHelper;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.message.SpouseMessage;
 
 public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPacket> {
@@ -33,10 +34,10 @@ public final class SpouseChatHandler extends AbstractPacketHandler<SpouseChatPac
                LogHelper.logChat(client, "Spouse", packet.message());
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Your spouse is currently offline.");
+            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SPOUSE_OFFLINE"));
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "You don't have a spouse.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SPOUSE_MISSING"));
       }
    }
 }

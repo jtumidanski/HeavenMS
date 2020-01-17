@@ -97,6 +97,7 @@ import tools.Pair;
 import tools.PointUtil;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.buff.GiveForeignBuff;
 import tools.packet.character.CharacterLook;
@@ -2816,14 +2817,14 @@ public class MapleMap {
       }
    }
 
-   private String getSpawnPointMessage(SpawnPoint spawnPoint) {
-      return String.format("  id: %d canSpawn: %b numSpawned: %d x: %d y: %d time: %t team: %d",
-            spawnPoint.getMonsterId(), !spawnPoint.getDenySpawn(), spawnPoint.getSpawned(), spawnPoint.getPosition().getX(),
+   private I18nMessage getSpawnPointMessage(SpawnPoint spawnPoint) {
+      return I18nMessage.from("DEBUG_COMMAND_MOB_SPAWN_POINTS_BODY").with(spawnPoint.getMonsterId(),
+            !spawnPoint.getDenySpawn(), spawnPoint.getSpawned(), spawnPoint.getPosition().getX(),
             spawnPoint.getPosition().getY(), new Date(spawnPoint.getMobTime()), spawnPoint.getTeam());
    }
 
    public void reportMonsterSpawnPoints(MapleCharacter chr) {
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, "Mob spawn points on map " + getId() + ", with available Mob SPs " + monsterSpawn.size() + ", used " + spawnedMonstersOnMap.get() + ":");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_MOB_SPAWN_POINTS_TITLE").with(getId(), monsterSpawn.size(), spawnedMonstersOnMap.get()));
       getAllMonsterSpawn().stream()
             .map(this::getSpawnPointMessage)
             .forEach(message -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.LIGHT_BLUE, message));

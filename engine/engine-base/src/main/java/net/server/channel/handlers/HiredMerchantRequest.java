@@ -17,6 +17,7 @@ import server.maps.MaplePortal;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.MiniRoomError;
 import tools.packet.character.interaction.GetMiniRoomError;
 import tools.packet.shop.RetrieveFirstMessage;
@@ -65,10 +66,10 @@ public final class HiredMerchantRequest extends AbstractPacketHandler<NoOpPacket
                PacketCreator.announce(chr, new RetrieveFirstMessage());
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You already have a store open.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_ALREADY_OPEN"));
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot open your hired merchant here.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PLACEMENT_ERROR"));
       }
    }
 }

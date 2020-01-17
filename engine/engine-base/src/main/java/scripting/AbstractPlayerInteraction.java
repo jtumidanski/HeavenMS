@@ -56,6 +56,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.DojoWarpUp;
 import tools.packet.GetEnergy;
 import tools.packet.field.effect.EnvironmentChange;
@@ -532,7 +533,7 @@ public class AbstractPlayerInteraction {
 
       target = getPlayer().getPet(slot);
       if (target == null) {
-         MessageBroadcaster.getInstance().sendServerNotice(getPlayer(), ServerNoticeType.PINK_TEXT, "Pet could not be evolved...");
+         MessageBroadcaster.getInstance().sendServerNotice(getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PET_EVOLVE_ERROR"));
          return (null);
       }
 
@@ -646,7 +647,7 @@ public class AbstractPlayerInteraction {
          }
 
          if (!MapleInventoryManipulator.checkSpace(c, id, quantity, "")) {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please remove an item from your " + ItemConstants.getInventoryType(id).name() + " inventory.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL").with(ItemConstants.getInventoryType(id).name()));
             return null;
          }
          if (ItemConstants.getInventoryType(id) == MapleInventoryType.EQUIP) {

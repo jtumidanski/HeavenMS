@@ -6,6 +6,7 @@ import client.command.Command;
 import net.server.Server;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class FlyCommand extends Command {
    {
@@ -16,25 +17,17 @@ public class FlyCommand extends Command {
    public void execute(MapleClient c, String[] params) { // fly option will become available for any character of that account
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !fly <on/off>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("FLY_COMMAND_SYNTAX"));
          return;
       }
 
-      Integer accountId = c.getAccID();
       Server srv = Server.getInstance();
-      String sendStr = "";
       if (params[0].equalsIgnoreCase("on")) {
-         sendStr += "Enabled Fly feature (F1). With fly active, you cannot attack.";
-         if (!srv.canFly(accountId)) sendStr += " Re-login to take effect.";
-
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("FLY_COMMAND_ON"));
          srv.changeFly(c.getAccID(), true);
       } else {
-         sendStr += "Disabled Fly feature. You can now attack.";
-         if (srv.canFly(accountId)) sendStr += " Re-login to take effect.";
-
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("FLY_COMMAND_OFF"));
          srv.changeFly(c.getAccID(), false);
       }
-
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, sendStr);
    }
 }

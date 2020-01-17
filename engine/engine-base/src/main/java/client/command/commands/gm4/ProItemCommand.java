@@ -12,6 +12,7 @@ import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ProItemCommand extends Command {
    {
@@ -43,7 +44,7 @@ public class ProItemCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !proitem <item id> <stat value> [<speed jump value>]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PRO_ITEM_COMMAND_SYNTAX"));
          return;
       }
 
@@ -51,7 +52,7 @@ public class ProItemCommand extends Command {
       int itemId = Integer.parseInt(params[0]);
 
       if (ii.getName(itemId) == null) {
-         player.yellowMessage("Item id '" + params[0] + "' does not exist.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PRO_ITEM_DOES_NOT_EXIST"));
          return;
       }
 
@@ -66,7 +67,7 @@ public class ProItemCommand extends Command {
          hardSetItemStats((Equip) it, stat, speedJump);
          MapleInventoryManipulator.addFromDrop(c, it);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Make sure it's an item able to be equipped.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PRO_ITEM_NOT_EQUIP"));
       }
    }
 }

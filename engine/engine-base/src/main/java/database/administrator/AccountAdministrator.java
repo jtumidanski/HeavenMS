@@ -93,7 +93,7 @@ public class AccountAdministrator extends AbstractQueryExecutor {
       update(entityManager, accountId, account -> account.setRewardPoints(value));
    }
 
-   public void setLanguage(EntityManager entityManager, int accountId, int language) {
+   public void setLanguage(EntityManager entityManager, int accountId, String language) {
       update(entityManager, accountId, account -> account.setLanguage(language));
    }
 

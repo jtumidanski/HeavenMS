@@ -25,6 +25,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePlayerStats;
 
@@ -353,9 +354,7 @@ public class AssignAPProcessor {
             chr.assignStrDexIntLuk(statGain[0], statGain[1], statGain[3], statGain[2]);
             PacketCreator.announce(c, new EnableActions());
 
-            //----------------------------------------------------------------------------------------
-
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Better AP applications detected:\r\nSTR: +" + statGain[0] + "\r\nDEX: +" + statGain[1] + "\r\nINT: +" + statGain[3] + "\r\nLUK: +" + statGain[2]);
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("ASSIGN_AP_SUGGESTION").with(statGain[0], statGain[1], statGain[3], statGain[2]));
          } else {
             if (types.length != 2 || gains.length != 2) {
                AutoBanFactory.PACKET_EDIT.alert(chr, "Didn't send full packet for Auto Assign.");
@@ -450,48 +449,48 @@ public class AssignAPProcessor {
          switch (APFrom) {
             case 64: // str
                if (player.getStr() < 5) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum STR required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MISSING_MINIMUM").with("STR"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                if (!player.assignStr(-1)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_RESET_ERROR"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                break;
             case 128: // dex
                if (player.getDex() < 5) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum DEX required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MISSING_MINIMUM").with("DEX"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                if (!player.assignDex(-1)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_RESET_ERROR"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                break;
             case 256: // int
                if (player.getInt() < 5) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum INT required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MISSING_MINIMUM").with("INT"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                if (!player.assignInt(-1)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_RESET_ERROR"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                break;
             case 512: // luk
                if (player.getLuk() < 5) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum LUK required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MISSING_MINIMUM").with("LUK"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
                if (!player.assignLuk(-1)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Couldn't execute AP reset operation.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_RESET_ERROR"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -499,14 +498,14 @@ public class AssignAPProcessor {
             case 2048: // HP
                if (YamlConfig.config.server.USE_ENFORCE_HPMP_SWAP) {
                   if (APTo != 8192) {
-                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You can only swap HP ability points to MP.");
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_HP_MP_SWAP_ENFORCEMENT"));
                      PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
                }
 
                if (player.getHpMpApUsed() < 1) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have enough HP/MP stat points to spend on AP Reset.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_NOT_ENOUGH_HP_MP"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -514,7 +513,7 @@ public class AssignAPProcessor {
                int hp = player.getMaxHp();
                int level_ = player.getLevel();
                if (hp < level_ * 14 + 148) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum HP pool required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MINIMUM_HP_POOL"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -530,14 +529,14 @@ public class AssignAPProcessor {
             case 8192: // MP
                if (YamlConfig.config.server.USE_ENFORCE_HPMP_SWAP) {
                   if (APTo != 2048) {
-                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You can only swap MP ability points to HP.");
+                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MP_HP_SWAP_ENFORCEMENT"));
                      PacketCreator.announce(c, new EnableActions());
                      return false;
                   }
                }
 
                if (player.getHpMpApUsed() < 1) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have enough HP/MP stat points to spend on AP Reset.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_NOT_ENOUGH_HP_MP"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -558,7 +557,7 @@ public class AssignAPProcessor {
                }
 
                if (!canWash) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You don't have the minimum MP pool required to swap.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_MINIMUM_MP_POOL"));
                   PacketCreator.announce(c, new EnableActions());
                   return false;
                }
@@ -595,42 +594,42 @@ public class AssignAPProcessor {
       switch (apTo) {
          case 64:
             if (!chr.assignStr(1)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_ASSIGN_ERROR"));
                PacketCreator.announce(chr, new EnableActions());
                return false;
             }
             break;
          case 128: // Dex
             if (!chr.assignDex(1)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_ASSIGN_ERROR"));
                PacketCreator.announce(chr, new EnableActions());
                return false;
             }
             break;
          case 256: // Int
             if (!chr.assignInt(1)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_ASSIGN_ERROR"));
                PacketCreator.announce(chr, new EnableActions());
                return false;
             }
             break;
          case 512: // Luk
             if (!chr.assignLuk(1)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_ASSIGN_ERROR"));
                PacketCreator.announce(chr, new EnableActions());
                return false;
             }
             break;
          case 2048:
             if (!chr.assignHP(calcHpChange(chr, usedAPReset), 1)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_ASSIGN_ERROR"));
                PacketCreator.announce(chr, new EnableActions());
                return false;
             }
             break;
          case 8192:
             if (!chr.assignMP(calcMpChange(chr, usedAPReset), 1)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Couldn't execute AP assign operation.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ASSIGN_AP_ASSIGN_ERROR"));
                PacketCreator.announce(chr, new EnableActions());
                return false;
             }

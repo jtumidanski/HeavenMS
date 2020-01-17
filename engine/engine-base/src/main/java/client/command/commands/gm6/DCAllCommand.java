@@ -1,12 +1,14 @@
 package client.command.commands.gm6;
 
+import java.util.Collection;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
-import net.server.world.World;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class DCAllCommand extends Command {
    {
@@ -16,13 +18,11 @@ public class DCAllCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-      for (World world : Server.getInstance().getWorlds()) {
-         for (MapleCharacter chr : world.getPlayerStorage().getAllCharacters()) {
-            if (!chr.isGM()) {
-               chr.getClient().disconnect(false, false);
-            }
-         }
-      }
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "All players successfully disconnected.");
+      Server.getInstance().getWorlds().stream()
+            .map(world -> world.getPlayerStorage().getAllCharacters())
+            .flatMap(Collection::stream)
+            .filter(character -> !character.isGM())
+            .forEach(character -> character.getClient().disconnect(false, false));
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("DC_ALL_COMMAND_SUCCESS"));
    }
 }

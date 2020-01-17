@@ -8,6 +8,7 @@ import server.life.MapleLifeFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 
@@ -140,7 +141,7 @@ class NPC9105004 {
                map.allowSummonState(true)
                map.spawnMonsterOnGroundBelow(snowman, new Point(-180, 15))
                eim.setIntProperty("snowmanLevel", 1)
-               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "The snowman appeared on the field! Protect it using all means necessary!")
+               MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SNOWMAN_PROTECT"))
                eim.setIntProperty("statusStg1", 0)
             })
 

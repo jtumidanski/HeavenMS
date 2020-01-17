@@ -9,6 +9,7 @@ import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 import java.util.List
@@ -113,7 +114,7 @@ class EventShowaBattle {
 
    // Warp player in etc..
    def playerEntry(EventInstanceManager eim, MapleCharacter player) {
-      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has entered the map.")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_ENTER_MAP").with(player.getName()))
       MapleMap map = eim.getMapInstance(entryMap)
       player.changeMap(map, map.getPortal(0))
    }
@@ -137,10 +138,10 @@ class EventShowaBattle {
       if (mapId < minMapId || mapId > maxMapId) {
          if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
             eim.unregisterPlayer(player)
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_LEADER_QUIT_OR_NOT_MINIMUM_PLAYERS"))
             end(eim)
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_LEFT_INSTANCE").with(player.getName()))
             eim.unregisterPlayer(player)
          }
       }
@@ -160,7 +161,7 @@ class EventShowaBattle {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }
@@ -204,10 +205,10 @@ class EventShowaBattle {
    def playerRevive(EventInstanceManager eim, MapleCharacter player) {
       if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
          eim.unregisterPlayer(player)
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_LEADER_QUIT_OR_NOT_MINIMUM_PLAYERS"))
          end(eim)
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_LEFT_INSTANCE").with(player.getName()))
          eim.unregisterPlayer(player)
       }
    }
@@ -218,10 +219,10 @@ class EventShowaBattle {
    def playerDisconnected(EventInstanceManager eim, MapleCharacter player) {
       if (eim.isExpeditionTeamLackingNow(true, minPlayers, player)) {
          eim.unregisterPlayer(player)
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] Either the leader has quit the expedition or there is no longer the minimum number of members required to continue it.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_LEADER_QUIT_OR_NOT_MINIMUM_PLAYERS").with(player.getName()))
          end(eim)
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "[Expedition] " + player.getName() + " has left the instance.")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("EXPEDITION_PLAYER_LEFT_INSTANCE").with(player.getName()))
          eim.unregisterPlayer(player)
       }
    }
@@ -250,7 +251,7 @@ class EventShowaBattle {
       if (eim.getIntProperty("playerDied") == 0) {
          eim.getMonster(9400114).ifPresent({ mob ->
             eim.getMapInstance(801040101).spawnMonsterOnGroundBelow(mob, new Point(500, -50))
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Konpei: The Boss has been defeated with no casualties, well done! We found a suspicious machine inside, we're moving it out.")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("KONPEI_BOSS_DEFEATED"))
          })
       }
    }

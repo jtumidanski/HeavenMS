@@ -1,16 +1,17 @@
 package client.command.commands.gm3;
 
-import client.processor.BanProcessor;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import client.processor.BanProcessor;
+import database.DatabaseConnection;
 import database.administrator.IpBanAdministrator;
 import server.TimerManager;
-import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.I18nMessage;
 import tools.packet.ui.GMEffect;
 
 public class BanCommand extends Command {
@@ -22,7 +23,7 @@ public class BanCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !ban <IGN> <Reason> (Please be descriptive)");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("BAN_COMMAND_SYNTAX"));
          return;
       }
       String ign = params[0];
@@ -38,8 +39,8 @@ public class BanCommand extends Command {
          target.getClient().banMacs();
          reason = c.getPlayer().getName() + " banned " + readableTargetName + " for " + reason + " (IP: " + ip + ") " + "(MAC: " + c.getMacs() + ")";
          target.ban(reason);
-         target.yellowMessage("You have been banned by #b" + c.getPlayer().getName() + " #k.");
-         target.yellowMessage("Reason: " + reason);
+         MessageBroadcaster.getInstance().yellowMessage(target, I18nMessage.from("BAN_COMMAND_BANNED_BY").with(c.getPlayer().getName()));
+         MessageBroadcaster.getInstance().yellowMessage(target, I18nMessage.from("BAN_COMMAND_REASON").with(reason));
          PacketCreator.announce(c, new GMEffect(4, (byte) 0));
          final MapleCharacter rip = target;
          TimerManager.getInstance().schedule(() -> rip.getClient().disconnect(false, false), 5000); //5 Seconds

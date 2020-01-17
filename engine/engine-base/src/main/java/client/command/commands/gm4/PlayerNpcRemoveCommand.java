@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.life.MaplePlayerNPC;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class PlayerNpcRemoveCommand extends Command {
    {
@@ -11,12 +13,12 @@ public class PlayerNpcRemoveCommand extends Command {
    }
 
    @Override
-   public void execute(MapleClient c, String[] params) {
-      MapleCharacter player = c.getPlayer();
+   public void execute(MapleClient client, String[] params) {
+      MapleCharacter player = client.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !playernpcremove <player name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PNPC_REMOVE_COMMAND_SYNTAX"));
          return;
       }
-      c.getChannelServer().getPlayerStorage().getCharacterByName(params[0]).ifPresent(MaplePlayerNPC::removePlayerNPC);
+      client.getChannelServer().getPlayerStorage().getCharacterByName(params[0]).ifPresent(MaplePlayerNPC::removePlayerNPC);
    }
 }

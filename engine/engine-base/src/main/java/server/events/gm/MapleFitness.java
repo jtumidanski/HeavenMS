@@ -7,6 +7,7 @@ import server.TimerManager;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ui.GetClock;
 
 public class MapleFitness {
@@ -33,7 +34,7 @@ public class MapleFitness {
       checkAndMessage();
 
       chr.getMap().getPortal("join00").setPortalStatus(true);
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The portal has now opened. Press the up arrow key at the portal to enter.");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_START"));
    }
 
    public boolean isTimerStarted() {
@@ -62,29 +63,29 @@ public class MapleFitness {
          }
          if (chr.getMap().getId() >= 109040000 && chr.getMap().getId() <= 109040004) {
             if (getTimeLeft() > 9000 && getTimeLeft() < 11000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "You have 10 sec left. Those of you unable to beat the game, we hope you beat it next time! Great job everyone!! See you later~");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_1"));
             } else if (getTimeLeft() > 99000 && getTimeLeft() < 101000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Alright, you don't have much time remaining. Please hurry up a little!");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_2"));
             } else if (getTimeLeft() > 239000 && getTimeLeft() < 241000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The 4th stage is the last one for [The Maple Physical Fitness Test]. Please don't give up at the last minute and try your best. The reward is waiting for you at the very top!");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_3"));
             } else if (getTimeLeft() > 299000 && getTimeLeft() < 301000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The 3rd stage offers traps where you may see them, but you won't be able to step on them. Please be careful of them as you make your way up.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_4"));
             } else if (getTimeLeft() > 359000 && getTimeLeft() < 361000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "For those who have heavy lags, please make sure to move slowly to avoid falling all the way down because of lags.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_5"));
             } else if (getTimeLeft() > 499000 && getTimeLeft() < 501000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Please remember that if you die during the event, you'll be eliminated from the game. If you're running out of HP, either take a potion or recover HP first before moving on.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_6"));
             } else if (getTimeLeft() > 599000 && getTimeLeft() < 601000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The most important thing you'll need to know to avoid the bananas thrown by the monkeys is *Timing* Timing is everything in this!");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_7"));
             } else if (getTimeLeft() > 659000 && getTimeLeft() < 661000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The 2nd stage offers monkeys throwing bananas. Please make sure to avoid them by moving along at just the right timing.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_8"));
             } else if (getTimeLeft() > 699000 && getTimeLeft() < 701000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Please remember that if you die during the event, you'll be eliminated from the game. You still have plenty of time left, so either take a potion or recover HP first before moving on.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_9"));
             } else if (getTimeLeft() > 779000 && getTimeLeft() < 781000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Everyone that clears [The Maple Physical Fitness Test] on time will be given an item, regardless of the order of finish, so just relax, take your time, and clear the 4 stages.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_10"));
             } else if (getTimeLeft() > 839000 && getTimeLeft() < 841000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "There may be a heavy lag due to many users at stage 1 all at once. It won't be difficult, so please make sure not to fall down because of heavy lag.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_11"));
             } else if (getTimeLeft() > 869000 && getTimeLeft() < 871000) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "[MapleStory Physical Fitness Test] consists of 4 stages, and if you happen to die during the game, you'll be eliminated from the game, so please be careful of that.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_FITNESS_TIME_WARNING_12"));
             }
          } else {
             resetTimes();

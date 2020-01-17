@@ -12,6 +12,7 @@ import scripting.portal.PortalScriptManager;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public class MapleGenericPortal implements MaplePortal {
@@ -134,7 +135,7 @@ public class MapleGenericPortal implements MaplePortal {
             chr.changeMap(to, pto); //late resolving makes this harder but prevents us from loading the whole world at once
             changed = true;
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot enter this map with the chalkboard opened.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CANNOT_ENTER_MAP_WITH_CHALKBOARD_OPENED"));
          }
       }
       if (!changed) {

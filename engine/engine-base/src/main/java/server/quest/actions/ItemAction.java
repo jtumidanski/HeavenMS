@@ -23,6 +23,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.showitemgaininchat.ShowItemGainInChat;
 
 public class ItemAction extends MapleQuestAction {
@@ -227,12 +228,12 @@ public class ItemAction extends MapleQuestAction {
    private void announceInventoryLimit(List<Integer> itemIds, MapleCharacter chr) {
       for (Integer id : itemIds) {
          if (MapleItemInformationProvider.getInstance().isPickupRestricted(id) && chr.haveItemWithId(id, true)) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you already have a similar one-of-a-kind item in your inventory.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_ONE_OF_A_KIND_LIMIT"));
             return;
          }
       }
 
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_LIMIT"));
    }
 
    private boolean canHold(MapleCharacter chr, List<Pair<Item, MapleInventoryType>> gainList) {
@@ -286,7 +287,7 @@ public class ItemAction extends MapleQuestAction {
             int missingQty = item.count() - chr.countItem(itemId);
             if (missingQty > 0) {
                if (!chr.canHold(itemId, missingQty)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check if you have enough space in your inventory.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_LIMIT"));
                   return false;
                }
 

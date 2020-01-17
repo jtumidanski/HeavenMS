@@ -15,6 +15,7 @@ import scripting.npc.NPCConversationManager;
 import scripting.npc.NPCScriptManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
 
@@ -91,7 +92,7 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
          @Override
          public void onMatchDeclined(int leaderId, Set<MapleCharacter> matchPlayers, String message) {
             MapleCharacter chr = getChallenger(leaderId, matchPlayers);
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQChallengeRoomDenied));
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CPQ_CHALLENGE_ROOM_DENIED"));
          }
 
          @Override

@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class LeaveEventCommand extends Command {
    {
@@ -31,7 +32,7 @@ public class LeaveEventCommand extends Command {
             c.getChannelServer().getEvent().addLimit();
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You are not currently in an event.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_IN_EVENT"));
       }
 
    }

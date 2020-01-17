@@ -6,6 +6,7 @@ import client.command.Command;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class QuestStartCommand extends Command {
    {
@@ -17,7 +18,7 @@ public class QuestStartCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !startquest <quest id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("QUEST_START_COMMAND_SYNTAX"));
          return;
       }
 
@@ -31,9 +32,9 @@ public class QuestStartCommand extends Command {
             c.getAbstractPlayerInteraction().forceStartQuest(questId);
          }
 
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " started.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_START_COMMAND_SUCCESS").with(questId));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " already started/completed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_START_COMMAND_ALREADY_STARTED_OR_COMPLETE").with(questId));
       }
    }
 }

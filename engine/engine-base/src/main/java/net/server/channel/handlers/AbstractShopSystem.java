@@ -9,6 +9,7 @@ import server.maps.MapleMiniDungeonInfo;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public abstract class AbstractShopSystem<T extends MaplePacket> extends AbstractPacketHandler<T> {
@@ -41,13 +42,13 @@ public abstract class AbstractShopSystem<T extends MaplePacket> extends Abstract
       }
 
       if (client.getPlayer().getEventInstance() != null) {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Entering Cash Shop or MTS are disabled when registered on an event.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("CANNOT_ENTER_CS_OR_MTS_WHEN_REGISTERED_FOR_EVENT"));
          PacketCreator.announce(client, new EnableActions());
          return;
       }
 
       if (MapleMiniDungeonInfo.isDungeonMap(client.getPlayer().getMapId())) {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Changing channels or entering Cash Shop or MTS are disabled when inside a Mini-Dungeon.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_WITHIN_MINI_DUNGEON"));
          PacketCreator.announce(client, new EnableActions());
          return;
       }

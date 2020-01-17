@@ -29,6 +29,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.guild.GuildCapacityChange;
 import tools.packet.guild.GuildDisband;
@@ -168,12 +169,12 @@ public class MapleGuildProcessor {
          int cost = MapleGuildProcessor.getInstance().getIncreaseGuildCost(guild.getCapacity());
 
          if (character.getMeso() < cost) {
-            MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "You don't have enough mesos.");
+            MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CAPACITY_CHANGE_MINIMUM_MESO_ERROR"));
             return;
          }
 
          if (guild.getCapacity() > 99) {
-            MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, "Your guild already reached the maximum capacity of players.");
+            MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CAPACITY_CHANGE_MAXIMUM_CAPACITY"));
             return;
          }
 

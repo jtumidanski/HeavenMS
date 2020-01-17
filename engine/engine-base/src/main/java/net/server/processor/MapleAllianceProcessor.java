@@ -23,6 +23,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.alliance.AllianceInvite;
 import tools.packet.alliance.AllianceNotice;
@@ -190,7 +191,7 @@ public class MapleAllianceProcessor {
    public void sendInvitation(MapleClient c, String targetGuildName, int allianceId) {
       Server.getInstance().getGuildByName(targetGuildName).ifPresentOrElse(guild -> {
          if (guild.getAllianceId() > 0) {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The entered guild is already registered on a guild alliance.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_INVITED_ALREADY_REGISTERED"));
          } else {
             guild.findMember(guild.getLeaderId())
                   .flatMap(MapleGuildCharacter::getCharacter)
@@ -198,28 +199,28 @@ public class MapleAllianceProcessor {
                      if (MapleInviteCoordinator.createInvite(MapleInviteCoordinator.InviteType.ALLIANCE, c.getPlayer(), allianceId, victim.getId())) {
                         PacketCreator.announce(victim, new AllianceInvite(allianceId, c.getPlayer().getName()));
                      } else {
-                        MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The master of the guild that you offered an invitation is currently managing another invite.");
+                        MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_INVITED_MANAGING_ANOTHER_INVITE"));
                      }
-                  }, () -> MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The master of the guild that you offered an invitation is currently not online."));
+                  }, () -> MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_INVITED_LEADER_OFFLINE")));
          }
-      }, () -> MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "The entered guild does not exist."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_INVITE_GUILD_DOES_NOT_EXIST")));
    }
 
    public boolean answerInvitation(int targetId, String targetGuildName, int allianceId, boolean answer) {
       MapleInviteCoordinator.MapleInviteResult res = MapleInviteCoordinator.answerInvite(MapleInviteCoordinator.InviteType.ALLIANCE, targetId, allianceId, answer);
 
-      String msg;
+      I18nMessage msg;
       MapleCharacter sender = res.from;
       switch (res.result) {
          case ACCEPTED:
             return true;
 
          case DENIED:
-            msg = "[" + targetGuildName + "] guild has denied your guild alliance invitation.";
+            msg = I18nMessage.from("ALLIANCE_GUILD_INVITE_DENIED").with(targetGuildName);
             break;
 
          default:
-            msg = "The guild alliance request has not been accepted, since the invitation expired.";
+            msg = I18nMessage.from("ALLIANCE_GUILD_INVITE_EXPIRED");
       }
 
       if (sender != null) {

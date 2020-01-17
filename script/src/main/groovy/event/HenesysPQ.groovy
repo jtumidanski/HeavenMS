@@ -9,6 +9,7 @@ import server.life.MapleMonster
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 class EventHenesysPQ {
    EventManager em
@@ -186,7 +187,7 @@ class EventHenesysPQ {
    }
 
    def bunnyDefeated(EventInstanceManager eim) {
-      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Due to your failure to protect the Moon Bunny, you have been transported to the Exile Map.")
+      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("HENESYS_PQ_FAIL"))
       end(eim)
    }
 
@@ -195,7 +196,7 @@ class EventHenesysPQ {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }

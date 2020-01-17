@@ -92,7 +92,7 @@ public class AccountProvider extends AbstractQueryExecutor {
    }
 
    public Optional<AccountData> getAccountDataByName(EntityManager entityManager, String name) {
-      TypedQuery<AccountData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountData(a.id, a.name, a.password, a.gender, a.banned, a.pin, a.pic, a.characterSlots, a.tos, a.language) FROM Account a WHERE a.name = :name", AccountData.class);
+      TypedQuery<AccountData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountData(a.id, a.name, a.password, a.gender, a.banned, a.pin, a.pic, a.characterSlots, a.tos, a.language, a.country) FROM Account a WHERE a.name = :name", AccountData.class);
       query.setParameter("name", name);
       return getSingleOptional(query);
    }
@@ -103,7 +103,7 @@ public class AccountProvider extends AbstractQueryExecutor {
    }
 
    public Optional<AccountData> getAccountDataById(EntityManager entityManager, int accountId) {
-      TypedQuery<AccountData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountData(a.id, a.name, a.password, a.gender, a.banned, a.pin, a.pic, a.characterSlots, a.tos, a.language) FROM Account a WHERE a.id = :id", AccountData.class);
+      TypedQuery<AccountData> query = entityManager.createQuery("SELECT NEW client.database.data.AccountData(a.id, a.name, a.password, a.gender, a.banned, a.pin, a.pic, a.characterSlots, a.tos, a.language, a.country) FROM Account a WHERE a.id = :id", AccountData.class);
       query.setParameter("id", accountId);
       return getSingleOptional(query);
    }

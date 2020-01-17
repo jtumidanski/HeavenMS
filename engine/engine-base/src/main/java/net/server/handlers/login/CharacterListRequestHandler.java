@@ -1,5 +1,8 @@
 package net.server.handlers.login;
 
+import java.util.List;
+
+import client.MapleCharacter;
 import client.MapleClient;
 import net.server.AbstractPacketHandler;
 import net.server.Server;
@@ -34,6 +37,8 @@ public final class CharacterListRequestHandler extends AbstractPacketHandler<Cha
 
       client.setWorld(packet.world());
       client.setChannel(packet.channel());
-      PacketCreator.announce(client, new CharacterList(client, packet.world(), 0));
+      List<MapleCharacter> characters = List.copyOf(client.loadCharacters(packet.world()));
+      PacketCreator.announce(client, new CharacterList(characters, packet.world(), 0, client.cannotBypassPic(),
+            client.getPic(), client.getAvailableCharacterSlots(), client.getCharacterSlots()));
    }
 }

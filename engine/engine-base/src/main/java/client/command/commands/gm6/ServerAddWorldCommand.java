@@ -7,6 +7,7 @@ import net.server.Server;
 import server.ThreadManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ServerAddWorldCommand extends Command {
    {
@@ -22,12 +23,12 @@ public class ServerAddWorldCommand extends Command {
 
          if (player.isLoggedInWorld()) {
             if (wid >= 0) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "NEW World " + wid + " successfully deployed.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_WORLD_COMMAND").with(wid));
             } else {
                if (wid == -2) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Error detected when loading the 'world.ini' file. World creation aborted.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_WORLD_COMMAND_INI_ERROR"));
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "NEW World failed to be deployed. Check if needed ports are already in use or maximum world count has been reached.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_WORLD_COMMAND_ERROR_GENERIC"));
                }
             }
          }

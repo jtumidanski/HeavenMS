@@ -7,9 +7,11 @@ import java.util.List;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import database.provider.PlayerLifeProvider;
 import database.DatabaseConnection;
+import database.provider.PlayerLifeProvider;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.I18nMessage;
 
 public class RemovePlayerNpcCommand extends Command {
    {
@@ -41,6 +43,6 @@ public class RemovePlayerNpcCommand extends Command {
                .forEach(map -> toRemove.forEach(pair -> map.destroyNPC(pair.getLeft())));
       }
 
-      player.yellowMessage("Cleared " + toRemove.size() + " pNPC placements.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("REMOVE_PLAYER_NPC_COMMAND_SUCCESS").with(toRemove.size()));
    }
 }

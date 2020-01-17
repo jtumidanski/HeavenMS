@@ -17,6 +17,7 @@ import server.maps.MaplePortal;
 import server.maps.MapleReactor;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class DebugCommand extends Command {
    private final static String[] debugTypes = {"monster", "packet", "portal", "spawnpoint", "pos", "map", "mobsp", "event", "areas", "reactors", "servercoupons", "playercoupons", "timer", "marriage", "buff", ""};
@@ -30,7 +31,7 @@ public class DebugCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !debug <type>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("DEBUG_COMMAND_SYNTAX"));
          return;
       }
 
@@ -44,105 +45,92 @@ public class DebugCommand extends Command {
 
             c.getAbstractPlayerInteraction().npcTalk(9201143, msgTypes.toString());
             break;
-
          case "monster":
             List<MapleMapObject> monsters = player.getMap().getMapObjectsInRange(player.position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
             for (MapleMapObject mapObject : monsters) {
                MapleMonster monster = (MapleMonster) mapObject;
                MapleCharacter controller = monster.getController();
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Monster ID: " + monster.id() + " Aggro target: " + ((controller != null) ? controller.getName() + " Has aggro: " + monster.isControllerHasAggro() + " Knowns aggro: " + monster.isControllerKnowsAboutAggro() : "<none>"));
+               if (controller != null) {
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_COMMAND_MONSTER_WITH_AGGRO").with(monster.id(), controller.getName(), monster.isControllerHasAggro(), monster.isControllerKnowsAboutAggro()));
+               } else {
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_COMMAND_MONSTER_WITH_AGGRO").with(monster.id()));
+               }
             }
             break;
-
          case "packet":
             //player.getMap().broadcastMessage(MaplePacketCreator.customPacket(joinStringFrom(params, 1)));
             break;
-
          case "portal":
             MaplePortal portal = player.getMap().findClosestPortal(player.position());
             if (portal != null) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Closest portal: " + portal.getId() + " '" + portal.getName() + "' Type: " + portal.getType() + " --> toMap: " + portal.getTargetMapId() + " script name: '" + portal.getScriptName() + "' state: " + (portal.getPortalState() ? 1 : 0) + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_PORTAL").with(portal.getId(), portal.getName(), portal.getType(), portal.getTargetMapId(), portal.getScriptName(), (portal.getPortalState() ? 1 : 0)));
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "There is no portal on this map.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_PORTAL_NONE"));
             }
             break;
-
          case "spawnpoint":
             SpawnPoint sp = player.getMap().findClosestSpawnPoint(player.position());
             if (sp != null) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Closest mob spawn point: " + " Position: x " + sp.getPosition().getX() + " y " + sp.getPosition().getY() + " Spawns mob id: '" + sp.getMonsterId() + "' --> canSpawn: " + !sp.getDenySpawn() + " canSpawnRightNow: " + sp.shouldSpawn() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_SPAWN_POINT").with(sp.getPosition().getX(), sp.getPosition().getY(), sp.getMonsterId(), !sp.getDenySpawn(), sp.shouldSpawn()));
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "There is no mob spawn point on this map.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_NO_SPAWN_POINT"));
             }
             break;
-
          case "pos":
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current map position: (" + player.position().getX() + ", " + player.position().getY() + ").");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_POS").with(player.position().getX(), player.position().getY()));
             break;
-
          case "map":
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current map id " + player.getMap().getId() + ", event: '" + ((player.getMap().getEventInstance() != null) ? player.getMap().getEventInstance().getName() : "null") + "'; Players: " + player.getMap().getAllPlayers().size() + ", Mobs: " + player.getMap().countMonsters() + ", Reactors: " + player.getMap().countReactors() + ", Items: " + player.getMap().countItems() + ", Objects: " + player.getMap().getMapObjects().size() + ".");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_MAP").with(player.getMap().getId(), ((player.getMap().getEventInstance() != null) ? player.getMap().getEventInstance().getName() : "null"), player.getMap().getAllPlayers().size(), player.getMap().countMonsters(), player.getMap().countReactors(), player.getMap().countItems(), player.getMap().getMapObjects().size()));
             break;
-
          case "mobsp":
             player.getMap().reportMonsterSpawnPoints(player);
             break;
-
          case "event":
             if (player.getEventInstance() == null) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Player currently not in an event.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_EVENT_NONE"));
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current event name: " + player.getEventInstance().getName() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_EVENT").with(player.getEventInstance().getName()));
             }
             break;
-
          case "areas":
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Configured areas on map " + player.getMapId() + ":");
-
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_AREAS").with(player.getMapId()));
             byte index = 0;
             for (Rectangle rect : player.getMap().getAreas()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Id: " + index + " -> posX: " + rect.getX() + " posY: '" + rect.getY() + "' dX: " + rect.getWidth() + " dY: " + rect.getHeight() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_AREAS_BODY").with(index, rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
                index++;
             }
             break;
-
          case "reactors":
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Current reactor states on map " + player.getMapId() + ":");
-
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_REACTORS").with(player.getMapId()));
             for (MapleMapObject mmo : player.getMap().getReactors()) {
                MapleReactor mr = (MapleReactor) mmo;
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Id: " + mr.getId() + " Oid: " + mr.objectId() + " name: '" + mr.getName() + "' -> Type: " + mr.getReactorType() + " State: " + mr.getState() + " Event State: " + mr.getEventState() + " Position: x " + mr.position().getX() + " y " + mr.position().getY() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_REACTORS_BODY").with(mr.getId(), mr.objectId(), mr.getName(), mr.getReactorType(), mr.getState(), mr.getEventState(), mr.position().getX(), mr.position().getY()));
             }
             break;
-
          case "servercoupons":
          case "coupons":
-            StringBuilder s = new StringBuilder("Currently active SERVER coupons: ");
-            for (Integer i : Server.getInstance().getActiveCoupons()) {
-               s.append(i).append(" ");
-            }
-
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, s.toString());
+            String serverCoupons = Server.getInstance().getActiveCoupons().stream()
+                  .collect(StringBuilder::new,
+                        (sb, s1) -> sb.append(" ").append(s1),
+                        (sb1, sb2) -> sb1.append(sb2.toString()))
+                  .toString();
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_SERVER_COUPONS").with(serverCoupons));
             break;
-
          case "playercoupons":
-            StringBuilder st = new StringBuilder("Currently active PLAYER coupons: ");
-            for (Integer i : player.getActiveCoupons()) {
-               st.append(i).append(" ");
-            }
-
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, st.toString());
+            String playerCoupons = player.getActiveCoupons().stream()
+                  .collect(StringBuilder::new,
+                        (sb, s1) -> sb.append(" ").append(s1),
+                        (sb1, sb2) -> sb1.append(sb2.toString()))
+                  .toString();
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_PLAYER_COUPONS").with(playerCoupons));
             break;
-
          case "timer":
             TimerManager tMan = TimerManager.getInstance();
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "Total Task: " + tMan.getTaskCount() + " Current Task: " + tMan.getQueuedTasks() + " Active Task: " + tMan.getActiveCount() + " Completed Task: " + tMan.getCompletedTaskCount());
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEBUG_COMMAND_TIMER").with(tMan.getTaskCount(), tMan.getQueuedTasks(), tMan.getActiveCount(), tMan.getCompletedTaskCount()));
             break;
-
          case "marriage":
             c.getChannelServer().debugMarriageStatus();
             break;
-
          case "buff":
             c.getPlayer().debugListAllBuffs();
             break;

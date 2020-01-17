@@ -161,10 +161,12 @@ public class MapleServerHandler extends IoHandlerAdapter {
       short packetId = accessor.readShort();
       MapleClient client = (MapleClient) session.getAttribute(MapleClient.CLIENT_KEY);
 
-      if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId)) {
-         System.out.println("Received packet id " + packetId);
-      }
       final MaplePacketHandler packetHandler = processor.getHandler(packetId);
+
+      if (YamlConfig.config.server.USE_DEBUG_SHOW_RCVD_PACKET && !ignoredDebugRecvPackets.contains(packetId)) {
+         System.out.println("Received packet id " + packetId + " to be processed by " + packetHandler.getClass().getSimpleName());
+      }
+
       if (packetHandler != null && packetHandler.validateState(client)) {
          try {
             MapleLogger.logRecv(client, packetId, message);
@@ -243,7 +245,7 @@ public class MapleServerHandler extends IoHandlerAdapter {
          idleLock.unlock();
       }
 
-      for(MapleClient c : pingClients) {
+      for (MapleClient c : pingClients) {
          c.testPing(timeThen);
       }
    }

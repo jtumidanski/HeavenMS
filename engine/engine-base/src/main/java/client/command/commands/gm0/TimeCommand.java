@@ -7,6 +7,8 @@ import java.util.TimeZone;
 
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class TimeCommand extends Command {
    {
@@ -17,6 +19,6 @@ public class TimeCommand extends Command {
    public void execute(MapleClient client, String[] params) {
       DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
       dateFormat.setTimeZone(TimeZone.getDefault());
-      client.getPlayer().yellowMessage("HeavenMS Server Time: " + dateFormat.format(new Date()));
+      MessageBroadcaster.getInstance().yellowMessage(client.getPlayer(), I18nMessage.from("TIME_COMMAND").with(dateFormat.format(new Date())));
    }
 }

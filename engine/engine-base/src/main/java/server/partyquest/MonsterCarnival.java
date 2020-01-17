@@ -18,6 +18,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
 import tools.packet.ui.GetClock;
@@ -60,7 +61,7 @@ public class MonsterCarnival {
                   character.setTeam(0);
                   character.setFestivalPoints(0);
                   character.forceChangeMap(map, map.getPortal(redPortal));
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, LanguageConstants.getMessage(character, LanguageConstants.CPQEntry));
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("CPQ_ENTRY"));
                   if (p1.getLeader().getId() == character.getId()) {
                      leader1 = character;
                   }
@@ -74,7 +75,7 @@ public class MonsterCarnival {
                   character.setTeam(1);
                   character.setFestivalPoints(0);
                   character.forceChangeMap(map, map.getPortal(bluePortal));
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, LanguageConstants.getMessage(character, LanguageConstants.CPQEntry));
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("CPQ_ENTRY"));
                   if (p2.getLeader().getId() == character.getId()) {
                      leader2 = character;
                   }
@@ -83,10 +84,10 @@ public class MonsterCarnival {
 
          if (team1 == null || team2 == null) {
             for (MaplePartyCharacter mpc : p1.getMembers()) {
-               mpc.getPlayer().ifPresent(chr -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQError)));
+               mpc.getPlayer().ifPresent(chr -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CPQ_ERROR")));
             }
             for (MaplePartyCharacter mpc : p2.getMembers()) {
-               mpc.getPlayer().ifPresent(chr -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chr, LanguageConstants.CPQError)));
+               mpc.getPlayer().ifPresent(chr -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CPQ_ERROR")));
             }
             return;
          }
@@ -132,7 +133,7 @@ public class MonsterCarnival {
                teamS = LanguageConstants.getMessage(chrMap, LanguageConstants.CPQBlue);
                break;
          }
-         MessageBroadcaster.getInstance().sendServerNotice(chrMap, ServerNoticeType.PINK_TEXT, teamS + LanguageConstants.getMessage(chrMap, LanguageConstants.CPQPlayerExit));
+         MessageBroadcaster.getInstance().sendServerNotice(chrMap, ServerNoticeType.PINK_TEXT, I18nMessage.from("CPQ_PLAYER_EXIT").with(teamS));
       }
       earlyFinish();
    }
@@ -304,7 +305,7 @@ public class MonsterCarnival {
 
    private void extendTime() {
       for (MapleCharacter chrMap : map.getAllPlayers()) {
-         MessageBroadcaster.getInstance().sendServerNotice(chrMap, ServerNoticeType.PINK_TEXT, LanguageConstants.getMessage(chrMap, LanguageConstants.CPQExtendTime));
+         MessageBroadcaster.getInstance().sendServerNotice(chrMap, ServerNoticeType.PINK_TEXT, I18nMessage.from("CPQ_EXTEND_TIME"));
       }
       startTime = System.currentTimeMillis() + 3 * 60 * 1000;
 

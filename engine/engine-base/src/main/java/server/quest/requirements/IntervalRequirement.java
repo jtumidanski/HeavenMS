@@ -8,6 +8,7 @@ import server.quest.MapleQuest;
 import server.quest.MapleQuestRequirementType;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class IntervalRequirement extends MapleQuestRequirement {
    private int interval = -1;
@@ -68,7 +69,7 @@ public class IntervalRequirement extends MapleQuestRequirement {
       if (check || check2) {
          return true;
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This quest will become available again in approximately " + getIntervalTimeLeft(chr, this) + ".");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_INTERVAL_STATUS").with(getIntervalTimeLeft(chr, this)));
          return false;
       }
    }

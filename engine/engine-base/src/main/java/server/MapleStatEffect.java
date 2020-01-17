@@ -90,6 +90,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.buff.GiveBuff;
 import tools.packet.buff.GiveForeignBuff;
@@ -361,11 +362,11 @@ public class MapleStatEffect {
             MapleInventoryManipulator.addFromDrop(applyTo.getClient(), new Item(4006000, (short) 0, (short) 1), false);
 
             if (door.getOwnerId() == -3) {
-               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, "Mystic Door cannot be cast far from a spawn point. Nearest one is at " + door.getDoorStatus().getRight() + "pts " + door.getDoorStatus().getLeft());
+               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("MYSTIC_DOOR_CLOSENESS").with(door.getDoorStatus().getRight(), door.getDoorStatus().getLeft()));
             } else if (door.getOwnerId() == -2) {
-               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, "Mystic Door cannot be cast on a slope, try elsewhere.");
+               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("MYSTIC_DOOR_SLOPE"));
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, "There are no door portals available for the town at this moment. Try again later.");
+               MessageBroadcaster.getInstance().sendServerNotice(applyTo, ServerNoticeType.PINK_TEXT, I18nMessage.from("NO_PORTALS_AVAILABLE"));
             }
 
             applyTo.cancelBuffStats(MapleBuffStat.SOUL_ARROW);  // cancel door buff

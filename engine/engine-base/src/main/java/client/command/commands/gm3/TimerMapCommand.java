@@ -3,7 +3,9 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
 import tools.PacketCreator;
+import tools.I18nMessage;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;
 
@@ -16,7 +18,7 @@ public class TimerMapCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !timermap <seconds>|remove");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("TIMER_MAP_COMMAND_SYNTAX"));
          return;
       }
 
@@ -31,7 +33,7 @@ public class TimerMapCommand extends Command {
                PacketCreator.announce(victim, new GetClock(seconds));
             }
          } catch (NumberFormatException e) {
-            player.yellowMessage("Syntax: !timermap <seconds>|remove");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("TIMER_MAP_COMMAND_SYNTAX"));
          }
       }
    }

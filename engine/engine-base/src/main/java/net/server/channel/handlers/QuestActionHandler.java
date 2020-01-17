@@ -12,6 +12,7 @@ import server.life.MapleNPC;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public final class QuestActionHandler extends AbstractPacketHandler<QuestActionPacket> {
    @Override
@@ -88,7 +89,7 @@ public final class QuestActionHandler extends AbstractPacketHandler<QuestActionP
 
          Point npcP = npc.position();
          if (Math.abs(npcP.getX() - playerP.getX()) > 1200 || Math.abs(npcP.getY() - playerP.getY()) > 800) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Approach the NPC to fulfill this quest operation.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("NPC_MOVE_CLOSER_TO_NPC"));
             return false;
          }
       }

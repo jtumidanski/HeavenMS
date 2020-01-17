@@ -17,6 +17,7 @@ import server.maps.MapleMiniDungeonInfo;
 import server.maps.MaplePortal;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class GotoCommand extends Command {
 
@@ -74,13 +75,13 @@ public class GotoCommand extends Command {
       }
 
       if (!player.isAlive()) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command cannot be used when you're dead.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("COMMAND_CANNOT_BE_USED_WHEN_DEAD"));
          return;
       }
 
       if (!player.isGM()) {
          if (player.getEventInstance() != null || MapleMiniDungeonInfo.isDungeonMap(player.getMapId()) || FieldLimit.CANNOT_MIGRATE.check(player.getMap().getFieldLimit())) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, "This command can not be used in this map.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("COMMAND_CANNOT_BE_USED_IN_MAP"));
             return;
          }
       }

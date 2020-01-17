@@ -6,16 +6,17 @@ import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
+import client.newyear.NewYearCardRecord;
+import database.DatabaseConnection;
 import database.administrator.NewYearAdministrator;
 import database.provider.NewYearCardProvider;
-import client.newyear.NewYearCardRecord;
 import net.server.Server;
 import server.TimerManager;
-import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.NewYearCardResolution;
 
 public class NewYearCardProcessor {
@@ -66,29 +67,6 @@ public class NewYearCardProcessor {
                   .forEach(chr::addNewYearRecord));
    }
 
-   public void printNewYearRecords(MapleCharacter chr) {
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "New Years: " + chr.getNewYearRecords().size());
-
-      for (NewYearCardRecord nyc : chr.getNewYearRecords()) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "-------------------------------");
-
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Id: " + nyc.id());
-
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Sender id: " + nyc.senderId());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Sender name: " + nyc.senderName());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Sender discard: " + nyc.senderDiscardCard());
-
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Receiver id: " + nyc.receiverId());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Receiver name: " + nyc.receiverName());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Receiver discard: " + nyc.receiverDiscardCard());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Received: " + nyc.receiverReceivedCard());
-
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Message: " + nyc.message());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Date sent: " + nyc.dateSent());
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Date recv: " + nyc.dateReceived());
-      }
-   }
-
    private void deleteNewYearCard(int id) {
       Server.getInstance().removeNewYearCard(id);
       DatabaseConnection.getInstance().withConnection(connection -> NewYearAdministrator.getInstance().deleteById(connection, id));
@@ -112,7 +90,7 @@ public class NewYearCardProcessor {
                chr.getClient().getWorldServer().getPlayerStorage().getCharacterById(nyc.receiverId()).filter(MapleCharacter::isLoggedInWorld).ifPresent(other -> {
                   other.removeNewYearRecord(nyc);
                   MasterBroadcaster.getInstance().sendToAllInMap(other.getMap(), new NewYearCardResolution(other.getId(), nyc, 0xE, 0));
-                  MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
+                  MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("NEW_YEAR_CARD_THROWAWAY").with(chr.getName()));
                });
             }
          } else {
@@ -130,7 +108,7 @@ public class NewYearCardProcessor {
                      .ifPresent(other -> {
                         other.removeNewYearRecord(nyc);
                         MasterBroadcaster.getInstance().sendToAllInMap(other.getMap(), new NewYearCardResolution(other.getId(), nyc, 0xE, 0));
-                        MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, "[New Year] " + chr.getName() + " threw away the New Year card.");
+                        MessageBroadcaster.getInstance().sendServerNotice(other, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("NEW_YEAR_CARD_THROWAWAY").with(chr.getName()));
                      });
             }
          }

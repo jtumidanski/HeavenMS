@@ -13,6 +13,7 @@ import net.server.coordinator.world.MapleInviteCoordinator.InviteType;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.family.FamilyMessage;
 import tools.packet.family.SendFamilyInvite;
 import tools.packet.stat.EnableActions;
@@ -51,7 +52,7 @@ public final class FamilyAddHandler extends AbstractPacketHandler<FamilyAddPacke
       } else {
          MapleInviteCoordinator.createInvite(InviteType.FAMILY, chr, addChr.get(), addChr.get().getId());
          PacketCreator.announce(addChr.get(), new SendFamilyInvite(chr.getId(), chr.getName()));
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The invite has been sent.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("FAMILY_INVITE_SUCCESS"));
          PacketCreator.announce(client, new EnableActions());
       }
    }

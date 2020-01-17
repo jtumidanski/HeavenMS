@@ -16,7 +16,7 @@ public class ItemDropCommand extends AbstractItemProductionCommand {
 
    @Override
    protected String getSyntax() {
-      return "Syntax: !drop <item id> <quantity>";
+      return "ITEM_DROP_PRODUCTION_COMMAND_SYNTAX";
    }
 
    @Override

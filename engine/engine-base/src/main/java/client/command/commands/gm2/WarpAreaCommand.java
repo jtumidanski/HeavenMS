@@ -7,6 +7,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.maps.MapleMap;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class WarpAreaCommand extends Command {
    {
@@ -17,14 +19,14 @@ public class WarpAreaCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !warparea <map id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_AREA_COMMAND_SYNTAX"));
          return;
       }
 
       try {
          MapleMap target = c.getChannelServer().getMapFactory().getMap(Integer.parseInt(params[0]));
          if (target == null) {
-            player.yellowMessage("Map ID " + params[0] + " is invalid.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_AREA_COMMAND_INVALID_MAP").with(params[0]));
             return;
          }
 
@@ -39,7 +41,7 @@ public class WarpAreaCommand extends Command {
             }
          }
       } catch (Exception ex) {
-         player.yellowMessage("Map ID " + params[0] + " is invalid.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_AREA_COMMAND_INVALID_MAP").with(params[0]));
       }
    }
 }

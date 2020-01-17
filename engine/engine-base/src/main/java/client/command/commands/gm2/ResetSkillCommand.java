@@ -9,6 +9,8 @@ import client.SkillFactory;
 import client.command.Command;
 import provider.MapleData;
 import provider.MapleDataProviderFactory;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class ResetSkillCommand extends Command {
    {
@@ -34,6 +36,6 @@ public class ResetSkillCommand extends Command {
          SkillFactory.getSkill(21001001).ifPresent(skill -> player.changeSkillLevel(skill, (byte) -1, -1, -1));
       }
 
-      player.yellowMessage("Skills reset.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("RESET_SKILL_COMMAND_SUCCESS"));
    }
 }

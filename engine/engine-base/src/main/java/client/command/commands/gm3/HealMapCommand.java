@@ -1,6 +1,8 @@
 package client.command.commands.gm3;
 
-import client.MapleCharacter;
+import java.util.Objects;
+
+import client.AbstractMapleCharacterObject;
 import client.MapleClient;
 import client.command.Command;
 
@@ -10,12 +12,9 @@ public class HealMapCommand extends Command {
    }
 
    @Override
-   public void execute(MapleClient c, String[] params) {
-      MapleCharacter player = c.getPlayer();
-      for (MapleCharacter mch : player.getMap().getCharacters()) {
-         if (mch != null) {
-            mch.healHpMp();
-         }
-      }
+   public void execute(MapleClient client, String[] params) {
+      client.getPlayer().getMap().getCharacters().stream()
+            .filter(Objects::nonNull)
+            .forEach(AbstractMapleCharacterObject::healHpMp);
    }
 }

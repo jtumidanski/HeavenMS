@@ -13,6 +13,7 @@ import net.server.channel.packet.reader.FamilySeparateReader;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.family.FamilyMessage;
 import tools.packet.family.GetFamilyInfo;
 
@@ -68,7 +69,7 @@ public class FamilySeparateHandler extends AbstractPacketHandler<FamilySeparateP
       }
 
       Collection<MapleCharacter> recipients = forkOn.getSeniors(true);
-      MessageBroadcaster.getInstance().sendServerNotice(recipients, ServerNoticeType.PINK_TEXT, forkOn.getName() + " has left the family.");
+      MessageBroadcaster.getInstance().sendServerNotice(recipients, ServerNoticeType.PINK_TEXT, I18nMessage.from("LEFT_FAMILY").with(forkOn.getName()));
       forkOn.fork();
       PacketCreator.announce(client, new GetFamilyInfo(forkOn)); //pedigree info will be requested by the client if the window is open
       forkOn.updateSeniorFamilyInfo(true);

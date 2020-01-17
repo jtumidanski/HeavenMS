@@ -2,6 +2,8 @@ package client.command.commands.gm2;
 
 import client.*;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class SetSlotCommand extends Command {
    {
@@ -12,7 +14,7 @@ public class SetSlotCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !setslot <new level>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SET_SLOT_COMMAND_SYNTAX"));
          return;
       }
 
@@ -26,6 +28,6 @@ public class SetSlotCommand extends Command {
          player.gainSlots(i, slots - curSlots, true);
       }
 
-      player.yellowMessage("Slots updated.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SET_SLOT_COMMAND_SUCCESS"));
    }
 }

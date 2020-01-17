@@ -7,6 +7,7 @@ import server.maps.MapleMap
 import server.maps.MapleMapObject
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 
@@ -93,7 +94,7 @@ class NPC2112000 {
                      cm.sendOk("Behold! The pinnacle of Magatia's alchemy studies! Hahahahahahaha...")
                   } else if (state == 0) {
                      cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest alchemy, #rFrankenroid#k.")
-                     MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: I present you my newest weapon, brought by the finest alchemy, Frankenroid!")
+                     MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("YULETE_MEET_FRANK"))
 
                      MapleMap map = eim.getMapInstance(926100401)
                      MapleLifeFactory.getMonster(9300139).ifPresent({ monster ->
@@ -103,7 +104,7 @@ class NPC2112000 {
                      })
                   } else {
                      cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the #rmighty Frankenroid#k!")
-                     MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the mighty Frankenroid!!")
+                     MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("YULETE_MEET_FRANK_LONG"))
 
                      MapleMap map = eim.getMapInstance(926100401)
                      MapleLifeFactory.getMonster(9300140).ifPresent({ monster ->

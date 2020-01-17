@@ -3,7 +3,7 @@ package client.database.data
 class AccountData(private var _id: Integer, private var _name: String, private var _password: String,
                   private var _gender: Integer, private var _banned: Boolean, private var _pin: String,
                   private var _pic: String, private var _characterSlots: Integer, private var _tos: Boolean,
-                  private var _language: Integer) {
+                  private var _language: String, private var _country: String) {
   def id: Int = _id
 
   def name: String = _name
@@ -22,5 +22,7 @@ class AccountData(private var _id: Integer, private var _name: String, private v
 
   def tos: Boolean = _tos
 
-  def language: Int = _language
+  def language: String = _language
+
+  def country: String = _country
 }

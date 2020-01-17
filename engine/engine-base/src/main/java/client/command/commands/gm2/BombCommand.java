@@ -8,6 +8,7 @@ import client.command.Command;
 import server.life.MapleLifeFactory;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class BombCommand extends Command {
    {
@@ -23,7 +24,7 @@ public class BombCommand extends Command {
             MapleLifeFactory.getMonster(9300166).ifPresent(monster -> victim.get().getMap().spawnMonsterOnGroundBelow(monster, victim.get().position()));
             MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, player.getName() + " used !bomb on " + victim.get().getName());
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0]));
          }
       } else {
          MapleLifeFactory.getMonster(9300166).ifPresent(monster -> player.getMap().spawnMonsterOnGroundBelow(monster, player.position()));

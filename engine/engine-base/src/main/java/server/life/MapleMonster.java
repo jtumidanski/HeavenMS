@@ -65,6 +65,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowBossHP;
@@ -489,7 +490,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
       }
 
       if (YamlConfig.config.server.USE_DEBUG) {
-         MessageBroadcaster.getInstance().sendServerNotice(from, ServerNoticeType.PINK_TEXT, "Hit MOB " + this.id() + ", OID " + this.objectId());
+         MessageBroadcaster.getInstance().sendServerNotice(from, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_MONSTER_DAMAGE").with(this.id(), this.objectId()));
       }
 
       if (!fake) {

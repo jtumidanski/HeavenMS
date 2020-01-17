@@ -6,6 +6,7 @@ import client.MapleJob;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class JobCommand extends Command {
    {
@@ -18,7 +19,7 @@ public class JobCommand extends Command {
       if (params.length == 1) {
          int jobId = Integer.parseInt(params[0]);
          if (jobId < 0 || jobId >= 2200) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "job id " + jobId + " is not available.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("JOB_COMMAND_NOT_AVAILABLE").with(jobId));
             return;
          }
 
@@ -28,14 +29,14 @@ public class JobCommand extends Command {
          c.getWorldServer().getPlayerStorage().getCharacterByName(params[0]).ifPresentOrElse(victim -> {
             int jobId = Integer.parseInt(params[1]);
             if (jobId < 0 || jobId >= 2200) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "job id " + jobId + " is not available.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("JOB_COMMAND_NOT_AVAILABLE").with(jobId));
                return;
             }
             victim.changeJob(MapleJob.getById(jobId));
             player.equipChanged();
-         }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
+         }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0])));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Syntax: !job <job id> <opt: IGN of another person>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("JOB_COMMAND_SYNTAX"));
       }
    }
 }

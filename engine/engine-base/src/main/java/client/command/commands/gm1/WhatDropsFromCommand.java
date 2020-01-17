@@ -10,6 +10,7 @@ import server.life.MonsterDropEntry;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class WhatDropsFromCommand extends Command {
    {
@@ -20,7 +21,7 @@ public class WhatDropsFromCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please do @whatdropsfrom <monster name>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("WHAT_DROPS_FROM_COMMAND_SYNTAX"));
          return;
       }
       String monsterName = player.getLastCommandMessage();

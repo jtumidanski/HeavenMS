@@ -8,6 +8,8 @@ import client.MapleStat;
 import client.command.Command;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class HairCommand extends Command {
    {
@@ -18,7 +20,7 @@ public class HairCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !hair [<player name>] <hair id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_SYNTAX"));
          return;
       }
 
@@ -26,7 +28,7 @@ public class HairCommand extends Command {
          if (params.length == 1) {
             int itemId = Integer.parseInt(params[0]);
             if (!ItemConstants.isHair(itemId) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
-               player.yellowMessage("Hair id '" + params[0] + "' does not exist.");
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_HAIR_DOES_NOT_EXIST").with(params[0]));
                return;
             }
 
@@ -36,7 +38,7 @@ public class HairCommand extends Command {
          } else {
             int itemId = Integer.parseInt(params[1]);
             if (!ItemConstants.isHair(itemId) || MapleItemInformationProvider.getInstance().getName(itemId) == null) {
-               player.yellowMessage("Hair id '" + params[1] + "' does not exist.");
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_HAIR_DOES_NOT_EXIST").with(params[1]));
                return;
             }
 
@@ -46,7 +48,7 @@ public class HairCommand extends Command {
                victim.get().updateSingleStat(MapleStat.HAIR, itemId);
                victim.get().equipChanged();
             } else {
-               player.yellowMessage("Player '" + params[0] + "' has not been found on this channel.");
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HAIR_COMMAND_PLAYER_NOT_FOUND").with(params[0]));
             }
          }
       } catch (Exception ignored) {

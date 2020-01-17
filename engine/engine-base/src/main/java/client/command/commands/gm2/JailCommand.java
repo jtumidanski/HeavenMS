@@ -3,10 +3,11 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
-import server.maps.MaplePortal;
 import server.maps.MapleMap;
+import server.maps.MaplePortal;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class JailCommand extends Command {
    {
@@ -17,14 +18,14 @@ public class JailCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !jail <player name> [<minutes>]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("JAIL_COMMAND_SYNTAX"));
          return;
       }
 
       int minutesJailed = params.length >= 2 ? Integer.parseInt(params[1]) : 5;
 
       if (minutesJailed <= 0) {
-         player.yellowMessage("Syntax: !jail <player name> [<minutes>]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("JAIL_COMMAND_SYNTAX"));
          return;
       }
 
@@ -36,10 +37,10 @@ public class JailCommand extends Command {
             MaplePortal targetPortal = target.getPortal(0);
             victim.saveLocationOnWarp();
             victim.changeMap(target, targetPortal);
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + " was jailed for " + minutesJailed + " minutes.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("JAIL_COMMAND_LOOPBACK").with(victim.getName(), minutesJailed));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, victim.getName() + "'s time in jail has been extended for " + minutesJailed + " minutes.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("JAIL_COMMAND_EXTENDED").with(victim.getName(), minutesJailed));
          }
-      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0])));
    }
 }

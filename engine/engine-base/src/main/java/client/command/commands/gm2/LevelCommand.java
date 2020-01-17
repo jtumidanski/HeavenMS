@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import config.YamlConfig;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class LevelCommand extends Command {
    {
@@ -14,7 +16,7 @@ public class LevelCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !level <new level>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("LEVEL_COMMAND_SYNTAX"));
          return;
       }
 

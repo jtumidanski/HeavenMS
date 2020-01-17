@@ -11,6 +11,7 @@ import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.message.GiveFameErrorResponse;
 
 public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket> {
@@ -41,7 +42,7 @@ public final class GiveFameHandler extends AbstractPacketHandler<GiveFamePacket>
                player.hasGivenFame(target);
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Could not process the request, since this character currently has the minimum/maximum level of fame.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("FAME_GIVE_ERROR_MINIMUM_LEVEL"));
          }
       } else {
          PacketCreator.announce(client, new GiveFameErrorResponse(status == FameStatus.NOT_TODAY ? 3 : 4));

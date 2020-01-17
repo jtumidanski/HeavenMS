@@ -30,6 +30,7 @@ import server.MapleMarriage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.wedding.WeddingGiftResult;
 
@@ -77,11 +78,11 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
 
                   PacketCreator.announce(c, new WeddingGiftResult((byte) 0xF, marriage.getWishListItems(groomWishList), marriage.getGiftItems(c, groomWishList)));
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Free a slot on your inventory before collecting this item.");
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_WEDDING_ITEM_RECEIPT_NEED_SLOT_ERROR"));
                   PacketCreator.announce(c, new WeddingGiftResult((byte) 0xE, marriage.getWishListItems(groomWishList), marriage.getGiftItems(c, groomWishList)));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You have already collected this item.");
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_WEDDING_ITEM_ALREADY_RECEIVED"));
                PacketCreator.announce(c, new WeddingGiftResult((byte) 0xE, marriage.getWishListItems(groomWishList), marriage.getGiftItems(c, groomWishList)));
             }
          }
@@ -96,11 +97,11 @@ public final class WeddingHandler extends AbstractPacketHandler<BaseWeddingPacke
                MapleInventoryManipulator.addFromDrop(c, item, true);
                PacketCreator.announce(c, new WeddingGiftResult((byte) 0xF, Collections.singletonList(""), items));
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Free a slot on your inventory before collecting this item.");
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_WEDDING_ITEM_RECEIPT_NEED_SLOT_ERROR"));
                PacketCreator.announce(c, new WeddingGiftResult((byte) 0xE, Collections.singletonList(""), items));
             }
          } catch (Exception e) {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You have already collected this item.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MARRIAGE_WEDDING_ITEM_ALREADY_RECEIVED"));
             PacketCreator.announce(c, new WeddingGiftResult((byte) 0xE, Collections.singletonList(""), items));
          }
       }

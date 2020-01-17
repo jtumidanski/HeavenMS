@@ -3,6 +3,8 @@ package client.command.commands.gm3;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class NightCommand extends Command {
    {
@@ -13,6 +15,6 @@ public class NightCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       player.getMap().broadcastNightEffect();
-      player.yellowMessage("Done.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("COMMAND_DONE_MESSAGE"));
    }
 }

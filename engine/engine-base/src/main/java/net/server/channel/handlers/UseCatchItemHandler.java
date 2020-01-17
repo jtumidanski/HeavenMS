@@ -16,6 +16,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.monster.CatchMonsterFailure;
 import tools.packet.monster.CatchMonsterWithItem;
 import tools.packet.stat.EnableActions;
@@ -95,7 +96,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
                   PacketCreator.announce(client, new CatchMonsterFailure(0));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot use the Fishing Net yet.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("FISHING_CANNOT_USE_NET_YET"));
             }
          }
       }
@@ -111,7 +112,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
             MapleInventoryManipulator.removeById(client, MapleInventoryType.USE, itemId, 1, true, true);
             MapleInventoryManipulator.addById(client, 2022323, (short) 1, "", -1);
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot use the Fishing Net yet.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("FISHING_CANNOT_USE_NET_YET"));
          }
          PacketCreator.announce(client, new EnableActions());
       }
@@ -201,7 +202,7 @@ public final class UseCatchItemHandler extends AbstractPacketHandler<UseCatchIte
                      MasterBroadcaster.getInstance().sendToAllInMap(chr.getMap(), new CatchMonsterWithItem(monsterId, itemId, (byte) 0));
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Make a ETC slot available before using this item.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ETC_SPACE_NEEDED"));
                }
 
                abm.spam(10);

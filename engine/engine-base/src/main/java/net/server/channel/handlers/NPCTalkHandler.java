@@ -14,6 +14,7 @@ import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
@@ -42,7 +43,7 @@ public final class NPCTalkHandler extends AbstractPacketHandler<NPCTalkPacket> {
       if (obj instanceof MapleNPC) {
          MapleNPC npc = (MapleNPC) obj;
          if (YamlConfig.config.server.USE_DEBUG) {
-            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "Talking to NPC " + npc.id());
+            MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NPC_TALK").with(npc.id()));
          }
 
          if (npc.id() == 9010009) {   //is duey

@@ -3,12 +3,11 @@ package server.processor;
 import java.util.function.BiConsumer;
 
 import client.MapleCharacter;
-import database.AbstractQueryExecutor;
 import client.inventory.Item;
 import client.inventory.manipulator.MapleInventoryManipulator;
 import client.inventory.manipulator.MapleKarmaManipulator;
 import config.YamlConfig;
-import constants.game.GameConstants;
+import database.AbstractQueryExecutor;
 import net.server.coordinator.world.MapleInviteCoordinator;
 import server.MapleTrade;
 import server.MapleTradeResult;
@@ -17,6 +16,7 @@ import tools.LogHelper;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.character.interaction.GetTradeResult;
 import tools.packet.character.interaction.GetTradeStart;
 import tools.packet.character.interaction.TradeChat;
@@ -60,34 +60,34 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
 
          if (!referenceTrade.fitsMeso()) {
             cancelTrade(referenceTrade.getOwner(), MapleTradeResult.UNSUCCESSFUL);
-            MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, "There is not enough meso inventory space to complete the trade.");
-            MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, "Partner does not have enough meso inventory space to complete the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_MESO_FOR_TRADE"));
+            MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_PARTNER_MESO_SPACE"));
             return;
          } else if (!partnerTrade.fitsMeso()) {
             cancelTrade(partnerTrade.getOwner(), MapleTradeResult.UNSUCCESSFUL);
-            MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, "Partner does not have enough meso inventory space to complete the trade.");
-            MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, "There is not enough meso inventory space to complete the trade.");
+            MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_PARTNER_MESO_SPACE"));
+            MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_MESO_FOR_TRADE"));
             return;
          }
 
          if (!referenceTrade.fitsInInventory()) {
             if (referenceTrade.fitsUniquesInInventory()) {
                cancelTrade(referenceTrade.getOwner(), MapleTradeResult.UNSUCCESSFUL);
-               MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, "There is not enough inventory space to complete the trade.");
-               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, "Partner does not have enough inventory space to complete the trade.");
+               MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_INVENTORY_SPACE_FOR_TRADE"));
+               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_PARTNER_INVENTORY_SPACE_FOR_TRADE"));
             } else {
                cancelTrade(referenceTrade.getOwner(), MapleTradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
-               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, "Partner cannot hold more than one one-of-a-kind item at a time.");
+               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTNER_CANNOT_HOLD_MORE_THAN_ONE_OF_A_KIND"));
             }
             return;
          } else if (!partnerTrade.fitsInInventory()) {
             if (partnerTrade.fitsUniquesInInventory()) {
                cancelTrade(partnerTrade.getOwner(), MapleTradeResult.UNSUCCESSFUL);
-               MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, "Partner does not have enough inventory space to complete the trade.");
-               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, "There is not enough inventory space to complete the trade.");
+               MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_PARTNER_INVENTORY_SPACE_FOR_TRADE"));
+               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NOT_ENOUGH_INVENTORY_SPACE_FOR_TRADE"));
             } else {
                cancelTrade(partnerTrade.getOwner(), MapleTradeResult.UNSUCCESSFUL_UNIQUE_ITEM_LIMIT);
-               MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, "Partner cannot hold more than one one-of-a-kind item at a time.");
+               MessageBroadcaster.getInstance().sendServerNotice(referenceCharacter, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTNER_CANNOT_HOLD_MORE_THAN_ONE_OF_A_KIND"));
             }
             return;
          }
@@ -95,7 +95,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
          if (referenceTrade.getOwner().getLevel() < 15) {
             if (referenceTrade.getOwner().getMesosTraded() + referenceTrade.getExchangeMesos() > 1000000) {
                cancelTrade(referenceTrade.getOwner(), MapleTradeResult.NO_RESPONSE);
-               MessageBroadcaster.getInstance().sendServerNotice(referenceTrade.getOwner(), ServerNoticeType.POP_UP, "Characters under level 15 may not trade more than 1 million mesos per day.");
+               MessageBroadcaster.getInstance().sendServerNotice(referenceTrade.getOwner(), ServerNoticeType.POP_UP, I18nMessage.from("LEVEL_TRADE_MESO_LIMIT"));
                return;
             } else {
                referenceTrade.getOwner().addMesosTraded(referenceTrade.getExchangeMesos());
@@ -103,7 +103,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
          } else if (partnerTrade.getOwner().getLevel() < 15) {
             if (partnerTrade.getOwner().getMesosTraded() + partnerTrade.getExchangeMesos() > 1000000) {
                cancelTrade(partnerTrade.getOwner(), MapleTradeResult.NO_RESPONSE);
-               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.POP_UP, "Characters under level 15 may not trade more than 1 million mesos per day.");
+               MessageBroadcaster.getInstance().sendServerNotice(partnerTrade.getOwner(), ServerNoticeType.POP_UP, I18nMessage.from("LEVEL_TRADE_MESO_LIMIT"));
                return;
             } else {
                partnerTrade.getOwner().addMesosTraded(partnerTrade.getExchangeMesos());
@@ -133,9 +133,9 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
 
          referenceTrade.getOwner().gainMeso(referenceTrade.getExchangeMesos() - fee, show, true, show);
          if (fee > 0) {
-            MessageBroadcaster.getInstance().sendServerNotice(referenceTrade.getOwner(), ServerNoticeType.POP_UP, "Transaction completed. You received " + GameConstants.numberWithCommas(referenceTrade.getExchangeMesos() - fee) + " mesos due to trade fees.");
+            MessageBroadcaster.getInstance().sendServerNotice(referenceTrade.getOwner(), ServerNoticeType.POP_UP, I18nMessage.from("TRADE_COMPLETE_MESO_WITH_FEE").with(referenceTrade.getExchangeMesos() - fee));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(referenceTrade.getOwner(), ServerNoticeType.POP_UP, "Transaction completed. You received " + GameConstants.numberWithCommas(referenceTrade.getExchangeMesos()) + " mesos.");
+            MessageBroadcaster.getInstance().sendServerNotice(referenceTrade.getOwner(), ServerNoticeType.POP_UP, I18nMessage.from("TRADE_COMPLETE").with(referenceTrade.getExchangeMesos()));
          }
 
          result = MapleTradeResult.NO_RESPONSE.getValue();
@@ -175,13 +175,13 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
    public void inviteTrade(MapleCharacter character1, MapleCharacter character2) {
       if (MapleInviteCoordinator.hasInvite(MapleInviteCoordinator.InviteType.TRADE, character1.getId())) {
          if (hasTradeInviteBack(character1, character2)) {
-            MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "You are already managing this player's trade invitation.");
+            MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("HAS_TRADE_INVITE_BACK_FROM_PLAYER"));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "You are already managing someone's trade invitation.");
+            MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("HAS_TRADE_INVITE_BACK"));
          }
          return;
       } else if (character1.getTrade().map(MapleTrade::isFullTrade).orElse(false)) {
-         MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "You are already in a trade.");
+         MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALREADY_IN_TRADE"));
          return;
       }
 
@@ -197,12 +197,12 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
             PacketCreator.announce(character1, new GetTradeStart(character1, trade1, (byte) 0));
             PacketCreator.announce(character2, new TradeInvite(character1));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "The other player is already trading with someone else.");
+            MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("OTHER_PLAYER_ALREADY_IN_TRADE"));
             cancelTrade(character1, MapleTradeResult.NO_RESPONSE);
             MapleInviteCoordinator.answerInvite(MapleInviteCoordinator.InviteType.TRADE, character2.getId(), character1.getId(), false);
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "The other player is already managing someone else's trade invitation.");
+         MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("OTHER_PLAYER_ALREADY_INVITED_TO_TRADE"));
          cancelTrade(character1, MapleTradeResult.NO_RESPONSE);
       }
    }
@@ -231,7 +231,7 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
 
       MapleInviteCoordinator.InviteResult res = inviteRes.result;
       if (res != MapleInviteCoordinator.InviteResult.ACCEPTED) {
-         MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "This trade invitation already rescinded.");
+         MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("TRADE_ALREADY_RESCINDED"));
          cancelTrade(character1, MapleTradeResult.NO_RESPONSE);
          return;
       }
@@ -241,14 +241,14 @@ public class MapleTradeProcessor extends AbstractQueryExecutor {
          PacketCreator.announce(character1, new GetTradeStart(character1, trade1, (byte) 1));
          trade1.setFullTrade(true);
          trade2.setFullTrade(true);
-      }, () -> MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, "The other player has already closed the trade."));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(character1, ServerNoticeType.PINK_TEXT, I18nMessage.from("TRADE_ALREADY_CLOSED_BY_OTHER_PLAYER")));
    }
 
    public void declineTrade(MapleCharacter referenceCharacter) {
       referenceCharacter.getTrade().ifPresent(trade -> {
          trade.getPartnerCharacter().ifPresent(partnerCharacter -> {
             if (MapleInviteCoordinator.answerInvite(MapleInviteCoordinator.InviteType.TRADE, referenceCharacter.getId(), partnerCharacter.getId(), false).result == MapleInviteCoordinator.InviteResult.DENIED) {
-               MessageBroadcaster.getInstance().sendServerNotice(partnerCharacter, ServerNoticeType.PINK_TEXT, referenceCharacter.getName() + " has declined your trade request.");
+               MessageBroadcaster.getInstance().sendServerNotice(partnerCharacter, ServerNoticeType.PINK_TEXT, I18nMessage.from("TRADE_DECLINED_BY_PLAYER").with(referenceCharacter.getName()));
             }
 
             partnerCharacter.getTrade().ifPresent(otherTrade -> otherTrade.cancel(MapleTradeResult.PARTNER_CANCEL.getValue()));

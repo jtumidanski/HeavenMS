@@ -7,6 +7,7 @@ import config.YamlConfig;
 import server.maps.MapleMap;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class MapOwnerClaimCommand extends Command {
    {
@@ -28,24 +29,24 @@ public class MapOwnerClaimCommand extends Command {
                         ownedMap.relinquishOwnership(chr);
 
                         if (map == ownedMap) {
-                           MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
+                           MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_IS_FREE"));
                            return;
                         }
                      }
 
                      if (map.claimOwnership(chr)) {
-                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You have leased this lawn for a while, until you leave here or after 1 minute of inactivity.");
+                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_IS_LEASED"));
                      } else {
-                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn has already been leased by a player.");
+                        MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_ALREADY_LEASED"));
                      }
                   } else {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn is currently under a boss siege.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_HAS_BOSS_SIEGE"));
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "This lawn cannot be leased.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_CANNOT_BE_LEASED"));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Feature unavailable.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("FEATURE_UNAVAILABLE"));
             }
          } finally {
             c.releaseClient();

@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class ToggleCouponCommand extends Command {
    {
@@ -14,7 +16,7 @@ public class ToggleCouponCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !togglecoupon <item id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("TOGGLE_COUPON_COMMAND_SYNTAX"));
          return;
       }
       Server.getInstance().toggleCoupon(Integer.parseInt(params[0]));

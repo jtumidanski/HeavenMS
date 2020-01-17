@@ -19,6 +19,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.reactor.DestroyReactor;
 import tools.packet.reactor.TriggerReactor;
 
@@ -217,7 +218,7 @@ public class MapleReactor extends AbstractMapleMapObject {
                attackHit = wHit;
 
                if (YamlConfig.config.server.USE_DEBUG) {
-                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, "Hit REACTOR " + this.getId() + " with POS " + charPos + " , STANCE " + stance + " , SkillID " + skillId + " , STATE " + stats.getType(state) + " STATESIZE " + stats.getStateSize(state));
+                  MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_HIT_REACTOR").with(getId(), charPos, stance, skillId, stats.getType(state), stats.getStateSize(state)));
                }
                ReactorScriptManager.getInstance().onHit(c, this);
 

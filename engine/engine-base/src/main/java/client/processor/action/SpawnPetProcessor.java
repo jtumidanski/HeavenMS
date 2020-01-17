@@ -18,6 +18,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.spawn.ShowPet;
 import tools.packet.stat.EnableActions;
 import tools.packet.stat.UpdatePetStats;
@@ -38,7 +39,12 @@ public class SpawnPetProcessor {
             int petid = pet.id();
             if (petid == 5000028 || petid == 5000047) {
                if (chr.haveItem(petid + 1)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You can't hatch your " + (petid == 5000028 ? "Dragon egg" : "Robo egg") + " if you already have a Baby " + (petid == 5000028 ? "Dragon." : "Robo."));
+                  boolean dragon = petid == 5000028;
+                  if (dragon) {
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("SPAWN_PET_CANNOT_HATCH_IF_ALREADY_HAVE_DRAGON"));
+                  } else {
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("SPAWN_PET_CANNOT_HATCH_IF_ALREADY_HAVE_ROBOT"));
+                  }
                   PacketCreator.announce(c, new EnableActions());
                   return;
                } else {

@@ -9,6 +9,8 @@ import client.command.Command;
 import net.server.Server;
 import net.server.channel.Channel;
 import server.expeditions.MapleExpedition;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class ExpeditionsCommand extends Command {
    {
@@ -21,24 +23,29 @@ public class ExpeditionsCommand extends Command {
       for (Channel ch : Server.getInstance().getChannelsFromWorld(c.getWorld())) {
          List<MapleExpedition> expeditions = ch.getExpeditions();
          if (expeditions.isEmpty()) {
-            player.yellowMessage("No Expeditions in Channel " + ch.getId());
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_NONE_IN_CHANNEL").with(ch.getId()));
             continue;
          }
-         player.yellowMessage("Expeditions in Channel " + ch.getId());
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_IN_CHANNEL").with(ch.getId()));
          int id = 0;
          for (MapleExpedition expedition : expeditions) {
             id++;
-            player.yellowMessage("> Expedition " + id);
-            player.yellowMessage(">> Type: " + expedition.getType().toString());
-            player.yellowMessage(">> Status: " + (expedition.isRegistering() ? "REGISTERING" : "UNDERWAY"));
-            player.yellowMessage(">> Size: " + expedition.getMembers().size());
-            player.yellowMessage(">> Leader: " + expedition.getLeader().getName());
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_ID").with(id));
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_TYPE").with(expedition.getType().toString()));
+            if (expedition.isRegistering()) {
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_STATUS_REGISTERING"));
+            } else {
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_STATUS_UNDERWAY"));
+            }
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_SIZE").with(expedition.getMembers().size()));
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_LEADER").with(expedition.getLeader().getName()));
             int memId = 2;
+
             for (Entry<Integer, String> e : expedition.getMembers().entrySet()) {
                if (expedition.isLeader(e.getKey())) {
                   continue;
                }
-               player.yellowMessage(">>> Member " + memId + ": " + e.getValue());
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXPEDITIONS_COMMAND_MEMBER").with(memId, e.getValue()));
                memId++;
             }
          }

@@ -8,6 +8,8 @@ import client.inventory.MapleInventory;
 import client.inventory.MapleInventoryType;
 import client.processor.ItemProcessor;
 import constants.inventory.ItemConstants;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class SetEqStatCommand extends Command {
    {
@@ -18,7 +20,7 @@ public class SetEqStatCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !seteqstat <stat value> [<speed jump value>]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SET_EQUIP_STAT_COMMAND_SYNTAX"));
          return;
       }
 

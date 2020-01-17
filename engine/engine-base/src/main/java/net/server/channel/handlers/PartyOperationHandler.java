@@ -26,6 +26,7 @@ import scala.Option;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.party.PartyInvite;
 import tools.packet.party.PartyStatusMessage;
 
@@ -70,11 +71,11 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
       } else {
          MapleCharacter invited = invitedOptional.get();
          if (invited.getLevel() < 10 && (!YamlConfig.config.server.USE_PARTY_FOR_STARTERS || player.getLevel() >= 10)) { //min requirement is level 10
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The player you have invited does not meet the requirements.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTY_REQUIREMENT_ERROR"));
             return;
          }
          if (YamlConfig.config.server.USE_PARTY_FOR_STARTERS && invited.getLevel() >= 10 && player.getLevel() < 10) {    //trying to invite high level
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "The player you have invited does not meet the requirements.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTY_REQUIREMENT_ERROR"));
             return;
          }
 
@@ -107,7 +108,7 @@ public final class PartyOperationHandler extends AbstractPacketHandler<BaseParty
       if (res == InviteResult.ACCEPTED) {
          MaplePartyProcessor.getInstance().joinParty(player, partyId, false);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You couldn't join the party due to an expired invitation request.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTY_EXPIRED_INVITATION_ERROR"));
       }
    }
 

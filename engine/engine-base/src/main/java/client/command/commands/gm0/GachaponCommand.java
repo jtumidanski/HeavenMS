@@ -1,9 +1,13 @@
 package client.command.commands.gm0;
 
+import java.util.Arrays;
+
 import client.MapleClient;
 import client.command.Command;
 import server.MapleItemInformationProvider;
 import server.gachapon.MapleGachapon;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class GachaponCommand extends Command {
    {
@@ -24,10 +28,8 @@ public class GachaponCommand extends Command {
          }
       }
       if (gachapon == null) {
-         c.getPlayer().yellowMessage("Please use @gacha <name> where name corresponds to one of the below:");
-         for (String name : names) {
-            c.getPlayer().yellowMessage(name);
-         }
+         MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), I18nMessage.from("GACHAPON_COMMAND_SYNTAX"));
+         Arrays.stream(names).forEach(name -> MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), name));
          return;
       }
       StringBuilder talkStr = new StringBuilder("The #b" + gachaponName + "#k Gachapon contains the following items.\r\n\r\n");

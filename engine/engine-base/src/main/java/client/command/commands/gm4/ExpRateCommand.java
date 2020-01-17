@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ExpRateCommand extends Command {
    {
@@ -15,7 +16,7 @@ public class ExpRateCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !exprate <new rate>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("EXP_RATE_COMMAND_SYNTAX"));
          return;
       }
 

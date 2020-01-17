@@ -11,7 +11,9 @@ import provider.MapleDataProviderFactory;
 import provider.MapleDataTool;
 import server.MapleItemInformationProvider;
 import server.quest.MapleQuest;
+import tools.MessageBroadcaster;
 import tools.Pair;
+import tools.I18nMessage;
 
 public class SearchCommand extends Command {
    private static MapleData npcStringData;
@@ -33,7 +35,7 @@ public class SearchCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !search <type> <name>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SEARCH_COMMAND_SYNTAX"));
          return;
       }
       StringBuilder sb = new StringBuilder();

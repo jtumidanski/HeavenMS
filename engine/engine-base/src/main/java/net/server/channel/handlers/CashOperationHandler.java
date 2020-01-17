@@ -48,6 +48,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.cashshop.CashShopMessage;
 import tools.packet.cashshop.ShowCash;
 import tools.packet.cashshop.operation.PutIntoCashInventory;
@@ -244,7 +245,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
             c.enableCSActions();
             return;
          } else if (ItemConstants.isRateCoupon(cItem.getItemId()) && !YamlConfig.config.server.USE_SUPPLY_RATE_COUPONS) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Rate coupons are currently unavailable to purchase.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_RATE_COUPON_UNAVAILABLE"));
             c.enableCSActions();
             return;
          } else if (ItemConstants.isMapleLife(cItem.getItemId()) && chr.getLevel() < 30) {
@@ -278,11 +279,11 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          c.enableCSActions();
          return;
       } else if (c.getPlayer().getPetIndex(item.petId()) > -1) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot put the pet you currently equip into the Cash Shop inventory.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_INVENTORY_EQUIPPED_PET_ERROR"));
          c.enableCSActions();
          return;
       } else if (ItemConstants.isWeddingRing(item.id()) || ItemConstants.isWeddingToken(item.id())) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You cannot put relationship items into the Cash Shop inventory.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_INVENTORY_RELATIONSHIP_ITEM_ERROR"));
          c.enableCSActions();
          return;
       }
@@ -324,7 +325,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
          cs.gainCash(cash, cItem, chr.getWorld());
          PacketCreator.announce(c, new ShowCash(chr.getCashShop().getCash(1), chr.getCashShop().getCash(2), chr.getCashShop().getCash(4)));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You have already used up all 12 extra character slots.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_CHARACTER_SLOT_MAX"));
          c.enableCSActions();
       }
    }
@@ -488,7 +489,7 @@ public final class CashOperationHandler extends AbstractPacketHandler<BaseCashOp
                NoteProcessor.getInstance().sendNote(partner.getName(), chr.getName(), text, (byte) 1);
                partner.showNote();
             }
-         }, () -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "The partner you specified cannot be found.\r\nPlease make sure your partner is online and in the same channel."));
+         }, () -> MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_RING_PARTNER_ERROR")));
       } else {
          PacketCreator.announce(c, new ShowCashShopMessage(CashShopMessage.CHECK_BIRTHDAY_CODE));
       }

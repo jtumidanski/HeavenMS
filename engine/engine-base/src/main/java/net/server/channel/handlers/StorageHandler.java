@@ -24,6 +24,7 @@ import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.storage.StorageError;
 
@@ -37,7 +38,7 @@ public final class StorageHandler extends AbstractPacketHandler<BaseStoragePacke
    public boolean successfulProcess(MapleClient client) {
       MapleCharacter chr = client.getPlayer();
       if (chr.getLevel() < 15) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You may only use the storage once you have reached level 15.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("STORAGE_LEVEL_REQUIREMENT"));
          PacketCreator.announce(client, new EnableActions());
          return false;
       }

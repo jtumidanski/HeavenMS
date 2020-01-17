@@ -7,6 +7,7 @@ import server.TimerManager;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ui.GetClock;
 
 public class MapleOla {
@@ -32,7 +33,7 @@ public class MapleOla {
       this.time = 360000;
 
       chr.getMap().getPortal("join00").setPortalStatus(true);
-      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "The portal has now opened. Press the up arrow key at the portal to enter.");
+      MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("EVENT_OLA_START"));
    }
 
    public boolean isTimerStarted() {

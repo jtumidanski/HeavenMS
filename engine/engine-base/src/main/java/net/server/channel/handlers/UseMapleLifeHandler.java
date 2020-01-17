@@ -9,6 +9,7 @@ import net.server.channel.packet.reader.UseMapleLifeReader;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.cashshop.SendMapleLife;
 import tools.packet.cashshop.SendMapleLifeError;
 import tools.packet.cashshop.SendMapleNameLifeError;
@@ -26,7 +27,7 @@ public class UseMapleLifeHandler extends AbstractPacketHandler<UseMapleLifePacke
       long timeNow = currentServerTime();
 
       if (timeNow - player.getLastUsedCashItem() < 3000) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Please wait a moment before trying again.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("USE_DELAY"));
          PacketCreator.announce(client, new SendMapleLifeError(3));
          PacketCreator.announce(client, new EnableActions());
          return;

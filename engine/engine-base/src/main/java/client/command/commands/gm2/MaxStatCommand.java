@@ -5,6 +5,8 @@ import client.MapleClient;
 import client.MapleStat;
 import client.command.Command;
 import config.YamlConfig;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class MaxStatCommand extends Command {
    {
@@ -24,6 +26,6 @@ public class MaxStatCommand extends Command {
       player.updateMaxHpMaxMp(30000, 30000);
       player.updateSingleStat(MapleStat.LEVEL, 255);
       player.updateSingleStat(MapleStat.FAME, 13337);
-      player.yellowMessage("Stats maxed out.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("MAX_STAT_COMMAND_SUCCESS"));
    }
 }

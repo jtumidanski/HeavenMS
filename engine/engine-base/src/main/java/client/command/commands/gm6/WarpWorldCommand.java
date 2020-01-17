@@ -10,6 +10,7 @@ import net.server.Server;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ChangeChannel;
 
 public class WarpWorldCommand extends Command {
@@ -21,7 +22,7 @@ public class WarpWorldCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !warpworld <world id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("WARP_WORLD_COMMAND_SYNTAX"));
          return;
       }
 
@@ -38,11 +39,10 @@ public class WarpWorldCommand extends Command {
             PacketCreator.announce(c, new ChangeChannel(InetAddress.getByName(socket[0]), Integer.parseInt(socket[1])));
          } catch (UnknownHostException | NumberFormatException ex) {
             ex.printStackTrace();
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Unexpected error when changing worlds, are you sure the world you are trying to warp to has the same amount of channels?");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("WARP_WORLD_COMMAND_CHANNEL_ERROR"));
          }
-
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Invalid world; highest number available: " + (server.getWorldsSize() - 1));
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("WARP_WORLD_COMMAND_INVALID_WORLD").with(server.getWorldsSize() - 1));
       }
    }
 }

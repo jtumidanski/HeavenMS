@@ -7,6 +7,7 @@ import net.server.Server;
 import server.ThreadManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ServerAddChannelCommand extends Command {
    {
@@ -18,7 +19,7 @@ public class ServerAddChannelCommand extends Command {
       final MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Syntax: @addchannel <world id>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_CHANNEL_COMMAND_SYNTAX"));
          return;
       }
 
@@ -28,16 +29,16 @@ public class ServerAddChannelCommand extends Command {
          int channelId = Server.getInstance().addChannel(worldId);
          if (player.isLoggedInWorld()) {
             if (channelId >= 0) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "NEW Channel " + channelId + " successfully deployed on world " + worldId + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_CHANNEL_COMMAND_SUCCESS").with(channelId, worldId));
             } else {
                if (channelId == -3) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Invalid worldId detected. Channel creation aborted.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_CHANNEL_COMMAND_INVALID_WORLD"));
                } else if (channelId == -2) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Reached channel limit on worldId " + worldId + ". Channel creation aborted.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_CHANNEL_COMMAND_CHANNEL_LIMIT").with(worldId));
                } else if (channelId == -1) {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Error detected when loading the 'world.ini' file. Channel creation aborted.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_CHANNEL_COMMAND_INI_ERROR"));
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "NEW Channel failed to be deployed. Check if the needed port is already in use or other limitations are taking place.");
+                  MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_ADD_CHANNEL_COMMAND_ERROR_GENERIC"));
                }
             }
          }

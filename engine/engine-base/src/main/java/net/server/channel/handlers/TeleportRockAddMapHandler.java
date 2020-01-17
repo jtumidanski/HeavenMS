@@ -11,6 +11,7 @@ import server.maps.FieldLimit;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ui.RefreshTeleportRockMapList;
 
 public final class TeleportRockAddMapHandler extends AbstractPacketHandler<BaseTeleportRockMapPacket> {
@@ -39,7 +40,7 @@ public final class TeleportRockAddMapHandler extends AbstractPacketHandler<BaseT
 
             PacketCreator.announce(client, new RefreshTeleportRockMapList(chr.getVipTeleportRockMaps(), chr.getTeleportRockMaps(), false, packet.vip()));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You may not save this map.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("TELEPORT_ROCK_MAP_CANNOT_BE_SAVED"));
          }
       }
    }

@@ -12,7 +12,7 @@ public class ItemCommand extends AbstractItemProductionCommand {
 
    @Override
    protected String getSyntax() {
-      return "Syntax: !item <item id> <quantity>";
+      return "ITEM_PRODUCTION_COMMAND_SYNTAX";
    }
 
    @Override

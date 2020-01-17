@@ -28,6 +28,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.alliance.AddGuildToAlliance;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.ChangeAllianceRankTitles;
@@ -88,7 +89,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       } else if (packet instanceof AllianceInvitePacket) {
          sendInvite(client, alliance, chr, ((AllianceInvitePacket) packet).guildName());
       } else if (packet instanceof AllianceAlreadyRegisteredPacket) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Your guild is already registered on a guild alliance.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_ALREADY_REGISTERED"));
          PacketCreator.announce(client, new EnableActions());
       } else if (packet instanceof AllianceNoticePacket) {
          setAllianceNotice(alliance, ((AllianceNoticePacket) packet).notice());
@@ -101,7 +102,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       } else if (packet instanceof ExpelGuildPacket) {
          expelGuild(client, alliance, allianceId, ((ExpelGuildPacket) packet).guildId(), ((ExpelGuildPacket) packet).allianceId());
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Feature not available");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("FEATURE_UNAVAILABLE"));
       }
    }
 
@@ -174,7 +175,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
             }
 
             if (alliance.guilds().size() == alliance.capacity()) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Your alliance cannot comport any more guilds at the moment.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_CAPACITY"));
                return;
             }
 
@@ -198,7 +199,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
 
    private void sendInvite(MapleClient client, MapleAlliance alliance, MapleCharacter character, String guildName) {
       if (alliance.guilds().size() == alliance.capacity()) {
-         MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, "Your alliance cannot comport any more guilds at the moment.");
+         MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_CAPACITY"));
       } else {
          MapleAllianceProcessor.getInstance().sendInvitation(client, guildName, alliance.id());
       }

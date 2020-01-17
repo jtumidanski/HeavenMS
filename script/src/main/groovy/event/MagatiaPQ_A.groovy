@@ -11,6 +11,7 @@ import server.life.MapleNPCFactory
 import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
+import tools.I18nMessage
 
 import java.awt.*
 import java.util.List
@@ -303,9 +304,9 @@ class EventMagatiaPQ_A {
       if (eim.getIntProperty("yuleteTalked") == 1) {
          eim.setIntProperty("yuletePassed", 1)
 
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: Ugh, you guys disgust me. All I desired was to make this nation the greatest alchemy powerhouse of the entire world. If they won't accept this, I will make it true by myself, at any costs!!!")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("YULETE_DISGUST"))
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, "Yulete: Hahaha... Did you really think I was going to be so unprepared knowing that the Magatia societies' dogs would be coming in my pursuit after my actions? Fools!")
+         MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("YULETE_UNPREPARED"))
       }
       eim.setIntProperty("yuleteTalked", -1)
 
@@ -348,7 +349,7 @@ class EventMagatiaPQ_A {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }

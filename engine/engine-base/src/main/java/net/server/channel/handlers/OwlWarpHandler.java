@@ -10,8 +10,9 @@ import server.maps.MaplePlayerShop;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.packet.owl.GetOwlMessage;
+import tools.I18nMessage;
 import tools.packet.character.interaction.GetHiredMerchant;
+import tools.packet.owl.GetOwlMessage;
 
 public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
    @Override
@@ -23,7 +24,7 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
    public void handlePacket(OwlWarpPacket packet, MapleClient client) {
 
       if (packet.ownerId() == client.getPlayer().getId()) {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You cannot visit your own shop.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("OWL_OWN_SHOP_ERROR"));
          return;
       }
 
@@ -58,10 +59,10 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
                      PacketCreator.announce(client, new GetOwlMessage(18));
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "That shop is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("OWL_OTHER_CHANNEL_ERROR").with(hm.getChannel(), hm.getMap().getMapName()));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "That shop is currently located outside of the FM area. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
+               MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("OWL_OTHER_AREA").with(hm.getChannel(), hm.getMap().getMapName()));
             }
          } else {
             //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));
@@ -86,10 +87,10 @@ public final class OwlWarpHandler extends AbstractPacketHandler<OwlWarpPacket> {
                      PacketCreator.announce(client, new GetOwlMessage(18));
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "That merchant is currently located in another channel. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("OWL_OTHER_CHANNEL_ERROR").with(hm.getChannel(), hm.getMap().getMapName()));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "That merchant is currently located outside of the FM area. Current location: Channel " + hm.getChannel() + ", '" + hm.getMap().getMapName() + "'.");
+               MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("OWL_OTHER_AREA").with(hm.getChannel(), hm.getMap().getMapName()));
             }
          } else {
             //c.announce(MaplePacketCreator.serverNotice(1, "That merchant has either been closed or is under maintenance."));

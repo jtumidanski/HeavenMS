@@ -11,6 +11,7 @@ import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.PacketCreator
 import tools.ServerNoticeType
+import tools.I18nMessage
 import tools.packet.ui.GetClock
 
 class Event3rdJob_mount {
@@ -41,7 +42,7 @@ class Event3rdJob_mount {
          int oldHp = eim.getIntProperty("whog_hp")
 
          if (oldHp - hp > 1000) {    // or 800, if using mobHP / eventTime
-            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, "Please protect the pig from the aliens!")
+            MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("3RD_JOB_MOUNT_WARNING"))
          }
          eim.setIntProperty("whog_hp", hp)
       }
@@ -149,7 +150,7 @@ class Event3rdJob_mount {
          Iterator<MapleCharacter> pIter = eim.getPlayers().iterator()
          while (pIter.hasNext()) {
             MapleCharacter player = pIter.next()
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, "You have run out of time to complete this event!")
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_TIMEOUT"))
             playerExit(eim, player)
          }
       }

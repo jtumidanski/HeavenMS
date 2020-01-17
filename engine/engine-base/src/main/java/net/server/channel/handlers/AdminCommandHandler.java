@@ -41,6 +41,7 @@ import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.StringUtil;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.ui.GMEffect;
 
@@ -116,7 +117,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void banPlayer(MapleClient c) {
-      c.getPlayer().yellowMessage("Please use !ban <IGN> <Reason>");
+      MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), I18nMessage.from("BAN_COMMAND_SYNTAX"));
    }
 
    private void hidePlayer(MapleClient c, boolean hide) {
@@ -126,12 +127,11 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    private void enteringAMap(MapleClient c, byte type) {
       switch (type) {
          case 0:// /u
-            StringBuilder sb = new StringBuilder("USERS ON THIS MAP: ");
-            for (MapleCharacter mc : c.getPlayer().getMap().getCharacters()) {
-               sb.append(mc.getName());
-               sb.append(" ");
-            }
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, sb.toString());
+            String names = c.getPlayer().getMap().getCharacters().stream()
+                  .map(MapleCharacter::getName)
+                  .collect(StringBuilder::new, (sb, s1) -> sb.append(" ").append(s1), (sb1, sb2) -> sb1.append(sb2.toString()))
+                  .toString();
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("USERS_IN_MAP").with(names));
             break;
          case 12:
             break;
@@ -161,12 +161,12 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
    }
 
    private void monsterHpBroadcast(MapleClient c, int mobHp) {
-      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, "Monsters HP");
+      MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("MONSTER_HP_TITLE"));
       List<MapleMapObject> monsters = c.getPlayer().getMap().getMapObjectsInRange(c.getPlayer().position(), Double.POSITIVE_INFINITY, Collections.singletonList(MapleMapObjectType.MONSTER));
       for (MapleMapObject mobs : monsters) {
          MapleMonster monster = (MapleMonster) mobs;
          if (monster.id() == mobHp) {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, monster.getName() + ": " + monster.getHp());
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("MONSTER_HP_BODY").with(monster.getName(), monster.getHp()));
          }
       }
    }

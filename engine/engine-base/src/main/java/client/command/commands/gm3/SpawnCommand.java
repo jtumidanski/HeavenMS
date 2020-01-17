@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.life.MapleLifeFactory;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class SpawnCommand extends Command {
    {
@@ -14,7 +16,7 @@ public class SpawnCommand extends Command {
    public void execute(MapleClient client, String[] params) {
       MapleCharacter player = client.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !spawn <mob id> [<mob quantity>]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SPAWN_COMMAND_SYNTAX"));
          return;
       }
 

@@ -9,6 +9,7 @@ import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class RechargeCommand extends Command {
    {
@@ -34,6 +35,6 @@ public class RechargeCommand extends Command {
             c.getPlayer().forceUpdateItem(toRecharge);
          }
       }
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "USE Recharged.");
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("RECHARGE_COMMAND_SUCCESS"));
    }
 }

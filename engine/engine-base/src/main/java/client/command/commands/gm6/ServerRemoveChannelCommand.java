@@ -7,6 +7,7 @@ import net.server.Server;
 import server.ThreadManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ServerRemoveChannelCommand extends Command {
    {
@@ -18,7 +19,7 @@ public class ServerRemoveChannelCommand extends Command {
       final MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Syntax: @removechannel <world id>");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_CHANNEL_COMMAND_SYNTAX"));
          return;
       }
 
@@ -26,11 +27,11 @@ public class ServerRemoveChannelCommand extends Command {
       ThreadManager.getInstance().newTask(() -> {
          if (Server.getInstance().removeChannel(worldId)) {
             if (player.isLoggedInWorld()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Successfully removed a channel on World " + worldId + ". Current channel count: " + Server.getInstance().getWorld(worldId).getChannelsSize() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_CHANNEL_COMMAND_SUCCESS").with(worldId, Server.getInstance().getWorld(worldId).getChannelsSize()));
             }
          } else {
             if (player.isLoggedInWorld()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Failed to remove last Channel on world " + worldId + ". Check if either that world exists or there are people currently playing there.");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SERVER_REMOVE_CHANNEL_COMMAND_ERROR").with(worldId));
             }
          }
       });

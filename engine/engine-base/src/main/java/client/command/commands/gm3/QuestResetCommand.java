@@ -6,6 +6,7 @@ import client.command.Command;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class QuestResetCommand extends Command {
    {
@@ -17,7 +18,7 @@ public class QuestResetCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !resetquest <quest id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("QUEST_RESET_COMMAND_SYNTAX"));
          return;
       }
 
@@ -27,9 +28,9 @@ public class QuestResetCommand extends Command {
          MapleQuest quest = MapleQuest.getInstance(questId);
          if (quest != null) {
             quest.reset(player);
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " reset.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_RESET_COMMAND_SUCCESS").with(questId));
          } else {    // should not occur
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " is invalid.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_RESET_COMMAND_FAILURE").with(questId));
          }
       }
    }

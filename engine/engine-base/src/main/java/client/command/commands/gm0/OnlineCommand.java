@@ -7,7 +7,7 @@ import net.server.Server;
 import net.server.channel.Channel;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.StringUtil;
+import tools.I18nMessage;
 
 public class OnlineCommand extends Command {
    {
@@ -18,10 +18,10 @@ public class OnlineCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       for (Channel ch : Server.getInstance().getChannelsFromWorld(player.getWorld())) {
-         player.yellowMessage("Players in Channel " + ch.getId() + ":");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ONLINE_COMMAND_TITLE").with(ch.getId()));
          for (MapleCharacter chr : ch.getPlayerStorage().getAllCharacters()) {
             if (!chr.isGM()) {
-               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, " >> " + StringUtil.makeMapleReadable(chr.getName()) + " is at " + chr.getMap().getMapName() + ".");
+               MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("ONLINE_COMMAND_BODY").with(chr.getName(), chr.getMap().getMapName()));
             }
          }
       }

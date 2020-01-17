@@ -7,6 +7,8 @@ import client.processor.PetProcessor;
 import config.YamlConfig;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public abstract class AbstractItemProductionCommand extends Command {
    protected abstract String getSyntax();
@@ -20,7 +22,7 @@ public abstract class AbstractItemProductionCommand extends Command {
       MapleCharacter player = client.getPlayer();
 
       if (params.length < 1) {
-         player.yellowMessage(getSyntax());
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from(getSyntax()));
          return;
       }
 
@@ -28,7 +30,7 @@ public abstract class AbstractItemProductionCommand extends Command {
       MapleItemInformationProvider ii = MapleItemInformationProvider.getInstance();
 
       if (ii.getName(itemId) == null) {
-         player.yellowMessage("Item id '" + params[0] + "' does not exist.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ITEM_PRODUCTION_COMMAND_ITEM_NOT_FOUND").with(params[0]));
          return;
       }
 
@@ -38,7 +40,7 @@ public abstract class AbstractItemProductionCommand extends Command {
       }
 
       if (YamlConfig.config.server.BLOCK_GENERATE_CASH_ITEM && ii.isCash(itemId)) {
-         player.yellowMessage("You cannot create a cash item with this command.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ITEM_PRODUCTION_COMMAND_CANNOT_MAKE_CASH_ITEM"));
          return;
       }
 
@@ -50,7 +52,7 @@ public abstract class AbstractItemProductionCommand extends Command {
             int petId = PetProcessor.getInstance().createPet(itemId);
             producePet(client, itemId, quantity, petId, expiration);
          } else {
-            player.yellowMessage("Pet Syntax: !item <item id> <expiration>");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ITEM_PRODUCTION_COMMAND_PET_SYNTAX"));
          }
          return;
       }

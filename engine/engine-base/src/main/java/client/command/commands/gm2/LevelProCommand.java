@@ -3,6 +3,8 @@ package client.command.commands.gm2;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class LevelProCommand extends Command {
    {
@@ -13,7 +15,7 @@ public class LevelProCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !levelpro <new level>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("LEVEL_PRO_COMMAND_SYNTAX"));
          return;
       }
       while (player.getLevel() < Math.min(player.getMaxClassLevel(), Integer.parseInt(params[0]))) {

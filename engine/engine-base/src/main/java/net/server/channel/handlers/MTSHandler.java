@@ -45,6 +45,7 @@ import database.DatabaseConnection;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.mtsoperation.GetNotYetSoldMTSInventory;
 import tools.packet.mtsoperation.MTSConfirmBuy;
 import tools.packet.mtsoperation.MTSConfirmSell;
@@ -231,7 +232,7 @@ public final class MTSHandler extends AbstractPacketHandler<BaseMTSPacket> {
          DatabaseConnection.getInstance().withConnection(connection -> {
             long itemForSaleCount = MtsItemProvider.getInstance().countBySeller(connection, client.getPlayer().getId());
             if (itemForSaleCount > 10) { //They have more than 10 items up for sale already!
-               MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You already have 10 items up for auction!");
+               MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MTS_MAXIMUM_ITEMS_FOR_SALE"));
                client.announce(getMTS(1, 0, 0));
                PacketCreator.announce(client, new MTSTransferInventory(getTransfer(client.getPlayer().getId())));
                PacketCreator.announce(client, new GetNotYetSoldMTSInventory(getNotYetSold(client.getPlayer().getId())));

@@ -13,8 +13,6 @@ public class BuffMeCommand extends Command {
    @Override
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
-
-
       SkillFactory.getSkill(4101004).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
       SkillFactory.getSkill(2311003).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));
       SkillFactory.getSkill(1301007).ifPresent(skill -> skill.getEffect(skill.getMaxLevel()).applyTo(player));

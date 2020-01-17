@@ -6,7 +6,6 @@ import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
 boolean enter(PortalPlayerInteraction pi) {
    int jobType = 0
    if (pi.isQuestStarted(20301) || pi.isQuestStarted(20302) || pi.isQuestStarted(20303) || pi.isQuestStarted(20304) || pi.isQuestStarted(20305)) {

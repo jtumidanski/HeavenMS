@@ -7,11 +7,10 @@ import client.MapleClient;
 import client.command.Command;
 import database.DatabaseConnection;
 import database.administrator.PlayerLifeAdministrator;
-import net.server.channel.Channel;
 import server.life.MapleLifeFactory;
-import server.maps.MapleMap;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class PlayerMobCommand extends Command {
    {
@@ -22,7 +21,7 @@ public class PlayerMobCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !pmob <mob id> [<mob time>]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PLAYER_MOB_COMMAND_SYNTAX"));
          return;
       }
 
@@ -37,7 +36,7 @@ public class PlayerMobCommand extends Command {
 
       MapleLifeFactory.getMonster(mobId).ifPresentOrElse(mob -> {
          if (mob.getName().equals("MISSINGNO")) {
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have entered an invalid mob id.");
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("INVALID_MONSTER_ID"));
             return;
          }
 
@@ -50,13 +49,14 @@ public class PlayerMobCommand extends Command {
          DatabaseConnection.getInstance().withConnection(connection ->
                PlayerLifeAdministrator.getInstance().create(connection, mobId, 0, fh, yPosition, xPosition + 50, xPosition - 50, "m", xPosition, yPosition, player.getWorld(), mapId, mobTime, 0));
 
-         for (Channel ch : player.getWorldServer().getChannels()) {
-            MapleMap map = ch.getMapFactory().getMap(mapId);
-            map.addMonsterSpawn(mob, mobTime, -1);
-            map.addAllMonsterSpawn(mob, mobTime, -1);
-         }
+         player.getWorldServer().getChannels().stream()
+               .map(channel -> channel.getMapFactory().getMap(mapId))
+               .forEach(map -> {
+                  map.addMonsterSpawn(mob, mobTime, -1);
+                  map.addAllMonsterSpawn(mob, mobTime, -1);
+               });
 
-         player.yellowMessage("Player mob created.");
-      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have entered an invalid mob id."));
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PLAYER_MOB_COMMAND_SUCCESS"));
+      }, () -> MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("INVALID_MONSTER_ID")));
    }
 }

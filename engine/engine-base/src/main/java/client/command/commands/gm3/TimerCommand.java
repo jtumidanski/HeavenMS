@@ -8,6 +8,7 @@ import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.ui.GetClock;
 import tools.packet.ui.StopClock;
 
@@ -20,7 +21,7 @@ public class TimerCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !timer <player name> <seconds>|remove");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("TIMER_COMMAND_SYNTAX"));
          return;
       }
 
@@ -32,11 +33,11 @@ public class TimerCommand extends Command {
             try {
                PacketCreator.announce(victim.get(), new GetClock(Integer.parseInt(params[1])));
             } catch (NumberFormatException e) {
-               player.yellowMessage("Syntax: !timer <player name> <seconds>|remove");
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("TIMER_COMMAND_SYNTAX"));
             }
          }
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0]));
       }
    }
 }

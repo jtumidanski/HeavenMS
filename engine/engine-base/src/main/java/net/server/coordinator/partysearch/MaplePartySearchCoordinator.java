@@ -28,6 +28,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.party.PartySearchInvite;
 
 public class MaplePartySearchCoordinator {
@@ -339,7 +340,7 @@ public class MaplePartySearchCoordinator {
             addQueueLeader(leader);
          } else {
             if (leader.isLoggedInWorld()) {
-               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session has finished as your party reached full capacity.");
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTY_SEARCH_SUCCESS"));
             }
             searchLeaders.remove(leader.getId());
             searchSettings.remove(leader.getId());
@@ -355,10 +356,10 @@ public class MaplePartySearchCoordinator {
             if (settings != null) {
                recycledLeaders.add(new Pair<>(leader, settings));
                if (YamlConfig.config.server.USE_DEBUG && leader.isGM()) {
-                  MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session is now on waiting queue for up to 7 minutes, to get it working right away please stop your Party Search and retry again later.");
+                  MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTY_SEARCH_TRY_AGAIN_LATER"));
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, "Your Party Search token session expired, please stop your Party Search and retry again later.");
+               MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.PINK_TEXT, I18nMessage.from("PARTY_SEARCH_SESSION_EXPIRED"));
             }
          }
       }

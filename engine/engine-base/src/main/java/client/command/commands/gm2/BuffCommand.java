@@ -4,6 +4,8 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.SkillFactory;
 import client.command.Command;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class BuffCommand extends Command {
    {
@@ -14,7 +16,7 @@ public class BuffCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !buff <buff id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("BUFF_COMMAND_SYNTAX"));
          return;
       }
       int skillId = Integer.parseInt(params[0]);

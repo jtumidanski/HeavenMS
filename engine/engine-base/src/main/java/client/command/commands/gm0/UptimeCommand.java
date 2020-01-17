@@ -3,6 +3,8 @@ package client.command.commands.gm0;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
+import tools.MessageBroadcaster;
+import tools.I18nMessage;
 
 public class UptimeCommand extends Command {
    {
@@ -16,6 +18,6 @@ public class UptimeCommand extends Command {
       int minutes = (int) ((milliseconds / (1000 * 60)) % 60);
       int hours = (int) ((milliseconds / (1000 * 60 * 60)) % 24);
       int days = (int) ((milliseconds / (1000 * 60 * 60 * 24)));
-      c.getPlayer().yellowMessage("Server has been online for " + days + " days " + hours + " hours " + minutes + " minutes and " + seconds + " seconds.");
+      MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), I18nMessage.from("UPTIME_COMMAND_MESSAGE").with(days, hours, minutes, seconds));
    }
 }

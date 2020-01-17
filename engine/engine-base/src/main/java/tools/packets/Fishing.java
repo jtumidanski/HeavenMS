@@ -11,6 +11,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.foreigneffect.ShowForeignInfo;
 import tools.packet.showitemgaininchat.ShowInfo;
 
@@ -38,9 +39,9 @@ public class Fishing {
       double baitLikelihood = 0.0002 * chr.getWorldServer().getFishingRate() * baitLevel;   // can improve 10.0 at "max level 50000" on rate 1x
 
       if (YamlConfig.config.server.USE_DEBUG) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "----- FISHING RESULT -----");
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Likelihoods - Year: " + yearLikelihood + " Time: " + timeLikelihood + " Meso: " + baitLikelihood);
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Score rolls - Year: " + (0.23 * yearLikelihood) + " Time: " + (0.77 * timeLikelihood) + " Meso: " + baitLikelihood);
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_TITLE"));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_BODY").with(yearLikelihood, timeLikelihood, baitLikelihood));
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DEBUG_FISHING_FOOTER").with((0.23 * yearLikelihood), (0.77 * timeLikelihood), baitLikelihood));
       }
 
       return (0.23 * yearLikelihood) + (0.77 * timeLikelihood) + (baitLikelihood) > 57.777;
@@ -52,12 +53,12 @@ public class Fishing {
       }
 
       if (!GameConstants.isFishingArea(chr.getMapId())) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "You are not in a fishing area!");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, I18nMessage.from("FISHING_ERROR_WRONG_MAP"));
          return;
       }
 
       if (chr.getLevel() < 30) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You must be above level 30 to fish!");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("FISHING_ERROR_LEVEL_REQUIREMENT"));
          return;
       }
 

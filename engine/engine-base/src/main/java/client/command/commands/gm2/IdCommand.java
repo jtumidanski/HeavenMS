@@ -11,7 +11,9 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import server.ThreadManager;
+import tools.MessageBroadcaster;
 import tools.exceptions.IdTypeNotSupportedException;
+import tools.I18nMessage;
 
 public class IdCommand extends Command {
    private final Map<String, String> handbookDirectory = new HashMap<>();
@@ -33,11 +35,11 @@ public class IdCommand extends Command {
    public void execute(MapleClient client, final String[] params) {
       final MapleCharacter player = client.getPlayer();
       if (params.length < 2) {
-         player.yellowMessage("Syntax: !id <type> <query>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ID_COMMAND_SYNTAX"));
          return;
       }
       final String queryItem = joinStringArr(Arrays.copyOfRange(params, 1, params.length), " ");
-      player.yellowMessage("Querying for entry... May take some time... Please try to refine your search.");
+      MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ID_COMMAND_BE_PATIENT"));
       Runnable queryRunnable = () -> {
          try {
             populateIdMap(params[0].toLowerCase());
@@ -57,12 +59,12 @@ public class IdCommand extends Command {
 
                player.getAbstractPlayerInteraction().npcTalk(9010000, sb.toString());
             } else {
-               player.yellowMessage(String.format("Id not found for item: %s, of type: %s.", queryItem, params[0]));
+               MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ID_COMMAND_ID_NOT_FOUND").with(queryItem, params[0]));
             }
          } catch (IdTypeNotSupportedException e) {
-            player.yellowMessage("Your query type is not supported.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ID_COMMAND_NOT_SUPPORTED"));
          } catch (IOException e) {
-            player.yellowMessage("Error reading file, please contact your administrator.");
+            MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("ID_COMMAND_GENERIC_ERROR"));
          }
       };
 
@@ -85,10 +87,14 @@ public class IdCommand extends Command {
    }
 
    private String joinStringArr(String[] arr, String separator) {
-      if (null == arr || 0 == arr.length) return "";
+      if (null == arr || 0 == arr.length) {
+         return "";
+      }
       StringBuilder sb = new StringBuilder(256);
       sb.append(arr[0]);
-      for (int i = 1; i < arr.length; i++) sb.append(separator).append(arr[i]);
+      for (int i = 1; i < arr.length; i++) {
+         sb.append(separator).append(arr[i]);
+      }
       return sb.toString();
    }
 

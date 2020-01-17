@@ -7,6 +7,7 @@ import client.MapleClient;
 import client.command.Command;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class HpMpCommand extends Command {
    {
@@ -25,13 +26,13 @@ public class HpMpCommand extends Command {
       } else if (params.length == 1) {
          statUpdate = Integer.parseInt(params[0]);
       } else {
-         player.yellowMessage("Syntax: !hpmp [<player name>] <value>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("HP_MP_COMMAND_SYNTAX"));
       }
 
       if (victim.isPresent()) {
          victim.get().updateHpMp(statUpdate);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Player '" + params[0] + "' could not be found on this world.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0]));
       }
    }
 }

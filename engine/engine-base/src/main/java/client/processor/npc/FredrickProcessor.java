@@ -35,6 +35,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.fredrick.FredrickMessage;
 
 public class FredrickProcessor {
@@ -203,7 +204,7 @@ public class FredrickProcessor {
                PacketCreator.announce(chr, new FredrickMessage((byte) 0x1E));
                removeFredrickLog(chr.getId());
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "An unknown error has occurred.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("UNKNOWN_ERROR"));
             }
          } finally {
             c.releaseClient();

@@ -22,6 +22,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.monster.carnival.MonsterCarnivalMessage;
 import tools.packet.monster.carnival.MonsterCarnivalPlayerSummoned;
 import tools.packet.stat.EnableActions;
@@ -75,7 +76,7 @@ public final class MonsterCarnivalHandler extends AbstractPacketHandler<MonsterC
                } else if (tab == 1) { //abnormal statuses
                   final List<Integer> skillIds = client.getPlayer().getMap().getSkillIds();
                   if (num >= skillIds.size()) {
-                     MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, "An unexpected error has occurred.");
+                     MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("UNKNOWN_ERROR"));
                      PacketCreator.announce(client, new EnableActions());
                      return;
                   }

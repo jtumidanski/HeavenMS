@@ -72,6 +72,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.MiniRoomError;
 import tools.packet.character.box.AddMatchCard;
 import tools.packet.character.box.AddOmokBox;
@@ -291,7 +292,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MapleHiredMerchant merchant = chr.getHiredMerchant();
       if (merchant != null && merchant.isOwner(chr)) {
          if (merchant.isOpen()) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't take it with the store open.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_CANNOT_TAKE_BACK_WITH_STORE_OPEN"));
             return;
          }
 
@@ -362,7 +363,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MaplePlayerShop shop = chr.getPlayerShop();
       if (shop != null && shop.isOwner(chr)) {
          if (shop.isOpen()) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't take it with the store open.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_CANNOT_TAKE_BACK_WITH_STORE_OPEN"));
             return;
          }
 
@@ -386,14 +387,14 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       Item ivItem = chr.getInventory(ivType).getItem(slot);
 
       if (ivItem == null || ItemProcessor.getInstance().isUnableToBeTraded(ivItem)) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Could not perform shop operation with that item.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_SHOP_OPERATION_ERROR"));
          PacketCreator.announce(c, new EnableActions());
          return;
       } else if (MapleItemInformationProvider.getInstance().isUnmerchable(ivItem.id())) {
          if (ItemConstants.isPet(ivItem.id())) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Pets are not allowed to be sold on the Player Store.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_SHOP_NO_PETS"));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Cash items are not allowed to be sold on the Player Store.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_SHOP_NO_CASH_ITEMS"));
          }
 
          PacketCreator.announce(c, new EnableActions());
@@ -404,7 +405,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          perBundle = 1;
          bundles = 1;
       } else if (ivItem.quantity() < (bundles * perBundle)) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Could not perform shop operation with that item.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_SHOP_OPERATION_ERROR"));
          PacketCreator.announce(c, new EnableActions());
          return;
       }
@@ -425,7 +426,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       MapleHiredMerchant merchant = chr.getHiredMerchant();
       if (shop != null && shop.isOwner(chr)) {
          if (shop.isOpen() || !shop.addItem(shopItem)) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't sell it anymore.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_CANNOT_SELL_ANYMORE"));
             return;
          }
 
@@ -438,12 +439,12 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          PacketCreator.announce(c, new PlayerShopItemUpdate(shop));
       } else if (merchant != null && merchant.isOwner(chr)) {
          if (ivType.equals(MapleInventoryType.CASH) && merchant.isPublished()) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Cash items are only allowed to be sold when first opening the store.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_CANNOT_SELL_WHEN_FIRST_OPENING_STORE"));
             return;
          }
 
          if (merchant.isOpen() || !merchant.addItem(shopItem)) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't sell it anymore.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_CANNOT_SELL_ANYMORE"));
             return;
          }
 
@@ -461,7 +462,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
 
          merchant.saveItems(false);
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You can't sell without owning a shop.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("PLAYER_INTERACTION_CANNOT_SELL_WITHOUT_SHOP"));
       }
    }
 
@@ -481,16 +482,16 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
 
       if (item == null) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Invalid item description.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("BAD_ITEM_DESCRIPTION"));
          PacketCreator.announce(c, new EnableActions());
          return;
       }
 
       if (ii.isUnmerchable(item.id())) {
          if (ItemConstants.isPet(item.id())) {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Pets are not allowed to be traded.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("TRADE_PET_CANNOT_BE_TRADED"));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Cash items are not allowed to be traded.");
+            MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("TRADE_CASH_ITEM_CANNOT_BE_TRADED"));
          }
 
          PacketCreator.announce(c, new EnableActions());
@@ -498,7 +499,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
 
       if (quantity < 1 || quantity > item.quantity()) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "You don't have enough quantity of the item.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("TRADE_LACK_QUANTITY"));
          PacketCreator.announce(c, new EnableActions());
          return;
       }
@@ -511,7 +512,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       if ((quantity <= item.quantity() && quantity >= 0) || ItemConstants.isRechargeable(item.id())) {
          if (ii.isDropRestricted(item.id())) { // ensure that undroppable items do not make it to the trade window
             if (!MapleKarmaManipulator.hasKarmaFlag(item)) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "That item is not able to be traded.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("TRADE_GENERIC_ITEM_CANNOT_BE_TRADED"));
                PacketCreator.announce(c, new EnableActions());
                return;
             }
@@ -522,7 +523,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
          try {
             Item checkItem = chr.getInventory(ivType).getItem(pos);
             if (checkItem != item || checkItem.position() != item.position()) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Invalid item description.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("BAD_ITEM_DESCRIPTION"));
                PacketCreator.announce(c, new EnableActions());
                return;
             }
@@ -698,7 +699,7 @@ public final class PlayerInteractionHandler extends AbstractPacketHandler<BasePl
       }
 
       if (!CashOperationHandler.checkBirthday(c, birthday)) {
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Please check again the birthday date.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_BAD_BIRTHDAY"));
          return;
       }
 

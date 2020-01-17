@@ -6,6 +6,7 @@ import client.command.Command;
 import server.quest.MapleQuest;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class QuestCompleteCommand extends Command {
    {
@@ -17,7 +18,7 @@ public class QuestCompleteCommand extends Command {
       MapleCharacter player = c.getPlayer();
 
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !completequest <quest id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("QUEST_COMPLETE_COMMAND_SYNTAX"));
          return;
       }
 
@@ -31,9 +32,9 @@ public class QuestCompleteCommand extends Command {
             c.getAbstractPlayerInteraction().forceCompleteQuest(questId);
          }
 
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " completed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_COMPLETE_COMMAND_SUCCESS").with(questId));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "QUEST " + questId + " not started or already completed.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("QUEST_COMPLETE_COMMAND_NOT_STARTED_OR_ALREADY_COMPLETE").with(questId));
       }
    }
 }

@@ -36,6 +36,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.MiniRoomError;
 import tools.packet.character.interaction.GetHiredMerchant;
 import tools.packet.character.interaction.GetMiniRoomError;
@@ -205,7 +206,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                item.quantity_$eq((short) (shopItem.item().quantity() * shopItem.bundles()));
 
                if (!MapleInventory.checkSpot(chr, item)) {
-                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, "Have a slot available on your inventory to claim back the item.");
+                  MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_TAKE_ITEM_BACK"));
                   PacketCreator.announce(chr, new EnableActions());
                   return;
                }
@@ -279,12 +280,12 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
                   });
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full. Please clear a slot before buying this item.");
+               MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM"));
                PacketCreator.announce(c, new EnableActions());
                return;
             }
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, "You don't have enough mesos to purchase this item.");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("HIRED_MERCHANT_PURCHASE_ITEM_ERROR_NO_MESO"));
             PacketCreator.announce(c, new EnableActions());
             return;
          }
@@ -301,7 +302,7 @@ public class MapleHiredMerchant extends AbstractMapleMapObject {
       String itemName = MapleItemInformationProvider.getInstance().getName(item.id());
       Server.getInstance().getWorld(world).getPlayerStorage().getCharacterById(ownerId)
             .filter(MapleCharacter::isLoggedInWorld)
-            .ifPresent(character -> MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, "[Hired Merchant] Item '" + itemName + "'" + qtyStr + " has been sold for " + mesos + " mesos. (" + inStore + " left)"));
+            .ifPresent(character -> MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("HIRED_MERCHANT_ITEM_SOLD").with(itemName, qtyStr, mesos, inStore)));
    }
 
    public void forceClose() {

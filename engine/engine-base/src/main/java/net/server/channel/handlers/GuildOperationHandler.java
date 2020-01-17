@@ -33,6 +33,7 @@ import net.server.world.World;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.guild.GuildMarkChanged;
 import tools.packet.guild.GuildNameChange;
@@ -130,7 +131,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
          return;
       }
       if (mapleCharacter.getMeso() < YamlConfig.config.server.CHANGE_EMBLEM_COST) {
-         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(YamlConfig.config.server.CHANGE_EMBLEM_COST) + " mesos to change the Guild emblem.");
+         MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("GUILD_EMBLEM_CHANGE_MINIMUM_MESO_ERROR").with(GameConstants.numberWithCommas(YamlConfig.config.server.CHANGE_EMBLEM_COST)));
          return;
       }
 
@@ -219,7 +220,7 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
       boolean success = MapleGuildProcessor.getInstance().addGuildMember(mapleCharacter.getMGC(), mapleCharacter);
       if (!success) {
-         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "The guild you are trying to join is already full.");
+         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_JOIN_ATTEMPT_FULL"));
          mapleCharacter.getMGC().setGuildId(0);
          return;
       }
@@ -252,31 +253,31 @@ public final class GuildOperationHandler extends AbstractPacketHandler<BaseGuild
 
    private void createGuild(MapleClient client, MapleCharacter mapleCharacter, CreateGuildPacket packet) {
       if (mapleCharacter.getGuildId() > 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "You cannot create a new Guild while in one.");
+         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CREATION_ALREADY_IN_A_GUILD"));
          return;
       }
       if (mapleCharacter.getMeso() < YamlConfig.config.server.CREATE_GUILD_COST) {
-         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "You do not have " + GameConstants.numberWithCommas(YamlConfig.config.server.CREATE_GUILD_COST) + " mesos to create a Guild.");
+         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CREATION_MINIMUM_MESO_ERROR").with(GameConstants.numberWithCommas(YamlConfig.config.server.CREATE_GUILD_COST)));
          return;
       }
       if (!isGuildNameAcceptable(packet.name())) {
-         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "The Guild name you have chosen is not accepted.");
+         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CREATION_NAME_ERROR"));
          return;
       }
 
       Set<MapleCharacter> eligibleMembers = new HashSet<>(MapleGuildProcessor.getInstance().getEligiblePlayersForGuild(mapleCharacter));
       if (eligibleMembers.size() < YamlConfig.config.server.CREATE_GUILD_MIN_PARTNERS) {
          if (mapleCharacter.getMap().getAllPlayers().size() < YamlConfig.config.server.CREATE_GUILD_MIN_PARTNERS) {
-            MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "Your Guild doesn't have enough co-founders present here and therefore cannot be created at this time.");
+            MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CREATION_MINIMUM_CO_FOUNDERS_ERROR"));
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "Please make sure everyone you are trying to invite is neither on a guild nor on a party.");
+            MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CREATION_INVITEE_IN_GUILD_ERROR"));
          }
 
          return;
       }
 
       if (!MaplePartyProcessor.getInstance().createParty(mapleCharacter, true)) {
-         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, "You cannot create a new Guild while in a party.");
+         MessageBroadcaster.getInstance().sendServerNotice(mapleCharacter, ServerNoticeType.POP_UP, I18nMessage.from("GUILD_CREATION_IN_PARTY_ERROR"));
          return;
       }
 

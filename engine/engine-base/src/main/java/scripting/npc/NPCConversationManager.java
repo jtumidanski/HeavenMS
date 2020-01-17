@@ -67,6 +67,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.UpdateAllianceInfo;
@@ -690,7 +691,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
                .forEach(character -> {
                   character.setChallenged(false);
                   character.changeMap(map, map.getPortal(0));
-                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, LanguageConstants.getMessage(character, LanguageConstants.CPQEntryLobby));
+                  MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("CPQ_ENTER_LOBBY"));
                   TimerManager tMan = TimerManager.getInstance();
                   tMan.schedule(() -> mapClock(3 * 60), 1500);
                   character.setCpqTimer(TimerManager.getInstance().schedule(() -> character.changeMap(mapExit, mapExit.getPortal(0)), 3 * 60 * 1000));

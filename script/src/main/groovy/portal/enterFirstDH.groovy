@@ -6,7 +6,6 @@ import server.maps.MapleMap
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
-
 boolean enter(PortalPlayerInteraction pi) {
    int mapId = 0
 

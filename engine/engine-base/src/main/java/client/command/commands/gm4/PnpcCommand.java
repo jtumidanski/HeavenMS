@@ -14,6 +14,7 @@ import database.DatabaseConnection;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.spawn.SpawnNPC;
 
 public class PnpcCommand extends Command {
@@ -25,14 +26,14 @@ public class PnpcCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !pnpc <npc id>");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PNPC_COMMAND_SYNTAX"));
          return;
       }
 
       int mapId = player.getMapId();
       int npcId = Integer.parseInt(params[0]);
       if (player.getMap().containsNPC(npcId)) {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "This map already contains the specified NPC.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PNPC_COMMAND_ALREADY_EXISTS"));
          return;
       }
 
@@ -62,9 +63,9 @@ public class PnpcCommand extends Command {
             MasterBroadcaster.getInstance().sendToAllInMap(map, new SpawnNPC(npc));
          }
 
-         player.yellowMessage("Player NPC created.");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("PNPC_COMMAND_SUCCESS"));
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "You have entered an invalid NPC id.");
+         MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PNPC_COMMAND_INVALID"));
       }
    }
 }

@@ -1,13 +1,15 @@
 package client.command.commands.gm6;
 
+import java.util.Collection;
+
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
-import net.server.world.World;
 import server.TimerManager;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 
 public class ShutdownCommand extends Command {
    {
@@ -18,7 +20,7 @@ public class ShutdownCommand extends Command {
    public void execute(MapleClient c, String[] params) {
       MapleCharacter player = c.getPlayer();
       if (params.length < 1) {
-         player.yellowMessage("Syntax: !shutdown [<time>|NOW]");
+         MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("SHUT_DOWN_COMMAND_SYNTAX"));
          return;
       }
 
@@ -35,19 +37,12 @@ public class ShutdownCommand extends Command {
          int hours = (time / (1000 * 60 * 60)) % 24;
          int days = (time / (1000 * 60 * 60 * 24));
 
-         String strTime = "";
-         if (days > 0) strTime += days + " days, ";
-         if (hours > 0) strTime += hours + " hours, ";
-         strTime += minutes + " minutes, ";
-         strTime += seconds + " seconds";
-
-         for (World w : Server.getInstance().getWorlds()) {
-            for (MapleCharacter chr : w.getPlayerStorage().getAllCharacters()) {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.NOTICE, "Server is undergoing maintenance process, and will be shutdown in " + strTime + ". Prepare yourself to quit safely in the mean time.");
-            }
-         }
+         String strTime = (days > 0 ? days + "days, " : "") + (hours > 0 ? hours + " hours, " : "") + minutes + " minutes, " + seconds + " seconds";
+         Server.getInstance().getWorlds().parallelStream()
+               .map(world -> world.getPlayerStorage().getAllCharacters())
+               .flatMap(Collection::stream)
+               .forEach(character -> MessageBroadcaster.getInstance().sendServerNotice(character, ServerNoticeType.NOTICE, I18nMessage.from("SHUT_DOWN_COMMAND_MESSAGE").with(strTime)));
       }
-
       TimerManager.getInstance().schedule(Server.getInstance().shutdown(false), time);
    }
 }

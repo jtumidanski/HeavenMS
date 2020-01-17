@@ -16,6 +16,7 @@ import server.MapleStatEffect;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
 
 public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
@@ -77,7 +78,7 @@ public final class UseItemHandler extends AbstractPacketHandler<UseItemPacket> {
             if (ii.getItemEffect(toUse.id()).applyTo(chr)) {
                remove(client, packet.slot());
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You cannot recover from a banish state at the moment.");
+               MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("CANNOT_RECOVER_FROM_BANISH_YET"));
             }
             return;
          }

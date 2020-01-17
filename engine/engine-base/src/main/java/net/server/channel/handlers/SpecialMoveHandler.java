@@ -24,6 +24,7 @@ import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.I18nMessage;
 import tools.packet.GetEnergy;
 import tools.packet.character.SkillCoolDown;
 import tools.packet.foreigneffect.ShowBuffEffect;
@@ -51,7 +52,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
          skillLevel = 1;
          chr.setDojoEnergy(0);
          PacketCreator.announce(client, new GetEnergy("energy", chr.getDojoEnergy()));
-         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "As you used the secret skill, your energy bar has been reset.");
+         MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("ENERGY_RESET_DUE_TO_SECRET_SKILL"));
       }
       if (skillLevel == 0 || skillLevel != packet.skillLevel()) {
          return;
@@ -116,7 +117,7 @@ public final class SpecialMoveHandler extends AbstractPacketHandler<BaseSpecialM
                      chr.cancelMagicDoor();
                      skill.getEffect(skillLevel).applyTo(chr, pos);
                   } else {
-                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "Please wait 5 seconds before casting Mystic Door again.");
+                     MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("MYSTIC_DOOR_COOL_DOWN"));
                   }
                } finally {
                   client.releaseClient();

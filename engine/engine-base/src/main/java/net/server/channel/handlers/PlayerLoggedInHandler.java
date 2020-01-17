@@ -235,7 +235,7 @@ public final class PlayerLoggedInHandler extends AbstractPacketHandler<PlayerLog
             }
 
             if (!newcomer) {
-               client.setLanguage(player.getClient().getLanguage());
+               client.setLocale(player.getClient().getLocale());
                client.setCharacterSlots((byte) player.getClient().getCharacterSlots());
                player.newClient(client);
             }

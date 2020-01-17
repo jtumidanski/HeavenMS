@@ -14,5 +14,4 @@ public class HealCommand extends Command {
       MapleCharacter player = c.getPlayer();
       player.healHpMp();
    }
-
 }
