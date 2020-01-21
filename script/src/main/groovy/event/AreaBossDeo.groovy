@@ -49,7 +49,7 @@ class EventAreaBossDeo {
 
       MapleLifeFactory.getMonster(3220001).ifPresent({ deo ->
          royalCactusDesert.spawnMonsterOnGroundBelow(deo, new Point(645, 275))
-         MessageBroadcaster.getInstance().sendMapServerNotice(royalCactusDesert, ServerNoticeType.LIGHT_BLUE, "Deo slowly appeared out of the sand dust.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(royalCactusDesert, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEO_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

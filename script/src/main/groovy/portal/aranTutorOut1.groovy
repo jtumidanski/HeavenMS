@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -16,7 +17,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(914000200, 1)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You can only exit after you accept the quest from Athena Pierce, who is to your right.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ARAN_TUTORIAL_EXIT"))
       return false
    }
 }

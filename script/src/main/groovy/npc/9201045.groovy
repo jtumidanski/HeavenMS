@@ -5,6 +5,7 @@ import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.maps.MapleMap
 import server.maps.MapleReactor
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -111,7 +112,7 @@ class NPC9201045 {
                            }
 
                            cm.sendNext("Well done! Let me open the gate for you now.")
-                           MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: The time runs short now. Your objective is to open the gates and gather together on the other side of the next map. Good luck!")
+                           MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201045_TIME_RUNS_SHORT"))
                            clearStage(stage, eim, curMap)
                         } else {
                            cm.sendNext("Hey, didn't you pay heed? I demand #r50 #t4031597##k for the success of this trial.")
@@ -148,7 +149,7 @@ class NPC9201045 {
 
                               cm.sendNext("Okay, your team is already gathered. Talk to me when you guys feel ready to fight the #rGeist Balrog#k.")
 
-                              MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: Now only the boss fight remains! Once inside, talk to me only if you want to join the boss fight, you will be transported to action immediately.")
+                              MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201045_BOSS_FIGHT"))
                               clearStage(stage, eim, curMap)
                            } else {
                               cm.sendNext("You guys reached here by teleporting, eh? I can tell it. This is a shame, all gates needs to be open to fulfill this stage. If you still have the time, backtrack your steps and take down those gates.")

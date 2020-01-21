@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -21,7 +22,7 @@ class Quest29924 {
          }
 
          String medalName = qm.getMedalName()
-         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalName + "> has been awarded.")
+         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MEDAL_AWARDED").with(medalName))
          qm.earnTitle("<" + medalName + "> has been awarded.")
 
          qm.forceStartQuest()
@@ -43,7 +44,7 @@ class Quest29924 {
          }
 
          String medalName = qm.getMedalName()
-         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "<" + medalName + "> has been awarded.")
+         MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MEDAL_AWARDED").with(medalName))
          qm.earnTitle("<" + medalName + "> has been awarded.")
 
          qm.forceStartQuest()

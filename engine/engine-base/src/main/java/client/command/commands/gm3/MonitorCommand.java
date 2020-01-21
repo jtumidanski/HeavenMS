@@ -5,10 +5,10 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.I18nMessage;
 import tools.MapleLogger;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class MonitorCommand extends Command {
    {
@@ -36,8 +36,10 @@ public class MonitorCommand extends Command {
          MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("MONITOR_TOGGLE_COMMAND_OFF").with(victim.get().getId()));
       }
 
-      String message = player.getName() + (!monitored ? " has started monitoring " : " has stopped monitoring ") + victim.get().getId() + ".";
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, message);
-
+      if (!monitored) {
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, I18nMessage.from("MONITOR_COMMAND_START").with(player.getName(), victim.get().getName()));
+      } else {
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, I18nMessage.from("MONITOR_COMMAND_END").with(player.getName(), victim.get().getName()));
+      }
    }
 }

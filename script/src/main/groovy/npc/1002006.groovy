@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 
@@ -13,7 +14,7 @@ class NPC1002006 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Hi, I'm #b#p1002006##k. Nice to meet you.")
+      cm.sendNext(I18nMessage.from("1002006_HELLO"))
       cm.dispose()
    }
 

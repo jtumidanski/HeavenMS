@@ -2,12 +2,13 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor2111000 extends SimpleReactor {
    def act() {
-      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Oh noes! Monsters in the chest!")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MONSTERS_IN_CHEST"))
       rm.spawnMonster(9300004,3)
    }
 }

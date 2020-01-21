@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -22,6 +23,6 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.warp(106020000, 0)
       return true
    }
-   MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "A strange force is blocking you from entering.")
+   MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("STRANGE_FORCE_2"))
    return false
 }

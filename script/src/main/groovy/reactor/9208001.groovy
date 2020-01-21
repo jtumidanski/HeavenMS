@@ -2,6 +2,7 @@ package reactor
 
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -28,7 +29,7 @@ class Reactor9208001 extends SimpleReactor {
                   eim.setProperty("stage1combo", prevCombo)
                   if (prevCombo.length() == (3 * (stage + 3))) { //end of displaying
                      eim.setProperty("stage1status", "active")
-                     MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The combo has been displayed; Proceed with caution.")
+                     MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PROCEED_WITH_CAUTION"))
                      eim.setProperty("stage1guess", "")
                   }
                }

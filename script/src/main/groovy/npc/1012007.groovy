@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1012007 {
    NPCConversationManager cm
@@ -9,24 +10,24 @@ class NPC1012007 {
    int sel = -1
 
    def start() {
-      if (cm.haveItem(4031035))
-         cm.sendNext("Eh, that's my brother's letter! Probably scolding me for thinking I'm not working and stuff...Eh? Ahhh...you followed my brother's advice and trained your pet and got up here, huh? Nice!! Since you worked hard to get here, I'll boost your intimacy level with your pet.")
-      else {
-         cm.sendOk("My brother told me to take care of the pet obstacle course, but ... since I'm so far away from him, I can't help but wanting to goof around ...hehe, since I don't see him in sight, might as well just chill for a few minutes.")
+      if (cm.haveItem(4031035)) {
+         cm.sendNext(I18nMessage.from("1012007_BROTHERS_LETTER"))
+      } else {
+         cm.sendOk(I18nMessage.from("1012007_BROTHER_TOLD_ME"))
          cm.dispose()
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      if (mode < 1)
+      if (mode < 1) {
          cm.dispose()
-      else {
-         if (cm.getPlayer().getNoPets() == 0)
-            cm.sendNextPrev("Hmmm ... did you really get here with your pet? These obstacles are for pets. What are you here for without it?? Get outta here!")
-         else {
+      } else {
+         if (cm.getPlayer().getNoPets() == 0) {
+            cm.sendNextPrev(I18nMessage.from("1012007_DID_YOU_REALLY"))
+         } else {
             cm.gainItem(4031035, (short) -1)
             cm.gainCloseness(2)
-            cm.sendNextPrev("What do you think? Don't you think you have gotten much closer with your pet? If you have time, train your pet again on this obstacle course...of course, with my brother's permission.")
+            cm.sendNextPrev(I18nMessage.from("1012007_WHAT_DO_YOU_THINK"))
          }
          cm.dispose()
       }

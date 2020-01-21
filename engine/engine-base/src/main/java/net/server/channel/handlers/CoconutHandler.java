@@ -7,6 +7,7 @@ import net.server.channel.packet.reader.CoconutReader;
 import server.events.gm.MapleCoconut;
 import server.events.gm.MapleCoconuts;
 import server.maps.MapleMap;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
@@ -50,10 +51,10 @@ public final class CoconutHandler extends AbstractPacketHandler<CoconutPacket> {
             event.fallCoconut();
             if (client.getPlayer().getTeam() == 0) {
                event.addMapleScore();
-               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, client.getPlayer().getName() + " of Team Maple knocks down a coconut.");
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, I18nMessage.from("EVENT_COCONUT_MAPLE_KNOCK_DOWN").with(client.getPlayer().getName()));
             } else {
                event.addStoryScore();
-               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, client.getPlayer().getName() + " of Team Story knocks down a coconut.");
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, I18nMessage.from("EVENT_COCONUT_STORY_KNOCK_DOWN").with(client.getPlayer().getName()));
             }
             MasterBroadcaster.getInstance().sendToAllInMap(map, new CoconutScore(event.getMapleScore(), event.getStoryScore()));
          }

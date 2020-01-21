@@ -4,6 +4,7 @@ import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
 import server.life.MapleMonster
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -39,7 +40,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(925100500, 0)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal is not opened yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PORTAL_NOT_YET_OPENED"))
       return false
    }
 }

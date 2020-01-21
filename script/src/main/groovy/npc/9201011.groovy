@@ -6,6 +6,7 @@ import net.server.channel.handlers.RingActionHandler
 import scripting.AbstractPlayerInteraction
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.PacketCreator
@@ -248,12 +249,12 @@ class NPC9201011 {
 
                                  giveCoupleBlessings(eim, player, partner)
 
-                                 MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "Wayne: I'll call it out right now, and it shall go on: you guys are the key of the other's lock, a lace of a pendant. That's it, snog yourselves!")
+                                 MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_WAYNE"))
                                  eim.schedule("showMarriedMsg", 2 * 1000)
                               }
                            } else {
                               eim.setIntProperty("confirmedVows", player.getId())
-                              MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: " + player.getName() + " has confirmed vows! Alright, one step away to make it official. Tighten your seatbelts!")
+                              MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ONE_LAST_STEP").with(player.getName()))
                            }
 
                            break

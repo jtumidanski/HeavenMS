@@ -165,7 +165,7 @@ public final class MakerSkillHandler extends AbstractPacketHandler<BaseMakerActi
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
                case 5: // inventory full
-                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("MAKER_SKILL_INVENTORY_FULL_ERROR"));
+                  MessageBroadcaster.getInstance().sendServerNotice(client.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"));
                   PacketCreator.announce(client, new MakerEnableActions());
                   break;
                default:

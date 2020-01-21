@@ -2,6 +2,7 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -15,7 +16,7 @@ class Reactor5511001 extends SimpleReactor {
    def summonBoss() {
       rm.spawnMonster(9420547,-238,636)
       rm.changeMusic("Bgm09/TimeAttack")
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Beware! The furious Scarlion has shown himself!")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("SCARLION_SUMMONED"))
    }
 }
 

@@ -22,6 +22,6 @@ public class MesoRateCommand extends Command {
 
       int mesoRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setMesoRate(mesoRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Meso Rate has been changed to " + mesoRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MESO_RATE_COMMAND_SUCCESS").with(mesoRate));
    }
 }

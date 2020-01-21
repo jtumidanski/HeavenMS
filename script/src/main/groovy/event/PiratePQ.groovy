@@ -325,7 +325,7 @@ class EventPiratePQ {
       MapleMap map = mob.getMap()
 
       if (isLordPirate(mob)) {  // lord pirate defeated, spawn the little fella!
-         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, "As Lord Pirate dies, Wu Yang is released!")
+         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, I18nMessage.from("WU_YANG_RELEASED"))
          MapleNPCFactory.spawnNpc(2094001, new Point(777, 140), mob.getMap())
       }
 

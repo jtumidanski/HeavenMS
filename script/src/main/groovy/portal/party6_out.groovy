@@ -2,6 +2,7 @@ package portal
 
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -14,11 +15,11 @@ boolean enter(PortalPlayerInteraction pi) {
          eim.warpEventTeam(930000800)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Wait for the leader to pass through the portal.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("WAIT_FOR_LEADER"))
          return false
       }
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please eliminate the Poison Golem.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ELIMINATE_POISON_GOLEM"))
       return false
    }
 }

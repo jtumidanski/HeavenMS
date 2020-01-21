@@ -154,7 +154,7 @@ class NPC9105004 {
             }
 
             MapleLifeFactory.getMonster(9400318 + difficulty).ifPresent({ boss ->
-               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, "As the snowman grows to it's prime, the Scrooge appears!")
+               MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, I18nMessage.from("SCROOGE_SUMMONED"))
                eim.getEm().getIv().invokeFunction("snowmanHeal", eim)
                map.spawnMonsterOnGroundBelow(boss, new Point(-180, 15))
                eim.setProperty("spawnedBoss", "true")

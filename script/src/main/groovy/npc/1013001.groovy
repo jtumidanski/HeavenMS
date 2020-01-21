@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -29,9 +30,9 @@ class NPC1013001 {
          status++
       }
       if (status == 0) {
-         cm.sendNext("You, who are destined to be a Dragon Master... You have finally arrived.", (byte) 1)
+         cm.sendNext(I18nMessage.from("1013001_DRAGON_MASTER_ARRIVED"), (byte) 1)
       } else if (status == 1) {
-         cm.sendNextPrev("Go and fulfill your duties as the Dragon Master...", (byte) 1)
+         cm.sendNextPrev(I18nMessage.from("1013001_DRAGON_MASTER_DUTIES"), (byte) 1)
       } else if (status == 2) {
          cm.warp(900090101, 0)
          cm.dispose()

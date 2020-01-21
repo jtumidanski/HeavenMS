@@ -8,6 +8,7 @@ import net.server.channel.packet.reader.AdminChatReader;
 import tools.LogHelper;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 
 public class AdminChatHandler extends AbstractPacketHandler<AdminChatPacket> {
    @Override
@@ -25,19 +26,19 @@ public class AdminChatHandler extends AbstractPacketHandler<AdminChatPacket> {
    public void handlePacket(AdminChatPacket packet, MapleClient client) {
       switch (packet.mode()) {
          case 0:// /alert all, /notice all, /slide all
-            MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.get(packet.noticeType()), packet.message());
+            MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.get(packet.noticeType()), SimpleMessage.from(packet.message()));
             if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert All", packet.message());
             }
             break;
          case 1:// /alert channel, /notice channel, /slide channel
-            MessageBroadcaster.getInstance().sendChannelServerNotice(client.getWorld(), client.getChannel(), ServerNoticeType.get(packet.noticeType()), packet.message());
+            MessageBroadcaster.getInstance().sendChannelServerNotice(client.getWorld(), client.getChannel(), ServerNoticeType.get(packet.noticeType()), SimpleMessage.from(packet.message()));
             if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert Ch", packet.message());
             }
             break;
          case 2:// /alert map /alert map, /notice map /notice map, /slide map /slide map
-            MessageBroadcaster.getInstance().sendMapServerNotice(client.getPlayer().getMap(), ServerNoticeType.get(packet.noticeType()), packet.message());
+            MessageBroadcaster.getInstance().sendMapServerNotice(client.getPlayer().getMap(), ServerNoticeType.get(packet.noticeType()), SimpleMessage.from(packet.message()));
             if (YamlConfig.config.server.USE_ENABLE_CHAT_LOG) {
                LogHelper.logChat(client, "Alert Map", packet.message());
             }

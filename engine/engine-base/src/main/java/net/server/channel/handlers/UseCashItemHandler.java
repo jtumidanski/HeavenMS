@@ -84,6 +84,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.ServerNoticeType;
 import tools.I18nMessage;
+import tools.SimpleMessage;
 import tools.packet.cashshop.SendMapleLifeError;
 import tools.packet.cashshop.SendMapleNameLifeError;
 import tools.packet.character.box.UseChalkboard;
@@ -550,7 +551,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
    private void megaphone(MapleClient c, MapleCharacter player, short position, int itemId, String medal, String message) {
       if (player.getLevel() > 9) {
-         MessageBroadcaster.getInstance().sendServerNotice(player.getClient().getChannelServer().getPlayerStorage().getAllCharacters(), ServerNoticeType.MEGAPHONE, medal + player.getName() + " : " + message);
+         MessageBroadcaster.getInstance().sendServerNotice(player.getClient().getChannelServer().getPlayerStorage().getAllCharacters(), ServerNoticeType.MEGAPHONE, SimpleMessage.from(medal + player.getName() + " : " + message));
       } else {
          MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.POP_UP, I18nMessage.from("CASH_SHOP_MEGAPHONE_LEVEL_REQUIREMENT"));
          return;
@@ -559,7 +560,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
    }
 
    private void superMegaphone(MapleClient c, MapleCharacter player, short position, int itemId, String medal, String message, Boolean ear) {
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), c.getChannel(), ServerNoticeType.SUPER_MEGAPHONE, medal + player.getName() + " : " + message, ear);
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), c.getChannel(), ServerNoticeType.SUPER_MEGAPHONE, SimpleMessage.from(medal + player.getName() + " : " + message), ear);
       remove(c, position, itemId);
    }
 
@@ -580,7 +581,7 @@ public final class UseCashItemHandler extends AbstractPacketHandler<AbstractUseC
 
       if (megaMessenger) {
 
-         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), c.getChannel(), ServerNoticeType.SUPER_MEGAPHONE, medal + player.getName() + " : " + String.join(" ", messages), ear);
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), c.getChannel(), ServerNoticeType.SUPER_MEGAPHONE, SimpleMessage.from(medal + player.getName() + " : " + String.join(" ", messages)), ear);
       }
 
       remove(c, position, itemId);

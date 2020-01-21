@@ -24,11 +24,11 @@ import net.server.guild.MapleAlliance;
 import net.server.guild.MapleGuild;
 import net.server.processor.MapleAllianceProcessor;
 import net.server.processor.MapleGuildProcessor;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.alliance.AddGuildToAlliance;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.ChangeAllianceRankTitles;
@@ -110,7 +110,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       Server.getInstance().setAllianceNotice(alliance.id(), notice);
       Server.getInstance().allianceMessage(alliance.id(), new AllianceNotice(alliance.id(), notice), -1, -1);
 
-      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "* Alliance Notice : " + notice);
+      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_NOTICE").with(notice));
       MapleAllianceProcessor.getInstance().saveToDB(alliance);
    }
 
@@ -158,7 +158,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
          Server.getInstance().allianceMessage(alliance.id(), new AllianceNotice(alliance.id(), alliance.notice()), -1, -1);
          MasterBroadcaster.getInstance().sendToGuild(guildIdToExpel, new DisbandAlliance(allianceIdForGuild));
 
-         MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "[" + guild.getName() + "] guild has been expelled from the union.");
+         MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_EXPELLED").with(guild.getName()));
          MapleAllianceProcessor.getInstance().saveToDB(alliance);
       });
    }
@@ -191,7 +191,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
             Server.getInstance().allianceMessage(alliance.id(), new AddGuildToAlliance(alliance, guildId, c.getWorld()), -1, -1);
             Server.getInstance().allianceMessage(alliance.id(), new UpdateAllianceInfo(alliance, c.getWorld()), -1, -1);
             Server.getInstance().allianceMessage(alliance.id(), new AllianceNotice(alliance.id(), alliance.notice()), -1, -1);
-            MessageBroadcaster.getInstance().sendGuildServerNotice(guild, ServerNoticeType.PINK_TEXT, "Your guild has joined the [" + alliance.name() + "] union.");
+            MessageBroadcaster.getInstance().sendGuildServerNotice(guild, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_JOINED").with(alliance.name()));
             MapleAllianceProcessor.getInstance().saveToDB(alliance);
          });
       });
@@ -225,7 +225,7 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
          newLeader.saveGuildStatus();
 
          Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, newLeader.getWorld()), -1, -1);
-         MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "'" + newLeader.getName() + "' has been appointed as the new head of this Alliance.");
+         MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_NEW_LEADER").with(newLeader.getName()));
       });
    }
 
@@ -239,6 +239,6 @@ public final class AllianceOperationHandler extends AbstractPacketHandler<Allian
       chr.saveGuildStatus();
 
       Server.getInstance().allianceMessage(alliance.id(), new GetGuildAlliances(alliance, chr.getWorld()), -1, -1);
-      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, "'" + chr.getName() + "' has been reassigned to '" + alliance.rankTitle(newRank) + "' in this Alliance.");
+      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.PINK_TEXT, I18nMessage.from("ALLIANCE_GUILD_NEW_RANK").with(chr.getName(), alliance.rankTitle(newRank)));
    }
 }

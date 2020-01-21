@@ -3,6 +3,7 @@ package portal
 import client.MapleBuffStat
 import client.MapleCharacter
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -15,7 +16,7 @@ boolean enter(PortalPlayerInteraction pi) {
       return false
    } else {
       pi.playPortalSound(); pi.warp(260000300, 7)
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You, intruder! You don't have permission to roam the palace! Get out!!")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PALACE_INTRUDER"))
       return true
    }
 }

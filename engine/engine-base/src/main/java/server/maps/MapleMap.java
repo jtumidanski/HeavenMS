@@ -1263,19 +1263,19 @@ public class MapleMap {
    }
 
    public void broadcastBalrogVictory(String leaderName) {
-      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] " + leaderName + "'s party has successfully defeated the Balrog! Praise to them, they finished with " + countAlivePlayers() + " players alive.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("BALROG_VICTORY").with(leaderName, countAlivePlayers()));
    }
 
    public void broadcastHorntailVictory() {
-      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] To the crew that have finally conquered Horned Tail after numerous attempts, I salute thee! You are the true heroes of Leafre!!");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("HORNTAIL_VICTORY"));
    }
 
    public void broadcastZakumVictory() {
-      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] At last, the tree of evil that for so long overwhelmed Ossyria has fallen. To the crew that managed to finally conquer Zakum, after numerous attempts, victory! You are the true heroes of Ossyria!!");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ZAKUM_VICTORY"));
    }
 
    public void broadcastPinkBeanVictory(int channel) {
-      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, "[Victory] In a swift stroke of sorts, the crew that has attempted Pink Bean at channel " + channel + " has ultimately defeated it. The Temple of Time shines radiantly once again, the day finally coming back, as the crew that managed to finally conquer it returns victoriously from the battlefield!!");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("PINK_BEAN_VICTORY").with(channel));
    }
 
    private boolean removeKilledMonsterObject(MapleMonster monster) {
@@ -2591,7 +2591,7 @@ public class MapleMap {
             String mobName = MapleMonsterInformationProvider.getInstance().getMobNameFromId(monster.id());
             if (mobName != null) {
                mobName = mobName.trim();
-               MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, "This lawn has been taken siege by " + mobName + "'s forces and will be kept hold until their defeat.");
+               MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_SIEGE").with(mobName));
             }
          }
       }
@@ -3642,7 +3642,7 @@ public class MapleMap {
       long timeNow = Server.getInstance().getCurrentTime();
       if (timeNow - mapOwnerLastActivityTime > 60000) {
          if (relinquishOwnership() != null) {
-            MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, "This lawn is now free real estate.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(this, ServerNoticeType.PINK_TEXT, I18nMessage.from("LAWN_IS_FREE"));
          }
       }
    }

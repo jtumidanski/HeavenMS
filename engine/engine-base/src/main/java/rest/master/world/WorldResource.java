@@ -11,6 +11,7 @@ import javax.ws.rs.core.Response;
 import net.server.Server;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 
 @Path("worlds")
 public class WorldResource {
@@ -25,7 +26,7 @@ public class WorldResource {
             .getCharacterById(characterId)
             .ifPresent(character ->
                   MessageBroadcaster.getInstance()
-                        .sendServerNotice(character, ServerNoticeType.get(message.theType()), message.message()));
+                        .sendServerNotice(character, ServerNoticeType.get(message.theType()), SimpleMessage.from(message.message())));
       return Response.ok().build();
    }
 }

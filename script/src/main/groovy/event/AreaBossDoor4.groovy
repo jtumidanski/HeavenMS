@@ -44,7 +44,6 @@ class EventAreaBossDoor4 {
    def start() {
       int bossMobId = 9400633
       int bossMapId = 677000012
-      String bossMsg = "Astaroth has appeared!"
       Point bossPos = new Point(842, 0)
 
       MapleMap map = em.getChannelServer().getMapFactory().getMap(bossMapId)
@@ -55,7 +54,7 @@ class EventAreaBossDoor4 {
 
       MapleLifeFactory.getMonster(bossMobId).ifPresent({ boss ->
          map.spawnMonsterOnGroundBelow(boss, bossPos)
-         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, bossMsg)
+         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ASTAROTH_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

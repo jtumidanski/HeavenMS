@@ -22,6 +22,6 @@ public class ExpRateCommand extends Command {
 
       int expRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setExpRate(expRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Exp Rate has been changed to " + expRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXP_RATE_COMMAND_SUCCESS").with(expRate));
    }
 }

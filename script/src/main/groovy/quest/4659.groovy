@@ -2,6 +2,7 @@ package quest
 
 import client.inventory.MaplePet
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -46,7 +47,7 @@ class Quest4659 {
                }
             }
             if (i == 3) {
-               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, "Pet could not be evolved.")
+               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PET_COULD_NOT_BE_EVOLVED"))
                qm.dispose()
                return
             }
@@ -90,7 +91,7 @@ class Quest4659 {
 //            MapleInventoryManipulator.addById(qm.getClient(), rand+5000049, 1, "", petId);
             qm.dispose()
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"))
             qm.dispose()
          }
       }

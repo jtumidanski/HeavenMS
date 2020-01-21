@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -51,7 +52,7 @@ class Quest21013 {
          qm.sendYesNo("Ah, you've brought all the components. Give me a few seconds to assemble them.. Like this.. And like that.. and...\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v3010062# 1 #t3010062#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 95 exp")
       } else if (status == 1) {
          if (qm.isQuestCompleted(21013)) {
-            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Unknown Error")
+            MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("UNKNOWN_ERROR"))
          }
          qm.forceCompleteQuest()
          qm.gainExp(95)

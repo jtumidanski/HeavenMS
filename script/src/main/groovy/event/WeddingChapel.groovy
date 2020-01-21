@@ -131,7 +131,7 @@ class EventWeddingChapel {
 
    def stopBlessings(EventInstanceManager eim) {
       MapleMap map = eim.getMapInstance(entryMap + 10)
-      MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: Alright people, our couple are preparing their vows to each other right now.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT_PREPARING_VOWS"))
 
       eim.setIntProperty("weddingStage", 2)
    }
@@ -222,7 +222,7 @@ class EventWeddingChapel {
             chr.changeMap(entryMap + 10, "we00")
          }
 
-         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: The couple are heading to the altar, hurry hurry talk to me to arrange your seat.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT_HEADING_TO_ALTER"))
 
          eim.setIntProperty("weddingStage", 1)
          eim.schedule("showStartMsg", startMsgTime * 60 * 1000)

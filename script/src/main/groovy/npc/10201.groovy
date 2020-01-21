@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 
@@ -13,20 +14,20 @@ class NPC10201 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Magicians are armed with flashy element-based spells and secondary magic that aids party as a whole. After the 2nd job adv., the elemental-based magic will provide ample amount of damage to enemies of opposite element.")
+      cm.sendNext(I18nMessage.from("10201_MAGICIAN_INTRO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       status++
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendNext("If you wish to experience what it's like to be a Magician, come see me again.")
+            cm.sendNext(I18nMessage.from("10201_DEMO_NOTE"))
          }
          cm.dispose()
          return
       }
       if (status == 0) {
-         cm.sendYesNo("Would you like to experience what it's like to be a Magician?")
+         cm.sendYesNo(I18nMessage.from("10201_DEMO_PROMPT"))
       } else if (status == 1) {
          cm.lockUI()
          cm.warp(1020200, 0)

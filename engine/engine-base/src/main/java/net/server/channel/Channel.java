@@ -58,6 +58,7 @@ import server.maps.MapleMap;
 import server.maps.MapleMapManager;
 import server.maps.MapleMiniDungeon;
 import server.maps.MapleMiniDungeonInfo;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Pair;
@@ -737,7 +738,7 @@ public final class Channel {
       Pair<Boolean, Set<Integer>> typeGuests = world.removeMarriageQueued(ret);
 
       Pair<String, String> couple = new Pair<>(CharacterProcessor.getInstance().getNameById(coupleId.getLeft()), CharacterProcessor.getInstance().getNameById(coupleId.getRight()));
-      MessageBroadcaster.getInstance().sendWorldServerNotice(this.world, ServerNoticeType.LIGHT_BLUE, couple.getLeft() + " and " + couple.getRight() + "'s wedding is going to be started at " + (cathedral ? "Cathedral" : "Chapel") + " on Channel " + channel + ".");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(this.world, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_START").with(couple.getLeft(), couple.getRight(), (cathedral ? "Cathedral" : "Chapel"), channel));
 
       return new Pair<>(typeGuests.getLeft(), new Pair<>(ret, typeGuests.getRight()));
    }

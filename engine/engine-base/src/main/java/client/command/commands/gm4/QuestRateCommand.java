@@ -22,7 +22,7 @@ public class QuestRateCommand extends Command {
 
       int questRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setQuestRate(questRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Quest Rate has been changed to " + questRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("QUEST_RATE_COMMAND_SUCCESS").with(questRate));
 
    }
 }

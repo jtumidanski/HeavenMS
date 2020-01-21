@@ -1,7 +1,5 @@
 package client;
 
-import static client.ServerNoticeConstants.LEVEL_200;
-
 import java.awt.Point;
 import java.lang.ref.WeakReference;
 import java.sql.Timestamp;
@@ -183,6 +181,7 @@ import server.processor.maps.MapleDoorProcessor;
 import server.processor.maps.MapleMapObjectProcessor;
 import server.quest.MapleQuest;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.MapleStringUtil;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
@@ -190,9 +189,9 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 import tools.StringUtil;
 import tools.exceptions.NotEnabledException;
-import tools.I18nMessage;
 import tools.packet.PacketInput;
 import tools.packet.alliance.UpdateAllianceJobLevel;
 import tools.packet.buff.CancelAbnormalStatus;
@@ -1322,8 +1321,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
 
       if (YamlConfig.config.server.USE_ANNOUNCE_CHANGEJOB) {
          if (!this.isGM()) {
-            String message = "[" + GameConstants.ordinal(GameConstants.getJobBranch(newJob)) + " Job] " + name + " has just become a " + GameConstants.getJobName(this.job.getId()) + ".";
-            MessageBroadcaster.getInstance().sendServerNoticeToAcquaintances(this, ServerNoticeType.LIGHT_BLUE, message);
+            MessageBroadcaster.getInstance().sendServerNoticeToAcquaintances(this, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ANNOUNCE_CHANGE_JOB").with(GameConstants.ordinal(GameConstants.getJobBranch(newJob)), name, GameConstants.getJobName(this.job.getId())));
          }
       }
    }
@@ -1411,7 +1409,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       long banTime = System.currentTimeMillis();
 
       if (msg != null) {
-         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, msg);
+         MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.PINK_TEXT, SimpleMessage.from(msg));
       }
 
       MapleMap map_ = getWarpMap(mapId);
@@ -2620,7 +2618,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                   if (replace.left > 0) {
                      toAdd.add(replace.left);
                      if (!replace.right.isEmpty()) {
-                        MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, replace.right);
+                        MessageBroadcaster.getInstance().sendServerNotice(MapleCharacter.this, ServerNoticeType.NOTICE, SimpleMessage.from(replace.right));
                      }
                   }
                   for (Integer itemId : toAdd) {
@@ -5637,7 +5635,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                }
 
                final String names = (getMedalText() + name);
-               MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, String.format(LEVEL_200, names, maxClassLevel, names));
+               MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("LEVEL_200").with(names, maxClassLevel, names));
             }
          }
 
@@ -7380,7 +7378,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
                this.forceUpdateItem(eqp);
 
                showStr += upgradeStrength;
-               MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, showStr);
+               MessageBroadcaster.getInstance().sendServerNotice(this, ServerNoticeType.LIGHT_BLUE, SimpleMessage.from(showStr));
             }
          }
 
@@ -7938,7 +7936,7 @@ public class MapleCharacter extends AbstractMapleCharacterObject {
       PacketCreator.announce(this, new SendPolice(String.format("You have been blocked by the#b %s Police for HACK reason.#k", "HeavenMS")));
       TimerManager.getInstance().schedule(() -> client.disconnect(false, false), 5000);
 
-      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, StringUtil.makeMapleReadable(this.name) + " was auto banned for " + reason);
+      MessageBroadcaster.getInstance().sendWorldServerNotice(world, ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, SimpleMessage.from(StringUtil.makeMapleReadable(this.name) + " was auto banned for " + reason));
    }
 
    public void block(int reason, int days, String desc) {

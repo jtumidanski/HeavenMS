@@ -2,6 +2,7 @@ package npc
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1012117 {
    NPCConversationManager cm
@@ -31,11 +32,11 @@ class NPC1012117 {
          }
 
          if (status == 0) {
-            cm.sendSimple("Hi, I'm #p1012117#, the most charming and stylish stylist around. If you're looking for the best looking hairdos around, look no further!\r\n#L0##i5150040##t5150040##l\r\n#L1##i5150044##t5150044##l")
+            cm.sendSimple(I18nMessage.from("1012117_HELLO"))
          } else if (status == 1) {
             if (selection == 0) {
                beauty = 1
-               cm.sendYesNo("If you use this REGULAR coupon, your hair may transform into a random new look...do you still want to do it using #b#t5150040##k, I will do it anyways for you. But don't forget, it will be random!")
+               cm.sendYesNo(I18nMessage.from("1012117_REGULAR_EXPLAINED"))
             } else {
                beauty = 2
 
@@ -50,7 +51,7 @@ class NPC1012117 {
                   }
                }
 
-               cm.sendStyle("Using the SPECIAL coupon you can choose the style your hair will become. Pick the style that best provides you delight...", hairNew)
+               cm.sendStyle(I18nMessage.from("1012117_SPECIAL_EXPLAINED"), hairNew)
             }
          } else if (status == 2) {
             if (beauty == 1) {
@@ -68,17 +69,17 @@ class NPC1012117 {
 
                   cm.gainItem(5150040, (short) -1)
                   cm.setHair(hairNew[Math.floor(Math.random() * hairNew.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("1012117_ENJOY_HAIR_STYLE"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("1012117_NO_STYLE_COUPON"))
                }
             } else if (beauty == 2) {
                if (cm.haveItem(5150044)) {
                   cm.gainItem(5150044, (short) -1)
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("1012117_ENJOY_HAIR_STYLE"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("1012117_NO_STYLE_COUPON"))
                }
             }
 

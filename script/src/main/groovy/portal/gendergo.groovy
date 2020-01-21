@@ -3,6 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -13,7 +14,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(map.getId(), "female01")
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "This portal leads to the girls' area, try the portal at the other side.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("FEMALE_ONLY"))
          return false
       }
    } else {
@@ -21,7 +22,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(map.getId(), "male01")
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "This portal leads to the boys' area, try the portal at the other side.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MALE_ONLY"))
          return false
       }
    }

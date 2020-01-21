@@ -2,6 +2,7 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -17,7 +18,7 @@ class Reactor2111001 extends SimpleReactor {
          rm.spawnMonster(i)
       }
       rm.createMapMonitor(280030000, "ps00")
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Zakum is summoned by the force of Eye of Fire.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ZAKUM_SUMMONED"))
    }
 }
 

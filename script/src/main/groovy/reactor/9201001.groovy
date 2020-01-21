@@ -2,12 +2,13 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor9201001 extends SimpleReactor {
    def act() {
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "A bright flash of light, then someone familiar appears in front of the blocked gate.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SOMEONE_FAMILIAR_SUMMONED"))
       rm.spawnNpc(9040003)
    }
 }

@@ -1,14 +1,13 @@
 package npc
 
-
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Ms. Tan
 	Map(s): 		Henesys Skin Change
 	Description: 	
 */
-
 
 class NPC1012105 {
    NPCConversationManager cm
@@ -33,18 +32,18 @@ class NPC1012105 {
          }
 
          if (status == 0) {
-            cm.sendSimple("Well, hello! Welcome to the Henesys Skin-Care! Would you like to have a firm, tight, healthy looking skin like mine?  With a #b#t5153000##k, you can let us take care of the rest and have the kind of skin you've always wanted~!\r\n#L1#Skin Care: #i5153000##t5153000##l")
+            cm.sendSimple(I18nMessage.from("1012105_HELLO"))
          } else if (status == 1) {
             if (cm.haveItem(5153000)) {
-               cm.sendStyle("With our specialized machine, you can see yourself after the treatment in advance. What kind of skin-treatment would you like to do? Choose the style of your liking.", skin)
+               cm.sendStyle(I18nMessage.from("1012105_CHOOSE_STYLE"), skin)
             } else {
-               cm.sendOk("Um... you don't have the skin-care coupon you need to receive the treatment. Sorry, but I am afraid we can't do it for you...")
+               cm.sendOk(I18nMessage.from("1012105_NEED_COUPON"))
                cm.dispose()
             }
          } else {
             cm.gainItem(5153000, (short) -1)
             cm.setSkin(selection)
-            cm.sendOk("Enjoy your new and improved skin!")
+            cm.sendOk(I18nMessage.from("1012105_ENJOY"))
             cm.dispose()
          }
       }

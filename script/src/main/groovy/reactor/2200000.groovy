@@ -2,12 +2,13 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor2200000 extends SimpleReactor {
    def act() {
-      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Gotcha! Try again next time!")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GOTCHA_TRY_AGAIN"))
       rm.warp(221023200)
    }
 }

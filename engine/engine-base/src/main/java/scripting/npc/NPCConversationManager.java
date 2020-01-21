@@ -24,7 +24,6 @@ import client.processor.PetProcessor;
 import config.YamlConfig;
 import constants.game.GameConstants;
 import constants.inventory.ItemConstants;
-import constants.string.LanguageConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.coordinator.matchchecker.MatchCheckerListenerFactory.MatchCheckerType;
@@ -62,12 +61,14 @@ import server.partyquest.Pyramid;
 import server.partyquest.Pyramid.PyramidMode;
 import server.processor.MapleShopProcessor;
 import tools.FilePrinter;
+import tools.I18nMessage;
 import tools.LogHelper;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
+import tools.SimpleMessage;
+import tools.UserMessage;
 import tools.packet.alliance.AllianceNotice;
 import tools.packet.alliance.GetGuildAlliances;
 import tools.packet.alliance.UpdateAllianceInfo;
@@ -89,11 +90,11 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    private int npc;
    private int npcOid;
    private String scriptName;
-   private String getText;
+   private UserMessage getText;
    private boolean itemScript;
    private List<MaplePartyCharacter> otherParty;
 
-   private Map<Integer, String> npcDefaultTalks = new HashMap<>();
+   private Map<Integer, UserMessage> npcDefaultTalks = new HashMap<>();
 
    public NPCConversationManager(MapleClient c, int npc, String scriptName) {
       this(c, npc, -1, scriptName, false);
@@ -114,10 +115,10 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       this.itemScript = itemScript;
    }
 
-   private String getDefaultTalk(int npcId) {
-      String talk = npcDefaultTalks.get(npcId);
+   private UserMessage getDefaultTalk(int npcId) {
+      UserMessage talk = npcDefaultTalks.get(npcId);
       if (talk == null) {
-         talk = MapleLifeFactory.getNPCDefaultTalk(npcId);
+         talk = SimpleMessage.from(MapleLifeFactory.getNPCDefaultTalk(npcId));
          npcDefaultTalks.put(npcId, talk);
       }
 
@@ -149,81 +150,81 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       PacketCreator.announce(getClient(), new EnableActions());
    }
 
-   public void sendNext(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 01", (byte) 0));
+   public void sendNext(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 01", (byte) 0));
    }
 
-   public void sendPrev(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 00", (byte) 0));
+   public void sendPrev(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 00", (byte) 0));
    }
 
-   public void sendNextPrev(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 01", (byte) 0));
+   public void sendNextPrev(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 01", (byte) 0));
    }
 
-   public void sendOk(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 00", (byte) 0));
+   public void sendOk(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 00", (byte) 0));
    }
 
    public void sendDefault() {
       sendOk(getDefaultTalk(npc));
    }
 
-   public void sendYesNo(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text, "", (byte) 0));
+   public void sendYesNo(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text.to(getClient()).evaluate(), "", (byte) 0));
    }
 
-   public void sendAcceptDecline(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text, "", (byte) 0));
+   public void sendAcceptDecline(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text.to(getClient()).evaluate(), "", (byte) 0));
    }
 
-   public void sendSimple(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text, "", (byte) 0));
+   public void sendSimple(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text.to(getClient()).evaluate(), "", (byte) 0));
    }
 
-   public void sendNext(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 01", speaker));
+   public void sendNext(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 01", speaker));
    }
 
-   public void sendPrev(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 00", speaker));
+   public void sendPrev(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 00", speaker));
    }
 
-   public void sendNextPrev(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "01 01", speaker));
+   public void sendNextPrev(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "01 01", speaker));
    }
 
-   public void sendOk(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text, "00 00", speaker));
+   public void sendOk(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0, text.to(getClient()).evaluate(), "00 00", speaker));
    }
 
-   public void sendYesNo(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text, "", speaker));
+   public void sendYesNo(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 1, text.to(getClient()).evaluate(), "", speaker));
    }
 
-   public void sendAcceptDecline(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text, "", speaker));
+   public void sendAcceptDecline(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 0x0C, text.to(getClient()).evaluate(), "", speaker));
    }
 
-   public void sendSimple(String text, byte speaker) {
-      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text, "", speaker));
+   public void sendSimple(UserMessage text, byte speaker) {
+      PacketCreator.announce(getClient(), new GetNPCTalk(npc, (byte) 4, text.to(getClient()).evaluate(), "", speaker));
    }
 
-   public void sendStyle(String text, int[] styles) {
+   public void sendStyle(UserMessage text, int[] styles) {
       if (styles.length > 0) {
-         PacketCreator.announce(getClient(), new GetNPCTalkStyle(npc, text, styles));
+         PacketCreator.announce(getClient(), new GetNPCTalkStyle(npc, text.to(getClient()).evaluate(), styles));
       } else {
-         sendOk("Sorry, there are no options of cosmetics available for you here at the moment.");
+         sendOk(I18nMessage.from("NO_COSMETICS"));
          dispose();
       }
    }
 
-   public void sendGetNumber(String text, int def, int min, int max) {
-      PacketCreator.announce(getClient(), new GetNPCTalkNum(npc, text, def, min, max));
+   public void sendGetNumber(UserMessage text, int def, int min, int max) {
+      PacketCreator.announce(getClient(), new GetNPCTalkNum(npc, text.to(getClient()).evaluate(), def, min, max));
    }
 
-   public void sendGetText(String text) {
-      PacketCreator.announce(getClient(), new GetNPCTalkText(npc, text, ""));
+   public void sendGetText(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetNPCTalkText(npc, text.to(getClient()).evaluate(), ""));
    }
 
    /*
@@ -235,15 +236,15 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
     * 5 = Pyramid PQ
     * 6 = Kerning Subway
     */
-   public void sendDimensionalMirror(String text) {
-      PacketCreator.announce(getClient(), new GetDimensionalMirror(text));
+   public void sendDimensionalMirror(UserMessage text) {
+      PacketCreator.announce(getClient(), new GetDimensionalMirror(text.to(getClient()).evaluate()));
    }
 
-   public void setGetText(String text) {
-      this.getText = text;
+   public void setGetText(UserMessage text) {
+      this.getText = text.to(getClient());
    }
 
-   public String getText() {
+   public UserMessage getText() {
       return this.getText;
    }
 
@@ -415,7 +416,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
 
       Item itemGained = gainItem(item.id(), (short) (item.id() / 10000 == 200 ? 100 : 1), true, true); // For normal potions, make it give 100.
 
-      sendNext("You have obtained a #b#t" + item.id() + "##k.");
+      sendNext(I18nMessage.from("YOU_HAVE_OBTAINED").with(item.id()));
 
       String map = c.getChannelServer().getMapFactory().getMap(maps[(getNpc() != 9100117 && getNpc() != 9100109) ? (getNpc() - 9100100) : getNpc() == 9100109 ? 8 : 9]).getMapName();
 
@@ -615,7 +616,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
    }
 
    protected boolean sendCPQMapLists(int mapId, int offset) {
-      StringBuilder msg = new StringBuilder(LanguageConstants.getMessage(getPlayer(), LanguageConstants.CPQPickRoom));
+      StringBuilder msg = new StringBuilder(I18nMessage.from("CPQ_PICK_ROOM").to(getClient()).evaluate());
       int msgLen = msg.length();
       for (int i = 0; i < 3; i++) {
          if (fieldTaken2(i)) {
@@ -633,7 +634,7 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       }
 
       if (msg.length() > msgLen) {
-         sendSimple(msg.toString());
+         sendSimple(SimpleMessage.from(msg.toString()));
          return true;
       } else {
          return false;
@@ -861,13 +862,13 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       MapleMap map = c.getChannelServer().getMapFactory().getMap(mapId + 100 * field);
 
       if (getPlayer().getParty().map(party -> party.getMembers().size() != map.getAllPlayers().size()).orElse(true)) {
-         sendOk("An unexpected error regarding the other party has occurred.");
+         sendOk(I18nMessage.from("UNEXPECTED_ERROR_OTHER_PARTY"));
          return;
       }
       for (MapleMapObject mmo : map.getAllPlayer()) {
          MapleCharacter mc = (MapleCharacter) mmo;
          if (mc.getParty().isEmpty()) {
-            sendOk(LanguageConstants.getMessage(mc, LanguageConstants.CPQFindError));
+            sendOk(I18nMessage.from("CPQ_FIND_ERROR"));
             return;
          }
          if (mc.getParty().map(party -> party.getLeader().getId() == mc.getId()).orElse(false)) {
@@ -878,13 +879,13 @@ public class NPCConversationManager extends AbstractPlayerInteraction {
       if (leader != null) {
          if (leader.canBeChallenged()) {
             if (!sendCPQChallenge(type, leader.getId())) {
-               sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomAnswer));
+               sendOk(I18nMessage.from("CPQ_CHALLENGE_ROOM_ANSWER"));
             }
          } else {
-            sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomAnswer));
+            sendOk(I18nMessage.from("CPQ_CHALLENGE_ROOM_ANSWER"));
          }
       } else {
-         sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQLeaderNotFound));
+         sendOk(I18nMessage.from("CPQ_LEADER_NOT_FOUND"));
       }
    }
 

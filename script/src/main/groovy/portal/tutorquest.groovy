@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -12,7 +13,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.warp(130030002, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please click on the NPC first to receive a quest.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("CLICK_ON_THE_NPC_FIRST_TO_RECEIVE"))
       }
    } else if (pi.getPlayer().getMapId() == 130030002) {
       if (pi.isQuestCompleted(20011)) {
@@ -20,7 +21,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.warp(130030003, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please complete the required quest before proceeding.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("COMPLETE_QUEST_BEFORE_PROCEEDING_2"))
       }
    } else if (pi.getPlayer().getMapId() == 130030003) {
       if (pi.isQuestCompleted(20012)) {
@@ -28,7 +29,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.warp(130030004, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please complete the required quest before proceeding.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("COMPLETE_QUEST_BEFORE_PROCEEDING_2"))
       }
    } else if (pi.getPlayer().getMapId() == 130030004) {
       if (pi.isQuestCompleted(20013)) {
@@ -36,7 +37,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.warp(130030005, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Please complete the required quest before proceeding.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("COMPLETE_QUEST_BEFORE_PROCEEDING_2"))
       }
    }
 

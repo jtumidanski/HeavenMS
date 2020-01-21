@@ -9,6 +9,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 import tools.StringUtil;
 import tools.I18nMessage;
 import tools.packet.message.YellowTip;
@@ -27,7 +28,7 @@ public class GmCommand extends Command {
       }
       String message = player.getLastCommandMessage();
       Server.getInstance().broadcastGMMessage(c.getWorld(), PacketCreator.create(new YellowTip("[GM Message]:" + StringUtil.makeMapleReadable(player.getName()) + ": " + message)));
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, message);
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.POP_UP, MapleCharacter::isGM, SimpleMessage.from(message));
       FilePrinter.printError(FilePrinter.COMMAND_GM, StringUtil.makeMapleReadable(player.getName()) + ": " + message);
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("GM_COMMAND_MESSAGE_LOOPBACK").with(message));
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("GM_COMMAND_TIP_" + Randomizer.nextInt(5)));

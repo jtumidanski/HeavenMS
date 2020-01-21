@@ -102,7 +102,7 @@ public class MapleExpedition {
       registering = true;
       PacketCreator.announce(leader, new GetClock(type.getRegistrationTime() * 60));
       if (!silent) {
-         MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, character -> character != leader, "[Expedition] " + leader.getName() + " has been declared the expedition captain. Please register for the expedition.");
+         MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, character -> character != leader, I18nMessage.from("EXPEDITION_CAPTAIN_DECLARED").with(leader.getName()));
          MessageBroadcaster.getInstance().sendServerNotice(leader, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_BEGIN_REGISTRATION"));
       }
       scheduleRegistrationEnd();
@@ -116,7 +116,7 @@ public class MapleExpedition {
          if (registering) {
             expedition.removeChannelExpedition(startMap.getChannelServer());
             if (!silent) {
-               MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, "[Expedition] The time limit has been reached. Expedition has been disbanded.");
+               MessageBroadcaster.getInstance().sendMapServerNotice(startMap, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_TIME_LIMIT"));
             }
 
             dispose(false);
@@ -147,7 +147,7 @@ public class MapleExpedition {
          MessageBroadcaster.getInstance().sendServerNotice(getActiveMembers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_START"));
       }
       startTime = System.currentTimeMillis();
-      MessageBroadcaster.getInstance().sendWorldServerNotice(startMap.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Expedition] " + type.toString() + " Expedition started with leader: " + leader.getName());
+      MessageBroadcaster.getInstance().sendWorldServerNotice(startMap.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_START_WITH_LEADER").with(type.toString(), leader.getName()));
    }
 
    public String addMember(MapleCharacter player) {

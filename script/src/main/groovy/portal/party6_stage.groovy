@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -18,13 +19,13 @@ boolean enter(PortalPlayerInteraction pi) {
             pi.warp(930000200, 0)
             return true
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Eliminate all the monsters.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ELIMINATE_MONSTERS"))
             return false
          }
          break
       case 930000200:
          if (pi.getMap().getReactorByName("spine") != null && pi.getMap().getReactorByName("spine").getState() < 4) {
-            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The spine blocks the way.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SPINE_BLOCKS"))
             return false
          } else {
             pi.playPortalSound()
@@ -34,7 +35,7 @@ boolean enter(PortalPlayerInteraction pi) {
          break
 
       default:
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "This portal leads to an unbound path.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("UNBOUND_PATH"))
          return false
    }
 }

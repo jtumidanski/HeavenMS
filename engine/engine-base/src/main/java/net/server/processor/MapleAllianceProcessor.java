@@ -180,7 +180,7 @@ public class MapleAllianceProcessor {
       MasterBroadcaster.getInstance().sendToGuild(guildId, new DisbandAlliance(alliance.id()));
 
       String guildName = server.getGuild(guildId, worldId).map(MapleGuild::getName).orElse("");
-      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.NOTICE, "[" + guildName + "] guild has left the union.");
+      MessageBroadcaster.getInstance().sendAllianceServerNotice(alliance, ServerNoticeType.NOTICE, I18nMessage.from("ALLIANCE_GUILD_LEFT").with(guildName));
       return true;
    }
 

@@ -1,6 +1,9 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
+import tools.UserMessage
 
 /*
 	NPC Name: 		
@@ -25,12 +28,13 @@ class NPC1012002 {
 
    def start() {
       cm.getPlayer().setCS(true)
-      String selStr = "Hello. I am Vicious, retired Sniper. However, I used to be the top student of Athena Pierce. Though I no longer hunt, I can make some archer items that will be useful for you...#b"
-      String[] options = ["Create a bow", "Create a crossbow", "Make a glove", "Upgrade a glove", "Create materials", "Create Arrows"]
+      String selStr = I18nMessage.from("1012002_HELLO").to(cm.getClient()).evaluate()
+      UserMessage[] options = [
+            I18nMessage.from("1012002_CREATE_BOW"), I18nMessage.from("1012002_CREATE_CROSSBOW"), I18nMessage.from("1012002_MAKE_GLOVE"), I18nMessage.from("1012002_UPGRADE_GLOVE"), I18nMessage.from("1012002_CREATE_MATERIALS"), I18nMessage.from("1012002_CREATE_ARROWS")]
       for (int i = 0; i < options.length; i++) {
-         selStr += "\r\n#L" + i + "# " + options[i] + "#l"
+         selStr += "\r\n#L" + i + "# " + options[i].to(cm.getClient()).evaluate() + "#l"
       }
-      cm.sendSimple(selStr)
+      cm.sendSimple(SimpleMessage.from(selStr))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -42,25 +46,25 @@ class NPC1012002 {
       if (status == 0) {
          String selStr = ""
          if (selection == 0) { //bow refine
-            selStr = "I may have been a Sniper, but bows and crossbows aren't too much different. Anyway, which would you like to make?#b"
+            selStr = I18nMessage.from("1012002_BOW_REFINE").to(cm.getClient()).evaluate()
             items = [1452002, 1452003, 1452001, 1452000, 1452005, 1452006, 1452007]
             for (int i = 0; i < items.length; i++) {
                selStr += "\r\n#L" + i + "##t" + items[i] + "##k - Bowman Lv. " + (10 + (i * 5)) + "#l#b"
             }
          } else if (selection == 1) { //crossbow refine
-            selStr = "I was a Sniper. Crossbows are my specialty. Which would you like me to make for you?#b"
+            selStr = I18nMessage.from("1012002_CROSSBOW_REFINE").to(cm.getClient()).evaluate()
             items = [1462001, 1462002, 1462003, 1462000, 1462004, 1462005, 1462006, 1462007]
             for (int i = 0; i < items.length; i++) {
                selStr += "\r\n#L" + i + "##t" + items[i] + "##k - Bowman Lv. " + (10 + (i * 5)) + "#l#b"
             }
          } else if (selection == 2) { //glove refine
-            selStr = "Okay, so which glove do you want me to make?#b"
+            selStr = I18nMessage.from("1012002_GLOVE_REFINE").to(cm.getClient()).evaluate()
             items = [1082012, 1082013, 1082016, 1082048, 1082068, 1082071, 1082084, 1082089]
             for (int i = 0; i < items.length; i++) {
                selStr += "\r\n#L" + i + "##t" + items[i] + "##k - Bowman Lv. " + (15 + (i * 5) > 40 ? ((i - 1) * 10) : 15 + (i * 5)) + "#l#b"
             }
          } else if (selection == 3) { //glove upgrade
-            selStr = "Upgrade a glove? That shouldn't be too difficult. Which did you have in mind?#b"
+            selStr = I18nMessage.from("1012002_GLOVE_UPGRADE").to(cm.getClient()).evaluate()
             items = [1082015, 1082014, 1082017, 1082018, 1082049, 1082050, 1082069, 1082070, 1082072, 1082073, 1082085, 1082083, 1082090, 1082091]
             int x = 0
             for (int i = 0; i < items.length; i++) {
@@ -68,13 +72,13 @@ class NPC1012002 {
                x += (i + 1) % 2 == 0 ? 1 : 0
             }
          } else if (selection == 4) { //material refine
-            selStr = "Materials? I know of a few materials that I can make for you...#b"
-            String[] materials = ["Make Processed Wood with Tree Branch", "Make Processed Wood with Firewood", "Make Screws (packs of 15)"]
+            selStr = I18nMessage.from("1012002_MATERIAL_REFINE").to(cm.getClient()).evaluate()
+            UserMessage[] materials = [I18nMessage.from("1012002_MATERIAL_1"), I18nMessage.from("1012002_MATERIAL_2"), I18nMessage.from("1012002_MATERIAL_3")]
             for (int i = 0; i < materials.length; i++) {
-               selStr += "\r\n#L" + i + "# " + materials[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + materials[i].to(cm.getClient()).evaluate() + "#l"
             }
          } else if (selection == 5) { //arrow refine
-            selStr = "Arrows? Not a problem at all.#b"
+            selStr = I18nMessage.from("1012002_ARROW_REFINE").to(cm.getClient()).evaluate()
             items = [2060000, 2061000, 2060001, 2061001, 2060002, 2061002]
             for (int i = 0; i < items.length; i++) {
                selStr += "\r\n#L" + i + "##t" + items[i] + "##l"
@@ -94,7 +98,7 @@ class NPC1012002 {
          mats = matSet[selection]
          matQty = matQtySet[selection]
          cost = 0
-         cm.sendGetNumber("So, you want me to make some #t" + item + "#s? In that case, how many do you want me to make?", 1, 1, 100)
+         cm.sendGetNumber(I18nMessage.from("1012002_SO_YOU_WANT"), 1, 1, 100)
       } else if (status == 2) {
          if (selectedType != 4) {
             selectedItem = selection
@@ -132,13 +136,14 @@ class NPC1012002 {
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
          }
-         String prompt = "You want me to make "
+
+         String qtyPrompt
          if (qty == 1) {
-            prompt += "a #t" + item + "#?"
+            qtyPrompt = "a #t" + item + "#?"
          } else {
-            prompt += qty + " #t" + item + "#?"
+            qtyPrompt = qty + " #t" + item + "#?"
          }
-         prompt += " In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
+         String prompt = I18nMessage.from("1012002_YOU_WANT_ME").to(cm.getClient()).with(qtyPrompt).evaluate()
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
             for (int i = 0; i < mats.size(); i++) {
                prompt += "\r\n#i" + mats[i] + "# " + ((matQty[i] as Integer) * qty) + " #t" + mats[i] + "#"
@@ -149,12 +154,12 @@ class NPC1012002 {
          if (cost > 0) {
             prompt += "\r\n#i4031138# " + (cost * qty) + " meso"
          }
-         cm.sendYesNo(prompt)
+         cm.sendYesNo(SimpleMessage.from(prompt))
       } else if (status == 3) {
          boolean complete = true
 
          if (cm.getMeso() < (cost * qty)) {
-            cm.sendOk("Sorry, but this is how I make my living. No meso, no item.")
+            cm.sendOk(I18nMessage.from("1012002_SORRY"))
             cm.dispose()
             return
          } else {
@@ -169,7 +174,7 @@ class NPC1012002 {
             }
          }
          if (!complete) {
-            cm.sendOk("Surely you, of all people, would understand the value of having quality items? I can't do that without the items I require.")
+            cm.sendOk(I18nMessage.from("1012002_SURELY"))
          } else {
             int recvItem = item, recvQty
 
@@ -197,9 +202,9 @@ class NPC1012002 {
                cm.gainMeso(-(cost * qty))
 
                cm.gainItem(recvItem, (short) recvQty)
-               cm.sendOk("A perfect item, as usual. Come and see me if you need anything else.")
+               cm.sendOk(I18nMessage.from("1012002_PERFECT"))
             } else {
-               cm.sendOk("Please make sure you have room in your inventory, and talk to me again.")
+               cm.sendOk(I18nMessage.from("1012002_NO_INVENTORY"))
             }
          }
          cm.dispose()

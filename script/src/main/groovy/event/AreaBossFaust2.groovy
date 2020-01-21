@@ -50,7 +50,7 @@ class EventAreaBossFaust2 {
 
       MapleLifeFactory.getMonster(5220002).ifPresent({ faust2 ->
          theForestOfEvil2.spawnMonsterOnGroundBelow(faust2, new Point(474, 278))
-         MessageBroadcaster.getInstance().sendMapServerNotice(theForestOfEvil2, ServerNoticeType.LIGHT_BLUE, "Faust appeared amidst the blue fog.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(theForestOfEvil2, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("FAUST_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

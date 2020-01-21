@@ -7,11 +7,11 @@ import config.YamlConfig;
 import constants.game.GameConstants;
 import constants.inventory.ItemConstants;
 import server.MapleItemInformationProvider;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.foreigneffect.ShowForeignInfo;
 import tools.packet.showitemgaininchat.ShowInfo;
 
@@ -96,7 +96,7 @@ public class Fishing {
                break;
          }
 
-         MessageBroadcaster.getInstance().sendMapServerNotice(chr.getMap(), ServerNoticeType.LIGHT_BLUE, chr.getName() + " found " + rewardStr);
+         MessageBroadcaster.getInstance().sendMapServerNotice(chr.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("FISHING_FOUND").with(chr.getName(), rewardStr));
       }
 
       PacketCreator.announce(chr, new ShowInfo(fishingEffect));

@@ -3,6 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleReactor
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -16,7 +17,7 @@ boolean enter(PortalPlayerInteraction pi) {
    MapleReactor spring = pi.getMap().getReactorById(3008000)
    if (spring != null && spring.getState() > 0) {
       if (!pi.canHold(4001198, 1)) {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Check for a free space on your ETC inventory before entering this portal.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("INVENTORY_FULL").with("ETC"))
          return false
       }
 

@@ -50,7 +50,7 @@ class EventAreaBossMano {
 
       MapleLifeFactory.getMonster(2220000).ifPresent({ mano ->
          thicketAroundTheBeach3.spawnMonsterOnGroundBelow(mano, new Point(279, -496))
-         MessageBroadcaster.getInstance().sendMapServerNotice(thicketAroundTheBeach3, ServerNoticeType.LIGHT_BLUE, "A cool breeze was felt when Mano appeared.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(thicketAroundTheBeach3, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MANO_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

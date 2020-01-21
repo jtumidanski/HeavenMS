@@ -44,7 +44,6 @@ class EventAreaBossDoor1 {
    def start() {
       int bossMobId = 9400610
       int bossMapId = 677000003
-      String bossMsg = "Amdusias has appeared!"
       Point bossPos = new Point(467, 0)
 
       MapleMap map = em.getChannelServer().getMapFactory().getMap(bossMapId)
@@ -55,7 +54,7 @@ class EventAreaBossDoor1 {
 
       MapleLifeFactory.getMonster(bossMobId).ifPresent({ boss ->
          map.spawnMonsterOnGroundBelow(boss, bossPos)
-         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, bossMsg)
+         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("AMDUSIAS_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

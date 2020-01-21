@@ -240,7 +240,7 @@ class EventCWKPQ {
       if (map.countPlayers() <= 0) {
          return
       }
-      MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, "The Master Guardians have detected you.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.PINK_TEXT, I18nMessage.from("MASTER_GUARDIANS_DETECTED_YOU"))
       for (int i = 0; i < 20; i++) { //spawn 20 guardians
          eim.getMonster(9400594).ifPresent({ mob ->
             eim.registerMonster(mob)

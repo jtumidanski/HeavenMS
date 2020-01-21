@@ -225,7 +225,7 @@ class EventHenesysPQ {
          int cakes = eim.getIntProperty("bunnyCake") + 1
          eim.setIntProperty("bunnyCake", cakes)
 
-         MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, "The Moon Bunny made rice cake number " + cakes + ".")
+         MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MOON_BUNNY_CAKE_COUNT").with(cakes))
       }
    }
 
@@ -233,7 +233,7 @@ class EventHenesysPQ {
       if (mob.id() == 9300061) {
          int bunnyDamage = eim.getIntProperty("bunnyDamaged") + 1
          if (bunnyDamage > 5) {
-            MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, "The Moon Bunny is feeling sick. Please protect it so it can make delicious rice cakes.")
+            MessageBroadcaster.getInstance().sendMapServerNotice(mob.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MOON_BUNNY_SICK_PROTECT"))
             eim.setIntProperty("bunnyDamaged", 0)
          }
       }

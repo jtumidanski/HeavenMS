@@ -4,6 +4,7 @@ import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.maps.MapleReactor
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -84,13 +85,13 @@ class NPC9040009 {
                         } else {
                            cm.sendOk("Very good. You still have more to complete, however. Talk to me again when you're ready.")
                            eim.setProperty("stage1phase", stage + 1)
-                           MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "You have completed part " + stage + " of the Gatekeeper Test.")
+                           MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GATE_KEEPER_TEST_PART_COMPLETE").with(stage))
                         }
 
                      } else {
                         eim.showWrongEffect()
                         cm.sendOk("You have failed this test.")
-                        MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "You have failed the Gatekeeper Test.")
+                        MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GATE_KEEPER_TEST_FAILED"))
                         eim.setProperty("stage1phase", "1")
                      }
                      eim.setProperty("stage1status", "waiting")
@@ -102,7 +103,7 @@ class NPC9040009 {
                } else if (status == 1) {
                   int[] reactors = getReactors()
                   int[] combo = makeCombo(reactors)
-                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Please wait while the combination is revealed.")
+                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GATE_KEEPER_TEST_COMBINATION_REVEALED"))
                   int delay = 5000
                   for (int i = 0; i < combo.length; i++) {
                      cm.getPlayer().getMap().getReactorByOid(combo[i]).delayedHitReactor(cm.getClient(), delay + 3500 * i)

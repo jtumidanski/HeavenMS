@@ -2,6 +2,7 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -10,7 +11,7 @@ class Reactor5411000 extends SimpleReactor {
       rm.changeMusic("Bgm09/TimeAttack")
       rm.spawnMonster(9420513, -146, 225)
       rm.getEventInstance().setIntProperty("boss", 1)
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "As you wish, here comes Capt Latanica.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("CAPTAIN_LATANICA_SUMMONED"))
    }
 }
 

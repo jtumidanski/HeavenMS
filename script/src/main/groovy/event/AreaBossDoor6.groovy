@@ -44,7 +44,6 @@ class EventAreaBossDoor6 {
    def start() {
       int bossMobId = 9400611
       int bossMapId = 677000007
-      String bossMsg = "Crocell has appeared!"
       Point bossPos = new Point(171, 50)
 
       MapleMap map = em.getChannelServer().getMapFactory().getMap(bossMapId)
@@ -55,7 +54,7 @@ class EventAreaBossDoor6 {
 
       MapleLifeFactory.getMonster(bossMobId).ifPresent({ boss ->
          map.spawnMonsterOnGroundBelow(boss, bossPos)
-         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, bossMsg)
+         MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("CROCELL_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

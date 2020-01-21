@@ -6,16 +6,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import client.MapleCharacter;
-import constants.string.LanguageConstants;
 import net.server.coordinator.matchchecker.AbstractMatchCheckerListener;
 import net.server.coordinator.matchchecker.MatchCheckerListenerRecipe;
 import net.server.world.MapleParty;
 import net.server.world.MaplePartyCharacter;
 import scripting.npc.NPCConversationManager;
 import scripting.npc.NPCScriptManager;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
 
@@ -61,7 +60,7 @@ public class MatchCheckerCPQChallenge implements MatchCheckerListenerRecipe {
                NPCScriptManager.getInstance().start("cpqchallenge2", ldr.getClient(), npcId, chrMembers);
             }
 
-            cm.sendOk(LanguageConstants.getMessage(leader, LanguageConstants.CPQChallengeRoomSent));
+            cm.sendOk(I18nMessage.from("CPQ_CHALLENGE_ROOM_SENT"));
          }
 
          @Override

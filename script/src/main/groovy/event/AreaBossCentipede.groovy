@@ -50,7 +50,7 @@ class EventAreaBossCentipede {
 
       MapleLifeFactory.getMonster(5220004).ifPresent({ giantCentipede ->
          herbGarden.spawnMonsterOnGroundBelow(giantCentipede, new Point(560, 50))
-         MessageBroadcaster.getInstance().sendMapServerNotice(herbGarden, ServerNoticeType.LIGHT_BLUE, "From the mists surrounding the herb garden, the gargantuan Giant Centipede appears.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(herbGarden, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("GIANT_CENTIPEDE_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

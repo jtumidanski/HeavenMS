@@ -2,6 +2,7 @@ package portal
 
 import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -15,7 +16,7 @@ boolean enter(PortalPlayerInteraction pi) {
       } else if (theWay == (byte) 3) {
          target = 240050310 //dark
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Hit the light bulb to determine your fate!")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("HORNTAIL_HIT_LIGHT_BULB"))
          return false
       }
 
@@ -23,7 +24,7 @@ boolean enter(PortalPlayerInteraction pi) {
       eim.warpEventTeam(target)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "You are not the party leader. Only the party leader may proceed through this portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("HORNTAIL_PARTY_LEADER"))
       return false
    }
 }

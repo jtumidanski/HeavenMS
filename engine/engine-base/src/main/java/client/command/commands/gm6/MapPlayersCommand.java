@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import net.server.world.World;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
 
@@ -29,6 +30,6 @@ public class MapPlayersCommand extends Command {
             }
          }
       }
-      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, "Players on map " + map + ": " + names);
+      MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("MAP_PLAYERS_COMMAND_SUCCESS").with(map, names));
    }
 }

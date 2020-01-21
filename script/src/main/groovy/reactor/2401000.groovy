@@ -2,6 +2,7 @@ package reactor
 
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -16,7 +17,7 @@ class Reactor2401000 extends SimpleReactor {
          EventInstanceManager eim = rm.getEventInstance()
          eim.restartEventTimer(60 * 60000)
       }
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "From the depths of his cave, here comes Horntail!")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("HORN_TAIL_SUMMONED"))
    }
 }
 

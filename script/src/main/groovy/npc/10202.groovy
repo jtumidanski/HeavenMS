@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 
@@ -13,20 +14,20 @@ class NPC10202 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Warriors possess an enormous power with stamina to back it up, and they shine the brightest in melee combat situation. Regular attacks are powerful to begin with, and armed with complex skills, the job is perfect for explosive attacks.")
+      cm.sendNext(I18nMessage.from("10202_WARRIOR_INTRO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       status++
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendNext("If you wish to experience what it's like to be a Warrior, come see me again.")
+            cm.sendNext(I18nMessage.from("10202_DEMO_NOTE"))
          }
          cm.dispose()
          return
       }
       if (status == 0) {
-         cm.sendYesNo("Would you like to experience what it's like to be a Warrior?")
+         cm.sendYesNo(I18nMessage.from("10202_DEMO_PROMPT"))
       } else if (status == 1) {
          cm.lockUI()
          cm.warp(1020100, 0)

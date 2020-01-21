@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -51,7 +52,7 @@ class NPC9201115 {
                cm.sendNext("Tonight, we have a feast of a squad of Maplers.. ahaha...")
             } else if (status == 2) {
                cm.sendNext("Let our specially trained Master Guardians escort you!")
-               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Engarde! Master Guardians approach!")
+               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MASTER_GUARDIANS_APPROACH"))
                for (int i = 0; i < 10; i++) {
                   eim.getMonster(9400594).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276)) })
                }
@@ -67,7 +68,7 @@ class NPC9201115 {
                   cm.sendOk("Eh. What is this? You've defeated them?")
                } else if (status == 1) {
                   cm.sendNext("Well, no matter! The Twisted Masters will be glad to welcome you.")
-                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "Twisted Masters approach!")
+                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("TWISTED_MASTERS_APPROACH"))
 
                   //Margana
                   eim.getMonster(9400590).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-22, 1)) })
@@ -91,7 +92,7 @@ class NPC9201115 {
          } else if (eim.getIntProperty("glpq6") == 2) {
             if (cm.getMap().countMonsters() == 0) {
                cm.sendOk("WHAT? Ugh... this can't be happening.")
-               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The portal to the next stage has opened!")
+               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201115_NEXT_STAGE_OPENED"))
                eim.setIntProperty("glpq6", 3)
 
                eim.showClearEffect(true)

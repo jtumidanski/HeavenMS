@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1013104 {
    NPCConversationManager cm
@@ -12,18 +13,17 @@ class NPC1013104 {
       if (cm.isQuestStarted(22007)) {
          if (!cm.haveItem(4032451)) {
             cm.gainItem(4032451, true)
-            cm.sendNext("#b(You have obtained an Egg. Deliver it to Utah.)")
+            cm.sendNext(I18nMessage.from("1013104_EGG_OBTAINED"))
          } else {
-            cm.sendNext("#b(You have already obtained an Egg. Take the Egg you have and give it to Utah.)")
+            cm.sendNext(I18nMessage.from("1013104_EGG_ALREADY_OBTAINED"))
          }
       } else {
-         cm.sendNext("#b(You don't need to take an egg now.)#k")
+         cm.sendNext(I18nMessage.from("1013104_NO_NEED_FOR_EGG"))
       }
       cm.dispose()
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-
    }
 }
 

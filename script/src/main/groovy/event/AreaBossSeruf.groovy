@@ -53,7 +53,7 @@ class EventAreaBossSeruf {
          int posY = 520
          posX = Math.floor((Math.random() * 2300) - 1500).intValue()
          theSeaweedTower.spawnMonsterOnGroundBelow(seruf, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(theSeaweedTower, ServerNoticeType.LIGHT_BLUE, "A strange shell has appeared from a grove of seaweed")
+         MessageBroadcaster.getInstance().sendMapServerNotice(theSeaweedTower, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("SERUF_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

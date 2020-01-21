@@ -5,6 +5,7 @@ import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -244,10 +245,10 @@ class NPC9201044 {
 
                                  if (guessedRight == 6) { //6 unused slots on this stage
                                     cm.sendNext("All ropes weigh differently. Think your next course of action, then try again.")
-                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: Hmm... All ropes weigh differently.")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201044_ALL_WEIGH_DIFFERENTLY"))
                                  } else {
                                     cm.sendNext("One rope weigh the same. Think your next course of action, then try again.")
-                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: Hmm... One rope weigh the same.")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201044_ONE_WEIGH_SAME"))
                                  }
                               } else {
                                  spawnMobs(playersRight)
@@ -256,7 +257,7 @@ class NPC9201044 {
                                     eim.setProperty("stage2combo", "")
 
                                     cm.sendNext("You have failed to discover the right combination, now it shall be reset. Start over again!")
-                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Amos: You have failed to discover the right combination, now it shall be reset. Start over again!")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201044_WRONG_COMBINATION"))
                                  }
                               }
 

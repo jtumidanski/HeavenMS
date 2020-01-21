@@ -3,6 +3,7 @@ package npc
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1012112 {
    NPCConversationManager cm
@@ -34,7 +35,7 @@ class NPC1012112 {
             if (status == 0) {
                em = cm.getEventManager("HenesysPQ")
                if (em == null) {
-                  cm.sendOk("The Henesys PQ has encountered an error.")
+                  cm.sendOk(I18nMessage.from("1012112_PQ_ERROR"))
                   cm.dispose()
                   return
                } else if (cm.isUsingOldPqNpcStyle()) {
@@ -42,71 +43,71 @@ class NPC1012112 {
                   return
                }
 
-               cm.sendSimple("#e#b<Party Quest: Primrose Hill>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nI'm Tory. Inside here is a beautiful hill where the primrose blooms. There's a tiger that lives in the hill, Growlie, and he seems to be looking for something to eat. Would you like to head over to the hill of primrose and join forces with your party members to help Growlie out?#b\r\n#L0#I want to participate in the party quest.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.\r\n#L3#I would like to redeem an instance hat.")
+               cm.sendSimple(I18nMessage.from("1012112_HELLO").with(em.getProperty("party"), (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable")))
             } else if (status == 1) {
                if (selection == 0) {
                   if (cm.getParty().isEmpty()) {
-                     cm.sendOk("Hi there! I'm Tory. This place is covered with mysterious aura of the full moon, and no one person can enter here by him/herself.")
+                     cm.sendOk(I18nMessage.from("1012112_HELLO_NO_PARTY"))
                      cm.dispose()
                   } else if (!cm.isLeader()) {
-                     cm.sendOk("If you'd like to enter here, the leader of your party will have to talk to me. Talk to your party leader about this.")
+                     cm.sendOk(I18nMessage.from("1012112_HELLO_NOT_LEADER"))
                      cm.dispose()
                   } else {
                      MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                      if (eli.size() > 0) {
                         if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
-                           cm.sendOk("Someone is already attempting the PQ. Please wait for them to finish, or find another channel.")
+                           cm.sendOk(I18nMessage.from("1012112_SOMEONE_ALREADY_ATTEMPTING"))
                         }
                      } else {
-                        cm.sendOk("You cannot start this party quest yet, because either your party is not in the range size, some of your party members are not eligible to attempt it or they are not in this map. If you're having trouble finding party members, try Party Search.")
+                        cm.sendOk(I18nMessage.from("1012112_PARTY_NOT_ELLIGIBLE"))
                      }
 
                      cm.dispose()
                   }
                } else if (selection == 1) {
                   boolean psState = cm.getPlayer().toggleRecvPartySearchInvite()
-                  cm.sendOk("Your Party Search status is now: #b" + (psState ? "enabled" : "disabled") + "#k. Talk to me whenever you want to change it back.")
+                  cm.sendOk(I18nMessage.from("1012112_PARTY_SEARCH_TOGGLE").with(psState ? "enabled" : "disabled"))
                   cm.dispose()
                } else if (selection == 2) {
-                  cm.sendOk("#e#b<Party Quest: Primrose Hill>#k#n\r\nCollect primrose seeds from the flowers at the bottom part of the map and drop them by the platforms above the stage. Primrose seed color must match to grow the seeds, so test until you find the correct combination. When all the seeds have been planted, that is, starting second part of the mission, scout the Moon Bunny while it prepares Rice Cakes for the hungry Growlie. Once Growlie becomes satisfied, your mission is complete.")
+                  cm.sendOk(I18nMessage.from("1012112_MISSION_INFO"))
                   cm.dispose()
                } else {
-                  cm.sendYesNo("So you want to exchange #b20 #b#t4001158##k for the instance-designed hat?")
+                  cm.sendYesNo(I18nMessage.from("1012112_HAT_EXCHANGE"))
                }
             } else {
                if (cm.hasItem(4001158, 20)) {
                   if (cm.canHold(1002798)) {
                      cm.gainItem(4001158, (short) -20)
                      cm.gainItem(1002798, (short) 20)
-                     cm.sendNext("Here it is. Enjoy!")
+                     cm.sendNext(I18nMessage.from("1012112_GIVE_ITEM"))
                   }
                } else {
-                  cm.sendNext("You don't have enough #t4001158# to buy it yet!")
+                  cm.sendNext(I18nMessage.from("1012112_NEED_MORE_OF_ITEM"))
                }
 
                cm.dispose()
             }
          } else if (cm.getMapId() == 910010100) {
             if (status == 0) {
-               cm.sendYesNo("Thank you for aiding in the effort of feeding the Growlie. As a matter of fact, your team has already been rewarded for reaching this far. With this problem now solved, there is another issue happening right now, if you are interested check #bTommy#k there for the info. So, are you returning straight to Henesys now?")
+               cm.sendYesNo(I18nMessage.from("1012112_THANK_YOU"))
             } else if (status == 1) {
                if (cm.getEventInstance().giveEventReward(cm.getPlayer())) {
                   cm.warp(100000200)
                } else {
-                  cm.sendOk("It seems you are short on space in one of your inventories. Please check that first to get rewarded properly.")
+                  cm.sendOk(I18nMessage.from("1012112_CHECK_INVENTORY_SPACE"))
                }
                cm.dispose()
             }
          } else if (cm.getMapId() == 910010400) {
             if (status == 0) {
-               cm.sendYesNo("So, are you returning to Henesys now?")
+               cm.sendYesNo(I18nMessage.from("1012112_RETURN"))
             } else if (status == 1) {
                if (cm.getEventInstance() == null) {
                   cm.warp(100000200)
                } else if (cm.getEventInstance().giveEventReward(cm.getPlayer())) {
                   cm.warp(100000200)
                } else {
-                  cm.sendOk("It seems you are short on space in one of your inventories. Please check that first to get rewarded properly.")
+                  cm.sendOk(I18nMessage.from("1012112_CHECK_INVENTORY_SPACE"))
                }
                cm.dispose()
             }

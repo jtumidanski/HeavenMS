@@ -2,6 +2,7 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -11,7 +12,7 @@ class Reactor1209000 extends SimpleReactor {
          rm.setQuestProgress(6400, 1, 2)
          rm.setQuestProgress(6400, 6401, "q3")
       }
-      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "Real Bart has found. Return to Jonathan through portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("REAL_BART_FOUND"))
    }
 }
 

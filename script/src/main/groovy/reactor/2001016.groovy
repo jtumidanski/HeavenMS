@@ -2,6 +2,7 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -10,7 +11,7 @@ class Reactor2001016 extends SimpleReactor {
       rm.getMap().killAllMonsters()
       rm.getMap().allowSummonState(false)
       rm.spawnMonster(9300039, 260, 490)
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "As the air on the tower outskirts starts to become more dense, Papa Pixie appears.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("2001016_AS_THE_AIR"))
    }
 }
 

@@ -53,7 +53,7 @@ class EventAreaBossTaeRoon {
          int posY = 390
          posX = Math.floor((Math.random() * 700) - 800).intValue()
          territoryOfWanderingBear.spawnMonsterOnGroundBelow(taeRoon, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(territoryOfWanderingBear, ServerNoticeType.LIGHT_BLUE, "Tae Roon has appeared with a soft whistling sound.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(territoryOfWanderingBear, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("TAE_ROON_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

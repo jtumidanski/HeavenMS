@@ -50,7 +50,7 @@ class EventAreaBossBamboo {
 
       MapleLifeFactory.getMonster(6090002).ifPresent({ mobObj ->
          mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(560, 50))
-         MessageBroadcaster.getInstance().sendMapServerNotice(mapObj, ServerNoticeType.LIGHT_BLUE, "From amongst the ruins shrouded by the mists, Bamboo Warrior appears.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(mapObj, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("BAMBOO_WARRIOR_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

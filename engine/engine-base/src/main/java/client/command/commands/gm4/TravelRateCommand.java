@@ -22,6 +22,6 @@ public class TravelRateCommand extends Command {
 
       int travelRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setTravelRate(travelRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Travel Rate has been changed to " + travelRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("TRAVEL_RATE_COMMAND_SUCCESS").with(travelRate));
    }
 }

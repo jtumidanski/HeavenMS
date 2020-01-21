@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -11,7 +12,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.warp(920011000, 0)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The storage is currently inaccessible, as the powers of the Pixies remains active within the tower.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PIXIE_POWER_REMAINS"))
       return false
    }
 }

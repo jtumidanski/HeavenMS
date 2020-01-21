@@ -2,13 +2,13 @@ package npc
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Natalie
 	Map(s): 		Henesys VIP Hair/Hair Color Change
 	Description: 	
 */
-
 
 class NPC1012103 {
    NPCConversationManager cm
@@ -35,7 +35,7 @@ class NPC1012103 {
       } else {
          status++
          if (status == 0) {
-            cm.sendSimple("I'm the head of this hair salon. If you have a #b#t5150001##k or a #b#t5151001##k allow me to take care of your hairdo. Please choose the one you want.\r\n#L1#Haircut: #i5150001##t5150001##l\r\n#L2#Dye your hair: #i5151001##t5151001##l")
+            cm.sendSimple(I18nMessage.from("1012103_IM_THE_HEAD"))
          } else if (status == 1) {
             if (selection == 1) {
                beauty = 1
@@ -50,7 +50,7 @@ class NPC1012103 {
                      hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[i] + (cm.getPlayer().getHair() % 10), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendStyle("I can totally change up your hairstyle and make it look so good. Why don't you change it up a bit? If you have #b#t5150001##k I'll change it for you. Choose the one to your liking~.", hairNew)
+               cm.sendStyle(I18nMessage.from("1012103_I_CAN_TOTALLY_STYLE"), hairNew)
             } else if (selection == 2) {
                beauty = 2
                hairColor = []
@@ -58,42 +58,42 @@ class NPC1012103 {
                for (def i = 0; i < 8; i++) {
                   hairColor = ScriptUtils.pushItemIfTrue(hairColor, current + i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                }
-               cm.sendStyle("I can totally change your hair color and make it look so good. Why don't you change it up a bit? With #b#t51051001##k I'll change it for you. Choose the one to your liking.", hairColor)
+               cm.sendStyle(I18nMessage.from("1012103_I_CAN_TOTALLY_COLOR"), hairColor)
             }
          } else if (status == 2) {
             cm.dispose()
             if (beauty == 1) {
                if (cm.haveItem(5420002)) {
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("1012103_ENJOY_HAIR_STYLE"))
                } else if (cm.haveItem(5150001)) {
                   cm.gainItem(5150001, (short) -1)
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("1012103_ENJOY_HAIR_STYLE"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("1012103_NO_STYLE_COUPON"))
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151001)) {
                   cm.gainItem(5151001, (short) -1)
                   cm.setHair(hairColor[selection])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("1012103_ENJOY_HAIR_COLOR"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("1012103_NO_COLOR_COUPON"))
                }
             }
             if (beauty == 0) {
                if (selection == 0 && cm.getMeso() >= hairPrice) {
                   cm.gainMeso(-hairPrice)
                   cm.gainItem(5150001, (short) 1)
-                  cm.sendOk("Enjoy!")
+                  cm.sendOk(I18nMessage.from("1012103_ENJOY"))
                } else if (selection == 1 && cm.getMeso() >= hairColorPrice) {
                   cm.gainMeso(-hairColorPrice)
                   cm.gainItem(5151001, (short) 1)
-                  cm.sendOk("Enjoy!")
+                  cm.sendOk(I18nMessage.from("1012103_ENJOY"))
                } else {
-                  cm.sendOk("You don't have enough mesos to buy a coupon!")
+                  cm.sendOk(I18nMessage.from("1012103_MORE_MESOS_TO_BUY_COUPON"))
                }
             }
          }

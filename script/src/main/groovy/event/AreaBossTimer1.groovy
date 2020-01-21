@@ -53,7 +53,7 @@ class EventAreaBossTimer1 {
          int posY = 1030
          posX = Math.floor((Math.random() * 770) - 770).intValue()
          whirlpoolOfTime.spawnMonsterOnGroundBelow(timer1, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(whirlpoolOfTime, ServerNoticeType.LIGHT_BLUE, "Tick-Tock Tick-Tock! Timer makes it's presence known.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(whirlpoolOfTime, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("TIMER_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

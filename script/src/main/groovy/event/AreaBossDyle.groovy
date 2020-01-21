@@ -50,7 +50,7 @@ class EventAreaBossDyle {
 
       MapleLifeFactory.getMonster(6220000).ifPresent({ dyle ->
          dangerousCroko1.spawnMonsterOnGroundBelow(dyle, new Point(90, 119))
-         MessageBroadcaster.getInstance().sendMapServerNotice(dangerousCroko1, ServerNoticeType.LIGHT_BLUE, "The huge crocodile Dyle has come out from the swamp.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(dangerousCroko1, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DYLE_SUMMONED"))
          setupTask = em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

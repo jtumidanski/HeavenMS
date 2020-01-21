@@ -7,6 +7,7 @@ import net.server.Server;
 import net.server.channel.Channel;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 import tools.StringUtil;
 
 public class OnlineTwoCommand extends Command {
@@ -26,7 +27,7 @@ public class OnlineTwoCommand extends Command {
             for (MapleCharacter chr : ch.getPlayerStorage().getAllCharacters()) {
                s.append(StringUtil.makeMapleReadable(chr.getName())).append(", ");
             }
-            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, s.substring(0, s.length() - 2));
+            MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, SimpleMessage.from(s.substring(0, s.length() - 2)));
          }
       }
 

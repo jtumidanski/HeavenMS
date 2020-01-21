@@ -4,6 +4,7 @@ import net.server.world.MapleParty
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -14,11 +15,11 @@ boolean enter(PortalPlayerInteraction pi) {
    }
 
    if (pi.isQuestCompleted(2333) && pi.isQuestStarted(2331) && !pi.hasItem(4001318)) {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Lost the Royal Seal, eh? Worry not! Kevin's code here to save your hide.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("LOST_SEAL"))
       if (pi.canHold(4001318)) {
          pi.gainItem(4001318, (short) 1)
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Hey, how do you plan to hold this Seal when your inventory is full?")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SEAL_INVENTORY_FULL"))
       }
    }
 
@@ -28,7 +29,7 @@ boolean enter(PortalPlayerInteraction pi) {
       return true
    } else if (pi.isQuestStarted(2332) && pi.hasItem(4032388)) {
       pi.forceCompleteQuest(2332, 1300002)
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You've found the princess!")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("FOUND_PRINCESS"))
       pi.giveCharacterExp(4400, pi.getPlayer())
 
       EventManager em = pi.getEventManager("MK_PrimeMinister")
@@ -40,7 +41,7 @@ boolean enter(PortalPlayerInteraction pi) {
                pi.playPortalSound()
                return true
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
+               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("BOSS_ANOTHER_PARTY_CHALLENGING_IN_CHANNEL"))
                return false
             }
          }
@@ -49,7 +50,7 @@ boolean enter(PortalPlayerInteraction pi) {
             pi.playPortalSound()
             return true
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("BOSS_ANOTHER_PARTY_CHALLENGING_IN_CHANNEL"))
             return false
          }
       }
@@ -64,7 +65,7 @@ boolean enter(PortalPlayerInteraction pi) {
                pi.playPortalSound()
                return true
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
+               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("BOSS_ANOTHER_PARTY_CHALLENGING_IN_CHANNEL"))
                return false
             }
          }
@@ -73,12 +74,12 @@ boolean enter(PortalPlayerInteraction pi) {
             pi.playPortalSound()
             return true
          } else {
-            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Another party is already challenging the boss in this channel.")
+            MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("BOSS_ANOTHER_PARTY_CHALLENGING_IN_CHANNEL"))
             return false
          }
       }
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The door seems to be locked. Perhaps I can find a key to open it...")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SEEMS_TO_BE_LOCKED_LONG"))
       return false
    }
 }

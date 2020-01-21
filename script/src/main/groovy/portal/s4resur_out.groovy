@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -14,7 +15,7 @@ boolean enter(PortalPlayerInteraction pi) {
 
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Make room on your ETC to receive the quest item.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("MAKE_ROOM_FOR_QUEST_ITEM").with("ETC"))
          return false
       }
    } else {

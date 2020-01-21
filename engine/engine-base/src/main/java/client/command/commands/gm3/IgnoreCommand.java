@@ -5,10 +5,10 @@ import java.util.Optional;
 import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
+import tools.I18nMessage;
 import tools.MapleLogger;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class IgnoreCommand extends Command {
    {
@@ -35,7 +35,10 @@ public class IgnoreCommand extends Command {
          MapleLogger.ignored.add(victim.get().getId());
          MessageBroadcaster.getInstance().yellowMessage(player, I18nMessage.from("IGNORE_TOGGLE_COMMAND_OFF").with(victim.get().getId()));
       }
-      String message_ = player.getName() + (!monitored_ ? " has started ignoring " : " has stopped ignoring ") + victim.get().getName() + ".";
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, message_);
+      if (!monitored_) {
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, I18nMessage.from("IGNORE_HAS_STARTED").with(player.getName(), victim.get().getName()));
+      } else {
+         MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, I18nMessage.from("IGNORE_HAS_ENDED").with(player.getName(), victim.get().getName()));
+      }
    }
 }

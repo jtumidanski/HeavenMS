@@ -3,6 +3,7 @@ package portal
 
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleMap
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -25,11 +26,11 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.warp(mapId, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Someone is already in this map.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SOMEONE_ALREADY_IN_MAP"))
          return false
       }
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Hall #1 can only be entered if you're engaged in Kiku's Acclimation Training.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("KIKUS_ACCLIMATION_TRAINING_REQUIREMENT"))
       return false
    }
 }

@@ -34,7 +34,7 @@ public class LogHelper {
    }
 
    public static void logExpedition(MapleExpedition expedition) {
-      MessageBroadcaster.getInstance().sendWorldServerNotice(expedition.getLeader().getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, expedition.getType().toString() + " Expedition with leader " + expedition.getLeader().getName() + " finished after " + getTimeString(expedition.getStartTime()));
+      MessageBroadcaster.getInstance().sendWorldServerNotice(expedition.getLeader().getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, I18nMessage.from("EXPEDITION_ENDED").with(expedition.getType().toString(), expedition.getLeader().getName(), getTimeString(expedition.getStartTime())));
 
       StringBuilder log = new StringBuilder(expedition.getType().toString() + " EXPEDITION\r\n");
       log.append(getTimeString(expedition.getStartTime())).append("\r\n");

@@ -53,7 +53,7 @@ class EventAreaBossKingSageCat {
          int posY = 540
          posX = Math.floor((Math.random() * 1300) - 500).intValue()
          goblinForest2.spawnMonsterOnGroundBelow(kingSageCat, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(goblinForest2, ServerNoticeType.LIGHT_BLUE, "The ghostly air around here has become stronger. The unpleasant sound of a cat crying can be heard.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(goblinForest2, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("KING_SAGE_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

@@ -4,6 +4,7 @@ import scripting.event.EventInstanceManager
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MaplePortal
 import server.maps.MapleMap
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -14,7 +15,7 @@ boolean enter(PortalPlayerInteraction pi) {
    MaplePortal targetPortal = target.getPortal("st00")
    String avail = eim.getProperty("2stageclear")
    if (avail == null) {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Some seal is blocking this door.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SEAL_BLOCKING_DOOR"))
       return false
    } else {
       pi.playPortalSound()

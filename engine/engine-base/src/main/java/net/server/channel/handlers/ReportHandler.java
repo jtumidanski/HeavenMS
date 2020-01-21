@@ -5,14 +5,15 @@ import java.util.Calendar;
 
 import client.MapleCharacter;
 import client.MapleClient;
-import database.administrator.ReportAdministrator;
 import client.processor.CharacterProcessor;
+import database.DatabaseConnection;
+import database.administrator.ReportAdministrator;
 import net.server.AbstractPacketHandler;
 import net.server.channel.packet.reader.ReportReader;
 import net.server.channel.packet.report.BaseReportPacket;
 import net.server.channel.packet.report.ReportPacket;
 import net.server.channel.packet.report.ReportWithChatPacket;
-import database.DatabaseConnection;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
@@ -39,7 +40,7 @@ public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket>
             PacketCreator.announce(client, new ReportResponse((byte) 2));
             return;
          }
-         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, packet.victim() + " was reported for: " + packet.description());
+         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, I18nMessage.from("WAS_REPORTED_FOR").with(packet.victim(), packet.description()));
          addReport(client.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(packet.victim()), 0, packet.description(), null);
       } else if (packet instanceof ReportWithChatPacket) {
          if (((ReportWithChatPacket) packet).chatLog() == null) {
@@ -54,10 +55,10 @@ public final class ReportHandler extends AbstractPacketHandler<BaseReportPacket>
                return;
             }
          }
-         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, packet.victim() + " was reported for: " + packet.description());
+         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, I18nMessage.from("WAS_REPORTED_FOR").with(packet.victim(), packet.description()));
          addReport(client.getPlayer().getId(), CharacterProcessor.getInstance().getIdByName(packet.victim()), packet.reason(), packet.description(), ((ReportWithChatPacket) packet).chatLog());
       } else {
-         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, client.getPlayer().getName() + " is probably packet editing. Got unknown report type, which is impossible.");
+         MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, MapleCharacter::isGM, I18nMessage.from("PROBABLY_PACKET_EDITING").with(client.getPlayer().getName()));
       }
    }
 

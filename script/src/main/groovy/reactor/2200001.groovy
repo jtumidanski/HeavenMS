@@ -2,12 +2,13 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor2200001 extends SimpleReactor {
    def act() {
-      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, "You have found a secret factory!")
+      MessageBroadcaster.getInstance().sendServerNotice(rm.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SECRET_FACTOR"))
       rm.warp(Math.random() < 0.5 ? 922000020 : 922000021, 0)
    }
 }

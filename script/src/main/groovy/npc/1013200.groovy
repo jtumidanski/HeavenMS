@@ -20,7 +20,7 @@ class NPC1013200 {
 
    def start() {
       if (!cm.isQuestStarted(22015)) {
-         cm.sendOk("#b(You are too far from the Piglet. Go closer to grab it.)")
+         cm.sendOk(I18nMessage.from("1013200_TOO_FAR_FROM_PIG"))
       } else {
          cm.gainItem(4032449, true)
          cm.forceCompleteQuest(22015)

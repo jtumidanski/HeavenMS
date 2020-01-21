@@ -2,12 +2,13 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 boolean enter(PortalPlayerInteraction pi) {
    if (!pi.getEventInstance().isEventCleared()) {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You have to clear this mission before entering this portal.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("COMPLETE_MISSION_BEFORE_PROCEEDING"))
       return false
    } else {
       if (pi.isQuestStarted(6410)) {

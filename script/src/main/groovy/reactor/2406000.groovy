@@ -2,6 +2,7 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -9,7 +10,7 @@ class Reactor2406000 extends SimpleReactor {
    def act() {
       rm.spawnNpc(2081008)
       rm.startQuest(100203)
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "In a flicker of light the egg has matured and cracked, thus born a radiant baby dragon.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("BABY_DRAGON_SUMMONED"))
    }
 
    def touch() {

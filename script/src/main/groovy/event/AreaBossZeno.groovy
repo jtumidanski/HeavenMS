@@ -50,7 +50,7 @@ class EventAreaBossZeno {
 
       MapleLifeFactory.getMonster(6220001).ifPresent({ zeno ->
          graysPrairie.spawnMonsterOnGroundBelow(zeno, new Point(-4224, 776))
-         MessageBroadcaster.getInstance().sendMapServerNotice(graysPrairie, ServerNoticeType.LIGHT_BLUE, "Zeno has appeared with a heavy sound of machinery.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(graysPrairie, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ZENO_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

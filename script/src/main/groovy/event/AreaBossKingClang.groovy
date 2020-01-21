@@ -54,7 +54,7 @@ class EventAreaBossKingClang {
          int posY = 140
          posX = Math.floor((Math.random() * 2400) - 1600).intValue()
          hotSand.spawnMonsterOnGroundBelow(kingClang, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(hotSand, ServerNoticeType.LIGHT_BLUE, "A strange turban shell has appeared on the beach.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(hotSand, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("KING_CLANG_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

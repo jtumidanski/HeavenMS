@@ -6,7 +6,6 @@ import java.util.concurrent.ScheduledFuture;
 
 import client.MapleCharacter;
 import config.YamlConfig;
-import constants.string.LanguageConstants;
 import net.server.Server;
 import net.server.channel.Channel;
 import net.server.world.MapleParty;
@@ -14,11 +13,11 @@ import net.server.world.MaplePartyCharacter;
 import server.TimerManager;
 import server.maps.MapleMap;
 import server.maps.MapleReactor;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowEffect;
 import tools.packet.ui.GetClock;
@@ -127,10 +126,10 @@ public class MonsterCarnival {
          String teamS = "";
          switch (team) {
             case 0:
-               teamS = LanguageConstants.getMessage(chrMap, LanguageConstants.CPQRed);
+               teamS = I18nMessage.from("CPQ_RED").to(chrMap).evaluate();
                break;
             case 1:
-               teamS = LanguageConstants.getMessage(chrMap, LanguageConstants.CPQBlue);
+               teamS = I18nMessage.from("CPQ_BLUE").to(chrMap).evaluate();
                break;
          }
          MessageBroadcaster.getInstance().sendServerNotice(chrMap, ServerNoticeType.PINK_TEXT, I18nMessage.from("CPQ_PLAYER_EXIT").with(teamS));

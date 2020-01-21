@@ -2,16 +2,17 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor2201003 extends SimpleReactor {
    def act() {
       if (rm.getPlayer().getMapId() == 922010900) {
-         MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Alishar has been summoned.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ALISHAR_SUMMONED"))
          rm.spawnMonster(9300012, 941, 184)
       } else if (rm.getPlayer().getMapId() == 922010700) {
-         MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "Rombard has been summoned somewhere in the map.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ROMBARD_SUMMONED"))
          rm.spawnMonster(9300010, 1, -211)
       }
    }

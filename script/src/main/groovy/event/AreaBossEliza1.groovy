@@ -50,7 +50,7 @@ class EventAreaBossEliza1 {
 
       MapleLifeFactory.getMonster(8220000).ifPresent({ eliza ->
          stairwayToTheSky2.spawnMonsterOnGroundBelow(eliza, new Point(208, 83))
-         MessageBroadcaster.getInstance().sendMapServerNotice(stairwayToTheSky2, ServerNoticeType.LIGHT_BLUE, "Eliza has appeared with a black whirlwind.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(stairwayToTheSky2, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ELIZA_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

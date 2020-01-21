@@ -6,6 +6,7 @@ import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -150,7 +151,7 @@ class NPC2030013 {
                cm.sendOk("The expedition will begin and you will now be escorted to the #b" + expeditionMap + "#k.")
                status = 4
             } else if (selection == 3) {
-               MessageBroadcaster.getInstance().sendMapServerNotice(player.getMap(), ServerNoticeType.LIGHT_BLUE, expedition.getLeader().getName() + " has ended the expedition.")
+               MessageBroadcaster.getInstance().sendMapServerNotice(player.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EXPEDITION_ENDED_BY").with(expedition.getLeader().getName()))
                cm.endExpedition(expedition)
                cm.sendOk("The expedition has now ended. Sometimes the best strategy is to run away.")
                cm.dispose()

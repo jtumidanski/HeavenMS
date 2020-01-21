@@ -8,6 +8,7 @@ import scripting.AbstractPlayerInteraction
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 import tools.MasterBroadcaster
 import tools.MessageBroadcaster
 import tools.PacketCreator
@@ -373,12 +374,12 @@ class NPC9201002 {
 
                                     giveCoupleBlessings(eim, player, partner)
 
-                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "High Priest John: By the power vested in me through the mighty Maple tree, I now pronounce you  Husband and Wife. You may kiss the bride!")
+                                    MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_SUCCESS"))
                                     eim.schedule("showMarriedMsg", 2 * 1000)
                                  }
                               } else {
                                  eim.setIntProperty("confirmedVows", player.getId())
-                                 MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, "Wedding Assistant: " + player.getName() + " has confirmed vows! Alright, one step away to make it official. Tighten your seatbelts!")
+                                 MessageBroadcaster.getInstance().sendMapServerNotice(cm.getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ONE_LAST_STEP").with(player.getName()))
                               }
 
                               break

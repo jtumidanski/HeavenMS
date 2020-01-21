@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -18,7 +19,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(nextStage)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Defeat all monsters before proceeding to the next stage.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DEFEAT_ALL_MONSTERS"))
       return false
    }
 }

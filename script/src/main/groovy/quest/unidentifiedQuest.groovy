@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -10,7 +11,7 @@ class UnidentifiedQuest {
    int status = -1
 
    def start(Byte mode, Byte type, Integer selection) {
-      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.NOTICE, "Quest: " + qm.getQuest() + " is not found, please report this.")
+      MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("QUEST_NOT_FOUND").with(qm.getQuest()))
       qm.dispose()
    }
 

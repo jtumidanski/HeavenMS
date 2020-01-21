@@ -2,6 +2,7 @@ package reactor
 
 import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -15,7 +16,7 @@ class Reactor6109013 extends SimpleReactor {
    def action() {
       EventInstanceManager eim = rm.getEventInstance()
 
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "All stirges have disappeared.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("STIRGES_DISAPPEARED"))
       rm.getMap().killAllMonsters()
       eim.setIntProperty(fid, 777)
    }

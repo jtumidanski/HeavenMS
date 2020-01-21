@@ -2,6 +2,7 @@ package portal
 
 import scripting.event.EventManager
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -12,14 +13,14 @@ boolean enter(PortalPlayerInteraction pi) {
    } else if (pi.isQuestStarted(100203) || pi.getPlayer().haveItem(4001094)) {
       EventManager em = pi.getEventManager("NineSpirit")
       if (!em.startInstance(pi.getPlayer())) {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "There is currently someone in this map, come back later.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SOMEONE_IN_MAP"))
          return false
       } else {
          pi.playPortalSound()
          return true
       }
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "A strange force is blocking you from entering.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("STRANGE_FORCE_2"))
       return false
    }
 }

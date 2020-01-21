@@ -5,6 +5,7 @@ import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
 import server.events.gm.MapleEvent;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
@@ -29,11 +30,6 @@ public class StartEventCommand extends Command {
                   + " and will allow "
                   + players
                   + " players to join. Type @joinevent to participate.")));
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE,
-            "[Event] An event has started on "
-                  + player.getMap().getMapName()
-                  + " and will allow "
-                  + players
-                  + " players to join. Type @joinevent to participate.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_START").with(player.getMap().getMapName(), players));
    }
 }

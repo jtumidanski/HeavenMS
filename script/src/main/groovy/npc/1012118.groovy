@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,23 +36,23 @@ class NPC1012118 {
       }
       if (status == 0) {
          if (cm.getLevel() >= 20) {
-            cm.sendOk("This training ground is available only for those under level 20.")
+            cm.sendOk(I18nMessage.from("1012118_UNDER_20_ONLY"))
             cm.dispose()
          } else if (cm.isQuestActive(22515) || cm.isQuestActive(22516) || cm.isQuestActive(22517) || cm.isQuestActive(22518)) {
-            cm.sendYesNo("Would you like to go in the special Training Center?")
+            cm.sendYesNo(I18nMessage.from("1012118_WOULD_YOU_LIKE_TO_GO_SPECIAL"))
             status = 1
          } else {
-            String selStr = "Would you like to go into the Training Center?"
+            String selStr = ""
             for (def i = 0; i < num; i++ ) {
                selStr += "\r\n#b#L" + i + "#Training Center " + i + " (" + cm.getPlayerCount(map + i) + "/" + maxPlayerCount + ")#l#k"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(I18nMessage.from("1012118_WOULD_YOU_LIKE_TO_GO").with(selStr))
          }
       } else if (status == 1) {
          if (selection < 0 || selection >= num) {
             cm.dispose()
          } else if (cm.getPlayerCount(map + selection) >= maxPlayerCount) {
-            cm.sendNext("This training center is full.")
+            cm.sendNext(I18nMessage.from("1012118_MAP_FULL"))
             status = -1
          } else {
             cm.warp(map + selection, 0)

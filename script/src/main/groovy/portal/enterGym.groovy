@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -19,7 +20,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.warp(914010200, 1)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You will be allowed to enter the Penguin Training Ground only if you are receiving a lesson from Puo.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("PUO_LESSON_REQUIREMENT"))
       return false
    }
 }

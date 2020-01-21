@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -78,14 +79,14 @@ class Quest1021 {
             qm.sendPrev("Okay, this is all I can teach you. I know it's sad but it is time to say good bye. Well take care if yourself and Good luck my friend!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v2010000# 3 #t2010000#\r\n#v2010009# 3 #t2010009#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 10 exp")
          } else if (status == 3) {
             if (qm.isQuestCompleted(1021)) {
-               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Unknown Error")
+               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("UNKNOWN_ERROR"))
             } else if (qm.canHold(2010000) && qm.canHold(2010009)) {
                qm.gainExp(10)
                qm.gainItem(2010000, (short) 3)
                qm.gainItem(2010009, (short) 3)
                qm.forceCompleteQuest()
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "Your inventory is full")
+               MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"))
             }
             qm.dispose()
          }

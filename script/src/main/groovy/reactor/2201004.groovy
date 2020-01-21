@@ -2,12 +2,13 @@ package reactor
 
 
 import scripting.reactor.ReactorActionManager
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 class Reactor2201004 extends SimpleReactor {
    def act() {
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The dimensional hole has been filled by the <Piece of Cracked Dimension>.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DIMENSIONAL_HOLE_FILLED"))
       rm.changeMusic("Bgm09/TimeAttack")
       rm.spawnMonster(8500000, -410, -400)
       rm.createMapMonitor(220080001, "in00")

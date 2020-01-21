@@ -2,13 +2,14 @@ package portal
 
 import net.server.Server
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
 boolean enter(PortalPlayerInteraction pi) {
    if (pi.getPlayer().getMapId() != 777777777) {
       if (!Server.getInstance().canEnterDeveloperRoom()) {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The next room is currently unavailable.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NEXT_ROOM_NOT_AVAILABLE"))
          return false
       }
 

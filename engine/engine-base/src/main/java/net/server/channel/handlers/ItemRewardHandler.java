@@ -17,6 +17,7 @@ import tools.PacketCreator;
 import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 import tools.packet.stat.EnableActions;
 import tools.packet.statusinfo.ShowInventoryFull;
 
@@ -55,7 +56,7 @@ public final class ItemRewardHandler extends AbstractPacketHandler<ItemRewardPac
                String msg = reward.worldMessage();
                msg = msg.replaceAll("/name", client.getPlayer().getName());
                msg = msg.replaceAll("/item", ii.getName(reward.itemId()));
-               MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, msg);
+               MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.LIGHT_BLUE, SimpleMessage.from(msg));
             }
             break;
          }

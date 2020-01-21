@@ -6,6 +6,7 @@ import scripting.event.EventInstanceManager
 import scripting.reactor.ReactorActionManager
 import server.maps.MapleMap
 import server.maps.MapleReactor
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -18,7 +19,7 @@ class Reactor2408002 extends SimpleReactor {
       int vvpOrig = 4001088
       int vvpStage = -1
       eim.showClearEffect(false, mapId)
-      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, "The key has been teleported somewhere...")
+      MessageBroadcaster.getInstance().sendMapServerNotice(rm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("KEY_TELEPORTED"))
       switch (mapId) {
          case 240050101:
             vvpKey = vvpOrig
@@ -47,7 +48,7 @@ class Reactor2408002 extends SimpleReactor {
       MapleReactor reactor = map.getReactorByName("keyDrop1")
       MapleCharacter dropper = eim.getPlayers().get(0)
       map.spawnItemDrop(reactor, dropper, item, reactor.position(), true, true)
-      MessageBroadcaster.getInstance().sendMapServerNotice(eim.getMapInstance(240050100), ServerNoticeType.LIGHT_BLUE, "A bright flash of light, then a key suddenly appears somewhere in the map.")
+      MessageBroadcaster.getInstance().sendMapServerNotice(eim.getMapInstance(240050100), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("KEY_SUMMONED"))
    }
 }
 

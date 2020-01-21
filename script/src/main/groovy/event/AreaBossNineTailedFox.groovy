@@ -53,7 +53,7 @@ class EventAreaBossNineTailedFox {
          int posY = 33
          posX = Math.floor((Math.random() * 1300) - 800).intValue()
          moonRidge.spawnMonsterOnGroundBelow(nineTailedFox, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(moonRidge, ServerNoticeType.LIGHT_BLUE, "As the moon light dims, a long fox cry can be heard and the presence of the old fox can be felt")
+         MessageBroadcaster.getInstance().sendMapServerNotice(moonRidge, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("NINE_TAILED_FOX_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

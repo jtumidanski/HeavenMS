@@ -16,6 +16,7 @@ import tools.FilePrinter;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 import tools.packet.stat.EnableActions;
 
 public class NPCScriptManager extends AbstractScriptManager {
@@ -68,7 +69,7 @@ public class NPCScriptManager extends AbstractScriptManager {
          ScriptEngine iv = getScriptEngine("npc/" + filename, c);
 
          if (iv == null) {
-            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, npc + "");
+            MessageBroadcaster.getInstance().sendServerNotice(c.getPlayer(), ServerNoticeType.POP_UP, SimpleMessage.from(npc + ""));
             cm.dispose();
             return;
          }

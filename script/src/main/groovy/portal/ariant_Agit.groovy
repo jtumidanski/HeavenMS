@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -10,7 +11,7 @@ boolean enter(PortalPlayerInteraction pi) {
       pi.playPortalSound(); pi.warp(260000201, 1)
       return true
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Access restricted to only members of the Sand Bandits team.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SAND_BANDITS_ONLY"))
       return false
    }
 }

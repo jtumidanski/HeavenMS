@@ -11,7 +11,7 @@ import java.util.ResourceBundle;
 import client.MapleCharacter;
 import client.MapleClient;
 
-public class I18nMessage {
+public class I18nMessage implements UserMessage {
    private Locale locale;
 
    private String template;
@@ -29,11 +29,13 @@ public class I18nMessage {
       this.args = new ArrayList<>();
    }
 
+   @Override
    public I18nMessage to(MapleCharacter character) {
       locale = character.getLocale();
       return this;
    }
 
+   @Override
    public I18nMessage to(MapleClient client) {
       locale = client.getLocale();
       return this;
@@ -49,6 +51,7 @@ public class I18nMessage {
       return this;
    }
 
+   @Override
    public String evaluate() {
       try {
          if (args == null || args.size() == 0) {

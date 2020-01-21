@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 
@@ -13,20 +14,20 @@ class NPC10200 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Bowmen are blessed with dexterity and power, taking charge of long-distance attacks, providing support for those at the front line of the battle. Very adept at using landscape as part of the arsenal.")
+      cm.sendNext(I18nMessage.from("10200_BOWMAN_INTRO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       status++
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendNext("If you wish to experience what it's like to be a Bowman, come see me again.")
+            cm.sendNext(I18nMessage.from("10200_DEMO_NOTE"))
          }
          cm.dispose()
          return
       }
       if (status == 0) {
-         cm.sendYesNo("Would you like to experience what it's like to be a Bowman?")
+         cm.sendYesNo(I18nMessage.from("10200_DEMO_PROMPT"))
       } else if (status == 1) {
          cm.lockUI()
          cm.warp(1020300, 0)

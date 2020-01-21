@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -16,7 +17,7 @@ boolean enter(PortalPlayerInteraction pi) {
       int minutes = (Math.floor(jailedTime / (1000 * 60)) % 60)
       int hours = (Math.floor(jailedTime / (1000 * 60 * 60)) % 24)
 
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You have been caught in bad behaviour by the Maple POLICE. You've got to stay here for " + hours + " hours " + minutes + " minutes " + seconds + " seconds yet.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("JAIL_NOTE").with(hours, minutes, seconds))
       return false
    }
 }

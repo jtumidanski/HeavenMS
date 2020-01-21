@@ -40,6 +40,7 @@ import tools.MessageBroadcaster;
 import tools.PacketCreator;
 import tools.Randomizer;
 import tools.ServerNoticeType;
+import tools.SimpleMessage;
 import tools.StringUtil;
 import tools.I18nMessage;
 import tools.packet.stat.EnableActions;
@@ -182,7 +183,7 @@ public final class AdminCommandHandler extends AbstractPacketHandler<BaseAdminCo
 
    private void warnCommand(MapleClient c, String victim, String message) {
       c.getChannelServer().getPlayerStorage().getCharacterByName(victim).ifPresentOrElse(target -> {
-         MessageBroadcaster.getInstance().sendServerNotice(target, ServerNoticeType.POP_UP, message);
+         MessageBroadcaster.getInstance().sendServerNotice(target, ServerNoticeType.POP_UP, SimpleMessage.from(message));
          PacketCreator.announce(c, new GMEffect(0x1E, (byte) 1));
       }, () -> PacketCreator.announce(c, new GMEffect(0x1E, (byte) 0)));
    }

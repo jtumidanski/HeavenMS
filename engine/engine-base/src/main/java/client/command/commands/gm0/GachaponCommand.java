@@ -8,6 +8,7 @@ import server.MapleItemInformationProvider;
 import server.gachapon.MapleGachapon;
 import tools.MessageBroadcaster;
 import tools.I18nMessage;
+import tools.SimpleMessage;
 
 public class GachaponCommand extends Command {
    {
@@ -29,7 +30,7 @@ public class GachaponCommand extends Command {
       }
       if (gachapon == null) {
          MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), I18nMessage.from("GACHAPON_COMMAND_SYNTAX"));
-         Arrays.stream(names).forEach(name -> MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), name));
+         Arrays.stream(names).forEach(name -> MessageBroadcaster.getInstance().yellowMessage(c.getPlayer(), SimpleMessage.from(name)));
          return;
       }
       StringBuilder talkStr = new StringBuilder("The #b" + gachaponName + "#k Gachapon contains the following items.\r\n\r\n");

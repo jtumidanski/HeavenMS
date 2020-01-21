@@ -52,7 +52,7 @@ class EventAreaBossSnackBar {
          int[][] setPos = [[-626, -604], [735, -600]]
          int[] rndPos = setPos[Math.floor(Math.random() * setPos.length).intValue()]
          snackBarMap.spawnMonsterOnGroundBelow(snackBar, new Point(rndPos[0], rndPos[1]))
-         MessageBroadcaster.getInstance().sendMapServerNotice(snackBarMap, ServerNoticeType.LIGHT_BLUE, "Slowly, a suspicious food stand opens up on a strangely remote place.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(snackBarMap, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("SNACK_BAR_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

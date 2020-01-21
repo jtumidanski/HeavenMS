@@ -22,7 +22,7 @@ public class BombCommand extends Command {
          Optional<MapleCharacter> victim = client.getWorldServer().getPlayerStorage().getCharacterByName(params[0]);
          if (victim.isPresent()) {
             MapleLifeFactory.getMonster(9300166).ifPresent(monster -> victim.get().getMap().spawnMonsterOnGroundBelow(monster, victim.get().position()));
-            MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, player.getName() + " used !bomb on " + victim.get().getName());
+            MessageBroadcaster.getInstance().sendWorldServerNotice(client.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, I18nMessage.from("USE_BOMB").with(player.getName(), victim.get().getName()));
          } else {
             MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("PLAYER_NOT_FOUND").with(params[0]));
          }

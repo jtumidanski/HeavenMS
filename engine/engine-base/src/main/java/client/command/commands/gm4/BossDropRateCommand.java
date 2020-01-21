@@ -22,6 +22,6 @@ public class BossDropRateCommand extends Command {
 
       int bossDropRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setBossDropRate(bossDropRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Boss Drop Rate has been changed to " + bossDropRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("BOSS_DROP_RATE_COMMAND_SUCCESS").with(bossDropRate));
    }
 }

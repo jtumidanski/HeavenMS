@@ -2,6 +2,7 @@ package portal
 
 import constants.game.GameConstants
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -15,7 +16,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.getPlayer().setVanquisherKills(pi.getPlayer().getVanquisherKills() + 1)
       }
    } else {
-      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "There are still some monsters remaining.")
+      MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DOJO_MORE_MONSTERS"))
    }
    pi.enableActions()
    return true

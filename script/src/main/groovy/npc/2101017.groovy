@@ -4,6 +4,7 @@ import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
 import server.expeditions.MapleExpedition
 import server.expeditions.MapleExpeditionType
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -106,7 +107,7 @@ class NPC2101017 {
                      cm.dispose()
                   }
                } else if (selection == 4) {
-                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, "The Leader of the arena left.")
+                  MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("ARENA_LEADER_LEFT"))
                   expedition.warpExpeditionTeam(980010000)
                   cm.endExpedition(expedition)
                   cm.dispose()

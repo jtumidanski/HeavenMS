@@ -3,6 +3,7 @@ package portal
 import client.MapleCharacter
 import scripting.portal.PortalPlayerInteraction
 import server.maps.MapleReactor
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -32,18 +33,18 @@ boolean enter(PortalPlayerInteraction pi) {
                         MapleCharacter chr = pIter.next()
 
                         for (int j = i; j >= 0; j--) {
-                           MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, "You received " + chr.addDojoPointsByMap(mapId - 100 * j) + " training points. Your total training points score is now " + chr.getDojoPoints() + ".")
+                           MessageBroadcaster.getInstance().sendServerNotice(chr, ServerNoticeType.PINK_TEXT, I18nMessage.from("DOJO_RECEIVE_POINTS").with(chr.addDojoPointsByMap(mapId - 100 * j), chr.getDojoPoints()))
                         }
 
                         chr.changeMap(restMapId, 0)
                      }
                   }
                } else {
-                  MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You received " + pi.getPlayer().addDojoPointsByMap(pi.getMapId()) + " training points. Your total training points score is now " + pi.getPlayer().getDojoPoints() + ".")
+                  MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DOJO_RECEIVE_POINTS").with(pi.getPlayer().addDojoPointsByMap(pi.getMapId()), pi.getPlayer().getDojoPoints()))
                   pi.playPortalSound(); pi.warp(pi.getPlayer().getMap().getId() + 100, 0)
                }
             } else {
-               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "You received " + pi.getPlayer().addDojoPointsByMap(pi.getMapId()) + " training points. Your total training points score is now " + pi.getPlayer().getDojoPoints() + ".")
+               MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DOJO_RECEIVE_POINTS").with(pi.getPlayer().addDojoPointsByMap(pi.getMapId()), pi.getPlayer().getDojoPoints()))
                pi.playPortalSound(); pi.warp(pi.getPlayer().getMap().getId() + 100, 0)
             }
          } else {
@@ -52,7 +53,7 @@ boolean enter(PortalPlayerInteraction pi) {
          }
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The door is not open yet.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("DOJO_DOOR_NOT_OPEN"))
          return false
       }
    } else {

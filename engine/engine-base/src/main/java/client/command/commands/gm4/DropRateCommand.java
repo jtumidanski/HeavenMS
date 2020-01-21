@@ -22,7 +22,7 @@ public class DropRateCommand extends Command {
 
       int dropRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setDropRate(dropRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Drop Rate has been changed to " + dropRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DROP_RATE_COMMAND_SUCCESS").with(dropRate));
 
    }
 }

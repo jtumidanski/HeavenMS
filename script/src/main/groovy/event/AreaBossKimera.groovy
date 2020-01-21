@@ -53,7 +53,7 @@ class EventAreaBossKimera {
          int posY = 180
          posX = (Math.floor(Math.random() * 900) - 900).intValue()
          labSecretBasementPath.spawnMonsterOnGroundBelow(chimera, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(labSecretBasementPath, ServerNoticeType.LIGHT_BLUE, "Kimera has appeared out of the darkness of the underground with a glitter in her eyes.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(labSecretBasementPath, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("KIMERA_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

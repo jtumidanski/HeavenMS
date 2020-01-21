@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -11,7 +12,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.playPortalSound()
          pi.warp(130010000, "east00")
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "Due to the lock down you can not enter without a permit.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("NEED_PERMIT"))
          return false
       }
    } else {

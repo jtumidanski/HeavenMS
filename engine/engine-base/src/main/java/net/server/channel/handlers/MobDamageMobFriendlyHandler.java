@@ -7,6 +7,7 @@ import net.server.channel.packet.reader.MobDamageMobFriendlyReader;
 import scripting.event.EventInstanceManager;
 import server.life.MapleMonster;
 import server.maps.MapleMap;
+import tools.I18nMessage;
 import tools.MasterBroadcaster;
 import tools.MessageBroadcaster;
 import tools.PacketCreator;
@@ -34,19 +35,19 @@ public final class MobDamageMobFriendlyHandler extends AbstractPacketHandler<Mob
 
       if (monster.getHp() - damage < 1) {     // friendly dies
          if (monster.id() == 9300102) {
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The Watch Hog has been injured by the aliens. Better luck next time...");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("WATCH_HOG_DIES"));
          } else if (monster.id() == 9300061) {  //moon bunny
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The Moon Bunny went home because he was sick.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MOON_BUNNY_DIES"));
          } else if (monster.id() == 9300093) {   //tylus
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Tylus has fallen by the overwhelming forces of the ambush.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("TYLUS_DIES"));
          } else if (monster.id() == 9300137) {   //juliet
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Juliet has fainted in the middle of the combat.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("JULIET_DIES"));
          } else if (monster.id() == 9300138) {   //romeo
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Romeo has fainted in the middle of the combat.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("ROMEO_DIES"));
          } else if (monster.id() == 9400322 || monster.id() == 9400327 || monster.id() == 9400332) { //snowman
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The Snowman has melted on the heat of the battle.");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("SNOWMAN_DIES"));
          } else if (monster.id() == 9300162) {   //delli
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "Delli vanished after the ambush, sheets still laying on the ground...");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("DELLI_DIES"));
          }
 
          map.killFriendlies(monster);

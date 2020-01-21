@@ -75,7 +75,7 @@ public final class MapleOxQuiz {
          }
          //send question
          if (map.getCharacters().size() - number <= 2) {
-            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, "The event has ended");
+            MessageBroadcaster.getInstance().sendMapServerNotice(map, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("EVENT_END"));
             map.getPortal("join00").setPortalStatus(true);
             map.setOx(null);
             map.setOxQuiz(false);

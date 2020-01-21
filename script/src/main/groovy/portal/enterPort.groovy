@@ -3,6 +3,7 @@ package portal
 import scripting.portal.PortalPlayerInteraction
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -11,7 +12,7 @@ import java.awt.*
 boolean enter(PortalPlayerInteraction pi) {
    if (pi.isQuestStarted(21301) && pi.getQuestProgressInt(21301, 9001013) == 0) {
       if (pi.getPlayerCount(108010700) != 0) {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, "The portal is blocked from the other side. I wonder if someone is already fighting the Thief Crow?")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.PINK_TEXT, I18nMessage.from("SOMEONE_ALREADY_CHALLENGING_THIEF_CROW"))
          return false
       } else {
          MapleMap map = pi.getClient().getChannelServer().getMapFactory().getMap(108010700)

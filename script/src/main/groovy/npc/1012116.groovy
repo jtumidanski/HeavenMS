@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC1012116 {
    int sel = -1
 
    def start() {
-      cm.sendNext("It looks like there's nothing suspicious in the area.")
+      cm.sendNext(I18nMessage.from("1012116_NOTHING_SUSPICIOUS"))
       cm.dispose()
    }
 

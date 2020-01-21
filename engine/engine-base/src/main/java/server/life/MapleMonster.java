@@ -66,6 +66,7 @@ import tools.Pair;
 import tools.Randomizer;
 import tools.ServerNoticeType;
 import tools.I18nMessage;
+import tools.SimpleMessage;
 import tools.packet.PacketInput;
 import tools.packet.field.effect.PlaySound;
 import tools.packet.field.effect.ShowBossHP;
@@ -777,7 +778,7 @@ public class MapleMonster extends AbstractLoadedMapleLife {
          Pair<Integer, String> timeMob = reviveMap.getTimeMob();
          if (timeMob != null) {
             if (toSpawn.contains(timeMob.getLeft())) {
-               MessageBroadcaster.getInstance().sendMapServerNotice(reviveMap, ServerNoticeType.LIGHT_BLUE, timeMob.getRight());
+               MessageBroadcaster.getInstance().sendMapServerNotice(reviveMap, ServerNoticeType.LIGHT_BLUE, SimpleMessage.from(timeMob.getRight()));
             }
          }
 

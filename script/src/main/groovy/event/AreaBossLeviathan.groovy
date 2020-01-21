@@ -53,7 +53,7 @@ class EventAreaBossLeviathan {
          int posY = 1125
          posX = Math.floor((Math.random() * 600) - 300).intValue()
          leviathansCanyon.spawnMonsterOnGroundBelow(leviathan, new Point(posX, posY))
-         MessageBroadcaster.getInstance().sendMapServerNotice(leviathansCanyon, ServerNoticeType.LIGHT_BLUE, "Leviathan emerges from the canyon and the cold icy wind blows.")
+         MessageBroadcaster.getInstance().sendMapServerNotice(leviathansCanyon, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("LEVIATHAN_SUMMONED"))
          em.schedule("start", 3 * 60 * 60 * 1000)
       })
    }

@@ -1,15 +1,13 @@
 package npc
 
-
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Tommy (HPQ)
 	Map(s): 		
 	Description: 	
 */
-
-
 class NPC1012113 {
    NPCConversationManager cm
    int status = -1
@@ -27,12 +25,12 @@ class NPC1012113 {
          status++
          if (cm.getPlayer().getMap().getId() == 910010100) { //Clear map
             if (status == 0) {
-               cm.sendNext("Hello, there! I'm Tommy. There's a Pig Town nearby where we're standing. The pigs there are rowdy and uncontrollable to the point where they have stolen numerous weapons from travelers. They were kicked out from their towns, and are currently hiding out at the Pig Town.")
+               cm.sendNext(I18nMessage.from("1012113_HELLO"))
             } else if (status == 1) {
                if (cm.isEventLeader()) {
-                  cm.sendYesNo("What do you think about making your way there with your party members and teach those rowdy pigs a lesson?")
+                  cm.sendYesNo(I18nMessage.from("1012113_TEACH_THE_PIGS_A_LESSON"))
                } else {
-                  cm.sendOk("Interested? Tell your party leader to talk to me to head there!")
+                  cm.sendOk(I18nMessage.from("1012113_TELL_PARTY_LEADER"))
                   cm.dispose()
                }
             } else if (status == 2) {
@@ -42,14 +40,14 @@ class NPC1012113 {
             }
          } else if (cm.getPlayer().getMap().getId() == 910010200) { //Bonus map
             if (status == 0) {
-               cm.sendYesNo("Would you like to exit the bonus now?")
+               cm.sendYesNo(I18nMessage.from("1012113_EXIT_BONUS"))
             } else {
                cm.warp(910010400)
                cm.dispose()
             }
          } else if (cm.getPlayer().getMap().getId() == 910010300) { //Exit map
             if (status == 0) {
-               cm.sendOk("You will now be warped out, thank you for helping us!")
+               cm.sendOk(I18nMessage.from("1012113_EXIT_EXIT"))
             } else {
                cm.warp(100000200)
                cm.dispose()

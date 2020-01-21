@@ -6,9 +6,9 @@ import client.MapleCharacter;
 import client.MapleClient;
 import client.command.Command;
 import net.server.Server;
+import tools.I18nMessage;
 import tools.MessageBroadcaster;
 import tools.ServerNoticeType;
-import tools.I18nMessage;
 
 public class SaveAllCommand extends Command {
    {
@@ -23,8 +23,7 @@ public class SaveAllCommand extends Command {
             .flatMap(Collection::stream)
             .forEach(MapleCharacter::saveCharToDB);
 
-      String message = player.getName() + " used !saveall.";
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, message);
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.PINK_TEXT, MapleCharacter::isGM, I18nMessage.from("SAVE_ALL_COMMAND_GM_SUCCESS").with(player.getName()));
       MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.PINK_TEXT, I18nMessage.from("SAVE_ALL_COMMAND_SUCCESS"));
    }
 }

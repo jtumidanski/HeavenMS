@@ -22,6 +22,6 @@ public class FishingRateCommand extends Command {
 
       int fishRate = Math.max(Integer.parseInt(params[0]), 1);
       c.getWorldServer().setFishingRate(fishRate);
-      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, "[Rate] Fishing Rate has been changed to " + fishRate + "x.");
+      MessageBroadcaster.getInstance().sendWorldServerNotice(c.getWorld(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("FISH_RATE_COMMAND_SUCCESS").with(fishRate));
    }
 }

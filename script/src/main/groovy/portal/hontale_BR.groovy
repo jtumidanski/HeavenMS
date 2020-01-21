@@ -2,6 +2,7 @@ package portal
 
 
 import scripting.portal.PortalPlayerInteraction
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
 
@@ -11,7 +12,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(240060100, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("HORNTAIL_SEAL"))
          return false
       }
    } else if (pi.getPlayer().getMapId() == 240060100) {
@@ -19,7 +20,7 @@ boolean enter(PortalPlayerInteraction pi) {
          pi.playPortalSound(); pi.warp(240060200, 0)
          return true
       } else {
-         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, "Horntail\'s Seal is Blocking this Door.")
+         MessageBroadcaster.getInstance().sendServerNotice(pi.getPlayer(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("HORNTAIL_SEAL"))
          return false
       }
    }
