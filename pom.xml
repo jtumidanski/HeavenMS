@@ -21,11 +21,6 @@
 
     <repositories>
         <repository>
-            <id>mvnrepository</id>
-            <name>mvn repository</name>
-            <url>https://mvnrepository.com/</url>
-        </repository>
-        <repository>
             <id>scala-tools.org</id>
             <name>Scala-Tools Maven2 Repository</name>
             <url>http://scala-tools.org/repo-releases</url>
