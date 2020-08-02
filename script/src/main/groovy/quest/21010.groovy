@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -11,7 +12,7 @@ class Quest21010 {
       status++
       if (mode != 1) {
          if (type == 15 && mode == 0) {
-            qm.sendNext("Oh, no need to decline my offer. It's no big deal. It's just a potion. Well, let me know if you change your mind.")
+            qm.sendNext(I18nMessage.from("21010_NO_NEED_TO_DECLINE"))
             qm.dispose()
             return
          }
@@ -19,13 +20,13 @@ class Quest21010 {
       }
 
       if (status == 0) {
-         qm.sendNext("Hm, what's a human doing on this island? Wait, it's #p1201000#. What are you doing here, #p1201000#? And who's that beside you? Is it someone you know, #p1201000#? What? The hero, you say?")
+         qm.sendNext(I18nMessage.from("21010_WHATS_A_HUMAN"))
       } else if (status == 1) {
          qm.sendNextPrev("     #i4001170#")//gms like
       } else if (status == 2) {
-         qm.sendNextPrev("Ah, this must be the hero you and your clan have been waiting for. Am I right, #p1201000#? Ah, I knew you weren't just accompanying an average passerby...")
+         qm.sendNextPrev(I18nMessage.from("21010_HAVE_BEEN_WAITING_FOR"))
       } else if (status == 3) {
-         qm.sendAcceptDecline("Oh, but it seems our hero has become very weak since the Black Magician's curse. It's only makes sense, considering that the hero has been asleep for hundreds of years. #bHere, I'll give you a HP Recovery Potion.#k")
+         qm.sendAcceptDecline(I18nMessage.from("21010_OUR_HERO_HAS_BECOME_VERY_WEAK"))
 //nexon probably forgot to remove the '.' before '#k', lol
       } else if (status == 4) {
          if (qm.getPlayer().getHp() >= 50) {
@@ -56,13 +57,13 @@ class Quest21010 {
       }
       if (status == 0) {
          if (qm.c.getPlayer().getHp() < 50) {
-            qm.sendNext("You have't drank the potion yet.")
+            qm.sendNext(I18nMessage.from("21010_HAVE_NOT_HAD_THE_POTION"))
             qm.dispose()
          } else {
-            qm.sendNext("We've been digging and digging inside the Ice Cave in the hope of finding a hero, but I never thought I'd actually see the day... The prophecy was true! You were right, #p1201000#! Now that one of the legendary heroes has returned, we have no reason to fear the Black Magician!")
+            qm.sendNext(I18nMessage.from("21010_DIGGING_AND_DIGGIN"))
          }
       } else if (status == 1) {
-         qm.sendOk("Oh, I've kept you too long. I'm sorry, I got a little carried away. I'm sure the other Penguins feel the same way. I know you're busy, but could you #bstop and talk to the other Penguins#k on your way to town? They would be so honored.\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0# \r\n#i2000022# 5 #t2000022#\r\n#i2000023# 5 #t2000023#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 16 exp")
+         qm.sendOk(I18nMessage.from("21010_I_HAVE_KEPT_YOU_TOO_LONG"))
       } else if (status == 2) {
          if (qm.isQuestStarted(21010) && !qm.isQuestCompleted(21010)) {
             qm.gainExp(16)

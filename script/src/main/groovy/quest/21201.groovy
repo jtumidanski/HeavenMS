@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.quest.QuestActionManager
@@ -13,11 +14,11 @@ class Quest21201 {
 
    def end(Byte mode, Byte type, Integer selection) {
       if (mode == -1) {
-         qm.sendNext("Hey! At least say you tried!")
+         qm.sendNext(I18nMessage.from("21201_AT_LEAST_YOU_TRIED"))
          qm.dispose()
       } else {
          if (mode == 0 && type > 0) {
-            qm.sendNext("Hey! At least say you tried!")
+            qm.sendNext(I18nMessage.from("21201_AT_LEAST_YOU_TRIED"))
             qm.dispose()
             return
          }
@@ -29,26 +30,26 @@ class Quest21201 {
          }
 
          if (status == 0) {
-            qm.sendNext("First you promise to defeat the Black Magician and make me a famous weapon, then you abandon me for hundreds of years, and now you're telling me you don't remember who I am? What the...?! Do you think I will let you get away with that? You're the one who begged and pined for me!")
+            qm.sendNext(I18nMessage.from("21201_FIRST_YOU_PROMISE"))
          } //Giant Polearm
          else if (status == 1) {
             qm.sendNextPrev("I did tell #p1203000# to make a pole arm for me if I could prove my worth.", (byte) 2)
          } else if (status == 2) {
-            qm.sendNextPrev("After all that begging, shouldn't you treat me with a little more love and respect? Ya know, a weapon like me's a rare and wonderful thing. I am the ultimate #p1201001# that can help you defeat the Black Magician. How could you ditch me for hundreds of years?")
+            qm.sendNextPrev(I18nMessage.from("21201_AFTER_ALL_THAT_BEGGING"))
          } else if (status == 3) {
             qm.sendNextPrev("Hey, I never begged for you.", (byte) 2)
          } else if (status == 4) {
-            qm.sendNextPrev("What? You never begged for me? Ha! #p1203000# told me you got on your knees, begged for me in tears, and... Wait a sec. Aran! Did you just remember who I am?")
+            qm.sendNextPrev(I18nMessage.from("21201_YOU_GOT_ON_YOUR_KNEES"))
          } else if (status == 5) {
             qm.sendNextPrev("Maybe a little bit...", (byte) 2)
          } else if (status == 6) {
-            qm.sendNextPrev("Aran, it is you! *Sniff sniff* Wait, *ahem* I didn't get emotional, it's just allergies. I know the Black Magician has stripped you of your abilities so you probably don't even have the strength to lift me... but at least you remember me! I'm glad that your memory's starting to return.")
+            qm.sendNextPrev(I18nMessage.from("21201_JUST_ALLERGIES"))
          } else if (status == 7) {
-            qm.sendAcceptDecline("Even though you've lost your memory, you're still my master. You endured some very tough training in the past, and I'm sure your body still remembers the skills you got through those hard times. Alright, I'll restore your abilities!")
+            qm.sendAcceptDecline(I18nMessage.from("21201_STILL_MY_MASTER"))
          } else if (status == 8) {
             if (!qm.isQuestCompleted(21201)) {
                if (!qm.canHold(1142130)) {
-                  qm.sendOk("Wow, your #bequip#k inventory is full. I need you to make at least 1 empty slot to complete this quest.")
+                  qm.sendOk(I18nMessage.from("21201_INVENTORY_IS_FULL"))
                   return
                }
 
@@ -65,7 +66,7 @@ class Quest21201 {
                qm.completeQuest()
             }
 
-            qm.sendNext("Your level isn't what it used to be back in your glory days, so I can't restore all of your old abilities. But the few I can restore should help you level up faster. Now hurry up and train so you can return to the old you.")
+            qm.sendNext(I18nMessage.from("21201_I_CAN_RESTORE_A_FEW"))
          } else if (status == 9) {
             qm.dispose()
          }

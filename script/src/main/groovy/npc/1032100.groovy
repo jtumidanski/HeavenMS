@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -29,7 +30,7 @@ class NPC1032100 {
             cm.dispose()
             return
          } else if (status == 2 && mode == 0) {
-            cm.sendNext("It's not easy making " + item + ". Please get the materials ready.")
+            cm.sendNext(I18nMessage.from("1032100_GET_THE_MATERIALS_READY").with(item))
             cm.dispose()
             return
          }
@@ -40,24 +41,24 @@ class NPC1032100 {
          }
          if (status == 0) {
             if (cm.getLevel() >= 40) {
-               cm.sendNext("Yeah... I am the master alchemist of the fairies. But the fairies are not supposed to be in contact with a human being for a long period of time... A strong person like you will be fine, though. If you get me the materials, I'll make you a special item.")
+               cm.sendNext(I18nMessage.from("1032100_HELLO"))
             } else {
-               cm.sendOk("I can make rare, valuable items but unfortunately I can't make it to a stranger like you.")
+               cm.sendOk(I18nMessage.from("1032100_HELLO_MORE"))
                cm.dispose()
             }
          } else if (status == 1) {
-            cm.sendSimple("What do you want to make?#b\r\n#L0#Moon Rock#l\r\n#L1#Star Rock#l\r\n#L2#Black Feather#l")
+            cm.sendSimple(I18nMessage.from("1032100_WHAT_DO_YOU_WANT_TO_MAKE"))
          } else if (status == 2) {
             selected = selection
             if (selection == 0) {
                item = "Moon Rock"
-               cm.sendYesNo("So you want to make a Moon Rock? To do that you need to refine one of each of these: #bBronze Plate#k, #bSteel Plate#k,\r\n#bMithril Plate#k, #bAdamantium Plate#k, #bSilver Plate#k, #bOrihalcon Plate#k and #bGold Plate#k. Throw in 10,000 mesos and I'll make it for you.")
+               cm.sendYesNo(I18nMessage.from("1032100_MOON_ROCK"))
             } else if (selection == 1) {
                item = "Star Rock"
-               cm.sendYesNo("So you want to make a Star Rock? To do that you need to refine one of each of these: #bGarnet#k, #bAmethyst#k, #bAquaMarine#k, #bEmerald#k, #bOpal#k, #bSapphire#k, #bTopaz#k, #bDiamond#k and #bBlack Crystal#k. Throw in 15,000 mesos and I'll make it for you.")
+               cm.sendYesNo(I18nMessage.from("1032100_STAR_ROCK"))
             } else if (selection == 2) {
                item = "Black Feather"
-               cm.sendYesNo("So you want to make a Black Feather? To do that you need #b1 Flaming Feather#k, #b1 Moon Rock#k and #b1 Black Crystal#k. Throw in 30,000 mesos and I'll make it for you. Oh yeah, this piece of feather is a very special item, so if you drop it by any chance, it'll disappear, as well as you won't be able to give it away to someone else.")
+               cm.sendYesNo(I18nMessage.from("1032100_BLACK_FEATHER"))
             }
          } else if (status == 3) {
             if (selected == 0) {
@@ -67,9 +68,9 @@ class NPC1032100 {
                      cm.gainItem(i, (short) -1)
                   }
                   cm.gainItem(4011007, (short) 1)
-                  cm.sendNext("Ok here, take " + item + ". It's well-made, probably because I'm using good materials. If you need my help down the road, feel free to come back.")
+                  cm.sendNext(I18nMessage.from("1032100_SUCCESS").with(item))
                } else {
-                  cm.sendNext("Are you sure you have enough mesos? Please check and see if you have the refined #bBronze Plate#k, #bSteel Plate#k,\r\n#bMithril Plate#k, #bAdamantium Plate#k, #bSilver Plate#k, #bOrihalcon Plate#k and #bGold Plate#k, one of each.")
+                  cm.sendNext(I18nMessage.from("1032100_NOT_ENOUGH_MESOS"))
                }
             } else if (selected == 1) {
                if (cm.haveItem(4021000) && cm.haveItem(4021001) && cm.haveItem(4021002) && cm.haveItem(4021003) && cm.haveItem(4021004) && cm.haveItem(4021005) && cm.haveItem(4021006) && cm.haveItem(4021007) && cm.haveItem(4021008) && cm.getMeso() >= 15000) {
@@ -78,9 +79,9 @@ class NPC1032100 {
                      cm.gainItem(j, (short) -1)
                   }
                   cm.gainItem(4021009, (short) 1)
-                  cm.sendNext("Ok here, take " + item + ". It's well-made, probably because I'm using good materials. If you need my help down the road, feel free to come back.")
+                  cm.sendNext(I18nMessage.from("1032100_SUCCESS").with(item))
                } else {
-                  cm.sendNext("Are you sure you have enough mesos? Please check and see if you have the refined #bGarnet#k, #bAmethyst#k, #bAquaMarine#k, #bEmerald#k, #bOpal#k, #bSapphire#k, #bTopaz#k, #bDiamond#k and #bBlack Crystal#k, one of each.")
+                  cm.sendNext(I18nMessage.from("1032100_NOT_ENOUGH_MESOS"))
                }
             } else if (selected == 2) {
                if (cm.haveItem(4001006) && cm.haveItem(4011007) && cm.haveItem(4021008) && cm.getMeso() >= 30000) {
@@ -89,9 +90,9 @@ class NPC1032100 {
                      cm.gainItem(k, (short) -1)
                   }
                   cm.gainItem(4031042, (short) 1)
-                  cm.sendNext("Ok here, take " + item + ". It's well-made, probably because I'm using good materials. If you need my help down the road, feel free to come back.")
+                  cm.sendNext(I18nMessage.from("1032100_SUCCESS").with(item))
                } else {
-                  cm.sendNext("Are you sure you have enough mesos? Please check and see if you have the refined #bGarnet#k, #bAmethyst#k, #bAquaMarine#k, #bEmerald#k, #bOpal#k, #bSapphire#k, #bTopaz#k, #bDiamond#k and #bBlack Crystal#k, one of each.")
+                  cm.sendNext(I18nMessage.from("1032100_NOT_ENOUGH_MESOS"))
                }
             }
             cm.dispose()

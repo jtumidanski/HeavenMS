@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1092007 {
    NPCConversationManager cm
@@ -31,13 +32,13 @@ class NPC1092007 {
          if (status == 0) {
             if (cm.getQuestStatus(2175) == 1) {
                if (cm.getPlayer().canHold(2030019)) {
-                  cm.sendOk("Please take this #b#t2030019##k, it will make your life a lot easier.  #i2030019#")
+                  cm.sendOk(I18nMessage.from("1092007_TAKE_THIS"))
                } else {
-                  cm.sendOk("No free inventory spot available. Please make room in your USE inventory first.")
+                  cm.sendOk(I18nMessage.from("1092007_NO_FREE_INVENTORY"))
                   cm.dispose()
                }
             } else {
-               cm.sendOk("The Black Magician and his followers. Kyrin and the Crew of Nautilus. \n They'll be chasing one another until one of them doesn't exist, that's for sure.")
+               cm.sendOk(I18nMessage.from("1092007_CHASING_ONE_ANOTHER"))
                cm.dispose()
             }
          } else if (status == 1) {

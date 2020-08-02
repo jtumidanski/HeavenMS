@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -36,23 +37,23 @@ class NPC1072003 {
 
          if (status == 0) {
             if (cm.isQuestCompleted(100010)) {
-               cm.sendOk("You're truly a hero!")
+               cm.sendOk(I18nMessage.from("1072003_TRUE_HERO"))
                cm.dispose()
             } else if (cm.isQuestCompleted(100009)) {
-               cm.sendNext("Alright I'll let you in! Defeat the monsters inside, collect 30 Dark Marbles, then strike up a conversation with a colleague of mine inside. He'll give you #bThe Proof of a Hero#k, the proof that you've passed the test. Best of luck to you.")
+               cm.sendNext(I18nMessage.from("1072003_ILL_LET_YOU_IN"))
                status = 3
             } else if (cm.isQuestStarted(100009)) {
-               cm.sendNext("Oh, isn't this a letter from the #bDark Lord#k?")
+               cm.sendNext(I18nMessage.from("1072003_ISNT_THIS_A_LETTER"))
             } else {
-               cm.sendOk("I can show you the way once your ready for it.")
+               cm.sendOk(I18nMessage.from("1072003_ONCE_YOU_ARE_READY"))
                cm.dispose()
             }
          } else if (status == 1) {
-            cm.sendNextPrev("So you want to prove your skills? Very well...")
+            cm.sendNextPrev(I18nMessage.from("1072003_SO_YOU_WANT_TO"))
          } else if (status == 2) {
-            cm.sendAcceptDecline("I will give you a chance if you're ready.")
+            cm.sendAcceptDecline(I18nMessage.from("1072003_IF_YOU_ARE_READY"))
          } else if (status == 3) {
-            cm.sendOk("You will have to collect me #b30 #t4031013##k. Good luck.")
+            cm.sendOk(I18nMessage.from("1072003_COLLECT_MARBLES"))
             cm.completeQuest(100009)
             cm.startQuest(100010)
             cm.gainItem(4031011, (short) -1)

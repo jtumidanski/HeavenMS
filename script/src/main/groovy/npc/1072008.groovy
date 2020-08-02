@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -37,20 +38,20 @@ class NPC1072008 {
          if (status == 0) {
             if (cm.getMapId() == 108000502) {
                if (!(cm.haveItem(4031856, 15))) {
-                  cm.sendSimple("You haven't brought me all the crystals yet. I'm looking forward for your progress, mate! \r\n#b#L1#I would like to leave#l")
+                  cm.sendSimple(I18nMessage.from("1072008_MISSING_CRYSTALS"))
                } else {
                   status++
-                  cm.sendNext("Wow, you have brought me 15 #b#t4031856##k! Congratulations. Let me warp you out now.")
+                  cm.sendNext(I18nMessage.from("1072008_CONGRATULATIONS"))
                }
             } else if (cm.getMapId() == 108000501) {
                if (!(cm.haveItem(4031857, 15))) {
-                  cm.sendSimple("You haven't brought me all the crystals yet. I'm looking forward for your progress, mate! \r\n#b#L1#I would like to leave#l")
+                  cm.sendSimple(I18nMessage.from("1072008_MISSING_CRYSTALS"))
                } else {
                   status++
-                  cm.sendNext("Wow, you have brought me 15 #b#t4031857##k! Congratulations. Let me warp you out now.")
+                  cm.sendNext(I18nMessage.from("1072008_CONGRATULATIONS"))
                }
             } else {
-               cm.sendNext("Error. Please report this.")
+               cm.sendNext(I18nMessage.from("1072008_ERROR"))
                cm.dispose()
             }
          } else if (status == 1) {

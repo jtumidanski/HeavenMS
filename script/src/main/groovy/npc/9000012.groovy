@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,7 +18,7 @@ class NPC9000012 {
 
    def start() {
       status = -1
-      cm.sendSimple("Man... It is hot!!!~ How can I help you?\r\n#L0##bLeave the event game.#l\r\n#L1#Buy the weapon (Wooden Club 1 meso)")
+      cm.sendSimple(I18nMessage.from("9000012_IT_IS_HOT"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -34,10 +35,10 @@ class NPC9000012 {
       }
       if (status == 0) {
          if (selection == 0) {
-            cm.sendYesNo("If you leave now, you can't participate in this event for the next 24 hours. Are you sure you want to leave?")
+            cm.sendYesNo(I18nMessage.from("9000012_IF_YOU_LEAVE_NOW"))
          } else if (selection == 1) {
             if (cm.getMeso() < 1 && !cm.canHold(1322005)) {
-               cm.sendOk("You don't have enough mesos or you don't have any space in your inventory.")
+               cm.sendOk(I18nMessage.from("9000012_NOT_ENOUGH_MESOS_OR_INVENTORY_SPACE"))
                cm.dispose()
             } else {
                cm.gainItem(1322005)

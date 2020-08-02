@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,20 +17,20 @@ class NPC9270017 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("The plane will be taking off soon, will you leave now? You will have to buy the plane ticket again to come in here.")
+      cm.sendYesNo(I18nMessage.from("9270017_TAKING_OFF_SOON"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendOk("Please hold on for a sec, and plane will be taking off. Thanks for your patience.")
+            cm.sendOk(I18nMessage.from("9270017_HOLD_ON"))
          }
          cm.dispose()
          return
       }
       status++
       if (status == 1) {
-         cm.sendNext("The ticket is not refundable, hope to see you again!")
+         cm.sendNext(I18nMessage.from("9270017_NOT_REFUNDABLE"))
       } else if (status == 2) {
          cm.warp(103000000)
          cm.dispose()

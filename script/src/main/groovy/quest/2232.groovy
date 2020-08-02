@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.MapleFamilyEntry
 import scripting.quest.QuestActionManager
@@ -12,9 +13,9 @@ class Quest2232 {
       if (familyEntry != null && familyEntry.getJuniorCount() > 0) {
          qm.forceCompleteQuest()
          qm.gainExp(3000)
-         qm.sendNext("Good job!")
+         qm.sendNext(I18nMessage.from("2232_GOOD_JOB"))
       } else {
-         qm.sendNext("I see that you have not successfully find a Junior, ok?")
+         qm.sendNext(I18nMessage.from("2232_NOT_SUCCESSFUL"))
       }
       qm.dispose()
    }
@@ -24,9 +25,9 @@ class Quest2232 {
       if (familyEntry != null && familyEntry.getJuniorCount() > 0) {
          qm.forceCompleteQuest()
          qm.gainExp(3000)
-         qm.sendNext("Good job!")
+         qm.sendNext(I18nMessage.from("2232_GOOD_JOB"))
       } else {
-         qm.sendNext("I see that you have not successfully find a Junior, ok?")
+         qm.sendNext(I18nMessage.from("2232_NOT_SUCCESSFUL"))
       }
       qm.dispose()
    }

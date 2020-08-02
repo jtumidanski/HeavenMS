@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -36,9 +37,9 @@ class NpcGachapon {
          }
          if (status == 0 && mode == 1) {
             if (cm.haveItem(ticketId)) {
-               cm.sendYesNo("You may use the " + curMapName + " Gachapon. Would you like to use your Gachapon ticket?")
+               cm.sendYesNo(I18nMessage.from("gachapon_USE_YOUR_TICKET").with(curMapName))
             } else {
-               cm.sendSimple("Welcome to the " + curMapName + " Gachapon. How may I help you?\r\n\r\n#L0#What is Gachapon?#l\r\n#L1#Where can you buy Gachapon tickets?#l")
+               cm.sendSimple(I18nMessage.from("gachapon_WELCOME").with(curMapName))
             }
          } else if (status == 1 && cm.haveItem(ticketId)) {
             if (cm.canHold(1302000) && cm.canHold(2000000) && cm.canHold(3010001) && cm.canHold(4000000)) {
@@ -46,17 +47,17 @@ class NpcGachapon {
                cm.gainItem(ticketId, (short) -1)
                cm.doGachapon()
             } else {
-               cm.sendOk("Please have at least one slot in your #rEQUIP, USE, SET-UP, #kand #rETC#k inventories free.")
+               cm.sendOk(I18nMessage.from("gachapon_NEED_INVENTORY_SPACE_FREE"))
             }
             cm.dispose()
          } else if (status == 1) {
             if (selection == 0) {
-               cm.sendNext("Play Gachapon to earn rare scrolls, equipment, chairs, mastery books, and other cool items! All you need is a #bGachapon Ticket#k to be the winner of a random mix of items.")
+               cm.sendNext(I18nMessage.from("gachapon_GACHAPON_DETAIL"))
             } else {
-               cm.sendNext("Gachapon Tickets are available in the #rCash Shop#k and can be purchased using NX or Maple Points. Click on the red SHOP at the lower right hand corner of the screen to visit the #rCash Shop#k where you can purchase tickets.")
+               cm.sendNext(I18nMessage.from("gachapon_TICKET_DETAIL"))
             }
          } else if (status == 2) {
-            cm.sendNextPrev("You'll find a variety of items from the " + curMapName + " Gachapon, but you'll most likely find items and scrolls related to " + curMapName + ".")
+            cm.sendNextPrev(I18nMessage.from("gachapon_VARIETY_OF_ITEMS").with(curMapName, curMapName))
          } else {
             cm.dispose()
          }

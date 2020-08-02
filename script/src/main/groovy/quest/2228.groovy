@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2228 {
          }
 
          if (status == 0) {
-            qm.sendNext("Thank you for defeating #rFaust#k. That will finally settle my spirit to rest.")
+            qm.sendNext(I18nMessage.from("2228_THANK_YOU"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainFame(8)

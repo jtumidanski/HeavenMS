@@ -2,6 +2,8 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
 
 /*
 	NPC Name: 		
@@ -16,13 +18,12 @@ class NPC1052007 {
    int sel = -1
 
    int ticketSelection = -1
-   String text = "Here's the ticket reader."
    boolean hasTicket = false
    boolean NLC = false
    EventManager em
 
    def start() {
-      cm.sendSimple("Pick your destination.\n\r\n#L0##bKerning Square Shopping Center#l\n\n\r\n#L1#Enter Construction Site#l\r\n#L2#New Leaf City#l")
+      cm.sendSimple(I18nMessage.from("1052007_PICK_YOUR_DESTINATION"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -41,33 +42,33 @@ class NPC1052007 {
          if (selection == 0) {
             EventManager em = cm.getEventManager("KerningTrain")
             if (!em.startInstance(cm.getPlayer())) {
-               cm.sendOk("The passenger wagon is already full. Try again a bit later.")
+               cm.sendOk(I18nMessage.from("1052007_ALREADY_FULL"))
             }
             cm.dispose()
          } else if (selection == 1) {
             if (cm.haveItem(4031036) || cm.haveItem(4031037) || cm.haveItem(4031038)) {
-               text += " You will be brought in immediately. Which ticket you would like to use?#b"
+               String text = I18nMessage.from("1052007_WHICH_TICKET").to(cm.getClient()).evaluate()
                for (def i = 0; i < 3; i++) {
                   if (cm.haveItem(4031036 + i)) {
                      text += "\r\n#b#L" + (i + 1) + "##t" + (4031036 + i) + "#"
                   }
                }
-               cm.sendSimple(text)
+               cm.sendSimple(SimpleMessage.from(text))
                hasTicket = true
             } else {
-               cm.sendOk("It seems as though you don't have a ticket!")
+               cm.sendOk(I18nMessage.from("1052007_NEED_A_TICKET"))
                cm.dispose()
             }
          } else if (selection == 2) {
             if (!cm.haveItem(4031711) && cm.getPlayer().getMapId() == 103000100) {
-               cm.sendOk("It seems you don't have a ticket! You can buy one from Bell.")
+               cm.sendOk(I18nMessage.from("1052007_NEED_A_TICKET_BUY_ONE_FROM_BELL"))
                cm.dispose()
                return
             }
             if (em.getProperty("entry") == "true") {
-               cm.sendYesNo("It looks like there's plenty of room for this ride. Please have your ticket ready so I can let you in. The ride will be long, but you'll get to your destination just fine. What do you think? Do you want to get on this ride?")
+               cm.sendYesNo(I18nMessage.from("1052007_DO_YOU_WANT_TO_GET_ON"))
             } else {
-               cm.sendNext("We will begin boarding 1 minute before the takeoff. Please be patient and wait for a few minutes. Be aware that the subway will take off right on time, and we stop receiving tickets 1 minute before that, so please make sure to be here on time.")
+               cm.sendNext(I18nMessage.from("1052007_PLEASE_BE_PATIENT"))
                cm.dispose()
             }
          }
@@ -85,7 +86,7 @@ class NPC1052007 {
 
          if (cm.haveItem(4031711)) {
             if (em.getProperty("entry") == "false") {
-               cm.sendNext("We will begin boarding 1 minute before the takeoff. Please be patient and wait for a few minutes. Be aware that the subway will take off right on time, and we stop receiving tickets 1 minute before that, so please make sure to be here on time.")
+               cm.sendNext(I18nMessage.from("1052007_PLEASE_BE_PATIENT"))
             } else {
                cm.gainItem(4031711, (short) -1)
                cm.warp(600010004)

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -29,10 +30,10 @@ class NPC2131001 {
          return
       }
       if (status == 0) {
-         cm.sendSimple("My name is #p2131001#, I am the strongest magician around these parts.#b\r\n#L0#Hey, take these rubbles. You can perform your magic on them.#l")
+         cm.sendSimple(I18nMessage.from("2131001_HELLO"))
       } else if (status == 1) {
          if (!cm.haveItem(exchangeItem, 100)) {
-            cm.sendNext("You don't have enough... I need at least 100.")
+            cm.sendNext(I18nMessage.from("2131001_NEED_AT_LEAST_100"))
             cm.dispose()
          } else {
             double quantity = (cm.itemQuantity(exchangeItem) / 100)
@@ -42,11 +43,11 @@ class NPC2131001 {
       } else if (status == 2) {
          if (selection >= 1 && selection <= cm.itemQuantity(exchangeItem) / 100) {
             if (!cm.canHold(4310000, selection)) {
-               cm.sendOk("Please make some space in ETC tab.")
+               cm.sendOk(I18nMessage.from("2131001_MAKE_SOME_ETC_SPACE"))
             } else {
                cm.gainItem(4310000, (short) selection)
                cm.gainItem(exchangeItem, (short) -(selection * 100))
-               cm.sendOk("Thanks!")
+               cm.sendOk(I18nMessage.from("2131001_THANKS"))
             }
          }
          cm.dispose()

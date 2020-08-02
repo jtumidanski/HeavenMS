@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -22,7 +23,7 @@ class NPC9201069 {
    int[] faceNew = []
 
    def start() {
-      cm.sendSimple("Well, hello! Welcome to the New Leaf City Plastic Surgery! Would you like to transform your face into something new? With a #b#t5152034##k, you can let us take care of the rest and have the face you've always wanted~!\r\n#L2#Plastic Surgery: #i5152034##t5152034##l")
+      cm.sendSimple(I18nMessage.from("9201069_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -53,9 +54,9 @@ class NPC9201069 {
             if (cm.haveItem(5152034)) {
                cm.gainItem(5152034, (short) -1)
                cm.setFace(faceNew[selection])
-               cm.sendOk("Enjoy your new and improved face!")
+               cm.sendOk(I18nMessage.from("9201069_ENJOY_NEW_FACE"))
             } else {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("9201069_MISSING_SURGERY_COUPON"))
             }
 
             cm.dispose()

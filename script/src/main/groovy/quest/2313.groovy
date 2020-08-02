@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,16 +14,16 @@ class Quest2313 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("There's not much time. Please hurry.")
+            qm.sendOk(I18nMessage.from("2313_NOT_MUCH_TIME"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("I have told our #bMinister of Home Affairs#k of your abilities. Please go pay a visit to him immediately.")
+         qm.sendAcceptDecline(I18nMessage.from("2313_GO_PAY_A_VISIT"))
       } else if (status == 1) {
          qm.forceStartQuest()
-         qm.sendOk("Save our kingdom! We believe in you!")
+         qm.sendOk(I18nMessage.from("2313_WE_BELIEVE"))
       } else if (status == 2) {
          qm.dispose()
       }

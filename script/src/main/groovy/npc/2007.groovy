@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 
@@ -18,11 +19,11 @@ class NPC2007 {
 
     def action(Byte mode, Byte type, Integer selection) {
         if (mode == -1) {
-            cm.sendNext("Enjoy your trip.")
+            cm.sendNext(I18nMessage.from("2007_ENJOY"))
             cm.dispose()
         } else {
             if (status == 0 && mode == 0) {
-                cm.sendNext("Enjoy your trip.")
+                cm.sendNext(I18nMessage.from("2007_ENJOY"))
                 cm.dispose()
             }
             if (mode == 1)
@@ -30,7 +31,7 @@ class NPC2007 {
             else
                 status--
             if (status == 0)
-                cm.sendYesNo("Would you like to skip the tutorials and head straight to Lith Harbor?")
+                cm.sendYesNo(I18nMessage.from("2007_WOULD_YOU_LIKE_TO_SKIP_THE_TUTORIALS"))
             else if (status == 1) {
                 cm.warp(104000000, 0)
                 cm.dispose()

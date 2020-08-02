@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1061010 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("Would you like to leave?")
+            cm.sendYesNo(I18nMessage.from("1061010_WOULD_YOU_LIKE_TO_LEAVE"))
          } else if (status == 1) {
             int mapId = cm.getMapId()
             int exitId = mapId

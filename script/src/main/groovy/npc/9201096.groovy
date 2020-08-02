@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -34,7 +35,7 @@ class NPC9201096 {
       if (mode == 1) {
          status++
       } else {
-         cm.sendOk("Very well, see you around.")
+         cm.sendOk(I18nMessage.from("9201096_VERY_WELL"))
          cm.dispose()
          return
       }
@@ -94,9 +95,9 @@ class NPC9201096 {
          boolean complete = true
 
          if (cm.getMeso() < cost * qty) {
-            cm.sendOk("Well, I DID say I would be needing some funds to craft it, wasn't it?")
+            cm.sendOk(I18nMessage.from("9201096_NEED_FUNDS"))
          } else if (!cm.canHold(item, qty)) {
-            cm.sendOk("You didn't check if you got a slot to spare on your inventory before crafting, right?")
+            cm.sendOk(I18nMessage.from("9201096_NEED_SPARE_SLOT"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; complete && i < mats.size(); i++) {
@@ -111,7 +112,7 @@ class NPC9201096 {
             }
 
             if (!complete) {
-               cm.sendOk("There are not enough resources on your inventory. Please check it again.")
+               cm.sendOk(I18nMessage.from("9201096_NOT_ENOUGH_RESOURCES"))
             } else {
                if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                   for (int i = 0; i < mats.size(); i++) {
@@ -122,7 +123,7 @@ class NPC9201096 {
                }
                cm.gainMeso(-cost * qty)
                cm.gainItem(item, (short) qty)
-               cm.sendOk("There it is! Thanks for your cooperation.")
+               cm.sendOk(I18nMessage.from("9201096_THERE_IT_IS"))
             }
          }
          cm.dispose()

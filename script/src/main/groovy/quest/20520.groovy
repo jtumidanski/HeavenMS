@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -20,13 +21,13 @@ class Quest20520 {
       }
 
       if (status == 0) {
-         qm.sendNext("Wow, you have already reach Level 50, yet why are you still walking around like that? I mean, you've reached Level 50, but you are still walking around with your own feet. That's unusual behavior for a Knight like you.")
+         qm.sendNext(I18nMessage.from("20520_WOW_YOU_ALREADY"))
       } else if (status == 1) {
-         qm.sendAcceptDecline("Well, I suppose it's up to you, but by doing that, you also risk marring the pride and honor of the Empress. This is why I am here to give you a helpful pointer. It's called #bMonster Riding#k. Of course you're interested in this, right?")
+         qm.sendAcceptDecline(I18nMessage.from("20520_RISK_MARRING_THE_PRIDE"))
       } else if (status == 2) {
          qm.forceStartQuest()
          qm.forceCompleteQuest()
-         qm.sendOk("There's a special mount that only the Cygnus Knights can enjoy. If you are interested, visit #bEreve#k. I will give you more information on it.")
+         qm.sendOk(I18nMessage.from("20520_SPECIAL_MOUNT"))
       } else if (status == 3) {
          qm.dispose()
       }

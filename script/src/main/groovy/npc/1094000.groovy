@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC1094000 {
    int sel = -1
 
    def start() {
-      cm.sendOk("I need to keep my eyes wide open to look for the enemy although my sea gull friends help me out so it's not all that bad.")
+      cm.sendOk(I18nMessage.from("1094000_EYES_OPEN"))
       cm.dispose()
    }
 

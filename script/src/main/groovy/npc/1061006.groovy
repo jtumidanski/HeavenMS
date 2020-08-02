@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -21,7 +22,7 @@ class NPC1061006 {
    int selectedMap = -1
 
    def start() {
-      cm.sendNext("You feel a mysterious force surrounding this statue.")
+      cm.sendNext(I18nMessage.from("1061006_MYSTERIOUS_FORCE"))
       if (cm.isQuestStarted(2054) || cm.isQuestCompleted(2054)) {
          zones = 3
       } else if (cm.isQuestStarted(2053) || cm.isQuestCompleted(2053)) {
@@ -38,7 +39,7 @@ class NPC1061006 {
          cm.dispose()
       } else {
          if (status >= 2 && mode == 0) {
-            cm.sendOk("Alright, see you next time.")
+            cm.sendOk(I18nMessage.from("1061006_SEE_YOU_NEXT_TIME"))
             cm.dispose()
             return
          }

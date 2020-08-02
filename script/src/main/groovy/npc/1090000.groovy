@@ -4,6 +4,7 @@ import constants.game.GameConstants
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import server.life.MaplePlayerNPC
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -30,30 +31,30 @@ class NPC1090000 {
       if (cm.isQuestStarted(6330)) {
          if (cm.getEventInstance() != null) {
             advQuest = 5
-            cm.sendNext("Not bad at all. Let's discuss this outside!")
+            cm.sendNext(I18nMessage.from("1090000_NOT_BAD"))
          } else if (cm.getQuestProgressInt(6330, 6331) == 0) {
             advQuest = 1
-            cm.sendNext("You're ready, right? Now try to withstand my attacks for 2 minutes. I won't go easy on you. Good luck, because you will need it.")
+            cm.sendNext(I18nMessage.from("1090000_READY_RIGHT"))
          } else {
             advQuest = 3
             cm.teachSkill(5121003, (byte) 0, (byte) 10, -1)
             cm.forceCompleteQuest(6330)
 
-            cm.sendNext("Congratulations. You have managed to pass my test. I'll teach you a new skill called \"Super Transformation\".\r\n\r\n  #s5121003#    #b#q5121003##k")
+            cm.sendNext(I18nMessage.from("1090000_CONGRATULATIONS_TRANSFORMATION"))
          }
       } else if (cm.isQuestStarted(6370)) {
          if (cm.getEventInstance() != null) {
             advQuest = 6
-            cm.sendNext("Not bad at all. Let's discuss this outside!")
+            cm.sendNext(I18nMessage.from("1090000_NOT_BAD"))
          } else if (cm.getQuestProgressInt(6370, 6371) == 0) {
             advQuest = 2
-            cm.sendNext("You're ready, right? Now try to withstand my attacks for 2 minutes. I won't go easy on you. Good luck, because you will need it.")
+            cm.sendNext(I18nMessage.from("1090000_READY_RIGHT"))
          } else {
             advQuest = 4
             cm.teachSkill(5221006, (byte) 0, (byte) 10, -1)
             cm.forceCompleteQuest(6370)
 
-            cm.sendNext("Congratulations. You have managed to pass my test. I'll teach you a new skill called \"Battleship\".\r\n\r\n  #s5221006#    #b#q5221006##k")
+            cm.sendNext(I18nMessage.from("1090000_CONGRATULATIONS_BATTLE_SHIP"))
          }
       } else if ((cm.getJobId() / 100).intValue() == jobType && cm.canSpawnPlayerNpc(GameConstants.getHallOfFameMapId(cm.getJob()))) {
          spawnPlayerNpc = true
@@ -67,25 +68,25 @@ class NPC1090000 {
       } else {
          if (cm.getJobId() == 0) {
             action["1stJob"] = true
-            cm.sendNext("Want to be a #rpirate#k? There are some standards to meet. because we can't just accept EVERYONE in... #bYour level should be at least 10, with " + cm.getFirstJobStatRequirement(jobType) + " minimum#k. Let's see.")
+            cm.sendNext(I18nMessage.from("1090000_WANT_TO_BE_A_PIRATE").with(cm.getFirstJobStatRequirement(jobType)))
          } else if (cm.getLevel() >= 30 && cm.getJobId() == 500) {
             action["2ndJob"] = true
             if (cm.isQuestCompleted(2191) || cm.isQuestCompleted(2192)) {
-               cm.sendNext("I see you have done well. I will allow you to take the next step on your long road.")
+               cm.sendNext(I18nMessage.from("1090000_ALLOW_YOU"))
             } else {
-               cm.sendNext("The progress you have made is astonishing.")
+               cm.sendNext(I18nMessage.from("1090000_PROGRESS"))
             }
          } else if (action["3thJobI"] || (cm.getPlayer().gotPartyQuestItem("JB3") && cm.getLevel() >= 70 && cm.getJobId() % 10 == 0 && (cm.getJobId() / 100).intValue() == 5 && !cm.getPlayer().gotPartyQuestItem("JBP"))) {
             action["3thJobI"] = true
-            cm.sendNext("There you are. A few days ago, #b#p2020013##k of Ossyria talked to me about you. I see that you are interested in making the leap to the world of the third job advancement for pirates. To achieve that goal, I will have to test your strength in order to see whether you are worthy of the advancement. There is an opening in the middle of a cave on Victoria Island, where it'll lead you to a secret passage. Once inside, you'll face a clone of myself. Your task is to defeat him and bring #b#t4031059##k back with you.")
+            cm.sendNext(I18nMessage.from("1090000_THERE_YOU_ARE"))
          } else if (cm.getPlayer().gotPartyQuestItem("JBP") && !cm.haveItem(4031059)) {
-            cm.sendNext("Please, bring me the #b#t4031059##k.")
+            cm.sendNext(I18nMessage.from("1090000_BRING_ME"))
             cm.dispose()
          } else if (cm.haveItem(4031059) && cm.getPlayer().gotPartyQuestItem("JBP")) {
             action["3thJobC"] = true
-            cm.sendNext("Nice work. You have defeated my clone and brought #b#t4031059##k back safely. You have now proven yourself worthy of the 3rd job advancement from the physical standpoint. Now you should give this necklace to #b#p2020013##k in Ossyria to take on the second part of the test. Good luck. You'll need it.")
+            cm.sendNext(I18nMessage.from("1090000_DEFEATED_CLONE"))
          } else {
-            cm.sendOk("You have chosen wisely.")
+            cm.sendOk(I18nMessage.from("1090000_CHOSEN_WISELY"))
             cm.dispose()
          }
       }
@@ -108,13 +109,13 @@ class NPC1090000 {
             if (advQuest < 3) {
                EventManager em = cm.getEventManager(advQuest == 1 ? "4jship" : "4jsuper")
                if (!em.startInstance(cm.getPlayer())) {
-                  cm.sendOk("Someone is already challenging the test. Please try again later.")
+                  cm.sendOk(I18nMessage.from("1090000_SOMEONE_IS_ALREADY_CHALLENGING"))
                }
             } else if (advQuest < 5) {
                if (advQuest == 3) {
-                  cm.sendOk("It is similar to that of 'Transformation', but it's much more powerful than that. Keep training, and hope to see you around.")
+                  cm.sendOk(I18nMessage.from("1090000_SIMILAR_TO_TRANSFORMATION"))
                } else {
-                  cm.sendOk("Unlike most of the other skills you used as a Pirate, this one definitely is different. You can actually ride the 'Battleship' and attack enemies with it. Your DEF level will increase for the time you're on board, so that'll help you tremendously in combat situations. May you become the best Gunslinger out there...")
+                  cm.sendOk(I18nMessage.from("1090000_DEFINITELY_DIFFERENT"))
                }
             } else {
                if (advQuest < 6) {
@@ -129,16 +130,16 @@ class NPC1090000 {
          } else if (spawnPlayerNpc) {
             if (mode > 0) {
                if (cm.getMeso() < spawnPlayerNpcFee) {
-                  cm.sendOk("Sorry, you don't have enough mesos to purchase your place on the Hall of Fame.")
+                  cm.sendOk(I18nMessage.from("1090000_NOT_ENOUGH_MESOS"))
                   cm.dispose()
                   return
                }
 
                if (MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapId(cm.getJob()), cm.getPlayer())) {
-                  cm.sendOk("There you go! Hope you will like it.")
+                  cm.sendOk(I18nMessage.from("1090000_THERE_YOU_GO"))
                   cm.gainMeso(-spawnPlayerNpcFee)
                } else {
-                  cm.sendOk("Sorry, the Hall of Fame is currently full...")
+                  cm.sendOk(I18nMessage.from("1090000_FULL"))
                }
             }
 
@@ -147,7 +148,7 @@ class NPC1090000 {
          } else {
             if (mode != 1 || status == 7 && type != 1 || (action["1stJob"] && status == 4) || (cm.haveItem(4031008) && status == 2) || (action["3thJobI"] && status == 1)) {
                if (mode == 0 && status == 2 && type == 1) {
-                  cm.sendOk("You know there is no other choice...")
+                  cm.sendOk(I18nMessage.from("1090000_NO_OTHER_CHOICE"))
                }
                if (!(mode == 0 && type != 1)) {
                   cm.dispose()
@@ -160,9 +161,9 @@ class NPC1090000 {
       if (action["1stJob"]) {
          if (status == 0) {
             if (cm.getLevel() >= 10 && cm.canGetFirstJob(jobType)) {
-               cm.sendYesNo("Oh...! You look like someone that can definitely be a part of us... all you need is a little slang, and... yeah... so, what do you think? Wanna be the Pirate?")
+               cm.sendYesNo(I18nMessage.from("1090000_WANNA_BE_A_PIRATE"))
             } else {
-               cm.sendOk("Train a bit more until you reach the base requirements and I can show you the way of the #rPirate#k.")
+               cm.sendOk(I18nMessage.from("1090000_TRAIN_A_BIT_MORE"))
                cm.dispose()
             }
          } else if (status == 1) {
@@ -174,41 +175,41 @@ class NPC1090000 {
                   cm.gainItem(2330000, (short) 1000)
                   cm.resetStats()
                }
-               cm.sendNext("Alright, from here out, you are a part of us! You'll be living the life of a wanderer at ..., but just be patient as soon, you'll be living the high life. Alright, it ain't much, but I'll give you some of my abilities... HAAAHHH!!!")
+               cm.sendNext(I18nMessage.from("1090000_YOU_ARE_PART_OF_US"))
             } else {
-               cm.sendNext("Make some room in your inventory and talk back to me.")
+               cm.sendNext(I18nMessage.from("1090000_MAKE_SOME_INVENTORY_ROOM"))
                cm.dispose()
             }
          } else if (status == 2) {
-            cm.sendNextPrev("You've gotten much stronger now. Plus every single one of your inventories have added slots. A whole row, to be exact. Go see for it yourself. I just gave you a little bit of #bSP#k. When you open up the #bSkill#k menu on the lower left corner of the screen, there are skills you can learn by using SP's. One warning, though: You can't raise it all together all at once. There are also skills you can acquire only after having learned a couple of skills first.")
+            cm.sendNextPrev(I18nMessage.from("1090000_MUCH_STRONGER_NOW"))
          } else if (status == 3) {
-            cm.sendNextPrev("Now a reminder. Once you have chosen, you cannot change up your mind and try to pick another path. Go now, and live as a proud Pirate.")
+            cm.sendNextPrev(I18nMessage.from("1090000_CANNOT_CHANGE_YOUR_MIND"))
          } else {
             cm.dispose()
          }
       } else if (action["2ndJob"]) {
          if (status == 0) {
             if (cm.isQuestCompleted(2191) || cm.isQuestCompleted(2192)) {
-               cm.sendSimple("Alright, when you have made your decision, click on [I'll choose my occupation] at the bottom.#b\r\n#L0#Please explain to me what being the Brawler is all about.\r\n#L1#Please explain to me what being the Gunslinger is all about.\r\n#L3#I'll choose my occupation!")
+               cm.sendSimple(I18nMessage.from("1090000_INFO"))
             } else {
-               cm.sendNext("Good decision. You look strong, but I need to see if you really are strong enough to pass the test, it's not a difficult test, so you'll do just fine.")
+               cm.sendNext(I18nMessage.from("1090000_GOOD_DECISION"))
             }
          } else if (status == 1) {
             if (!cm.isQuestCompleted(2191) && !cm.isQuestCompleted(2192)) {
                // Pirate works differently from the other jobs. It warps you directly in.
                action["2ndJobT"] = true
-               cm.sendYesNo("Would you like to take the test now?")
+               cm.sendYesNo(I18nMessage.from("1090000_WOULD_YOU_LIKE_TO_TAKE_THE_TEST"))
             } else {
                if (selection < 3) {
                   if (selection == 0) {    //brawler
-                     cm.sendNext("Pirates that master #rKnuckles#k.\r\n\r\n#bBrawlers#k are melee, close-ranged fist fighters who deal lots of damage and have high HP. Armed with #rCorkscrew Blow#k, one can deal massive damage to multiple targets at once. #rOak Barrel#k permits one to scout or disguise themselves in middle of difficult fights, enabling a possible escaping route in front of danger.")
+                     cm.sendNext(I18nMessage.from("1090000_BRAWLER_INFO"))
                   } else if (selection == 1) {    //gunslinger
-                     cm.sendNext("Pirates that master #rGuns#k.\r\n\r\n#bGunslingers#k are faster and ranged attackers. With the #rWings#k skill, Gunslingers can hover in the air, allowing for a longer, more sustained jump than a regular jump. #rBlank Shot#k allows to deal Stun status to multiple targets nearby.")
+                     cm.sendNext(I18nMessage.from("1090000_GUNSLINGER_INFO"))
                   }
 
                   status -= 2
                } else {
-                  cm.sendNextPrev("You have a long road ahead of you still, but being a pirate will help you get there. Just keep that in mind and you will do fine.")
+                  cm.sendNextPrev(I18nMessage.from("1090000_LONG_ROAD"))
                }
             }
          } else if (status == 2) {
@@ -220,7 +221,7 @@ class NPC1090000 {
                   map = 108000501
                }
                if (cm.getPlayerCount(map) > 0) {
-                  cm.sendOk("All the training maps are currently in use. Please try again later.")
+                  cm.sendOk(I18nMessage.from("1090000_TRAINING_MAPS_IN_USE"))
                   cm.dispose()
                } else {
                   cm.warp(map, 0)
@@ -235,7 +236,7 @@ class NPC1090000 {
                   job = 520
                }
 
-               cm.sendYesNo("So you want to make the second job advancement as the " + (job == 510 ? "#bBrawler#k" : "#bGunslinger#k") + "? You know you won't be able to choose a different job for the 2nd job advancement once you make your decision here, right?")
+               cm.sendYesNo(I18nMessage.from("1090000_2ND_JOB_CONFIRMATION").with(job == 510 ? "#bBrawler#k" : "#bGunslinger#k"))
             }
          } else if (status == 3) {
             if (cm.haveItem(4031012)) {
@@ -243,18 +244,18 @@ class NPC1090000 {
             }
 
             if (job == 510) {
-               cm.sendNext("From here on out, you are a #bBrawler#k. Brawlers rule the world with the power of their bare fists...which means they need to train their body more than others. If you have any trouble training, I'll be more than happy to help.")
+               cm.sendNext(I18nMessage.from("1090000_BRAWLER_SUCCESS"))
             } else {
-               cm.sendNext("From here on out, you are a #bGunslinger#k. Gunslingers are notable for their long-range attacks with sniper-like accuracy and of course, using Guns as their primary weapon. You should continue training to truly master your skills. If you are having trouble training, I'll be here to help.")
+               cm.sendNext(I18nMessage.from("1090000_GUNSLINGER_SUCCESS"))
             }
 
             if (cm.getJobId() != job) {
                cm.changeJobById(job)
             }
          } else if (status == 4) {
-            cm.sendNextPrev("I have just given you a book that gives you the list of skills you can acquire as a " + (job == 510 ? "brawler" : "gunslinger") + ". Also your etc inventory has expanded by adding another row to it. Your max HP and MP have increased, too. Go check and see for it yourself.")
+            cm.sendNextPrev(I18nMessage.from("1090000_GIVEN_BOOK").with(job == 510 ? "brawler" : "gunslinger"))
          } else if (status == 5) {
-            cm.sendNextPrev("I have also given you a little bit of #bSP#k. Open the #bSkill Menu#k located at the bottom left corner. you'll be able to boost up the newer acquired 2nd level skills. A word of warning, though. You can't boost them up all at once. Some of the skills are only available after you have learned other skills. Make sure yo remember that.")
+            cm.sendNextPrev(I18nMessage.from("1090000_GIVEN_SP"))
          } else if (status == 6) {
             cm.sendNextPrev((job == 510 ? "Brawlers" : "Gunslingers") + " need to be strong. But remember that you can't abuse that power and use it on a weakling. Please use your enormous power the right way, because... for you to use that the right way, that is much harden than just getting stronger. Please find me after you have advanced much further. I'll be waiting for you.")
          }
@@ -264,7 +265,7 @@ class NPC1090000 {
                cm.getPlayer().removePartyQuestItem("JB3")
                cm.getPlayer().setPartyQuestItemObtained("JBP")
             }
-            cm.sendNextPrev("Since he is a clone of myself, you can expect a tough battle ahead. He uses a number of special attacking skills unlike any you have ever seen, and it is your task to successfully take him one on one. There is a time limit in the secret passage, so it is crucial that you defeat him within the time limit. I wish you the best of luck, and I hope you bring the #b#t4031059##k with you.")
+            cm.sendNextPrev(I18nMessage.from("1090000_CLONE_INFO"))
          }
       } else if (action["3thJobC"]) {
          cm.getPlayer().removePartyQuestItem("JBP")

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -33,18 +34,18 @@ class NPC9000002 {
          }
 
          if (status == 0) {
-            cm.sendNext("Bam bam bam bam!! You have won the game from the \r\n#bEVENT#k. Congratulations on making it this far!")
+            cm.sendNext(I18nMessage.from("9000002_BAM_BAM"))
          } else if (status == 1) {
-            cm.sendNext("You'll be awarded the #bScroll of Secrets#k as the winning prize. On the scroll, it has secret information written in ancient characters.")
+            cm.sendNext(I18nMessage.from("9000002_WINNING_PRIZE"))
          } else if (status == 2) {
-            cm.sendNext("The Scroll of Secrets can be deciphered by #rChun Ji#k or \r\n#rGeanie#k at Ludibrium. Bring it with you and something good's bound to happen.")
+            cm.sendNext(I18nMessage.from("9000002_SOMETHING_GOOD_IS_BOUND_TO_HAPPEN"))
          } else if (status == 3) {
             if (cm.canHold(4031019)) {
                cm.gainItem(4031019)
                cm.warp(cm.getPlayer().getSavedLocation("EVENT"))
                cm.dispose()
             } else {
-               cm.sendNext("I think your Etc window is full. Please make room, then talk to me.")
+               cm.sendNext(I18nMessage.from("9000002_NEED_ETC_SPACE"))
             }
          } else if (status == 4) {
             cm.dispose()

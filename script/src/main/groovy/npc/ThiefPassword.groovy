@@ -36,7 +36,7 @@ class NPCThiefPassword {
 
 
       if (status == 0) {
-         cm.sendGetText("A suspicious voice pierces through the silence. #bPassword#k!")
+         cm.sendGetText(I18nMessage.from("ThiefPassword_SUSPICIOUS_VOICE"))
       } else if (status == 1) {
          if (cm.getText() == "Open Sesame") {
             if (cm.isQuestCompleted(3925)) {
@@ -47,7 +47,7 @@ class NPCThiefPassword {
 
             cm.dispose()
          } else {
-            cm.sendOk("#rWrong!")
+            cm.sendOk(I18nMessage.from("ThiefPassword_WRONG"))
          }
       } else if (status == 2) {
          cm.dispose()

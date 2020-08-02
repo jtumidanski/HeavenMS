@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -36,15 +37,15 @@ class NPC2081300 {
 
          if (status == 0) {
             if (cm.getLevel() < 120 || Math.floor(cm.getJobId() / 100) != 3) {
-               cm.sendOk("Please don't bother me right now, I am trying to concentrate.")
+               cm.sendOk(I18nMessage.from("2081300_DO_NOT_BOTHER_ME"))
                cm.dispose()
             } else if (!cm.isQuestCompleted(6924)) {
-               cm.sendOk("You have not yet passed my trials. I can not advance you until you do so.")
+               cm.sendOk(I18nMessage.from("2081300_NOT_YET_PASSED"))
                cm.dispose()
             } else if (cm.getJobId() % 100 % 10 != 2) {
-               cm.sendYesNo("You did a marvellous job passing my test. Are you ready to advance to your 4th job?")
+               cm.sendYesNo(I18nMessage.from("2081300_DID_A_MARVELLOUS_JOB"))
             } else {
-               cm.sendSimple("If I must, I can teach you the art of your class.\r\n#b#L0#Teach me the skills of my class.#l")
+               cm.sendSimple(I18nMessage.from("2081300_I_CAN_TEACH_YOU"))
                //cm.dispose();
             }
          } else if (status == 1) {
@@ -62,7 +63,7 @@ class NPC2081300 {
                   }
                   cm.gainItem(2280003, (short) 1)
                } else {
-                  cm.sendOk("Please have one slot available on #bUSE#k inventory to receive a skill book.")
+                  cm.sendOk(I18nMessage.from("2081300_HAVE_ONE_USE_SLOT"))
                }
             } else if (mode >= 0 && cm.getJobId() % 100 % 10 == 2) {
                if (cm.getJobId() == 312) {
@@ -86,7 +87,7 @@ class NPC2081300 {
                      cm.teachSkill(3221001, (byte) 0, (byte) 10, -1)
                   }
                }
-               cm.sendOk("It is done. Leave me now.")
+               cm.sendOk(I18nMessage.from("2081300_IT_IS_DONE"))
             }
 
             cm.dispose()

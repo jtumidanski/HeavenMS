@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -204,37 +205,37 @@ class NPC2010000 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0) {
-         cm.sendOk("Hmmm...it shouldn't be a bad deal for you. Come see me at the right time and you may get a much better item to be offered. Anyway, let me know when you have a change of heart.")
+         cm.sendOk(I18nMessage.from("2010000_SHOULD_NOT_BE_A_BAD_DEAL"))
          cm.dispose()
          return
       }
 
       status++
       if (status == 0) { // first interaction with NPC
-         cm.sendNext("Hey, got a little bit of time? Well, my job is to collect items here and sell them elsewhere, but these days the monsters have become much more hostile so it's been difficult to getting good items ... What do you think? Do you want to do some business with me?")
+         cm.sendNext(I18nMessage.from("2010000_GOT_A_BIT_OF_TIME"))
       } else if (status == 1) {
-         cm.sendYesNo("The deal is simple. You get me something I need, I get you something you need. The problem is, I deal with a whole bunch of people, so the items I have to offer may change every time you see me. What do you think? Still want to do it?")
+         cm.sendYesNo(I18nMessage.from("2010000_DEAL_IS_SIMPLE"))
       } else if (status == 2) {
          String eQuestChoice = makeChoices(eQuestChoices)
          cm.sendSimple(eQuestChoice)
       } else if (status == 3) {
          lastSelection = selection
          requiredItem = eQuestChoices[selection]
-         cm.sendYesNo("Let's see, you want to trade your #b100 #t" + requiredItem + "##k with my stuff right? Before trading make sure you have an empty slot available on your use or etc. inventory. Now, do you want to trade with me?")
+         cm.sendYesNo(I18nMessage.from("2010000_YOU_WANT_TO_TRADE").with(requiredItem))
       } else if (status == 4) {
          itemSet = (Math.floor(Math.random() * eQuestPrizes[lastSelection].length)).intValue()
          reward = eQuestPrizes[lastSelection]
          prizeItem = reward[itemSet][0]
          prizeQuantity = reward[itemSet][1]
          if (!cm.haveItem(requiredItem, 100)) {
-            cm.sendOk("Hmmm... are you sure you have #b100 #t" + requiredItem + "##k? If so, then please check and see if your item inventory is full or not.")
+            cm.sendOk(I18nMessage.from("2010000_INVENTORY_FULL").with(requiredItem))
          } else if (!cm.canHold(prizeItem)) {
-            cm.sendOk("Your use and etc. inventory seems to be full. You need the free spaces to trade with me! Make room, and then find me.")
+            cm.sendOk(I18nMessage.from("2010000_USE_AND_ETC_INVENTORY_FULL"))
          } else {
             cm.gainItem(requiredItem, (short) -100)
             cm.gainExp(500 * cm.getPlayer().getExpRate())
             cm.gainItem(prizeItem, (short) prizeQuantity)
-            cm.sendOk("For your #b100 #t" + requiredItem + "##k, here's my #b" + prizeQuantity + " #t" + prizeItem + "##k. What do you think? Do you like the items I gave you in return? I plan on being here for a while, so if you gather up more items, I'm always open for a trade ...")
+            cm.sendOk(I18nMessage.from("2010000_WHAT_DO_YOU_THINK").with(requiredItem, prizeQuantity, prizeItem))
          }
          cm.dispose()
       }

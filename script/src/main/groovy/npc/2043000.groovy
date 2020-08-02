@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC2043000 {
          }
 
          if (status == 0) {
-            cm.sendNext("You don't belong to this world... Return now.")
+            cm.sendNext(I18nMessage.from("2043000_YOU_DO_NOT_BELONG"))
          } else if (status == 1) {
             cm.warp(220080000)
             cm.dispose()

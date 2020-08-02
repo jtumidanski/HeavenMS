@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest3320 {
          }
 
          if (status == 0) {
-            qm.sendAcceptDecline("I may have an idea of the whereabouts of Dr. De Lang. Are you ready to be transported to the area?")
+            qm.sendAcceptDecline(I18nMessage.from("3320_ARE_YOU_READY"))
          } else if (status == 1) {
             qm.forceStartQuest()
             qm.warp(926120200, 1)

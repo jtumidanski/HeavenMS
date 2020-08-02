@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9120200 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("Here you are, right in front of the hideout! What? You want to\r\nreturn to #m801000000#?")
+      cm.sendYesNo(I18nMessage.from("9120200_WANT_TO_RETURN"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -24,7 +25,7 @@ class NPC9120200 {
          cm.dispose()
       } else {
          if (mode == 0) {
-            cm.sendOk("If you want to return to #m801000000#, then talk to me.")
+            cm.sendOk(I18nMessage.from("9120200_TALK_TO_ME"))
             cm.dispose()
          } else if (mode == 1) {
             status++

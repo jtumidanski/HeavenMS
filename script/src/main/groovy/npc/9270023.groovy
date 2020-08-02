@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -21,7 +22,7 @@ class NPC9270023 {
    int[] faceNew = []
 
    def start() {
-      cm.sendSimple("If you use this regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152037##k, I will do it anyways for you. But don't forget, it will be random!\r\n#L2#OK! (Uses #i5152037# #t5152037#)#l")
+      cm.sendSimple(I18nMessage.from("9270023_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -36,7 +37,7 @@ class NPC9270023 {
 
          if (status == 1) {
             if (!cm.haveItem(5152037)) {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("9270023_MISSING_SURGERY_COUPON"))
                cm.dispose()
                return
             }
@@ -52,11 +53,11 @@ class NPC9270023 {
                   faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                }
             }
-            cm.sendYesNo("If you use the regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152037##k?")
+            cm.sendYesNo(I18nMessage.from("9270023_REG_CONFIRM"))
          } else if (status == 2) {
             cm.gainItem(5152037, (short) -1)
             cm.setFace(faceNew[Math.floor(Math.random() * faceNew.length).intValue()])
-            cm.sendOk("Enjoy your new and improved face!")
+            cm.sendOk(I18nMessage.from("9270023_ENJOY_NEW_FACE"))
 
             cm.dispose()
          }

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,9 +28,9 @@ class Quest3353 {
          }
 
          if (status == 0) {
-            qm.sendNext("I see. De Lang wants to stop the Huroids from causing more destruction, but the societies would like to get him on jail at once. So that's why he hid himself there.")
+            qm.sendNext(I18nMessage.from("3353_THAT_IS_WHY"))
          } else if (status == 1) {
-            qm.sendAcceptDecline("In that case, go there again and hear more details from De Lang, will you?")
+            qm.sendAcceptDecline(I18nMessage.from("3353_GO_THERE_AGAIN"))
          } else if (status == 2) {
             qm.warp(926120200, 1)
 

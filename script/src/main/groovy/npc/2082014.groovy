@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
@@ -38,7 +39,7 @@ class NPC2082014 {
             if (YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
                cm.openShopNPC(2082014)
             } else if (cm.isQuestStarted(3749)) {
-               cm.sendOk("We've already located the enemy's ultimate weapon! Follow along the ship's bow area ahead and you will find my sister #b#p2082013##k. Report to her for further instructions on the mission.")
+               cm.sendOk(I18nMessage.from("2082014_ULTIMATE_WEAPON"))
             } else {
                cm.sendDefault()
             }

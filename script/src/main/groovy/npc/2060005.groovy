@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
@@ -17,25 +18,25 @@ class NPC2060005 {
 
    def start() {
       if (cm.isQuestCompleted(6002)) {
-         cm.sendOk("Thanks for saving the pork.")
+         cm.sendOk(I18nMessage.from("2060005_THANKS_FOR_SAVING_THE_PORK"))
       } else if (cm.isQuestStarted(6002)) {
          if (cm.haveItem(4031507, 5) && cm.haveItem(4031508, 5)) {
-            cm.sendOk("Thanks for saving the pork.")
+            cm.sendOk(I18nMessage.from("2060005_THANKS_FOR_SAVING_THE_PORK"))
          } else {
             EventManager em = cm.getEventManager("3rdJob_mount")
             if (em == null) {
-               cm.sendOk("Sorry, but 3rd job advancement (mount) is closed.")
+               cm.sendOk(I18nMessage.from("2060005_IS_CLOSED"))
             } else {
                if (em.startInstance(cm.getPlayer())) {
                   cm.removeAll(4031507)
                   cm.removeAll(4031508)
                } else {
-                  cm.sendOk("There is currently someone in this map, come back later.")
+                  cm.sendOk(I18nMessage.from("2060005_SOMEONE_IN_THE_MAP"))
                }
             }
          }
       } else {
-         cm.sendOk("Only few adventurers, from a selected public, are eligible to protect the Watch Hog.")
+         cm.sendOk(I18nMessage.from("2060005_NOT_ELIGIBLE"))
       }
 
       cm.dispose()

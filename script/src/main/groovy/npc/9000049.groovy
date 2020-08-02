@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -45,11 +46,11 @@ class NPC9000049 {
                if (stage == 3) {
                   event = "HARD"
                }
-               cm.sendSimple("Hello GM.\r\nThe event is currently: #r" + event + "#k\r\nWhat would you like to do?\r\n#b#L0#Enter the event#l\r\n#L1#Close the event#l\r\n#L2#Set the event to EASY#l\r\n#L3#Set the event to MEDIUM#l\r\n#L4#Set the event to HARD#l")
+               cm.sendSimple(I18nMessage.from("9000049_HELLO").with(event))
             } else {
                int stage = cm.getClient().getChannelServer().getStoredVar(9000049)
                if (stage == 0) {
-                  cm.sendOk("It looks like the Tower isn't unlocked yet. Please wait for a GM to unlock it!")
+                  cm.sendOk(I18nMessage.from("9000049_TOWER_IS_NOT_UNLOCKED"))
                } else {
                   cm.warp(980040000 + stage * 1000, 0)
                }
@@ -59,7 +60,7 @@ class NPC9000049 {
             if (selection == 0) {
                int stage = cm.getClient().getChannelServer().getStoredVar(9000049)
                if (stage == 0) {
-                  cm.sendOk("It looks like the Tower isn't unlocked yet. Please wait for a GM to unlock it!")
+                  cm.sendOk(I18nMessage.from("9000049_TOWER_IS_NOT_UNLOCKED"))
                } else {
                   cm.warp(980040000 + stage * 1000, 0)
                }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,20 +17,20 @@ class NPC2101 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("Are you done with your training? If you wish, I will send you out from this training camp.")
+      cm.sendYesNo(I18nMessage.from("2101_DONE_TRAINING"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       status++
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendOk("Haven't you finished the training program yet? If you want to leave this place, please do not hesitate to tell me.")
+            cm.sendOk(I18nMessage.from("2101_IF_YOU_WANT_TO_LEAVE"))
          }
          cm.dispose()
          return
       }
       if (status == 0) {
-         cm.sendNext("Then, I will send you out from here. Good job.")
+         cm.sendNext(I18nMessage.from("2101_I_WILL_SEND_YOU_OUT"))
       } else {
          cm.warp(40000, 0)
          cm.dispose()

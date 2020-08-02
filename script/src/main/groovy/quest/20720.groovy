@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -18,7 +19,7 @@ class Quest20720 {
       }
 
       if (status == 0) {
-         qm.sendAcceptDecline("How's the leveling up so far? By this time, you might be able to participate in the Party Quest at #m103000000#. Leveling up is important, yes, but we need you now to take on a mission as a Cygnus Knight. We just received a new information that may help us.")
+         qm.sendAcceptDecline(I18nMessage.from("20720_HOWS_THE_LEVELING"))
       } else if (status == 1) {
          qm.forceStartQuest()
          qm.dispose()

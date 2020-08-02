@@ -181,7 +181,8 @@ class NPC9201002 {
                   }
                   cm.sendSimple(text)
                } else {
-                  cm.sendOk("Hmm, today two fluttering hearts are about to be joined together by the blessings of love!")
+                  cm.sendOk(I18nMessage.from("9201002_TODAY_TWO"))
+
                   cm.dispose()
                }
             } else if (status == 1) {
@@ -193,36 +194,44 @@ class NPC9201002 {
                      MapleCharacter partner = channel.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                      if (!(partner == null || cm.getMap() != partner.getMap())) {
                         if (!cm.canHold(4000313)) {
-                           cm.sendOk("Please have a free ETC slot available to get the #b#t4000313##k.")
+                           cm.sendOk(I18nMessage.from("9201002_ETC_SPACE_NEEDED"))
+
                            cm.dispose()
                            return
                         } else if (!partner.canHold(4000313)) {
-                           cm.sendOk("Please let your partner know they must have a free ETC slot available to get the #b#t4000313##k.")
+                           cm.sendOk(I18nMessage.from("9201002_PARTNER_NEEDS_ETC_SPACE"))
+
                            cm.dispose()
                            return
                         } else if (!isSuitedForWedding(cm.getPlayer(), false)) {
-                           cm.sendOk("Please purchase a #rwedding garment#k for the ceremony, quickly! Without it I am not able to marry you.")
+                           cm.sendOk(I18nMessage.from("9201002_PURCHASE_GARMENT"))
+
                            cm.dispose()
                            return
                         } else if (!isSuitedForWedding(partner, false)) {
-                           cm.sendOk("Please let your partner know they must have a #rwedding garment#k ready for the ceremony.")
+                           cm.sendOk(I18nMessage.from("9201002_PARTNER_GARMENT_PURCHASE"))
+
                            cm.dispose()
                            return
                         }
 
-                        cm.sendOk("Very well, the preparations here are finished too. This indeed is a beautiful day, you two are truly blessed to marry on such a day. Let us begin the marriage!!")
+                        cm.sendOk(I18nMessage.from("9201002_VERY_WELL_LONG"))
+
                      } else {
-                        cm.sendOk("Hmm, it seems your partner is elsewhere... Please let them come here before starting the ceremony.")
+                        cm.sendOk(I18nMessage.from("9201002_MISSING_PARTNER"))
+
                         cm.dispose()
                      }
                   } else {
                      String placeTime = channel.getWeddingReservationTimeLeft(wid)
 
-                     cm.sendOk("Have patience. Your wedding is set to happen at the #r" + placeTime + "#k. Don't forget the wedding garment.")
+                     cm.sendOk(I18nMessage.from("9201002_HAVE_PATIENCE").with(placeTime))
+
                      cm.dispose()
                   }
                } else {
-                  cm.sendOk("Hmm, I'm sorry but there are no reservations made for you at this channel for the time being.")
+                  cm.sendOk(I18nMessage.from("9201002_NO_RESERVATIONS_MADE"))
+
                   cm.dispose()
                }
             } else if (status == 2) {
@@ -245,23 +254,27 @@ class NPC9201002 {
 
                               eim.registerPlayer(partner)
                            } else {
-                              cm.sendOk("An unexpected error happened when locating the wedding event. Please try again later.")
+                              cm.sendOk(I18nMessage.from("9201002_UNEXPECTED_ERROR"))
+
                            }
 
                            cm.dispose()
                         } else {
-                           cm.sendOk("An unexpected error happened before the wedding preparations. Please try again later.")
+                           cm.sendOk(I18nMessage.from("9201002_UNEXPECTED_ERROR_BEFORE_PREPARATIONS"))
+
                            cm.dispose()
                         }
                      } else {
-                        cm.sendOk("An unexpected error happened before the wedding preparations. Please try again later.")
+                        cm.sendOk(I18nMessage.from("9201002_UNEXPECTED_ERROR_BEFORE_PREPARATIONS"))
+
                         cm.dispose()
                      }
                   } else {    // partner already decided to start
                      cm.dispose()
                   }
                } else {
-                  cm.sendOk("Hmm, it seems your partner is elsewhere... Please let them come here before starting the ceremony.")
+                  cm.sendOk(I18nMessage.from("9201002_MISSING_PARTNER"))
+
                   cm.dispose()
                }
             }
@@ -278,35 +291,43 @@ class NPC9201002 {
                   int weddingStage = eim.getIntProperty("weddingStage")
 
                   if (weddingStage == 2) {
-                     cm.sendYesNo("Very well, the guests has bestowed all their blessings to you now. The time has come, #rshould I make you Husband and Wife#k?")
+                     cm.sendYesNo(I18nMessage.from("9201002_VERY_WELL"))
+
                      state = 1
                   } else if (weddingStage == 1) {
-                     cm.sendOk("While you two are making your wedding vows to each other, your guests are currently giving their blessings to you. This is a time of happiness for both of you, please rejoice the ceremony.")
+                     cm.sendOk(I18nMessage.from("9201002_TIME_OF_HAPPINESS"))
+
                      cm.dispose()
                   } else {
-                     cm.sendOk("Congratulations on your wedding! Our ceremony is complete, you can head to #b#p9201007##k now, she will lead you and your guests to the after party. Cheers for your love!")
+                     cm.sendOk(I18nMessage.from("9201002_CONGRATULATIONS"))
+
                      cm.dispose()
                   }
                } else {
                   int weddingStage = eim.getIntProperty("weddingStage")
                   if (weddingStage == 1) {
                      if (eim.gridCheck(cm.getPlayer()) != -1) {
-                        cm.sendOk("Everyone give your blessings to this lovely couple!")
+                        cm.sendOk(I18nMessage.from("9201002_GIVE_YOUR_BLESSINGS"))
+
                         cm.dispose()
                      } else {
                         if (eim.getIntProperty("guestBlessings") == 1) {
-                           cm.sendYesNo("Do you want to bless this couple?")
+                           cm.sendYesNo(I18nMessage.from("9201002_DO_YOU_WANT_TO_BLESS"))
+
                            state = 0
                         } else {
-                           cm.sendOk("Today we are gathered here to reunite this lively couple in matrimony!")
+                           cm.sendOk(I18nMessage.from("9201002_TODAY_WE_ARE_GATHERED"))
+
                            cm.dispose()
                         }
                      }
                   } else if (weddingStage == 3) {
-                     cm.sendOk("The two loving birds are now married. What a lively day! Please #rget ready for the after party#k, it should start soon. Follow the married couple's lead.")
+                     cm.sendOk(I18nMessage.from("9201002_NOW_MARRIED"))
+
                      cm.dispose()
                   } else {
-                     cm.sendOk("The guest's blessing time has ended. Hang on, the couple will renew their vows very soon now. What a sight to see!")
+                     cm.sendOk(I18nMessage.from("9201002_BLESSING_TIME_ENDED"))
+
                      cm.dispose()
                   }
                }
@@ -328,7 +349,8 @@ class NPC9201002 {
                      MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9), false, target)
                   }
 
-                  cm.sendOk("Your blessings have been added to their love. What a noble act for a lovely couple!")
+                  cm.sendOk(I18nMessage.from("9201002_WHAT_A_NOBLE_ACT"))
+
                   cm.dispose()
                } else {            // couple wants to complete the wedding
                   int weddingStage = eim.getIntProperty("weddingStage")
@@ -336,7 +358,8 @@ class NPC9201002 {
                   if (weddingStage == 2) {
                      int pid = cm.getPlayer().getPartnerId()
                      if (pid <= 0) {
-                        cm.sendOk("It seems you are no longer engaged to your partner, just before the altar... Where did all that happiness you two had sported a while ago went?")
+                        cm.sendOk(I18nMessage.from("9201002_NO_LONGER_ENGAGED"))
+
                         cm.dispose()
                         return
                      }
@@ -351,7 +374,8 @@ class NPC9201002 {
                               pid = eim.getIntProperty("confirmedVows")
                               if (pid != -1) {
                                  if (pid == player.getId()) {
-                                    cm.sendOk("You have already confirmed your vows. All that is left is for your partner to confirm now.")
+                                    cm.sendOk(I18nMessage.from("9201002_ALREADY_CONFIRMED"))
+
                                  } else {
                                     eim.setIntProperty("weddingStage", 3)
                                     AbstractPlayerInteraction cmPartner = partner.getAbstractPlayerInteraction()
@@ -385,45 +409,55 @@ class NPC9201002 {
                               break
 
                            case -1:
-                              cm.sendOk("It seems you no longer have the ring/ring box you and your partner shared at the engagement time. Sorry, but that was needed for the wedding...")
+                              cm.sendOk(I18nMessage.from("9201002_MISSING_RING_BOX"))
+
                               break
 
                            case -2:
-                              cm.sendOk("It seems your partner no longer has the ring/ring box you two shared at the engagement time. Sorry, but that was needed for the wedding...")
+                              cm.sendOk(I18nMessage.from("9201002_PARTNER_MISSING_RING_BOX"))
+
                               break
 
                            case -3:
-                              cm.sendOk("It seems you don't have the #r#t4000313##k given at the entrance... Please find it, I can't marry you without that item in hands.")
+                              cm.sendOk(I18nMessage.from("9201002_CANNOT_MARRY_YOU_WITHOUT_THAT_ITEM"))
+
                               break
 
                            case -4:
-                              cm.sendOk("Pardon my rudeness, but the garments are a essential part of the ceremony. Please #rsuit yourself properly#k for a wedding.")
+                              cm.sendOk(I18nMessage.from("9201002_GARMENTS_ARE_ESSENTIAL"))
+
                               break
 
                            case 1:
-                              cm.sendOk("Please make an EQUIP slot available to get the marriage ring, will you?")
+                              cm.sendOk(I18nMessage.from("9201002_MAKE_EQUIP_SPACE"))
+
                               break
 
                            case 2:
-                              cm.sendOk("Please let your partner know to make an EQUIP slot available to get the marriage ring, will you?")
+                              cm.sendOk(I18nMessage.from("9201002_PARTNER_MAKE_EQUIP_SPACE"))
+
                               break
 
                            case 3:
-                              cm.sendOk("It seems your partner don't have the #r#t4000313##k given at the entrance... Please find it, I can't marry you without that item in hands.")
+                              cm.sendOk(I18nMessage.from("9201002_PARTNER_CANNOT_MARRY_YOU_WITHOUT_THAT_ITEM"))
+
                               break
 
                            case 4:
-                              cm.sendOk("It seems your partner is not properly dressed for the wedding... Pardon my rudeness, but the garments are a essential part of the ceremony.")
+                              cm.sendOk(I18nMessage.from("9201002_PARTNER_NOT_PROPERLY_DRESSED"))
+
                               break
                         }
 
                         cm.dispose()
                      } else {
-                        cm.sendOk("Hmm, it seems your partner is not here, before the altar... It is a pity, but I can't fulfill the wedding if your partner is not here.")
+                        cm.sendOk(I18nMessage.from("9201002_PARTNER_IS_NOT_HERE"))
+
                         cm.dispose()
                      }
                   } else {
-                     cm.sendOk("You are now #bhusband and wife#k. Congratulations!")
+                     cm.sendOk(I18nMessage.from("9201002_NOW_HUSBAND_AND_WIFE"))
+
                      cm.dispose()
                   }
                }

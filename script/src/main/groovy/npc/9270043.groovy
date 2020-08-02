@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -23,9 +24,9 @@ class NPC9270043 {
          cm.doGachapon()
          cm.dispose()
       } else if (cm.haveItem(5220000)) {
-         cm.sendYesNo("You may use Gachapon. Would you like to use your Gachapon ticket?")
+         cm.sendYesNo(I18nMessage.from("9270043_USE_YOUR_GACHAPON_TICKET"))
       } else {
-         cm.sendSimple("Welcome to the " + cm.getPlayer().getMap().getMapName() + " Gachapon. How may I help you?\r\n\r\n#L0#What is Gachapon?#l\r\n#L1#Where can you buy Gachapon tickets?#l")
+         cm.sendSimple(I18nMessage.from("9270043_WELCOME").with(cm.getPlayer().getMap().getMapName()))
       }
    }
 
@@ -37,12 +38,12 @@ class NPC9270043 {
          if (mode > 0) {
             status++
             if (selection == 0) {
-               cm.sendNext("Play Gachapon to earn rare scrolls, equipment, chairs, mastery books, and other cool items! All you need is a #bGachapon Ticket#k to be the winner of a random mix of items.")
+               cm.sendNext(I18nMessage.from("9270043_GACHAPON_INFO"))
             } else if (selection == 1) {
-               cm.sendNext("Gachapon Tickets are available in the #rCash Shop#k and can be purchased using NX or Maple Points. Click on the red SHOP at the lower right hand corner of the screen to visit the #rCash Shop #kwhere you can purchase tickets.")
+               cm.sendNext(I18nMessage.from("9270043_TICKET_INFO"))
                cm.dispose()
             } else if (status == 2) {
-               cm.sendNext("You'll find a variety of items from the " + cm.getPlayer().getMap().getMapName() + " Gachapon, but you'll most likely find several related items and scrolls since " + cm.getPlayer().getMap().getMapName() + " is known as the town.")
+               cm.sendNext(I18nMessage.from("9270043_VARIETY_OF_ITEMS").with(cm.getPlayer().getMap().getMapName(), cm.getPlayer().getMap().getMapName()))
                cm.dispose()
             }
          }

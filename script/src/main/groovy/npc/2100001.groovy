@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -30,7 +31,7 @@ class NPC2100001 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0 && status == 0) {
-         cm.sendNext("If you aren't in a hurry, then please come back in a bit. As you can see, there's so much work going on right now that I can't possibly give them to you on time.")
+         cm.sendNext(I18nMessage.from("2100001_COME_BACK_IN_A_BIT"))
          cm.dispose()
          return
       }
@@ -45,7 +46,7 @@ class NPC2100001 {
       }
 
       if (status == 0) {
-         cm.sendYesNo("Are you here to refine the ores of a mineral or a jewel? It doesn't matter how many ores you have, if you don't have them refined by a master like me, then they won't see the light of day. What do you think, do you want to refine them right now?")
+         cm.sendYesNo(I18nMessage.from("2100001_ARE_YOU_HERE_TO"))
       }
       if (status == 1 && mode == 1) {
          String selStr = "I like your attitude! Let's just take care of this right now. What kind of ores would you like to refine? #b"
@@ -164,9 +165,9 @@ class NPC2100001 {
          }
 
          if (!cm.canHold(recvItem, recvQty)) {
-            cm.sendOk("I'm afraid you are short in inventory slots for this.")
+            cm.sendOk(I18nMessage.from("2100001_SHORT_INVENTORY_SLOTS"))
          } else if (cm.getMeso() < cost * qty) {
-            cm.sendOk("I'm afraid you cannot afford my services.")
+            cm.sendOk(I18nMessage.from("2100001_CANNOT_AFFORD_IT"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; complete && i < mats.size(); i++) {
@@ -188,7 +189,7 @@ class NPC2100001 {
             }
 
             if (!complete) {
-               cm.sendOk("Please check and see if you have all the necessary items with you. If so, then please check your etc. inventory and see if you have an empty space.")
+               cm.sendOk(I18nMessage.from("2100001_CHECK_FOR_MISSING_ITEMS"))
             } else {
                if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                   for (int i = 0; i < mats.size(); i++) {
@@ -203,7 +204,7 @@ class NPC2100001 {
                }
 
                cm.gainItem(recvItem, (short) recvQty)
-               cm.sendOk("There, finished. What do you think, a piece of art, isn't it? Well, if you need anything else, you know where to find me.")
+               cm.sendOk(I18nMessage.from("2100001_FINISHED"))
             }
          }
 

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,10 +18,10 @@ class Quest22502 {
          status++
       }
       if (status == 0) {
-         qm.sendAcceptDecline("Wouldn't a lizard enjoy a #b#t4032452##k, like a cow? There are a lot of #bHaystacks#k nearby, so try feeding it that.")
+         qm.sendAcceptDecline(I18nMessage.from("22502_LIKE_A_COW"))
       } else if (status == 1) {
          if (mode == 0) {
-            qm.sendNext("Hm, you never know unless you try. That lizard is big enough to be on Maple's Believe It Or Not. It might eat hay.")
+            qm.sendNext(I18nMessage.from("22502_NEVER_KNOW"))
          } else {
             qm.forceStartQuest()
             qm.showInfo("UI/tutorial/evan/12/0")

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,11 +36,11 @@ class NPC1209000 {
          status--
       }
       if (status == 0) {
-         cm.sendNext("Aran, you're awake! How are you feeling? Hm? You want to know what's been going on?")
+         cm.sendNext(I18nMessage.from("1209000_HOW_ARE_YOU_FEELING"))
       } else if (status == 1) {
-         cm.sendNext("We're almost done preparing for the escape. You don't have to worry. Everyone I could possibly find has boarded the ark, and Shinsoo has agreed to guide the way. We'll head to Victoria Island as soon as we finish the remaining preparations.")
+         cm.sendNext(I18nMessage.from("1209000_ALMOST_DONE"))
       } else if (status == 2) {
-         cm.sendNext("The other heroes? They've left to fight the Black Magician. They're buying us time to escape. What? You want to fight with them? No! You can't! You're hurt. You must leave with us!")
+         cm.sendNext(I18nMessage.from("1209000_OTHER_HEROES"))
       } else if (status == 3) {
          //cm.updateQuest(21002, "1")
          cm.showIntro("Effect/Direction1.img/aranTutorial/Trio")

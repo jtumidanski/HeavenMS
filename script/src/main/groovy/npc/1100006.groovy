@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1100006 {
    NPCConversationManager cm
@@ -9,7 +10,7 @@ class NPC1100006 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Ah, such lovely winds. This should be a perfect voyage as long as no stupid customer falls off for attempting some weird skill. Of course, I'm talking about you. Please refrain from using your skills.")
+      cm.sendOk(I18nMessage.from("1100006_LOVELY_WINDS"))
       cm.dispose()
    }
 

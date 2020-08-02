@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,17 +18,17 @@ class Quest22503 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("No, no, no. This isn't what I need. I need something more nutritious, master!")
+         qm.sendNext(I18nMessage.from("22503_THIS_IS_NOT_WHAT_I_NEED"))
       } else if (status == 1) {
          qm.sendNextPrev("#bHm... So you're not a herbivore. You might be a carnivore. You're a Dragon, after all. How does some #t4032453# sound?", (byte) 2)
       } else if (status == 2) {
-         qm.sendAcceptDecline("What's a...#t4032453#? Never heard of it, but if it's yummy, I accept! Just feed me something tasty. Anything but plants!")
+         qm.sendAcceptDecline(I18nMessage.from("22503_NEVER_HEARD_OF_IT"))
       } else if (status == 3) {
          if (mode == 0) {
-            qm.sendNext("How can you starve me like this. I'm just a baby. This is wrong!")
+            qm.sendNext(I18nMessage.from("22503_HOW_CAN_YOU_STARVE_ME"))
          } else {
             qm.forceStartQuest()
-            qm.sendNext("#b#b(Try giving #p1013000# some #t4032453#. You have to hunt a few #o1210100#s at the farm. Ten should be plenty...)")
+            qm.sendNext(I18nMessage.from("22503_TRY_GIVING"))
          }
       } else if (status == 4) {
          qm.dispose()

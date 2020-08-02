@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.AbstractPlayerInteraction
@@ -31,16 +32,16 @@ class NPC9201007 {
 
       if (cm.getMapId() == 680000200) {
          if (eim.getIntProperty("weddingStage") == 0) {
-            cm.sendNext("The guests are gathering here right now. Please wait awhile, the ceremony will start soon enough.")
+            cm.sendNext(I18nMessage.from("9201007_GUESTS_ARE_GATHERING"))
          } else {
             cm.warp(680000210, "sp")
-            cm.sendNext("Pick your seat over here and good show!")
+            cm.sendNext(I18nMessage.from("9201007_PICK_YOUR_SEAT"))
          }
 
          cm.dispose()
       } else {
          if (cm.getPlayer().getId() != eim.getIntProperty("groomId") && cm.getPlayer().getId() != eim.getIntProperty("brideId")) {
-            cm.sendNext("Sorry, only the marrying couple should be talking to me right now.")
+            cm.sendNext(I18nMessage.from("9201007_NO_TALKING"))
             cm.dispose()
             return
          }
@@ -68,7 +69,7 @@ class NPC9201007 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode == -1 || mode == 0) {
-         cm.sendOk("Goodbye then.")
+         cm.sendOk(I18nMessage.from("9201007_GOOD_BYE"))
          cm.dispose()
          return
       } else if (mode == 1) {
@@ -81,7 +82,7 @@ class NPC9201007 {
          boolean hasGoldenLeaf = cm.haveItem(4000313)
 
          if (hasGoldenLeaf && hasEngage) {
-            cm.sendOk("You can't leave yet! You need to click High Priest John and get married before I can let you leave.")
+            cm.sendOk(I18nMessage.from("9201007_YOU_CANNOT_LEAVE_YET"))
             cm.dispose()
          } else if (hasGoldenLeaf && hasRing) {
             String[] choice = ["Go to the after party", "What should I be doing"]
@@ -91,7 +92,7 @@ class NPC9201007 {
             }
             cm.sendSimple(msg)
          } else {
-            cm.sendNext("You don't seem to have a Gold Maple Leaf, engagement ring, or wedding ring. You must not belong here, so I will take you to Amoria.")
+            cm.sendNext(I18nMessage.from("9201007_MUST_NOT_BELONG"))
          }
       } else if (status == 1) {
          AbstractPlayerInteraction cmPartner = cm.getMap().getCharacterById(cm.getPlayer().getPartnerId()).getAbstractPlayerInteraction()
@@ -100,13 +101,13 @@ class NPC9201007 {
             case 0:
                if (eim.getIntProperty("isPremium") == 1) {
                   eim.warpEventTeam(680000300)
-                  cm.sendOk("Enjoy! Cherish your Photos Forever!")
+                  cm.sendOk(I18nMessage.from("9201007_CHERISH_YOUR_PHOTOS"))
                   if (cmPartner != null) {
                      cmPartner.npcTalk(cm.getNpc(), "Enjoy! Cherish your Photos Forever!")
                   }
                } else {    // skip the party-time (premium only)
                   eim.warpEventTeam(680000500)
-                  cm.sendOk("Congratulations for the newly-wed! I will escort you to the exit.")
+                  cm.sendOk(I18nMessage.from("9201007_CONGRATULATIONS"))
                   if (cmPartner != null) {
                      cmPartner.npcTalk(cm.getNpc(), "Congratulations for the newly-wed! I will escort you to the exit.")
                   }
@@ -116,7 +117,7 @@ class NPC9201007 {
                break
 
             case 1:
-               cm.sendOk("The Bride and Groom must receive the blessings of High Priest John to be wed. When you are ready you can click me to go to the after party.")
+               cm.sendOk(I18nMessage.from("9201007_RECEIVE_THE_BLESSINGS"))
                cm.dispose()
                break
 

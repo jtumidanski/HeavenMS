@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.quest.QuestActionManager
@@ -13,17 +14,17 @@ class Quest21101 {
          status -= 2
       } else if (mode != 1) {
          if (mode == 0) {
-            qm.sendNext("#b(You need to think about this for a second...)#k")
+            qm.sendNext(I18nMessage.from("21101_THINK_ABOUT_THIS"))
          }
          qm.dispose()
          return
       }
       if (status == 0) {
-         qm.sendYesNo("#b(Are you certain that you were the hero that wielded the #p1201001#? Yes, you're sure. You better grab the #p1201001# really tightly. Surely it will react to you.)#k")
+         qm.sendYesNo(I18nMessage.from("21101_ARE_YOU_CERTAIN"))
       } else if (status == 1) {
          if (qm.getPlayer().getJob().getId() == 2000) {
             if (!qm.canHold(1142129)) {
-               qm.sendOk("Wow, your #bequip#k inventory is full. You need to make at least 1 empty slot to complete this quest.")
+               qm.sendOk(I18nMessage.from("21101_EQUIP_INVENTORY_IS_FULL"))
                qm.dispose()
                return
             }

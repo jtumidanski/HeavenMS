@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -17,9 +18,9 @@ class NPC1092095 {
 
    def start() {
       if (cm.haveItem(4031847)) {
-         cm.sendNext("The hungry calf is drinking all the milk! The bottle remains empty...")
+         cm.sendNext(I18nMessage.from("1092095_HUNGRY_CALF_REMAINS_EMPTY"))
       } else if (cm.haveItem(4031848) || cm.haveItem(4031849) || cm.haveItem(4031850)) {
-         cm.sendNext("The hungry calf is drinking all the milk! The bottle is now empty.")
+         cm.sendNext(I18nMessage.from("1092095_HUNGRY_CALF_IS_NOW_EMPTY"))
          if (cm.haveItem(4031848)) {
             cm.gainItem(4031848, (short) -1)
          } else if (cm.haveItem(4031849)) {
@@ -42,7 +43,7 @@ class NPC1092095 {
          status++
       }
       if (status == 0) {
-         cm.sendPrev("The hungry calf isn't interested in the empty bottle.")
+         cm.sendPrev(I18nMessage.from("1092095_EMPTY_BOTTLE"))
       } else if (status == 1) {
          cm.dispose()
       }

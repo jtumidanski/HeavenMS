@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.quest.QuestActionManager
@@ -15,20 +16,20 @@ class Quest21302 {
       status++
       if (mode != 1) {
          if (mode == 0 && type == 1) {
-            qm.sendNext("Hey! At least say you tried!")
+            qm.sendNext(I18nMessage.from("21302_AT_LEAST_YOU_TRIED"))
          }
          qm.dispose()
          return
       }
       if (status == 0) {
-         qm.sendNext("Wait.. Isn't that.. Did you remember how to make Red Jade?\r\nWow... you may be stupid and prone to amnesia, but this is why I can't abandon you. Now give me the jade!")
+         qm.sendNext(I18nMessage.from("21302_GIVE_ME_THE_JADE"))
          //Giant Polearm
       } else if (status == 1) {
-         qm.sendNextPrev("Okay, now that I have the Red Jade back on, let me work on reawakening more of your abilities. I mean, your level's gone much higher since the last time we met, so I am sure I can work my magic a bit more this time!")
+         qm.sendNextPrev(I18nMessage.from("21302_WORK_MY_MAGIC"))
       } else if (status == 2) {
          if (!qm.isQuestCompleted(21302)) {
             if (!qm.canHold(1142131)) {
-               qm.sendOk("Wow, your #bequip#k inventory is full. I need you to make at least 1 empty slot to complete this quest.")
+               qm.sendOk(I18nMessage.from("21302_EQUIP_INVENTORY_IS_FULL"))
                qm.dispose()
                return
             }
@@ -47,7 +48,7 @@ class Quest21302 {
             qm.completeQuest()
          }
 
-         qm.sendNext("Come on, keep training so you can get all your abilities back, and that way we can explore together once more!")
+         qm.sendNext(I18nMessage.from("21302_KEEP_TRAINING"))
       } else if (status == 3) {
          qm.dispose()
       }

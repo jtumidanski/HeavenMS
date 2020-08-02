@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -24,7 +25,7 @@ class NPC9220004 {
          cm.dispose()
       } else {
          if (status == 0 && mode == 0) {
-            cm.sendOk("Talk to me again when you want to.")
+            cm.sendOk(I18nMessage.from("9220004_WHEN_YOU_WANT_TO"))
             cm.dispose()
          }
          if (mode == 1) {
@@ -34,11 +35,11 @@ class NPC9220004 {
          }
 
          if (status == 0) {
-            cm.sendSimple("#b<Raid Quest: Happyville>#k\r\nA raid is nothing but many people joining up in an attempt to defeat extremely powerful creatures. Here is no different. Everyone can take part in defeating the spawned creature. What will you do?\r\n#b\r\n#L0#Spawn Kid Snowman.\r\n#L1#Spawn Lost Rudolph.\r\n#L2#Nothing, just chilling.#k")
+            cm.sendSimple(I18nMessage.from("9220004_RAID_QUEST_INFO"))
          } else if (status == 1) {
             if (selection == 0) {
                if (cm.getMap().getMonsters().size() > 1) {  //reactor as a monster? wtf
-                  cm.sendOk("Eliminate all mobs in the area to call Kid Snowman.")
+                  cm.sendOk(I18nMessage.from("9220004_ELIMINATE_ALL"))
                   cm.dispose()
                   return
                }
@@ -46,14 +47,14 @@ class NPC9220004 {
                cm.getMap().spawnMonsterOnGroundBelow(9500317, 1700, 80)
             } else if (selection == 1) {
                if (cm.getMap().getMonsters().size() > 6) {  //reactor as a monster? wtf
-                  cm.sendOk("The place is too crowded right now. Eliminate some mobs before trying again.")
+                  cm.sendOk(I18nMessage.from("9220004_TOO_CROWDED"))
                   cm.dispose()
                   return
                }
 
                cm.getMap().spawnMonsterOnGroundBelow(9500320, 1700, 80)
             } else {
-               cm.sendOk("Fine then.")
+               cm.sendOk(I18nMessage.from("9220004_FINE_THEN"))
             }
 
             cm.dispose()

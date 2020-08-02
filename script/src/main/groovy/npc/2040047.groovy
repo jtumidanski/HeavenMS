@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Sgt.Anderson
@@ -30,7 +31,8 @@ class NPC2040047 {
       int mapId = cm.getPlayer().getMapId()
       if (mapId == 922010000) {
          if (status == 0) {
-            cm.sendNext("To return back to the recruitment map, follow this way.")
+            cm.sendNext(I18nMessage.from("2040047_RETURN"))
+
          } else {
             cm.warp(221024500)
             cm.dispose()

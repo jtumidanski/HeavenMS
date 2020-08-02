@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -27,7 +28,7 @@ class NPC2042007 {
          cm.dispose()
       } else {
          if (status >= 0 && mode == 0) {
-            cm.sendOk("Alright then, I hope we can chat later next time.")
+            cm.sendOk(I18nMessage.from("2042007_CHAT_LATER"))
             cm.dispose()
             return
          }
@@ -39,7 +40,7 @@ class NPC2042007 {
 
          if (cm.getPlayer().getMapId() == 980030010) {
             if (status == 0) {
-               cm.sendNext("I hope you had fun at the Monster Carnival!")
+               cm.sendNext(I18nMessage.from("2042007_HOPE_YOU_HAD_FUN"))
             } else if (status > 0) {
                cm.warp(980030000, 0)
                cm.dispose()

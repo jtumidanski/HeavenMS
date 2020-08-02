@@ -2,6 +2,7 @@ package quest
 
 import client.MapleJob
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20314 {
    QuestActionManager qm
@@ -12,7 +13,7 @@ class Quest20314 {
          qm.dispose()
       } else {
          if (status == 1 && mode == 0) {
-            qm.sendNext("Come back when you are ready.")
+            qm.sendNext(I18nMessage.from("20314_COME_BACK"))
             qm.dispose()
             return
          }
@@ -22,21 +23,21 @@ class Quest20314 {
             status--
          }
          if (status == 0) {
-            qm.sendNext("The jewel you brought back from the Master of Disguise is Shinsoo's Teardrop. It is the crystallization of Shinsoo's powers. If the Black Magician gets his hands on this, then this spells doom for all of us.")
+            qm.sendNext(I18nMessage.from("20314_DOOM_US_ALL"))
          } else if (status == 1) {
-            qm.sendYesNo("The Empress thought highly of your accomplishment and granted you a new title. Would you like to receive it?")
+            qm.sendYesNo(I18nMessage.from("20314_NEW_TITLE"))
          } else if (status == 2) {
             int nPSP = (qm.getPlayer().getLevel() - 70) * 3
             if (qm.getPlayer().getRemainingSp() > nPSP) {
-               qm.sendNext("You still have way too much #bSP#k with you. You can't earn a new title like that, I strongly urge you to use more SP on your 1st and 2nd level skills.")
+               qm.sendNext(I18nMessage.from("20314_SPEND_SP"))
             } else {
                if (!qm.canHold(1142068)) {
-                  qm.sendNext("If you wish to receive the medal befitting the title, you may want to make some room in your equipment inventory.")
+                  qm.sendNext(I18nMessage.from("20314_NEED_ROOM_FOR_MEDAL"))
                } else {
                   qm.gainItem(1142068, (short) 1)
                   qm.getPlayer().changeJob(MapleJob.NIGHT_WALKER_3)
                   qm.completeQuest()
-                  qm.sendOk("#h #, from here on out, you are an Advanced Knight of Cygnus Knights. The title comes with a newfound broad view on everything. You may encounter temptations here and there, but I want you to keep your faith and beliefs intact and do not succumb to the darkness.")
+                  qm.sendOk(I18nMessage.from("20314_ADVANCED_KNIGHT"))
                }
             }
          } else if (status == 3) {

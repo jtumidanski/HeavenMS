@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -39,17 +40,17 @@ class NPC9103000 {
          if (status == 0) {
             if (cm.isEventLeader()) {
                if (!cm.getEventInstance().isEventTeamTogether()) {
-                  cm.sendOk("One or more instance team members is missing, please wait for them to reach here first.")
+                  cm.sendOk(I18nMessage.from("9103000_MEMBER_MISSING"))
                   cm.dispose()
                } else if (cm.hasItem(4001106, 30)) {
                   qty = cm.getItemQuantity(4001106)
-                  cm.sendYesNo("Splendid! You have retrieved " + qty + " #t4001106# from this run, now your team will receive the fair amount of EXP from this action. Are you ready to get transported out?")
+                  cm.sendYesNo(I18nMessage.from("9103000_SPLENDID").with(qty))
                } else {
-                  cm.sendOk("Your party cannot finish this PQ yet, as you have not reached the minimum of 30 #t4001106#'s in hand yet.")
+                  cm.sendOk(I18nMessage.from("9103000_NEED_30"))
                   cm.dispose()
                }
             } else {
-               cm.sendOk("Let your party leader talk to me to end this quest.")
+               cm.sendOk(I18nMessage.from("9103000_PARTY_LEADER_MUST_TALK"))
                cm.dispose()
             }
          } else if (status == 1) {

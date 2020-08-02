@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2216 {
          }
 
          if (status == 0) {
-            qm.sendNext("I've just gathered an interesting information, #rDyle looks just like regular Ligators#k, but bigger.")
+            qm.sendNext(I18nMessage.from("2216_GATHERED_INFORMATION"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(7000)

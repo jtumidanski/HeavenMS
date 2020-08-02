@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2041017 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Hey adventurer! Keep it a secret, ok? We are currently manufacturing the so-called #b#t2049100##k, under Just-in-time marketing strategy. You needed? We're here. So, we act in two fronts: talk to me if you want a good bunch of these. It will be a #bQuest#k-esque procedure, however I will need plenty of #bhard-to-get gadgets#k from you. I will require a #r3 days#k break after the completion to start working for you again.\r\nTalk to my partner here, and he will JIT #bsynthetize#k these scrolls for you, requiring a bunch of #blow-cost items#k, #ranytime anywhere#k.")
+      cm.sendOk(I18nMessage.from("2041017_HELLO"))
       cm.dispose()
    }
 

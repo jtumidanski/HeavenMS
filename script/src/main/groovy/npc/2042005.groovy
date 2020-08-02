@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import net.server.world.MaplePartyCharacter
@@ -42,10 +43,10 @@ class NPC2042005 {
          if (status == 0) {
             if (cm.getParty() == null) {
                status = 10
-               cm.sendOk("You need to create a party before you can participate in Monster Carnival!")
+               cm.sendOk(I18nMessage.from("2042005_NEED_TO_BE_IN_A_PARTY"))
             } else if (!cm.isLeader()) {
                status = 10
-               cm.sendOk("If you want to start the battle, let the #bleader#k come and speak to me.")
+               cm.sendOk(I18nMessage.from("2042005_LEADER_MUST_START"))
             } else {
                int leaderMapId = cm.getMapId()
                MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
@@ -64,16 +65,16 @@ class NPC2042005 {
 
                if (party >= 1) {
                   status = 10
-                  cm.sendOk("You do not have enough people in your party. You need a party with #b" + cpqMinAmt + "#k - #r" + cpqMaxAmt + "#k members and they should be on the map with you.")
+                  cm.sendOk(I18nMessage.from("2042005_NOT_ENOUGH_PEOPLE").with(cpqMinAmt, cpqMaxAmt))
                } else if (lvlOk != inMap) {
                   status = 10
-                  cm.sendOk("Make sure everyone in your party is among the correct levels (" + cpqMinLvl + "~" + cpqMaxLvl + ")!")
+                  cm.sendOk(I18nMessage.from("2042005_LEVEL_RANGE").with(cpqMinLvl, cpqMaxLvl))
                } else if (isOutMap > 0) {
                   status = 10
-                  cm.sendOk("There are some of the party members that is not on the map!")
+                  cm.sendOk(I18nMessage.from("2042005_PARTY_MEMBERS_NOT_IN_MAP"))
                } else {
                   if (!cm.sendCPQMapLists2()) {
-                     cm.sendOk("All Monster Carnival fields are currently in use! Try again later.")
+                     cm.sendOk(I18nMessage.from("2042005_ALL_FIELDS_CURRENTLY_FULL"))
                      cm.dispose()
                   }
                }
@@ -84,15 +85,15 @@ class NPC2042005 {
                   cm.challengeParty2(selection)
                   cm.dispose()
                } else {
-                  cm.sendOk("The room is currently full.")
+                  cm.sendOk(I18nMessage.from("2042005_ROOM_IS_FULL"))
                   cm.dispose()
                }
             } else {
                MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                if ((selection == 0 || selection == 1) && party.size() < (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 2)) {
-                  cm.sendOk("You need at least 2 players to participate in the battle!")
+                  cm.sendOk(I18nMessage.from("2042005_NEED_AT_LEAST_2_PLAYERS"))
                } else if ((selection == 2) && party.size() < (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS ? 1 : 3)) {
-                  cm.sendOk("You need at least 3 players to participate in the battle!")
+                  cm.sendOk(I18nMessage.from("2042005_NEED_AT_LEAST_3_PLAYERS"))
                } else {
                   cm.cpqLobby2(selection)
                }

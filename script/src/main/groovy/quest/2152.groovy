@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2152 {
          }
 
          if (status == 0) {
-            qm.sendNext("That tree... I've heard of it before, I even studied its behavior! If I recall correctly, the #bStumpy#k comes alive when the soil deems infertile by some sort of magic, and those stumps who evolves under these conditions starts to drain these suspicious magical sources instead of water and minerals for living, which makes them very threatening to people and villages nearby.")
+            qm.sendNext(I18nMessage.from("2152_IF_I_RECALL_CORRECTLY"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

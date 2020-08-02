@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC2096000 {
          }
 
          if (status == 0) {
-            cm.sendOk("Amateurs train on this map. Adepts train on the next. Professionals train on the last, where the boss will be awaiting.")
+            cm.sendOk(I18nMessage.from("2096000_AMATUERS"))
             cm.dispose()
          }
       }

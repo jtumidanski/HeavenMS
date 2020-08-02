@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -19,7 +20,7 @@ class NPC2111006 {
       if (cm.isQuestStarted(3320) || cm.isQuestCompleted(3320)) {
          cm.warp(926120200, 1)
       } else {
-         cm.sendOk("uuuuhuk...Why only Ghost are around here?...")
+         cm.sendOk(I18nMessage.from("2111006_ONLY_GHOST_AROUND_HERE"))
       }
 
       cm.dispose()

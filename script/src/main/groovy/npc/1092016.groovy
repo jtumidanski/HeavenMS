@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -17,10 +18,10 @@ class NPC1092016 {
 
    def start() {
       if (cm.isQuestStarted(2166)) {
-         cm.sendNext("It's a beautiful, shiny rock. I can feel the mysterious power surrounding it.")
+         cm.sendNext(I18nMessage.from("1092016_BEAUTIFUL_ROCK"))
          cm.completeQuest(2166)
       } else {
-         cm.sendNext("I touched the shiny rock with my hand, and I felt a mysterious power flowing into my body.")
+         cm.sendNext(I18nMessage.from("1092016_MYSTERIOUS_POWER"))
       }
       cm.dispose()
    }

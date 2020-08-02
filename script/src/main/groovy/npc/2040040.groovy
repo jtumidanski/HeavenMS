@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -45,27 +46,27 @@ class NPC2040040 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
-            cm.sendNext("Hurry, goto the next stage, the portal is open!")
+            cm.sendNext(I18nMessage.from("2040040_GO_TO_NEXT_STAGE"))
          } else {
             if (eim.isEventLeader(cm.getPlayer())) {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
-                  cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k. This is the 2nd stage, but everyone has to cooperate. There are 6 portals here. One is guarded by monsters which can not be defeated, and one is very high. I'd like you and your party to go in each one and break the boxes inside. Bring back the drops -- there should be 24.")
+                  cm.sendOk(I18nMessage.from("2040040_WELCOME").with(stage))
                   eim.setProperty("statusStg" + stage, 0)
                } else {       // check stage completion
                   if (cm.haveItem(4001022, 24)) {
-                     cm.sendOk("Good job! You have collected all 24 #b#t4001022#'s.#k")
+                     cm.sendOk(I18nMessage.from("2040040_GOOD_JOB"))
                      cm.gainItem(4001022, (short) -24)
 
                      eim.setProperty("statusStg" + stage, 1)
                      clearStage(stage, eim, curMap)
                   } else {
-                     cm.sendNext("Sorry you don't have all 24 #b#t4001022#'s.#k")
+                     cm.sendNext(I18nMessage.from("2040040_SORRY"))
                   }
                }
             } else {
-               cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+               cm.sendNext(I18nMessage.from("2040040_PARTY_LEADER_MUST_TALK"))
             }
          }
 

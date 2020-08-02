@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.MapleBuffStat
 import client.MapleCharacter
@@ -14,13 +15,13 @@ class Quest3514 {
             qm.gainItem(2022337, (short) 1)
             qm.gainMeso(-1000000)
 
-            //qm.sendOk("Nice doing business with you~~.");
+            //qm.sendOk(I18nMessage.from("3514_NICE_DOING_BUSINESS"))
             qm.startQuest(3514)
          } else {
-            qm.sendOk("Check out for a slot on your USE inventory first.")
+            qm.sendOk(I18nMessage.from("3514_USE_SLOT_NEEDED"))
          }
       } else {
-         qm.sendOk("Oy, you don't have the money. I charge #r1,000,000 mesos#k for the emotion potion. No money, no deal.")
+         qm.sendOk(I18nMessage.from("3514_NO_MONEY"))
       }
 
       qm.dispose()
@@ -39,19 +40,19 @@ class Quest3514 {
       if (status == 0) {
          if (!usedPotion(qm.getPlayer())) {
             if (qm.haveItem(2022337)) {
-               qm.sendOk("Are you scared to drink the potion? I can assure you it has only a minor #rside effect#k.")
+               qm.sendOk(I18nMessage.from("3514_ARE_YOU_SCARED"))
             } else {
                if (qm.canHold(2022337)) {
                   qm.gainItem(2022337, (short) 1)
-                  qm.sendOk("Lost it? Luckily for you I managed to recover it back. Take it.")
+                  qm.sendOk(I18nMessage.from("3514_LOST_IT"))
                } else {
-                  qm.sendOk("Lost it? Luckily for you I managed to recover it back. Make a room to get it.")
+                  qm.sendOk(I18nMessage.from("3514_LOST_IT_MAKE_ROOM"))
                }
             }
 
             qm.dispose()
          } else {
-            qm.sendOk("It seems the potion worked and your emotions are no longer frozen. And, oh, my... You're ailing bad, #bpurge#k that out quickly.")
+            qm.sendOk(I18nMessage.from("3514_POTION_WORKED"))
          }
       } else if (status == 1) {
          qm.gainExp(891500)

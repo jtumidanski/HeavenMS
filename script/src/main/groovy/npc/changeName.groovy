@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.processor.CharacterProcessor
 import scripting.npc.NPCConversationManager
@@ -36,7 +37,7 @@ class NpcChangeName {
                cm.dispose()
             }
          } else if (status == 1) {
-            cm.sendGetText("Please input your desired name below.")
+            cm.sendGetText(I18nMessage.from("changeName_INPUT_DESIRED_NAME"))
          } else if (status == 2) {
             String text = cm.getText()
             boolean canCreate = CharacterProcessor.getInstance().canCreateChar(text)

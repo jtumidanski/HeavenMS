@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -17,10 +18,10 @@ class NPC9201108 {
 
    def start() {
       if (cm.getPlayer().getMapId() == 610030500) {
-         cm.sendOk("A legendary creature known as the Master Guardian awaits you. It was a Crimson Guardian that Ridley once experimented on, which resulted in its becoming highly resistant to magic attacks, spears, maces, everything--except arrows fired with exceptional power. Bowmen and women! As undisputed masters of the Bow and Arrow, you must use your most powerful attacks--everything from Strafe to Hurricane to Piercing Arrow to destroy this powerful creature and reach the Bowman Statue to claim The Ancestral Bow! Good luck!")
+         cm.sendOk(I18nMessage.from("9201108_LEGENDARY_CREATURE_AWAITS"))
          cm.dispose()
       } else if (cm.getPlayer().getMap().getId() == 610030000) {
-         cm.sendOk("One of the only known Holy Archers, Lockewood is one of the Keep's most famous heroes. Of particular note is his custom white and gold battle barb, said to be blessed by a powerful goddess. His aim was tremendously accurate over long distances. Feared and respected for his 'Genesis Arrow' and 'Doom Phoenix', he once struck down six Typhons from the Valley of Heroes.")
+         cm.sendOk(I18nMessage.from("9201108_MOST_FAMOUS_HEROES"))
          cm.dispose()
       } else if (cm.getPlayer().getMapId() == 610030540) {
          if (cm.getPlayer().getMap().countMonsters() == 0) {
@@ -31,18 +32,18 @@ class NPC9201108 {
             if ((stgStatus >> jobNiche) % 2 == 0) {
                if (cm.canHold(4001258, 1)) {
                   cm.gainItem(4001258, (short) 1)
-                  cm.sendOk("Good job.")
+                  cm.sendOk(I18nMessage.from("9201108_GOOD_JOB"))
 
                   stgStatus += (1 << jobNiche)
                   eim.setIntProperty("glpq5_room", stgStatus)
                } else {
-                  cm.sendOk("Make room on your ETC inventory first.")
+                  cm.sendOk(I18nMessage.from("9201108_MAKE_ETC_ROOM"))
                }
             } else {
-               cm.sendOk("The weapon inside this room has already been retrieved.")
+               cm.sendOk(I18nMessage.from("9201108_ALREADY_BEEN_RETRIEVED"))
             }
          } else {
-            cm.sendOk("Eliminate all Master Guardians.")
+            cm.sendOk(I18nMessage.from("9201108_ELIMINATE_ALL"))
          }
          cm.dispose()
       }

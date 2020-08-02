@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -18,7 +19,7 @@ class NPC2083005 {
    def start() {
       if (cm.isQuestStarted(6280)) {
          if (cm.hasItem(4031454)) {
-            cm.sendOk("(You poured some water from the fountain into the cup.)")
+            cm.sendOk(I18nMessage.from("2083005_POURED_WATER"))
             cm.gainItem(4031454, (short) -1)
             cm.gainItem(4031455, (short) 1)
          }

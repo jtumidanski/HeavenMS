@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9270031 {
    int sel = -1
 
    def start() {
-      cm.sendOk("We had our wedding at Amoria, such a beautiful place, and their people are even more amiable. Now our honeymoon on this paradisiac place... Ah, glorious, glorious!")
+      cm.sendOk(I18nMessage.from("9270031_HONEYMOON"))
       cm.dispose()
    }
 

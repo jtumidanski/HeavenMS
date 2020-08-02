@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,17 +24,17 @@ class Quest3321 {
          }
 
          if (status == 0) {
-            qm.sendNext("As you may know by now, I am Dr. De Lang. Once an affluent alchemist amongst the ranks of the Alcadno society, I have been disconnected from their society due to the disaster of the aftermatch of my failed experiments, that can be seen now all over Magatia.")
+            qm.sendNext(I18nMessage.from("3321_HELLO"))
          } else if (status == 1) {
-            qm.sendNextPrev("Huroids, my creation, were originally engineered to fulfill both domestic, scientific and military affairs, however a critical malfunction on their main processing unit chips rendered them unstable and violent, rapidly causing upheavals and havoc all over the place. Due to that, I've been stripped of my status as Alcadno's alchemist and researcher and got myself an arrest warrant.")
+            qm.sendNextPrev(I18nMessage.from("3321_MY_CREATION"))
          } else if (status == 2) {
-            qm.sendAcceptDecline("Even so, I must not be stopped now! Creations of mine are still roaming around causing destruction and casualities every day, with no great hopes of repelling them from the city! They can replicate themselves too fast, normal weapons cannot stop them. I've been since relentlessly researching a way to shut them down all at once, trying to find a way to stop this insanity. Surely you can understand my situation?")
+            qm.sendAcceptDecline(I18nMessage.from("3321_I_MUST_NOT_BE_STOPPED"))
          } else if (status == 3) {
-            qm.sendNext("My gratitude for understanding my point. You must have met Parwen, since you know where I am. Make him aware of the current situation.")
+            qm.sendNext(I18nMessage.from("3321_MY_GRATITUDE"))
          } else if (status == 4) {
-            qm.sendNext("Oh, and I have a personal favor to ask, if it's not too much. I am worried about my wife, #b#p2111004##k. Since the incident with the Huroids I could send a word to her, that must have made a toll on her... Please, if you could, could you get the #bSilver Pendant#k I left #bback at home#k, and give it to her in my stead? I regret not giving the item right away to her, it was her birthday... Maybe giving it now to her can get her a good sleeping night, at least.")
+            qm.sendNext(I18nMessage.from("3321_PERSONAL_FAVOR"))
          } else if (status == 5) {
-            qm.sendNext("#rMake sure to remember this pattern!#k I've hid the pendant in my house, in a container #bbehind the water pipes#k. The pipes must be turned #bin order#k: top, bottom, middle. And then, enter the secret password: '#rmy love Phyllia#k'.")
+            qm.sendNext(I18nMessage.from("3321_REMEMBER"))
             qm.forceStartQuest()
          } else if (status == 6) {
             qm.dispose()

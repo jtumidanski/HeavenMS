@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -55,9 +56,9 @@ class NPC2133001 {
             } else if (mapId == 930000400) {
                if (cm.haveItem(4001169, 20)) {
                   if (cm.isEventLeader()) {
-                     cm.sendNext("Oh you have brought them! We can now continue, shall we proceed?")
+                     cm.sendNext(I18nMessage.from("2133001_SHALL_WE_PROCEED"))
                   } else {
-                     cm.sendOk("You have brought them, but you're not the leader! Please let the leader hand me the marbles...")
+                     cm.sendOk(I18nMessage.from("2133001_LET_THE_LEADER_HAND_ME"))
                      cm.dispose()
                   }
                } else {
@@ -73,17 +74,17 @@ class NPC2133001 {
                         if (!cm.haveItem(2270004)) {
                            if (cm.canHold(2270004, 10)) {
                               cm.gainItem(2270004, (short) 10)
-                              cm.sendOk("Take 10 #t2270004#. First, #rweaken the #o9300174##k and, once it gets low health, use the item I gave you to capture them.")
+                              cm.sendOk(I18nMessage.from("2133001_USE_THE_ITEM_TO_CAPTURE"))
                               cm.dispose()
                            } else {
-                              cm.sendOk("Please make space on your USE inventory before receiving the purifiers!")
+                              cm.sendOk(I18nMessage.from("2133001_MAKE_USE_SPACE"))
                               cm.dispose()
                            }
                         } else {
                            cm.sendYesNo(ellinStr + "\r\n\r\nIt may be you are #rwilling to quit#k? Please double-think it, maybe your partners are still trying this instance.")
                         }
                      } else {
-                        cm.sendYesNo("You guys caught all the #o9300174#. Let the party leader hand all #b20 #t4001169##k to me to proceed." + "\r\n\r\nIt may be you are #rwilling to quit#k? Please double-think it, maybe your partners are still trying this instance.")
+                        cm.sendYesNo(I18nMessage.from("2133001_PARTY_MEMBER_OPTIONS"))
                      }
                   }
                }

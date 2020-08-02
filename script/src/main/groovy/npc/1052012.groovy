@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,10 +36,10 @@ class NPC1052012 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("So, are you going to use the Internet Cafe? There is a fee to use the spaces there, that is #b5,000 mesos#k. Are you going to enter the Cafe?")
+            cm.sendYesNo(I18nMessage.from("1052012_INTERNET_CAFE"))
          } else if (status == 1) {
             if (cm.getMeso() < 5000) {
-               cm.sendOk("Oh, you don't have the money, right? Sorry, I can't let you in.")
+               cm.sendOk(I18nMessage.from("1052012_NOT_ENOUGH_MESOS"))
             } else {
                cm.gainMeso(-5000)
                cm.warp(193000000, "out00")

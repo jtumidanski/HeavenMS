@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,7 +32,7 @@ class NPC1032110 {
       }
 
       if (status == 0) {
-         cm.sendOk("Nothing remarkable here.")
+         cm.sendOk(I18nMessage.from("1032110_NOTHING_REMARKABLE"))
       } else if (status == 1) {
          cm.dispose()
       }

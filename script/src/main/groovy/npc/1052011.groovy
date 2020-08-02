@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,21 +17,21 @@ class NPC1052011 {
    int sel = -1
 
    def start() {
-      cm.sendNext("This device is connected to outside.")
+      cm.sendNext(I18nMessage.from("1052011_DEVICE_CONNECTED_OUTSIDE"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode == -1) {
          cm.dispose()
       } else if (mode == 0) {
-         cm.sendOk("Alright, see you next time.")
+         cm.sendOk(I18nMessage.from("1052011_SEE_YOU_NEXT_TIME"))
          cm.dispose()
       } else {
          status++
          if (status == 1) {
-            cm.sendNextPrev("Are you going to give up and leave this place?")
+            cm.sendNextPrev(I18nMessage.from("1052011_GIVE_UP_AND_LEAVE"))
          } else if (status == 2) {
-            cm.sendYesNo("You'll have to start from scratch the next time you come in...")
+            cm.sendYesNo(I18nMessage.from("1052011_START_FROM_SCRATCH"))
          } else if (status == 3) {
             cm.warp(103000100, 0)
             cm.dispose()

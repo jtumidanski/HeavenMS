@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.quest.QuestActionManager
@@ -28,16 +29,16 @@ class Quest2291 {
 
          if (status == 0) {
             if (!qm.haveItem(4032521, 10)) {
-               qm.sendNext("Hey, you didn't get #b10 #t4032521##k yet, did you?")
+               qm.sendNext(I18nMessage.from("2291_YOU_DID_NOT_GET"))
                qm.dispose()
                return
             }
 
-            qm.sendNext("You got the #b#i4032521##k with you, great. Let me show you the way.")
+            qm.sendNext(I18nMessage.from("2291_YOU_GOT_THE"))
          } else if (status == 1) {
             EventManager em = qm.getEventManager("RockSpiritVIP")
             if (!em.startInstance(qm.getPlayer())) {
-               qm.sendOk("Uh... It looks like the rooms ahead are a bit crowded right now. Please wait around here for a bit, ok?")
+               qm.sendOk(I18nMessage.from("2291_ROOMS_AHEAD_ARE_A_BIT_CROWDED"))
                qm.dispose()
                return
             }

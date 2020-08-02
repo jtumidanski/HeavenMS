@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
@@ -37,10 +38,10 @@ class NPC9040010 {
 
                eim.clearPQ()
             } else {
-               cm.sendOk("This is your final challenge. Defeat the evil lurking within the Rubian and return it to me. That is all.")
+               cm.sendOk(I18nMessage.from("9040010_FINAL_CHALLENGE"))
             }
          } else {
-            cm.sendOk("This is your final challenge. Defeat the evil lurking within the Rubian and let your instance leader return it to me. That is all.")
+            cm.sendOk(I18nMessage.from("9040010_FINAL_CHALLENGE_LEADER"))
          }
       } else {
          cm.warp(990001100)

@@ -27,13 +27,13 @@ class NPC9201115 {
    def action(Byte mode, Byte type, Integer selection) {
       EventInstanceManager eim = cm.getEventInstance()
       if (eim != null && eim.getIntProperty("glpq6") == 3) {
-         cm.sendOk("... Well played. You overtook the Twisted Masters. Pass through that gate to receive your prizes.")
+         cm.sendOk(I18nMessage.from("9201115_WELL_PLAYED"))
          cm.dispose()
          return
       }
 
       if (!cm.isEventLeader()) {
-         cm.sendNext("I wish for your leader to talk to me.")
+         cm.sendNext(I18nMessage.from("9201115_LEADER_MUST_TALK"))
          cm.dispose()
          return
       }
@@ -47,11 +47,11 @@ class NPC9201115 {
       if (eim != null) {
          if (eim.getIntProperty("glpq6") == 0) {
             if (status == 0) {
-               cm.sendNext("Welcome to the Twisted Masters' Keep. I will be your host for this evening...")
+               cm.sendNext(I18nMessage.from("9201115_WELCOME"))
             } else if (status == 1) {
-               cm.sendNext("Tonight, we have a feast of a squad of Maplers.. ahaha...")
+               cm.sendNext(I18nMessage.from("9201115_TONIGHT_WE_FEAST"))
             } else if (status == 2) {
-               cm.sendNext("Let our specially trained Master Guardians escort you!")
+               cm.sendNext(I18nMessage.from("9201115_ESCORT"))
                MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MASTER_GUARDIANS_APPROACH"))
                for (int i = 0; i < 10; i++) {
                   eim.getMonster(9400594).ifPresent({ mob -> cm.getMap().spawnMonsterOnGroundBelow(mob, new Point(-1337 + (Math.random() * 1337).intValue(), 276)) })
@@ -65,9 +65,9 @@ class NPC9201115 {
          } else if (eim.getIntProperty("glpq6") == 1) {
             if (cm.getMap().countMonsters() == 0) {
                if (status == 0) {
-                  cm.sendOk("Eh. What is this? You've defeated them?")
+                  cm.sendOk(I18nMessage.from("9201115_WHAT_IS_THIS"))
                } else if (status == 1) {
-                  cm.sendNext("Well, no matter! The Twisted Masters will be glad to welcome you.")
+                  cm.sendNext(I18nMessage.from("9201115_NO_MATTER"))
                   MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("TWISTED_MASTERS_APPROACH"))
 
                   //Margana
@@ -86,12 +86,12 @@ class NPC9201115 {
                   cm.dispose()
                }
             } else {
-               cm.sendOk("Pay no attention to me. The Master Guardians will escort you!")
+               cm.sendOk(I18nMessage.from("9201115_PAY_NO_ATTENTION"))
                cm.dispose()
             }
          } else if (eim.getIntProperty("glpq6") == 2) {
             if (cm.getMap().countMonsters() == 0) {
-               cm.sendOk("WHAT? Ugh... this can't be happening.")
+               cm.sendOk(I18nMessage.from("9201115_CANNOT_BE_HAPPENING"))
                MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201115_NEXT_STAGE_OPENED"))
                eim.setIntProperty("glpq6", 3)
 
@@ -101,11 +101,11 @@ class NPC9201115 {
                eim.clearPQ()
                cm.dispose()
             } else {
-               cm.sendOk("Pay no attention to me. The Twisted Masters will escort you!")
+               cm.sendOk(I18nMessage.from("9201115_PAY_NO_ATTENTION_TWISTED_MASTERS"))
                cm.dispose()
             }
          } else {
-            cm.sendOk("... Well played. You overtook the Twisted Masters. Pass through that gate to receive your prizes.")
+            cm.sendOk(I18nMessage.from("9201115_WELL_PLAYED"))
             cm.dispose()
          }
       } else {

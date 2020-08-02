@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
@@ -18,7 +19,7 @@ class NPC9010021 {
    def start() {
       status = -1
       if (!YamlConfig.config.server.USE_REBIRTH_SYSTEM) {
-         cm.sendOk("... I came from distant planes to assist the fight against the #rBlack Magician#k. Right now I search my master, have you seen him?")
+         cm.sendOk(I18nMessage.from("9010021_ASSIST_THE_FIGHT"))
          cm.dispose()
          return
       }
@@ -33,24 +34,24 @@ class NPC9010021 {
          return
       }
       if (status == 0) {
-         cm.sendNext("Come to me when you want to be reborn again. You currently have a total of #r" + cm.getChar().getReborns() + " #krebirths.")
+         cm.sendNext(I18nMessage.from("9010021_REBORN").with(cm.getChar().getReborns()))
       } else if (status == 1) {
-         cm.sendSimple("What do you want me to do today: \r\n \r\n #L0##bI want to be rebirthed#l \r\n #L1##bMaybe next time#k#l")
+         cm.sendSimple(I18nMessage.from("9010021_WHAT_DO_YOU_WANT_ME_TO_DO"))
       } else if (status == 2) {
          if (selection == 0) {
             if (cm.getChar().getLevel() == 200) {
-               cm.sendYesNo("Are you sure you want to be rebirthed?")
+               cm.sendYesNo(I18nMessage.from("9010021_ARE_YOU_SURE"))
             } else {
-               cm.sendOk("You are not level 200, please come back when you hit level 200.")
+               cm.sendOk(I18nMessage.from("9010021_NOT_LEVEL_200"))
                cm.dispose()
             }
          } else if (selection == 1) {
-            cm.sendOk("Ok Bye")
+            cm.sendOk(I18nMessage.from("9010021_BYE"))
             cm.dispose()
          }
       } else if (status == 3 && type == 1) {
          cm.getChar().executeReborn()
-         cm.sendOk("You have now been reborn. That's a total of #r" + cm.getChar().getReborns() + "#k rebirths")
+         cm.sendOk(I18nMessage.from("9010021_REBORN_SUCCESS").with(cm.getChar().getReborns()))
          cm.dispose()
       }
    }

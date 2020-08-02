@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,14 +22,14 @@ class NPC2102001 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (status == 0) {
-         cm.sendYesNo("Do you wish to leave the genie?")
+         cm.sendYesNo(I18nMessage.from("2102001_WISH_TO_LEAVE_THE_GENIE"))
          status++
       } else {
          if (mode < 1) {
             cm.dispose()
          } else {
             if (status == 1) {
-               cm.sendNext("Alright, see you next time. Take care.")
+               cm.sendNext(I18nMessage.from("2102001_SEE_YOU_NEXT_TIME"))
                status++
             } else if (status == 2) {
                cm.warp(260000100, 0)

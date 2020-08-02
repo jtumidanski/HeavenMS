@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -17,10 +18,10 @@ class NPC9201107 {
 
    def start() {
       if (cm.getPlayer().getMapId() == 610030500) {
-         cm.sendOk("Unbelievable strength and power, anyone can be achieve. But what makes a warrior special is their iron will. No matter the odds, a true warrior pushes through until victory is assured. Thus, the Warrior Chamber is a brutal road where the room itself is against you, as well as the ultra-strong monsters within. Use your skills to shake off the effects and defeat the monsters within to reach the Warrior Statue and claim the Master Sword. Good luck!")
+         cm.sendOk(I18nMessage.from("9201107_UNBELIEVABLE"))
          cm.dispose()
       } else if (cm.getPlayer().getMap().getId() == 610030000) {
-         cm.sendOk("A legendary family of heroes, the de Vrisiens are the original founders of the Storm Casters. The family is unique, as each son or daughter inherits the full fighting techniques of their ancestors. This ability has proven to be immensely useful; as it allows for nearly unlimited strategy, improvisation and tactics to defeat all enemies. A true family for the generations.")
+         cm.sendOk(I18nMessage.from("9201107_LEGENDARY_FAMILY_OF_HEROES"))
          cm.dispose()
       } else if (cm.getPlayer().getMapId() == 610030510) {
          if (cm.getPlayer().getMap().countMonsters() == 0) {
@@ -31,18 +32,18 @@ class NPC9201107 {
             if ((stgStatus >> jobNiche) % 2 == 0) {
                if (cm.canHold(4001259, 1)) {
                   cm.gainItem(4001259, (short) 1)
-                  cm.sendOk("Good job.")
+                  cm.sendOk(I18nMessage.from("9201107_GOOD_JOB"))
 
                   stgStatus += (1 << jobNiche)
                   eim.setIntProperty("glpq5_room", stgStatus)
                } else {
-                  cm.sendOk("Make room on your ETC inventory first.")
+                  cm.sendOk(I18nMessage.from("9201107_MAKE_ETC_ROOM"))
                }
             } else {
-               cm.sendOk("The weapon inside this room has already been retrieved.")
+               cm.sendOk(I18nMessage.from("9201107_WEAPON_INSIDE"))
             }
          } else {
-            cm.sendOk("Eliminate all Crimson Guardians.")
+            cm.sendOk(I18nMessage.from("9201107_ELIMINATE_ALL"))
          }
          cm.dispose()
       }

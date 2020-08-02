@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -30,7 +31,7 @@ class NPC2023000 {
          cm.dispose()
       } else {
          if (mode == 0 && type > 0) {
-            cm.sendNext("Hmm, please think this over. It's not cheap, but you will NOT be disappointed with our premier service!")
+            cm.sendNext(I18nMessage.from("2023000_NOT_CHEAP"))
             cm.dispose()
             return
          }
@@ -47,12 +48,12 @@ class NPC2023000 {
                   break
                }
             }
-            cm.sendNext("Hello there! This taxi will take you to dangerous places in Ossyria faster than an arrow! We go from #m" + inMap[location] + "# to #b#m" + toMap[location] + "##k on this Ossyria Continent! It'll cost you #b" + cost[location] + " meso#k. I know it's a bit expensive, but it's well worth passing all the dangerous areas!")
+            cm.sendNext(I18nMessage.from("2023000_HELLO").with(inMap[location], toMap[location], cost[location]))
          } else if (status == 1) {
-            cm.sendYesNo("Would you like to pay #b" + cost[location] + " mesos#k to travel to the #b#m" + toMap[location] + "##k?")
+            cm.sendYesNo(I18nMessage.from("2023000_WOULD_YOU_LIKE_TO").with(cost[location], + toMap[location]))
          } else if (status == 2) {
             if (cm.getMeso() < cost[location]) {
-               cm.sendNext("You don't seem to have enough mesos. I am terribly sorry, but I cannot help you unless you pay up. Bring in the mesos by hunting more and come back when you have enough.")
+               cm.sendNext(I18nMessage.from("2023000_NOT_ENOUGH_MESOS"))
             } else {
                cm.warp(toMap[location], location != 1 ? 0 : 1)
                cm.gainMeso(-cost[location])

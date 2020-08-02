@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Orbis Magic Spot
@@ -17,9 +18,9 @@ class NPC2012014 {
 
    def start() {
       if (cm.haveItem(4001019)) {
-         cm.sendYesNo("You can use #b#t4001019##k to activate #b#p2012014##k. Will you teleport to where #b#p2012015##k is?")
+         cm.sendYesNo(I18nMessage.from("2012014_WILL_YOU_TELEPORT"))
       } else {
-         cm.sendOk("There's a #b#p2012014##k that'll enable you to teleport to where #b#p2012015##k is, but you can't activate it without the scroll.")
+         cm.sendOk(I18nMessage.from("2012014_NEED_THE_SCROLL"))
          cm.dispose()
       }
    }

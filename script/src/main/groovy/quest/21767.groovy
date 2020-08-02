@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -19,11 +20,11 @@ class Quest21767 {
 
          canStart = qm.canHold(4032423, 1)
          if (!canStart) {
-            qm.sendNext("Please open a slot in your ETC inventory first.")
+            qm.sendNext(I18nMessage.from("21767_OPEN_ETC_SPACE"))
             return
          }
 
-         qm.sendNext("#bHm, there's a medicinal substance in the box. What could this be? You better take this to John and ask him what it is.#k")
+         qm.sendNext(I18nMessage.from("21767_BETTER_TAKE_IT_TO_JOHN"))
       } else if (status == 1) {
          if (canStart) {
             qm.gainItem(4032423, (short) 1)

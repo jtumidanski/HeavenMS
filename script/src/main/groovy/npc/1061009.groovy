@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Door of Dimension
@@ -21,10 +22,10 @@ class NPC1061009 {
 
          EventManager em = cm.getEventManager("3rdJob_" + js)
          if (em == null) {
-            cm.sendOk("Sorry, but 3rd job advancement (" + js + ") is closed.")
+            cm.sendOk(I18nMessage.from("1061009_CLOSED").with(js))
          } else {
             if (!em.startInstance(cm.getPlayer())) {
-               cm.sendOk("Someone else is already challenging the clone. Please wait until the area is cleared.")
+               cm.sendOk(I18nMessage.from("1061009_ALREADY_CHALLENGING"))
             }
 
             cm.dispose()

@@ -2,6 +2,7 @@ package npc
 
 import client.inventory.MapleInventoryType
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		John JQ Flower pile #2
@@ -20,7 +21,7 @@ class NPC1063001 {
    def start() {
       if (cm.isQuestStarted(2053) && !cm.haveItem(4031026, 20)) {
          if (!cm.canHold(4031026, 20)) {
-            cm.sendNext("Check for a available slot on your ETC inventory.")
+            cm.sendNext(I18nMessage.from("1063001_CHECK_YOUR_ETC_INVENTORY"))
             cm.dispose()
             return
          }
@@ -28,7 +29,7 @@ class NPC1063001 {
          cm.gainItem(4031026, (short) 20)
       } else {
          if (cm.getPlayer().getInventory(MapleInventoryType.ETC).getNumFreeSlot() < 1) {
-            cm.sendNext("Check for a available slot on your ETC inventory.")
+            cm.sendNext(I18nMessage.from("1063001_CHECK_YOUR_ETC_INVENTORY"))
             cm.dispose()
             return
          }

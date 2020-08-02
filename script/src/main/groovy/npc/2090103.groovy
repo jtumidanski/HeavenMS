@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -37,7 +38,7 @@ class NPC2090103 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Hey, I'm Pata, and I am a renowned plastic surgeon and cosmetic lens expert here in Mu Lung. I believe your face and eyes are the most important features in your body, and with #b#t5152028##k or #b#t5152041##k, I can prescribe the right kind of facial care and cosmetic lenses for you. Now, what would you like to use?\r\n#L1#Plastic Surgery: #i5152028##t5152028##l\r\n#L2#Cosmetic Lenses: #i5152041##t5152041##l\r\n#L3#One-time Cosmetic Lenses: #i5152100# (any color)#l")
+            cm.sendSimple(I18nMessage.from("2090103_HELLO"))
          } else if (status == 1) {
             if (selection == 1) {
                beauty = 1
@@ -81,7 +82,7 @@ class NPC2090103 {
                }
 
                if (colors.length == 0) {
-                  cm.sendOk("You don't have any One-Time Cosmetic Lens to use.")
+                  cm.sendOk(I18nMessage.from("2090103_MISSING_ONE_TIME_LENS"))
                   cm.dispose()
                   return
                }
@@ -94,17 +95,17 @@ class NPC2090103 {
                if (cm.haveItem(5152028)) {
                   cm.gainItem(5152028, (short) -1)
                   cm.setFace(faceNew[selection])
-                  cm.sendOk("Enjoy your new and improved face!")
+                  cm.sendOk(I18nMessage.from("2090103_ENJOY_NEW_FACE"))
                } else {
-                  cm.sendOk("I'm sorry, but I don't think you have our plastic surgery coupon with you right now. Without the coupon, I'm afraid I can't do it for you..")
+                  cm.sendOk(I18nMessage.from("2090103_MISSING_SURGERY_COUPON"))
                }
             } else if (beauty == 2) {
                if (cm.haveItem(5152041)) {
                   cm.gainItem(5152041, (short) -1)
                   cm.setFace(colors[selection])
-                  cm.sendOk("Enjoy your new and improved cosmetic lenses!")
+                  cm.sendOk(I18nMessage.from("2090103_ENJOY_NEW_LENS"))
                } else {
-                  cm.sendOk("I'm sorry, but I don't think you have our cosmetic lens coupon with you right now. Without the coupon, I'm afraid I can't do it for you..")
+                  cm.sendOk(I18nMessage.from("2090103_MISSING_LENS_COUPON"))
                }
             } else if (beauty == 3) {
                int color = (colors[selection] / 100) % 100 | 0
@@ -112,9 +113,9 @@ class NPC2090103 {
                if (cm.haveItem(5152100 + color)) {
                   cm.gainItem(5152100 + color, (short) -1)
                   cm.setFace(colors[selection])
-                  cm.sendOk("Enjoy your new and improved cosmetic lenses!")
+                  cm.sendOk(I18nMessage.from("2090103_ENJOY_NEW_LENS"))
                } else {
-                  cm.sendOk("I'm sorry, but I don't think you have our cosmetic lens coupon with you right now. Without the coupon, I'm afraid I can't do it for you..")
+                  cm.sendOk(I18nMessage.from("2090103_MISSING_LENS_COUPON"))
                }
             }
          }

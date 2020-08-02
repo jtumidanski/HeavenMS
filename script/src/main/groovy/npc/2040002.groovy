@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Olson the Toy Soldier
@@ -22,13 +23,13 @@ class NPC2040002 {
          em = cm.getEventManager("DollHouse")
 
          if (em.getProperty("noEntry") == "false") {
-            cm.sendNext("The pendulum is hidden inside a dollhouse that looks different than the others.")
+            cm.sendNext(I18nMessage.from("2040002_PENDULUM_INSIDE"))
          } else {
-            cm.sendOk("Someone else is already searching the area. Please wait until the area is cleared.")
+            cm.sendOk(I18nMessage.from("2040002_SOMEONE_ALREADY"))
             cm.dispose()
          }
       } else {
-         cm.sendOk("We are not allowed to let the general public wander past this point.")
+         cm.sendOk(I18nMessage.from("2040002_NOT_ALLOWED"))
          cm.dispose()
       }
    }
@@ -39,11 +40,11 @@ class NPC2040002 {
       } else {
          status++
          if (status == 1) {
-            cm.sendYesNo("Are you ready to enter the dollhouse map?")
+            cm.sendYesNo(I18nMessage.from("2040002_ARE_YOU_READY"))
          } else if (status == 2) {
             em = cm.getEventManager("DollHouse")
             if (!em.startInstance(cm.getPlayer())) {
-               cm.sendOk("Hmm... The DollHouse is being challenged already, it seems. Try again later.")
+               cm.sendOk(I18nMessage.from("2040002_ALREADY_BEING_CHALLENGED"))
             }
 
             cm.dispose()

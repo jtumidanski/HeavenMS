@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,9 +18,9 @@ class NPC9201057 {
 
    def start() {
       if (cm.c.getPlayer().getMapId() == 103000100 || cm.c.getPlayer().getMapId() == 600010001) {
-         cm.sendYesNo("The ride to " + (cm.c.getPlayer().getMapId() == 103000100 ? "New Leaf City of Masteria" : "Kerning City of Victoria Island") + " takes off every minute, beginning on the hour, and it'll cost you #b5000 mesos#k. Are you sure you want to purchase #b#t" + (4031711 + (cm.c.getPlayer().getMapId() / 300000000).intValue()) + "##k?")
+         cm.sendYesNo(I18nMessage.from("9201057_THE_RIDE").with((cm.c.getPlayer().getMapId() == 103000100 ? "New Leaf City of Masteria" : "Kerning City of Victoria Island")))
       } else if (cm.c.getPlayer().getMapId() == 600010002 || cm.c.getPlayer().getMapId() == 600010004) {
-         cm.sendYesNo("Do you want to leave before the train start? There will be no refund.")
+         cm.sendYesNo(I18nMessage.from("9201057_NO_REFUND"))
       }
    }
 
@@ -32,13 +33,13 @@ class NPC9201057 {
          int item = 4031711 + (cm.c.getPlayer().getMapId() / 300000000).intValue()
 
          if (!cm.canHold(item)) {
-            cm.sendNext("You don't have a etc. slot available.")
+            cm.sendNext(I18nMessage.from("9201057_NO_ETC_SPACE"))
          } else if (cm.getMeso() >= 5000) {
             cm.gainMeso(-5000)
             cm.gainItem(item, (short) 1)
-            cm.sendNext("There you go.")
+            cm.sendNext(I18nMessage.from("9201057_THERE_YOU_GO"))
          } else {
-            cm.sendNext("You don't have enough mesos.")
+            cm.sendNext(I18nMessage.from("9201057_NOT_ENOUGH_MESO"))
          }
       } else {
          cm.warp(cm.c.getPlayer().getMapId() == 600010002 ? 600010001 : 103000100)

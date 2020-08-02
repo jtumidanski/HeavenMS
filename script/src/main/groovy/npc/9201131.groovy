@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -34,13 +35,13 @@ class NPC9201131 {
       if (status == 0) {
          if (cm.isQuestStarted(quest)) {
             if (cm.haveItem(questItem)) {
-               cm.sendYesNo("Would you like to move to #b#m" + map + "##k?")
+               cm.sendYesNo(I18nMessage.from("9201131_WOULD_YOU_LIKE_TO_MOVE").with(map))
             } else {
-               cm.sendOk("The entrance is blocked by a force that can only be lifted by those holding an emblem.")
+               cm.sendOk(I18nMessage.from("9201131_HOLD_AN_EMBLEM"))
                cm.dispose()
             }
          } else {
-            cm.sendOk("The entrance is blocked by a strange force.")
+            cm.sendOk(I18nMessage.from("9201131_STRANCE_FORCE"))
             cm.dispose()
          }
       } else {

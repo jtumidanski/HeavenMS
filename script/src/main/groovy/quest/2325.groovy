@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -22,13 +23,13 @@ class Quest2325 {
       }
 
       if (status == 0) {
-         qm.sendNext("I... I am scared... Please... please help me...")
+         qm.sendNext(I18nMessage.from("2325_I_AM_SCARED"))
       } else if (status == 1) {
          qm.sendNextPrev("Don't be afraid, #b#p1300005##k sent me here.",  (byte) 2)
       } else if (status == 2) {
          qm.forceCompleteQuest()
          qm.gainExp(6000)
-         qm.sendOk("What? My brother sent you here? Ahhh... I am safe now. Thank you so much...")
+         qm.sendOk(I18nMessage.from("2325_THANK_YOU"))
       } else if (status == 3) {
          qm.dispose()
       }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,7 +22,7 @@ class NPC2103001 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (cm.isQuestStarted(3927)) {
-         cm.sendNext("If I had an iron hammer and a dagger, a bow and an arrow...")
+         cm.sendNext(I18nMessage.from("2103001_IF_I_HAD"))
          cm.setQuestProgress(3927, 1)
       }
 

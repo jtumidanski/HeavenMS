@@ -2,6 +2,7 @@ package npc
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -22,7 +23,7 @@ class NPC2012009 {
    int[] faceNew = []
 
    def start() {
-      cm.sendSimple("Hi, I pretty much shouldn't be doing this, but with a #b#t5152004##k, I will do it anyways for you. But don't forget, it will be random!\r\n#L2#Plastic Surgery: #i5152004##t5152004##l")
+      cm.sendSimple(I18nMessage.from("2012009_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -42,15 +43,15 @@ class NPC2012009 {
                      faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendYesNo("If you use the regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152004##k?")
+               cm.sendYesNo(I18nMessage.from("2012009_REGULAR_COUPON_EXPLANATION"))
             }
          } else if (status == 2) {
             if (cm.haveItem(5152004)) {
                cm.gainItem(5152004, (short) -1)
                cm.setFace(faceNew[Math.floor(Math.random() * faceNew.length).intValue()])
-               cm.sendOk("Enjoy your new and improved face!")
+               cm.sendOk(I18nMessage.from("2012009_ENJOY_NEW_FACE"))
             } else {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("2012009_MISSING_FACE_COUPON"))
             }
 
             cm.dispose()

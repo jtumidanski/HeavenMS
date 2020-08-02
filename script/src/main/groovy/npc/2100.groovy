@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,9 +18,9 @@ class NPC2100 {
 
    def start() {
       if (cm.c.getPlayer().getMapId() == 0 || cm.c.getPlayer().getMapId() == 3) {
-         cm.sendYesNo("Welcome to the world of MapleStory. The purpose of this training camp is to help beginners. Would you like to enter this training camp? Some people start their journey without taking the training program. But I strongly recommend you take the training program first.")
+         cm.sendYesNo(I18nMessage.from("2100_WELCOME"))
       } else {
-         cm.sendNext("This is the image room where your first training program begins. In this room, you will have an advance look into the job of your choice.")
+         cm.sendNext(I18nMessage.from("2100_FIRST_TRAINING_PROGRAM"))
       }
    }
 
@@ -27,23 +28,23 @@ class NPC2100 {
       status++
       if (mode != 1) {
          if (mode == 0 && status == 0) {
-            cm.sendYesNo("Do you really want to start your journey right away?")
+            cm.sendYesNo(I18nMessage.from("2100_DO_YOU_REALLY_WANT_TO_START"))
             return
          } else if (mode == 0 && status == 1 && type == 0) {
             status -= 2
             start()
             return
          } else if (mode == 0 && status == 1 && type == 1) {
-            cm.sendNext("Please talk to me again when you finally made your decision.")
+            cm.sendNext(I18nMessage.from("2100_TALK_TO_ME_AGAIN"))
          }
          cm.dispose()
          return
       }
       if (cm.c.getPlayer().getMapId() == 0 || cm.c.getPlayer().getMapId() == 3) {
          if (status == 0) {
-            cm.sendNext("Ok then, I will let you enter the training camp. Please follow your instructor's lead.")
+            cm.sendNext(I18nMessage.from("2100_OK_THEN"))
          } else if (status == 1 && type == 1) {
-            cm.sendNext("It seems like you want to start your journey without taking the training program. Then, I will let you move on to the training ground. Be careful~")
+            cm.sendNext(I18nMessage.from("2100_SKIP_TRAINING"))
          } else if (status == 1) {
             cm.warp(1, 0)
             cm.dispose()
@@ -52,7 +53,7 @@ class NPC2100 {
             cm.dispose()
          }
       } else if (status == 0) {
-         cm.sendPrev("Once you train hard enough, you will be entitled to occupy a job. You can become a Bowman in Henesys, a Magician in Ellinia, a Warrior in Perion, and a Thief in Kerning City...")
+         cm.sendPrev(I18nMessage.from("2100_ENTITLED_TO_OCCUPY_A_JOB"))
       } else {
          cm.dispose()
       }

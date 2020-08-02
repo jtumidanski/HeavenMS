@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9000010 {
    int sel = -1
 
    def start() {
-      cm.sendNext("I'm sorry but I'm afraid you didn't win the event. Try it again some other time. You can return to where you were through me.")
+      cm.sendNext(I18nMessage.from("9000010_TRY_AGAIN_SOME_OTHER_TIME"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -28,9 +29,9 @@ class Quest2342 {
                   qm.forceStartQuest()
                   qm.gainItem(4001318, (short) 1)
                   qm.forceCompleteQuest()
-                  qm.sendOk("Looks like you forgot to pick up the #b#t4001318##k when you fought with the #bPrime Minister#k. This is very important to our kingdom, so please deliver this to my father as soon as possible.")
+                  qm.sendOk(I18nMessage.from("2342_LOOKS_LIKE_YOU_FORGOT"))
                } else {
-                  qm.sendOk("Please free up one spot in your ETC inventory")
+                  qm.sendOk(I18nMessage.from("2342_ETC_SPACE_NEEDED"))
                }
             } else {
                qm.dispose()

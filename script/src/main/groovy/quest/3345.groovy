@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -28,12 +29,12 @@ class Quest3345 {
 
          if (status == 0) {
             if (qm.getQuestProgress(3345, 0) == 4) {
-               qm.sendNext("So, you have succeeded. With this, Magatia's upfront demise has been averted, well done brave adventurer!")
+               qm.sendNext(I18nMessage.from("3345_WELL_DONE"))
                qm.forceCompleteQuest()
 
                qm.gainExp(20000)
             } else {
-               qm.sendNext("Did you not seal the #rmagic circle beneath Magatia#k yet? It is a matter of great importance, please haste yourself.")
+               qm.sendNext(I18nMessage.from("3345_HASTE_YOURSELF"))
             }
          } else if (status == 1) {
             qm.dispose()

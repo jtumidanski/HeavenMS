@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC2012012 {
          }
 
          if (status == 0) {
-            cm.sendOk("Can you help me find the Ancient Book? I lost it somewhere in El Nath...")
+            cm.sendOk(I18nMessage.from("2012012_ANCIENT_BOOK"))
             cm.dispose()
          }
       }

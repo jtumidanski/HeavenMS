@@ -14,7 +14,7 @@ class Quest21013 {
       status++
       if (mode != 1) {
          if (type == 1 && mode == 0) {
-            qm.sendNext("I'm sure it will come in handy during your journey. Please, don't decline my offer.")
+            qm.sendNext(I18nMessage.from("21013_I_AM_SURE_IT_WILL_COME_IN_HANDY"))
             qm.dispose()
             return
          } else {
@@ -24,9 +24,9 @@ class Quest21013 {
       }
 
       if (status == 0) {
-         qm.sendSimple("Ah, you're the hero. I've been dying to meet you. \r\n#b#L0#(Seems a bit shy...)#l")
+         qm.sendSimple(I18nMessage.from("21013_I_HAVE_BEEN_DYING_TO_MEET_YOU"))
       } else if (status == 1) {
-         qm.sendAcceptDecline("I have something I've been wanting to give you as a gift for a very long time... I know you're busy, especially since you're on your way to town, but will you accept my gift?")
+         qm.sendAcceptDecline(I18nMessage.from("21013_I_HAVE_BEEN_WANTING_TO_GIVE_YOU"))
       } else if (status == 2) {
          qm.forceStartQuest()
          qm.sendNext("The parts of the gift have been packed inside a box nearby. Sorry to trouble you, but could you break the box and bring me a #b#t4032309##k and some #b#t4032310##k? I'll assemble them for you right away.", (byte) 9)
@@ -40,7 +40,7 @@ class Quest21013 {
       status++
       if (mode != 1) {
          if (type == 1 && mode == 0) {
-            qm.sendNext("What? You don't want the potion?")
+            qm.sendNext(I18nMessage.from("21013_YOU_DO_NOT_WANT_THE_POTION"))
             qm.dispose()
             return
          } else {
@@ -49,7 +49,7 @@ class Quest21013 {
          }
       }
       if (status == 0) {
-         qm.sendYesNo("Ah, you've brought all the components. Give me a few seconds to assemble them.. Like this.. And like that.. and...\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v3010062# 1 #t3010062#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 95 exp")
+         qm.sendYesNo(I18nMessage.from("21013_GIVE_ME_A_FEW_SECONDS"))
       } else if (status == 1) {
          if (qm.isQuestCompleted(21013)) {
             MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("UNKNOWN_ERROR"))

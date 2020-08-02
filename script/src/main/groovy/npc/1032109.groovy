@@ -4,6 +4,7 @@ import client.MapleCharacter
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.I18nMessage
 
 import java.awt.*
 
@@ -43,7 +44,7 @@ class NPC1032109 {
 
 
       if (status == 0) {
-         cm.sendOk("A mysterious black figure appeared and summoned a lot of angry monsters!")
+         cm.sendOk(I18nMessage.from("1032109_A_LOT_OF_ANGRY_MONSTERS_SUMMONED"))
       } else if (status == 1) {
          MapleCharacter player = cm.getPlayer()
          MapleMap map = player.getMap()

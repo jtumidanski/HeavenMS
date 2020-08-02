@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -21,7 +22,7 @@ class NPC1209002 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendOk("Please calm down, uncle. We are embarking to #bVictoria Island#k, we will be safe once we reach there. So, come on!")
+      cm.sendOk(I18nMessage.from("1209002_CALM_DOWN"))
       cm.dispose()
    }
 }

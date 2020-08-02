@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,20 +14,20 @@ class Quest2314 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendNext("Please do not lose faith in our Kingdom of Mushroom.")
+            qm.sendNext(I18nMessage.from("2314_DO_NOT_LOSE_FAITH"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("In order to rescue the princess, you must first navigate the Mushroom Forest. King Pepe set up a powerful barrier forbidding anyone from entering the castle. Please investigate this matter for us.")
+         qm.sendAcceptDecline(I18nMessage.from("2314_IN_ORDER_TO"))
       } else if (status == 1) {
-         qm.sendNext("You'll run into the barrier at the Mushroom Forest by heading east of where you are standing right now. Please be careful. I hear that the area is infested with crazy, fear-inducing monsters.")
+         qm.sendNext(I18nMessage.from("2314_BARRIER"))
       } else if (status == 2) {
          //qm.forceStartQuest();
          //qm.forceStartQuest(2314,"1");
          qm.gainExp(8300)
-         qm.sendOk("I see, so it was indeed not a regular barrier by any means. Great work there. If not for you help, we wouldn't have had a clue as to what that was all about.")
+         qm.sendOk(I18nMessage.from("2314_GREAT_WORK"))
          qm.forceCompleteQuest()
       } else if (status == 3) {
          qm.dispose()
@@ -44,12 +45,12 @@ class Quest2314 {
          }
       }
       if (status == 0) {
-         qm.sendOk("I see that you have thoroughly investigated the barrier at the Mushroom Forest. What was it like?")
+         qm.sendOk(I18nMessage.from("2314_WHAT_WAS_IT_LIKE"))
       }
       if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainExp(8300)
-         qm.sendOk("I see, so it was indeed not a regular barrier by any means. Great work there. If not for you help, we wouldn't have had a clue as to what that was all about.")
+         qm.sendOk(I18nMessage.from("2314_GREAT_WORK"))
       } else if (status == 2) {
          qm.dispose()
       }

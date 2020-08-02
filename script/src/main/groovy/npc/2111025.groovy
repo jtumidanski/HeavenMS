@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111025 {
    int sel = -1
 
    def start() {
-      cm.sendNext ("This control device seems to be monitoring something...")
+      cm.sendNext (I18nMessage.from("2111025_SEEMS_TO_BE_MONITORING_SOMETHING"))
       cm.dispose()
    }
 

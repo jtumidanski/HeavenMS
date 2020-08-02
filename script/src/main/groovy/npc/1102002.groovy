@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1102002 {
    NPCConversationManager cm
@@ -9,7 +10,7 @@ class NPC1102002 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Yo. I am #p1102002#, in charge of mount raising and training for the Cygnus Knights' of Ereve!")
+      cm.sendOk(I18nMessage.from("1102002_MOUNT_RAISING"))
       cm.dispose()
    }
 

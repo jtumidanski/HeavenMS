@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Third Eos Rock
@@ -19,9 +20,9 @@ class NPC2040026 {
 
    def start() {
       if (cm.haveItem(4001020)) {
-         cm.sendSimple("You can use #bEos Rock Scroll#k to activate #bThird Eos Rock#k. Which of these rocks would you like to teleport to?#b\r\n#L0#Second Eos Rock (71st Floor)#l\r\n#L1#Fourth Eos Rock (1st Floor)#l")
+         cm.sendSimple(I18nMessage.from("2040026_CHOICES"))
       } else {
-         cm.sendOk("There's a rock that will enable you to teleport to #bSecond Eos Rock or Fourth Eos Rock#k, but it cannot be activated without the scroll.")
+         cm.sendOk(I18nMessage.from("2040026_NEED_SCROLL"))
          cm.dispose()
       }
    }
@@ -33,10 +34,10 @@ class NPC2040026 {
          status++
          if (status == 1) {
             if (selection == 0) {
-               cm.sendYesNo("You can use #bEos Rock Scroll#k to activate #bThird Eos Rock#k. Will you teleport to #bSecond Eos Rock#k at the 71st Floor?")
+               cm.sendYesNo(I18nMessage.from("2040026_TO_71"))
                map = 221022900
             } else {
-               cm.sendYesNo("You can use #bEos Rock Scroll#k to activate #bThird Eos Rock#k. Will you teleport to #bFourth Eos Rock#k at the 1st Floor?")
+               cm.sendYesNo(I18nMessage.from("2040026_TO_1"))
                map = 221020000
             }
          } else if (status == 2) {

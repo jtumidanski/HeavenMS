@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -38,7 +39,7 @@ class NPC9110002 {
             if (cm.isQuestCompleted(8074)) {
                cm.openNpc(9110002)
             } else {
-               cm.sendOk("Musssshhhhroooom Shrine~~~")
+               cm.sendOk(I18nMessage.from("9110002_MUSHROOM_SHRINE"))
             }
 
             cm.dispose()

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -30,25 +31,25 @@ class Quest2215 {
          if (status == 0) {
             int hourDay = qm.getHourOfDay()
             if (!(hourDay >= 17 && hourDay < 20)) {
-               qm.sendNext("(Hmm, I'm searching the trash can but can't find the #t4031894# JM was talking about, maybe it's not time yet...)")
+               qm.sendNext(I18nMessage.from("2215_CANNOT_FIND"))
                canComplete = false
                return
             }
 
             if (qm.getMeso() < 2000) {
-               qm.sendNext("(Oh, I don't have the combined fee amount yet.)")
+               qm.sendNext(I18nMessage.from("2215_DO_NOT_HAVE_THE_FEE"))
                canComplete = false
                return
             }
 
             if (!qm.canHold(4031894, 1)) {
-               qm.sendNext("(Eh, I can't hold the #t4031894# right now, I need an ETC slot available.)")
+               qm.sendNext(I18nMessage.from("2215_NEED_ETC_SLOT"))
                canComplete = false
                return
             }
 
             canComplete = true
-            qm.sendNext("(Alright, now I will deposit the fee there and get the paper... That's it, yea, that's done.)")
+            qm.sendNext(I18nMessage.from("2215_DEPOSIT_THE_FEE"))
          } else if (status == 1) {
             if (canComplete) {
                qm.forceCompleteQuest()

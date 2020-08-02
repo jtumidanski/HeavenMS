@@ -3,6 +3,7 @@ package quest
 import client.MapleJob
 import client.inventory.MapleInventoryType
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest2034 {
    QuestActionManager qm
@@ -22,10 +23,10 @@ class Quest2034 {
       status++
 
       if (status == 0) {
-         qm.sendNext("I knew it ... I knew you could get it done with, quickly! You did your job well last time, and here you are again, taking care of business!! Alright, since you have done it so well, I should reward you well. #b#p1051000##k is giving you a pair of shoes in hopes of helping you out on your future traveling.")
+         qm.sendNext(I18nMessage.from("2034_I_KNEW_IT"))
       } else if (status == 1) {
          if (qm.getPlayer().getInventory(MapleInventoryType.EQUIP).getNumFreeSlot() < 1) {
-            qm.sendOk("Please free a EQUIP inventory slot to receive the reward.")
+            qm.sendOk(I18nMessage.from("2034_FREE_EQUIP_SLOT"))
             qm.dispose()
             return
          }
@@ -51,7 +52,7 @@ class Quest2034 {
          qm.gainExp(2200)
          qm.completeQuest()
 
-         qm.sendOk("Alright, if you need work sometime down the road, feel free to come back and see me. This town sure can use a person like you for help~")
+         qm.sendOk(I18nMessage.from("2034_ALRIGHT"))
          qm.dispose()
       } else if (status == 2) {
          qm.dispose()

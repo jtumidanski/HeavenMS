@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -33,10 +34,10 @@ class NPC9030000 {
             cm.dispose()
          } else {
             if (cm.hasMerchant()) {
-               cm.sendOk("You have a Merchant open.")
+               cm.sendOk(I18nMessage.from("9030000_MERCHANT_OPEN"))
                cm.dispose()
             } else {
-               cm.sendOk("You don't have any items or mesos to be retrieved.")
+               cm.sendOk(I18nMessage.from("9030000_NO_ITEMS_OR_MESOS"))
                cm.dispose()
             }
          }

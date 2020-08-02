@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.inventory.Item
 import client.inventory.MapleInventoryType
@@ -44,7 +45,7 @@ class NPC2042002 {
             status = 0
             action((byte) 1, (byte) 0, 4)
          } else {
-            cm.sendOk("The Monster Carnival is currently unavailable.")
+            cm.sendOk(I18nMessage.from("2042002_CARNIVAL_UNAVAILABLE"))
             cm.dispose()
          }
 
@@ -69,7 +70,7 @@ class NPC2042002 {
 
          if (cm.getPlayer().getMapId() == 980000010) {
             if (status == 0) {
-               cm.sendNext("I hope you had fun at the Monster Carnival!")
+               cm.sendNext(I18nMessage.from("2042002_HOPE_YOU_HAD_FUN"))
             } else if (status > 0) {
                cm.warp(980000000, 0)
                cm.dispose()
@@ -184,10 +185,10 @@ class NPC2042002 {
             if (status == 0) {
                if (cm.getParty() == null) {
                   status = 10
-                  cm.sendOk("You need to create a party first before you can join the battle!")
+                  cm.sendOk(I18nMessage.from("2042002_MUST_BE_IN_A_PARTY"))
                } else if (!cm.isLeader()) {
                   status = 10
-                  cm.sendOk("If you want to start the battle, let the #bParty Leader#k talk to me.")
+                  cm.sendOk(I18nMessage.from("2042002_LEADER_MUST_START"))
                } else {
                   MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                   int inMap = cm.partyMembersInMap()
@@ -205,16 +206,16 @@ class NPC2042002 {
 
                   if (party >= 1) {
                      status = 10
-                     cm.sendOk("You do not have enough people in your party. You need a party with #b" + cpqMinAmt + "#k - #r" + cpqMaxAmt + "#k members and they should be on the map with you.")
+                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_PEOPLE").with(cpqMinAmt, cpqMaxAmt))
                   } else if (lvlOk != inMap) {
                      status = 10
-                     cm.sendOk("Make sure everyone in your party is among the correct levels (" + cpqMinLvl + "~" + cpqMaxLvl + ")!")
+                     cm.sendOk(I18nMessage.from("2042002_LEVEL_RANGE").with(cpqMinLvl, cpqMaxLvl))
                   } else if (isOutMap > 0) {
                      status = 10
-                     cm.sendOk("There are some of the party members that is not on the map!")
+                     cm.sendOk(I18nMessage.from("2042002_PARTY_MEMBERS_NOT_IN_MAP"))
                   } else {
                      if (!cm.sendCPQMapLists()) {
-                        cm.sendOk("All Monster Carnival fields are currently in use! Try again later.")
+                        cm.sendOk(I18nMessage.from("2042002_ALL_FIELDS_IN_USE"))
                         cm.dispose()
                      }
                   }
@@ -225,15 +226,15 @@ class NPC2042002 {
                      cm.challengeParty(selection)
                      cm.dispose()
                   } else {
-                     cm.sendOk("The room is currently full.")
+                     cm.sendOk(I18nMessage.from("2042002_ROOM_IS_FULL"))
                      cm.dispose()
                   }
                } else {
                   MaplePartyCharacter[] party = cm.getParty().orElseThrow().getMembers()
                   if ((selection >= 0 && selection <= 3) && party.size() < 1) {
-                     cm.sendOk("You need at least 2 players to participate in the battle!")
+                     cm.sendOk(I18nMessage.from("2042002_NEED_AT_LEAST_2_PLAYERS"))
                   } else if ((selection >= 4 && selection <= 5) && party.size() < 1) {
-                     cm.sendOk("You need at least 3 players to participate in the battle!")
+                     cm.sendOk(I18nMessage.from("2042002_NEED_AT_LEAST_3_PLAYERS"))
                   } else {
                      cm.cpqLobby(selection)
                   }
@@ -256,17 +257,17 @@ class NPC2042002 {
                      cm.warp(980000000, 0)
                      cm.dispose()
                   } else if (cm.getLevel() < 30) {
-                     cm.sendOk("You must be at least level 30 to participate in the Monster Carnival. Talk to me when you're strong enough.")
+                     cm.sendOk(I18nMessage.from("2042002_MUST_BE_AT_LEAST_LEVEL_30"))
                      cm.dispose()
                   } else {
-                     cm.sendOk("I'm sorry, but only players of level 30 ~ 50 can participate in the Monster Carnival.")
+                     cm.sendOk(I18nMessage.from("2042002_SORRY_LEVEL_RANGE"))
                      cm.dispose()
                   }
                } else if (selection == 1) {
                   status = 60
-                  cm.sendSimple("What would you like to do?\r\n#b#L0# What is Monster Carnival?#l\r\n#L1# Overview of the Monster Carnival.#l\r\n#L2# Detailed information about the Monster Carnival.#l\r\n#L3# Nothing really, I've changed my mind.#l")
+                  cm.sendSimple(I18nMessage.from("2042002_WHAT_WOULD_YOU_LIKE_TO_DO"))
                } else if (selection == 2) {
-                  cm.sendSimple("Remember, if you have #t4001129#, you can exchange for items. Select the item you would like to change them! \r\n#b#L0# #t1122007# (" + n1 + " coins)#l\r\n#L1# #t2041211# (" + n2 + " coins)#l\r\n#L2# Weapons for Warriors#l\r\n#L3# Weapons for Magician#l\r\n#L4# Weapons for Archers#l\r\n#L5# Weapons for Thief#l\r\n#L6# Weapons for Pirate#l")
+                  cm.sendSimple(I18nMessage.from("2042002_REMEMBER").with(n1, n2))
                } else if (selection == 3) {
                   cm.getChar().saveLocation("MONSTER_CARNIVAL")
                   cm.warp(980030000, 0)
@@ -298,7 +299,7 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -n1)
                      cm.dispose()
                   } else {
-                     cm.sendOk("Check and see if you are missing #b#t4001129##k or if your EQUIP inventory is full.")
+                     cm.sendOk(I18nMessage.from("2042002_MISSING_SOMETHING_OR_EQUIP_FULL"))
                      cm.dispose()
                   }
                } else if (select == 1) {
@@ -307,28 +308,28 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -n2)
                      cm.dispose()
                   } else {
-                     cm.sendOk("Check and see if you are missing #b#t4001129##k or if your USE inventory is full.")
+                     cm.sendOk(I18nMessage.from("2042002_MISSING_SOMETHING_OR_USE_FULL"))
                      cm.dispose()
                   }
                } else if (select == 2) {//S2 Warrior 26 S3 Magician 6 S4 Bowman 6 S5 Thief 8
                   status = 10
-                  cm.sendSimple("Please make sure you have #t4001129# for the weapon you want. Select the weapon you would like to trade #t4001129#. The choices I have are really good, and I'm not the one who speaks to the people who say it! \r\n#b#L0# #z1302004# (" + n3 + " coins)#l\r\n#L1# #z1402006# (" + n3 + " coins)#l\r\n#L2# #z1302009# (" + n4 + " coins)#l\r\n#L3# #z1402007# (" + n4 + " coins)#l\r\n#L4# #z1302010# (" + n5 + " coins)#l\r\n#L5# #z1402003# (" + n5 + " coins)#l\r\n#L6# #z1312006# (" + n3 + " coins)#l\r\n#L7# #z1412004# (" + n3 + " coins)#l\r\n#L8# #z1312007# (" + n4 + " coins)#l\r\n#L9# #z1412005# (" + n4 + " coins)#l\r\n#L10# #z1312008# (" + n5 + " coins)#l\r\n#L11# #z1412003# (" + n5 + " coins)#l\r\n#L12# Continue to the next page(1/2)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_MAKE_SURE").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
                } else if (select == 3) {
                   status = 20
-                  cm.sendSimple("Select the weapon you would like to trade. The weapons I have here are extremely attractive. See for yourself! \r\n#b#L0# #z1372001# (" + n3 + " coins)#l\r\n#L1# #z1382018# (" + n3 + " coins)#l\r\n#L2# #z1372012# (" + n4 + " coins)#l\r\n#L3# #z1382019# (" + n4 + " coins)#l\r\n#L4# #z1382001# (" + n5 + " coins)#l\r\n#L5# #z1372007# (" + n5 + " coins)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE").with(n3, n3, n4, n4, n5, n5))
                } else if (select == 4) {
                   status = 30
-                  cm.sendSimple("Select the weapon you would like to trade. The weapons I have here are extremely attractive. See for yourself! \r\n#b#L0# #z1452006# (" + n3 + " coins)#l\r\n#L1# #z1452007# (" + n4 + " coins)#l\r\n#L2# #z1452008# (" + n5 + " coins)#l\r\n#L3# #z1462005# (" + n3 + " coins)#l\r\n#L4# #z1462006# (" + n4 + " coins)#l\r\n#L5# #z1462007# (" + n5 + " coins)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_2").with(n3, n4, n5, n3, n4, n5))
                } else if (select == 5) {
                   status = 40
-                  cm.sendSimple("Select the weapon you would like to trade for. The weapons I have are of the highest quality. Select the one most appealing to you! \r\n#b#L0# #z1472013# (" + n3 + " coins)#l\r\n#L1# #z1472017# (" + n4 + " coins)#l\r\n#L2# #z1472021# (" + n5 + " coins)#l\r\n#L3# #z1332014# (" + n3 + " coins)#l\r\n#L4# #z1332031# (" + n4 + " coins)#l\r\n#L5# #z1332011# (" + n4 + " coins)#l\r\n#L6# #z1332016# (" + n5 + " coins)#l\r\n#L7# #z1332003# (" + n5 + " coins)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_3").with(n3, n4, n5, n3, n4, n4, n5, n5))
                } else if (select == 6) {
                   status = 50 //pirate rewards
-                  cm.sendSimple("Select the weapon you would like to trade for. The weapons I have are of the highest quality. Select the one most appealing to you! \r\n#b#L0# #z1482005# (" + n3 + " coins)#l \r\n#b#L1# #z1482006# (" + n4 + " coins)#l \r\n#b#L2# #z1482007# (" + n5 + " coins)#l \r\n#b#L3# #z1492005# (" + n3 + " coins)#l \r\n#b#L4# #z1492006# (" + n4 + " coins)#l \r\n#b#L5# #z1492007# (" + n5 + " coins)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_4").with(n3, n4, n5, n3, n4, n5))
                }
             } else if (status == 11) {
                if (selection == 12) {
-                  cm.sendSimple("Select the weapon you would like to trade. The weapons I have here are extremely useful. Take a look! \r\n#b#L0# #z1322015# (" + n3 + " coins)#l\r\n#L1# #z1422008# (" + n3 + " coins)#l\r\n#L2# #z1322016# (" + n4 + " coins)#l\r\n#L3# #z1422007# (" + n4 + " coins)#l\r\n#L4# #z1322017# (" + n5 + " coins)#l\r\n#L5# #z1422005# (" + n5 + " coins)#l\r\n#L6# #z1432003# (" + n3 + " coins)#l\r\n#L7# #z1442003# (" + n3 + " coins)#l\r\n#L8# #z1432005# (" + n4 + " coins)#l\r\n#L9# #z1442009# (" + n4 + " coins)#l\r\n#L10# #z1442005# (" + n5 + " coins)#l\r\n#L11# #z1432004# (" + n5 + " coins)#l\r\n#L12# Back to the first page (2/2)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_SELECT_THE_WEAPON_TO_TRADE_5").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
                } else {
                   int[] item = [1302004, 1402006, 1302009, 1402007, 1302010, 1402003, 1312006, 1412004, 1312007, 1412005, 1312008, 1412003]
                   int[] cost = [n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5]
@@ -337,14 +338,14 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -cost[selection])
                      cm.dispose()
                   } else {
-                     cm.sendOk("You do not have enough #b#t4001129##k, or your inventory is full. Please check again.")
+                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
                      cm.dispose()
                   }
                }
             } else if (status == 12) {
                if (selection == 12) {
                   status = 10
-                  cm.sendSimple("Please make sure you have #b#t4001129##k for the weapon you want. Select the weapon you would like to trade #t4001129#. The choices I have are really good, and I'm not the one who speaks to the people who say it! \r\n#b#L0# #z1302004# (" + n3 + " coins)#l\r\n#L1# #z1402006# (" + n3 + " coins)#l\r\n#L2# #z1302009# (" + n4 + " coins)#l\r\n#L3# #z1402007# (" + n4 + " coins)#l\r\n#L4# #z1302010# (" + n5 + " coins)#l\r\n#L5# #z1402003# (" + n5 + " coins)#l\r\n#L6# #z1312006# (" + n3 + " coins)#l\r\n#L7# #z1412004# (" + n3 + " coins)#l\r\n#L8# #z1312007# (" + n4 + " coins)#l\r\n#L9# #z1412005# (" + n4 + " coins)#l\r\n#L10# #z1312008# (" + n5 + " coins)#l\r\n#L11# #z1412003# (" + n5 + " coins)#l\r\n#L12# Continue to the next page(1/2)#l")
+                  cm.sendSimple(I18nMessage.from("2042002_MAKE_SURE_2").with(n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5))
                } else {
                   int[] item = [1322015, 1422008, 1322016, 1422007, 1322017, 1422005, 1432003, 1442003, 1432005, 1442009, 1442005, 1432004]
                   int[] cost = [n3, n3, n4, n4, n5, n5, n3, n3, n4, n4, n5, n5]
@@ -353,7 +354,7 @@ class NPC2042002 {
                      cm.gainItem(4001129, (short) -cost[selection])
                      cm.dispose()
                   } else {
-                     cm.sendOk("You do not have enough #b#t4001129##k, or your inventory is full. Please check again.")
+                     cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
                      cm.dispose()
                   }
                }
@@ -365,7 +366,7 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk("You do not have enough #b#t4001129##k, or your inventory is full. Please check again.")
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
                   cm.dispose()
                }
             } else if (status == 31) {
@@ -376,7 +377,7 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk("You do not have enough #b#t4001129##k, or your inventory is full. Please check again.")
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
                   cm.dispose()
                }
             } else if (status == 41) {
@@ -387,7 +388,7 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk("You do not have enough #b#t4001129##k, or your inventory is full. Please check again.")
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
                   cm.dispose()
                }
             } else if (status == 51) {
@@ -398,54 +399,54 @@ class NPC2042002 {
                   cm.gainItem(4001129, (short) -cost[selection])
                   cm.dispose()
                } else {
-                  cm.sendOk("You do not have enough #b#t4001129##k, or your inventory is full. Please check again.")
+                  cm.sendOk(I18nMessage.from("2042002_NOT_ENOUGH_OR_INVENTORY_IS_FULL"))
                   cm.dispose()
                }
             } else if (status == 61) {
                select = selection
                if (selection == 0) {
-                  cm.sendNext("Haha! I am Spiegelmann, the leader of this Monster Carnival. I got the first #bMonster Carnival#k here, waiting for travelers like you to take part in this extravaganza!")
+                  cm.sendNext(I18nMessage.from("2042002_HELLO"))
                } else if (selection == 1) {
-                  cm.sendNext("#bMonster Carnival#k consists of 2 groups entering the battlefield, and dropping the monsters invoked by the other party. #bA combat brigade that determines the victor by the amount of Carnival Points (CP) received#k.")
+                  cm.sendNext(I18nMessage.from("2042002_MONSTER_CARNIVAL_INFO"))
                } else if (selection == 2) {
-                  cm.sendNext("When you enter the Carnival Field, you will see the Monster List window appear. All you need to do is #bselect what you want to use, and press OK#k. Very easy, right?")
+                  cm.sendNext(I18nMessage.from("2042002_EASY_RIGHT"))
                } else {
                   cm.dispose()
                }
             } else if (status == 62) {
                if (select == 0) {
-                  cm.sendNext("What is #bMonster Carnival#k? Hahaha! Let's say it's an experience you'll never forget! It's a battle against other travelers just like you!#k")
+                  cm.sendNext(I18nMessage.from("2042002_WHAT_IS_IT"))
                } else if (select == 1) {
-                  cm.sendNext("When entering the Carnival Field, your task is to #breceive CP by killing the monsters from the opposite group, and using these CP's to distract the opposing group from hitting monsters#k.")
+                  cm.sendNext(I18nMessage.from("2042002_HOW_TO"))
                } else if (select == 2) {
-                  cm.sendNext("Once you get used to the commands, try using #bTAB and F1 ~ F12#k. #bTAB toggles between Monster Invocation / Skills / Protector#k, and, #bF1 ~ F12 enables you to access one of the windows directly#k.")
+                  cm.sendNext(I18nMessage.from("2042002_COMMANDS"))
                }
             } else if (status == 63) {
                if (select == 0) {
-                  cm.sendNext("I know it's too dangerous for you to fight with each other using real weapons; and I would not suggest such a barbaric act. Not my friend, what I offer to the competition. The excitement of the battle and the excitement of competing against such strong and motivated people. I offer the premise that your group and the opposite group both #binvoquem the monsters, and defeat the monsters invoked by the opposing group. This is the essence of the Monster Carnival. In addition, you can use Maple Coins earned during the Monster Carnival to get new items and weapons! #k")
+                  cm.sendNext(I18nMessage.from("2042002_I_KNOW_IT_IS_TOO_DANGEROUS"))
                } else if (select == 1) {
-                  cm.sendNext("There are 3 ways to distract the opposing group: #bSummoning a monster, Ability, and Protector#k. I will give you a more in-depth look if you want to know more about 'detailed instructions'!")
+                  cm.sendNext(I18nMessage.from("2042002_3_WAYS_TO_DISTRACT"))
                } else if (select == 2) {
-                  cm.sendNext("#bSummoning#k a Monster calls a monster that attacks the opposing party, under its control. Use CP to bring an Summoned Monster, and it will appear in the same area, attacking the opposing group.")
+                  cm.sendNext(I18nMessage.from("2042002_SUMMONING"))
                }
             } else if (status == 64) {
                if (select == 0) {
-                  cm.sendNext("Of course, it's not that simple. There are other ways to prevent the other group from dropping monsters, and it's up to you to figure out how to do it. What do you think? Interested in a friendly competition?")
+                  cm.sendNext(I18nMessage.from("2042002_OF_COURSE"))
                   cm.dispose()
                } else if (select == 1) {
-                  cm.sendNext("Please remember. It's never a good idea to keep your CP's. #bThe CPs you used will help determine the winner and loser of Monster Carnival.")
+                  cm.sendNext(I18nMessage.from("2042002_PLEASE_REMEMBER"))
                } else if (select == 2) {
-                  cm.sendNext("#bAbility#k is an option to use abilities such as Darkness, Weakness, and others to prevent the opposing group from killing other monsters. Not many CPs are needed, but it's worth it. The only problem is they do not last very long. Use this tactic wisely!")
+                  cm.sendNext(I18nMessage.from("2042002_ABILITY"))
                }
             } else if (status == 65) {
                if (select == 1) {
-                  cm.sendNext("Oh, and do not worry about turning into a ghost. In the Monster Carnival, #byou will not lose EXP after death#k. So it's really an experience like no other!")
+                  cm.sendNext(I18nMessage.from("2042002_DO_NOT_LOSE_EXP_WHEN_DEAD"))
                   cm.dispose()
                } else if (select == 2) {
-                  cm.sendNext("#bProtetor#k basically an invoked item that drastically increases the abilities of the monsters invoked by your group. Protector works until it is demolished by the opposing group, so I'm hoping you'll summon several monsters first, and then bring the Protector.")
+                  cm.sendNext(I18nMessage.from("2042002_PROTECTOR"))
                }
             } else if (status == 66) {
-               cm.sendNext("Lastly, while in the Monster Carnival, #byou can not use items / recovery potions that you carry around with you. #kMeanwhile, the monsters let these items fall for good. when, and when you #bget them, the item will immediately activate#k. That's why it's important to know when to get these items.")
+               cm.sendNext(I18nMessage.from("2042002_CANNOT_USE_ITEMS"))
                cm.dispose()
             } else if (status == 77) {
                boolean allDone
@@ -461,9 +462,9 @@ class NPC2042002 {
                }
 
                if (allDone) {
-                  cm.sendOk("Done. Thanks for showing up~.")
+                  cm.sendOk(I18nMessage.from("2042002_DONE"))
                } else {
-                  cm.sendOk("Done. Be aware some of the items #rcould not be synthesized#k because either you have a lack of space on your ETC inventory or there's not enough mesos to cover the fee.")
+                  cm.sendOk(I18nMessage.from("2042002_DONE_BUT_LACK_ETC_SPACE"))
                }
                cm.dispose()
             }

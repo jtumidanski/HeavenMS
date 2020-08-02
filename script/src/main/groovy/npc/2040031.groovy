@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Document Roll
@@ -35,7 +36,7 @@ class NPC2040031 {
          }
 
          if (status == 0) {
-            cm.sendOk("A document roll on the ground.")
+            cm.sendOk(I18nMessage.from("2040031_ROLL_ON_THE_GROUND"))
             cm.dispose()
          }
       }

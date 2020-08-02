@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9101001 {
    int sel = -1
 
    def start() {
-      cm.sendNext("You have finished all your trainings. Good job. You seem to be ready to start with the journey right away! Good, I will let you move on to the next place.")
+      cm.sendNext(I18nMessage.from("9101001_FINISHED_ALL_TRAINING"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -25,7 +26,7 @@ class NPC9101001 {
       } else {
          status++
          if (status == 1) {
-            cm.sendNextPrev("But remember, once you get out of here, you will enter a village full with monsters. Well them, good bye!")
+            cm.sendNextPrev(I18nMessage.from("9101001_BUT_REMEMBER"))
          } else if (status == 2) {
             cm.warp(40000, 0)
             cm.gainExp(3)

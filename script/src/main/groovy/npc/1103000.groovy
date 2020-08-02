@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1103000 {
          }
 
          if (status == 0) {
-            cm.sendOk("I am Advanced Knight #b#p1103000##k. Thanks to your bravery I and all of Ereve have been rescued from the grasps of Eleanor. By the kindness of our Empress, well battled!")
+            cm.sendOk(I18nMessage.from("1103000_RESCUED"))
             cm.dispose()
          }
       }

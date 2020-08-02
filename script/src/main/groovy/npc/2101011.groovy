@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101011 {
    int sel = -1
 
    def start() {
-      cm.sendNext ("The light and dark always coexist...")
+      cm.sendNext (I18nMessage.from("2101011_ALWAYS_COEXIST"))
       cm.dispose()
    }
 

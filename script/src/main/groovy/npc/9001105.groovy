@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
@@ -28,7 +29,7 @@ class NPC9001105 {
       } else {
          if (mode == 0 && type > 0) {
             if (cm.getPlayer().getMapId() == 922240200) {
-               cm.sendOk("That's a shame, come back when your ready.")
+               cm.sendOk(I18nMessage.from("9001105_A_SHAME"))
             }
 
             cm.dispose()
@@ -42,10 +43,10 @@ class NPC9001105 {
 
          if (status == 0) {
             if (cm.getMapId() == 922240200) {
-               cm.sendSimple("Did you have something to say...? #b\b\r\n#L0#I want to rescue Gaga.#l\r\n")
+               cm.sendSimple(I18nMessage.from("9001105_DID_YOU_HAVE_SOMETHING_TO_SAY"))
                //#L1#I want to go to the Space Mine.#l
             } else if (cm.getMapId() >= 922240000 && cm.getMapId() <= 922240019) {
-               cm.sendYesNo("Don't worry if you fail. You'll have 3 chances. Do you still want to give up?")
+               cm.sendYesNo(I18nMessage.from("9001105_DO_NOT_WORRY"))
             } else if (cm.getMapId() >= 922240100 && cm.getMapId() <= 922240119) {
                String text = "You went through so much trouble to rescue Gaga, but it looks like we're back to square one. "
                RescueGaga rescueGaga = (RescueGaga) cm.getPlayer().getEvents().get("rescueGaga")
@@ -63,24 +64,24 @@ class NPC9001105 {
                if (status == 1) {
                   if (selection == 0) {
                      selected = 1
-                     cm.sendNext("Welcome! I heard what happened from Baby Moon Bunny I'm glad you came since I was Planning on requesting some help. Gaga is a friend of mine who has helped me before and often stops by to say hello. Unfortunately, he was kidnapped by aliens.")
+                     cm.sendNext(I18nMessage.from("9001105_WELCOME"))
                   } else {
                      selected = 2
-                     cm.sendYesNo("At the Space Mine, you can find special ores called #bKrypto Crystals#k that contains the mysterious power of space. #bKrypto Crystals#l are usually emerald in color, but will turn brown if hit with the Spaceship's #bSpace Beam#k. Remember, in order to thwart this alien conspiracy, #b10 Brown Krypto Crystal's and 10 Emerald Krypto Crystal's are needed. But since even #b1 Krypto Crystal#k can be of help, bring me as many as possible. Oh, and one more thing! The Space Mines are protected by the Space Mateons. They are extremely strong due to the power of the #Krypto Crystals#k, so don't try to defeat them. Simply concentrate on quickly collecting the crystals.")
+                     cm.sendYesNo(I18nMessage.from("9001105_SPACE_MINE"))
                   }
                } else if (status == 2) {
                   if (selected == 1) {
-                     cm.sendYesNo("If we just leave Gaga with the aliens, something terrible will happen to him! I'll let you borrow a spaceship that the Moon Bunnies use for traveling so that you can rescue Gaga.#b Although he might appear a bit indecisive, slow, and immature at times#k, he's really a nice young man. Do you want to go rescue him now?")
+                     cm.sendYesNo(I18nMessage.from("9001105_SOMETHING_TERRIBLE"))
                   } else if (selected == 2) {
-                     cm.sendOk("Not coded yet, f4.")
+                     cm.sendOk(I18nMessage.from("9001105_NOT_CODED"))
                      cm.dispose()
                   }
                } else if (status == 3) {
                   EventManager em = cm.getEventManager("RescueGaga")
                   if (em == null) {
-                     cm.sendOk("This event is currently unavailable.")
+                     cm.sendOk(I18nMessage.from("9001105_UNAVAILABLE"))
                   } else if (!em.startInstance(cm.getPlayer())) {
-                     cm.sendOk("There is currently someone in this map, come back later.")
+                     cm.sendOk(I18nMessage.from("9001105_SOMEONE_IN_MAP"))
                   }
 
                   cm.dispose()

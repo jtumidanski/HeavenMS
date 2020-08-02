@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -24,7 +25,7 @@ class Quest21746 {
          }
 
          if (status == 0) {
-            qm.sendNext("If you want to know more about the Seal Rock of Mu Lung, you will need to pass my test. Prove your valor overpowering me in melee combat, only then I shall recognize you as a worthy knight.")
+            qm.sendNext(I18nMessage.from("21746_PASS_MY_TEST"))
          } else {
             MapleMap map = qm.getWarpMap(925040001)
             if (map.countPlayers() == 0) {
@@ -33,7 +34,7 @@ class Quest21746 {
                qm.warp(925040001, 0)
                qm.forceStartQuest()
             } else {
-               qm.sendOk("Someone is already attempting a challenge. Wait for them to finish before you enter.")
+               qm.sendOk(I18nMessage.from("21746_SOMEONE_ALREADY_ATTEMPTING"))
             }
 
 
@@ -58,7 +59,7 @@ class Quest21746 {
          }
 
          if (status == 0) {
-            qm.sendNext("Oh, you brought the ink. Now let me pour it, cautiously.... Almost there, almost. ... ..... Kyaaa! Th-the letter. It says: 'I'll be there to take your Seal Rock of Mu Lung.'")
+            qm.sendNext(I18nMessage.from("21746_LET_ME_POUR_IT"))
          } else if (status == 1) {
             qm.gainItem(4032342, (short) -8)
             qm.gainItem(4220151, (short) -1)

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -19,7 +20,7 @@ class NPC9201065 {
    int[] skin = [0, 1, 2, 3, 4]
 
    def start() {
-      cm.sendSimple("Well, hello! Welcome to the NLC Skin-Care! Would you like to have a firm, tight, healthy looking skin like mine?  With #b#t5153009##k, you can let us take care of the rest and have the kind of skin you've always wanted~!\r\n#L2#Skin Care: #i5153009##t5153009##l")
+      cm.sendSimple(I18nMessage.from("9201065_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -39,9 +40,9 @@ class NPC9201065 {
             if (cm.haveItem(5153009)) {
                cm.gainItem(5153009, (short) -1)
                cm.setSkin(skin[selection])
-               cm.sendOk("Enjoy your new and improved skin!")
+               cm.sendOk(I18nMessage.from("9201065_ENJOY_NEW_SKIN"))
             } else {
-               cm.sendOk("Um...you don't have the skin-care coupon you need to receive the treatment. Sorry, but I am afraid we can't do it for you...")
+               cm.sendOk(I18nMessage.from("9201065_MISSING_SKIN_COUPON"))
             }
 
             cm.dispose()

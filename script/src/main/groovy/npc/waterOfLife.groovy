@@ -50,7 +50,7 @@ class NPCWaterOfLife {
          }
 
          if (status == 0) {
-            cm.sendYesNo("I am Mar the Fairy. You have the #bWater of Life#k... With this, I can bring a doll back to life with my magic. What do you think? Do you want to use this item and reawaken your pet ...?")
+            cm.sendYesNo(I18nMessage.from("waterOfLife_I_AM_MAR"))
 
          } else if (status == 1) {
             String talkStr = "So which pet you want to reawaken? Please choose the pet you'd most like to reawaken...\r\n\r\n"
@@ -73,7 +73,7 @@ class NPCWaterOfLife {
             MaplePet sPet = dList.get(selection)
 
             if (sPet != null) {
-               cm.sendNext("Your doll has now reawaken as your pet! However, my magic isn't perfect, so I can't promise an eternal life for your pet... Please take care of that pet before the Water of Life dries. Well then, good bye...")
+               cm.sendNext(I18nMessage.from("waterOfLife_REAWAKEN"))
 
                Item it = cm.getPlayer().getInventory(MapleInventoryType.CASH).getItem(sPet.position())
                it.expiration_(System.currentTimeMillis() + (1000 * 60 * 60 * 24 * 90))
@@ -81,7 +81,7 @@ class NPCWaterOfLife {
 
                cm.gainItem(5180000, (short) -1)
             } else {
-               cm.sendNext("Oh, well then. Good bye...")
+               cm.sendNext(I18nMessage.from("waterOfLife_GOOD_BYE"))
             }
 
             cm.dispose()

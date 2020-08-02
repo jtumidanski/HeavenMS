@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,15 +32,15 @@ class NPC1092000 {
          }
 
          if (status == 0) {
-            cm.sendNext("Okay, I'll now send you to the stable where my cows are. Watch out for the calves that drink all the milk. You don't want your effort to go to waste.")
+            cm.sendNext(I18nMessage.from("1092000_SEND_YOU_TO_THE_STABLE"))
          } else if (status == 1) {
-            cm.sendNextPrev("It won't be easy to tell at a glance between a calf and a cow. Those calves may only be a month or two old, but they have already grown to the size of their mother. They even look alike...even I get confused at times! Good luck!")
+            cm.sendNextPrev(I18nMessage.from("1092000_I_GET_CONFUSED"))
          } else if (status == 2) {
             if (cm.canHold(4031847)) {
                cm.gainItem(4031847, (short) 1)
                cm.warp(912000100, 0)
             } else {
-               cm.sendOk("I can't give you the empty bottle because your inventory is full. Please make some room in your Etc window.")
+               cm.sendOk(I18nMessage.from("1092000_INVENTORY_IS_FULL"))
             }
             cm.dispose()
          }

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -39,7 +40,7 @@ class Quest21720 {
       } else if (status == 5) {
          qm.sendNextPrev("Aren't you scared?", (byte) 2)
       } else if (status == 6) {
-         qm.sendYesNo("Scared? Pfft. Who cares if the Black Magican appears. You'll be here to protect us. If anything, this makes me want to prepare you for the big battle. Ah, that reminds me, I found a #bskill#k. Would you like to see it?")
+         qm.sendYesNo(I18nMessage.from("21720_WOULD_YOU_LIKE_TO_SEE"))
       } else if (status == 7) {
          if (qm.getQuestStatus(21720) == 1) {
             qm.forceCompleteQuest()

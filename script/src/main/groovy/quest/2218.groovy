@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2218 {
          }
 
          if (status == 0) {
-            qm.sendNext("Hey did you see how strange #rLakelis#k has been acting these days? We should see what's going on about her, her actions have been so weird lately...")
+            qm.sendNext(I18nMessage.from("2218_SEE_HOW_STRANGE"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(7000)

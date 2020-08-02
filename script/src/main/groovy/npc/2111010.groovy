@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -39,7 +40,7 @@ class NPC2111010 {
                if (cm.canHold(4031708, 1)) {
                   cm.gainItem(4031708, (short) 1)
                } else {
-                  cm.sendOk("Have a ETC slot available to get the Alcadno's secret document.")
+                  cm.sendOk(I18nMessage.from("2111010_NEED_ETC_SLOT"))
                }
             }
 

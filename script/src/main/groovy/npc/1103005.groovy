@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC1103005 {
    int sel = -1
 
    def start() {
-      cm.sendAcceptDecline("Becoming a Knight of Cygnus requires talent, faith, courage, and will power... and it looks like you are more than qualified to become a Knight of Cygnus. What do you think? If you wish to become one right this minute, I'll take you straight to Erev. Would you like to head over to Erev right now?")
+      cm.sendAcceptDecline(I18nMessage.from("1103005_WHAT_DO_YOU_THINK"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

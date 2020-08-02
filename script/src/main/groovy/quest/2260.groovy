@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import constants.game.GameConstants
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2260 {
          }
 
          if (status == 0) {
-            qm.sendNext("Once you've got #b2nd job advancement#k, I'll tell you about the #bMushroom Castle#k.")
+            qm.sendNext(I18nMessage.from("2260_MUSHROOM_CASTLE_INTRO"))
          } else if (status == 1) {
             qm.forceStartQuest()
             qm.dispose()
@@ -48,12 +49,12 @@ class Quest2260 {
 
          if (status == 0) {
             if (GameConstants.getJobBranch(qm.getPlayer().getJob()) == 1) {
-               qm.sendNext("Eh, didn't you get the #r2nd job advancement#k yet?")
+               qm.sendNext(I18nMessage.from("2260_2ND_ADVANCEMENT_YET"))
                qm.dispose()
                return
             }
 
-            qm.sendNext("Okay you seem ready to go to the #bMushroom Castle#k. In #rHenesys#k, climb at the tree fort at #bwest#k then enter a portal over there. On the other area, #rgo west#k. From there, a portal will be readily available to access the #bMushroom Castle#k area.")
+            qm.sendNext(I18nMessage.from("2260_YOU_SEEM_TO_BE_READY"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

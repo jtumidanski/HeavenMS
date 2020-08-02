@@ -3,6 +3,7 @@ package npc
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -44,9 +45,9 @@ class NPC2030008 {
 
          if (!(cm.isQuestStarted(100200) || cm.isQuestCompleted(100200))) {
             if (cm.getPlayer().getLevel() >= 50) {
-               cm.sendOk("Beware, for the power of old has not been forgotten... If you seek to defeat #rZakum#k someday, earn the #bChief's Residence Council#k approval foremost and then #bface the trials#k, only then you will become eligible to fight.")
+               cm.sendOk(I18nMessage.from("2030008_BEWARE"))
             } else {
-               cm.sendOk("Beware, for the power of old has not been forgotten...")
+               cm.sendOk(I18nMessage.from("2030008_BEWARE_SHORT"))
             }
 
             cm.dispose()
@@ -55,41 +56,41 @@ class NPC2030008 {
 
          em = cm.getEventManager("ZakumPQ")
          if (em == null) {
-            cm.sendOk("The Zakum PQ has encountered an error.")
+            cm.sendOk(I18nMessage.from("2030008_PQ_ERROR"))
             cm.dispose()
             return
          }
 
          if (status == 0) {
-            cm.sendSimple("#e#b<Party Quest: Zakum Campaign>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nBeware, for the power of old has not been forgotten... #b\r\n#L0#Enter the Unknown Dead Mine (Stage 1)#l\r\n#L1#Face the Breath of Lava (Stage 2)#l\r\n#L2#Forging the Eyes of Fire (Stage 3)#l")
+            cm.sendSimple(I18nMessage.from("2030008_CHOICES").with(em.getProperty("party")))
          } else if (status == 1) {
             if (selection == 0) {
                if (cm.getParty().isEmpty()) {
-                  cm.sendOk("You can participate in the party quest only if you are in a party.")
+                  cm.sendOk(I18nMessage.from("2030008_NEED_TO_BE_IN_PARTY"))
                   cm.dispose()
                } else if (!cm.isLeader()) {
-                  cm.sendOk("Your party leader must talk to me to start this party quest.")
+                  cm.sendOk(I18nMessage.from("2030008_PARTY_LEADER_MUST_START"))
                   cm.dispose()
                } else {
                   MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                   if (eli.size() > 0) {
                      if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
-                        cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
+                        cm.sendOk(I18nMessage.from("2030008_ANOTHER_PARTY_HAS_ENTERED"))
                      }
                   } else {
-                     cm.sendOk("You cannot start this party quest yet, because either your party is not in the range size, some of your party members are not eligible to attempt it or they are not in this map. If you're having trouble finding party members, try Party Search.")
+                     cm.sendOk(I18nMessage.from("2030008_PARTY_REQUIREMENTS"))
                   }
 
                   cm.dispose()
                }
             } else if (selection == 1) {
                if (cm.haveItem(4031061) && !cm.haveItem(4031062)) {
-                  cm.sendYesNo("Would you like to attempt the #bBreath of Lava#k?  If you fail, there is a very real chance you will die.")
+                  cm.sendYesNo(I18nMessage.from("2030008_ATTEMPT_BREATH_OF_LAVA"))
                } else {
                   if (cm.haveItem(4031062)) {
-                     cm.sendNext("You've already got the #bBreath of Lava#k, you don't need to do this stage.")
+                     cm.sendNext(I18nMessage.from("2030008_ALREADY_HAVE_BREATH_OF_LAVA"))
                   } else {
-                     cm.sendNext("Please complete the earlier trials first.")
+                     cm.sendNext(I18nMessage.from("2030008_COMPLETE_EARLIER_TRIALS_FIRST"))
                   }
 
                   cm.dispose()
@@ -97,7 +98,7 @@ class NPC2030008 {
             } else {
                if (cm.haveItem(4031061) && cm.haveItem(4031062)) {
                   if (!cm.haveItem(4000082, 30)) {
-                     cm.sendOk("You have completed the trials, however there's still the need of #b30 #t4000082##k to forge 5 #t4001017#.")
+                     cm.sendOk(I18nMessage.from("2030008_STILL_NEED"))
                   } else {
                      cm.completeQuest(100201)
                      cm.gainItem(4031061, (short) -1)
@@ -105,12 +106,12 @@ class NPC2030008 {
                      cm.gainItem(4000082, (short) -30)
 
                      cm.gainItem(4001017, (short) 5)
-                     cm.sendNext("You #rhave completed the trials#k, from now on having my approval to challenge Zakum.")
+                     cm.sendNext(I18nMessage.from("2030008_APPROVED_TO_CHALLENGE_ZAKUM"))
                   }
 
                   cm.dispose()
                } else {
-                  cm.sendOk("You lack some of the required items to forge the #b#t4001017##k.")
+                  cm.sendOk(I18nMessage.from("2030008_LACK_REQUIRED_ITEMS"))
                   cm.dispose()
                }
             }

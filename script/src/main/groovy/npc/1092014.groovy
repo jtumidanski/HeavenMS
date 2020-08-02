@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -20,7 +21,7 @@ class NPC1092014 {
    int selectedMap = -1
 
    def start() {
-      cm.sendNext("Hello, I drive the Nautilus' Mid-Sized Taxi. If you want to go from town to town safely and fast, then ride our cab. We'll gladly take you to your destination with an affordable price.")
+      cm.sendNext(I18nMessage.from("1092014_NAUTILUS_TAXI_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -31,7 +32,7 @@ class NPC1092014 {
             cm.dispose()
             return
          } else if (status >= 2 && mode == 0) {
-            cm.sendNext("There's a lot to see in this town, too. Come back and find us when you need to go to a different town.")
+            cm.sendNext(I18nMessage.from("1092014_A_LOT_TO_SEE"))
             cm.dispose()
             return
          }
@@ -51,7 +52,7 @@ class NPC1092014 {
             }
             cm.sendSimple(selStr)
          } else if (status == 2) {
-            cm.sendYesNo("You don't have anything else to do here, huh? Do you really want to go to #b#m" + maps[selection] + "##k? It'll cost you #b" + (cm.getJobId() == 0 ? cost[selection] / 10 : cost[selection]) + " mesos#k.")
+            cm.sendYesNo(I18nMessage.from("1092014_NOTHING_ELSE_TO_DO").with(maps[selection], (cm.getJobId() == 0 ? cost[selection] / 10 : cost[selection])))
             selectedMap = selection
          } else if (status == 3) {
             int mesos
@@ -62,7 +63,7 @@ class NPC1092014 {
             }
 
             if (cm.getMeso() < mesos) {
-               cm.sendNext("You don't have enough mesos. Sorry to say this, but without them, you won't be able to ride the cab.")
+               cm.sendNext(I18nMessage.from("1092014_NOT_ENOUGH_MESOS"))
                cm.dispose()
                return
             }

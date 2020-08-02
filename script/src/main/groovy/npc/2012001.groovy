@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -19,20 +20,20 @@ class NPC2012001 {
       if (cm.haveItem(4031047)) {
          EventManager em = cm.getEventManager("Boats")
          if (em.getProperty("entry") == "true") {
-            cm.sendYesNo("Do you want to go to Ellinia?")
+            cm.sendYesNo(I18nMessage.from("2012001_GO_TO_ELLINIA"))
          } else {
-            cm.sendOk("The boat to Ellinia is already travelling, please be patient for the next one.")
+            cm.sendOk(I18nMessage.from("2012001_ALREADY_TRAVELLING"))
             cm.dispose()
          }
       } else {
-         cm.sendOk("Make sure you got a Ellinia ticket to travel in this boat. Check your inventory.")
+         cm.sendOk(I18nMessage.from("2012001_NEED_A_TICKET"))
          cm.dispose()
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0) {
-         cm.sendOk("Okay, talk to me if you change your mind!")
+         cm.sendOk(I18nMessage.from("2012001_OK"))
          cm.dispose()
          return
       }
@@ -43,7 +44,7 @@ class NPC2012001 {
          cm.gainItem(4031047, (short) -1)
          cm.dispose()
       } else {
-         cm.sendOk("The boat to Ellinia is ready to take off, please be patient for the next one.")
+         cm.sendOk(I18nMessage.from("2012001_BOAT_IS_READY_BE_PATIENT"))
          cm.dispose()
       }
    }

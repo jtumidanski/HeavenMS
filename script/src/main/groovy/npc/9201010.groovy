@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -42,7 +43,7 @@ class NPC9201010 {
       switch (status) {
          case 0:
             if (cm.getMapId() == 680000300) {
-               cm.sendYesNo("Are you sure you want to #rquit the stage#k and head back to #bAmoria#k? You will be #rskipping the bonus stages#k that way.")
+               cm.sendYesNo(I18nMessage.from("9201010_ARE_YOU_SURE"))
             } else {
                boolean hasEngagement = false
                for (int x = 4031357; x <= 4031364; x++) {
@@ -54,26 +55,26 @@ class NPC9201010 {
 
                if (cm.haveItem(4000313) && isMarrying) {
                   if (eim.getIntProperty("weddingStage") == 3) {
-                     cm.sendOk("You guys totally rocked the stage!!! Go go, talk to #b#p9201007##k to start the after party.")
+                     cm.sendOk(I18nMessage.from("9201010_TOTALLY_ROCKED"))
                      cm.dispose()
                   } else if (hasEngagement) {
                      if (!cm.createMarriageWishList()) {
-                        cm.sendOk("You have already sent your wish list...")
+                        cm.sendOk(I18nMessage.from("9201010_ALREADY_SENT_WISH_LIST"))
                      }
                      cm.dispose()
                   } else {
-                     cm.sendOk("Oh, hey, where are the credentials for the this so-lauded party? Oh man, we can't continue at this rate now... Sorry, the party is over.")
+                     cm.sendOk(I18nMessage.from("9201010_OH_HEY"))
                   }
                } else {
                   if (eim.getIntProperty("weddingStage") == 3) {
                      if (!isMarrying) {
-                        cm.sendYesNo("You guys didn't miss them right? Our superstars #rworked so good together#k, and soon #bthey will start the after party#k. Are you really going to #rdrop out of the show#k and return to #bAmoria#k?")
+                        cm.sendYesNo(I18nMessage.from("9201010_THEY_WILL_START_SOON"))
                      } else {
-                        cm.sendOk("You guys totally rocked the stage!!! Go go, talk to #b#p9201007##k to start the after party.")
+                        cm.sendOk(I18nMessage.from("9201010_TOTALLY_ROCKED"))
                         cm.dispose()
                      }
                   } else {
-                     cm.sendYesNo("Are you sure you want to #rquit the stage#k and head to #bAmoria#k? You will be #rskipping the bonus stages#k, fam.")
+                     cm.sendYesNo(I18nMessage.from("9201010_SKIPPING_BONUS"))
                   }
                }
             }

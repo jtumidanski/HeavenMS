@@ -3,6 +3,7 @@ package npc
 import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
 import server.life.MaplePlayerNPC
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,7 +32,7 @@ class NPC1202010 {
 
          cm.sendYesNo(sendStr)
       } else {
-         cm.sendOk("Behold, the distinguished brave heroes of Rien! Those stout hearts are who have been protecting our people since long ago, our valiant comrades.")
+         cm.sendOk(I18nMessage.from("1202010_BRAVE_HEROES"))
          cm.dispose()
       }
    }
@@ -47,16 +48,16 @@ class NPC1202010 {
          if (spawnPlayerNpc) {
             if (mode > 0) {
                if (cm.getMeso() < spawnPlayerNpcFee) {
-                  cm.sendOk("Sorry, you don't have enough mesos to purchase your place on the Hall of Fame.")
+                  cm.sendOk(I18nMessage.from("1202010_NOT_ENOUGH_MESOS"))
                   cm.dispose()
                   return
                }
 
                if (MaplePlayerNPC.spawnPlayerNPC(GameConstants.getHallOfFameMapId(cm.getJob()), cm.getPlayer())) {
-                  cm.sendOk("There you go! Hope you will like it.")
+                  cm.sendOk(I18nMessage.from("1202010_THERE_YOU_GO"))
                   cm.gainMeso(-spawnPlayerNpcFee)
                } else {
-                  cm.sendOk("Sorry, the Hall of Fame is currently full...")
+                  cm.sendOk(I18nMessage.from("1202010_FULL"))
                }
             }
 

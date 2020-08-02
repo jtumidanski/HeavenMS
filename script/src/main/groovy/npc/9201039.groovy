@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -21,17 +22,17 @@ class NPC9201039 {
 
    def start() {
       if (cm.isQuestCompleted(8860) && !cm.haveItem(4031528)) {
-         cm.sendNext("I've already done your hair once as a trade-for-services, sport. You'll have to snag an EXP Hair coupon from the Cash Shop if you want to change it again!")
+         cm.sendNext(I18nMessage.from("9201039_SNAG_A_EXP_COUPON"))
          cm.dispose()
       } else {
-         cm.sendYesNo("Ready for an awesome hairdo? I think you are! Just say the word, and we'll get started!")
+         cm.sendYesNo(I18nMessage.from("9201039_READY_FOR"))
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode < 1) {
          if (type == 7) {
-            cm.sendNext("Ok, I'll give you a minute.")
+            cm.sendNext(I18nMessage.from("9201039_GIVE_YOU_A_MINUTE"))
          }
 
          cm.dispose()
@@ -48,15 +49,15 @@ class NPC9201039 {
                hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[j], { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
             }
          }
-         cm.sendNext("Here we go!")
+         cm.sendNext(I18nMessage.from("9201039_HERE_WE_GO"))
       } else {
          if (cm.haveItem(4031528)) {
             cm.gainItem(4031528, (short) -1)
             cm.setHair(hairNew[Math.floor(Math.random() * hairNew.length).intValue()])
-            cm.sendNextPrev("Not bad, if I do say so myself! I knew those books I studied would come in handy...")
+            cm.sendNextPrev(I18nMessage.from("9201039_NOT_BAD"))
             cm.dispose()
          } else {
-            cm.sendNext("Hmmm...are you sure you have our designated free coupon? Sorry but no haircut without it.")
+            cm.sendNext(I18nMessage.from("9201039_NEED_COUPON"))
             cm.dispose()
          }
       }

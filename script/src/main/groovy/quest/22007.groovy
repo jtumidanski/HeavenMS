@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -21,12 +22,12 @@ class Quest22007 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("Oh, did you bring the #t4032451#? Here, give it to me. I'll give you the Incubator then.")
+         qm.sendNext(I18nMessage.from("22007_DID_YOU_BRING"))
       } else if (status == 1) {
-         qm.sendYesNo("Alright, here you go. I have no idea how you use it, but it's yours... \r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 360 exp")
+         qm.sendYesNo(I18nMessage.from("22007_HERE_YOU_GO"))
       } else if (status == 2) {
          if (mode == 0) {//decline
-            qm.sendNext("Hm? That's strange. The Incubator wasn't installed properly. Try again.")
+            qm.sendNext(I18nMessage.from("22007_THAT_IS_STRANGE"))
          } else {
             qm.gainItem(4032451, (short) -1)
             qm.forceCompleteQuest()

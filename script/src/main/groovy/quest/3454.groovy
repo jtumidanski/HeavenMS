@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.inventory.MapleInventoryType
 import scripting.quest.QuestActionManager
@@ -28,7 +29,7 @@ class Quest3454 {
 
          if (status == 0) {
             if (qm.getPlayer().getInventory(MapleInventoryType.ETC).getNumFreeSlot() < 1) {
-               qm.sendOk("Make room on your ETC inventory first.")
+               qm.sendOk(I18nMessage.from("3454_ETC_ROOM_NEEDED"))
                qm.dispose()
                return
             }
@@ -45,7 +46,7 @@ class Quest3454 {
                qm.gainItem(4031927, (short) 1)
             }
 
-            qm.sendOk("Now, go meet Alien Gray and use this undercover to read through their plans. If this fails, we will need to gather some materials once again.")
+            qm.sendOk(I18nMessage.from("3454_GO_MEET"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

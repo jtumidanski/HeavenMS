@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2083002 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("Do you wish to leave?")
+      cm.sendYesNo(I18nMessage.from("2083002_WISH_TO_LEAVE"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

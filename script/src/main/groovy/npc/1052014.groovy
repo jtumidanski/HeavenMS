@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -60,7 +61,7 @@ class NPC1052014 {
 
          if (status == 0) {
             hasCoin = cm.haveItem(coinId)
-            cm.sendNext("This is the vending machine of the Internet Cafe. Place your erasers or #t" + coinId + "# earned throughout the quests to redeem a prize. You can place #bany amount of erasers#k, however take note that placing #rdifferent erasers#k and #rbigger shots of any of them#k will improve the reward possibilities!")
+            cm.sendNext(I18nMessage.from("1052014_INTERNET_CAFE_VENDING_MACHINE").with(coinId))
          } else if (status == 1) {
             String sendStr
             currentTier = getRewardTier()
@@ -92,7 +93,7 @@ class NPC1052014 {
          } else if (status == 2) {
             if (selection == getRewardIndex(hasCoin)) {
                if (currentTier < 0) {
-                  cm.sendPrev("You have set no erasers. Insert at least one to claim a prize.")
+                  cm.sendPrev(I18nMessage.from("1052014_NO_ERASERS"))
                   advance = false
                } else {
                   givePrize()
@@ -110,9 +111,9 @@ class NPC1052014 {
                curItemSel = selection
 
                if (curItemQty > 0) {
-                  cm.sendGetText("How many of #b#t" + tickSel + "##k do you want to insert on the machine? (#r" + curItemQty + "#k available)#k")
+                  cm.sendGetText(I18nMessage.from("1052014_HOW_MANY_TO_INSERT").with(tickSel, curItemQty))
                } else {
-                  cm.sendPrev("You have got #rnone#k of #b#t" + tickSel + "##k to insert on the machine. Click '#rBack#k' to return to the main interface.")
+                  cm.sendPrev(I18nMessage.from("1052014_HAVE_GOT_NONE").with(tickSel))
                   advance = false
                }
             }
@@ -126,7 +127,7 @@ class NPC1052014 {
                }
 
                if (placedQty > curItemQty) {
-                  cm.sendPrev("You cannot insert the given amount of erasers (#r" + curItemQty + "#k available). Click '#rBack#k' to return to the main interface.")
+                  cm.sendPrev(I18nMessage.from("1052014_CANNOT_INSERT_THE_GIVEN_AMOUNT").with(curItemQty))
                   advance = false
                } else {
                   if (curItemSel < tickets.length) {
@@ -135,11 +136,11 @@ class NPC1052014 {
                      coins = placedQty
                   }
 
-                  cm.sendPrev("Operation succeeded. Click '#rBack#k' to return to the main interface.")
+                  cm.sendPrev(I18nMessage.from("1052014_SUCCESS"))
                   advance = false
                }
             } catch (ignored) {
-               cm.sendPrev("You must enter a positive number of erasers to insert. Click '#rBack#k' to return to the main interface.")
+               cm.sendPrev(I18nMessage.from("1052014_POSITIVE_NUMBER"))
                advance = false
             }
 
@@ -219,7 +220,7 @@ class NPC1052014 {
       }
 
       if (!hasRewardSlot(lvTarget, lvQty)) {
-         cm.sendOk("Check for an available space on your inventory before retrieving a prize.")
+         cm.sendOk(I18nMessage.from("1052014_CHECK_AVAILABLE_SPACE"))
       } else {
          int rnd = Math.floor(Math.random() * lvTarget.length).intValue()
 

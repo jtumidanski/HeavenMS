@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -39,10 +40,10 @@ class NPC1072004 {
          if (status == 0) {
             if (cm.haveItem(4031013, 30)) {
                completed = true
-               cm.sendNext("Ohhhhh.. you collected all 30 Dark Marbles!! It should have been difficult... just incredible! Alright. You've passed the test and for that, I'll reward you #bThe Proof of a Hero#k. Take that and go back to Perion.")
+               cm.sendNext(I18nMessage.from("1072004_PASSED_THE_TEST"))
             } else {
                completed = false
-               cm.sendSimple("You will have to collect me #b30 #t4031013##k. Good luck. \r\n#b#L1#I would like to leave#l")
+               cm.sendSimple(I18nMessage.from("1072004_COLLECT_MARBLES"))
             }
          } else if (status == 1) {
             if (completed) {

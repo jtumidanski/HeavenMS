@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -33,14 +34,14 @@ class NPCMagatiaPassword {
       }
 
       if (status == 0) {
-         cm.sendGetText("The door reacts to the entry pass inserted. #bPassword#k!")
+         cm.sendGetText(I18nMessage.from("magatiaPassword_THE_DOOR_REACTS"))
       } else if (status == 1) {
          if (cm.getText() == cm.getQuestProgress(3360)) {
             cm.setQuestProgress(3360, 1)
             PacketCreator.announce(cm.getPlayer(), new ShowSpecialEffect(7))
             cm.warp(261030000, "sp_" + ((cm.getMapId() == 261010000) ? "jenu" : "alca"))
          } else {
-            cm.sendOk("#rWrong!")
+            cm.sendOk(I18nMessage.from("magatiaPassword_WRONG"))
          }
 
          cm.dispose()

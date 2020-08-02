@@ -2,6 +2,7 @@ package npc
 
 import client.MapleQuestStatus
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -34,26 +35,26 @@ class NPC1052115 {
          } else if (cm.getMapId() == 910330001) {
             int itemId = 4001321
             if (!cm.canHold(itemId)) {
-               cm.sendOk("Please make room for 1 ETC slot.")
+               cm.sendOk(I18nMessage.from("1052115_MAKE_ETC_ROOM"))
             } else {
                cm.gainItem(itemId, (short) 1)
                cm.warp(910320000, 0)
             }
             cm.dispose()
          } else if (cm.getMapId() >= 910320100 && cm.getMapId() <= 910320304) {
-            cm.sendYesNo("Would you like to exit this place?")
+            cm.sendYesNo(I18nMessage.from("1052115_WOULD_YOU_LIKE_TO_EXIT"))
             status = 99
          } else {
-            cm.sendSimple("My name is Mr.Lim.\r\n#b#e#L1#Enter the Dusty Platform.#l#n\r\n#L2#Head towards Train 999.#l\r\n#L3#Receive a medal of <Honorary Employee>.#l#k")
+            cm.sendSimple(I18nMessage.from("1052115_HELLO"))
          }
       } else if (status == 2) {
          section = selection
          if (selection == 1) {
             if (cm.getPlayer().getLevel() < 25 || cm.getPlayer().getLevel() > 30 || !cm.isLeader()) {
-               cm.sendOk("You must be in the Level Range 25-30 and be the party leader.")
+               cm.sendOk(I18nMessage.from("1052115_LEVEL_RANGE"))
             } else {
                if (!cm.start_PyramidSubway(-1)) {
-                  cm.sendOk("The Dusty Platform is currently full at the moment.")
+                  cm.sendOk(I18nMessage.from("1052115_FULL"))
                }
             }
             //TODO
@@ -62,10 +63,10 @@ class NPC1052115 {
                if (cm.bonus_PyramidSubway(-1)) {
                   cm.gainItem(4001321, (short) -1)
                } else {
-                  cm.sendOk("The Train 999 is currently full at the moment")
+                  cm.sendOk(I18nMessage.from("1052115_TRAIN_999_FULL"))
                }
             } else {
-               cm.sendOk("You do not have the Boarding Pass.")
+               cm.sendOk(I18nMessage.from("1052115_NEED_BOARDING_PASS"))
             }
          } else if (selection == 3) {
             MapleQuestStatus record = cm.getQuestRecord(7662)
@@ -82,7 +83,7 @@ class NPC1052115 {
                cm.startQuest(29931)
                cm.completeQuest(29931)
             } else {
-               cm.sendOk("Please make room.")
+               cm.sendOk(I18nMessage.from("1052115_MAKE_ROOM"))
             }
          }
          cm.dispose()

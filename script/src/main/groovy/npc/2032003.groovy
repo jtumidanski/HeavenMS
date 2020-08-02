@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Lira
@@ -27,15 +28,15 @@ class NPC2032003 {
          status++
 
          if (status == 0) {
-            cm.sendNext("Congratulations on getting this far! Well, I suppose I'd better give you the #bBreath of Fire#k. You've certainly earned it!")
+            cm.sendNext(I18nMessage.from("2032003_CONGRATULATIONS"))
          } else if (status == 1) {
             if (!cm.canHold(4031062)) {
-               cm.sendOk("Try freeing a slot to receive the #b#t4031062##k.")
+               cm.sendOk(I18nMessage.from("2032003_FREE_A_SLOT"))
                cm.dispose()
                return
             }
 
-            cm.sendNext("Well, time for you to head off.")
+            cm.sendNext(I18nMessage.from("2032003_TIME_FOR_YOU_TO_HEAD_OFF"))
          } else if (status == 2) {
             cm.gainItem(4031062, (short) 1)
             cm.gainExp(10000 * cm.getPlayer().getExpRate())

@@ -122,7 +122,7 @@ class NPC9201005 {
                Channel channel = cm.getClient().getChannelServer()
                switch (selection) {
                   case 0:
-                     cm.sendOk("Firstly you need to be #bengaged#k to someone. #p9201000# makes the engagement ring. Once attained the engagement status, purchase a #b#t" + weddingEntryTicketCommon + "##k.\r\nShow me your engagement ring and a wedding ticket, and I will book a reservation for you along with #r15 Wedding Tickets#k. Use them to invite your guests into the wedding. They need 1 each to enter.")
+                     cm.sendOk(I18nMessage.from("9201005_ENGAGE_INFO").with(weddingEntryTicketCommon))
                      cm.dispose()
                      break
                   case 1:
@@ -131,35 +131,35 @@ class NPC9201005 {
                         if (weddingId > 0) {
                            if (channel.isWeddingReserved(weddingId)) {    // registration check
                               String placeTime = channel.getWeddingReservationTimeLeft(weddingId)
-                              cm.sendOk("Your wedding is set to start at the #r" + placeTime + "#k. Get formally dressed and don't be late!")
+                              cm.sendOk(I18nMessage.from("9201005_WEDDING_START_TIME").with(placeTime))
                            } else {
                               MapleCharacter partner = world.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                               if (partner == null) {
-                                 cm.sendOk("Your partner seems to be offline right now... Make sure to get both gathered here when the time comes!")
+                                 cm.sendOk(I18nMessage.from("9201005_PARTNER_OFFLINE"))
                                  cm.dispose()
                                  return
                               }
 
                               if (hasWeddingRing(cm.getPlayer()) || hasWeddingRing(partner)) {
-                                 cm.sendOk("Either you or your partner already has a marriage ring.")
+                                 cm.sendOk(I18nMessage.from("9201005_YOU_OR_YOUR_PARTNER_ALREADY_MARRIED"))
                                  cm.dispose()
                                  return
                               }
 
                               if (cm.getMap() != partner.getMap()) {
-                                 cm.sendOk("Please let your partner come here as well to register the reservation.")
+                                 cm.sendOk(I18nMessage.from("9201005_PARTNER_MUST_REGISTER"))
                                  cm.dispose()
                                  return
                               }
 
                               if (!cm.canHold(weddingSendTicket, 15) || !partner.canHold(weddingSendTicket, 15)) {
-                                 cm.sendOk("Either you or your partner doesn't have a free ETC slot for the Wedding tickets! Please make some room before trying to register a reservation.")
+                                 cm.sendOk(I18nMessage.from("9201005_YOU_OR_PARTNER_NEED_FREE_ETC_SPACE"))
                                  cm.dispose()
                                  return
                               }
 
                               if (!cm.getUnclaimedMarriageGifts().isEmpty() || !partner.getAbstractPlayerInteraction().getUnclaimedMarriageGifts().isEmpty()) {
-                                 cm.sendOk("Eerhm... I'm sorry, something doesn't seem right according to the Amoria's Wedding Gift Registry reserve. Please check in the situation with #b#p9201014##k.")
+                                 cm.sendOk(I18nMessage.from("9201005_SOMETHING_DOES_NOT_SEEM_RIGHT"))
                                  cm.dispose()
                                  return
                               }
@@ -182,7 +182,7 @@ class NPC9201005 {
                                     String placeTime = channel.getWeddingReservationTimeLeft(weddingId)
 
                                     String wedType = weddingType ? "Premium" : "Regular"
-                                    cm.sendOk("You both have received 15 Wedding Tickets, to be given to your guests. #bDouble-click the ticket#k to send it to someone. Invitations can only be sent #rbefore the wedding start time#k. Your #b" + wedType + " wedding#k is set to start at the #r" + placeTime + "#k. Get formally dressed and don't be late!")
+                                    cm.sendOk(I18nMessage.from("9201005_BOTH_RECEIVED_TICKETS").with(wedType, placeTime))
 
                                     MessageBroadcaster.getInstance().sendServerNotice(player, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT").with(wedType, placeTime))
                                     MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.LIGHT_BLUE, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT").with(wedType, placeTime))
@@ -195,19 +195,19 @@ class NPC9201005 {
                                        MessageBroadcaster.getInstance().sendServerNotice(partner, ServerNoticeType.PINK_TEXT, I18nMessage.from("MARRIAGE_WEDDING_ASSISTANT_GARMENT"))
                                     }
                                  } else {
-                                    cm.sendOk("Your wedding reservation must have been processed recently. Please try again later.")
+                                    cm.sendOk(I18nMessage.from("9201005_PLEASE_TRY_AGAIN_LATER"))
                                  }
                               } else {
-                                 cm.sendOk("Please have a #b#t" + weddingEntryTicketCommon + "##k available on your CASH inventory before trying to register a reservation.")
+                                 cm.sendOk(I18nMessage.from("9201005_BEFORE_TRYING_TO_REGISTER").with(weddingEntryTicketCommon))
                               }
                            }
                         } else {
-                           cm.sendOk("Wedding reservation encountered an error, try again later.")
+                           cm.sendOk(I18nMessage.from("9201005_ENCOUNTERED_ERROR_DURING_RESERVATION"))
                         }
 
                         cm.dispose()
                      } else {
-                        cm.sendOk("You do not have an engagement ring.")
+                        cm.sendOk(I18nMessage.from("9201005_NEED_ENGAGEMENT_RING"))
                         cm.dispose()
                      }
                      break
@@ -219,21 +219,21 @@ class NPC9201005 {
                            if (channel.isOngoingWeddingGuest(cathedralWedding, cm.getPlayer().getId())) {
                               EventInstanceManager eim = getMarriageInstance(wid)
                               if (eim != null) {
-                                 cm.sendOk("Enjoy the wedding. Don't drop your Gold Maple Leaf or you won't be able to finish the whole wedding.")
+                                 cm.sendOk(I18nMessage.from("9201005_ENJOY_THE_WEDDING"))
                               } else {
-                                 cm.sendOk("Please wait a moment while the couple get ready to enter the Cathedral.")
+                                 cm.sendOk(I18nMessage.from("9201005_PLEASE_WAIT_A_MOMENT"))
                                  cm.dispose()
                               }
                            } else {
-                              cm.sendOk("Sorry, but you have not been invited for this wedding.")
+                              cm.sendOk(I18nMessage.from("9201005_YOU_ARE_NOT_INVITED"))
                               cm.dispose()
                            }
                         } else {
-                           cm.sendOk("There is no wedding booked right now.")
+                           cm.sendOk(I18nMessage.from("9201005_NO_WEDDING_BOOKED"))
                            cm.dispose()
                         }
                      } else {
-                        cm.sendOk("You do not have a #b#t" + weddingGuestTicket + "##k.")
+                        cm.sendOk(I18nMessage.from("9201005_YOU_NEED_TICKET").with(weddingGuestTicket))
                         cm.dispose()
                      }
                      break
@@ -247,10 +247,10 @@ class NPC9201005 {
                            long expirationTime = WeddingProcessor.getInstance().getRelativeWeddingTicketExpireTime(resStatus)
                            cm.gainItem(weddingSendTicket, (short) 3, false, true, expirationTime)
                         } else {
-                           cm.sendOk("Please have a free ETC slot available to get more invitations.")
+                           cm.sendOk(I18nMessage.from("9201005_NEED_ETC_SPACE"))
                         }
                      } else {
-                        cm.sendOk("You're not currently booked on the Cathedral to make additional invitations.")
+                        cm.sendOk(I18nMessage.from("9201005_NOT_CURRENTLY_BOOKED"))
                      }
 
                      cm.dispose()
@@ -262,7 +262,7 @@ class NPC9201005 {
                   cm.gainItem(weddingGuestTicket, (short) -1)
                   eim.registerPlayer(cm.getPlayer())     //cm.warp(680000210, 0);
                } else {
-                  cm.sendOk("The marriage event could not be found.")
+                  cm.sendOk(I18nMessage.from("9201005_MARRIAGE_COULD_NOT_BE_FOUND"))
                }
 
                cm.dispose()
@@ -280,14 +280,14 @@ class NPC9201005 {
 
                if (eim.getIntProperty("weddingStage") == 0) {
                   if (!isMarrying) {
-                     cm.sendOk("Welcome to the #b#m" + cm.getMapId() + "##k. Please hang around with the groom and bride while the other guests are gathering here.\r\n\r\nWhen the timer reach it's end the couple will head to the altar, at that time you will be allowed to root over them from the #bguests area#k.")
+                     cm.sendOk(I18nMessage.from("9201005_WELCOME").with(cm.getMapId()))
                   } else {
-                     cm.sendOk("Welcome to the #b#m" + cm.getMapId() + "##k. Please greet the guests that are already here while the others are coming. When the timer reach it's end the couple will head to the altar.")
+                     cm.sendOk(I18nMessage.from("9201005_WELCOME_SHORT").with(cm.getMapId()))
                   }
 
                   cm.dispose()
                } else {
-                  cm.sendYesNo("The #bbride and groom#k are already on their way to the altar. Would you like to join them now?")
+                  cm.sendYesNo(I18nMessage.from("9201005_BRIDE_AND_GROOM_READY"))
                }
             } else if (status == 1) {
                cm.warp(weddingAltarMapId, "sp")

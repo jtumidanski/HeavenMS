@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,16 +14,16 @@ class Quest2321 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("You don't seem to follow instructions well. Come see me when you are ready.")
+            qm.sendOk(I18nMessage.from("2321_COME_SEE_ME_WHEN_YOU_ARE_READY"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("Now you'll be able to penetrate the spiny vine barrier of Mushroom Forest, but before that, #bMinister of Home Affairs#k wants to have a word with you. Please go see him immediately.")
+         qm.sendAcceptDecline(I18nMessage.from("2321_PLEASE_GO_SEE_HIM"))
       } else if (status == 1) {
          qm.forceStartQuest()
-         qm.sendOk("Good luck.")
+         qm.sendOk(I18nMessage.from("2321_GOOD_LUCK"))
       } else if (status == 2) {
          qm.dispose()
       }
@@ -39,11 +40,11 @@ class Quest2321 {
          }
       }
       if (status == 0) {
-         qm.sendOk("I have been keeping up on your fabulous work. I am aware that you have successfully created the #bKiller Mushroom Spores#k, which penetrates through the impenetrable barrier of the forest. Congratulations!")
+         qm.sendOk(I18nMessage.from("2321_CONGRATULATIONS"))
       } else if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainExp(2500)
-         qm.sendOk("The problem now is to figure out how to enter the castle.")
+         qm.sendOk(I18nMessage.from("2321_PROBLEM_NOW"))
       } else if (status == 2) {
          qm.dispose()
       }

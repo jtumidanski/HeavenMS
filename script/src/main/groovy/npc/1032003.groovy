@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -19,11 +20,11 @@ class NPC1032003 {
 
    def start() {
       if (cm.getLevel() < 25) {
-         cm.sendOk("You must be a higher level to enter the Forest of Patience.")
+         cm.sendOk(I18nMessage.from("1032003_LEVEL_REQUIREMENT"))
          cm.dispose()
          check = 1
       } else {
-         cm.sendYesNo("Hi, i'm Shane. I can let you into the Forest of Patience for a small fee. Would you like to enter for #b5000#k mesos?")
+         cm.sendYesNo(I18nMessage.from("1032003_FOREST_OF_PATIENCE_FEE"))
       }
    }
 
@@ -32,7 +33,7 @@ class NPC1032003 {
          cm.dispose()
       } else {
          if (mode == 0) {
-            cm.sendOk("Alright, see you next time.")
+            cm.sendOk(I18nMessage.from("1032003_SEE_YOU_NEXT_TIME"))
             cm.dispose()
             return
          }
@@ -44,7 +45,7 @@ class NPC1032003 {
          if (status == 1) {
             if (check != 1) {
                if (cm.getPlayer().getMeso() < 5000) {
-                  cm.sendOk("Sorry but it doesn't like you have enough mesos!")
+                  cm.sendOk(I18nMessage.from("1032003_NOT_ENOUGH_MESO"))
                   cm.dispose()
                } else {
                   if (cm.isQuestStarted(2050)) {

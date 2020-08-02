@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,23 +36,23 @@ class NPC9201133 {
          if (!inHuntingGround) {
             if (cm.isQuestStarted(quest)) {
                if (!cm.getPlayer().haveItemEquipped(1003036)) {
-                  cm.sendOk("The path ahead has a weird stench... Equip the #rgas mask#k before entering.")
+                  cm.sendOk(I18nMessage.from("9201133_WEIRD_STENCH"))
                   cm.dispose()
                   return
                }
 
-               cm.sendYesNo("Would you like to move to #b#m" + map + "##k?")
+               cm.sendYesNo(I18nMessage.from("9201133_LIKE_TO_MOVE").with(map))
             } else {
-               cm.sendOk("The entrance is blocked by a strange force.")
+               cm.sendOk(I18nMessage.from("9201133_STRANGE_FORCE"))
                cm.dispose()
             }
          } else {
             if (cm.getMapId() == 677000011) {
                map = 677000012
-               cm.sendYesNo("Would you like to move to #b#m" + map + "##k?")
+               cm.sendYesNo(I18nMessage.from("9201133_LIKE_TO_MOVE").with(map))
             } else {
                map = 105050400
-               cm.sendYesNo("Would you like to #bexit this place#k?")
+               cm.sendYesNo(I18nMessage.from("9201133_EXIT"))
             }
          }
       } else {

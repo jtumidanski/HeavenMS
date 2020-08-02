@@ -2,6 +2,7 @@ package quest
 
 import client.MapleJob
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20203 {
    QuestActionManager qm
@@ -12,7 +13,7 @@ class Quest20203 {
          qm.dispose()
       } else {
          if (status == 0 && mode == 0) {
-            qm.sendNext("Is there actually a reason why you should stay as a Knight-in-Training?")
+            qm.sendNext(I18nMessage.from("20203_WHY_SHOULD_YOU_STAY"))
             qm.dispose()
             return
          }
@@ -22,15 +23,15 @@ class Quest20203 {
             status--
          }
          if (status == 0) {
-            qm.sendYesNo("#t4032098#... I checked them all. I can tell you are now ready to make the leap as an official knight. Do you want to become one?")
+            qm.sendYesNo(I18nMessage.from("20203_QUALIFIED"))
          } else if (status == 1) {
             if (qm.getPlayer().getJob().getId() == 1300 && qm.getPlayer().getRemainingSp() > ((qm.getPlayer().getLevel() - 30) * 3)) {
-               qm.sendNext("You have way too much #bSP#k with you. You'll need to spend more SP on 1st-level skills to become an official knight.")
+               qm.sendNext(I18nMessage.from("20203_USE_ALL_SP"))
                qm.dispose()
             } else {
                if (qm.getPlayer().getJob().getId() != 1310) {
                   if (!qm.canHold(1142067)) {
-                     qm.sendNext("If you wish to receive the medal befitting the title, you may want to make some room in your equipment inventory.")
+                     qm.sendNext(I18nMessage.from("20203_MAKE_INVENTORY_ROOM"))
                      qm.dispose()
                      return
                   }
@@ -39,12 +40,12 @@ class Quest20203 {
                   qm.getPlayer().changeJob(MapleJob.WIND_ARCHER_2)
                   qm.completeQuest()
                }
-               qm.sendNext("You are no longer a Knight-in-Training. You are now officially a Cygnus Knight.")
+               qm.sendNext(I18nMessage.from("20203_SUCCESS"))
             }
          } else if (status == 2) {
-            qm.sendNextPrev("I have given you some #bSP#k. I have also given you some skills of Wind Archer that are only available to official knights, so keep working!")
+            qm.sendNextPrev(I18nMessage.from("20203_GIVEN_SP"))
          } else if (status == 3) {
-            qm.sendPrev("As an official Cygnus Knight, you should always keep yourself level-headed.")
+            qm.sendPrev(I18nMessage.from("20203_ACT_LIKE_ONE"))
          } else if (status == 4) {
             qm.dispose()
          }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.command.CommandsExecutor
 import scripting.npc.NPCConversationManager

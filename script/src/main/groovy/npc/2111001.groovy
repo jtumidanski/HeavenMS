@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111001 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Zenumist......I know what they say. They don't like combination the of life with machine. But it is about being fearful of machine only. Seeking Pure Alchemy won't achieve anything.")
+      cm.sendOk(I18nMessage.from("2111001_I_KNOW_WHAT_THEY_SAY"))
       cm.dispose()
    }
 

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Jeff
@@ -22,7 +23,7 @@ class NPC2030000 {
          return
       }
 
-      cm.sendNext("Hey, you look like you want to go farther and deeper past this place. Over there, though, you'll find yourself surrounded by aggressive, dangerous monsters, so even if you feel that you're ready to go, please be careful. Long ago, a few brave men from our town went in wanting to eliminate anyone threatening the town, but never came back out...")
+      cm.sendNext(I18nMessage.from("2030000_FURTHER_AND_DEEPER"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -30,7 +31,7 @@ class NPC2030000 {
          cm.dispose()
       } else {
          if (status == 1 && mode == 0 && cm.getLevel() > 49) {
-            cm.sendNext("Even if your level's high it's hard to actually go in there, but if you ever change your mind, please find me. After all, my job is to protect this place.")
+            cm.sendNext(I18nMessage.from("2030000_IF_YOU_EVER_CHANGE_YOUR_MIND"))
             cm.dispose()
             return
          }
@@ -41,9 +42,9 @@ class NPC2030000 {
          }
          if (status == 1) {
             if (cm.getLevel() > 49) {
-               cm.sendYesNo("If you are thinking of going in, I suggest you change your mind. But if you really want to go in... I'm only letting in the ones that are strong enough to stay alive in there. I do not wish to see anyone else die. Let's see... Hmmm...! You look pretty strong. All right, do you want to go in?")
+               cm.sendYesNo(I18nMessage.from("2030000_DO_YOU_WANT_TO_GO"))
             } else {
-               cm.sendPrev("If you are thinking of going in, I suggest you change your mind. But if you really want to go in... I'm only letting in the ones that are strong enough to stay alive in there. I do not wish to see anyone else die. Let's see... Hmmm... You haven't reached Level 50 yet. I can't let you in, then, so forget it.")
+               cm.sendPrev(I18nMessage.from("2030000_YOU_ARE_TOO_WEAK"))
             }
          } else if (status == 2) {
             if (cm.getLevel() >= 50) {

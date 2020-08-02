@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -50,7 +51,7 @@ class NPC2111014 {
                if (cm.canHold(4031697, 1)) {
                   cm.gainItem(4031697, (short) 1)
                } else {
-                  cm.sendNext("Your inventory is full, make sure a ETC slot is available for the item.")
+                  cm.sendNext(I18nMessage.from("2111014_NEED_ETC_SLOT"))
                }
             }
 

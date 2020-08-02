@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -19,20 +20,20 @@ class NPC2012021 {
       if (cm.haveItem(4031331)) {
          EventManager em = cm.getEventManager("Cabin")
          if (em.getProperty("entry") == "true") {
-            cm.sendYesNo("Do you wish to board the flight?")
+            cm.sendYesNo(I18nMessage.from("2012021_BOARD_THE_FLIGHT"))
          } else {
-            cm.sendOk("The flight has not arrived yet. Come back soon.")
+            cm.sendOk(I18nMessage.from("2012021_FLIGHT_HAS_NOT_ARRIVED"))
             cm.dispose()
          }
       } else {
-         cm.sendOk("Make sure you got a Leafre ticket to travel in this flight. Check your inventory.")
+         cm.sendOk(I18nMessage.from("2012021_NEED_TICKET"))
          cm.dispose()
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0) {
-         cm.sendOk("Okay, talk to me if you change your mind!")
+         cm.sendOk(I18nMessage.from("2012021_OKAY"))
          cm.dispose()
          return
       }
@@ -42,7 +43,7 @@ class NPC2012021 {
          cm.warp(200000132)
          cm.gainItem(4031331, (short) -1)
       } else {
-         cm.sendOk("The flight has not arrived yet. Come back soon.")
+         cm.sendOk(I18nMessage.from("2012021_FLIGHT_HAS_NOT_ARRIVED"))
       }
       cm.dispose()
    }

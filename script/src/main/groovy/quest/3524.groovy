@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -26,7 +27,7 @@ class Quest3524 {
             qm.startQuest()
             qm.setQuestProgress(3507, 7081, 1)
             qm.completeQuest()
-            qm.sendOk("You have regained your memories, talk to #b#p2140001##k to get the pass.")
+            qm.sendOk(I18nMessage.from("3524_REGAINED_MEMORIES"))
          } else if (status == 1) {
             qm.dispose()
          }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2041029 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Up ahead is the mysterious forest of #bEllin#k. Go through #bthe portal of time#k if you are ready to unveil some of the mysteries of the past of Victoria Island, as how it used to be at it's dawn.")
+      cm.sendOk(I18nMessage.from("2041029_UP_AHEAD_IS"))
       cm.dispose()
    }
 

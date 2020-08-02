@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -41,9 +42,9 @@ class NPC9209100 {
 
          if (status == 0) {
             if (playerNearby(cm.getPlayer().position(), cm.getMap().getPortal("chimney01").getPosition())) {
-               cm.sendOk("Hey, hey~~ Please don't go sneaking into someone else's house without permission, you don't want to get a naughty remark on Santa's list this year, do you?")
+               cm.sendOk(I18nMessage.from("9209100_DO_YOU"))
             } else {
-               cm.sendOk("Hohoho~~ have you a Great Year full of health, realization and happiness!")
+               cm.sendOk(I18nMessage.from("9209100_HAVE_A_GREAT_YEAR"))
             }
          } else {
             cm.dispose()

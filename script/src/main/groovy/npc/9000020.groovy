@@ -1,4 +1,6 @@
 package npc
+import tools.I18nMessage
+
 
 
 import scripting.npc.NPCConversationManager
@@ -67,12 +69,15 @@ class NPC9000020 {
 
       if (travelStatus != -1) {
          if (status == 0) {
-            cm.sendSimple("How's the traveling? Are you enjoying it?#b\r\n#L0#Yes, I'm done with traveling. Can I go back to #m" + cm.getPlayer().peekSavedLocation("WORLDTOUR") + "#?\r\n#L1#No, I'd like to continue exploring this place.")
+            cm.sendSimple(I18nMessage.from("9000020_HOW_IS_THE_TRAVELING").with(cm.getPlayer().peekSavedLocation("WORLDTOUR")))
+
          } else if (status == 1) {
             if (selection == 0) {
-               cm.sendNext("Alright. I'll take you back to where you were before the visit to Japan. If you ever feel like traveling again down the road, please let me know!")
+               cm.sendNext(I18nMessage.from("9000020_ALRIGHT"))
+
             } else if (selection == 1) {
-               cm.sendOk("OK. If you ever change your mind, please let me know.")
+               cm.sendOk(I18nMessage.from("9000020_LET_ME_KNOW"))
+
                cm.dispose()
             }
          } else if (status == 2) {
@@ -87,14 +92,17 @@ class NPC9000020 {
       } else {
          if (status == 0) {
             travelType = getTravelType(cm.getPlayer().getMapId())
-            cm.sendNext("If you're tired of the monotonous daily life, how about getting out for a change? there's nothing quite like soaking up a new culture, learning something new by the minute! It's time for you to get out and travel. We, at the Maple Travel Agency recommend you going on a #bWorld Tour#k! Are you worried about the travel expense? You shouldn't be! We, the #bMaple Travel Agency#k, have carefully come up with a plan to let you travel for ONLY #b" + cm.numberWithCommas(travelFee[travelType]) + " mesos#k!")
+            cm.sendNext(I18nMessage.from("9000020_GETTING_OUT_FOR_A_CHANGE").with(cm.numberWithCommas(travelFee[travelType])))
+
          } else if (status == 1) {
-            cm.sendSimple("We currently offer this place for you traveling pleasure: #b" + travelPlace[travelType] + "#k. " + travelAgent[travelType] + "'ll be there serving you as the travel guide. Rest assured, the number of destinations will be increase over time. Now, would you like to head over to the " + travelPlaceShort[travelType] + "?#b\r\n#L0#Yes, take me to " + travelPlaceShort[travelType] + " (" + travelPlaceCountry[travelType] + ")")
+            cm.sendSimple(I18nMessage.from("9000020_TRAVEL_GUIDE").with(travelPlace[travelType], travelAgent[travelType], travelPlaceShort[travelType], travelPlaceShort[travelType], travelPlaceCountry[travelType]))
+
          } else if (status == 2) {
             cm.sendNext("Would you like to travel to #b" + travelPlace[travelType] + "#k? " + travelDescription[travelType])
          } else if (status == 3) {
             if (cm.getMeso() < travelFee[travelType]) {
-               cm.sendNext("You don't have enough mesos to take the travel.")
+               cm.sendNext(I18nMessage.from("9000020_NOT_ENOUGH_MESOS"))
+
                cm.dispose()
                return
             }

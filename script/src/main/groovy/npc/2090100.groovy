@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -24,7 +25,7 @@ class NPC2090100 {
    int[] hairColor = []
 
    def start() {
-      cm.sendSimple("Welcome to the Mu Lung hair shop. If you have a #b#t5150025##k, or a #b#t5151020##k, allow me to take care of your hairdo. Please choose the one you want.\r\n#L1#Haircut: #i5150025##t5150025##l\r\n#L2#Dye your hair: #i5151020##t5151020##l")
+      cm.sendSimple(I18nMessage.from("2090100_WELCOME"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -65,35 +66,35 @@ class NPC2090100 {
             if (beauty == 1) {
                if (cm.haveItem(5420006)) {
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("2090100_ENJOY_NEW_STYLE"))
                } else if (cm.haveItem(5150025)) {
                   cm.gainItem(5150025, (short) -1)
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("2090100_ENJOY_NEW_STYLE"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("2090100_MISSING_STYLE_COUPON"))
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151020)) {
                   cm.gainItem(5151020, (short) -1)
                   cm.setHair(hairColor[selection])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("2090100_ENJOY_NEW_COLOR"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("2090100_MISSING_COLOR_COUPON"))
                }
             }
             if (beauty == 0) {
                if (selection == 0 && cm.getMeso() >= hairPrice) {
                   cm.gainMeso(-hairPrice)
                   cm.gainItem(5150025, (short) 1)
-                  cm.sendOk("Enjoy!")
+                  cm.sendOk(I18nMessage.from("2090100_ENJOY"))
                } else if (selection == 1 && cm.getMeso() >= hairColorPrice) {
                   cm.gainMeso(-hairColorPrice)
                   cm.gainItem(5151020, (short) 1)
-                  cm.sendOk("Enjoy!")
+                  cm.sendOk(I18nMessage.from("2090100_ENJOY"))
                } else {
-                  cm.sendOk("You don't have enough mesos to buy a coupon!")
+                  cm.sendOk(I18nMessage.from("2090100_NOT_ENOUGH_MESOS"))
                }
             }
          }

@@ -2,6 +2,7 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
+import tools.I18nMessage
 
 import java.awt.*
 
@@ -37,10 +38,10 @@ class NPC1063017 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("Ahead awaits the Master himself. Are you ready to face him?")
+            cm.sendYesNo(I18nMessage.from("1063017_READY_TO_FACE"))
          } else {
             if (cm.getClient().getChannelServer().getMapFactory().getMap(925020010).getCharacters().size() > 0) {
-               cm.sendOk("Someone is already challenging the Master. Try again later.")
+               cm.sendOk(I18nMessage.from("1063017_SOMEONE_IS_ALREADY_CHALLENGING"))
             } else {
                MapleLifeFactory.getMonster(9300346).ifPresent({ monster ->
                   cm.getWarpMap(910510202).spawnMonsterOnGroundBelow(monster, new Point(95, 200))

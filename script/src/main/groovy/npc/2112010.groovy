@@ -65,18 +65,18 @@ class NPC2112010 {
                int state = eim.getIntProperty("yuleteTalked")
 
                if (state == -1) {
-                  cm.sendOk("Heh, it seems you guys have company. Have fun with them, as I politely request my leave.")
+                  cm.sendOk(I18nMessage.from("2112010_HAVE_COMPANY"))
 
                } else if (playersTooClose()) {
-                  cm.sendOk("Oh, hello there. I have been #bmonitoring your moves#k since you guys entered this perimeter. Quite the feat reaching here, I commend all of you. Now, now, look at the time, I've got an appointment right now, I'm afraid I will need to request my leave. But worry not, my #raccessors#k will deal with all of you. Now, if you permit me, I'm leaving now.")
+                  cm.sendOk(I18nMessage.from("2112010_OH_HELLO_THERE"))
 
                   eim.setIntProperty("yuleteTalked", -1)
                } else if (eim.getIntProperty("npcShocked") == 0) {
-                  cm.sendOk("Ho~ Aren't you quite the sneaky one? Well, it matters not. I have been #bmonitoring your moves#k since you guys entered this perimeter. Quite the feat reaching here, I commend all of you. Now, now, look at the time, I've got an appointment right now, I'm afraid I will need to request my leave. But worry not, my #raccessors#k will deal with all of you. Now, if you permit me, I'm leaving now.")
+                  cm.sendOk(I18nMessage.from("2112010_QUITE_SNEAKY"))
 
                   eim.setIntProperty("yuleteTalked", -1)
                } else {
-                  cm.sendOk("... Hah! What, wh-- How did you get here?! I though I had sealed all paths here! No matter, this situation will be resolved soon. Guys: DEPLOY the #rmaster weapon#k!! You! Yes, you. Don't you think this ends here, look back at your companions, they need some help! I'll be retreating for now.")
+                  cm.sendOk(I18nMessage.from("2112010_HOW_DID_YOU_GET_HERE"))
 
                   eim.setIntProperty("yuleteTalked", 1)
                }
@@ -86,14 +86,14 @@ class NPC2112010 {
          } else {
             if (status == 0) {
                if (eim.isEventCleared()) {
-                  cm.sendOk("Nooooo... I have been beaten? But how? Everything I did was for the sake of the development of a greater alchemy! You can't jail me, I did what everybody standing in a place like mine would do! But no, they simply decided to damp up the progress of the science JUST BECAUSE it was deemed dangerous??? Oh, come on!")
+                  cm.sendOk(I18nMessage.from("2112010_I_HAVE_BEEN_BEATEN"))
                } else {
                   int state = eim.getIntProperty("yuletePassed")
 
                   if (state == -1) {
-                     cm.sendOk("Behold! The pinnacle of Magatia's alchemy studies! Hahahahahahaha...")
+                     cm.sendOk(I18nMessage.from("2112010_BEHOLD"))
                   } else if (state == 0) {
-                     cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest alchemy, #rFrankenroid#k.")
+                     cm.sendOk(I18nMessage.from("2112010_SUCH_A_PAIN"))
                      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("YULETE_MEET_FRANK"))
 
                      MapleMap map = eim.getMapInstance(926110401)
@@ -103,7 +103,7 @@ class NPC2112010 {
                         eim.setIntProperty("yuletePassed", -1)
                      })
                   } else {
-                     cm.sendOk("You guys are such a pain, geez. Very well, I present you my newest weapon, brought by the finest combined alchemy of Alcadno's and Zenumist's, those that the boring people of Magatia societies have banned to bring along, the #rmighty Frankenroid#k!")
+                     cm.sendOk(I18nMessage.from("2112010_SUCH_A_PAIN_LONG"))
                      MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.PINK_TEXT, I18nMessage.from("YULETE_MEET_FRANK_LONG"))
 
                      MapleMap map = eim.getMapInstance(926110401)

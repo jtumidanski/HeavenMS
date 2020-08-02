@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.MapleMount
 import scripting.quest.QuestActionManager
@@ -27,9 +28,9 @@ class Quest20527 {
 
             if (mount != null && mount.level() >= 3) {
                qm.forceCompleteQuest()
-               qm.sendNext("Alright, I'll get you started in how to train Mimio, the next step for Mimianas. When you're ready, talk to me again.")
+               qm.sendNext(I18nMessage.from("20527_HOW_TO_TRAIN"))
             } else {
-               qm.sendNext("It looks like your Mimiana haven't reached #rlevel 3#k yet. Please train it a bit more before trying to advance it.")
+               qm.sendNext(I18nMessage.from("20527_TRAIN_A_BIT_MORE"))
             }
          } else if (status == 1) {
             qm.dispose()

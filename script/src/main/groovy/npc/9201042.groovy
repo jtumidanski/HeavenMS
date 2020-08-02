@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -57,7 +58,7 @@ class NPC9201042 {
          advance = true
 
          if (status == 0) {
-            cm.sendNext("Hi there, how is it going? Since you're passing by Amoria, have you heard about the instance my brother Amos is hosting? It is the #bAmorian Challenge#k, an instance for everyone above level 40.\r\n\r\nThere, you may find the #i4031543# #i4031544# #i4031545# #bWish Tickets#k that can be brought here to redeem prizes.")
+            cm.sendNext(I18nMessage.from("9201042_HI_THERE"))
          } else if (status == 1) {
             String listStr = ""
             for (int i = 0; i < wishPrizes.length; i++) {
@@ -71,19 +72,19 @@ class NPC9201042 {
             sel = selection
 
             if (amntTicket < wishPrizesCst[selection]) {
-               cm.sendPrev("You will need #b" + wishPrizesCst[selection] + " #t" + slctTicket + "##k to purchase that! If you want this, come back another time when you have all the tickets at hand.")
+               cm.sendPrev(I18nMessage.from("9201042_YOU_WILL_NEED").with(wishPrizesCst[selection], slctTicket))
                advance = false
             } else {
-               cm.sendYesNo("You have selected #b" + wishPrizesQty[selection] + " #z" + wishPrizes[selection] + "##k, that will require #b" + wishPrizesCst[selection] + " #t" + slctTicket + "##k. Will you purchase it?")
+               cm.sendYesNo(I18nMessage.from("9201042_HAVE_SELECTED").with(wishPrizesQty[selection], wishPrizes[selection], wishPrizesCst[selection], slctTicket))
             }
          } else {
             if (cm.canHold(wishPrizes[sel], wishPrizesQty[sel])) {
                cm.gainItem(wishPrizes[sel], (short) wishPrizesQty[sel])
                cm.gainItem(slctTicket, (short) -wishPrizesCst[sel])
 
-               cm.sendOk("There you go, have a good day!")
+               cm.sendOk(I18nMessage.from("9201042_THERE_YOU_GO"))
             } else {
-               cm.sendOk("Please have a slot available on your inventory before claiming the item.")
+               cm.sendOk(I18nMessage.from("9201042_NEED_SLOT_AVAILABLE"))
             }
 
             cm.dispose()

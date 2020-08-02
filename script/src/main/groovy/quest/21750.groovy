@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest21750 {
          }
 
          if (status == 0) {
-            qm.sendNext("Aran, you're finally back!!! How you've been doing? Where did you go for so long? We have so much to catch up...")
+            qm.sendNext(I18nMessage.from("21750_FINALLY_BACK"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()

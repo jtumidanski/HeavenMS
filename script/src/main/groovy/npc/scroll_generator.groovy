@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleJob
 import client.MonsterBook
@@ -66,7 +67,7 @@ class ScrollGenerator {
          }
 
          if (status == 0) {
-            cm.sendNext("This is the MapleTV Scroll Generator broadcast. Place your supplies or mesos earned throughout your adventure to redeem a prize! You can place #bany amount of supplies#k, however take note that placing #rdifferent supplies#k with #rbigger shots of any of them#k will improve the reward possibilities!")
+            cm.sendNext(I18nMessage.from("scroll_generator_BROADCAST"))
          } else if (status == 1) {
             String sendStr
 
@@ -98,7 +99,7 @@ class ScrollGenerator {
          } else if (status == 2) {
             if (selection == (sgItems.size() + 2)) {
                if (sgItemBuckets < 1.0) {
-                  cm.sendPrev("You have set not enough supplies. Insert at least one bucket of #bsupplies#k to claim a prize.")
+                  cm.sendPrev(I18nMessage.from("scroll_generator_NOT_ENOUGH_SUPPLIES"))
                } else {
                   generateRandomScroll()
                   cm.dispose()
@@ -116,9 +117,9 @@ class ScrollGenerator {
 
                curItemSel = selection
                if (curItemQty > 0) {
-                  cm.sendGetText("How many " + tickSel + " do you want to provide? (#r" + curItemQty + "#k available)#k")
+                  cm.sendGetText(I18nMessage.from("scroll_generator_HOW_MANY").with(tickSel, curItemQty))
                } else {
-                  cm.sendPrev("You have got #rnone#k " + tickSel + " to provide for Scroll Generation. Click '#rBack#k' to return to the main interface.")
+                  cm.sendPrev(I18nMessage.from("scroll_generator_GOT_NONE").with(tickSel))
                }
             }
          } else if (status == 3) {
@@ -131,7 +132,7 @@ class ScrollGenerator {
                }
 
                if (placedQty > curItemQty) {
-                  cm.sendPrev("You cannot insert the given amount of #r" + (curItemSel < sgItems.size() ? "#t" + sgItems[curItemSel] + "#" : "mesos") + "#k (#r" + curItemQty + "#k available). Click '#rBack#k' to return to the main interface.")
+                  cm.sendPrev(I18nMessage.from("scroll_generator_CANNOT_INSERT").with(sgItems[curItemSel], curItemQty))
                } else {
                   if (curItemSel < sgItems.size()) {
                      sgApplyItem(curItemSel, placedQty)
@@ -139,10 +140,10 @@ class ScrollGenerator {
                      sgApplyMeso(placedQty)
                   }
 
-                  cm.sendPrev("Operation succeeded. Click '#rBack#k' to return to the main interface.")
+                  cm.sendPrev(I18nMessage.from("scroll_generator_SUCCESS"))
                }
             } catch (Exception ignored) {
-               cm.sendPrev("You must enter a positive number of supplies to insert. Click '#rBack#k' to return to the main interface.")
+               cm.sendPrev(I18nMessage.from("scroll_generator_MUST_BE_POSITIVE"))
             }
 
             status = 2
@@ -404,15 +405,15 @@ class ScrollGenerator {
          int itemId = getRandomScroll(calculateScrollTiers())
          if (itemId != -1) {
             if (performExchange(itemId, 1)) {
-               cm.sendNext("Transaction accepted! You have received a #r#t" + itemId + "##k.")
+               cm.sendNext(I18nMessage.from("scroll_generator_ACCEPTED").with(itemId))
             } else {
-               cm.sendOk("Oh, it looks like some items are missing... Please double-check provided items in your inventory before trying to exchange.")
+               cm.sendOk(I18nMessage.from("scroll_generator_SOME_ITEMS_MISSING"))
             }
          } else {
-            cm.sendOk("Sorry for the inconvenience, but it seems there are no scrolls on store right now... Try again later.")
+            cm.sendOk(I18nMessage.from("scroll_generator_SORRY"))
          }
       } else {
-         cm.sendOk("Please look out for a slot available on your USE inventory before trying for a scroll.")
+         cm.sendOk(I18nMessage.from("scroll_generator_NEED_USE_SLOT_FREE"))
       }
    }
 }

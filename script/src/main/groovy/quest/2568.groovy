@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,7 +18,7 @@ class Quest2568 {
          status++
       }
       if (status == 0) {
-         qm.sendAcceptDecline("You're back! Great. I got the Ignition Device all hooked up, so we can get back to civilization. Nothing left to do here, right? Let's roll!")
+         qm.sendAcceptDecline(I18nMessage.from("2568_LETS_ROLL"))
       } else if (status == 1) {
          if (mode == 0) {//decline
 

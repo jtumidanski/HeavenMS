@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.inventory.MaplePet
 import scripting.quest.QuestActionManager
@@ -22,14 +23,14 @@ class Quest8189 {
          }
          if (status == 0) {
             if (qm.getMeso() < 10000) {
-               qm.sendOk("Hey! I need #b10,000 mesos#k to do your pet's re-evolution!")
+               qm.sendOk(I18nMessage.from("8189_I_NEED_MESOS"))
                qm.dispose()
                return
             }
 
-            qm.sendYesNo("Alright then, let's do this again, shall we? As usual, it's going to be random, and I'm going to take away one of your Rock of Evolutions. \r\n\r #r#eReady?#n#k")
+            qm.sendYesNo(I18nMessage.from("8189_ALRIGHT_THEN"))
          } else if (status == 1) {
-            qm.sendNextPrev("Then here we go...! #rHYAHH!#k")
+            qm.sendNextPrev(I18nMessage.from("8189_HERE_WE_GO"))
          } else if (status == 2) {
             int petId = -1
             int petItemId
@@ -52,7 +53,7 @@ class Quest8189 {
             }
 
             if (petId == -1) {
-               qm.sendOk("Something wrong, try again.")
+               qm.sendOk(I18nMessage.from("8189_SOMETHING_WRONG"))
                qm.dispose()
                return
             }
@@ -84,7 +85,7 @@ name = MapleItemInformationProvider.getInstance().getName(after)
             qm.gainItem(5380000, (short) -1)
             qm.evolvePet((byte) petId, after)
 
-            qm.sendOk("Woo! It worked again! #rYou may find your new pet under your 'CASH' inventory.\r #kIt used to be a #b#i" + id + "##t" + id + "##k, and now it's \r a#b #i" + after + "##t" + after + "##k! \r\n Come back with 10,000 mesos and another Rock of Evolution if you don't like it!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v" + after + "# #t" + after + "#")
+            qm.sendOk(I18nMessage.from("8189_IT_WORKED").with(id, id, after, after, after, after))
          } else if (status == 3) {
             qm.dispose()
          }

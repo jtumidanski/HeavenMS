@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -21,14 +22,14 @@ class NPC1032009 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (status == 0) {
-         cm.sendYesNo("Do you wish to leave the boat?")
+         cm.sendYesNo(I18nMessage.from("1032009_LEAVE_THE_BOAT"))
          status++
       } else {
          if (mode < 1) {
             cm.dispose()
          } else {
             if (status == 1) {
-               cm.sendNext("Alright, see you next time. Take care.")
+               cm.sendNext(I18nMessage.from("1032009_SEE_YOU_NEXT_TIME"))
                status++
             } else if (status == 2) {
                cm.warp(101000300, 0)// back to orbis

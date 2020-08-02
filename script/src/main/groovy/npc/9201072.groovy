@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9201072 {
    int sel = -1
 
    def start() {
-      cm.sendOk("(This tombstone keeps emitting ever odder light waves the more I stare to it...)")
+      cm.sendOk(I18nMessage.from("9201072_ODDER_LIGHT"))
       cm.dispose()
    }
 

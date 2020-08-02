@@ -27,7 +27,7 @@ class Quest2001 {
       status++
 
       if (status == 0) {
-         qm.sendNext("THIS is the deed to the land that my son lost! And you even brought all the necessary materials to build the house! Thank you so much ... my relatives can all move in and live in #m102000000#! As a sign of appreciation ...")
+         qm.sendNext(I18nMessage.from("2001_THIS_IS_THE_DEED"))
       } else if (status == 1) {
          if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() < 1) {
             MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("INVENTORY_FULL_ERROR"))

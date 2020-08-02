@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		June
@@ -16,7 +17,7 @@ class NPC1052125 {
    int sel = -1
 
    def start() {
-      cm.sendSimple("Hold up! Access to this area is limited due to remodeling. I can only allow people who meet certain conditions to enter here.#b\n\r\n#L0#I'm helping #eBlake#n right now.#l\r\n#L1#I'm a #rVIP#b at this shopping Center!#l")
+      cm.sendSimple(I18nMessage.from("1052125_ACCESS_LIMITED"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -34,22 +35,22 @@ class NPC1052125 {
             if (cm.isQuestStarted(2286) || cm.isQuestStarted(2287) || cm.isQuestStarted(2288)) {
                EventManager em = cm.getEventManager("RockSpirit")
                if (!em.startInstance(cm.getPlayer())) {
-                  cm.sendOk("Uh... It looks like the rooms ahead are a bit crowded right now. Please wait around here for a bit, ok?")
+                  cm.sendOk(I18nMessage.from("1052125_ROOMS_CROWDED"))
                }
                cm.dispose()
                return
             } else {
-               cm.sendOk("I did not hear anything from Blake that you are assisting him.")
+               cm.sendOk(I18nMessage.from("1052125_DID_YOU_HEAR_ANYTHING"))
             }
          } else {
             if (cm.isQuestCompleted(2290)) {
                if (cm.getPlayer().getLevel() > 50) {
-                  cm.sendOk("The VIP area is available only for players #rlevel 50 or below#k.")
+                  cm.sendOk(I18nMessage.from("1052125_VIP_LEVEL_REQUIREMENT"))
                } else {
-                  cm.sendOk("The VIP area only gets available after handing over #r#t4032521#s#k from the #b'Admission to the VIP Zone'#k quest.")
+                  cm.sendOk(I18nMessage.from("1052125_VIP_NEEDS_TICKET"))
                }
             } else {
-               cm.sendOk("#rVIP#k? Yeah that is funny #rMr. VIP#k, now get lost before I call security.")
+               cm.sendOk(I18nMessage.from("1052125_GET_LOST"))
             }
          }
          cm.dispose()

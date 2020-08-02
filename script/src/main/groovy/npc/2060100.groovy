@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,10 +22,10 @@ class NPC2060100 {
             cm.gainItem(4000175, (short) -1)
             cm.warp(923000000, 0)
          } else {
-            cm.sendOk("In order to open the crack of dimension you will have to possess one piece of Miniature Pianus. Those could be gained by defeating a Pianus.")
+            cm.sendOk(I18nMessage.from("2060100_POSSESS_ONE_MINIATURE_PIANUS"))
          }
       } else {
-         cm.sendOk("I'm #bCarta the sea-witch.#k Don't fool around with me, as I'm known for my habit of turning people into worms.")
+         cm.sendOk(I18nMessage.from("2060100_DONT_FOOL_AROUND"))
       }
 
       cm.dispose()

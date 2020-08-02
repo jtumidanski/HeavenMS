@@ -139,18 +139,18 @@ class NPC9201044 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
-            cm.sendNext("The portal is already open, advance for the trials that awaits you there.")
+            cm.sendNext(I18nMessage.from("9201044_PORTAL_IS_ALREADY_OPOEN"))
          } else {
             if (eim.isEventLeader(cm.getPlayer())) {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
                   if (stage == 1) {
-                     cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k of the Amorian Challenge. In this stage, talk to #p9201047#, he will pass to you further details of the mission. After shattering the Magik Mirror down there, return the shard to #p9201047# and come here to gain access to the next stage.")
+                     cm.sendOk(I18nMessage.from("9201044_WELCOME").with(stage))
                   } else if (stage == 2) {
-                     cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k of the Amorian Challenge. In this stage, let 5 of your party members climb up the platforms in such a way to try for a combination to unlock the portal to the next level. When you feel ready, talk to me and I'll let you know the situation. However, be prepared, as in the case the portal does not get unlocked after a few tries, monsters will spawn.")
+                     cm.sendOk(I18nMessage.from("9201044_WELCOME_CLIMB").with(stage))
                   } else if (stage == 3) {
-                     cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k of the Amorian Challenge. In this stage, let 5 of your party members climb up the platforms, one on each, in such a way to try for a combination to unlock the portal to the next level. When you feel ready, talk to me and I'll let you know the situation. Take hint: upon failing, count the number of slimes appearing on the scene, that will tell how many of you had their position right.")
+                     cm.sendOk(I18nMessage.from("9201044_WELCOME_CLIMB_2").with(stage))
                   }
 
                   int st = (autoPass) ? 2 : 0
@@ -168,7 +168,7 @@ class NPC9201044 {
                      if (eim.getIntProperty("statusStg" + stage) == 1) {
                         clearStage(stage, eim, curMap)
                      } else {
-                        cm.sendOk("Talk with #p9201047# for more info on this stage.")
+                        cm.sendOk(I18nMessage.from("9201044_TALK_WITH"))
                      }
                   } else if (stage == 2 || stage == 3) {
                      if (map.countMonsters() == 0) {
@@ -244,10 +244,10 @@ class NPC9201044 {
                                  eim.setIntProperty("missCount", miss)
 
                                  if (guessedRight == 6) { //6 unused slots on this stage
-                                    cm.sendNext("All ropes weigh differently. Think your next course of action, then try again.")
+                                    cm.sendNext(I18nMessage.from("9201044_WEIGH_DIFFERENTLY"))
                                     MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201044_ALL_WEIGH_DIFFERENTLY"))
                                  } else {
-                                    cm.sendNext("One rope weigh the same. Think your next course of action, then try again.")
+                                    cm.sendNext(I18nMessage.from("9201044_THINK_YOUR_NEXT_COURSE"))
                                     MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201044_ONE_WEIGH_SAME"))
                                  }
                               } else {
@@ -256,7 +256,7 @@ class NPC9201044 {
                                  if (stage == 2) {
                                     eim.setProperty("stage2combo", "")
 
-                                    cm.sendNext("You have failed to discover the right combination, now it shall be reset. Start over again!")
+                                    cm.sendNext(I18nMessage.from("9201044_FAILED_TO_DISCOVER"))
                                     MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201044_WRONG_COMBINATION"))
                                  }
                               }
@@ -266,20 +266,20 @@ class NPC9201044 {
                            }
                         } else {
                            if (stage == 2) {
-                              cm.sendNext("It looks like you guys haven't found the ways of this trial yet. Think on an arrangement of 5 members on the platforms. Remember, exactly 5 are allowed to stand on the platforms, and if you move it may not count as an answer, so please keep that in mind. Keep going!")
+                              cm.sendNext(I18nMessage.from("9201044_HOW_TO"))
                            } else {
-                              cm.sendNext("It looks like you guys haven't found the ways of this trial yet. Think on an arrangement of party members on different platforms. Remember, exactly 5 are allowed to stand on the platforms, and if you move it may not count as an answer, so please keep that in mind. Keep going!")
+                              cm.sendNext(I18nMessage.from("9201044_HOW_TO_2"))
                            }
 
                            cm.dispose()
                         }
                      } else {
-                        cm.sendNext("Defeat all mobs before trying for a combination.")
+                        cm.sendNext(I18nMessage.from("9201044_DEFEAT_ALL_MOBS"))
                      }
                   }
                }
             } else {
-               cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+               cm.sendNext(I18nMessage.from("9201044_PARTY_LEADER_MUST_TALK"))
             }
          }
 

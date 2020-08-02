@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,12 +28,12 @@ class Quest6033 {
          }
 
          if (status == 0) {
-            qm.sendNext("Hm, so you claim to have brought the #b#t4260003##k? Ok, let's take a look into it.")
+            qm.sendNext(I18nMessage.from("6033_LET_US_TAKE_A_LOOK"))
          } else if (status == 1) {
             if (qm.getQuestProgressInt(6033) == 1 && qm.haveItem(4260003, 1)) {
-               qm.sendNextPrev("You indeed have crafted a fine piece of Monster Crystal, I see. You passed! Now, I shall teach you the next steps of the Maker skill. Keep the monster crystal with you as well, it's your work.")
+               qm.sendNextPrev(I18nMessage.from("6033_FINE_PIECE"))
             } else {
-               qm.sendNext("Hey, what's wrong? I did tell you to make a monster crystal to pass my test, didn't I? Buying one or crafting before the start of the test is NOT part of the deal. Go craft me an #b#t4260003##k.")
+               qm.sendNext(I18nMessage.from("6033_WHAT_IS_WRONG"))
                qm.dispose()
             }
          } else if (status == 2) {

@@ -3,6 +3,7 @@ package npc
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.I18nMessage
 
 import java.awt.*
 
@@ -42,12 +43,12 @@ class NPC1104104 {
 
          if (status == 0) {
             if (Math.floor(cm.getJobId() / 100) != baseJob) {
-               cm.sendOk("Hello there, #h0#. Are you helping us finding the intruder? He is not in this area, I've already searched here.")
+               cm.sendOk(I18nMessage.from("1104104_INTRUDER_NOT_HERE"))
                cm.dispose()
                return
             }
 
-            cm.sendOk("Darn, you found me! Then, there's only one way out! Let's fight, like #rBlack Wings#k should!")
+            cm.sendOk(I18nMessage.from("1104104_YOU_FOUND_ME"))
          } else if (status == 1) {
             MapleMap map = cm.getMap()
             Point npcPosition = map.getMapObject(cm.getNpcObjectId()).position()

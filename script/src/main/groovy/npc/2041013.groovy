@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -32,7 +33,7 @@ class NPC2041013 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Oh, hello! Welcome to the Ludibrium Skin-Care! Are you interested in getting tanned and looking sexy? How about a beautiful, snow-white skin? If you have #b#t5153002##k, you can let us take care of the rest and have the kind of skin you've always dreamed of!\r\n#L2#Skin Care: #i5153002##t5153002##l")
+            cm.sendSimple(I18nMessage.from("2041013_HELLO"))
          } else if (status == 1) {
             if (selection == 2) {
                cm.sendStyle("With our specialized machine, you can see the way you'll look after the treatment PRIOR to the procedure. What kind of a look are you looking for? Go ahead and choose the style of your liking~!", skin)
@@ -42,9 +43,9 @@ class NPC2041013 {
             if (cm.haveItem(5153002)) {
                cm.gainItem(5153002, (short) -1)
                cm.setSkin(skin[selection])
-               cm.sendOk("Enjoy your new and improved skin!")
+               cm.sendOk(I18nMessage.from("2041013_ENJOY_NEW_SKIN"))
             } else {
-               cm.sendOk("Um...you don't have the skin-care coupon you need to receive the treatment. Sorry, but I am afraid we can't do it for you...")
+               cm.sendOk(I18nMessage.from("2041013_MISSING_SKIN_COUPON"))
             }
          }
       }

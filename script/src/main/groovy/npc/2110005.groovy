@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -25,7 +26,7 @@ class NPC2110005 {
    def action(Byte mode, Byte type, Integer selection) {
       if (mode == 1) {
          if (cm.getMeso() < 1500) {
-            cm.sendNext("I am sorry, but I think you are short on mesos. I am afraid I can't let you ride this if you do not have enough money to do so. Please come back when you have enough money to use this.")
+            cm.sendNext(I18nMessage.from("2110005_I_AM_SORRY"))
             cm.dispose()
          } else {
             cm.warp(cm.getPlayer().getMapId() == 260020000 ? 261000000 : 260000000, 0)
@@ -33,7 +34,7 @@ class NPC2110005 {
             cm.dispose()
          }
       } else if (mode == 0) {
-         cm.sendNext("Hmmm... too busy to do it right now? If you feel like doing it, though, come back and find me.")
+         cm.sendNext(I18nMessage.from("2110005_TOO_BUSY"))
          cm.dispose()
       }
    }

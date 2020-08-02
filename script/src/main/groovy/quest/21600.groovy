@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,12 +24,12 @@ class Quest21600 {
          }
 
          if (status == 0) {
-            qm.sendNext("Hey, Aran. You seem pretty strong, since that time from when you got freed from the glacier. Suitable enough to #bride a wolf#k, if you ask me.")
+            qm.sendNext(I18nMessage.from("21600_IF_YOU_ASK_ME"))
          } else if (status == 1) {
-            qm.sendAcceptDecline("Picked your interest, huh? Very well, first you must make your way to #bAqua#k, there is a person there who makes #rfood for wolf cubs#k. Bring one portion to me, and I shall deem you able to tame and take care of one. What do you say, will you try for it?")
+            qm.sendAcceptDecline(I18nMessage.from("21600_FIRST_MAKE_YOUR_WAY"))
          } else if (status == 2) {
             qm.forceStartQuest()
-            qm.sendNext("Alright. The one you must meet is #bNanuke#k, she is on top of a #rsnowy whale#k, somewhere in the ocean. Good luck!")
+            qm.sendNext(I18nMessage.from("21600_THE_ONE_YOU_MUST_MEET"))
          } else if (status == 3) {
             qm.dispose()
          }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
@@ -35,17 +36,17 @@ class NPC2083000 {
          }
          if (status == 0) {
             if (cm.haveItem(4001086)) {
-               cm.sendYesNo("Do you want to access #b#m240050400##k right now?")
+               cm.sendYesNo(I18nMessage.from("2083000_DO_YOU_WANT_TO_ACCESS"))
             } else if (YamlConfig.config.server.USE_ENABLE_SOLO_EXPEDITIONS) {
                if (canBypassHTPQ()) {
-                  cm.sendYesNo("Do you want to access #b#m240050400##k right now?")
+                  cm.sendYesNo(I18nMessage.from("2083000_DO_YOU_WANT_TO_ACCESS"))
                } else {
-                  cm.sendOk("Those who don't have the #r#t4001086##k must prove their valor before challenging #bHorntail#k. Come here holding the #r3 certificates#k that proves you're worthy to || the task.")
+                  cm.sendOk(I18nMessage.from("2083000_MUST_PROVE_VALOR"))
                   // NPC picture is so long it goes through some section of text, || to fill up that space
                   cm.dispose()
                }
             } else {
-               cm.sendOk("Those who don't have the #r#t4001086##k must prove their valor before challenging #bHorntail#k.")
+               cm.sendOk(I18nMessage.from("2083000_MUST_PROVE_VALOR_SHORT"))
                cm.dispose()
             }
          } else {

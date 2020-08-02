@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,12 +28,12 @@ class Quest6036 {
          }
 
          if (status == 0) {
-            qm.sendNext("Bothering me again? What's it?")
+            qm.sendNext(I18nMessage.from("6036_BOTHERING_ME_AGAIN"))
          } else if (status == 1) {
             if (qm.haveItem(4031980, 1)) {
-               qm.sendNext("You crafted a #b#t4031980##k?! How comes, how did you do it?? ... Well, that can't be helped, I guess. The student surpassed the teacher! Youth sure do wonders to one's perception capabilities.\r\n\r\nYou are now ready to take the last step on mastering the Maker skill, contemplate it at it's finest form!")
+               qm.sendNext(I18nMessage.from("6036_HOW_DID_YOU_DO_IT"))
             } else {
-               qm.sendNext("... Please step aside, I can't finish this work if I'm being distracted at every moment.")
+               qm.sendNext(I18nMessage.from("6036_STEP_ASIDE"))
                qm.dispose()
             }
          } else if (status == 2) {

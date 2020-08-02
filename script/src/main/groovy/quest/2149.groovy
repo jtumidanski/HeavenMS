@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2149 {
          }
 
          if (status == 0) {
-            qm.sendNext("It is said that a old tree gets alive whenever something sinister disturbs this land... We need a hero that fends our village of that creature!")
+            qm.sendNext(I18nMessage.from("2149_NEED_A_HERO"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

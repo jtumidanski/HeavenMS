@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -36,7 +37,7 @@ class NPC2041010 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Well, hello! Welcome to the Ludibrium Plastic Surgery! Would you like to transform your face into something new? With a #b#t5152007##k, you can let us take care of the rest and have the face you've always wanted~!\r\n#L2#Plastic Surgery: #i5152007##t5152007##l")
+            cm.sendSimple(I18nMessage.from("2041010_HELLO"))
          } else if (status == 1) {
             if (selection == 2) {
                faceNew = []
@@ -57,9 +58,9 @@ class NPC2041010 {
             if (cm.haveItem(5152007)) {
                cm.gainItem(5152007, (short) -1)
                cm.setFace(faceNew[selection])
-               cm.sendOk("Enjoy your new and improved face!")
+               cm.sendOk(I18nMessage.from("2041010_ENJOY_NEW_FACE"))
             } else {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("2041010_MISSING_FACE_COUPON"))
             }
          }
       }

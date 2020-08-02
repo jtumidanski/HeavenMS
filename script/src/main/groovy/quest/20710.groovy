@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -12,7 +13,7 @@ class Quest20710 {
          qm.dispose()
          return
       } else if (mode == 0 && status == 0) {
-         qm.sendOk("What? Are you declining the mission? Fine, do it like that. I'll just report it straight to #p1101002#.")
+         qm.sendOk(I18nMessage.from("20710_DECLINING_THE_MISSION"))
          qm.dispose()
          return
       } else if (mode == 0) {
@@ -23,7 +24,7 @@ class Quest20710 {
 
 
       if (status == 0) {
-         qm.sendAcceptDecline("You don't really instill confidence in me, but since you're a Cygnus Knight and all... and since no one else can go on a search right now... Okay, let me explain to you what this mission is about.")
+         qm.sendAcceptDecline(I18nMessage.from("20710_DO_NOT_INSTILL_CONFIDENCE"))
       } else if (status == 1) {
          qm.forceStartQuest()
          qm.dispose()

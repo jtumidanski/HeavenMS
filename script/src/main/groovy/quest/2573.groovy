@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,16 +18,16 @@ class Quest2573 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("Greetings! Isn't this just the perfect weather for a journey? I'm Skipper, the captain of this fine ship. You must be a new Explorer, eh? Nice to meet you.")
+         qm.sendNext(I18nMessage.from("2573_GREETINGS"))
       } else if (status == 1) {
-         qm.sendAcceptDecline("We're not quite ready to leave, so feel free to look around the ship while we're waiting.")
+         qm.sendAcceptDecline(I18nMessage.from("2573_NOT_QUITE_READY"))
       } else if (status == 2) {
          if (mode == 0) {//decline
-            qm.sendNext("Hey, take it easy! Sometimes you just gotta wait.")
+            qm.sendNext(I18nMessage.from("2573_TAKE_IT_EASY"))
          } else {
             qm.warp(3000000, 0)
             qm.forceCompleteQuest()
-            qm.sendNext("Looks like we're all set! I think this is going to be a great voyage. Let's get underway.")
+            qm.sendNext(I18nMessage.from("2573_WE_ARE_ALL_SET"))
          }
       } else if (status == 3) {
          qm.dispose()

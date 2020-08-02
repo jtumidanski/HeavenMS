@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -33,7 +34,7 @@ class NPC9201061 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Hi, there~! I'm Bomack. If you have a #b#t5152035##k, I can prescribe the right kind of cosmetic lenses for you. Now, what would you like to do?\r\n#L2#Cosmetic Lens: #i5152035##t5152035##l")
+            cm.sendSimple(I18nMessage.from("9201061_HI_THERE"))
          } else if (status == 1) {
             if (selection == 2) {
                int current = 0
@@ -44,16 +45,16 @@ class NPC9201061 {
                }
                int[] temp = [current + 100, current + 200, current + 300, current + 400, current + 500, current + 600, current + 700]
                colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
-               cm.sendYesNo("If you use the regular coupon, you'll be awarded a random pair of cosmetic lenses. Are you going to use #b#t5152035##k and really make the change to your eyes?")
+               cm.sendYesNo(I18nMessage.from("9201061_REG_CONFIRM"))
             }
          } else if (status == 2) {
             cm.dispose()
             if (cm.haveItem(5152035)) {
                cm.gainItem(5152035, (short) -1)
                cm.setFace(colors[Math.floor(Math.random() * colors.length).intValue()])
-               cm.sendOk("Enjoy your new and improved cosmetic lenses!")
+               cm.sendOk(I18nMessage.from("9201061_ENJOY_NEW_LENS"))
             } else {
-               cm.sendOk("I'm sorry, but I don't think you have our cosmetic lens coupon with you right now. Without the coupon, I'm afraid I can't do it for you..")
+               cm.sendOk(I18nMessage.from("9201061_MISSING_LENS_COUPON"))
             }
          }
       }

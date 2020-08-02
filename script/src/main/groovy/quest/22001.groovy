@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,22 +18,22 @@ class Quest22001 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("Haha. I had a good laugh. Hahaha. But enough with that nonsense. Feed #p1013102#, would you?")
+         qm.sendNext(I18nMessage.from("22001_FEED"))
       } else if (status == 1) {
          qm.sendNextPrev("#bWhat? That's #p1013101#'s job!", (byte) 2)
       } else if (status == 2) {
-         qm.sendAcceptDecline("You little brat! I told you to call me Older Brother! You know how much #p1013102# hates me. He'll bite me if I go near him. You feed him. He likes you.")
+         qm.sendAcceptDecline(I18nMessage.from("22001_LITTLE_BRAT"))
       } else if (status == 3) {
          if (mode == 0) {
-            qm.sendNext("Stop being lazy. Do you want to see your brother bitten by a dog? Hurry up! Talk to me again and accept the quest!")
+            qm.sendNext(I18nMessage.from("22001_STOP_BEING_LAZY"))
             qm.dispose()
          } else {//accept
             qm.gainItem(4032447, true)
             qm.forceStartQuest()
-            qm.sendNext("Hurry up and head #bleft#k to feed #b#p1013102##k. He's been barking to be fed all morning.")
+            qm.sendNext(I18nMessage.from("22001_HURRY_UP"))
          }
       } else if (status == 4) {
-         qm.sendNextPrev("Feed #p1013102# and come back to see me.")
+         qm.sendNextPrev(I18nMessage.from("22001_FEED_AND_COME_BACK"))
       } else if (status == 5) {
          qm.dispose()
       }

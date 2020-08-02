@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -19,7 +20,7 @@ class NPC2111000 {
       if (cm.isQuestStarted(3310) && !cm.haveItem(4031709, 1)) {
          cm.warp(926120100, "out00")
       } else {
-         cm.sendNext("Alchemy....and Alchemist.....both of them are important. But more importantly, it is the Magatia that tolerate everything. The honor of Magatia should be protected by me.")
+         cm.sendNext(I18nMessage.from("2111000_HONOR_OF_MAGATIA_SHOULD_BE_PROTECTED_BY_ME"))
       }
 
       cm.dispose()

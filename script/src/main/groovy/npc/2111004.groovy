@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111004 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Even though Alchemists and Fairies have antipathy for each other, I can still be in this town because the Zenumist President has been protecting us.")
+      cm.sendOk(I18nMessage.from("2111004_PRESIDENT_HAS_BEEN_PROTECTING_US"))
       cm.dispose()
    }
 

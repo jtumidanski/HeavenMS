@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1052113 {
       }
       if (status == 0) {
          if (cm.getLevel() >= 20) {
-            cm.sendOk("This training ground is available only for those under level 20.")
+            cm.sendOk(I18nMessage.from("1052113_LEVEL_REQUIREMENT"))
             cm.dispose()
             return
          }
@@ -49,7 +50,7 @@ class NPC1052113 {
          if (selection < 0 || selection >= num) {
             cm.dispose()
          } else if (cm.getPlayerCount(map + selection) >= maxPlayerCount) {
-            cm.sendNext("This training center is full.")
+            cm.sendNext(I18nMessage.from("1052113_FULL"))
             status = -1
          } else {
             cm.warp(map + selection, 0)

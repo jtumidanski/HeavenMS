@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,9 +18,9 @@ class NPC9201105 {
 
    def start() {
       if (cm.getMapId() == 610020005) {
-         cm.sendOk("The Crimsonwood Keep lies right ahead, a great feat has been made by you this day, salute to thee. Pass through these woods to enter the gates of the Keep.")
+         cm.sendOk(I18nMessage.from("9201105_KEEP_LIES_AHEAD"))
       } else {
-         cm.sendOk("So far your progress is splendid, good job. However, to make it to the Keep, you must face and accomplish this ordeal, carry on.")
+         cm.sendOk(I18nMessage.from("9201105_PROGRESS_IS_SPLENDID"))
       }
       cm.dispose()
    }

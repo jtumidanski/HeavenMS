@@ -2,6 +2,8 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import server.life.MapleNPCFactory
+import tools.I18nMessage
+import tools.SimpleMessage
 
 import java.awt.*
 
@@ -38,10 +40,10 @@ class NPC1104201 {
 
          if (status == 0) {
             if (!(cm.isQuestCompleted(20407) || cm.isQuestStarted(20407) && cm.getQuestProgressInt(20407, 9001010) != 0) && cm.getMap().countMonster(9001010) == 0 && cm.getMap().getNPCById(1104002) == null) {
-               cm.sendOk("... Hnngh... #b#h0##k, is that you...? #r#p1104002##k... She's already here... #b#h0##k, I'm truly sorry I can't help you right now in this state, just when a bigger threat appeared I could do nothing for my people.... Please I beg you, please defeat her, #b#h0##k!! ....")
+               cm.sendOk(I18nMessage.from("1104201_SHES_ALREADY_HERE"))
                MapleNPCFactory.spawnNpc(1104002, new Point(850, 0), cm.getMap())
             } else {
-               cm.sendOk("...")
+               cm.sendOk(SimpleMessage.from("..."))
             }
 
             cm.dispose()

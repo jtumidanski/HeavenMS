@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9201082 {
          }
 
          if (status == 0) {
-            cm.sendOk("Have you ever come to know about the card game based on MapleStory, the MapleStory iTCG?")
+            cm.sendOk(I18nMessage.from("9201082_CARD_GAME"))
             cm.dispose()
          }
       }

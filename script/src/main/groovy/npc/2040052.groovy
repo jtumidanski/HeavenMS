@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -49,13 +50,15 @@ class NPC2040052 {
                }
             }
             if (counter == 99) {
-               cm.sendOk("#b#h ##k has not returned a single storybook yet.")
+               cm.sendOk(I18nMessage.from("2040052_NO_STORYBOOK"))
+
                cm.dispose()
             } else {
                cm.sendNext("Let's see.. #b#h ##k have returned a total of #b" + counter + "#k books. The list of returned books is as follows:" + books)
             }
          } else if (status == 1) {
-            cm.sendNextPrev("The library is settling down now thanks chiefly to you, #b#h ##k's immense help. If the story gets mixed up once again, then I'll be counting on you to fix it once more.")
+            cm.sendNextPrev(I18nMessage.from("2040052_SETTLING_DOWN"))
+
          } else if (status == 2) {
             cm.dispose()
          }

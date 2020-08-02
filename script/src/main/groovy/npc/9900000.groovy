@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -29,15 +30,15 @@ class NPC9900000 {
 
    def start() {
       if (cm.getPlayer().gmLevel() < 1) {
-         cm.sendOk("Hey wassup?")
+         cm.sendOk(I18nMessage.from("9900000_WASSUP"))
          cm.dispose()
          return
       }
 
       if (cm.getPlayer().isMale()) {
-         cm.sendSimple("Hey there, you can change your look for " + price + " mesos. What would you like to change?\r\n#L0#Skin#l\r\n#L1#Male Hair#l\r\n#L2#Hair Color#l\r\n#L3#Male Regular Eyes#l\r\n#L4#Eye Color#l")
+         cm.sendSimple(I18nMessage.from("9900000_CHANGE_YOUR_LOOK").with(price))
       } else {
-         cm.sendSimple("Hey there, you can change your look for " + price + " mesos. What would you like to change?\r\n#L0#Skin#l\r\n#L5#Female Hair#l\r\n#L2#Hair Color#l\r\n#L6#Female Eyes#l\r\n#L4#Eye Color#l")
+         cm.sendSimple(I18nMessage.from("9900000_CHANGE_YOUR_LOOK_2").with(price))
       }
    }
 
@@ -78,7 +79,7 @@ class NPC9900000 {
                cm.sendStyle("Pick one?", colors)
             }
          } else {
-            cm.sendNext("You don't have enough mesos. Sorry to say this, but without " + price + " mesos, you won't be able to change your look!")
+            cm.sendNext(I18nMessage.from("9900000_NOT_ENOUGH_MESOS").with(price))
             cm.dispose()
          }
 

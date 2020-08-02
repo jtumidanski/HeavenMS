@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,7 +22,7 @@ class NPC2101016 {
    def start() {
       arena = cm.getPlayer().getAriantColiseum()
       if (arena == null) {
-         cm.sendOk("Hey, I did not see you on the field during the battle in the arena! What are you doing here?")
+         cm.sendOk(I18nMessage.from("2101016_WHAT_ARE_YOU_DOING_HERE"))
          cm.dispose()
          return
       }
@@ -46,10 +47,10 @@ class NPC2101016 {
          if (status == 0) {
             int ariantScore = arena.getAriantScore(cm.getPlayer())
             if (ariantScore < 1 && !cm.getPlayer().isGM()) {
-               cm.sendOk("Too bad, you did not get any jewelry!")
+               cm.sendOk(I18nMessage.from("2101016_NO_JEWELRY"))
                cm.dispose()
             } else {
-               cm.sendNext("Ok, let's see... You did very well and you brought #b" + ariantScore + "#k jewelry that I love. Since you have completed the match, I will reward you with a Battle Arena score of #b" + arena.getAriantRewardTier(cm.getPlayer()) + " points#k. If you want to know more about the Battle Arena score, then talk to #b#p2101015##k.")
+               cm.sendNext(I18nMessage.from("2101016_SCORE_REWARD").with(ariantScore, arena.getAriantRewardTier(cm.getPlayer())))
             }
          } else if (status == 1) {
             //cm.warp(980010020, 0);
@@ -60,7 +61,7 @@ class NPC2101016 {
 
             cm.getPlayer().gainExp((int) (92.7 * cm.getPlayer().getExpRate() * rewardTier), true, true)
             cm.getPlayer().gainAriantPoints(rewardTier)
-            cm.sendOk("Alright! Make me more jewels next time! Ahahahahah!")
+            cm.sendOk(I18nMessage.from("2101016_MAKE_MORE_JEWELS"))
             cm.dispose()
          }
       }

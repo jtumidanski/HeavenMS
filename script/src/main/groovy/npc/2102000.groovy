@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
@@ -19,20 +20,20 @@ class NPC2102000 {
       if (cm.haveItem(4031045)) {
          EventManager em = cm.getEventManager("Genie")
          if (em.getProperty("entry") == "true") {
-            cm.sendYesNo("This will not be a short flight, so you need to take care of some things, I suggest you do that first before getting on board. Do you still wish to board the genie?")
+            cm.sendYesNo(I18nMessage.from("2102000_NOT_A_SHORT_FLIGHT"))
          } else {
-            cm.sendOk("This genie is getting ready for takeoff. I'm sorry, but you'll have to get on the next ride. The ride schedule is available through the guide at the ticketing booth.")
+            cm.sendOk(I18nMessage.from("2102000_READY_FOR_TAKEOFF"))
             cm.dispose()
          }
       } else {
-         cm.sendOk("Make sure you got an Ariant ticket to travel in this genie. Check your inventory.")
+         cm.sendOk(I18nMessage.from("2102000_NEED_A_TICKET"))
          cm.dispose()
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0) {
-         cm.sendOk("Okay, talk to me if you change your mind!")
+         cm.sendOk(I18nMessage.from("2102000_IF_YOU_CHANGE_YOUR_MIND"))
          cm.dispose()
          return
       }
@@ -42,7 +43,7 @@ class NPC2102000 {
          cm.warp(260000110)
          cm.gainItem(4031045, (short) -1)
       } else {
-         cm.sendOk("This genie is getting ready for takeoff. I'm sorry, but you'll have to get on the next ride. The ride schedule is available through the guide at the ticketing booth.")
+         cm.sendOk(I18nMessage.from("2102000_HAVE_TO_GO_ON_THE_NEXT_RIDE"))
       }
 
       cm.dispose()

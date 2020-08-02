@@ -1,6 +1,9 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
+import tools.UserMessage
 
 /*
 	NPC Name: 		
@@ -36,33 +39,38 @@ class NPC1052002 {
          cm.dispose()
       }
       if (status == 0 && mode == 1) {
-         String selStr = "Pst... If you have the right goods, I can turn it into something nice...#b"
-         String[] options = ["Create a glove", "Upgrade a glove", "Create a claw", "Upgrade a claw", "Create materials"]
+         String selStr = I18nMessage.from("1052002_I_CAN_TURN_IT").to(cm.getClient()).evaluate()
+         UserMessage[] options = [I18nMessage.from("1052002_CREATE_A_GLOVE"), I18nMessage.from("1052002_UPGRADE_A_GLOVE"), I18nMessage.from("1052002_CREATE_A_CLAW"),
+                                  I18nMessage.from("1052002_UPGRADE_A_CLAW"), I18nMessage.from("1052002_CREATE_MATERIALS")]
          for (int i = 0; i < options.length; i++) {
-            selStr += "\r\n#L" + i + "# " + options[i] + "#l"
+            selStr += "\r\n#L" + i + "# " + options[i].to(cm.getClient()).evaluate() + "#l"
          }
-         cm.sendSimple(selStr)
+         cm.sendSimple(SimpleMessage.from(selStr))
       } else if (status == 1 && mode == 1) {
          selectedType = selection
          if (selectedType == 0) { //glove refine
-            String selStr = "So, what kind of glove would you like me to make?#b"
-            String[] gloves = ["Work Gloves#k - Common Lv. 10#b", "Brown Duo#k - Thief Lv. 15#b", "Blue Duo#k - Thief Lv. 15#b", "Black Duo#k - Thief Lv. 15#b", "Bronze Mischief#k - Thief Lv. 20#b", "Bronze Wolfskin#k - Thief Lv. 25#b", "Steel Sylvia#k - Thief Lv. 30#b",
-                               "Steel Arbion#k - Thief Lv. 35#b", "Red Cleave#k - Thief Lv. 40#b", "Blue Moon Glove#k - Thief Lv. 50#b", "Bronze Pow#k - Thief Lv. 60#b"]
+            String selStr = I18nMessage.from("1052002_WHAT_KIND_OF_GLOVE").to(cm.getClient()).evaluate()
+            UserMessage[] gloves = [I18nMessage.from("1052002_WORK_GLOVES"), I18nMessage.from("1052002_BROWN_DUO"), I18nMessage.from("1052002_BLUE_DUO"),
+                               I18nMessage.from("1052002_BLACK_DUO"), I18nMessage.from("1052002_BRONZE_MISCHIEF"), I18nMessage.from("1052002_BRONZE_WOLFSKIN"),
+                               I18nMessage.from("1052002_STEEL_SYLVIA"), I18nMessage.from("1052002_STEEL_ARBION"), I18nMessage.from("1052002_RED_CLEAVE"),
+                               I18nMessage.from("1052002_BLUE_MOON_GLOVE"), I18nMessage.from("1052002_BRONZE_POW")]
             for (int i = 0; i < gloves.length; i++) {
-               selStr += "\r\n#L" + i + "# " + gloves[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + gloves[i].to(cm.getClient()).evaluate() + "#l"
             }
             equip = true
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (selectedType == 1) { //glove upgrade
-            String selStr = "An upgraded glove? Sure thing, but note that upgrades won't carry over to the new item... #b"
-            String[] gloves = ["Mithril Mischief#k - Thief Lv. 20#b", "Dark Mischief#k - Thief Lv. 20#b", "Mithril Wolfskin#k - Thief Lv. 25#b",
-                               "Dark Wolfskin#k - Thief Lv. 25#b", "Silver Sylvia#k - Thief Lv. 30#b", "Gold Sylvia#k - Thief Lv. 30#b", "Orihalcon Arbion#k - Thief Lv. 35#b", "Gold Arbion#k - Thief Lv. 35#b", "Gold Cleave#k - Thief Lv. 40#b",
-                               "Dark Cleave#k - Thief Lv. 40#b", "Red Moon Glove#k - Thief Lv. 50#b", "Brown Moon Glove#k - Thief Lv. 50#b", "Silver Pow#k - Thief Lv. 60#b", "Gold Pow#k - Thief Lv. 60#b"]
+            String selStr = I18nMessage.from("1052002_GLOVE_UPGRADE").to(cm.getClient()).evaluate()
+            UserMessage[] gloves = [I18nMessage.from("1052002_MITHRIL_MISCHIEF"), I18nMessage.from("1052002_DARK_MISCHIEF"), I18nMessage.from("1052002_MITHRIL_WOLFSKIN"),
+                                    I18nMessage.from("1052002_DARK_WOLFSKIN"), I18nMessage.from("1052002_SILVER_SYLVIA"), I18nMessage.from("1052002_GOLD_SYLVIA"),
+                                    I18nMessage.from("1052002_ORIHALCON_ARBION"), I18nMessage.from("1052002_GOLD_ARBION"), I18nMessage.from("1052002_GOLD_CLEAVE"),
+                                    I18nMessage.from("1052002_DARK_CLEAVE"), I18nMessage.from("1052002_RED_MOON_GLOVE"), I18nMessage.from("1052002_BROWN_MOON_GLOVE"),
+                                    I18nMessage.from("1052002_SILVER_POW"), I18nMessage.from("1052002_GOLD_POW")]
             for (int i = 0; i < gloves.length; i++) {
-               selStr += "\r\n#L" + i + "# " + gloves[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + gloves[i].to(cm.getClient()).evaluate() + "#l"
             }
             equip = true
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (selectedType == 2) { //claw refine
             String selStr = "So, what kind of claw would you like me to make?#b"
             String[] claws = ["Steel Titans#k - Thief Lv. 15#b", "Bronze Igor#k - Thief Lv. 20#b", "Meba#k - Thief Lv. 25#b", "Steel Guards#k - Thief Lv. 30#b", "Bronze Guardian#k - Thief Lv. 35#b", "Steel Avarice#k - Thief Lv. 40#b", "Steel Slain#k - Thief Lv. 50#b"]
@@ -188,11 +196,11 @@ class NPC1052002 {
          }
 
          if (!cm.canHold(recvItem, recvQty)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("1052002_CHECK_YOUR_INVENTORY_FOR_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost * qty) {
-            cm.sendOk("I'm afraid you cannot afford my services.")
+            cm.sendOk(I18nMessage.from("1052002_NOT_ENOUGH_MESOS"))
             cm.dispose()
             return
          } else {
@@ -208,7 +216,7 @@ class NPC1052002 {
          }
 
          if (!complete) {
-            cm.sendOk("What are you trying to pull? I can't make anything unless you bring me what I ask for.")
+            cm.sendOk(I18nMessage.from("1052002_MATERIALS_MISSING"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -222,7 +230,7 @@ class NPC1052002 {
             }
 
             cm.gainItem(recvItem, (short) recvQty)
-            cm.sendOk("All done. If you need anything else... Well, I'm not going anywhere.")
+            cm.sendOk(I18nMessage.from("1052002_SUCCESS"))
          }
          cm.dispose()
       }

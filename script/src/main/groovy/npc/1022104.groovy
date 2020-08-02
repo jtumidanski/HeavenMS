@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
 
 /*
 	NPC Name: 		
@@ -35,21 +37,21 @@ class NPC1022104 {
       }
       if (status == 0) {
          if (cm.getLevel() >= 20) {
-            cm.sendOk("This training ground is available only for those under level 20.")
+            cm.sendOk(I18nMessage.from("1022104_LEVEL_REQUIREMENT"))
             cm.dispose()
             return
          }
 
-         String selStr = "Would you like to go into the Training Center?"
+         String selStr = I18nMessage.from("1022104_WOULD_YOU").to(cm.getClient()).evaluate()
          for (def i = 0; i < num; i++) {
             selStr += "\r\n#b#L" + i + "#Training Center " + i + " (" + cm.getPlayerCount(map + i) + "/" + maxPlayerCount + ")#l#k"
          }
-         cm.sendSimple(selStr)
+         cm.sendSimple(SimpleMessage.from(selStr))
       } else if (status == 1) {
          if (selection < 0 || selection >= num) {
             cm.dispose()
          } else if (cm.getPlayerCount(map + selection) >= maxPlayerCount) {
-            cm.sendNext("This training center is full.")
+            cm.sendNext(I18nMessage.from("1022104_FULL"))
             status = -1
          } else {
             cm.warp(map + selection, 0)

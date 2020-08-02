@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,16 +14,16 @@ class Quest2317 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("Breaking through the barrier will require the Poison Mushroom Cap. Talk to me when you change your mind.")
+            qm.sendOk(I18nMessage.from("2317_BREAKING_THE_BARRIER"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("Ah! If I am not mistaken, I saw the #bKiller Mushroom Spores#k way back when I was a kid in a book. Now I remember... it's made out of extracts of powerful poisons from Poison Mushrooms, which means you'll need some Poison Mushroom Caps. If you can get me those, I think I'll be able to make it.")
+         qm.sendAcceptDecline(I18nMessage.from("2317_I_REMEMBER"))
       } else if (status == 1) {
          qm.forceStartQuest()
-         qm.sendOk("Please defeat #bPoison Mushrooms#k and bring back #b100 Poison Mushroom Caps#k in return.")
+         qm.sendOk(I18nMessage.from("2317_PLEASE_DEFEAT"))
       } else if (status == 2) {
          qm.dispose()
       }
@@ -39,12 +40,12 @@ class Quest2317 {
          }
       }
       if (status == 0) {
-         qm.sendOk("Have you gathered up the 100 Poison Mushroom Caps like I asked you to get?")
+         qm.sendOk(I18nMessage.from("2317_HAVE_YOU"))
       } else if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainExp(13500)
          qm.gainItem(4000500, (short) -100)
-         qm.sendOk("I am amazed that you were able to gather up these 100 Poison Mushroom Caps, which is considered a difficult feat. I think I'll be able to make #bKiller Mushroom Spores#k our of these.")
+         qm.sendOk(I18nMessage.from("2317_I_AM_AMAZED"))
       } else if (status == 2) {
          qm.dispose()
       }

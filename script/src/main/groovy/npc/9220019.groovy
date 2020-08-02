@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -37,16 +38,16 @@ class NPC9220019 {
          if (status == 0) {
             int mapId = cm.getMapId()
             if (mapId == 674030100) {
-               cm.sendNext("Hi, I'm #p9220019#.")
+               cm.sendNext(I18nMessage.from("9220019_HELLO"))
                cm.dispose()
                return
             } else if (mapId == 674030300) {
-               cm.sendNext("Hi there, #h0#. This is the MV's treasure room. Use the time you have here to do whatever you want, there are a lot of things to uncover here, actually. Or else you can use the portal here to #rgo back#k to the entrance.")
+               cm.sendNext(I18nMessage.from("9220019_TREASURE_ROOM"))
                cm.dispose()
                return
             }
 
-            cm.sendYesNo("Are you sure you want to return? By returning now you are leaving your partners behind, do you really want to do it?")
+            cm.sendYesNo(I18nMessage.from("9220019_WANT_TO_RETURN"))
          } else if (status == 1) {
             cm.warp(674030100)
             cm.dispose()

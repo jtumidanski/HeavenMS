@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1032111 {
    NPCConversationManager cm
@@ -29,16 +30,16 @@ class NPC1032111 {
             if(!cm.hasItem(4032142)){
                if(cm.canHold(4032142)){
                   cm.gainItem(4032142, (short) 1)
-                  cm.sendOk("You bottled up some of the clear tree sap.  #i4032142#")
+                  cm.sendOk(I18nMessage.from("1032111_BOTTLED_UP_SOME_SAP"))
                }
                else
-                  cm.sendOk("Make sure you have a free spot in your ETC inventory.")
+                  cm.sendOk(I18nMessage.from("1032111_MAKE_SURE_YOU_HAVE_A_FREE_SPOT"))
             }
             else
-               cm.sendOk("A never ending flow of sap is coming from this small tree stump.")
+               cm.sendOk(I18nMessage.from("1032111_NEVER_ENDING_FLOW"))
          }
          else
-            cm.sendOk("A never ending flow of sap is coming from this small tree stump.")
+            cm.sendOk(I18nMessage.from("1032111_NEVER_ENDING_FLOW"))
       }
       else if(status == 1){
          cm.dispose()

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1092015 {
          }
 
          if (status == 0) {
-            cm.sendOk("I'm bored! Someone come play with me!")
+            cm.sendOk(I18nMessage.from("1092015_IM_BORED"))
             cm.dispose()
          }
       }

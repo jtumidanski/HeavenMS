@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -33,10 +34,10 @@ class NPC9270025 {
          }
 
          if (status == 0) {
-            cm.sendSimple("Well, hello! Welcome to the Lian Hua Hua Skin-Care! Would you like to have a firm, tight, healthy looking skin like mine?  With #b#tCBD Skin Coupon##k, you can let us take care of the rest and have the kind of skin you've always wanted!\r\n#L1#Sounds Good! (uses #i5153010# #t5153010#)#l")
+            cm.sendSimple(I18nMessage.from("9270025_HELLO"))
          } else if (status == 1) {
             if (!cm.haveItem(5153010)) {
-               cm.sendOk("It looks like you don't have the coupon you need to receive the treatment. I'm sorry but it looks like we cannot do it for you.")
+               cm.sendOk(I18nMessage.from("9270025_MISSING_SKIN_COUPON"))
                cm.dispose()
                return
             }
@@ -44,7 +45,7 @@ class NPC9270025 {
          } else {
             cm.gainItem(5153010, (short) -1)
             cm.setSkin(selection)
-            cm.sendOk("Enjoy your new and improved skin!")
+            cm.sendOk(I18nMessage.from("9270025_ENJOY_NEW_SKIN"))
 
             cm.dispose()
          }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -30,7 +31,7 @@ class NPC9020002 {
       int mapId = cm.getPlayer().getMapId()
       if (mapId == 103000890) {
          if (status == 0) {
-            cm.sendNext("To return back to the city, follow this way.")
+            cm.sendNext(I18nMessage.from("9020002_RETURN_BACK_TO_THE_CITY"))
          } else {
             cm.warp(103000000)
             cm.dispose()

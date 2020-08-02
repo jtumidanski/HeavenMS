@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -37,7 +38,7 @@ class NPC2141002 {
          EventInstanceManager eim = cm.getEventInstance()
          if (!eim.isEventCleared()) {
             if (status == 0) {
-               cm.sendYesNo("Do you want to get out now?")
+               cm.sendYesNo(I18nMessage.from("2141002_WANT_TO_GET_OUT"))
             } else if (status == 1) {
                cm.warp(270050000, 0)
                cm.dispose()
@@ -45,12 +46,12 @@ class NPC2141002 {
 
          } else {
             if (status == 0) {
-               cm.sendYesNo("Pink Bean has been defeated! You guys sure are true heroes of this land! In no time, Temple of Time will shine again as bright as ever, all thanks to your efforts! Hooray to our heroes!! Are you ready to go now?")
+               cm.sendYesNo(I18nMessage.from("2141002_PINK_BEAN_DEFEATED"))
             } else if (status == 1) {
                if (eim.giveEventReward(cm.getPlayer(), 1)) {
                   cm.warp(270050000)
                } else {
-                  cm.sendOk("You cannot receive an instance prize without having an empty room in your EQUIP, USE, SET-UP and ETC inventory.")
+                  cm.sendOk(I18nMessage.from("2141002_NEED_INVENTORY_ROOM"))
                }
 
                cm.dispose()

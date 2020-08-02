@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -23,7 +24,7 @@ class NPC9120103 {
    int[] colors = []
 
    def start() {
-      cm.sendSimple("Hi, I pretty much shouldn't be doing this, but with a #b#t5152008##k or a #b#t5152046##k, I will do it anyways for you. But don't forget, it will be random!\r\n#L1#Plastic Surgery: #i5152008##t5152008##l\r\n#L2#Cosmetic Lens: #i5152046##t5152046##l")
+      cm.sendSimple(I18nMessage.from("9120103_WELCOME"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -44,7 +45,7 @@ class NPC9120103 {
                      faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendYesNo("If you use the regular coupon, your face may transform into a random new look...do you still want to do it using #b#t5152008##k?")
+               cm.sendYesNo(I18nMessage.from("9120103_REGULAR_COUPON_CONFIRM"))
             } else if (selection == 2) {
                beauty = 1
                int current = 0
@@ -56,24 +57,24 @@ class NPC9120103 {
                }
                int[] temp = [current, current + 100, current + 200, current + 300, current + 400, current + 500, current + 700]
                colors = ScriptUtils.pushItemsIfTrue(colors, temp, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
-               cm.sendYesNo("If you use the regular coupon, you'll be awarded a random pair of cosmetic lenses. Are you going to use a #b#t5152046##k and really make the change to your eyes?")
+               cm.sendYesNo(I18nMessage.from("9120103_REGULAR_LENS_COUPON_CONFIRM"))
             }
          } else if (status == 2) {
             if (beauty == 0) {
                if (cm.haveItem(5152008)) {
                   cm.gainItem(5152008, (short) -1)
                   cm.setFace(faceNew[Math.floor(Math.random() * faceNew.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved face!")
+                  cm.sendOk(I18nMessage.from("9120103_ENJOY_NEW_FACE"))
                } else {
-                  cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+                  cm.sendOk(I18nMessage.from("9120103_MISSING_SURGERY_COUPON"))
                }
             } else if (beauty == 1) {
                if (cm.haveItem(5152046)) {
                   cm.gainItem(5152046, (short) -1)
                   cm.setFace(colors[Math.floor(Math.random() * colors.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved cosmetic lenses!")
+                  cm.sendOk(I18nMessage.from("9120103_ENJOY_NEW_LENS"))
                } else {
-                  cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+                  cm.sendOk(I18nMessage.from("9120103_MISSING_SURGERY_COUPON"))
                }
             }
 

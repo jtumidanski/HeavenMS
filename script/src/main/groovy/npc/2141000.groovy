@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2141000 {
    int sel = -1
 
    def start() {
-      cm.sendAcceptDecline("If only I had the Mirror of Goodness then I can re-summon the Black Wizard! \r\nWait! something's not right! Why is the Black Wizard not summoned? Wait, what's this force? I feel something... totally different from the Black Wizard Ahhhhh!!!!! \r\n\r\n #b(Places a hand on the shoulder of Kryston.)")
+      cm.sendAcceptDecline(I18nMessage.from("2141000_IF_ONLY_I_HAD"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

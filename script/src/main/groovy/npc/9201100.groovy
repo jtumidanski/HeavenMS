@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,9 +18,9 @@ class NPC9201100 {
 
    def start() {
       if (cm.getQuestStatus(8224) == 2) {
-         cm.sendOk("Well met, fellow clan member. If you need anything we can be of help, try talking to one of our members.")
+         cm.sendOk(I18nMessage.from("9201100_FELLOW_CLAN_MEMBER"))
       } else {
-         cm.sendOk("Hello there, stranger. We are the renowned Raven Claw clan of mercenaries, and I'm their leader.")
+         cm.sendOk(I18nMessage.from("9201100_HELLO"))
       }
 
       cm.dispose()

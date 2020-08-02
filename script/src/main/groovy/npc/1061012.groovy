@@ -4,6 +4,7 @@ import net.server.world.MapleParty
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1061012 {
    NPCConversationManager cm
@@ -14,32 +15,32 @@ class NPC1061012 {
       if (cm.getQuestStatus(6107) == 1 || cm.getQuestStatus(6108) == 1) {
          int ret = checkJob()
          if (ret == -1) {
-            cm.sendOk("Please form a party and talk to me again.")
+            cm.sendOk(I18nMessage.from("1061012_FORM_A_PARTY"))
          } else if (ret == 0) {
-            cm.sendOk("Please make sure that your party is a size of 2.")
+            cm.sendOk(I18nMessage.from("1061012_PARTY_SIZE_REQUIREMENT"))
          } else if (ret == 1) {
-            cm.sendOk("One of your party member's job is not eligible for entering the other world.")
+            cm.sendOk(I18nMessage.from("1061012_INELLIGIBLE_JOB"))
          } else if (ret == 2) {
-            cm.sendOk("One of your party member's level is not eligible for entering the other world.")
+            cm.sendOk(I18nMessage.from("1061012_MEMBER_LEVEL_REQUIREMENT"))
          } else {
             EventManager em = cm.getEventManager("s4aWorld")
             if (em == null) {
-               cm.sendOk("You're not allowed to enter with unknown reason. Try again.")
+               cm.sendOk(I18nMessage.from("1061012_UNKNOWN_REASON"))
             } else if (em.getProperty("started") == "true") {
-               cm.sendOk("Someone else is already attempting to defeat the Jr.Balrog in another world.")
+               cm.sendOk(I18nMessage.from("1061012_SOMEONE_ELSE_ALREADY_ATTEMPTING"))
             } else {
                MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                if (eli.size() > 0) {
                   if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
-                     cm.sendOk("A party in your name is already registered in this instance.")
+                     cm.sendOk(I18nMessage.from("1061012_PARTY_MEMBER_ALREADY_REGISTERED"))
                   }
                } else {
-                  cm.sendOk("You cannot start this party quest yet, because either your party is not in the range size, some of your party members are not eligible to attempt it or they are not in this map. If you're having trouble finding party members, try Party Search.")
+                  cm.sendOk(I18nMessage.from("1061012_INVALID_PARTY_REQUIREMENT"))
                }
             }
          }
       } else {
-         cm.sendOk("You're not allowed to enter the other world with unknown reason.")
+         cm.sendOk(I18nMessage.from("1061012_NOT_ALLOWED_TO_ENTER_UNKNOWN"))
       }
 
       cm.dispose()

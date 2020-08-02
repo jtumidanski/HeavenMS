@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Eurek the Alchemist
@@ -43,16 +44,19 @@ class NPC2040050 {
          return
       }
       if (mode == 0) {
-         cm.sendNext("Not enough materials, huh? No worries. Just come see me once you gather up the necessary items. There are numerous ways to obtain them, whether it be hunting or purchasing it from others, so keep going.")
+         cm.sendNext(I18nMessage.from("2040050_NOT_ENOUGH_MATERIALS"))
+
          cm.dispose()
       }
       if (mode == 1) {
          status++
       }
       if (status == 0) {
-         cm.sendNext("Alright, mix up the frog's tongue with the squirrel's tooth and ... oh yeah! Forgot to put in the sparkling white powder!! Man, that could have been really bad ... Whoa!! How long have you been standing there? I maaaay have been a little carried away with my work ... hehe.")
+         cm.sendNext(I18nMessage.from("2040050_ALRIGHT"))
+
       } else if (status == 1) {
-         cm.sendSimple("As you can see, I'm just a traveling alchemist. I may be in training, but I can still make a few things that you may need. Do you want to take a look?\r\n\r\n#L0##bMake Magic Rock#k#l\r\n#L1##bMake The Summoning Rock#k#l")
+         cm.sendSimple(I18nMessage.from("2040050_AS_YOU_CAN_SEE"))
+
       } else if (status == 2) {
          set = selection
          makeItem = makeItems[set]
@@ -78,9 +82,11 @@ class NPC2040050 {
             }
          }
          if (!access || !cm.canHold(makeItem) || cm.getMeso() < cost) {
-            cm.sendNext("Please check and see if you have all the items needed, or if your etc. inventory is full or not")
+            cm.sendNext(I18nMessage.from("2040050_MISSING_ITEMS_OR_INVENTORY_FULL"))
+
          } else {
-            cm.sendOk("Here, take the 5 pieces of #b#t" + makeItem + "##k. Even I have to admit, this is a masterpiece. Alright, if you need my help down the road, by all means come back and talk to me!")
+            cm.sendOk(I18nMessage.from("2040050_5_PIECES").with(makeItem))
+
             cm.gainItem(requiredItems[0][0], (short) -requiredItems[0][1])
             cm.gainItem(requiredItems[1][0], (short) -requiredItems[1][1])
             cm.gainItem(requiredItems[2][0], (short) -requiredItems[2][1])

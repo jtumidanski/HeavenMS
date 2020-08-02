@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -18,19 +19,19 @@ class NPC9120003 {
    int price = 300
 
    def start() {
-      cm.sendYesNo("Would you like to enter the bathhouse? That'll be " + price + " mesos for you.")
+      cm.sendYesNo(I18nMessage.from("9120003_ENTER_BATHHOUSE").with(price))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode < 1) {
          if (mode == 0) {
-            cm.sendOk("Please come back some other time.")
+            cm.sendOk(I18nMessage.from("9120003_COME_BACK_SOME_OTHER_TIME"))
          }
          cm.dispose()
          return
       }
       if (cm.getMeso() < price) {
-         cm.sendOk("Please check and see if you have " + price + " mesos to enter this place.")
+         cm.sendOk(I18nMessage.from("9120003_CHECK_AND_SEE").with(price))
       } else {
          cm.gainMeso(-price)
          cm.warp(801000100 + 100 * cm.getPlayer().getGender(), "out00")

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -20,7 +21,7 @@ class NPC2111003 {
          cm.warp(926120300, "out00")
          cm.dispose()
       } else {
-         cm.sendOk("Emotion that I feel is real? Or just illusion coming from mechanical error?")
+         cm.sendOk(I18nMessage.from("2111003_IS_IT_REAL"))
          cm.dispose()
       }
    }

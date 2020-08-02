@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -81,7 +82,7 @@ class NPC9201135 {
          cm.dispose()
          return
       } else if (mode == 0) {
-         cm.sendNext("You know where to come if you need a ride!")
+         cm.sendNext(I18nMessage.from("9201135_KNOW_WHERE_TO_COME"))
          cm.dispose()
          return
       } else {
@@ -108,13 +109,13 @@ class NPC9201135 {
          }
 
          if (travelCost > 0) {
-            cm.sendYesNo("Would you like to travel to #b#m" + travelMap + "##k? To head over to #b#m" + travelMap + "##k, it'll cost you #r" + cm.numberWithCommas(travelCost) + " mesos#k. Would you like to go right now?")
+            cm.sendYesNo(I18nMessage.from("9201135_WOULD_YOU_LIKE_TO_TRAVEL").with(travelMap, travelMap, cm.numberWithCommas(travelCost)))
          } else {
-            cm.sendNext("Had a great time in #rMalaysia#k? I hope so, have a safe travel back!")
+            cm.sendNext(I18nMessage.from("9201135_HAD_A_GREAT_TIME"))
          }
       } else if (status == 2) {
          if (cm.getMeso() < travelCost) {
-            cm.sendNext("You do not seem to have enough mesos.")
+            cm.sendNext(I18nMessage.from("9201135_NOT_ENOUGH_MESO"))
          } else {
             if (travelCost > 0) {
                cm.gainMeso(-travelCost)

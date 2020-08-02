@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9103003 {
          }
 
          if (status == 0) {
-            cm.sendNext("Come this way to return to Ludibrium.")
+            cm.sendNext(I18nMessage.from("9103003_COME_THIS_WAY"))
          } else {
             cm.warp(220000000, 0)
             cm.dispose()

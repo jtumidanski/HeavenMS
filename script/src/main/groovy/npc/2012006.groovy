@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -34,7 +35,7 @@ class NPC2012006 {
       status++
       if (status == 0) {
          sel = selection
-         cm.sendNext("Ok #h #, I will send you to the platform for #b#m" + (200000110 + (sel * 10)) + "##k.")
+         cm.sendNext(I18nMessage.from("2012006_I_WILL_SEND_YOU").with(200000110 + (sel * 10)))
       } else if (status == 1) {
          cm.warp(200000110 + (sel * 10), "west00")
          cm.dispose()

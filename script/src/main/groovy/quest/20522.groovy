@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,14 +24,14 @@ class Quest20522 {
       }
 
       if (status == 0) {
-         qm.sendNext("The riding for Knights are a bit different from the rides available for regular folks. The takes place through a creature that is of the Mimi race that can be found on this island; they are called #bMimianas#k. Instead of riding monsters, the Knights ride Mimiana. There's one thing that you should never, ever forget.")
+         qm.sendNext(I18nMessage.from("20522_RIDING_FOR_KNIGHTS_DIFFERENT"))
       } else if (status == 1) {
-         qm.sendNextPrev("Dont't think of this as just a form of mount or transportation. These mounts can be your friend, your comrade, your colleague... all of the above. Even a friend close enough to entrust your life! That's why the Knights of Ereve actually grow their own mounts.")
+         qm.sendNextPrev(I18nMessage.from("20522_MOUNTS_CAN_BE_YOUR_FRIEND"))
       } else if (status == 2) {
-         qm.sendAcceptDecline("Now, here's a Mimiana egg. Are you ready to raise a Mimiana and have it as your traveling companion for the rest of its life?")
+         qm.sendAcceptDecline(I18nMessage.from("20522_MIMIANA_EGG"))
       } else if (status == 3) {
          if (!qm.haveItem(4220137) && !qm.canHold(4220137)) {
-            qm.sendOk("Make up a room on your ETC tab so I can give you the Mimiana egg.")
+            qm.sendOk(I18nMessage.from("20522_MAKE_ETC_ROOM"))
             qm.dispose()
             return
          }
@@ -39,7 +40,7 @@ class Quest20522 {
          if (!qm.haveItem(4220137)) {
             qm.gainItem(4220137)
          }
-         qm.sendOk("Mimiana's egg can be raised by #bsharing your daily experiences with it#k. Once Mimiana fully grows up, please come see me.")
+         qm.sendOk(I18nMessage.from("20522_ONCE_IT_FULLY_GROWS"))
       } else if (status == 4) {
          qm.dispose()
       }
@@ -53,17 +54,17 @@ class Quest20522 {
 
       status++
       if (status == 0) {
-         qm.sendNext("Hey there! How's Mimiana's egg?")
+         qm.sendNext(I18nMessage.from("20522_HOWS_THE_EGG"))
       } else if (status == 1) {   //pretty sure there would need to have an egg EXP condition... Whatever.
          if (!qm.haveItem(4220137)) {
-            qm.sendOk("I see, you lost your egg... You need to be more careful when raising a baby Mimiana!")
+            qm.sendOk(I18nMessage.from("20522_YOU_LOST_YOUR_EGG"))
             return
          }
 
          qm.forceCompleteQuest()
          qm.gainItem(4220137, (short) -1)
          qm.gainExp(37600)
-         qm.sendOk("Oh, were you able to awaken Mimiana Egg? That's amazing... Most knights can't even dream of awakening it in such a short amount of time.")
+         qm.sendOk(I18nMessage.from("20522_AMAZING"))
       } else if (status == 2) {
          qm.dispose()
       }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9270038 {
    int oldSelection = -1
 
    def start() {
-      cm.sendSimple("Hello, I am Shalon from Singapore Airport. I can assist you in getting you to Kerning City in no time. Do you want to go to Kerning City?\r\n#b#L0#I would like to buy a plane ticket to Kerning City\r\n#b#L1#Let me go in to the departure point.")
+      cm.sendSimple(I18nMessage.from("9270038_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -28,9 +29,9 @@ class NPC9270038 {
 
       if (status == 0) {
          if (selection == 0) {
-            cm.sendYesNo("The ticket will cost you 5,000 mesos. Will you purchase the ticket?")
+            cm.sendYesNo(I18nMessage.from("9270038_TICKET_COST"))
          } else if (selection == 1) {
-            cm.sendYesNo("Would you like to go in now? You will lose your ticket once you go in! Thank you for choosing Wizet Airline.")
+            cm.sendYesNo(I18nMessage.from("9270038_GO_IN_NOW"))
          }
          oldSelection = selection
       } else if (status == 1) {
@@ -39,14 +40,14 @@ class NPC9270038 {
                if (cm.getPlayer().canHold(4031732, 1)) {
                   cm.gainMeso(-5000)
                   cm.gainItem(4031732)
-                  cm.sendOk("Thank you for choosing Wizet Airline! Enjoy your flight!")
+                  cm.sendOk(I18nMessage.from("9270038_THANK_YOU"))
                   cm.dispose()
                } else {
-                  cm.sendOk("You don't have a free slot on your ETC inventory for the ticket, please make a room beforehand.")
+                  cm.sendOk(I18nMessage.from("9270038_NEED_ETC_SPACE"))
                   cm.dispose()
                }
             } else {
-               cm.sendOk("You do not have enough mesos or you've already purchased a ticket.")
+               cm.sendOk(I18nMessage.from("9270038_NOT_ENOUGH_MESOS"))
                cm.dispose()
             }
          } else if (oldSelection == 1) {
@@ -56,10 +57,10 @@ class NPC9270038 {
                   cm.warp(540010001)
                   cm.gainItem(4031732, (short) -1)
                } else {
-                  cm.sendOk("Sorry the plane has taken off, please wait a few minutes.")
+                  cm.sendOk(I18nMessage.from("9270038_WAIT_A_FEW_MINUTES"))
                }
             } else {
-               cm.sendOk("You need a #b#t4031732##k to get on the plane!")
+               cm.sendOk(I18nMessage.from("9270038_NEED_A_TICKET"))
             }
          }
          cm.dispose()

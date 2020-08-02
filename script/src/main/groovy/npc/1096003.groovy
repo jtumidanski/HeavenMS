@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,7 +32,7 @@ class NPC1096003 {
       if (status == 0) {
          cm.sendDirectionInfo(4, 1096003)//else you will crash sending sendNext
          cm.sendDirectionInfo(3, 4)
-         cm.sendNext("Ook! Ook!")
+         cm.sendNext(I18nMessage.from("1096003_OOK_OOK"))
          cm.showIntro("Effect/Direction4.img/cannonshooter/face00")
       } else if (status == 1) {
          cm.unlockUI()

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -30,7 +31,7 @@ class NPC2081010 {
 
       status++
       if (status == 0) {
-         cm.sendYesNo("Do you want to exit the area? If you quit, you will need to start this task from the scratch.")
+         cm.sendYesNo(I18nMessage.from("2081010_DO_YOU_WANT_TO_EXIT"))
       } else if (status == 1) {
          cm.warp(exitMap, "st00")
          cm.dispose()

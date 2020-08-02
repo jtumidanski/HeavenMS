@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,21 +18,21 @@ class Quest20700 {
          status++
       } else {
          if (status == 1) {
-            qm.sendNext("When will you realize how weak you are... When you get yourself in trouble in Victoria Island?")
+            qm.sendNext(I18nMessage.from("20700_REALIZE_HOW_WEAK"))
             qm.dispose()
             return
          }
          status--
       }
       if (status == 0) {
-         qm.sendNext("You have finally become a Knight-in-Training. I'd like to give you a mission right away, but you still look miles away from even being able to handle a task on your own. Are you sure you can even go to Victoria Island like this?")
+         qm.sendNext(I18nMessage.from("20700_FINALLY_A_KNIGHT_IN_TRAINING"))
       } else if (status == 1) {
-         qm.sendAcceptDecline("It's up to you to head over to Victoria Island, but a Knight-in-Training that can't take care of one's self in battles is likely to cause harm to the Empress's impeccable reputation. As the Head Tactician of this island, I can't let that happen, period. I want you to keep training until the right time comes.")
+         qm.sendAcceptDecline(I18nMessage.from("20700_HARM_REPUTATION"))
       } else if (status == 2) {
          qm.forceCompleteQuest()
-         qm.sendNext("#p1102000#, the Training Instructor, will help you train into a serviceable knight. Once you reach Level 13, I'll assign you a mission or two. So until then, keep training.")
+         qm.sendNext(I18nMessage.from("20700_HELP_YOU_TRAIN"))
       } else if (status == 3) {
-         qm.sendPrev("Oh, and are you aware that if you strike a conversation with #p1101001#, she'll give you a blessing? The blessing will definitely help you on your journey.")
+         qm.sendPrev(I18nMessage.from("20700_GIVE_YOU_BLESSING"))
       } else if (status == 4) {
          qm.dispose()
       }

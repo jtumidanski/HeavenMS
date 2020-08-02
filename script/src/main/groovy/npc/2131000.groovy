@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2131000 {
    int sel = -1
 
    def start() {
-      cm.sendOk("It is been a while since we left Ossyria to avoid the Black Magician. If not for the world tree, I do not know where we would have been. I have been trying to establish myself here, but that is not easy. I wonder how things are like back home.")
+      cm.sendOk(I18nMessage.from("2131000_IT_HAS_BEEN"))
       cm.dispose()
    }
 

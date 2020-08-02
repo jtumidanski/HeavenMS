@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -41,14 +42,14 @@ class NPC2071012 {
             }
 
             if (!cm.haveItem(4031793, 1)) {
-               cm.sendOk("Umm... Hey... Would you help me find a #bsoft and shiny silver fur#k that I lost on the woods? I need it, I need it, I need it sooooo much!")
+               cm.sendOk(I18nMessage.from("2071012_I_LOST_IN_THE_WOODS"))
                cm.dispose()
                return
             }
 
-            cm.sendYesNo("Hey... Umm... Would you help me find a #bsoft and shiny silver fur#k that I lost on the woods? I need it, I need it, I need it sooooo much! ... Oh you found it!!! Will you give it to me?")
+            cm.sendYesNo(I18nMessage.from("2071012_I_LOST_IN_THE_WOODS_LONG"))
          } else if (status == 1) {
-            cm.sendNext("Teehehee~ That's your reward for taking it from me, serves you well.")
+            cm.sendNext(I18nMessage.from("2071012_REWARD"))
             cm.gainItem(4031793, (short) -1)
             cm.gainFame(-5)
             cm.setQuestProgress(23647, 1, 1)

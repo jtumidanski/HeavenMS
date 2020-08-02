@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -29,7 +30,7 @@ class NPC9201033 {
          cm.dispose()
       } else {
          if (status == 0 && mode == 0) {
-            cm.sendNext("Let me know if you've changed your mind!")
+            cm.sendNext(I18nMessage.from("9201033_LET_ME_KNOW"))
             cm.dispose()
          }
 
@@ -42,11 +43,11 @@ class NPC9201033 {
          if (status == 0) {
             if (cm.getMapId() == hv) {
                tst = 1 //to shalom temple
-               cm.sendYesNo("The Shalom Temple is unlike any other place in Happyville, would you like to head to #bShalom Temple#k?")
+               cm.sendYesNo(I18nMessage.from("9201033_UNLIKE_ANY_OTHER_PLACE"))
                //not GMS lol
             } else if (cm.getMapId() == smap) {
                b2h = 1 //back to happyville
-               cm.sendYesNo("Would you like to head back to Happyville?")
+               cm.sendYesNo(I18nMessage.from("9201033_WOULD_YOU_LIKE_TO"))
             }
          } else if (status == 1) {
             if (tst == 1) {

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import constants.game.GameConstants
@@ -69,7 +70,7 @@ class NpcCpqChallenge2 {
             } else {
                cm.answerCPQChallenge(false)
                cm.getChar().setChallenged(false)
-               cm.sendOk("The number of players between the teams is not the same.")
+               cm.sendOk(I18nMessage.from("cpqchallenge2_NOT_THE_SAME"))
             }
             cm.dispose()
          }

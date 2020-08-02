@@ -1,6 +1,7 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -49,7 +50,7 @@ class NPC2040020 {
          selectedType = selection
          stimulator = selectedType > 4
          if (selectedType == 0) { //What's a stimulator?
-            cm.sendNext("A stimulator is a special potion that I can add into the process of creating certain items. It gives it stats as though it had dropped from a monster. However, it is possible to have no change, and it is also possible for the item to be below average. There's also a 10% chance of not getting any item when using a stimulator, so please choose wisely.")
+            cm.sendNext(I18nMessage.from("2040020_STIMULATOR_INFO"))
             cm.dispose()
          } else if (selectedType == 1) { //warrior glove
             String selStr = "Warrior glove? Sure thing, which kind?#b"
@@ -207,11 +208,11 @@ class NPC2040020 {
          boolean complete = true
 
          if (!cm.canHold(item, 1)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("2040020_NEED_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost) {
-            cm.sendOk("Sorry, we only accept meso.")
+            cm.sendOk(I18nMessage.from("2040020_ONLY_ACCEPT_MESO"))
             cm.dispose()
             return
          } else {
@@ -231,7 +232,7 @@ class NPC2040020 {
             }
          }
          if (!complete) {
-            cm.sendOk("Sorry, but I have to have those items to get this exactly right. Perhaps next time.")
+            cm.sendOk(I18nMessage.from("2040020_MISSING_ITEMS"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -247,13 +248,13 @@ class NPC2040020 {
                if (deleted != 0) {
                   //TODO
                   cm.gainRandomItem(newItem)
-                  cm.sendOk("There, the gloves are ready. Be careful, they're still hot.")
+                  cm.sendOk(I18nMessage.from("2040020_GLOVE_SUCCESS"))
                } else {
-                  cm.sendOk("Eek! I think I accidentally added too much stimulator and, well, the whole thing is unusable now... Sorry, but I can't offer a refund.")
+                  cm.sendOk(I18nMessage.from("2040020_STIMULATOR_ERROR"))
                }
             } else {
                cm.gainItem(item, (short) 1)
-               cm.sendOk("There, the gloves are ready. Be careful, they're still hot.")
+               cm.sendOk(I18nMessage.from("2040020_GLOVE_SUCCESS"))
             }
          }
          cm.dispose()

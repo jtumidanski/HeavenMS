@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2150 {
          }
 
          if (status == 0) {
-            qm.sendNext("The tree has a scarf upon its branches, I tell you.")
+            qm.sendNext(I18nMessage.from("2150_TREE_HAS_A_SCARF"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

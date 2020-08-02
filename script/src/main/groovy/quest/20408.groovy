@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20408 {
    QuestActionManager qm
@@ -23,14 +24,18 @@ class Quest20408 {
          }
 
          if (status == 0) {
-            qm.sendNext("#h0#... First of all, thank you for your great work. If it weren't you, I... I wouldn't be safe from the curse of Black Witch. Thank you so much.")
+            qm.sendNext(I18nMessage.from("20408_FIRST_OF_ALL"))
+
          } else if (status == 1) {
-            qm.sendNextPrev("If nothing else, this chain of events makes one thing crystal clear, you have put in countless hours of hard work to better yourself and contribute to the Cygnus Knights.")
+            qm.sendNextPrev(I18nMessage.from("20408_IF_NOTHING_ELSE"))
+
          } else if (status == 2) {
-            qm.sendAcceptDecline("To celebrate your hard work and accomplishments... I would like to award you a new title and renew my blessings onto you. Will you... accept this?")
+            qm.sendAcceptDecline(I18nMessage.from("20408_TO_CELEBRATE"))
+
          } else if (status == 3) {
             if (!qm.canHold(1142069, 1)) {
-               qm.sendOk("Please, make a room available on your EQUIP inventory for the medal.")
+               qm.sendOk(I18nMessage.from("20408_MAKE_ROOM"))
+
                qm.dispose()
                return
             }
@@ -43,7 +48,8 @@ class Quest20408 {
             qm.forceStartQuest()
             qm.forceCompleteQuest()
 
-            qm.sendOk("#h0#. For courageously battling the Black Magician, I will appoint you as the new Chief Knight of Cygnus Knights from this moment onwards. Please use your power and authority wisely to help protect the citizens of Maple World.")
+            qm.sendOk(I18nMessage.from("20408_APPOINT_YOU"))
+
          } else if (status == 4) {
             qm.dispose()
          }

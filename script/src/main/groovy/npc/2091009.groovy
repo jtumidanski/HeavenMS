@@ -36,10 +36,10 @@ class NPC2091009 {
 
 
       if (status == 0) {
-         cm.sendGetText("The entrance of the Sealed Shrine... #bPassword#k!")
+         cm.sendGetText(I18nMessage.from("2091009_SEALED_SHRINE"))
       } else if (status == 1) {
          if (cm.getWarpMap(925040100).countPlayers() > 0) {
-            cm.sendOk("Someone is already attending the Sealed Shrine.")
+            cm.sendOk(I18nMessage.from("2091009_SOMEONE_IS_ALREADY_ATTENDING"))
             cm.dispose()
             return
          }
@@ -52,7 +52,7 @@ class NPC2091009 {
 
             cm.dispose()
          } else {
-            cm.sendOk("#rWrong!")
+            cm.sendOk(I18nMessage.from("2091009_WRONG"))
          }
       } else if (status == 2) {
          cm.dispose()

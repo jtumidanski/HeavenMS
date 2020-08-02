@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -63,7 +64,7 @@ class NPC2080000 {
             stimulator = false
          }
          if (selectedType == 0) { //What's a stimulator?
-            cm.sendNext("A stimulator is a special potion that I can add into the process of creating certain items. It gives it stats as though it had dropped from a monster. However, it is possible to have no change, and it is also possible for the item to be below average. There's also a 10% chance of not getting any item when using a stimulator, so please choose wisely.")
+            cm.sendNext(I18nMessage.from("2080000_STIMULATOR_INFO"))
             cm.dispose()
          } else if (selectedType == 1) { //warrior weapon
             String selStr = "Very well, then which Warrior weapon shall receive a dragon's power?#b"
@@ -181,11 +182,11 @@ class NPC2080000 {
          boolean complete = true
 
          if (!cm.canHold(item, 1)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("2080000_NEED_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost) {
-            cm.sendOk("My fee is for the good of all of Leafre. If you cannot pay it, then begone.")
+            cm.sendOk(I18nMessage.from("2080000_NEED_FEE"))
             cm.dispose()
             return
          } else {
@@ -205,7 +206,7 @@ class NPC2080000 {
             }
          }
          if (!complete) {
-            cm.sendOk("I'm afraid that without the correct items, the dragon's essence would... not make for a very reliable weapon. Please bring the correct items next time.")
+            cm.sendOk(I18nMessage.from("2080000_MISSING_ITEMS"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -220,13 +221,13 @@ class NPC2080000 {
                int deleted = Math.floor(Math.random() * 10).intValue()
                if (deleted != 0) {
                   cm.gainItem(item, (short) 1, true, true)
-                  cm.sendOk("The process is complete. Treat your weapon well, lest you bring the wrath of the dragons upon you.")
+                  cm.sendOk(I18nMessage.from("2080000_SUCCESS"))
                } else {
-                  cm.sendOk("Unfortunately, the dragon's essence has... conflicted with your weapon. My apologies for your loss.")
+                  cm.sendOk(I18nMessage.from("2080000_FAILURE"))
                }
             } else {//just give basic item
                cm.gainItem(item, (short) 1)
-               cm.sendOk("The process is complete. Treat your weapon well, lest you bring the wrath of the dragons upon you.")
+               cm.sendOk(I18nMessage.from("2080000_SUCCESS"))
             }
          }
          cm.dispose()

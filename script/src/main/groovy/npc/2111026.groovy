@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111026 {
    int sel = -1
 
    def start() {
-      cm.sendNext ("This chalkboard has some hard-founded studies annotated on it...")
+      cm.sendNext (I18nMessage.from("2111026_STUDIES_ANNOTATED"))
       cm.dispose()
    }
 

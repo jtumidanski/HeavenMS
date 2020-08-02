@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +37,7 @@ class NPC1104203 {
          }
 
          if (status == 0) {
-            cm.sendOk("...")
+            cm.sendOk(SimpleMessage.from("..."))
             cm.dispose()
          }
       }

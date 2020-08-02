@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20400 {
    QuestActionManager qm
@@ -23,7 +24,7 @@ class Quest20400 {
          }
 
          if (status == 0) {
-            qm.sendNext("Not long ago, we received a distress signal of #bAdvanced Knight #p1103000##k, currently stationed somewhere in #rEl Nath#k. His Your job is to find him, first go talk to #b#p1101002##k and receive further instructions on your mission.")
+            qm.sendNext(I18nMessage.from("20400_NOT_LONG_AGO"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()

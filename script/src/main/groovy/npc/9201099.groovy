@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -19,7 +20,7 @@ class NPC9201099 {
       if (cm.getQuestStatus(8224) == 2) {
          cm.openShopNPC(9201099)
       } else {
-         cm.sendOk("Hm, at who do you think you are looking at?")
+         cm.sendOk(I18nMessage.from("9201099_WHAT_ARE_YOU_LOOKING_AT"))
       }
 
       cm.dispose()

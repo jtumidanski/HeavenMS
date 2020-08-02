@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1095000 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("#b#p2095000##k must be some way up this cliff, according to our latest reports... Or are you saying you want to #rleave here#k?")
+            cm.sendYesNo(I18nMessage.from("1095000_MUST_BE_SOME_WAY_UP"))
          } else if (status == 1) {
             cm.warp(120000104)
             cm.dispose()

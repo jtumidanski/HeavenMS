@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Fourth Eos Rock
@@ -17,9 +18,9 @@ class NPC2040027 {
 
    def start() {
       if (cm.haveItem(4001020)) {
-         cm.sendYesNo("You can use #bEos Rock Scroll#k to activate #bFourth Eos Rock#k. Will you head over to #bThird Eos Rock#k at the 41st floor?")
+         cm.sendYesNo(I18nMessage.from("2040027_CHOICES"))
       } else {
-         cm.sendOk("There's a rock that will enable you to teleport to #bThird Eos Rock#k, but it cannot be activated without the scroll.")
+         cm.sendOk(I18nMessage.from("2040027_NEED_SCROLL"))
          cm.dispose()
       }
    }

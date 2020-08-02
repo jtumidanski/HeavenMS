@@ -52,7 +52,7 @@ class NPC9040009 {
             cm.warp(990001100)
          } else {
             if (eim.getProperty("stage1clear") == "true") {
-               cm.sendOk("Excellent work. You may proceed to the next stage.")
+               cm.sendOk(I18nMessage.from("9040009_EXCELLENT_WORK"))
                cm.dispose()
                return
             }
@@ -68,9 +68,9 @@ class NPC9040009 {
                      }
 
                      if (stage == 1) {
-                        cm.sendOk("In this challenge, I shall show a pattern on the statues around me. When I give the word, repeat the pattern to me to proceed.")
+                        cm.sendOk(I18nMessage.from("9040009_IN_THIS_CHALLENGE"))
                      } else {
-                        cm.sendOk("I shall now present a more difficult puzzle for you. Good luck.")
+                        cm.sendOk(I18nMessage.from("9040009_GOOD_LUCK"))
                      }
                   } else if (eim.getProperty("stage1status") == "active") {
                      stage = (eim.getProperty("stage1phase")).toInteger()
@@ -81,23 +81,23 @@ class NPC9040009 {
                            clearStage(1, eim)
                            MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), 15)
 
-                           cm.sendOk("Excellent work. You may proceed to the next stage.")
+                           cm.sendOk(I18nMessage.from("9040009_EXCELLENT_WORK"))
                         } else {
-                           cm.sendOk("Very good. You still have more to complete, however. Talk to me again when you're ready.")
+                           cm.sendOk(I18nMessage.from("9040009_VERY_GOOD"))
                            eim.setProperty("stage1phase", stage + 1)
                            MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GATE_KEEPER_TEST_PART_COMPLETE").with(stage))
                         }
 
                      } else {
                         eim.showWrongEffect()
-                        cm.sendOk("You have failed this test.")
+                        cm.sendOk(I18nMessage.from("9040009_FAILED"))
                         MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("GATE_KEEPER_TEST_FAILED"))
                         eim.setProperty("stage1phase", "1")
                      }
                      eim.setProperty("stage1status", "waiting")
                      cm.dispose()
                   } else {
-                     cm.sendOk("The statues are working on the pattern. Please wait.")
+                     cm.sendOk(I18nMessage.from("9040009_PLEASE_WAIT"))
                      cm.dispose()
                   }
                } else if (status == 1) {
@@ -113,7 +113,7 @@ class NPC9040009 {
                   cm.dispose()
                }
             } else {
-               cm.sendOk("I need the leader of this instance to speak with me, nobody else.")
+               cm.sendOk(I18nMessage.from("9040009_LEADER_MUST_SPEAK"))
                cm.dispose()
             }
          }

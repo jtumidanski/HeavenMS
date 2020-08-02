@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2219 {
          }
 
          if (status == 0) {
-            qm.sendNext("Did you know, they say someone from the sewers has been trying to #rdevelop a magic powder that let's one to grow#k, isn't that nice?")
+            qm.sendNext(I18nMessage.from("2219_DID_YOU_KNOW"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(7000)

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -34,10 +35,10 @@ class Quest2186 {
                      qm.gainExp(1700)
                      qm.gainItem(2030019, (short) 10)
 
-                     qm.sendOk("Geez, you found my glasses! Thank you, thank you so much. Now I'm able to see everything again!")
+                     qm.sendOk(I18nMessage.from("2186_FOUND_MY_GLASSES"))
                      qm.forceCompleteQuest()
                   } else {
-                     qm.sendOk("I need you to have an USE slot available to reward you properly!")
+                     qm.sendOk(I18nMessage.from("2186_NEED_USE_SLOT_FREE"))
                   }
                } else if (qm.haveItem(4031854) || qm.haveItem(4031855)) {
                   if (qm.canHold(2030019)) {
@@ -50,10 +51,10 @@ class Quest2186 {
                      qm.gainExp(1000)
                      qm.gainItem(2030019, (short) 5)
 
-                     qm.sendOk("Hm, those aren't my glasses... But alas, I'll take it anyway. Thanks.")
+                     qm.sendOk(I18nMessage.from("2186_ALAS_I_WILL_TAKE_THEM"))
                      qm.forceCompleteQuest()
                   } else {
-                     qm.sendOk("I need you to have an USE slot available to reward you properly!")
+                     qm.sendOk(I18nMessage.from("2186_NEED_USE_SLOT_FREE"))
                   }
                }
             }

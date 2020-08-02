@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest21739 {
          }
 
          if (status == 0) {
-            qm.sendNext("So, have you defeated the giant? Oh, a Black Wing agent undercover? And he GOT THE SEAL STONE OF ORBIS?! Oh, no. That's horrible! We need to develop countermeasures as soon as possible! Tell the informant on Lith about the situation.")
+            qm.sendNext(I18nMessage.from("21739_YOU_DEFEATED_THE_GIANT"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(29500)

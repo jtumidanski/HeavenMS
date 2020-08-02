@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2041025 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("Beep... beep... you can make your escape to a safer place through me. Beep... beep... would you like to leave this place?")
+      cm.sendYesNo(I18nMessage.from("2041025_BEEP_BEEP"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

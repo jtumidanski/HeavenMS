@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101006 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Home is so boring... my parents ignore me so much it's unbearable. And ever since we moved from #rAriant#k, they've been trying to get a new palace built so they don't have to live outdoors. But I love the outdoors...")
+      cm.sendNext(I18nMessage.from("2101006_HOME_IS_BORING"))
       cm.dispose()
    }
 

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9120203 {
          }
 
          if (status == 0) {
-            cm.sendNext("Ah, The Boss has been defeated. What a happy day this turns out to be! Congratulations, everyone. Follow this way back to town.")
+            cm.sendNext(I18nMessage.from("9120203_BOSS_DEFEATED"))
          } else if (status == 1) {
             cm.warp(801000000)
             cm.dispose()

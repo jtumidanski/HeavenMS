@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.inventory.MapleInventoryType
 import scripting.quest.QuestActionManager
@@ -17,7 +18,7 @@ class Quest3833 {
          qm.dispose()
       } else {
          if (status == 0) {
-            qm.sendOk("Great! You managed to get the herb I need. As a #btoken of gratitude#k, take this item to help on your journey.")
+            qm.sendOk(I18nMessage.from("3833_GREAT"))
          } else if (status == 1) {
             if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() >= 2) {
                if (qm.haveItem(4000294, 1000)) {
@@ -52,7 +53,7 @@ class Quest3833 {
                }
                qm.dispose()
             } else {
-               qm.sendOk("Could you make #b2 slots available#k on your USE inventory before receiving your reward?")
+               qm.sendOk(I18nMessage.from("3833_COULD_YOU_MAKE"))
             }
          } else if (status == 2) {
             qm.dispose()

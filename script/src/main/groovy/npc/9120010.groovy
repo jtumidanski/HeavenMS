@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -44,7 +45,7 @@ class NPC9120010 {
          cm.dispose()
       } else {
          if (mode == 0 && status == 0) {
-            cm.sendOk("Really? Let me know if you ever change your mind.")
+            cm.sendOk(I18nMessage.from("9120010_LET_ME_KNOW"))
             cm.dispose()
             return
          }
@@ -56,7 +57,7 @@ class NPC9120010 {
             status++
          }
          if (status == 0) {
-            cm.sendYesNo("If you're looking for someone that can pinpoint the characteristics of various items, you're looking at one right now. I'm currently looking for something. Would you like to hear my story?")
+            cm.sendYesNo(I18nMessage.from("9120010_HEAR_MY_STORY"))
          } else if (status == 1) {
             String eQuestChoice = makeChoices(eQuestChoices)
             cm.sendSimple(eQuestChoice)
@@ -67,13 +68,13 @@ class NPC9120010 {
             prizeItem = reward[itemSet][0]
             prizeQuantity = reward[itemSet][1]
             if (!cm.canHold(prizeItem)) {
-               cm.sendNext("I can't give you the reward if your equip, use, or etc. inventory is full. Please go take a look right now.")
+               cm.sendNext(I18nMessage.from("9120010_INVENTORY_FULL"))
             } else if (cm.hasItem(requiredItem, 100)) {   // check they have >= 100 in Inventory
                cm.gainItem(requiredItem, (short) -100)
                cm.gainItem(prizeItem, (short) prizeQuantity)
-               cm.sendOk("Hmmm ... if not for this minor scratch ... sigh. I'm afraid I can only deem this a standard-quality item. Well, here's \r\n#t" + prizeItem + "# for you.")
+               cm.sendOk(I18nMessage.from("9120010_ONLY_DEEM_STANDARD").with(prizeItem))
             } else {
-               cm.sendOk("Hey, what do you think you're doing? Go lie to someone that DOESN'T know what he's talking about. Not me!")
+               cm.sendOk(I18nMessage.from("9120010_WHAT_ARE_YOU_DOING"))
             }
             cm.dispose()
          }

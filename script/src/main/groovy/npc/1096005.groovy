@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -30,7 +31,7 @@ class NPC1096005 {
       }
       if (status == 0) {
          cm.sendDirectionInfo(4, 1096005)//else you will crash sending sendNext
-         cm.sendNext("All right! Let's go!")
+         cm.sendNext(I18nMessage.from("1096005_LETS_GO"))
       } else if (status == 1) {
          cm.removeNPC(579711)
          cm.updateInfo("fire", "0")

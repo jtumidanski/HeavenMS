@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9201043 {
    int MySelection = -1
 
    def start() {
-      cm.sendSimple("My name is Amos the Strong. What would you like to do?\r\n#b#L0#Enter the Amorian Challenge!!#l\r\n#L1#Trade 10 Keys for a Ticket!#l\r\n#k")
+      cm.sendSimple(I18nMessage.from("9201043_MY_NAME_IS"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -24,7 +25,7 @@ class NPC9201043 {
          cm.dispose()
       } else {
          if (status >= 0 && mode == 0) {
-            cm.sendOk("Ok come back when you're ready.")
+            cm.sendOk(I18nMessage.from("9201043_COME_BACK"))
             cm.dispose()
             return
          }
@@ -35,21 +36,21 @@ class NPC9201043 {
          }
          if (status == 1 && selection == 0) {
             if (cm.haveItem(4031592, 1)) {
-               cm.sendYesNo("So you would like to enter the #bEntrance#k?")
+               cm.sendYesNo(I18nMessage.from("9201043_LIKE_TO_ENTER"))
                MySelection = selection
             } else {
-               cm.sendOk("You must have an Entrance Ticket to enter.")
+               cm.sendOk(I18nMessage.from("9201043_MUST_HAVE_A_TICKET"))
                cm.dispose()
             }
          } else if (status == 1 && selection == 1) {
             if (cm.haveItem(4031592)) {
-               cm.sendOk("You already have an Entrance Ticket!")
+               cm.sendOk(I18nMessage.from("9201043_ALREADY_HAVE_A_TICKET"))
                cm.dispose()
             } else if (cm.haveItem(4031593, 10)) {
-               cm.sendYesNo("So you would like a Ticket?")
+               cm.sendYesNo(I18nMessage.from("9201043_WOULD_YOU_LIKE_A_TICKET"))
                MySelection = selection
             } else {
-               cm.sendOk("Please get me 10 Keys first!")
+               cm.sendOk(I18nMessage.from("9201043_GET_ME"))
                cm.dispose()
             }
          } else if (status == 2 && MySelection == 0) {

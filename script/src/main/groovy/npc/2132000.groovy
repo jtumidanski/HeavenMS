@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2132000 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Hmmm! For you to make your way here, far away from the Camp, you must be one strong individual. Let's explore new areas and find a place to establish our own town!!")
+      cm.sendOk(I18nMessage.from("2132000_MUST_BE_STRONG"))
       cm.dispose()
    }
 

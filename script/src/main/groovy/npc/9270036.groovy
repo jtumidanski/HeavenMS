@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -22,7 +23,7 @@ class NPC9270036 {
    int[] hairColor = []
 
    def start() {
-      cm.sendSimple("Welcome to the Quick-Hand Hair-Salon!. Do you, by any chance, have #b#t5150033##k or #b#t5151028##k? If so, how about letting me take care of your hair? Please what you want to do with it.\r\n#L1#Haircut: #i5150033##t5150033##l\r\n#L2#Dye your hair: #i5151028##t5151028##l")
+      cm.sendSimple(I18nMessage.from("9270036_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -56,18 +57,18 @@ class NPC9270036 {
                if (cm.haveItem(5150033)) {
                   cm.gainItem(5150033, (short) -1)
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("9270036_ENJOY_NEW_STYLE"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry.")
+                  cm.sendOk(I18nMessage.from("9270036_MISSING_STYLE_COUPON"))
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151028)) {
                   cm.gainItem(5151028, (short) -1)
                   cm.setHair(hairColor[selection])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("9270036_ENJOY_NEW_COLOR"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry.")
+                  cm.sendOk(I18nMessage.from("9270036_MISSING_COLOR_COUPON"))
                }
             }
             cm.dispose()

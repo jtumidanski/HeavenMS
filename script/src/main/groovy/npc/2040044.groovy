@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -38,13 +39,15 @@ class NPC2040044 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
-            cm.sendNext("Hurry, goto the next stage, the portal is open!")
+            cm.sendNext(I18nMessage.from("2040044_GO_TO"))
+
          } else {
             if (eim.isEventLeader(cm.getPlayer())) {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
-                  cm.sendOk("Hi. Welcome to the #bBOSS stage#k. Kill the Ratz on that platform to reveal the Alishar, and defeat him!")
+                  cm.sendOk(I18nMessage.from("2040044_WELCOME"))
+
                   eim.setProperty("statusStg" + stage, 0)
                } else {                      // check stage completion
                   if (cm.haveItem(4001023, 1)) {
@@ -61,11 +64,13 @@ class NPC2040044 {
 
                      eim.clearPQ()
                   } else {
-                     cm.sendNext("Please defeat Alishar and bring me his #b#t4001023#.#k")
+                     cm.sendNext(I18nMessage.from("2040044_DEFEAT_ALISHAR"))
+
                   }
                }
             } else {
-               cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+               cm.sendNext(I18nMessage.from("2040044_PARTY_LEADER_MUST_TALK"))
+
             }
          }
 

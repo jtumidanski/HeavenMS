@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -17,10 +18,10 @@ class NPC9201109 {
 
    def start() {
       if (cm.getPlayer().getMapId() == 610030500) {
-         cm.sendOk("As a powerful Elite Magician, Ridly knew the value of intelligence, the hallmark quality of a wizard. Thus, the Mage Chamber is a twisting maze of devious conception--the Teleport skill is the only skill you can use inside to get around, and Magic Claw is the only skill that will break the statues. You must also kill numerous monsters within. After you solve the maze and defeat all the foes within it, deduce which Mage Statue hides the Staff of First Magic and break it open to claim it! Good luck!")
+         cm.sendOk(I18nMessage.from("9201109_QUALITY_WIZARD"))
          cm.dispose()
       } else if (cm.getPlayer().getMap().getId() == 610030000) {
-         cm.sendOk("A name forever remembered, Rafael was an exceptionally skilled sorcerer, and the foremost master of mental magic powers, telekinesis and telepathy. In addition to that, he was one of the 'Elite Magicians' who mastered all the elements. He was last seen looking for the 'Temple of the Elementals' to turn the tide against the invading Krakian Army...")
+         cm.sendOk(I18nMessage.from("9201109_EXCEPTIONALLY_SKILLED_SORCERER"))
          cm.dispose()
       } else if (cm.getPlayer().getMapId() == 610030521) {
          if (cm.getPlayer().getMap().countMonsters() == 0) {
@@ -31,18 +32,18 @@ class NPC9201109 {
             if ((stgStatus >> jobNiche) % 2 == 0) {
                if (cm.canHold(4001257, 1)) {
                   cm.gainItem(4001257, (short) 1)
-                  cm.sendOk("Good job.")
+                  cm.sendOk(I18nMessage.from("9201109_GOOD_JOB"))
 
                   stgStatus += (1 << jobNiche)
                   eim.setIntProperty("glpq5_room", stgStatus)
                } else {
-                  cm.sendOk("Make room on your ETC inventory first.")
+                  cm.sendOk(I18nMessage.from("9201109_MAKE_ETC_SPACE"))
                }
             } else {
-               cm.sendOk("The weapon inside this room has already been retrieved.")
+               cm.sendOk(I18nMessage.from("9201109_ALREADY_RETRIEVED"))
             }
          } else {
-            cm.sendOk("Eliminate all monsters.")
+            cm.sendOk(I18nMessage.from("9201109_ELIMINATE_ALL"))
          }
          cm.dispose()
       }

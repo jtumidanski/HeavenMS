@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,7 +22,7 @@ class NPC2083006 {
 
    def start() {
       if (!cm.isQuestCompleted(3718)) {
-         cm.sendOk("The time machine has not been activated yet.")
+         cm.sendOk(I18nMessage.from("2083006_NOT_BEEN_ACTIVATED"))
          cm.dispose()
          return
       }
@@ -33,7 +34,7 @@ class NPC2083006 {
       }
 
       if (limit == 0) {
-         cm.sendOk("Prove your valor against the #bGuardian Nex#k before unlocking next Neo City maps.")
+         cm.sendOk(I18nMessage.from("2083006_PROVE_VALOR"))
          cm.dispose()
          return
       }
@@ -89,7 +90,7 @@ class NPC2083006 {
             if (mapId > 0) {
                cm.warp(mapId, 1)
             } else {
-               cm.sendOk("Complete your mission first.")
+               cm.sendOk(I18nMessage.from("2083006_COMPLETE_YOUR_MISSION"))
             }
          }
       }

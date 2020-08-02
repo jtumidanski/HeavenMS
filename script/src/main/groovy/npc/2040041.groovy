@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Aqua Balloon
@@ -16,7 +17,7 @@ class NPC2040041 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Try to find the right combination of numbers to reach the top.")
+      cm.sendOk(I18nMessage.from("2040041_FIND_THE_CORRECT_COMBINATION"))
       cm.dispose()
    }
 

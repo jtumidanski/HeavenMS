@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -36,10 +37,10 @@ class NPC1092008 {
 
          if (status == 0) {
             if (!cm.isQuestStarted(6410)) {
-               cm.sendOk("Hey, do you have any business with me?")
+               cm.sendOk(I18nMessage.from("1092008_ANY_BUSINESS_WITH_ME"))
                cm.dispose()
             } else {
-               cm.sendYesNo("Let's go save #r#p2095000##k?")
+               cm.sendYesNo(I18nMessage.from("1092008_LETS_GO_SAVE"))
             }
          } else if (status == 1) {
             cm.warp(925010000, 0)

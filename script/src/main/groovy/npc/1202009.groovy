@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -24,7 +25,7 @@ class NPC1202009 {
       if (cm.haveItemWithId(1902016, true)) {
          cm.warp(140010210, 0)
       } else {
-         cm.sendOk("What is it? If you you're here to waste my time, get lost!")
+         cm.sendOk(I18nMessage.from("1202009_GET_LOST"))
       }
 
       cm.dispose()

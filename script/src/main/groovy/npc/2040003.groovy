@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -20,14 +21,14 @@ class NPC2040003 {
    def start() {
       if (cm.getPlayer().getMapId() == 922000000) {
          entry = 0
-         cm.sendYesNo("Do you wish to quit this stage?")
+         cm.sendYesNo(I18nMessage.from("2040003_QUIT_THIS_STAGE"))
          status++
       } else if (cm.isQuestStarted(3239)) {
          entry = 1
-         cm.sendYesNo("Do you want to enter #bToy Factory<Sector 4>#k?")
+         cm.sendYesNo(I18nMessage.from("2040003_DO_YOU_WANT_TO_ENTER"))
          status++
       } else {
-         cm.sendOk("Access to #bToy Factory<Sector 4>#k is restricted to the public.")
+         cm.sendOk(I18nMessage.from("2040003_ACCESS_RESTRICTED"))
       }
    }
 
@@ -35,7 +36,7 @@ class NPC2040003 {
       if (status == 1) {
          if (entry == 0) {
             if (mode <= 0) {
-               cm.sendOk("Ok. Call me if you urge to exit, then.")
+               cm.sendOk(I18nMessage.from("2040003_CALL_ME"))
                cm.dispose()
                return
             }
@@ -57,7 +58,7 @@ class NPC2040003 {
                   cm.removeAll(4031092)
                }
             } else {
-               cm.sendOk("Someone else is already attempting the parts. Wait for them to finish before you enter.")
+               cm.sendOk(I18nMessage.from("2040003_SOMEONE_ALREADY_ATTEMPTING"))
             }
 
             cm.dispose()

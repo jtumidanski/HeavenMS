@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,10 +36,10 @@ class NPC2012000 {
          status++
          if (status == 1) {
             select = selection
-            cm.sendYesNo("The ride to " + mapName2[select] + " takes off every " + (select == 0 ? 15 : 10) + " minutes, beginning on the hour, and it'll cost you #b" + cost[select] + " mesos#k. Are you sure you want to purchase #b#t" + ticket[select] + "##k?")
+            cm.sendYesNo(I18nMessage.from("2012000_RIDE_EXPLANATION").with(mapName2[select], (select == 0 ? 15 : 10), cost[select], ticket[select]))
          } else if (status == 2) {
             if (cm.getMeso() < cost[select] || !cm.canHold(ticket[select])) {
-               cm.sendOk("Are you sure you have #b" + cost[select] + " mesos#k? If so, then I urge you to check you etc. inventory, and see if it's full or not.")
+               cm.sendOk(I18nMessage.from("2012000_ARE_YOU_SURE").with(cost[select]))
             } else {
                cm.gainMeso(-cost[select])
                cm.gainItem(ticket[select], (short) 1)

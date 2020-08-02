@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -28,10 +29,10 @@ class Quest2126 {
 
          if (status == 0) {
             if (!qm.haveItem(4031619, 1)) {
-               qm.sendOk("Please bring me the box with the supplies that lies with #b#p2012019##k...")
+               qm.sendOk(I18nMessage.from("2126_BRING_ME_THE_BOX"))
             } else {
                qm.gainItem(4031619, (short) -1)
-               qm.sendOk("Oh, you brought #p2012019#'s box! Thank you.")
+               qm.sendOk(I18nMessage.from("2126_OH_YOU_BROUGHT"))
                qm.forceCompleteQuest()
             }
          } else if (status == 1) {

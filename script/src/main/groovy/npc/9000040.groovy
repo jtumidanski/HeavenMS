@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.processor.action.MakerProcessor
 import config.YamlConfig
@@ -40,7 +41,7 @@ class NPC9000040 {
 
          if (status == 0) {
             if (!YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
-               cm.sendOk("The medal ranking system is currently unavailable...")
+               cm.sendOk(I18nMessage.from("9000040_MEDAL_RANKING_UNAVAILABLE"))
                cm.dispose()
                return
             }
@@ -68,9 +69,9 @@ class NPC9000040 {
 
             if (cm.getPlayer().mergeAllItemsFromName(name)) {
                cm.gainMeso(-mergeFee)
-               cm.sendOk("Merging complete! Thanks for using the service and enjoy your new equipment stats.")
+               cm.sendOk(I18nMessage.from("9000040_MERGING_COMPLETE"))
             } else {
-               cm.sendOk("There is no #b'" + name + "'#k in your #bEQUIP#k inventory!")
+               cm.sendOk(I18nMessage.from("9000040_NOT_IN_INVENTORY").with(name))
             }
 
             cm.dispose()

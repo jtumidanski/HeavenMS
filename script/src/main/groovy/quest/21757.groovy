@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest21757 {
          }
 
          if (status == 0) {
-            qm.sendNext("Oh, a letter for the #rempress#k? From the #bheroes#k?!")
+            qm.sendNext(I18nMessage.from("21757_A_LETTER"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(1000)

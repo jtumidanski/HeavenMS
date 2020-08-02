@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -29,23 +30,23 @@ class NPC2131006 {
          return
       }
       if (status == 0) {
-         cm.sendSimple("The monsters are advancing.. I can't fight. I was badly injured by the Primitive Boars...#b\r\n#L0#Hey, take these boar hides. You can recover from them.#l")
+         cm.sendSimple(I18nMessage.from("2131006_MONSTERS_ARE_ADVANCING"))
       } else if (status == 1) {
          if (!cm.haveItem(exchangeItem, 100)) {
-            cm.sendNext("You don't have enough... I need at least 100.")
+            cm.sendNext(I18nMessage.from("2131006_NEED_AT_LEAST_100"))
             cm.dispose()
          } else {
             double itemQuantity = cm.itemQuantity(exchangeItem) / 100
-            cm.sendGetNumber("Hey, that's a good idea! I can give you #i4310000#Perfect Pitch for each 100 #i" + exchangeItem + "##t" + exchangeItem + "# you give me. How many do you want? (Current Items: " + cm.itemQuantity(exchangeItem) + ")", (int) Math.min(300, itemQuantity), 1, (int) Math.min(300, itemQuantity))
+            cm.sendGetNumber(I18nMessage.from("2131006_PERFECT_PITCH").with(exchangeItem, exchangeItem))
          }
       } else if (status == 2) {
          if (selection >= 1 && selection <= cm.itemQuantity(exchangeItem) / 100) {
             if (!cm.canHold(4310000, selection)) {
-               cm.sendOk("Please make some space in ETC tab.")
+               cm.sendOk(I18nMessage.from("2131006_MAKE_SOME_ETC_SPACE"))
             } else {
                cm.gainItem(4310000, (short) selection)
                cm.gainItem(exchangeItem, (short) -(selection * 100))
-               cm.sendOk("Thanks!")
+               cm.sendOk(I18nMessage.from("2131006_THANKS"))
             }
          }
          cm.dispose()

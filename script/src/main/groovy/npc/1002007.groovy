@@ -3,6 +3,7 @@ package npc
 
 import scripting.npc.NPCConversationManager
 import tools.I18nMessage
+import tools.SimpleMessage
 
 /*
 
@@ -58,7 +59,7 @@ class NPC1002007 {
             for (def i = 0; i < maps.length; i++) {
                selStr += "\r\n#L" + i + "##m" + maps[i] + "# (" + (cm.getJobId() == 0 ? cost[i] / 10 : cost[i]) + " mesos)#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (status == 2) {
             cm.sendYesNo(I18nMessage.from("1002007_NOTHING_ELSE_TO_DO").with(maps[selection], (cm.getJobId() == 0 ? cost[selection] / 10 : cost[selection])))
             selectedMap = selection

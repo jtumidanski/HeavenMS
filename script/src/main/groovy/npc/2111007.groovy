@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111007 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Hm... Don't doubt it because I'm a back street broker. Dealing with me is trust... I keep up my credit.")
+      cm.sendOk(I18nMessage.from("2111007_DEALING_WITH_ME_IS_TRUST"))
       cm.dispose()
    }
 

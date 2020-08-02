@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,9 +18,9 @@ class NPC9900001 {
 
    def start() {
       if (cm.getPlayer().gmLevel() > 1) {
-         cm.sendYesNo("Do you want to level up?")
+         cm.sendYesNo(I18nMessage.from("9900001_LEVEL_UP"))
       } else {
-         cm.sendOk("Hey wassup?")
+         cm.sendOk(I18nMessage.from("9900001_WASSUP"))
       }
    }
 

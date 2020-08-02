@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2197 {
          }
 
          if (status == 0) {
-            qm.sendNext("Oh, you already have monster book. Good luck on your journey~!")
+            qm.sendNext(I18nMessage.from("2197_ALREADY_HAVE_A_MONSTER_BOOK"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()
@@ -47,7 +48,7 @@ class Quest2197 {
          }
 
          if (status == 0) {
-            qm.sendNext("Oh, you already have monster book. Good luck on your journey~!")
+            qm.sendNext(I18nMessage.from("2197_ALREADY_HAVE_A_MONSTER_BOOK"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()

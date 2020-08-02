@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import scripting.npc.NPCConversationManager
@@ -62,13 +63,13 @@ class NPC9201001 {
             cm.gainItem(questItems[nanaLoc], (short) -50)
             cm.gainItem(4031367 + nanaLoc, (short) 1)
 
-            cm.sendOk("Kyaaaa~ Thank you a lot, here get the #b#t4031367##k.")
+            cm.sendOk(I18nMessage.from("9201001_THANK_YOU"))
             return true
          } else {
-            cm.sendOk("Please have a free ETC slot available to hold the token of love.")
+            cm.sendOk(I18nMessage.from("9201001_NEED_ETC_SPACE"))
          }
       } else {
-         cm.sendOk("Please gather to me #b50 #t" + questItems[nanaLoc] + "##k.")
+         cm.sendOk(I18nMessage.from("9201001_PLEASE_GATHER").with(questItems[nanaLoc]))
       }
 
       return false
@@ -90,14 +91,14 @@ class NPC9201001 {
 
          if (status == 0) {
             if (!cm.isQuestStarted(100400)) {
-               cm.sendOk("Hello #b#h0##k, I'm #p9201001# the fairy of Love.")
+               cm.sendOk(I18nMessage.from("9201001_HELLO"))
                cm.dispose()
                return
             }
 
             nanaLoc = getNanaLocation(cm.getPlayer())
             if (nanaLoc == -1) {
-               cm.sendOk("Hello #b#h0##k, I'm #p9201001# the fairy of Love.")
+               cm.sendOk(I18nMessage.from("9201001_HELLO"))
                cm.dispose()
                return
             }
@@ -105,7 +106,7 @@ class NPC9201001 {
             if (!cm.haveItem(4031367 + nanaLoc, 1)) {
                if (cm.isQuestCompleted(100401 + nanaLoc)) {
                   state = 1
-                  cm.sendAcceptDecline("Did you lost the #k#t4031367##k I gave to you? Well, I can share another one with you, but you will need to redo the favor I asked last time, is that ok? I need you to bring me #r50 #t" + questItems[nanaLoc] + "#'s.#k")
+                  cm.sendAcceptDecline(I18nMessage.from("9201001_DID_YOU_LOSE").with(questItems[nanaLoc]))
                } else if (cm.isQuestStarted(100401 + nanaLoc)) {
                   if (processNanaQuest()) {
                      cm.gainExp(questExp[nanaLoc] * cm.getPlayer().getExpRate())
@@ -115,17 +116,17 @@ class NPC9201001 {
                   cm.dispose()
                } else {
                   state = 0
-                  cm.sendAcceptDecline("Are you searching for #k#t4031367#'s#k? I can share one with you, but you must do a favor for me, is that ok?")
+                  cm.sendAcceptDecline(I18nMessage.from("9201001_ARE_YOU_SEARCHING"))
                }
             } else {
-               cm.sendOk("Hey there. Did you get the #t4031367# from the other Nana's already?")
+               cm.sendOk(I18nMessage.from("9201001_HEY_THERE"))
                cm.dispose()
             }
          } else if (status == 1) {
             if (state == 0) {
                cm.startQuest(100401 + nanaLoc)
 
-               cm.sendOk("I need you to collect #r50 #t" + questItems[nanaLoc] + "##k.")
+               cm.sendOk(I18nMessage.from("9201001_COLLECT").with(questItems[nanaLoc]))
                cm.dispose()
             } else {
                processNanaQuest()

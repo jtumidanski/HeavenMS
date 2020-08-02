@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -39,9 +40,9 @@ class NPC9105005 {
 
          if (status == 0) {
             if (area > 0) {
-               cm.sendYesNo("Do you wish to leave this place?")
+               cm.sendYesNo(I18nMessage.from("9105005_DO_YOU_WISH_TO_LEAVE"))
             } else {
-               cm.sendYesNo("Do you wish to return to #bHappyville#k?")
+               cm.sendYesNo(I18nMessage.from("9105005_RETURN_TO_HAPPYVILLE"))
             }
          } else {
             if (area > 0) {

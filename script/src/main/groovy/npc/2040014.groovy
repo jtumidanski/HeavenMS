@@ -1,6 +1,7 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -75,7 +76,7 @@ class NPC2040014 {
          boolean complete = true
 
          if (cm.getMeso() < (cost * qty)) {
-            cm.sendOk("See, I need to specify my wages to support my career, that cannot be bypassed. I will gladly help you once you've got the money.")
+            cm.sendOk(I18nMessage.from("2040014_WILL_HELP_FOR_MONEY"))
             cm.dispose()
             return
          } else {
@@ -90,7 +91,7 @@ class NPC2040014 {
             }
          }
          if (!complete) {
-            cm.sendOk("You are lacking some items for the set you want to make. Please provide them so that we can assemble the game set.")
+            cm.sendOk(I18nMessage.from("2040014_LACKING_ITEMS"))
          } else {
             if (cm.canHold(item, qty)) {
                if (mats instanceof ArrayList && matQty instanceof ArrayList) {
@@ -103,9 +104,9 @@ class NPC2040014 {
                cm.gainMeso(-(cost * qty))
 
                cm.gainItem(item, (short) qty)
-               cm.sendOk("There is your game set. Have fun!")
+               cm.sendOk(I18nMessage.from("2040014_SUCCESS"))
             } else {
-               cm.sendOk("I can't make a set for you if there's no room in your ETC inventory for it. Please free a space first and then talk to me.")
+               cm.sendOk(I18nMessage.from("2040014_NEED_ETC_ROOM"))
             }
          }
 

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,7 +32,7 @@ class NPC1100003 {
             cm.dispose()
             return
          } else if (mode == 0) {
-            cm.sendNext("If you're not interested, then oh well...")
+            cm.sendNext(I18nMessage.from("1100003_OH_WELL"))
             cm.dispose()
             return
          }
@@ -44,7 +45,7 @@ class NPC1100003 {
             cm.sendSimple("Eh, Hello...again. Do you want to leave Ereve and go somewhere else? If so, you've come to the right place. I operate a ferry that goes from #bEreve#k to #bVictoria Island#k, I can take you to #bVictoria Island#k if you want... You'll have to pay a fee of #b1000#k Mesos.\r\n" + display)
          } else if (status == 1) {
             if (cm.getMeso() < 1000) {
-               cm.sendNext("Hmm... Are you sure you have #b1000#k Mesos? Check your Inventory and make sure you have enough. You must pay the fee or I can't let you get on...")
+               cm.sendNext(I18nMessage.from("1100003_NOT_ENOUGH_MESO"))
                cm.dispose()
             } else {
                cm.gainMeso(-1000)

@@ -85,7 +85,7 @@ class NPC1012002 {
             }
          }
          selectedType = selection
-         cm.sendSimple(selStr)
+         cm.sendSimple(SimpleMessage.from(selStr))
          if (selection != 4) {
             status++
          }

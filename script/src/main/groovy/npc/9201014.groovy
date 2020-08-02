@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.inventory.Item
 import scripting.npc.NPCConversationManager
@@ -82,22 +83,22 @@ class NPC9201014 {
                            cm.gainItem(4031424, (short) -1)
                            cm.dispose()
                         } else {
-                           cm.sendOk("You don't have a free USE slot right now.")
+                           cm.sendOk(I18nMessage.from("9201014_NEED_USE_SLOT_FREE"))
                            cm.dispose()
                         }
                      } else {
-                        cm.sendOk("You must be married to claim the prize for this box.")
+                        cm.sendOk(I18nMessage.from("9201014_MUST_BE_MARRIED_TO_CLAIM"))
                         cm.dispose()
                      }
                   } else {
-                     cm.sendOk("You don't have an Onyx Chest for Bride and Groom.")
+                     cm.sendOk(I18nMessage.from("9201014_NO_ONYX_CHEST_TO_GIVE"))
                      cm.dispose()
                   }
                } else if (selection == 1) {
                   if (cm.haveItem(4031423)) {
-                     cm.sendSimple("You may choose your prize.\r\n#L0#Triangular Sushi#l\r\n#L1#50 power elixers#l\r\n#L2#10 Swiss Cheese#l\r\n#L3#3 Onyx Apples#l")
+                     cm.sendSimple(I18nMessage.from("9201014_CHOOSE_PRIZE"))
                   } else {
-                     cm.sendOk("You don't have an Onyx Chest")
+                     cm.sendOk(I18nMessage.from("9201014_NO_ONYX_CHEST"))
                      cm.dispose()
                   }
                }
@@ -115,12 +116,12 @@ class NPC9201014 {
                   cm.gainItem(4031423, (short) -1)
                   cm.dispose()
                } else {
-                  cm.sendOk("You don't have a free USE slot right now.")
+                  cm.sendOk(I18nMessage.from("9201014_NEED_USE_SLOT_FREE"))
                   cm.dispose()
                }
             }
          } else {
-            cm.sendOk("Hi there, welcome to Amoria's Wedding Gift Registry reserve. We redistribute and tender gifts for both wedding spouses and lucky ceremonial attenders.")
+            cm.sendOk(I18nMessage.from("9201014_HELLO"))
             cm.dispose()
          }
       }

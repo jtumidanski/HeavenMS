@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2148 {
          }
 
          if (status == 0) {
-            qm.sendNext("Some bats seems to accompany this tree wherever it goes. Creepy...")
+            qm.sendNext(I18nMessage.from("2148_CREEPY"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

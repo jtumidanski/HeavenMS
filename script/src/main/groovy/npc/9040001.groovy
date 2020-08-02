@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -36,7 +37,7 @@ class NPC9040001 {
 
          if (eim != null && eim.isEventCleared()) {
             if (!eim.giveEventReward(cm.getPlayer())) {
-               cm.sendNext("It seems you don't have a free slot in either your #rEquip#k, #rUse#k or #rEtc#k inventories. Please make some room first.")
+               cm.sendNext(I18nMessage.from("9040001_NEED_FREE_SLOT"))
             } else {
                cm.warp(101030104)
             }

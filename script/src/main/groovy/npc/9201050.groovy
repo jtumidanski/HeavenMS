@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -38,10 +39,10 @@ class NPC9201050 {
          }
          if (status == 0 && mode == 1) {
             if (cm.isQuestCompleted(4911)) {
-               cm.sendNext("Good job! You've solved all of my questions about NLC. Enjoy your trip!")
+               cm.sendNext(I18nMessage.from("9201050_GOOD_JOB"))
                cm.dispose()
             } else if (cm.isQuestCompleted(4900) || cm.isQuestStarted(4900)) {
-               cm.sendNext("Hey, pay attention, I'm trying to quiz you on another question, fam!")
+               cm.sendNext(I18nMessage.from("9201050_PAY_ATTENTION"))
                cm.dispose()
             } else {
                String selStr = "What up! Name's Icebyrd Slimm, mayor of New Leaf City! Happy to see you accepted my invite. So, what can I do for you?#b"
@@ -54,51 +55,51 @@ class NPC9201050 {
          } else if (status == 1) {
             switch (selection) {
                case 0:
-                  cm.sendNext("I've always dreamed of building a city. Not just any city, but one where everyone was welcome. I used to live in Kerning City, so I decided to see if I could create a city. As I went along in finding the means to do so, I encountered many people, some of whom I've come to regard as friends. Like Professor Foxwit-he's our resident genius; saved him from a group of man-eating plants. Jack Masque is an old hunting buddy from Amoria-almost too smooth of a talker for his own good. Lita and I are old friends from Kerning City-she's saved me a few times with that weapon of hers; so I figured she was a perfect choice for Town Sheriff. It took a bit of persuasion, but she came to believe her destiny lies here. About our resident explorer, Barricade came searching for something; he agreed to bring whatever he found to the museum. I'd heard stories about him and his brother when I was still in Kerning City. And Elpam...well, let's just say he's not from around here. At all. We've spoken before, and he seems to mean well, so I've allowed him to stay. I just realized that I've rambled quite a bit! What else would you like to know?")
+                  cm.sendNext(I18nMessage.from("9201050_ALWAYS_DREAMED"))
                   status -= 2
                   break
                case 1:
-                  cm.sendNext("A pretty spry guy for being 97. He's a time-traveller I ran into outside the city one day. Old guy had a bit of trouble with some jungle creatures-like they tried to eat him. In return for me saving him, he agreed to build a time museum. I get the feeling that he's come here for another reason, as he's mentioned more than a few times that New Leaf City has an interesting role to play in the future. Maybe you can find out a bit more...")
+                  cm.sendNext(I18nMessage.from("9201050_PRETTY_SPRY"))
                   status -= 2
                   break
                case 2:
-                  cm.sendNext("Heh, I asked the same thing when I saw the Professor building them. They're warp points. Pressing Up will warp you to another location. I recommend getting the hang of them, they're our transport system.")
+                  cm.sendNext(I18nMessage.from("9201050_PRESSING_UP"))
                   status -= 2
                   break
                case 3:
-                  cm.sendNext("The MesoGears are beneath Bigger Ben. It's a monster-infested section of Bigger Ben that Barricade discovered. It seems to reside in a separate section of the tower-quite strange if you ask me. I hear he needs a bit of help exploring it, you should see him. Be careful though, the Wolf Spiders in there are no joke.")
+                  cm.sendNext(I18nMessage.from("9201050_MONSTER_INFESTED"))
                   status -= 2
                   break
                case 4:
-                  cm.sendNext("Ah...well. The Krakian Jungle is located on the outskirts of New Leaf City. Many new and powerful creatures roam those areas, so you'd better be prepared to fight if you head out there. It's at the right end of town. Rumors abound that the Jungle leads to a lost city, but we haven't found anything yet.")
+                  cm.sendNext(I18nMessage.from("9201050_OUTSKIRTS"))
                   status -= 2
                   break
                case 5:
-                  cm.sendNext("Well, when John found himself in the MesoGears portion of Bigger Ben, he stood on one and went to another location. However, he could only head back and forth-they don't cycle through like the Foxwit Door. Ancient tech for you.")
+                  cm.sendNext(I18nMessage.from("9201050_ANCIENT_TECH"))
                   status -= 2
                   break
                case 6:
-                  cm.sendNext("Well, you'll see them just about everywhere. They're areas under construction. The Red lights mean it's not finished, but the Green lights mean it's open. Check back often, we're always building!")
+                  cm.sendNext(I18nMessage.from("9201050_WE_ARE_ALWAYS_BUILDING"))
                   status -= 2
                   break
                case 7:
-                  cm.sendNext("Ah, Jack. You know those guys that are too cool for school? The ones who always seem to get away with everything? AND get the girl? Well, that's Jack, but without the girl. He thinks he blew his chance, and began wearing that mask to hide his true identity. My lips are sealed about who he is, but he's from Amoria. He might tell you a bit more if you ask him.")
+                  cm.sendNext(I18nMessage.from("9201050_TOO_COOL_FOR_SCHOOL"))
                   status -= 2
                   break
                case 8:
-                  cm.sendNext("I've known Lita for a while, though we've just recently rekindled our friendship. I didn't see her for quite a bit, but I understand why. She trained for a very, very long time as a Thief. Matter of fact, that's how we first met! I was besieged by a group of wayward Mushrooms, and she jumped in to help. When it was time to pick a sheriff, it was a no-brainer. She's made a promise to help others in their training and protect the city, so if you're interested in a bit of civic duty, speak with her.")
+                  cm.sendNext(I18nMessage.from("9201050_REKINDLED_FRIENDSHIP"))
                   status -= 2
                   break
                case 9:
-                  cm.sendNext("Soon, my friend. Even though you can't see them, the city developers are hard at work. When they're ready, we'll open them. I know you're looking forward to it and so am I!")
+                  cm.sendNext(I18nMessage.from("9201050_HARD_AT_WORK"))
                   status -= 2
                   break
                case 10:
                   if (cm.getLevel() >= minLevel) {
-                     cm.sendNext("No problem. I'll give you something nice if you answer them correctly!")
+                     cm.sendNext(I18nMessage.from("9201050_NO_PROBLEM"))
                      cm.startQuest(4900)
                   } else {
-                     cm.sendNext("Eager, are we? How about you explore a bit more before I let you take the quiz?")
+                     cm.sendNext(I18nMessage.from("9201050_EXPLORE_A_BIT_MORE"))
                   }
 
                   cm.dispose()

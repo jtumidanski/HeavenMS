@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -38,15 +39,15 @@ class NPC2112018 {
 
          if (status == 0) {
             if (eim.getIntProperty("escortFail") == 1) {
-               cm.sendNext("Thanks to you, we were capable of reunion once again. Yulete will now be forwarded to jail for attempt against the Law of Magatia. Once again, thank you.")
+               cm.sendNext(I18nMessage.from("2112018_THANK_YOU"))
             } else {
-               cm.sendNext("Thanks to you, we were capable of reunion once again. Yulete will now pass through rehabilitation, as his studies are invaluable for the growth of our town, and all his doings were being made because he was blinded by the greed for power, although it was for the sake of Magatia. Once again, thank you.")
+               cm.sendNext(I18nMessage.from("2112018_THANK_YOU_LONG"))
             }
          } else {
             if (eim.giveEventReward(cm.getPlayer())) {
                cm.warp((eim.getIntProperty("isAlcadno") == 0) ? 261000011 : 261000021)
             } else {
-               cm.sendOk("Please free a slot on one of your inventories before receiving your reward.")
+               cm.sendOk(I18nMessage.from("2112018_FREE_A_SLOT"))
             }
 
             cm.dispose()

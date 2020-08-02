@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.inventory.MapleInventoryType
 import scripting.quest.QuestActionManager
@@ -29,13 +30,13 @@ class Quest3239 {
          if (status == 0) {
             if (qm.haveItem(4031092, 10)) {
                if (qm.getPlayer().getInventory(MapleInventoryType.USE).getNumFreeSlot() >= 1) {
-                  qm.sendOk("Well done! You brought back all the #t4031092# that were missing. Here, take this scroll as a token of my gratitude...")
+                  qm.sendOk(I18nMessage.from("3239_WELL_DONE"))
                } else {
-                  qm.sendOk("Free a space on your USE inventory before receiving your prize.")
+                  qm.sendOk(I18nMessage.from("3239_USE_SPACE_NEEDED"))
                   qm.dispose()
                }
             } else {
-               qm.sendOk("Please return me 10 #t4031092# that went missing on this room.")
+               qm.sendOk(I18nMessage.from("3239_RETURN_ME"))
                qm.dispose()
             }
          } else if (status == 1) {

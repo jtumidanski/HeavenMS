@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.MapleBuffStat
 import client.MapleCharacter
@@ -25,14 +26,14 @@ class Quest3941 {
 
          if (status == 0) {
             if (!isTigunMorphed(qm.getPlayer())) {
-               qm.sendNext("What's this? I can't simply give the Queen's silk to anyone, claiming they will hand it at once to the queen. Get out of my sights.")
+               qm.sendNext(I18nMessage.from("3941_WHAT_IS_THIS"))
                status = 1
                return
             }
 
-            qm.sendNext("Tigun, what are you doing here?")
+            qm.sendNext(I18nMessage.from("3941_WHAT_ARE_YOU_DOING_HERE"))
          } else if (status == 1) {
-            qm.sendNext("The Queen wants her silk right now? Alright, I have them here. Hold on a moment.")
+            qm.sendNext(I18nMessage.from("3941_WANTS_HER_SILK"))
             qm.forceStartQuest()
          } else if (status == 2) {
             qm.dispose()
@@ -57,7 +58,7 @@ class Quest3941 {
 
          if (status == 0) {
             if (!isTigunMorphed(qm.getPlayer())) {
-               qm.sendNext("What's this? I can't simply give the Queen's silk to anyone, claiming they will hand it at once to the queen. Get out of my sights.")
+               qm.sendNext(I18nMessage.from("3941_GET_OUT_OF_MY_SIGHTS"))
                qm.dispose()
                return
             }
@@ -65,10 +66,10 @@ class Quest3941 {
             if (qm.canHold(4031571, 1)) {
                qm.gainItem(4031571)
 
-               qm.sendNext("There you go. Please deliver to the queen as soon as possible, Tigun, she gets really mad if things get delayed.")
+               qm.sendNext(I18nMessage.from("3941_THERE_YOU_GO"))
                qm.forceCompleteQuest()
             } else {
-               qm.sendNext("Hey, you're lacking space to hold this, man. I will stay with it while you arrange your backpack...")
+               qm.sendNext(I18nMessage.from("3941_YOU_ARE_LACKING_SPACE"))
             }
          } else if (status == 1) {
             qm.dispose()

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -31,7 +32,7 @@ class NPC2112016 {
 
             if (book < 20) {
                if (!cm.canHold(4031797, 1)) {
-                  cm.sendNext("(You found a report file, but since your ETC is full you choose to put the file in the place you've found.)")
+                  cm.sendNext(I18nMessage.from("2112016_ETC_IS_FULL"))
                   cm.dispose()
                   return
                } else {

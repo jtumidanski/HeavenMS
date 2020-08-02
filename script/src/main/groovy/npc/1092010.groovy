@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Jack
@@ -36,10 +37,10 @@ class NPC1092010 {
 
          if (status == 0) {
             if (!cm.haveItem(4220153)) {
-               cm.sendOk("(Scratch scratch...)")
+               cm.sendOk(I18nMessage.from("1092010_SCRATCH_SCRATCH"))
                cm.dispose()
             } else {
-               cm.sendYesNo("Hey, nice #bTreasure Map#k you have there? #rCan I keep it#k for the Nautilus crew, if you don't need it any longer?")
+               cm.sendYesNo(I18nMessage.from("1092010_CAN_I_KEEP_THE_MAP"))
             }
          } else if (status == 1) {
             cm.gainItem(4220153, (short) -1)

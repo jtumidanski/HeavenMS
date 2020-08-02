@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import net.server.channel.Channel
@@ -92,7 +93,7 @@ class NPC9201012 {
                }
                cm.sendSimple(text)
             } else {
-               cm.sendOk("Hi there, folks. Even thought of having a wedding held on Amoria? When the talk is about wedding, everyone firstly thinks about Amoria, there is no miss to it. Our chapel here is renowned around the Maple world for offering the best wedding services for maplers!")
+               cm.sendOk(I18nMessage.from("9201012_HELLO"))
                cm.dispose()
             }
          } else if (status == 1) {
@@ -104,36 +105,36 @@ class NPC9201012 {
                   MapleCharacter partner = channel.getPlayerStorage().getCharacterById(cm.getPlayer().getPartnerId()).get()
                   if (!(partner == null || cm.getMap() != partner.getMap())) {
                      if (!cm.canHold(4000313)) {
-                        cm.sendOk("Please have a free ETC slot available to get the #b#t4000313##k.")
+                        cm.sendOk(I18nMessage.from("9201012_NEED_ETC_SPACE"))
                         cm.dispose()
                         return
                      } else if (!partner.canHold(4000313)) {
-                        cm.sendOk("Please let your partner know they must have a free ETC slot available to get the #b#t4000313##k.")
+                        cm.sendOk(I18nMessage.from("9201012_PARTNER_NEED_ETC_SPACE"))
                         cm.dispose()
                         return
                      } else if (!isSuitedForWedding(cm.getPlayer(), false)) {
-                        cm.sendOk("Please purchase fashionable #rwedding clothes#k for the wedding, quickly! It's time to shine, baby~!")
+                        cm.sendOk(I18nMessage.from("9201012_FASHIONABLE_CLOTHES"))
                         cm.dispose()
                         return
                      } else if (!isSuitedForWedding(partner, false)) {
-                        cm.sendOk("Your partner must know they must have fashionable #rwedding clothes#k for the wedding. It's time to shine, baby~!")
+                        cm.sendOk(I18nMessage.from("9201012_PARTNER_FASHIONABLE_CLOTHES"))
                         cm.dispose()
                         return
                      }
 
-                     cm.sendOk("Alright! The couple appeared here stylish as ever. Let's go folks, let's rock 'n' roll!!!")
+                     cm.sendOk(I18nMessage.from("9201012_ALRIGHT"))
                   } else {
-                     cm.sendOk("Aww, your partner is elsewhere... Both must be here for the wedding, else it's going to be sooooo lame.")
+                     cm.sendOk(I18nMessage.from("9201012_PARTNER_ELSEWHERE"))
                      cm.dispose()
                   }
                } else {
                   String placeTime = channel.getWeddingReservationTimeLeft(wid)
 
-                  cm.sendOk("Yo. Your wedding is set to happen at the #r" + placeTime + "#k, get a decent apparel don't be late will you?")
+                  cm.sendOk(I18nMessage.from("9201012_WEDDING_TIME").with(placeTime))
                   cm.dispose()
                }
             } else {
-               cm.sendOk("Aawww, I'm sorry but there are no reservations made for you at this channel for the time being.")
+               cm.sendOk(I18nMessage.from("9201012_NO_RESERVATIONS"))
                cm.dispose()
             }
          } else if (status == 2) {
@@ -156,23 +157,23 @@ class NPC9201012 {
 
                            eim.registerPlayer(partner)
                         } else {
-                           cm.sendOk("An unexpected error happened when locating the wedding event. Please try again later.")
+                           cm.sendOk(I18nMessage.from("9201012_UNEXPECTED_ERROR"))
                         }
 
                         cm.dispose()
                      } else {
-                        cm.sendOk("An unexpected error happened before the wedding preparations. Please try again later.")
+                        cm.sendOk(I18nMessage.from("9201012_UNEXPECTED_ERROR_DURING_PREPARATIONS"))
                         cm.dispose()
                      }
                   } else {
-                     cm.sendOk("An unexpected error happened before the wedding preparations. Please try again later.")
+                     cm.sendOk(I18nMessage.from("9201012_UNEXPECTED_ERROR_DURING_PREPARATIONS"))
                      cm.dispose()
                   }
                } else {    // partner already decided to start
                   cm.dispose()
                }
             } else {
-               cm.sendOk("Aww, it seems your partner is elsewhere... Both must be here for the wedding, else it's going to be sooooo lame.")
+               cm.sendOk(I18nMessage.from("9201012_PARTNER_ELSEWHERE"))
                cm.dispose()
             }
          }

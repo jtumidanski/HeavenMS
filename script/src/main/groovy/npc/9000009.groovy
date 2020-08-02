@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9000009 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Hey hey!!! Find the Treasure Scroll! I lost the map\r\nsomewhere and I can't leave without it.")
+      cm.sendOk(I18nMessage.from("9000009_FIND_THE_TREASURE_SCROLL"))
       cm.dispose()
    }
 

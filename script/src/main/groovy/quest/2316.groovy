@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,16 +14,16 @@ class Quest2316 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("Why did you even ask if you were going to say no to this?#")
+            qm.sendOk(I18nMessage.from("2316_WHY"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("I think i've heard of a potion that breaks these kinds of barriers. I think it's called #bKiller Mushroom Spores#k? Hmmm... outside, you'll find the Mushroom Scholar #bScarrs#k waiting outside. #bScarrs#k is an expert on mushrooms, so go talk to him.")
+         qm.sendAcceptDecline(I18nMessage.from("2316_I_HAVE_HEARD_OF_A_POTION"))
       } else if (status == 1) {
          qm.forceStartQuest()
-         qm.sendOk("I am confident #kScarrs#k will do everything to help you.")
+         qm.sendOk(I18nMessage.from("2316_I_AM_CONFIDENT"))
       } else if (status == 2) {
          qm.dispose()
       }
@@ -39,11 +40,11 @@ class Quest2316 {
          }
       }
       if (status == 0) {
-         qm.sendOk("Ah, so you're the explorer people were talking about. I'm #bScarrs, the Royal Mushroom Scholar#k representing the Kingdom of Mushroom. So you need some #kKiller Mushroom Spores#k?")
+         qm.sendOk(I18nMessage.from("2316_NEED_SOME_SPORES"))
       } else if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainExp(4200)
-         qm.sendOk("#kKiller Mushroom Spores#k... I think i've heard of them before...")
+         qm.sendOk(I18nMessage.from("2316_I_HAVE_HEARD_OF_THEM"))
       } else if (status == 2) {
          qm.dispose()
       }

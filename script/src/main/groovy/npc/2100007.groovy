@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -32,7 +33,7 @@ class NPC2100007 {
             status--
          }
          if (status == 0) {
-            cm.sendNext("Hohoh~ welcome welcome. Welcome to Ariant Skin Care. You have stepped into a renowned Skin Care shop that even the Queen herself frequents this place. If you have #bAriant skin care coupon#k with you, we'll take care of the rest. How about letting work on your skin today?")
+            cm.sendNext(I18nMessage.from("2100007_HELLO"))
          } else if (status == 1) {
             cm.sendStyle("With our specialized machine, you can see yourself after the treatment in advance. What kind of skin-treatment would you like to do? Choose the style of your liking...", skin)
          } else if (status == 2) {
@@ -40,9 +41,9 @@ class NPC2100007 {
             if (cm.haveItem(5153007)) {
                cm.gainItem(5153007, (short) -1)
                cm.setSkin(skin[selection])
-               cm.sendOk("Enjoy your new and improved skin!")
+               cm.sendOk(I18nMessage.from("2100007_ENJOY_NEW_SKIN"))
             } else {
-               cm.sendNext("Hmmm... I don't think you have our Skin Care coupon with you. Without it, I can't give you the treatment")
+               cm.sendNext(I18nMessage.from("2100007_MISSING_SKIN_COUPON"))
             }
          }
       }

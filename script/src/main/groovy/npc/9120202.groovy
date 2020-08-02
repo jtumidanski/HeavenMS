@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -37,19 +38,19 @@ class NPC9120202 {
          EventInstanceManager eim = cm.getEventInstance()
          if (!eim.isEventCleared()) {
             if (status == 0) {
-               cm.sendYesNo("If you leave now, you won't be able to return. Are you sure you want to leave?")
+               cm.sendYesNo(I18nMessage.from("9120202_ARE_YOU_SURE"))
             } else if (status == 1) {
                cm.warp(801040004, 1)
                cm.dispose()
             }
          } else {
             if (status == 0) {
-               cm.sendNext("You guys did it, great job! Now our city is free from the tyranny of their mobs! As representative of the city, please accept this as a prize for your efforts, as I get you back to town.")
+               cm.sendNext(I18nMessage.from("9120202_YOU_DID_IT"))
             }
 
             if (status == 1) {
                if (!eim.giveEventReward(cm.getPlayer())) {
-                  cm.sendNext("Please make room on your inventory first...")
+                  cm.sendNext(I18nMessage.from("9120202_MAKE_INVENTORY_ROOM"))
                } else {
                   cm.warp(801040101)
                }

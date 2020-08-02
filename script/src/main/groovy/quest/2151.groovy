@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2151 {
          }
 
          if (status == 0) {
-            qm.sendNext("The tree has a strange carving that resembles a scary face.")
+            qm.sendNext(I18nMessage.from("2151_STRANGE_CARVING"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

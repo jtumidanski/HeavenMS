@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -70,19 +71,19 @@ class NPC1202000 {
             }
          } else {
             if (status == 0) {
-               cm.sendSimple("Is there anything you're still curious about? If so, I'll try to explain it better. #b#l\r\n#L0#Who am I? #l #l\r\n#L1#Where am I? #l #l\r\n#L2#Who are you?#l#l\r\n#L3#Tell me what I have to do.#l #l\r\n#L4#Tell me about my Inventory.#l #l\r\n#L5#How do I advance my skills?#l #l\r\n#L6#I want to know how to equip items.#l #l\r\n#L7#How do I use quick slots? #l #l\r\n#L8#How can I open breakable containers?#l #l\r\n#L9#I want to sit in a chair but I forgot how.#l#k")
+               cm.sendSimple(I18nMessage.from("1202000_ANYTHING_STILL_CURIOUS"))
             } else if (status == 1) {
                if (selection == 0) {
-                  cm.sendNext("You are one of the heroes that saved Maple World from the Black Magician hundreds of years ago. You've lost your memory due to the curse of the Black Mage.")
+                  cm.sendNext(I18nMessage.from("1202000_YOU_HAVE_LOST_YOUR_MEMORY"))
                   cm.dispose()
                } else if (selection == 1) {
-                  cm.sendNext("This island is called Rien, and this is where the Black Magician's curse put you to sleep. It's a small island covered in ice and snow, and the majority of the residents are Penguins.")
+                  cm.sendNext(I18nMessage.from("1202000_ISLAND_CALLED_RIEN"))
                   cm.dispose()
                } else if (selection == 2) {
-                  cm.sendNext("I'm Lilin, a clan member of Rien, and I've been waiting for your return as the prophecy foretold. I'll be your guide for now.")
+                  cm.sendNext(I18nMessage.from("1202000_I_AM_LILIN"))
                   cm.dispose()
                } else if (selection == 3) {
-                  cm.sendNext("Let's not waste any more time and just get to town. I'll give you the details when we get there.")
+                  cm.sendNext(I18nMessage.from("1202000_JUST_GET_TO_TOWN"))
                   cm.dispose()
                } else if (selection == 4) {
                   cm.guideHint(14)

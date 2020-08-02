@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -29,7 +30,7 @@ class Quest21100 {
       } else if (status == 5) {
          qm.sendNextPrev("Come to think of it, I did see a #p1201001# in town.", (byte) 2)
       } else if (status == 6) {
-         qm.sendAcceptDecline("Yes, that's it. According to what's been recorded, the weapon of a hero will recognize its rightful owner, and if you're the hero that used the #p1201001#, the #p1201001# will react when you grab the #p1201001#. Please go find the #b#p1201001# and click on it.#k")
+         qm.sendAcceptDecline(I18nMessage.from("21100_WEAPON_WILL_RECOGNIZE_ITS_RIGHTFUL_OWNER"))
       } else if (status == 7) {
          if (mode == 0 && type == 15) {
             qm.sendNext("What's stopping you? I promise, I won't be disappointed even if the #p1201001# shows no reaction to you. Please, rush over there and grab the #p1201001#. Just #bclick#k on it.", (byte) 8)

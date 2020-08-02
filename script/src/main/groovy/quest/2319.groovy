@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,17 +14,17 @@ class Quest2319 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("I know it's not a tough task, so come back to me if you're ready.")
+            qm.sendOk(I18nMessage.from("2319_NOT_A_TOUGH_TASK"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("Oh, I almost forgot! What was I thinking? I need you to hand this #bSample of Killer Mushroom Spores#k to #bMinister of Magic#k and report the results.")
+         qm.sendAcceptDecline(I18nMessage.from("2319_I_ALMOST_FORGOT"))
       } else if (status == 1) {
          qm.forceStartQuest()
          qm.gainItem(4032389, (short) 1)
-         qm.sendOk("The #bMinister of Magic#k told me once the #bKiller Mushroom Spores#k is complete, that he'll want a sample of it as well. I'll give you the sample; now go please hand it in to our #bMinister of Magic.#k")
+         qm.sendOk(I18nMessage.from("2319_GIVE_YOU_THE_SAMPLE"))
       } else if (status == 2) {
          qm.dispose()
       }
@@ -40,12 +41,12 @@ class Quest2319 {
          }
       }
       if (status == 0) {
-         qm.sendOk("Are the #bKiller Mushroom Spores#k finally completed?")
+         qm.sendOk(I18nMessage.from("2319_FINALLY_COMPLETED"))
       } else if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainExp(4200)
          qm.gainItem(4032389, (short) -1)
-         qm.sendOk("Okay, so this is the #bKiller Mushroom Spores.#k Thank you, thank you, and please tell #bScarrs#k the same.")
+         qm.sendOk(I18nMessage.from("2319_THANK_YOU"))
       } else if (status == 2) {
          qm.dispose()
       }

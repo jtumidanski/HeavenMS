@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2132001 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Call me Dark Lord. I will give thieves a place in society... watch in a few years!")
+      cm.sendNext(I18nMessage.from("2132001_CALL_ME"))
       cm.dispose()
    }
 

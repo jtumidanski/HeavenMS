@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC1096001 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Will I ever finish cleaning? This ship is just too big...")
+      cm.sendOk(I18nMessage.from("1096001_SHIP_IS_TOO_BIG"))
       cm.dispose()
    }
 

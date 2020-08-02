@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9201102 {
    int sel = -1
 
    def start() {
-      cm.sendOk("The patrol in New Leaf City is always ready. No creatures are able to break through to the city.")
+      cm.sendOk(I18nMessage.from("9201102_ALWAYS_READY"))
       cm.dispose()
    }
 

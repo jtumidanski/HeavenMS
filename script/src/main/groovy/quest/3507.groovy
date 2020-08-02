@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -29,9 +30,9 @@ class Quest3507 {
          if (status == 0) {
             if (qm.isQuestCompleted(3523) || qm.isQuestCompleted(3524) || qm.isQuestCompleted(3525) || qm.isQuestCompleted(3526) || qm.isQuestCompleted(3527) || qm.isQuestCompleted(3529) || qm.isQuestCompleted(3539)) {
                qm.completeQuest()
-               qm.sendOk("You are now filled with all of your memories again.. You are now allowed to go to #m270020000#.")
+               qm.sendOk(I18nMessage.from("3507_NOW_FILLED_WITH_MEMORIES"))
             } else {
-               qm.sendOk("You have not yet checked with your first teacher about your memories?")
+               qm.sendOk(I18nMessage.from("3507_CHECK_WITH_TEACHER"))
             }
          } else if (status == 1) {
             qm.dispose()

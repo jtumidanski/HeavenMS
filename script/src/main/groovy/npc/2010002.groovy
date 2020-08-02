@@ -2,6 +2,7 @@ package npc
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -36,7 +37,7 @@ class NPC2010002 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Well well well, welcome to the Orbis Plastic Surgery! Would you like to transform your face into something new? With a #b#t5152005##k, you can let us take care of the rest and have the face you've always wanted~!\r\n#L2#Plastic Surgery: #i5152005##t5152005##l")
+            cm.sendSimple(I18nMessage.from("2010002_HELLO"))
          } else if (status == 1) {
             if (selection == 2) {
                faceNew = []
@@ -57,9 +58,9 @@ class NPC2010002 {
             if (cm.haveItem(5152005)) {
                cm.gainItem(5152005, (short) -1)
                cm.setFace(faceNew[selection])
-               cm.sendOk("Enjoy your new and improved face!")
+               cm.sendOk(I18nMessage.from("2010002_ENJOY_NEW_FACE"))
             } else {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("2010002_MISSING_FACE_COUPON"))
             }
          }
       }

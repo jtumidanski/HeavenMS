@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Trash Can 3
@@ -38,15 +39,15 @@ class NPC1052111 {
                if (!cm.hasItem(4032136)) {
                   if (cm.canHold(4032136)) {
                      cm.gainItem(4032136, (short) 1)
-                     cm.sendNext("You have found a #b#t4032136##k in the trash can!   #i4032136#")
+                     cm.sendNext(I18nMessage.from("1052111_FOUND_IN_THE_CAN"))
                   } else {
-                     cm.sendOk("#i4032136# Not enough space in your ETC inventory.")
+                     cm.sendOk(I18nMessage.from("1052111_NOT_ENOUGH_SPACE"))
                   }
                } else {
-                  cm.sendOk("Just a trash can sitting there.")
+                  cm.sendOk(I18nMessage.from("1052111_JUST_A_TRASH_CAN"))
                }
             } else {
-               cm.sendOk("Just a trash can sitting there.")
+               cm.sendOk(I18nMessage.from("1052111_JUST_A_TRASH_CAN"))
             }
          } else if (status == 1) {
             cm.dispose()

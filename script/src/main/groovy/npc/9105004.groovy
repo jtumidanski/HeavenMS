@@ -6,9 +6,9 @@ import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
 import server.life.MapleLifeFactory
 import server.maps.MapleMap
+import tools.I18nMessage
 import tools.MessageBroadcaster
 import tools.ServerNoticeType
-import tools.I18nMessage
 
 import java.awt.*
 
@@ -65,40 +65,48 @@ class NPC9105004 {
       if (status == 0) {
          em = cm.getEventManager("HolidayPQ_" + pqType)
          if (em == null) {
-            cm.sendOk("The Holiday PQ " + pqType + " has encountered an error.")
+            cm.sendOk(I18nMessage.from("9105004_HOLIDAY_PQ_ENCOUNTERED_ERROR").with(pqType))
+
             cm.dispose()
          } else if (cm.isUsingOldPqNpcStyle()) {
             action((byte) 1, (byte) 0, 0)
             return
          }
 
-         cm.sendSimple("#e#b<Party Quest: Holiday>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nHow about you and your party members collectively beating a quest? Here you'll find obstacles and problems where you won't be able to beat it without great teamwork. If you want to try it, please tell the #bleader of your party#k to talk to me.#b\r\n#L0#I want to participate in the party quest.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.")
+         cm.sendSimple(I18nMessage.from("9105004_PARTY_QUEST_INFO").with(em.getProperty("party"), cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable"))
+
       } else if (status == 1) {
          if (selection == 0) {
             if (cm.getParty().isEmpty()) {
-               cm.sendOk("You can participate in the party quest only if you are in a party.")
+               cm.sendOk(I18nMessage.from("9105004_MUST_BE_IN_PARTY"))
+
                cm.dispose()
             } else if (!cm.isLeader()) {
-               cm.sendOk("Your party leader must talk to me to start this party quest.")
+               cm.sendOk(I18nMessage.from("9105004_PARTY_LEADER_MUST_START"))
+
                cm.dispose()
             } else {
                MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                if (eli.size() > 0) {
                   if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), pqType)) {
-                     cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
+                     cm.sendOk(I18nMessage.from("9105004_ANOTHER_PARTY"))
+
                   }
                } else {
-                  cm.sendOk("You cannot start this party quest yet, because either your party is not in the range size, some of your party members are not eligible to attempt it or they are not in this map. If you're having trouble finding party members, try Party Search.")
+                  cm.sendOk(I18nMessage.from("9105004_PARTY_REQUIREMENTS"))
+
                }
 
                cm.dispose()
             }
          } else if (selection == 1) {
             boolean psState = cm.getPlayer().toggleRecvPartySearchInvite()
-            cm.sendOk("Your Party Search status is now: #b" + (psState ? "enabled" : "disabled") + "#k. Talk to me whenever you want to change it back.")
+            cm.sendOk(I18nMessage.from("9105004_PARTY_SEARCH_STATUS").with((psState ? "enabled" : "disabled")))
+
             cm.dispose()
          } else {
-            cm.sendOk("#e#b<Party Quest: Holiday>#k#n\r\n\r\nJoin in with your team to build up the Snowman that will protect Happyville from the misdoings of Scrooge. While inside, work out with your team to protect it at any means necessary while collecting Snow Vigor that will help on the build up of the Snowman.")
+            cm.sendOk(I18nMessage.from("9105004_PARTY_QUEST_INFO_2"))
+
             cm.dispose()
          }
       }
@@ -113,26 +121,32 @@ class NPC9105004 {
 
       if (status == 0) {
          if (stg == -1) {
-            cm.sendNext("#b#h0##k... you're finally here. This is the place where the residents of Happyville build the giant snowman. But Scrooge's subordinates are attacking it right now. Now Hurry! Our mission is for you and your party to protect the snowman from Scrooge's men within the time limit. If you eliminate them, then they'll drop an item called Snow Vigor. Gather them up and drop them on the snowman, and you'll literally see it grow. Once it returns to its original size, then your task is complete. Just beware of one thing. Some of the subordinates may drop a fake Snow Vigor. A fake Snow Vigor will actually cause the snowman to melt even faster than usual. Best of luck to you.")
+            cm.sendNext(I18nMessage.from("9105004_FINALLY_HERE"))
+
          } else if (stg == 0) {
             if (cm.getMap().getMonsterById(9400321 + 5 * difficulty) == null) {
-               cm.sendNext("Please, defeat Scrooge's underlings and make the snowman grow, so that Scrooge has no other way to avoid showing himself up.")
+               cm.sendNext(I18nMessage.from("9105004_DEFEAT_SCROOGE"))
+
                cm.dispose()
             } else {
-               cm.sendNext("Awesome! Just as I expected, you managed to defeat Scrooge's subordinates. Thank you so much! (Stands silent for a while...) Unfortunately, Scrooge doesn't seem like he's going to stop right here. One of his men have already told him what happened, which means... he'll show up soon. Please keep fighting, and again, best of luck to you.")
+               cm.sendNext(I18nMessage.from("9105004_JUST_AS_I_EXPECTED"))
+
             }
          } else {
             if (!eim.isEventCleared()) {
-               cm.sendNext("Please defeat the Scrooge, so our Maplemas keeps safe from harm!")
+               cm.sendNext(I18nMessage.from("9105004_DEFEAT_SCROOGE_2"))
+
                cm.dispose()
             } else {
-               cm.sendNext("Wow!! You defeated Scrooge! Thank you so much! You have managed to make this Maplemas safe and sound! Thanks!!")
+               cm.sendNext(I18nMessage.from("9105004_WOW"))
+
             }
          }
       } else if (status == 1) {
          if (stg == -1) {
             if (!cm.isEventLeader()) {
-               cm.sendOk("Please let your party leader talk to me for further details on the mission.")
+               cm.sendOk(I18nMessage.from("9105004_PARTY_LEADER_MUST_SPEAK"))
+
                cm.dispose()
                return
             }
@@ -148,7 +162,8 @@ class NPC9105004 {
             cm.dispose()
          } else if (stg == 0) {
             if (!cm.isEventLeader()) {
-               cm.sendOk("Please let your party leader talk to me for further details on the mission.")
+               cm.sendOk(I18nMessage.from("9105004_PARTY_LEADER_MUST_SPEAK"))
+
                cm.dispose()
                return
             }
@@ -168,9 +183,11 @@ class NPC9105004 {
                String optStr = generateSelectionMenu(generatePrizeString())
                cm.sendSimple("Oh, you brought a #b#t4032092##k with you? That's nice, hold on a bit... Here's your Maplemas gift. Please select the one you'd like to receive:\r\n\r\n" + optStr)
             } else if (eim.gridCheck(cm.getPlayer()) == -1) {
-               cm.sendNext("Here's your Maplemas gift. Enjoy~")
+               cm.sendNext(I18nMessage.from("9105004_MAPLEMAS_GIFT"))
+
             } else {
-               cm.sendOk("Happy Maplemas!!")
+               cm.sendOk(I18nMessage.from("9105004_HAPPY"))
+
                cm.dispose()
             }
          }
@@ -189,13 +206,15 @@ class NPC9105004 {
                   cm.gainItem(selItems[0][1], (short) selItems[1][1])
                }
             } else {
-               cm.sendOk("Please make sure you have room in your EQUIP and USE inventories before proceeding.")
+               cm.sendOk(I18nMessage.from("9105004_MAKE_EQUIP_AND_USE_ROOM"))
+
             }
          } else {
             if (eim.giveEventReward(cm.getPlayer(), difficulty)) {
                eim.gridInsert(cm.getPlayer(), 1)
             } else {
-               cm.sendOk("Please make sure you have room in your EQUIP, USE and ETC inventories before proceeding.")
+               cm.sendOk(I18nMessage.from("9105004_MAKE_EQUIP_USE_AND_ETC_ROOM"))
+
             }
          }
 

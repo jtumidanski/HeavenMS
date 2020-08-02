@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -34,10 +35,10 @@ class NPC1101008 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Wait! You'll figure the stuff out by the time you reach Lv. 10 anyway, but if you absolutely want to prepare beforehand, you may view the following information.\r\n\r\n Tell me, what would you like to know?\r\n#b#L0#About you#l\r\n#L1#Mini Map#l\r\n#L2#Quest Window#l\r\n#L3#Inventory#l\r\n#L4#Regular Attack Hunting#l\r\n#L5#How to Pick Up Items#l\r\n#L6#How to Equip Items#l\r\n#L7#Skill Window#l\r\n#L8#How to Use Quick Slots#l\r\n#L9#How to Break Boxes#l\r\n#L10#How to Sit in a Chair#l\r\n#L11#World Map#l\r\n#L12#Quest Notifications#l\r\n#L13#Enhancing Stats#l\r\n#L14#Who are the Cygnus Knights?#l")
+            cm.sendSimple(I18nMessage.from("1101008_WAIT"))
          } else if (status == 1) {
             if (selection == 0) {
-               cm.sendNext("I serve under Shinsoo, the guardian of Empress Cygnus. My master, Shinsoo, has ordered me to guide everyone who comes to Maple World to join Cygnus Knights. I will be assisting and following you around until you become a Knight or reach Lv. 11. Please let me know if you have any questions.")
+               cm.sendNext(I18nMessage.from("1101008_SERVE_UNDER_SHINSOO"))
             } else if (selection == 1) {
                cm.guideHint(1)
                cm.dispose()
@@ -78,11 +79,11 @@ class NPC1101008 {
                cm.guideHint(13)
                cm.dispose()
             } else if (selection == 14) {
-               cm.sendOk("The Black Magician is trying to revive and conquer our peaceful Maple World. As a response to this threat, Empress Cygnus has formed a knighthood, now known as Cygnus Knights. You can become a Knight when you reach Lv. 10.")
+               cm.sendOk(I18nMessage.from("1101008_CYGNUS_KNIGHT_INFO"))
                cm.dispose()
             }
          } else if (status == 2) {
-            cm.sendNextPrev("There is no need for you to check this info now. These are basics that you'll pick up as you play. You can always ask me questions that come up after you've reached Lv. 10, so just relax.")
+            cm.sendNextPrev(I18nMessage.from("1101008_ASK_ME_QUESTIONS_ANYTIME"))
             cm.dispose()
          }
       }

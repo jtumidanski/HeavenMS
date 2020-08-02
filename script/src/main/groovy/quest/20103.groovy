@@ -2,6 +2,7 @@ package quest
 
 import client.MapleJob
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20103 {
    QuestActionManager qm
@@ -18,7 +19,7 @@ class Quest20103 {
    def end(Byte mode, Byte type, Integer selection) {
       if (mode == 0) {
          if (status == 0) {
-            qm.sendNext("This is an important decision to make.")
+            qm.sendNext(I18nMessage.from("20103_IMPORTANT_DECISION"))
             qm.dispose()
             return
          }
@@ -27,19 +28,19 @@ class Quest20103 {
          status++
       }
       if (status == 0) {
-         qm.sendYesNo("Have you made your decision? The decision will be final, so think carefully before deciding what to do. Are you sure you want to become a Wind Archer?")
+         qm.sendYesNo(I18nMessage.from("20103_DO_YOU_WANT_TO_BECOME"))
       } else if (status == 1) {
          if (canTryFirstJob) {
             canTryFirstJob = false
             if (qm.getPlayer().getJob().getId() != 1300) {
                if (!qm.canGetFirstJob(jobType)) {
-                  qm.sendOk("Train a bit more until you reach #blevel 10, " + qm.getFirstJobStatRequirement(jobType) + "#k and I can show you the way of the #rWind Archer#k.")
+                  qm.sendOk(I18nMessage.from("20103_TRAIN_A_BIT_MORE").with(qm.getFirstJobStatRequirement(jobType)))
                   qm.dispose()
                   return
                }
 
                if (!(qm.canHoldAll([1452051, 1142066]) && qm.canHold(2070000))) {
-                  qm.sendOk("Make some room in your inventory and talk back to me.")
+                  qm.sendOk(I18nMessage.from("20103_MAKE_SOME_ROOM"))
                   qm.dispose()
                   return
                }
@@ -53,15 +54,15 @@ class Quest20103 {
             qm.forceCompleteQuest()
          }
 
-         qm.sendNext("I have just molded your body to make it perfect for a Wind Archer. If you wish to become more powerful, use Stat Window (S) to raise the appropriate stats. If you aren't sure what to raise, just click on #bAuto#k.")
+         qm.sendNext(I18nMessage.from("20103_YOU_ARE_A_WIND_ARCHER"))
       } else if (status == 2) {
-         qm.sendNextPrev("I have also expanded your inventory slot counts for your equipment and etc. inventory. Use those slots wisely and fill them up with items required for Knights to carry.")
+         qm.sendNextPrev(I18nMessage.from("20103_EXPANDED_INVENTORY"))
       } else if (status == 3) {
-         qm.sendNextPrev("I have also given you a hint of #bSP#k, so open the #bSkill Menu#k to acquire new skills. Of course, you can't raise them at all once, and there are some skills out there where you won't be able to acquire them unless you master the basic skills first.")
+         qm.sendNextPrev(I18nMessage.from("20103_GIVEN_SP"))
       } else if (status == 4) {
-         qm.sendNextPrev("Unlike your time as a Noblesse, once you become the Wind Archer, you will lost a portion of your EXP when you run out of HP, okay?")
+         qm.sendNextPrev(I18nMessage.from("20103_LOSE_EXP_WHEN_YOU_DIE"))
       } else if (status == 5) {
-         qm.sendNextPrev("Now... I want you to go out there and show the world how the Knights of Cygnus operate.")
+         qm.sendNextPrev(I18nMessage.from("20103_SHOW_THE_WORLD"))
       } else if (status == 6) {
          qm.dispose()
       }

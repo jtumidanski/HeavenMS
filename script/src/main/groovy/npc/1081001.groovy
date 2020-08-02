@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC1081001 {
    NPCConversationManager cm
@@ -15,19 +16,19 @@ class NPC1081001 {
       if (returnMap == -1) {
          returnMap = 104000000
       }
-      cm.sendNext("So you want to leave #b#m110000000##k? If you want, I can take you back to #b#m" + returnMap + "##k.")
+      cm.sendNext(I18nMessage.from("1081001_SO_YOU_WANT_TO_LEAVE").with(returnMap))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode == -1) {
          cm.dispose()
       } else if (mode == 0) {
-         cm.sendNext("You must have some business to take care of here. It's not a bad idea to take some rest at #m" + returnMap + "# Look at me; I love it here so much that I wound up living here. Hahaha anyway, talk to me when you feel like going back.")
+         cm.sendNext(I18nMessage.from("1081001_MUST_HAVE_SOME_BUSINESS").with(returnMap))
          cm.dispose()
       } else if (mode == 1) {
          status++
          if (status == 1) {
-            cm.sendYesNo("Are you sure you want to return to #b#m" + returnMap + "##k? Alright, we'll have to get going fast. Do you want to head back to #m" + returnMap + "# now?")
+            cm.sendYesNo(I18nMessage.from("1081001_ARE_YOU_SURE").with(returnMap, returnMap))
          } else {
             cm.getPlayer().getSavedLocation("FLORINA")
             cm.warp(returnMap)

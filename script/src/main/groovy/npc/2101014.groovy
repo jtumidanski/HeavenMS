@@ -47,7 +47,7 @@ class NPC2101014 {
          }
          if (cm.getPlayer().getMapId() == 980010000) {
             if (cm.getLevel() > 30) {
-               cm.sendOk("You are already over #rlevel 30#k, therefore you can't participate in this instance anymore.")
+               cm.sendOk(I18nMessage.from("2101014_MAXIMUM_LEVEL_30"))
                cm.dispose()
                return
             }
@@ -77,7 +77,7 @@ class NPC2101014 {
                   toSnd += "#L2#Join Battle Arena (3)  Owner (" + expedition2.getLeader().getName() + ")" + " Current Member: " + cm.getExpeditionMemberNames(expeditionType2) + "\r\n"
                }
                if (toSnd == startSnd) {
-                  cm.sendOk("All the Battle Arena is currently occupied. I suggest you to come back later or change channels.")
+                  cm.sendOk(I18nMessage.from("2101014_ARENA_CURRENTLY_OCCUPIED"))
                   cm.dispose()
                } else {
                   cm.sendSimple(toSnd)
@@ -93,15 +93,15 @@ class NPC2101014 {
                if (expedition != null) {
                   enterArena(-1)
                } else {
-                  cm.sendGetText("Up to how many participants can join in this match? (2~5 people)")
+                  cm.sendGetText(I18nMessage.from("2101014_HOW_MANY_CAN_JOIN"))
                }
             } else if (status == 2) {
                Integer players = (cm.getText()).toInteger()
                if (players == null) {
-                  cm.sendNext("Please enter a numeric limit value of allowed players in your instance.")
+                  cm.sendNext(I18nMessage.from("2101014_ENTER_NUMERIC_LIMIT"))
                   status = 0
                } else if (players < 2) {
-                  cm.sendNext("The numeric limit value should not be less than 2 players.")
+                  cm.sendNext(I18nMessage.from("2101014_MINIMUM_2_PLAYERS"))
                   status = 0
                } else {
                   enterArena(players)
@@ -150,35 +150,35 @@ class NPC2101014 {
                cm.warp(map, 0)
                MessageBroadcaster.getInstance().sendServerNotice(cm.getPlayer(), ServerNoticeType.NOTICE, I18nMessage.from("ARENA_CREATED_WAIT_FOR_PEOPLE_TO_JOIN"))
             } else if (res > 0) {
-               cm.sendOk("Sorry, you've already reached the quota of attempts for this expedition! Try again another day...")
+               cm.sendOk(I18nMessage.from("2101014_QUOTA_LIMIT"))
             } else {
-               cm.sendOk("An unexpected error has occurred when starting the expedition, please try again later.")
+               cm.sendOk(I18nMessage.from("2101014_UNEXPECTED_ERROR"))
             }
          } else {
-            cm.sendOk("An unexpected error has occurred when locating the expedition, please try again later.")
+            cm.sendOk(I18nMessage.from("2101014_UNEXPECTED_ERROR"))
          }
 
          cm.dispose()
       } else {
          if (playerAlreadyInLobby(cm.getPlayer())) {
-            cm.sendOk("Sorry, you're already inside the lobby.")
+            cm.sendOk(I18nMessage.from("2101014_YOU_ARE_ALREADY_INSIDE"))
             cm.dispose()
             return
          }
 
          int playerAdd = expedition.addMemberInt(cm.getPlayer())
          if (playerAdd == 3) {
-            cm.sendOk("Sorry, the lobby is full now")
+            cm.sendOk(I18nMessage.from("2101014_LOBBY_IS_FULL"))
             cm.dispose()
          } else {
             if (playerAdd == 0) {
                cm.warp(map, 0)
                cm.dispose()
             } else if (playerAdd == 2) {
-               cm.sendOk("Sorry, the leader do not allowed you to enter.")
+               cm.sendOk(I18nMessage.from("2101014_LEADER_DID_NOT_ALLOW_YOU"))
                cm.dispose()
             } else {
-               cm.sendOk("Error.")
+               cm.sendOk(I18nMessage.from("2101014_ERROR"))
                cm.dispose()
             }
          }

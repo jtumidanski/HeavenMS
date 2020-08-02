@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -24,21 +25,21 @@ class Quest3714 {
 
          if (status == 0) {
             if (!qm.haveItem(4001094, 1)) {
-               qm.sendNext("You don't have a #b#t4001094##k...")
+               qm.sendNext(I18nMessage.from("3714_YOU_DO_NOT_HAVE"))
                qm.dispose()
                return
             }
 
             if (qm.haveItem(2041200, 1)) {
-               qm.sendOk("(The #b#t2041200##k in my bag has grown brighter since reaching this place... Noticing again, the young dragon over there seems to be glaring bitterly towards it.)")
+               qm.sendOk(I18nMessage.from("3714_GROWN_BRIGHTER"))
                qm.dispose()
                return
             }
 
-            qm.sendNext("You have brought a #b#t4001094##k, thank you for retrieving one more of my kin to the nest! Please have this...\r\n\r\n....... (bleuuhnuhgh) (blahrgngnhhng) ...\r\n\r\nehh, #b#t2041200##k as a token of my kin's gratitude. And do a favor for us, please, get that thing out of here...")
+            qm.sendNext(I18nMessage.from("3714_YOU_HAVE_BROUGHT"))
          } else if (status == 1) {
             if (!qm.canHold(2041200, 1)) {
-               qm.sendOk("Please make a room on your USE inventory to receive the reward.")
+               qm.sendOk(I18nMessage.from("3714_MAKE_USE_ROOM"))
                qm.dispose()
                return
             }

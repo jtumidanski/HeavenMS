@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleJob
 import scripting.npc.NPCConversationManager
@@ -44,13 +45,13 @@ class NPC9201124 {
          if (status == 0) {
             if (cm.getJob().getId() == MapleJob.BEGINNER.getId()) {
                if (cm.getLevel() >= 10 && cm.canGetFirstJob(jobType)) {
-                  cm.sendYesNo("Hey #h #, I can send you to #b#m" + map + "##k if you want to be a #b" + job + "#k. Do you want to go now?")
+                  cm.sendYesNo(I18nMessage.from("9201124_DO_YOU_WANT_TO_GO").with(map, job))
                } else {
-                  cm.sendOk("If you want to be a #b" + job + "#k, train yourself further until you reach #blevel 10, " + cm.getFirstJobStatRequirement(jobType) + "#k.")
+                  cm.sendOk(I18nMessage.from("9201124_IF_YOU_WANT").with(job, cm.getFirstJobStatRequirement(jobType)))
                   cm.dispose()
                }
             } else {
-               cm.sendOk("You're much stronger now. Keep training!")
+               cm.sendOk(I18nMessage.from("9201124_MUCH_STRONGER_NOW"))
                cm.dispose()
             }
          } else if (status == 1) {

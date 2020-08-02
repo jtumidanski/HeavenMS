@@ -2,6 +2,7 @@ package npc
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -37,7 +38,8 @@ class NPC2041007 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Welcome, welcome, welcome to the Ludibrium Hair Salon! Do you, by any chance, have a #b#t5150007##k or a #b#t5151007##k? If so, how about letting me take care of your hair? Please choose what you want to do with it...\r\n#L1#Haircut: #i5150007##t5150007##l\r\n#L2#Dye your hair: #i5151007##t5151007##l")
+            cm.sendSimple(I18nMessage.from("2041007_WELCOME"))
+
          } else if (status == 1) {
             if (selection == 1) {
                beauty = 1
@@ -67,35 +69,43 @@ class NPC2041007 {
             if (beauty == 1) {
                if (cm.haveItem(5420005)) {
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("2041007_ENJOY_NEW_STYLE"))
+
                } else if (cm.haveItem(5150007)) {
                   cm.gainItem(5150007, (short) -1)
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("2041007_ENJOY_NEW_STYLE"))
+
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("2041007_MISSING_STYLE_COUPON"))
+
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151007)) {
                   cm.gainItem(5151007, (short) -1)
                   cm.setHair(hairColor[selection])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("2041007_ENJOY_NEW_COLOR"))
+
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("2041007_MISSING_COLOR_COUPON"))
+
                }
             }
             if (beauty == 0) {
                if (selection == 0 && cm.getMeso() >= hairPrice) {
                   cm.gainMeso(-hairPrice)
                   cm.gainItem(5150007, (short) 1)
-                  cm.sendOk("Enjoy!")
+                  cm.sendOk(I18nMessage.from("2041007_ENJOY"))
+
                } else if (selection == 1 && cm.getMeso() >= hairColorPrice) {
                   cm.gainMeso(-hairColorPrice)
                   cm.gainItem(5151007, (short) 1)
-                  cm.sendOk("Enjoy!")
+                  cm.sendOk(I18nMessage.from("2041007_ENJOY"))
+
                } else {
-                  cm.sendOk("You don't have enough mesos to buy a coupon!")
+                  cm.sendOk(I18nMessage.from("2041007_NOT_ENOUGH_MESOS"))
+
                }
             }
          }

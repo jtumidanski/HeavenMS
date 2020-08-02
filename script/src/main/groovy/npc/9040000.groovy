@@ -1,4 +1,6 @@
 package npc
+import tools.I18nMessage
+
 
 import scripting.event.EventInstanceManager
 import scripting.event.EventManager
@@ -56,21 +58,25 @@ class NPC9040000 {
          if (status == 0) {
             em = cm.getEventManager("GuildQuest")
             if (em == null) {
-               cm.sendOk("The Guild Quest has encountered an error.")
+               cm.sendOk(I18nMessage.from("9040000_ENCOUNTERED_ERROR"))
+
                cm.dispose()
                return
             }
 
-            cm.sendSimple("#e#b<Guild Quest: Sharenian Ruins>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nThe path to Sharenian starts here. What would you like to do? #b\r\n#L0#Register your guild for Guild Quest#l\r\n#L1#Join your guild's Guild Quest#l\r\n#L2#I would like to hear more details.#l")
+            cm.sendSimple(I18nMessage.from("9040000_GUILD_QUEST_INFO").with(em.getProperty("party")))
+
          } else if (status == 1) {
             sel = selection
             if (selection == 0) {
                if (!cm.isGuildLeader()) {
-                  cm.sendOk("Your guild master/jr.master must talk to me to register the guild for the guild quest.")
+                  cm.sendOk(I18nMessage.from("9040000_MASTER_OR_JR_MASTER_MUST_REGISTER"))
+
                   cm.dispose()
                } else {
                   if (em.isQueueFull()) {
-                     cm.sendOk("The queue on this channel is already full. Please be patient and try again after a while, or try on another channel.")
+                     cm.sendOk(I18nMessage.from("9040000_QUEUE_FULL"))
+
                      cm.dispose()
                   } else {
                      int qsize = em.getQueueSize()
@@ -81,7 +87,8 @@ class NPC9040000 {
                if (cm.getPlayer().getGuildId() > 0) {
                   EventInstanceManager eim = findLobby(cm.getPlayer().getGuildId())
                   if (eim == null) {
-                     cm.sendOk("Your guild is not currently on strategy time on this channel. Check again if your guild is currently planning a Guild Quest or, if so, the channel they are allotted on.")
+                     cm.sendOk(I18nMessage.from("9040000_NOT_CURRENTLY"))
+
                   } else {
                      if (cm.isLeader()) {
                         em.getEligibleParty(cm.getParty().orElseThrow())
@@ -91,7 +98,8 @@ class NPC9040000 {
                      }
                   }
                } else {
-                  cm.sendOk("You can't participate in the guild quest if you don't pertain on a guild yourself!")
+                  cm.sendOk(I18nMessage.from("9040000_NEED_TO_BE_IN_GUILD"))
+
                }
 
                cm.dispose()
@@ -111,11 +119,14 @@ class NPC9040000 {
             if (sel == 0) {
                byte entry = em.addGuildToQueue(cm.getPlayer().getGuildId(), cm.getPlayer().getId())
                if (entry > 0) {
-                  cm.sendOk("Your guild has been registered successfully. A message will pop on your chat keeping your guild aware about the registration status.\r\n\r\nNow, #rimportant#k: as the leader of this instance, #ryou must already be present on this channel#k the right moment your guild is called for the strategy time. #bThe missubmission of this action will void#k your guild registration as a whole, and the next guild will be called immediately. Must be noted also that if you, leader of this instance, become absent from the end of the strategy time to any point on the duration of the instance, it will render the mission interrupted, and your guild will be moved out instantly, moving again the queue.")
+                  cm.sendOk(I18nMessage.from("9040000_REGISTERED_SUCCESSFULLY"))
+
                } else if (entry == ((byte) 0)) {
-                  cm.sendOk("The queue on this channel is already full. Please be patient and try again after a while, or try on another channel.")
+                  cm.sendOk(I18nMessage.from("9040000_QUEUE_FULL"))
+
                } else {
-                  cm.sendOk("Your guild is already queued on a channel. Please wait for your guild's turn.")
+                  cm.sendOk(I18nMessage.from("9040000_ALREADY_QUEUED"))
+
                }
             }
 

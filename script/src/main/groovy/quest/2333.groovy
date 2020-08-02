@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -19,9 +20,9 @@ class Quest2333 {
 
 
       if (status == 0) {
-         qm.sendAcceptDecline("Please help me!")
+         qm.sendAcceptDecline(I18nMessage.from("2333_PLEASE_HELP_ME"))
       } else if (status == 1) {
-         qm.sendNext("The #bPrime Minister#k is the one who plotted all this! Oh no! Here he comes...")
+         qm.sendNext(I18nMessage.from("2333_HERE_HE_COMES"))
       } else if (status == 2) {
          qm.forceStartQuest()
          qm.dispose()
@@ -40,7 +41,7 @@ class Quest2333 {
 
 
       if (status == 0) {
-         qm.sendNext("Hurray! #b#h ##k you defeated the #bPrime Minister#k.")
+         qm.sendNext(I18nMessage.from("2333_HURRAY"))
       } else if (status == 1) {
          qm.gainExp(15000)
          qm.forceCompleteQuest()

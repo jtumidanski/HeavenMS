@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -37,12 +38,12 @@ class NPC1040000 {
             if(cm.isQuestStarted(28177) && !cm.haveItem(4032479)) {
                if(cm.canHold(4032479)) {
                   cm.gainItem(4032479, (short) 1)
-                  cm.sendOk("Huh, are you looking for me? Chief Stan sent you here, right? But hey, I am not the suspect you seek. If I have some proof? Here, take this and return it to #b#p1012003##k.")
+                  cm.sendOk(I18nMessage.from("1040000_NOT_THE_SUSPECT_YOU_SEEK"))
                } else {
-                  cm.sendOk("Hey, make a slot available before talking to me.")
+                  cm.sendOk(I18nMessage.from("1040000_MAKE_A_SLOT_AVAILABLE"))
                }
             } else {
-               cm.sendOk("Zzzzzz...")
+               cm.sendOk(I18nMessage.from("1040000_ZZZZ"))
             }
 
             cm.dispose()

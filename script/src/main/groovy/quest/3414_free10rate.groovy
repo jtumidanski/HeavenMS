@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.MapleJob
 import client.inventory.Item
@@ -24,7 +25,7 @@ class Quest3414_free10rate {
       status++
 
       if (status == 0) {
-         qm.sendNext("Whoa... this is it!!! With this sample, the studies that are taking place in Omega Sector will be reinvigorated with results! I am also at a loss for words for finding someone that is more talented than me at hunting. I'll have to get back on track! Anyway, for your job well done, I'll have to reward you accordingly.")
+         qm.sendNext(I18nMessage.from("3414_free10rate_WHOA"))
       } else if (status == 1) {
          String talkStr = "Here, please select the scroll of your choice. All success rates are at 10%. \r\n\r\n#rSELECT A ITEM\r\n#b"
          stance = qm.getPlayer().getJobStyle()

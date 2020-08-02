@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Spiruna
@@ -17,9 +18,9 @@ class NPC2032001 {
 
    def start() {
       if (cm.isQuestCompleted(3034)) {
-         cm.sendYesNo("You've been so much of a help to me... If you have any Dark Crystal Ore, I can refine it for you for only #b500000 meso#k each.")
+         cm.sendYesNo(I18nMessage.from("2032001_CAN_REFINE_DARK_CRYSTAL"))
       } else {
-         cm.sendOk("Go away, I'm trying to meditate.")
+         cm.sendOk(I18nMessage.from("2032001_GO_AWAY"))
          cm.dispose()
       }
    }
@@ -36,23 +37,23 @@ class NPC2032001 {
          boolean complete = true
 
          if (cm.getMeso() < 500000 * selection) {
-            cm.sendOk("I'm sorry, but I am NOT doing this for free.")
+            cm.sendOk(I18nMessage.from("2032001_NOT_FOR_FREE"))
             cm.dispose()
             return
          } else if (!cm.haveItem(4004004, 10 * selection)) {
             complete = false
          } else if (!cm.canHold(4005004, selection)) {
-            cm.sendOk("Are you having trouble with no empty slots on your inventory? Sort that out first!")
+            cm.sendOk(I18nMessage.from("2032001_NEED_EMPTY_SLOTS"))
             cm.dispose()
             return
          }
          if (!complete) {
-            cm.sendOk("I need that ore to refine the Crystal. No exceptions..")
+            cm.sendOk(I18nMessage.from("2032001_NEED_ORE"))
          } else {
             cm.gainItem(4004004, (short) (-10 * selection))
             cm.gainMeso(-500000 * selection)
             cm.gainItem(4005004, (short) selection)
-            cm.sendOk("Use it wisely.")
+            cm.sendOk(I18nMessage.from("2032001_SUCCESS"))
          }
          cm.dispose()
       }

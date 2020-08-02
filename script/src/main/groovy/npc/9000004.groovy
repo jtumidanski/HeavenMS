@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import net.server.world.MaplePartyCharacter
@@ -45,12 +46,12 @@ class NPC9000004 {
             preamble = eim.getProperty("leader" + nthText + "preamble")
             mobCount = eim.getProperty("leader" + nthText + "mobcount")
             if (preamble == null) {
-               cm.sendOk("Hi. Welcome to the " + nthText + " stage. This is where you fight the #bboss#k. Shall we get started?")
+               cm.sendOk(I18nMessage.from("9000004_SHALL_WE_GET_STARTED").with(nthText))
                status = 9
             } else {
                if (!isLeader()) {
                   if (mobCount == null) {
-                     cm.sendOk("Please tell your #bParty-Leader#k to come talk to me")
+                     cm.sendOk(I18nMessage.from("9000004_PARTY_LEADER_MUST_TALK"))
                      cm.dispose()
                   } else {
                      cm.warp(109020001, 0)
@@ -58,19 +59,19 @@ class NPC9000004 {
                   }
                }
                if (mobCount == null) {
-                  cm.sendYesNo("You're finished?!")
+                  cm.sendYesNo(I18nMessage.from("9000004_FINISHED"))
                }
             }
          } else if (status == 1) {
             //if (cm.mobCount(600010000)==0) {
             if (cm.countMonster() == 0) {
-               cm.sendOk("Good job! You've killed 'em!")
+               cm.sendOk(I18nMessage.from("9000004_GOOD_JOB"))
             } else {
-               cm.sendOk("What are you talking about? Kill those creatures!!")
+               cm.sendOk(I18nMessage.from("9000004_KILL_THOSE_CREATURES"))
                cm.dispose()
             }
          } else if (status == 2) {
-            cm.sendOk("You may continue to the next stage!")
+            cm.sendOk(I18nMessage.from("9000004_YOU_MAY_CONTINUE"))
          } else if (status == 3) {
             cm.getMap().clearMapObjects()
             eim.setProperty("leader" + nthText + "mobcount", "done")

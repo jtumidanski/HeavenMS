@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9201106 {
          }
 
          if (status == 0) {
-            cm.sendOk("I came from far-away places looking for people powerful enough to join my expedition against the evil that lays waste on this land. Are you, by any chance, one of those people?")
+            cm.sendOk(I18nMessage.from("9201106_FROM_FAR_AWAY"))
             cm.dispose()
          }
       }

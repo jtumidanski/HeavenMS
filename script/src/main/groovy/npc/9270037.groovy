@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -23,7 +24,7 @@ class NPC9270037 {
 
 
    def start() {
-      cm.sendSimple("Hi, I'm the assistant here. Dont worry, I'm plenty good enough for this. If you have #b#t5150032##k or #b#t5151027##k by any chance, then allow me to take care of the rest?\r\n#L1#Haircut: #i5150032##t5150032##l\r\n#L2#Dye your hair: #i5151027##t5151027##l")
+      cm.sendSimple(I18nMessage.from("9270037_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -45,7 +46,7 @@ class NPC9270037 {
                }
             }
 
-            cm.sendYesNo("If you use the REG coupon your hair will change RANDOMLY with a chance to obtain a new experimental style that I came up with. Are you going to use #b#t5150032##k and really change your hairstyle?")
+            cm.sendYesNo(I18nMessage.from("9270037_REG_CONFIRM"))
          } else if (selection == 2) {
             beauty = 2
             hairColor = []
@@ -53,24 +54,24 @@ class NPC9270037 {
             for (int i = 0; i < 8; i++) {
                hairColor = ScriptUtils.pushItemIfTrue(hairColor, current + i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
             }
-            cm.sendYesNo("If you use the REG coupon your hair will change RANDOMLY. Do you still want to use #b#t5151027##k and change it up?")
+            cm.sendYesNo(I18nMessage.from("9270037_REG_CONFIRM_2"))
          } else if (status == 2) {
             if (beauty == 1) {
                if (cm.haveItem(5150032)) {
                   cm.gainItem(5150032, (short) -1)
                   cm.setHair(hairNew[Math.floor(Math.random() * hairNew.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("9270037_ENJOY_NEW_STYLE"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't give you a haircut without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("9270037_MISSING_STYLE_COUPON"))
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151027)) {
                   cm.gainItem(5151027, (short) -1)
                   cm.setHair(hairColor[Math.floor(Math.random() * hairColor.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("9270037_ENJOY_NEW_COLOR"))
                } else {
-                  cm.sendOk("Hmmm...it looks like you don't have our designated coupon...I'm afraid I can't dye your hair without it. I'm sorry...")
+                  cm.sendOk(I18nMessage.from("9270037_MISSING_COLOR_COUPON"))
                }
             }
             cm.dispose()

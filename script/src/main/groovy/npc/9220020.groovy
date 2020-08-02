@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -36,14 +37,14 @@ class NPC9220020 {
 
          if (status == 0) {
             if (!cm.isEventLeader()) {
-               cm.sendNext("Please let your party leader talk to me for further instructions to proceed to the next stage.")
+               cm.sendNext(I18nMessage.from("9220020_PARTY_LEADER_MUST_TALK"))
                cm.dispose()
                return
             }
 
             EventInstanceManager eim = cm.getEventInstance()
             if (eim.getIntProperty("statusStg1") == 1) {
-               cm.sendNext("Go through this tunnel for the boss battle.")
+               cm.sendNext(I18nMessage.from("9220020_BOSS_BATTLE"))
             } else {
                if (cm.haveItem(4032118, 15)) {
                   cm.gainItem(4032118, (short) -15)
@@ -52,9 +53,9 @@ class NPC9220020 {
                   eim.showClearEffect()
                   eim.giveEventPlayersStageReward(1)
 
-                  cm.sendNext("You got the letters, great! Now, you can proceed to the room MV is through this tunnel. Be prepared!")
+                  cm.sendNext(I18nMessage.from("9220020_BE_PREPARED"))
                } else {
-                  cm.sendNext("Please hand me #r15 secret letters#k.")
+                  cm.sendNext(I18nMessage.from("9220020_HAND_ME"))
                }
             }
 

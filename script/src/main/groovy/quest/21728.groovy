@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -28,9 +29,9 @@ class Quest21728 {
 
          if (status == 0) {
             if (qm.getQuestProgress(21728, 0) == 0) {
-               qm.sendNext("You haven't found the #rPuppeteer's cave#k yet, did you?")
+               qm.sendNext(I18nMessage.from("21728_HAVE_NOT_FOUND_IT_YET"))
             } else {
-               qm.sendNext("Hm, so the entrance is blocked by a powerful force? I see, gimme a time to think now...")
+               qm.sendNext(I18nMessage.from("21728_ENTRANCE_IS_BLOCKED"))
                qm.gainExp(200)
                qm.forceCompleteQuest()
             }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -27,7 +28,7 @@ class NPC2101013 {
          cm.dispose()
       } else {
          if (mode == 0) {
-            cm.sendNext("Aye...are you scared of speed or heights? You can't trust my flying skills? Trust me, I've worked out all the kinks!")
+            cm.sendNext(I18nMessage.from("2101013_SCARED_OF_SPEED_OR_HEIGHTS"))
             cm.dispose()
             return
          }
@@ -37,17 +38,17 @@ class NPC2101013 {
             status--
          }
          if (status == 0) {
-            cm.sendNext("I don't know how you found out about this, but you came to the right place! For those that wandered around Nihal Desert and are getting homesick, I am offering a flight straight to Victoria Island, non-stop! Don't worry about the flying ship--it's only fallen once or twice! Don't you feel claustrophobic being in a long flight on that small ship?")
+            cm.sendNext(I18nMessage.from("2101013_YOU_CAME_TO_THE_RIGHT_PLACE"))
          } else if (status == 1) {
-            cm.sendYesNo("Please remember two things. One, this line is actually for overseas shipping, so #rI cannot guarantee exactly which town you'll land#k. Two, since I am putting you in this special flight, it'll be a bit expensive. The service charge is #e#b10,000 mesos#n#k. There's a flight that is about to take off. Are you interested in this direct flight?")
+            cm.sendYesNo(I18nMessage.from("2101013_PLEASE_REMEMBER"))
          } else if (status == 2) {
-            cm.sendNext("Okay, ready to takeoff~")
+            cm.sendNext(I18nMessage.from("2101013_READY_TO_TAKEOFF"))
          } else if (status == 3) {
             if (cm.getMeso() >= 10000) {
                cm.gainMeso(-10000)
                cm.warp(towns[Math.floor(Math.random() * towns.length).intValue()])
             } else {
-               cm.sendNextPrev("Hey, are you short on cash? I told you you'll need #b10,000#k mesos to get on this.")
+               cm.sendNextPrev(I18nMessage.from("2101013_SHORT_ON_CASH"))
                cm.dispose()
             }
          }

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -30,7 +31,7 @@ class NPC1100008 {
             cm.dispose()
             return
          } else if (mode == 0) {
-            cm.sendNext("OK. If you ever change your mind, please let me know.")
+            cm.sendNext(I18nMessage.from("1100008_LET_ME_KNOW"))
             cm.dispose()
             return
          }
@@ -44,7 +45,7 @@ class NPC1100008 {
 
          } else if (status == 1) {
             if (cm.getMeso() < 1000) {
-               cm.sendNext("Hmm... Are you sure you have #b1000#k Mesos? Check your Inventory and make sure you have enough. You must pay the fee or I can't let you get on...")
+               cm.sendNext(I18nMessage.from("1100008_NOT_ENOUGH_MESOS"))
                cm.dispose()
             } else {
                cm.gainMeso(-1000)

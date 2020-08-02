@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,9 +18,9 @@ class NPC9201022 {
 
    def start() {
       if (cm.getPlayer().getMapId() == 100000000) {
-         cm.sendYesNo("I can take you to the Amoria Village. Are you ready to go?")
+         cm.sendYesNo(I18nMessage.from("9201022_CAN_I_TAKE_YOU"))
       } else {
-         cm.sendYesNo("I can take you back to Henesys. Are you ready to go?")
+         cm.sendYesNo(I18nMessage.from("9201022_BACK_HOME"))
       }
    }
 
@@ -27,13 +28,13 @@ class NPC9201022 {
       status++
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendOk("Ok, feel free to hang around until you're ready to go!")
+            cm.sendOk(I18nMessage.from("9201022_FEEL_FREE_TO_HANG"))
          }
          cm.dispose()
          return
       }
       if (status == 0) {
-         cm.sendNext("I hope you had a great time! See you around!")
+         cm.sendNext(I18nMessage.from("9201022_I_HOPE_YOU_HAD_A_GREAT_TIME"))
       } else if (status == 1) {
          if (cm.getPlayer().getMapId() == 100000000) {
             cm.warp(680000000, 0)

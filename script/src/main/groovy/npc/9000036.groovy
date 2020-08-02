@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
@@ -27,7 +28,7 @@ class NPC9000036 {
 
    def start() {
       if (!YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
-         cm.sendOk("Hi, I'm #b#p" + cm.getNpc() + "##k.")
+         cm.sendOk(I18nMessage.from("9000036_HELLO").with(cm.getNpc()))
          cm.dispose()
          return
       }
@@ -176,7 +177,7 @@ class NPC9000036 {
          cm.sendYesNo(prompt)
       } else if (status == 2) {
          if (cm.getMeso() < (cost * qty)) {
-            cm.sendOk("This is the fee I charge to make my items! No credit.")
+            cm.sendOk(I18nMessage.from("9000036_FEE"))
          } else {
             boolean complete = true
 
@@ -187,7 +188,7 @@ class NPC9000036 {
             }
 
             if (!complete) {
-               cm.sendOk("Are you sure you got all the items required? Double check it!")
+               cm.sendOk(I18nMessage.from("9000036_ARE_YOU_SURE"))
             } else {
                if (cm.canHold(item, qty)) {
                   for (int i = 0; i < mats.length; i++) {
@@ -197,9 +198,9 @@ class NPC9000036 {
                   cm.gainMeso(-(cost * qty))
 
                   cm.gainItem(item, (short) qty)
-                  cm.sendOk("The item is done! Take and try this piece of art yourself.")
+                  cm.sendOk(I18nMessage.from("9000036_ITEM_IS_DONE"))
                } else {
-                  cm.sendOk("You got no free slot on your inventory.")
+                  cm.sendOk(I18nMessage.from("9000036_NO_FREE_SPACE"))
                }
             }
          }

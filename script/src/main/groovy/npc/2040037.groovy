@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -45,27 +46,27 @@ class NPC2040037 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
-            cm.sendNext("Hurry, goto the next stage, the portal is open!")
+            cm.sendNext(I18nMessage.from("2040037_GO_TO_NEXT_STAGE"))
          } else {
             if (eim.isEventLeader(cm.getPlayer())) {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
-                  cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k. Collect 15 #t4001022#'s scattered across the map, then talk to me.")
+                  cm.sendOk(I18nMessage.from("2040037_WELCOME").with(stage))
                   eim.setProperty("statusStg" + stage, 0)
                } else {       // check stage completion
                   if (cm.haveItem(4001022, 15)) {
-                     cm.sendOk("Good job! You have collected all 15 #b#t4001022#'s.#k")
+                     cm.sendOk(I18nMessage.from("2040037_GOOD_JOB"))
                      cm.gainItem(4001022, (short) -15)
 
                      eim.setProperty("statusStg" + stage, 1)
                      clearStage(stage, eim, curMap)
                   } else {
-                     cm.sendNext("Sorry you don't have all 15 #b#t4001022#'s.#k")
+                     cm.sendNext(I18nMessage.from("2040037_SORRY"))
                   }
                }
             } else {
-               cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+               cm.sendNext(I18nMessage.from("2040037_PARTY_LEADER_MUST_TALK"))
             }
          }
 

@@ -3,6 +3,7 @@ package npc
 import net.server.world.MapleParty
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Blocked Entrance
@@ -42,7 +43,7 @@ class NPC1300013 {
          }
 
          if (status == 0) {
-            cm.sendSimple("#L0#Enter to fight #bKing Pepe#k and #bYeti Brothers#k.#l\r\n#L1#Enter to fight #bPrime Minister#k.#l")
+            cm.sendSimple(I18nMessage.from("1300013_MUSHROOM_KINGDOM_BOSS_FIGHTS"))
          } else if (status == 1) {
             if (selection == 0) {
                EventManager pepe = cm.getEventManager("KingPepeAndYetis")
@@ -55,11 +56,11 @@ class NPC1300013 {
                Optional<MapleParty> party = cm.getPlayer().getParty()
                if (party.isPresent()) {
                   if (!em.startInstance(party.get(), cm.getMap(), 1)) {
-                     cm.sendOk("Another party is already challenging the boss in this channel.")
+                     cm.sendOk(I18nMessage.from("1300013_ANOTHER_PARTY_IS_CHALLENGING"))
                   }
                } else {
                   if (!em.startInstance(cm.getPlayer())) {
-                     cm.sendOk("Another party is already challenging the boss in this channel.")
+                     cm.sendOk(I18nMessage.from("1300013_ANOTHER_PARTY_IS_CHALLENGING"))
                   }
                }
 
@@ -75,7 +76,7 @@ class NPC1300013 {
          }
 
          if (status == 0) {
-            cm.sendSimple("#L1#Enter to fight #bKing Pepe#k and #bYeti Brothers#k.#l")
+            cm.sendSimple(I18nMessage.from("1300013_FIGHT_PEPE_OR_YETI"))
          } else if (status == 1) {
             if (selection == 1) {
                EventManager pepe = cm.getEventManager("KingPepeAndYetis")

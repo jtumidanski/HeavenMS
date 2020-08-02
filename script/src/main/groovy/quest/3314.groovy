@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import client.MapleBuffStat
 import client.MapleCharacter
@@ -34,7 +35,7 @@ class Quest3314 {
          if (status == 0) {
             if (isPillUsed(qm.getPlayer())) {
                if (qm.canHoldAll([2050004, 2022224], [10, 20])) {
-                  qm.sendNext("You did took my experiments. Hmm, so THAT is the result of it, hehehehe... Ok, take that as compensation will you? And oh, you can #rspew that#k right away (#bright-click on the pill icon at the top-right corner of the screen#k), no worries.")
+                  qm.sendNext(I18nMessage.from("3314_THAT_IS_THE_RESULT"))
 
                   qm.gainExp(12500)
                   qm.gainItem(2050004, (short) 10)
@@ -44,10 +45,10 @@ class Quest3314 {
 
                   qm.forceCompleteQuest()
                } else {
-                  qm.sendNext("Huh, your inventory is full. Free some spaces on your USE first.")
+                  qm.sendNext(I18nMessage.from("3314_USE_SPACE_NEEDED"))
                }
             } else {
-               qm.sendNext("You seem pretty normal, don't you? I can't detect any possible effect from my experiment on you. Go take the pill I asked you to take and show me the effects, will you?")
+               qm.sendNext(I18nMessage.from("3314_TAKE_THE_PILL"))
             }
          } else if (status == 1) {
             qm.dispose()

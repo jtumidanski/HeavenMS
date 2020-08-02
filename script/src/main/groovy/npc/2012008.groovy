@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -19,7 +20,7 @@ class NPC2012008 {
    int[] skin = [0, 1, 2, 3, 4]
 
    def start() {
-      cm.sendSimple("Well, hello! Welcome to the Orbis Skin-Care~! Would you like to have a firm, tight, healthy looking skin like mine?  With #b#t5153001##k, you can let us take care of the rest and have the kind of skin you've always wanted~!\r\n#L2#Skin Care: #i5153001##t5153001##l")
+      cm.sendSimple(I18nMessage.from("2012008_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -40,9 +41,9 @@ class NPC2012008 {
             if (cm.haveItem(5153001)) {
                cm.gainItem(5153001, (short) -1)
                cm.setSkin(selection + 1)
-               cm.sendOk("Enjoy your new and improved skin!")
+               cm.sendOk(I18nMessage.from("2012008_ENJOY_NEW_SKIN"))
             } else {
-               cm.sendOk("Um...you don't have the skin-care coupon you need to receive the treatment. Sorry, but I am afraid we can't do it for you...")
+               cm.sendOk(I18nMessage.from("2012008_MISSING_SKIN_COUPON"))
             }
          }
       }

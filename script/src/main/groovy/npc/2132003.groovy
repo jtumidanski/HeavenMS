@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -20,7 +21,7 @@ class NPC2132003 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendNext("Being young doesn't mean I'm any different from those guys. I'll show them!")
+      cm.sendNext(I18nMessage.from("2132003_BEING_YOUNG_DOES_NOT_MEAN"))
       cm.dispose()
    }
 }

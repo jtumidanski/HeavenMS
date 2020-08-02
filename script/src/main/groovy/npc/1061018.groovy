@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -36,11 +37,11 @@ class NPC1061018 {
 
          if (status == 0) {
             if (cm.getEventInstance().isEventCleared()) {
-               cm.sendOk("Wow! You defeated the balrog.")
+               cm.sendOk(I18nMessage.from("1061018_DEFEATED_BALROG"))
             } else if (cm.getPlayer().getMap().getCharacters().size() > 1) {
-               cm.sendYesNo("Are you really going to leave this battle and leave your fellow travelers to die?")
+               cm.sendYesNo(I18nMessage.from("1061018_REALLY_GOING_TO_LEAVE"))
             } else {
-               cm.sendYesNo("If you're a coward, you will leave.")
+               cm.sendYesNo(I18nMessage.from("1061018_YOU_ARE_A_COWARD"))
             }
          } else if (status == 1) {
             if (cm.getEventInstance().isEventCleared()) {

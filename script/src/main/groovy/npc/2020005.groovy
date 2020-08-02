@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -28,12 +29,12 @@ class NPC2020005 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (!cm.isQuestCompleted(3035)) {
-         cm.sendNext("If you decide to help me out, then in return, I'll make the item available for sale.")
+         cm.sendNext(I18nMessage.from("2020005_HELP_ME_OUT"))
          cm.dispose()
          return
       }
       if (mode == 0 && status == 2) {
-         cm.sendNext("I see. Understand that I have many different items here. Take a look around. I'm only selling these items to you, so I won't be ripping you off in any way shape or form.")
+         cm.sendNext(I18nMessage.from("2020005_TAKE_A_LOOK_AROUND"))
          cm.dispose()
          return
       }
@@ -56,16 +57,16 @@ class NPC2020005 {
          amount = selection
          totalCost = cost[selected] * amount
          if (amount == 0) {
-            cm.sendOk("If you're not going to buy anything, then I've got nothing to sell neither.")
+            cm.sendOk(I18nMessage.from("2020005_IF_YOU_DO_NOT_BUY_I_CANNOT_SELL"))
             cm.dispose()
          }
-         cm.sendYesNo("Are you sure you want to buy #r" + amount + " #t" + item[selected] + "(s)##k? It'll cost you " + cost[selected] + " mesos per #t" + item[selected] + "#, which will cost you #r" + totalCost + " mesos#k in total.")
+         cm.sendYesNo(I18nMessage.from("2020005_ARE_YOU_SURE").with(amount, item[selected], cost[selected], item[selected], totalCost))
       } else if (status == 3) {
          if (cm.getMeso() < totalCost || !cm.canHold(item[selected])) {
-            cm.sendNext("Are you sure you have enough mesos? Please check and see if your etc. or use inventory is full, or if you have at least #r" + totalCost + "#k mesos.")
+            cm.sendNext(I18nMessage.from("2020005_NOT_ENOUGH_MESOS").with(totalCost))
             cm.dispose()
          }
-         cm.sendNext("Thank you. If you ever find yourself needing items down the road, make sure to drop by here. I may have gotten old over the years, but I can still make magic items with ease.")
+         cm.sendNext(I18nMessage.from("2020005_THANK_YOU"))
          cm.gainMeso(-totalCost)
          cm.gainItem(item[selected], (short) amount)
          cm.dispose()

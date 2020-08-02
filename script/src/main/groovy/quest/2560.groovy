@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,14 +18,14 @@ class Quest2560 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("Ooook! Ook! Ook!")
+         qm.sendNext(I18nMessage.from("2560_OOK_OOK"))
       } else if (status == 1) {
          qm.sendNextPrev("Well, that hit the spot, but... I still don't understand what happened. Where's the ship? Hey, do you know what happened to me?", (byte) 2)
       } else if (status == 2) {
-         qm.sendAcceptDecline("Oook! (The monkey nods. Does he really know what's going on? Couldn't hurt to ask.)")
+         qm.sendAcceptDecline(I18nMessage.from("2560_COULD_NOT_HURT_TO_ASK"))
       } else if (status == 3) {
          if (mode == 0) {//decline
-            qm.sendNext("Ook! Ook! (The monkey looks very dissatisfied.)")
+            qm.sendNext(I18nMessage.from("2560_DISSATISFIED"))
          } else {
             qm.forceStartQuest()
             qm.dispose()

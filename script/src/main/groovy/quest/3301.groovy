@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -32,17 +33,17 @@ class Quest3301 {
             if (oreArray.length > 0) {
                qm.sendSimple("Oh, looks like someone's ready to make a deal. You want to join Zenumist so badly, huh? I really don't understand you, but that's just fine. What will you give me in return?\r\n" + getOreString(oreArray))
             } else {
-               qm.sendOk("What is this, you don't have the #rjewel ores#k with you. No ore, no deal.")
+               qm.sendOk(I18nMessage.from("3301_NO_ORE_NO_DEAL"))
                qm.dispose()
             }
          } else if (status == 1) {
             if (!qm.haveItem(oreArray[selection], 2)) {
-               qm.sendNext("What's this, you haven't got the #rjewel ores#k. No ores no deal!")
+               qm.sendNext(I18nMessage.from("3301_NO_ORE_NO_DEAL_2"))
                qm.dispose()
                return
             }
             qm.gainItem(oreArray[selection], (short) -2) // Take 2 ores
-            qm.sendNext("Then wait for awhile. I'll go and get the stuff to help you pass the test of Chief Zenumist.")
+            qm.sendNext(I18nMessage.from("3301_WAIT_FOR_A_WHILE"))
             qm.forceCompleteQuest()
          } else if (status == 2) {
             qm.dispose()

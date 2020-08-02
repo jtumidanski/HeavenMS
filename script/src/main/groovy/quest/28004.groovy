@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -29,9 +30,9 @@ class Quest28004 {
                return
             }
 
-            qm.sendNext("Okay... so here's our plan to defeat Scrooge and his dastardly plans. The Force of the Spirit I gave you is an item packed with mana. It's an item you'll definitely use at the map I am about to send you. In order to do that, you'll have to bring your party members with you as well. You should bring your party members here or form one right now!")
+            qm.sendNext(I18nMessage.from("28004_HERE_IS_OUR_PLAN"))
          } else if (status == 1) {
-            qm.sendAcceptDecline("Would you like to move forward?")
+            qm.sendAcceptDecline(I18nMessage.from("28004_MOVE_FORWARD"))
          } else if (status == 2) {
             int level = qm.getPlayer().getLevel()
 

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Strange Looking Statue
@@ -35,7 +36,7 @@ class NPC1063016 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("Will you exit this trial?")
+            cm.sendYesNo(I18nMessage.from("1063016_WILL_YOU_EXIT"))
          } else {
             cm.warp(105040201, 2)
             cm.dispose()

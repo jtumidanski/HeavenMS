@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -45,27 +46,27 @@ class NPC2040042 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
-            cm.sendNext("Hurry, goto the next stage, the portal is open!")
+            cm.sendNext(I18nMessage.from("2040042_GO_TO_NEXT_STAGE"))
          } else {
             if (eim.isEventLeader(cm.getPlayer())) {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
-                  cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k. You need ranged personnel here. They must kill the three Ratz, which will trigger something. What's next is for you to find out! Get me 3 passes!")
+                  cm.sendOk(I18nMessage.from("2040042_WELCOME").with(stage))
                   eim.setProperty("statusStg" + stage, 0)
                } else if (state == 0) {       // check stage completion
                   if (cm.haveItem(4001022, 3)) {
-                     cm.sendOk("Good job! You have collected all 3 #b#t4001022#'s.#k")
+                     cm.sendOk(I18nMessage.from("2040042_GOOD_JOB"))
                      cm.gainItem(4001022, (short) -3)
 
                      eim.setProperty("statusStg" + stage, 1)
                      clearStage(stage, eim, curMap)
                   } else {
-                     cm.sendNext("Sorry you don't have all 3 #b#t4001022#'s.#k")
+                     cm.sendNext(I18nMessage.from("2040042_SORRY"))
                   }
                }
             } else {
-               cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+               cm.sendNext(I18nMessage.from("2040042_PARTY_LEADER_MUST_TALK"))
             }
          }
 

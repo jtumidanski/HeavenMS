@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20000 {
    QuestActionManager qm
@@ -17,11 +18,11 @@ class Quest20000 {
             status--
          }
          if (status == 0) {
-            qm.sendNext("Ah, you've come... this is exhilarating. I am grateful for your decision to become a Cygnus Knight. I have been waiting a long time for someone like you. Someone that is courageous enough to face the Black Magician and not flinch...")
+            qm.sendNext(I18nMessage.from("20000_THIS_IS_EXHILARATING"))
          } else if (status == 1) {
-            qm.sendNext("The battle against the evil nature of the Black Magician who wants to swallow up Maple World as a whole, the cunning nature of his disciples, and the physical battle against the crazy monsters will await you. There will also come a time where even you may turn against yourself into an enemy and torment you ...")
+            qm.sendNext(I18nMessage.from("20000_BATTLE_AGAINST_EVIL"))
          } else if (status == 2) {
-            qm.sendOk("But I won't worry about that. I am confident that you will be able to fight through all that and protect Maple World from the Black Magician. Of course, you'll have to become a bit stronger than you are right now, right?")
+            qm.sendOk(I18nMessage.from("20000_I_AM_CONFIDENT"))
          } else if (status == 3) {
             qm.gainItem(1142065, (short) 1) // Noblesse Medal * 1
             qm.gainExp(20) //gain 20 exp!!

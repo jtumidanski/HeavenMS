@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111009 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Definitely Alcadno is excluded.....Huhuhuhu.....Stupid people....cannot see the real important things..")
+      cm.sendOk(I18nMessage.from("2111009_STUPID_PEOPLE"))
       cm.dispose()
    }
 

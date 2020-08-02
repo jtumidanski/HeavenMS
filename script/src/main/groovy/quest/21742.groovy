@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -35,7 +36,7 @@ class Quest21742 {
          } else if (status == 5) {
             qm.sendNextPrev("So did you deliver the Hanging Scroll to him?", (byte) 3)
          } else if (status == 6) {
-            qm.sendAcceptDecline("Well, the thing is... There is a slight problem, care to listen?")
+            qm.sendAcceptDecline(I18nMessage.from("21742_SLIGHT_PROBLEM"))
          } else if (status == 7) {
             qm.sendNext("So what happened was... I was making a new type of medicine, so I filled a pot with water and started boiling some herbs. That's when I made the mistake of... dropping the Hanging Scroll, right into the pot. Oh gosh, I pulled it out as fast as I could, but the Hanging Scroll, was already soaked and the writing on it had already disappeared.", (byte) 9)
          } else if (status == 8) {
@@ -73,7 +74,7 @@ class Quest21742 {
          }
 
          if (status == 0) {
-            qm.sendNext("Oh, you brought the ink. Now let me pour it, cautiously.... Almost there, almost. ... ..... Kyaaa! Th-the letter. It says: 'I'll be there to take your Seal Rock of Mu Lung.'")
+            qm.sendNext(I18nMessage.from("21742_LET_ME_POUR_IT"))
          } else if (status == 1) {
             qm.gainItem(4032342, (short) -8)
             qm.gainItem(4220151, (short) -1)

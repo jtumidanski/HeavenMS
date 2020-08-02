@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,15 +18,15 @@ class NPC9201021 {
 
    def start() {
       if (cm.getMapId() != 680000401) {
-         cm.sendSimple("Hello, where would you like to go?\r\n#b" + ((cm.getMapId() != 680000400) ? "#L0#Untamed Hearts Hunting Ground#l\r\n" : "") + ((cm.getMapId() == 680000400) ? "#L1#I have 7 keys. Bring me to smash boxes#l\r\n" : "") + "#L2#Please warp me out.#l#k")
+         cm.sendSimple(I18nMessage.from("9201021_HELLO"))
       } else {
-         cm.sendSimple("Hello, do you want to go back now? Returning here again will cost you #rother 7 keys#k.\r\n#b#L2#Please warp me back to the training grounds.#l#k")
+         cm.sendSimple(I18nMessage.from("9201021_HELLO_RETURN"))
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode < 1) {
-         cm.sendOk("Goodbye then.")
+         cm.sendOk(I18nMessage.from("9201021_GOOD_BYE"))
          cm.dispose()
          return
       }
@@ -37,7 +38,7 @@ class NPC9201021 {
       if (status == 1) {
          if (selection < 1) {
             if (!cm.haveItem(4000313, 1)) {
-               cm.sendOk("It seems like you lost your #b#t4000313##k. I'm sorry, but I can't let you proceed to the hunting grounds without that.")
+               cm.sendOk(I18nMessage.from("9201021_SEEMS_LIKE_YOU_LOST"))
                cm.dispose()
                return
             }
@@ -48,12 +49,12 @@ class NPC9201021 {
                cm.gainItem(4031217, (short) -7)
                cm.warp(680000401, 0)
             } else {
-               cm.sendOk("It seems like you don't have 7 Keys. Kill the cakes and candles in the Untamed Heart Hunting Ground to get keys.")
+               cm.sendOk(I18nMessage.from("9201021_MISSING_THE_7_KEYS"))
             }
          } else if (selection > 1) {
             if (cm.getMapId() != 680000401) {
                cm.warp(680000500, 0)
-               cm.sendOk("Goodbye. I hope you enjoyed the wedding!")
+               cm.sendOk(I18nMessage.from("9201021_GOOD_BYE"))
             } else {
                cm.warp(680000400, 0)
             }

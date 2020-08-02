@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -20,18 +21,18 @@ class Quest3360 {
          if (mode == 1) {
             status++
          } else {
-            qm.sendNext("Come on, hurry up. Get your pen and paper out if you're not that smart!")
+            qm.sendNext(I18nMessage.from("3360_COME_ON"))
             qm.dispose()
             return
          }
 
          if (status == 0) {
-            qm.sendNext("Oh! Finally you have come! I'm glad you are here in time. I have the master key for you to open the secret passage! Hahahaha! Isn't it amazing? Say it amazing!")
+            qm.sendNext(I18nMessage.from("3360_FINALLY"))
          } else if (status == 1) {
-            qm.sendAcceptDecline("All right, now, this key is very long and complex. I need you to memorize it very well. I won't say again, so you'd better write it down somewhere. Are you ready?")
+            qm.sendAcceptDecline(I18nMessage.from("3360_ALL_RIGHT"))
          } else if (status == 2) {
             pass = generateString()
-            qm.sendOk("The key code is #b" + pass + "#k. Got that? Put the key into the door of the secret passage, and you will be able to walk around the passage freely.")
+            qm.sendOk(I18nMessage.from("3360_KEY_CODE").with(pass))
          } else if (status == 3) {
             qm.forceStartQuest()
             qm.setQuestProgress(3360, pass)

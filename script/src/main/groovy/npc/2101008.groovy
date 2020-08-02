@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101008 {
    int sel = -1
 
    def start() {
-      cm.sendNext("The King and Queen are so bossy and demanding lately. I only get to see my family every Sunday or whenever they come visit. But like me, they're poor and are in need of mesos... for some reason Tigun doesn't allow the poor to enter.")
+      cm.sendNext(I18nMessage.from("2101008_SO_BOSSY"))
       cm.dispose()
    }
 

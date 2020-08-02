@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 	Ali
@@ -20,7 +21,7 @@ class NPC2030011 {
       cm.removeAll(4001015)
       cm.removeAll(4001016)
       cm.removeAll(4001018)
-      cm.sendOk("See you next time.")
+      cm.sendOk(I18nMessage.from("2030011_SEE_YOU_NEXT_TIME"))
       cm.dispose()
    }
 

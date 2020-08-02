@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC2010008 {
    int sel = -1
 
    def start() {
-      cm.sendSimple("What would you like to do?\r\n#b#L0#Create/Change your Guild Emblem#l#k")
+      cm.sendSimple(I18nMessage.from("2010008_WHAT_WOULD_YOU_LIKE_TO_DO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -28,9 +29,9 @@ class NPC2010008 {
             sel = selection
             if (sel == 0) {
                if (cm.getPlayer().getGuildRank() == 1) {
-                  cm.sendYesNo("Creating or changing Guild Emblem costs #b 5000000 mesos#k, are you sure you want to continue?")
+                  cm.sendYesNo(I18nMessage.from("2010008_EMBLEM_CHANGE_COST"))
                } else {
-                  cm.sendOk("You must be the Guild Leader to change the Emblem. Please tell your leader to speak with me.")
+                  cm.sendOk(I18nMessage.from("2010008_MUST_BE_LEADER_TO_CHANGE_EMBLEM"))
                }
             }
          } else if (status == 2 && sel == 0) {

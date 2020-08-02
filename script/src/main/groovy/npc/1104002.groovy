@@ -50,14 +50,14 @@ class NPC1104002 {
 
          if (status == 0) {
             if (!cm.isQuestStarted(20407)) {
-               cm.sendOk("... Knight, you still #bseem unsure to face this fight#k, don't you? There's no grace in challenging someone when they are still not mentally ready for the battle. Talk your peace to that big clumsy bird of yours, maybe it'll put some guts on you.")
+               cm.sendOk(I18nMessage.from("1104002_NO_CHALLENGING"))
                cm.dispose()
                return
             }
 
-            cm.sendAcceptDecline("Hahahahaha! This place's Empress is already under my domain, that's surely a great advance on the #bBlack Wings#k' overthrow towards Maple World... And you, there? Still wants to face us? Or, better yet, since you seem strong enough to be quite a supplementary reinforcement at our service, #rwill you meet our expectations and fancy joining us#k since there's nothing more you can do?")
+            cm.sendAcceptDecline(I18nMessage.from("1104002_STILL_WANT_TO_FACE_US"))
          } else if (status == 1) {
-            cm.sendOk("Heh, cowards have no place on the #rBlack Magician's#k army. Begone!")
+            cm.sendOk(I18nMessage.from("1104002_COWARDS"))
             cm.dispose()
          }
       }

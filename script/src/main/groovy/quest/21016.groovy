@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,10 +18,10 @@ class Quest21016 {
          status++
       }
       if (status == 0) {
-         qm.sendAcceptDecline("Shall we continue with your Basic Training? Before accepting, please make sure you have properly equipped your sword and your skills and potions are readily accessible.")
+         qm.sendAcceptDecline(I18nMessage.from("21016_CONTINUE_BASIC_TRAINING"))
       } else if (status == 1) {
          if (mode == 0) {
-            qm.sendNext("Are you not ready to hunt the #o0100132#s yet? Always proceed if and only if you are fully ready. There's nothing worse than engaging in battles without sufficient preparation.")
+            qm.sendNext(I18nMessage.from("21016_ONLY_PROCEED_IF_YOU_ARE_READY"))
             qm.dispose()
          } else {
             qm.forceStartQuest()

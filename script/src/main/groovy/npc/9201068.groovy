@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
@@ -27,7 +28,7 @@ class NPC9201068 {
          hasTicket = true
       }
       if (!hasTicket) {
-         cm.sendOk("It seems you don't have a ticket! You can buy one from Bell.")
+         cm.sendOk(I18nMessage.from("9201068_MISSING_TICKET"))
          cm.dispose()
       } else {
          cm.sendSimple(text)
@@ -38,7 +39,7 @@ class NPC9201068 {
       status++
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendNext("You must have some business to take care of here, right?")
+            cm.sendNext(I18nMessage.from("9201068_SOME_BUSINESS_HERE"))
          }
          cm.dispose()
          return
@@ -46,9 +47,9 @@ class NPC9201068 {
       if (status == 0) {
          if (selection == 0) {
             if (em.getProperty("entry") == "true") {
-               cm.sendYesNo("It looks like there's plenty of room for this ride. Please have your ticket ready so I can let you in. The ride will be long, but you'll get to your destination just fine. What do you think? Do you wants to get on this ride?")
+               cm.sendYesNo(I18nMessage.from("9201068_PLENTY_OF_ROOM"))
             } else {
-               cm.sendNext("We will begin boarding 1 minute before the takeoff. Please be patient and wait for a few minutes. Be aware that the subway will take off right on time, and we stop receiving tickets 1 minute before that, so please make sure to be here on time.")
+               cm.sendNext(I18nMessage.from("9201068_BE_PATIENT"))
                cm.dispose()
             }
          }
@@ -59,10 +60,10 @@ class NPC9201068 {
                cm.gainItem(4031713, (short) -1)
                cm.warp(600010002)
             } else {
-               cm.sendNext("We will begin boarding 1 minute before the takeoff. Please be patient and wait for a few minutes. Be aware that the subway will take off right on time, and we stop receiving tickets 1 minute before that, so please make sure to be here on time.")
+               cm.sendNext(I18nMessage.from("9201068_BE_PATIENT"))
             }
          } else {
-            cm.sendNext("Sorry, you need a ticket to enter!")
+            cm.sendNext(I18nMessage.from("9201068_NEED_A_TICKET"))
          }
 
          cm.dispose()

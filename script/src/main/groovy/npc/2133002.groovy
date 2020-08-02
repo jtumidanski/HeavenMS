@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -29,7 +30,7 @@ class NPC2133002 {
          status--
       }
       if (status == 0) {
-         cm.sendYesNo("Would you like to exit this instance? Your party members may have to abandon it as well, so take that in mind.")
+         cm.sendYesNo(I18nMessage.from("2133002_WOULD_YOU_LIKE_TO_EXIT"))
       } else if (status == 1) {
          cm.removeAll(4001163)
          cm.removeAll(4001169)

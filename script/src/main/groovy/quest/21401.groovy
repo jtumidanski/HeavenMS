@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.quest.QuestActionManager
@@ -17,23 +18,23 @@ class Quest21401 {
          status -= 2
       } else if (mode != 1) {
          //if (mode == 0)
-         qm.sendNext("#b(You need to think about this for a second...)#k")
+         qm.sendNext(I18nMessage.from("21401_NEED_TO_THINK_ABOUT_THIS"))
          qm.dispose()
          return
       }
 
       if (status == 0) {
-         qm.sendNext("Why do I look like this, you ask? I don't want to talk about it, but I suppose I can't hide from you since you're my master.")
+         qm.sendNext(I18nMessage.from("21401_WHY_DO_I_LOOK_LIKE_THIS"))
       } else if (status == 1) {
-         qm.sendNextPrev("While you were trapped inside ice for hundreds of years, I, too, was frozen. It was a long time to be away from you. That's when the seed of darkness was planted in my heart.")
+         qm.sendNextPrev(I18nMessage.from("21401_SEED_OF_DARKNESS_PLANTED"))
       } else if (status == 2) {
-         qm.sendNextPrev("But since you awoke, I thought the darkness had gone away. I thought things would return to the way they were. But I was mistaken...")
+         qm.sendNextPrev(I18nMessage.from("21401_I_WAS_MISTAKEN"))
       } else if (status == 3) {
-         qm.sendAcceptDecline("Please, Aran. Please stop me from becoming enraged. Only you can control me. It's getting out of my hands now. Please do whatever it takes to #rstop me from going berserk#k!")
+         qm.sendAcceptDecline(I18nMessage.from("21401_STOP_ME_FROM_BECOMING_ENRAGED"))
       } else if (status == 4) {
          EventManager em = qm.getEventManager("MahaBattle")
          if (!em.startInstance(qm.getPlayer())) {
-            qm.sendOk("There is currently someone in this map, come back later.")
+            qm.sendOk(I18nMessage.from("21401_SOMEONE_CURRENTLY_IN_MAP"))
          } else {
             qm.startQuest()
          }
@@ -48,24 +49,24 @@ class Quest21401 {
          status -= 2
       } else if (mode != 1) {
          //if (mode == 0)
-         qm.sendNext("#b(You need to think about this for a second...)#k")
+         qm.sendNext(I18nMessage.from("21401_NEED_TO_THINK_ABOU_TTHIS"))
          qm.dispose()
          return
       }
 
       if (status == 0) {
-         qm.sendNext("Thank you, Aran. If it weren't for you, I would have become enraged and who knows what could have happened. Thank you, NOT! It's only your duty as my master...")
+         qm.sendNext(I18nMessage.from("21401_ONLY_YOUR_DUTY"))
       } else if (status == 1) {
-         qm.sendYesNo("Anyway, I just noticed how high of a level you've reached. If you were able to control me in my state of rage, I think you're ready to handle more abilities.")
+         qm.sendYesNo(I18nMessage.from("21401_READY_TO_HANDLE_MORE"))
       } else if (status == 2) {
          if (!qm.isQuestCompleted(21401)) {
             if (!qm.canHold(1142132)) {
-               qm.sendOk("Wow, your #bequip#k inventory is full. I need you to make at least 1 empty slot to complete this quest.")
+               qm.sendOk(I18nMessage.from("21401_EQUIP_INVENTORY_IS_FULL"))
                qm.dispose()
                return
             }
             if (!qm.canHold(2280003, 1)) {
-               qm.sendOk("Hey, your #buse#k inventory is full. I need you to make at least 1 empty slot to complete this quest.")
+               qm.sendOk(I18nMessage.from("21401_USE_INVENTORY_IS_FULL"))
                qm.dispose()
                return
             }
@@ -76,7 +77,7 @@ class Quest21401 {
 
             qm.completeQuest()
          }
-         qm.sendNext("Your skills have been restored. Those skills have been dormant for so long that you'll have to re-train yourself, but you'll be as good as new once you complete your training.")
+         qm.sendNext(I18nMessage.from("21401_SKILLS_HAVE_BEEN_RESTORED"))
       } else if (status == 3) {
          qm.dispose()
       }

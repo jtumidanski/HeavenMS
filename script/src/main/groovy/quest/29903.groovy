@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -20,14 +21,14 @@ class Quest29903 {
          qm.dispose()
       } else {
          if (status == 0) {
-            qm.sendNext("Congratulations on earning your honorable #b<Master Adventurer>#k title. I wish you the best of luck in your future endeavors! Keep up the good work.\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n #v1142110:# #t1142110# 1")
+            qm.sendNext(I18nMessage.from("29903_CONGRATULATIONS"))
          } else if (status == 1) {
             if (qm.canHold(1142110)) {
                qm.gainItem(1142110)
                qm.forceCompleteQuest()
                qm.dispose()
             } else {
-               qm.sendNext("Please make room in your inventory")
+               qm.sendNext(I18nMessage.from("29903_MAKE_ROOM"))
             }//NOT GMS LIKE
          } else if (status == 2) {
             qm.dispose()

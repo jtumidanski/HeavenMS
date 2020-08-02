@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -29,7 +30,7 @@ class NPC2100005 {
    def action(Byte mode, Byte type, Integer selection) {
       if (mode < 1) {
          if (type == 7) {
-            cm.sendNext("I guess you aren't ready to make the change yet. Let me know when you are!")
+            cm.sendNext(I18nMessage.from("2100005_NOT_READY"))
          }
 
          cm.dispose()
@@ -40,7 +41,7 @@ class NPC2100005 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Hey there! I'm Shatti, and I'm Mazra's apprentice. If you have #bAriant hair style coupon(REG)#k or #bAriant hair color coupon(REG)#k with you, how about allowing me to work on your hair? \r\n#L0#Haircut: #i5150026##t5150026##l\r\n#L1#Dye your hair: #i5151021##t5151021##l")
+            cm.sendSimple(I18nMessage.from("2100005_HELLO"))
          } else if (status == 1) {
             if (selection == 0) {
                beauty = 1
@@ -55,7 +56,7 @@ class NPC2100005 {
                      hairNew = ScriptUtils.pushItemIfTrue(hairNew, femaleHair[i] + (cm.getChar().getHair() % 10).intValue(), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendYesNo("If you use the REG coupon, your hairstyle will be changed to a random new look. You'll also have access to new hairstyles I worked on that's not available for VIP coupons. Would you like to use #bAriant hair style coupon(REG)#k for a fabulous new look?")
+               cm.sendYesNo(I18nMessage.from("2100005_REG_COUPON_INFO"))
             } else if (selection == 1) {
                beauty = 2
                hairColor = []
@@ -63,7 +64,7 @@ class NPC2100005 {
                for (int i = 0; i < 8; i++) {
                   hairColor = ScriptUtils.pushItemIfTrue(hairColor, current + i, { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                }
-               cm.sendYesNo("If you use the regular coupon, your hair color will change to a random new color. Are you sure you want to use #b#t5151021##k and randomly change your hair color?")
+               cm.sendYesNo(I18nMessage.from("2100005_REG_COUPON_CONFIRM"))
             }
          } else if (status == 2) {
             cm.dispose()
@@ -71,18 +72,18 @@ class NPC2100005 {
                if (cm.haveItem(5150026)) {
                   cm.gainItem(5150026, (short) -1)
                   cm.setHair(hairNew[Math.floor(Math.random() * hairNew.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("2100005_ENJOY_NEW_STYLE"))
                } else {
-                  cm.sendNext("I can only change your hairstyle if you bring me the coupon. You didn't forget that, did you?")
+                  cm.sendNext(I18nMessage.from("2100005_MISSING_STYLE_COUPON"))
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151021)) {
                   cm.gainItem(5151021, (short) -1)
                   cm.setHair(hairColor[Math.floor(Math.random() * hairColor.length).intValue()])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("2100005_ENJOY_NEW_COLOR"))
                } else {
-                  cm.sendNext("I can only change your hairstyle if you bring me the coupon. You didn't forget that, did you?")
+                  cm.sendNext(I18nMessage.from("2100005_MISSING_COLOR_COUPON"))
                }
             }
          }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
@@ -34,14 +35,14 @@ class NPC9000017 {
       if (mode == 1) {
          status++
       } else {
-         cm.sendOk("Oh, ok... Talk back to us when you want to make business.")
+         cm.sendOk(I18nMessage.from("9000017_OH_OK"))
          cm.dispose()
          return
       }
 
       if (status == 0) {
          if (!YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
-            cm.sendOk("Hi, I'm #b#p" + cm.getNpc() + "##k.")
+            cm.sendOk(I18nMessage.from("9000017_HELLO").with(cm.getNpc()))
             cm.dispose()
             return
          }
@@ -91,9 +92,9 @@ class NPC9000017 {
          boolean complete = true
 
          if (cm.getMeso() < cost * qty) {
-            cm.sendOk("Come on! We're not here doing you a favor! We all need money to live properly, so bring the cash so we make deal and start the synthesis.")
+            cm.sendOk(I18nMessage.from("9000017_NOT_DOING_YOU_A_FAVOR"))
          } else if (!cm.canHold(item, qty)) {
-            cm.sendOk("You didn't check if you got a slot to spare on your inventory before our business, no?")
+            cm.sendOk(I18nMessage.from("9000017_NEED_INVENTORY_SPACE"))
          } else {
             for (int i = 0; complete && i < mats.length; i++) {
                if (matQty[i] * qty == 1) {
@@ -104,14 +105,14 @@ class NPC9000017 {
             }
 
             if (!complete) {
-               cm.sendOk("You kidding, right? We won't be able to start the process without all the ingredients at hands. Go get all of them and then talk to us!")
+               cm.sendOk(I18nMessage.from("9000017_KIDDING_RIGHT"))
             } else {
                for (int i = 0; i < mats.length; i++) {
                   cm.gainItem(mats[i], (short) (-matQty[i] * qty))
                }
                cm.gainMeso(-cost * qty)
                cm.gainItem(item, (short) qty)
-               cm.sendOk("Wow... can't believe it worked! To think for a moment that it could f... Ahem. Of course it worked, all work of ours are very efficient! Nice doing business with you.")
+               cm.sendOk(I18nMessage.from("9000017_CANNOT_BELIEVE_IT_WORKED"))
             }
          }
          cm.dispose()

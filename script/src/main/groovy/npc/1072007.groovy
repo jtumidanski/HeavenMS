@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -39,10 +40,10 @@ class NPC1072007 {
          if (status == 0) {
             if (cm.haveItem(4031013, 30)) {
                completed = true
-               cm.sendOk("You're a true hero! Take this and the Dark Lord will acknowledge you.")
+               cm.sendOk(I18nMessage.from("1072007_TRUE_HERO"))
             } else {
                completed = false
-               cm.sendSimple("You will have to collect me #b30 #t4031013##k. Good luck. \r\n#b#L1#I would like to leave#l")
+               cm.sendSimple(I18nMessage.from("1072007_COLLECT_MARBLES"))
             }
          } else if (status == 1) {
             if (completed) {

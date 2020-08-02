@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.quest.QuestActionManager
@@ -25,12 +26,12 @@ class Quest2245 {
          if (status == 0) {
             EventManager em = qm.getEventManager("BalrogQuest")
             if (em == null) {
-               qm.sendOk("Sorry, but the BalrogQuest is closed.")
+               qm.sendOk(I18nMessage.from("2245_SORRY"))
                return
             }
 
             if (!em.startInstance(qm.getPlayer())) {
-               qm.sendOk("There is currently someone in this map, come back later.")
+               qm.sendOk(I18nMessage.from("2245_CURRENTLY_SOMEONE_IN_MAP"))
             } else {
                qm.forceStartQuest()
                qm.dispose()

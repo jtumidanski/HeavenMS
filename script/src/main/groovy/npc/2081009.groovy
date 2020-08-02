@@ -1,4 +1,6 @@
 package npc
+import tools.I18nMessage
+
 
 
 import scripting.npc.NPCConversationManager
@@ -29,16 +31,20 @@ class NPC2081009 {
       status++
       if (status == 0) {
          if (cm.isQuestStarted(6180) && cm.getQuestProgressInt(6180, 9300096) < 200) {
-            cm.sendYesNo("Pay attention: during the time you stay inside the training ground make sure you #bhave equipped your #t1092041##k, it is of the utmost importance. Are you ready to proceed to the training area?")
+            cm.sendYesNo(I18nMessage.from("2081009_PAY_ATTENTION"))
+
          } else {
-            cm.sendOk("Only assigned personnel can access the training ground.")
+            cm.sendOk(I18nMessage.from("2081009_ASSIGNED_PERSONNEL"))
+
             cm.dispose()
          }
       } else if (status == 1) {
          if (cm.getPlayer().haveItemEquipped(1092041)) {
-            cm.sendNext("Have your shield equipped until the end of the quest, or else you will need to start all over again!")
+            cm.sendNext(I18nMessage.from("2081009_SHIELD_EQUIPPED"))
+
          } else {
-            cm.sendOk("Please equip the #r#t1092041##k before entering the training ground.")
+            cm.sendOk(I18nMessage.from("2081009_PLEASE_EQUIP"))
+
             cm.dispose()
          }
       } else {

@@ -26,11 +26,11 @@ class Quest4659 {
       }
       if (status == 0) {
          if (qm.getMeso() < 10000) {
-            qm.sendOk("Hey! I need #b10,000 mesos#k to do your pet's evolution!")
+            qm.sendOk(I18nMessage.from("4659_I_NEED_MESOS"))
             qm.dispose()
             return
          }
-         qm.sendNext("Great job on finding your evolution materials. I will now give you a robot.")
+         qm.sendNext(I18nMessage.from("4659_GREAT_JOB"))
       } else if (status == 1) {
          if (qm.isQuestCompleted(4659)) {
             MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, "how did this get here?")
@@ -54,7 +54,7 @@ class Quest4659 {
 
             int closeness = pet.closeness()
             if (closeness < 1642) {
-               qm.sendOk("It looks like your pet is not grown enough to be evolved yet. Train it a bit more, util it reaches #blevel 15#k.")
+               qm.sendOk(I18nMessage.from("4659_NOT_GROWN_ENOUGH"))
                qm.dispose()
                return
             }
@@ -76,7 +76,7 @@ class Quest4659 {
             } else if (rand == 9) {
                after = 5000053
             } else {
-               qm.sendOk("Something wrong. Try again.")
+               qm.sendOk(I18nMessage.from("4659_SOMETHING_IS_WRONG"))
                qm.dispose()
                return
             }

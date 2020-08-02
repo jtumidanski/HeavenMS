@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9000007 {
          }
 
          if (status == 0) {
-            cm.sendOk("Just a kid... Don't talk to me...")
+            cm.sendOk(I18nMessage.from("9000007_DO_NOT_TALK_TO_ME"))
             cm.dispose()
          }
       }

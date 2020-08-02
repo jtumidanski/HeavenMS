@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -35,10 +36,10 @@ class NPC9270024 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Let's see...I can totally transform your face into something new. Don't you want to try it? For #b#t5152038##k, you can get the face of your liking. Take your time in choosing the face of your preference...\r\n#L2#Let me get my dream face! (Uses #i5152038# #t5152038#)#l")
+            cm.sendSimple(I18nMessage.from("9270024_HELLO"))
          } else if (status == 1) {
             if (!cm.haveItem(5152038)) {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("9270024_MISSING_SURGERY_COUPON"))
                cm.dispose()
                return
             }
@@ -58,7 +59,7 @@ class NPC9270024 {
          } else if (status == 2) {
             cm.gainItem(5152038, (short) -1)
             cm.setFace(faceNew[selection])
-            cm.sendOk("Enjoy your new and improved face!")
+            cm.sendOk(I18nMessage.from("9270024_ENJOY_NEW_FACE"))
 
             cm.dispose()
          }

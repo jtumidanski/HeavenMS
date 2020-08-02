@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9201143 {
    int sel = -1
 
    def start() {
-      cm.sendNext("At your service, my friend.")
+      cm.sendNext(I18nMessage.from("9201143_AT_YOUR_SERVICE"))
       cm.dispose()
    }
 

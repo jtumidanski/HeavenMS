@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -39,14 +40,14 @@ class NPC9270033 {
          eim = cm.getEventInstance()
          if (status == 0) {
             if (!eim.isEventCleared()) {
-               cm.sendYesNo("Are you ready to leave this place?")
+               cm.sendYesNo(I18nMessage.from("9270033_READY_TO_LEAVE"))
             } else {
-               cm.sendYesNo("You have defeated Capt. Latanica, well done! Are you ready to leave this place?")
+               cm.sendYesNo(I18nMessage.from("9270033_DEFEATED"))
             }
          } else if (status == 1) {
             if (eim.isEventCleared()) {
                if (!eim.giveEventReward(cm.getPlayer())) {
-                  cm.sendOk("Please make a room on your inventory to receive the loot.")
+                  cm.sendOk(I18nMessage.from("9270033_MAKE_INVENTORY_ROOM"))
                   cm.dispose()
                   return
                }

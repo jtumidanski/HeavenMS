@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9201049 {
          }
 
          if (status == 0) {
-            cm.sendOk("Hey there, did you enjoy the wedding? I will head you back to #bAmoria#k now.")
+            cm.sendOk(I18nMessage.from("9201049_DID_YOU_ENJOY"))
          } else if (status == 1) {
             EventInstanceManager eim = cm.getEventInstance()
             if (eim != null) {
@@ -44,9 +45,9 @@ class NPC9201049 {
                if (cm.canHold(boxId, 1)) {
                   cm.gainItem(boxId, (short) 1)
                   cm.warp(680000000)
-                  cm.sendOk("You just received an Onyx Chest. Search for #b#p9201014##k, she is at the top of Amoria, she knows how to open these.")
+                  cm.sendOk(I18nMessage.from("9201049_RECEIVED_ONYX_CHEST"))
                } else {
-                  cm.sendOk("Please make room on your ETC inventory to receive the Onyx Chest.")
+                  cm.sendOk(I18nMessage.from("9201049_MAKE_ETC_ROOM"))
                   cm.dispose()
                   return
                }

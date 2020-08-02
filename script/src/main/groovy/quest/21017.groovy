@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest21017 {
       } else if (status == 4) {
          qm.sendNextPrev("Oh no, no, no. Twenty is plenty.", (byte) 2)
       } else if (status == 5) {
-         qm.sendAcceptDecline("You don't have to be so modest. I understand your desire to quickly become the hero you once were. This sort of attitude is what makes you a hero.")
+         qm.sendAcceptDecline(I18nMessage.from("21017_DO_NOT_BE_SO_MODEST"))
       } else if (status == 6) {
          if (mode == 0 && type == 15) {
             qm.sendNext("#b(You declined out of fear, but it's not like you can run away like this. Take a big breath, calm down, and try again.)#k", (byte) 2)

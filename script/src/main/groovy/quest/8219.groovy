@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,15 +14,15 @@ class Quest8219 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("Okay, then. See you around.")
+            qm.sendOk(I18nMessage.from("8219_OKAY_THEN"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("The time is now, kid. We have all the preparations complete to further research for why all these oddities have been happening lately. I also must introduce you to my brother, Jack. ")
+         qm.sendAcceptDecline(I18nMessage.from("8219_TIME_IS_NOW"))
       } else if (status == 1) {
-         qm.sendOk("He is currently wandering around the Crimsonwood Mountain, past the sinister Phantom Forest, in the track to the Crimsonwood Keep. Your next destination is there, may your journey be a safe one.")
+         qm.sendOk(I18nMessage.from("8219_CURRENTLY_WANDERING"))
          qm.forceStartQuest()
       } else if (status == 2) {
          qm.dispose()
@@ -34,15 +35,15 @@ class Quest8219 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("Okay, then. See you around.")
+            qm.sendOk(I18nMessage.from("8219_SEE_YOU_AROUND"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendNext("Who are you? Oh, you came here by my brother John's stead? Great.")
+         qm.sendNext(I18nMessage.from("8219_WHO_ARE_YOU"))
       } else if (status == 1) {
-         qm.sendOk("It seems you helped the folks at the city at some errands, don't you? I shall appraise you nicely. Take a look on this: this is a map of the Phantom Forest, which I made myself after enough exploration. Take possession of that, and you #bwill be granted passage#k by paths other times undiscoverable. Remember well to #rnever lose it#k, you won't be having that again!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0# \r\n#i3992040# #t3992040#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 175000 EXP")
+         qm.sendOk(I18nMessage.from("8219_APPRAISE_YOU_NICELY"))
       } else if (status == 2) {
          if (qm.canHold(3992040, 1)) {
             qm.forceCompleteQuest()
@@ -50,7 +51,7 @@ class Quest8219 {
             qm.gainExp(175000)
             qm.dispose()
          } else {
-            qm.sendOk("Hey, you don't have a slot in your SETUP inventory for what I have to give to you. Solve that minor issue of yours then talk to me.")
+            qm.sendOk(I18nMessage.from("8219_NEED_SETUP_SLOT"))
          }
       } else if (status == 3) {
          qm.dispose()

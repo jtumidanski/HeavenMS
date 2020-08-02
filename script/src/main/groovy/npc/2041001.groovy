@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -21,14 +22,16 @@ class NPC2041001 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (status == 0) {
-         cm.sendYesNo("Do you wish to leave the train?")
+         cm.sendYesNo(I18nMessage.from("2041001_DO_YOU_WISH_TO_LEAVE"))
+
          status++
       } else {
          if ((status == 1 && type == 1 && selection == -1 && mode == 0) || mode == -1) {
             cm.dispose()
          } else {
             if (status == 1) {
-               cm.sendNext("Alright, see you next time. Take care.")
+               cm.sendNext(I18nMessage.from("2041001_SEE_YOU_NEXT_TIME"))
+
                status++
             } else if (status == 2) {
                if (cm.getPlayer().getMapId() == 200000122) {

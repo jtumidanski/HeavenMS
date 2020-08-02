@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import config.YamlConfig
 import scripting.npc.NPCConversationManager
@@ -26,7 +27,7 @@ class NPC9000041 {
 
       if (status == 0) {
          if (!YamlConfig.config.server.USE_ENABLE_CUSTOM_NPC_SCRIPT) {
-            cm.sendOk("The medal ranking system is currently unavailable...")
+            cm.sendOk(I18nMessage.from("9000041_MEDAL_RANKING_UNAVAILABLE"))
             cm.dispose()
             return
          }
@@ -38,15 +39,15 @@ class NPC9000041 {
          cm.sendSimple(selStr)
       } else if (status == 1) {
          selectedType = selection
-         cm.sendGetText("From what item on your #r" + options[selectedType] + "#k inventory do you want to start the transaction?")
+         cm.sendGetText(I18nMessage.from("9000041_START").with(options[selectedType]))
       } else if (status == 2) {
          name = cm.getText()
          int res = cm.getPlayer().sellAllItemsFromName((byte) (selectedType + 1), name)
 
          if (res > -1) {
-            cm.sendOk("Transaction complete! You received #r" + cm.numberWithCommas(res) + " mesos#k from this action.")
+            cm.sendOk(I18nMessage.from("9000041_COMPLETE").with(cm.numberWithCommas(res)))
          } else {
-            cm.sendOk("There is no #b'" + name + "'#k in your #b" + options[selectedType] + "#k inventory!")
+            cm.sendOk(I18nMessage.from("9000041_NOT_IN_INVENTORY").with(name, options[selectedType]))
          }
 
          cm.dispose()

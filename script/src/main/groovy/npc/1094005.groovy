@@ -19,12 +19,12 @@ class NPC1094005 {
 
    def start() {
       if (!cm.isQuestStarted(2186)) {
-         cm.sendOk("Just a pile of boxes, nothing special...")
+         cm.sendOk(I18nMessage.from("1094005_PILE_OF_BOXES"))
          cm.dispose()
          return
       }
 
-      cm.sendNext("Do you want to obtain a glasses?")
+      cm.sendNext(I18nMessage.from("1094005_DO_YOU_WANT"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -39,7 +39,7 @@ class NPC1094005 {
             cm.gainItem(4031855, (short) 1)
          }
       } else {
-         cm.sendOk("You #balready have#k the glasses that was here!")
+         cm.sendOk(I18nMessage.from("1094005_ALREADY_HAVE"))
       }
 
       cm.dispose()

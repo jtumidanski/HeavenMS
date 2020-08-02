@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,10 +18,10 @@ class NPC9209001 {
    int sel2 = -1
 
    def start() {
-      cm.sendOk("Hello, the Maple 7th Day Market is currently unavailable.")
+      cm.sendOk(I18nMessage.from("9209001_HELLO"))
       cm.dispose()
 
-      //cm.sendSimple("Hello, the Maple 7th Day Market opens today.#b\r\n#L0#Move to Maple 7th Day Market map\r\n#L1#Listen for an explanation about the Maple 7th Day Market")
+      //cm.sendSimple(I18nMessage.from("9209001_HELLO_OPENS_TODAY"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -42,9 +43,9 @@ class NPC9209001 {
             sel = selection
          }
          if (selection == 0) {
-            cm.sendNext("Okay, we will send you to the Maple 7th Day Market map.")
+            cm.sendNext(I18nMessage.from("9209001_WILL_SEND_YOU"))
          } else {
-            cm.sendSimple("What would you like to know about the Maple 7th Day Market?#b\r\n#L0#Where does the Maple 7th Day Market take place?\r\n#L1#What can you do at the Maple 7th Day Market?\r\n#L2#I do not have any questions.")
+            cm.sendSimple(I18nMessage.from("9209001_WHAT_WOULD_YOU_LIKE_TO_KNOW"))
          }
       } else if (status == 1) {
          if (sel == 0) {
@@ -52,12 +53,12 @@ class NPC9209001 {
             cm.warp(680100000 + (Math.random() * 3).intValue())
             cm.dispose()
          } else if (selection == 0) {
-            cm.sendNext("The Maple 7th Day Market opens only on Sundays. You can enter if you find me in any town, Henesys, New Leaf City, Leafre, Kerning City, Ludibrium, I'm just about everywhere!")
+            cm.sendNext(I18nMessage.from("9209001_ONLY_ON_SUNDAYS"))
             status -= 2
          } else if (selection == 1) {
-            cm.sendSimple("You can find rare goods that are hard to find elsewhere at the Maple 7th Day Market.#b\r\n#L0#Purchase Special Items\r\n#L1#Help the Poultry Farm Owner")
+            cm.sendSimple(I18nMessage.from("9209001_RARE_GOODS"))
          } else {
-            cm.sendNext("I guess you don't have any question. Please keep us in your thoughts, and ask if you are curious about anything.")
+            cm.sendNext(I18nMessage.from("9209001_KEEP_US_IN_YOUR_THOUGHTS"))
             cm.dispose()
          }
       } else if (status == 2) {
@@ -65,27 +66,27 @@ class NPC9209001 {
             sel2 = selection
          }
          if (sel2 == 0) {
-            cm.sendNext("You can find many items at the Maple 7th Day Market. The prices are subject to change, so you'd better get them when they're cheap!")
+            cm.sendNext(I18nMessage.from("9209001_CAN_FIND_MANY_ITEMS"))
          } else {
-            cm.sendNext("Aside from the merchants, you can also find the lazy daughter of the poultry farm owner at the Maple 7th Day Market. Help Mimi and hatch her egg until it grows to be a chicken!")
+            cm.sendNext(I18nMessage.from("9209001_GROWS_TO_BE_A_CHICKEN"))
          }
       } else if (status == 3) {
          if (sel2 == 0) {
-            cm.sendNextPrev("The purchases made here can be sold back to the merchant intermediary, Abdula. He won't accept anything more than a week old, so make sure you re-sell by Saturday!")
+            cm.sendNextPrev(I18nMessage.from("9209001_CAN_BE_RESOLD"))
          } else {
-            cm.sendNextPrev("Since she can't just trust anyone with the egg, she'll ask for deposit money. Pay her the deposit and take good care of the egg.")
+            cm.sendNextPrev(I18nMessage.from("9209001_DEPOSIT_MONEY"))
          }
       } else if (status == 4) {
          if (sel2 == 0) {
-            cm.sendNextPrev("Abdula adjusts his reselling rates as well, so it would be wise to sell when you can make the most profit. The prices tend to fluctuate hourly, so remember to check often.")
+            cm.sendNextPrev(I18nMessage.from("9209001_PRICES_FLUCTUATE"))
          } else {
-            cm.sendNextPrev("If you manage to successfully grow the egg into a chicken and take it back to Mimi, Mimi will reward you. She may be lazy but she's not ungrateful.")
+            cm.sendNextPrev(I18nMessage.from("9209001_WILL_REWARD_YOU"))
          }
       } else if (status == 5) {
          if (sel2 == 0) {
-            cm.sendNextPrev("Test your business wit by buying good at low prices in the Maple 7th Day Market and selling it to the merchant intermediary when its value goes up!")
+            cm.sendNextPrev(I18nMessage.from("9209001_TEST_YOUR_BUSINESS_WIT"))
          } else {
-            cm.sendNextPrev("You can click on the egg to check on its growth. You have to be diligent with the egg since the EXP you gain and the egg will grow together.")
+            cm.sendNextPrev(I18nMessage.from("9209001_CHECK_ITS_GROWTH"))
          }
       }
    }

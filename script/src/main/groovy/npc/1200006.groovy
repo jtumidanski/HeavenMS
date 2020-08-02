@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Puro
@@ -16,7 +17,7 @@ class NPC1200006 {
    int sel = -1
 
    def start() {
-      cm.sendOk("The current is serene, which means we may arrive in lith harbor earlier than expected.")
+      cm.sendOk(I18nMessage.from("1200006_CURRENT_IS_SERENE"))
       cm.dispose()
    }
 

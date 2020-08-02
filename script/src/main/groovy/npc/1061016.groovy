@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -28,7 +29,7 @@ class NPC1061016 {
       }
       status++
       if (status == 0) {
-         cm.sendSimple("Hello, #h0#. I can exchange your Balrog Leathers.\r\n\r\n#r#L1#Redeem items#l#k")
+         cm.sendSimple(I18nMessage.from("1061016_HELLO"))
       } else if (status == 1) {
          String selStr = "Well, okay. These are what you can redeem...\r\n\r\n#b"
          for (def i = 0; i < itemIds.length; i++) {
@@ -37,13 +38,13 @@ class NPC1061016 {
          cm.sendSimple(selStr)
       } else if (status == 2) {
          if (!cm.canHold(itemIds[selection], 1)) {
-            cm.sendOk("Please make room")
+            cm.sendOk(I18nMessage.from("1061016_MAKE_ROOM"))
          } else if (!cm.haveItemWithId(4001261)) {
-            cm.sendOk("You don't have enough leathers.")
+            cm.sendOk(I18nMessage.from("1061016_NOT_ENOUGH_LEATHERS"))
          } else {
             cm.gainItem(4001261, (short) -1)
             cm.gainItem(itemIds[selection], (short) 1)
-            cm.sendOk("Thank you for your redemption")
+            cm.sendOk(I18nMessage.from("1061016_THANK_YOU"))
          }
          cm.dispose()
       }

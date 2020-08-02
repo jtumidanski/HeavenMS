@@ -25,23 +25,23 @@ class Quest8185 {
          }
          if (status == 0) {
             if (qm.getMeso() < 10000) {
-               qm.sendOk("Hey! I need #b10,000 mesos#k to do your pet's evolution!")
+               qm.sendOk(I18nMessage.from("8185_I_NEED_MESOS"))
                qm.dispose()
                return
             }
 
-            qm.sendNext("#e#bHey, you did it!#n#k \r\n#rWow!#k Now I could complete my studies on your pet!")
+            qm.sendNext(I18nMessage.from("8185_YOU_DID_IT"))
          } else if (status == 1) {
             if (mode == 0) {
-               qm.sendOk("I see... Come back when you wish to do it. I'm really excited to do this.")
+               qm.sendOk(I18nMessage.from("8185_I_SEE"))
                qm.dispose()
             } else {
-               qm.sendNextPrev("Just saying, your new dragon's color is gonna be #e#rrandom#k#n! It's either gonna be #ggreen, #bblue, #rred, #dor very rarely#k, black. \r\n\r\n#fUI/UIWindow.img/QuestIcon/5/0# \r\n\r If you happen to not like your pet's new color, or if you ever wish to change your pet color again, #eyou can change it!#n Simply just #dbuy another Rock of Evolution, 10,000 mesos, #kand #dequip your new pet#k before talking to me again, but of course, I cannot return your pet as a baby dragon, only to another adult dragon.")
+               qm.sendNextPrev(I18nMessage.from("8185_JUST_SAYING"))
             }
          } else if (status == 2) {
-            qm.sendYesNo("Now let me try to evolve your pet. You ready? Wanna see your cute baby dragon turn into either a matured dark black, blue, calm green, or fiery red adult dragon? It'll still have the same closeness, level, name, fullness, hunger, and equipment in case you're worried. \r\n\r #b#eDo you wish to continue or do you have some last-minute things to do first?#k#n")
+            qm.sendYesNo(I18nMessage.from("8185_LET_ME_TRY"))
          } else if (status == 3) {
-            qm.sendNextPrev("Alright, here we go...! #rHYAHH!#k")
+            qm.sendNextPrev(I18nMessage.from("8185_HERE_WE_GO"))
          } else if (status == 4) {
             int rand = 1 + Math.floor(Math.random() * 10).intValue()
 
@@ -69,7 +69,7 @@ class Quest8185 {
             } else if (rand == 10) {
                after = 5000033
             } else {
-               qm.sendOk("Something wrong. Try again.")
+               qm.sendOk(I18nMessage.from("8185_SOMETHING_WRONG"))
                qm.dispose()
                return
             }
@@ -85,7 +85,7 @@ class Quest8185 {
 
             //SpawnPetHandler.evolve(qm.getPlayer().getClient(), 5000029, after);
 
-            qm.sendOk("#bSWEET! IT WORKED!#k Your dragon has grown beautifully! #rYou may find your new pet under your 'CASH' inventory.\r #kIt used to be a #b #i5000029##t5000029##k, and now it's \r a #b#i" + after + "##t" + after + "##k!\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v" + after + "# #t" + after + "#")
+            qm.sendOk(I18nMessage.from("8185_SWEET").with(after, after, after, after))
          } else if (status == 5) {
             qm.dispose()
          }

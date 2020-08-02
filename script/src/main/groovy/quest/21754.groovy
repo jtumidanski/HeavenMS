@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -24,12 +25,12 @@ class Quest21754 {
 
          if (status == 0) {
             if (!qm.canHold(4032328, 1)) {
-               qm.sendNext("Hm, I will need you to prepare a ETC slot for a letter I need to give you.")
+               qm.sendNext(I18nMessage.from("21754_NEED_AN_ETC_SPACE"))
                qm.dispose()
                return
             }
 
-            qm.sendNext("Here, take this. Send it to #r#p1002104##k, it contains a relevant matter for protecting this world. Please comply to this request.")
+            qm.sendNext(I18nMessage.from("21754_TAKE_THIS"))
          } else if (status == 1) {
             qm.forceStartQuest()
 

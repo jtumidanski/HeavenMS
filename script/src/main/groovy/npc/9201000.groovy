@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import scripting.npc.NPCConversationManager
@@ -51,19 +52,19 @@ class NPC9201000 {
                if (!cm.isQuestCompleted(100400)) {
                   if (!cm.isQuestStarted(100400)) {
                      state = 0
-                     cm.sendNext("So you want to make a engagement ring, huh? Very well, I can provide one after you receive #rblessings#k from your #b#p9201003##k.")
+                     cm.sendNext(I18nMessage.from("9201000_MAKE_ENGAGEMENT_RING"))
                   } else {
-                     cm.sendOk("Take the blessings from your #b#p9201003##k before trying to craft an engagement ring. They must be waiting for you at home, beyond #rHenesys hunting grounds#k.")
+                     cm.sendOk(I18nMessage.from("9201000_TAKE_BLESSINGS"))
                      cm.dispose()
                   }
                } else {
                   if (hasEngagementBox(cm.getPlayer())) {
-                     cm.sendOk("Sorry, you already have an engagement box. I cannot provide you more than one box per time.")
+                     cm.sendOk(I18nMessage.from("9201000_SORRY"))
                      cm.dispose()
                      return
                   }
                   if (cm.getPlayer().getGender() != 0) {
-                     cm.sendOk("Sorry, but the ring box is currently available only for males.")
+                     cm.sendOk(I18nMessage.from("9201000_RING_BOX_ONLY_FOR_MALES"))
                      cm.dispose()
                      return
                   }
@@ -79,16 +80,16 @@ class NPC9201000 {
                      cm.removeAll(i)
                   }
 
-                  cm.sendOk("Your ring box has been discarded.")
+                  cm.sendOk(I18nMessage.from("9201000_RING_BOX_DISCARDED"))
                } else {
-                  cm.sendOk("You have no ring box to discard.")
+                  cm.sendOk(I18nMessage.from("9201000_NO_RING_BOX"))
                }
 
                cm.dispose()
             }
          } else if (status == 2) {
             if (state == 0) {
-               cm.sendOk("Where do they live, you ask? My, it goes way back... you see, I'm a friend of theirs, and I was the one who crafted and personally delivered their engagement ring. They live beyond #rHenesys Hunting Grounds#k, I'm sure you know where it is.")
+               cm.sendOk(I18nMessage.from("9201000_WHERE_DO_THEY_LIVE"))
                cm.startQuest(100400)
                cm.dispose()
             } else {
@@ -124,11 +125,11 @@ class NPC9201000 {
             int recvItem = item, recvQty = 1, qty = 1
 
             if (!cm.canHold(recvItem, recvQty)) {
-               cm.sendOk("Check your inventory for a free slot first.")
+               cm.sendOk(I18nMessage.from("9201000_CHECK_INVENTORY_FOR_FREE_SLOT"))
                cm.dispose()
                return
             } else if (cm.getMeso() < cost * qty) {
-               cm.sendOk("I'm sorry but there's a fee for my services. Please bring me the right amount of mesos here before trying to forge a ring.")
+               cm.sendOk(I18nMessage.from("9201000_MUST_PAY_FEE"))
                cm.dispose()
                return
             } else {
@@ -144,7 +145,7 @@ class NPC9201000 {
             }
 
             if (!complete) {
-               cm.sendOk("Hm, it seems you're lacking some ingredients for the engagement ring. Please provide them first, will you?")
+               cm.sendOk(I18nMessage.from("9201000_LACK_INGREDIENTS"))
             } else {
                if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                   for (int i = 0; i < mats.size(); i++) {
@@ -159,7 +160,7 @@ class NPC9201000 {
                }
 
                cm.gainItem(recvItem, (short) recvQty)
-               cm.sendOk("All done, the engagement ring came out just right. I wish you a happy engagement.")
+               cm.sendOk(I18nMessage.from("9201000_ALL_DONE"))
             }
             cm.dispose()
          }

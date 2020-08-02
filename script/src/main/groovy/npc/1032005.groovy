@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -18,7 +19,7 @@ class NPC1032005 {
    int cost = 10000
 
    def start() {
-      cm.sendNext("Hi there! This cab is for VIP customers only. Instead of just taking you to different towns like the regular cabs, we offer a much better service worthy of VIP class. It's a bit pricey, but... for only 10,000 mesos, we'll take you safely to the \r\n#bAnt Tunnel#k.")
+      cm.sendNext(I18nMessage.from("1032005_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -27,16 +28,20 @@ class NPC1032005 {
          cm.dispose()
          return
       } else if (mode == 0) {
-         cm.sendOk("This town also has a lot to offer. Find us if and when you feel the need to go to the Ant Tunnel Park.")
+         cm.sendOk(I18nMessage.from("1032005_THIS_TOWN_HAS_A_LOT_TO_OFFER"))
          cm.dispose()
          return
       }
       if (status == 1) {
-         cm.sendYesNo(cm.getJobId() == 0 ? "We have a special 90% discount for beginners. The Ant Tunnel is located deep inside in the dungeon that's placed at the center of the Victoria Island, where the 24 Hr Mobile Store is. Would you like to go there for #b1,000 mesos#k?" : "The regular fee applies for all non-beginners. The Ant Tunnel is located deep inside in the dungeon that's placed at the center of the Victoria Island, where 24 Hr Mobile Store is. Would you like to go there for #b10,000 mesos#k?")
+         if (cm.getJobId() == 0) {
+            cm.sendYesNo(I18nMessage.from("1032005_BEGINNER_SPECIAL"))
+         } else {
+            cm.sendYesNo(I18nMessage.from("1032005_NON_BEGINNER"))
+         }
          cost /= ((cm.getJobId() == 0) ? 10 : 1)
       } else if (status == 2) {
          if (cm.getMeso() < cost) {
-            cm.sendNext("It looks like you don't have enough mesos. Sorry but you won't be able to use this without it.")
+            cm.sendNext(I18nMessage.from("1032005_NOT_ENOUGH_MESOS"))
          } else {
             cm.gainMeso(-cost)
             cm.warp(105070001)

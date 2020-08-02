@@ -2,6 +2,7 @@ package quest
 
 import client.MapleJob
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20205 {
    QuestActionManager qm
@@ -12,7 +13,7 @@ class Quest20205 {
          qm.dispose()
       } else {
          if (status == 0 && mode == 0) {
-            qm.sendNext("Hmm? Why? What's holding you back?")
+            qm.sendNext(I18nMessage.from("20205_WHAT_IS_HOLDING_YOU_BACK"))
             qm.dispose()
             return
          }
@@ -22,15 +23,15 @@ class Quest20205 {
             status--
          }
          if (status == 0) {
-            qm.sendYesNo("Oh, you brought all #t4032100#s! Ahaha, I knew you'd be good at it. Tell you what, I now commend that you're now ready to become an official knight. Do you want to become one right now?")
+            qm.sendYesNo(I18nMessage.from("20205_QUALIFIED"))
          } else if (status == 1) {
             if (qm.getPlayer().getJob().getId() == 1500 && qm.getPlayer().getRemainingSp() > ((qm.getPlayer().getLevel() - 30) * 3)) {
-               qm.sendNext("Hey, how did you manage to hunt all that? You have way too much #bSP#k lying around unused! You can't become an official knight like this! Use more SP on the 1st level skill.")
+               qm.sendNext(I18nMessage.from("20205_USE_ALL_SP"))
                qm.dispose()
             } else {
                if (qm.getPlayer().getJob().getId() != 1510) {
                   if (!qm.canHold(1142067)) {
-                     qm.sendNext("If you wish to receive the medal befitting the title, you may want to make some room in your equipment inventory.")
+                     qm.sendNext(I18nMessage.from("20205_MAKE_INVENTORY_ROOM"))
                      qm.dispose()
                      return
                   }
@@ -39,12 +40,12 @@ class Quest20205 {
                   qm.getPlayer().changeJob(MapleJob.THUNDER_BREAKER_2)
                   qm.completeQuest()
                }
-               qm.sendNext("You are now no longer a Knight-in-Training. You have now officially become a Cygnus Knight.")
+               qm.sendNext(I18nMessage.from("20205_SUCCESS"))
             }
          } else if (status == 2) {
-            qm.sendNextPrev("I have also given you some #bSP#k and the accompanying skills of a Thunder Breakers that are only available to the official knights. These skills are lightning-based, so use them wisely!")
+            qm.sendNextPrev(I18nMessage.from("20205_GIVEN_SP"))
          } else if (status == 3) {
-            qm.sendPrev("Well, personally, I hope you don't lose your enthusiasm even after becoming the Cygnus Knights. Always seek out the positive even if you're in the midst of a barrage of negative items.")
+            qm.sendPrev(I18nMessage.from("20205_ACT_LIKE_ONE"))
          } else if (status == 4) {
             qm.dispose()
          }

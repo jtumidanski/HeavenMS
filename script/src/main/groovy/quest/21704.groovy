@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,11 +24,11 @@ class Quest21704 {
          status--
       }
       if (status == 0) {
-         qm.sendNext("How did the training go? The Penguin Teacher #p1202006# likes to exaggerate and it worried me knowing that he has bouts of Alzheimer's, but I'm sure he helped you. He's been studying the skills of heroes for a very long time.")
+         qm.sendNext(I18nMessage.from("21704_HOW_DID_THE_TRAINING_GO"))
       } else if (status == 1) {
          qm.sendNextPrev("#b(You tell her that you were able to remember the Combo Ability skill.)#k", (byte) 2)
       } else if (status == 2) {
-         qm.sendNextPrev("That's great! Honestly, though, I think it has less to do with the method of #p1202006#'s training and more to do with your body remembering its old abilities. #bI'm sure your body will remember more skills as you continue to train#k!  \r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 500 exp")
+         qm.sendNextPrev(I18nMessage.from("21704_THAT_IS_GREAT"))
       } else if (status == 3) {
          qm.forceCompleteQuest()
          qm.gainExp(500)

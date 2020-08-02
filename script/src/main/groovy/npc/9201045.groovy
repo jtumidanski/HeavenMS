@@ -68,7 +68,7 @@ class NPC9201045 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
             if (stage < 5) {
-               cm.sendNext("The portal is already open, advance for the trials that awaits you there.")
+               cm.sendNext(I18nMessage.from("9201045_ALREADY_OPEN"))
             } else if (stage == 5) {
                eim.warpEventTeamToMapSpawnPoint(670010700, 0)
             } else {
@@ -83,7 +83,7 @@ class NPC9201045 {
                      eim.warpEventTeamToMapSpawnPoint(670010750, 1)
                   }
                } else {
-                  cm.sendNext("Wait for the leader's command to start the bonus phase.")
+                  cm.sendNext(I18nMessage.from("9201045_LEADERS_COMMAND"))
                }
             }
          } else {
@@ -93,9 +93,9 @@ class NPC9201045 {
 
                   if (state == -1) {           // preamble
                      if (stage == 4) {
-                        cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k of the Amorian Challenge. In this stage, collect me #b50 #t4031597##k from the mobs around here.")
+                        cm.sendOk(I18nMessage.from("9201045_WELCOME").with(stage))
                      } else if (stage == 5) {
-                        cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k of the Amorian Challenge. That was quite the run to reach here, eh? Well, that was your task this stage here, anyway: survival! Firstly, have anyone alive gathered here before challenging the boss.")
+                        cm.sendOk(I18nMessage.from("9201045_WELCOME_2").with(stage))
                      }
 
                      int st = (debug) ? 2 : 0
@@ -111,11 +111,11 @@ class NPC9201045 {
                               eim.restartEventTimer(4 * 60 * 1000)
                            }
 
-                           cm.sendNext("Well done! Let me open the gate for you now.")
+                           cm.sendNext(I18nMessage.from("9201045_WELL_DONE"))
                            MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201045_TIME_RUNS_SHORT"))
                            clearStage(stage, eim, curMap)
                         } else {
-                           cm.sendNext("Hey, didn't you pay heed? I demand #r50 #t4031597##k for the success of this trial.")
+                           cm.sendNext(I18nMessage.from("9201045_DID_YOU_NOT_PAY_HEED"))
                         }
 
                      } else if (stage == 5) {
@@ -147,20 +147,20 @@ class NPC9201045 {
                                  eim.restartEventTimer((long) tlf - (4 * 60 * 1000 - tr))
                               }
 
-                              cm.sendNext("Okay, your team is already gathered. Talk to me when you guys feel ready to fight the #rGeist Balrog#k.")
+                              cm.sendNext(I18nMessage.from("9201045_ALREADY_GATHERED"))
 
                               MessageBroadcaster.getInstance().sendMapServerNotice(cm.getPlayer().getMap(), ServerNoticeType.PINK_TEXT, I18nMessage.from("9201045_BOSS_FIGHT"))
                               clearStage(stage, eim, curMap)
                            } else {
-                              cm.sendNext("You guys reached here by teleporting, eh? I can tell it. This is a shame, all gates needs to be open to fulfill this stage. If you still have the time, backtrack your steps and take down those gates.")
+                              cm.sendNext(I18nMessage.from("9201045_I_CAN_TELL_IT"))
                            }
                         } else {
-                           cm.sendNext("Your team has not gathered nearby yet. Give them some time to reach here.")
+                           cm.sendNext(I18nMessage.from("9201045_TEAM_NOT_GATHERED"))
                         }
                      }
                   }
                } else {
-                  cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+                  cm.sendNext(I18nMessage.from("9201045_PARTY_LEADER_MUST_TALK"))
                }
             } else {
                Rectangle area = cm.getMap().getArea(0)
@@ -168,21 +168,21 @@ class NPC9201045 {
                   if (cm.getPlayer().isAlive()) {
                      cm.warp(670010700, "st01")
                   } else {
-                     cm.sendNext("Oy stand back... You are already dead.")
+                     cm.sendNext(I18nMessage.from("9201045_STAND_BACK"))
                   }
                } else {
                   if (cm.isEventLeader()) {
                      if (cm.haveItem(4031594, 1)) {
                         cm.gainItem(4031594, (short) -1)
-                        cm.sendNext("Congratulations! Your party defeated the Geist Balrog, thus #bcompleting the Amorian Challenge#k! Talk to me again to start the bonus stage.")
+                        cm.sendNext(I18nMessage.from("9201045_CONGRATULATIONS"))
 
                         clearStage(stage, eim, curMap)
                         eim.clearPQ()
                      } else {
-                        cm.sendNext("How is it? Are you going to retrieve me the #b#t4031594##k? That's your last trial, hold on!")
+                        cm.sendNext(I18nMessage.from("9201045_HOW_IS_IT"))
                      }
                   } else {
-                     cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+                     cm.sendNext(I18nMessage.from("9201045_PARTY_LEADER_MUST_TALK"))
                   }
                }
             }

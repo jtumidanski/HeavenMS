@@ -2,6 +2,8 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
 
 /*
 	NPC Name: 		
@@ -22,7 +24,7 @@ class NPC1032000 {
    boolean hasCoupon = false
 
    def start() {
-      cm.sendNext("Hello, I drive the Regular Cab. If you want to go from town to town safely and fast, then ride our cab. We'll gladly take you to your destination with an affordable price.")
+      cm.sendNext(I18nMessage.from("1032000_HELLO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -33,7 +35,7 @@ class NPC1032000 {
             cm.dispose()
             return
          } else if (status >= 2 && mode == 0) {
-            cm.sendNext("There's a lot to see in this town, too. Come back and find us when you need to go to a different town.")
+            cm.sendNext(I18nMessage.from("1032000_A_LOT_TO_DO"))
             cm.dispose()
             return
          }
@@ -45,19 +47,19 @@ class NPC1032000 {
          if (status == 1) {
             String selStr = ""
             if (cm.getJobId() == 0) {
-               selStr += "We have a special 90% discount for beginners."
+               selStr += I18nMessage.from("1032000_BEGINNER_SPECIAL").to(cm.getClient()).evaluate()
             }
-            selStr += "Choose your destination, for fees will change from place to place.#b"
+            selStr += I18nMessage.from("1032000_CHOOSE_DESTINATION").to(cm.getClient()).evaluate()
             for (def i = 0; i < maps.length; i++) {
                selStr += "\r\n#L" + i + "##m" + maps[i] + "# (" + (cm.getJobId() == 0 ? cost[i] / 10 : cost[i]) + " mesos)#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (status == 2) {
             if (maps[selection] == 100000000 && cm.getMapId() == 101000000 && cm.haveItem(4032288)) {
-               cm.sendYesNo("Hmm, I see you have been recommended by Neinheart to come to Victoria Island to improve your knightly skills. Well, just this time the ride will be free of charges. Will you take the ride?")
+               cm.sendYesNo(I18nMessage.from("1032000_FREE_OF_CHARGE"))
                hasCoupon = true
             } else {
-               cm.sendYesNo("You don't have anything else to do here, huh? Do you really want to go to #b#m" + maps[selection] + "##k? It'll cost you #b" + (cm.getJobId() == 0 ? cost[selection] / 10 : cost[selection]) + " mesos#k.")
+               cm.sendYesNo(I18nMessage.from("1032000_NOTHING_ELSE_TO_DO").with(maps[selection], (cm.getJobId() == 0 ? cost[selection] / 10 : cost[selection])))
             }
 
             selectedMap = selection
@@ -70,7 +72,7 @@ class NPC1032000 {
                }
 
                if (cm.getMeso() < mesos) {
-                  cm.sendNext("You don't have enough mesos. Sorry to say this, but without them, you won't be able to ride the cab.")
+                  cm.sendNext(I18nMessage.from("1032000_NOT_ENOUGH_MESOS"))
                   cm.dispose()
                   return
                }

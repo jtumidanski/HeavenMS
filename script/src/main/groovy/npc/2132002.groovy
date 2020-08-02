@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,7 +22,7 @@ class NPC2132002 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendNext("The magic of this forest is amazing...")
+      cm.sendNext(I18nMessage.from("2132002_MAGIC_OF_THIS_FOREST"))
       cm.dispose()
    }
 }

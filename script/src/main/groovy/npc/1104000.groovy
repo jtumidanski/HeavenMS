@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,7 +32,7 @@ class NPC1104000 {
       }
 
       if (status == 0) {
-         cm.sendNext("What the... you don't belong here!")
+         cm.sendNext(I18nMessage.from("1104000_YOU_DO_NOT_BELONG"))
       } else if (status == 1) {
          EventManager puppet = cm.getEventManager("Puppeteer")
          puppet.setProperty("player", cm.getPlayer().getName())

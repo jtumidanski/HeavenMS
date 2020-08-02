@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101001 {
    int sel = -1
 
    def start() {
-      cm.sendNext("I miss my sister... She's always working at the palace as the servant and I only get to see her on Sundays. The King and Queen are so selfish.")
+      cm.sendNext(I18nMessage.from("2101001_I_MISS_MY_SISTER"))
       cm.dispose()
    }
 

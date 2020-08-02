@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2217 {
          }
 
          if (status == 0) {
-            qm.sendNext("Hey, did you notice already, it looks like some awful stench is emanating from the sewers... Ewww")
+            qm.sendNext(I18nMessage.from("2217_AWFUL_STENCH"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainExp(7000)

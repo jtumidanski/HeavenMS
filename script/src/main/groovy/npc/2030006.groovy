@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -95,13 +96,13 @@ class NPC2030006 {
             if (cm.getPlayer().gotPartyQuestItem("JBQ") && !cm.haveItem(4031058, 1)) {
                if (cm.haveItem(4005004, 1)) {
                   if (!cm.canHold(4031058)) {
-                     cm.sendNext("Have a free ETC slot available before accepting this trial.")
+                     cm.sendNext(I18nMessage.from("2030006_NEED_ETC_SLOT_AVAILABLE"))
                      cm.dispose()
                   } else {
-                     cm.sendNext("Alright... I'll be testing out your wisdom here. Answer all the questions correctly, and you will pass the test BUT, if you even lie to me once, then you'll have to start over again ok, here we go.")
+                     cm.sendNext(I18nMessage.from("2030006_ALRIGHT"))
                   }
                } else {
-                  cm.sendNext("Bring me a #b#t4005004##k to proceed with the trial.")
+                  cm.sendNext(I18nMessage.from("2030006_BRING_ME"))
                   cm.dispose()
                }
             } else {
@@ -123,7 +124,7 @@ class NPC2030006 {
             cm.sendSimple(questionHead + questionEntry + "\r\n\r\n#b" + questionOptions + "#k")
          } else if (status >= 2 && status <= 5) {
             if (!evaluateAnswer(selection)) {
-               cm.sendNext("You have failed the question.")
+               cm.sendNext(I18nMessage.from("2030006_FAILED"))
                cm.dispose()
                return
             }
@@ -140,16 +141,16 @@ class NPC2030006 {
             cm.sendSimple(questionHead + questionEntry + "\r\n\r\n#b" + questionOptions + "#k")
          } else if (status == 6) {
             if (!evaluateAnswer(selection)) {
-               cm.sendNext("You have failed the question.")
+               cm.sendNext(I18nMessage.from("2030006_FAILED"))
                cm.dispose()
                return
             }
 
-            cm.sendOk("Alright. All your answers have been proven as the truth. Your wisdom has been proven.\r\nTake this necklace and go back.")
+            cm.sendOk(I18nMessage.from("2030006_CORRECT_ANSWERS"))
             cm.gainItem(4031058, (short) 1)
             cm.dispose()
          } else {
-            cm.sendOk("Unexpected branch.")
+            cm.sendOk(I18nMessage.from("2030006_UNEXPECTED"))
             cm.dispose()
          }
       }

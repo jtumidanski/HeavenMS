@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -21,7 +22,7 @@ class NPC9010001 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendNext("Hi, I'm #p9010001#.")
+      cm.sendNext(I18nMessage.from("9010001_HELLO"))
       cm.dispose()
    }
 }

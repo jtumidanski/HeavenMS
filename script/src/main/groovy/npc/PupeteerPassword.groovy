@@ -37,13 +37,13 @@ class NpcPuppeteerPassword {
 
       if (status == 0) {
          if (cm.isQuestStarted(21728)) {
-            cm.sendOk("You search for any hints of the Puppeteer, but it seems a powerful force blocks the path... Better return to #b#p1061019##k.")
+            cm.sendOk(I18nMessage.from("PupeteerPassword_BETTER_RETURN"))
             cm.setQuestProgress(21728, 21761, 0)
             cm.dispose()
             return
          }
 
-         cm.sendGetText("A suspicious voice pierces through the silence. #bPassword#k!")
+         cm.sendGetText(I18nMessage.from("PupeteerPassword_SUSPICIOUS_VOICE"))
       } else if (status == 1) {
          if (cm.getText() == "Francis is a genius Puppeteer!") {
             if (cm.isQuestStarted(20730) && cm.getQuestProgressInt(20730, 9300285) == 0) {
@@ -56,7 +56,7 @@ class NpcPuppeteerPassword {
 
             cm.dispose()
          } else {
-            cm.sendOk("#rWrong!")
+            cm.sendOk(I18nMessage.from("PupeteerPassword_WRONG"))
          }
       } else if (status == 2) {
          cm.dispose()

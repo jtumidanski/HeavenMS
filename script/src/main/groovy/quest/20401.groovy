@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20401 {
    QuestActionManager qm
@@ -23,7 +24,8 @@ class Quest20401 {
          }
 
          if (status == 0) {
-            qm.sendNext("Last time #bAdvanced Knight #p1103000##k was seen, he was investigating the surging increase on #rzombies#k lately on the #rhigh-grounds of El Nath#k. You should get yourself there to see if you can find any clue of what could have happened.")
+            qm.sendNext(I18nMessage.from("20401_YOU_SHOULD_GET_YOURSELF"))
+
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()

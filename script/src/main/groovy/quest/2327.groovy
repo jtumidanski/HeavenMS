@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -21,9 +22,9 @@ class Quest2327 {
       }
 
       if (status == 0) {
-         qm.sendNext("Hey! Thank you for bringing me a #b#t4001317##k.")
+         qm.sendNext(I18nMessage.from("2327_THANK_YOU"))
       } else if (status == 1) {
-         qm.sendNextPrev("I plan to escape from here wearing the #b#t4001317##k. Give me a minute to put it on. Talk to you soon...")
+         qm.sendNextPrev(I18nMessage.from("2327_I_PLAN_TO_ESCAPE"))
       } else if (status == 2) {
          qm.forceStartQuest()
          qm.dispose()

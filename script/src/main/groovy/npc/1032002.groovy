@@ -1,6 +1,9 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
+import tools.UserMessage
 
 /*
 	NPC Name: 		
@@ -36,55 +39,60 @@ class NPC1032002 {
          cm.dispose()
       }
       if (status == 0 && mode == 1) {
-         String selStr = "Welcome to my eco-safe refining operation! What would you like today?#b"
-         String[] options = ["Make a glove", "Upgrade a glove", "Upgrade a hat", "Make a wand", "Make a staff"]
+         String selStr = I18nMessage.from("1032002_WHAT_WOULD_YOU_LIKE").to(cm.getClient()).evaluate()
+         UserMessage[] options = [I18nMessage.from("1032002_MAKE_A_GLOVE"), I18nMessage.from("1032002_UPGRADE_A_GLOVE"), I18nMessage.from("1032002_UPGRADE_A_HAT"),
+                                  I18nMessage.from("1032002_MAKE_A_WAND"), I18nMessage.from("1032002_MAKE_A_STAFF")]
          for (int i = 0; i < options.length; i++) {
-            selStr += "\r\n#L" + i + "# " + options[i] + "#l"
+            selStr += "\r\n#L" + i + "# " + options[i].to(cm.getClient()).evaluate() + "#l"
          }
 
-         cm.sendSimple(selStr)
+         cm.sendSimple(SimpleMessage.from(selStr))
       } else if (status == 1 && mode == 1) {
          selectedType = selection
          if (selectedType == 0) { //glove refine
-            String selStr = "So, what kind of glove would you like me to make?#b"
-            String[] items = ["Lemona#k - Magician Lv. 15#b", "Blue Morrican#k - Magician Lv. 20#b", "Ocean Mesana#k - Magician Lv. 25#b", "Red Lutia#k - Magician Lv. 30#b", "Red Noel#k - Magician Lv. 35#b", "Red Arten#k - Magician Lv. 40#b",
-                              "Red Pennance#k - Magician Lv. 50#b", "Steel Manute#k - Magician Lv. 60#b"]
+            String selStr = I18nMessage.from("1032002_WHAT_KIND_OF_GLOVE").to(cm.getClient()).evaluate()
+            UserMessage[] items = [I18nMessage.from("1032002_LEMONA"), I18nMessage.from("1032002_BLUE_MORRICAN"), I18nMessage.from("1032002_OCEAN_MESANA"),
+                              I18nMessage.from("1032002_RED_LUTIA"), I18nMessage.from("1032002_RED_NOEL"), I18nMessage.from("1032002_RED_ARTEN"),
+                              I18nMessage.from("1032002_RED_PENNANCE"), I18nMessage.from("1032002_STEEL_MANUTE")]
             for (int i = 0; i < items.length; i++) {
-               selStr += "\r\n#L" + i + "# " + items[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + items[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (selectedType == 1) { //glove upgrade
-            String selStr = "So, what kind of glove are you looking to upgrade to?#b"
-            String[] items = ["Green Morrican#k - Magician Lv. 20#b", "Purple Morrican#k - Magician Lv. 20#b", "Blood Mesana#k - Magician Lv. 25#b", "Dark Mesana#k - Magician Lv. 25#b", "Blue Lutia#k - Magician Lv. 30#b", "Black Lutia#k - Magician Lv. 30#b",
-                              "Blue Noel#k - Magician Lv. 35#b", "Dark Noel#k - Magician Lv. 35#b", "Blue Arten#k - Magician Lv. 40#b", "Dark Arten#k - Magician Lv. 40#b", "Blue Pennance#k - Magician Lv. 50#b", "Dark Pennance#k - Magician Lv. 50#b",
-                              "Gold Manute#k - Magician Lv. 60#b", "Dark Manute#k - Magician Lv. 60#b"]
+            String selStr = I18nMessage.from("1032002_GLOVE_UPGRADE").to(cm.getClient()).evaluate()
+            UserMessage[] items = [I18nMessage.from("1032002_GREEN_MORRICAN"), I18nMessage.from("1032002_PURPLE_MORRICAN"), I18nMessage.from("1032002_BLOOD_MESANA"),
+                                   I18nMessage.from("1032002_DARK_MESANA"), I18nMessage.from("1032002_BLUE_LUTIA"), I18nMessage.from("1032002_BLACK_LUTIA"),
+                                   I18nMessage.from("1032002_BLUE_NOEL"), I18nMessage.from("1032002_DARK_NOEL"), I18nMessage.from("1032002_BLUE_ARTEN"),
+                                   I18nMessage.from("1032002_DARK_ARTEN"), I18nMessage.from("1032002_BLUE_PENNANCE"), I18nMessage.from("1032002_DARK_PENNANCE"),
+                                   I18nMessage.from("1032002_GOLD_MANUTE"), I18nMessage.from("1032002_DARK_MANUTE")]
             for (int i = 0; i < items.length; i++) {
-               selStr += "\r\n#L" + i + "# " + items[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + items[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (selectedType == 2) { //hat upgrade
-            String selStr = "A hat? Which one were you thinking of?#b"
-            String[] items = ["Steel Pride#k - Magician Lv. 30#b", "Golden Pride#k - Magician Lv. 30#b"]
+            String selStr = I18nMessage.from("1032002_WHICH_HAT").to(cm.getClient()).evaluate()
+            UserMessage[] items = [I18nMessage.from("1032002_STEEL_PRIDE"), I18nMessage.from("1032002_GOLDEN_PRIDE")]
             for (int i = 0; i < items.length; i++) {
-               selStr += "\r\n#L" + i + "# " + items[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + items[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (selectedType == 3) { //wand refine
-            String selStr = "A wand, huh? Prefer the smaller weapon that fits in your pocket? Which type are you seeking?#b"
-            String[] items = ["Wooden Wand#k - Common Lv. 8#b", "Hardwood Wand#k - Common Lv. 13#b", "Metal Wand#k - Common Lv. 18#b", "Ice Wand#k - Magician Lv. 23#b", "Mithril Wand#k - Magician Lv. 28#b",
-                              "Wizard Wand#k - Magician Lv. 33#b", "Fairy Wand#k - Magician Lv. 38#b", "Cromi#k - Magician Lv. 48#b"]
+            String selStr = I18nMessage.from("1032002_A_WAND").to(cm.getClient()).evaluate()
+            UserMessage[] items = [I18nMessage.from("1032002_WOODEN_WAND"), I18nMessage.from("1032002_HARDWOOD_WAND"), I18nMessage.from("1032002_METAL_WAND"),
+                              I18nMessage.from("1032002_ICE_WAND"), I18nMessage.from("1032002_MITHRIL_WAND"), I18nMessage.from("1032002_WIZARD_WAND"),
+                              I18nMessage.from("1032002_FAIRY_WAND"), I18nMessage.from("1032002_CROMI")]
             for (int i = 0; i < items.length; i++) {
-               selStr += "\r\n#L" + i + "# " + items[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + items[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          } else if (selectedType == 4) { //staff refine
-            String selStr = "Ah, a staff, a great symbol of one's power! Which are you looking to make?#b"
-            String[] items = ["Wooden Staff#k - Magician Lv. 10#b", "Sapphire Staff#k - Magician Lv. 15#b", "Emerald Staff#k - Magician Lv. 15#b", "Old Wooden Staff#k - Magician Lv. 20#b", "Wizard Staff#k - Magician Lv. 25#b",
-                              "Arc Staff#k - Magician Lv. 45#b"]
+            String selStr = I18nMessage.from("1032002_A_STAFF").to(cm.getClient()).evaluate()
+            UserMessage[] items = [I18nMessage.from("1032002_WOODEN_STAFF"), I18nMessage.from("1032002_SAPPHIRE_STAFF"), I18nMessage.from("1032002_EMERALD_STAFF"),
+                              I18nMessage.from("1032002_OLD_WOODEN_STAFF"), I18nMessage.from("1032002_WIZARD_STAFF"), I18nMessage.from("1032002_ARC_STAFF")]
             for (int i = 0; i < items.length; i++) {
-               selStr += "\r\n#L" + i + "# " + items[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + items[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
          }
       } else if (status == 2 && mode == 1) {
          selectedItem = selection
@@ -142,7 +150,7 @@ class NPC1032002 {
             cost = costSet[selectedItem]
          }
 
-         String prompt = "You want me to make a #t" + item + "#? In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
+         String prompt = I18nMessage.from("1032002_WANT_ME_TO_MAKE_A").to(cm.getClient()).with(item).evaluate()
 
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
             for (int i = 0; i < mats.size(); i++) {
@@ -156,16 +164,16 @@ class NPC1032002 {
             prompt += "\r\n#i4031138# " + cost + " meso"
          }
 
-         cm.sendYesNo(prompt)
+         cm.sendYesNo(SimpleMessage.from(prompt))
       } else if (status == 3 && mode == 1) {
          boolean complete = true
 
          if (!cm.canHold(item, 1)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("1032002_CHECK_YOUR_INVENTORY_FOR_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost) {
-            cm.sendOk("Sorry, but all of us need money to live. Come back when you can pay my fees, yes?")
+            cm.sendOk(I18nMessage.from("1032002_NEED_MORE_MESOS"))
             cm.dispose()
             return
          } else {
@@ -181,7 +189,7 @@ class NPC1032002 {
          }
 
          if (!complete) {
-            cm.sendOk("Uhm... I don't keep extra material on me. Sorry. ")
+            cm.sendOk(I18nMessage.from("1032002_MISSING_MATERIALS"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -196,7 +204,7 @@ class NPC1032002 {
             }
 
             cm.gainItem(item, (short) 1)
-            cm.sendOk("It's a success! Oh, I've never felt so alive! Please come back again!")
+            cm.sendOk(I18nMessage.from("1032002_SUCCESS"))
          }
          cm.dispose()
       }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.inventory.MapleInventoryType
 import scripting.npc.NPCConversationManager
@@ -38,7 +39,7 @@ class NPC9000019 {
 
          if (status == 0) {
             if (cm.getPlayer().getInventory(MapleInventoryType.ETC).getNumFreeSlot() < 1) {
-               cm.sendNext("Check for a available slot on your ETC inventory.")
+               cm.sendNext(I18nMessage.from("9000019_NEED_ETC_SPACE"))
                cm.dispose()
                return
             }

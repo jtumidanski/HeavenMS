@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest21719 {
       } else if (status == 1) {
          qm.sendNextPrev("Who are you?", (byte) 2)
       } else if (status == 2) {
-         qm.sendAcceptDecline("Me? If you want to know, stop by my cave. I'll even send you an invitation. You'll be directly sent to my cave as soon as you accept. Look forward to seeing you there.")
+         qm.sendAcceptDecline(I18nMessage.from("21719_STOP_BY_MY_CAVE"))
       } else if (status == 3) {
          qm.forceCompleteQuest()
          qm.warp(910510200, 0)

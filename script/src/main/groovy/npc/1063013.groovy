@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -53,7 +54,7 @@ class NPC1063013 {
 
          cm.setQuestProgress(2236, nextProgress)
          cm.gainItem(4032263, (short) -1)
-         cm.sendOk("The seal took it's place, repelling the evil in the area.")
+         cm.sendOk(I18nMessage.from("1063013_SEAL_TOOK_ITS_PLACE"))
          return 1
       }
 

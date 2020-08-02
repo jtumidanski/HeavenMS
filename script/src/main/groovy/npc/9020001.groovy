@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import scripting.event.EventInstanceManager
@@ -120,28 +121,28 @@ class NPC9020001 {
             int stage = curMap - 103000800 + 1
             if (eim.getProperty(stage.toString() + "stageclear") != null) {
                if (stage < 5) {
-                  cm.sendNext("Please hurry on to the next stage, the portal opened!")
+                  cm.sendNext(I18nMessage.from("9020001_PLEASE_HURRY"))
                   cm.dispose()
                } else {
-                  cm.sendNext("Incredible! You cleared all the stages to get to this point. Here's a small prize for your job well done. Before you accept it, however, please make sure your use and etc. inventories have empty slots available.")
+                  cm.sendNext(I18nMessage.from("9020001_INCREDIBLE"))
                }
             } else if (curMap == 103000800) {   // stage 1
                if (cm.isEventLeader()) {
                   int numberOfPasses = eim.getPlayerCount() - 1     // minus leader
 
                   if (cm.hasItem(4001008, numberOfPasses)) {
-                     cm.sendNext("You gathered up " + numberOfPasses + " passes! Congratulations on clearing the stage! I'll make the portal that sends you to the next stage. There's a time limit on getting there, so please hurry. Best of luck to you all!")
+                     cm.sendNext(I18nMessage.from("9020001_CONGRATULATIONS").with(numberOfPasses))
                      clearStage(stage, eim, curMap)
                      eim.gridClear()
                      cm.gainItem(4001008, (short) -numberOfPasses)
                   } else {
-                     cm.sendNext("I'm sorry, but you are short on the number of passes. You need to give me the right number of passes; it should be the number of members of your party minus the leader, in this case the total of " + numberOfPasses + " to clear the stage. Tell your party members to solve the questions, gather up the passes, and give them to you.")
+                     cm.sendNext(I18nMessage.from("9020001_SHORT_PASSES").with(numberOfPasses))
                   }
                } else {
                   int data = eim.gridCheck(cm.getPlayer())
 
                   if (data == 0) {
-                     cm.sendNext("Thanks for bringing me the coupons. Please hand the pass to your party leader to continue.")
+                     cm.sendNext(I18nMessage.from("9020001_THANK_YOU"))
                   } else if (data == -1) {
                      data = Math.floor(Math.random() * stage1Questions.length).intValue() + 1
                      //data will be counted from 1
@@ -153,7 +154,7 @@ class NPC9020001 {
                      int answer = stage1Answers[data - 1]
 
                      if (cm.itemQuantity(4001007) == answer) {
-                        cm.sendNext("That's the right answer! For that you have just received a #bpass#k. Please hand it to the leader of the party.")
+                        cm.sendNext(I18nMessage.from("9020001_RIGHT_ANSWER"))
                         cm.gainItem(4001007, (short) -answer)
                         cm.gainItem(4001008, (short) 1)
                         eim.gridInsert(cm.getPlayer(), 0)
@@ -173,9 +174,9 @@ class NPC9020001 {
                String nthText = "2nd", nthObject = "ropes", nthVerb = "hang", nthPosition = "hang on the ropes too low"
 
                if (!eim.isEventLeader(cm.getPlayer())) {
-                  cm.sendOk("Follow the instructions given by your party leader to proceed through this stage.")
+                  cm.sendOk(I18nMessage.from("9020001_FOLLOW_INSTRUCTIONS"))
                } else if (eim.getProperty(stgProperty) == null) {
-                  cm.sendNext("Hi. Welcome to the " + nthText + " stage. Next to me, you'll see a number of " + nthObject + ". Out of these " + nthObject + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthObject + " and " + nthVerb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthPosition + "; please be near the middle of the " + nthObject + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthObject + ". Once they are " + nthVerb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthObject + " to " + nthVerb + " on!")
+                  cm.sendNext(I18nMessage.from("9020001_WELCOME").with(nthText, nthObject, nthObject, nthObject, nthVerb, nthPosition, nthObject, nthObject, nthVerb, nthObject, nthVerb))
                   int c = Math.floor(Math.random() * stgCombos.length).intValue()
                   eim.setProperty(stgProperty, c.toString())
                } else {
@@ -183,10 +184,10 @@ class NPC9020001 {
 
                   if (accept) {
                      clearStage(stage, eim, curMap)
-                     cm.sendNext("Please hurry on to the next stage, the portal opened!")
+                     cm.sendNext(I18nMessage.from("9020001_PLEASE_HURRY"))
                   } else {
                      eim.showWrongEffect()
-                     cm.sendNext("It looks like you haven't found the 3 " + nthObject + " just yet. Please think of a different combination of " + nthObject + ". Only 3 are allowed to " + nthVerb + " on " + nthObject + ", and if you " + nthPosition + " it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext(I18nMessage.from("9020001_YOU_HAVE_NOT_FOUND").with(nthObject, nthObject, nthVerb, nthObject, nthPosition))
                   }
                }
 
@@ -199,9 +200,9 @@ class NPC9020001 {
                String nthText = "3rd", nthObject = "platforms", nthVerb = "stand", nthPosition = "stand too close to the edges"
 
                if (!eim.isEventLeader(cm.getPlayer())) {
-                  cm.sendOk("Follow the instructions given by your party leader to proceed through this stage.")
+                  cm.sendOk(I18nMessage.from("9020001_FOLLOW_INSTRUCTIONS"))
                } else if (eim.getProperty(stgProperty) == null) {
-                  cm.sendNext("Hi. Welcome to the " + nthText + " stage. Next to me, you'll see a number of " + nthObject + ". Out of these " + nthObject + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthObject + " and " + nthVerb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthPosition + "; please be near the middle of the " + nthObject + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthObject + ". Once they are " + nthVerb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthObject + " to " + nthVerb + " on!")
+                  cm.sendNext(I18nMessage.from("9020001_WELCOME").with(nthText, nthObject, nthObject, nthObject, nthVerb, nthPosition, nthObject, nthObject, nthVerb, nthObject, nthVerb))
                   int c = Math.floor(Math.random() * stgCombos.length).toInteger()
                   eim.setProperty(stgProperty, c.toString())
                } else {
@@ -209,10 +210,10 @@ class NPC9020001 {
 
                   if (accept) {
                      clearStage(stage, eim, curMap)
-                     cm.sendNext("Please hurry on to the next stage, the portal opened!")
+                     cm.sendNext(I18nMessage.from("9020001_PLEASE_HURRY"))
                   } else {
                      eim.showWrongEffect()
-                     cm.sendNext("It looks like you haven't found the 3 " + nthObject + " just yet. Please think of a different combination of " + nthObject + ". Only 3 are allowed to " + nthVerb + " on " + nthObject + ", and if you " + nthPosition + " it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext(I18nMessage.from("9020001_YOU_HAVE_NOT_FOUND").with(nthObject, nthObject, nthVerb, nthObject, nthPosition))
                   }
                }
 
@@ -225,9 +226,9 @@ class NPC9020001 {
                String nthText = "4th", nthObject = "barrels", nthVerb = "stand", nthPosition = "stand too close to the edges"
 
                if (!eim.isEventLeader(cm.getPlayer())) {
-                  cm.sendOk("Follow the instructions given by your party leader to proceed through this stage.")
+                  cm.sendOk(I18nMessage.from("9020001_FOLLOW_INSTRUCTIONS"))
                } else if (eim.getProperty(stgProperty) == null) {
-                  cm.sendNext("Hi. Welcome to the " + nthText + " stage. Next to me, you'll see a number of " + nthObject + ". Out of these " + nthObject + ", #b3 are connected to the portal that sends you to the next stage#k. All you need to do is have #b3 party members find the correct " + nthObject + " and " + nthVerb + " on them.#k\r\nBUT, it doesn't count as an answer if you " + nthPosition + "; please be near the middle of the " + nthObject + " to be counted as a correct answer. Also, only 3 members of your party are allowed on the " + nthObject + ". Once they are " + nthVerb + "ing on them, the leader of the party must #bdouble-click me to check and see if the answer's correct or not#k. Now, find the right " + nthObject + " to " + nthVerb + " on!")
+                  cm.sendNext(I18nMessage.from("9020001_WELCOME").with(nthText, nthObject, nthObject, nthObject, nthVerb, nthPosition, nthObject, nthObject, nthVerb, nthObject, nthVerb))
                   int c = Math.floor(Math.random() * stgCombos.length).toInteger()
                   eim.setProperty(stgProperty, c.toString())
                } else {
@@ -235,10 +236,10 @@ class NPC9020001 {
 
                   if (accept) {
                      clearStage(stage, eim, curMap)
-                     cm.sendNext("Please hurry on to the next stage, the portal opened!")
+                     cm.sendNext(I18nMessage.from("9020001_PLEASE_HURRY"))
                   } else {
                      eim.showWrongEffect()
-                     cm.sendNext("It looks like you haven't found the 3 " + nthObject + " just yet. Please think of a different combination of " + nthObject + ". Only 3 are allowed to " + nthVerb + " on " + nthObject + ", and if you " + nthPosition + " it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext(I18nMessage.from("9020001_YOU_HAVE_NOT_FOUND").with(nthObject, nthObject, nthVerb, nthObject, nthPosition))
                   }
                }
 
@@ -246,23 +247,23 @@ class NPC9020001 {
             } else if (curMap == 103000804) {
                if (eim.isEventLeader(cm.getPlayer())) {
                   if (cm.haveItem(4001008, 10)) {
-                     cm.sendNext("Here's the portal that leads you to the last, bonus stage. It's a stage that allows you to defeat regular monsters a little easier. You'll be given a set amount of time to hunt as much as possible, but you can always leave the stage in the middle of it through the NPC. Again, congratulations on clearing all the stages. Let your party talk to me to receive their prizes as they are allowed to pass to the bonus stage. Take care...")
+                     cm.sendNext(I18nMessage.from("9020001_LAST_BONUS_STAGE"))
                      cm.gainItem(4001008, (short) -10)
 
                      clearStage(stage, eim, curMap)
                      eim.clearPQ()
                   } else {
-                     cm.sendNext("Hello. Welcome to the 5th and final stage. Walk around the map and you'll be able to find some Boss monsters. Defeat all of them, gather up #bthe passes#k, and please get them to me. Once you earn your pass, the leader of your party will collect them, and then get them to me once the #bpasses#k are gathered up. The monsters may be familiar to you, but they may be much stronger than you think, so please be careful. Good luck!")
+                     cm.sendNext(I18nMessage.from("9020001_FINAL_STAGE"))
                   }
                } else {
-                  cm.sendNext("Welcome to the 5th and final stage.  Walk around the map and you will be able to find some Boss monsters.  Defeat them all, gather up the #bpasses#k, and #bgive them to your leader#k.  Once you are done, return to me to collect your reward.")
+                  cm.sendNext(I18nMessage.from("9020001_WELCOME_FINAL_STAGE"))
                }
 
                cm.dispose()
             }
          } else if (status == 1) {
             if (!eim.giveEventReward(cm.getPlayer())) {
-               cm.sendNext("Please make room on your inventory first!")
+               cm.sendNext(I18nMessage.from("9020001_MAKE_INVENTORY_ROOM"))
             } else {
                cm.warp(103000805, "st00")
             }

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,17 +14,17 @@ class Quest8238 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("Okay, then. See you around.")
+            qm.sendOk(I18nMessage.from("8238_SEE_YOU_AROUND"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
          String target = "is the Bigfoot"
-         qm.sendAcceptDecline("Hey, traveler! I need your help. A new threat has appeared to the citizens of the New Leaf City. I'm currently recruiting anyone, and this time's target #r" + target + "#k. Are you in?")
+         qm.sendAcceptDecline(I18nMessage.from("8238_NEED_YOUR_HELP").with(target))
       } else if (status == 1) {
          String reqs = "#r1 #t4032013##k"
-         qm.sendOk("Very well. Get me #r" + reqs + "#k, asap. The NLC is counting on you.")
+         qm.sendOk(I18nMessage.from("8238_VERY_WELL").with(reqs))
          qm.forceStartQuest()
       } else if (status == 2) {
          qm.dispose()

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,17 +18,17 @@ class Quest22002 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("Did you feed #p1013102#? You should have some breakfast now then, Evan. Today's breakfast is a #t2022620#. I've brought it with me. Hee hee. I was going to eat it myself if you didn't agree to feed #p1013102#.")
+         qm.sendNext(I18nMessage.from("22002_DID_YOU_FEED"))
       } else if (status == 1) {
-         qm.sendAcceptDecline("Here, I'll give you this #bSandwich#k, so #bgo talk to mom when you finish eating#k. She says she has something to tell you.")
+         qm.sendAcceptDecline(I18nMessage.from("22002_I_WILL_GIVE_YOU_THIS"))
       } else if (status == 2) {
          if (mode == 0) {//decline
-            qm.sendNext("Oh, what? Aren't you going to have breakfast? Breakfast is the most important meal of the day! Talk to me again if you change your mind. If you don't, I'm going to eat it myself.")
+            qm.sendNext(I18nMessage.from("22002_BREAKFAST_IS_IMPORTANT"))
             qm.dispose()
          } else {
             qm.gainItem(2022620, true)
             qm.forceStartQuest()
-            qm.sendNext("#b(Mom has something to say? Eat your #t2022620# and head back inside the house.)#k")
+            qm.sendNext(I18nMessage.from("22002_HEAD_BACK_INSIDE"))
          }
       } else if (status == 3) {
          qm.showInfo("UI/tutorial/evan/3/0")
@@ -45,7 +46,7 @@ class Quest22002 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("Did you eat your breakfast, Evan? Then, will you do me a favor?  \r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0# \r\n#i1003028# 1 #t1003028#  \r\n#i2022621# 5 #t2022621#s \r\n#i2022622# 5 #t2022622# \r\n#fUI/UIWindow.img/QuestIcon/8/0# 60 exp")
+         qm.sendNext(I18nMessage.from("22002_DID_YOU_EAT"))
       } else if (status == 1) {
          qm.forceCompleteQuest()
          qm.gainItem(1003028, (short) 1, true)

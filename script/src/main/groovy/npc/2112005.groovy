@@ -46,7 +46,7 @@ class NPC2112005 {
                   cm.gainItem(4001130, (short) -1)
                   eim.setIntProperty("npcShocked", 1)
 
-                  cm.sendNext("Oh? You got a letter for me? On times like this, what should it be... Gasp! Something big is going on, guys. Rally yourselves, from now on things will be harder than ever!")
+                  cm.sendNext(I18nMessage.from("2112005_SOMETHING_BIG"))
                   MessageBroadcaster.getInstance().sendServerNotice(eim.getPlayers(), ServerNoticeType.LIGHT_BLUE, I18nMessage.from("JULIET_SHOCK"))
 
                   cm.dispose()
@@ -54,10 +54,10 @@ class NPC2112005 {
                   MapleReactor door = cm.getMap().getReactorByName("jnr3_out3")
 
                   if (door.getState() == ((byte) 0)) {
-                     cm.sendNext("Let me open the door for you.")
+                     cm.sendNext(I18nMessage.from("2112005_LET_ME_OPEN_THE_DOOR"))
                      door.hitReactor(cm.getClient())
                   } else {
-                     cm.sendNext("Please hurry, Romeo is in trouble.")
+                     cm.sendNext(I18nMessage.from("2112005_PLEASE_HURRY"))
                   }
 
                   cm.dispose()
@@ -65,7 +65,7 @@ class NPC2112005 {
                   if (cm.isEventLeader()) {
                      cm.gainItem(4001134, (short) -1)
                      cm.gainItem(4001135, (short) -1)
-                     cm.sendNext("Great! You got both Alcadno and Zenumist files at hand. Now we can proceed.")
+                     cm.sendNext(I18nMessage.from("2112005_NOW_WE_CAN_PROCEED"))
 
                      eim.showClearEffect()
                      eim.giveEventPlayersStageReward(4)
@@ -74,12 +74,12 @@ class NPC2112005 {
                      cm.getMap().killAllMonsters()
                      cm.getMap().getReactorByName("jnr3_out3").hitReactor(cm.getClient())
                   } else {
-                     cm.sendOk("Please let your leader pass the files to me.")
+                     cm.sendOk(I18nMessage.from("2112005_LET_LEADER_PASS"))
                   }
 
                   cm.dispose()
                } else {
-                  cm.sendYesNo("We must keep fighting to save Romeo, please keep your pace. If you are not feeling so well to continue, your companions and I will understand... So, are you going to retreat?")
+                  cm.sendYesNo(I18nMessage.from("2112005_MUST_KEEP_FIGHTING"))
                }
             } else {
                cm.warp(926110700, 0)
@@ -88,13 +88,13 @@ class NPC2112005 {
          } else {
             if (status == 0) {
                if (eim.getIntProperty("escortFail") == 0) {
-                  cm.sendNext("Finally, Romeo is safe! Thanks to your efforts, we could save him from the clutches of Yulete, who will now be judged for his rebellion against Magatia. From now on, as he will start rehabilitation, we will keep an eye on his endeavours, making sure he will cause no more troubles on the future.")
+                  cm.sendNext(I18nMessage.from("2112005_FINALLY"))
                } else {
-                  cm.sendNext("Romeo is safe now, although the battle took it's toll on him... Thanks to your efforts, we could save him from the clutches of Yulete, who will now be judged for his rebellion against Magatia. Thank you.")
+                  cm.sendNext(I18nMessage.from("2112005_THANKS_TO_YOUR_EFFORTS"))
                   status = 2
                }
             } else if (status == 1) {
-               cm.sendNext("Now, please receive this gift as an act of acceptation for our gratitude.")
+               cm.sendNext(I18nMessage.from("2112005_RECEIVE_THIS_GIFT"))
             } else if (status == 2) {
                if (cm.canHold(4001160)) {
                   cm.gainItem(4001160, (short) 1)
@@ -105,7 +105,7 @@ class NPC2112005 {
                      cm.warp(926110500, 0)
                   }
                } else {
-                  cm.sendOk("Make sure you have a space on your ETC inventory.")
+                  cm.sendOk(I18nMessage.from("2112005_MAKE_ETC_SPACE"))
                }
 
                cm.dispose()

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Trash Can 2
@@ -35,7 +36,7 @@ class NPC1052110 {
          }
 
          if (status == 0) {
-            cm.sendOk("Just a trash can sitting there.")
+            cm.sendOk(I18nMessage.from("1052110_JUST_A_TRASH_CAN"))
             cm.dispose()
          }
       }

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -37,7 +38,7 @@ class NPC2090004 {
       if (mode == 1) {
          status++
       } else {
-         cm.sendOk("Oh, talk to me when you have decided what you want from me. I am very busy right now.")
+         cm.sendOk(I18nMessage.from("2090004_I_AM_VERY_BUSY"))
          cm.dispose()
          return
       }
@@ -47,12 +48,12 @@ class NPC2090004 {
             //player lost his book, help him complete quest anyways
 
             if (cm.canHold(4031554)) {
-               cm.sendOk("Oh, the boy wanted you to bring him a #t4031554#? No problem, I was on his debt anyway. Now, tell him I am repaying the debt, OK?")
+               cm.sendOk(I18nMessage.from("2090004_OH_BOY"))
                cm.gainItem(4031554, (short) 1)
                cm.dispose()
                return
             } else {
-               cm.sendOk("Oh, the boy wanted you to bring him a #t4031554#? Make room at your ETC inventory first.")
+               cm.sendOk(I18nMessage.from("2090004_OH_BOY_MAKE_ETC_ROOM"))
                cm.dispose()
                return
             }
@@ -74,7 +75,7 @@ class NPC2090004 {
             matQtyMeso = [0, 0, 910, 950, 1940, 600, 700, 1000]
 
             if (!cm.haveItem(4161030)) {
-               cm.sendNext("If you want to make a medicine, you must study the Book on Herbal Medicine first. Nothing is more dangerous than practicing a medicine without proper knowledge.")
+               cm.sendNext(I18nMessage.from("2090004_STUDY_THE_BOOK"))
                cm.dispose()
                return
             }
@@ -112,7 +113,7 @@ class NPC2090004 {
          cm.sendSimple(selStr)
       } else if (status == 2) {
          selectedItem = selection
-         cm.sendGetText("How many #b#t" + itemSet[selectedItem] + "##k do you want to make?")
+         cm.sendGetText(I18nMessage.from("2090004_HOW_MANY_TO_MAKE").with(itemSet[selectedItem]))
       } else if (status == 3) {
          if (selectedType == 0) { //Medicines
             String text = cm.getText()
@@ -193,7 +194,7 @@ class NPC2090004 {
             }
 
             if (!complete || !cm.canHold(item as Integer, makeQty)) {
-               cm.sendOk("Please make sure you are neither lacking ingredients or lacking space in your use inventory.")
+               cm.sendOk(I18nMessage.from("2090004_NEED_INGREDIENTS_OR_INVENTORY_SPACE"))
             } else {
                if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                   for (int i = 0; i < mats.size(); i++) {
@@ -230,7 +231,7 @@ class NPC2090004 {
             }
 
             if (!complete || !cm.canHold(item as Integer, 1)) {
-               cm.sendOk("Please make sure you are neither lacking ingredients or lacking space in your use inventory.")
+               cm.sendOk(I18nMessage.from("2090004_NEED_INGREDIENTS_OR_INVENTORY_SPACE"))
             } else {
                if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                   for (int i = 0; i < mats.size(); i++) {
@@ -252,7 +253,7 @@ class NPC2090004 {
             }
 
             if (!complete) {
-               cm.sendOk("Please make sure you are neither lacking ingredients or lacking space in your etc inventory.")
+               cm.sendOk(I18nMessage.from("2090004_NEED_INGREDIENTS_OR_INVENTORY_SPACE"))
                cm.dispose()
                return
             }
@@ -267,7 +268,7 @@ class NPC2090004 {
             }
 
             if (!cm.canHold(4001124, reward)) {
-               cm.sendOk("Please make sure you are neither lacking ingredients or lacking space in your etc inventory.")
+               cm.sendOk(I18nMessage.from("2090004_NEED_INGREDIENTS_OR_INVENTORY_SPACE"))
             } else {
                cm.gainItem(item as Integer, (short) -100)
                cm.gainItem(4001124, (short) reward)

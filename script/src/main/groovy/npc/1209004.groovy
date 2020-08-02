@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -21,7 +22,7 @@ class NPC1209004 {
    }
 
    def action(Byte mode, Byte type, Integer selection) {
-      cm.sendOk("I hope for this travel to be a safe one, and that we get to live on a more peaceful place there... Hey, darling, let's go.")
+      cm.sendOk(I18nMessage.from("1209004_TRAVEL_TO_BE_SAFE"))
       cm.dispose()
    }
 }

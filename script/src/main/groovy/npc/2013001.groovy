@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Chamberlain Eak
@@ -46,7 +47,7 @@ class NPC2013001 {
                return
             }
 
-            cm.sendOk("I only wish to speak to your leader!")
+            cm.sendOk(I18nMessage.from("2013001_LEADER_ONLY"))
             cm.dispose()
             return
          }
@@ -60,7 +61,7 @@ class NPC2013001 {
                   eim.giveEventPlayersExp(3500)
                   clearStage(0, eim)
 
-                  cm.sendNext("Please save Minerva, She've been trapped in the seal by Papa Pixie, the terror of our tower! He misplaced all of our Minerva Statue's parts and we have to get it all back! Oh pardon me, I am the tower's Chamberlain, Eak. I am Minerva's royal servant.")
+                  cm.sendNext(I18nMessage.from("2013001_PLEASE_SAVE_MINERVA"))
                } else {
                   cm.warp(920010000, 2)
                }
@@ -71,19 +72,19 @@ class NPC2013001 {
                   if (eim.getIntProperty("statusStg7") == -1) {
                      eim.warpEventTeam(920010800)
                   } else if (eim.getIntProperty("statusStg8") == -1) {
-                     cm.sendOk("Oh! You brought the #t4001055#! Please, drop it at the base of the statue to bring Minerva back!")
+                     cm.sendOk(I18nMessage.from("2013001_DROP_IT_AT_THE_BASE"))
                   } else {
-                     cm.sendOk("Thank you for saving Minerva! Please, talk to her...")
+                     cm.sendOk(I18nMessage.from("2013001_THANK_YOU"))
                   }
                } else {
-                  cm.sendOk("Please, save Minerva! Gather the six pieces of her statue and then talk to me to retrieve the final piece!")
+                  cm.sendOk(I18nMessage.from("2013001_RETRIEVE_THE_FINAL_PIECE"))
                }
                break
             case 920010200: //walkway
                if (!cm.haveItem(4001050, 30)) {
-                  cm.sendOk("Gather the 30 Statue Pieces from the monsters in this stage, and please bring them to me so I can put them together!")
+                  cm.sendOk(I18nMessage.from("2013001_GATHER_THE_STATUE_PIECES"))
                } else {
-                  cm.sendOk("You got them all! Here, the 1st statue piece.")
+                  cm.sendOk(I18nMessage.from("2013001_HERE_IS_THE_1ST_STATUE_PIECE"))
                   cm.removeAll(4001050)
                   cm.gainItem(4001044, (short) 1) //first piece
                   eim.giveEventPlayersExp(3500)
@@ -94,34 +95,34 @@ class NPC2013001 {
                if (eim.getIntProperty("statusStg2") != 1) {
                   if (cm.getMap().countMonsters() == 0 && cm.getMap().countItems() == 0) {
                      if (cm.canHold(4001045)) {
-                        cm.sendOk("Oh, I've found the 2nd Piece of Statue. Here, take it.")
+                        cm.sendOk(I18nMessage.from("2013001_2ND_STATUE_PIECE"))
                         cm.gainItem(4001045, (short) 1)
                         eim.giveEventPlayersExp(3500)
                         clearStage(2, eim)
                         eim.setProperty("statusStg2", "1")
                      } else {
-                        cm.sendOk("I've found the 2nd Piece of Statue. Get a slot available on your inventory to take it.")
+                        cm.sendOk(I18nMessage.from("2013001_NEED_INVENTORY_SPACE"))
                      }
                   } else {
-                     cm.sendOk("Find the 2nd Piece of Statue that is hidden in this room.")
+                     cm.sendOk(I18nMessage.from("2013001_2ND_PIECE_HIDDEN"))
                   }
                } else {
-                  cm.sendOk("Well done. Go find the other statue pieces.")
+                  cm.sendOk(I18nMessage.from("2013001_GO_FIND_THE_OTHER_PIECES"))
                }
 
                break
             case 920010400: //lobby
                if (eim.getIntProperty("statusStg3") == -1) {
-                  cm.sendOk("Please, find the LP for the current day of week and place it on the music player.\r\n#v4001056# Sunday\r\n#v4001057# Monday\r\n#v4001058# Tuesday\r\n#v4001059# Wednesday\r\n#v4001060# Thursday\r\n#v4001061# Friday\r\n#v4001062# Saturday\r\n")
+                  cm.sendOk(I18nMessage.from("2013001_PLACE_IT_ON_THE_MUSIC_PLAYER"))
                } else if (eim.getIntProperty("statusStg3") == 0) {
                   cm.getMap().getReactorByName("stone3").forceHitReactor((byte) 1)
-                  cm.sendOk("Ooh, the music... It sounds so fitting with the ambient. Nicely done, a box has appeared on the field. Retrieve the statue part from it!")
+                  cm.sendOk(I18nMessage.from("2013001_RETRIEVE_THE_STATUE_PART_FROM_BOX"))
                   eim.giveEventPlayersExp(3500)
                   clearStage(3, eim)
                   eim.setProperty("statusStg3", "2")
 
                } else {
-                  cm.sendOk("Thank you so much!")
+                  cm.sendOk(I18nMessage.from("2013001_THANK_YOU_SO_MUCH"))
                }
                break
             case 920010500: //sealed
@@ -146,7 +147,7 @@ class NPC2013001 {
                      total += z
                   }
                   if (total != 3) {
-                     cm.sendOk("There needs to be exactly 3 players on these platforms.")
+                     cm.sendOk(I18nMessage.from("2013001_EXACTLY_3_PLAYERS"))
                   } else {
                      int num_correct = 0
                      for (def i = 0; i < 3; i++) {
@@ -155,30 +156,30 @@ class NPC2013001 {
                         }
                      }
                      if (num_correct == 3) {
-                        cm.sendOk("You found the right combination! A box has appeared on the top of this map, go retrieve the statue piece from it!")
+                        cm.sendOk(I18nMessage.from("2013001_RIGHT_COMBINATION_BOX_APPEARED"))
                         cm.getMap().getReactorByName("stone4").forceHitReactor((byte) 1)
                         eim.giveEventPlayersExp(3500)
                         clearStage(4, eim)
                      } else {
                         eim.showWrongEffect()
                         if (num_correct > 0) {
-                           cm.sendOk("One of the platforms has the right number of players.")
+                           cm.sendOk(I18nMessage.from("2013001_ONE_PLATFORM"))
                         } else {
-                           cm.sendOk("All of the platforms have the wrong amount of players.")
+                           cm.sendOk(I18nMessage.from("2013001_ALL_PLATFORMS"))
                         }
                      }
                   }
                } else {
-                  cm.sendOk("Well done! Please, go fetch the other pieces and save Minerva!")
+                  cm.sendOk(I18nMessage.from("2013001_WELL_DONE"))
                }
                cm.dispose()
                break
             case 920010600: //lounge
                if (eim.getIntProperty("statusStg5") == -1) {
                   if (!cm.haveItem(4001052, 40)) {
-                     cm.sendOk("Gather the 40 Statue Pieces from the monsters in this stage, and please bring them to me so I can put them together!")
+                     cm.sendOk(I18nMessage.from("2013001_40_STATUE_PIECES"))
                   } else {
-                     cm.sendOk("You got them all! Here, the 5th statue piece.")
+                     cm.sendOk(I18nMessage.from("2013001_5TH_STATUE_PIECE"))
                      cm.removeAll(4001052)
                      cm.gainItem(4001048, (short) 1) //fifth piece
                      eim.giveEventPlayersExp(3500)
@@ -186,7 +187,7 @@ class NPC2013001 {
                      eim.setIntProperty("statusStg5", 1)
                   }
                } else {
-                  cm.sendOk("You got them all here. Go search the others rooms of the tower.")
+                  cm.sendOk(I18nMessage.from("2013001_GO_SEARCH_OTHER_ROOMS"))
                }
                break
             case 920010700: //on the way up
@@ -237,7 +238,7 @@ class NPC2013001 {
                   }
 
                   if (total != 2) {
-                     cm.sendOk("There needs to be exactly 2 levers at the top of the map pushed on.")
+                     cm.sendOk(I18nMessage.from("2013001_2_LEVERS"))
                   } else {
                      int num_correct = 0
                      int psh_correct = 0
@@ -250,36 +251,36 @@ class NPC2013001 {
                         }
                      }
                      if (num_correct == 5) {
-                        cm.sendOk("You found the right combination! Retrieve the statue piece from inside it!")
+                        cm.sendOk(I18nMessage.from("2013001_RIGHT_COMBINATION"))
                         cm.getMap().getReactorByName("stone6").forceHitReactor((byte) 1)
                         eim.giveEventPlayersExp(3500)
                         clearStage(6, eim)
                      } else {
                         eim.showWrongEffect()
                         if (psh_correct >= 1) {
-                           cm.sendOk("One of the pushed levers is correct.")
+                           cm.sendOk(I18nMessage.from("2013001_ONE_LEVEL_CORRECT"))
                         } else {
-                           cm.sendOk("Both of the pushed levers are wrong.")
+                           cm.sendOk(I18nMessage.from("2013001_BOTH_LEVER_WRONG"))
                         }
                      }
                   }
                } else {
-                  cm.sendOk("Nicely done!! Go check out the rest of the pieces.")
+                  cm.sendOk(I18nMessage.from("2013001_NICELY_DONE"))
                }
                break
             case 920010800:
-               cm.sendNext("Please, find a way to defeat Papa Pixie! Once you've found the Dark Nependeath by placing seeds, you've found Papa Pixie! Defeat it, and get the Root of Life to save Minerva!!!")
+               cm.sendNext(I18nMessage.from("2013001_DEFEAT_PAPA_PIXIE"))
                break
             case 920010900:
                if (eim.getProperty("statusStg8") == "1") {
-                  cm.sendNext("This is the jail of the tower. You may find some goodies here, just be sure to clear the puzzles ahead as fast as possible.")
+                  cm.sendNext(I18nMessage.from("2013001_JAIL_OF_THE_TOWER"))
                } else {
-                  cm.sendNext("Down there you will not find any statue pieces. Go up the ladder to return to the center tower and search elsewhere. You can come back here to get the goodies that lies down there once you have saved Minerva.")
+                  cm.sendNext(I18nMessage.from("2013001_GO_UP_THE_LADDER"))
                }
                break
             case 920011000:
                if (cm.getMap().countMonsters() > 0) {
-                  cm.sendNext("This is the hidden room of the tower. After eliminating all monsters on this room, talk to me to gain access to the treasure room, leaving the center tower access behind.")
+                  cm.sendNext(I18nMessage.from("2013001_ELIMINATE_MONSTERS_TO_GAIN_ACCESS"))
                } else {
                   cm.warp(920011100, "st00")
                }

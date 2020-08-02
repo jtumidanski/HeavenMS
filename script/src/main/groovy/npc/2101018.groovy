@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -17,7 +18,7 @@ class NPC2101018 {
 
    def start() {
       if ((cm.getPlayer().getLevel() < 19 || cm.getPlayer().getLevel() > 30) && !cm.getPlayer().isGM()) {
-         cm.sendNext("You're not between level 20 and 30. Sorry, you may not participate.")
+         cm.sendNext(I18nMessage.from("2101018_LEVEL_RANGE"))
          cm.dispose()
          return
       }
@@ -40,13 +41,13 @@ class NPC2101018 {
          }
       }
       if (status == 0) {
-         cm.sendNext("I have prepared a huge festival here at Ariant for the great fighters of MapleStory. It's called #bThe Ariant Coliseum Challenge#k.")
+         cm.sendNext(I18nMessage.from("2101018_HUGE_FESTIVAL"))
       } else if (status == 1) {
-         cm.sendNextPrev("The Ariant Coliseum Challenge is a competition that matches the skills of monster combat against others. In this competition, your object isn't to hunt the monster;  rather, you need to #beliminate a set amount of HP from the monster, followed by absorbing it with a jewel#k. #bThe fighter that ends up with the most jewels will win the competition.#k")
+         cm.sendNextPrev(I18nMessage.from("2101018_ARIANT_COLISEUM_CHALLENGE_EXPLAINED"))
       } else if (status == 2) {
-         cm.sendSimple("If you are a strong and brave warrior from #bPerion#k, training under Dances With Balrogs, then are you interested in participating in The Ariant Coliseum Challenge?!\r\n#b#L0# I'd love to participate in this great competition.#l")
+         cm.sendSimple(I18nMessage.from("2101018_ARE_YOU_INTERESTED"))
       } else if (status == 3) {
-         cm.sendNext("Okay, now I'll send you to the battle arena. I'd like to see you emerge victorious!")
+         cm.sendNext(I18nMessage.from("2101018_EMERGE_VICTORIOUS"))
       }
    }
 }

@@ -1,6 +1,7 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -56,7 +57,7 @@ class NPC2040022 {
             stimulator = false
          }
          if (selectedType == 0) { //What's a stimulator?
-            cm.sendNext("A stimulator is a special potion that I can add into the process of creating certain items. It gives it stats as though it had dropped from a monster. However, it is possible to have no change, and it is also possible for the item to be below average. There's also a 10% chance of not getting any item when using a stimulator, so please choose wisely.")
+            cm.sendNext(I18nMessage.from("2040022_STIMULATOR_INFO"))
             cm.dispose()
          } else if (selectedType == 1) { //warrior weapon
             selStr = "Very well, then which Warrior weapon shall I work on?#b"
@@ -183,11 +184,11 @@ class NPC2040022 {
          boolean complete = true
 
          if (!cm.canHold(item, 1)) {
-            cm.sendOk("Verify for a slot in your inventory first.")
+            cm.sendOk(I18nMessage.from("2040022_NEED_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost) {
-            cm.sendOk("I'm afraid my fees are non-negotiable.")
+            cm.sendOk(I18nMessage.from("2040022_ONLY_ACCEPT_MESO"))
             cm.dispose()
             return
          } else {
@@ -217,7 +218,7 @@ class NPC2040022 {
          }
 
          if (!complete) {
-            cm.sendOk("Sorry, but you're missing a required item. Possibly a manual? Or one of the ores?")
+            cm.sendOk(I18nMessage.from("2040022_MISSING_ITEMS"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -233,14 +234,14 @@ class NPC2040022 {
                int deleted = Math.floor(Math.random() * 10).intValue()
                if (deleted != 0) {
                   cm.gainItem(item, (short) 1, true, true)
-                  cm.sendOk("Heeere you go! What do you think? Marvellous, isn't it?")
+                  cm.sendOk(I18nMessage.from("2040022_SUCCESS"))
                } else {
-                  cm.sendOk("...ACK! My attention wandered, and before I knew it... Uh, sorry, but there's nothing I can do for you now.")
+                  cm.sendOk(I18nMessage.from("2040022_STIMULATOR_ERROR"))
                }
             } else //just give basic item
             {
                cm.gainItem(item, (short) 1)
-               cm.sendOk("Heeere you go! What do you think? Marvellous, isn't it?")
+               cm.sendOk(I18nMessage.from("2040022_SUCCESS"))
             }
          }
          cm.dispose()

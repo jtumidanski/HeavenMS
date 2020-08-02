@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101005 {
    int sel = -1
 
    def start() {
-      cm.sendNext("I thought #rAriant#k was amazing, but Valvendale is just SUPERB! There are so many different landscapes and forms of life. Like #b#ethose weird slimes outside of town#n#k... those are just WEIRD!")
+      cm.sendNext(I18nMessage.from("2101005_VALVENDALE_IS_JUST_SUPERB"))
       cm.dispose()
    }
 

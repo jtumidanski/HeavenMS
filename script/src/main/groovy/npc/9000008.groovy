@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9000008 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Should you have a locked box you want to open, bring it to me.")
+      cm.sendOk(I18nMessage.from("9000008_BRING_IT_TO_ME"))
       cm.dispose()
    }
 

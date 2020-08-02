@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111008 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Make it clear of your position! Are you Zenumist or Alcadno?")
+      cm.sendOk(I18nMessage.from("2111008_ZENUMIST_OR_ALCADNO"))
       cm.dispose()
    }
 

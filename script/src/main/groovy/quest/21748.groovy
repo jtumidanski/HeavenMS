@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,9 +28,9 @@ class Quest21748 {
          }
 
          if (status == 0) {
-            qm.sendNext("Aran, you came back home safe! So, how fared the mission in Mu Lung? #rGentleman#k ambushed and stole the seal rock again? That's unfortunate. At least you are unharmed, I'm glad.")
+            qm.sendNext(I18nMessage.from("21748_COME_BACK_HOME"))
          } else if (status == 1) {
-            qm.sendNext("I've researched some skill books, trying to trace any lost skills of yours. Good news I found one of them: it's the #rFinal Charge#k! With it you will be able to draw closer opposing monsters at each swipe. It's a fine improvement for your arsenal, isn't it?")
+            qm.sendNext(I18nMessage.from("21748_FINE_IMPROVEMENT"))
          } else if (status == 2) {
             qm.gainExp(20000)
             qm.teachSkill(21100002, (byte) 0, (byte) 30, -1) // final charge

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -36,7 +37,7 @@ class NPC1052107 {
          }
 
          if (status == 0) {
-            cm.sendOk("A small focus of light lighting in the immersive darkness.")
+            cm.sendOk(I18nMessage.from("1052107_SMALL_FOCUS_OF_LIGHT"))
             cm.dispose()
          }
       }

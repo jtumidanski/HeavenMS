@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 class NPC2002000 {
    NPCConversationManager cm
@@ -9,7 +10,7 @@ class NPC2002000 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("Do you want to get out of Happyville?")
+      cm.sendYesNo(I18nMessage.from("2002000_YOU_WANT_TO_GET_OUT"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

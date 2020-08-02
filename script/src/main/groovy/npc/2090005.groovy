@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC2090005 {
             cm.dispose()
             return
          } else if (mode == 0) {
-            cm.sendNext("OK. If you ever change your mind, please let me know.")
+            cm.sendNext(I18nMessage.from("2090005_LET_ME_KNOW"))
             cm.dispose()
             return
          }
@@ -54,7 +55,7 @@ class NPC2090005 {
                btwmsg = "#bMu Lung#k to #bOrbis#k"
             }
             if (cm.getPlayer().getMapId() == 251000000) {
-               cm.sendYesNo("Hello there. How's the traveling so far? I've been transporting other travelers like you to #b" + menu[3] + "#k in no time, and... are you interested? It's not as stable as the ship, so you'll have to hold on tight, but i can get there much faster than the ship. I'll take you there as long as you pay #b" + cost[2] + " mesos#k.")
+               cm.sendYesNo(I18nMessage.from("2090005_HOWS_THE_TRAVELING").with(menu[3], cost[2]))
                status++
             } else if (cm.getPlayer().getMapId() == 250000100) {
                cm.sendSimple("Hello there. How's the traveling so far? I understand that walking on two legs is much harder to cover ground compared to someone like me that can navigate the skies. I've been transporting other travelers like you to other regions in no time, and... are you interested? If so, then select the town you'd like yo head to.\r\n" + display)
@@ -63,12 +64,12 @@ class NPC2090005 {
             }
          } else if (status == 1) {
             slct = selection
-            cm.sendYesNo("Will you move to #b" + menu[selection] + "#k now? If you have #b" + cost[selection] + " mesos#k, I'll take you there right now.")
+            cm.sendYesNo(I18nMessage.from("2090005_I_CAN_TAKE_YOU_THERE").with(menu[selection], cost[selection]))
 
          } else if (status == 2) {
             if (slct == 2) {
                if (cm.getMeso() < cost[2]) {
-                  cm.sendNext("Are you sure you have enough mesos?")
+                  cm.sendNext(I18nMessage.from("2090005_NOT_ENOUGH_MESOS"))
                   cm.dispose()
                } else {
                   cm.gainMeso(-cost[2])
@@ -77,7 +78,7 @@ class NPC2090005 {
                }
             } else {
                if (cm.getMeso() < cost[slct]) {
-                  cm.sendNext("Are you sure you have enough mesos?")
+                  cm.sendNext(I18nMessage.from("2090005_NOT_ENOUGH_MESOS"))
                   cm.dispose()
                } else {
                   if (cm.getPlayer().getMapId() == 251000000) {
@@ -87,7 +88,7 @@ class NPC2090005 {
                   } else {
                      EventManager em = cm.getEventManager("Hak")
                      if (!em.startInstance(cm.getPlayer())) {
-                        cm.sendOk("Uh... We are currently taking requests from too many maplers right now... Please try again in a bit.")
+                        cm.sendOk(I18nMessage.from("2090005_TRY_AGAIN_IN_A_BIT"))
                         cm.dispose()
                         return
                      }

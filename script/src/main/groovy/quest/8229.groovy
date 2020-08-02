@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -13,13 +14,13 @@ class Quest8229 {
          if (type == 1 && mode == 0) {
             status -= 2
          } else {
-            qm.sendOk("Come on, the city really needs you cooperating on this one!")
+            qm.sendOk(I18nMessage.from("8229_COME_ON"))
             qm.dispose()
             return
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("I knew we could rely on the outsider on this matter! Now that we have the letter translated by him, head it to Jack, he knows what to do.")
+         qm.sendAcceptDecline(I18nMessage.from("8229_I_KNEW_WE_COULD"))
       } else if (status == 1) {
          if (qm.haveItem(4032018, 1)) {
             qm.forceStartQuest()
@@ -27,7 +28,7 @@ class Quest8229 {
             qm.gainItem(4032018, (short) 1)
             qm.forceStartQuest()
          } else {
-            qm.sendOk("Oy, you need a slot in your ETC to get the communique.")
+            qm.sendOk(I18nMessage.from("8229_NEED_ETC_SPACE"))
          }
 
          qm.dispose()
@@ -46,9 +47,9 @@ class Quest8229 {
       }
       if (status == 0) {
          if (qm.haveItem(4032018, 1)) {
-            qm.sendOk("Oh, you brought it. Nicely done, the countermeasure process will be much easier now.\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0# \r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 50000 EXP")
+            qm.sendOk(I18nMessage.from("8229_YOU_BROUGHT_IT"))
          } else {
-            qm.sendOk("What's wrong? Why you didn't retrieved the translated message yet? Please bring me the letter's content for me to strategize a countermeasure ASAP.")
+            qm.sendOk(I18nMessage.from("8229_WHAT_IS_WRONG"))
             qm.dispose()
          }
       } else if (status == 1) {

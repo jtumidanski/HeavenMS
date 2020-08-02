@@ -1,13 +1,15 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
+import tools.UserMessage
 
 /*
 	NPC Name: 		
 	Map(s): 		
 	Description: 	
 */
-
 
 class NPC1022003 {
    NPCConversationManager cm
@@ -36,49 +38,70 @@ class NPC1022003 {
          cm.dispose()
       }
       if (status == 0 && mode == 1) {
-         String selStr = "Hm? Who might you be? Oh, you've heard about my forging skills? In that case, I'd be glad to process some of your ores... for a fee.#b"
-         String[] options = ["Refine a mineral ore", "Refine a jewel ore", "Upgrade a helmet", "Upgrade a shield"]
+         String selStr = I18nMessage.from("1022003_PROCESS_SOME_ORES").to(cm.getClient()).evaluate()
+         UserMessage[] options = [I18nMessage.from("1022003_REFINE_A_MINERAL"),
+                                  I18nMessage.from("1022003_REFINE_A_JEWEL"),
+                                  I18nMessage.from("1022003_UPGRADE_A_HELMET"),
+                                  I18nMessage.from("1022003_UPGRADE_A_SHIELD")]
          for (int i = 0; i < options.length; i++) {
-            selStr += "\r\n#L" + i + "# " + options[i] + "#l"
+            selStr += "\r\n#L" + i + "# " + options[i].to(cm.getClient()).evaluate() + "#l"
          }
 
-         cm.sendSimple(selStr)
+         cm.sendSimple(SimpleMessage.from(selStr))
       } else if (status == 1 && mode == 1) {
          selectedType = selection
          if (selectedType == 0) { //mineral refine
-            String selStr = "So, what kind of mineral ore would you like to refine?#b"
-            String[] minerals = ["Bronze", "Steel", "Mithril", "Adamantium", "Silver", "Orihalcon", "Gold"]
+            String selStr = I18nMessage.from("1022003_WHAT_KIND_OF_ORE").to(cm.getClient()).evaluate()
+            UserMessage[] minerals = [I18nMessage.from("BRONZE"), I18nMessage.from("STEEL"),
+                                      I18nMessage.from("MITHRIL"), I18nMessage.from("ADAMANTIUM"),
+                                      I18nMessage.from("SILVER"), I18nMessage.from("ORIHALCON"),
+                                      I18nMessage.from("GOLD")]
             for (int i = 0; i < minerals.length; i++) {
-               selStr += "\r\n#L" + i + "# " + minerals[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + minerals[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = false
          } else if (selectedType == 1) { //jewel refine
-            String selStr = "So, what kind of jewel ore would you like to refine?#b"
-            String[] jewels = ["Garnet", "Amethyst", "Aquamarine", "Emerald", "Opal", "Sapphire", "Topaz", "Diamond", "Black Crystal"]
+            String selStr = I18nMessage.from("1022003_WHAT_KIND_OF_JEWEL").to(cm.getClient()).evaluate()
+            UserMessage[] jewels = [I18nMessage.from("GARNET"), I18nMessage.from("AMETHYST"),
+                                    I18nMessage.from("AQUAMARINE"), I18nMessage.from("EMERALD"),
+                                    I18nMessage.from("OPAL"), I18nMessage.from("SAPPHIRE"),
+                                    I18nMessage.from("TOPAZ"), I18nMessage.from("DIAMOND"),
+                                    I18nMessage.from("BLACK_CRYSTAL")]
             for (int i = 0; i < jewels.length; i++) {
-               selStr += "\r\n#L" + i + "# " + jewels[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + jewels[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = false
          } else if (selectedType == 2) { //helmet refine
-            String selStr = "Ah, you wish to upgrade a helmet? Then tell me, which one?#b"
-            String[] helmets = ["Blue Metal Gear#k - Common Lv. 15#b", "Yellow Metal Gear#k - Common Lv. 15#b", "Metal Koif#k - Warrior Lv. 10#b", "Mithril Koif#k - Warrior Lv. 10#b", "Steel Helmet#k - Warrior Lv. 12#b", "Mithril Helmet#k - Warrior Lv. 12#b", "Steel Full Helm#k - Warrior Lv. 15#b",
-                                "Mithril Full Helm#k - Warrior Lv. 15#b", "Iron Viking Helm#k - Warrior Lv. 20#b", "Mithril Viking Helm#k - Warrior Lv. 20#b", "Steel Football Helmet#k - Warrior Lv. 20#b", "Mithrill Football Helmet#k - Warrior Lv. 20#b", "Mithril Sharp Helm#k - Warrior Lv. 22#b", "Gold Sharp Helm#k - Warrior Lv. 22#b",
-                                "Orihalcon Burgernet Helm#k - Warrior Lv. 25#b", "Gold Burgernet Helm#k - Warrior Lv. 25#b", "Great Red Helmet#k - Warrior Lv. 35#b", "Great Blue Helmet#k - Warrior Lv. 35#b", "Mithril Nordic Helm#k - Warrior Lv. 40#b", "Gold Nordic Helm#k - Warrior Lv. 40#b", "Mithril Crusader Helm#k - Warrior Lv. 50#b",
-                                "Silver Crusader Helm#k - Warrior Lv. 50#b", "Old Steel Nordic Helm#k - Warrior Lv. 55#b", "Old Mithril Nordic Helm#k - Warrior Lv. 55#b"]
+            String selStr = I18nMessage.from("1022003_WHICH_HELMET").to(cm.getClient()).evaluate()
+            UserMessage[] helmets = [I18nMessage.from("BLUE_METAL_GEAR"), I18nMessage.from("YELLOW_METAL_GEAR"),
+                                     I18nMessage.from("METAL_KOIF"), I18nMessage.from("MITHRIL_KOIF"),
+                                     I18nMessage.from("STEEL_HELMET"), I18nMessage.from("MITHRIL_HELMET"),
+                                     I18nMessage.from("STEEL_FULL_HELMET"), I18nMessage.from("MITHRIL_FULL_HELMET"),
+                                     I18nMessage.from("IRON_VIKING_HELMET"), I18nMessage.from("MITHRIL_VIKING_HELMET"),
+                                     I18nMessage.from("STEEL_FOOTBALL_HELMET"), I18nMessage.from("MITHRIL_FOOTBALL_HELMET"),
+                                     I18nMessage.from("MITHRIL_SHARP_HELMET"), I18nMessage.from("GOLD_SHARP_HELMET"),
+                                     I18nMessage.from("ORIHALCON_BURGERNET_HELMET"), I18nMessage.from("GOLD_BURGERNET_HELMET"),
+                                     I18nMessage.from("GREAT_RED_HELMET"), I18nMessage.from("GREAT_BLUE_HELMET"),
+                                     I18nMessage.from("MITHRIL_NORDIC_HELMET"), I18nMessage.from("GOLD_NORDIC_HELMET"),
+                                     I18nMessage.from("MITHRIL_CRUSADER_HELMET"), I18nMessage.from("SILVER_CRUSADER_HELMET"),
+                                     I18nMessage.from("OLD_STEEL_NORDIC_HELMET"), I18nMessage.from("OLD_MITHRIL_NORDIC_HELMET")]
             for (int i = 0; i < helmets.length; i++) {
-               selStr += "\r\n#L" + i + "# " + helmets[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + helmets[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = true
          } else if (selectedType == 3) { //shield refine
-            String selStr = "Ah, you wish to upgrade a shield? Then tell me, which one?#b"
-            String[] shields = ["Adamantium Tower Shield#k - Warrior Lv. 40#b", "Mithril Tower Shield#k - Warrior Lv. 40#b", "Silver Legend Shield#k - Warrior Lv. 60#b", "Adamantium Legend Shield#k - Warrior Lv. 60#b"]
+            String selStr = I18nMessage.from("1022003_WHICH_SHIELD")
+            UserMessage[] shields = [I18nMessage.from("ADAMANTIUM_TOWER_SHIELD"),
+                                     I18nMessage.from("MITHRIL_TOWER_SHIELD"),
+                                     I18nMessage.from("SILVER_LEGEND_SHIELD"),
+                                     I18nMessage.from("ADAMANTIUM_LEGEND_SHIELD")]
             for (int i = 0; i < shields.length; i++) {
-               selStr += "\r\n#L" + i + "# " + shields[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + shields[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = true
          }
          if (equip) {
@@ -106,9 +129,7 @@ class NPC1022003 {
             cost = costSet[selectedItem]
          }
 
-         String prompt = "So, you want me to make some #t" + item + "#s? In that case, how many do you want me to make?"
-
-         cm.sendGetNumber(prompt, 1, 1, 100)
+         cm.sendGetNumber(I18nMessage.from("1022003_HOW_MANY").with(item), 1, 1, 100)
       } else if (status == 3 && mode == 1) {
          if (equip) {
             selectedItem = selection
@@ -139,33 +160,34 @@ class NPC1022003 {
             matQty = matQtySet[selectedItem]
             cost = costSet[selectedItem]
          }
-         String prompt = "You want me to make "
+         String itemPrompt = ""
          if (qty == 1) {
-            prompt += "a #t" + item + "#?"
+            itemPrompt += "a #t" + item + "#?"
          } else {
-            prompt += qty + " #t" + item + "#?"
+            itemPrompt += qty + " #t" + item + "#?"
          }
-         prompt += " In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
+
+         String materialList = ""
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
             for (int i = 0; i < mats.size(); i++) {
-               prompt += "\r\n#i" + mats[i] + "# " + ((matQty[i] as Integer) * qty) + " #t" + mats[i] + "#"
+               materialList += "\r\n#i" + mats[i] + "# " + ((matQty[i] as Integer) * qty) + " #t" + mats[i] + "#"
             }
          } else {
-            prompt += "\r\n#i" + mats + "# " + ((matQty as Integer) * qty) + " #t" + mats + "#"
+            materialList += "\r\n#i" + mats + "# " + ((matQty as Integer) * qty) + " #t" + mats + "#"
          }
          if (cost > 0) {
-            prompt += "\r\n#i4031138# " + cost * qty + " meso"
+            materialList += "\r\n#i4031138# " + cost * qty + " meso"
          }
-         cm.sendYesNo(prompt)
+         cm.sendYesNo(I18nMessage.from("1022003_CONFIRM").with(itemPrompt, materialList))
       } else if (status == 4 && mode == 1) {
          boolean complete = true
 
          if (!cm.canHold(item, qty)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("1022003_NEED_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost * qty) {
-            cm.sendOk("I'm afraid you cannot afford my services.")
+            cm.sendOk(I18nMessage.from("1022003_CANNOT_AFFORD"))
             cm.dispose()
             return
          } else {
@@ -180,7 +202,7 @@ class NPC1022003 {
             }
          }
          if (!complete) {
-            cm.sendOk("I'm afraid you're missing something for the item you want. See you another time, yes?")
+            cm.sendOk(I18nMessage.from("1022003_MISSING_SOMETHING"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -191,7 +213,7 @@ class NPC1022003 {
             }
             cm.gainMeso(-cost * qty)
             cm.gainItem(item, (short) qty)
-            cm.sendOk("There, finished. What do you think, a piece of art, isn't it? Well, if you need anything else, you know where to find me.")
+            cm.sendOk(I18nMessage.from("1022003_FINISHED"))
          }
          cm.dispose()
       }

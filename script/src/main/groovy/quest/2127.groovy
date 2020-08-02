@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest2127 {
          }
 
          if (status == 0) {
-            qm.sendOk("I see you're ready for the task. Now, pay heed to the details of your mission...")
+            qm.sendOk(I18nMessage.from("2127_I_SEE_YOU_ARE_READY"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -39,7 +40,7 @@ class NPC2111019 {
                int progress = cm.getQuestProgressInt(23339, 1)
 
                if (progress == 3) {
-                  cm.sendGetText("The pipe reacts as the water starts flowing. A secret compartment with a keypad shows up. #bPassword#k!")
+                  cm.sendGetText(I18nMessage.from("2111019_SECRET_COMPARTMENT_SHOWS_UP"))
                } else if (progress == 1) {
                   cm.setQuestProgress(23339, 1, 2)
                   cm.dispose()
@@ -63,7 +64,7 @@ class NPC2111019 {
                cm.warp(261000001, 1)
                cm.dispose()
             } else {
-               cm.sendOk("#rWrong!")
+               cm.sendOk(I18nMessage.from("2111019_WRONG"))
                cm.dispose()
             }
          }

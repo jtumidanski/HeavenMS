@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,7 +28,7 @@ class Quest2257 {
          }
 
          if (status == 0) {
-            qm.sendNext("Hey there, do you want a ride to #r#m261000000##k? Oh a request from #b#p2101013##k?")
+            qm.sendNext(I18nMessage.from("2257_WANT_A_RIDE"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()

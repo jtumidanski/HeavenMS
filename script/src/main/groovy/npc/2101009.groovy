@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101009 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Yawnnnn~!")
+      cm.sendNext(I18nMessage.from("2101009_YAWN"))
       cm.dispose()
    }
 

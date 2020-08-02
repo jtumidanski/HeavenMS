@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2131004 {
    int sel = -1
 
    def start() {
-      cm.sendNext("Zzzzz...")
+      cm.sendNext(I18nMessage.from("2131004_ZZZ"))
       cm.dispose()
    }
 

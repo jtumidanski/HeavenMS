@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -27,15 +28,15 @@ class Quest6031 {
          }
 
          if (status == 0) {
-            qm.sendNext("I am to teach you about the basics of the Theory of Science.")
+            qm.sendNext(I18nMessage.from("6031_I_AM_TO_TEACH_YOU"))
          } else if (status == 1) {
-            qm.sendNextPrev("Science stages where the alchemy doesn't meet the requirements. All items have molecular constitutions. The #rnature of their arrangements and each intrinsic unit of matter#k defines the many properties an item will have.")
+            qm.sendNextPrev(I18nMessage.from("6031_SCIENCE_STAGES"))
          } else if (status == 2) {
-            qm.sendNextPrev("This makes true in the scenario of the #rMaker#k as well. One must be able to study the traces of each component that is being used to form the item, to be able to tell if the experiment will either succeed or fail.")
+            qm.sendNextPrev(I18nMessage.from("6031_THIS_MAKES_TRUE"))
          } else if (status == 3) {
-            qm.sendNextPrev("Take that in mind: the main perspective of science, that one engine that makes it flows the strongest, whatever scenario it is, is the aspect of #bunderstanding the process#k that generates the results, not simply throwing away tries at will.")
+            qm.sendNextPrev(I18nMessage.from("6031_TAKE_THAT_IN_MIND"))
          } else if (status == 4) {
-            qm.sendNextPrev("That has been made clear, right? Good, then the class is over. Dismissed.")
+            qm.sendNextPrev(I18nMessage.from("6031_THAT_HAS_BEEN_MADE_CLEAR"))
          } else if (status == 5) {
             qm.gainMeso(-10000)
 

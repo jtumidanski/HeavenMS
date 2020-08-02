@@ -2,6 +2,7 @@ package npc
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -36,7 +37,7 @@ class NPC1052004 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Well, hello! Welcome to the Henesys Plastic Surgery! Would you like to transform your face into something new? With a #b#t5152001##k, you can let us take care of the rest and have the face you've always wanted~!\r\n#L2#Plastic Surgery: #i5152001##t5152001##l")
+            cm.sendSimple(I18nMessage.from("1052004_HELLO"))
          } else if (status == 1) {
             if (selection == 2) {
                faceNew = []
@@ -50,16 +51,16 @@ class NPC1052004 {
                      faceNew = ScriptUtils.pushItemIfTrue(faceNew, femaleFace[i] + cm.getPlayer().getFace() % 1000 - (cm.getPlayer().getFace() % 100), { itemId -> cm.cosmeticExistsAndIsntEquipped(itemId) })
                   }
                }
-               cm.sendStyle("Let's see... I can totally transform your face into something new. Don't you want to try it? For #b#t5152001##k, you can get the face of your liking. Take your time in choosing the face of your preference.", faceNew)
+               cm.sendStyle(I18nMessage.from("1052004_DO_YOU_WANT_TO_TRY"), faceNew)
             }
          } else if (status == 2) {
             cm.dispose()
             if (cm.haveItem(5152001)) {
                cm.gainItem(5152001, (short) -1)
                cm.setFace(faceNew[selection])
-               cm.sendOk("Enjoy your new and improved face!")
+               cm.sendOk(I18nMessage.from("1052004_ENJOY_YOUR_NEW_FACE"))
             } else {
-               cm.sendOk("Hmm ... it looks like you don't have the coupon specifically for this place. Sorry to say this, but without the coupon, there's no plastic surgery for you...")
+               cm.sendOk(I18nMessage.from("1052004_MISSING_COUPON"))
             }
          }
       }

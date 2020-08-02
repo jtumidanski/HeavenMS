@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -25,24 +26,24 @@ class NPC2112013 {
 
          if (res == 0) {  // mesos
             int mgain = 500 * cm.getPlayer().getMesoRate()
-            cm.sendNext("Earned " + mgain + " mesos!")
+            cm.sendNext(I18nMessage.from("2112013_EARNED_MESOS").with(mgain))
             cm.gainMeso(mgain)
          } else if (res == 1) {  // exp
             int egain = 500 * cm.getPlayer().getExpRate()
-            cm.sendNext("Earned " + egain + " exp!")
+            cm.sendNext(I18nMessage.from("2112013_EARNED_EXP").with(egain))
             cm.gainExp(egain)
          } else if (res == 2) {  // letter
             int letter = 4001130
             if (!cm.canHold(letter)) {
-               cm.sendOk("You got a letter, however it didn't fit on your inventory, so you put it back.")
+               cm.sendOk(I18nMessage.from("2112013_NO_INVENTORY"))
                cm.dispose()
                return
             }
 
             cm.gainItem(letter, (short) 1)
-            cm.sendNext("You found a letter, strategically placed here as it seems.")
+            cm.sendNext(I18nMessage.from("2112013_FOUND_A_LETTER"))
          } else if (res == 3) {  // pass
-            cm.sendNext("You found the trigger to the next stage.")
+            cm.sendNext(I18nMessage.from("2112013_FOUND_A_TRIGGER"))
 
             eim.showClearEffect()
             eim.giveEventPlayersStageReward(1)
@@ -51,7 +52,7 @@ class NPC2112013 {
             cm.getMap().getReactorByName("d00").hitReactor(cm.getClient())
          }
       } else {
-         cm.sendNext("There is nothing here.")
+         cm.sendNext(I18nMessage.from("2112013_NOTHING_HERE"))
       }
 
       cm.dispose()

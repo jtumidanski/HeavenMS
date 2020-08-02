@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,12 +17,12 @@ class NPC2012002 {
    int sel = -1
 
    def start() {
-      cm.sendYesNo("Do you wish to leave the boat?")
+      cm.sendYesNo(I18nMessage.from("2012002_WISH_TO_LEAVE"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode == 0 && status == 1) {
-         cm.sendOk("Good choice")
+         cm.sendOk(I18nMessage.from("2012002_GOOD_CHOICE"))
          cm.dispose()
       }
       if (mode > 0) {
@@ -31,7 +32,7 @@ class NPC2012002 {
       }
 
       if (status == 1) {
-         cm.sendNext("Alright, see you next time. Take care.")
+         cm.sendNext(I18nMessage.from("2012002_ALRIGHT"))
       } else if (status == 2) {
          cm.warp(200000111, 0)// back to Orbis jetty
          cm.dispose()

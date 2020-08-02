@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -47,21 +48,21 @@ class NPC9201046 {
                   int rnd = Math.floor(Math.random() * 3).intValue()
                   cm.gainItem(baseId + rnd)
 
-                  cm.sendNext("Bravo! You are the first to claim the prize for fetching 35 #t4031597#. Take this cape as merit for your feat.")
+                  cm.sendNext(I18nMessage.from("9201046_BRAVO"))
                   cm.gainItem(4031597, (short) -35)
                   cm.gainExp(4000 * cm.getPlayer().getExpRate())
                } else if (eim.getIntProperty("marriedGroup") == 0) {
-                  cm.sendNext("Check if you have a slot available before talking about receiving prizes!")
+                  cm.sendNext(I18nMessage.from("9201046_NEED_SLOT_SPACE"))
                } else {
-                  cm.sendNext("35 #t4031597#. Nicely done, too bad someone took the prize first. Hurry up to get the last moments of the bonus stage!")
+                  cm.sendNext(I18nMessage.from("9201046_NICELY_DONE"))
                   cm.gainItem(4031597, (short) -35)
                   cm.gainExp(4000 * cm.getPlayer().getExpRate())
                }
             } else {
-               cm.sendNext("To claim a prize here, get to me 35 #t4031597# from the mobs spawned from the boxes. Only the #rfirst player can claim the big prize#k, although others can still claim an EXP boost from this feat. Alternatively, one can choose to #bskip this bonus stage#k and go for the usual one by passing #bthrough the portals#k.")
+               cm.sendNext(I18nMessage.from("9201046_CLAIM_A_PRIZE"))
             }
          } else {
-            cm.sendNext("Hurry up to get the last moments of the bonus stage!")
+            cm.sendNext(I18nMessage.from("9201046_HURRY_UP"))
          }
 
          cm.dispose()

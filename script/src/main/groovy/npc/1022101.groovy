@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Rooney
@@ -35,7 +36,7 @@ class NPC1022101 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("Santa told me to go to here, only he didn't told me when...  I hope I'm here on the right time! Oh! By the way, I'm Rooney, I can take you to #bHappyVille#k. Are you ready to go?")
+            cm.sendYesNo(I18nMessage.from("1022101_HELLO"))
          } else {
             cm.getPlayer().saveLocation("HAPPYVILLE")
             cm.warp(209000000, 0)

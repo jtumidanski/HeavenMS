@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1300006 {
          }
 
          if (status == 0) {
-            cm.sendOk("Hey guys, what's going on? I'm already getting married at this age? But I'm only a child!!! How comes?")
+            cm.sendOk(I18nMessage.from("1300006_WHAT_IS_GOING_ON"))
             cm.dispose()
          }
       }

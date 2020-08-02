@@ -4,6 +4,7 @@ import client.MapleCharacter
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
 import server.maps.MapleMap
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -75,13 +76,15 @@ class NPC2040043 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty(stage.toString() + "stageclear") != null) {
-            cm.sendNext("Hurry, goto the next stage, the portal is open!")
+            cm.sendNext(I18nMessage.from("2040043_GO_TO"))
+
          } else {
             if (eim.isEventLeader(cm.getPlayer())) {
                int state = eim.getIntProperty("statusStg" + stage)
 
                if (state == -1) {           // preamble
-                  cm.sendOk("Hi. Welcome to the #bstage " + stage + "#k. In this stage, line up 5 member of your party above those boxes in order to form the right combination to unlock the next stage. Only one player should stay above a box desired to pertain the combination.")
+                  cm.sendOk(I18nMessage.from("2040043_WELCOME").with(stage))
+
 
                   int st = (debug) ? 2 : 0
                   eim.setProperty("statusStg" + stage, st)
@@ -132,12 +135,14 @@ class NPC2040043 {
                         cm.dispose()
                      }
                   } else {
-                     cm.sendNext("It looks like you haven't found the 5 boxes just yet. Please think of a different combination of boxes. Only 5 are allowed to stand on boxes, and if you move it may not count as an answer, so please keep that in mind. Keep going!")
+                     cm.sendNext(I18nMessage.from("2040043_SORRY"))
+
                      cm.dispose()
                   }
                }
             } else {
-               cm.sendNext("Please tell your #bParty-Leader#k to come talk to me.")
+               cm.sendNext(I18nMessage.from("2040043_PARTY_LEADER_MUST_TALK"))
+
             }
          }
 

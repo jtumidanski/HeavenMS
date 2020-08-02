@@ -3,6 +3,7 @@ package npc
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -47,7 +48,8 @@ class NPC2083001 {
             if (status == 0) {
                em = cm.getEventManager("HorntailPQ")
                if (em == null) {
-                  cm.sendOk("The Horntail PQ has encountered an error.")
+                  cm.sendOk(I18nMessage.from("2083001_PQ_ENCOUNTERED_ERROR"))
+
                   cm.dispose()
                   return
                } else if (cm.isUsingOldPqNpcStyle()) {
@@ -55,39 +57,47 @@ class NPC2083001 {
                   return
                }
 
-               cm.sendSimple("#e#b<Party Quest: Horntail Trial Grounds>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nThis is the path to Horntail's lair. If you want to face him, you and your team shall be tested on the trial grounds ahead.#b\r\n#L0#Let us pass to the trial grounds.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.")
+               cm.sendSimple(I18nMessage.from("2083001_PARTY_QUEST_INTRO").with(em.getProperty("party"), (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable")))
+
             } else if (status == 1) {
                if (selection == 0) {
                   if (cm.getParty().isEmpty()) {
-                     cm.sendOk("You can participate in the party quest only if you are in a party.")
+                     cm.sendOk(I18nMessage.from("2083001_MUST_BE_IN_PARTY"))
+
                      cm.dispose()
                   } else if (!cm.isLeader()) {
-                     cm.sendOk("Your party leader must talk to me to start this party quest.")
+                     cm.sendOk(I18nMessage.from("2083001_LEADER_MUST_TALK"))
+
                      cm.dispose()
                   } else {
                      MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
                      if (eli.size() > 0) {
                         if (!em.startInstance(cm.getParty().orElseThrow(), cm.getPlayer().getMap(), 1)) {
-                           cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
+                           cm.sendOk(I18nMessage.from("2083001_ANOTHER_PARTY_HAS_STARTED"))
+
                         }
                      } else {
-                        cm.sendOk("Either I cannot accept some members of your party inside the cave or you team is lacking. Solve this problem then talk to me!")
+                        cm.sendOk(I18nMessage.from("2083001_PARTY_MEMBERS_NOT_IN_MAP"))
+
                      }
 
                      cm.dispose()
                   }
                } else if (selection == 1) {
                   boolean psState = cm.getPlayer().toggleRecvPartySearchInvite()
-                  cm.sendOk("Your Party Search status is now: #b" + (psState ? "enabled" : "disabled") + "#k. Talk to me whenever you want to change it back.")
+                  cm.sendOk(I18nMessage.from("2083001_PARTY_SEARCH_STATUS").with((psState ? "enabled" : "disabled")))
+
                   cm.dispose()
                } else {
-                  cm.sendOk("#e#b<Party Quest: Horntail Trial Grounds>#k#n\r\nAs the gatekeeper of Horntail's lair, I will grant access #bjust to those worthy#k of his presence. Even for those people, the path inside is that of a maze, full of branches and trials. However, those #radept at fighting squad bosses#k have a better chance to stand to our leader, although those #rof our kind#k have a shabby chance as well.")
+                  cm.sendOk(I18nMessage.from("2083001_PARTY_QUEST_INTRO_2"))
+
                   cm.dispose()
                }
             }
          } else {
             if (!cm.isEventLeader()) {
-               cm.sendOk("Only your party leader is allowed to interact with the Schedule.")
+               cm.sendOk(I18nMessage.from("2083001_PARTY_LEADER_MUST_INTERACT"))
+
             } else if (cm.getMapId() == 240050100) {
                if (cm.haveItem(4001087) && cm.haveItem(4001088) && cm.haveItem(4001089) && cm.haveItem(4001090) && cm.haveItem(4001091)) {
                   cm.gainItem(4001087, (short) -1)
@@ -98,7 +108,8 @@ class NPC2083001 {
 
                   cm.getEventInstance().warpEventTeam(240050200)
                } else {
-                  cm.sendOk("You don't have all the keys needed to proceed.")
+                  cm.sendOk(I18nMessage.from("2083001_MISSING_KEYS"))
+
                }
             } else if (cm.getMapId() == 240050300) {
                if (cm.haveItem(4001092, 1) && cm.haveItem(4001093, 6)) {
@@ -106,7 +117,8 @@ class NPC2083001 {
                   cm.gainItem(4001093, (short) -6)
                   cm.getEventInstance().clearPQ()
                } else {
-                  cm.sendOk("Check if you have got all 6 Red keys and 1 Blue key with you.")
+                  cm.sendOk(I18nMessage.from("2083001_MISSING_KEYS_DETAIL"))
+
                }
             } else if (cm.getMapId() == 240050310) {
                if (cm.haveItem(4001092, 1) && cm.haveItem(4001093, 6)) {
@@ -114,7 +126,8 @@ class NPC2083001 {
                   cm.gainItem(4001093, (short) -6)
                   cm.getEventInstance().clearPQ()
                } else {
-                  cm.sendOk("Check if you have got all 6 Red keys and 1 Blue key with you.")
+                  cm.sendOk(I18nMessage.from("2083001_MISSING_KEYS_DETAIL"))
+
                }
             }
 

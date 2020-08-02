@@ -31,7 +31,8 @@ class NPC2091005 {
 
    def start() {
       if (disabled) {
-         cm.sendOk("My master has requested that the dojo be #rclosed#k at this time so I can't let you in.")
+         cm.sendOk(I18nMessage.from("2091005_DOJO_CLOSED"))
+
          cm.dispose()
          return
       }
@@ -67,12 +68,15 @@ class NPC2091005 {
                cm.sendSimple(text)
             } else if (cm.getPlayer().getLevel() >= 25) {
                if (cm.getPlayer().getMap().getId() == 925020001) {
-                  cm.sendSimple("My master is the strongest person in Mu Lung, and you want to challenge him? Fine, but you'll regret it later.\r\n\r\n#b#L0#I want to challenge him alone.#l\r\n#L1#I want to challenge him with a party.#l\r\n\r\n#L2#I want to receive a belt.#l\r\n#L3#I want to reset my training points.#l\r\n#L4#I want to receive a medal.#l\r\n#L5#What is a Mu Lung Dojo?#l")
+                  cm.sendSimple(I18nMessage.from("2091005_WANT_TO_CHALLENGE"))
+
                } else {
-                  cm.sendYesNo("What, you're giving up? You just need to get to the next level! Do you really want to quit and leave?")
+                  cm.sendYesNo(I18nMessage.from("2091005_GIVING_UP_LONG"))
+
                }
             } else {
-               cm.sendOk("Hey! Are you mocking my master? Who do you think you are to challenge him? This is a joke! You should at least be level #b25#k.")
+               cm.sendOk(I18nMessage.from("2091005_MOCKING_MASTER"))
+
                cm.dispose()
             }
          } else {
@@ -85,19 +89,23 @@ class NPC2091005 {
                      if (!cm.getPlayer().hasEntered("dojang_Msg") && !cm.getPlayer().getFinishedDojoTutorial()) {
                         //kind of hackish...
                         if (status == 1) {
-                           cm.sendYesNo("Hey there! You! This is your first time, huh? Well, my master doesn't just meet with anyone. He's a busy man. And judging by your looks, I don't think he'd bother. Ha! But, today's your lucky day... I tell you what, if you can defeat me, I'll allow you to see my Master. So what do you say?")
+                           cm.sendYesNo(I18nMessage.from("2091005_IS_THIS_YOUR_FIRST_TIME"))
+
                         } else if (status == 2) {
                            if (mode == 0) {
-                              cm.sendNext("Haha! Who are you trying to impress with a heart like that?\r\nGo back home where you belong!")
+                              cm.sendNext(I18nMessage.from("2091005_GO_BACK_HOME"))
+
                               cm.dispose()
                            } else {
                               int avDojo = cm.getClient().getChannelServer().ingressDojo(true, 0)
 
                               if (avDojo < 0) {
                                  if (avDojo == -1) {
-                                    cm.sendOk("All Dojo's are being used already. Wait for awhile before trying again.")
+                                    cm.sendOk(I18nMessage.from("2091005_ALL_DOJOS_USED"))
+
                                  } else {
-                                    cm.sendOk("Either your party is already using the Dojo or your party's allotted time on the Dojo has not expired yet. Wait for them to finish to enter.")
+                                    cm.sendOk(I18nMessage.from("2091005_PARTY_ALREADY_USING_DOJO"))
+
                                  }
                               } else {
                                  cm.getClient().getChannelServer().getMapFactory().getMap(925020010 + avDojo).resetMapObjects()
@@ -113,15 +121,18 @@ class NPC2091005 {
                         dojoWarp = cm.getPlayer().getDojoStage()
                         cm.getPlayer().setDojoStage(0)
                         int stageWarp = ((dojoWarp / 6) | 0) * 5
-                        cm.sendYesNo("The last time you took the challenge by yourself, you went up to round #b" + stageWarp + "#k. I can take you there right now. Do you want to go there? (Select #rNo#k to erase this record.)")
+                        cm.sendYesNo(I18nMessage.from("2091005_LAST_TIME").with(stageWarp))
+
                      } else {
                         int avDojo = cm.getClient().getChannelServer().ingressDojo(false, dojoWarp)
 
                         if (avDojo < 0) {
                            if (avDojo == -1) {
-                              cm.sendOk("All Dojo's are being used already. Wait for awhile before trying again.")
+                              cm.sendOk(I18nMessage.from("2091005_ALL_DOJOS_USED"))
+
                            } else {
-                              cm.sendOk("Either your party is already using the Dojo or your party's allotted time on the Dojo has not expired yet. Wait for them to finish to enter.")
+                              cm.sendOk(I18nMessage.from("2091005_PARTY_ALREADY_USING_DOJO"))
+
                            }
 
                            cm.getPlayer().setDojoStage(dojoWarp)
@@ -138,31 +149,37 @@ class NPC2091005 {
                   } else if (selectedMenu == 1) { //I want to challenge him with a party.
                      Optional<MapleParty> party = cm.getPlayer().getParty()
                      if (party.isEmpty()) {
-                        cm.sendNext("Where do you think you're going? You're not even the party leader! Go tell your party leader to talk to me.")
+                        cm.sendNext(I18nMessage.from("2091005_WHERE_DO_YOU_THINK"))
+
                         cm.dispose()
                         return
                      }
 
                      if (party.get().getLeader().getId() != cm.getPlayer().getId()) {
-                        cm.sendNext("Where do you think you're going? You're not even the party leader! Go tell your party leader to talk to me.")
+                        cm.sendNext(I18nMessage.from("2091005_WHERE_DO_YOU_THINK"))
+
                         cm.dispose()
                      }
 
                      //else if (party.getMembers().size() == 1) {
-                     //    cm.sendNext("You're going to take on the challenge as a one-man party?");
+                     //    cm.sendNext(I18nMessage.from("2091005_ONE_MAN_PARTY"))
+
                      //}
 
                      else if (!isBetween(party.get(), 30)) {
-                        cm.sendNext("Your parties level ranges are too broad to enter. Please make sure all of your party members are within #r30 levels#k of each other.")
+                        cm.sendNext(I18nMessage.from("2091005_LEVEL_RANGE_TOO_BROAD"))
+
                         cm.dispose()
                      } else {
                         int avDojo = cm.getClient().getChannelServer().ingressDojo(true, cm.getParty().get(), 0)
 
                         if (avDojo < 0) {
                            if (avDojo == -1) {
-                              cm.sendOk("All Dojo's are being used already. Wait for awhile before trying again.")
+                              cm.sendOk(I18nMessage.from("2091005_ALL_DOJOS_USED"))
+
                            } else {
-                              cm.sendOk("Either your party is already using the Dojo or your party's allotted time on the Dojo has not expired yet. Wait for them to finish to enter.")
+                              cm.sendOk(I18nMessage.from("2091005_PARTY_ALREADY_USING_DOJO"))
+
                            }
                         } else {
                            cm.getClient().getChannelServer().resetDojoMap(925030100 + avDojo)
@@ -176,7 +193,8 @@ class NPC2091005 {
 
                   } else if (selectedMenu == 2) { //I want to receive a belt.
                      if (!cm.canHold(belts[0])) {
-                        cm.sendNext("Make room in your EQUIP inventory before trying to claim a belt!")
+                        cm.sendNext(I18nMessage.from("2091005_EQUIP_INVENTORY_ROOM_NEEDED"))
+
                         cm.dispose()
                         return
                      }
@@ -213,7 +231,8 @@ class NPC2091005 {
                               }
                               cm.gainItem(belt, (short) 1)
                               cm.getPlayer().setDojoPoints(cm.getPlayer().getDojoPoints() - points)
-                              cm.sendNext("There is the #i" + belt + "# #b#t" + belt + "##k. You have proven your valor to ascend on the Dojo ranks. Well done!")
+                              cm.sendNext(I18nMessage.from("2091005_BELT_AWARD").with(belt, belt))
+
                            } else {
                               sendBeltRequirements(belt, oldBelt, hasOldBelt, level, points)
                            }
@@ -225,31 +244,39 @@ class NPC2091005 {
                      }
                   } else if (selectedMenu == 3) { //I want to reset my training points.
                      if (status == 1) {
-                        cm.sendYesNo("You do know that if you reset your training points, it returns to 0, right? Although, that's not always a bad thing. If you can start earning training points again after you reset, you can receive the belts once more. Do you want to reset your training points now?")
+                        cm.sendYesNo(I18nMessage.from("2091005_RESET_INFO"))
+
                      } else if (status == 2) {
                         if (mode == 0) {
-                           cm.sendNext("Do you need to gather yourself or something? Come back after you take a deep breath.")
+                           cm.sendNext(I18nMessage.from("2091005_GATHER_YOURSELF"))
+
                         } else {
                            cm.getPlayer().setDojoPoints(0)
-                           cm.sendNext("There! All your training points have been reset. Think of it as a new beginning and train hard!")
+                           cm.sendNext(I18nMessage.from("2091005_RESET_SUCCESS"))
+
                         }
                         cm.dispose()
                      }
                   } else if (selectedMenu == 4) { //I want to receive a medal.
                      if (status == 1 && cm.getPlayer().getVanquisherStage() <= 0) {
-                        cm.sendYesNo("You haven't attempted the medal yet? If you defeat one type of monster in Mu Lung Dojo #b100 times#k you can receive a title called #b#t" + (1142033 + cm.getPlayer().getVanquisherStage()) + "##k. It looks like you haven't even earned the #b#t" + (1142033 + cm.getPlayer().getVanquisherStage()) + "##k... Do you want to try out for the #b#t" + (1142033 + cm.getPlayer().getVanquisherStage()) + "##k?")
+                        cm.sendYesNo(I18nMessage.from("2091005_ATTEMPT_THE_MEDAL"))
+
                      } else if (status == 2 || cm.getPlayer().getVanquisherStage() > 0) {
                         if (mode == 0) {
-                           cm.sendNext("If you don't want to, that's fine.")
+                           cm.sendNext(I18nMessage.from("2091005_THAT_IS_FINE"))
+
                         } else {
                            if (cm.getPlayer().getDojoStage() > 37) {
-                              cm.sendNext("You have completed all medals challenges.")
+                              cm.sendNext(I18nMessage.from("2091005_COMPLETED_ALL_MEDAL_CHALLENGES"))
+
                            } else if (cm.getPlayer().getVanquisherKills() < 100 && cm.getPlayer().getVanquisherStage() > 0) {
-                              cm.sendNext("You still need #b" + (100 - cm.getPlayer().getVanquisherKills()) + "#k in order to obtain the #b#t" + (1142032 + cm.getPlayer().getVanquisherStage()) + "##k. Please try a little harder. As a reminder, only the monsters that have been summoned by our Master in Mu Lung Dojo are considered. Oh, and make sure you're not hunting the monsters and exiting!#r If you don't go to the next level after defeating the monster, it doesn't count as a win#k.")
+                              cm.sendNext(I18nMessage.from("2091005_STILL_NEED").with((100 - cm.getPlayer().getVanquisherKills())))
+
                            } else if (cm.getPlayer().getVanquisherStage() <= 0) {
                               cm.getPlayer().setVanquisherStage(1)
                            } else {
-                              cm.sendNext("You have obtained #b#t" + (1142032 + cm.getPlayer().getVanquisherStage()) + "##k.")
+                              cm.sendNext(I18nMessage.from("2091005_HAVE_OBTAINED"))
+
                               cm.gainItem(1142033 + cm.getPlayer().getVanquisherStage(), (short) 1)
                               cm.getPlayer().setVanquisherStage(cm.c.getPlayer().getVanquisherStage() + 1)
                               cm.getPlayer().setVanquisherKills(0)
@@ -261,7 +288,8 @@ class NPC2091005 {
                         cm.dispose()
                      }
                   } else if (selectedMenu == 5) { //What is a Mu Lung Dojo?
-                     cm.sendNext("Our master is the strongest person in Mu Lung. The place he built is called the Mu Lung Dojo, a building that is #r38 stories#k tall! You can train yourself as you go up each level. Of course, it'll be hard for someone at your level to reach the top.")
+                     cm.sendNext(I18nMessage.from("2091005_OUR_MASTER"))
+
                      cm.dispose()
                   }
                } else {
@@ -280,13 +308,15 @@ class NPC2091005 {
                   if (avDojo < 0) {
                      if (hasParty) {
                         if (!cm.isPartyLeader()) {
-                           cm.sendOk("You are not the leader! Call your party leader to talk to me if you wish to continue.")
+                           cm.sendOk(I18nMessage.from("2091005_NOT_THE_LEADER"))
+
                            cm.dispose()
                            return
                         }
 
                         if (!isBetween(cm.getParty().get(), 35)) {
-                           cm.sendOk("Your parties level ranges are too broad to enter. Please make sure all of your party members are within #r35 levels#k of each other.")
+                           cm.sendOk(I18nMessage.from("2091005_LEVEL_RANGE"))
+
                            cm.dispose()
                            return
                         }
@@ -298,9 +328,11 @@ class NPC2091005 {
 
                   if (avDojo < 0) {
                      if (avDojo == -1) {
-                        cm.sendOk("All Dojo's are being used already. Wait for awhile before trying again.")
+                        cm.sendOk(I18nMessage.from("2091005_ALL_DOJOS_USED"))
+
                      } else {
-                        cm.sendOk("Your party already registered for the dojo. Wait for the end of the registration time to enter again.")
+                        cm.sendOk(I18nMessage.from("2091005_ALREADY_REGISTERED"))
+
                      }
                   } else {
                      int baseStg = hasParty ? 925030000 : 925020000
@@ -324,7 +356,8 @@ class NPC2091005 {
                   cm.dispose()
                } else if (selectedMenu == 1) { //I want to leave
                   if (status == 1) {
-                     cm.sendYesNo("So, you're giving up? You're really going to leave?")
+                     cm.sendYesNo(I18nMessage.from("2091005_GIVING_UP"))
+
                   } else {
                      if (mode == 1) {
                         cm.warp(925020002, "st00")
@@ -333,14 +366,18 @@ class NPC2091005 {
                   }
                } else if (selectedMenu == 2) { //I want to record my score up to this point
                   if (status == 1) {
-                     cm.sendYesNo("If you record your score, you can start where you left off the next time. Isn't that convenient? Do you want to record your current score?")
+                     cm.sendYesNo(I18nMessage.from("2091005_DO_YOU_WANT_TO_RECORD"))
+
                   } else {
                      if (mode == 0) {
-                        cm.sendNext("You think you can go even higher? Good luck!")
+                        cm.sendNext(I18nMessage.from("2091005_GOOD_LUCK"))
+
                      } else if (cm.getPlayer().getDojoStage() == Math.floor(cm.getMapId() / 100) % 100) {
-                        cm.sendOk("Your score have already been recorded. Next time you get to challenge the Dojo, you'll be able to come back to this point.")
+                        cm.sendOk(I18nMessage.from("2091005_ALREADY_RECORDED"))
+
                      } else {
-                        cm.sendNext("I recorded your score. If you tell me the next time you go up, you'll be able to start where you left off. Note that you will have your #rrecord erased#k if you choose to #bcontinue challenging the Dojo#k, so choose carefully.")
+                        cm.sendNext(I18nMessage.from("2091005_RECORD_SUCCESS"))
+
                         cm.getPlayer().setDojoStage(Math.floor(cm.getMapId() / 100) % 100)
                      }
                      cm.dispose()
@@ -348,7 +385,8 @@ class NPC2091005 {
                }
             } else {
                if (mode == 0) {
-                  cm.sendNext("Stop changing your mind! Soon, you'll be crying, begging me to go back.")
+                  cm.sendNext(I18nMessage.from("2091005_STOP_CHANGING_YOUR_MIND"))
+
                } else if (mode == 1) {
                   int dojoMapId = cm.getPlayer().getMap().getId()
 
@@ -371,7 +409,8 @@ class NPC2091005 {
       String beltLeftStr = (!hasOldBelt) ? " you must have the needed belt unequipped and available in your EQP inventory" : ""
       String conjStr = (pointsLeftStr.length() > 0 && beltLeftStr.length() > 0) ? " and" : ""
 
-      cm.sendNext("In order to receive #i" + belt + "# #b#t" + belt + "##k," + beltReqStr + " you have to be at least over level #b" + level + "#k and you need to have earned at least #b" + points + " training points#k.\r\n\r\nIf you want to obtain this belt," + beltLeftStr + conjStr + pointsLeftStr + ".")
+      cm.sendNext(I18nMessage.from("2091005_IN_ORDER_TO").with(belt, belt, beltReqStr, level, points))
+
    }
 
    static def isRestingSpot(int id) {

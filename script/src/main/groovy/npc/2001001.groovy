@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -31,7 +32,7 @@ class NPC2001001 {
          }
 
          if (status == 0) {
-            cm.sendYesNo("We have a beautiful christmas tree.\r\nDo you want to see/decorate it?")
+            cm.sendYesNo(I18nMessage.from("2001001_DO_YOU_WANT_TO_SEE_OR_DECORATE_IT"))
          } else if (status == 1) {
             cm.warp(209000001)
             cm.dispose()

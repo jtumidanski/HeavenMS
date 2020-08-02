@@ -2,6 +2,7 @@ package npc
 
 import client.inventory.MapleInventoryType
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -20,7 +21,7 @@ class NPC1063002 {
    def start() {
       if (cm.isQuestStarted(2054) && !cm.haveItem(4031028, 30)) {
          if (!cm.canHold(4031028, 30)) {
-            cm.sendNext("Check for a available slot on your ETC inventory.")
+            cm.sendNext(I18nMessage.from("1063002_CHECK_YOUR_ETC_INVENTORY"))
             cm.dispose()
             return
          }
@@ -28,7 +29,7 @@ class NPC1063002 {
          cm.gainItem(4031028, (short) 30)
       } else {
          if (cm.getPlayer().getInventory(MapleInventoryType.ETC).getNumFreeSlot() < 1) {
-            cm.sendNext("Check for a available slot on your ETC inventory.")
+            cm.sendNext(I18nMessage.from("1063002_CHECK_YOUR_ETC_INVENTORY"))
             cm.dispose()
             return
          }

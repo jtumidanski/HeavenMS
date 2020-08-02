@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -18,10 +19,10 @@ class NPC9201110 {
    def start() {
       switch (cm.getPlayer().getMapId()) {
          case 610030500:
-            cm.sendOk("As every Thief knows, the best attack is the one you never see coming. So, to best illustrate this, you'll be in a chamber with platforms and ledges that you can only get to with Haste, as well as All-Seeing Eyes that your dagger or claw must close--permanently. After all the All-Seeing Eyes have been eliminated, get ti the Thief Statue and lay claim to the Primal Claw! Good luck!")
+            cm.sendOk(I18nMessage.from("9201110_ONLY_GET_TO_WITH_HASTE"))
             break
          case 610030000:
-            cm.sendOk("Once known as the 'Prince of Shadows', Grandmaster Ryo possessed supreme speed and power with short-ranged daggers and longer chain-like Claw. A part-time member of the Boss Hunters, he was renowned for unparalleled ability to blend into the very night itself. His legend grew during a battle with Crimson Balrog, where he moved so swiftly that Balrog's attacks only caught air. Ryo also performed occasional 'retrievals' for those less fortunate than himself.")
+            cm.sendOk(I18nMessage.from("9201110_ABILITY_TO_BLEND"))
             break
          case 610030530:
             if (cm.isAllReactorState(6108004, 1)) {
@@ -32,18 +33,18 @@ class NPC9201110 {
                if ((stgStatus >> jobNiche) % 2 == 0) {
                   if (cm.canHold(4001256, 1)) {
                      cm.gainItem(4001256, (short) 1)
-                     cm.sendOk("Good job.")
+                     cm.sendOk(I18nMessage.from("9201110_GOOD_JOB"))
 
                      stgStatus += (1 << jobNiche)
                      eim.setIntProperty("glpq5_room", stgStatus)
                   } else {
-                     cm.sendOk("Make room on your ETC inventory first.")
+                     cm.sendOk(I18nMessage.from("9201110_MAKE_ETC_ROOM"))
                   }
                } else {
-                  cm.sendOk("The weapon inside this room has already been retrieved.")
+                  cm.sendOk(I18nMessage.from("9201110_ALREADY_BEEN_RETRIEVED"))
                }
             } else {
-               cm.sendOk("Go now, destroy all of the watchful eyes with your mobility skills, fellow Thief. Report back to me when you are done.")
+               cm.sendOk(I18nMessage.from("9201110_DESTROY_ALL"))
             }
             break
       }

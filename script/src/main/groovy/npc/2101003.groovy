@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101003 {
    int sel = -1
 
    def start() {
-      cm.sendNext ("Hey hey, don't try to start trouble with anyone. I want nothing to do with you.")
+      cm.sendNext (I18nMessage.from("2101003_DO_NOT_TRY_TO_START_TROUBLE"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

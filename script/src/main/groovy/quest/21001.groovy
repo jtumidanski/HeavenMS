@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -11,7 +12,7 @@ class Quest21001 {
       status++
       if (mode != 1) {
          if (type == 15 && mode == 0) {
-            qm.sendNext("*Sob* Aran has declined my request!")
+            qm.sendNext(I18nMessage.from("21001_DECLINED"))
             qm.dispose()
             return
          } else {
@@ -20,7 +21,7 @@ class Quest21001 {
          }
       }
       if (status == 0) {
-         qm.sendAcceptDecline("*Sniff sniff* I was so scared... Please take me to Athena Pierce.")
+         qm.sendAcceptDecline(I18nMessage.from("21001_SO_SCARED"))
       } else if (status == 1) {
          qm.gainItem(4001271, (short) 1)
          qm.forceStartQuest()
@@ -33,7 +34,7 @@ class Quest21001 {
       status++
       if (mode != 1) {
          if (type == 1 && mode == 0) {
-            qm.sendNext("What about the child? Please give me the child!")
+            qm.sendNext(I18nMessage.from("21001_GIVE_ME_THE_CHILD"))
          }
 
          qm.dispose()
@@ -41,7 +42,7 @@ class Quest21001 {
       }
 
       if (status == 0) {
-         qm.sendYesNo("You made it back safely! What about the child?! Did you bring the child with you?!")
+         qm.sendYesNo(I18nMessage.from("21001_DID_YOU_BRING_THE_CHILD"))
       } else if (status == 1) {
          qm.sendNext("Oh, what a relief. I'm so glad...", (byte) 9)
       } else if (status == 2) {

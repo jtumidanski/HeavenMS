@@ -1,6 +1,7 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -138,11 +139,11 @@ class NPC2010003 {
          boolean complete = true
 
          if (!cm.canHold(item, 1)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("2010003_CHECK_FOR_INVENTORY_SPACE"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost) {
-            cm.sendOk("I'm afraid you cannot afford my services.")
+            cm.sendOk(I18nMessage.from("2010003_CANNOT_AFFORD_IT"))
             cm.dispose()
             return
          } else {
@@ -158,7 +159,7 @@ class NPC2010003 {
          }
 
          if (!complete) {
-            cm.sendOk("I'm afraid that substitute items are unacceptable, if you want your gloves made properly.")
+            cm.sendOk(I18nMessage.from("2010003_MISSING_ITEM"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -170,7 +171,7 @@ class NPC2010003 {
 
             cm.gainMeso(-cost)
             cm.gainItem(item, (short) 1)
-            cm.sendOk("Done. If you need anything else, just ask again.")
+            cm.sendOk(I18nMessage.from("2010003_SUCCESS"))
          }
          cm.dispose()
       }

@@ -2,6 +2,7 @@ package npc
 
 import net.server.processor.MapleGuildProcessor
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC2010007 {
    int sel = -1
 
    def start() {
-      cm.sendSimple("What would you like to do?\r\n#b#L0#Create a Guild#l\r\n#L1#Disband your Guild#l\r\n#L2#Increase your Guild's capacity#l#k")
+      cm.sendSimple(I18nMessage.from("2010007_WHAT_WOULD_YOU_LIKE_TO_DO"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -36,24 +37,24 @@ class NPC2010007 {
             sel = selection
             if (selection == 0) {
                if (cm.getPlayer().getGuildId() > 0) {
-                  cm.sendOk("You may not create a new Guild while you are in one.")
+                  cm.sendOk(I18nMessage.from("2010007_CANNOT_CREATE_GUILD_WHEN_IN_ONE"))
                   cm.dispose()
                } else {
-                  cm.sendYesNo("Creating a Guild costs #b 1500000 mesos#k, are you sure you want to continue?")
+                  cm.sendYesNo(I18nMessage.from("2010007_COST_CONFIRMATION"))
                }
             } else if (selection == 1) {
                if (cm.getPlayer().getGuildId() < 1 || cm.getPlayer().getGuildRank() != 1) {
-                  cm.sendOk("You can only disband a Guild if you are the leader of that Guild.")
+                  cm.sendOk(I18nMessage.from("2010007_MUST_BE_LEADER_TO_DISBAND"))
                   cm.dispose()
                } else {
-                  cm.sendYesNo("Are you sure you want to disband your Guild? You will not be able to recover it afterward and all your GP will be gone.")
+                  cm.sendYesNo(I18nMessage.from("2010007_DISBAND_CONFIRMATION"))
                }
             } else if (selection == 2) {
                if (cm.getPlayer().getGuildId() < 1 || cm.getPlayer().getGuildRank() != 1) {
-                  cm.sendOk("You can only increase your Guild's capacity if you are the leader.")
+                  cm.sendOk(I18nMessage.from("2010007_MUST_BE_LEADER_TO_INCREASE_CAPACITY"))
                   cm.dispose()
                } else {
-                  cm.sendYesNo("Increasing your Guild capacity by #b5#k costs #b " + MapleGuildProcessor.getInstance().getIncreaseGuildCost(cm.getPlayer().getGuild().get().getCapacity()) + " mesos#k, are you sure you want to continue?")
+                  cm.sendYesNo(I18nMessage.from("2010007_CAPACITY_INCREASE_CONFIRMATION").with(MapleGuildProcessor.getInstance().getIncreaseGuildCost(cm.getPlayer().getGuild().get().getCapacity())))
                }
             }
          } else if (status == 2) {

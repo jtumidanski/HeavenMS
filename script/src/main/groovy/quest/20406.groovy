@@ -2,6 +2,7 @@ package quest
 
 
 import scripting.quest.QuestActionManager
+import tools.I18nMessage
 
 class Quest20406 {
    QuestActionManager qm
@@ -23,7 +24,8 @@ class Quest20406 {
          }
 
          if (status == 0) {
-            qm.sendNext("Is that so? All there was was a saying that #p1103000# set out to continue his journey? That can't be, there were further instructions for him to detail the progress of his mission until then. #rReturn to the cave#k and report again if it really has nothing more there.")
+            qm.sendNext(I18nMessage.from("20406_IS_THAT_SO"))
+
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.dispose()

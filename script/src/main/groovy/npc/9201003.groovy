@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleCharacter
 import scripting.npc.NPCConversationManager
@@ -52,24 +53,24 @@ class NPC9201003 {
 
          if (status == 0) {
             if (!cm.isQuestStarted(100400)) {
-               cm.sendOk("Hello we're Mom and Dad...")
+               cm.sendOk(I18nMessage.from("9201003_HELLO"))
                cm.dispose()
             } else {
                if (cm.getQuestProgressInt(100400, 1) == 0) {
                   cm.sendNext("Mom, dad, I have a request to do to both of you... I wanna know more about the path you've already been walking since always, the path of loving and caring for someone dear to me.", (byte) 2)
                } else {
                   if (!hasProofOfLoves(cm.getPlayer())) {
-                     cm.sendOk("Dear, we need to make sure you are really ready to fall in love with whoever you choose to be your partner, please bring here #b4 #t4031367#'s#k.")
+                     cm.sendOk(I18nMessage.from("9201003_PLEASE_BRING"))
                      cm.dispose()
                   } else {
-                     cm.sendNext("#b#h0##k, you made us proud today. You may now have #rour blessings#k to choose whoever you like to be your fiancee. You may now consult #p9201000#, the Wedding Jeweler. Have a sooth, loving and caring journey ahead~~")
+                     cm.sendNext(I18nMessage.from("9201003_MADE_US_PROUD"))
                      state = 1
                   }
                }
             }
          } else if (status == 1) {
             if (state == 0) {
-               cm.sendNextPrev("My dear! How thoughtful of you asking our help. Surely we will help you out!")
+               cm.sendNextPrev(I18nMessage.from("9201003_MY_DEAR"))
             } else {
                cm.sendOk("Mom... Dad... Thanks a lot for your tender support!!!", (byte) 2)
                cm.completeQuest(100400)
@@ -81,7 +82,7 @@ class NPC9201003 {
                cm.dispose()
             }
          } else if (status == 2) {
-            cm.sendNextPrev("Certainly you must have already seen #rNanas, the fairies of Love#k, around the Maple world. From 4 of them, collect #b4 #t4031367#'s#k and bring them here. This journey shall clear some questions you may have about love...")
+            cm.sendNextPrev(I18nMessage.from("9201003_COLLECT_AND_BRING"))
          } else if (status == 3) {
             cm.setQuestProgress(100400, 1, 1)
             cm.dispose()

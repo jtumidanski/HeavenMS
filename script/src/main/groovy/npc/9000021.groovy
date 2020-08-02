@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -36,13 +37,13 @@ class NPC9000021 {
          }
 
          if (status == 0) {
-            cm.sendNext("Hey, traveler! I am #p9000021#, and my job is to recruit travelers like you, who are eager for new challenges daily. Right now, my team is holding contests that thoroughly tests the mental and physical capabilities of adventurers like you.")
+            cm.sendNext(I18nMessage.from("9000021_HELLO"))
          } else if (status == 1) {
-            cm.sendNext("These contests involve #bsequential boss fights#k, with some resting spots between some sections. These will require some strategy time and enough supplies at hand, as they are not common fights.")
+            cm.sendNext(I18nMessage.from("9000021_SEQUENTIAL_BOSS_FIGHTS"))
          } else if (status == 2) {
-            cm.sendAcceptDecline("If you feel you are powerful enough, you can join others like you at where we are hosting the contests of power. ... So, what is your decision? Will you come to where the contests are being held right now?")
+            cm.sendAcceptDecline(I18nMessage.from("9000021_IF_YOU_FEEL_POWERFUL_ENOUGH"))
          } else if (status == 3) {
-            cm.sendOk("Very well. Remember, there you can assemble a team or take on the fighting on your own, it's up to you. Good luck!")
+            cm.sendOk(I18nMessage.from("9000021_VERY_WELL"))
          } else if (status == 4) {
             cm.getPlayer().saveLocation("BOSSPQ")
             cm.warp(970030000, "out00")

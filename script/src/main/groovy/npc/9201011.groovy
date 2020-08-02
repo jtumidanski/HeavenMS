@@ -153,35 +153,35 @@ class NPC9201011 {
                int weddingStage = eim.getIntProperty("weddingStage")
 
                if (weddingStage == 2) {
-                  cm.sendYesNo("Awhoooooooooosh~, the guests have proclaimed their love to y'all. The time has come baby~, #rshould I make you Husband and Wife#k?")
+                  cm.sendYesNo(I18nMessage.from("9201011_SHOULD_I"))
                   state = 1
                } else if (weddingStage == 1) {
-                  cm.sendOk("W-whoah wait a bit alright? Your guests are currently giving their love to y'all. Let's shake this place up, baby~~.")
+                  cm.sendOk(I18nMessage.from("9201011_WAIT_A_BIT"))
                   cm.dispose()
                } else {
-                  cm.sendOk("Wheeeeeeeeeeeeeew! Our festival here is now complete, give a sweet talk to #b#p9201009##k, she will lead you and your folks to the after party. Cheers for your love!")
+                  cm.sendOk(I18nMessage.from("9201011_FESTIVAL_NOW_COMPLETE"))
                   cm.dispose()
                }
             } else {
                int weddingStage = eim.getIntProperty("weddingStage")
                if (weddingStage == 1) {
                   if (eim.gridCheck(cm.getPlayer()) != -1) {
-                     cm.sendOk("Everyone let's shake this place up! Let's rock 'n' roll!!")
+                     cm.sendOk(I18nMessage.from("9201011_SHAKE_THIS_PLACE_UP"))
                      cm.dispose()
                   } else {
                      if (eim.getIntProperty("guestBlessings") == 1) {
-                        cm.sendYesNo("Will you manifest your love to the superstars here present?")
+                        cm.sendYesNo(I18nMessage.from("9201011_WILL_YOU"))
                         state = 0
                      } else {
-                        cm.sendOk("Our superstars are gathered down here. Everyone, let's give them some nice, nicey party~!")
+                        cm.sendOk(I18nMessage.from("9201011_NICE_PARTY"))
                         cm.dispose()
                      }
                   }
                } else if (weddingStage == 3) {
-                  cm.sendOk("Whooooooo-hoo! The couple's love now are like one super big shiny heart right now! And it shall go on ever after this festival. Please #rget ready for the after party#k, baby~. Follow the married couple's lead!")
+                  cm.sendOk(I18nMessage.from("9201011_GET_READY"))
                   cm.dispose()
                } else {
-                  cm.sendOk("It's now guys... Stay with your eyes and ears keened up! They are about to smooch it all over the place!!!")
+                  cm.sendOk(I18nMessage.from("9201011_ALL_OVER_THE_PLACE"))
                   cm.dispose()
                }
             }
@@ -203,7 +203,7 @@ class NPC9201011 {
                   MasterBroadcaster.getInstance().sendToAllInMap(target.getMap(), new ShowForeignEffect(target.getId(), 9), false, target)
                }
 
-               cm.sendOk("Way to go, my friend! Your LOVE has been added to theirs, now in one bigger heart-shaped sentiment that will remain lively in our hearts forever! Who-hoo~!")
+               cm.sendOk(I18nMessage.from("9201011_WAY_TO_GO"))
                cm.dispose()
             } else {            // couple wants to complete the wedding
                int weddingStage = eim.getIntProperty("weddingStage")
@@ -211,7 +211,7 @@ class NPC9201011 {
                if (weddingStage == 2) {
                   int pid = cm.getPlayer().getPartnerId()
                   if (pid <= 0) {
-                     cm.sendOk("Huh~.... Wait wait, did you just break that thing you had right now?? Oh my, what happened?")
+                     cm.sendOk(I18nMessage.from("9201011_WHAT_HAPPENED"))
                      cm.dispose()
                      return
                   }
@@ -226,7 +226,7 @@ class NPC9201011 {
                            pid = eim.getIntProperty("confirmedVows")
                            if (pid != -1) {
                               if (pid == player.getId()) {
-                                 cm.sendOk("You have already confirmed your vows. All that is left is for your partner to confirm now.")
+                                 cm.sendOk(I18nMessage.from("9201011_ALREADY_CONFIRMED"))
                               } else {
                                  eim.setIntProperty("weddingStage", 3)
                                  AbstractPlayerInteraction cmPartner = partner.getAbstractPlayerInteraction()
@@ -260,45 +260,45 @@ class NPC9201011 {
                            break
 
                         case -1:
-                           cm.sendOk("Well, it seems you no longer have the ring/ring box you guys exchanged at the engagement. Awww man~")
+                           cm.sendOk(I18nMessage.from("9201011_MISSING_RING_BOX"))
                            break
 
                         case -2:
-                           cm.sendOk("Well, it seems your partner no longer has the ring/ring box you guys exchanged at the engagement. Awww man~")
+                           cm.sendOk(I18nMessage.from("9201011_PARTNER_MISSING_RING_BOX"))
                            break
 
                         case -3:
-                           cm.sendOk("Well, it seems you don't have the #r#t4000313##k given at the entrance... Please find it, baby~")
+                           cm.sendOk(I18nMessage.from("9201011_PLEASE_FIND_IT"))
                            break
 
                         case -4:
-                           cm.sendOk("Aww I know that shucks, but the fashionable wedding clothes does a essential part here. Please wear it before talking to me.")
+                           cm.sendOk(I18nMessage.from("9201011_FASHIONABLE_CLOTHES"))
                            break
 
                         case 1:
-                           cm.sendOk("Please make an EQUIP slot available to get the marriage ring, will you?")
+                           cm.sendOk(I18nMessage.from("9201011_MAKE_EQUIP_SLOT"))
                            break
 
                         case 2:
-                           cm.sendOk("Please let your partner know to make an EQUIP slot available to get the marriage ring, will you?")
+                           cm.sendOk(I18nMessage.from("9201011_PARTNER_MAKE_EQUIP_SLOT"))
                            break
 
                         case 3:
-                           cm.sendOk("Well, it seems your partner don't have the #r#t4000313##k given at the entrance... Please find it, I can't call the finally without it.")
+                           cm.sendOk(I18nMessage.from("9201011_PARTNER_PLEASE_FIND_IT"))
                            break
 
                         case 4:
-                           cm.sendOk("Aww I know that shucks, but it seems your partner is not using the fashionable wedding clothes. Please tell them to wear it before talking to me.")
+                           cm.sendOk(I18nMessage.from("9201011_PARTNER_FASHIONABLE_CLOTHES"))
                            break
                      }
 
                      cm.dispose()
                   } else {
-                     cm.sendOk("Oof, is that it that your partner is not here, right now? ... Oh noes, I'm afraid I can't call the finally if your partner is not here.")
+                     cm.sendOk(I18nMessage.from("9201011_PARTNER_NOT_HERE"))
                      cm.dispose()
                   }
                } else {
-                  cm.sendOk("Wheeeeeeeeeeeeew~ You are now #bofficially one couple#k, and a brilliant one. Your moves fitted in outstandingly, congratulations!")
+                  cm.sendOk(I18nMessage.from("9201011_OFFICIALLY_ONE_COUPLE"))
                   cm.dispose()
                }
             }

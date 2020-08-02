@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -19,15 +20,15 @@ class Quest2335 {
 
 
       if (status == 0) {
-         qm.sendNext("This is not the end, #b#h ##k. Minions of the #bPrime Minister#k can still be found scattered throughout the castle.")
+         qm.sendNext(I18nMessage.from("2335_NOT_THE_END"))
       } else if (status == 1) {
-         qm.sendAcceptDecline("From what I've heard, there is a place near #bSkyscraper 3#k where a group of Prime Minister's minions can be found. I've picked up a key that the Prime Minister dropped the other day. Here, use this key.")
+         qm.sendAcceptDecline(I18nMessage.from("2335_FROM_WHAT_I_HAVE_HEARD"))
       } else if (status == 2) {
          if (qm.canHold(4032405)) {
             qm.gainItem(4032405, (short) 1)
-            qm.sendNext("For one last time, good luck.")
+            qm.sendNext(I18nMessage.from("2335_GOOD_LUCK"))
          } else {
-            qm.sendOk("Please have a free space in your ETC inventory.")
+            qm.sendOk(I18nMessage.from("2335_ETC_SPACE_NEEDED"))
             qm.dispose()
          }
       } else if (status == 3) {

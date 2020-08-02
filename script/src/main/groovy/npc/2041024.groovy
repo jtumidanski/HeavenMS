@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC2041024 {
          }
 
          if (status == 0) {
-            cm.sendOk("For those capable of great feats and bearers of an unwavering resolve, the #bfinal destination#k lies ahead past the gate. The Machine Room accepts only #rone party at a time#k, so make sure your party is ready when crossing the gate.")
+            cm.sendOk(I18nMessage.from("2041024_MACHINE_ROOM"))
             cm.dispose()
          }
       }

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -28,10 +29,10 @@ class Quest2251 {
 
          if (status == 0) {
             if (!qm.haveItem(4032399, 20)) {
-               qm.sendOk("Please bring me 20 #b#t4032399##k...  #i4032399#")
+               qm.sendOk(I18nMessage.from("2251_BRING_ME"))
             } else {
                qm.gainItem(4032399, (short) -20)
-               qm.sendOk("Oh, you brought 20 #b#t4032399##k! Thank you.")
+               qm.sendOk(I18nMessage.from("2251_YOU_BROUGHT_ME"))
                qm.gainExp(8000)
                qm.forceCompleteQuest()
             }

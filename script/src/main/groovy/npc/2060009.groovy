@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -48,7 +49,7 @@ class NPC2060009 {
          if (selection == 0) {
             if (payment) {
                if (cm.getPlayer().getMeso() < 1000) {
-                  cm.sendOk("I don't think you have enough money...")
+                  cm.sendOk(I18nMessage.from("2060009_NOT_ENOUGH_MONEY"))
                   cm.dispose()
                } else {
                   cm.gainMeso(-1000)
@@ -61,7 +62,7 @@ class NPC2060009 {
             return
          } else if (selection == 1) {
             if (cm.getPlayer().getMeso() < 10000) {
-               cm.sendOk("I don't think you have enough money...")
+               cm.sendOk(I18nMessage.from("2060009_NOT_ENOUGH_MONEY"))
                cm.dispose()
                return
             } else {

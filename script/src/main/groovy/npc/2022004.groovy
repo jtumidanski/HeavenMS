@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -16,7 +17,7 @@ class NPC2022004 {
    int sel = -1
 
    def start() {
-      cm.sendNext("You did a great job back there, " + cm.getPlayer().getName() + ", well done. Now I will transport you back to El Nath. Have the pendant in your possession and talk to me when you feel ready to receive the new skill.")
+      cm.sendNext(I18nMessage.from("2022004_GREAT_JOB").with(cm.getPlayer().getName()))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

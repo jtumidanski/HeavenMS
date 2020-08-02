@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 import scripting.event.EventManager
 import scripting.quest.QuestActionManager
@@ -27,14 +28,14 @@ class Quest21613 {
          } else if (status == 1) {
             qm.sendNextPrev("Werewolf is my friend, I can't just hand over a friend.", (byte) 3)
          } else if (status == 2) {
-            qm.sendAcceptDecline("We understand, but we won't leave without our pup. Tell you what, we'll test you to see if you are worthy of raising a wolf. #rGet ready to be tested by wolves.#k")
+            qm.sendAcceptDecline(I18nMessage.from("21613_TEST_TO_SEE_IF_YOU_ARE_WORTHY"))
          } else if (status == 3) {
             EventManager em = qm.getEventManager("Aran_3rdmount")
             if (em == null) {
-               qm.sendOk("Sorry, but the 3rd mount quest (Wolves) is closed.")
+               qm.sendOk(I18nMessage.from("21613_QUEST_IS_CLOSED"))
             } else {
                if (!em.startInstance(qm.getPlayer())) {
-                  qm.sendOk("There is currently someone in this map, come back later.")
+                  qm.sendOk(I18nMessage.from("21613_SOMEONE_IN_THE_MAP"))
                } else {
                   qm.forceStartQuest()
                }

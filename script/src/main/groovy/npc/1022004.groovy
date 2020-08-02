@@ -1,6 +1,9 @@
 package npc
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
+import tools.SimpleMessage
+import tools.UserMessage
 
 /*
 	NPC Name: 		
@@ -36,41 +39,55 @@ class NPC1022004 {
          cm.dispose()
       }
       if (status == 0 && mode == 1) {
-         String selStr = "Um... Hi, I'm Mr. Thunder's apprentice. He's getting up there in age, so he handles most of the heavy-duty work while I handle some of the lighter jobs. What can I do for you?#b"
-         String[] options = ["Make a glove", "Upgrade a glove", "Create materials"]
+         String selStr = I18nMessage.from("1022004_HELLO").to(cm.getClient()).evaluate()
+         UserMessage[] options = [I18nMessage.from("1022004_MAKE_A_GLOVE"), I18nMessage.from("1022004_UPGRADE_A_GLOVE"), I18nMessage.from("1022004_CREATE_MATERIALS")]
          for (int i = 0; i < options.length; i++) {
-            selStr += "\r\n#L" + i + "# " + options[i] + "#l"
+            selStr += "\r\n#L" + i + "# " + options[i].to(cm.getClient()).evaluate() + "#l"
          }
 
-         cm.sendSimple(selStr)
+         cm.sendSimple(SimpleMessage.from(selStr))
       } else if (status == 1 && mode == 1) {
          selectedType = selection
          if (selectedType == 0) { //glove refine
-            String selStr = "Okay, so which glove do you want me to make?#b"
-            String[] items = ["Juno#k - Warrior Lv. 10#b", "Steel Fingerless Gloves#k - Warrior Lv. 15#b", "Venon#k - Warrior Lv. 20#b", "White Fingerless Gloves#k - Warrior Lv. 25#b",
-                              "Bronze Missel#k - Warrior Lv. 30#b", "Steel Briggon#k - Warrior Lv. 35#b", "Iron Knuckle#k - Warrior Lv. 40#b", "Steel Brist#k - Warrior Lv. 50#b", "Bronze Clench#k - Warrior Lv. 60#b"]
+            String selStr = I18nMessage.from("1022004_WHICH_GLOVE").to(cm.getClient()).evaluate()
+            UserMessage[] items = [I18nMessage.from("JUNO"),
+                                   I18nMessage.from("STEEL_FINGERLESS_GLOVES"),
+                                   I18nMessage.from("VENON"),
+                                   I18nMessage.from("WHITE_FINGERLESS_GLOVES"),
+                                   I18nMessage.from("BRONZE_MISSEL"),
+                                   I18nMessage.from("STEEL_BRIGGON"),
+                                   I18nMessage.from("IRON_KNUCKLE"),
+                                   I18nMessage.from("STEEL_BRIST"),
+                                   I18nMessage.from("BRONZE_CLENCH")]
             for (int i = 0; i < items.length; i++) {
-               selStr += "\r\n#L" + i + "# " + items[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + items[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = true
          } else if (selectedType == 1) { //glove upgrade
-            String selStr = "Upgrade a glove? That shouldn't be too difficult. Which did you have in mind?#b"
-            String[] crystals = ["Steel Missel#k - Warrior Lv. 30#b", "Orihalcon Missel#k - Warrior Lv. 30#b", "Yellow Briggon#k - Warrior Lv. 35#b", "Dark Briggon#k - Warrior Lv. 35#b",
-                                 "Adamantium Knuckle#k - Warrior Lv. 40#b", "Dark Knuckle#k - Warrior Lv. 40#b", "Mithril Brist#k - Warrior Lv. 50#b", "Gold Brist#k - Warrior Lv. 50#b",
-                                 "Sapphire Clench#k - Warrior Lv. 60#b", "Dark Clench#k - Warrior Lv. 60#b"]
+            String selStr = I18nMessage.from("1022004_WHICH_GLOVE_TO_UPGRADE").to(cm.getClient()).evaluate()
+            UserMessage[] crystals = [I18nMessage.from("STEEL_MISSEL"),
+                                      I18nMessage.from("ORIHALCON_MISSEL"),
+                                      I18nMessage.from("YELLOW_BRIGGON"),
+                                      I18nMessage.from("DARK_BRIGGON"),
+                                      I18nMessage.from("ADAMANTIUM_KNUCKL"),
+                                      I18nMessage.from("DARK_KNUCKLE"),
+                                      I18nMessage.from("MITHRIL_BRIST"),
+                                      I18nMessage.from("GOLD_BRIST"),
+                                      I18nMessage.from("SAPPHIRE_CLENCH"),
+                                      I18nMessage.from("DARK_CLENCH")]
             for (int i = 0; i < crystals.length; i++) {
-               selStr += "\r\n#L" + i + "# " + crystals[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + crystals[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = true
          } else if (selectedType == 2) { //material refine
-            String selStr = "Materials? I know of a few materials that I can make for you...#b"
-            String[] materials = ["Make Processed Wood with Tree Branch", "Make Processed Wood with Firewood", "Make Screws (packs of 15)"]
+            String selStr = I18nMessage.from("1022004_WHAT_MATERIALS").to(cm.getClient()).evaluate()
+            UserMessage[] materials = [I18nMessage.from("PROCESSED_WOOD_FROM_TREE_BRANCH"), I18nMessage.from("PROCESSED_WOOD_FROM_FIREWOOD"), I18nMessage.from("SCREWS")]
             for (int i = 0; i < materials.length; i++) {
-               selStr += "\r\n#L" + i + "# " + materials[i] + "#l"
+               selStr += "\r\n#L" + i + "# " + materials[i].to(cm.getClient()).evaluate() + "#l"
             }
-            cm.sendSimple(selStr)
+            cm.sendSimple(SimpleMessage.from(selStr))
             equip = false
          }
          if (equip) {
@@ -89,9 +106,7 @@ class NPC1022004 {
             cost = costSet[selectedItem]
          }
 
-         String prompt = "So, you want me to make some #t" + item + "#s? In that case, how many do you want me to make?"
-
-         cm.sendGetNumber(prompt, 1, 1, 100)
+         cm.sendGetNumber(I18nMessage.from("1022004_HOW_MANY").with(item), 1, 1, 100)
       } else if (status == 3 && mode == 1) {
          if (equip) {
             selectedItem = selection
@@ -122,28 +137,27 @@ class NPC1022004 {
             cost = costSet[selectedItem]
          }
 
-         String prompt = "You want me to make "
+         String itemPrompt = ""
          if (qty == 1) {
-            prompt += "a #t" + item + "#?"
+            itemPrompt += "a #t" + item + "#?"
          } else {
-            prompt += qty + " #t" + item + "#?"
+            itemPrompt += qty + " #t" + item + "#?"
          }
 
-         prompt += " In that case, I'm going to need specific items from you in order to make it. Make sure you have room in your inventory, though!#b"
-
+         String materialList = ""
          if (mats instanceof ArrayList && matQty instanceof ArrayList) {
             for (int i = 0; i < mats.size(); i++) {
-               prompt += "\r\n#i" + mats[i] + "# " + ((matQty[i] as Integer) * qty) + " #t" + mats[i] + "#"
+               materialList += "\r\n#i" + mats[i] + "# " + ((matQty[i] as Integer) * qty) + " #t" + mats[i] + "#"
             }
          } else {
-            prompt += "\r\n#i" + mats + "# " + ((matQty as Integer) * qty) + " #t" + mats + "#"
+            materialList += "\r\n#i" + mats + "# " + ((matQty as Integer) * qty) + " #t" + mats + "#"
          }
 
          if (cost > 0) {
-            prompt += "\r\n#i4031138# " + cost * qty + " meso"
+            materialList += "\r\n#i4031138# " + cost * qty + " meso"
          }
 
-         cm.sendYesNo(prompt)
+         cm.sendYesNo(I18nMessage.from("1022004_CONFIRM").with(itemPrompt, materialList))
       } else if (status == 4 && mode == 1) {
          boolean complete = true
          int recvItem = item, recvQty
@@ -156,11 +170,11 @@ class NPC1022004 {
          }
 
          if (!cm.canHold(recvItem, recvQty)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("1022004_NEED_FREE_SLOT"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost * qty) {
-            cm.sendOk("I may still be an apprentice, but I do need to earn a living.")
+            cm.sendOk(I18nMessage.from("1022004_CANNOT_AFFORD"))
             cm.dispose()
             return
          } else {
@@ -176,7 +190,7 @@ class NPC1022004 {
          }
 
          if (!complete) {
-            cm.sendOk("I'm still an apprentice, I don't know if I can substitute other items in yet... Can you please bring what the recipe calls for?")
+            cm.sendOk(I18nMessage.from("1022004_MISSING_SOMETHING"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -191,7 +205,7 @@ class NPC1022004 {
             }
 
             cm.gainItem(recvItem, (short) recvQty)
-            cm.sendOk("Did that come out right? Come by me again if you have anything for me to practice on.")
+            cm.sendOk(I18nMessage.from("1022004_FINISHED"))
          }
          cm.dispose()
       }

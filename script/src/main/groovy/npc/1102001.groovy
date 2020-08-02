@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -30,7 +31,7 @@ class NPC1102001 {
             status--
          }
          if (status == 0 && mode == 1) {
-            cm.sendYesNo("Would you like to exit the drill hall?")
+            cm.sendYesNo(I18nMessage.from("1102001_EXIT_THE_HALL"))
          } else if (status == 1) {
             cm.warp(130020000, 0)
             cm.dispose()

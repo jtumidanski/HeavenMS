@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,7 +24,7 @@ class Quest2259 {
          }
 
          if (status == 0) {
-            qm.sendNext("Ok, meet me at #b#m260020700##k for your information. To reach there, follow #reast#k from here until you reach #rMagatia#k, I will be there. Now go.")
+            qm.sendNext(I18nMessage.from("2259_MEET_ME_AT"))
          } else {
             qm.forceStartQuest()
             qm.dispose()
@@ -48,11 +49,11 @@ class Quest2259 {
 
          if (status == 0) {
             if (qm.getMapId() == 260020000) {
-               qm.sendNext("Eh you're still here? To reach #b#m260020700##k, follow #reast#k from here until you reach #rMagatia#k, I will be there. Now go.")
+               qm.sendNext(I18nMessage.from("2259_STILL_HERE"))
                return
             }
 
-            qm.sendNext("Oh there you are. There're no Meerkat's nearby, so there probably is no eavesdropping around here. Very well, you must be fit to go to the #rMushroom Castle#k. Talk to me once you've got #blevel 30#k.")
+            qm.sendNext(I18nMessage.from("2259_NO_MEERKAT_NEARBY"))
             qm.forceCompleteQuest()
          } else if (status == 1) {
             qm.dispose()

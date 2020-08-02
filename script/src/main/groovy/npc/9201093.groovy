@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC9201093 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Have you heard the fantastic Jack Masque appeared around the city these days? That is sooooo nice!")
+      cm.sendOk(I18nMessage.from("9201093_SO_NICE"))
       cm.dispose()
    }
 

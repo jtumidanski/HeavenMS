@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -25,9 +26,9 @@ class Quest4647 {
                qm.completeQuest()
                qm.teachSkill(8, (byte) 1, (byte) 1, -1)
                qm.gainItem(5460000, (short) -1, false)
-               qm.sendOk("You got the Pet Snack! Thanks! You can use these to feed multiple pets at once!")
+               qm.sendOk(I18nMessage.from("4647_THANKS"))
             } else {
-               qm.sendOk("Get me the Pet Snack! It can be found in a very big shop....")
+               qm.sendOk(I18nMessage.from("4647_GET_ME_THE_SNACK"))
             }
          } else if (status == 1) {
             qm.dispose()

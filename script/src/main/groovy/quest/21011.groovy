@@ -14,7 +14,7 @@ class Quest21011 {
       status++
       if (mode != 1) {
          if (type == 1 && mode == 0) {
-            qm.sendOk("Ah, okay. I understand. Heroes are very busy. *Sniff...* If you ever get any free time, though...")
+            qm.sendOk(I18nMessage.from("21011_HEROES_ARE_VERY_BUSY"))
             qm.dispose()
             return
          } else {
@@ -24,16 +24,16 @@ class Quest21011 {
       }
 
       if (status == 0) {
-         qm.sendNext("Wait, are you... No way.... Are you the hero that #p1201000# has been talking about all this time?! #p1201000#! Don't just nod... Tell me! Is this the hero you've been waiting for?! ")
+         qm.sendNext(I18nMessage.from("21011_ARE_YOU_THE_HERO"))
       } else if (status == 1) {
          qm.sendNextPrev("   #i4001171#")
       } else if (status == 2) {
-         qm.sendNextPrev("I'm sorry. I'm just so overcome with emotions... *Sniff sniff* My goodness, I'm starting to tear up. You must be so happy, #p1201000#.")
+         qm.sendNextPrev(I18nMessage.from("21011_I_AM_SORRY"))
       } else if (status == 3) {
-         qm.sendAcceptDecline("Wait a minute... You're not carrying any weapons. From what I've heard, each of the heroes had a special weapon. Oh, you must have lost it during the battle against the Black Magician.")
+         qm.sendAcceptDecline(I18nMessage.from("21011_WAIT_A_MINUTE"))
       } else if (status == 4) {
          qm.forceStartQuest()
-         qm.sendOk("My brother #bPuir #kis just down the street, and he's been dying to meet you! I know you're busy, but could you please stop by and say hello to Puir? Please...")
+         qm.sendOk(I18nMessage.from("21011_COULD_YOU_PLEASE_STOP_BY"))
       } else if (status == 5) {
          qm.dispose()
       }
@@ -43,7 +43,7 @@ class Quest21011 {
       status++
       if (mode != 1) {
          if (type == 1 && mode == 0) {
-            qm.sendNext("*sniff sniff* Isn't this sword good enough for you, just for now? I'd be so honored...")
+            qm.sendNext(I18nMessage.from("21011_GOOD_ENOUGH"))
             qm.dispose()
          } else {
             qm.dispose()
@@ -51,15 +51,15 @@ class Quest21011 {
          }
       }
       if (status == 0) {
-         qm.sendNext("Wait, are you... No way... Are you the hero that Lilin has been talking about all this time?! Lilin! Don't just nod... Tell me! Is this the hero you've been waiting for?!")
+         qm.sendNext(I18nMessage.from("21011_ARE_YOU_THE_HERO"))
       } else if (status == 1) {
-         qm.sendNextPrev("#i4001171#")
+         qm.sendNextPrev(I18nMessage.from("21011_4001171"))
       } else if (status == 2) {
-         qm.sendNextPrev("I'm sorry. I'm just so overcome with emotions... *Sniff sniff* My goodness, I'm starting to tear up. You must be so happy, Lilin.")
+         qm.sendNextPrev(I18nMessage.from("21011_YOU_MUST_BE_SO_HAPPY"))
       } else if (status == 3) {
-         qm.sendNextPrev("Wait a minute... You're not carrying any weapons. From what I've hear, each of the heroes had a special weapon. Oh, you must have lost it during the battle against the Black Magician.")
+         qm.sendNextPrev(I18nMessage.from("21011_YOU_ARE_NOT_CARRYING_ANY_WEAPONS"))
       } else if (status == 4) {
-         qm.sendYesNo("This isn't good enough to replace your weapon, but #bcarry this sword with you for now#k. It's my gift to you. A hero can't be walking around empty-handed.\r\n\r\n#fUI/UIWindow.img/QuestIcon/4/0#\r\n#v1302000# 1 #t1302000#\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 35 exp")
+         qm.sendYesNo(I18nMessage.from("21011_IT_IS_MY_GIFT_TO_YOU"))
       } else if (status == 5) {
          if (qm.isQuestCompleted(21011)) {
             MessageBroadcaster.getInstance().sendServerNotice(qm.getPlayer(), ServerNoticeType.POP_UP, I18nMessage.from("UNKNOWN_ERROR"))

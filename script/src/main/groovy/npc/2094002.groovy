@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -39,12 +40,14 @@ class NPC2094002 {
       }
 
       if (!cm.isEventLeader()) {
-         cm.sendYesNo("I wish for your leader to talk to me. Alternatively, you may be wanting to quit. Are you going to abandon this campaign?")
+         cm.sendYesNo(I18nMessage.from("2094002_LEADER_MUST_SPEAK"))
+
       } else {
          EventInstanceManager eim = cm.getEventInstance()
          if (eim == null) {
             cm.warp(251010404, 0)
-            cm.sendNext("How are you even here without being registered on an instance?")
+            cm.sendNext(I18nMessage.from("2094002_HOW"))
+
             cm.dispose()
             return
          }
@@ -53,87 +56,98 @@ class NPC2094002 {
 
          switch (cm.getPlayer().getMapId()) {
             case 925100000:
-               cm.sendNext("We are heading into the Pirate Ship now! To get in, we must destroy all the monsters guarding it.")
+               cm.sendNext(I18nMessage.from("2094002_DESTROY_ALL_MONSTERS"))
+
                cm.dispose()
                break
             case 925100100:
                String emp = eim.getProperty("stage2")
                if (emp == "0") {
                   if (cm.haveItem(4001120, 20)) {
-                     cm.sendNext("Excellent! Now hunt me 20 Rising Medals.")
+                     cm.sendNext(I18nMessage.from("2094002_EXCELLENT"))
+
                      cm.gainItem(4001120, (short) -20)
                      cm.getMap().killAllMonsters()
                      eim.setProperty("stage2", "1")
                   } else {
-                     cm.sendNext("We are heading into the Pirate Ship now! To get in, we must qualify ourselves as noble pirates. Hunt me 20 Rookie Medals.")
+                     cm.sendNext(I18nMessage.from("2094002_QUALIFY_AS_NOBLE_PIRATES"))
+
                   }
                } else if (emp == "1") {
                   if (cm.haveItem(4001121, 20)) {
-                     cm.sendNext("Excellent! Now hunt me 20 Veteran Medals.")
+                     cm.sendNext(I18nMessage.from("2094002_EXCELLENT_VETERAN"))
+
                      cm.gainItem(4001121, (short) -20)
                      cm.getMap().killAllMonsters()
                      eim.setProperty("stage2", "2")
                   } else {
-                     cm.sendNext("We are heading into the Pirate Ship now! To get in, we must qualify ourselves as noble pirates. Hunt me 20 Rising Medals.")
+                     cm.sendNext(I18nMessage.from("2094002_QUALIFY_AS_NOBLE_RISING_PIRATES"))
+
                   }
                } else if (emp == "2") {
                   if (cm.haveItem(4001122, 20)) {
-                     cm.sendNext("Excellent! Now let us go.")
+                     cm.sendNext(I18nMessage.from("2094002_LET_US_GO"))
+
                      cm.gainItem(4001122, (short) -20)
                      cm.getMap().killAllMonsters()
                      eim.setProperty("stage2", "3")
                      eim.showClearEffect(cm.getMapId())
                   } else {
-                     cm.sendNext("We are heading into the Pirate Ship now! To get in, we must qualify ourselves as noble pirates. Hunt me 20 Veteran Medals.")
+                     cm.sendNext(I18nMessage.from("2094002_QUALIFY_AS_NOBLE_VETERAN_PIRATES"))
+
                   }
                } else {
-                  cm.sendNext("The next stage has opened. GO!")
+                  cm.sendNext(I18nMessage.from("2094002_NEXT_STAGE"))
+
                }
                cm.dispose()
                break
             case 925100200:
             case 925100300:
-               cm.sendNext("To assault the pirate ship, we must destroy the guards first.")
+               cm.sendNext(I18nMessage.from("2094002_DESTROY_THE_GUARDS"))
+
                cm.dispose()
                break
             case 925100201:
                if (cm.getMap().getMonsters().size() == 0) {
-                  cm.sendNext("The Lord Pirate's chest has appeared! If you happen to have a key, drop it by the chest to reveal it's treasures. That will certainly make him upset.")
+                  cm.sendNext(I18nMessage.from("2094002_CHEST_HAS_APPEARED"))
+
                   if (eim.getProperty("stage2a") == "0") {
                      cm.getMap().setReactorState()
                      eim.setProperty("stage2a", "1")
                   }
                } else {
-                  cm.sendNext("These bellflowers are in hiding. We must liberate them.")
+                  cm.sendNext(I18nMessage.from("2094002_LIBERATE_THEM"))
                }
                cm.dispose()
                break
             case 925100301:
                if (cm.getMap().getMonsters().size() == 0) {
-                  cm.sendNext("The Lord Pirate's chest has appeared! If you happen to have a key, drop it by the chest to reveal it's treasures. That will certainly make him upset.")
+                  cm.sendNext(I18nMessage.from("2094002_CHEST_HAS_APPEARED"))
+
                   if (eim.getProperty("stage3a") == "0") {
                      cm.getMap().setReactorState()
                      eim.setProperty("stage3a", "1")
                   }
                } else {
-                  cm.sendNext("These bellflowers are in hiding. We must liberate them.")
+                  cm.sendNext(I18nMessage.from("2094002_LIBERATE_THEM"))
                }
                cm.dispose()
                break
             case 925100202:
             case 925100302:
-               cm.sendNext("These are the Captains and Krus that devote their lives to the Lord Pirate. Kill them as you see fit.")
+               cm.sendNext(I18nMessage.from("2094002_KILL_THEM"))
                cm.dispose()
                break
             case 925100400:
-               cm.sendNext("These are the sources of the ship's power. We must seal it by using the Old Metal Keys on the doors!")
+               cm.sendNext(I18nMessage.from("2094002_SEAL_IT"))
                cm.dispose()
                break
             case 925100500:
                if (cm.getMap().getMonsters().size() == 0) {
-                  cm.sendNext("Thanks for saving our leader! We are in your debt.")
+                  cm.sendNext(I18nMessage.from("2094002_THANKS"))
                } else {
-                  cm.sendNext("Defeat all monsters! Even Lord Pirate's minions!")
+                  cm.sendNext(I18nMessage.from("2094002_DEFEAT_ALL_MONSTERS"))
                }
                cm.dispose()
                break

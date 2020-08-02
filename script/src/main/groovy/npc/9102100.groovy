@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -22,7 +23,7 @@ class NPC9102100 {
 
    def action(Byte mode, Byte type, Integer selection) {
       if (status == 0 && mode == 0) {
-         cm.sendNext("#b(I didn't touch this hidden item covered in grass)")
+         cm.sendNext(I18nMessage.from("9102100_COVERED_IN_GRASS"))
          cm.dispose()
          return
       }
@@ -34,17 +35,17 @@ class NPC9102100 {
       if (status == 0) {
          if (cm.getQuestStatus(4646) == 1) {
             if (cm.haveItem(4031921)) {
-               cm.sendNext("#b(What's this... eww... a pet's poop was in there!)")
+               cm.sendNext(I18nMessage.from("9102100_POOP_WAS_IN_THERE"))
                cm.dispose()
             } else {
-               cm.sendYesNo("#b(I can see something covered in grass. Should I pull it out?)")
+               cm.sendYesNo(I18nMessage.from("9102100_PULL_IT_OUT"))
             }
          } else {
-            cm.sendOk("#b(I couldn't find anything.)")
+            cm.sendOk(I18nMessage.from("9102100_COULD_NOT_FIND_ANYTHING"))
             cm.dispose()
          }
       } else if (status == 1) {
-         cm.sendNext("I found the item that Pet Trainer Bartos hid... this note.")
+         cm.sendNext(I18nMessage.from("9102100_THIS_NOTE"))
          cm.gainItem(4031921, (short) 1)
          cm.dispose()
       }

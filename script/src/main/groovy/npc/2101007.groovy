@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101007 {
    int sel = -1
 
    def start() {
-      cm.sendNext("NO! Abdullah, I said 17 bedrooms, and 23 bathrooms! CALL THE CONSTRUCTION COMPANY AND CHANGE IT!")
+      cm.sendNext(I18nMessage.from("2101007_CALL_THE_CONSTRUCTION_COMPANY"))
       cm.dispose()
    }
 

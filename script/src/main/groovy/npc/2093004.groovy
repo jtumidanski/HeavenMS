@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -19,7 +20,7 @@ class NPC2093004 {
    int cost = 10000
 
    def start() {
-      cm.sendYesNo("Will you move to #b#m230000000##k now? The price is #b" + cost + " mesos#k.")
+      cm.sendYesNo(I18nMessage.from("2093004_MOVE_TO").with(cost))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -27,7 +28,7 @@ class NPC2093004 {
          cm.dispose()
       } else {
          if (mode == 0) {
-            cm.sendNext("Hmmm ... too busy to do it right now? If you feel like doing it, though, come back and find me.")
+            cm.sendNext(I18nMessage.from("2093004_TOO_BUSY"))
             cm.dispose()
             return
          }
@@ -38,7 +39,7 @@ class NPC2093004 {
          }
          if (status == 1) {
             if (cm.getPlayer().getMeso() < cost) {
-               cm.sendOk("I don't think you have enough money...")
+               cm.sendOk(I18nMessage.from("2093004_NOT_ENOUGH_MESOS"))
             } else {
                cm.gainMeso(-cost)
                cm.warp(230000000)

@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -23,14 +24,14 @@ class Quest3933 {
          }
 
          if (status == 0) {
-            qm.sendNext("I didn't think you would be this strong. I feel like you have what it takes to become a member of the Sand Bandits. The most important aspect of being a member is power, and I think you have that. I also... want to test you one more time, just to make sure you're the right one. What do you think? Can you handle it?")
+            qm.sendNext(I18nMessage.from("3933_DID_NOT_THINK_YOU_WOULD_BE"))
          } else if (status == 1) {
-            qm.sendAcceptDecline("To truly see your strength, I'll have to face you myself. Don't worry, I'll summon my other self to face off against you. Are you ready?")
+            qm.sendAcceptDecline(I18nMessage.from("3933_TRULY_SEE_YOUR_STRENGTH"))
          } else if (status == 2) {
-            qm.sendNext("Good, I like your confidence.")
+            qm.sendNext(I18nMessage.from("3933_LIKE_YOUR_CONFIDENCE"))
          } else if (status == 3) {
             if (qm.getWarpMap(926000000).getCharacters().size() > 0) {
-               qm.sendOk("There is someone currently in this map, come back later.")
+               qm.sendOk(I18nMessage.from("3933_SOMEONE_CURRENTLY_IN_MAP"))
                qm.dispose()
             } else {
                qm.warp(926000000, "st00")

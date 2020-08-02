@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
@@ -30,7 +31,7 @@ class NPC9040006 {
 
    def start() {
       if (cm.getPlayer().getMap().getReactorByName("watergate").getState() > 0) {
-         cm.sendOk("Excellent work. You may proceed to the next stage.")
+         cm.sendOk(I18nMessage.from("9040006_EXCELLENT_WORK"))
          cm.dispose()
          return
       }
@@ -46,7 +47,7 @@ class NPC9040006 {
                eim.setProperty("stage3combo", newCombo)
                //cm.playerMessage("Debug: " + newCombo);
                eim.setProperty("stage3attempt", "1")
-               cm.sendOk("This fountain guards the secret passage to the throne room. Offer items in the area to the vassals to proceed. The vassals shall tell you whether your offerings are accepted, and if not, which vassals are displeased. You have seven attempts. Good luck.")
+               cm.sendOk(I18nMessage.from("9040006_FOUNTAIN_GUARDS"))
             } else {
                int attempt = (eim.getProperty("stage3attempt")).toInteger()
                int combo = (currentCombo).toInteger()
@@ -58,7 +59,7 @@ class NPC9040006 {
                      MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), 25)
 
                      removeGroundItems()
-                     cm.sendOk("Excellent work. You may proceed to the next stage.")
+                     cm.sendOk(I18nMessage.from("9040006_EXCELLENT_WORK"))
                   } else {
                      if (attempt < 7) {
                         int[] comboItems = [0, 0, 0, 0]
@@ -135,7 +136,7 @@ class NPC9040006 {
                      } else {
                         //reset the combo and mass spawn monsters
                         eim.setProperty("stage3combo", "reset")
-                        cm.sendOk("You have failed the test. Please compose yourselves and try again later.")
+                        cm.sendOk(I18nMessage.from("9040006_FAILED"))
 
                         for (int i = 0; i < 6; i++) {
                            //keep getting new monsters, lest we spawn the same monster five times o.o!
@@ -147,11 +148,11 @@ class NPC9040006 {
                      eim.showWrongEffect()
                   }
                } else {
-                  cm.sendOk("Please make sure your attempt is properly set in front of the vassals and talk to me again.")
+                  cm.sendOk(I18nMessage.from("9040006_TALK_TO_ME_AGAIN"))
                }
             }
          } else {
-            cm.sendOk("Please have your leader speak to me.")
+            cm.sendOk(I18nMessage.from("9040006_LEADER_MUST_SPEAK"))
          }
       }
 

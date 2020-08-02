@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -18,12 +19,12 @@ class NPC2030010 {
    def start() {
       if (cm.getMapId() == 280030000) {
          if (!cm.getEventInstance().isEventCleared()) {
-            cm.sendYesNo("If you leave now, you'll have to start over. Are you sure you want to leave?")
+            cm.sendYesNo(I18nMessage.from("2030010_LEAVE_NOW"))
          } else {
-            cm.sendYesNo("You guys finally overthrew Zakum, what a superb feat! Congratulations! Are you sure you want to leave now?")
+            cm.sendYesNo(I18nMessage.from("2030010_CONGRATULATIONS"))
          }
       } else {
-         cm.sendYesNo("If you leave now, you'll have to start over. Are you sure you want to leave?")
+         cm.sendYesNo(I18nMessage.from("2030010_LEAVE_NOW"))
       }
    }
 

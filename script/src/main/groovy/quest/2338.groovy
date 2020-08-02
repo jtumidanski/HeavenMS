@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -24,15 +25,15 @@ class Quest2338 {
 
          if (status == 0) {
             if (qm.haveItem(2430014, 1)) {
-               qm.sendNext("It looks like you already have one #b#t2430014##k on your inventory.")
+               qm.sendNext(I18nMessage.from("2338_YOU_ALREADY_HAVE"))
                status = 1
                return
             }
 
-            qm.sendNext("You've used the #b#t2430014##k? Oh well, good thing I have a spare one right here.")
+            qm.sendNext(I18nMessage.from("2338_I_HAVE_A_SPARE"))
          } else if (status == 1) {
             if (!qm.canHold(2430014, 1)) {
-               qm.sendNext("Please make a USE slot available to get it, alright?")
+               qm.sendNext(I18nMessage.from("2338_MAKE_USE_SPACE"))
             } else {
                qm.gainItem(2430014, (short) 1)
                qm.forceCompleteQuest()

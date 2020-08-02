@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
@@ -48,7 +49,7 @@ class NPCrank_user {
 
                cm.sendOk(rankStr)
             } else {
-               cm.sendOk("Hi, how're you doing?")
+               cm.sendOk(I18nMessage.from("rank_user_HOW_ARE_YOU_DOING"))
             }
 
             cm.dispose()

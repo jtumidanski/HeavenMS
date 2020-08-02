@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -40,7 +41,7 @@ class NpcGachaponRemote {
                cm.gainItem(ticketId, (short) -1)
                cm.doGachapon()
             } else {
-               cm.sendOk("Please have at least one slot in your #rEQUIP, USE, SET-UP, #kand #rETC#k inventories free.")
+               cm.sendOk(I18nMessage.from("gachaponRemote_NEED_INVENTORY_SPACE_FREE"))
             }
          } else {
             cm.dispose()

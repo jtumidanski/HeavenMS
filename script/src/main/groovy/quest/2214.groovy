@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -30,19 +31,19 @@ class Quest2214 {
          if (status == 0) {
             int hourDay = qm.getHourOfDay()
             if (!(hourDay >= 17 && hourDay < 20)) {
-               qm.sendNext("(Hmm, I'm searching the trash can but can't find the #t4031894# JM was talking about, maybe it's not time yet...)")
+               qm.sendNext(I18nMessage.from("2214_CANNOT_FIND"))
                canComplete = false
                return
             }
 
             if (!qm.canHold(4031894, 1)) {
-               qm.sendNext("(Eh, I can't hold the #t4031894# right now, I need an ETC slot available.)")
+               qm.sendNext(I18nMessage.from("2214_NEED_ETC_SLOT"))
                canComplete = false
                return
             }
 
             canComplete = true
-            qm.sendNext("(Ah, there is a crumbled note here... Hm, it contains details about some scheme that is about to happen, that must be what #r#p1052002##k was talking about.)")
+            qm.sendNext(I18nMessage.from("2214_CRUMBLED_NOTE"))
          } else if (status == 1) {
             if (canComplete) {
                qm.forceCompleteQuest()

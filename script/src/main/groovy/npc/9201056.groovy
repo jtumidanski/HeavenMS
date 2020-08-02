@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -25,7 +26,7 @@ class NPC9201056 {
    def action(Byte mode, Byte type, Integer selection) {
       if (mode != 1) {
          if (mode == 0) {
-            cm.sendOk("Alright, see you next time.")
+            cm.sendOk(I18nMessage.from("9201056_SEE_YOU_NEXT_TIME"))
          }
          cm.dispose()
       } else {
@@ -33,27 +34,27 @@ class NPC9201056 {
          if (cm.getPlayer().getMapId() == 682000000) {
             if (status == 0) {
                if (selection == 0) {
-                  cm.sendYesNo("Would you like to return back to #bcivilization#k? The fee is " + fee + " mesos.")
+                  cm.sendYesNo(I18nMessage.from("9201056_RETURN_BACK").with(fee))
                }
             } else if (status == 1) {
                if (cm.getMeso() >= fee) {
                   cm.gainMeso(-fee)
                   cm.warp(600000000)
                } else {
-                  cm.sendOk("Hey, what are you trying to pull on? You don't have enough meso to pay the fee.")
+                  cm.sendOk(I18nMessage.from("9201056_NOT_ENOUGH_MESO"))
                }
 
                cm.dispose()
             }
          } else {
             if (status == 0) {
-               cm.sendYesNo("Would you like to go to the #bHaunted Mansion#k? The fee is " + fee + " mesos.")
+               cm.sendYesNo(I18nMessage.from("9201056_WOULD_YOU_LIKE_TO").with(fee))
             } else if (status == 1) {
                if (cm.getMeso() >= fee) {
                   cm.gainMeso(-fee)
                   cm.warp(682000000, 0)
                } else {
-                  cm.sendOk("Hey, what are you trying to pull on? You don't have enough meso to pay the fee.")
+                  cm.sendOk(I18nMessage.from("9201056_NOT_ENOUGH_MESO"))
                }
 
                cm.dispose()

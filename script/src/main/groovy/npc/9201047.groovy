@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -45,7 +46,7 @@ class NPC9201047 {
 
          if (status == 0) {
             if (cm.getMapId() != 670010200) {
-               cm.sendYesNo("So, are you going to leave this place?")
+               cm.sendYesNo(I18nMessage.from("9201047_GOING_TO_LEAVE"))
             } else {
                if (cm.isEventLeader()) {
                   EventInstanceManager eim = cm.getEventInstance()
@@ -55,7 +56,7 @@ class NPC9201047 {
                      cm.gainItem(4031595, (short) -1)
                      eim.setIntProperty("statusStg" + stage, 1)
 
-                     cm.sendOk("You retrieved the #t4031595#, splendid! You may report to Amos about your success on this task.")
+                     cm.sendOk(I18nMessage.from("9201047_SPLENDID"))
                   } else if (st < 1 && cm.getMap().countMonsters() == 0) {
                      eim.setIntProperty("statusStg" + stage, 1)
 
@@ -64,17 +65,17 @@ class NPC9201047 {
 
                      MapleLifeFactory.getMonster(9400518).ifPresent({ mobObj ->
                         mapObj.spawnMonsterOnGroundBelow(mobObj, new Point(-245, 810))
-                        cm.sendOk("The fierry appeared! Defeat it to get the #b#t4031596##k!")
+                        cm.sendOk(I18nMessage.from("9201047_DEFEAT_IT"))
                      })
                   } else {
                      if (st < 1) {
-                        cm.sendOk("Your task is to recover a shard of the Magik Mirror. To do so, you will need a #b#t4031596##k, that drops on a fierry that appears when all other mobs are killed. To access the rooms the mobs are, pick the portal corresponding to your gender and kill all mobs there. Ladies take the left side, gentlemen the right side.")
+                        cm.sendOk(I18nMessage.from("9201047_YOUR_TASK"))
                      } else {
-                        cm.sendOk("Your task is to recover a shard of the Magik Mirror. Defeat the fierry to get the #b#t4031596##k.")
+                        cm.sendOk(I18nMessage.from("9201047_YOUR_TASK_SHORT"))
                      }
                   }
                } else {
-                  cm.sendOk("Your task is to recover a shard of the Magik Mirror. To do so, you will need a #b#t4031596##k, that drops on a fierry that appears when all other mobs are killed. To access the rooms the mobs are, pick the portal corresponding to your gender and kill all mobs there. Ladies take the left side, gentlemen the right side. #bYour leader#k must bring the #b#t4031595##k to have my pass.")
+                  cm.sendOk(I18nMessage.from("9201047_YOUR_TASK_LONG_NON_LEADER"))
                }
 
                cm.dispose()

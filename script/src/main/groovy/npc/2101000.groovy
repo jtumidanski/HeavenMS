@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101000 {
    int sel = -1
 
    def start() {
-      cm.sendOk ("Just dancing well is not enough for me. I want to do a marvelous brilliant dance!")
+      cm.sendOk (I18nMessage.from("2101000_JUST_DANCING"))
       cm.dispose()
    }
 

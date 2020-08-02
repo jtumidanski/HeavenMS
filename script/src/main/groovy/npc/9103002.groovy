@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
@@ -33,11 +34,11 @@ class NPC9103002 {
             status--
          }
          if (status == 0) {
-            cm.sendYesNo("Your party gave a stellar effort and gathered up at least 30 coupons. For that, I have a present for each and every one of you. After receiving the present, you will be sent back to Ludibrium. Now, would you like to receive the present right now?")
+            cm.sendYesNo(I18nMessage.from("9103002_STELLAR_EFFORT"))
          } else if (status == 1) {
             EventInstanceManager eim = cm.getEventInstance()
             if (!eim.giveEventReward(cm.getPlayer())) {
-               cm.sendNext("It seems you don't have a free slot in either your #rEquip#k, #rUse#k or #rEtc#k inventories. Please make some room and try again.")
+               cm.sendNext(I18nMessage.from("9103002_NEED_FREE_SLOT"))
             } else {
                cm.warp(809050017)
             }

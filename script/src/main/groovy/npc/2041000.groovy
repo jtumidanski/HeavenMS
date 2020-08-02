@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -19,20 +20,24 @@ class NPC2041000 {
       if (cm.haveItem(4031045)) {
          EventManager em = cm.getEventManager("Trains")
          if (em.getProperty("entry") == "true") {
-            cm.sendYesNo("Do you want to go to Orbis?")
+            cm.sendYesNo(I18nMessage.from("2041000_DO_YOU_WANT_TO"))
+
          } else {
-            cm.sendOk("The train to Orbis is already travelling, please be patient for the next one.")
+            cm.sendOk(I18nMessage.from("2041000_ALREADY_TRAVELLING"))
+
             cm.dispose()
          }
       } else {
-         cm.sendOk("Make sure you got a Orbis ticket to travel in this train. Check your inventory.")
+         cm.sendOk(I18nMessage.from("2041000_NEED_TICKET"))
+
          cm.dispose()
       }
    }
 
    def action(Byte mode, Byte type, Integer selection) {
       if (mode <= 0) {
-         cm.sendOk("Okay, talk to me if you change your mind!")
+         cm.sendOk(I18nMessage.from("2041000_TALK_TO_ME"))
+
          cm.dispose()
          return
       }
@@ -43,7 +48,8 @@ class NPC2041000 {
          cm.gainItem(4031045, (short) -1)
          cm.dispose()
       } else {
-         cm.sendOk("The train to Orbis is ready to take off, please be patient for the next one.")
+         cm.sendOk(I18nMessage.from("2041000_BE_PATIENT"))
+
          cm.dispose()
       }
    }

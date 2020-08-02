@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -52,12 +53,12 @@ class Quest21618 {
 
          if (status == 0) {
             if (!qm.haveItemWithId(1902017, false)) {
-               qm.sendNext("You will have to unequip the wolf first before going for the evolution.")
+               qm.sendNext(I18nMessage.from("21618_UNEQUIP_THE_WOLF"))
                qm.dispose()
                return
             }
 
-            qm.sendNext("Step aside, behold the mighty prowess of Maha!!")
+            qm.sendNext(I18nMessage.from("21618_STEP_ASIDE"))
          } else if (status == 1) {
             qm.forceCompleteQuest()
             qm.gainItem(1902017, (short) -1)

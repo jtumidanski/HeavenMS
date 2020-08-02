@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.npc.NPCConversationManager
 
@@ -25,7 +26,7 @@ class NPC9201095 {
 
    def start() {
       if (cm.getQuestStatus(8225) != 2) {
-         cm.sendOk("Step aside, novice, we're doing business here.")
+         cm.sendOk(I18nMessage.from("9201095_STEP_ASIDE"))
          cm.dispose()
          return
       }
@@ -122,11 +123,11 @@ class NPC9201095 {
          recvQty = qty
 
          if (!cm.canHold(recvItem, recvQty)) {
-            cm.sendOk("Check your inventory for a free slot first.")
+            cm.sendOk(I18nMessage.from("9201095_FREE_SLOT_NEEDED"))
             cm.dispose()
             return
          } else if (cm.getMeso() < cost * qty) {
-            cm.sendOk("I am afraid you don't have enough to pay me, partner. Please check this out first, ok?")
+            cm.sendOk(I18nMessage.from("9201095_NOT_ENOUGH_MESO"))
             cm.dispose()
             return
          } else {
@@ -142,7 +143,7 @@ class NPC9201095 {
          }
 
          if (!complete) {
-            cm.sendOk("Hey, I need those items to craft properly, you know?")
+            cm.sendOk(I18nMessage.from("9201095_NEED_ITEMS"))
          } else {
             if (mats instanceof ArrayList && matQty instanceof ArrayList) {
                for (int i = 0; i < mats.size(); i++) {
@@ -156,7 +157,7 @@ class NPC9201095 {
             }
 
             cm.gainItem(recvItem, (short) recvQty)
-            cm.sendOk("All done. If you need anything else... Well, I'm not going anywhere.")
+            cm.sendOk(I18nMessage.from("9201095_ALL_DONE"))
          }
          cm.dispose()
       }

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -35,7 +36,7 @@ class NPC1300001 {
          }
 
          if (status == 0) {
-            cm.sendOk("Let the ceremony begins, we cannot let the masses waiting! Hem~hem~heeh~~")
+            cm.sendOk(I18nMessage.from("1300001_LET_THE_CEREMONY_BEGIN"))
             cm.dispose()
          }
       }

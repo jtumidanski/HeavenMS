@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import net.server.processor.MapleGuildProcessor
 import scripting.event.EventInstanceManager
@@ -41,14 +42,14 @@ class NPC9040003 {
          EventInstanceManager eim = cm.getPlayer().getEventInstance()
 
          if (eim.getProperty("stage4clear") != null && eim.getProperty("stage4clear") == "true") {
-            cm.sendOk("After what I thought would be an immortal sleep, I have finally found someone that will save Sharenian. I can truly rest in peace now.")
+            cm.sendOk(I18nMessage.from("9040003_IMMORTAL_SLEEP"))
             cm.dispose()
             return
          }
 
          if (status == 0) {
             if (cm.isEventLeader()) {
-               cm.sendNext("After what I thought would be an immortal sleep, I have finally found someone that will save Sharenian. This old man will now pave the way for you to finish the quest.")
+               cm.sendNext(I18nMessage.from("9040003_IMMORTAL_SLEEP_WILL_NOW"))
 
                clearStage(4, eim)
                MapleGuildProcessor.getInstance().gainGP(cm.getGuild(), 30)
@@ -56,7 +57,7 @@ class NPC9040003 {
 
                cm.dispose()
             } else {
-               cm.sendOk("I need the leader of your party to speak with me, nobody else.")
+               cm.sendOk(I18nMessage.from("9040003_LEADER_MUST_SPEAK"))
                cm.dispose()
             }
          }

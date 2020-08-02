@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import client.MapleBuffStat
 import scripting.npc.NPCConversationManager

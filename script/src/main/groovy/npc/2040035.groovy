@@ -2,6 +2,7 @@ package npc
 
 import scripting.event.EventInstanceManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Arturo
@@ -30,12 +31,12 @@ class NPC2040035 {
             status--
          }
          if (status == 0 && mode == 1) {
-            cm.sendNext("Congratulations on sealing the dimensional crack! For all of your hard work, I have a gift for you! Here take this prize.")
+            cm.sendNext(I18nMessage.from("2040035_CONGRATULATIONS"))
          } else if (status == 1) {
             EventInstanceManager eim = cm.getEventInstance()
 
             if (!eim.giveEventReward(cm.getPlayer())) {
-               cm.sendNext("It seems you don't have a free slot in either your #rEquip#k, #rUse#k or #rEtc#k inventories. Please make some room and try again.")
+               cm.sendNext(I18nMessage.from("2040035_NEED_FREE_SLOT"))
             } else {
                cm.warp(221024500)
             }

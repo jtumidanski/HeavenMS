@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2101002 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Stay away from me, if you don't want any danger.")
+      cm.sendOk(I18nMessage.from("2101002_STAY_AWAY"))
    }
 
    def action(Byte mode, Byte type, Integer selection) {

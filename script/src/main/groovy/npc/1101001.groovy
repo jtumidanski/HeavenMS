@@ -2,6 +2,7 @@ package npc
 
 import constants.game.GameConstants
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -18,9 +19,9 @@ class NPC1101001 {
    def start() {
       if (cm.getPlayer().isCygnus() && GameConstants.getJobBranch(cm.getJob()) > 2) {
          cm.useItem(2022458)
-         cm.sendOk("Let me cast you my blessings, my Knight. Please protect the world of Maple....")
+         cm.sendOk(I18nMessage.from("1101001_CAST_BLESSING"))
       } else {
-         cm.sendOk("Don't stop training. Every ounce of your energy is required to protect the world of Maple....")
+         cm.sendOk(I18nMessage.from("1101001_DO_NOT_STOP_TRAINING"))
       }
 
       cm.dispose()

@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		Neru
@@ -17,9 +18,9 @@ class NPC2040033 {
 
    def start() {
       if (cm.haveItem(4031128)) {
-         cm.sendNext("Eh, that's my brother's letter! Probably scolding me for thinking I'm not working and stuff...Eh? Ahhh...you followed my brother's advice and trained your pet and got up here, huh? Nice!! Since you worked hard to get here, I'll boost your intimacy level with your pet.")
+         cm.sendNext(I18nMessage.from("2040033_BROTHERS_LETTER"))
       } else {
-         cm.sendOk("My brother told me to take care of the pet obstacle course, but ... since I'm so far away from him, I can't help but wanting to goof around ...hehe, since I don't see him in sight, might as well just chill for a few minutes.")
+         cm.sendOk(I18nMessage.from("2040033_CHILL_FOR_A_FEW"))
          cm.dispose()
       }
    }
@@ -27,11 +28,11 @@ class NPC2040033 {
    def action(Byte mode, Byte type, Integer selection) {
       if (mode >= 1) {
          if (cm.getPlayer().getNoPets() == 0) {
-            cm.sendNextPrev("Hmmm ... did you really get here with your pet? These obstacles are for pets. What are you here for without it?? Get outta here!")
+            cm.sendNextPrev(I18nMessage.from("2040033_GET_OUTTA_HERE"))
          } else {
             cm.gainItem(4031128, (short) -1)
             cm.gainCloseness(4)
-            cm.sendNextPrev("What do you think? Don't you think you have gotten much closer with your pet? If you have time, train your pet again on this obstacle course...of course, with my brother's permission.")
+            cm.sendNextPrev(I18nMessage.from("2040033_TRAIN_YOUR_PET_AGAIN"))
          }
       }
       cm.dispose()

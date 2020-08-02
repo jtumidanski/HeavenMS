@@ -2,6 +2,7 @@ package npc
 
 
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -18,7 +19,7 @@ class NPC1032007 {
    int cost = 5000
 
    def start() {
-      cm.sendYesNo("Hello, I'm in charge of selling tickets for the ship ride to Orbis Station of Ossyria. The ride to Orbis takes off every 15 minutes, beginning on the hour, and it'll cost you #b" + cost + " mesos#k. Are you sure you want to purchase #b#t4031045##k?")
+      cm.sendYesNo(I18nMessage.from("1032007_HELLO").with(cost))
    }
 
    def action(Byte mode, Byte type, Integer selection) {
@@ -26,7 +27,7 @@ class NPC1032007 {
          cm.dispose()
       } else {
          if (mode == 0) {
-            cm.sendNext("You must have some business to take care of here, right?")
+            cm.sendNext(I18nMessage.from("1032007_BUSINESS_TO_TAKE_CARE_OF_HERE"))
             cm.dispose()
             return
          }
@@ -37,7 +38,7 @@ class NPC1032007 {
                cm.gainMeso(-cost)
                cm.dispose()
             } else {
-               cm.sendOk("Are you sure you have #b" + cost + " mesos#k? If so, then I urge you to check your etc. inventory, and see if it's full or not.")
+               cm.sendOk(I18nMessage.from("1032007_NOT_ENOUGH_MESOS").with(cost))
                cm.dispose()
             }
          }

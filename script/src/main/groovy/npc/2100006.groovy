@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 import scripting.ScriptUtils
 import scripting.npc.NPCConversationManager
@@ -36,7 +37,7 @@ class NPC2100006 {
             status--
          }
          if (status == 0) {
-            cm.sendSimple("Hahaha... it takes a lot of style and flair for someone to pay attention to his or her hair style in a desert. Someone like you...If you have #bAriant hair style coupon(VIP)#k or #bAriant hair color coupon(VIP)#k, I'll give your hair a fresh new look. \r\n#L0#Haircut: #i5150027##t5150027##l\r\n#L1#Dye your hair: #i5151022##t5151022##l")
+            cm.sendSimple(I18nMessage.from("2100006_HELLO"))
          } else if (status == 1) {
             if (selection == 0) {
                beauty = 1
@@ -67,18 +68,18 @@ class NPC2100006 {
                if (cm.haveItem(5150027)) {
                   cm.gainItem(5150027, (short) -1)
                   cm.setHair(hairNew[selection])
-                  cm.sendOk("Enjoy your new and improved hairstyle!")
+                  cm.sendOk(I18nMessage.from("2100006_ENJOY_NEW_STYLE"))
                } else {
-                  cm.sendNext("I thought I told you, you need the coupon in order for me to work magic on your hair check again.")
+                  cm.sendNext(I18nMessage.from("2100006_MISSING_STYLE_COUPON"))
                }
             }
             if (beauty == 2) {
                if (cm.haveItem(5151022)) {
                   cm.gainItem(5151022, (short) -1)
                   cm.setHair(hairColor[selection])
-                  cm.sendOk("Enjoy your new and improved hair color!")
+                  cm.sendOk(I18nMessage.from("2100006_ENJOY_NEW_COLOR"))
                } else {
-                  cm.sendNext("I thought I told you, you need the coupon in order for me to work magic on your hair check again.")
+                  cm.sendNext(I18nMessage.from("2100006_MISSING_COLOR_COUPON"))
                }
             }
          }

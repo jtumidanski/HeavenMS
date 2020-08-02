@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -39,9 +40,9 @@ class NPC9120013 {
          }
          if (status == 0 && mode == 1) {
             if (cm.isQuestStarted(8012) && !cm.haveItem(4031064)) { //quest in progress
-               cm.sendYesNo("Did you get them all? Are you going to try to answer all of my questions?")
+               cm.sendYesNo(I18nMessage.from("9120013_GET_THEM_ALL"))
             } else { //quest not started or already completed
-               //cm.sendOk("Meeeoooowww!");//lol what's this?
+               //cm.sendOk(I18nMessage.from("9120013_MEOW"))
                cm.dispose()
             }
          } else if (status == 1 && mode == 1) {
@@ -50,28 +51,28 @@ class NPC9120013 {
                hasChicken = false
             }
             if (!hasChicken) {
-               cm.sendOk("What? No! 300! THREE. HUNDRED. No less. Hand over more if you want, but I need at least 300. Not all of us can be as big and as fed as you...")
+               cm.sendOk(I18nMessage.from("9120013_NOT_ALL_OF_US"))
                cm.dispose()
             } else {
                cm.gainItem(2020001, (short) -300)
-               cm.sendNext("Good job! Now hold on a sec... Hey look! I got some food here! Help yourselves. Okay, now it's time for me to ask you some questions. I'm sure you're aware of this, but remember, if you're wrong, it's over. It's all or nothing!")
+               cm.sendNext(I18nMessage.from("9120013_GOOD_JOB"))
             }
          } else if (status == 7 && mode == 1) { //2-6 are the questions
             if (selection != correctAnswer.pop()) {
-               cm.sendNext("Hmmm...all humans make mistakes anyway! If you want to take another crack at it, then bring me 300 Fried Chicken.")
+               cm.sendNext(I18nMessage.from("9120013_ALL_HUMANS_MAKE_MISTAKES"))
                cm.dispose()
             } else {
-               cm.sendNext("Dang, you answered all the questions right. I may not like humans in general, but I HATE breaking a promise, so, as promised, here's the Orange Marble.")
+               cm.sendNext(I18nMessage.from("9120013_ALL_QUESTIONS_RIGHT"))
             }
          } else if (status == 8 && mode == 1) { //gain marble
             cm.gainItem(4031064, (short) 1)
-            cm.sendOk("Our business is concluded, thank you very much! You can leave now!")
+            cm.sendOk(I18nMessage.from("9120013_CAN_LEAVE_NOW"))
             cm.dispose()
          } else if (status >= 2 && status <= 6 && mode == 1) {//questions
             boolean cont = true
             if (status > 2) {
                if (selection != correctAnswer.pop()) {
-                  cm.sendNext("Hmmm...all humans make mistakes anyway! If you want to take another crack at it, then bring me 300 Fried Chicken.")
+                  cm.sendNext(I18nMessage.from("9120013_ALL_HUMANS_MAKE_MISTAKES"))
                   cm.dispose()
                   cont = false
                }

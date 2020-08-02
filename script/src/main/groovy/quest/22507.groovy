@@ -1,4 +1,5 @@
 package quest
+import tools.I18nMessage
 
 
 import scripting.quest.QuestActionManager
@@ -17,49 +18,49 @@ class Quest22507 {
          status++
       }
       if (status == 0) {
-         qm.sendNext("I knew it! I knew we were connected, master! When you get stronger, I get stronger, too. And when I get stronger, you can use my strength! That's our pact. I knew I picked a good master!")
+         qm.sendNext(I18nMessage.from("22507_I_KNEW_IT"))
       } else if (status == 1) {
          qm.sendNextPrev("#bI see. How did we end up in this pact anyway?", (byte) 2)
       } else if (status == 2) {
-         qm.sendNextPrev("I don't know. I was just an egg. I can't really remember...though I faintly recall you, master, walking toward me in a foggy forest. I remember your surprise upon seeing me. And I was calling out to you in return.")
+         qm.sendNextPrev(I18nMessage.from("22507_I_CANNOT_REMEMBER"))
       } else if (status == 3) {
          qm.sendNextPrev("#b#b(Wait! That sounds just like that one dream you had... Did the two of you meet in a dream? Is it possible that the giant Dragon you saw in that dream was...#p1013000#?)", (byte) 2)
       } else if (status == 4) {
-         qm.sendNextPrev("Master, you and I are one in spirit. I knew it the moment I saw you. That's why I wanted to make the pact with you. No one else. You had to pay the price I set, of course.")
+         qm.sendNextPrev(I18nMessage.from("22507_YOU_AND_I_ARE_ONE"))
       } else if (status == 5) {
          qm.sendNextPrev("#bI paid a price?", (byte) 2)
       } else if (status == 6) {
-         qm.sendNextPrev("Don't you remember? When you recognized me and touched me? That was the one condition I set. The moment you touched my egg, you and I became one in spirit.")
+         qm.sendNextPrev(I18nMessage.from("22507_DO_YOU_NOT_REMEMBER"))
       } else if (status == 7) {
          qm.sendNextPrev("#bOne in...spirit?", (byte) 2)
       } else if (status == 8) {
-         qm.sendNextPrev("Yes! The Spirit Pact! You and I have separate bodies, but we share one spirit. That's why you get stronger when I get stronger, and vice versa! Awesome, right? At least, I think so.")
+         qm.sendNextPrev(I18nMessage.from("22507_SPIRIT_PACT"))
       } else if (status == 9) {
          qm.sendNextPrev("#bI have no idea what you're talking about, but it sounds like a pretty big deal.", (byte) 2)
       } else if (status == 10) {
-         qm.sendNextPrev("Of course it's a big deal, silly master! You never have to worry about monsters again. You have me to protect you now! Go ahead and test me. In fact, let's go right now!")
+         qm.sendNextPrev(I18nMessage.from("22507_BIG_DEAL"))
       } else if (status == 11) {
          qm.sendNextPrev("#bBut it's peaceful here. There are no dangerous monsters around.", (byte) 2)
       } else if (status == 12) {
-         qm.sendNextPrev("WHAT?! That's no fun! Don't you like adventuring, master? Fighting monsters on behalf of your people, defeating evil, rescuing the innocent, and all that? You're not into that kind of thing?")
+         qm.sendNextPrev(I18nMessage.from("22507_THAT_IS_NO_FUN"))
       } else if (status == 13) {
          qm.sendNextPrev("#bIt's not part of my five year plan. I'm just kidding, but seriously, I'm a farmer's kid...", (byte) 2)
       } else if (status == 14) {
-         qm.sendAcceptDecline("Bah, well let me tell you this. It's impossible for a Dragon Master to live a peaceful life. I'll have plenty of chances to prove my skills. Trust me, our life will be one big adventure. Promise me that you'll stick with me, okay?\r\n\r\n#fUI/UIWindow.img/QuestIcon/8/0# 810 exp")
+         qm.sendAcceptDecline(I18nMessage.from("22507_LET_ME_TELL_YOU_THIS"))
       } else if (status == 15) {
          if (mode == 0) {
-            qm.sendNext("Uh, you're kidding me, right? Tell me your finger slipped! Go ahead and accept the quest.")
+            qm.sendNext(I18nMessage.from("22507_YOU_ARE_KIDDING_ME"))
          } else {
             if (!qm.isQuestCompleted(22507)) {
                qm.forceCompleteQuest()
                qm.gainExp(810)
             }
-            qm.sendNext("Hehehe, alrighty then, master. Let's get to it!")
+            qm.sendNext(I18nMessage.from("22507_ALRIGHTY_THEN"))
          }
       } else if (status == 16) {
          qm.sendNextPrev("#b(You're a bit confused, but you are now traveling with Mir the Dragon. Perhaps you'll go on an adventure together, like he said.)", (byte) 2)
       } else if (status == 17) {
-         qm.sendPrev("#b#b(You still have an errand to run. Your dad needs to talk to you, so go and see him now.)")
+         qm.sendPrev(I18nMessage.from("22507_DAD_NEEDS_TO_TALK"))
       } else if (status == 18) {
          qm.dispose()
       }

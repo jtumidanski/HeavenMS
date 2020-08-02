@@ -3,6 +3,7 @@ package npc
 import net.server.world.MaplePartyCharacter
 import scripting.event.EventManager
 import scripting.npc.NPCConversationManager
+import tools.I18nMessage
 
 /*
 	NPC Name: 		
@@ -86,28 +87,35 @@ class NPC9000037 {
                }
 
                if (cm.isEventLeader()) {
-                  cm.sendOk("Your party completed such an astounding feat coming this far, #byou have defeated all the bosses#k, congratulations! Now I will be handing your reward as you are being transported out...")
+                  cm.sendOk(I18nMessage.from("9000037_ASTOUNDING_FEAT"))
+
                } else {
-                  cm.sendOk("For #bdefeating all bosses#k in this instance, congratulations! You will now receive a prize that matches your performance here as I warp you out.")
+                  cm.sendOk(I18nMessage.from("9000037_PRIZE"))
+
                }
             } else if (state == 2) {
                if (cm.isEventLeader()) {
                   if (cm.getPlayer().getEventInstance().isEventTeamTogether()) {
-                     cm.sendYesNo("Is your party ready to proceed to the next stages? Walk through the portal if you think you're done, the time is now.. Now, do you guys REALLY want to proceed?")
+                     cm.sendYesNo(I18nMessage.from("9000037_READY_TO_PROCEED"))
+
                   } else {
-                     cm.sendOk("Please wait for your party to reassemble before proceeding.")
+                     cm.sendOk(I18nMessage.from("9000037_PLEASE_WAIT"))
+
                      cm.dispose()
                   }
                } else {
-                  cm.sendOk("Wait for your party leader to give me the signal to proceed. If you're not feeling too well and want to quit, walk through the portal and you will be transported out, and you will receive a prize for coming this far.")
+                  cm.sendOk(I18nMessage.from("9000037_PARTY_LEADER_SIGNAL"))
+
                   cm.dispose()
                }
             } else if (state == 1) {
-               cm.sendYesNo("Do you wish to abandon this instance?")
+               cm.sendYesNo(I18nMessage.from("9000037_ABANDON"))
+
             } else {
                em = cm.getEventManager("BossRushPQ")
                if (em == null) {
-                  cm.sendOk("The Boss Rush PQ has encountered an error.")
+                  cm.sendOk(I18nMessage.from("9000037_ENCOUNTERED_ERROR"))
+
                   cm.dispose()
                   return
                } else if (cm.isUsingOldPqNpcStyle()) {
@@ -115,12 +123,14 @@ class NPC9000037 {
                   return
                }
 
-               cm.sendSimple("#e#b<Party Quest: Boss Rush>\r\n#k#n" + em.getProperty("party") + "\r\n\r\nWould you like to collaborate with party members to complete the expedition, or are you brave enough to take it on all by yourself? Have your #bparty leader#k talk to me or make yourself a party.#b\r\n#L0#I want to participate in the party quest.\r\n#L1#I would like to " + (cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable") + " Party Search.\r\n#L2#I would like to hear more details.")
+               cm.sendSimple(I18nMessage.from("9000037_PARTY_QUEST_INFO").with(em.getProperty("party"), cm.getPlayer().isRecvPartySearchInviteEnabled() ? "disable" : "enable"))
+
             }
          } else if (status == 1) {
             if (state == 3) {
                if (!cm.getPlayer().getEventInstance().giveEventReward(cm.getPlayer(), 6)) {
-                  cm.sendOk("Please arrange a slot in all tabs of your inventory beforehand.")
+                  cm.sendOk(I18nMessage.from("9000037_ARRANGE_SLOT"))
+
                   cm.dispose()
                   return
                }
@@ -140,10 +150,12 @@ class NPC9000037 {
             } else {
                if (selection == 0) {
                   if (cm.getParty().isEmpty()) {
-                     cm.sendOk("You can participate in the party quest only if you are in a party.")
+                     cm.sendOk(I18nMessage.from("9000037_MUST_BE_IN_PARTY"))
+
                      cm.dispose()
                   } else if (!cm.isLeader()) {
-                     cm.sendOk("Your party leader must talk to me to start this party quest.")
+                     cm.sendOk(I18nMessage.from("9000037_PARTY_LEADER_MUST_TALK"))
+
                      cm.dispose()
                   } else {
                      MaplePartyCharacter[] eli = em.getEligibleParty(cm.getParty().orElseThrow())
@@ -156,20 +168,24 @@ class NPC9000037 {
                         }
 
                         if (i == 8) {
-                           cm.sendOk("Another party has already entered the #rParty Quest#k in this channel. Please try another channel, or wait for the current party to finish.")
+                           cm.sendOk(I18nMessage.from("9000037_ANOTHER_PARTY"))
+
                         }
                      } else {
-                        cm.sendOk("You cannot start this party quest yet, because either your party is not in the range size, some of your party members are not eligible to attempt it or they are not in this map. If you're having trouble finding party members, try Party Search.")
+                        cm.sendOk(I18nMessage.from("9000037_PARTY_REQUIREMENTS"))
+
                      }
 
                      cm.dispose()
                   }
                } else if (selection == 1) {
                   boolean psState = cm.getPlayer().toggleRecvPartySearchInvite()
-                  cm.sendOk("Your Party Search status is now: #b" + (psState ? "enabled" : "disabled") + "#k. Talk to me whenever you want to change it back.")
+                  cm.sendOk(I18nMessage.from("9000037_PARTY_SEARCH_STATUS").with((psState ? "enabled" : "disabled")))
+
                   cm.dispose()
                } else {
-                  cm.sendOk("#e#b<Party Quest: Boss Rush>#k#n\r\nBrave adventurers from all over the places travels here to test their skills and abilities in combat, as they face even more powerful bosses from MapleStory. Join forces with fellow adventurers or face all the burden by yourself and receive all the glory, it is up to you. REWARDS are given accordingly to how far the adventurers reach and extra prizes may are given to a random member of the party, all attributed at the end of an expedition.\r\n\r\nThis instance also supports #bmultiple lobbies for matchmaking several ranges of team levels#k at once: team up with players with lower level if you want better chances to swiftly set up a boss rush for your team.")
+                  cm.sendOk(I18nMessage.from("9000037_PARTY_QUEST_INFO_2"))
+
                   cm.dispose()
                }
             }

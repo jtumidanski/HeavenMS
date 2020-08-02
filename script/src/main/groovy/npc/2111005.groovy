@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -16,7 +17,7 @@ class NPC2111005 {
    int sel = -1
 
    def start() {
-      cm.sendOk("Almost all Magatian people are Alchemists. Everyone concentrates on Alchemy. So...Magatia is always quiet.")
+      cm.sendOk(I18nMessage.from("2111005_ALMOST_ALL_ARE_ALCHEMISTS"))
       cm.dispose()
    }
 

@@ -1,4 +1,5 @@
 package npc
+import tools.I18nMessage
 
 
 import scripting.npc.NPCConversationManager
@@ -35,7 +36,7 @@ class NPC9010022 {
          }
          if (status == 0) {
             if (cm.getLevel() < 20) {
-               cm.sendDimensionalMirror("#-1# There is no place for you to transport to from here.")
+               cm.sendDimensionalMirror(I18nMessage.from("9010022_NO_PLACE_TO_TRANSPORT"))
                cm.dispose()
             } else {
                String selStr = ""
