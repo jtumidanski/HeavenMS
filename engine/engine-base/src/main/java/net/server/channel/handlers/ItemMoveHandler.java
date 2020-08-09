@@ -29,11 +29,11 @@ public final class ItemMoveHandler extends AbstractPacketHandler<ItemMovePacket>
       MapleInventoryType type = MapleInventoryType.getByType(packet.inventoryType());
 
       if (packet.source() < 0 && packet.action() > 0) {
-         MapleInventoryManipulator.unequip(client, packet.source(), packet.action());
+         MapleInventoryManipulator.unequip(client.getPlayer(), packet.source(), packet.action());
       } else if (packet.action() < 0) {
-         MapleInventoryManipulator.equip(client, packet.source(), packet.action());
+         MapleInventoryManipulator.equip(client.getPlayer(), packet.source(), packet.action());
       } else if (packet.action() == 0) {
-         MapleInventoryManipulator.drop(client, type, packet.source(), packet.quantity());
+         MapleInventoryManipulator.drop(client.getPlayer(), type, packet.source(), packet.quantity());
       } else {
          MapleInventoryManipulator.move(client, type, packet.source(), packet.action());
       }

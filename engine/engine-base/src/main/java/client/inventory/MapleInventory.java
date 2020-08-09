@@ -14,6 +14,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import client.MapleCharacter;
 import client.MapleClient;
@@ -64,11 +67,9 @@ public class MapleInventory implements Iterable<Item> {
    }
 
    public static boolean checkSpot(MapleCharacter chr, List<Item> items) {
-      List<Pair<Item, MapleInventoryType>> listItems = new LinkedList<>();
-      for (Item item : items) {
-         listItems.add(new Pair<>(item, item.inventoryType()));
-      }
-
+      List<Pair<Item, MapleInventoryType>> listItems = items.stream()
+            .map(item -> new Pair<>(item, item.inventoryType()))
+            .collect(Collectors.toList());
       return checkSpotsAndOwnership(chr, listItems);
    }
 
@@ -242,16 +243,10 @@ public class MapleInventory implements Iterable<Item> {
       lock.lock();
       try {
          if (newLimit < slotLimit) {
-            List<Short> toRemove = new LinkedList<>();
-            for (Item it : list()) {
-               if (it.position() > newLimit) {
-                  toRemove.add(it.position());
-               }
-            }
-
-            for (Short slot : toRemove) {
-               removeSlot(slot);
-            }
+            list().stream()
+                  .filter(item -> item.position() > newLimit)
+                  .map(Item::position)
+                  .forEach(this::removeSlot);
          }
       } finally {
          lock.unlock();
@@ -268,12 +263,10 @@ public class MapleInventory implements Iterable<Item> {
    }
 
    public Item findById(int itemId) {
-      for (Item item : list()) {
-         if (item.id() == itemId) {
-            return item;
-         }
-      }
-      return null;
+      return list().stream()
+            .filter(item -> item.id() == itemId)
+            .findFirst()
+            .orElse(null);
    }
 
    public Item findByName(String name) {
@@ -293,23 +286,17 @@ public class MapleInventory implements Iterable<Item> {
    }
 
    public int countById(int itemId) {
-      int qty = 0;
-      for (Item item : list()) {
-         if (item.id() == itemId) {
-            qty += item.quantity();
-         }
-      }
-      return qty;
+      return list().stream()
+            .filter(item -> item.id() == itemId)
+            .mapToInt(Item::quantity)
+            .sum();
    }
 
    public int countNotOwnedById(int itemId) {
-      int qty = 0;
-      for (Item item : list()) {
-         if (item.id() == itemId && item.owner().equals("")) {
-            qty += item.quantity();
-         }
-      }
-      return qty;
+      return list().stream()
+            .filter(item -> item.id() == itemId && item.owner().equals(""))
+            .mapToInt(Item::quantity)
+            .sum();
    }
 
    public int freeSlotCountById(int itemId, int required) {
@@ -347,34 +334,20 @@ public class MapleInventory implements Iterable<Item> {
       return -1;
    }
 
-   public List<Item> listById(int itemId) {
-      List<Item> ret = new ArrayList<>();
-      for (Item item : list()) {
-         if (item.id() == itemId) {
-            ret.add(item);
-         }
-      }
-
+   protected List<Item> listById(int itemId, Supplier<List<Item>> collector) {
+      List<Item> ret = list().stream().filter(item -> item.id() == itemId).collect(Collectors.toCollection(collector));
       if (ret.size() > 1) {
          ret.sort(Comparator.comparingInt(Item::position));
       }
-
       return ret;
    }
 
+   public List<Item> listById(int itemId) {
+      return listById(itemId, ArrayList::new);
+   }
+
    public List<Item> linkedListById(int itemId) {
-      List<Item> ret = new LinkedList<>();
-      for (Item item : list()) {
-         if (item.id() == itemId) {
-            ret.add(item);
-         }
-      }
-
-      if (ret.size() > 1) {
-         ret.sort(Comparator.comparingInt(Item::position));
-      }
-
-      return ret;
+      return listById(itemId, LinkedList::new);
    }
 
    public Optional<Item> addItem(Item item) {
@@ -388,6 +361,13 @@ public class MapleInventory implements Iterable<Item> {
       addSlotFromDB(item.position(), item);
    }
 
+   /**
+    * Move an item from the source slot to the destination slot, considering the slot max.
+    *
+    * @param sSlot   the source slot
+    * @param dSlot   the destination slot
+    * @param slotMax the maximum quantity for the item in a slot
+    */
    public void move(short sSlot, short dSlot, short slotMax) {
       lock.lock();
       try {
@@ -405,12 +385,11 @@ public class MapleInventory implements Iterable<Item> {
                swap(target, source);
             } else if (source.quantity() + target.quantity() > slotMax) {
                short rest = (short) ((source.quantity() + target.quantity()) - slotMax);
-               // TODO JDT this is an issue
-               source = source.setQuantity(rest);
-               target = target.setQuantity(slotMax);
+               getAndUpdateUnlocked(sSlot, item -> item.setQuantity(rest));
+               getAndUpdateUnlocked(dSlot, item -> item.setQuantity(slotMax));
             } else {
-               // TODO JDT this is an issue
-               target = target.setQuantity((short) (source.quantity() + target.quantity()));
+               short combined = (short) (source.quantity() + target.quantity());
+               getAndUpdate(dSlot, item -> item.setQuantity(combined));
                inventory.remove(sSlot);
             }
          } else {
@@ -438,6 +417,36 @@ public class MapleInventory implements Iterable<Item> {
       } finally {
          lock.unlock();
       }
+   }
+
+   /**
+    * Retrieves the item at the slot, allows modification, stores the update, and returns the updated item.
+    *
+    * @param slot     the slot the item to update is at
+    * @param modifier a function which modifies the indicated item
+    * @return the modified item
+    */
+   public Item getAndUpdate(short slot, Function<Item, Item> modifier) {
+      lock.lock();
+      try {
+         return getAndUpdateUnlocked(slot, modifier);
+      } finally {
+         lock.unlock();
+      }
+   }
+
+   /**
+    * Retrieves the item at the slot, allows modification, stores the update, and returns the updated item. NOTE: Only
+    * should be used inside a lock of the inventory
+    *
+    * @param slot     the slot the item to update is at
+    * @param modifier a function which modifies the indicated item
+    * @return the modified item
+    */
+   protected Item getAndUpdateUnlocked(short slot, Function<Item, Item> modifier) {
+      Item newItem = modifier.apply(inventory.get(slot));
+      inventory.put(slot, newItem);
+      return newItem;
    }
 
    public void removeItem(short slot) {
